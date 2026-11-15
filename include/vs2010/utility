@@ -1,0 +1,59 @@
+// VS2010 STL subset: std::pair. Layout: _Pair_base { first; second; }, pair : _Pair_base.
+#pragma once
+#include <xstddef>
+
+namespace std {
+template<class T1, class T2>
+class _Pair_base
+{
+public:
+    typedef T1 first_type;
+    typedef T2 second_type;
+
+    _Pair_base() : first(), second() {}
+    _Pair_base(const T1& a, const T2& b) : first(a), second(b) {}
+    template<class U1, class U2>
+    _Pair_base(U1&& a, U2&& b) : first(std::forward<U1>(a)), second(std::forward<U2>(b)) {}
+
+    T1 first;
+    T2 second;
+};
+
+template<class T1, class T2>
+class pair : public _Pair_base<T1, T2>
+{
+public:
+    typedef _Pair_base<T1, T2> _Mybase;
+
+    pair() : _Mybase() {}
+    pair(const T1& a, const T2& b) : _Mybase(a, b) {}
+    template<class U1, class U2>
+    pair(const pair<U1, U2>& r) : _Mybase(r.first, r.second) {}
+    template<class U1, class U2>
+    pair(U1&& a, U2&& b) : _Mybase(std::forward<U1>(a), std::forward<U2>(b)) {}
+
+    void swap(pair& r)
+    {
+        std::swap(this->first, r.first);
+        std::swap(this->second, r.second);
+    }
+};
+
+template<class T1, class T2>
+inline pair<T1, T2> make_pair(T1 a, T2 b)
+{
+    return pair<T1, T2>(a, b);
+}
+
+template<class T1, class T2>
+inline bool operator==(const pair<T1, T2>& l, const pair<T1, T2>& r)
+{
+    return l.first == r.first && l.second == r.second;
+}
+
+template<class T1, class T2>
+inline bool operator<(const pair<T1, T2>& l, const pair<T1, T2>& r)
+{
+    return l.first < r.first || (!(r.first < l.first) && l.second < r.second);
+}
+} // namespace std

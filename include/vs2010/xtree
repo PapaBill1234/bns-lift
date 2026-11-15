@@ -1,0 +1,545 @@
+// VS2010 STL subset: red-black tree (_Tree) for std::map and std::set.
+// x64 layout (CacheGate PDB, map<K, V, Pr, A>): sizeof == 0x20.
+//   map : _Tree : _Tree_val : _Tree_nod : _Tmap_traits : _Container_base0
+//   _Tmap_traits { comp @0x00 (1 byte) }
+//   _Tree_nod { _Myhead @0x08, _Mysize @0x10, _Alnod @0x18, _Alval @0x19 }
+//   _Node (0x30 for a 0x10 value) { _Left @0, _Parent @8, _Right @0x10, _Myval @0x18,
+//                                   _Color, _Isnil (char, after _Myval) }
+// The head node has _Isnil = 1. _Myhead->_Parent is the root, _Left the minimum, _Right the maximum.
+#pragma once
+#include <xstddef>
+#include <memory>
+#include <xutility>
+
+namespace std {
+template<class Traits>
+class _Tree_nod : public Traits
+{
+public:
+    typedef typename Traits::allocator_type allocator_type;
+    typedef typename Traits::key_compare key_compare;
+    typedef typename Traits::value_type value_type;
+
+    struct _Node
+    {
+        _Node* _Left;
+        _Node* _Parent;
+        _Node* _Right;
+        value_type _Myval;
+        char _Color;   // _Red or _Black
+        char _Isnil;   // 1 only for the head node
+    };
+    typedef _Node* _Nodeptr;
+    typedef typename allocator_type::template rebind<_Node>::other _Alty_node;
+    typedef typename allocator_type::template rebind<value_type>::other _Alty_value;
+
+    _Tree_nod(const key_compare& pr) : Traits(pr), _Myhead(0), _Mysize(0), _Alnod(), _Alval() {}
+
+    _Nodeptr _Myhead;
+    size_t _Mysize;
+    _Alty_node _Alnod;
+    _Alty_value _Alval;
+};
+
+template<class Traits>
+class _Tree_val : public _Tree_nod<Traits>
+{
+public:
+    _Tree_val(const typename Traits::key_compare& pr) : _Tree_nod<Traits>(pr) {}
+};
+
+template<class Traits>
+class _Tree : public _Tree_val<Traits>
+{
+public:
+    typedef _Tree<Traits> _Myt;
+    typedef _Tree_val<Traits> _Mybase;
+    typedef typename Traits::key_type key_type;
+    typedef typename Traits::value_compare value_compare;
+    typedef typename Traits::key_compare key_compare;
+    typedef typename Traits::value_type value_type;
+    typedef typename Traits::allocator_type allocator_type;
+    typedef typename _Mybase::_Node _Node;
+    typedef typename _Mybase::_Nodeptr _Nodeptr;
+    typedef size_t size_type;
+    typedef ptrdiff_t difference_type;
+    typedef value_type& reference;
+    typedef const value_type& const_reference;
+
+    enum _Redbl { _Red, _Black };
+
+    // VS2010 release iterators hold one pointer (_Ptr).
+    class iterator
+    {
+    public:
+        typedef bidirectional_iterator_tag iterator_category;
+        typedef typename Traits::value_type value_type;
+        typedef ptrdiff_t difference_type;
+        typedef value_type* pointer;
+        typedef value_type& reference;
+
+        iterator() : _Ptr(0) {}
+        explicit iterator(_Nodeptr p) : _Ptr(p) {}
+
+        reference operator*() const { return _Ptr->_Myval; }
+        pointer operator->() const { return &_Ptr->_Myval; }
+
+        iterator& operator++()
+        {
+            if (_Ptr->_Isnil)
+                ;
+            else if (!_Ptr->_Right->_Isnil)
+                _Ptr = _Myt::_Min(_Ptr->_Right);
+            else {
+                _Nodeptr p;
+                while (!(p = _Ptr->_Parent)->_Isnil && _Ptr == p->_Right)
+                    _Ptr = p;
+                _Ptr = p;
+            }
+            return *this;
+        }
+        iterator operator++(int)
+        {
+            iterator tmp = *this;
+            ++*this;
+            return tmp;
+        }
+        iterator& operator--()
+        {
+            if (_Ptr->_Isnil)
+                _Ptr = _Ptr->_Right;
+            else if (!_Ptr->_Left->_Isnil)
+                _Ptr = _Myt::_Max(_Ptr->_Left);
+            else {
+                _Nodeptr p;
+                while (!(p = _Ptr->_Parent)->_Isnil && _Ptr == p->_Left)
+                    _Ptr = p;
+                if (!_Ptr->_Isnil)
+                    _Ptr = p;
+            }
+            return *this;
+        }
+        iterator operator--(int)
+        {
+            iterator tmp = *this;
+            --*this;
+            return tmp;
+        }
+        bool operator==(const iterator& r) const { return _Ptr == r._Ptr; }
+        bool operator!=(const iterator& r) const { return _Ptr != r._Ptr; }
+
+        _Nodeptr _Mynode() const { return _Ptr; }
+
+        _Nodeptr _Ptr;
+    };
+    typedef iterator const_iterator;
+    typedef pair<iterator, bool> _Pairib;
+    typedef pair<iterator, iterator> _Pairii;
+
+    explicit _Tree(const key_compare& pr) : _Mybase(pr) { _Init(); }
+    _Tree(const _Myt& r) : _Mybase(r.comp)
+    {
+        _Init();
+        for (iterator it = r.begin(); it != r.end(); ++it)
+            insert(*it);
+    }
+    ~_Tree()
+    {
+        _Erase(_Root());
+        _Freenode0(this->_Myhead);
+    }
+
+    _Myt& operator=(const _Myt& r)
+    {
+        if (this != &r) {
+            clear();
+            this->comp = r.comp;
+            for (iterator it = r.begin(); it != r.end(); ++it)
+                insert(*it);
+        }
+        return *this;
+    }
+
+    iterator begin() const { return iterator(_Lmost()); }
+    iterator end() const { return iterator(this->_Myhead); }
+    size_type size() const { return this->_Mysize; }
+    size_type max_size() const { return this->_Alval.max_size(); }
+    bool empty() const { return this->_Mysize == 0; }
+    key_compare key_comp() const { return this->comp; }
+
+    _Pairib insert(const value_type& v)
+    {
+        _Nodeptr trynode = _Root();
+        _Nodeptr wherenode = this->_Myhead;
+        bool addleft = true;
+        while (!trynode->_Isnil) {
+            wherenode = trynode;
+            addleft = this->comp(Traits::_Kfn(v), _Key(trynode));
+            trynode = addleft ? trynode->_Left : trynode->_Right;
+        }
+        if (Traits::_Multi)
+            return _Pairib(_Insert_at(addleft, wherenode, v), true);
+        iterator where(wherenode);
+        if (!addleft)
+            ;
+        else if (where == begin())
+            return _Pairib(_Insert_at(true, wherenode, v), true);
+        else
+            --where;
+        if (this->comp(_Key(where._Mynode()), Traits::_Kfn(v)))
+            return _Pairib(_Insert_at(addleft, wherenode, v), true);
+        return _Pairib(where, false);
+    }
+    iterator insert(const_iterator, const value_type& v) { return insert(v).first; }
+
+    iterator erase(const_iterator where)
+    {
+        _Nodeptr erasednode = where._Mynode();
+        ++where;
+        _Nodeptr fixnode;
+        _Nodeptr fixnodeparent;
+        _Nodeptr pnode = erasednode;
+
+        if (pnode->_Left->_Isnil)
+            fixnode = pnode->_Right;
+        else if (pnode->_Right->_Isnil)
+            fixnode = pnode->_Left;
+        else {
+            pnode = where._Mynode();
+            fixnode = pnode->_Right;
+        }
+
+        if (pnode == erasednode) {
+            fixnodeparent = erasednode->_Parent;
+            if (!fixnode->_Isnil)
+                fixnode->_Parent = fixnodeparent;
+            if (_Root() == erasednode)
+                _Root() = fixnode;
+            else if (fixnodeparent->_Left == erasednode)
+                fixnodeparent->_Left = fixnode;
+            else
+                fixnodeparent->_Right = fixnode;
+            if (_Lmost() == erasednode)
+                _Lmost() = fixnode->_Isnil ? fixnodeparent : _Min(fixnode);
+            if (_Rmost() == erasednode)
+                _Rmost() = fixnode->_Isnil ? fixnodeparent : _Max(fixnode);
+        } else {
+            erasednode->_Left->_Parent = pnode;
+            pnode->_Left = erasednode->_Left;
+            if (pnode == erasednode->_Right)
+                fixnodeparent = pnode;
+            else {
+                fixnodeparent = pnode->_Parent;
+                if (!fixnode->_Isnil)
+                    fixnode->_Parent = fixnodeparent;
+                fixnodeparent->_Left = fixnode;
+                pnode->_Right = erasednode->_Right;
+                erasednode->_Right->_Parent = pnode;
+            }
+            if (_Root() == erasednode)
+                _Root() = pnode;
+            else if (erasednode->_Parent->_Left == erasednode)
+                erasednode->_Parent->_Left = pnode;
+            else
+                erasednode->_Parent->_Right = pnode;
+            pnode->_Parent = erasednode->_Parent;
+            std::swap(pnode->_Color, erasednode->_Color);
+        }
+
+        if (erasednode->_Color == _Black) {
+            for (; fixnode != _Root() && fixnode->_Color == _Black; fixnodeparent = fixnode->_Parent) {
+                if (fixnode == fixnodeparent->_Left) {
+                    pnode = fixnodeparent->_Right;
+                    if (pnode->_Color == _Red) {
+                        pnode->_Color = _Black;
+                        fixnodeparent->_Color = _Red;
+                        _Lrotate(fixnodeparent);
+                        pnode = fixnodeparent->_Right;
+                    }
+                    if (pnode->_Isnil)
+                        fixnode = fixnodeparent;
+                    else if (pnode->_Left->_Color == _Black && pnode->_Right->_Color == _Black) {
+                        pnode->_Color = _Red;
+                        fixnode = fixnodeparent;
+                    } else {
+                        if (pnode->_Right->_Color == _Black) {
+                            pnode->_Left->_Color = _Black;
+                            pnode->_Color = _Red;
+                            _Rrotate(pnode);
+                            pnode = fixnodeparent->_Right;
+                        }
+                        pnode->_Color = fixnodeparent->_Color;
+                        fixnodeparent->_Color = _Black;
+                        pnode->_Right->_Color = _Black;
+                        _Lrotate(fixnodeparent);
+                        break;
+                    }
+                } else {
+                    pnode = fixnodeparent->_Left;
+                    if (pnode->_Color == _Red) {
+                        pnode->_Color = _Black;
+                        fixnodeparent->_Color = _Red;
+                        _Rrotate(fixnodeparent);
+                        pnode = fixnodeparent->_Left;
+                    }
+                    if (pnode->_Isnil)
+                        fixnode = fixnodeparent;
+                    else if (pnode->_Right->_Color == _Black && pnode->_Left->_Color == _Black) {
+                        pnode->_Color = _Red;
+                        fixnode = fixnodeparent;
+                    } else {
+                        if (pnode->_Left->_Color == _Black) {
+                            pnode->_Right->_Color = _Black;
+                            pnode->_Color = _Red;
+                            _Lrotate(pnode);
+                            pnode = fixnodeparent->_Left;
+                        }
+                        pnode->_Color = fixnodeparent->_Color;
+                        fixnodeparent->_Color = _Black;
+                        pnode->_Left->_Color = _Black;
+                        _Rrotate(fixnodeparent);
+                        break;
+                    }
+                }
+            }
+            fixnode->_Color = _Black;
+        }
+
+        this->_Alval.destroy(&erasednode->_Myval);
+        this->_Alnod.deallocate(erasednode, 1);
+        if (0 < this->_Mysize)
+            --this->_Mysize;
+        return where;
+    }
+    iterator erase(const_iterator first, const_iterator last)
+    {
+        if (first == begin() && last == end()) {
+            clear();
+            return begin();
+        }
+        while (first != last)
+            erase(first++);
+        return first;
+    }
+    size_type erase(const key_type& key)
+    {
+        _Pairii where = equal_range(key);
+        size_type num = 0;
+        for (iterator it = where.first; it != where.second; ++it)
+            ++num;
+        erase(where.first, where.second);
+        return num;
+    }
+
+    void clear()
+    {
+        _Erase(_Root());
+        _Root() = this->_Myhead;
+        _Lmost() = this->_Myhead;
+        _Rmost() = this->_Myhead;
+        this->_Mysize = 0;
+    }
+
+    iterator find(const key_type& key) const
+    {
+        iterator where(_Lbound(key));
+        return where == end() || this->comp(key, _Key(where._Mynode())) ? end() : where;
+    }
+    size_type count(const key_type& key) const
+    {
+        _Pairii where = equal_range(key);
+        size_type num = 0;
+        for (iterator it = where.first; it != where.second; ++it)
+            ++num;
+        return num;
+    }
+    iterator lower_bound(const key_type& key) const { return iterator(_Lbound(key)); }
+    iterator upper_bound(const key_type& key) const { return iterator(_Ubound(key)); }
+    _Pairii equal_range(const key_type& key) const { return _Pairii(lower_bound(key), upper_bound(key)); }
+
+    void swap(_Myt& r)
+    {
+        std::swap(this->comp, r.comp);
+        std::swap(this->_Myhead, r._Myhead);
+        std::swap(this->_Mysize, r._Mysize);
+    }
+
+    _Nodeptr& _Root() const { return this->_Myhead->_Parent; }
+    _Nodeptr& _Lmost() const { return this->_Myhead->_Left; }
+    _Nodeptr& _Rmost() const { return this->_Myhead->_Right; }
+    static const key_type& _Key(_Nodeptr p) { return Traits::_Kfn(p->_Myval); }
+
+    static _Nodeptr _Min(_Nodeptr p)
+    {
+        while (!p->_Left->_Isnil)
+            p = p->_Left;
+        return p;
+    }
+    static _Nodeptr _Max(_Nodeptr p)
+    {
+        while (!p->_Right->_Isnil)
+            p = p->_Right;
+        return p;
+    }
+
+    void _Init()
+    {
+        this->_Myhead = _Buynode0();
+        this->_Myhead->_Color = _Black;
+        this->_Myhead->_Isnil = 1;
+        this->_Mysize = 0;
+    }
+
+    _Nodeptr _Buynode0()
+    {
+        _Nodeptr p = this->_Alnod.allocate(1);
+        p->_Left = this->_Myhead ? this->_Myhead : p;
+        p->_Parent = p->_Left;
+        p->_Right = p->_Left;
+        return p;
+    }
+
+    _Nodeptr _Buynode(const value_type& v)
+    {
+        _Nodeptr p = _Buynode0();
+        p->_Color = _Red;
+        p->_Isnil = 0;
+        this->_Alval.construct(&p->_Myval, v);
+        return p;
+    }
+
+    void _Freenode0(_Nodeptr p) { this->_Alnod.deallocate(p, 1); }
+
+    void _Erase(_Nodeptr rootnode)
+    {
+        for (_Nodeptr p = rootnode; !p->_Isnil; rootnode = p) {
+            _Erase(p->_Right);
+            p = p->_Left;
+            this->_Alval.destroy(&rootnode->_Myval);
+            this->_Alnod.deallocate(rootnode, 1);
+        }
+    }
+
+    iterator _Insert_at(bool addleft, _Nodeptr wherenode, const value_type& v)
+    {
+        if (max_size() - 1 <= this->_Mysize)
+            std::_Xlength_error("map/set<T> too long");
+        _Nodeptr newnode = _Buynode(v);
+        ++this->_Mysize;
+        newnode->_Parent = wherenode;
+
+        if (wherenode == this->_Myhead) {
+            _Root() = newnode;
+            _Lmost() = newnode;
+            _Rmost() = newnode;
+        } else if (addleft) {
+            wherenode->_Left = newnode;
+            if (wherenode == _Lmost())
+                _Lmost() = newnode;
+        } else {
+            wherenode->_Right = newnode;
+            if (wherenode == _Rmost())
+                _Rmost() = newnode;
+        }
+
+        for (_Nodeptr p = newnode; p->_Parent->_Color == _Red;) {
+            if (p->_Parent == p->_Parent->_Parent->_Left) {
+                wherenode = p->_Parent->_Parent->_Right;
+                if (wherenode->_Color == _Red) {
+                    p->_Parent->_Color = _Black;
+                    wherenode->_Color = _Black;
+                    p->_Parent->_Parent->_Color = _Red;
+                    p = p->_Parent->_Parent;
+                } else {
+                    if (p == p->_Parent->_Right) {
+                        p = p->_Parent;
+                        _Lrotate(p);
+                    }
+                    p->_Parent->_Color = _Black;
+                    p->_Parent->_Parent->_Color = _Red;
+                    _Rrotate(p->_Parent->_Parent);
+                }
+            } else {
+                wherenode = p->_Parent->_Parent->_Left;
+                if (wherenode->_Color == _Red) {
+                    p->_Parent->_Color = _Black;
+                    wherenode->_Color = _Black;
+                    p->_Parent->_Parent->_Color = _Red;
+                    p = p->_Parent->_Parent;
+                } else {
+                    if (p == p->_Parent->_Left) {
+                        p = p->_Parent;
+                        _Rrotate(p);
+                    }
+                    p->_Parent->_Color = _Black;
+                    p->_Parent->_Parent->_Color = _Red;
+                    _Lrotate(p->_Parent->_Parent);
+                }
+            }
+        }
+        _Root()->_Color = _Black;
+        return iterator(newnode);
+    }
+
+    void _Lrotate(_Nodeptr wherenode)
+    {
+        _Nodeptr p = wherenode->_Right;
+        wherenode->_Right = p->_Left;
+        if (!p->_Left->_Isnil)
+            p->_Left->_Parent = wherenode;
+        p->_Parent = wherenode->_Parent;
+        if (wherenode == _Root())
+            _Root() = p;
+        else if (wherenode == wherenode->_Parent->_Left)
+            wherenode->_Parent->_Left = p;
+        else
+            wherenode->_Parent->_Right = p;
+        p->_Left = wherenode;
+        wherenode->_Parent = p;
+    }
+
+    void _Rrotate(_Nodeptr wherenode)
+    {
+        _Nodeptr p = wherenode->_Left;
+        wherenode->_Left = p->_Right;
+        if (!p->_Right->_Isnil)
+            p->_Right->_Parent = wherenode;
+        p->_Parent = wherenode->_Parent;
+        if (wherenode == _Root())
+            _Root() = p;
+        else if (wherenode == wherenode->_Parent->_Right)
+            wherenode->_Parent->_Right = p;
+        else
+            wherenode->_Parent->_Left = p;
+        p->_Right = wherenode;
+        wherenode->_Parent = p;
+    }
+
+    _Nodeptr _Lbound(const key_type& key) const
+    {
+        _Nodeptr p = _Root();
+        _Nodeptr wherenode = this->_Myhead;
+        while (!p->_Isnil)
+            if (this->comp(_Key(p), key))
+                p = p->_Right;
+            else {
+                wherenode = p;
+                p = p->_Left;
+            }
+        return wherenode;
+    }
+
+    _Nodeptr _Ubound(const key_type& key) const
+    {
+        _Nodeptr p = _Root();
+        _Nodeptr wherenode = this->_Myhead;
+        while (!p->_Isnil)
+            if (this->comp(key, _Key(p))) {
+                wherenode = p;
+                p = p->_Left;
+            } else
+                p = p->_Right;
+        return wherenode;
+    }
+};
+} // namespace std

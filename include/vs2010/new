@@ -1,0 +1,14 @@
+// VS2010 STL subset: placement new. msvcr100 gives operator new(size_t) and operator delete.
+#pragma once
+#include <stddef.h>
+
+#ifndef __PLACEMENT_NEW_INLINE
+#define __PLACEMENT_NEW_INLINE
+inline void* __cdecl operator new(size_t, void* where) noexcept { return where; }
+inline void __cdecl operator delete(void*, void*) noexcept {}
+#endif
+#ifndef __PLACEMENT_VEC_NEW_INLINE
+#define __PLACEMENT_VEC_NEW_INLINE
+inline void* __cdecl operator new[](size_t, void* where) noexcept { return where; }
+inline void __cdecl operator delete[](void*, void*) noexcept {}
+#endif

@@ -1,0 +1,86 @@
+// VS2010 STL subset: std::map and std::multimap. Layout: see <xtree>.
+#pragma once
+#include <xtree>
+
+namespace std {
+template<class K, class T, class Pr, class Alloc, bool Mfl>
+class _Tmap_traits : public _Container_base
+{
+public:
+    typedef K key_type;
+    typedef pair<const K, T> value_type;
+    typedef Pr key_compare;
+    typedef typename Alloc::template rebind<value_type>::other allocator_type;
+    enum { _Multi = Mfl };
+
+    class value_compare : public binary_function<value_type, value_type, bool>
+    {
+    public:
+        bool operator()(const value_type& l, const value_type& r) const { return comp(l.first, r.first); }
+        value_compare(key_compare pr) : comp(pr) {}
+    protected:
+        key_compare comp;
+    };
+
+    _Tmap_traits() : comp() {}
+    _Tmap_traits(Pr parg) : comp(parg) {}
+
+    template<class T1, class T2>
+    static const K& _Kfn(const pair<T1, T2>& v) { return v.first; }
+
+    Pr comp;
+};
+
+template<class K, class T, class Pr = less<K>, class Alloc = allocator<pair<const K, T> > >
+class map : public _Tree<_Tmap_traits<K, T, Pr, Alloc, false> >
+{
+public:
+    typedef map<K, T, Pr, Alloc> _Myt;
+    typedef _Tree<_Tmap_traits<K, T, Pr, Alloc, false> > _Mybase;
+    typedef K key_type;
+    typedef T mapped_type;
+    typedef T referent_type;
+    typedef Pr key_compare;
+    typedef typename _Mybase::value_type value_type;
+    typedef typename _Mybase::iterator iterator;
+    typedef typename _Mybase::const_iterator const_iterator;
+    typedef typename _Mybase::size_type size_type;
+
+    map() : _Mybase(key_compare()) {}
+    explicit map(const key_compare& pr) : _Mybase(pr) {}
+    map(const _Myt& r) : _Mybase(r) {}
+    _Myt& operator=(const _Myt& r)
+    {
+        _Mybase::operator=(r);
+        return *this;
+    }
+
+    mapped_type& operator[](const key_type& key)
+    {
+        iterator where = this->lower_bound(key);
+        if (where == this->end() || this->comp(key, this->_Key(where._Mynode())))
+            where = this->insert(where, value_type(key, mapped_type()));
+        return (*where).second;
+    }
+    mapped_type& at(const key_type& key)
+    {
+        iterator where = this->lower_bound(key);
+        if (where == this->end() || this->comp(key, this->_Key(where._Mynode())))
+            std::_Xout_of_range("invalid map<K, T> key");
+        return (*where).second;
+    }
+};
+
+template<class K, class T, class Pr = less<K>, class Alloc = allocator<pair<const K, T> > >
+class multimap : public _Tree<_Tmap_traits<K, T, Pr, Alloc, true> >
+{
+public:
+    typedef _Tree<_Tmap_traits<K, T, Pr, Alloc, true> > _Mybase;
+    typedef K key_type;
+    typedef T mapped_type;
+    typedef Pr key_compare;
+
+    multimap() : _Mybase(key_compare()) {}
+    explicit multimap(const key_compare& pr) : _Mybase(pr) {}
+};
+} // namespace std

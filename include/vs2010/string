@@ -1,0 +1,3 @@
+// VS2010 STL subset: <string> includes <xstring>.
+#pragma once
+#include <xstring>

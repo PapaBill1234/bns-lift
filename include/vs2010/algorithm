@@ -1,0 +1,77 @@
+// VS2010 STL subset: heap algorithms (push_heap, pop_heap, make_heap) for priority_queue.
+// The hole logic follows VS2010 _Push_heap and _Adjust_heap.
+#pragma once
+#include <xstddef>
+#include <xutility>
+
+namespace std {
+template<class RanIt, class Diff, class T, class Pr>
+inline void _Push_heap(RanIt first, Diff hole, Diff top, T&& val, Pr pred)
+{
+    for (Diff idx = (hole - 1) / 2; top < hole && pred(first[idx], val); idx = (hole - 1) / 2) {
+        first[hole] = std::move(first[idx]);
+        hole = idx;
+    }
+    first[hole] = std::move(val);
+}
+
+template<class RanIt, class Diff, class T, class Pr>
+inline void _Adjust_heap(RanIt first, Diff hole, Diff bottom, T&& val, Pr pred)
+{
+    Diff top = hole;
+    Diff idx = 2 * hole + 2;
+    for (; idx < bottom; idx = 2 * idx + 2) {
+        if (pred(first[idx], first[idx - 1]))
+            --idx;
+        first[hole] = std::move(first[idx]);
+        hole = idx;
+    }
+    if (idx == bottom) {
+        first[hole] = std::move(first[bottom - 1]);
+        hole = bottom - 1;
+    }
+    std::_Push_heap(first, hole, top, std::move(val), pred);
+}
+
+template<class RanIt, class Pr>
+inline void push_heap(RanIt first, RanIt last, Pr pred)
+{
+    ptrdiff_t count = last - first;
+    if (1 < count) {
+        --last;
+        typename remove_reference<decltype(*last)>::type val = std::move(*last);
+        std::_Push_heap(first, count - 1, (ptrdiff_t)0, std::move(val), pred);
+    }
+}
+
+template<class RanIt, class Pr>
+inline void pop_heap(RanIt first, RanIt last, Pr pred)
+{
+    if (1 < last - first) {
+        --last;
+        typename remove_reference<decltype(*last)>::type val = std::move(*last);
+        *last = std::move(*first);
+        std::_Adjust_heap(first, (ptrdiff_t)0, (ptrdiff_t)(last - first), std::move(val), pred);
+    }
+}
+
+template<class RanIt, class Pr>
+inline void make_heap(RanIt first, RanIt last, Pr pred)
+{
+    ptrdiff_t bottom = last - first;
+    if (1 < bottom) {
+        for (ptrdiff_t hole = bottom / 2; 0 < hole;) {
+            --hole;
+            typename remove_reference<decltype(*first)>::type val = std::move(first[hole]);
+            std::_Adjust_heap(first, hole, bottom, std::move(val), pred);
+        }
+    }
+}
+
+template<class RanIt>
+inline void push_heap(RanIt first, RanIt last) { std::push_heap(first, last, less<typename remove_reference<decltype(*first)>::type>()); }
+template<class RanIt>
+inline void pop_heap(RanIt first, RanIt last) { std::pop_heap(first, last, less<typename remove_reference<decltype(*first)>::type>()); }
+template<class RanIt>
+inline void make_heap(RanIt first, RanIt last) { std::make_heap(first, last, less<typename remove_reference<decltype(*first)>::type>()); }
+} // namespace std

@@ -1,0 +1,142 @@
+// VS2010 (msvcp100) STL subset for bns-lift: common base.
+// The object layouts follow the VS2010 SP1 x64 release build (_ITERATOR_DEBUG_LEVEL 0).
+// The PDB of each server gives the layouts. src/selftest/stl_layout.cpp checks them.
+#pragma once
+#include <stddef.h>
+#include <string.h>
+#include <wchar.h>
+#include <stdlib.h>
+
+// msvcp100.dll exports. They throw the std exception. The build links an import lib
+// for msvcp100.dll (see CMakeLists.txt, LIFT_MSVCP100_IMPLIB).
+// clang makes destructors noexcept and calls __std_terminate (vcruntime140) when a noexcept
+// function throws. msvcr100 does not export it. The Wine import lib for msvcr100 has no C++
+// names (no ?terminate@@YAXXZ), so do the same as msvcr100 terminate(): call the handler
+// from _get_terminate(), then abort(). It is a COMDAT (inline + used), so each object can have a copy.
+extern "C" {
+typedef void(__cdecl* _lift_terminate_handler)();
+__declspec(dllimport) _lift_terminate_handler __cdecl _get_terminate();
+[[noreturn]] inline __attribute__((used)) void __cdecl __std_terminate()
+{
+    _lift_terminate_handler handler = _get_terminate();
+    if (handler != 0)
+        handler();
+    abort();
+}
+}
+
+namespace std {
+
+[[noreturn]] void __cdecl _Xinvalid_argument(const char*);
+[[noreturn]] void __cdecl _Xlength_error(const char*);
+[[noreturn]] void __cdecl _Xout_of_range(const char*);
+[[noreturn]] void __cdecl _Xoverflow_error(const char*);
+[[noreturn]] void __cdecl _Xruntime_error(const char*);
+
+using ::size_t;
+using ::ptrdiff_t;
+
+// Small type traits that the containers use.
+template<class T> struct remove_reference { typedef T type; };
+template<class T> struct remove_reference<T&> { typedef T type; };
+template<class T> struct remove_reference<T&&> { typedef T type; };
+template<class T> struct remove_const { typedef T type; };
+template<class T> struct remove_const<const T> { typedef T type; };
+
+template<class T>
+inline typename remove_reference<T>::type&& move(T&& v) noexcept
+{
+    return static_cast<typename remove_reference<T>::type&&>(v);
+}
+
+template<class T>
+inline T&& forward(typename remove_reference<T>::type& v) noexcept
+{
+    return static_cast<T&&>(v);
+}
+
+template<class T>
+inline T&& forward(typename remove_reference<T>::type&& v) noexcept
+{
+    return static_cast<T&&>(v);
+}
+
+template<class T>
+inline void swap(T& a, T& b)
+{
+    T t(std::move(a));
+    a = std::move(b);
+    b = std::move(t);
+}
+
+// Function object bases (VS2010 <xstddef>).
+template<class Arg, class Result>
+struct unary_function
+{
+    typedef Arg argument_type;
+    typedef Result result_type;
+};
+
+template<class Arg1, class Arg2, class Result>
+struct binary_function
+{
+    typedef Arg1 first_argument_type;
+    typedef Arg2 second_argument_type;
+    typedef Result result_type;
+};
+
+template<class T>
+struct less : public binary_function<T, T, bool>
+{
+    bool operator()(const T& l, const T& r) const { return l < r; }
+};
+
+template<class T>
+struct greater : public binary_function<T, T, bool>
+{
+    bool operator()(const T& l, const T& r) const { return l > r; }
+};
+
+template<class T>
+struct equal_to : public binary_function<T, T, bool>
+{
+    bool operator()(const T& l, const T& r) const { return l == r; }
+};
+
+// Container and iterator bases. Release build: _Container_base0 and _Iterator_base0.
+// _Container_base12 has one pointer (_Myproxy). std::deque uses it in all builds.
+struct _Container_base0
+{
+    void _Orphan_all() {}
+    void _Swap_all(_Container_base0&) {}
+};
+
+struct _Iterator_base0
+{
+};
+
+struct _Container_base12;
+
+struct _Iterator_base12
+{
+    struct _Container_proxy* _Myproxy;
+    _Iterator_base12* _Mynextiter;
+};
+
+struct _Container_proxy
+{
+    const _Container_base12* _Mycont;
+    _Iterator_base12* _Myfirstiter;
+};
+
+struct _Container_base12
+{
+    _Container_base12() : _Myproxy(0) {}
+    void _Orphan_all() {}
+    void _Swap_all(_Container_base12&) {}
+    _Container_proxy* _Myproxy;
+};
+
+typedef _Container_base0 _Container_base;
+typedef _Iterator_base0 _Iterator_base;
+} // namespace std

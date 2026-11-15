@@ -1,0 +1,520 @@
+// VS2010 STL subset: char_traits, basic_string, string, wstring.
+// x64 layout (CacheGate PDB): sizeof == 0x28.
+//   _Bx @0x00 (union _Bxty: _Buf[16 / sizeof(E)], _Ptr, _Alias[16])
+//   _Mysize @0x10, _Myres @0x18, _Alval @0x20
+// The growth rule and the small buffer (16 bytes) follow the VS2010 code.
+#pragma once
+#include <xstddef>
+#include <memory>
+
+namespace std {
+template<class E>
+struct char_traits
+{
+    typedef E char_type;
+    typedef int int_type;
+
+    static void assign(E& l, const E& r) { l = r; }
+    static bool eq(const E& l, const E& r) { return l == r; }
+    static bool lt(const E& l, const E& r) { return l < r; }
+    static int compare(const E* a, const E* b, size_t count)
+    {
+        for (; 0 < count; --count, ++a, ++b)
+            if (!eq(*a, *b))
+                return lt(*a, *b) ? -1 : +1;
+        return 0;
+    }
+    static size_t length(const E* s)
+    {
+        size_t count = 0;
+        while (!eq(*s, E()))
+            ++count, ++s;
+        return count;
+    }
+    static E* copy(E* dest, const E* src, size_t count)
+    {
+        for (size_t i = 0; i < count; ++i)
+            dest[i] = src[i];
+        return dest;
+    }
+    static E* move(E* dest, const E* src, size_t count)
+    {
+        if (dest < src)
+            for (size_t i = 0; i < count; ++i)
+                dest[i] = src[i];
+        else
+            for (size_t i = count; 0 < i; --i)
+                dest[i - 1] = src[i - 1];
+        return dest;
+    }
+    static const E* find(const E* s, size_t count, const E& c)
+    {
+        for (; 0 < count; --count, ++s)
+            if (eq(*s, c))
+                return s;
+        return 0;
+    }
+    static E* assign(E* s, size_t count, E c)
+    {
+        for (size_t i = 0; i < count; ++i)
+            s[i] = c;
+        return s;
+    }
+};
+
+template<class E, class Alloc>
+class _String_val : public _Container_base
+{
+public:
+    typedef typename Alloc::template rebind<E>::other _Alty;
+
+    enum { _BUF_SIZE = 16 / sizeof(E) < 1 ? 1 : 16 / sizeof(E) };
+    enum { _ALLOC_MASK = sizeof(E) <= 1 ? 15 : sizeof(E) <= 2 ? 7 : sizeof(E) <= 4 ? 3 : sizeof(E) <= 8 ? 1 : 0 };
+
+    _String_val() : _Mysize(0), _Myres(0), _Alval() {}
+
+    union _Bxty
+    {
+        E _Buf[_BUF_SIZE];
+        E* _Ptr;
+        char _Alias[_BUF_SIZE];
+    } _Bx;
+    size_t _Mysize;
+    size_t _Myres;
+    _Alty _Alval;
+};
+
+template<class E, class Tr = char_traits<E>, class Alloc = allocator<E> >
+class basic_string : public _String_val<E, Alloc>
+{
+public:
+    typedef basic_string<E, Tr, Alloc> _Myt;
+    typedef _String_val<E, Alloc> _Mybase;
+    typedef Tr traits_type;
+    typedef Alloc allocator_type;
+    typedef E value_type;
+    typedef size_t size_type;
+    typedef ptrdiff_t difference_type;
+    typedef E* pointer;
+    typedef const E* const_pointer;
+    typedef E& reference;
+    typedef const E& const_reference;
+    // VS2010 release iterators hold one pointer (_Ptr). A raw pointer has the same layout.
+    typedef E* iterator;
+    typedef const E* const_iterator;
+
+    static const size_type npos = (size_type)(-1);
+
+    basic_string() { _Tidy(); }
+    basic_string(const _Myt& r) { _Tidy(); assign(r, 0, npos); }
+    basic_string(_Myt&& r) { _Tidy(); _Assign_rv(std::move(r)); }
+    basic_string(const _Myt& r, size_type off, size_type count = npos) { _Tidy(); assign(r, off, count); }
+    basic_string(const E* p) { _Tidy(); assign(p); }
+    basic_string(const E* p, size_type count) { _Tidy(); assign(p, count); }
+    basic_string(size_type count, E c) { _Tidy(); assign(count, c); }
+    basic_string(const E* first, const E* last) { _Tidy(); assign(first, last - first); }
+    ~basic_string() { _Tidy(true); }
+
+    _Myt& operator=(const _Myt& r) { return assign(r); }
+    _Myt& operator=(_Myt&& r)
+    {
+        if (this != &r) {
+            _Tidy(true);
+            _Assign_rv(std::move(r));
+        }
+        return *this;
+    }
+    _Myt& operator=(const E* p) { return assign(p); }
+    _Myt& operator=(E c) { return assign(1, c); }
+
+    _Myt& operator+=(const _Myt& r) { return append(r); }
+    _Myt& operator+=(const E* p) { return append(p); }
+    _Myt& operator+=(E c) { return append((size_type)1, c); }
+
+    _Myt& append(const _Myt& r) { return append(r, 0, npos); }
+    _Myt& append(const _Myt& r, size_type off, size_type count)
+    {
+        if (r.size() < off)
+            _Xran();
+        size_type num = r.size() - off;
+        if (num < count)
+            count = num;
+        if (npos - this->_Mysize <= count)
+            _Xlen();
+        if (0 < count && _Grow(num = this->_Mysize + count)) {
+            Tr::copy(_Myptr() + this->_Mysize, r._Myptr() + off, count);
+            _Eos(num);
+        }
+        return *this;
+    }
+    _Myt& append(const E* p, size_type count)
+    {
+        if (_Inside(p))
+            return append(*this, p - _Myptr(), count);
+        if (npos - this->_Mysize <= count)
+            _Xlen();
+        size_type num;
+        if (0 < count && _Grow(num = this->_Mysize + count)) {
+            Tr::copy(_Myptr() + this->_Mysize, p, count);
+            _Eos(num);
+        }
+        return *this;
+    }
+    _Myt& append(const E* p) { return append(p, Tr::length(p)); }
+    _Myt& append(size_type count, E c)
+    {
+        if (npos - this->_Mysize <= count)
+            _Xlen();
+        size_type num;
+        if (0 < count && _Grow(num = this->_Mysize + count)) {
+            Tr::assign(_Myptr() + this->_Mysize, count, c);
+            _Eos(num);
+        }
+        return *this;
+    }
+
+    _Myt& assign(const _Myt& r) { return assign(r, 0, npos); }
+    _Myt& assign(const _Myt& r, size_type off, size_type count)
+    {
+        if (r.size() < off)
+            _Xran();
+        size_type num = r.size() - off;
+        if (count < num)
+            num = count;
+        if (this == &r) {
+            erase((size_type)(off + num));
+            erase(0, off);
+        } else if (_Grow(num)) {
+            Tr::copy(_Myptr(), r._Myptr() + off, num);
+            _Eos(num);
+        }
+        return *this;
+    }
+    _Myt& assign(const E* p, size_type count)
+    {
+        if (_Inside(p))
+            return assign(*this, p - _Myptr(), count);
+        if (_Grow(count)) {
+            Tr::copy(_Myptr(), p, count);
+            _Eos(count);
+        }
+        return *this;
+    }
+    _Myt& assign(const E* p) { return assign(p, Tr::length(p)); }
+    _Myt& assign(size_type count, E c)
+    {
+        if (count == npos)
+            _Xlen();
+        if (_Grow(count)) {
+            Tr::assign(_Myptr(), count, c);
+            _Eos(count);
+        }
+        return *this;
+    }
+
+    _Myt& insert(size_type off, const E* p, size_type count)
+    {
+        if (this->_Mysize < off)
+            _Xran();
+        if (npos - this->_Mysize <= count)
+            _Xlen();
+        if (_Inside(p)) {
+            _Myt tmp(p, count);
+            return insert(off, tmp._Myptr(), count);
+        }
+        size_type num;
+        if (0 < count && _Grow(num = this->_Mysize + count)) {
+            Tr::move(_Myptr() + off + count, _Myptr() + off, this->_Mysize - off);
+            Tr::copy(_Myptr() + off, p, count);
+            _Eos(num);
+        }
+        return *this;
+    }
+    _Myt& insert(size_type off, const E* p) { return insert(off, p, Tr::length(p)); }
+    _Myt& insert(size_type off, const _Myt& r) { return insert(off, r._Myptr(), r.size()); }
+
+    _Myt& erase(size_type off = 0, size_type count = npos)
+    {
+        if (this->_Mysize < off)
+            _Xran();
+        if (this->_Mysize - off < count)
+            count = this->_Mysize - off;
+        if (0 < count) {
+            Tr::move(_Myptr() + off, _Myptr() + off + count, this->_Mysize - off - count);
+            size_type newsize = this->_Mysize - count;
+            _Eos(newsize);
+        }
+        return *this;
+    }
+    iterator erase(iterator where)
+    {
+        size_type off = where - _Myptr();
+        erase(off, 1);
+        return _Myptr() + off;
+    }
+
+    _Myt& replace(size_type off, size_type n0, const E* p, size_type count)
+    {
+        _Myt tmp(p, count);
+        erase(off, n0);
+        return insert(off, tmp._Myptr(), tmp.size());
+    }
+    _Myt& replace(size_type off, size_type n0, const _Myt& r) { return replace(off, n0, r._Myptr(), r.size()); }
+
+    void clear() { _Eos(0); }
+    void push_back(E c) { append((size_type)1, c); }
+    void resize(size_type newsize, E c = E())
+    {
+        if (newsize <= this->_Mysize)
+            erase(newsize);
+        else
+            append(newsize - this->_Mysize, c);
+    }
+    void reserve(size_type newcap = 0)
+    {
+        if (this->_Mysize <= newcap && this->_Myres != newcap) {
+            size_type size = this->_Mysize;
+            if (_Grow(newcap, true))
+                _Eos(size);
+        }
+    }
+    void swap(_Myt& r)
+    {
+        if (this == &r)
+            return;
+        _Myt tmp(std::move(r));
+        r = std::move(*this);
+        *this = std::move(tmp);
+    }
+
+    const E* c_str() const { return _Myptr(); }
+    const E* data() const { return _Myptr(); }
+    size_type size() const { return this->_Mysize; }
+    size_type length() const { return this->_Mysize; }
+    size_type capacity() const { return this->_Myres; }
+    bool empty() const { return this->_Mysize == 0; }
+    size_type max_size() const
+    {
+        size_type num = this->_Alval.max_size();
+        return num <= 1 ? 1 : num - 1;
+    }
+
+    iterator begin() { return _Myptr(); }
+    const_iterator begin() const { return _Myptr(); }
+    iterator end() { return _Myptr() + this->_Mysize; }
+    const_iterator end() const { return _Myptr() + this->_Mysize; }
+
+    reference operator[](size_type off) { return _Myptr()[off]; }
+    const_reference operator[](size_type off) const { return _Myptr()[off]; }
+    reference at(size_type off)
+    {
+        if (this->_Mysize <= off)
+            _Xran();
+        return _Myptr()[off];
+    }
+    const_reference at(size_type off) const
+    {
+        if (this->_Mysize <= off)
+            _Xran();
+        return _Myptr()[off];
+    }
+
+    _Myt substr(size_type off = 0, size_type count = npos) const { return _Myt(*this, off, count); }
+
+    int compare(const _Myt& r) const { return compare(0, this->_Mysize, r._Myptr(), r.size()); }
+    int compare(const E* p) const { return compare(0, this->_Mysize, p, Tr::length(p)); }
+    int compare(size_type off, size_type n0, const E* p, size_type count) const
+    {
+        if (this->_Mysize < off)
+            _Xran();
+        if (this->_Mysize - off < n0)
+            n0 = this->_Mysize - off;
+        size_type ans = Tr::compare(_Myptr() + off, p, n0 < count ? n0 : count);
+        return ans != 0 ? (int)ans : n0 < count ? -1 : n0 == count ? 0 : +1;
+    }
+
+    size_type find(const E* p, size_type off, size_type count) const
+    {
+        if (count == 0 && off <= this->_Mysize)
+            return off;
+        size_type num;
+        if (off < this->_Mysize && count <= (num = this->_Mysize - off)) {
+            const E* u;
+            const E* v;
+            for (num -= count - 1, v = _Myptr() + off; (u = Tr::find(v, num, *p)) != 0;
+                 num -= u - v + 1, v = u + 1)
+                if (Tr::compare(u, p, count) == 0)
+                    return u - _Myptr();
+        }
+        return npos;
+    }
+    size_type find(const _Myt& r, size_type off = 0) const { return find(r._Myptr(), off, r.size()); }
+    size_type find(const E* p, size_type off = 0) const { return find(p, off, Tr::length(p)); }
+    size_type find(E c, size_type off = 0) const { return find(&c, off, 1); }
+
+    size_type rfind(const E* p, size_type off, size_type count) const
+    {
+        if (count == 0)
+            return off < this->_Mysize ? off : this->_Mysize;
+        if (count <= this->_Mysize) {
+            const E* u = _Myptr() + (off < this->_Mysize - count ? off : this->_Mysize - count);
+            for (;; --u)
+                if (Tr::eq(*u, *p) && Tr::compare(u, p, count) == 0)
+                    return u - _Myptr();
+                else if (u == _Myptr())
+                    break;
+        }
+        return npos;
+    }
+    size_type rfind(E c, size_type off = npos) const { return rfind(&c, off, 1); }
+    size_type rfind(const E* p, size_type off = npos) const { return rfind(p, off, Tr::length(p)); }
+
+    size_type find_first_of(const E* p, size_type off, size_type count) const
+    {
+        if (0 < count && off < this->_Mysize) {
+            const E* const v = _Myptr() + this->_Mysize;
+            for (const E* u = _Myptr() + off; u < v; ++u)
+                if (Tr::find(p, count, *u) != 0)
+                    return u - _Myptr();
+        }
+        return npos;
+    }
+    size_type find_first_of(const E* p, size_type off = 0) const { return find_first_of(p, off, Tr::length(p)); }
+    size_type find_last_of(const E* p, size_type off, size_type count) const
+    {
+        if (0 < count && 0 < this->_Mysize) {
+            const E* u = _Myptr() + (off < this->_Mysize ? off : this->_Mysize - 1);
+            for (;; --u)
+                if (Tr::find(p, count, *u) != 0)
+                    return u - _Myptr();
+                else if (u == _Myptr())
+                    break;
+        }
+        return npos;
+    }
+    size_type find_last_of(const E* p, size_type off = npos) const { return find_last_of(p, off, Tr::length(p)); }
+
+    E* _Myptr() { return _Mybase::_BUF_SIZE <= this->_Myres ? this->_Bx._Ptr : this->_Bx._Buf; }
+    const E* _Myptr() const { return _Mybase::_BUF_SIZE <= this->_Myres ? this->_Bx._Ptr : this->_Bx._Buf; }
+
+    void _Eos(size_type newsize)
+    {
+        Tr::assign(_Myptr()[this->_Mysize = newsize], E());
+    }
+
+    bool _Grow(size_type newsize, bool trim = false)
+    {
+        if (max_size() < newsize)
+            _Xlen();
+        if (this->_Myres < newsize)
+            _Copy(newsize, this->_Mysize);
+        else if (trim && newsize < _Mybase::_BUF_SIZE)
+            _Tidy(true, newsize < this->_Mysize ? newsize : this->_Mysize);
+        else if (newsize == 0)
+            _Eos(0);
+        return 0 < newsize;
+    }
+
+    void _Copy(size_type newsize, size_type oldlen)
+    {
+        size_type newres = newsize | _Mybase::_ALLOC_MASK;
+        if (max_size() < newres)
+            newres = newsize;
+        else if (this->_Myres / 2 <= newres / 3)
+            ;
+        else if (this->_Myres <= max_size() - this->_Myres / 2)
+            newres = this->_Myres + this->_Myres / 2;
+        else
+            newres = max_size();
+        E* ptr = this->_Alval.allocate(newres + 1);
+        if (0 < oldlen)
+            Tr::copy(ptr, _Myptr(), oldlen);
+        _Tidy(true);
+        this->_Bx._Ptr = ptr;
+        this->_Myres = newres;
+        _Eos(oldlen);
+    }
+
+    void _Tidy(bool built = false, size_type newsize = 0)
+    {
+        if (built && _Mybase::_BUF_SIZE <= this->_Myres) {
+            E* ptr = this->_Bx._Ptr;
+            if (0 < newsize)
+                Tr::copy(this->_Bx._Buf, ptr, newsize);
+            this->_Alval.deallocate(ptr, this->_Myres + 1);
+        }
+        this->_Myres = _Mybase::_BUF_SIZE - 1;
+        _Eos(newsize);
+    }
+
+    void _Assign_rv(_Myt&& r)
+    {
+        if (r._Myres < _Mybase::_BUF_SIZE)
+            Tr::move(this->_Bx._Buf, r._Bx._Buf, r._Mysize + 1);
+        else {
+            this->_Bx._Ptr = r._Bx._Ptr;
+            r._Bx._Ptr = 0;
+        }
+        this->_Mysize = r._Mysize;
+        this->_Myres = r._Myres;
+        r._Tidy();
+    }
+
+    bool _Inside(const E* p) const
+    {
+        return !(p == 0 || p < _Myptr() || _Myptr() + this->_Mysize <= p);
+    }
+
+    [[noreturn]] static void _Xlen() { std::_Xlength_error("string too long"); }
+    [[noreturn]] static void _Xran() { std::_Xout_of_range("invalid string position"); }
+};
+
+template<class E, class Tr, class A>
+inline basic_string<E, Tr, A> operator+(const basic_string<E, Tr, A>& l, const basic_string<E, Tr, A>& r)
+{
+    basic_string<E, Tr, A> ans;
+    ans.reserve(l.size() + r.size());
+    ans += l;
+    ans += r;
+    return ans;
+}
+template<class E, class Tr, class A>
+inline basic_string<E, Tr, A> operator+(const basic_string<E, Tr, A>& l, const E* r)
+{
+    basic_string<E, Tr, A> ans(l);
+    ans += r;
+    return ans;
+}
+template<class E, class Tr, class A>
+inline basic_string<E, Tr, A> operator+(const E* l, const basic_string<E, Tr, A>& r)
+{
+    basic_string<E, Tr, A> ans(l);
+    ans += r;
+    return ans;
+}
+template<class E, class Tr, class A>
+inline basic_string<E, Tr, A> operator+(const basic_string<E, Tr, A>& l, E r)
+{
+    basic_string<E, Tr, A> ans(l);
+    ans += r;
+    return ans;
+}
+
+template<class E, class Tr, class A>
+inline bool operator==(const basic_string<E, Tr, A>& l, const basic_string<E, Tr, A>& r) { return l.compare(r) == 0; }
+template<class E, class Tr, class A>
+inline bool operator==(const basic_string<E, Tr, A>& l, const E* r) { return l.compare(r) == 0; }
+template<class E, class Tr, class A>
+inline bool operator==(const E* l, const basic_string<E, Tr, A>& r) { return r.compare(l) == 0; }
+template<class E, class Tr, class A>
+inline bool operator!=(const basic_string<E, Tr, A>& l, const basic_string<E, Tr, A>& r) { return !(l == r); }
+template<class E, class Tr, class A>
+inline bool operator!=(const basic_string<E, Tr, A>& l, const E* r) { return !(l == r); }
+template<class E, class Tr, class A>
+inline bool operator<(const basic_string<E, Tr, A>& l, const basic_string<E, Tr, A>& r) { return l.compare(r) < 0; }
+template<class E, class Tr, class A>
+inline bool operator>(const basic_string<E, Tr, A>& l, const basic_string<E, Tr, A>& r) { return r < l; }
+
+typedef basic_string<char, char_traits<char>, allocator<char> > string;
+typedef basic_string<wchar_t, char_traits<wchar_t>, allocator<wchar_t> > wstring;
+} // namespace std

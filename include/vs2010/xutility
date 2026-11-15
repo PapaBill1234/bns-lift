@@ -1,0 +1,60 @@
+// VS2010 STL subset: iterator tags, iterator base, min/max, copy/fill helpers.
+#pragma once
+#include <xstddef>
+#include <utility>
+
+namespace std {
+struct input_iterator_tag {};
+struct output_iterator_tag {};
+struct forward_iterator_tag : public input_iterator_tag {};
+struct bidirectional_iterator_tag : public forward_iterator_tag {};
+struct random_access_iterator_tag : public bidirectional_iterator_tag {};
+
+template<class Category, class T, class Diff = ptrdiff_t, class Pointer = T*, class Reference = T&>
+struct iterator
+{
+    typedef Category iterator_category;
+    typedef T value_type;
+    typedef Diff difference_type;
+    typedef Pointer pointer;
+    typedef Reference reference;
+};
+
+template<class T>
+inline const T& (min)(const T& a, const T& b) { return b < a ? b : a; }
+
+template<class T>
+inline const T& (max)(const T& a, const T& b) { return a < b ? b : a; }
+
+template<class InIt, class OutIt>
+inline OutIt copy(InIt first, InIt last, OutIt dest)
+{
+    for (; first != last; ++first, ++dest)
+        *dest = *first;
+    return dest;
+}
+
+template<class BidIt1, class BidIt2>
+inline BidIt2 copy_backward(BidIt1 first, BidIt1 last, BidIt2 dest)
+{
+    while (first != last)
+        *--dest = *--last;
+    return dest;
+}
+
+template<class FwdIt, class T>
+inline void fill(FwdIt first, FwdIt last, const T& v)
+{
+    for (; first != last; ++first)
+        *first = v;
+}
+
+template<class InIt, class T>
+inline InIt find(InIt first, InIt last, const T& v)
+{
+    for (; first != last; ++first)
+        if (*first == v)
+            break;
+    return first;
+}
+} // namespace std

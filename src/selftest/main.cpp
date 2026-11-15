@@ -6,6 +6,8 @@
 //   lift exit
 #include <stdio.h>
 
+int lift_stl_selftest();
+
 namespace {
 
 class Base
@@ -55,6 +57,13 @@ int main(int argc, char** argv)
     delete object;
     if (deleted != 1) {
         printf("lift fail delete\n");
+        return 1;
+    }
+
+    // include/vs2010 runtime test (src/selftest/stl_layout.cpp). It prints nothing on success.
+    int stl = lift_stl_selftest();
+    if (stl != 0) {
+        printf("lift fail stl %d\n", stl);
         return 1;
     }
 

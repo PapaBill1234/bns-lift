@@ -1,0 +1,306 @@
+// VS2010 STL subset: std::vector.
+// x64 layout (CacheGate PDB): sizeof == 0x20.
+//   _Vector_val : _Container_base0 { _Myfirst @0x00, _Mylast @0x08, _Myend @0x10, _Alval @0x18 }
+// Growth: capacity + capacity / 2 (VS2010 _Grow_to).
+#pragma once
+#include <xstddef>
+#include <memory>
+#include <xutility>
+
+namespace std {
+template<class T, class Alloc>
+class _Vector_val : public _Container_base
+{
+public:
+    typedef typename Alloc::template rebind<T>::other _Alty;
+
+    _Vector_val() : _Myfirst(0), _Mylast(0), _Myend(0), _Alval() {}
+
+    T* _Myfirst;
+    T* _Mylast;
+    T* _Myend;
+    _Alty _Alval;
+};
+
+template<class T, class Alloc = allocator<T> >
+class vector : public _Vector_val<T, Alloc>
+{
+public:
+    typedef vector<T, Alloc> _Myt;
+    typedef _Vector_val<T, Alloc> _Mybase;
+    typedef Alloc allocator_type;
+    typedef T value_type;
+    typedef size_t size_type;
+    typedef ptrdiff_t difference_type;
+    typedef T* pointer;
+    typedef const T* const_pointer;
+    typedef T& reference;
+    typedef const T& const_reference;
+    // VS2010 release iterators hold one pointer (_Ptr). A raw pointer has the same layout.
+    typedef T* iterator;
+    typedef const T* const_iterator;
+
+    vector() {}
+    explicit vector(size_type count) { resize(count); }
+    vector(size_type count, const T& v) { assign(count, v); }
+    vector(const _Myt& r)
+    {
+        if (_Buy(r.size()))
+            this->_Mylast = std::_Uninitialized_copy(r._Myfirst, r._Mylast, this->_Myfirst, this->_Alval);
+    }
+    vector(_Myt&& r) { _Assign_rv(std::move(r)); }
+    template<class InIt>
+    vector(InIt first, InIt last)
+    {
+        for (; first != last; ++first)
+            push_back(*first);
+    }
+    ~vector() { _Tidy(); }
+
+    _Myt& operator=(const _Myt& r)
+    {
+        if (this != &r) {
+            clear();
+            reserve(r.size());
+            this->_Mylast = std::_Uninitialized_copy(r._Myfirst, r._Mylast, this->_Myfirst, this->_Alval);
+        }
+        return *this;
+    }
+    _Myt& operator=(_Myt&& r)
+    {
+        if (this != &r) {
+            _Tidy();
+            _Assign_rv(std::move(r));
+        }
+        return *this;
+    }
+
+    void assign(size_type count, const T& v)
+    {
+        T tmp(v);
+        clear();
+        reserve(count);
+        std::_Uninitialized_fill_n(this->_Myfirst, count, tmp, this->_Alval);
+        this->_Mylast = this->_Myfirst + count;
+    }
+
+    void reserve(size_type count)
+    {
+        if (max_size() < count)
+            _Xlen();
+        else if (capacity() < count) {
+            T* ptr = this->_Alval.allocate(count);
+            std::_Uninitialized_move(this->_Myfirst, this->_Mylast, ptr, this->_Alval);
+            size_type size = this->size();
+            if (this->_Myfirst != 0) {
+                std::_Destroy_range(this->_Myfirst, this->_Mylast, this->_Alval);
+                this->_Alval.deallocate(this->_Myfirst, this->_Myend - this->_Myfirst);
+            }
+            this->_Myend = ptr + count;
+            this->_Mylast = ptr + size;
+            this->_Myfirst = ptr;
+        }
+    }
+
+    void resize(size_type newsize)
+    {
+        if (newsize < size())
+            erase(begin() + newsize, end());
+        else if (size() < newsize) {
+            _Reserve(newsize - size());
+            for (; this->_Mylast != this->_Myfirst + newsize; ++this->_Mylast)
+                this->_Alval.construct(this->_Mylast, T());
+        }
+    }
+    void resize(size_type newsize, const T& v)
+    {
+        if (newsize < size())
+            erase(begin() + newsize, end());
+        else if (size() < newsize) {
+            T tmp(v);
+            size_type count = newsize - size();
+            _Reserve(count);
+            std::_Uninitialized_fill_n(this->_Mylast, count, tmp, this->_Alval);
+            this->_Mylast += count;
+        }
+    }
+
+    size_type capacity() const { return this->_Myend - this->_Myfirst; }
+    size_type size() const { return this->_Mylast - this->_Myfirst; }
+    size_type max_size() const { return this->_Alval.max_size(); }
+    bool empty() const { return this->_Myfirst == this->_Mylast; }
+
+    iterator begin() { return this->_Myfirst; }
+    const_iterator begin() const { return this->_Myfirst; }
+    iterator end() { return this->_Mylast; }
+    const_iterator end() const { return this->_Mylast; }
+
+    reference operator[](size_type pos) { return this->_Myfirst[pos]; }
+    const_reference operator[](size_type pos) const { return this->_Myfirst[pos]; }
+    reference at(size_type pos)
+    {
+        if (size() <= pos)
+            _Xran();
+        return this->_Myfirst[pos];
+    }
+    const_reference at(size_type pos) const
+    {
+        if (size() <= pos)
+            _Xran();
+        return this->_Myfirst[pos];
+    }
+    reference front() { return *this->_Myfirst; }
+    const_reference front() const { return *this->_Myfirst; }
+    reference back() { return this->_Mylast[-1]; }
+    const_reference back() const { return this->_Mylast[-1]; }
+
+    void push_back(const T& v)
+    {
+        if (_Inside(&v)) {
+            size_type idx = &v - this->_Myfirst;
+            if (this->_Mylast == this->_Myend)
+                _Reserve(1);
+            this->_Alval.construct(this->_Mylast, this->_Myfirst[idx]);
+        } else {
+            if (this->_Mylast == this->_Myend)
+                _Reserve(1);
+            this->_Alval.construct(this->_Mylast, v);
+        }
+        ++this->_Mylast;
+    }
+    void push_back(T&& v)
+    {
+        if (_Inside(&v)) {
+            size_type idx = &v - this->_Myfirst;
+            if (this->_Mylast == this->_Myend)
+                _Reserve(1);
+            this->_Alval.construct(this->_Mylast, std::move(this->_Myfirst[idx]));
+        } else {
+            if (this->_Mylast == this->_Myend)
+                _Reserve(1);
+            this->_Alval.construct(this->_Mylast, std::move(v));
+        }
+        ++this->_Mylast;
+    }
+    void pop_back()
+    {
+        if (!empty()) {
+            this->_Alval.destroy(this->_Mylast - 1);
+            --this->_Mylast;
+        }
+    }
+
+    iterator insert(const_iterator where, const T& v)
+    {
+        size_type off = where - this->_Myfirst;
+        push_back(v);
+        _Rotate_back(off);
+        return this->_Myfirst + off;
+    }
+    iterator insert(const_iterator where, T&& v)
+    {
+        size_type off = where - this->_Myfirst;
+        push_back(std::move(v));
+        _Rotate_back(off);
+        return this->_Myfirst + off;
+    }
+
+    iterator erase(const_iterator where)
+    {
+        T* ptr = const_cast<T*>(where);
+        for (T* p = ptr; p + 1 != this->_Mylast; ++p)
+            *p = std::move(p[1]);
+        this->_Alval.destroy(this->_Mylast - 1);
+        --this->_Mylast;
+        return ptr;
+    }
+    iterator erase(const_iterator first, const_iterator last)
+    {
+        T* f = const_cast<T*>(first);
+        T* l = const_cast<T*>(last);
+        if (f != l) {
+            T* p = f;
+            for (T* q = l; q != this->_Mylast; ++p, ++q)
+                *p = std::move(*q);
+            std::_Destroy_range(p, this->_Mylast, this->_Alval);
+            this->_Mylast = p;
+        }
+        return f;
+    }
+
+    void clear() { erase(begin(), end()); }
+
+    void swap(_Myt& r)
+    {
+        std::swap(this->_Myfirst, r._Myfirst);
+        std::swap(this->_Mylast, r._Mylast);
+        std::swap(this->_Myend, r._Myend);
+    }
+
+    size_type _Grow_to(size_type count) const
+    {
+        size_type cap = capacity();
+        cap = max_size() - cap / 2 < cap ? 0 : cap + cap / 2;
+        if (cap < count)
+            cap = count;
+        return cap;
+    }
+
+    void _Reserve(size_type count)
+    {
+        size_type size = this->size();
+        if (max_size() - count < size)
+            _Xlen();
+        else if ((size += count) > capacity())
+            reserve(_Grow_to(size));
+    }
+
+    bool _Buy(size_type capacity)
+    {
+        this->_Myfirst = 0;
+        this->_Mylast = 0;
+        this->_Myend = 0;
+        if (capacity == 0)
+            return false;
+        if (max_size() < capacity)
+            _Xlen();
+        this->_Myfirst = this->_Alval.allocate(capacity);
+        this->_Mylast = this->_Myfirst;
+        this->_Myend = this->_Myfirst + capacity;
+        return true;
+    }
+
+    void _Tidy()
+    {
+        if (this->_Myfirst != 0) {
+            std::_Destroy_range(this->_Myfirst, this->_Mylast, this->_Alval);
+            this->_Alval.deallocate(this->_Myfirst, this->_Myend - this->_Myfirst);
+        }
+        this->_Myfirst = 0;
+        this->_Mylast = 0;
+        this->_Myend = 0;
+    }
+
+    void _Assign_rv(_Myt&& r)
+    {
+        this->_Myfirst = r._Myfirst;
+        this->_Mylast = r._Mylast;
+        this->_Myend = r._Myend;
+        r._Myfirst = 0;
+        r._Mylast = 0;
+        r._Myend = 0;
+    }
+
+    // Moves the last element to position off.
+    void _Rotate_back(size_type off)
+    {
+        for (size_type i = size() - 1; off < i; --i)
+            std::swap(this->_Myfirst[i], this->_Myfirst[i - 1]);
+    }
+
+    bool _Inside(const T* p) const { return p < this->_Mylast && this->_Myfirst <= p; }
+
+    [[noreturn]] static void _Xlen() { std::_Xlength_error("vector<T> too long"); }
+    [[noreturn]] static void _Xran() { std::_Xout_of_range("invalid vector<T> subscript"); }
+};
+} // namespace std

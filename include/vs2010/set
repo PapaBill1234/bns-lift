@@ -1,0 +1,49 @@
+// VS2010 STL subset: std::set and std::multiset. Layout: see <xtree> (_Tset_traits has comp @0).
+// CacheGate does not use set. The layout is the same as map with value_type == K.
+#pragma once
+#include <xtree>
+
+namespace std {
+template<class K, class Pr, class Alloc, bool Mfl>
+class _Tset_traits : public _Container_base
+{
+public:
+    typedef K key_type;
+    typedef K value_type;
+    typedef Pr key_compare;
+    typedef typename Alloc::template rebind<value_type>::other allocator_type;
+    typedef key_compare value_compare;
+    enum { _Multi = Mfl };
+
+    _Tset_traits() : comp() {}
+    _Tset_traits(Pr parg) : comp(parg) {}
+
+    static const K& _Kfn(const value_type& v) { return v; }
+
+    Pr comp;
+};
+
+template<class K, class Pr = less<K>, class Alloc = allocator<K> >
+class set : public _Tree<_Tset_traits<K, Pr, Alloc, false> >
+{
+public:
+    typedef _Tree<_Tset_traits<K, Pr, Alloc, false> > _Mybase;
+    typedef K key_type;
+    typedef Pr key_compare;
+
+    set() : _Mybase(key_compare()) {}
+    explicit set(const key_compare& pr) : _Mybase(pr) {}
+};
+
+template<class K, class Pr = less<K>, class Alloc = allocator<K> >
+class multiset : public _Tree<_Tset_traits<K, Pr, Alloc, true> >
+{
+public:
+    typedef _Tree<_Tset_traits<K, Pr, Alloc, true> > _Mybase;
+    typedef K key_type;
+    typedef Pr key_compare;
+
+    multiset() : _Mybase(key_compare()) {}
+    explicit multiset(const key_compare& pr) : _Mybase(pr) {}
+};
+} // namespace std
