@@ -1,8 +1,10 @@
 // TimerQueue, Timer (CacheGate PDB). Layouts from include/pdb/CacheGate/types.h.
-// Declarations only. The bodies are in a later card.
+// TimerQueue bodies: src/common/Timer.cpp (SmartCouponDaemon Timer.obj).
 #pragma once
 #include "RefCntObject.h"
 #include "Lock.h"
+#include <queue>
+#include "StlMemory.h"
 
 class EventContext;
 
@@ -54,27 +56,36 @@ public:
         Timer* tail;
     };
 
-    // ❓ Inlined in Daemon::start (0xb140).
-    TimerQueue() : TimerInterval(0), StqSize(0), StqSlot(nullptr), StqCurrent(0)
+    // PDB: TimerQueue::GreaterBySlotIndex (1 byte). The smallest SlotIndex is on top.
+    struct GreaterBySlotIndex
     {
-        for (int i = 0; i < 0x28; ++i)
-            LtQueue[i] = 0;
-    }
-    virtual ~TimerQueue();
+        bool operator()(Timer const* left, Timer const* right) const { return left->SlotIndex > right->SlotIndex; }
+    };
+    typedef std::priority_queue<Timer*, std::vector<Timer*, StlAllocator<Timer*, 2> >, GreaterBySlotIndex> LongTermQueue;  // ❓ typedef name
+
+    // ❓ Inlined in Daemon::start (0xb140).
+    TimerQueue() : TimerInterval(0), StqSize(0), StqSlot(nullptr), StqCurrent(0), LtQueue() {}
+    virtual ~TimerQueue();  // 0x25EC0 (SmartCouponDaemon)
 
 protected:
-    bool Initialize(long interval, unsigned int slotCount);  // 0x16400 TODO(lift-timerqueue)
-    void TimeExpired(Slot* slot);                            // 0x164e0 TODO(lift-timerqueue)
+    bool Initialize(long timerInterval, unsigned int shortTermQueueSize);  // 0x25FF0 (SmartCouponDaemon)
+    bool Add(long elapse, Timer* timer);                                    // 0x26270 (SmartCouponDaemon)
+    bool Remove(Timer* timer);                                              // 0x26390 (SmartCouponDaemon)
+    void TimeExpired(Slot* slot);                                           // 0x260D0 (SmartCouponDaemon)
+
+private:
+    void removeShortTermQueue(Slot* slot, Timer* timer);  // 0x26480 (SmartCouponDaemon)
+    void clearShortTermQueueSlot(Slot* slot);             // 0x264F0 (SmartCouponDaemon)
+    void addLongTermQueue(unsigned int slice, Timer* timer);  // 0x26560 (SmartCouponDaemon)
+    void clearLongTermQueueSlot();                        // 0x26680 (SmartCouponDaemon)
 
 public:
     long TimerInterval;
     SpinLock Lock;
     unsigned int StqSize;
-    void* StqSlot;
+    Slot* StqSlot;
     unsigned int StqCurrent;
-    // ❓ PDB type: std::priority_queue<Timer*, std::vector<Timer*, StlAllocator<Timer*,2> >,
-    // TimerQueue::GreaterBySlotIndex>. The later card puts the real type here.
-    alignas(8) unsigned char LtQueue[0x28];
+    LongTermQueue LtQueue;
 
     friend class Daemon;
 };

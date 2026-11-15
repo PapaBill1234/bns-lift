@@ -22,7 +22,11 @@ public:
     IdleWatcher* _idleWatcher;
     void* _iocpHandle;
 
+private:
+    static Network* Instance;  // 0x84B40 (SmartCouponDaemon) TODO(lift-network)
+
     friend class Daemon;
+    friend class DelayedRelease;  // ❓ access for DelayedRelease::Release (0x22DA0)
 };
 static_assert(sizeof(Network) == 0xE0, "sizeof Network");
 static_assert(offsetof(Network, _iocpHandle) == 0xD8, "Network::_iocpHandle");

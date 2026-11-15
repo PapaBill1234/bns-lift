@@ -11,5 +11,5 @@ static_assert(sizeof(id128) == 0x10, "sizeof id128");
 class String
 {
 public:
-    static bool GetId128FromGuidString(wchar_t const* guidString, id128* id);  // 0xdd90 TODO(lift-string)
+    static bool GetId128FromGuidString(wchar_t const* guidString, id128* id);  // 0x1B360 (SmartCouponDaemon)
 };

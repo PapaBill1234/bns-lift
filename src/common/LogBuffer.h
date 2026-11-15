@@ -1,10 +1,13 @@
-// LogBuffer, ConsoleLog, LogBufferPool, LogBufferAllocator (CacheGate PDB).
-// Layouts from include/pdb/CacheGate/types.h. The functions are in a later card.
-// Only declarations are here.
+// LogBuffer.obj: LogBuffer, ConsoleLog, LogBufferPool, LogBufferAllocator.
+// Layouts from include/pdb/CacheGate/types.h. The SmartCouponDaemon PDB has the same layouts.
 #pragma once
 #include <windows.h>
 #include <stddef.h>
 #include "RefCntObject.h"
+#include "Lock.h"
+#include "Log.h"
+
+class PagePoolMemoryManager;
 
 class ConsoleLog
 {
@@ -23,18 +26,29 @@ enum ConsoleLogType  // ❓
     L_NONE = 0,  // ❓
 };
 
-// ❓ PDB global. Maps Log::Type to the ConsoleLog type. Defined in a later card.
+// PDB global (LogBuffer.obj). Maps Log::Type to the ConsoleLog type.
 extern int const CONSOLE_LOG_TYPE[11];
 
 class LogBuffer : public RefCntObject, public ConsoleLog
 {
 public:
+    LogBuffer()  // ❓ inlined in LogBufferPool::allocate (0x20200) and LogBufferAllocator::allocate (0x20500)
+        : _flush(false)
+    {
+        _ref = 1;
+        _history = nullptr;
+        _tag = 266;
+        for (int i = 0; i < 8; ++i)
+            _next[i] = nullptr;
+    }
     virtual ~LogBuffer();
     virtual void deallocate_me(void* ptr, wchar_t const* file, int line);
     virtual int GetType() const;
     virtual bool Acquire();
     virtual void Release();
     virtual bool GetLog(wchar_t* buffer, unsigned long long size) const;
+
+    void Prepare(Log::Type type, wchar_t const* file, int line);
 
     LogBuffer* _next[8];
     SYSTEMTIME _logtime;
@@ -56,7 +70,9 @@ static_assert(offsetof(LogBuffer, _log) == 0x86, "LogBuffer::_log");
 class LogBufferPool
 {
 public:
+    LogBufferPool() : _count(0), _pool(nullptr) {}  // ❓ inlined in LogBufferAllocator::Initialize (0x203D0)
     LogBuffer* allocate();
+    void deallocate(LogBuffer* logbuf);
 
     int _count;
     LogBuffer* _pool;
@@ -68,8 +84,23 @@ class LogBufferAllocator
 public:
     static void Initialize();
 
-    // PDB S_GTHREAD32, .tls +0x18. Defined in a later card.
+    // PDB S_GTHREAD32, .tls +0x18.
     static __declspec(thread) LogBufferPool* _Local;
+    static long long Using;
+    static long long Allocated;
+
+protected:
+    static LogBuffer* allocate(int count);
+
+private:
+    static void initAllocator();
+
+    static SpinLock _Lock;
+    static LogBuffer* _Pool;
+    static long long _Count;
+    static PagePoolMemoryManager* _Allocator;
+
+    friend class LogBufferPool;
 };
 
 class PacketBufferAllocator

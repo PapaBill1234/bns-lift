@@ -1,6 +1,7 @@
 // LogMedia (CacheGate PDB). Layout from include/pdb/CacheGate/types.h.
 // The constructor and the destructor are inline in the original.
-// Writable (0xcd80) and GetLastFileName (0xffd0) are in a later card.
+// Writable (0xcd80; SmartCouponDaemon 0xAAD0) and GetLastFileName (0xffd0; SmartCouponDaemon 0x1D7A0)
+// are in LogMedia.cpp.
 #pragma once
 #include <windows.h>
 #include <stddef.h>
@@ -29,6 +30,9 @@ protected:
     }
 
 public:
+    void Write();
+    int Add(LogBuffer* logbuffer);
+
     int _bufferNodePos;
     LogMedia* _next[11];
     bool _enable[11];

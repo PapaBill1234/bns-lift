@@ -1,13 +1,13 @@
-// SysInfo (CacheGate PDB). Declarations only. The bodies are in a later card.
+// SysInfo (SmartCouponDaemon PDB). Bodies: SystemInformation.cpp.
 #pragma once
 
 class SysInfo
 {
 public:
-    // 0x14390 TODO(lift-sysinfo)
-    static void Hostname(unsigned long address, wchar_t* hostname, int length);
-    // 0x144f0 TODO(lift-sysinfo)
-    static void IpAddress(wchar_t const* hostname, int* count, unsigned long* address);
+    // 0x1FB80 (SmartCouponDaemon)
+    static int Hostname(unsigned long address, wchar_t* hostname, int length);
+    // 0x1FCE0 (SmartCouponDaemon)
+    static int IpAddress(wchar_t const* hostname, int* count, unsigned long* address);
 
 private:
     static int _PageSize;
@@ -15,4 +15,5 @@ private:
     static int _Granularity;
 
     friend void BloodDaemonMain(int argc, wchar_t** argv);
+    friend class LogBufferAllocator;  // ❓ access for initAllocator (0x20440)
 };

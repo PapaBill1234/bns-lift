@@ -35,6 +35,8 @@ public:
     static void Write(Type type, wchar_t const* file, int line, wchar_t const* format, ...);
     static void Write(wchar_t const* file, int line, long errorCode, wchar_t const* format, ...);
 
+    static wchar_t const* TypeName[LT_MAX];  // 0x83140 (SmartCouponDaemon)
+
 private:
     Log()  // ❓ inlined in Initialize (0x9DA0)
         : open(false), flush(false), mediaCount(0)
@@ -51,7 +53,7 @@ private:
     virtual ~Log();
     virtual wchar_t const* Name();
     virtual void run();
-    void Add(LogBuffer* buffer);
+    static void Add(LogBuffer* buf);  // SmartCouponDaemon 0x19B50: static, uses instance
 
     static Log* instance;
 

@@ -46,6 +46,14 @@ add_library(lift_common STATIC
   src/common/Memory.cpp
   src/common/MemoryManager.cpp
   src/common/RefCntObject.cpp
+  src/common/Log.cpp
+  src/common/LogBuffer.cpp
+  src/common/LogMedia.cpp
+  src/common/StringUtil.cpp
+  src/common/SystemInformation.cpp
+  src/common/DelayedRelease.cpp
+  src/common/Timer.cpp
+  src/common/AlertSender.cpp
   src/common/Thread.cpp
   src/common/Console.cpp
   src/common/TextConsole.cpp
@@ -71,6 +79,10 @@ target_compile_definitions(lift_common PUBLIC WIN32_LEAN_AND_MEAN)
 target_include_directories(lift_common BEFORE PRIVATE ${LIFT_STL_INCLUDE})
 target_include_directories(lift_common PUBLIC ${CMAKE_SOURCE_DIR}/src/common)
 add_dependencies(lift_common lift_msvcp100_implib)
+# Wine import libs for the BloodLib modules (Db: odbc32, SystemInformation: ws2_32 iphlpapi, String: ole32).
+foreach(imp odbc32 ws2_32 iphlpapi ole32)
+  target_link_libraries(lift_common INTERFACE "${WINE_LIBDIR}/lib${imp}.a")
+endforeach()
 
 # Upstream zstd (see vendor/zstd/README.md). Build it only if the source is present.
 set(LIFT_ZSTD_DIR ${CMAKE_SOURCE_DIR}/vendor/zstd/src)
