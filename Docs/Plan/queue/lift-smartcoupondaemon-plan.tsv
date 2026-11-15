@@ -1,0 +1,6 @@
+lift-smartcoupondaemon-1	lift	opus	-	src/common/,include/vs2010/,CMakeLists.txt	lift-cg-5	150	ready	Lift SmartCouponDaemon: log, alert, crash, timer, Db (common)
+lift-smartcoupondaemon-2	lift	opus	-	src/common/,include/vs2010/,CMakeLists.txt	lift-smartcoupondaemon-1	150	ready	Lift SmartCouponDaemon: network, session, packet (common)
+lift-smartcoupondaemon-3	lift	opus	-	src/common/,src/SmartCouponDaemon/,include/pdb/,include/vs2010/,CMakeLists.txt	lift-smartcoupondaemon-2	150	ready	Lift SmartCouponDaemon: RSA crypto, NP channel, object pool
+lift-smartcoupondaemon-4	lift	opus	-	src/SmartCouponDaemon/,src/crt/,src/common/,CMakeLists.txt	lift-smartcoupondaemon-3	150	ready	Lift SmartCouponDaemon: coupon app modules, full exe
+lift-smartcoupondaemon-verify	lift	opus	-	tools/verify/,Docs/Verify/	lift-smartcoupondaemon-4	150	ready	Lift SmartCouponDaemon: run under Wine, compare packet logs
+lift-lobbygate-plan	lift	opus	-	Docs/Plan/cards/,Docs/Plan/queue/	lift-smartcoupondaemon-4	100	ready	Lift LobbyGate: plan cards and queue rows
