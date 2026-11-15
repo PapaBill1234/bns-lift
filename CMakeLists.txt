@@ -54,10 +54,33 @@ add_library(lift_common STATIC
   src/common/WinServiceConsole.cpp
   src/common/Daemon.cpp
   src/common/DaemonConfig.cpp
-  src/common/BnsCommonConfig.cpp)
+  src/common/BnsCommonConfig.cpp
+  src/common/Crypto.cpp
+  src/common/aes128.cpp
+  src/common/aes128Table.cpp
+  src/common/aes128NI.cpp
+  src/common/blowfish.cpp
+  src/common/ctr.cpp
+  src/common/prng.cpp
+  src/common/ripemd160.cpp)
+# clang-cl needs the AES target feature for the <wmmintrin.h> intrinsics.
+set_source_files_properties(src/common/aes128NI.cpp PROPERTIES COMPILE_OPTIONS "-maes")
 target_compile_options(lift_common PRIVATE /GR-)
 # AlertSender.h includes winsock2.h after windows.h.
 target_compile_definitions(lift_common PUBLIC WIN32_LEAN_AND_MEAN)
 target_include_directories(lift_common BEFORE PRIVATE ${LIFT_STL_INCLUDE})
 target_include_directories(lift_common PUBLIC ${CMAKE_SOURCE_DIR}/src/common)
 add_dependencies(lift_common lift_msvcp100_implib)
+
+# Upstream zstd (see vendor/zstd/README.md). Build it only if the source is present.
+set(LIFT_ZSTD_DIR ${CMAKE_SOURCE_DIR}/vendor/zstd/src)
+if(EXISTS ${LIFT_ZSTD_DIR}/lib/zstd.h)
+  file(GLOB LIFT_ZSTD_SOURCES
+    ${LIFT_ZSTD_DIR}/lib/common/*.c
+    ${LIFT_ZSTD_DIR}/lib/compress/*.c
+    ${LIFT_ZSTD_DIR}/lib/decompress/*.c)
+  add_library(lift_zstd STATIC ${LIFT_ZSTD_SOURCES})
+  target_include_directories(lift_zstd PUBLIC ${LIFT_ZSTD_DIR}/lib ${LIFT_ZSTD_DIR}/lib/common)
+  target_compile_definitions(lift_zstd PRIVATE ZSTD_MULTITHREAD=0)
+  target_link_libraries(lift_common PUBLIC lift_zstd)
+endif()
