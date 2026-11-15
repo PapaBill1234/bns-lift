@@ -16,3 +16,24 @@ MemoryManager const* Memory::CreateManager(MgrType type, void const* option, uns
     manager->Initialize(option, size);
     return manager;
 }
+
+// 0x19550 (SmartCouponDaemon) scalar deleting destructor
+GrowingBuffer::~GrowingBuffer()
+{
+    if (_buffer != nullptr)
+    {
+        Memory::_Manager[_sec]->Free(_buffer, L"source\\Memory.cpp", 109);
+        _buffer = nullptr;
+    }
+}
+
+// 0x195A0 (SmartCouponDaemon)
+void GrowingBuffer::grow(unsigned long long size)
+{
+    _size *= 2;
+    if (_size == 0)
+        _size = _initSize;
+    while (_size - _count < size)
+        _size *= 2;
+    _buffer = static_cast<unsigned char*>(Memory::_Manager[_sec]->Realloc(_buffer, _size, L"source\\Memory.cpp", 147));
+}

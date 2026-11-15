@@ -16,4 +16,5 @@ private:
 
     friend void BloodDaemonMain(int argc, wchar_t** argv);
     friend class LogBufferAllocator;  // ❓ access for initAllocator (0x20440)
+    friend class PacketBufferAllocator;  // ❓ access for initAllocator (0x24100)
 };

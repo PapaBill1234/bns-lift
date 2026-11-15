@@ -75,6 +75,8 @@ private:
     unsigned char* _end;
     unsigned char* _current;
     MemoryManager const* _additional;
+
+    friend class Session;  // ❓ access for Session::~Session (0x1BA50)
 };
 static_assert(sizeof(StaticPageMemoryManager) == 0x28, "sizeof StaticPageMemoryManager");
 

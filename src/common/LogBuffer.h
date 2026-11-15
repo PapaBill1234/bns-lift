@@ -103,8 +103,4 @@ private:
     friend class LogBufferPool;
 };
 
-class PacketBufferAllocator
-{
-public:
-    static void Initialize();
-};
+#include "PacketBuffer.h"  // PacketBufferAllocator::Initialize (callers include LogBuffer.h)

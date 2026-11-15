@@ -6,7 +6,7 @@
 #include <queue>
 #include "StlMemory.h"
 
-class EventContext;
+struct EventContext;
 
 class EventObject : public RefCntObject
 {
@@ -88,6 +88,7 @@ public:
     LongTermQueue LtQueue;
 
     friend class Daemon;
+    friend class Session;  // ❓ access for Session::tryReconnect, reconnect, close (Add/Remove)
 };
 static_assert(sizeof(TimerQueue) == 0x78, "sizeof TimerQueue");
 static_assert(offsetof(TimerQueue, StqSlot) == 0x40, "TimerQueue::StqSlot");

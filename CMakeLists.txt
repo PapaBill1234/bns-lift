@@ -70,7 +70,9 @@ add_library(lift_common STATIC
   src/common/blowfish.cpp
   src/common/ctr.cpp
   src/common/prng.cpp
-  src/common/ripemd160.cpp)
+  src/common/ripemd160.cpp
+  src/common/PacketBuffer.cpp
+  src/common/Packet.cpp)
 # clang-cl needs the AES target feature for the <wmmintrin.h> intrinsics.
 set_source_files_properties(src/common/aes128NI.cpp PROPERTIES COMPILE_OPTIONS "-maes")
 target_compile_options(lift_common PRIVATE /GR-)
