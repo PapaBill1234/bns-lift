@@ -39,3 +39,17 @@ target_compile_options(lift_selftest PRIVATE /GR-)
 target_include_directories(lift_selftest BEFORE PRIVATE ${LIFT_STL_INCLUDE} ${LIFT_PDB_INCLUDE})
 add_dependencies(lift_selftest lift_msvcp100_implib)
 target_link_libraries(lift_selftest PRIVATE ${LIFT_MSVCP100_IMPLIB})
+
+# Common server code (BloodLib). Static lib, shared by the server exes.
+add_library(lift_common STATIC
+  src/common/BaseMemory.cpp
+  src/common/Memory.cpp
+  src/common/MemoryManager.cpp
+  src/common/RefCntObject.cpp
+  src/common/Thread.cpp)
+target_compile_options(lift_common PRIVATE /GR-)
+# AlertSender.h includes winsock2.h after windows.h.
+target_compile_definitions(lift_common PUBLIC WIN32_LEAN_AND_MEAN)
+target_include_directories(lift_common BEFORE PRIVATE ${LIFT_STL_INCLUDE})
+target_include_directories(lift_common PUBLIC ${CMAKE_SOURCE_DIR}/src/common)
+add_dependencies(lift_common lift_msvcp100_implib)
