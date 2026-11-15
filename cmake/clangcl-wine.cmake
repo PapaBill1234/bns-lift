@@ -25,7 +25,8 @@ set(WINE_INCDIR "/usr/include/wine/wine" CACHE PATH "Wine header root")
 set(WINE_LIBDIR "/usr/lib/x86_64-linux-gnu/wine/x86_64-windows" CACHE PATH "Wine import libs (lib<name>.a)")
 
 # Compile flags (plan.md "Toolchain"). Do not add -fms-compatibility-version=16.
-set(LIFT_COMMON_FLAGS "--target=x86_64-pc-windows-msvc /GS- /X -imsvc ${WINE_INCDIR}/msvcrt -imsvc ${WINE_INCDIR}/windows /D_WIN64 /D_MSVCR_VER=100")
+# WINE_UNICODE_NATIVE: WCHAR is wchar_t, as in MSVC. Without it Wine makes WCHAR char16_t in C++.
+set(LIFT_COMMON_FLAGS "--target=x86_64-pc-windows-msvc /GS- /X -imsvc ${WINE_INCDIR}/msvcrt -imsvc ${WINE_INCDIR}/windows /D_WIN64 /D_MSVCR_VER=100 /DWINE_UNICODE_NATIVE")
 set(CMAKE_C_FLAGS_INIT   "${LIFT_COMMON_FLAGS}")
 # msvcr100 has no sized operator delete (??3@YAXPEAX_K@Z). Do not emit calls to it.
 set(CMAKE_CXX_FLAGS_INIT "${LIFT_COMMON_FLAGS} /Zc:sizedDealloc-")
