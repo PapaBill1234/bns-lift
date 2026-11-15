@@ -2,6 +2,7 @@
 #pragma once
 #include <windows.h>
 #include <stddef.h>
+#include <time.h>
 
 class ThreadManager;
 
@@ -37,7 +38,7 @@ static_assert(offsetof(Thread, _run) == 0x28, "Thread::_run");
 class ThreadManager
 {
 public:
-    ThreadManager() : _maxThreadCount(0), _runningThreadCount(0), _threads(nullptr), _threadHandles(nullptr), _now(0) {}  // ❓ inlined
+    ThreadManager() : _maxThreadCount(0), _runningThreadCount(0), _threads(nullptr), _threadHandles(nullptr), _now(_time64(nullptr)) {}  // ❓ inlined in Daemon::Start (0xad50)
     ~ThreadManager();
     bool Initialize(unsigned int maxThreadCount);
     bool StartThread(Thread* thread, unsigned long long* threadId);

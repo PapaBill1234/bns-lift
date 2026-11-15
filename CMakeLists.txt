@@ -46,7 +46,15 @@ add_library(lift_common STATIC
   src/common/Memory.cpp
   src/common/MemoryManager.cpp
   src/common/RefCntObject.cpp
-  src/common/Thread.cpp)
+  src/common/Thread.cpp
+  src/common/Console.cpp
+  src/common/TextConsole.cpp
+  src/common/PipeConsole.cpp
+  src/common/WindowConsole.cpp
+  src/common/WinServiceConsole.cpp
+  src/common/Daemon.cpp
+  src/common/DaemonConfig.cpp
+  src/common/BnsCommonConfig.cpp)
 target_compile_options(lift_common PRIVATE /GR-)
 # AlertSender.h includes winsock2.h after windows.h.
 target_compile_definitions(lift_common PUBLIC WIN32_LEAN_AND_MEAN)

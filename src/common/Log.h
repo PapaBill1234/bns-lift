@@ -55,6 +55,8 @@ private:
 
     static Log* instance;
 
+    friend class Daemon;
+
 public:
     bool open;
     bool flush;

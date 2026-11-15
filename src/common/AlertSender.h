@@ -38,6 +38,8 @@ private:
 
     static AlertSender _alertSender;
 
+    friend class Daemon;
+
 public:
     unsigned long long _socket;
     void* _sockEvent;

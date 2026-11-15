@@ -1,0 +1,222 @@
+// DaemonConfig.obj (CacheGate PDB).
+#include "DaemonConfig.h"
+#include "Console.h"
+#include "Daemon.h"
+#include "Log.h"
+#include "Memory.h"
+#include "Network.h"
+#include <windows.h>
+#include <shlwapi.h>
+#include <stdio.h>
+#include <string.h>
+
+namespace
+{
+// Function types of the XmlReader_sv64.dll exports.  // ❓ names
+typedef wchar_t const* (*GetInterfaceVersionFunc)();                 // ❓
+typedef XmlReader* (*CreateXmlReaderFunc)();                         // ❓
+typedef void (*DestroyXmlReaderFunc)(XmlReader* reader);             // ❓
+typedef XmlConfigReader* (*CreateXmlConfigReaderFunc)(XmlReader*);   // ❓
+typedef void (*DestroyXmlConfigReaderFunc)(XmlConfigReader* config); // ❓
+
+wchar_t const* const XML_READER_DLL = L"XmlReader_sv64.dll";  // ❓ name
+wchar_t const* const XML_READER_VERSION = L"15";              // ❓ name
+}
+
+// 0xc600
+void* DaemonConfig::Load(XmlCfgDef const* def, int count, unsigned long long size, wchar_t const* fileName,
+                         wchar_t const* configName, bool readOnly)
+{
+    wchar_t fullPath[780];
+    Daemon* daemon = Daemon::Instance;
+    // 0xcca0 is swprintf_s<780>.
+    if (PathIsFileSpecW(fileName) && daemon->confDir[0] != 0)
+        swprintf_s(fullPath, 780, L"%s\\%s", daemon->confDir, fileName);
+    else
+        swprintf_s(fullPath, 780, fileName);  // BUG: 0xc600 the file name is used as a format string.
+
+    Console* console = Daemon::Instance->console;
+    HMODULE module = LoadLibraryW(XML_READER_DLL);
+    if (module == nullptr)
+    {
+        if (console != nullptr)
+        {
+            console->WriteStartLog(0, L"[config], cannot load xml reader library, file: %s", XML_READER_DLL);
+            Sleep(5000);
+        }
+        return nullptr;
+    }
+
+    GetInterfaceVersionFunc getInterfaceVersion =
+        reinterpret_cast<GetInterfaceVersionFunc>(GetProcAddress(module, "GetInterfaceVersion"));
+    GetProcAddress(module, "SetMemAllocator");
+    CreateXmlReaderFunc createXmlReader = reinterpret_cast<CreateXmlReaderFunc>(GetProcAddress(module, "CreateXmlReader"));
+    DestroyXmlReaderFunc destroyXmlReader =
+        reinterpret_cast<DestroyXmlReaderFunc>(GetProcAddress(module, "DestroyXmlReader"));
+
+    if (_wcsicmp(XML_READER_VERSION, getInterfaceVersion()) != 0)
+    {
+        if (console != nullptr)
+        {
+            // BUG: 0xc600 "%d" gets a string (the platform binary version).
+            console->WriteStartLog(
+                0, L"[config], xml reader check version failed, file: %s, required: %s, loaded: %s, platform binary:%d",
+                XML_READER_DLL, XML_READER_VERSION, getInterfaceVersion(), L"0.0.346.440");
+            Sleep(5000);
+        }
+        FreeLibrary(module);
+        return nullptr;
+    }
+
+    XmlReader* reader = createXmlReader();
+    if (reader == nullptr)
+    {
+        if (console != nullptr)
+        {
+            console->WriteStartLog(0, L"[config], cannot load xml reader library, file: %s", XML_READER_DLL);
+            Sleep(5000);
+        }
+        FreeLibrary(module);
+        return nullptr;
+    }
+
+    if (!reader->Initialize(nullptr, nullptr, false))
+    {
+        if (console != nullptr)
+        {
+            console->WriteStartLog(0, L"[config], xml reader library initialize failed.");
+            Sleep(5000);
+        }
+        destroyXmlReader(reader);
+        FreeLibrary(module);
+        return nullptr;
+    }
+
+    CreateXmlConfigReaderFunc createXmlConfigReader =
+        reinterpret_cast<CreateXmlConfigReaderFunc>(GetProcAddress(module, "CreateXmlConfigReader"));
+    DestroyXmlConfigReaderFunc destroyXmlConfigReader =
+        reinterpret_cast<DestroyXmlConfigReaderFunc>(GetProcAddress(module, "DestroyXmlConfigReader"));
+    XmlConfigReader* config = createXmlConfigReader(reader);
+    GetProcAddress(module, "EncodeToConfigPacket");
+    GetProcAddress(module, "DecodeFromConfigPacket");
+
+    if (config == nullptr)
+    {
+        if (console != nullptr)
+        {
+            console->WriteStartLog(0, L"[config], cannot create xml config, file: %s", XML_READER_DLL);
+            Sleep(5000);
+        }
+        destroyXmlConfigReader(nullptr);
+        destroyXmlReader(reader);
+        FreeLibrary(module);
+        return nullptr;
+    }
+
+    if (!config->Initialize(def, count, &DaemonConfig::AllocConfig, size))
+    {
+        if (console != nullptr)
+        {
+            console->WriteStartLog(0, L"[config], xml config library initialize failed, file: %s, error: %s", fullPath,
+                                   config->GetLastErrorString());
+            Sleep(5000);
+        }
+        destroyXmlConfigReader(config);
+        destroyXmlReader(reader);
+        FreeLibrary(module);
+        return nullptr;
+    }
+
+    void* result = config->Read(fullPath, configName, readOnly);
+    if (result == nullptr && console != nullptr)
+    {
+        console->WriteStartLog(0, L"[config], cannot load config, file: %s, error: %s", fullPath,
+                               config->GetLastErrorString());
+        Sleep(5000);
+    }
+    destroyXmlConfigReader(config);
+    destroyXmlReader(reader);
+    FreeLibrary(module);
+    return result;
+}
+
+// 0xc9f0
+void* DaemonConfig::AllocConfig(unsigned long long size)
+{
+    return Memory::_Manager[1]->Alloc(size, L"source\\DaemonConfig.cpp", 110);
+}
+
+// ❓ inline only (seen in 0x13e0 and 0x1600)
+void DaemonConfig::FreeConfig(void* config)
+{
+    Memory::_Manager[1]->Free(config, L"source\\DaemonConfig.cpp", 115);
+}
+
+// 0xca10
+// ❓ LTCG made this function specific to CacheGateConfig::_Def and L"cachegate config".
+// The lift uses the parameters.
+void DaemonConfig::Dump(wchar_t const* name, void const* config, XmlCfgDef const* defs, int count)
+{
+    wchar_t const* const file = L"source\\DaemonConfig.cpp";
+    char const* base = static_cast<char const*>(config);
+    wchar_t temp[1024];
+    for (int i = 0; i < count; ++i)
+    {
+        XmlCfgDef const& def = defs[i];
+        if (def.name == nullptr)
+        {
+            if (def.desc != nullptr)
+                Log::Write(Log::LT_DEBUG, file, 132, L"[%s], ==== %s ====", name, def.desc);
+            continue;
+        }
+        void const* field = base + def.offset;
+        switch (def.type)
+        {
+        case XML_CFG_TYPE_INT:
+            Log::Write(Log::LT_DEBUG, file, 141, L"[%s], %s : %d", name, def.name, *static_cast<int const*>(field));
+            break;
+        case XML_CFG_TYPE_INT64:
+            Log::Write(Log::LT_DEBUG, file, 142, L"[%s], %s : %I64d", name, def.name,
+                       *static_cast<long long const*>(field));
+            break;
+        case XML_CFG_TYPE_FLOAT:
+            Log::Write(Log::LT_DEBUG, file, 143, L"[%s], %s : %f", name, def.name,
+                       static_cast<double>(*static_cast<float const*>(field)));
+            break;
+        case XML_CFG_TYPE_BOOL:
+            Log::Write(Log::LT_DEBUG, file, 144, L"[%s], %s : %s", name, def.name,
+                       *static_cast<bool const*>(field) ? L"yes" : L"no");
+            break;
+        case XML_CFG_TYPE_ADDRESS:
+        {
+            unsigned long long address = *static_cast<unsigned long long const*>(field);
+            wchar_t const* text = address != 0 ? Network::GetAddressStringW(static_cast<unsigned long>(address)) : L"N/A";
+            Log::Write(Log::LT_DEBUG, file, 148, L"[%s], %s : %s", name, def.name, text);
+            break;
+        }
+        case XML_CFG_TYPE_WSTRING:
+        case XML_CFG_TYPE_WSTRING2:
+        {
+            wchar_t const* text = *static_cast<wchar_t const* const*>(field);
+            if (text == nullptr || *text == 0)
+                text = L"N/A";
+            Log::Write(Log::LT_DEBUG, file, 156, L"[%s], %s : %s", name, def.name, text);
+            break;
+        }
+        case XML_CFG_TYPE_STRING:
+        {
+            temp[0] = 0;
+            char const* text = *static_cast<char const* const*>(field);
+            if (text == nullptr || *text == 0)
+                text = "N/A";
+            temp[1023] = 0;
+            MultiByteToWideChar(CP_ACP, 0, text, -1, temp, 1023);
+            temp[1023] = 0;
+            Log::Write(Log::LT_DEBUG, file, 164, L"[%s], %s : %s", name, def.name, temp);
+            break;
+        }
+        default:
+            break;
+        }
+    }
+}
