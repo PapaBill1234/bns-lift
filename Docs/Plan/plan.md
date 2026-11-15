@@ -118,3 +118,19 @@ The shared framework comes first, in the pilot. Each later server reuses `src/co
 - Queue: `bns-server/tools/slices/queue.tsv`, kind `lift`.
 - The runner makes the worktree from this repo, runs `tools/gate.sh`, merges into `main` and pushes to the private GitHub repo.
 - Rules for lift sessions: `bns-server/tools/slices/lift-rules.md`.
+
+## Planner chain
+
+The queue makes new cards by itself. You do not write cards for servers 2 to 13 by hand.
+
+```
+lift-cg-5 ─► lift-smartcoupondaemon-plan ─► lift-smartcoupondaemon-1..N ─► lift-lobbygate-plan ─► ...
+                         │                              └─► lift-smartcoupondaemon-verify
+                         └─ writes cards + Docs/Plan/queue/<id>.tsv
+```
+
+1. A planner card `lift-<slug>-plan` reads the PDB of its server. It skips the modules that are already in `src/common/`.
+2. It writes the lift cards, the verify card and the next planner card (from `Docs/Plan/planner-template.md`).
+3. It writes the queue rows to `Docs/Plan/queue/lift-<slug>-plan.tsv`.
+4. After the gate passes, the runner (`chain_lift` in `slice_runner.py`) adds the valid rows to `queue.tsv`. Valid = 9 columns, kind `lift`, id starts with `lift-`, id not in the queue, paths not empty.
+5. The next planner depends on the last lift card of the server, not on verify. A failed verify does not stop the chain.
