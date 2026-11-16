@@ -117,6 +117,8 @@ public:
     friend class Client;          // ❓ access for the inlined send in Client::Send* (LobbyGate)
     friend class ClientManager;   // ❓ access for the inlined send in ClientManager::broadcast (LobbyGate)
     friend class LobbyD;          // ❓ access for the inlined send in LobbyD::Send* (LobbyGate)
+    friend class NPChannel;        // ❓ access for the inlined send in NPChannel::SendMsg (SmartCouponDaemon)
+    friend class NPSessionHandler; // ❓ access for NPSessionHandler::OnConnect/OnClose (SmartCouponDaemon)
 };
 static_assert(sizeof(Session) == 0x128, "sizeof Session");
 static_assert(offsetof(Session, _lock) == 0x18, "Session::_lock");

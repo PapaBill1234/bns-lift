@@ -196,3 +196,15 @@ unsigned long long Connection::makeConnectSocket(bool nagle)
     }
     return s;
 }
+
+// 0x2aea0 (SmartCouponDaemon)
+unsigned long Connection::GetLocalAddress() const
+{
+    int cnt = sizeof(sockaddr_in);
+    if (_socket == INVALID_SOCKET)
+        return 0;
+    sockaddr_in localAddr = {};
+    if (getsockname(_socket, reinterpret_cast<sockaddr*>(&localAddr), &cnt) == SOCKET_ERROR)
+        return 0;
+    return localAddr.sin_addr.S_un.S_addr;
+}

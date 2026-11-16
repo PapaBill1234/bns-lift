@@ -29,5 +29,6 @@ public:
 
     friend class Daemon;
     friend class DaemonConfig;  // ❓ the PDB has no friend list. DaemonConfig::Load (0xc600) calls WriteStartLog.
+    friend class GameEventConfig;  // ❓ the PDB has no friend list. GameEventConfig (SmartCouponDaemon) calls WriteStartLog.
 };
 static_assert(sizeof(Console) == 0xB0, "sizeof Console");

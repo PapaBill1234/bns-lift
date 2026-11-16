@@ -50,8 +50,9 @@ struct XmlCfgDef2;
 class XmlConfigReader
 {
 public:
-    virtual bool Initialize(XmlCfgDef2 const* def, int count, void* (*alloc)(unsigned long long), unsigned long long size) const = 0;  // slot 0
+    // The MSVC ABI puts overloads of a virtual function in the vtable in reverse order. Declare slot 1 first.
     virtual bool Initialize(XmlCfgDef const* def, int count, void* (*alloc)(unsigned long long), unsigned long long size) const = 0;   // slot 1
+    virtual bool Initialize(XmlCfgDef2 const* def, int count, void* (*alloc)(unsigned long long), unsigned long long size) const = 0;  // slot 0
     virtual void Cleanup() = 0;                                                                                                       // slot 2
     virtual void* Read3() const = 0;  // ❓ slot 3, Read overload, not used
     virtual void* Read4() const = 0;  // ❓ slot 4, Read overload, not used

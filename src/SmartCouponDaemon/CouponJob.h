@@ -4,6 +4,7 @@
 #include <map>
 #include "RefCntObject.h"
 #include "Lock.h"
+#include "StlMemory.h"
 
 class RefCntPoolObj : public RefCntObject
 {
@@ -36,6 +37,10 @@ public:
     virtual bool work(int, void*) = 0;                // slot 6
     virtual ~CouponJob();
 
+    bool transit(int state);                          // 0x6990
+    bool execute(int task, void* param);              // 0x6B50
+    bool resume(int state, int task, void* param);    // 0x6C10
+
     unsigned long long _id;
     int _state;
     int _lastState;
@@ -53,14 +58,28 @@ public:
         : _idgen(reinterpret_cast<void*>(idgen)), _hashCount(0), _jobs(nullptr), _lock(nullptr)
     {
     }
-    ~JobManager();  // ❓ address
+    ~JobManager();  // 0x6CE0
 
-    bool Initialize(int hashCount);  // ❓ address
-    void Clear();                    // ❓ address
+    typedef std::map<unsigned long long, CouponJob*, std::less<unsigned long long>,
+                     StlAllocator<std::pair<const unsigned long long, CouponJob*>, 2> > JobMap;  // ❓ typedef name
 
+    bool Initialize(int hashCount);                                   // 0x6E10
+    bool Register(CouponJob* job);                                    // 0x6F60
+    void Clear();                                                     // 0x6FF0
+    void Execute(CouponJob* job, int task, void* param);              // 0x71A0
+    bool ExecuteW(unsigned long long jobid, void* param);             // 0x7220 ❓ arguments
+    bool ResumeW(unsigned long long jobid, int state, int task);      // 0x72B0
+
+private:
+    friend class SendPublicationEvent;  // ❓ access for HandleEvent (0xBE30)
+    bool add(CouponJob* job);                     // 0x7360
+    void remove(unsigned long long jobid);        // 0x7440
+    CouponJob* find(unsigned long long jobid);    // 0x7540
+
+public:
     void* _idgen;
     int _hashCount;
-    std::map<unsigned long long, CouponJob*>* _jobs;
+    JobMap* _jobs;
     CriticalSection* _lock;
 };
 static_assert(sizeof(JobManager) == 0x20, "sizeof JobManager");

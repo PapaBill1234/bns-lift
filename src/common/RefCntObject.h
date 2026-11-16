@@ -46,6 +46,8 @@ static_assert(offsetof(RefCntHistory, _history) == 0x10, "RefCntHistory::_histor
 class RefCntObject
 {
 public:
+    // Inlined in Session::Session (0xdee0) and Port::Port: _ref = 1, _tag = 10, _history = nullptr.
+    RefCntObject() : _tag(10), _ref(1), _history(nullptr) {}
     virtual ~RefCntObject();                                                   // slot 0
 private:
     virtual void deallocate_object(wchar_t const* file, int line);             // slot 1

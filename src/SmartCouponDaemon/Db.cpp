@@ -1,0 +1,463 @@
+// Db.obj (SmartCouponDaemon PDB). Source file name from log strings: "source\Db.cpp".
+#include <windows.h>
+#include <sql.h>
+#include <sqlext.h>
+#include <stdio.h>
+#include <wchar.h>
+#include <new>
+#include "Db.h"
+#include "AlertSender.h"
+#include "CrashHandler.h"
+#include "Log.h"
+#include "Memory.h"
+#include "MemoryManager.h"
+
+static wchar_t const kFile[] = L"source\\Db.cpp";
+
+// Inlined crash macro. Db::Log hides the Log class in the Db scope, so use ::Log.
+#define DB_ASSERT_CRASH(line)                                                     \
+    do                                                                            \
+    {                                                                             \
+        ::Log::Write(::Log::LT_ERROR, kFile, line, L"== CRASH == ASSERT CRASH"); \
+        AlertSender::Write(kFile, line, L"== CRASH == ASSERT CRASH");            \
+        CrashHandler::MakeCrash("source\\Db.cpp", line, L"");                     \
+    } while (0)
+
+void* Db::EnvHandle = nullptr;
+Db* Db::Instance[41];
+
+// 0x20690
+// The compiler folds dbId to 1 (the only caller is SmartCouponDaemon::initialize).
+bool Db::Initialize(unsigned int dbId, wchar_t const* dsn)
+{
+    if (dsn == nullptr)
+        DB_ASSERT_CRASH(41);
+    if (Instance[dbId] != nullptr)
+        DB_ASSERT_CRASH(42);
+    if (EnvHandle == nullptr && !initEnv())
+        return false;
+    void* mem = Memory::_Manager[2]->Alloc(sizeof(Db), kFile, 46);  // ❓ line
+    Db* db = mem != nullptr ? new (mem) Db() : nullptr;
+    Instance[dbId] = db;
+    db->TranList = nullptr;  // BUG: 0x20690 no null check after a failed Alloc.
+    size_t const length = wcslen(dsn) + 1;
+    wchar_t* copy = static_cast<wchar_t*>(BaseMemoryManager::_Instance.Alloc(length * sizeof(wchar_t), kFile, 53));
+    Instance[dbId]->Dsn = copy;
+    wcsncpy(copy, dsn, wcslen(dsn) + 1);
+    return true;
+}
+
+// 0x20810
+void Db::Clear(unsigned int dbId)
+{
+    if (dbId == 0)
+    {
+        if (EnvHandle != nullptr)
+        {
+            SQLFreeHandle(SQL_HANDLE_ENV, EnvHandle);
+            EnvHandle = nullptr;
+        }
+        for (unsigned int i = 1; i <= 40; ++i)
+        {
+            if (Instance[i] != nullptr)
+                Clear(i);
+        }
+        return;
+    }
+    if (dbId > 40)
+        return;
+    Db* db = Instance[dbId];
+    if (db == nullptr)
+        return;
+    db->clearList();
+    if (db->Dsn != nullptr)
+    {
+        BaseMemoryManager::_Instance.Free(db->Dsn, kFile, 36);
+        db->Dsn = nullptr;
+    }
+    DeleteCriticalSection(&db->TranListLock.CS);
+    Memory::_Manager[2]->Free(Instance[dbId], kFile, 78);
+    Instance[dbId] = nullptr;
+}
+
+// 0x20910
+// The compiler folds dbId to 1.
+DbTransaction* Db::AllocTransaction(unsigned int dbId)
+{
+    if (Instance[dbId] == nullptr)
+    {
+        ::Log::Write(::Log::LT_ERROR, kFile, 85, L"Invalid DB ID, %d, %p", dbId, nullptr);
+        return nullptr;
+    }
+    EnterCriticalSection(&Instance[dbId]->TranListLock.CS);
+    DbTransaction* tran = nullptr;
+    DbTransaction* tail = Instance[dbId]->TranList;
+    if (tail != nullptr)
+    {
+        tran = tail->Next;
+        if (tran->Next == tran)
+            Instance[dbId]->TranList = nullptr;
+        else
+            tail->Next = tran->Next;
+        tran->Next = nullptr;
+    }
+    LeaveCriticalSection(&Instance[dbId]->TranListLock.CS);
+    if (tran == nullptr)
+    {
+        tran = static_cast<DbTransaction*>(Memory::_Manager[2]->Alloc(sizeof(DbTransaction), kFile, 96));
+        if (tran != nullptr)
+        {
+            tran->DbId = dbId;
+            tran->ConnHandle = nullptr;
+            tran->StmtHandle = nullptr;
+            tran->BoundCol = false;
+            tran->BoundParam = false;
+            tran->Next = nullptr;
+        }
+    }
+    // BUG: 0x20910 no null check of tran after a failed Alloc.
+    if (!tran->initialize(Instance[dbId]->Dsn))
+    {
+        ReleaseTransaction(tran);
+        return nullptr;
+    }
+    return tran;
+}
+
+// 0x20A30
+void Db::ReleaseTransaction(DbTransaction* tran)
+{
+    if (tran == nullptr)
+        return;
+    unsigned int const dbId = tran->DbId;
+    EnterCriticalSection(&Instance[dbId]->TranListLock.CS);
+    if (tran->StmtHandle != nullptr)
+    {
+        SQLFreeStmt(tran->StmtHandle, SQL_CLOSE);
+        if (tran->BoundCol)
+        {
+            SQLFreeStmt(tran->StmtHandle, SQL_UNBIND);
+            tran->BoundCol = false;
+        }
+        if (tran->BoundParam)
+        {
+            SQLFreeStmt(tran->StmtHandle, SQL_RESET_PARAMS);
+            tran->BoundParam = false;
+        }
+    }
+    Db* db = Instance[dbId];
+    if (db->TranList != nullptr)
+    {
+        tran->Next = db->TranList->Next;
+        Instance[dbId]->TranList->Next = tran;
+        Instance[dbId]->TranList = tran;
+    }
+    else
+    {
+        db->TranList = tran;
+        Instance[dbId]->TranList->Next = Instance[dbId]->TranList;
+    }
+    LeaveCriticalSection(&Instance[dbId]->TranListLock.CS);
+}
+
+// 0x20B00
+void Db::Log(short type, void* handle, wchar_t const* fmt, va_list args)
+{
+    wchar_t msg[520];
+    SQLWCHAR sqlState[12];
+    SQLWCHAR errorMsg[520];
+    SQLINTEGER nativeError;
+    SQLSMALLINT errMsgLen;
+
+    if (fmt != nullptr && _vsnwprintf(msg, 512, fmt, args) <= 0)  // ❓ original: _vswprintf_c_l(..., nullptr, args)
+        msg[0] = 0;
+    // BUG: 0x20B00 msg is not set when fmt is null.
+    SQLSMALLINT record = 1;
+    SQLRETURN ret = SQLGetDiagRecW(type, handle, record, sqlState, &nativeError, errorMsg, 512, &errMsgLen);
+    while (ret != SQL_NO_DATA)
+    {
+        ++record;
+        if (ret == SQL_ERROR)
+            break;
+        ::Log::Write(::Log::LT_ERROR, kFile, 186, L"%s: [%d] %s, %s", msg, nativeError, sqlState, errorMsg);
+        ret = SQLGetDiagRecW(type, handle, record, sqlState, &nativeError, errorMsg, 512, &errMsgLen);
+    }
+}
+
+// 0x20C70
+void Db::errorLog(wchar_t const* fmt, ...)
+{
+    va_list args;
+    va_start(args, fmt);
+    Log(SQL_HANDLE_ENV, EnvHandle, fmt, args);
+    va_end(args);
+}
+
+// 0x20CB0
+bool Db::initEnv()
+{
+    if (EnvHandle != nullptr)
+        return true;
+    if (static_cast<unsigned short>(SQLAllocHandle(SQL_HANDLE_ENV, nullptr, &EnvHandle)) >= 2)
+    {
+        ::Log::Write(::Log::LT_ERROR, kFile, 207, L"SQLAllocHandle(SQL_HANDLE_ENV)");
+        return false;
+    }
+    if (static_cast<unsigned short>(SQLSetEnvAttr(EnvHandle, SQL_ATTR_ODBC_VERSION,
+                                                  reinterpret_cast<SQLPOINTER>(SQL_OV_ODBC3), 0)) < 2)
+        return true;
+    errorLog(L"SQLSetEnvAttr(SQL_ATTR_ODBC_VERSION, %d)", SQL_OV_ODBC3);
+    if (EnvHandle != nullptr)
+    {
+        SQLFreeHandle(SQL_HANDLE_ENV, EnvHandle);
+        EnvHandle = nullptr;
+    }
+    return false;
+}
+
+// 0x20D90
+void Db::clearList()
+{
+    EnterCriticalSection(&TranListLock.CS);
+    while (TranList != nullptr)
+    {
+        DbTransaction* tail = TranList;
+        DbTransaction* tran = nullptr;
+        if (tail != nullptr)
+        {
+            tran = tail->Next;
+            if (tran->Next == tran)
+                TranList = nullptr;
+            else
+                tail->Next = tran->Next;
+            tran->Next = nullptr;
+            tran->close();
+        }
+        Memory::_Manager[2]->Free(tran, kFile, 234);
+    }
+    LeaveCriticalSection(&TranListLock.CS);
+}
+
+// 0x20E40
+bool DbTransaction::BindCol(unsigned int index, void* buffer, unsigned long long bufferSize, long long* varType)
+{
+    if (StmtHandle == nullptr)
+    {
+        ::Log::Write(::Log::LT_ERROR, kFile, 286, L"DbTransaction::BindCol(), Not initialized");
+        return false;
+    }
+    *varType = SQL_NTS;
+    if (static_cast<unsigned short>(SQLBindCol(StmtHandle, static_cast<SQLUSMALLINT>(index),
+                                               static_cast<SQLSMALLINT>(bufferSize), buffer, 0,
+                                               reinterpret_cast<SQLLEN*>(varType))) < 2)
+    {
+        BoundCol = true;
+        return true;
+    }
+    statmentErrorLog(L"SQLBindCol(%d, %d, %d, %p, %p)", index, static_cast<unsigned int>(bufferSize), buffer, 0,
+                     varType);
+    return false;
+}
+
+// 0x20F20
+bool DbTransaction::Prepare(wchar_t* query)
+{
+    if (StmtHandle == nullptr)
+    {
+        ::Log::Write(::Log::LT_ERROR, kFile, 327, L"DbTransaction::Prepare(), Not initialized");
+        return false;
+    }
+    if (BoundParam)
+    {
+        ::Log::Write(::Log::LT_ERROR, kFile, 331, L"DbTransaction::Prepare(), Already called");
+        return false;
+    }
+    if (static_cast<unsigned short>(SQLPrepareW(StmtHandle, reinterpret_cast<SQLWCHAR*>(query), SQL_NTS)) < 2)
+    {
+        BoundParam = true;
+        return true;
+    }
+    statmentErrorLog(L"SQLPrepare(%s)", query);
+    return false;
+}
+
+// 0x20FD0
+bool DbTransaction::BindParam(unsigned int index, unsigned int inout, void* buffer, unsigned long long bufferSize,
+                              unsigned long long columnSize, unsigned long long* decimalDigits)
+{
+    if (StmtHandle == nullptr)
+    {
+        ::Log::Write(::Log::LT_ERROR, kFile, 373, L"DbTransaction::BindParam(), Not initialized");
+        return false;
+    }
+    if (!BoundParam)
+    {
+        ::Log::Write(::Log::LT_ERROR, kFile, 377, L"DbTransaction::BindParam(), Not prepared");
+        return false;
+    }
+    if (static_cast<unsigned short>(SQLBindParameter(StmtHandle, static_cast<SQLUSMALLINT>(index),
+                                                     static_cast<SQLSMALLINT>(inout),
+                                                     static_cast<SQLSMALLINT>(columnSize),
+                                                     static_cast<SQLSMALLINT>(bufferSize), 0, 0, buffer, 0,
+                                                     reinterpret_cast<SQLLEN*>(decimalDigits))) < 2)
+        return true;
+    statmentErrorLog(L"SQLBindParameter(%d, %d, %d, %d, %d, %d, %p, %d, %p)", index, inout,
+                     static_cast<unsigned int>(columnSize), static_cast<unsigned int>(bufferSize), 0, 0, buffer, 0,
+                     decimalDigits);
+    return false;
+}
+
+// 0x21100
+bool DbTransaction::Execute()
+{
+    if (StmtHandle == nullptr || !BoundParam)
+    {
+        ::Log::Write(::Log::LT_ERROR, kFile, 415, L"DbTransaction::Execute(), Not initialized");
+        return false;
+    }
+    if (static_cast<unsigned short>(SQLExecute(StmtHandle)) < 2)
+        return true;
+    statmentErrorLog(L"SQLExecute()");
+    return false;
+}
+
+// 0x21180
+// Returns 1 for a row, 0 for no row, -1 for an error. fetchCount is not used.
+int DbTransaction::Fetch(int fetchCount)
+{
+    (void)fetchCount;
+    if (StmtHandle == nullptr)
+    {
+        ::Log::Write(::Log::LT_ERROR, kFile, 433, L"DbTransaction::Fetch(), Not initialized");
+        return -1;
+    }
+    SQLRETURN const ret = SQLFetch(StmtHandle);
+    if (ret == SQL_ERROR)
+    {
+        statmentErrorLog(L"SQLFetch()");
+        return -1;
+    }
+    if (ret == SQL_SUCCESS_WITH_INFO)
+    {
+        statmentErrorLog(L"SQLFetch()");
+        return 1;
+    }
+    if (ret == SQL_SUCCESS)
+        return 1;
+    return 0;
+}
+
+// 0x21210
+bool DbTransaction::initialize(wchar_t* dsn)
+{
+    void* const envHandle = Db::EnvHandle;
+    if (ConnHandle != nullptr)
+    {
+        SQLINTEGER state;
+        if (SQLGetConnectAttrW(ConnHandle, SQL_ATTR_CONNECTION_DEAD, &state, 4, nullptr) != SQL_SUCCESS ||
+            state == SQL_CD_TRUE)
+            close();
+    }
+    if (ConnHandle == nullptr)
+    {
+        if (!connect(envHandle, dsn))
+            return false;
+        if (!initStatement())
+        {
+            close();
+            return false;
+        }
+    }
+    return true;
+}
+
+// 0x212C0
+bool DbTransaction::connect(void* envHandle, wchar_t* dsn)
+{
+    if (envHandle == nullptr)
+    {
+        ::Log::Write(::Log::LT_ERROR, kFile, 508, L"DbConnection::connect(%p), Environment is not initialized",
+                     nullptr);
+        return false;
+    }
+    if (ConnHandle != nullptr)
+        return true;
+    if (static_cast<unsigned short>(SQLAllocHandle(SQL_HANDLE_DBC, envHandle, &ConnHandle)) >= 2)
+    {
+        Db::errorLog(L"SQLAllocHandle(SQL_HANDLE_DBC, %p)", envHandle);
+        return false;
+    }
+    if (static_cast<unsigned short>(SQLDriverConnectW(ConnHandle, nullptr, reinterpret_cast<SQLWCHAR*>(dsn), SQL_NTS,
+                                                      nullptr, 0, nullptr, SQL_DRIVER_NOPROMPT)) < 2)
+        return true;
+    connectionErrorLog(L"SQLDriverConnect()");
+    SQLFreeHandle(SQL_HANDLE_DBC, ConnHandle);
+    ConnHandle = nullptr;
+    return false;
+}
+
+// 0x213D0
+void DbTransaction::close()
+{
+    if (StmtHandle != nullptr)
+    {
+        SQLFreeStmt(StmtHandle, SQL_CLOSE);
+        if (BoundCol)
+        {
+            SQLFreeStmt(StmtHandle, SQL_UNBIND);
+            BoundCol = false;
+        }
+        if (BoundParam)
+        {
+            SQLFreeStmt(StmtHandle, SQL_RESET_PARAMS);
+            BoundParam = false;
+        }
+        SQLFreeHandle(SQL_HANDLE_STMT, StmtHandle);
+        StmtHandle = nullptr;
+    }
+    if (ConnHandle != nullptr)
+    {
+        SQLDisconnect(ConnHandle);
+        SQLFreeHandle(SQL_HANDLE_DBC, ConnHandle);
+        ConnHandle = nullptr;
+    }
+}
+
+// 0x21460
+bool DbTransaction::initStatement()
+{
+    if (ConnHandle == nullptr)
+    {
+        ::Log::Write(::Log::LT_ERROR, kFile, 550, L"DbConnection::initStatement(), Connection is not initialized");
+        return false;
+    }
+    if (StmtHandle == nullptr)
+    {
+        if (static_cast<unsigned short>(SQLAllocHandle(SQL_HANDLE_STMT, ConnHandle, &StmtHandle)) >= 2)
+        {
+            connectionErrorLog(L"SQLAllocHandle(SQL_HANDLE_STMT, %p)", ConnHandle);
+            return false;
+        }
+        SQLSetStmtAttrW(StmtHandle, SQL_ATTR_CONCURRENCY, reinterpret_cast<SQLPOINTER>(SQL_CONCUR_READ_ONLY), 0);
+        SQLSetStmtAttrW(StmtHandle, SQL_QUERY_TIMEOUT, reinterpret_cast<SQLPOINTER>(10), 0);
+    }
+    return true;
+}
+
+// 0x21520
+void DbTransaction::connectionErrorLog(wchar_t const* fmt, ...)
+{
+    va_list args;
+    va_start(args, fmt);
+    Db::Log(SQL_HANDLE_DBC, ConnHandle, fmt, args);
+    va_end(args);
+}
+
+// 0x21550
+void DbTransaction::statmentErrorLog(wchar_t const* fmt, ...)
+{
+    va_list args;
+    va_start(args, fmt);
+    Db::Log(SQL_HANDLE_STMT, StmtHandle, fmt, args);
+    va_end(args);
+}

@@ -109,7 +109,7 @@ static inline long long makeIdleStatePos(unsigned long long id)
 // 0xDED0
 unsigned int Session::EventId() const
 {
-    return 0;  // ❓
+    return 3;  // EVID_IO_CONNECT (bytes b8 03 00 00 00 c3)
 }
 
 // 0xDEE0

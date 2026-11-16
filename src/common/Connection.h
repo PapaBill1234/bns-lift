@@ -68,6 +68,8 @@ public:
     bool AsyncRecv(AsyncRecvContext* context, unsigned int* recvdSize);                                    // 0x1AF30
     bool AsyncSend(AsyncSendContext* context);                                                           // 0x1AFB0
 
+    friend class NPChannel;  // ❓ NPChannel2.cpp calls GetLocalAddress.
+
 protected:
     unsigned long GetLocalAddress() const;  // 0x2AEA0 (SmartCouponDaemon). Not in the CacheGate exe.
 

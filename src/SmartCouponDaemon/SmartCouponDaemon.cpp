@@ -285,7 +285,7 @@ bool SmartCouponDaemon::initialize()
         wcsncpy(Daemon::Instance->publicAddrString, Daemon::Instance->internalAddrString, 20);
     }
     const_cast<unsigned short&>(_wid) = static_cast<unsigned short>(_config->_serviceWid);
-    DaemonConfig::Dump(Daemon::Instance->ShortName(), _config, SmartCouponConfig::_Def, 23);  // ❓ arguments
+    DaemonConfig::Dump(L"config", _config, SmartCouponConfig::_Def, 23);
 
     if (!BnsCommonConfig::LoadBnsCommonConfig())
     {
@@ -303,9 +303,10 @@ bool SmartCouponDaemon::initialize()
     {
         EventNotiJob tmp;
         // ❓ The pool reads the vtable of a sample object.
-        EventNotiJob::_pool->Initialize(*reinterpret_cast<void**>(&tmp), _config->_initJobCount,
-                                        _config->_reuseWaitTime);
-        GObjPoolTimer->Add(&EventNotiJob::_pool);  // ❓
+        EventNotiJob::_pool.Initialize(*reinterpret_cast<void**>(&tmp), _config->_initJobCount,
+                                       _config->_reuseWaitTime);
+        ObjPool* pool = &EventNotiJob::_pool;  // ❓ Add takes ObjPool**
+        GObjPoolTimer->Add(&pool);
     }
 
     mem = Memory::_Manager[2]->Alloc(sizeof(JobManager), kFile, 261);
@@ -482,8 +483,7 @@ void SmartCouponDaemon::shutdown()
         }
         GObjPoolTimer->removeReferenceCount(kFile, 489);
     }
-    if (EventNotiJob::_pool != nullptr)
-        EventNotiJob::_pool->Finalize();  // ❓
+    EventNotiJob::_pool.Finalize();
 
     if (Db::EnvHandle != nullptr)
     {

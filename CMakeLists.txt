@@ -139,11 +139,23 @@ target_link_libraries(CacheGate PRIVATE lift_common ${LIFT_MSVCP100_IMPLIB})
 
 # SmartCouponDaemon app modules (static lib).
 add_library(lift_smartcoupondaemon STATIC
+  src/SmartCouponDaemon/CouponJob.cpp
+  src/SmartCouponDaemon/Db.cpp
+  src/SmartCouponDaemon/EventNotiJob.cpp
+  src/SmartCouponDaemon/GameEventWorker.cpp
   src/SmartCouponDaemon/ObjectPool.cpp
   src/SmartCouponDaemon/SharedChannel.cpp
   src/SmartCouponDaemon/ManagerChannel.cpp
   src/SmartCouponDaemon/ManagerPacketHandler.cpp
   src/SmartCouponDaemon/SmartCouponManagerPacketSmartCouponSideHandlerList.cpp
+  src/SmartCouponDaemon/SmartCouponDB.cpp
+  src/SmartCouponDaemon/DaemonChannel.cpp
+  src/SmartCouponDaemon/DaemonPacketHandler.cpp
+  src/SmartCouponDaemon/SmartCouponPacketSmartCouponSideHandlerList.cpp
+  src/SmartCouponDaemon/CouponGameEventConfig.cpp
+  src/SmartCouponDaemon/NPChannel2.cpp
+  src/SmartCouponDaemon/NPServiceChannel.cpp
+  src/SmartCouponDaemon/NPMessageHandler.cpp
   src/SmartCouponDaemon/SmartCouponDaemon.cpp)
 target_compile_options(lift_smartcoupondaemon PRIVATE /GR-)
 target_include_directories(lift_smartcoupondaemon BEFORE PRIVATE ${LIFT_STL_INCLUDE})

@@ -31,13 +31,13 @@ public:
     virtual wchar_t const* Name() const = 0;                                     // slot 3
     virtual long LineNumber() const = 0;                                         // slot 4
     virtual int AttributeCount() const = 0;                                      // slot 5
-    virtual wchar_t const* Attribute(unsigned int index, wchar_t const* name) const = 0;  // slot 6
-    virtual wchar_t const* Attribute(int index) const = 0;                       // slot 7
     virtual wchar_t const* Attribute(wchar_t const* name) const = 0;             // slot 8
+    virtual wchar_t const* Attribute(int index) const = 0;                       // slot 7
+    virtual wchar_t const* Attribute(unsigned int index, wchar_t const* name) const = 0;  // slot 6
     virtual wchar_t const* AttributeName(int index) const = 0;                   // slot 9
     virtual int AttributeIndex(wchar_t const* name) const = 0;                   // slot 10
-    virtual XmlNode const* ToXmlNode() const = 0;                                // slot 11
     virtual XmlNode* ToXmlNode() = 0;                                            // slot 12
+    virtual XmlNode const* ToXmlNode() const = 0;                                // slot 11
 };
 
 class XmlNode
@@ -60,18 +60,18 @@ public:
     virtual int BinarySize() const = 0;                            // slot 14
     virtual void SerializeTo(char*& buffer, int& size) const = 0;  // slot 15
     virtual void SerializeFrom(char*& buffer, int& size) = 0;      // slot 16
-    virtual XmlElement const* ToXmlElement() const = 0;            // slot 17
     virtual XmlElement* ToXmlElement() = 0;                        // slot 18
-    virtual XmlTextNode const* ToXmlTextNode() const = 0;          // slot 19
+    virtual XmlElement const* ToXmlElement() const = 0;            // slot 17
     virtual XmlTextNode* ToXmlTextNode() = 0;                      // slot 20
+    virtual XmlTextNode const* ToXmlTextNode() const = 0;          // slot 19
 };
 
 class XmlTextNode
 {
 public:
     virtual wchar_t const* Value() const = 0;        // slot 0
-    virtual XmlNode const* ToXmlNode() const = 0;    // slot 1
     virtual XmlNode* ToXmlNode() = 0;                // slot 2
+    virtual XmlNode const* ToXmlNode() const = 0;    // slot 1
 };
 
 class XmlPieceReader
@@ -108,14 +108,14 @@ public:
     virtual XmlReaderLog const* GetLog() const = 0;                                           // slot 2
     virtual void Cleanup(bool flag) const = 0;                                                // slot 3
     virtual XmlReaderIO* GetIO() const = 0;                                                   // slot 4
-    virtual bool Read(wchar_t const* fileName, void* param) const = 0;                        // slot 5
-    virtual XmlDoc* Read(wchar_t const* fileName, XmlPieceReader* pieceReader) const = 0;    // slot 6
     virtual XmlDoc* Read(unsigned char const* buffer, unsigned int size, wchar_t const* fileName,
                          XmlPieceReader* pieceReader) const = 0;                              // slot 7
+    virtual XmlDoc* Read(wchar_t const* fileName, XmlPieceReader* pieceReader) const = 0;    // slot 6
+    virtual bool Read(wchar_t const* fileName, void* param) const = 0;                        // slot 5
     virtual void Close(XmlDoc* doc) const = 0;                                                // slot 8
     virtual XmlDoc* NewDoc() const = 0;                                                       // slot 9
-    virtual bool IsBinary(wchar_t const* fileName) const = 0;                                 // slot 10
     virtual bool IsBinary(unsigned char const* buffer, unsigned int size) const = 0;          // slot 11
+    virtual bool IsBinary(wchar_t const* fileName) const = 0;                                 // slot 10
 };
 
 // ❓ The export typedef names are not in the PDB.

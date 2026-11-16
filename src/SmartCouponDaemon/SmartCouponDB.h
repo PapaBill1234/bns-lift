@@ -5,6 +5,7 @@
 #include "Memory.h"
 #include "MemoryManager.h"
 #include "StringUtil.h"
+#include "Db.h"
 
 struct EventLogInfo
 {
@@ -37,6 +38,7 @@ public:
             _eventLogList = nullptr;
         }
     }
+    bool AddEventLogInfo(EventLogInfo const* info);  // 0x10A00
 
     EventLogInfo* _eventLogList;
     int _count;
@@ -81,6 +83,7 @@ public:
         }
         return &_publicationList[index];
     }
+    bool AddPublicationInfo(PublicationInfo const* info);  // 0x108E0
 
     PublicationInfo* _publicationList;
     int _count;
@@ -88,10 +91,36 @@ public:
 };
 static_assert(sizeof(RetrievePublicationContext) == 0x10, "sizeof RetrievePublicationContext");
 
+// RAII holder of a DbTransaction. The ctor is inlined in the callers.
+struct AutoDbTran
+{
+    // ❓ Inlined ctor.
+    explicit AutoDbTran(unsigned int dbId) : Tran(Db::AllocTransaction(dbId)), TimeoutSec(10) {}
+    ~AutoDbTran();  // 0x10850
+
+    DbTransaction* Tran;
+    int TimeoutSec;
+};
+
 class SmartCouponDB
 {
 public:
-    static bool LoadCouponPublicationList(int* dbRetValue, RetrievePublicationContext* context);  // ❓ address
-    static bool LoadGameEventLogList(int* dbRetValue, RetrieveEventLogContext* context);          // ❓ address
+    static bool RegisterGameEventLog(int* dbRetValue, id128* gameAccountId, short worldId, long long pcdbid,
+                                     int gameEventId, long long* outGameEventLogId);  // 0x10B00
+    static bool UpdateStatusToProcessFailure(int* dbRetValue, long long gameEventLogId, id128* gameAccountId,
+                                             short worldId, long long pcdbid, int gameEventId);  // 0x11130
+    static bool ProcessCharacterGameEventLog(int* dbRetValue, long long gameEventLogId, id128* gameAccountId,
+                                             short worldId, long long pcdbid, int gameEventId,
+                                             RetrievePublicationContext* outPublicationContext);  // 0x117C0
+    static bool ProcessAccountGameEventLog(int* dbRetValue, long long gameEventLogId, id128* gameAccountId,
+                                           int gameEventId, RetrievePublicationContext* outPublicationContext);  // 0x12170
+    static bool LoadSingleCouponPublication(int* dbRetValue, long long publicationId, id128* gameAccountId,
+                                            int* outCouponEventId);  // 0x13DD0
+    static bool LoadCouponPublicationList(int* dbRetValue, RetrievePublicationContext* context);  // 0x13A30
+    static bool LoadGameEventLogList(int* dbRetValue, RetrieveEventLogContext* context);          // 0x13620
     static bool LoadRetryReadyGameEventLogList(int* dbRetValue, RetrieveEventLogContext* context);  // 0x145F0
+    static bool UpdateStatusToPublicationSuccess(int* dbRetValue, long long publicationId, id128 const* gameAccountId,
+                                                 int couponEventId, long long const* acceptTid);  // 0x129C0
+    static bool UpdateStatusToPublicationFailure(int* dbRetValue, long long publicationId, id128 const* gameAccountId,
+                                                 int couponEventId);  // 0x13060
 };
