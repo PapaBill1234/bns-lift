@@ -16,6 +16,8 @@
 #      SCD_ARGS     extra arguments for the exe (default: none)
 #      SCD_PKTLOG   folder with pktlog.dll and patch_import.py (default: bns-wine/pktlog)
 #      SCD_NP_STREAM, SCD_GAMED_STREAM     bytes that the peers send (default "-" = nothing)
+#      SCD_GAMED_PEER 1 = also listen on the gamed internal-port (default 0; the exe never connects there,
+#                   the GameDaemon connects to daemon-listen-port: use --client and SCD_DAEMON_STREAM)
 #      SCD_MANAGER_STREAM, SCD_DAEMON_STREAM bytes that the clients send (default "-" = nothing)
 #      SCD_CLIENT_AT  seconds after start for the --client connects (default SECONDS-6)
 #      SCD_DISPLAY  X display for the console window (default :77, a hidden Xvfb)
@@ -145,9 +147,18 @@ if [ "$PEER" = 1 ]; then
   python3 -I "$ROOT/tools/verify/replay.py" listen "$NP_PORT" "${SCD_NP_STREAM:--}" "$OUT/peer-np.txt" \
     --hdr 0 --wait "$SECS" --accept-timeout "$SECS" > "$OUT/peer-np.log" 2>&1 &
   PEER_PIDS+=($!)
-  python3 -I "$ROOT/tools/verify/replay.py" listen "$GAMED_PORT" "${SCD_GAMED_STREAM:--}" "$OUT/peer-gamed.txt" \
-    --hdr 0 --wait "$SECS" --accept-timeout "$SECS" > "$OUT/peer-gamed.log" 2>&1 &
-  PEER_PIDS+=($!)
+  # The exe does not connect to the GameDaemon. DChannelMgr only accepts on daemon-listen-port (22000).
+  # gamed-list.config.xml is the list of allowed GameDaemons, not a connect list (original log:
+  # "daemon registered ... port:20100", then "[daemon-ch] ... accept" for the --client connect to 22000).
+  # So the GameDaemon role is the --client connect to daemon-listen-port (SCD_DAEMON_STREAM).
+  # SCD_GAMED_PEER=1 still runs a listener on internal-port, to show that nothing connects there.
+  if [ "${SCD_GAMED_PEER:-0}" = 1 ]; then
+    python3 -I "$ROOT/tools/verify/replay.py" listen "$GAMED_PORT" "${SCD_GAMED_STREAM:--}" "$OUT/peer-gamed.txt" \
+      --hdr 0 --wait "$SECS" --accept-timeout "$SECS" > "$OUT/peer-gamed.log" 2>&1 &
+    PEER_PIDS+=($!)
+  else
+    echo "no listener (SCD_GAMED_PEER=0): the exe does not connect to the GameDaemon" > "$OUT/peer-gamed.log"
+  fi
 fi
 
 # wineconsole writes the console text into its window, not to stdout. wine.txt keeps what Wine
