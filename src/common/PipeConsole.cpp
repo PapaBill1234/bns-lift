@@ -603,6 +603,37 @@ void PipeConsole::SetInvalidInfo(wchar_t const* keyString, bool isInvalid)
     _lock.Leave();
 }
 
+// 0x2A5A0 (LobbyGate)
+void PipeConsole::SetRunningInfo(wchar_t const* keyString, wchar_t const* valueString)
+{
+    _lock.Enter();
+    ItemNode* node = _running._head._next;
+    for (; node != &_running._tail; node = node->_next)
+    {
+        if (wcscmp(node->_key, keyString) == 0)
+            break;
+    }
+    if (node == &_running._tail)
+        node = nullptr;
+    if (node == nullptr)
+    {
+        if (valueString != nullptr && *valueString != 0)
+            addNode(_running, keyString, valueString);
+    }
+    else if (valueString != nullptr && *valueString != 0)
+    {
+        wcsncpy_s(node->_value, 129, valueString, 128);
+        node->_value[128] = 0;
+    }
+    else
+    {
+        node->_next->_prev = node->_prev;
+        node->_prev->_next = node->_next;
+        Memory::_Manager[2]->Free(node, PIPE_CONSOLE_FILE, 837);
+    }
+    _lock.Leave();
+}
+
 // 0x15ed0
 bool PipeConsole::addNode(ItemList& list, wchar_t const* keyString, wchar_t const* valueString)
 {

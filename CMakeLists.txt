@@ -71,11 +71,18 @@ add_library(lift_common STATIC
   src/common/ctr.cpp
   src/common/prng.cpp
   src/common/ripemd160.cpp
+  src/common/ripemd128.cpp
+  src/common/mgf.cpp
+  src/common/oaep_encoder.cpp
+  src/common/rsa.cpp
+  src/common/CryptoKey.cpp
   src/common/BigInteger.cpp
   src/common/biArithmetic.cpp
   src/common/biMultiplication.cpp
   src/common/biSqr.cpp
   src/common/biMontgomery.cpp
+  src/common/NumberTheory.cpp
+  src/common/LogFile.cpp
   src/common/PacketBuffer.cpp
   src/common/Packet.cpp
   src/common/Connection.cpp

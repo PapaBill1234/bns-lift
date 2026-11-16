@@ -1,0 +1,31 @@
+// mgf.obj (LobbyGate PDB). MGF1 mask generator.
+// The PDB has no type records for this class. The layout comes from the code.
+// ❓ member names.
+#pragma once
+#include <stddef.h>
+#include <string.h>
+#include "CryptoHash.h"
+
+class MaskGenerator
+{
+    friend class OaepEncoder;
+
+public:
+    MaskGenerator() : _size(0), _hash(0) { memset(_digest, 0, sizeof(_digest)); }
+    ~MaskGenerator()
+    {
+        memset(_digest, 0, sizeof(_digest));
+        _size = 0;
+        _hash = 0;
+    }
+
+private:
+    bool generate(unsigned char const* seed, int seedSize, unsigned char* out, int outSize);
+
+public:
+    int _size;                 // ❓ +0, digest size of _hash
+    unsigned char _digest[64]; // ❓ +4
+    CryptoHash* _hash;         // ❓ +72
+};
+static_assert(sizeof(MaskGenerator) == 80, "sizeof MaskGenerator");
+static_assert(offsetof(MaskGenerator, _hash) == 72, "MaskGenerator::_hash");

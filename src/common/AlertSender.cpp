@@ -54,6 +54,37 @@ AlertSender::~AlertSender()
     DeleteCriticalSection(&_cs);
 }
 
+// 0x19DA0 (LobbyGate)
+// LTCG: the code uses _alertSender and not `this`. rcx holds address. The compiler put in the
+// constants daemonName L"LOBBYGATE", worldId 0 and maxLogCount 1000.
+bool AlertSender::init(wchar_t* address, wchar_t const* daemonName, int worldId, int maxLogCount)
+{
+    size_t nameLength = wcslen(daemonName);
+    wcsncpy(_daemonName, daemonName, nameLength);
+    _daemonNameBytes = static_cast<short>(nameLength * 2);
+    _daemonName[nameLength] = 0;
+    Daemon::Version ver;
+    Daemon::LoadVersion(&ver, _version, 64);
+    size_t versionLength = wcslen(_version);
+    int addrLen = sizeof(_remoteAddr);
+    _version[versionLength] = 0;
+    memset(&_remoteAddr, 0, sizeof(_remoteAddr));
+    _versionBytes = static_cast<short>(versionLength * 2);
+    _worldId = worldId;
+    _maxLogCount = maxLogCount;
+    if (WSAStringToAddressW(address, AF_INET, nullptr, &_remoteAddr, &addrLen) == SOCKET_ERROR)
+        return false;
+    _itemEvent = CreateEventW(nullptr, TRUE, FALSE, nullptr);
+    if (_itemEvent == nullptr || !createSocket())
+        return false;
+    if (connect(_socket, &_remoteAddr, sizeof(_remoteAddr)) == SOCKET_ERROR && WSAGetLastError() != WSAEWOULDBLOCK)
+        return false;
+    if (!Daemon::Instance->threadManager->StartThread(this, &_threadId))
+        return false;
+    _init = true;
+    return true;
+}
+
 // 0x18B20 (SmartCouponDaemon)
 void AlertSender::fini()
 {

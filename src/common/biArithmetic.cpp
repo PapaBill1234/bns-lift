@@ -527,3 +527,45 @@ void BigInteger::Divide(BigInteger const* a, BigInteger const* b, BigInteger* qu
             rem->Set(&x, 1);
     }
 }
+
+// 0x59ab0 (LobbyGate)
+// ❓ LTCG removed the quot code. All callers give quot = 0. The code uses only rem.
+void BigInteger::Divide(BigInteger const* a, unsigned int b, BigInteger* quot, unsigned int* rem)
+{
+    (void)quot;
+    if (rem == 0)
+        return;
+    if (a->bits == 0 || b == 0 || a->isZero() || b == 1 || b == 0xFFFFFFFFu)
+    {
+        *rem = 0;
+        return;
+    }
+    unsigned long long w = 0;
+    if (((b - 1) & b) != 0)
+    {
+        // BUG: 0x59B12 starts at digits[digitCount()], one digit above the top digit.
+        for (long long i = a->digitCount(); i >= 0; --i)
+        {
+            w = a->digits[i] | (w << 32);
+            if (w >= b)
+                w -= b * static_cast<unsigned long long>(static_cast<unsigned int>(w / b));
+        }
+        *rem = static_cast<unsigned int>(w);
+    }
+    else
+    {
+        // BUG: 0x59AF0 reads up to 128 entries of digit_bit_r, but the table has 32.
+        unsigned int k = 0;
+        unsigned int const* table = digit_bit_r;
+        while (b != *table)
+        {
+            ++k;
+            ++table;
+            if (k >= 0x80)
+                goto found;
+        }
+        w = 31 - k;
+    found:
+        *rem = a->digits[0] & digit_mask[static_cast<int>(w)];
+    }
+}

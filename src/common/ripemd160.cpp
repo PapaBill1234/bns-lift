@@ -131,6 +131,23 @@ static void hash(unsigned int* X, unsigned int* MDbuf)
     MDbuf[0] = ddd;
 }
 
+// 0x54CE0 (LobbyGate)
+Ripemd160::~Ripemd160()
+{
+}
+
+// 0x28750 (LobbyGate, folded with NetworkEndEvent::EventId)
+int Ripemd160::GetType() const
+{
+    return 1;
+}
+
+// 0x4BF40 (LobbyGate)
+int Ripemd160::Size() const
+{
+    return 20;
+}
+
 // 0x380b0
 bool Ripemd160::Digest(unsigned char const* in, int size, unsigned char* digest, int* digestSize) const
 {

@@ -73,6 +73,7 @@ public:
     };
 
     void SetInvalidInfo(wchar_t const* keyString, bool isInvalid);
+    void SetRunningInfo(wchar_t const* keyString, wchar_t const* valueString);
     // 0x25000 (SmartCouponDaemon). The body does not use the arguments.
     void SetDetectFrozenThread(bool detect, int crashCount);
 

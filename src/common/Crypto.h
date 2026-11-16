@@ -9,6 +9,8 @@ public:
     {
         AES128 = 3,   // ❓ name
         BLOWFISH = 4, // ❓ name
+        RSA_PUBLIC = 65,  // ❓ name
+        RSA_PRIVATE = 81, // ❓ name
     };
 
     virtual bool Setup(unsigned char const* key, int keySize, int round) = 0;
@@ -22,8 +24,8 @@ public:
 
     static void Initialize();
     static void Destroy(Crypto* crypto);
-    static int InstanceSize(Type type);  // 0x55150 (LobbyGate). TODO(lift-lobbygate-2)
-    // 0x55200 (LobbyGate). TODO(lift-lobbygate-2)
+    // ❓ InstanceSize and Create use the value GetType() - 1 (2, 3, 64, 80).
+    static int InstanceSize(Type type);
     // ❓ The PDB name gives (Type, void*, int). The code uses rcx=buffer, edx=size, r8d=type.
     static Crypto* Create(void* buffer, int size, Type type);
 

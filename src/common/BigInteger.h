@@ -8,6 +8,8 @@
 
 class BigInteger
 {
+    friend class Dh; // ❓ Dh uses the inline compare (absCompare).
+
 public:
     enum { MAX_DIGITS = 128 }; // ❓
 
@@ -35,28 +37,9 @@ public:
     void Pow2(int n);
     static void Divide(BigInteger const* a, BigInteger const* b, BigInteger* quot, BigInteger* rem);
 
-    // ❓ No PDB symbol. The compiler put this code inline in Rsa::encrypt and Rsa::decrypt.
-    void ExpMod(BigInteger const* a, BigInteger const* e, BigInteger const* n)
-    {
-        if (((n->bits + 31) & ~31) <= 2048)
-        {
-            if (e->bits != 0 && e->sign == -1)
-            {
-                // BUG: 0x46D47 computes the inverse in t, but expMod uses a and not t.
-                BigInteger t;
-                t.InvMod(a, n);
-                BigInteger* me = const_cast<BigInteger*>(e);
-                me->sign = -me->sign;
-                expMod(a, e, n);
-                if (e != this)
-                    me->sign = -me->sign;
-            }
-            else
-            {
-                expMod(a, e, n);
-            }
-        }
-    }
+    static void Divide(BigInteger const* a, unsigned int b, BigInteger* quot, unsigned int* rem);
+    void ExpMod(BigInteger const* a, BigInteger const* e, BigInteger const* n);
+    bool IsPrime() const;
 
     // ❓ Inline helpers. The compiler put this code inline. No PDB symbol.
     int digitCount() const { return (bits + 31) >> 5; }
@@ -83,6 +66,7 @@ private:
     static unsigned int const digit_mask[32];  // 0x5AAE0
 
     static int absCompare(BigInteger const* a, BigInteger const* b);
+    static bool isPrimeMR(BigInteger const* n, unsigned long long b);
     static void sqr(BigInteger const* a, BigInteger* r);
     static void mul(BigInteger const* a, BigInteger const* b, BigInteger* r);
 

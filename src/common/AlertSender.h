@@ -31,6 +31,7 @@ private:
     AlertSender();
     virtual ~AlertSender();
     virtual void run();
+    bool init(wchar_t* address, wchar_t const* daemonName, int worldId, int maxLogCount);
     void fini();
     bool createSocket();
     void writev2(wchar_t const* file, int line, wchar_t const* format, char* args);
