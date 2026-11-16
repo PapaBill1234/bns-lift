@@ -1,0 +1,7 @@
+lift-postofficedaemon-1	lift	opus	-	src/common/,src/SmartCouponDaemon/,src/LobbyGate/,include/vs2010/,include/pdb/,CMakeLists.txt	lift-lobbygate-4	150	ready	Lift PostOfficeDaemon: common delta, move Db, FragmentPacket, packet pump to common
+lift-postofficedaemon-2	lift	opus	-	src/PostOfficeDaemon/,src/common/,include/pdb/,include/vs2010/,CMakeLists.txt	lift-postofficedaemon-1	150	ready	Lift PostOfficeDaemon: relay core, ping, watchdog
+lift-postofficedaemon-3	lift	opus	-	src/PostOfficeDaemon/,src/common/,include/pdb/,include/vs2010/,CMakeLists.txt	lift-postofficedaemon-2	150	ready	Lift PostOfficeDaemon: channels and packet handlers
+lift-postofficedaemon-4	lift	opus	-	src/PostOfficeDaemon/,src/common/,include/pdb/,include/vs2010/,CMakeLists.txt	lift-postofficedaemon-3	150	ready	Lift PostOfficeDaemon: post context, post relays, CacheEconomy handler
+lift-postofficedaemon-5	lift	opus	-	src/PostOfficeDaemon/,src/crt/,src/common/,CMakeLists.txt	lift-postofficedaemon-4	150	ready	Lift PostOfficeDaemon: app, DB, world config, unsent posts, full exe
+lift-postofficedaemon-verify	lift	opus	-	tools/verify/,Docs/Verify/	lift-postofficedaemon-5	150	ready	Lift PostOfficeDaemon: run under Wine, compare packet logs
+lift-marketdealerdaemon-plan	lift	opus	-	Docs/Plan/cards/,Docs/Plan/queue/	lift-postofficedaemon-5	100	ready	Lift MarketDealerDaemon: plan cards and queue rows
