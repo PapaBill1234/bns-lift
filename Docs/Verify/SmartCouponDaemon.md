@@ -1,15 +1,20 @@
 # SmartCouponDaemon verify (card lift-smartcoupondaemon-verify)
 
-Status: **original done, lifted open**. The scripts work with the original exe. The lifted exe
-`build/SmartCouponDaemon.exe` does not exist yet: the CMake file has no `SmartCouponDaemon` target, and
-there is no `src/SmartCouponDaemon/` (lift-smartcoupondaemon-4 lifted 0 functions, see its handoff).
-Run the compare again when that card is done.
+Status: **original done, lifted blocked**. `tools/gate.sh` builds `build/SmartCouponDaemon.exe`, but the
+lifted exe does not get to LISTEN:
+- Committed `src/`: the exe stops at once with 0xc0000417 (0 log lines). Cause: the order of the
+  `XmlConfigReader::Initialize` overloads in `src/common/DaemonConfig.h` (same as CacheGate check 1).
+- Test copy with the `src/common` part of `Docs/Verify/CacheGate-fixes.patch`
+  (`tools/verify/fixsrc_smartcoupondaemon.sh`): 32 log lines, then a page fault in the object pool step.
+  After that step, `JobManager::Initialize` is a link stub that returns false. Thus initialize fails before LISTEN
+  until lift-smartcoupondaemon-5 lifts the stub modules.
 
 ## How to run
 | Command | Use |
 | --- | --- |
 | `tools/verify/run_smartcoupondaemon.sh lifted\|original [SECONDS] [--pktlog] [--peer] [--client]` | Runs one exe under wine64 in its own prefix (`build/verify/wineprefix`). Output in `build/verify/scd-<kind>/`: `log.txt`, `console.txt`, `ports.txt`, `exit.txt`, `peer-np.txt`, `peer-gamed.txt`, `client-manager.txt`, `client-daemon.txt`, `pktlog/*.pkl`. |
 | `tools/verify/compare_smartcoupondaemon.sh [SECONDS] [--pktlog]` | Runs both kinds with `--peer --client`, writes 7 diffs in `build/verify/scd-compare/`: log, ports, peer-np, peer-gamed, client-manager, client-daemon, pkl. Exit 0 = no difference, 1 = difference, 3 = no lifted exe. |
+| `tools/verify/fixsrc_smartcoupondaemon.sh` | Copies the source to `build/verify/scd-fixsrc/`, applies the `src/common` part of `Docs/Verify/CacheGate-fixes.patch`, builds `build/verify/scd-fixsrc/build/SmartCouponDaemon.exe`. The worktree `src/` does not change. Use it with `SCD_LIFTED_EXE=<that exe>`. |
 | `tools/verify/replay.py` | No change. Used as the NP peer and the GameDaemon peer (`listen`) and as the manager and daemon clients (`connect`). |
 
 Self test: `SCD_LIFTED_EXE=<original exe> tools/verify/compare_smartcoupondaemon.sh 15 --pktlog` gives
@@ -48,27 +53,38 @@ Self test: `SCD_LIFTED_EXE=<original exe> tools/verify/compare_smartcoupondaemon
 - Line order of the log changes (threads). The log diff ignores line order.
 
 ## Checks
+Lifted = fixsrc exe (`build/verify/scd-fixsrc/build/SmartCouponDaemon.exe`, 168448 B), run with
+`compare_smartcoupondaemon.sh 15 --pktlog`. The committed-src exe (`build/SmartCouponDaemon.exe`, 167936 B)
+stops before check 2 (0xc0000417, 0 log lines).
+
 | # | Check | Original | Lifted | Result |
 | --- | --- | --- | --- | --- |
-| 1 | Exe starts under wine64 | yes | no exe | open |
-| 2 | Startup log lines (to the DB error) | 74 to 76 lines, see above | no exe | open |
-| 3 | Listen ports (polled every 0.1 s) | 22000, 32000 | no exe | open |
-| 4 | Bytes to NP peer (`peer-np`) | 1 STS `/Sts/Connect`, 254 B | no exe | open |
-| 5 | Bytes to GameDaemon peer (`peer-gamed`) | no connect (stops before) | no exe | open |
-| 6 | Manager / daemon client (`client-*`) | connection refused (ports closed) | no exe | open |
-| 7 | Packet log, same input (`pkldump.py`) | 2 LISTEN, NP CONNECT, 1 STS | no exe | open |
+| 1 | Exe starts under wine64 | yes, exit 0 | committed src: 0xc0000417 at start. fixsrc: starts, page fault after 32 lines, exit 124 (timeout) | fail |
+| 2 | Startup log lines (to the DB error) | 74 to 76 lines | 32 lines (to the bns-common-config dump). Diff: 92 changed lines | fail |
+| 3 | Listen ports (polled every 0.1 s) | 22000, 32000 | none | fail |
+| 4 | Bytes to NP peer (`peer-np`) | 1 STS `/Sts/Connect`, 254 B | no connect | fail |
+| 5 | Bytes to GameDaemon peer (`peer-gamed`) | no connect (stops before) | no connect | same (0 lines) |
+| 6 | Manager / daemon client (`client-*`) | connection refused (ports closed) | connection refused | same (0 lines) |
+| 7 | Packet log, same input (`pkldump.py`) | 2 LISTEN, NP CONNECT, 1 STS | no records. Diff: 15 lines | fail |
 | 8 | Behaviour after the DB step (DB OK) | not run: no ODBC driver | not run | blocked |
 | 9 | 381 NP / GameDaemon accepts the 2019 protocol ❓ | not run | not run | open |
 
 ## Differences
 | Packet | Field | Original value | Lifted value | Function address |
 | --- | --- | --- | --- | --- |
-| - | - | - | - | - |
-
-None recorded. No lifted exe.
+| startup | process exit | runs to `onStart fail`, exit 0 | committed src: 0xc0000417 in `XmlReader_sv64.dll` +0x649D, `_wcsicmp(NULL, L"root-path")` | `XmlConfigReader::Initialize` overload order, `src/common/DaemonConfig.h` (CacheGate-fixes.patch) |
+| log | config dump tag | `[config]` | `[smartcoupond]` | `SmartCouponDaemon::initialize` 0x150E0, `DaemonConfig::Dump` call (`SmartCouponDaemon.cpp:288`). Same LTCG constant issue as CacheGate: pass `L"config"` |
+| log | version (`Daemon.cpp,496`) | `version: 0.0.348.352` | empty | No VERSIONINFO resource in the lifted exe |
+| log | extra line | none | `CrashHandler.cpp,490 [crash-mail], PrintMailInfo...` | CrashHandler. CacheGate shows it in some runs only ❓ |
+| log | `[objpool] initialized ... 4096 EventNotiJob` | yes | page fault, read at 0x20, lifted 0x14000BC88 (`cmp [rcx+0x20],0`, null `this`) | `EventNotiJob::_pool`: original is a static `ObjPool` object (dynamic init 0x52A30). Lifted is a null `ObjPool*` (`LinkStubs.cpp:66`, `EventNotiJob.h:18`) |
+| log | job-mgr and all later lines | job manager (hash-count 16), game-event config, np, workers, daemon list | not reached | `JobManager::Initialize` is a stub that returns false (`LinkStubs.cpp:40`), called in 0x150E0 after the pool |
+| LISTEN | ports | 22000, 32000 | none | follows from the rows above |
+| STS | `/Sts/Connect` to NP | 254 B | not sent | follows from the rows above |
 
 ## Next steps
-1. Finish the SmartCouponDaemon lift (CMake target `SmartCouponDaemon`, output `build/SmartCouponDaemon.exe`).
-2. `tools/verify/compare_smartcoupondaemon.sh 15 --pktlog`. Write each changed line in the table above.
-3. Checks 5, 6 and 8 need a working DB (an ODBC driver in the Wine prefix or in unixODBC, and a
+1. Apply the `src/common` part of `Docs/Verify/CacheGate-fixes.patch` to `src/` (a src card).
+2. Make `EventNotiJob::_pool` a static `ObjPool` object, as in 0x52A30. Pass `L"config"` to `DaemonConfig::Dump`.
+3. Lift the stub modules in `LinkStubs.cpp` (lift-smartcoupondaemon-5), first `JobManager`.
+4. Run `tools/verify/compare_smartcoupondaemon.sh 15 --pktlog` again and update the tables.
+5. Checks 5, 6 and 8 need a working DB (an ODBC driver in the Wine prefix or in unixODBC, and a
    SmartCouponDB schema). Then set `SCD_CERT` to a file with that DSN, and use `SCD_*_STREAM` with captured streams.

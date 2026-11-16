@@ -1,29 +1,30 @@
-# lift-smartcoupondaemon-verify
+# lift-smartcoupondaemon-verify (round 1)
 
 ## Done
-- `tools/verify/run_smartcoupondaemon.sh`: runs the lifted or the original exe under wine64 (own prefix, wineconsole on Xvfb :77).
-  Options: `--pktlog`, `--peer` (replay.py as NP 6601 and GameDaemon 20100), `--client` (replay.py on 32000 and 22000).
-  It polls the listen ports every 0.1 s. It writes a placeholder cert DSN with `keyhere` values (`SCD_CERT`).
-- `tools/verify/compare_smartcoupondaemon.sh`: makes 7 diffs (log, ports, peer-np, peer-gamed, client-manager, client-daemon, pkl).
-  It removes the noise. It exits 3 if there is no lifted exe.
-- Self test (original against original, 15 s, `--pktlog`): 0 changed lines in all 7 diffs, 2 runs.
-- Reference behaviour of the original: it listens on 22000 and 32000 and sends the STS `/Sts/Connect` to NP.
-  The first DB call fails (no ODBC driver), then `onStart fail` and the exe stops.
-- `Docs/Verify/SmartCouponDaemon.md`: the run facts, the reference behaviour, the noise and 9 checks.
-- `replay.py` and the CacheGate scripts did not change.
+- `tools/gate.sh` builds `build/SmartCouponDaemon.exe`. The compare ran with the lifted exe.
+- New `tools/verify/fixsrc_smartcoupondaemon.sh`: builds a test copy in `build/verify/scd-fixsrc/` with
+  the `src/common` part of `Docs/Verify/CacheGate-fixes.patch`. The worktree `src/` does not change.
+- `Docs/Verify/SmartCouponDaemon.md`: result of checks 1 to 9 and a differences table with addresses.
+- Original: ports 22000 and 32000, 76 log lines, 1 STS `/Sts/Connect` (254 B) to NP. Self test 0 diffs.
 
 ## Not done
-- All lifted checks. `build/SmartCouponDaemon.exe` does not exist: there is no CMake target and no `src/SmartCouponDaemon/`
-  (lift-smartcoupondaemon-4 lifted 0 functions). Done-when "lifted exe listens on the same ports" is not met.
-- GameDaemon peer and manage/daemon clients: the original stops about 2 s after start (DB fail), before these steps.
+- The lifted exe does not listen. Done-when (same ports) is not met.
+  - Committed src: 0xc0000417 at start (`XmlConfigReader::Initialize` overload order, DaemonConfig.h).
+  - fixsrc: page fault at 0x14000BC88. `EventNotiJob::_pool` is a null `ObjPool*`. The original has a
+    static `ObjPool` object (init 0x52A30).
+  - Next: `JobManager::Initialize` is a stub that returns false (LinkStubs.cpp:40), in 0x150E0.
+- Log differences: dump tag `[config]` vs `[smartcoupond]` (0x150E0), empty version (no VERSIONINFO),
+  extra crash-mail line.
 
 ## ❓
-- The 2023 production log shows `cannot execute, error:10`. I did not find the error-10 path in `initialize` (0x1400150E0).
-- I did not test whether a 381 NP or GameDaemon accepts the 2019 protocol.
+- Crash-mail line: in some CacheGate runs only. Cause not known.
+- Check 9 (381 NP / GameDaemon accepts the 2019 protocol): not run.
 
 ## Blocked
-- Lifted compare: no lifted exe. Next: lift the exe, then run `tools/verify/compare_smartcoupondaemon.sh 15 --pktlog`.
-- Steps after onStart: they need an ODBC driver and a SmartCouponDB schema.
+- Fixes are in `src/`, outside the Files of this card: apply CacheGate-fixes common part, fix
+  `EventNotiJob::_pool`, `L"config"` tag. Lift stub modules (lift-smartcoupondaemon-5). Then run
+  `tools/verify/compare_smartcoupondaemon.sh 15 --pktlog` again.
+- Check 8 needs an ODBC driver and a SmartCouponDB schema.
 
 ## Gate result
-- `tools/gate.sh`: `gate ok`, rc 0 (51/51 steps, warnings only). This card changed no source code.
+- `tools/gate.sh`: gate ok (SmartCouponDaemon.exe, CacheGate.exe, lift_selftest.exe link).
