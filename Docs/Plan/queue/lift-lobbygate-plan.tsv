@@ -1,0 +1,6 @@
+lift-lobbygate-1	lift	opus	-	src/common/,include/vs2010/,include/pdb/,CMakeLists.txt	lift-smartcoupondaemon-4	150	ready	Lift LobbyGate: session, network delta, crash handler (common)
+lift-lobbygate-2	lift	opus	-	src/common/,include/vs2010/,include/pdb/,CMakeLists.txt	lift-lobbygate-1	150	ready	Lift LobbyGate: base module delta, RSA and DH crypto (common)
+lift-lobbygate-3	lift	opus	-	src/LobbyGate/,src/common/,include/pdb/,include/vs2010/,CMakeLists.txt	lift-lobbygate-2	150	ready	Lift LobbyGate: packet pump, fragment packets, Client, LobbyD channel
+lift-lobbygate-4	lift	opus	-	src/LobbyGate/,src/crt/,src/common/,CMakeLists.txt	lift-lobbygate-3	150	ready	Lift LobbyGate: LobbyGate app modules, full exe
+lift-lobbygate-verify	lift	opus	-	tools/verify/,Docs/Verify/	lift-lobbygate-4	150	ready	Lift LobbyGate: run under Wine, compare packet logs
+lift-postofficedaemon-plan	lift	opus	-	Docs/Plan/cards/,Docs/Plan/queue/	lift-lobbygate-4	100	ready	Lift PostOfficeDaemon: plan cards and queue rows
