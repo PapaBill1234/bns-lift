@@ -11,6 +11,7 @@ class SessionSendBuffer;
 class SessionRecvBuffer;
 class Port;
 class Channel;
+class Client;
 class Packet;
 class PacketBuffer;
 class PacketBufferHandler;
@@ -57,6 +58,11 @@ public:
     void Send(Packet const* packet) const;                                        // 0xFA40
     void SendV(char const* format, char* args) const;                             // 0xFAA0
     PacketConcatenater* SetPacketConcatenater(PacketConcatenater const* concatenater) const;  // 0xFC40
+    // ❓ The PDB name is SetHandshakeParameter(PacketCrypt::Algorithm, char const*, int, char*, int*) const,
+    // but the code uses only four arguments (rdx, r8d, r9, stack). This declaration follows the code.
+    bool SetHandshakeParameter(unsigned char const* param, int paramSize, unsigned char* replyParam,
+                               int* replyParamSize) const;                        // 0x19530 (LobbyGate)
+    bool FailHandshake() const;                                                   // 0x19790 (LobbyGate)
 
 private:
     bool initialize(Port* port, unsigned long long id, int option);               // 0xE2E0
@@ -71,6 +77,7 @@ private:
     bool send(PacketBuffer const** const pbufferList, int count) const;           // 0xFE90
     void* allocateCrypt(PacketCrypt::Type type, PacketCrypt::Algorithm algorithm) const;  // 0x19460 (LobbyGate)
     void deallocateCrypt(void* crypt) const;             // 0x194C0 (LobbyGate)
+    void completeHandshake();                            // 0x197E0 (LobbyGate)
 
 public:
     CriticalSection _lock;
@@ -119,6 +126,10 @@ public:
     friend class LobbyD;          // ❓ access for the inlined send in LobbyD::Send* (LobbyGate)
     friend class NPChannel;        // ❓ access for the inlined send in NPChannel::SendMsg (SmartCouponDaemon)
     friend class NPSessionHandler; // ❓ access for NPSessionHandler::OnConnect/OnClose (SmartCouponDaemon)
+    // ❓ access for the inlined send and completeHandshake in the LobbyGate packet handlers
+    friend bool HandleLobbyGate_ContentsRuleListReq(Session* session, Packet const* packet);
+    friend bool HandleLobbyGate_HelloReq(Session* session, Packet* packet);
+    friend bool HandleLobbyGate_BypassPacket(Client* client, Packet const* packet);
 };
 static_assert(sizeof(Session) == 0x128, "sizeof Session");
 static_assert(offsetof(Session, _lock) == 0x18, "Session::_lock");

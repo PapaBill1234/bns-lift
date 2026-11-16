@@ -921,10 +921,37 @@ bool Session::send(PacketBuffer const** const pbufferList, int count) const
     return true;
 }
 
-// 0x19460 (LobbyGate). Not in the CacheGate hr export.
+// ❓ IDA name of the TLS slot at offset 0x10 (LobbyGate .tls). The PacketCrypt module owns it.
+__declspec(thread) int Thread_LastCryptError;
+
+// 0x4CC60 (LobbyGate, PacketCrypt module). Not in this card.
+int PacketCrypt::InstanceSize(Type type, Algorithm algorithm)
+{
+    (void)type;
+    (void)algorithm;
+    return 0;  // TODO(lift-lobbygate-4)
+}
+
+// 0x4CCE0 (LobbyGate, PacketCrypt module). Not in this card.
+PacketCrypt* PacketCrypt::Create(Type type, Algorithm algorithm, unsigned char* buffer, int size)
+{
+    (void)type;
+    (void)algorithm;
+    (void)buffer;
+    (void)size;
+    return nullptr;  // TODO(lift-lobbygate-4)
+}
+
+// 0x19460 (LobbyGate)
 void* Session::allocateCrypt(PacketCrypt::Type type, PacketCrypt::Algorithm algorithm) const
 {
-    return nullptr;  // TODO(lift-cg-5)
+    // ❓ The disasm sets only ecx, rdx, r8 for Create (tail jump). The PDB signature has four arguments.
+    Session* self = const_cast<Session*>(this);
+    int size = PacketCrypt::InstanceSize(type, algorithm);
+    if (size <= 0)
+        return nullptr;
+    unsigned char* buffer = static_cast<unsigned char*>(self->_allocator.Alloc(size, SESSION_FILE, 1320));
+    return PacketCrypt::Create(type, algorithm, buffer, size);
 }
 
 // 0x194C0 (LobbyGate). The CacheGate ~Session (0xE0A0) inlines it.
@@ -937,4 +964,86 @@ void Session::deallocateCrypt(void* crypt) const
         || type == PacketCrypt::BROADCAST_CRYPT)
         packetCrypt->~PacketCrypt();  // ❓ the pseudocode calls a virtual with argument 0
     self->_allocator.Free(crypt, SESSION_FILE, 1331);
+}
+
+// 0x19530 (LobbyGate)
+bool Session::SetHandshakeParameter(unsigned char const* param, int paramSize, unsigned char* replyParam,
+                                    int* replyParamSize) const
+{
+    Session* self = const_cast<Session*>(this);
+    if (_cryptMode != 2)
+    {
+        Log::Write(Log::LT_ERROR, SESSION_FILE, 1341, L"[session], invalid crypt mode, id:%I64x, this:%p, mode:%d", _id,
+                   this, _cryptMode);
+        return false;
+    }
+    PacketCrypt* currentCrypt = _currentCrypt;
+    if (currentCrypt == nullptr || _handshakeCrypt == nullptr || _sessionCrypt != nullptr)
+    {
+        Log::Write(Log::LT_ERROR, SESSION_FILE, 1346, L"[session], invalid crypt step, id:%I64x, this:%p", _id, this);
+        return false;
+    }
+    int errCode = currentCrypt->SetKey(param, paramSize);
+    Thread_LastCryptError = errCode;
+    if (errCode != PacketCrypt::SPCE_NO_ERROR)
+    {
+        Log::Write(Log::LT_ERROR, SESSION_FILE, 1363,
+                   L"[session], cannot set handshake key, id:%I64x, this:%p, error-code:%d", _id, this, errCode);
+        return false;
+    }
+    unsigned char keybuf[64];
+    int keybufCnt = 64;
+    errCode = currentCrypt->GenerateKey(keybuf, &keybufCnt, replyParam, replyParamSize);
+    Thread_LastCryptError = errCode;
+    if (errCode != PacketCrypt::SPCE_NO_ERROR)
+    {
+        Log::Write(Log::LT_ERROR, SESSION_FILE, 1373,
+                   L"[session], cannot generate session key, id:%I64x, this:%p, error-code:%d", _id, this, errCode);
+        return false;
+    }
+    // ❓ r8 (algorithm) is not set before this call in the original.
+    self->_sessionCrypt = static_cast<PacketCrypt*>(allocateCrypt(PacketCrypt::SESSION_CRYPT, PacketCrypt::ALGORITHM_DEFAULT));
+    if (_sessionCrypt == nullptr)
+    {
+        // BUG: 0x196da the format has "this:%p", but the call does not give it.
+        Log::Write(Log::LT_ERROR, SESSION_FILE, 1381, L"[session], cannot create session crypt, id:%I64x, this:%p", _id);
+        return false;
+    }
+    errCode = _sessionCrypt->SetKey(keybuf, keybufCnt);
+    Thread_LastCryptError = errCode;
+    if (errCode == PacketCrypt::SPCE_NO_ERROR)
+    {
+        self->_cryptMode = 3;
+        return true;
+    }
+    Log::Write(Log::LT_ERROR, SESSION_FILE, 1387,
+               L"[session], cannot set session key, id:%I64x, this:%p, error-code:%d", _id, this, errCode);
+    deallocateCrypt(_sessionCrypt);
+    self->_sessionCrypt = nullptr;
+    return false;
+}
+
+// 0x19790 (LobbyGate)
+bool Session::FailHandshake() const
+{
+    Session* self = const_cast<Session*>(this);
+    if (_cryptMode != 2 && _cryptMode != 3)
+        return false;
+    self->_cryptMode = 4;
+    if (_handshakeCrypt != nullptr)
+        _handshakeCrypt->SetEncryptParam(PacketCrypt::PARAM_HANDSHAKE_FAIL);
+    return true;
+}
+
+// 0x197E0 (LobbyGate). deallocateCrypt is inlined.
+void Session::completeHandshake()
+{
+    PacketCrypt* handshakeCrypt = _handshakeCrypt;
+    _cryptMode = 5;
+    if (handshakeCrypt != nullptr)
+    {
+        deallocateCrypt(handshakeCrypt);
+        _handshakeCrypt = nullptr;
+    }
+    _currentCrypt = _sessionCrypt;
 }

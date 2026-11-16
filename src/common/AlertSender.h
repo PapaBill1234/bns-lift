@@ -40,6 +40,7 @@ private:
     static AlertSender _alertSender;
 
     friend class Daemon;
+    friend class LobbyGate;  // ❓ LobbyGate::initNetwork and shutdown (LobbyGate 0x13220, 0x13580) call init and fini.
 
 public:
     unsigned long long _socket;

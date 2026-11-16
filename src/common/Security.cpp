@@ -1,6 +1,7 @@
 // Security.obj (LobbyGate PDB).
 #include "Security.h"
 #include <string.h>
+#include <stdlib.h>
 #include <new>
 #include "AlertSender.h"
 #include "CrashHandler.h"
@@ -123,4 +124,165 @@ void BroadcastCrypt::clear()
         BaseMemoryManager::_Instance.Free(key, SECURITY_FILE, 145);
         key = nullptr;
     }
+}
+
+// ❓ 0x4DFE0. The exe links zlib. This copy of compress2 takes 4 arguments (the level is fixed inside).
+// zlib is not in the tree. A non-zero result makes Encrypt send the packet without compression.
+extern "C" int compress2(unsigned char* dest, int* destLen, unsigned char const* source, int sourceLen)
+{
+    (void)dest;
+    (void)destLen;
+    (void)source;
+    (void)sourceLen;
+    return -2;  // TODO(lift-lobbygate-4) link zlib. -2 is Z_STREAM_ERROR.
+}
+
+// 0x4CF60
+int BroadcastPacketCrypt::SetKey(unsigned char const* key, int keySize)
+{
+    (void)key;
+    (void)keySize;
+    return PacketCrypt::NO_RESULT;
+}
+
+// 0x4DBA0
+int BroadcastPacketCrypt::GetType()
+{
+    return PacketCrypt::BROADCAST_CRYPT;
+}
+
+// 0x4DBB0 (vector deleting destructor)
+BroadcastPacketCrypt::~BroadcastPacketCrypt()
+{
+    _keySet = false;
+    Crypto::Destroy(_crypto);
+    _crypto = nullptr;
+    if (_dict != nullptr)
+    {
+        // BUG: 0x4DBB0 the destructor clears _dict but does not free it (SetExternalCompressFunc mallocs it).
+        _dict = nullptr;
+        _dictSize = 0;
+    }
+}
+
+// 0x4DC00
+int BroadcastPacketCrypt::SetEncryptParam(int param)
+{
+    if (param != PacketCrypt::PARAM_BROADCAST_LOCAL && param != PacketCrypt::PARAM_BROADCAST_GLOBAL &&
+        param != PacketCrypt::PARAM_BROADCAST_LOCAL_COMPRESS)
+        return PacketCrypt::INVALID_PARAM;
+    _param = param;
+    return PacketCrypt::SPCE_NO_ERROR;
+}
+
+// 0x4DC20
+int BroadcastPacketCrypt::GenerateKey(unsigned char* key1, int* size1, unsigned char* key2, int* size2)
+{
+    if (key1 == nullptr || size1 == nullptr || *size1 < 16)
+        return PacketCrypt::INVALID_PARAM;
+    if (_keySet == true)
+        return PacketCrypt::ALREADY_INITIALIZED;
+    if (*size2 > 0)  // BUG: 0x4DC20 size2 and key2 are not checked for nullptr.
+        _compressType = static_cast<char>(*key2);
+    if (*size1 < 0 || 8 * *size1 < 128)
+        return PacketCrypt::FAILED_KEYGEN;
+    unsigned char* p = key1;
+    for (long long i = 16; i != 0; --i)
+        *p++ = static_cast<unsigned char>(rand());
+    *size1 = 16;
+    if (_crypto->Setup(key1, 16, 0))
+    {
+        _keySet = true;
+        key1[(*size1)++] = static_cast<unsigned char>(_compressType);
+        return PacketCrypt::SPCE_NO_ERROR;
+    }
+    memset(key1, 0, *size1);
+    return PacketCrypt::FAILED_SETUP_CRYPTO;
+}
+
+// 0x4DD70
+int BroadcastPacketCrypt::Encrypt(unsigned char* buffer, int* bufferSize, int size, bool with3rdParty)
+{
+    (void)with3rdParty;
+    if (_keySet == false)
+        return PacketCrypt::NOT_INITIALIZED;
+    unsigned char const* src = buffer + 2;
+    unsigned char* out = buffer + 2;
+    int count = 0;
+    short type;
+    _bufferSize = 0x2800;
+    switch (_param)
+    {
+    case PacketCrypt::PARAM_BROADCAST_LOCAL:
+        type = 12;
+        break;
+    case PacketCrypt::PARAM_BROADCAST_GLOBAL:
+        type = 14;
+        break;
+    case PacketCrypt::PARAM_BROADCAST_LOCAL_COMPRESS:
+    {
+        type = 13;
+        int result;
+        if (_compressType == 1)
+            result = compress2(_buffer, &_bufferSize, src, size);
+        else if (_compressType == 2)
+            result = _compressFunc(_buffer, &_bufferSize, src, size, _dict, _dictSize);
+        else
+            return PacketCrypt::INVALID_PARAM;
+        if (result == 0 && PacketCrypt::_MaxSize >= _crypto->EncSize(_bufferSize))
+        {
+            size = _bufferSize;
+            src = _buffer;
+        }
+        else
+        {
+            type = 12;
+        }
+        break;
+    }
+    default:
+        return PacketCrypt::INVALID_PARAM;
+    }
+    int encSize = _crypto->EncSize(size);
+    if (PacketCrypt::_MaxSize < encSize)
+        return PacketCrypt::FAILED_TOO_LARGE_PACKET;
+    if (encSize + 2 > *bufferSize)
+        return PacketCrypt::FAILED_INSUFFIENT_BUFFER;
+    count = *bufferSize - 2;
+    if (!_crypto->Encrypt(src, size, out, &count))
+        return PacketCrypt::FAILED_ENCRYPT;
+    *reinterpret_cast<unsigned short*>(buffer) = static_cast<unsigned short>((type << 12) | ((count >> 2) & 0xFFF));
+    *bufferSize = count + 2;
+    return PacketCrypt::SPCE_NO_ERROR;
+}
+
+// 0x4DF30
+int BroadcastPacketCrypt::Decrypt(unsigned char* buffer, int size, int* outSize, bool* with3rdParty)
+{
+    (void)buffer;
+    (void)size;
+    (void)outSize;
+    (void)with3rdParty;
+    return PacketCrypt::FAILED_INVALID_CODE;
+}
+
+// 0x4DF40
+int BroadcastPacketCrypt::SetExternalCompressFunc(void* func, unsigned char const* data, int size)
+{
+    size_t dataSize = size;
+    if (_compressFunc != nullptr)
+        return PacketCrypt::FAILED_SET_EXT_COMP_FUNC;
+    _compressFunc = reinterpret_cast<CompressFunc>(func);
+    if (data != nullptr)
+    {
+        if (_dict != nullptr)
+        {
+            free(_dict);
+            _dict = nullptr;
+        }
+        _dict = static_cast<unsigned char*>(malloc(dataSize));
+        _dictSize = static_cast<int>(dataSize);
+        memcpy(_dict, data, dataSize);
+    }
+    return PacketCrypt::SPCE_NO_ERROR;
 }

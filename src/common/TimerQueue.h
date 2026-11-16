@@ -93,6 +93,9 @@ public:
     friend class SmartCouponDaemon;  // ❓ access for the inlined ObjPoolTimer stop in shutdown (0x15AD0)
     friend class NPPing;             // ❓ access for NPPing::HandleEvent (0x4490, SmartCouponDaemon)
     friend class NPChannel;          // ❓ access for NPChannel::onConnect (0x5AD0, SmartCouponDaemon)
+    friend class LobbyGate;                           // ❓ access for LobbyGate (LobbyGate.obj)
+    friend class LobbyGateCooldownTimer;              // ❓ access for 0x13bf0 (LobbyGate)
+    friend class LobbyGateReloadInvalidRestoreTimer;  // ❓ access for 0x127a0 (LobbyGate)
 };
 static_assert(sizeof(TimerQueue) == 0x78, "sizeof TimerQueue");
 static_assert(offsetof(TimerQueue, StqSlot) == 0x40, "TimerQueue::StqSlot");

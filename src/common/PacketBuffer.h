@@ -55,6 +55,8 @@ public:
         PARAM_BROADCAST_LOCAL_COMPRESS = 0x4,
     };
     static ErrCode Setup(int maxSize);  // 0x327E0 (PacketCrypt module, not in this card)
+    static int InstanceSize(Type type, Algorithm algorithm);                                   // 0x4CC60 (LobbyGate, PacketCrypt module)
+    static PacketCrypt* Create(Type type, Algorithm algorithm, unsigned char* buffer, int size);  // 0x4CCE0 (LobbyGate, PacketCrypt module)
     static int _MaxSize;
 
     virtual int GetType() = 0;                                                     // slot 0

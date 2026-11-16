@@ -167,7 +167,15 @@ add_library(lift_lobbygate STATIC
   src/LobbyGate/FragmentPacket.cpp
   src/LobbyGate/ThreadFreePacketPump.cpp
   src/LobbyGate/Client.cpp
-  src/LobbyGate/LobbyDChannel.cpp)
+  src/LobbyGate/LobbyDChannel.cpp
+  src/LobbyGate/LobbyGatePredefine.cpp
+  src/LobbyGate/PcCafeMileageFeverTimeScheduleList.cpp
+  src/LobbyGate/WorldListManager.cpp
+  src/LobbyGate/LobbyGateConfig.cpp
+  src/LobbyGate/ContentsRuleConfigDefinition.cpp
+  src/LobbyGate/LobbyGate.cpp
+  src/LobbyGate/LobbyGatePacketHandler.cpp
+  src/LobbyGate/LobbyDPacketHandler.cpp)
 target_compile_options(lift_lobbygate PRIVATE /GR-)
 target_include_directories(lift_lobbygate BEFORE PRIVATE ${LIFT_STL_INCLUDE})
 target_include_directories(lift_lobbygate PUBLIC ${CMAKE_SOURCE_DIR}/src/LobbyGate)
@@ -182,3 +190,13 @@ target_compile_options(SmartCouponDaemon PRIVATE /GR-)
 target_include_directories(SmartCouponDaemon BEFORE PRIVATE ${LIFT_STL_INCLUDE})
 add_dependencies(SmartCouponDaemon lift_msvcp100_implib)
 target_link_libraries(SmartCouponDaemon PRIVATE lift_smartcoupondaemon lift_common ${LIFT_MSVCP100_IMPLIB})
+
+# LobbyGate server exe. XmlReader_sv64.dll, bsConsole_sv64.dll and dbghelp.dll load at run time (not linked).
+lift_exe(LobbyGate
+  SOURCES src/LobbyGate/LinkStubs.cpp src/crt/wmain_bridge.c src/crt/tlssup.c src/crt/new_delete.c
+          src/crt/zstd_stub.c
+  IMPORTS msvcr100 kernel32 user32 advapi32 shell32 ole32 shlwapi version ws2_32 iphlpapi)
+target_compile_options(LobbyGate PRIVATE /GR-)
+target_include_directories(LobbyGate BEFORE PRIVATE ${LIFT_STL_INCLUDE})
+add_dependencies(LobbyGate lift_msvcp100_implib)
+target_link_libraries(LobbyGate PRIVATE lift_lobbygate lift_common ${LIFT_MSVCP100_IMPLIB})

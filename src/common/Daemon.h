@@ -98,6 +98,7 @@ private:
     void noTimerMain(Network* networkInstance);    // 0xc220
     void timerMain(Network* networkInstance);      // 0xc370
     void setState(int state);                      // ❓ inlined helper (PipeConsole and Console state)
+    friend class LobbyGateCooldownTimer;           // ❓ access for LobbyGateCooldownTimer::HandleEvent (0x13bf0, LobbyGate)
 
 public:
     static Daemon* Instance;

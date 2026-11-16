@@ -22,3 +22,16 @@ size_t ZSTD_freeCDict(void* cdict)
     (void)cdict;
     return 0; /* TODO(lift-cg-5) link upstream zstd */
 }
+
+/* 0x30AA0 (LobbyGate). zstdPacketCompress calls it. The result is a zstd error code, thus FAILED_COMP. */
+size_t ZSTD_compress_usingCDict(void* cctx, void* dst, size_t dstCapacity, void const* src, size_t srcSize,
+                                void const* cdict)
+{
+    (void)cctx;
+    (void)dst;
+    (void)dstCapacity;
+    (void)src;
+    (void)srcSize;
+    (void)cdict;
+    return (size_t)-1; /* TODO(lift-lobbygate-4) link upstream zstd */
+}
