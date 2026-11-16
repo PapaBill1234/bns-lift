@@ -374,6 +374,46 @@ void Port::ReconnectSession(unsigned long long id)
     }
 }
 
+// 0x25F20 (LobbyGate)
+void Port::CloseSession(unsigned long long sessionId, bool force)
+{
+    if (static_cast<unsigned int>(sessionId >> 32) != _id)
+        PORT_ASSERT_CRASH(523);
+    if (static_cast<unsigned int>(sessionId) >= _maxSession)
+        PORT_ASSERT_CRASH(524);
+    _sessionLock.Enter();
+    Session* session = _sessionList[static_cast<unsigned int>(sessionId)];
+    if (session != nullptr && session->_id == sessionId)
+        session->addReferenceCount(PORT_FILE, 531);
+    else
+        session = nullptr;
+    _sessionLock.Leave();
+    if (session == nullptr)
+        return;
+    session->_lock.Enter();
+    bool closed = session->close(force);
+    session->_lock.Leave();
+    if (closed)
+        session->_port->RemoveSession(session);
+    session->removeReferenceCount(PORT_FILE, 543);
+}
+
+// 0x26220 (LobbyGate)
+long long Port::GetSessionLastRecvTime(unsigned long long sessionId)
+{
+    long long lastRecvTime = 0;
+    if (static_cast<unsigned int>(sessionId >> 32) != _id)
+        PORT_ASSERT_CRASH(590);
+    if (static_cast<unsigned int>(sessionId) >= _maxSession)
+        PORT_ASSERT_CRASH(591);
+    _sessionLock.Enter();
+    Session* session = _sessionList[static_cast<unsigned int>(sessionId)];
+    if (session != nullptr)
+        lastRecvTime = session->_lastRecvTime;
+    _sessionLock.Leave();
+    return lastRecvTime;
+}
+
 // 0x19420
 Session* Port::makeSession(unsigned long long& id)
 {

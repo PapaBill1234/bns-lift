@@ -30,6 +30,30 @@ public:
         FAILED_SET_EXT_COMP_FUNC = 15,
         FAILED_COMP = 16,
     };
+    enum Type
+    {
+        NO_CRYPT = 0x0,
+        NO_HANDSHAKE_CRYPT = 0x1,
+        HANDSHAKE_CRYPT = 0x2,
+        SESSION_CRYPT = 0x3,
+        BROADCAST_CRYPT = 0x4,
+    };
+    enum Algorithm
+    {
+        ALGORITHM_DEFAULT = 0x0,
+        ALGORITHM_TYPE1 = 0x1,
+        ALGORITHM_TYPE2 = 0x2,
+        ALGORITHM_TYPE3 = 0x3,
+        ALGORITHM_TYPE4 = 0x4,
+    };
+    enum Param
+    {
+        PARAM_NONE = 0x0,
+        PARAM_HANDSHAKE_FAIL = 0x1,
+        PARAM_BROADCAST_LOCAL = 0x2,
+        PARAM_BROADCAST_GLOBAL = 0x3,
+        PARAM_BROADCAST_LOCAL_COMPRESS = 0x4,
+    };
     static ErrCode Setup(int maxSize);  // 0x327E0 (PacketCrypt module, not in this card)
     static int _MaxSize;
 
@@ -40,6 +64,7 @@ public:
     virtual int Encrypt(unsigned char* buffer, int* bufferSize, int size, bool with3rdParty) = 0;   // slot 4
     virtual int Decrypt(unsigned char* buffer, int size, int* outSize, bool* with3rdParty) = 0;     // slot 5
     virtual int SetExternalCompressFunc(void* func, unsigned char const* data, int size) = 0;        // slot 6
+    virtual ~PacketCrypt() {}  // slot 7, vector deleting destructor (BroadcastPacketCrypt 0x4DBB0, LobbyGate)
 };
 static_assert(sizeof(PacketCrypt) == 0x8, "sizeof PacketCrypt");
 
@@ -71,6 +96,7 @@ protected:
 public:
     static unsigned short Compose(char* buffer, unsigned int count, char const* format,
                                   unsigned long long fmtCount, char* args);
+    static unsigned short CheckCompose(char* buffer, unsigned int count, char const* format, char** args);
     static unsigned short Decompose(char const* buffer, unsigned int count, char const* format,
                                     unsigned long long fmtCount, char* args);
     bool encrypt(PacketCrypt* crypt, Security3rdParty* crypt3rd);

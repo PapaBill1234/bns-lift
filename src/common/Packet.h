@@ -3,6 +3,8 @@
 #include <stddef.h>
 
 class PacketBuffer;
+class PacketComposer;
+class PacketCrypt;
 
 class PacketSplitter
 {
@@ -21,12 +23,30 @@ public:
         short size;
     };
 
+    struct VarData
+    {
+        short* size;
+        char* buffer;
+    };
+
     ~Packet();
     void Clear();
     char const* Allocate();
     unsigned short Compose(char const* format, ...);
     void AddSize(short size);
     unsigned short Decompose(char const* format, ...) const;
+    char const* Allocate(PacketComposer* pcr);
+    unsigned short ComposeV(PacketComposer* pcr, int n, char* args);
+    void Add(void const* data, short size);
+    void Copy(Packet const* packet);
+    void Encrypt(PacketCrypt* crypt);
+    void Finalize(PacketCrypt* crypt);
+
+    // 0x14280 (inline)
+    char const* GetFreeBody() const
+    {
+        return CurHeader != nullptr ? reinterpret_cast<char const*>(CurHeader) + CurHeader->size : nullptr;
+    }
 
     PacketSplitter* Splitter;
     bool IsFragmentPacket;
@@ -35,6 +55,7 @@ public:
     PacketBuffer* ListHead;
     PacketBuffer* ListTail;
 };
+static_assert(sizeof(Packet::VarData) == 0x10, "sizeof Packet::VarData");
 static_assert(sizeof(Packet) == 0x28, "sizeof Packet");
 static_assert(offsetof(Packet, Splitter) == 0x0, "Packet::Splitter");
 static_assert(offsetof(Packet, IsFragmentPacket) == 0x8, "Packet::IsFragmentPacket");

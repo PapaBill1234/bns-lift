@@ -153,6 +153,97 @@ compose_overflow:
     return 0;
 }
 
+// 0x23760 (LobbyGate)
+// Checks one format item. Each argument slot is 8 bytes. Returns 5000 on overflow.
+unsigned short PacketBuffer::CheckCompose(char* buffer, unsigned int count, char const* format, char** args)
+{
+    char* end = &buffer[count];
+    if (strlen(format) == 0)
+    {
+        Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 203, L"[PacketBuffer] %s, invalid format", L"PacketBuffer::CheckCompose");
+        return 0;
+    }
+    char type = *format;
+    char* a = *args;
+    switch (type)
+    {
+    case ';':
+        Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 325, L"[PacketBuffer] %s, Repeat End type %C",
+                   L"PacketBuffer::CheckCompose", type);
+        return 0;
+    case 'C':
+    case 'E':
+    case 'U':
+    case 'h':
+    case 'u':
+        if (buffer + 2 > end)
+            goto compose_overflow;
+        *args = a + 8;
+        return 2;
+    case 'K':
+    case 'b':
+    {
+        short size = *reinterpret_cast<short*>(a + 8);
+        if (&buffer[size + 2] > end)
+            goto compose_overflow;
+        *args = a + 16;
+        return static_cast<unsigned short>(size + 2);
+    }
+    case 'P':
+    {
+        if (buffer + 1 > end)
+            goto compose_overflow;
+        if (buffer + 2 > end)
+            goto compose_overflow;
+        short size = *reinterpret_cast<short*>(a + 24);
+        if (&buffer[size + 2] > end)
+            goto compose_overflow;
+        *args = a + 32;
+        return static_cast<unsigned short>(size + 5);
+    }
+    case 'Q':
+    case 'c':
+        if (buffer + 1 > end)
+            goto compose_overflow;
+        *args = a + 8;
+        return 1;
+    case 'd':
+    case 'f':
+    case 'i':
+        if (buffer + 4 > end)
+            goto compose_overflow;
+        *args = a + 8;
+        return 4;
+    case 'o':
+        if (buffer + 16 > end)
+            goto compose_overflow;
+        *args = a + 8;
+        return 16;
+    case 'q':
+        if (buffer + 8 > end)
+            goto compose_overflow;
+        *args = a + 8;
+        return 8;
+    case 's':
+    {
+        short len = static_cast<short>(wcslen(*reinterpret_cast<wchar_t const**>(a)));
+        if (&buffer[2 * len + 2] > end)
+            goto compose_overflow;
+        *args = a + 8;
+        return static_cast<unsigned short>(2 * (len + 1));
+    }
+    default:
+        Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 331, L"[PacketBuffer] %s, Unknown type %C",
+                   L"PacketBuffer::CheckCompose", type);
+        PACKETBUFFER_ASSERT_CRASH(332);
+        return 0;
+    }
+
+compose_overflow:
+    Log::Write(Log::LT_DEBUG, PACKETBUFFER_FILE, 342, L"[PacketBuffer] %s, Compose overflow", L"PacketBuffer::CheckCompose");
+    return 5000;
+}
+
 // 0x23950 (SmartCouponDaemon)
 // LTCG gives fmtCount as (unsigned long long)-1. The loop stops at the format terminator.
 unsigned short PacketBuffer::Decompose(char const* buffer, unsigned int count, char const* format,

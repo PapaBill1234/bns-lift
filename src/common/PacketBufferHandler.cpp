@@ -152,3 +152,151 @@ int RawPacketBufferHandler::ToBuffer(Session const* session, char* buffer, int b
         *sendBuffer = packet + 2;
     return *reinterpret_cast<short const*>(packet) - 2;
 }
+
+// 0x5C580 (LobbyGate) folded with Blowfish::BlockSize
+unsigned long long ClientPacketBufferHandler::AllocSize() const
+{
+    return 8;
+}
+
+// 0x21920 (LobbyGate)
+PacketBufferHandler* ClientPacketBufferHandler::Clone(void* buffer) const
+{
+    if (buffer != nullptr)
+        return new (buffer) ClientPacketBufferHandler();
+    void* mem = Memory::_Manager[2]->Alloc(8, PBH_FILE, 98);
+    if (mem == nullptr)
+        return nullptr;
+    return new (mem) ClientPacketBufferHandler();
+}
+
+// 0x21970 (LobbyGate)
+void ClientPacketBufferHandler::Destroy(void* buffer)
+{
+    if (buffer == nullptr)
+        Memory::_Manager[2]->Free(this, PBH_FILE, 103);
+}
+
+// (LobbyGate) folded with Console::Flush ❓ no own address
+void ClientPacketBufferHandler::Initialize()
+{
+}
+
+// 0x21830 (LobbyGate) folded with LobbyGateReloadInvalidRestoreTimer::TimerId
+int ClientPacketBufferHandler::MinimalPacketSize()
+{
+    return 2;
+}
+
+// 0x219A0 (LobbyGate)
+int ClientPacketBufferHandler::ToPacket(Session const* session, char const* buffer, int bufferSize, int freeSize,
+                                        char const** packet)
+{
+    // The handler changes the crypt members through the const session.
+    Session* mutableSession = const_cast<Session*>(session);
+    unsigned short header = *reinterpret_cast<unsigned short const*>(buffer);
+    PacketCrypt::Algorithm algorithm = static_cast<PacketCrypt::Algorithm>(header >> 14);
+    unsigned int size;
+    if ((header >> 14) != 0)
+        size = 4 * (header & 0xFFF);
+    else
+        size = header & 0x3FFF;
+    int packetSize = 0;
+    if (size > 0xFFFF)
+        return -1;
+    if (bufferSize < static_cast<int>(size + 2))
+        return 0;
+
+    PacketCrypt* currentCrypt = session->_currentCrypt;
+    if (currentCrypt != nullptr)
+    {
+        int cryptMode = session->_cryptMode;
+        bool with3rdParty = false;
+        if (cryptMode != 5)
+        {
+            Log::Write(Log::LT_ERROR, PBH_FILE, 165, L"Session(%I64X), Seesion decrypt failed;invalid module, mode:%d",
+                       session->_id, cryptMode);
+            return -1;
+        }
+        short code = static_cast<short>(header >> 12);
+        if (code != 8 && code != 9 && code != 10 && code != 11)
+        {
+            Log::Write(Log::LT_ERROR, PBH_FILE, 173,
+                       L"Session(%I64X), Seesion decrypt failed;invalid enc-code, enc-code:%d", session->_id,
+                       static_cast<unsigned int>(header) >> 12);
+            return -1;
+        }
+        packetSize = bufferSize;
+        int err = currentCrypt->Decrypt(reinterpret_cast<unsigned char*>(const_cast<char*>(buffer)), bufferSize,
+                                        &packetSize, &with3rdParty);
+        if (err != PacketCrypt::SPCE_NO_ERROR)
+        {
+            Log::Write(Log::LT_ERROR, PBH_FILE, 180, L"Session(%I64X), Session decrypt failed, error-code:%d",
+                       session->_id, err);
+            return -1;
+        }
+        Security3rdParty* security3rd = session->_security3rd;
+        if (security3rd != nullptr)
+        {
+            int size3rd = reinterpret_cast<short const*>(buffer)[1] - 2;
+            int err3rd = security3rd->Decrypt(reinterpret_cast<unsigned char*>(const_cast<char*>(buffer)) + 4,
+                                              &size3rd, with3rdParty);
+            if (err3rd != 0)  // Security3rdParty::S3ERR_SUCCESS
+            {
+                Log::Write(Log::LT_ERROR, PBH_FILE, 198,
+                           L"Session(%I64X), Session 3rd party decrypt failed, error-code: %d", session->_id, err3rd);
+                return -1;
+            }
+        }
+    }
+    else
+    {
+        if (algorithm == PacketCrypt::ALGORITHM_DEFAULT)
+        {
+            Log::Write(Log::LT_ERROR, PBH_FILE, 139,
+                       L"Session(%I64X), Handshake decrypt failed, code 'plain' not acceptable", session->_id);
+            return -1;
+        }
+        if (session->_cryptMode == 2)
+        {
+            PacketCrypt* crypt =
+                static_cast<PacketCrypt*>(session->allocateCrypt(PacketCrypt::HANDSHAKE_CRYPT, algorithm));
+            mutableSession->_handshakeCrypt = crypt;
+            mutableSession->_currentCrypt = crypt;
+        }
+        PacketCrypt* crypt = session->_currentCrypt;
+        if (crypt == nullptr)
+        {
+            Log::Write(Log::LT_ERROR, PBH_FILE, 149, L"Session(%I64X), Handshake decrypt failed;cannot create crypt",
+                       session->_id);
+            return -1;
+        }
+        packetSize = bufferSize;
+        int err = crypt->Decrypt(reinterpret_cast<unsigned char*>(const_cast<char*>(buffer)), bufferSize, &packetSize,
+                                 nullptr);
+        if (err != PacketCrypt::SPCE_NO_ERROR)
+        {
+            Log::Write(Log::LT_ERROR, PBH_FILE, 156, L"Session(%I64X), Handshake decrypt failed, error-code:%d",
+                       session->_id, err);
+            return -1;
+        }
+    }
+    if (packet != nullptr)
+        *packet = buffer + 2;
+    short headerSize = reinterpret_cast<short const*>(buffer)[1];
+    if (headerSize >= 2 && packetSize >= headerSize)
+        return packetSize;
+    Log::Write(Log::LT_ERROR, PBH_FILE, 213,
+               L"[session], ClientPacketBufferHandler; invalid packet size, id:%I64X, header->size:%d, packet-size:%d",
+               session->_id, static_cast<int>(headerSize), packetSize);
+    return -1;
+}
+
+// 0x21CB0 (LobbyGate)
+int ClientPacketBufferHandler::ToBuffer(Session const* session, char* buffer, int bufferSize, char const* packet,
+                                        char const** sendBuffer)
+{
+    if (sendBuffer != nullptr)
+        *sendBuffer = packet;
+    return 4 * (*reinterpret_cast<unsigned short const*>(packet) & 0xFFF) + 2;
+}

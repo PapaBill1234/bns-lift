@@ -22,6 +22,10 @@ public:
 
     static void Initialize();
     static void Destroy(Crypto* crypto);
+    static int InstanceSize(Type type);  // 0x55150 (LobbyGate). TODO(lift-lobbygate-2)
+    // 0x55200 (LobbyGate). TODO(lift-lobbygate-2)
+    // ❓ The PDB name gives (Type, void*, int). The code uses rcx=buffer, edx=size, r8d=type.
+    static Crypto* Create(void* buffer, int size, Type type);
 
     mutable int _error; // ❓ +8, the const Encrypt and Decrypt write it
     bool _alloc; // ❓ +12, true when the object came from malloc

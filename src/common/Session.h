@@ -4,6 +4,7 @@
 #include "Lock.h"
 #include "MemoryManager.h"
 #include "TimerQueue.h"
+#include "PacketBuffer.h"
 
 class Connection;
 class SessionSendBuffer;
@@ -67,6 +68,8 @@ private:
     bool handlePacket();                                                          // 0xF750
     bool sendNext(unsigned long sentSize);                                        // 0xFDC0
     bool send(PacketBuffer const** const pbufferList, int count) const;           // 0xFE90
+    void* allocateCrypt(PacketCrypt::Type type, PacketCrypt::Algorithm algorithm) const;  // 0x19460 (LobbyGate)
+    void deallocateCrypt(void* crypt) const;             // 0x194C0 (LobbyGate)
 
 public:
     CriticalSection _lock;
@@ -107,6 +110,7 @@ public:
     friend class Network;
     friend class ReconnectTimer;
     friend class PortListener;
+    friend class ClientPacketBufferHandler;
 };
 static_assert(sizeof(Session) == 0x128, "sizeof Session");
 static_assert(offsetof(Session, _lock) == 0x18, "Session::_lock");

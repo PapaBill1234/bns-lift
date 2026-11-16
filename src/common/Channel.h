@@ -18,6 +18,8 @@ public:
 
     bool MakeSession(unsigned int portId, unsigned long ip, unsigned short portNo, long timeout, bool reconnect);  // 0x10450
     void Close();                                                      // 0x10810
+    bool Send(Packet const* packet);                                   // 0x21720 (LobbyGate)
+    bool Send(char const* format, ...);                                // 0x216C0 (LobbyGate)
 
 protected:
     static void removeSession(RefCntObject* ref1, RefCntObject* ref2, RefCntObject* ref3);  // 0x10770

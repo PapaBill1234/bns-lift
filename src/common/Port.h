@@ -70,6 +70,8 @@ protected:
                         bool reconnect, Session** session);                                            // 0x19010
     bool RemoveSession(Session* session);                                                              // 0x19120
     void ReconnectSession(unsigned long long id);                                                      // 0x192A0
+    void CloseSession(unsigned long long sessionId, bool force);                                       // 0x25F20 (LobbyGate)
+    long long GetSessionLastRecvTime(unsigned long long sessionId);                                    // 0x26220 (LobbyGate)
 
 private:
     Session* makeSession(unsigned long long& id);  // 0x19420
@@ -102,6 +104,7 @@ public:
     friend class PortListener;
     friend class Session;
     friend class Channel;
+    friend class IdleStateTable;
 };
 static_assert(sizeof(Port) == 0x80, "sizeof Port");
 static_assert(offsetof(Port, _sessionLock) == 0x28, "Port::_sessionLock");

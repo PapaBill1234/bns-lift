@@ -13,11 +13,15 @@
 #include "Network.h"
 #include "Port.h"
 #include "Session.h"
+#include <stdarg.h>
 
 static wchar_t const CHANNEL_FILE[] = L"source\\Channel.cpp";
 // The file name of the inlined helper from BloodLib/include/Channel.h.
 static wchar_t const CHANNEL_HEADER_FILE[] =
     L"E:\\DailyBuild02\\CacheGate-Common-0.0.348\\depot\\Branch\\348NC\\Program\\Server\\BloodLib\\include\\Channel.h";
+// The same helper file name in the LobbyGate build.
+static wchar_t const LOBBYGATE_CHANNEL_HEADER_FILE[] =
+    L"E:\\DailyBuild02\\LobbyGate-Common-0.0.348\\depot\\Branch\\348NC\\Program\\Server\\BloodLib\\include\\Channel.h";
 
 // Inlined crash macro.
 #define CHANNEL_ASSERT_CRASH(line)                                                  \
@@ -242,4 +246,30 @@ void ClientSideDaemonChannel::releaseSession(Session* releasedSession)
 {
     if (releasedSession != nullptr)
         releasedSession->removeReferenceCount(CHANNEL_FILE, 388);
+}
+
+// 0x216C0 (LobbyGate)
+bool Channel::Send(char const* format, ...)
+{
+    Session* session = const_cast<Session*>(GetSession());
+    if (session == nullptr)
+        return false;
+    va_list args;
+    va_start(args, format);
+    session->SendV(format, args);
+    va_end(args);
+    session->removeReferenceCount(LOBBYGATE_CHANNEL_HEADER_FILE, 52);
+    return true;
+}
+
+// 0x21720 (LobbyGate)
+bool Channel::Send(Packet const* packet)
+{
+    Session* session = const_cast<Session*>(GetSession());
+    if (session == nullptr)
+        return false;
+    // Inlined Session::Send(Packet const*) (0x18F00 LobbyGate).
+    session->Send(packet);
+    session->removeReferenceCount(LOBBYGATE_CHANNEL_HEADER_FILE, 52);
+    return true;
 }

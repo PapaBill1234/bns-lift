@@ -44,6 +44,9 @@ public:
     static void* iocpHandle() { return Instance->_iocpHandle; }
     static bool ClosePort(unsigned int id);                                                           // 0xD5A0
     static wchar_t const* GetAddressStringW(unsigned long address);                                   // 0xD6D0
+    static void CloseSession(unsigned long long sessionId, bool force);                               // 0x209D0 (LobbyGate)
+    // ❓ LTCG removed portId (the only caller gives 1). The code uses _port[0].
+    static bool SetMaxIdleTime(unsigned int portId, bool disconnect, long maxIdleTime);               // 0x20860 (LobbyGate)
 
 protected:
     static void ReconnectSession(unsigned long long id);         // 0xD630
@@ -78,6 +81,7 @@ private:
     friend class Session;
     friend class Channel;
     friend class ReconnectTimer;
+    friend class IdleStateTable;
     friend class DelayedRelease;  // ❓ access for DelayedRelease::Release (0x22DA0)
 };
 static_assert(sizeof(Network) == 0xE0, "sizeof Network");

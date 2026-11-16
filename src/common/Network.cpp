@@ -225,6 +225,39 @@ void Network::ReconnectSession(unsigned long long id)
     Instance->_port[portId - 1]->ReconnectSession(id);
 }
 
+// 0x20860 (LobbyGate)
+bool Network::SetMaxIdleTime(unsigned int portId, bool disconnect, long maxIdleTime)
+{
+    (void)portId;  // ❓ LTCG removed it. The code reads _port[0].
+    if (Instance->_port[0] == nullptr)
+        NETWORK_ASSERT_CRASH(229);
+    if (Instance->_idleWatcher == nullptr)
+    {
+        void* memory = BaseMemoryManager::_Instance.Alloc(sizeof(IdleWatcher), NETWORK_FILE, 233);
+        IdleWatcher* watcher = memory != nullptr ? new (memory) IdleWatcher() : nullptr;
+        Instance->_idleWatcher = watcher;
+        Daemon::Instance->threadManager->StartThread(watcher, nullptr);
+    }
+    Port* port = Instance->_port[0];
+    if (port->_idleStateTable != nullptr)
+        return false;
+    IdleStateTable* table = IdleStateTable::Create(port, static_cast<int>(port->_maxSession), maxIdleTime, disconnect);
+    port->_idleStateTable = table;
+    if (table == nullptr)
+        return false;
+    Instance->_idleWatcher->_table[port->_id] = table;
+    return true;
+}
+
+// 0x209D0 (LobbyGate)
+void Network::CloseSession(unsigned long long sessionId, bool force)
+{
+    unsigned int index = static_cast<unsigned int>(sessionId >> 32) - 1;
+    if (index > 23 || Instance->_port[index] == nullptr)
+        NETWORK_ASSERT_CRASH(250);
+    Instance->_port[index]->CloseSession(sessionId, force);
+}
+
 // 0xD6D0
 wchar_t const* Network::GetAddressStringW(unsigned long address)
 {
