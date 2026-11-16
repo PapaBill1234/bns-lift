@@ -1,25 +1,24 @@
-# lift-cg-verify handoff: run CacheGate under Wine, compare packet logs
+# lift-cg-verify handoff: CacheGate run and compare
 
 ## Done
-- `tools/verify/run_cachegate.sh`: copies one exe (lifted or original) + original config, DLLs and
-  `dict/` to `build/verify/<kind>/`, runs it under wine64 in its own prefix, saves the console output,
-  the new listen ports and the pktlog files. `--pktlog` patches only the copy with `patch_import.py`.
-- `tools/verify/compare_cachegate.sh`: runs both and diffs console, ports and `pkldump.py` output.
-- `tools/verify/replay.py`: replays a captured stream as client or as peer server, records replies.
-- `Docs/Verify/CacheGate.md`: check table (all checks open), facts, next steps.
+- `tools/verify/run_cachegate.sh`: runs one exe (lifted or original) under wine64 (wineconsole, Xvfb :77,
+  own prefix). Saves log, listen ports, peer and client bytes, pktlog records. Options `--pktlog --peer --client`.
+- `tools/verify/compare_cachegate.sh`: runs both, normalizes, writes 5 diffs in `build/verify/compare/`.
+- `tools/verify/replay.py`: CacheD peer (listen) and client (connect). No change in this session.
+- Original exe: starts, listens on 20800, sends a 10-byte hello to CacheD, pktlog patch works.
+- Self test (original against original, `--pktlog`): 0 changed lines in log, ports, peer, client, pkl.
+- `Docs/Verify/CacheGate.md`: run facts, reference behaviour, noise, checks table.
 
 ## Not done
-- Tasks 1-3 and 5 have no run result. No difference is recorded.
-- The scripts are not tested. They have no exec bit (run them with `bash`).
+- All compare checks of the lifted exe. `build/CacheGate.exe` does not exist: no CMake target,
+  `src/CacheGate/` has only `CacheD.h` (lift-cg-5 not done).
+- Tests with packet data (Hello, Relay) from a captured stream.
 
 ## ❓
-- Protocol of the 2019 + PDB CacheGate to CacheDaemon and GameDaemon versus the 381 set.
-- `replay.py` length field: the u16 len counts the 4-byte header (assumed, check with `pkldump.py`).
+- If the 381 CacheDaemon accepts the 2019 hello. Not tested: the 381 set was not running.
 
 ## Blocked
-- No lifted exe: no `CacheGate` CMake target. `lift-cg-3` and `lift-cg-5` wrote no source
-  (Network, Session, Packet, Port, CacheGate app modules are missing). These cards must run again.
-- The Bash tool was denied in this session. I could not run Wine, the scripts or `tools/gate.sh`.
+- Lifted checks: blocked by lift-cg-5. Then run `tools/verify/compare_cachegate.sh 20 --pktlog`.
 
 ## Gate result
-- Not run (Bash denied).
+- `tools/gate.sh`: gate ok (rc 0). Only warnings (offsetof on non-standard-layout types in common code).

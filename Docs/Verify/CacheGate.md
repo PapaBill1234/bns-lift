@@ -1,49 +1,58 @@
 # CacheGate verify (card lift-cg-verify)
 
-Status: **not run**. The checks below have no result yet.
+Status: **original done, lifted open**. The scripts work with the original exe. The lifted exe
+`build/CacheGate.exe` does not exist yet: the CMake file has no `CacheGate` target, and `src/CacheGate/`
+has only `CacheD.h` (see `Docs/Plan/handoffs/lift-cg-5.md`). Run the compare again when that card is done.
 
-## Why not run
-1. No lifted exe. The CMake file has no `CacheGate` target. The handoffs `lift-cg-3` and `lift-cg-5`
-   show that Network, Session, Packet, Port and all CacheGate app modules are not lifted
-   (no source in `src/`). Only `lift_common` (memory, thread, console, daemon, config, crypto) builds.
-2. The Bash tool was denied in this session. I could not run Wine, the original exe, or the scripts.
-
-## Tools (written in this card, not tested)
-| File | Use |
+## How to run
+| Command | Use |
 | --- | --- |
-| `tools/verify/run_cachegate.sh lifted\|original [SECONDS] [--pktlog]` | Copies the exe, the original config, DLLs and `dict/` to `build/verify/<kind>/Server/CacheGate/bin/`. Runs it under wine64 in its own prefix (`build/verify/wineprefix`, D: points to the run folder). Saves `console.txt`, `ports.txt` (new TCP listen ports), `exit.txt`, `pktlog/*.pkl`. |
-| `tools/verify/compare_cachegate.sh [SECONDS] [--pktlog]` | Runs both kinds and writes `build/verify/compare/{console,ports,pkl}.diff`. Removes time stamps, pids and addresses before the diff. |
-| `tools/verify/replay.py connect\|listen ...` | Sends a captured stream (u16 len + u16 id cut) to the exe as client or as peer server. Records the replies, one line per packet. |
+| `tools/verify/run_cachegate.sh lifted\|original [SECONDS] [--pktlog] [--peer] [--client]` | Runs one exe under wine64 in its own prefix (`build/verify/wineprefix`). Output in `build/verify/<kind>/`: `log.txt`, `ports.txt`, `exit.txt`, `peer.txt`, `client.txt`, `pktlog/*.pkl`. |
+| `tools/verify/compare_cachegate.sh [SECONDS] [--pktlog]` | Runs both kinds with `--peer --client`, writes `build/verify/compare/{log,ports,peer,client,pkl}.diff`. Exit 0 = no difference, 3 = no lifted exe. |
+| `tools/verify/replay.py connect HOST:PORT\|listen PORT STREAM OUT` | Peer or client. Sends STREAM, records each received packet as `<ms> <len> <id> <hex>`. |
 
-Run the scripts with `bash tools/verify/<name>.sh` (the files have no exec bit yet).
+Self test: `CG_LIFTED_EXE=<original exe> tools/verify/compare_cachegate.sh 20 --pktlog` gives 0 changed lines in all 5 diffs.
 
-## Facts
-- Original exe: `Service_348_8349/Service/CacheGate/bin/CacheGate.exe`. Do not use `CacheGate2019.exe`
-  in the same folder (plan: its PDB GUID does not match).
-- `cachegate.config.xml`: `public-port` = 20800. This is the expected listen port.
-- pktlog.dll writes to `D:\Logs\pktlog\<name>-<pid>-<time>.pkl`. `<name>` comes from the
-  `<name>\bin\` folder, so the script uses `Server/CacheGate/bin/` for both exes.
-- The peers in `bns-wine/` are the 381 set. The protocol of the 2019 + PDB CacheGate to CacheDaemon
-  and GameDaemon is not known ❓. If the 381 CacheDaemon does not accept it, use `replay.py listen`
-  as the CacheDaemon peer.
+## Run facts (found with the original exe)
+- The exe must have a console window. Without one it starts in service mode and crashes (page fault).
+  The script runs it in `wineconsole` on a hidden Xvfb display `:77`. Give the full Windows path of the exe.
+- Paths from the config: `E:\Service\CacheGate\{bin,config}`, `E:\log\CacheGate\`. pktlog writes to
+  `D:\Logs\pktlog\`. The script points E: and D: into `build/verify/<kind>/`.
+- The exe stops at start if `config\cached-list.config.xml` is missing. With `--peer` the script sets its
+  `ip-address` to 127.0.0.1, and `replay.py listen` is the CacheD peer on the economy port (20202).
+- `exit.txt` = 124 is correct: the script stops the exe with SIGINT after SECONDS.
+
+## Reference behaviour (original, 2019 + PDB, version 0.0.348.524)
+- Listen port: 20800 (`public-port`). No other listen port.
+- Log: 36 lines. Config dump, bns-common-config, CacheD session 200000001 connect,
+  `[cg], cached connect, hello send, wid:1`, `network initialize ok.`, `start`.
+- To CacheD (economy port) it sends one 10-byte hello: `0a 00 01 00 04 00 0a 00 01 00`.
+- Client connect with no data: accept (session 100000001), `recv zero`, `on close, portid : 1`, remove. No bytes sent to the client.
+
+## Noise (removed by compare_cachegate.sh)
+- Time stamps, pointers, socket handles, local ports, the host name and addresses.
+- `[worker], event object handle failed, id: N`: N changes from run to run.
+- The order of `Cached channel connected` and the connect lines changes (threads). The log diff ignores line order.
 
 ## Checks
 | # | Check | Original | Lifted | Result |
 | --- | --- | --- | --- | --- |
-| 1 | Exe starts under wine64 | not run | no exe | open |
-| 2 | Startup log lines | not run | no exe | open |
-| 3 | Listen ports (expected 20800) | not run | no exe | open |
-| 4 | Packet log, same input (`pkldump.py`) | not run | no exe | open |
-| 5 | Replay to CacheDaemon peer (2019 protocol) | not run | no exe | open |
+| 1 | Exe starts under wine64 | yes | no exe | open |
+| 2 | Startup log lines | 36 lines, see above | no exe | open |
+| 3 | Listen ports | 20800 | no exe | open |
+| 4 | Bytes to CacheD peer (`replay.py listen`) | 10 B hello | no exe | open |
+| 5 | Client on 20800, no data | accept, recv zero, close | no exe | open |
+| 6 | Packet log, same input (`pkldump.py`) | 7 records, same as 4 and 5 | no exe | open |
+| 7 | 381 CacheDaemon accepts the 2019 hello ❓ | not run | not run | open |
 
 ## Differences
 | Packet | Field | Original value | Lifted value | Function address |
 | --- | --- | --- | --- | --- |
 | - | - | - | - | - |
 
-None recorded. No run was possible.
+None recorded. No lifted exe.
 
 ## Next steps
-1. Run cards `lift-cg-3` and `lift-cg-5` again (with Bash) to get `build/CacheGate.exe`.
-2. `bash tools/verify/run_cachegate.sh original 20` to get the reference output, also before step 1.
-3. `bash tools/verify/compare_cachegate.sh 20 --pktlog`. Write each line of the diffs in the table above.
+1. Finish lift-cg-5 (CMake target `CacheGate`, output `build/CacheGate.exe`).
+2. `tools/verify/compare_cachegate.sh 20 --pktlog`. Write each changed line in the table above.
+3. For packet data tests: set `CG_PEER_STREAM` / `CG_CLIENT_STREAM` to a captured stream (Hello, Relay).
