@@ -71,6 +71,11 @@ add_library(lift_common STATIC
   src/common/ctr.cpp
   src/common/prng.cpp
   src/common/ripemd160.cpp
+  src/common/BigInteger.cpp
+  src/common/biArithmetic.cpp
+  src/common/biMultiplication.cpp
+  src/common/biSqr.cpp
+  src/common/biMontgomery.cpp
   src/common/PacketBuffer.cpp
   src/common/Packet.cpp
   src/common/Connection.cpp
