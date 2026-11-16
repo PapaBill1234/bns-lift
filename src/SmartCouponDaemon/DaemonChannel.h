@@ -76,5 +76,9 @@ static_assert(offsetof(DChannelMgr, _list) == 0x30, "DChannelMgr::_list");
 
 // 0x835F8
 extern wchar_t const* SmartCouponDaemonTypeDesc[2];
+
+bool HandleSmartCoupon_HelloReq(Session const* session, Packet const* packet);                 // 0x7DC0
+bool HandleSmartCoupon_GameEventByCharacterReq(Session const* session, Packet const* packet);  // 0x8360
+bool HandleSmartCoupon_GameEventByAccountReq(Session const* session, Packet const* packet);    // 0x8E80
 // 0x83660
 extern bool (*SmartCouponPacketSmartCouponSideHandlerList[10])(Session const* session, Packet const* packet);

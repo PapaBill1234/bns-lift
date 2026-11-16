@@ -73,11 +73,7 @@ bool GameEventEndEvent::HandleEvent(EventContext*, unsigned long)
     return true;
 }
 
-// 0x7d80 ❓ COMDAT in DaemonPacketHandler.obj
-unsigned int GameEventLogEvent::EventId() const
-{
-    return 128;
-}
+// GameEventLogEvent::EventId 0x7d80 is in DaemonPacketHandler.cpp (PDB module DaemonPacketHandler.obj).
 
 // 0xaa90
 unsigned int SendPublicationEvent::EventId() const

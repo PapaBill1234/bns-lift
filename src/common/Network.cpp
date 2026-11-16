@@ -237,6 +237,50 @@ bool Network::OpenPort(unsigned int id, unsigned short portNumber, int initialMo
     return true;
 }
 
+// 0x1A8B0 (SmartCouponDaemon)
+bool Network::OpenPort(unsigned int portId, unsigned short portNo, SessionHandler const* sessionHandler,
+                       PacketBufferHandler const* bufferHandler, unsigned int maxSession)
+{
+    if (portId == 0)
+        NETWORK_ASSERT_CRASH(170);
+    if (Instance->_port[portId - 1] != nullptr)
+        NETWORK_ASSERT_CRASH(177);
+
+    if (maxSession == 0)
+    {
+        maxSession = 2 * Instance->_workerThreadCount + 1;
+        if (maxSession < 16)
+            maxSession = 16;
+    }
+
+    void* memory = BaseMemoryManager::_Instance.Alloc(sizeof(Port), NETWORK_FILE, 184);  // ❓ line
+    Port* port = memory != nullptr ? new (memory) Port() : nullptr;
+    // ❓ LTCG folded Port::Initialize (0x28E10): initialMode 2, enableRecv true, nagle false.
+    if (!port->Initialize(portId, portNo, maxSession, 2, true, false, Instance->_iocpHandle, sessionHandler,
+                          bufferHandler))
+    {
+        if (port != nullptr)
+            port->~Port();
+        BaseMemoryManager::_Instance.Free(port, NETWORK_FILE, 188);
+        return false;
+    }
+    if (port->_portNumber != 0)
+    {
+        if (!port->StartAccept())
+        {
+            port->clearPool();
+            port->~Port();
+            BaseMemoryManager::_Instance.Free(port, NETWORK_FILE, 194);
+            return false;
+        }
+    }
+    // 0x1AAE7: one word store. Accept stays off (OpenPort(id) 0x1AB20 sets it later), recv is on.
+    port->_enableAccept = false;
+    port->_enableRecv = true;
+    Instance->_port[portId - 1] = port;
+    return true;
+}
+
 // 0x1AB20 (SmartCouponDaemon)
 bool Network::OpenPort(unsigned int id)
 {

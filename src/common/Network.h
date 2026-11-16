@@ -39,6 +39,8 @@ public:
     static bool OpenPort(unsigned int id, unsigned short portNumber, int initialMode, SessionHandler const* sessionHandler,
                          PacketBufferHandler const* bufferHandler, unsigned int maxSession, bool enableAccept,
                          bool enableRecv, bool nagle);                                                // 0xD2C0
+    static bool OpenPort(unsigned int portId, unsigned short portNo, SessionHandler const* sessionHandler,
+                         PacketBufferHandler const* bufferHandler, unsigned int maxSession);          // 0x1A8B0 (SmartCouponDaemon)
     static bool OpenPort(unsigned int id);                                                            // 0x1AB20 (SmartCouponDaemon)
     // ❓ Not in the PDB. Inlined read of Instance->_iocpHandle.
     static void* iocpHandle() { return Instance->_iocpHandle; }

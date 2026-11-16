@@ -29,6 +29,8 @@ static_assert(sizeof(DynamicEventObject) == 0x18, "sizeof DynamicEventObject");
 class Timer : public DynamicEventObject
 {
 public:
+    // Inline ctor (seen in SmartCouponDaemon::initialize 0x150E0).
+    Timer() : StartTick(0), next(nullptr), prev(nullptr), SlotIndex(-1), InLtq(false) {}
     virtual unsigned int TimerClass() const = 0;          // slot 6
     virtual unsigned long long TimerId() const = 0;       // slot 7
     virtual void preprocessExpireEvent();                 // slot 8
