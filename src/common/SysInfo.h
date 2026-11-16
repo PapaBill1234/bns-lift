@@ -18,5 +18,6 @@ private:
     friend class LogBufferAllocator;  // ❓ access for initAllocator (0x20440)
     friend class PacketBufferAllocator;  // ❓ access for initAllocator (0x24100)
     friend class Network;
+    friend class SmartCouponDaemon;  // ❓ access for initialize (0x150E0)
     friend class SessionPool;  // ❓ access for SessionPool::SessionPool (0x184E0)  // ❓ access for initWorkerThread (0xD8E0)
 };

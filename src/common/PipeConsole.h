@@ -73,6 +73,8 @@ public:
     };
 
     void SetInvalidInfo(wchar_t const* keyString, bool isInvalid);
+    // 0x25000 (SmartCouponDaemon). The body does not use the arguments.
+    void SetDetectFrozenThread(bool detect, int crashCount);
 
 protected:
     PipeConsole();
