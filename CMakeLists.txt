@@ -136,3 +136,26 @@ target_compile_options(CacheGate PRIVATE /GR-)
 target_include_directories(CacheGate BEFORE PRIVATE ${LIFT_STL_INCLUDE})
 add_dependencies(CacheGate lift_msvcp100_implib)
 target_link_libraries(CacheGate PRIVATE lift_common ${LIFT_MSVCP100_IMPLIB})
+
+# SmartCouponDaemon app modules (static lib).
+add_library(lift_smartcoupondaemon STATIC
+  src/SmartCouponDaemon/ObjectPool.cpp
+  src/SmartCouponDaemon/SharedChannel.cpp
+  src/SmartCouponDaemon/ManagerChannel.cpp
+  src/SmartCouponDaemon/ManagerPacketHandler.cpp
+  src/SmartCouponDaemon/SmartCouponManagerPacketSmartCouponSideHandlerList.cpp
+  src/SmartCouponDaemon/SmartCouponDaemon.cpp)
+target_compile_options(lift_smartcoupondaemon PRIVATE /GR-)
+target_include_directories(lift_smartcoupondaemon BEFORE PRIVATE ${LIFT_STL_INCLUDE})
+target_include_directories(lift_smartcoupondaemon PUBLIC ${CMAKE_SOURCE_DIR}/src/SmartCouponDaemon)
+target_link_libraries(lift_smartcoupondaemon PUBLIC lift_common)
+
+# SmartCouponDaemon server exe. LinkStubs.cpp has stub bodies for the modules in the handoff "Not done" list.
+lift_exe(SmartCouponDaemon
+  SOURCES src/SmartCouponDaemon/LinkStubs.cpp src/crt/wmain_bridge.c
+          src/crt/tlssup.c src/crt/new_delete.c src/crt/zstd_stub.c
+  IMPORTS msvcr100 kernel32 odbc32 iphlpapi version shlwapi ws2_32)
+target_compile_options(SmartCouponDaemon PRIVATE /GR-)
+target_include_directories(SmartCouponDaemon BEFORE PRIVATE ${LIFT_STL_INCLUDE})
+add_dependencies(SmartCouponDaemon lift_msvcp100_implib)
+target_link_libraries(SmartCouponDaemon PRIVATE lift_smartcoupondaemon lift_common ${LIFT_MSVCP100_IMPLIB})

@@ -634,6 +634,38 @@ void PipeConsole::SetRunningInfo(wchar_t const* keyString, wchar_t const* valueS
     _lock.Leave();
 }
 
+// 0x25000 (SmartCouponDaemon)
+void PipeConsole::SetDetectFrozenThread(bool detect, int crashCount)
+{
+    // ❓ LTCG removed the arguments. The binary always sets true and 0.
+    (void)detect;
+    (void)crashCount;
+    ThreadManager* threadManager = Daemon::Instance->threadManager;
+    if (threadManager != nullptr)
+    {
+        // Reset the last run time of each running thread (inlined ThreadManager code).
+        threadManager->_now = _time64(nullptr);
+        Thread* threads[1024];
+        unsigned int count = 0;
+        for (unsigned int i = 0; i < threadManager->_maxThreadCount; ++i)
+        {
+            if (count >= 1024)
+                break;
+            Thread* thread = threadManager->_threads[i];
+            if (thread != nullptr && thread->_run)
+                threads[count++] = thread;
+        }
+        for (unsigned int i = 0; i < count; ++i)
+        {
+            Thread* thread = threads[i];
+            if (thread != nullptr && thread->_maxFrozenSeconds != 0)
+                thread->_lastExecuted = thread->_threadManager->_now;
+        }
+    }
+    _detectFrozenThread = true;
+    _crashIfExistFrozenThreadCount = 0;
+}
+
 // 0x15ed0
 bool PipeConsole::addNode(ItemList& list, wchar_t const* keyString, wchar_t const* valueString)
 {

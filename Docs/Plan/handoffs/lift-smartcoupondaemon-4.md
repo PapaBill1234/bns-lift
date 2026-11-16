@@ -1,28 +1,30 @@
 # lift-smartcoupondaemon-4 handoff
+
 ## Done
-- Research only. Facts are in `.scratch/` (facts-scd4.md, def.txt, types_app.txt, sigs.txt, <Module>.min.c). `.scratch/` is not committed.
-- Common header additions for later use: src/common/{TimerQueue,Network,PipeConsole,SysInfo,CrashHandler}.h (18 lines).
-- Lifted functions: 0. No src/SmartCouponDaemon/ files. No CMake target. No exe.
-## Not done (all module functions; RVA ranges)
-- SmartCouponDaemon (43): 0x14A30-0x161A0 (wmain 0x14B70, GenerateJobid 0x14B50, shutdown 0x15AD0).
-- SmartCouponDB (25): 0x108A0-0x145F0.
-- CouponJob (32): 0x6990-0x7540, 0x9890, 0x98D0.
-- EventNotiJob (22): 0x9920-0xA9D0.
-- GameEventWorker (28): 0xAA80-0xC7D0.
-- CouponGameEventConfig (24): 0x2A40-0x3580.
-- DaemonChannel (38): 0xC8C0-0xDFE0.
-- DaemonPacketHandler (9): 0x7DC0, 0x8360, 0x8E80.
-- ManagerChannel (8): 0xE7A0-0xEEC0.
-- ManagerPacketHandler (8): 0xEF40, 0xF2F0, 0xF7F0.
-- SharedChannel (7): 0x4270-0x67B0.
-- Data tables: SmartCouponConfig _Def, handler lists.
-- src/crt/wcrt0.c (wmainCRTStartup), CMake targets lift_smartcoupondaemon and SmartCouponDaemon.
-- Next session: follow steps 1-7 in lift-smartcoupondaemon-4-progress.md.
+- Static lib `lift_smartcoupondaemon` (CMakeLists.txt) with 5 modules, 44 functions:
+  - SharedChannel.cpp (6), ManagerChannel.cpp (6), ManagerPacketHandler.cpp (5), SmartCouponManagerPacketSmartCouponSideHandlerList.cpp (2).
+  - SmartCouponDaemon.cpp (25): getters, Alloc, GenerateJobid, wmain, dtor, init/net/start/shutdown/reload/cooldown, NP start, unhandled loads, `SmartCouponConfig::_Def[23]`.
+- src/common/Session.{h,cpp}: Session::GetChannel (0x1D330).
+- Headers only (declarations for later cards): ObjectPool.h, CouponJob.h, EventNotiJob.h, Db.h, NPChannel.h, DaemonChannel.h, CouponGameEventConfig.h, SendPublicationEvent.h, SmartCouponDB.h, GameEventWorker.h.
+
+## Not done
+- These modules are not lifted. The exe links only with the stubs in LinkStubs.cpp:
+  - SmartCouponDB 0x10850-0x145F0, CouponJob 0x6990-0x7540, EventNotiJob 0x9890-0xA9D0.
+  - GameEventWorker 0xAA80-0xC7D0, CouponGameEventConfig 0x2A40-0x3580.
+  - DaemonChannel 0xC8C0-0xDFE0, DaemonPacketHandler 0x7D30-0x8E80, SmartCouponPacketSmartCouponSideHandlerList.
+  - ObjectPool (ObjPool, ObjPoolTimer 0x1940, allocator Free), Db, NPChannel/NPServiceChannelManager.
+
 ## ❓
-- DaemonConfig::Dump name arg; OpenPort args in initNetwork; SetDetectFrozenThread(true,0); `__seed__` name.
-- shutdown calls ObjPool::Finalize with timer ptr (BUG?); DbTransaction::BindParam last args.
-- loadUnhandledCouponPublication reads event after PostQueuedCompletionStatus (BUG/race?).
-## Blocked
-- None.
-## Gate result
-- Gate failed first: the handoff file was missing. Fix: wrote this handoff file. Rerun: `gate ok`.
+- Network::OpenPort mode and bool args (initNetwork). LogFile ctor args (1, 0). `_logFile->_enable[2]=false` is a comment only.
+- ObjPoolTimer::Start(1000), SetDetectFrozenThread(true, 0), ObjPool::Initialize(vtbl, initJobCount, reuseWaitTime).
+- ObjPool::Finalize receiver in shutdown. `_seed__` name. Default name `a127001` (3276849).
+- Handler arg of Network::Initialize and GameEventManager::Initialize. DaemonConfig::Dump name arg.
+
+## BUG marks
+- 0x14AB0 old block leaks, VirtualAlloc not checked. 0x14C80 ConfigNoReload not set to null.
+- 0x14F40 Alloc not checked. 0x150E0 strlen of null certFile, fp not closed. 0x161A0 no null check, event read after post.
+
+## Blocked: None.
+## Gate result: `tools/gate.sh` prints gate ok.
+- Gate fix: `sizeof(ObjPool)` assert in ObjectPool.h changed from 0xA8 to 0xB0 (PDB size).
+- Gate fix 2: `lift_exe(SmartCouponDaemon)` added. The exe links with stub bodies (`TODO(lift-smartcoupondaemon-5)`) in `src/SmartCouponDaemon/LinkStubs.cpp`, one per Not done symbol (incl. ❓ `ClientSideDaemonChannel::onAccept`). `src/crt/new_delete.c` now gives `operator new` (malloc), because the Wine msvcr100 import lib has no export for it.

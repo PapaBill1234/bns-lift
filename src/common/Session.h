@@ -52,6 +52,7 @@ protected:
 public:
     void Close(bool graceful);                                                    // 0xEE30
     void StopReconnect() const;                                                   // 0xF9B0
+    Channel* GetChannel() const;                                                  // 0x1D330 (SmartCouponDaemon)
     void Send(char const* format, ...) const;                                     // 0xFA10
     void Send(Packet const* packet) const;                                        // 0xFA40
     void SendV(char const* format, char* args) const;                             // 0xFAA0
@@ -111,6 +112,8 @@ public:
     friend class ReconnectTimer;
     friend class PortListener;
     friend class ClientPacketBufferHandler;
+    friend class ManagerChannel;  // ❓ access for the inlined send in ManagerChannel::SendRetryCouponPublication* (SmartCouponDaemon)
+    friend class DChannel;        // ❓ access for the inlined send in DChannel (SmartCouponDaemon)
 };
 static_assert(sizeof(Session) == 0x128, "sizeof Session");
 static_assert(offsetof(Session, _lock) == 0x18, "Session::_lock");

@@ -753,6 +753,15 @@ bool Session::SetChannel(Channel* channel)
     return true;
 }
 
+// 0x1D330 (SmartCouponDaemon). The callers inline it.
+Channel* Session::GetChannel() const
+{
+    if (_channel == nullptr || _waitForRelease)
+        return nullptr;
+    _channel->addReferenceCount(SESSION_FILE, 1051);
+    return _channel;
+}
+
 // 0xF9B0
 void Session::StopReconnect() const
 {

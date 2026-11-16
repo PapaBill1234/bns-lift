@@ -237,6 +237,26 @@ bool Network::OpenPort(unsigned int id, unsigned short portNumber, int initialMo
     return true;
 }
 
+// 0x1AB20 (SmartCouponDaemon)
+bool Network::OpenPort(unsigned int id)
+{
+    if (id - 1 > 23 || Instance->_port[id - 1] == nullptr)
+        NETWORK_ASSERT_CRASH(209);
+    Port* port = Instance->_port[id - 1];
+    if (port->_portNumber != 0)
+    {
+        if (port->_listener == nullptr)
+        {
+            Log::Write(Log::LT_ERROR, L"source\\Port.cpp", 330, L"Initialize first!");
+            port->clearPool();
+            return false;
+        }
+        port->_enableAccept = true;
+    }
+    port->_enableRecv = true;
+    return true;
+}
+
 // 0xD5A0
 bool Network::ClosePort(unsigned int id)
 {
