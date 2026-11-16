@@ -36,6 +36,9 @@ norm() {
     -e 's/addr:\(127\.0\.0\.1:[0-9]+\)/addr:(127.0.0.1:<N>)/' \
     -e 's/(hostname|public|internal): [^,]*/\1: <HOST>/g' \
     -e 's/(worker run, id:)[0-9]+\([0-9]+\)/\1<N>/' \
+    -e 's/(event object handle failed, id: )[0-9]+/\1<N>/' \
+    -e 's/(loading time: )[0-9]+/\1<N>/' \
+    -e 's/(ip:127\.0\.0\.1, port:)[0-9]{5}(, socket:)/\1<PORT>\2/' \
     "$1"
 }
 # replay.py lines are "<ms> <len> <id> <hex>": drop the time. In the STS Connect body, Epoch

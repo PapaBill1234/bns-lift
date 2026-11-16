@@ -1,10 +1,11 @@
-# SmartCouponDaemon verify (cards lift-smartcoupondaemon-verify, lift-smartcoupondaemon-verify-2)
+# SmartCouponDaemon verify (cards lift-smartcoupondaemon-verify, -verify-2, -verify-3)
 
-Status (verify-2, 2026-11-16, `SCD_CERT=sql`): **original done, lifted blocked**. The original passes the DB step,
-listens on 22000 and 32000 and runs to the timeout. The lifted exe (`build/SmartCouponDaemon.exe` from commit
-8e56145, 347136 B, built by `tools/gate.sh`) does not get to LISTEN. First difference: `Network.cpp,175`
-ASSERT CRASH in `Network::OpenPort`, because the lifted callers give `initialMode` 0 to the generic overload
-(0xD2C0). The original calls a 5-argument copy (0x1A8B0) that has no mode check. See "Differences".
+Status (verify-3, 2026-11-16, `SCD_CERT=sql`): **lifted = original for all packets**. The lifted exe
+(`build/SmartCouponDaemon.exe` from commit 1013fcb, 368128 B, built by `tools/gate.sh`) passes the DB step, listens
+on 22000 and 32000, sends the same STS `/Sts/Connect` to NP and accepts the manager and daemon clients. 6 of 7 diffs
+have 0 changed lines. The log diff has 4 changed lines: `version:` is empty in `Daemon.cpp,496` and `Daemon.cpp,545`
+(no VERSIONINFO resource in the lifted exe). Check 9 is open (no 381 NP or GameDaemon). Earlier status (verify-2):
+`Network.cpp,175` ASSERT CRASH, fixed by lift-smartcoupondaemon-6 (0x1A8B0).
 
 ## How to run
 | Command | Use |
@@ -57,41 +58,38 @@ Self test: `SCD_LIFTED_EXE=<original exe> tools/verify/compare_smartcoupondaemon
 ## Noise (removed by compare_smartcoupondaemon.sh)
 - Time stamps, pointers, host name and addresses, ephemeral local ports, pids.
 - `worker run, id:N(k)`: thread ids. STS body: `<Epoch>` and `<Process>`.
+- Added in verify-3: `event object handle failed, id: N` (worker id, changes from run to run), `loading time: N`,
+  and the ephemeral client port in `accepted from, ... ip:127.0.0.1, port:N, socket:`.
 - Race: `[np], np channel connected` and `[np-session-handler], connected` are in some runs only (placeholder DSN).
   The log diff ignores these 2 lines.
 - Line order of the log changes (threads). The log diff ignores line order.
 
-## Checks (verify-2: `SCD_CERT=sql tools/verify/compare_smartcoupondaemon.sh 20 --pktlog`, 2 runs, same result)
+## Checks (verify-3: `SCD_CERT=sql tools/verify/compare_smartcoupondaemon.sh 20 --pktlog`, 2 runs, same result)
+Lifted = gate build of 1013fcb (after lift-smartcoupondaemon-6). Verify-2 results are in git history.
 | # | Check | Original | Lifted | Result |
 | --- | --- | --- | --- | --- |
-| 1 | Exe starts under wine64 | yes, exit 124 (timeout, runs) | yes, no 0xc0000417. ASSERT CRASH at about 2 s, then exit 124 (timeout, hangs in crash handler) | fail |
-| 2 | Startup log lines | 96 lines | 55 lines, to the 16 worker lines. Diff: 47 changed lines | fail |
-| 3 | Listen ports (polled every 0.1 s) | 22000, 32000 (to the end) | none | fail |
-| 4 | Bytes to NP peer (`peer-np`) | 1 STS `/Sts/Connect`, 254 B | no connect | fail |
-| 5 | Bytes to GameDaemon peer (`peer-gamed`) | not applicable: the exe does not connect to the GameDaemon (see Run facts) | same | same (0 lines) |
-| 6 | Manager / daemon client (`client-*`) | both accepted, 0 reply bytes | connection refused | fail (1 line each) |
-| 7 | Packet log, same input (`pkldump.py`) | 2 LISTEN, NP CONNECT, 1 STS, 2 ACCEPT, 2 CLOSE | no records. Diff: 19 lines | fail |
-| 8 | Behaviour after the DB step (DB OK) | coupon-publication count 0, game-event-log count 0, `open managed port ok`, `start ... loading time: 2180`, runs to timeout | not reached (crash before the DB step) | fail |
-| 9 | 381 NP / GameDaemon accepts the 2019 protocol ❓ | not run | not run | open |
+| 1 | Exe starts under wine64 | yes, exit 124 (timeout, runs) | yes, exit 124 (timeout, runs). No ASSERT, no RefCntObject line, no CrashHandler line | pass |
+| 2 | Startup log lines | 96 lines | 96 lines. Diff: 4 changed lines (`version:` in 2 lines, see Differences) | fail (version only) |
+| 3 | Listen ports (polled every 0.1 s) | 22000, 32000 (to the end) | 22000, 32000 (to the end) | pass (0 lines) |
+| 4 | Bytes to NP peer (`peer-np`) | 1 STS `/Sts/Connect`, 254 B | 1 STS `/Sts/Connect`, 254 B, same bytes after noise | pass (0 lines) |
+| 5 | Bytes to GameDaemon peer (`peer-gamed`) | not applicable: the exe does not connect to the GameDaemon (see Run facts) | same | pass (0 lines) |
+| 6 | Manager / daemon client (`client-*`) | both accepted, 0 reply bytes, `close without channel` on 22000 | same | pass (0 lines). No Hello input stream yet |
+| 7 | Packet log, same input (`pkldump.py`) | 2 LISTEN, NP CONNECT, 1 STS (218 B body), 2 ACCEPT, 2 CLOSE | same | pass (0 lines) |
+| 8 | Behaviour after the DB step (DB OK) | coupon-publication count 0, game-event-log count 0, `open managed port ok`, `start ... loading time: 2178`, runs to timeout | same, `loading time: 2187` | pass |
+| 9 | 381 NP / GameDaemon accepts the 2019 protocol ❓ | not run | not run | open (no 381 NP or GameDaemon: only `bns-mssql` runs) |
 
-## Differences (verify-2, `SCD_CERT=sql`)
+## Differences (verify-3, `SCD_CERT=sql`)
 | Packet | Field | Original value | Lifted value | Function address |
 | --- | --- | --- | --- | --- |
-| log | `RefCntObject.h,129 destructring with not zero reference count, ref:1, tag:0xfa` | not in the log | after `[objpool] objpool added to timer, id:1`, before `[job-mgr] initialize ok` | 0x150E0 path between the pool init and `JobManager::Initialize` ❓ (a RefCntObject on the stack or freed early). Not fatal |
-| startup | process | runs | `Network.cpp,175 == CRASH == ASSERT CRASH` (about 2 s after start, after the 16 workers) | Lifted calls `Network::OpenPort(1, 0, 0, ...)` 9-argument overload (0xD2C0, `src/common/Network.cpp:196`, check `initialMode != 1 && != 2`). Callers: `SmartCouponDaemon.cpp:362` (NP port 1), `:390` (port 2), `:400` (port 3), all with `initialMode` 0. Original calls `Network::OpenPort(portId, portNo, sessionHandler, bufferHandler, maxSession)` **0x1A8B0**: no line-175 check, maxSession 0 → `2 * workers + 1`, min 16 (mode-2 rule), then `Port::Initialize` 0x1AA48, `_enableAccept = false`, `_enableRecv = true`. Fix (src card): lift 0x1A8B0 as its own overload and call it from 0x150E0 |
-| log | daemon list, np init, DB load, `open managed port ok`, `start` | 41 lines | not reached | follows from the ASSERT row |
-| LISTEN | ports | 22000, 32000 | none | follows from the ASSERT row |
-| STS | `/Sts/Connect` to NP | 254 B | not sent | follows from the ASSERT row |
-| client | manager 32000 / daemon 22000 | accepted, 0 B reply | connection refused | follows from the ASSERT row |
+| log | `Daemon.cpp,496` Starting, `version:` | `0.0.348.352` | empty | `Daemon::LoadVersion` 0xBB30 reads the VERSIONINFO resource of the exe. The lifted code is correct. The lifted exe has no VERSIONINFO resource (build fault, not a code fault). Known since round 1 |
+| log | `Daemon.cpp,545` start, `version:` | `0.0.348.352` | empty | same cause (0xBB30) |
 
-Closed since round 1 (fixed in 8e56145): 0xc0000417 in `XmlConfigReader::Initialize`, `[config]` dump tag,
-null `EventNotiJob::_pool`, `JobManager::Initialize` stub. Still open from round 1: `version:` empty in
-`Daemon.cpp,496` (no VERSIONINFO resource in the lifted exe), extra `CrashHandler.cpp,490` line.
+Closed in verify-3 (fixed in 1013fcb): `Network.cpp,175` ASSERT CRASH (0x1A8B0), `RefCntObject.h,129 ... tag:0xfa`,
+`CrashHandler.cpp,490` extra line. All verify-2 rows that followed from the ASSERT are closed.
 
 ## Next steps
-1. Src card: lift `Network::OpenPort` 0x1A8B0 (5 arguments) and use it in 0x150E0 for ports 1, 2 and 3.
-   Check the `Port::Initialize` arguments at 0x1AA1E..0x1AA48 ❓ (initial mode, nagle, useUnusedSessionReadOnly).
-2. Find the RefCntObject (tag 0xfa) that is destroyed with ref 1 in the 0x150E0 pool / job-manager step.
-3. Run `SCD_CERT=sql tools/verify/compare_smartcoupondaemon.sh 20 --pktlog` again and update the tables.
-4. Check 6 with data: capture a GameDaemon Hello stream (HandleSmartCoupon_HelloReq 0x7DC0, not lifted yet) and
-   give it as `SCD_DAEMON_STREAM`.
+1. Build card (not queued, see the verify-3 handoff): add a VERSIONINFO resource to the SmartCouponDaemon target
+   (FileVersion 0.0.348.352, same strings as the original exe). Needs a change in `cmake/` or `CMakeLists.txt`.
+2. Check 6 with data: capture a GameDaemon Hello stream (HandleSmartCoupon_HelloReq 0x7DC0, lifted in 1013fcb)
+   and give it as `SCD_DAEMON_STREAM`. Do the same for 0x8360 and 0x8E80.
+3. Check 9 when a 381 NP or GameDaemon is available.
