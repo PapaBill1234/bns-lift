@@ -116,6 +116,8 @@ private:
     friend class Daemon;
     friend class CacheD;  // ❓ CacheD::Initialize (CacheGate 0x2430) calls addNode (inlined SetInvalidInfo).
     friend class CacheDChannel;  // ❓ CacheDChannel::onClose (CacheGate 0x3E40) calls addNode (inlined SetInvalidInfo).
+    friend class LobbyD;  // ❓ LobbyD::Hello (LobbyGate 0x9bd0) uses _invalid and addNode (inlined SetInvalidInfo).
+    friend class LobbyDSessionHandler;  // ❓ OnConnect/OnClose (LobbyGate 0x9310, 0x94c0) use _invalid and addNode.
 };
 static_assert(sizeof(PipeConsole) == 0x10AA8, "sizeof PipeConsole");
 static_assert(offsetof(PipeConsole, _state) == 0x58, "PipeConsole::_state");

@@ -150,6 +150,17 @@ target_include_directories(lift_smartcoupondaemon BEFORE PRIVATE ${LIFT_STL_INCL
 target_include_directories(lift_smartcoupondaemon PUBLIC ${CMAKE_SOURCE_DIR}/src/SmartCouponDaemon)
 target_link_libraries(lift_smartcoupondaemon PUBLIC lift_common)
 
+# LobbyGate app modules (static lib).
+add_library(lift_lobbygate STATIC
+  src/LobbyGate/FragmentPacket.cpp
+  src/LobbyGate/ThreadFreePacketPump.cpp
+  src/LobbyGate/Client.cpp
+  src/LobbyGate/LobbyDChannel.cpp)
+target_compile_options(lift_lobbygate PRIVATE /GR-)
+target_include_directories(lift_lobbygate BEFORE PRIVATE ${LIFT_STL_INCLUDE})
+target_include_directories(lift_lobbygate PUBLIC ${CMAKE_SOURCE_DIR}/src/LobbyGate)
+target_link_libraries(lift_lobbygate PUBLIC lift_common)
+
 # SmartCouponDaemon server exe. LinkStubs.cpp has stub bodies for the modules in the handoff "Not done" list.
 lift_exe(SmartCouponDaemon
   SOURCES src/SmartCouponDaemon/LinkStubs.cpp src/crt/wmain_bridge.c
