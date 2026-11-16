@@ -29,7 +29,11 @@ Self test: `SCD_LIFTED_EXE=<original exe> tools/verify/compare_smartcoupondaemon
   `fread` (max 1000 B) and uses the text as the ODBC connection string. No file: `cannot execute, error:3`
   and exit (error 2 = no cert-file option). The script writes a placeholder DSN with `keyhere` values
   (`SCD_CERT=placeholder`, the default). `SCD_CERT=none` gives the error-3 run.
-- `Db::Initialize` does not connect, so it passes. The first DB call fails: unixODBC has no driver here.
+- `SCD_CERT=sql` uses the real SmartCouponDB in Docker `bns-mssql` (127.0.0.1:14333). Start the container first
+  (`docker start bns-mssql`). The script installs ODBC Driver 17 in the verify prefix once
+  (`bns-wine/dl/msodbcsql17_x64.msi`). It reads the sa password from the container env at run time. Never print the cfg file.
+- `Db::Initialize` does not connect, so it passes. With the placeholder DSN the first DB call fails (no driver).
+  With `SCD_CERT=sql` the original passes the DB step (commit 8254022, run 2026-11-16).
 - With `--peer` the script sets `np-address` and the gamed `ip-address` to 127.0.0.1. `replay.py listen`
   is the NP peer (6601) and the GameDaemon peer (20100).
 
@@ -66,7 +70,7 @@ stops before check 2 (0xc0000417, 0 log lines).
 | 5 | Bytes to GameDaemon peer (`peer-gamed`) | no connect (stops before) | no connect | same (0 lines) |
 | 6 | Manager / daemon client (`client-*`) | connection refused (ports closed) | connection refused | same (0 lines) |
 | 7 | Packet log, same input (`pkldump.py`) | 2 LISTEN, NP CONNECT, 1 STS | no records. Diff: 15 lines | fail |
-| 8 | Behaviour after the DB step (DB OK) | not run: no ODBC driver | not run | blocked |
+| 8 | Behaviour after the DB step (DB OK, `SCD_CERT=sql`) | coupon-publication count 0, game-event-log count 0, `open managed port ok`, `start ... version: 0.0.348.352, loading time: 2255`, runs to timeout (exit 124), ports 22000 and 32000 | not run (stops before) | open |
 | 9 | 381 NP / GameDaemon accepts the 2019 protocol ❓ | not run | not run | open |
 
 ## Differences
@@ -86,5 +90,6 @@ stops before check 2 (0xc0000417, 0 log lines).
 2. Make `EventNotiJob::_pool` a static `ObjPool` object, as in 0x52A30. Pass `L"config"` to `DaemonConfig::Dump`.
 3. Lift the stub modules in `LinkStubs.cpp` (lift-smartcoupondaemon-5), first `JobManager`.
 4. Run `tools/verify/compare_smartcoupondaemon.sh 15 --pktlog` again and update the tables.
-5. Checks 5, 6 and 8 need a working DB (an ODBC driver in the Wine prefix or in unixODBC, and a
-   SmartCouponDB schema). Then set `SCD_CERT` to a file with that DSN, and use `SCD_*_STREAM` with captured streams.
+5. Checks 5, 6 and 8: run `SCD_CERT=sql tools/verify/compare_smartcoupondaemon.sh 20 --pktlog`. The DB gap is closed
+   for the original. Use `SCD_*_STREAM` with captured streams. With `sql` the original did not connect to the
+   GameDaemon peer in 20 s ❓.

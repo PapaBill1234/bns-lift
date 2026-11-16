@@ -24,7 +24,7 @@
 - Fixes are in `src/`, outside the Files of this card: apply CacheGate-fixes common part, fix
   `EventNotiJob::_pool`, `L"config"` tag. Lift stub modules (lift-smartcoupondaemon-5). Then run
   `tools/verify/compare_smartcoupondaemon.sh 15 --pktlog` again.
-- Check 8 needs an ODBC driver and a SmartCouponDB schema.
+- Check 8 is no longer blocked for the original: use `SCD_CERT=sql` (bns-mssql + ODBC Driver 17). See Docs/Verify/SmartCouponDaemon.md.
 
 ## Gate result
 - `tools/gate.sh`: gate ok (SmartCouponDaemon.exe, CacheGate.exe, lift_selftest.exe link).
