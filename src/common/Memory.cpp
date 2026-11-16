@@ -1,6 +1,9 @@
 // Memory.obj (CacheGate PDB).
 #include "Memory.h"
 #include <new>
+#include "AlertSender.h"
+#include "CrashHandler.h"
+#include "Log.h"
 
 MemoryManager const* Memory::_Manager[3] = {};
 
@@ -25,6 +28,18 @@ GrowingBuffer::~GrowingBuffer()
         Memory::_Manager[_sec]->Free(_buffer, L"source\\Memory.cpp", 109);
         _buffer = nullptr;
     }
+}
+
+// 0x29750 (PostOfficeDaemon)
+void GrowingBuffer::Add(unsigned long long size)
+{
+    if (_size - _count < size)
+    {
+        Log::Write(Log::LT_ERROR, L"source\\Memory.cpp", 122, L"== CRASH == ASSERT CRASH");
+        AlertSender::Write(L"source\\Memory.cpp", 122, L"== CRASH == ASSERT CRASH");
+        CrashHandler::MakeCrash("source\\Memory.cpp", 122, L"");
+    }
+    _count += size;
 }
 
 // 0x195A0 (SmartCouponDaemon)

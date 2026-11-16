@@ -101,6 +101,12 @@ public:
     static unsigned short CheckCompose(char* buffer, unsigned int count, char const* format, char** args);
     static unsigned short Decompose(char const* buffer, unsigned int count, char const* format,
                                     unsigned long long fmtCount, char* args);
+    // ❓ The PostOfficeDaemon PDB has these as protected. Packet calls them, so they are public here.
+    // LTCG removed fmtCount (always -1); the PDB signature is kept.
+    static unsigned short ComposeText(char* buffer, unsigned int count, char const* format,
+                                      unsigned long long fmtCount, char* args);       // 0x2F530 (PostOfficeDaemon)
+    static unsigned short DecomposeText(char const* buffer, unsigned int count, char const* format,
+                                        unsigned long long fmtCount, char* args);     // 0x2FAB0 (PostOfficeDaemon)
     bool encrypt(PacketCrypt* crypt, Security3rdParty* crypt3rd);
 
     char Buffer[4008];

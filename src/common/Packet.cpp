@@ -72,6 +72,36 @@ unsigned short Packet::Compose(char const* format, ...)
     return size;
 }
 
+// 0x21EB0 (PostOfficeDaemon)
+unsigned short Packet::ComposeText(char const* format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    if (format == nullptr || CurHeader == nullptr)
+        PACKET_ASSERT_CRASH(213);
+    unsigned short size = PacketBuffer::ComposeText(reinterpret_cast<char*>(CurHeader) + CurHeader->size,
+                                                    4000 - CurHeader->size, format,
+                                                    static_cast<unsigned long long>(-1), args);
+    AddSize(size);
+    va_end(args);
+    return size;
+}
+
+// 0x22220 (PostOfficeDaemon)
+unsigned short Packet::DecomposeText(char const* format, ...) const
+{
+    va_list args;
+    va_start(args, format);
+    if (format == nullptr || CurHeader == nullptr)
+        PACKET_ASSERT_CRASH(612);
+    // ❓ LTCG removed the count argument; the size - 2 value is taken from Packet::Decompose.
+    unsigned short size = PacketBuffer::DecomposeText(reinterpret_cast<char const*>(CurHeader + 1),
+                                                      CurHeader->size - 2, format,
+                                                      static_cast<unsigned long long>(-1), args);
+    va_end(args);
+    return size;
+}
+
 // 0x1B750 (SmartCouponDaemon)
 void Packet::AddSize(short size)
 {

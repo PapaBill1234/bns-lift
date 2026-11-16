@@ -29,6 +29,7 @@ public:
     {
     }
     virtual ~GrowingBuffer();  // slot 0
+    void Add(unsigned long long size);  // 0x29750 (PostOfficeDaemon)
 
 private:
     void grow(unsigned long long size);
@@ -41,6 +42,7 @@ public:
     unsigned char* _buffer;
 
     friend class RawPacketBufferHandler;  // ❓ ToPacket (0x21860) calls the inlined grow path.
+    friend class TextStreamPacketBufferHandler;  // ❓ ToPacket (0x2C570) calls grow.
 };
 static_assert(sizeof(GrowingBuffer) == 0x30, "sizeof GrowingBuffer");
 static_assert(offsetof(GrowingBuffer, _sec) == 0x8, "GrowingBuffer::_sec");

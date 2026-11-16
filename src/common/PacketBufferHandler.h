@@ -69,3 +69,26 @@ public:
                          char const** sendBuffer);
 };
 static_assert(sizeof(ClientPacketBufferHandler) == 0x8, "sizeof ClientPacketBufferHandler");
+
+// PostOfficeDaemon PDB.
+class TextStreamPacketBufferHandler : public PacketBufferHandler
+{
+public:
+    // ❓ Inlined in Clone (0x2C3F0). Clone does not set delimiter; Initialize sets it.
+    TextStreamPacketBufferHandler() : Buffer(2, 512) {}
+    virtual unsigned long long AllocSize() const;
+    virtual PacketBufferHandler* Clone(void* buffer) const;
+    virtual void Destroy(void* buffer);
+    virtual void Initialize();
+    virtual int MinimalPacketSize();
+    virtual int ToPacket(Session const* session, char const* buffer, int bufferSize, int freeSize,
+                         char const** packet);
+    virtual int ToBuffer(Session const* session, char* buffer, int bufferSize, char const* packet,
+                         char const** sendBuffer);
+
+    wchar_t delimiter[4];
+    GrowingBuffer Buffer;
+};
+static_assert(sizeof(TextStreamPacketBufferHandler) == 0x40, "sizeof TextStreamPacketBufferHandler");
+static_assert(offsetof(TextStreamPacketBufferHandler, delimiter) == 0x8, "TextStreamPacketBufferHandler::delimiter");
+static_assert(offsetof(TextStreamPacketBufferHandler, Buffer) == 0x10, "TextStreamPacketBufferHandler::Buffer");

@@ -98,7 +98,9 @@ add_library(lift_common STATIC
   src/common/PacketUtil.cpp
   src/common/Security.cpp
   src/common/CrashHandler.cpp
-  src/common/FragmentPacket.cpp)
+  src/common/FragmentPacket.cpp
+  src/common/ThreadFreePacketPump.cpp
+  src/common/Db.cpp)
 # clang-cl needs the AES target feature for the <wmmintrin.h> intrinsics.
 set_source_files_properties(src/common/aes128NI.cpp PROPERTIES COMPILE_OPTIONS "-maes")
 target_compile_options(lift_common PRIVATE /GR-)
@@ -140,7 +142,6 @@ target_link_libraries(CacheGate PRIVATE lift_common ${LIFT_MSVCP100_IMPLIB})
 # SmartCouponDaemon app modules (static lib).
 add_library(lift_smartcoupondaemon STATIC
   src/SmartCouponDaemon/CouponJob.cpp
-  src/SmartCouponDaemon/Db.cpp
   src/SmartCouponDaemon/EventNotiJob.cpp
   src/SmartCouponDaemon/GameEventWorker.cpp
   src/SmartCouponDaemon/ObjectPool.cpp
@@ -164,8 +165,6 @@ target_link_libraries(lift_smartcoupondaemon PUBLIC lift_common)
 
 # LobbyGate app modules (static lib).
 add_library(lift_lobbygate STATIC
-  src/LobbyGate/FragmentPacket.cpp
-  src/LobbyGate/ThreadFreePacketPump.cpp
   src/LobbyGate/Client.cpp
   src/LobbyGate/LobbyDChannel.cpp
   src/LobbyGate/LobbyGatePredefine.cpp

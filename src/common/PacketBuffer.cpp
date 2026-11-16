@@ -572,3 +572,274 @@ PacketBuffer* PacketBufferAllocator::allocate(int count)
     }
     return head;
 }
+
+// PostOfficeDaemon PDB: text packets.
+
+wchar_t const* HEX_PREFIXES[] = {L"0x", L"0X", nullptr};  // ❓ type
+
+// 0x2F530 (PostOfficeDaemon)
+unsigned short PacketBuffer::ComposeText(char* buffer, unsigned int count, char const* format,
+                                         unsigned long long fmtCount, char* args)
+{
+    wchar_t* start = reinterpret_cast<wchar_t*>(buffer + 2);
+    char* end = &buffer[count];
+    wchar_t* cur = start;
+    for (char const* f = format; *f != 0; ++f)
+    {
+        if (static_cast<unsigned long long>(f - format) == fmtCount)
+            break;
+        int written;
+        size_t room = static_cast<size_t>((end - reinterpret_cast<char*>(cur)) >> 1);
+        switch (*f)
+        {
+        case ';':
+            continue;
+        case 'C':
+        case 'h':
+            written = swprintf_s(cur, room, L"%d ", static_cast<int>(static_cast<short>(va_arg(args, int))));
+            break;
+        case 'c':
+            written = swprintf_s(cur, room, L"%d ", static_cast<int>(static_cast<char>(va_arg(args, int))));
+            break;
+        case 'd':
+        case 'i':
+            written = swprintf_s(cur, room, L"%d ", va_arg(args, int));
+            break;
+        case 'f':
+            written = swprintf_s(cur, room, L"%f ", static_cast<double>(static_cast<float>(va_arg(args, double))));
+            break;
+        case 'q':
+            written = swprintf_s(cur, room, L"%I64d ", va_arg(args, long long));
+            break;
+        case 's':
+            written = swprintf_s(cur, room, L"%s ", va_arg(args, wchar_t*));
+            break;
+        default:
+            Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 764, L"Unknown type %C", static_cast<int>(*f));
+            PACKETBUFFER_ASSERT_CRASH(765);
+            return 0;
+        }
+        if (written < 0)
+        {
+            Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 783, L"Compose Text overflow.");
+            PACKETBUFFER_ASSERT_CRASH(784);
+            return 0;
+        }
+        cur += written;
+    }
+    // The last space is removed from the text length.
+    if (cur == start)
+        *reinterpret_cast<short*>(buffer) = 0;
+    else
+        *reinterpret_cast<short*>(buffer) = static_cast<short>((reinterpret_cast<char*>(--cur) - buffer) >> 1);
+    return static_cast<unsigned short>(reinterpret_cast<char*>(cur) - buffer);
+}
+
+// 0x2F7D0 (PostOfficeDaemon)
+bool isHex(wchar_t const* num)
+{
+    for (long long i = 0; HEX_PREFIXES[i] != nullptr; ++i)
+    {
+        if (wcsncmp(num, HEX_PREFIXES[i], 2) == 0)
+            return true;
+    }
+    return false;
+}
+
+// 0x2F850 (PostOfficeDaemon)
+int parseHexInt(wchar_t const* str, wchar_t const* end, long long& value)
+{
+    if (str >= end)
+        return -1;
+    wchar_t const* p = str + 2;
+    value = 0;
+    while (*p != 0 && *p != L' ')
+    {
+        if (p >= end)
+            break;
+        value *= 16;
+        int digit;
+        if (iswdigit(*p))
+            digit = *p - L'0';
+        else
+        {
+            if (towupper(*p) < L'A' || towupper(*p) > L'F')
+                return -1;
+            digit = towupper(*p) - 55;
+        }
+        ++p;
+        value += digit;
+    }
+    if (*p == L' ')
+        ++p;
+    return static_cast<int>(p - str);
+}
+
+// 0x2F940 (PostOfficeDaemon)
+int parseDecInt(wchar_t const* str, wchar_t const* end, long long& value)
+{
+    if (str >= end)
+        return -1;
+    wchar_t const* p = str;
+    int sign = 1;
+    if (*str == L'-')
+    {
+        sign = -1;
+        ++p;
+    }
+    else if (*str == L'+')
+        ++p;
+    value = 0;
+    while (*p != 0 && *p != L' ')
+    {
+        if (p >= end)
+            break;
+        if (!iswdigit(*p))
+            return -1;
+        int ch = *p++;
+        value = ch - L'0' + 10 * value;
+    }
+    if (*p == L' ')
+        ++p;
+    value *= sign;
+    return static_cast<int>(p - str);
+}
+
+// 0x2FA20 (PostOfficeDaemon)
+// The code never returns -2.
+int parseString(wchar_t const* str, wchar_t const* end, wchar_t* buffer, short count)
+{
+    bool quoted = false;
+    wchar_t const* p = str;
+    wchar_t* last = &buffer[count];
+    if (str >= end)
+        return -1;
+    if (*str == L'"')
+    {
+        p = str + 1;
+        quoted = true;
+    }
+    while (*p != 0 && p < end)
+    {
+        wchar_t ch = *p;
+        if (quoted)
+        {
+            if (ch == L'"')
+            {
+                ++p;
+                break;
+            }
+        }
+        else if (ch == L' ')
+            break;
+        *buffer++ = ch;
+        ++p;
+        if (buffer >= last)
+            return -1;
+    }
+    *buffer = 0;
+    if (*p == L' ')
+        ++p;
+    return static_cast<int>(p - str);
+}
+
+// 0x2FAB0 (PostOfficeDaemon)
+// LTCG removed count (not used) and fmtCount (always -1).
+unsigned short PacketBuffer::DecomposeText(char const* buffer, unsigned int count, char const* format,
+                                           unsigned long long fmtCount, char* args)
+{
+    wchar_t const* cur = reinterpret_cast<wchar_t const*>(buffer + 2);
+    wchar_t const* end =
+        reinterpret_cast<wchar_t const*>(&buffer[2 * *reinterpret_cast<short const*>(buffer) + 2]);
+    for (char const* f = format; *f != 0; ++f)
+    {
+        if (static_cast<unsigned long long>(f - format) == fmtCount)
+            break;
+        long long v;
+        int n;
+        int errorLine;
+        switch (*f)
+        {
+        case 'C':
+        case 'h':
+            if (cur >= end)
+                goto decompose_text_overflow;
+            n = isHex(cur) ? parseHexInt(cur, end, v) : parseDecInt(cur, end, v);
+            if (n < 0)
+                goto decompose_text_overflow;
+            cur += n;
+            if (static_cast<unsigned long long>(v + 0x8000) > 0xFFFF)
+            {
+                errorLine = 1038;
+                goto decompose_text_range;
+            }
+            *va_arg(args, short*) = static_cast<short>(v);
+            continue;
+        case 'c':
+            if (cur >= end)
+                goto decompose_text_overflow;
+            n = isHex(cur) ? parseHexInt(cur, end, v) : parseDecInt(cur, end, v);
+            if (n < 0)
+                goto decompose_text_overflow;
+            cur += n;
+            if (static_cast<unsigned long long>(v + 128) > 0xFF)
+            {
+                errorLine = 1030;
+                goto decompose_text_range;
+            }
+            *va_arg(args, char*) = static_cast<char>(v);
+            continue;
+        case 'd':
+        case 'i':
+            if (cur >= end)
+                goto decompose_text_overflow;
+            n = isHex(cur) ? parseHexInt(cur, end, v) : parseDecInt(cur, end, v);
+            if (n < 0)
+                goto decompose_text_overflow;
+            cur += n;
+            if (static_cast<unsigned long long>(v + 0x80000000LL) > 0xFFFFFFFF)
+            {
+                errorLine = 1046;
+                goto decompose_text_range;
+            }
+            *va_arg(args, int*) = static_cast<int>(v);
+            continue;
+        case 'q':
+            if (cur >= end)
+                goto decompose_text_overflow;
+            n = isHex(cur) ? parseHexInt(cur, end, v) : parseDecInt(cur, end, v);
+            if (n < 0)
+                goto decompose_text_overflow;
+            cur += n;
+            *va_arg(args, long long*) = v;
+            continue;
+        case 's':
+        {
+            wchar_t* dst = va_arg(args, wchar_t*);
+            short size = static_cast<short>(va_arg(args, int));
+            n = parseString(cur, end, dst, size);
+            if (n == -2)
+            {
+                Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 1084, L"Decompose Text, invalid string");
+                return 0;
+            }
+            if (n < 0)
+                goto decompose_text_overflow;
+            cur += n;
+            continue;
+        }
+        default:
+            Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 1143, L"Unknown type %C", static_cast<int>(*f));
+            return 0;
+        }
+    decompose_text_range:
+        // ❓ BUG: 0x2FAB0 the binary gives only v; %C gets the value and %I64d gets no argument.
+        Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, errorLine, L"Decompose Text, format('%C'), value(%I64d)", v);
+        return 0;
+    }
+    return static_cast<unsigned short>(reinterpret_cast<char const*>(cur) - buffer);
+
+decompose_text_overflow:
+    Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 1153, L"Decompose Text overflow.");
+    return 0;
+}

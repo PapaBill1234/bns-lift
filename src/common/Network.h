@@ -47,6 +47,7 @@ public:
     // ❓ Not in the PDB. Inlined read of (Instance ? Instance->_iocpHandle : nullptr).
     static void* iocpHandleOrNull() { return Instance ? Instance->_iocpHandle : nullptr; }
     static bool ClosePort(unsigned int id);                                                           // 0xD5A0
+    static bool StopPort(unsigned int portId);                                                        // 0x28F10 (PostOfficeDaemon)
     static wchar_t const* GetAddressStringW(unsigned long address);                                   // 0xD6D0
     static void CloseSession(unsigned long long sessionId, bool force);                               // 0x209D0 (LobbyGate)
     // ❓ LTCG removed portId (the only caller gives 1). The code uses _port[0].

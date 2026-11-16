@@ -310,6 +310,16 @@ bool Network::ClosePort(unsigned int id)
     return true;
 }
 
+// 0x28F10 (PostOfficeDaemon)
+bool Network::StopPort(unsigned int portId)
+{
+    if (portId - 1 > 23 || Instance->_port[portId - 1] == nullptr)
+        NETWORK_ASSERT_CRASH(222);
+    Instance->_port[portId - 1]->_enableAccept = false;
+    Instance->_port[portId - 1]->_enableRecv = false;
+    return true;
+}
+
 // 0xD630
 void Network::ReconnectSession(unsigned long long id)
 {

@@ -1,10 +1,12 @@
 // PacketBufferHandler.obj (SmartCouponDaemon PDB).
 #include "PacketBufferHandler.h"
 #include <string.h>
+#include <wchar.h>
 #include <new>
 #include "Session.h"
 #include "Log.h"
 #include "AlertSender.h"
+#include <windows.h>
 
 #define PBH_FILE L"source\\PacketBufferHandler.cpp"
 
@@ -299,4 +301,147 @@ int ClientPacketBufferHandler::ToBuffer(Session const* session, char* buffer, in
     if (sendBuffer != nullptr)
         *sendBuffer = packet;
     return 4 * (*reinterpret_cast<unsigned short const*>(packet) & 0xFFF) + 2;
+}
+
+// PostOfficeDaemon PDB.
+// 0x13C50 (PostOfficeDaemon) ~TextStreamPacketBufferHandler: compiler-made, it runs ~GrowingBuffer.
+
+// 0x2C3E0 (PostOfficeDaemon)
+unsigned long long TextStreamPacketBufferHandler::AllocSize() const
+{
+    return 64;
+}
+
+// 0x2C3F0 (PostOfficeDaemon)
+PacketBufferHandler* TextStreamPacketBufferHandler::Clone(void* buffer) const
+{
+    if (buffer != nullptr)
+        return new (buffer) TextStreamPacketBufferHandler();
+    void* mem = Memory::_Manager[2]->Alloc(64, PBH_FILE, 249);
+    if (mem == nullptr)
+        return nullptr;
+    return new (mem) TextStreamPacketBufferHandler();
+}
+
+// 0x2C4A0 (PostOfficeDaemon)
+void TextStreamPacketBufferHandler::Destroy(void* buffer)
+{
+    if (buffer != nullptr)
+    {
+        this->~TextStreamPacketBufferHandler();
+        return;
+    }
+    if (this != nullptr)
+        this->~TextStreamPacketBufferHandler();
+    Memory::_Manager[2]->Free(this, PBH_FILE, 254);
+}
+
+// 0x2C560 (PostOfficeDaemon)
+void TextStreamPacketBufferHandler::Initialize()
+{
+    delimiter[0] = L'\n';
+    delimiter[1] = 0;
+}
+
+// 0x5D860 (PostOfficeDaemon) folded with PingGenerator::TimerId
+int TextStreamPacketBufferHandler::MinimalPacketSize()
+{
+    return 0;
+}
+
+// 0x2C570 (PostOfficeDaemon)
+int TextStreamPacketBufferHandler::ToPacket(Session const* session, char const* buffer, int bufferSize, int freeSize,
+                                            char const** packet)
+{
+    char const* end = &buffer[bufferSize];
+    char* i = const_cast<char*>(buffer);  // The code writes 0 into the receive buffer.
+    // BUG: 0x2C570 the loop reads *i before the i >= end check, so it reads buffer[bufferSize].
+    for (; *i != '\r'; ++i)
+    {
+        if (*i == '\n')
+            break;
+        if (i >= end)
+            return 0;
+    }
+    if (i >= end)
+        return 0;
+    if (*i == '\r')
+    {
+        if (delimiter[0] != L'\r')
+        {
+            delimiter[0] = L'\r';
+            delimiter[1] = L'\n';
+            delimiter[2] = 0;
+        }
+        char* next = i + 1;
+        bool lf = *next == '\n';
+        *i = 0;
+        if (lf)
+        {
+            ++i;
+            *next = 0;
+        }
+    }
+    else
+    {
+        if (*i != '\n')
+            return 0;
+        if (delimiter[0] != L'\n')
+        {
+            delimiter[0] = L'\n';
+            delimiter[1] = 0;
+        }
+        *i = 0;
+    }
+    short length = static_cast<short>(i - buffer + 1);
+    short wideLength = static_cast<short>(MultiByteToWideChar(0, 0, buffer, -1, nullptr, 0));
+    // Inlined GrowingBuffer writes.
+    Buffer._count = 0;
+    short chars = static_cast<short>(wideLength - 1);
+    short bytes = static_cast<short>(2 * chars);
+    unsigned long long need = static_cast<unsigned long long>(static_cast<short>(bytes + 4));
+    if (Buffer._size < need)
+        Buffer.grow(need);
+    if (Buffer._size - Buffer._count < 2)
+        Buffer.grow(2);
+    *reinterpret_cast<short*>(&Buffer._buffer[Buffer._count]) = static_cast<short>(bytes + 4);
+    Buffer._count += 2;
+    if (Buffer._size - Buffer._count < 2)
+        Buffer.grow(2);
+    *reinterpret_cast<short*>(&Buffer._buffer[Buffer._count]) = chars;
+    Buffer._count += 2;
+    MultiByteToWideChar(0, 0, buffer, -1, reinterpret_cast<LPWSTR>(&Buffer._buffer[Buffer._count]),
+                        static_cast<int>(Buffer._size) - static_cast<int>(Buffer._count));
+    Buffer.Add(bytes);
+    if (packet != nullptr)
+        *packet = reinterpret_cast<char const*>(Buffer._buffer);
+    return length;
+}
+
+// 0x2C730 (PostOfficeDaemon)
+int TextStreamPacketBufferHandler::ToBuffer(Session const* session, char* buffer, int bufferSize, char const* packet,
+                                            char const** sendBuffer)
+{
+    // The packet is [size][chars][text]. Bit 0x8000 of size marks a packet that is already converted.
+    wchar_t* header = reinterpret_cast<wchar_t*>(const_cast<char*>(packet));
+    char* out = reinterpret_cast<char*>(header + 1);
+    if ((*header & 0x8000) == 0)
+    {
+        if (*reinterpret_cast<short*>(out) >= 4000)
+            return -1;
+        WCHAR Destination[4000];
+        wcsncpy(Destination, header + 2, *reinterpret_cast<short*>(out));
+        long long n = *reinterpret_cast<short*>(out);
+        Destination[n] = 0;
+        wcsncat(Destination, delimiter, 4000 - n);
+        // BUG: 0x2C730 the size uses the buffer argument as the start, but the text goes into the packet.
+        WideCharToMultiByte(0, 0, Destination, -1, out,
+                            bufferSize + static_cast<int>(reinterpret_cast<long long>(buffer)) -
+                                static_cast<int>(reinterpret_cast<long long>(out)),
+                            nullptr, nullptr);
+        *header |= 0x8000;
+    }
+    if (sendBuffer != nullptr)
+        *sendBuffer = out;
+    return static_cast<int>(strlen(out));
 }
