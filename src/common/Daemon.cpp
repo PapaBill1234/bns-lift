@@ -720,3 +720,15 @@ void Daemon::timerMain(Network* networkInstance)
         }
     }
 }
+
+// ❓ Not in the CacheGate hr export (the CacheGate class overrides it).
+bool Daemon::cooldown()
+{
+    return true;  // TODO(lift-cg-5)
+}
+
+// ❓ Not in the CacheGate hr export (the CacheGate class overrides it).
+void Daemon::FlushExtraLog()
+{
+    // TODO(lift-cg-5)
+}

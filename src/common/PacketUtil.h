@@ -2,8 +2,7 @@
 // PacketConcatenater, PacketConcatenateBuffer. Layouts from include/pdb/LobbyGate/types.h.
 #pragma once
 #include <stddef.h>
-
-class Packet;
+#include "Packet.h"
 
 class PacketFormatIterator
 {
@@ -75,6 +74,31 @@ public:
     virtual void Destroy(void* buffer) = 0;                      // slot 3
 };
 static_assert(sizeof(PacketConcatenater) == 0x8, "sizeof PacketConcatenater");
+
+// FragmentPacket.obj (CacheGate PDB). Layout from include/pdb/CacheGate/types.h.
+class SendFragmentPacketConcatenater : public PacketConcatenater
+{
+public:
+    // ❓ The constructor is inlined (Clone 0x1220, HandleCacheGateFragmentRelay 0x5880). Packet has no constructor.
+    SendFragmentPacketConcatenater()
+    {
+        _packet.Splitter = nullptr;
+        _packet.IsFragmentPacket = false;
+        _packet.FragmentPacketCmd = 0;
+        _packet.CurHeader = nullptr;
+        _packet.ListHead = nullptr;
+        _packet.ListTail = nullptr;
+    }
+    virtual ~SendFragmentPacketConcatenater();                   // 0x11C0 (slot 4)
+    virtual void Clear();                                        // 0x1200
+    virtual unsigned long long AllocSize() const;                // 0x1210
+    virtual PacketConcatenater* Clone(void* buffer) const;       // 0x1220
+    virtual void Destroy(void* buffer);                          // 0x1290
+
+    Packet _packet;
+};
+static_assert(sizeof(SendFragmentPacketConcatenater) == 0x30, "sizeof SendFragmentPacketConcatenater");
+static_assert(offsetof(SendFragmentPacketConcatenater, _packet) == 0x8, "SendFragmentPacketConcatenater::_packet");
 
 class PacketDecomposer : public PacketFormatIterator
 {

@@ -10,6 +10,7 @@
 #include "IdleWatcher.h"
 #include "IoWorkerThread.h"
 #include "Log.h"
+#include "Memory.h"
 #include "MemoryManager.h"
 #include "PacketBuffer.h"
 #include "Port.h"
@@ -30,6 +31,35 @@ static wchar_t const NETWORK_FILE[] = L"source\\Network.cpp";
 // ❓ File static of the PacketCrypt module (0x14005A508). PacketCrypt::Setup increments it.
 // Network::Clear decrements it (an inlined PacketCrypt clean-up).
 extern long volatile s_initializedCount;
+long volatile s_initializedCount = 0;  // ❓ the PacketCrypt module is not lifted; the definition is here
+
+int PacketCrypt::_MaxSize = 0;  // ❓
+
+// 0x327E0 (PacketCrypt module). Not in the CacheGate hr export.
+PacketCrypt::ErrCode PacketCrypt::Setup(int maxSize)
+{
+    // TODO(lift-cg-5) the PacketCrypt module is not lifted.
+    _MaxSize = maxSize;
+    _InterlockedIncrement(&s_initializedCount);
+    return SPCE_NO_ERROR;
+}
+
+// 0xCD60 (folded with DynamicEventObject::~DynamicEventObject)
+EventObject::~EventObject()
+{
+}
+
+// 0xCD60 (folded with EventObject::~EventObject)
+DynamicEventObject::~DynamicEventObject()
+{
+}
+
+// ❓ Not in the CacheGate hr export. Same body as DynamicRefCntObj::deallocate_me (0x2350).
+void DynamicEventObject::deallocate_me(void* ptr, wchar_t const* file, int line)
+{
+    this->~DynamicEventObject();
+    Memory::_Manager[2]->Free(ptr, file, line);
+}
 
 // ❓ IDA dword_14004E408: default maxSession for each initialMode (0..3).
 static unsigned int const s_defaultMaxSession[4] = {10000, 10000, 16, 16};

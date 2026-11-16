@@ -1,29 +1,31 @@
-# lift-cg-5 handoff: CacheGate app, full exe
+# lift-cg-5 handoff
 
 ## Done
-- Decompile of all six modules to `.scratch/` (git ignores it). All CacheD.c pseudocode is read.
-- `src/CacheGate/CacheD.h`: `CacheD::Initialize` has 4th param `char status` (PDB `?Initialize@CacheD@@QEAAXGKGD@Z`).
-- Verified facts for the next session are in `lift-cg-5-progress.md`. No `.cpp` is written yet.
+- CacheGate app modules in `src/CacheGate/`: CacheGate, CacheD, CacheDChannel, ClientManager, CacheGateSessionHandler, CacheGateServerSideHandlerList.
+- Common: `src/common/Session.cpp` (Session 0xDED0..0xFE90, Timer 0xDE80/0xDE90, ReconnectTimer 0xFF90/0xFFD0/0xFFE0), FragmentPacket.cpp, plus the deltas in Network, Daemon, SystemInformation, Port.h.
+- CacheGate.exe links. Link fix: Session.cpp added, import libs advapi32 shell32 version user32 shlwapi, `src/crt/tlssup.c` (TLS directory), `src/crt/new_delete.c` (operator delete alias, the Wine msvcr100 lib has no `??3@YAXPEAX@Z`).
 
-## Not done (all functions of the card)
-- CacheGate: 0x4050-0x40A0 (names, timer), 0x4180 main, 0x4270/0x4290 dtor, 0x43F0 initLog, 0x4510 initialize,
-  0x4770 initNetwork, 0x4930 shutdown, 0x4970 reload, 0x4B40 FailedEventObjectHandler, 0x4B90 PrintDependency.
-- CacheD and CacheDList: 0x23A0-0x3B80.
-- CacheDChannel: 0x3C40/0x3C70 dtor, 0x3C80 onConnect, 0x3E40 onClose, 0x40B0 onAccept.
-- CacheGateSessionHandler: 0x4150 PacketHandler, 0x4C00 Hello, 0x4F20 HelloOk, 0x5040 HelloFail,
-  0x51C0 Relay, 0x57A0 RelayFail, 0x5880 FragmentRelay.
-- ClientManager: 0x5D60 dtor, 0x5E90 Initialize, 0x6050 GetSession, 0x6120 AddSession,
-  0x6250 ReleaseSession, 0x6380 ReleaseAllSession.
-- CacheGateServerSideHandlerList: data at 0x592D0. CacheGateConfig::_Def at 0x596C0.
-- Wide CRT entry (wmainCRTStartup) in `src/crt/`. CMake target `CacheGate` is not added.
+## Not done (stubs with TODO(lift-cg-5))
+- PacketCrypt::Setup 0x327E0 (sets _MaxSize, returns SPCE_NO_ERROR).
+- ZSTD_freeCDict 0x18380, ZSTD_createCCtx_advanced: `src/crt/zstd_stub.c`. vendor/zstd/src is missing.
+- Daemon::cooldown, Daemon::FlushExtraLog (addresses ❓).
+- Timer::preprocessExpireEvent, ReconnectTimer::TimerClass.
+- Session::allocateCrypt (see LobbyGate 0x19460), returns nullptr.
 
 ## ❓
-- `CacheGate::_instance` (0x5A3E0) is private static: lifted code needs `friend` (not in PDB).
-- PacketHandler reads the command at `CurHeader + 2`. Hello error codes (dis 0x4C00) are not read.
+- Allocator Initialize args (2048, 0x248), `_timeout = 0`, recv param, ToPacket freeSize.
+- tryReconnect arg 5000 at 0xEE90, crypt release path.
+- Place of `s_initializedCount` and `PacketCrypt::_MaxSize`; DynamicEventObject::deallocate_me.
+
+## BUG
+- 0xEE90: the POSTPONE_CONNECTING branch is dead; the tryReconnect argument is not set.
+
+## Toolchain (cmake/)
+- `cmake/clangcl-wine.cmake`: `/Zc:tlsGuards-` added. Reason: link is /nodefaultlib, no CRT gives `__dyn_tls_on_demand_init` and `__tls_guard`.
+- Note: a `build/` with an old CMakeCache keeps the old flags. Remove `build/CMakeCache.txt` once.
 
 ## Blocked
-- None. The work stopped at the stage limit.
+- IDA open failed (status 4). Lift used `.scratch/hr/` only.
 
 ## Gate result
-- `tools/gate.sh`: gate ok (only `CacheD.h` changed; the exe target is not in CMake yet).
-- Fix: the gate failed because this handoff was the old one from commit 040fe32. It now shows the current state.
+- `tools/gate.sh`: gate ok.

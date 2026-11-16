@@ -29,7 +29,8 @@ set(WINE_LIBDIR "/usr/lib/x86_64-linux-gnu/wine/x86_64-windows" CACHE PATH "Wine
 set(LIFT_COMMON_FLAGS "--target=x86_64-pc-windows-msvc /GS- /X -imsvc ${WINE_INCDIR}/msvcrt -imsvc ${WINE_INCDIR}/windows /D_WIN64 /D_MSVCR_VER=100 /DWINE_UNICODE_NATIVE")
 set(CMAKE_C_FLAGS_INIT   "${LIFT_COMMON_FLAGS}")
 # msvcr100 has no sized operator delete (??3@YAXPEAX_K@Z). Do not emit calls to it.
-set(CMAKE_CXX_FLAGS_INIT "${LIFT_COMMON_FLAGS} /Zc:sizedDealloc-")
+# /Zc:tlsGuards-: no MSVC CRT gives __dyn_tls_on_demand_init and __tls_guard (link is /nodefaultlib).
+set(CMAKE_CXX_FLAGS_INIT "${LIFT_COMMON_FLAGS} /Zc:sizedDealloc- /Zc:tlsGuards-")
 set(CMAKE_C_FLAGS_RELEASE_INIT   "/O2 /DNDEBUG")
 set(CMAKE_CXX_FLAGS_RELEASE_INIT "/O2 /DNDEBUG")
 

@@ -5,6 +5,8 @@
 class PacketBuffer;
 class PacketComposer;
 class PacketCrypt;
+class PacketConcatenateHandler;
+class PacketDecomposer;
 
 class PacketSplitter
 {
@@ -41,6 +43,9 @@ public:
     void Copy(Packet const* packet);
     void Encrypt(PacketCrypt* crypt);
     void Finalize(PacketCrypt* crypt);
+    void Concatenate(Packet const* packet, PacketConcatenateHandler const* concatHandler);           // 0x7300 (CacheGate)
+    void Concatenate(char const* buffer, unsigned short size, PacketConcatenateHandler const* concatHandler);  // 0x7470 (CacheGate)
+    unsigned short Decompose(PacketDecomposer* pdr, int n, ...) const;                                // 0x75B0 (CacheGate)
 
     // 0x14280 (inline)
     char const* GetFreeBody() const

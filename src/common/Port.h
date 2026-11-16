@@ -41,6 +41,7 @@ public:
     std::deque<Session*, StlAllocator<Session*, 2> > _sessionQueue;
 
     friend class Port;
+    friend class Session;  // ❓ access for Session::deallocate_me (0xFD80)
 };
 static_assert(sizeof(SessionPool) == 0xD0, "sizeof SessionPool");
 static_assert(offsetof(SessionPool, _portId) == 0x18, "SessionPool::_portId");

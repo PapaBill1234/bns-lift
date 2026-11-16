@@ -2,6 +2,7 @@
 // The XmlReader DLL types are here because only the config code uses them.
 #pragma once
 #include <stddef.h>
+#include "XmlReader.h"
 
 struct XmlCfgDef
 {
@@ -45,15 +46,6 @@ enum XML_CFG_TYPE  // ❓ name
 enum { CFG_DEF_TYPE_GUID = 8 };  // defType value
 
 struct XmlCfgDef2;
-class XmlReaderIO;
-class XmlReaderLog;
-
-// Interface of XmlReader_sv64.dll. Only the vtable layout is used.
-class XmlReader
-{
-public:
-    virtual bool Initialize(XmlReaderIO* io, XmlReaderLog const* log, bool flag) const = 0;  // slot 0
-};
 
 class XmlConfigReader
 {

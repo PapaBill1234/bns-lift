@@ -87,6 +87,7 @@ add_library(lift_common STATIC
   src/common/Packet.cpp
   src/common/Connection.cpp
   src/common/SessionBuffer.cpp
+  src/common/Session.cpp
   src/common/Listener.cpp
   src/common/IoWorkerThread.cpp
   src/common/Channel.cpp
@@ -96,7 +97,8 @@ add_library(lift_common STATIC
   src/common/IdleWatcher.cpp
   src/common/PacketUtil.cpp
   src/common/Security.cpp
-  src/common/CrashHandler.cpp)
+  src/common/CrashHandler.cpp
+  src/common/FragmentPacket.cpp)
 # clang-cl needs the AES target feature for the <wmmintrin.h> intrinsics.
 set_source_files_properties(src/common/aes128NI.cpp PROPERTIES COMPILE_OPTIONS "-maes")
 target_compile_options(lift_common PRIVATE /GR-)
@@ -106,7 +108,7 @@ target_include_directories(lift_common BEFORE PRIVATE ${LIFT_STL_INCLUDE})
 target_include_directories(lift_common PUBLIC ${CMAKE_SOURCE_DIR}/src/common)
 add_dependencies(lift_common lift_msvcp100_implib)
 # Wine import libs for the BloodLib modules (Db: odbc32, SystemInformation: ws2_32 iphlpapi, String: ole32).
-foreach(imp odbc32 ws2_32 iphlpapi ole32)
+foreach(imp odbc32 ws2_32 iphlpapi ole32 advapi32 shell32 version user32 shlwapi)
   target_link_libraries(lift_common INTERFACE "${WINE_LIBDIR}/lib${imp}.a")
 endforeach()
 
@@ -122,3 +124,15 @@ if(EXISTS ${LIFT_ZSTD_DIR}/lib/zstd.h)
   target_compile_definitions(lift_zstd PRIVATE ZSTD_MULTITHREAD=0)
   target_link_libraries(lift_common PUBLIC lift_zstd)
 endif()
+
+# CacheGate server exe. wmain_bridge.c gives the narrow main that crt0.c calls.
+lift_exe(CacheGate
+  SOURCES src/CacheGate/CacheGate.cpp src/CacheGate/CacheD.cpp src/CacheGate/CacheDChannel.cpp
+          src/CacheGate/ClientManager.cpp src/CacheGate/CacheGateSessionHandler.cpp
+          src/CacheGate/CacheGateServerSideHandlerList.cpp src/crt/wmain_bridge.c
+          src/crt/tlssup.c src/crt/new_delete.c src/crt/zstd_stub.c
+  IMPORTS msvcr100 kernel32)
+target_compile_options(CacheGate PRIVATE /GR-)
+target_include_directories(CacheGate BEFORE PRIVATE ${LIFT_STL_INCLUDE})
+add_dependencies(CacheGate lift_msvcp100_implib)
+target_link_libraries(CacheGate PRIVATE lift_common ${LIFT_MSVCP100_IMPLIB})

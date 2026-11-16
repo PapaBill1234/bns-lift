@@ -13,9 +13,7 @@
 namespace
 {
 // Function types of the XmlReader_sv64.dll exports.  // ❓ names
-typedef wchar_t const* (*GetInterfaceVersionFunc)();                 // ❓
-typedef XmlReader* (*CreateXmlReaderFunc)();                         // ❓
-typedef void (*DestroyXmlReaderFunc)(XmlReader* reader);             // ❓
+// GetInterfaceVersionFunc, CreateXmlReaderFunc and DestroyXmlReaderFunc are in XmlReader.h.
 typedef XmlConfigReader* (*CreateXmlConfigReaderFunc)(XmlReader*);   // ❓
 typedef void (*DestroyXmlConfigReaderFunc)(XmlConfigReader* config); // ❓
 

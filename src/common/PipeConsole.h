@@ -114,6 +114,8 @@ private:
     void* _events[4];
 
     friend class Daemon;
+    friend class CacheD;  // ❓ CacheD::Initialize (CacheGate 0x2430) calls addNode (inlined SetInvalidInfo).
+    friend class CacheDChannel;  // ❓ CacheDChannel::onClose (CacheGate 0x3E40) calls addNode (inlined SetInvalidInfo).
 };
 static_assert(sizeof(PipeConsole) == 0x10AA8, "sizeof PipeConsole");
 static_assert(offsetof(PipeConsole, _state) == 0x58, "PipeConsole::_state");

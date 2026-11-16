@@ -240,3 +240,86 @@ void Packet::Finalize(PacketCrypt* crypt)
     if (ListHead != nullptr && crypt != nullptr)
         ListHead->encrypt(crypt, nullptr);
 }
+
+// 0x7300 (CacheGate)
+void Packet::Concatenate(Packet const* packet, PacketConcatenateHandler const* concatHandler)
+{
+    if (packet == nullptr)
+        PACKET_ASSERT_CRASH(414);
+    if (packet->CurHeader == nullptr)
+        PACKET_ASSERT_CRASH(415);
+    PacketBuffer* src = packet->ListHead;
+    if (src == nullptr)
+    {
+        Concatenate(reinterpret_cast<char const*>(packet->CurHeader), packet->CurHeader->size, concatHandler);
+        return;
+    }
+    do
+    {
+        PacketBuffer* pktbuf = PacketBufferAllocator::_Local->allocate();
+        if (ListHead != nullptr)
+            ListTail->Next = pktbuf;
+        else
+            ListHead = pktbuf;
+        Header* header = reinterpret_cast<Header*>(&pktbuf->Buffer[8]);
+        ListTail = pktbuf;
+        memcpy(&pktbuf->Buffer[8], &src->Buffer[8], *reinterpret_cast<unsigned short*>(&src->Buffer[8]));
+        src = src->Next;
+        if (CurHeader == nullptr)
+            CurHeader = header;
+    } while (src != nullptr);
+}
+
+// 0x7470 (CacheGate)
+void Packet::Concatenate(char const* buffer, unsigned short size, PacketConcatenateHandler const* concatHandler)
+{
+    if (buffer == nullptr)
+        PACKET_ASSERT_CRASH(440);
+    if (size > 4000)
+        PACKET_ASSERT_CRASH(441);
+    PacketBuffer* pktbuf = PacketBufferAllocator::_Local->allocate();
+    if (ListHead != nullptr)
+        ListTail->Next = pktbuf;
+    else
+        ListHead = pktbuf;
+    Header* header = reinterpret_cast<Header*>(&pktbuf->Buffer[8]);
+    ListTail = pktbuf;
+    memcpy(&pktbuf->Buffer[8], buffer, static_cast<short>(size));
+    if (CurHeader == nullptr)
+        CurHeader = header;
+}
+
+// 0x75B0 (CacheGate)
+unsigned short Packet::Decompose(PacketDecomposer* pdr, int n, ...) const
+{
+    va_list args;
+    va_start(args, n);
+    if (pdr == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, PACKET_FILE, 501, L"== CRASH == [packet], invalid pdr");
+        AlertSender::Write(PACKET_FILE, 501, L"== CRASH == [packet], invalid pdr");
+        return 0;
+    }
+    if (CurHeader == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, PACKET_FILE, 506, L"== CRASH == [packet], invalid CurHeader");
+        AlertSender::Write(PACKET_FILE, 506, L"== CRASH == [packet], invalid CurHeader");
+        return 0;
+    }
+    int offset = static_cast<int>(pdr->offset);
+    if (offset >= CurHeader->size - 2)
+    {
+        Log::Write(Log::LT_ERROR, PACKET_FILE, 514, L"[packet], pdr->offset %d >= CurHeader->size %d - HEADER_SIZE %d",
+                   offset, CurHeader->size, 2);
+        return 0;
+    }
+    int count = n >= 0 ? n : pdr->len - pdr->index;
+    unsigned short result = PacketBuffer::Decompose(reinterpret_cast<char const*>(CurHeader + 1) + pdr->offset,
+                                                    CurHeader->size - pdr->offset - 2, pdr->CurrentFormat(),
+                                                    static_cast<unsigned long long>(count), args);
+    // BUG: 0x75B0 index moves by n, not count. When n < 0 the index moves back.
+    pdr->index += n;
+    pdr->offset += result;
+    va_end(args);
+    return result;
+}
