@@ -20,7 +20,9 @@
 #      SCD_CLIENT_AT  seconds after start for the --client connects (default SECONDS-6)
 #      SCD_DISPLAY  X display for the console window (default :77, a hidden Xvfb)
 #      SCD_LIFTED_EXE exe for "lifted" (default: build/SmartCouponDaemon.exe; self test: the original)
-#      SCD_CERT     none | placeholder (default) | <file>: E:\Service\cert\smartcoupond.cfg (see below)
+#      SCD_CERT     none | placeholder (default) | sql | <file>: E:\Service\cert\smartcoupond.cfg (see below)
+#                   sql = real SmartCouponDB in Docker bns-mssql; installs ODBC Driver 17 in the prefix
+#      SCD_ODBC_MSI ODBC driver installer for SCD_CERT=sql (default: bns-wine/dl/msodbcsql17_x64.msi)
 #      LIFT_BUILD_DIR build folder (default: build)
 # Output: build/verify/scd-<kind>/ with log.txt, console.txt, ports.txt, exit.txt,
 #         peer-np.txt, peer-gamed.txt, client-manager.txt, client-daemon.txt, pktlog/*.pkl.
@@ -82,6 +84,14 @@ for f in "$SRC_CFG"/*.xml; do [ -f "$f" ] && cp "$f" "$CFG/"; done
 case "${SCD_CERT:-placeholder}" in
   none) ;;
   placeholder) printf 'DSN=SmartCouponDB;UID=keyhere;PWD=keyhere;' > "$DRIVE_E/Service/cert/smartcoupond.cfg" ;;
+  # "sql": the real DB in the Docker container bns-mssql (127.0.0.1:14333, SmartCouponDB attached).
+  # The script reads the sa password from the container env into the file. It never prints it.
+  # The file is in build/ (not in git).
+  sql)
+    docker exec bns-mssql true 2>/dev/null || { echo "start the container first: docker start bns-mssql" >&2; exit 4; }
+    { printf 'Driver={ODBC Driver 17 for SQL Server};Server=127.0.0.1,14333;Database=SmartCouponDB;UID=sa;PWD='
+      docker exec bns-mssql bash -c 'printf %s "${MSSQL_SA_PASSWORD:-$SA_PASSWORD}"'
+      printf ';' ; } > "$DRIVE_E/Service/cert/smartcoupond.cfg" ;;
   *) cp "$SCD_CERT" "$DRIVE_E/Service/cert/smartcoupond.cfg" ;;
 esac
 
@@ -115,6 +125,14 @@ fi
 if [ ! -d "$WINEPREFIX/dosdevices" ]; then
   "$WINE" wineboot -i >/dev/null 2>&1 || true
   "$WINESERVER" -w || true
+fi
+# SCD_CERT=sql needs an ODBC driver in the prefix. Install ODBC Driver 17 one time.
+# It needs no ntlm_auth for a SQL login (SNAC 11 does). Source: bns-wine/dl.
+if [ "${SCD_CERT:-}" = sql ] && [ ! -f "$WINEPREFIX/drive_c/windows/system32/msodbcsql17.dll" ]; then
+  MSI="${SCD_ODBC_MSI:-$CODEX/bns-wine/dl/msodbcsql17_x64.msi}"
+  "$WINE" msiexec /i "$MSI" /qn IACCEPTMSODBCSQLLICENSETERMS=YES >/dev/null 2>&1 || true
+  "$WINESERVER" -w || true
+  [ -f "$WINEPREFIX/drive_c/windows/system32/msodbcsql17.dll" ] || { echo "ODBC Driver 17 install failed: $MSI" >&2; exit 4; }
 fi
 "$WINESERVER" -k 2>/dev/null || true
 ln -sfn "$DRIVE_D" "$WINEPREFIX/dosdevices/d:"
