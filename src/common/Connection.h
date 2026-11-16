@@ -1,4 +1,4 @@
-// Connection.obj (SmartCouponDaemon PDB). Layouts from include/pdb/CacheGate/types.h.
+// Connection.obj (CacheGate PDB). Layouts from include/pdb/CacheGate/types.h.
 // The Async*Context layouts are from IDA only (❓). The PDB gives only the names and sizes.
 #pragma once
 #include <winsock2.h>
@@ -8,13 +8,25 @@ class Session;
 struct SendBufferList;
 
 // ❓ layout from IDA. Session, SessionRecvBuffer, SessionSendBuffer set _id (3, 16, 18).
+enum EventContextId : int
+{
+    EVID_INVALID = 0x0,
+    EVID_IO_ACCEPT = 0x2,
+    EVID_IO_CONNECT = 0x3,
+    EVID_IO_RECV = 0x10,
+    EVID_IO_SEND = 0x12,
+    EVID_IO_READ = 0x20,
+    EVID_IO_WRITE = 0x21,
+    EVID_OTHER = 0x80,
+};
+
 struct EventContext : public _OVERLAPPED
 {
     int _id;
 };
 static_assert(sizeof(EventContext) == 0x28, "sizeof EventContext");
 
-// ❓ layout from IDA (Session::Connect 0x1BF20).
+// ❓ layout from IDA (Session::Connect 0xE570).
 struct AsyncConnectContext : public EventContext
 {
     Session* _session;
@@ -28,7 +40,7 @@ static_assert(sizeof(AsyncConnectContext) == 0x60, "sizeof AsyncConnectContext")
 static_assert(offsetof(AsyncConnectContext, _remoteAddr) == 0x38, "AsyncConnectContext::_remoteAddr");
 static_assert(offsetof(AsyncConnectContext, _timeout) == 0x50, "AsyncConnectContext::_timeout");
 
-// ❓ layout from IDA (Session::recv 0x1CA50).
+// ❓ layout from IDA (Session::recv 0xF0D0).
 struct AsyncRecvContext : public EventContext
 {
     Session* _session;
@@ -36,7 +48,7 @@ struct AsyncRecvContext : public EventContext
 };
 static_assert(sizeof(AsyncRecvContext) == 0x40, "sizeof AsyncRecvContext");
 
-// ❓ layout from IDA (SessionSendBuffer::Add 0x2A030).
+// ❓ layout from IDA (SessionSendBuffer::Add 0x1A350).
 struct AsyncSendContext : public EventContext
 {
     Session* _session;
@@ -47,20 +59,20 @@ static_assert(sizeof(AsyncSendContext) == 0x38, "sizeof AsyncSendContext");
 class Connection
 {
 public:
-    Connection() : _socket(INVALID_SOCKET), _ip(0), _portNumber(0) {}  // ❓ inlined in Session::initialize (0x1BC90)
-    virtual ~Connection() {}  // ❓ body inlined in the vector deleting destructor (0x2A7C0)
+    Connection() : _socket(INVALID_SOCKET), _ip(0), _portNumber(0) {}  // ❓ inlined in Session::Session (0xDEE0)
+    virtual ~Connection();  // 0x1AAE0 (vector deleting destructor)
 
-    bool Accept(Session* session, unsigned long long socket, unsigned long ip, unsigned short portNumber);  // 0x2A800
-    bool AsyncConnect(AsyncConnectContext* context, bool nagle);                                         // 0x2A960
-    bool CompleteAsyncConnect(AsyncConnectContext* context);                                             // 0x2AB50
-    bool AsyncRecv(AsyncRecvContext* context, unsigned int* flags);                                      // 0x2AC10
-    bool AsyncSend(AsyncSendContext* context);                                                           // 0x2AC90
+    bool Accept(Session* session, unsigned long long socket, unsigned long ip, unsigned short portNumber);  // 0x1AB20
+    bool AsyncConnect(AsyncConnectContext* context, bool nagle);                                         // 0x1AC80
+    bool CompleteAsyncConnect(AsyncConnectContext* context);                                             // 0x1AE70
+    bool AsyncRecv(AsyncRecvContext* context, unsigned int* recvdSize);                                    // 0x1AF30
+    bool AsyncSend(AsyncSendContext* context);                                                           // 0x1AFB0
 
 protected:
-    unsigned long GetLocalAddress() const;  // 0x2AEA0
+    unsigned long GetLocalAddress() const;  // 0x2AEA0 (SmartCouponDaemon). Not in the CacheGate exe.
 
 private:
-    unsigned long long makeConnectSocket(bool nagle);  // 0x2AD10
+    unsigned long long makeConnectSocket(bool nagle);  // 0x1B030
 
 public:
     unsigned long long _socket;

@@ -10,6 +10,29 @@ class PagePoolMemoryManager;
 class PacketCrypt
 {
 public:
+    enum ErrCode
+    {
+        SPCE_NO_ERROR = 0,
+        UNKOWN_ERROR = 1,
+        NO_RESULT = 2,
+        NOT_INITIALIZED = 3,
+        ALREADY_INITIALIZED = 4,
+        INVALID_PARAM = 5,
+        FAILED_SETUP_CRYPTO = 6,
+        FAILED_INVALID_CODE = 7,
+        FAILED_TOO_LARGE_PACKET = 8,
+        FAILED_INSUFFIENT_BUFFER = 9,
+        FAILED_NOT_COMPLETE_PACKET = 10,
+        FAILED_KEYGEN = 11,
+        FAILED_ENCRYPT = 12,
+        FAILED_DECRYPT = 13,
+        ALREADY_CHANGE_KEY = 14,
+        FAILED_SET_EXT_COMP_FUNC = 15,
+        FAILED_COMP = 16,
+    };
+    static ErrCode Setup(int maxSize);  // 0x327E0 (PacketCrypt module, not in this card)
+    static int _MaxSize;
+
     virtual int GetType() = 0;                                                     // slot 0
     virtual int SetEncryptParam(int param) = 0;                                    // slot 1
     virtual int SetKey(unsigned char const* key, int keySize) = 0;                 // slot 2

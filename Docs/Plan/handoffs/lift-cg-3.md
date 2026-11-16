@@ -1,31 +1,30 @@
 # lift-cg-3 handoff: CacheGate network, session, packet
 
-## Done
-- No lifted source. The earlier session decompiled all 13 modules to `.scratch/*.c` (git ignores it)
-  and wrote the function list (`.scratch/funcs.txt`, 202 symbols). It did not write `src/common/` files.
-- No change to `src/common/`, `CMakeLists.txt` or `include/vs2010/`.
+## Done (all in CMake target `lift_common`)
+- Connection 0x1AAE0-0x1B030, SessionBuffer 0x1A310-0x1A980, PacketBufferHandler 0x11E00-0x11F50.
+- Listener 0x31F60-0x32510, IoWorkerThread 0x199E0-0x19DD0, Channel 0x103C0-0x10B90.
+- Network 0xCD70-0xDA30, Port 0x184E0-0x195A0 (SessionPool in Port.h). Session.h, IdleWatcher.h (declarations).
+- BUG: 0xCFD0 _workerThreads not freed; Instance/EndEventObject not released, no WSACleanup.
+  0xD760 leak when WSAStartup fails. 0x19010 session leaks if out ptr is null.
+- Toolchain: Wine headers lack `InterlockedExchange64`; code uses `_InterlockedExchange64` + `<intrin.h>`.
 
-## Not done (all functions; RVA ranges of the PDB symbols, without EH funclets at 0x3A4xx-0x3ACxx)
-- FragmentPacket (16): 0x1000-0x1290 (SetFormat 0x1040, Clone 0x1220, ~SendFragmentPacketConcatenater 0x11C0).
-- Packet (7): 0x6FE0-0x75B0 (Clear 0x6FF0, Add 0x7230, Concatenate 0x7300/0x7470, Decompose 0x75B0).
-- PacketUtil (1): PacketFormatIterator::skipRepeatFormat 0x7700.
-- Network (24): 0xCCD0-0xDA30 (Initialize 0xCEA0, Clear 0xCFD0, OpenPort 0xD2C0, initializeSocketInterface 0xDA30).
-- Session (42): 0xDE80-0xFFE0 (HandleEvent 0xF1C0, handlePacket 0xF750, Connect 0xE570, Accept 0xE7C0).
-- Channel (20): 0x10360-0x10B90 (MakeSession 0x10450, RemoveSession 0x10620, ClientSideDaemonChannel 0x10950).
-- PacketBufferHandler (6): 0x11E00-0x11F50, AllocSize 0x35F80.
-- PacketBuffer (13): 0x11F70-0x12BC0 (Compose 0x11FB0, Decompose 0x12320, PacketBufferAllocator::allocate 0x12BC0).
-- Port (43): 0x18450-0x199B0 (SessionPool 0x184E0-0x18AD0, Port 0x18B70-0x195A0, deque<Session*> 0x19610-0x19880).
-- IoWorkerThread (6): 0x199E0-0x19DD0 (IoWorker::run 0x19AC0).
-- SessionBuffer (8): 0x1A310-0x1A980.
-- Connection (7): 0x1AAE0-0x1B030.
-- Listener (9): 0x31F60-0x32510 (PortListener::Initialize 0x31FD0, accept 0x32510).
+## Not done
+- Session (src/common/Session.cpp not written): 0xDE80, 0xDEE0, 0xDF80, 0xE0A0, 0xE2E0, 0xE4B0, 0xE570, 0xE7C0,
+  0xEA40, 0xEC40, 0xEE30, 0xEE90, 0xF090, 0xF0D0, 0xF1C0, 0xF5D0, 0xF750, 0xF960, 0xF9B0, 0xFA10, 0xFA40,
+  0xFAA0, 0xFC40, 0xFD80, 0xFDC0, 0xFE90; ReconnectTimer 0xFF90, 0xFFD0, 0xFFE0. IdleStateTable::STATE_MASK.
+- FragmentPacket 0x1000-0x1290; PacketUtil skipRepeatFormat 0x7700; Packet 0x6FF0, 0x7230, 0x7300, 0x7470.
+- PacketBuffer 0x11F70-0x12BC0 (only PacketBuffer.h changed).
 
 ## ❓
-- None recorded.
+- LTCG folded constants: Port _nagle, SessionPool readOnly, TimerQueue::Add elapse 5000, SendBuffer freeSize 0x800,
+  Connect timeout/nagle/reconnect, StaticPageMemoryManager::Initialize args (0x800, 0x248).
+- handlePacket ToPacket size/freeSize args; Send(Packet) and send() count args (1 and 5).
+- SessionSendBuffer::Clear order 0x1A750; SessionHandler/IdleWatcher have no PDB module;
+  ClientSideDaemonChannel::onAccept 0x40B0 declared only; PacketCrypt::Setup, s_initializedCount external.
 
 ## Blocked
-- None. The earlier session stopped before it wrote source. The card must run again for the lift.
+- None.
 
 ## Gate result
-- Gate fix: the gate failed with "missing Docs/Plan/handoffs/lift-cg-3.md". This file is the fix.
-- `tools/gate.sh`: `gate ok` (2026-11-15, after the handoff file was added; no source change).
+- Gate fix: the gate failed with "missing Docs/Plan/handoffs/lift-cg-3.md". This file now has the current state.
+- `tools/gate.sh`: `gate ok` (2026-11-16).
