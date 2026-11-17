@@ -123,7 +123,7 @@ bool Network::Initialize(void (*failedEventHandler)(EventObject*), unsigned int 
         Log::Write(Log::LT_ERROR, NETWORK_FILE, 96, L"Worker Thread Initialize Error");
         return false;
     }
-    // ❓ LTCG removed the argument. PacketCrypt::Setup sets _MaxSize to 4000.
+    // LIFT: Setup is inlined. It sets _MaxSize to 4000 only when _MaxSize <= 0 (LobbyGate 0x20192-0x2019b).
     PacketCrypt::ErrCode result = PacketCrypt::Setup(4000);
     if (result != PacketCrypt::SPCE_NO_ERROR)
     {
@@ -188,8 +188,8 @@ bool Network::OpenPort(unsigned int id, unsigned short portNumber, int initialMo
                        PacketBufferHandler const* bufferHandler, unsigned int maxSession, bool enableAccept,
                        bool enableRecv, bool nagle)
 {
-    // ❓ LTCG removed the bool params (all callers give constants). The code uses enableAccept == true,
-    // enableRecv == true. Port::Initialize gets enableRecv and nagle as constants.
+    // LIFT: LTCG folded the bool params (LobbyGate 0x20500, call 0x20708). All callers give constants.
+    // The binary uses enableAccept == true and enableRecv == true. Port::Initialize gets them as constants.
     if (id == 0)
         NETWORK_ASSERT_CRASH(170);
     if (initialMode != 1 && initialMode != 2)
@@ -225,7 +225,7 @@ bool Network::OpenPort(unsigned int id, unsigned short portNumber, int initialMo
     {
         if (!port->StartAccept())
         {
-            port->clearPool();  // ❓ the binary calls clearPool on this path only
+            port->clearPool();  // LIFT: inlined StartAccept failed; only this path calls clearPool (LobbyGate 0x20753-0x207a1)
             port->~Port();
             BaseMemoryManager::_Instance.Free(port, NETWORK_FILE, 194);
             return false;
@@ -416,7 +416,7 @@ bool Network::initWorkerThread(void (*failedEventHandler)(EventObject*), unsigne
         {
             _workerThreads[i] = worker;
             worker->Initialize(i + 1, this, failedEventHandler);
-            WorkerManager->StartThread(worker, nullptr);  // ❓ threadId arg is not set in the binary (r8 is free)
+            WorkerManager->StartThread(worker, nullptr);  // LobbyGate 0x20e30 gives threadId = nullptr
         }
     }
     _workerThreadCount = workerThreadCount;

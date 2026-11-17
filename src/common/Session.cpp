@@ -226,7 +226,7 @@ bool Session::initialize(Port* port, unsigned long long id, int option)
     sendBuffer->_maxBufferCount = 0;
     _sendBuffer = sendBuffer;
 
-    // ❓ The pseudocode gives the session id as the free size.
+    // LIFT: SessionSendBuffer::Initialize does not read the second argument; it overwrites r8 (LobbyGate 0x2489a).
     if (_connection == nullptr || _recvBuffer == nullptr || _sendBuffer == nullptr
         || !_sendBuffer->Initialize(page + 2048, id))
         return false;
@@ -368,7 +368,7 @@ bool Session::Accept(Port* port, unsigned long long id, unsigned long long* sock
         Log::Write(Log::LT_DEBUG, SESSION_FILE, 480,
                    L"[session], accepted from, port id: %u, session id:%I64x, this:%p, ip:%s, port:%d, socket:%p",
                    port->_id, id, this, Network::GetAddressStringW(ip), portNumber,
-                   reinterpret_cast<void*>(_connection->_socket));  // ❓ socket value
+                   reinterpret_cast<void*>(_connection->_socket));  // LobbyGate 0x17ee8: _connection(+0x40)->_socket(+8)
     return true;
 }
 
@@ -510,7 +510,7 @@ check_state:
     _recvBuffer->_recvdSize = 0;
     _sendBuffer->Clear();
     _state = CLOSED;
-    // BUG: 0xEE90 the argument of tryReconnect is not set (edx). The lift gives 5000 (❓).
+    // LIFT: LTCG folded the tryReconnect argument. The callee does not read edx and uses 5000 (LobbyGate 0x180f4).
     if (_option == 2 && tryReconnect(5000))
         goto keep_session;
     if (Daemon::Instance->allowClientSessionLifeCycleInLogs || static_cast<unsigned int>(_id >> 32) != 1)
@@ -545,7 +545,7 @@ bool Session::recv()
     SessionRecvBuffer* recvBuffer = _recvBuffer;
     recvBuffer->_context._wsaBuffer.len = 4008 - recvBuffer->_recvdSize;
     recvBuffer->_context._wsaBuffer.buf = &recvBuffer->_buffer[recvBuffer->_recvdSize];
-    // ❓ The pseudocode gives the recv buffer address as the second argument.
+    // LIFT: AsyncRecv does not read the second argument; it sets r8 to 0 (LobbyGate 0x27264). r8 holds the recv buffer.
     if (_connection->AsyncRecv(&recvBuffer->_context, reinterpret_cast<unsigned int*>(recvBuffer)))
     {
         _recvPending = true;
@@ -947,7 +947,8 @@ PacketCrypt* PacketCrypt::Create(Type type, Algorithm algorithm, unsigned char* 
 // 0x19460 (LobbyGate)
 void* Session::allocateCrypt(PacketCrypt::Type type, PacketCrypt::Algorithm algorithm) const
 {
-    // ❓ The disasm sets only ecx, rdx, r8 for Create (tail jump). The PDB signature has four arguments.
+    // LIFT: LTCG removed the algorithm param from InstanceSize and Create. Create gets (type, buffer, size)
+    // (LobbyGate 0x1946d, tail jump 0x194ac).
     Session* self = const_cast<Session*>(this);
     int size = PacketCrypt::InstanceSize(type, algorithm);
     if (size <= 0)
@@ -964,7 +965,7 @@ void Session::deallocateCrypt(void* crypt) const
     int type = packetCrypt->GetType();
     if (type == PacketCrypt::NO_CRYPT || type == PacketCrypt::HANDSHAKE_CRYPT || type == PacketCrypt::SESSION_CRYPT
         || type == PacketCrypt::BROADCAST_CRYPT)
-        packetCrypt->~PacketCrypt();  // ❓ the pseudocode calls a virtual with argument 0
+        packetCrypt->~PacketCrypt();  // vtable slot 7 (deleting destructor) with flag 0 = no free (LobbyGate 0x194f9)
     self->_allocator.Free(crypt, SESSION_FILE, 1331);
 }
 
@@ -1003,7 +1004,7 @@ bool Session::SetHandshakeParameter(unsigned char const* param, int paramSize, u
                    L"[session], cannot generate session key, id:%I64x, this:%p, error-code:%d", _id, this, errCode);
         return false;
     }
-    // ❓ r8 (algorithm) is not set before this call in the original.
+    // LIFT: LTCG removed the algorithm param of allocateCrypt (LobbyGate 0x1946d).
     self->_sessionCrypt = static_cast<PacketCrypt*>(allocateCrypt(PacketCrypt::SESSION_CRYPT, PacketCrypt::ALGORITHM_DEFAULT));
     if (_sessionCrypt == nullptr)
     {

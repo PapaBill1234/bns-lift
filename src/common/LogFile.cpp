@@ -234,7 +234,7 @@ void LogFile::writeFile()
     tm wtm;
     wchar_t filename[MAX_PATH];
     _localtime64_s(&wtm, &_lastWritten);
-    MakeFilename(&wtm, filename, MAX_PATH);  // ❓ the count argument is not set in the exe
+    MakeFilename(&wtm, filename, MAX_PATH);  // LIFT: LTCG folded count; MakeFilename writes r9d before it reads it (LobbyGate 0x22256)
 
     HANDLE file = CreateFileW(filename, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
                               OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
