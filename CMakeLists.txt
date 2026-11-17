@@ -261,7 +261,8 @@ add_library(lift_marketdealerdaemon STATIC
   src/Server/Economy/MarketDealerDaemon/ManagerChannel.cpp
   src/Server/Economy/MarketDealerDaemon/MarketDB.cpp
   src/Server/Economy/MarketDealerDaemon/DeliveryTimer.cpp
-  src/Server/Economy/MarketDealerDaemon/TimeoutTimer.cpp)
+  src/Server/Economy/MarketDealerDaemon/TimeoutTimer.cpp
+  src/Server/Economy/MarketDealerDaemon/ManagementJobContext.cpp)
 target_compile_options(lift_marketdealerdaemon PRIVATE /GR-)
 target_include_directories(lift_marketdealerdaemon BEFORE PRIVATE ${LIFT_STL_INCLUDE})
 target_include_directories(lift_marketdealerdaemon PUBLIC ${LIFT_SRC_INCLUDE})

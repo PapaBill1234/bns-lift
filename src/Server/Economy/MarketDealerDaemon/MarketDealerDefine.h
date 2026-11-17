@@ -28,3 +28,44 @@ enum MarketDealerFailReason
     MARKETDEALER_REGISTERSALEFAIL_INVALID_SALE_STATUS = 21,
     // TODO(lift-marketdealerdaemon-2): the other values (types.h:544).
 };
+
+// PDB enum 0x3127 (manager channel packets).
+enum MarketManagerPacketCommand
+{
+    MarketManager_HelloReqCmd = 1,
+    MarketManager_HelloOkCmd = 2,
+    MarketManager_HelloFailCmd = 3,
+    MarketManager_SuspendSaleReqCmd = 4,
+    MarketManager_SuspendSaleOkCmd = 5,
+    MarketManager_SuspendSaleFailCmd = 6,
+    MarketManager_RetrySingleDeliveryFailureReqCmd = 7,
+    MarketManager_RetrySingleDeliveryFailureOkCmd = 8,
+    MarketManager_RetrySingleDeliveryFailureFailCmd = 9,
+    MarketManager_RetryAllDeliveryFailureReqCmd = 10,
+    MarketManager_RetryAllDeliveryFailureOkCmd = 11,
+    MarketManager_RetryAllDeliveryFailureFailCmd = 12,
+    MarketManager_UpdateStatusToReportFailureReqCmd = 13,
+    MarketManager_UpdateStatusToReportFailureOkCmd = 14,
+    MarketManager_UpdateStatusToReportFailureFailCmd = 15,
+    MARKETMANAGER_CMD_MAX = 16,
+};
+
+enum MarketManagerFailReason
+{
+    MARKETMANAGER_NO_ERROR = 0,
+    MARKETMANAGER_UNKNOWN_ERROR = 1,
+    MARKETMANAGER_SYSTEM_ERROR = 2,
+    MARKETMANAGER_DB_ERROR = 3,
+    MARKETMANAGER_HELLOFAIL_INVALID_PACKET_VERSION = 4,
+    MARKETMANAGER_SUSPENDSALEFAIL_INVALID_PARAMETER = 5,
+    MARKETMANAGER_SUSPENDSALEFAIL_NO_SUCH_SALE = 6,
+    MARKETMANAGER_SUSPENDSALEFAIL_INVALID_SALE_STATUS = 7,
+    MARKETMANAGER_SUSPENDSALEFAIL_PCID_IS_NOT_SAME = 8,
+    MARKETMANAGER_RETRYSINGLEDELIVERYFAILUREFAIL_INVALID_PARAMETER = 9,
+    MARKETMANAGER_RETRYSINGLEDELIVERYFAILUREFAIL_ALIVE_CONTEXT = 10,
+    MARKETMANAGER_UPDATESTATUSTOREPORTFAILUREFAIL_INVALID_PARAMETER = 11,
+    MARKETMANAGER_UPDATESTATUSTOREPORTFAILUREFAIL_INVALID_JOB_STATUS = 12,
+    MARKETMANAGER_UPDATESTATUSTOREPORTFAILUREFAIL_SALE_ID_IS_NOT_SAME = 13,
+    MARKETMANAGER_UPDATESTATUSTOREPORTFAILUREFAIL_RECIPIENT_PCID_IS_NOT_SAME = 14,
+    MARKETMANAGER_GLOBAL_MAX = 15,
+};
