@@ -15,6 +15,8 @@
 #include "SaleContext.h"
 #include "SaleTimeContext.h"
 #include "DeliveryContext.h"
+#include "DeliveryRelation.h"
+#include "MarketStatement.h"
 #include "TaxRateDataManager.h"
 #include "MarketDealerDaemon.h"
 #include "JobContext.h"
@@ -1477,6 +1479,580 @@ bool const MarketDB::RegisterPurchase(int& dbRetValue, RegisterPurchaseJob& job)
     if (!t->Execute())
     {
         Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1406, FAIL_EXECUTE, MODULE_NAME, fn, dbRetValue);
+        return false;
+    }
+    return dbRetValue == 0;
+}
+
+// Card lift-marketdealerdaemon-6: expire, delivery status, retry (0x24100..0x27230).
+
+// 0x24100
+bool const MarketDB::ExpireSale(int& dbRetValue, long long saleId, long long& outItemDeliveryId,
+                                MarketStatement& outMarketStatement)
+{
+    enum Param
+    {
+        PARAM_RETURN_VALUE = 0,
+        PARAM_SALE_ID = 1,
+        PARAM_DELIVERY_ID = 2,
+        PARAM_MARKETSTATEMENT_TITLE = 3,
+        PARAM_MARKETSTATEMENT_BODY = 4,
+        MAX_PARAM_COUNT = 5,
+    };
+    wchar_t const* const fn = L"MarketDB::ExpireSale";
+    AutoDbTran tran(kDbId);
+    if (tran.Tran != nullptr)
+    {
+        tran.TimeoutSec = 0;
+        SQLSetStmtAttrW(tran.Tran->StmtHandle, SQL_QUERY_TIMEOUT, nullptr, 0);
+    }
+    if (tran.Tran == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1424, FAIL_ACQUIRE, MODULE_NAME, fn, kDbId);
+        return false;
+    }
+    wchar_t const* const query = L"{?=CALL dbo.usp_ExpireSale(?,?,?,?)}";
+    if (!tran.Tran->Prepare(Query(query)))
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1430, FAIL_PREPARE, MODULE_NAME, fn, query);
+        return false;
+    }
+
+    unsigned long long paramLen[MAX_PARAM_COUNT] = {0};
+    paramLen[PARAM_MARKETSTATEMENT_BODY] = kNts;
+    paramLen[PARAM_MARKETSTATEMENT_TITLE] = kNts;
+
+    DbTransaction* const t = tran.Tran;
+    bool const bound =
+        t->BindParam(1, SQL_PARAM_OUTPUT, &dbRetValue, 0, 0, SQL_INTEGER, SQL_C_SLONG,
+                     &paramLen[PARAM_RETURN_VALUE]) &&
+        t->BindParam(2, SQL_PARAM_INPUT, &saleId, 0, 0, SQL_BIGINT, SQL_C_SBIGINT, &paramLen[PARAM_SALE_ID]) &&
+        t->BindParam(3, SQL_PARAM_OUTPUT, &outItemDeliveryId, 0, 0, SQL_BIGINT, SQL_C_SBIGINT,
+                     &paramLen[PARAM_DELIVERY_ID]) &&
+        t->BindParam(4, SQL_PARAM_OUTPUT, outMarketStatement._statementTitle, 130, 64, SQL_WVARCHAR, SQL_C_WCHAR,
+                     &paramLen[PARAM_MARKETSTATEMENT_TITLE]) &&
+        t->BindParam(5, SQL_PARAM_OUTPUT, outMarketStatement._statementBody, 2050, 1024, SQL_WVARCHAR, SQL_C_WCHAR,
+                     &paramLen[PARAM_MARKETSTATEMENT_BODY]);
+    if (!bound)
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1466, FAIL_BIND, MODULE_NAME, fn);
+        return false;
+    }
+    if (!t->Execute())
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1456, FAIL_EXECUTE, MODULE_NAME, fn, dbRetValue);
+        return false;
+    }
+    return dbRetValue == 0;
+}
+
+// 0x24490
+bool const MarketDB::ExpireAuction(int& dbRetValue, long long saleId, int ruleResetTime, int& outDeliveryCount,
+                                   DeliveryRelation*& deliveryRelation, int const arraySize)
+{
+    wchar_t const* const fn = L"MarketDB::ExpireAuction";
+    if (saleId <= 0 || deliveryRelation == nullptr || arraySize <= 0)
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1473,
+                   L"== CRASH == [%s], %s; invalid parameter, saleId:0x%I64X, deliveryRelation:0x%p, arraySize:%d",
+                   MODULE_NAME, fn, saleId, deliveryRelation, arraySize);
+        AlertSender::Write(MARKETDB_FILE, 1473,
+                           L"== CRASH == [%s], %s; invalid parameter, saleId:0x%I64X, deliveryRelation:0x%p, "
+                           L"arraySize:%d",
+                           MODULE_NAME, fn, saleId, deliveryRelation, arraySize);
+        return false;
+    }
+    AutoDbTran tran(kDbId);
+    if (tran.Tran != nullptr)
+    {
+        tran.TimeoutSec = 0;
+        SQLSetStmtAttrW(tran.Tran->StmtHandle, SQL_QUERY_TIMEOUT, nullptr, 0);
+    }
+    if (tran.Tran == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1479, FAIL_ACQUIRE, MODULE_NAME, fn, kDbId);
+        return false;
+    }
+    wchar_t const* const query = L"{?=CALL dbo.usp_ExpireAuction(?,?,?)}";
+    if (!tran.Tran->Prepare(Query(query)))
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1485, FAIL_PREPARE, MODULE_NAME, fn, query);
+        return false;
+    }
+
+    DeliveryRelation relation;
+    relation._deliveryId = 0;
+    relation._deliveryReason = 0;
+    relation._pawnOwnerServiceId = 0;
+    relation._pawnOwnerPcId = 0;
+    relation._recipientPcId = 0;
+    memset(relation._marketStatement._statementTitle, 0, sizeof(relation._marketStatement._statementTitle));
+    memset(relation._marketStatement._statementBody, 0, sizeof(relation._marketStatement._statementBody));
+    relation._moneyAmount = 0;
+    unsigned long long paramLen[4] = {0};
+    unsigned long long columnLen[DeliveryRelation::MAX_COLUMN_COUNT] = {0};
+
+    DbTransaction* const t = tran.Tran;
+    MarketStatement& statement = relation._marketStatement;
+    bool const bound =
+        t->BindParam(1, SQL_PARAM_OUTPUT, &dbRetValue, 0, 0, SQL_INTEGER, SQL_C_SLONG, &paramLen[0]) &&
+        t->BindParam(2, SQL_PARAM_INPUT, &saleId, 0, 0, SQL_BIGINT, SQL_C_SBIGINT, &paramLen[1]) &&
+        t->BindParam(3, SQL_PARAM_INPUT, &ruleResetTime, 0, 0, SQL_INTEGER, SQL_C_SLONG, &paramLen[2]) &&
+        t->BindParam(4, SQL_PARAM_OUTPUT, &outDeliveryCount, 0, 0, SQL_INTEGER, SQL_C_SLONG, &paramLen[3]) &&
+        t->BindCol(1, &relation._deliveryId, 0, SQL_C_SBIGINT, &columnLen[DeliveryRelation::COLUMN_DELIVERY_ID]) &&
+        t->BindCol(2, &relation._deliveryReason, 0, SQL_C_STINYINT,
+                   &columnLen[DeliveryRelation::COLUMN_DELIVERY_REASON]) &&
+        t->BindCol(3, &relation._pawnOwnerServiceId, 0, SQL_C_SBIGINT,
+                   &columnLen[DeliveryRelation::COLUMN_PAWN_OWNER_SERVICE_ID]) &&
+        t->BindCol(4, &relation._pawnOwnerPcId, 0, SQL_C_SBIGINT,
+                   &columnLen[DeliveryRelation::COLUMN_PAWN_OWNER_PCID]) &&
+        t->BindCol(5, &relation._recipientPcId, 0, SQL_C_SBIGINT,
+                   &columnLen[DeliveryRelation::COLUMN_RECIPIENT_PCID]) &&
+        t->BindCol(6, statement._statementTitle, 130, SQL_C_WCHAR,
+                   &columnLen[DeliveryRelation::COLUMN_MARKETSTATEMENT_TITLE]) &&
+        t->BindCol(7, statement._statementBody, 2050, SQL_C_WCHAR,
+                   &columnLen[DeliveryRelation::COLUMN_MARKETSTATEMENT_BODY]) &&
+        t->BindCol(8, &relation._moneyAmount, 0, SQL_C_SBIGINT, &columnLen[DeliveryRelation::COLUMN_MONEY_AMOUNT]);
+    if (!bound)
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1562, FAIL_BIND, MODULE_NAME, fn);
+        return false;
+    }
+    if (!t->Execute())
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1521, FAIL_EXECUTE, MODULE_NAME, fn, dbRetValue);
+        return false;
+    }
+
+    int currentIndex = 0;
+    for (long long index = 0;; ++index)
+    {
+        memset(&relation, 0, sizeof(relation));
+        int const result = t->Fetch(0);  // LIFT: folded. edx is not set at the call. Fetch does not read it.
+        if (result == -1)
+        {
+            Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1535, FAIL_FETCH, MODULE_NAME, fn);
+            return false;
+        }
+        if (result == 0)
+            break;
+        if (index >= arraySize)
+        {
+            Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1542,
+                       L"[%s], %s; fecth count is more than array size, arraySize:%d, currentIndex:%d", MODULE_NAME,
+                       fn, arraySize, currentIndex);
+            return false;
+        }
+        DeliveryRelation& target = deliveryRelation[index];
+        target._deliveryId = relation._deliveryId;
+        target._deliveryReason = relation._deliveryReason;
+        target._pawnOwnerServiceId = relation._pawnOwnerServiceId;
+        target._pawnOwnerPcId = relation._pawnOwnerPcId;
+        target._recipientPcId = relation._recipientPcId;
+        memcpy(&target._marketStatement, &relation._marketStatement, sizeof(target._marketStatement));
+        target._moneyAmount = relation._moneyAmount;
+        ++currentIndex;
+    }
+    return dbRetValue == 0;
+}
+
+// 0x24e90
+bool const MarketDB::UpdateStatusToReporting(int& dbRetValue, long long deliveryId)
+{
+    wchar_t const* const fn = L"MarketDB::UpdateStatusToReporting";
+    if (deliveryId <= 0)
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1572, L"== CRASH == [%s], %s; invalid parameter, deliveryId:0x%I64X",
+                   MODULE_NAME, fn, deliveryId);
+        AlertSender::Write(MARKETDB_FILE, 1572, L"== CRASH == [%s], %s; invalid parameter, deliveryId:0x%I64X",
+                           MODULE_NAME, fn, deliveryId);
+        return false;
+    }
+    AutoDbTran tran(kDbId);
+    if (tran.Tran == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1578, FAIL_ACQUIRE, MODULE_NAME, fn, kDbId);
+        return false;
+    }
+    wchar_t const* const query = L"{?=CALL dbo.usp_UpdateStatusToReporting(?)}";
+    if (!tran.Tran->Prepare(Query(query)))
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1584, FAIL_PREPARE, MODULE_NAME, fn, query);
+        return false;
+    }
+    unsigned long long paramLen[2] = {0};
+    DbTransaction* const t = tran.Tran;
+    if (!t->BindParam(1, SQL_PARAM_OUTPUT, &dbRetValue, 0, 0, SQL_INTEGER, SQL_C_SLONG, &paramLen[0]) ||
+        !t->BindParam(2, SQL_PARAM_INPUT, &deliveryId, 0, 0, SQL_BIGINT, SQL_C_SBIGINT, &paramLen[1]))
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1613, FAIL_BIND, MODULE_NAME, fn);
+        return false;
+    }
+    if (!t->Execute())
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1603, FAIL_EXECUTE, MODULE_NAME, fn, dbRetValue);
+        return false;
+    }
+    return dbRetValue == 0;
+}
+
+// 0x25110
+bool const MarketDB::UpdateStatusToReportSuccess(int& dbRetValue, UpdateStatusToReportSuccessJob& job)
+{
+    wchar_t const* const fn = L"MarketDB::UpdateStatusToReportSuccess";
+    AutoDbTran tran(kDbId);
+    if (tran.Tran == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1621, FAIL_ACQUIRE, MODULE_NAME, fn, kDbId);
+        return false;
+    }
+    wchar_t const* const query = L"{?=CALL dbo.usp_UpdateStatusToReportSuccess(?)}";
+    if (!tran.Tran->Prepare(Query(query)))
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1627, FAIL_PREPARE, MODULE_NAME, fn, query);
+        return false;
+    }
+    unsigned long long paramLen[UpdateStatusToReportSuccessJob::MAX_PARAM_COUNT] = {0};
+    DbTransaction* const t = tran.Tran;
+    if (!t->BindParam(1, SQL_PARAM_OUTPUT, &dbRetValue, 0, 0, SQL_INTEGER, SQL_C_SLONG, &paramLen[0]) ||
+        !t->BindParam(2, SQL_PARAM_INPUT, &job._deliveryId, 0, 0, SQL_BIGINT, SQL_C_SBIGINT, &paramLen[1]))
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1649, FAIL_BIND, MODULE_NAME, fn);
+        return false;
+    }
+    if (!t->Execute())
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1639, FAIL_EXECUTE, MODULE_NAME, fn, dbRetValue);
+        return false;
+    }
+    return dbRetValue == 0;
+}
+
+// 0x25320
+bool const MarketDB::UpdateStatusToPawnRemovalSuccess(int& dbRetValue, UpdateStatusToPawnRemovalSuccessJob& job)
+{
+    wchar_t const* const fn = L"MarketDB::UpdateStatusToPawnRemovalSuccess";
+    AutoDbTran tran(kDbId);
+    if (tran.Tran == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1657, FAIL_ACQUIRE, MODULE_NAME, fn, kDbId);
+        return false;
+    }
+    wchar_t const* const query = L"{?=CALL dbo.usp_UpdateStatusToPawnRemovalSuccess(?)}";
+    if (!tran.Tran->Prepare(Query(query)))
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1663, FAIL_PREPARE, MODULE_NAME, fn, query);
+        return false;
+    }
+    unsigned long long paramLen[UpdateStatusToPawnRemovalSuccessJob::MAX_PARAM_COUNT] = {0};
+    DbTransaction* const t = tran.Tran;
+    if (!t->BindParam(1, SQL_PARAM_OUTPUT, &dbRetValue, 0, 0, SQL_INTEGER, SQL_C_SLONG, &paramLen[0]) ||
+        !t->BindParam(2, SQL_PARAM_INPUT, &job._deliveryId, 0, 0, SQL_BIGINT, SQL_C_SBIGINT, &paramLen[1]))
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1685, FAIL_BIND, MODULE_NAME, fn);
+        return false;
+    }
+    if (!t->Execute())
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1675, FAIL_EXECUTE, MODULE_NAME, fn, dbRetValue);
+        return false;
+    }
+    return dbRetValue == 0;
+}
+
+// 0x25530
+bool const MarketDB::UpdateStatusToPawnRemovalFailure(int& dbRetValue, UpdateStatusToPawnRemovalFailureJob& job)
+{
+    wchar_t const* const fn = L"MarketDB::UpdateStatusToPawnRemovalFailure";
+    AutoDbTran tran(kDbId);
+    if (tran.Tran == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1693, FAIL_ACQUIRE, MODULE_NAME, fn, kDbId);
+        return false;
+    }
+    wchar_t const* const query = L"{?=CALL dbo.usp_UpdateStatusToPawnRemovalFailure(?)}";
+    if (!tran.Tran->Prepare(Query(query)))
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1699, FAIL_PREPARE, MODULE_NAME, fn, query);
+        return false;
+    }
+    unsigned long long paramLen[UpdateStatusToPawnRemovalFailureJob::MAX_PARAM_COUNT] = {0};
+    DbTransaction* const t = tran.Tran;
+    if (!t->BindParam(1, SQL_PARAM_OUTPUT, &dbRetValue, 0, 0, SQL_INTEGER, SQL_C_SLONG, &paramLen[0]) ||
+        !t->BindParam(2, SQL_PARAM_INPUT, &job._deliveryId, 0, 0, SQL_BIGINT, SQL_C_SBIGINT, &paramLen[1]))
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1721, FAIL_BIND, MODULE_NAME, fn);
+        return false;
+    }
+    if (!t->Execute())
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1711, FAIL_EXECUTE, MODULE_NAME, fn, dbRetValue);
+        return false;
+    }
+    return dbRetValue == 0;
+}
+
+// 0x25740
+bool const MarketDB::UpdateStatusToPostRegistrationSuccess(int& dbRetValue,
+                                                           UpdateStatusToPostRegistrationSuccessJob& job)
+{
+    wchar_t const* const fn = L"MarketDB::UpdateStatusToPostRegistrationSuccess";
+    AutoDbTran tran(kDbId);
+    if (tran.Tran == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1729, FAIL_ACQUIRE, MODULE_NAME, fn, kDbId);
+        return false;
+    }
+    wchar_t const* const query = L"{?=CALL dbo.usp_UpdateStatusToPostRegistrationSuccess(?,?)}";
+    if (!tran.Tran->Prepare(Query(query)))
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1735, FAIL_PREPARE, MODULE_NAME, fn, query);
+        return false;
+    }
+    unsigned long long paramLen[UpdateStatusToPostRegistrationSuccessJob::MAX_PARAM_COUNT] = {0};
+    DbTransaction* const t = tran.Tran;
+    if (!t->BindParam(1, SQL_PARAM_OUTPUT, &dbRetValue, 0, 0, SQL_INTEGER, SQL_C_SLONG, &paramLen[0]) ||
+        !t->BindParam(2, SQL_PARAM_INPUT, &job._deliveryId, 0, 0, SQL_BIGINT, SQL_C_SBIGINT, &paramLen[1]) ||
+        !t->BindParam(3, SQL_PARAM_INPUT, &job._receiptId, 0, 0, SQL_BIGINT, SQL_C_SBIGINT, &paramLen[2]))
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1758, FAIL_BIND, MODULE_NAME, fn);
+        return false;
+    }
+    if (!t->Execute())
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1748, FAIL_EXECUTE, MODULE_NAME, fn, dbRetValue);
+        return false;
+    }
+    return dbRetValue == 0;
+}
+
+// 0x259b0
+bool const MarketDB::UpdateStatusToPostRegistrationFailure(int& dbRetValue,
+                                                           UpdateStatusToPostRegistrationFailureJob& job)
+{
+    wchar_t const* const fn = L"MarketDB::UpdateStatusToPostRegistrationFailure";
+    AutoDbTran tran(kDbId);
+    if (tran.Tran == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1766, FAIL_ACQUIRE, MODULE_NAME, fn, kDbId);
+        return false;
+    }
+    wchar_t const* const query = L"{?=CALL dbo.usp_UpdateStatusToPostRegistrationFailure(?)}";
+    if (!tran.Tran->Prepare(Query(query)))
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1772, FAIL_PREPARE, MODULE_NAME, fn, query);
+        return false;
+    }
+    unsigned long long paramLen[UpdateStatusToPostRegistrationFailureJob::MAX_PARAM_COUNT] = {0};
+    DbTransaction* const t = tran.Tran;
+    if (!t->BindParam(1, SQL_PARAM_OUTPUT, &dbRetValue, 0, 0, SQL_INTEGER, SQL_C_SLONG, &paramLen[0]) ||
+        !t->BindParam(2, SQL_PARAM_INPUT, &job._deliveryId, 0, 0, SQL_BIGINT, SQL_C_SBIGINT, &paramLen[1]))
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1794, FAIL_BIND, MODULE_NAME, fn);
+        return false;
+    }
+    if (!t->Execute())
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1784, FAIL_EXECUTE, MODULE_NAME, fn, dbRetValue);
+        return false;
+    }
+    return dbRetValue == 0;
+}
+
+// 0x25bc0
+bool const MarketDB::UpdateStatusToRetryReady(int& dbRetValue, UpdateStatusToRetryReadyJob& job)
+{
+    wchar_t const* const fn = L"MarketDB::UpdateStatusToRetryReady";
+    AutoDbTran tran(kDbId);
+    if (tran.Tran == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1802, FAIL_ACQUIRE, MODULE_NAME, fn, kDbId);
+        return false;
+    }
+    wchar_t const* const query = L"{?=CALL dbo.usp_UpdateStatusToRetryReady(?)}";
+    if (!tran.Tran->Prepare(Query(query)))
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1808, FAIL_PREPARE, MODULE_NAME, fn, query);
+        return false;
+    }
+    unsigned long long paramLen[UpdateStatusToRetryReadyJob::MAX_PARAM_COUNT] = {0};
+    DbTransaction* const t = tran.Tran;
+    if (!t->BindParam(1, SQL_PARAM_OUTPUT, &dbRetValue, 0, 0, SQL_INTEGER, SQL_C_SLONG, &paramLen[0]) ||
+        !t->BindParam(2, SQL_PARAM_INPUT, &job._deliveryId, 0, 0, SQL_BIGINT, SQL_C_SBIGINT, &paramLen[1]))
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1830, FAIL_BIND, MODULE_NAME, fn);
+        return false;
+    }
+    if (!t->Execute())
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1820, FAIL_EXECUTE, MODULE_NAME, fn, dbRetValue);
+        return false;
+    }
+    return dbRetValue == 0;
+}
+
+// 0x25dd0
+bool const MarketDB::LoadRetryReadySingleDelivery(int& dbRetValue, long long deliveryId)
+{
+    wchar_t const* const fn = L"MarketDB::LoadRetryReadySingleDelivery";
+    AutoDbTran tran(kDbId);
+    if (tran.Tran != nullptr)
+    {
+        tran.TimeoutSec = 0;
+        SQLSetStmtAttrW(tran.Tran->StmtHandle, SQL_QUERY_TIMEOUT, nullptr, 0);
+    }
+    if (tran.Tran == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1838, FAIL_ACQUIRE, MODULE_NAME, fn, kDbId);
+        return false;
+    }
+    wchar_t const* const query = L"{?=CALL dbo.usp_LoadRetryReadySingleDelivery(?)}";
+    if (!tran.Tran->Prepare(Query(query)))
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1844, FAIL_PREPARE, MODULE_NAME, fn, query);
+        return false;
+    }
+
+    DeliveryInfo deliveryInfo;
+    SaleItemInfo itemInfo;
+    memset(&itemInfo, 0, sizeof(itemInfo));
+    long long moneyAmount = 0;
+    unsigned long long paramLen[2] = {0};
+    unsigned long long deliveryLen[15] = {0};  // columns 1..15
+    unsigned long long itemLen[13] = {0};      // columns 16..28
+    deliveryLen[12] = kNts;
+    deliveryLen[11] = kNts;
+    deliveryLen[10] = kNts;
+    deliveryLen[7] = kNts;
+    itemLen[12] = kNts;
+
+    DbTransaction* const t = tran.Tran;
+    bool const bound =
+        t->BindParam(1, SQL_PARAM_OUTPUT, &dbRetValue, 0, 0, SQL_INTEGER, SQL_C_SLONG, &paramLen[0]) &&
+        t->BindParam(2, SQL_PARAM_INPUT, &deliveryId, 0, 0, SQL_BIGINT, SQL_C_SBIGINT, &paramLen[1]) &&
+        t->BindCol(1, &deliveryInfo._deliveryId, 0, SQL_C_SBIGINT, &deliveryLen[0]) &&
+        t->BindCol(2, &deliveryInfo._deliveryReason, 0, SQL_C_STINYINT, &deliveryLen[1]) &&
+        t->BindCol(3, &deliveryInfo._saleId, 0, SQL_C_SBIGINT, &deliveryLen[2]) &&
+        t->BindCol(4, &deliveryInfo._pawnId, 0, SQL_C_SBIGINT, &deliveryLen[3]) &&
+        t->BindCol(5, &deliveryInfo._pawnServiceId, 0, SQL_C_SBIGINT, &deliveryLen[4]) &&
+        t->BindCol(6, &deliveryInfo._pawnOwner._participantWid, 0, SQL_C_SSHORT, &deliveryLen[5]) &&
+        t->BindCol(7, &deliveryInfo._pawnOwner._participantPcId, 0, SQL_C_SBIGINT, &deliveryLen[6]) &&
+        t->BindCol(8, deliveryInfo._pawnOwner._participantName, 66, SQL_C_WCHAR, &deliveryLen[7]) &&
+        t->BindCol(9, &deliveryInfo._recipient._participantWid, 0, SQL_C_SSHORT, &deliveryLen[8]) &&
+        t->BindCol(10, &deliveryInfo._recipient._participantPcId, 0, SQL_C_SBIGINT, &deliveryLen[9]) &&
+        t->BindCol(11, deliveryInfo._recipient._participantName, 66, SQL_C_WCHAR, &deliveryLen[10]) &&
+        t->BindCol(12, deliveryInfo._marketStatement._statementTitle, 130, SQL_C_WCHAR, &deliveryLen[11]) &&
+        t->BindCol(13, deliveryInfo._marketStatement._statementBody, 2050, SQL_C_WCHAR, &deliveryLen[12]) &&
+        t->BindCol(14, &deliveryInfo._jobStatus, 0, SQL_C_STINYINT, &deliveryLen[13]) &&
+        t->BindCol(15, &moneyAmount, 0, SQL_C_SBIGINT, &deliveryLen[14]) &&
+        t->BindCol(16, &itemInfo._itemCommonCategory, 0, SQL_C_STINYINT, &itemLen[0]) &&
+        t->BindCol(17, &itemInfo._itemFirstCategory, 0, SQL_C_STINYINT, &itemLen[1]) &&
+        t->BindCol(18, &itemInfo._itemSecondCategory, 0, SQL_C_STINYINT, &itemLen[2]) &&
+        t->BindCol(19, &itemInfo._itemThirdCategory, 0, SQL_C_STINYINT, &itemLen[3]) &&
+        t->BindCol(20, &itemInfo._itemType, 0, SQL_C_STINYINT, &itemLen[4]) &&
+        t->BindCol(21, &itemInfo._itemInstanceId, 0, SQL_C_SBIGINT, &itemLen[5]) &&
+        t->BindCol(22, &itemInfo._itemDataId, 0, SQL_C_SLONG, &itemLen[6]) &&
+        t->BindCol(23, &itemInfo._itemLevel, 0, SQL_C_SSHORT, &itemLen[7]) &&
+        t->BindCol(24, &itemInfo._itemExp, 0, SQL_C_SLONG, &itemLen[8]) &&
+        t->BindCol(25, &itemInfo._itemAmount, 0, SQL_C_SLONG, &itemLen[9]) &&
+        t->BindCol(26, &itemInfo._itemGrade, 0, SQL_C_STINYINT, &itemLen[10]) &&
+        t->BindCol(27, &itemInfo._itemEquipLevel, 0, SQL_C_STINYINT, &itemLen[11]) &&
+        t->BindCol(28, itemInfo._itemXmlData, 2050, SQL_C_WCHAR, &itemLen[12]);
+    if (!bound)
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1949, FAIL_BIND, MODULE_NAME, fn);
+        return false;
+    }
+    if (!t->Execute())
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1902, FAIL_EXECUTE, MODULE_NAME, fn, dbRetValue);
+        return false;
+    }
+
+    int const result = t->Fetch(0);  // LIFT: folded. edx is not set at the call. Fetch does not read it.
+    if (result == -1)
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1911, FAIL_FETCH, MODULE_NAME, fn);
+        return false;
+    }
+    if (result == 0)
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1915, L"[%s], %s; there is no such delivery, deliveryId:0x%I64X",
+                   MODULE_NAME, fn, deliveryId);
+        return false;
+    }
+
+    bool const existItem = itemLen[0] != kNullData;
+    // A delivery has an item or money, not both and not neither.
+    if ((!existItem && moneyAmount == 0) || (existItem && moneyAmount > 0))
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1924,
+                   L"[%s], %s; invalid delivery item, deliveryId:0x%I64X, saleId:0x%I64X", MODULE_NAME, fn,
+                   deliveryInfo._deliveryId, deliveryInfo._saleId);
+        return false;
+    }
+
+    DeliveryContext* deliveryContext = nullptr;
+    if (existItem)
+    {
+        void* const memory = Memory::_Manager[2]->Alloc(sizeof(DeliveryContext), MARKETDB_FILE, 1930);
+        if (memory != nullptr)
+            deliveryContext = ::new (memory) DeliveryContext(deliveryInfo, itemInfo);
+    }
+    else
+    {
+        void* const memory = Memory::_Manager[2]->Alloc(sizeof(DeliveryContext), MARKETDB_FILE, 1932);
+        if (memory != nullptr)
+            deliveryContext = ::new (memory) DeliveryContext(deliveryInfo, moneyAmount);
+    }
+    // BUG: 0x25dd0 no null check after the DeliveryContext Alloc (AddContext and the log read nullptr).
+    if (!MarketDealerDaemon::_instance->_deliveryContextManager->AddContext(deliveryContext))
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1935,
+                   L"[%s], %s; failed to add delivery context, deliveryId:0x%I64X, saleId:0x%I64X", MODULE_NAME, fn,
+                   deliveryContext->_deliveryInfo._deliveryId, deliveryContext->_deliveryInfo._saleId);
+        deliveryContext->removeReferenceCount(MARKETDB_FILE, 1936);
+        return false;
+    }
+    deliveryContext->removeReferenceCount(MARKETDB_FILE, 1940);
+    return dbRetValue == 0;
+}
+
+// 0x27230
+bool const MarketDB::ResetUncompletedDeliveryStatus(int& dbRetValue, int& resetCount)
+{
+    enum Param
+    {
+        PARAM_RETURN_VALUE = 0,
+        PARAM_RESET_COUNT = 1,
+        MAX_PARAM_COUNT = 2,
+    };
+    wchar_t const* const fn = L"MarketDB::ResetUncompletedDeliveryStatus";
+    AutoDbTran tran(kDbId);
+    if (tran.Tran == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1958, FAIL_ACQUIRE, MODULE_NAME, fn, kDbId);
+        return false;
+    }
+    wchar_t const* const query = L"{?=CALL dbo.usp_ResetUncompletedDeliveryStatus(?)}";
+    if (!tran.Tran->Prepare(Query(query)))
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1964, FAIL_PREPARE, MODULE_NAME, fn, query);
+        return false;
+    }
+    unsigned long long paramLen[MAX_PARAM_COUNT] = {0};
+    DbTransaction* const t = tran.Tran;
+    if (!t->BindParam(1, SQL_PARAM_OUTPUT, &dbRetValue, 0, 0, SQL_INTEGER, SQL_C_SLONG,
+                      &paramLen[PARAM_RETURN_VALUE]) ||
+        !t->BindParam(2, SQL_PARAM_OUTPUT, &resetCount, 0, 0, SQL_INTEGER, SQL_C_SLONG,
+                      &paramLen[PARAM_RESET_COUNT]))
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1993, FAIL_BIND, MODULE_NAME, fn);
+        return false;
+    }
+    if (!t->Execute())
+    {
+        Log::Write(Log::LT_ERROR, MARKETDB_FILE, 1983, FAIL_EXECUTE, MODULE_NAME, fn, dbRetValue);
         return false;
     }
     return dbRetValue == 0;

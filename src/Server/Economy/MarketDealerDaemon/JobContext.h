@@ -494,3 +494,54 @@ public:
     long long _itemDeliveryId;
     MarketStatement _itemMarketStatement;
 };
+
+// Card lift-marketdealerdaemon-6: delivery status jobs (layout only). The JobContext module is a later card.
+#define LIFT_DELIVERY_STATUS_JOB(Name)                         \
+    class Name : public JobContext                             \
+    {                                                          \
+    public:                                                    \
+        enum Param : int                                       \
+        {                                                      \
+            PARAM_RETURN_VALUE = 0x0,                          \
+            PARAM_DELIVERY_ID = 0x1,                           \
+            MAX_PARAM_COUNT = 0x2,                             \
+        };                                                     \
+        virtual ~Name();                                       \
+        virtual bool verifyParameter(short& result) const;     \
+        virtual bool handleJob(short& result);                 \
+                                                               \
+        unsigned long long _tid;                               \
+        long long _deliveryId;                                 \
+    };                                                         \
+    static_assert(sizeof(Name) == 0x18, "sizeof " #Name);      \
+    static_assert(offsetof(Name, _deliveryId) == 0x10, #Name "::_deliveryId")
+
+// LIFT: The macro is not in the PDB. The five classes have the same layout in the PDB types.
+LIFT_DELIVERY_STATUS_JOB(UpdateStatusToReportSuccessJob);
+LIFT_DELIVERY_STATUS_JOB(UpdateStatusToPawnRemovalSuccessJob);
+LIFT_DELIVERY_STATUS_JOB(UpdateStatusToPawnRemovalFailureJob);
+LIFT_DELIVERY_STATUS_JOB(UpdateStatusToPostRegistrationFailureJob);
+LIFT_DELIVERY_STATUS_JOB(UpdateStatusToRetryReadyJob);
+#undef LIFT_DELIVERY_STATUS_JOB
+
+class UpdateStatusToPostRegistrationSuccessJob : public JobContext
+{
+public:
+    enum Param : int
+    {
+        PARAM_RETURN_VALUE = 0x0,
+        PARAM_DELIVERY_ID = 0x1,
+        PARAM_RECEIPT_ID = 0x2,
+        MAX_PARAM_COUNT = 0x3,
+    };
+    virtual ~UpdateStatusToPostRegistrationSuccessJob();
+    virtual bool verifyParameter(short& result) const;
+    virtual bool handleJob(short& result);
+
+    unsigned long long _tid;
+    long long _deliveryId;
+    long long _receiptId;
+};
+static_assert(sizeof(UpdateStatusToPostRegistrationSuccessJob) == 0x20, "sizeof UpdateStatusToPostRegistrationSuccessJob");
+static_assert(offsetof(UpdateStatusToPostRegistrationSuccessJob, _receiptId) == 0x18,
+              "UpdateStatusToPostRegistrationSuccessJob::_receiptId");

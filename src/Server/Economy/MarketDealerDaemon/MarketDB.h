@@ -72,11 +72,11 @@ public:
     static bool const ReservePurchase(int& dbRetValue, ReservePurchaseJob& job);                           // 0x23450
     static bool const CancelPurchaseReservation(int& dbRetValue, CancelPurchaseReservationJob& job);       // 0x238d0
     static bool const RegisterPurchase(int& dbRetValue, RegisterPurchaseJob& job);                         // 0x23b40
-    // ❓ Parameter names of ExpireSale and ExpireAuction (the PDB gives the types only).
-    static bool const ExpireSale(int& dbRetValue, long long saleId, long long& deliveryId,
-                                 MarketStatement& marketStatement);                                        // 0x24100
-    static bool const ExpireAuction(int& dbRetValue, long long saleId, int bidCount, int& deliveryCount,
-                                    DeliveryRelation*& deliveryRelationList, int const maxDeliveryCount);  // 0x24490
+    // Parameter names of ExpireSale and ExpireAuction come from the PDB locals (pdbq fn).
+    static bool const ExpireSale(int& dbRetValue, long long saleId, long long& outItemDeliveryId,
+                                 MarketStatement& outMarketStatement);                                     // 0x24100
+    static bool const ExpireAuction(int& dbRetValue, long long saleId, int ruleResetTime, int& outDeliveryCount,
+                                    DeliveryRelation*& deliveryRelation, int const arraySize);             // 0x24490
     static bool const UpdateStatusToReporting(int& dbRetValue, long long deliveryId);                      // 0x24e90
     static bool const UpdateStatusToReportSuccess(int& dbRetValue, UpdateStatusToReportSuccessJob& job);   // 0x25110
     static bool const UpdateStatusToPawnRemovalSuccess(int& dbRetValue,
@@ -89,7 +89,7 @@ public:
                                                             UpdateStatusToPostRegistrationFailureJob& job); // 0x259b0
     static bool const UpdateStatusToRetryReady(int& dbRetValue, UpdateStatusToRetryReadyJob& job);         // 0x25bc0
     static bool const LoadRetryReadySingleDelivery(int& dbRetValue, long long deliveryId);                 // 0x25dd0
-    static bool const ResetUncompletedDeliveryStatus(int& dbRetValue, int& resetCount);                    // 0x27230 ❓ name
+    static bool const ResetUncompletedDeliveryStatus(int& dbRetValue, int& resetCount);                    // 0x27230
     static bool const SuspendSaleByManager(int& dbRetValue, SuspendSaleManagementJob& job);                // 0x27440
     static bool const ResetDeliveryFailureByManager(int& dbRetValue,
                                                     RetrySingleDeliveryFailureManagementJob& job);          // 0x276b0
