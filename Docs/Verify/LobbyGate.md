@@ -1,6 +1,6 @@
 # LobbyGate verify (lift-lobbygate-verify)
 
-Status: PASS WITH THE FIX PATCH. With `Docs/Verify/LobbyGate-fixes.patch` applied, the lifted exe gives the same ports, packets and packet log as the original. Only the version string in the log is different (Difference 2). Without the patch, the lifted exe crashes during start (Differences 1, 5, 6).
+Status: PASS. 2026-11-17: the fixes are in `src/`. The patch file and the fixsrc script are removed. The lifted exe gives the same ports, packets and packet log as the original. Only the version string in the log is different (Difference 2). Before the fixes, the lifted exe crashed during start (Differences 1, 5, 6).
 
 ## How to run
 
@@ -46,7 +46,7 @@ Cert file `E:\Service\cert\Lobbygate.cfg`: placeholder text `keyhere`. initializ
   (`TODO(lift-cg-5)`), which does not call `CryptoKey::Initialize`.
 - Fix (not applied; src/ is not in this card's Files): call `CryptoKey::Initialize()` in the lifted
   Network::Initialize (or in PacketCrypt::Setup) after `_MaxSize` is set.
-  The fix is hunk 1 of `Docs/Verify/LobbyGate-fixes.patch`. The original ignores the result.
+  The fix is in `src/` now. The original ignores the result.
   CacheGate and SmartCouponDaemon also use this Network::Initialize. The extra call only fills the
   crypto tables (srand, Crypto::Initialize, Prng) ❓ check their runs again after the fix.
 
@@ -57,9 +57,9 @@ Cert file `E:\Service\cert\Lobbygate.cfg`: placeholder text `keyhere`. initializ
   Port id 2 is a constant (reads `_port[1]`). The lifted Channel.cpp has the CacheGate shape
   (portId, ip, portNo, timeout, reconnect). Lifted `LobbyD::Hello` called `MakeSession(waitAck, portId, 0, 0, false)`,
   so portId = ip value → `_port[ip-1]` out of range.
-- Fix: hunk 2 of the patch, `MakeSession(2, waitAck, portId, 0, false)` (timeout, reconnect ❓).
+- Fix (in `src/` now): `MakeSession(2, waitAck, portId, 0, false)` (timeout, reconnect ❓).
 
-### Run after both fixes (`tools/verify/fixsrc_lobbygate.sh`, then run_lobbygate.sh lifted 20 --peer --client --pktlog)
+### Run after both fixes (run_lobbygate.sh lifted 20 --peer --client --pktlog)
 
 - No crash. Exit 124 (timeout), same as the original. No listen ports (same as the original without a LobbyD reply).
 - Peer bytes: `0a00010001003a00a451`, same as the original.

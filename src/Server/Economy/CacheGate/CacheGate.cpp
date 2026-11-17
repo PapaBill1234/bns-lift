@@ -36,7 +36,7 @@ XmlCfgDef const CacheGateConfig::_Def[13] = {
     {offsetof(CacheGateConfig, _rootPath), L"root-path", XmlCfgDef::CFG_DIR, 1, nullptr, L"full root path"},
     {offsetof(CacheGateConfig, _logPath), L"log-path", XmlCfgDef::CFG_DIR, 1, nullptr, L"full log path"},
     {offsetof(CacheGateConfig, _configPath), L"config-path", XmlCfgDef::CFG_DIR, 1, nullptr, L"full config path"},
-    {static_cast<unsigned long long>(-1), L"system configuration", 0, 0, nullptr, nullptr},
+    {static_cast<unsigned long long>(-1), nullptr, 0, 0, nullptr, L"system configuration"},
     {offsetof(CacheGateConfig, _workerThreadCount), L"worker-thread", XmlCfgDef::CFG_INT, 0, nullptr,
      L"0 is system recommend"},
     {offsetof(CacheGateConfig, _dumpType), L"dump-type", XmlCfgDef::CFG_INT, 0, &DEFAULT_DUMPTYPE,
@@ -45,10 +45,10 @@ XmlCfgDef const CacheGateConfig::_Def[13] = {
      L"max session count for connect to cached. 0 is system default."},
     {offsetof(CacheGateConfig, _maxPublicSessionCount), L"max-public-session-count", XmlCfgDef::CFG_INT, 1, nullptr,
      L"max session count for public port. 0 is system default."},
-    {static_cast<unsigned long long>(-1), L"network configuration", 0, 0, nullptr, nullptr},
+    {static_cast<unsigned long long>(-1), nullptr, 0, 0, nullptr, L"network configuration"},
     {offsetof(CacheGateConfig, _publicPort), L"public-port", XmlCfgDef::CFG_INT, 0, &CACHEGATE_PUBLIC_PORT_VALUE,
      L"daemon public access port"},
-    {static_cast<unsigned long long>(-1), L"economy service configuration", 0, 0, nullptr, nullptr},
+    {static_cast<unsigned long long>(-1), nullptr, 0, 0, nullptr, L"economy service configuration"},
     {offsetof(CacheGateConfig, _wid), L"wid", XmlCfgDef::CFG_INT, 0, nullptr, L"cachegate wid"},
 };
 

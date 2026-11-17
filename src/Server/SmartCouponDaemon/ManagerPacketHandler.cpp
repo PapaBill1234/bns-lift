@@ -203,8 +203,7 @@ bool HandleSmartCouponManager_LoadRetryReadyGameEventLogListReq(Session const* s
     else
     {
         Log::Write(Log::LT_DEBUG, MANAGERPACKETHANDLER_FILE, 179,
-                   L"[mgr-ch], 0x%.16I64X, %I64d, load-retryready-game-event-log-list, cmd:%d, tid:0x%.16I64X",
-                   session->_id, channel->GetId(), cmd, tid);
+                   L"load-retryready-game-event-log-list");
         int dbRetValue = 0;
         if (!SmartCouponDB::LoadRetryReadyGameEventLogList(&dbRetValue, &context))
         {

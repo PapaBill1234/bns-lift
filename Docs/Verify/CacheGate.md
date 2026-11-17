@@ -1,7 +1,8 @@
 # CacheGate verify (card lift-cg-verify)
 
-Status: **`src/` as committed fails at start** (0xc0000417 in `XmlReader_sv64.dll`, 0 log lines, no port).
-**With the 6 fixes in `Docs/Verify/CacheGate-fixes.patch`** (test copy `build/verify/fixsrc/`), the lifted exe
+Status: PASS. 2026-11-17: the fixes are in `src/`. The patch file and the fixsrc script are removed.
+Before the fixes, the exe failed at start (0xc0000417 in `XmlReader_sv64.dll`, 0 log lines, no port).
+With the 6 fixes, the lifted exe
 starts, listens on 20800, and the packet log, peer bytes and client replies are the same as the original.
 Only the version string in the log is different (no VERSIONINFO resource).
 
@@ -71,13 +72,11 @@ Checks with the fixed copy (`CG_LIFTED_EXE=$PWD/build/verify/fixsrc/build/CacheG
 | - (log) | version | `0.0.348.524` | empty | `Daemon::LoadVersion` reads the exe VERSIONINFO resource. The lifted exe has no `.rc`. OPEN |
 | - (log) | extra line `[crash-mail], PrintMailInfo` | none | seen in an earlier run | Not seen in the last runs (log.diff 4). Closed ❓ |
 
-The fixes are outside the Files of this card. The test copy `build/verify/fixsrc/` has all 6 fixes
-(built `build/verify/fixsrc/build/CacheGate.exe`). The same fixes are in `Docs/Verify/CacheGate-fixes.patch`.
+All 6 fixes are in `src/` now.
 All other `_Def` rows agree with the original table.
 
 ## Next steps
-1. Follow-up card: `git apply Docs/Verify/CacheGate-fixes.patch` (all 6 fixes; checked with `git apply --check`).
-   The `_Def` fix (row 1) is in `src/CacheGate/CacheGate.cpp` in the same patch.
+1. DONE: all 6 fixes are in `src/` (the `_Def` section rows are in `src/Server/Economy/CacheGate/CacheGate.cpp`).
 2. Add a VERSIONINFO resource (FileVersion 0.0.348.524) to the CacheGate target.
 3. Look for the same patterns in the other servers: overloaded virtuals declared in PDB order,
    `EventId` stubs that return 0 ❓, and classes with inlined base constructors.
