@@ -17,7 +17,6 @@ namespace
 wchar_t const* const FILE_NAME = L"ContentsRuleConfigDefinition.cpp";        // LIFT: No PDB symbol. The binary uses the literal.
 wchar_t const* const CONTENTS_RULE_CONFIG_FILENAME = L"ContentsRule.lobbygate.config.xml";  // rva 0x91328
 wchar_t const* const CONTENTS_RULE_CONFIG_MODULENAME = L"lobbygate-contents-rule-config";  // rva 0x91330
-wchar_t const valueString[] = L"";  // ❓ name and value. The binary uses &valueString as an empty string.
 int const ROW_COUNT = 13;           // LIFT: No PDB symbol. The binary uses the literal.
 }
 
@@ -61,42 +60,41 @@ ContentsRuleConfig* ContentsRuleConfig::ConfigOlds = nullptr;          // 0x93f8
 int ContentsRuleConfig::ConfigReloadCount = 0;                         // 0x93f90
 long long ContentsRuleConfig::ConfigLastReloadTime = 0;                // 0x93f98
 
-// ❓ The descriptions after the prefix are Korean text in the binary. Rows 3-12 have the text
-// "[REQ] [<topic>] <Korean text> (default ...) (min ~ max)". The Korean text is not kept here.
+// The descriptions are the binary text (rva 0x71780 .. 0x71fd8).
 // 0x140092850
 XmlCfgDef const ContentsRuleConfigLoad::_Def[13] = {
     {offsetof(ContentsRuleConfigLoad, _dummyData), L"dummy-data", XmlCfgDef::CFG_INT, 1, &DEFAULT_DUMMY_DATA,
      L"dummy data (0 ~ 1234)"},
     {offsetof(ContentsRuleConfigLoad, _useTimeBasedPlaySchedule), L"use-time-based-play-schedule", XmlCfgDef::CFG_BOOL, 1,
-     &DEFAULT_USE_TIME_BASED_PLAY_SCHEDULE, L"[TimeBased] TimeBased Play Schedule ❓"},
+     &DEFAULT_USE_TIME_BASED_PLAY_SCHEDULE, L"[TimeBased] TimeBased Play Schedule 사용 여부"},
     {offsetof(ContentsRuleConfigLoad, _enablePlayWarrior), L"enable-play-warrior", XmlCfgDef::CFG_BOOL, 1,
-     &DEFAULT_ENABLE_PLAY_WARRIOR, L"[Character] ❓"},
+     &DEFAULT_ENABLE_PLAY_WARRIOR, L"[Character] 투사 캐릭터 플레이 가능 여부"},
     {offsetof(ContentsRuleConfigLoad, _enableFishSystem), L"enable-fish-system", XmlCfgDef::CFG_BOOL, 1,
-     &DEFAULT_ENABLE_FISH_SYSTEM, L"[REQ] [❓] ❓ (default = n)"},
+     &DEFAULT_ENABLE_FISH_SYSTEM, L"[REQ] [낚시] 낚시 사용 여부 (default = n)"},
     {offsetof(ContentsRuleConfigLoad, _enableAccountContents), L"enable-account-contents", XmlCfgDef::CFG_BOOL, 1,
-     &DEFAULT_ENABLE_ACCOUNT_CONTENTS, L"[REQ] [❓] ❓ (default = n)"},
+     &DEFAULT_ENABLE_ACCOUNT_CONTENTS, L"[REQ] [계정컨텐츠] 계정 컨텐츠 사용 여부 (default = n)"},
     {offsetof(ContentsRuleConfigLoad, _accountContentsRequiredPcLevel), L"account-contents-required-pc-level",
      XmlCfgDef::CFG_INT, 1, &DEFAULT_ACCOUNT_CONTENTS_REQUIRED_PC_LEVEL,
-     L"[REQ] [❓] ❓ account-contents-required-pc-mastery-level > 0 ❓ rule config ❓ pc-level-max ❓.(default : 0) (0 ~ 1000)"},
+     L"[REQ] [계정컨텐츠] 계정 컨텐츠를 이용 가능한 최소 캐릭터 레벨. 계정 경험치 누적, 계정 등급 혜텍 적용 조건. account-contents-required-pc-mastery-level > 0이면, rule config의 pc-level-max 값과 동일해야한다.(default : 0) (0 ~ 1000)"},
     {offsetof(ContentsRuleConfigLoad, _accountContentsRequiredPcMasteryLevel),
      L"account-contents-required-pc-mastery-level", XmlCfgDef::CFG_INT, 1,
-     &DEFAULT_ACCOUNT_CONTENTS_REQUIRED_PC_MASTERY_LEVEL, L"[REQ] [❓] ❓ Mastery ❓ (default : 0) (0 ~ 1000)"},
+     &DEFAULT_ACCOUNT_CONTENTS_REQUIRED_PC_MASTERY_LEVEL, L"[REQ] [계정컨텐츠] 계정 컨텐츠를 이용 가능한 최소 캐릭터 Mastery 레벨. 계정 경험치 누적, 계정 등급 혜텍 적용 조건. 값이 0이면 체크하지 않는다. (default : 0) (0 ~ 1000)"},
     {offsetof(ContentsRuleConfigLoad, _accountContentsRequiredAccountTopPcLevel),
      L"account-contents-required-account-top-pc-level", XmlCfgDef::CFG_INT, 1,
      &DEFAULT_ACCOUNT_CONTENTS_REQUIRED_ACCOUNT_TOP_PC_LEVEL,
-     L"[REQ] [❓] ❓ account-contents-required-account-top-pc-mastery-level > 0 ❓ rule config ❓ pc-level-max ❓.(default : 0) (0 ~ 1000)"},
+     L"[REQ] [계정컨텐츠] 계정 컨텐츠를 이용하기 위해 보유해야하는 계정 내 캐릭터의 레벨 값. 계정 경험치 누적, 계정 등급 혜텍 적용 조건. account-contents-required-account-top-pc-mastery-level > 0이면, rule config의 pc-level-max 값과 동일해야한다.(default : 0) (0 ~ 1000)"},
     {offsetof(ContentsRuleConfigLoad, _accountContentsRequiredAccountTopPcMasteryLevel),
      L"account-contents-required-account-top-pc-mastery-level", XmlCfgDef::CFG_INT, 1,
      &DEFAULT_ACCOUNT_CONTENTS_REQUIRED_ACCOUNT_TOP_PC_MASTERY_LEVEL,
-     L"[REQ] [❓] ❓ Mastery ❓ (default : 0) (0 ~ 1000)"},
+     L"[REQ] [계정컨텐츠] 계정 컨텐츠를 이용하기 위해 보유해야하는 계정 내 캐릭터의 Mastery 레벨 값. 계정 경험치 누적, 계정 등급 혜텍 적용 조건. 값이 0이면 체크하지 않는다. (default : 0) (0 ~ 1000)"},
     {offsetof(ContentsRuleConfigLoad, _accountExpQuotaPerDay), L"account-exp-quota-per-day", XmlCfgDef::CFG_INT, 1,
-     &DEFAULT_ACCOUNT_EXP_QUOTA_PER_DAY, L"[REQ] [❓] ❓ (default : 0) (0 ~ 2147483647)"},
+     &DEFAULT_ACCOUNT_EXP_QUOTA_PER_DAY, L"[REQ] [계정컨텐츠] 계정(명예) 경험치 일일 최대 획득량. (default : 0) (0 ~ 2147483647)"},
     {offsetof(ContentsRuleConfigLoad, _accountExpQuotaResetTime), L"account-exp-quota-reset-time", XmlCfgDef::CFG_INT, 1,
-     &DEFAULT_ACCOUNT_EXP_QUOTA_RESET_TIME, L"[REQ] [❓] ❓ hour. 0~23 ❓. (default : 6) (0 ~ 23)"},
+     &DEFAULT_ACCOUNT_EXP_QUOTA_RESET_TIME, L"[REQ] [계정컨텐츠] 계정(명예) 경험치 일일 최대 획득량 초기화 시각. hour. 0~23시. (default : 6) (0 ~ 23)"},
     {offsetof(ContentsRuleConfigLoad, _accountLevelMax), L"account-level-max", XmlCfgDef::CFG_INT, 1,
-     &DEFAULT_ACCOUNT_LEVEL_MAX, L"[REQ] [❓] ❓ max. (default : 50) (0 ~ 1000)"},
+     &DEFAULT_ACCOUNT_LEVEL_MAX, L"[REQ] [계정컨텐츠] 계정(명예) 레벨 max. (default : 50) (0 ~ 1000)"},
     {offsetof(ContentsRuleConfigLoad, _enableGuildJoinRenewal), L"enable-guild-join-renewal", XmlCfgDef::CFG_BOOL, 1,
-     &DEFAULT_ENABLE_GUILD_JOIN_RENEWAL, L"[REQ] [❓] ❓ (default=n)"},
+     &DEFAULT_ENABLE_GUILD_JOIN_RENEWAL, L"[REQ] [문파 진입 개선] 문파 진입 개선 기능 사용 여부 (default=n)"},
 };
 
 // 0x140092a60
@@ -283,7 +281,7 @@ void ContentsRuleConfig::Dump()
 }
 
 // Adds one UTF-8 string element to the packet. This is the inlined code that repeats in MakeListPacket.
-static void addElement(FragmentPacket* fp, char* elementStr, wchar_t const* elementWStr, int length)  // ❓ name
+static void addElement(FragmentPacket* fp, char* elementStr, wchar_t const* elementWStr, int length)  // LIFT: inlined in MakeListPacket 0x8965, 0x8af5, 0x8bdd. No PDB name.
 {
     unsigned long long size = static_cast<unsigned long long>(
         WideCharToMultiByte(CP_UTF8, 0, elementWStr, length, elementStr, 260, nullptr, nullptr));
@@ -316,7 +314,7 @@ FragmentPacket* ContentsRuleConfig::MakeListPacket(ContentsRuleConfig* config)
     wchar_t elementWStr[264] = {0};
 
     fp->packet.Allocate(&fp->composer);
-    fp->Compose(3, 65);  // ❓ the pseudocode shows only the value 65 (client major version)
+    fp->Compose(3, 65, 0, ConfigReloadCount);  // 0x88d9: edx = 3, r8d = 65, r9d = 0, [rsp+20h] = ConfigReloadCount
     if (fp->packet.CurHeader == nullptr || static_cast<unsigned short>(4000 - fp->packet.CurHeader->size) < 2)
         fp->packet.Allocate(&fp->composer);
     fp->composer.PushRepeatCount(&fp->packet);
@@ -354,7 +352,7 @@ FragmentPacket* ContentsRuleConfig::MakeListPacket(ContentsRuleConfig* config)
         {
             wchar_t const* value = reinterpret_cast<wchar_t const*>(field);
             if (value == nullptr)
-                value = valueString;
+                value = L"";  // PDB: ??_C@_11LOCGONAA@ (rva 0x627d8)
             length = swprintf_s(elementWStr, 260, L"<option name='%s' value='%s'/>", def.name, value);
             break;
         }
@@ -407,7 +405,7 @@ bool ContentsRuleConfig::ConvPacketElement(char* utf8Name, char* utf8Value, wcha
                    nullptr);
     Log::Write(Log::LT_ERROR, FILE_NAME, 467,
                L"[ContentsRuleConfig::ConvPacketElement], overflow(%d/%s), config:%s, value:%s", lastError,
-               fmtStr != nullptr ? fmtStr : valueString, name, value);
+               fmtStr != nullptr ? fmtStr : L"", name, value);
     if (fmtStr != nullptr)
         LocalFree(fmtStr);
     return false;
@@ -417,8 +415,9 @@ bool ContentsRuleConfig::ConvPacketElement(char* utf8Name, char* utf8Value, wcha
 bool ContentsRuleConfig::CheckMinMaxBoundary(void const* const loaded, ContentsRuleXmlCfgDefLocal const* defList,
                                              XmlCfgDef const* loadDefList, int defCount)
 {
-    // ❓ The binary ignores the arguments. It reads ConfigNoReload and the two _Def tables, and it stops at the
-    // address of LobbyGateConfig::_Def[0].defaultValue (the next table in .rdata). That is the same as 13 rows.
+    // LIFT: LTCG folded the arguments. The only call (LoadContentsRuleConfig 0x8372) sets no argument register.
+    // The body reads ConfigNoReload and the two _Def tables. It stops at the address of
+    // LobbyGateConfig::_Def[0].defaultValue (the next table in .rdata). That is the same as 13 rows.
     (void)loaded;
     (void)defList;
     (void)loadDefList;
@@ -489,7 +488,8 @@ bool ContentsRuleConfig::CheckMinMaxBoundary(void const* const loaded, ContentsR
 // 0x9060
 bool ContentsRuleConfig::UpdateAllVariable(ContentsRuleConfigLoad const* const loaded)
 {
-    // ❓ The binary ignores both this and loaded. It reads the globals Config and ConfigNoReload.
+    // LIFT: LTCG folded this and loaded. The only call (LoadContentsRuleConfig 0x83d6) sets no argument register.
+    // The body reads the globals Config and ConfigNoReload.
     (void)loaded;
     ContentsRuleConfigLoad const* load = ConfigNoReload;
     ContentsRuleConfig* config = Config;
@@ -521,7 +521,7 @@ bool ContentsRuleConfig::UpdateAllVariable(ContentsRuleConfigLoad const* const l
         {
             wchar_t const* value = *reinterpret_cast<wchar_t const* const*>(from);
             if (value == nullptr)
-                value = valueString;
+                value = L"";  // PDB: ??_C@_11LOCGONAA@ (rva 0x627d8)
             if (def.name == nullptr || !ConvPacketElement(utf8Name, utf8Value, def.name, value))
                 return false;
             wcscpy_s(reinterpret_cast<wchar_t*>(to), 260, value);
