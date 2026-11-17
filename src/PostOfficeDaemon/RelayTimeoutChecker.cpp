@@ -117,7 +117,7 @@ bool RelayTimeoutChecker::occurTimeoutEvent(unsigned long long relayTid, RelayCo
     RelayTimeoutEvent* const relayTimeoutEvent =
         memory != nullptr ? ::new (memory) RelayTimeoutEvent(relayTid, relayContext) : nullptr;
 
-    if (PostQueuedCompletionStatus(Network::iocpHandleOrNull(), 0, reinterpret_cast<ULONG_PTR>(relayTimeoutEvent), nullptr))
+    if (PostQueuedCompletionStatus(Network::iocpHandle(), 0, reinterpret_cast<ULONG_PTR>(relayTimeoutEvent), nullptr))
         return true;
 
     Log::Write(RELAY_TIMEOUT_CHECKER_FILE, 95, GetLastError(),

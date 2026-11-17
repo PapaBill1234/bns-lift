@@ -68,7 +68,7 @@ bool PostDeliveryEvent::OccurEvent(PostContext* const postContext, CacheGateChan
     PostDeliveryEvent* const postDeliveryEvent =
         memory != nullptr ? ::new (memory) PostDeliveryEvent(postContext, cachegateChannel) : nullptr;
 
-    if (PostQueuedCompletionStatus(Network::iocpHandleOrNull(), 0, reinterpret_cast<ULONG_PTR>(postDeliveryEvent), nullptr))
+    if (PostQueuedCompletionStatus(Network::iocpHandle(), 0, reinterpret_cast<ULONG_PTR>(postDeliveryEvent), nullptr))
         return true;
 
     Log::Write(POST_DELIVERY_EVENT_FILE, 57, GetLastError(),

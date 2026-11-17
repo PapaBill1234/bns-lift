@@ -154,7 +154,7 @@ void EventNotiJob::finalize()
         void* mem = Memory::_Manager[2]->Alloc(sizeof(SendRetryCouponPublicationOkEvent), kFile, 113);
         SendRetryCouponPublicationOkEvent* evt =
             mem ? new (mem) SendRetryCouponPublicationOkEvent(_managementTid, _acceptTid) : nullptr;
-        PostQueuedCompletionStatus(Network::iocpHandleOrNull(), 0,
+        PostQueuedCompletionStatus(Network::iocpHandle(), 0,
                                    reinterpret_cast<ULONG_PTR>(evt), nullptr);
         Log::Write(Log::LT_DEBUG, kFile, 116,
                    L"[job], post sendRetryCouponPublicationOkEvent;, jobid:0x%I64X, type:%d, state:%d tid:%I64d, accept-tid:%I64d",
@@ -165,7 +165,7 @@ void EventNotiJob::finalize()
         void* mem = Memory::_Manager[2]->Alloc(sizeof(SendRetryCouponPublicationFailEvent), kFile, 121);  // ❓ line
         SendRetryCouponPublicationFailEvent* evt =
             mem ? new (mem) SendRetryCouponPublicationFailEvent(_managementTid, _managementReason) : nullptr;
-        PostQueuedCompletionStatus(Network::iocpHandleOrNull(), 0,
+        PostQueuedCompletionStatus(Network::iocpHandle(), 0,
                                    reinterpret_cast<ULONG_PTR>(evt), nullptr);
         Log::Write(Log::LT_DEBUG, kFile, 124,
                    L"[job], post sendRetryCouponPublicationFailEvent;, jobid:0x%I64X, type:%d, state:%d tid:%I64d, failReason:%d",

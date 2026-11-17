@@ -42,10 +42,9 @@ public:
     static bool OpenPort(unsigned int portId, unsigned short portNo, SessionHandler const* sessionHandler,
                          PacketBufferHandler const* bufferHandler, unsigned int maxSession);          // 0x1A8B0 (SmartCouponDaemon)
     static bool OpenPort(unsigned int id);                                                            // 0x1AB20 (SmartCouponDaemon)
-    // ❓ Not in the PDB. Inlined read of Instance->_iocpHandle.
-    static void* iocpHandle() { return Instance->_iocpHandle; }
-    // ❓ Not in the PDB. Inlined read of (Instance ? Instance->_iocpHandle : nullptr).
-    static void* iocpHandleOrNull() { return Instance ? Instance->_iocpHandle : nullptr; }
+    // PDB static iocpHandle(), inlined. Some sites have no null test: the compiler removed it after an
+    // earlier read of Instance.
+    static void* iocpHandle() { return Instance ? Instance->iopcHandle() : nullptr; }
     static bool ClosePort(unsigned int id);                                                           // 0xD5A0
     static bool StopPort(unsigned int portId);                                                        // 0x28F10 (PostOfficeDaemon)
     static wchar_t const* GetAddressStringW(unsigned long address);                                   // 0xD6D0
@@ -56,6 +55,8 @@ public:
 protected:
     static void ReconnectSession(unsigned long long id);         // 0xD630
     static Network* initInstance(ThreadManager* threadManager);  // 0xD760
+    // PDB name (with the typo). Inlined in Network::iocpHandle.
+    void* iopcHandle() { return _iocpHandle; }
 
 private:
     bool initWorkerThread(void (*failedEventHandler)(EventObject*), unsigned int workerThreadCount);  // 0xD8E0

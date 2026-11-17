@@ -314,7 +314,7 @@ bool WorldSessionHandler::PacketHandler(Session const* session, Packet const* pa
     if (cmd > 0 && cmd < 13 && PostOfficeServicePacketServerSideHandlerList[cmd] != nullptr)
     {
         // ❓ LTCG folded the event id and the offset. The values come from the LobbyGate call.
-        result = TFPP_PumpPacket(128, Network::iocpHandleOrNull(), session, packet, cmd, 0,
+        result = TFPP_PumpPacket(128, Network::iocpHandle(), session, packet, cmd, 0,
                                  PostOfficeServicePacketServerSideHandlerList,
                                  PostOfficeServicePacketServerSideFragmentHandlerList);
     }

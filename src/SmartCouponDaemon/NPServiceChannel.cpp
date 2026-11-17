@@ -253,6 +253,6 @@ bool NPServiceChannelManager::HandleMessage(NPChannel* channel, _StsMsg* msg, vo
         mem ? new (mem) NPMsgHandleEvent(channel, msg, static_cast<NPTransaction*>(context), NPHandlerEventNoti)
             : nullptr;
     channel->addReferenceCount(NPSERVICECHANNEL_FILE, 141);
-    PostQueuedCompletionStatus(Network::iocpHandleOrNull(), 0, reinterpret_cast<ULONG_PTR>(ev), nullptr);
+    PostQueuedCompletionStatus(Network::iocpHandle(), 0, reinterpret_cast<ULONG_PTR>(ev), nullptr);
     return true;
 }
