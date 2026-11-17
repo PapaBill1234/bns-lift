@@ -19,6 +19,7 @@ Status: MATCH = all 3 equal. Score = mean similarity of the 3 lists (0..100).
 Needs: capstone, pefile (for example: uv pip install capstone pefile).
 """
 import argparse
+import bisect
 import collections
 import difflib
 import json
@@ -35,6 +36,11 @@ except ImportError:
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
+# Worktree (bns-wt/<id>): ida/lift is not in a parent dir. Use the main project dir (same rule as hr_export.py).
+_PP_IDA = os.path.expanduser("~/Documents/Codex/private-project/ida/lift")
+if not os.environ.get("LIFT_IDA_DIR") and os.path.isdir(_PP_IDA) \
+        and not os.path.isdir(os.path.join(os.path.dirname(os.path.dirname(HERE)), "ida", "lift")):
+    os.environ["LIFT_IDA_DIR"] = _PP_IDA
 import pdbq  # noqa: E402
 
 CACHE = os.path.expanduser("~/.cache/bns-lift/funcdiff")
@@ -94,6 +100,27 @@ class Image:
             if ms:
                 self.mangled[rva] = ms[0]
 
+    def data_below(self, t, span=0x40):
+        """The nearest named symbol below t in a writable section, at most span bytes away."""
+        sec = next((s for s in self.pe.sections
+                    if s.VirtualAddress <= t < s.VirtualAddress + s.Misc_VirtualSize), None)
+        if sec is None or not sec.Characteristics & 0x80000000:      # IMAGE_SCN_MEM_WRITE
+            return None
+        if not hasattr(self, "_named"):
+            self._named = sorted(self.names)
+        i = bisect.bisect_right(self._named, t) - 1
+        b = self._named[i] if i >= 0 else None
+        return b if b is not None and t - b <= span else None
+
+    def const_ptr(self, t):
+        """The RVA that a pointer in a read-only section holds, else None."""
+        sec = next((s for s in self.pe.sections
+                    if s.VirtualAddress <= t < s.VirtualAddress + s.Misc_VirtualSize), None)
+        if sec is None or sec.Characteristics & 0x80000000 or t + 8 > len(self.mem):
+            return None
+        v = int.from_bytes(self.mem[t:t + 8], "little") - self.base
+        return v if 0 < v < self.size else None
+
     def code(self, rva, size):
         return self.mem[rva:rva + size]
 
@@ -140,10 +167,36 @@ def signals(img, rva, size, alias):
         ns = sorted(img.names.get(t, ()), key=lambda n: (n.startswith("?"), n))
         return alias.get(ns[0], ns[0]) if ns else None
 
+    def field_name(t):
+        """A slot inside a named global (for example Aes128::_Delegator+0x10). Noise fix 3."""
+        p = img.const_ptr(t)                       # a slot of a vtable in .rdata: call its function
+        if p is not None and p in img.funcs:
+            return target_name(p)
+        base = img.data_below(t)
+        if base is None:
+            return None
+        n = target_name(base)
+        return "%s+0x%x" % (n, t - base) if n else None
+
     loaded = {}                                    # register -> import loaded into it
 
+    # Noise fix 2: a jump table at the end of the function is data, not code. The table is read
+    # with [base + index*4 + disp] where disp is an RVA inside the function. Stop before it.
+    for ins in MD.disasm(img.code(rva, size), rva):
+        for op in ins.operands:
+            if (op.type == X86.X86_OP_MEM and op.mem.index != 0 and op.mem.scale in (1, 4)
+                    and op.mem.base not in (0, X86.X86_REG_RIP) and ins.address < op.mem.disp < end):
+                end = op.mem.disp
+        if ins.address >= end:
+            break
+    size = end - rva
+
+    chk = None                                     # const of the last instruction if it is mov eax, imm
     for ins in MD.disasm(img.code(rva, size), rva):
         op0 = ins.operands[0] if ins.operands else None
+        chk, prev = None, chk
+        if ins.group(X86.X86_GRP_JUMP) and ins.mnemonic != "jmp" or ins.mnemonic.startswith("loop"):
+            continue                               # noise fix 1: a branch target is not a constant
         if ins.group(X86.X86_GRP_CALL) or (ins.group(X86.X86_GRP_JUMP) and ins.mnemonic == "jmp"):
             t = None
             if op0 is not None and op0.type == X86.X86_OP_IMM:
@@ -152,8 +205,10 @@ def signals(img, rva, size, alias):
                     continue                       # jump inside the function
             elif op0 is not None and op0.type == X86.X86_OP_MEM and op0.mem.base == X86.X86_REG_RIP:
                 t = ins.address + ins.size + op0.mem.disp
+            if t is not None and target_name(t) in ("__chkstk", "_alloca_probe") and prev is not None:
+                consts.remove(prev)                 # noise fix 4: frame size for the stack probe
             if t is not None:
-                n = target_name(t) or ("?%x" % t if ins.mnemonic == "call" else None)
+                n = target_name(t) or (field_name(t) or "?%x" % t if ins.mnemonic == "call" else None)
                 if n and n not in NOISE:
                     calls.append(n)
             elif ins.mnemonic == "call":
@@ -185,6 +240,9 @@ def signals(img, rva, size, alias):
                 if 0x10000 <= v < img.size:
                     continue                       # an RVA (try tables, image-base addressing)
                 consts.append(v)
+                if ins.mnemonic == "mov" and ins.operands[0].type == X86.X86_OP_REG \
+                        and ins.operands[0].reg == X86.X86_REG_EAX:
+                    chk = v
     return calls, refs, sorted(set(consts))
 
 
@@ -224,6 +282,8 @@ def main():
     ap.add_argument("--json", help="write per-function results")
     ap.add_argument("--diff", help="compare with an earlier --json file")
     ap.add_argument("--worst", type=int, default=25)
+    ap.add_argument("--only", action="store_true",
+                    help="print the functions that are only in the original and only in ours (name, rva, size)")
     a = ap.parse_args()
 
     od = os.path.join(pdbq.ida_dir(), a.server)
@@ -234,6 +294,7 @@ def main():
     def table(img):
         """key -> signals. Key = mangled name, else the PDB name."""
         t, plain = {}, collections.defaultdict(list)
+        where = {}
         for rva, (name, size) in img.funcs.items():
             if SKIP_NAME.search(name) or not size:
                 continue
@@ -241,6 +302,8 @@ def main():
             if k not in t:
                 t[k] = (alias.get(name, name), signals(img, rva, size, alias))
                 plain[alias.get(name, name)].append(k)
+                where[k] = (rva, size)
+        img.where = where
         return t, plain
 
     (to, po), (tl, pl) = table(orig), table(ours)
@@ -283,7 +346,15 @@ def main():
     only_o = len(to) - len(pairs)
     print("%s: %d paired functions, %d MATCH (%.1f %%), mean score %.1f, %d only in original"
           % (a.server, n, m, 100.0 * m / max(n, 1), avg, only_o))
-    if not a.show:
+    if a.only:
+        lo = set(pairs.values())
+        for label, tab, img, ks in (("ORIG", to, orig, [k for k in to if k not in pairs]),
+                                    ("OURS", tl, ours, [k for k in tl if k not in lo])):
+            for k in sorted(ks, key=lambda k: tab[k][0]):
+                rva, size = img.where[k]
+                print("  ONLY-%s  0x%06x %5d  %s%s" % (label, rva, size, tab[k][0],
+                                                     "" if k == tab[k][0] else "  [%s]" % k))
+    if not a.show and not a.only:
         worst = sorted(res.items(), key=lambda kv: kv[1]["score"])[:a.worst]
         for k, r in worst:
             print("  %5.1f  calls %3d  refs %3d  consts %3d  %s" % (r["score"], r["calls"], r["refs"], r["consts"], k))

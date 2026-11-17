@@ -14,11 +14,11 @@
 "status": "MATCH"
 },
 "Aes128::Decrypt": {
-"calls": 0,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 66.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Aes128::EncSize": {
 "calls": 100,
@@ -28,11 +28,11 @@
 "status": "MATCH"
 },
 "Aes128::Encrypt": {
-"calls": 0,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 66.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Aes128::GetType": {
 "calls": 100,
@@ -50,45 +50,45 @@
 },
 "Aes128NI_Decrypt": {
 "calls": 100,
-"consts": 60,
+"consts": 100,
 "refs": 100,
-"score": 86.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Aes128NI_Encrypt": {
 "calls": 100,
-"consts": 55,
+"consts": 100,
 "refs": 100,
-"score": 84.8,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Aes128NI_Setup": {
 "calls": 100,
-"consts": 79,
-"refs": 40,
-"score": 72.9,
-"status": "DIFF"
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Aes128Table_Decrypt": {
 "calls": 100,
-"consts": 57,
+"consts": 100,
 "refs": 100,
-"score": 85.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Aes128Table_Encrypt": {
 "calls": 100,
-"consts": 50,
+"consts": 100,
 "refs": 100,
-"score": 83.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Aes128Table_Setup": {
 "calls": 100,
-"consts": 80,
+"consts": 100,
 "refs": 100,
-"score": 93.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "AgentChannel::GetId": {
 "calls": 100,
@@ -99,10 +99,10 @@
 },
 "AgentChannelManager::initChannelManager": {
 "calls": 100,
-"consts": 67,
+"consts": 100,
 "refs": 100,
-"score": 88.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "AgentSessionHandler::OnAccept": {
 "calls": 100,
@@ -113,9 +113,9 @@
 },
 "AgentSessionHandler::OnClose": {
 "calls": 100,
-"consts": 78,
+"consts": 100,
 "refs": 93,
-"score": 90.2,
+"score": 97.6,
 "status": "DIFF"
 },
 "AgentSessionHandler::OnConnect": {
@@ -127,9 +127,9 @@
 },
 "AgentSessionHandler::PacketHandler": {
 "calls": 71,
-"consts": 53,
+"consts": 77,
 "refs": 100,
-"score": 74.7,
+"score": 82.8,
 "status": "DIFF"
 },
 "AlertSender::AlertSender": {
@@ -155,30 +155,30 @@
 },
 "AlertSender::fini": {
 "calls": 100,
-"consts": 50,
+"consts": 100,
 "refs": 100,
-"score": 83.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "AlertSender::run": {
 "calls": 76,
-"consts": 44,
+"consts": 95,
 "refs": 100,
-"score": 73.6,
+"score": 90.6,
 "status": "DIFF"
 },
 "AlertSender::sendRemain": {
 "calls": 80,
-"consts": 46,
+"consts": 100,
 "refs": 100,
-"score": 75.4,
+"score": 93.3,
 "status": "DIFF"
 },
 "AlertSender::writev2": {
 "calls": 85,
-"consts": 56,
+"consts": 88,
 "refs": 100,
-"score": 80.2,
+"score": 90.7,
 "status": "DIFF"
 },
 "AttachedItemInfo::CheckValidityItemData": {
@@ -190,10 +190,10 @@
 },
 "AutoCS::Leave": {
 "calls": 100,
-"consts": 50,
+"consts": 100,
 "refs": 100,
-"score": 83.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "AutoCS::~AutoCS": {
 "calls": 100,
@@ -225,9 +225,9 @@
 },
 "BloodDaemonMain": {
 "calls": 75,
-"consts": 31,
+"consts": 67,
 "refs": 82,
-"score": 62.4,
+"score": 74.4,
 "status": "DIFF"
 },
 "Blowfish::BlockSize": {
@@ -246,10 +246,10 @@
 },
 "Blowfish::Decrypt": {
 "calls": 100,
-"consts": 50,
+"consts": 100,
 "refs": 100,
-"score": 83.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Blowfish::EncSize": {
 "calls": 100,
@@ -260,10 +260,10 @@
 },
 "Blowfish::Encrypt": {
 "calls": 100,
-"consts": 44,
+"consts": 100,
 "refs": 100,
-"score": 81.5,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Blowfish::GetType": {
 "calls": 100,
@@ -274,65 +274,65 @@
 },
 "Blowfish::Setup": {
 "calls": 100,
-"consts": 53,
+"consts": 76,
 "refs": 100,
-"score": 84.4,
+"score": 92.1,
 "status": "DIFF"
 },
 "BnsCommonConfig::CheckMinMaxBoundary": {
 "calls": 100,
-"consts": 56,
+"consts": 93,
 "refs": 100,
-"score": 85.3,
+"score": 97.8,
 "status": "DIFF"
 },
 "BnsCommonConfig::CompareMatch": {
 "calls": 100,
-"consts": 47,
+"consts": 100,
 "refs": 100,
-"score": 82.4,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "BnsCommonConfig::Copy": {
 "calls": 100,
-"consts": 80,
+"consts": 100,
 "refs": 100,
-"score": 93.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "BnsCommonConfig::Dump": {
 "calls": 100,
-"consts": 88,
+"consts": 100,
 "refs": 97,
-"score": 94.9,
+"score": 98.9,
 "status": "DIFF"
 },
 "BnsCommonConfig::LoadBnsCommonConfig": {
 "calls": 93,
-"consts": 79,
+"consts": 100,
 "refs": 88,
-"score": 86.5,
+"score": 93.6,
 "status": "DIFF"
 },
 "BnsCommonConfig::ReloadBnsCommonConfig": {
 "calls": 93,
-"consts": 73,
+"consts": 100,
 "refs": 93,
-"score": 86.7,
+"score": 95.6,
 "status": "DIFF"
 },
 "BnsCommonConfig::UpdateAllVariable": {
 "calls": 100,
-"consts": 77,
+"consts": 100,
 "refs": 92,
-"score": 89.7,
+"score": 97.4,
 "status": "DIFF"
 },
 "BnsCommonConfig::UpdateReloadedVariable": {
 "calls": 100,
-"consts": 60,
-"refs": 80,
-"score": 80.0,
+"consts": 100,
+"refs": 89,
+"score": 96.3,
 "status": "DIFF"
 },
 "BnsCommonConfigLoad::Load": {
@@ -358,38 +358,38 @@
 },
 "CacheGateChannel::SendFragmentRelayRequest": {
 "calls": 20,
-"consts": 27,
+"consts": 50,
 "refs": 57,
-"score": 34.6,
+"score": 42.4,
 "status": "DIFF"
 },
 "CacheGateChannel::SendRelayRequest": {
 "calls": 82,
-"consts": 50,
+"consts": 80,
 "refs": 100,
-"score": 77.5,
+"score": 87.5,
 "status": "DIFF"
 },
 "CacheGateChannel::composeRelayHeader [?composeRelayHeader@CacheGateChannel@@AEAA_NAEAVPacket@@AEBVRelayHeader@@@Z]": {
 "calls": 100,
-"consts": 86,
+"consts": 100,
 "refs": 100,
-"score": 95.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "CacheGateChannelManager::SetCacheGateChannel": {
 "calls": 100,
-"consts": 75,
+"consts": 100,
 "refs": 100,
-"score": 91.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "CacheGateChannelManager::initChannelManager": {
 "calls": 100,
-"consts": 67,
+"consts": 100,
 "refs": 100,
-"score": 88.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "CacheGateSessionHandler::OnAccept": {
 "calls": 100,
@@ -400,135 +400,135 @@
 },
 "CacheGateSessionHandler::OnClose": {
 "calls": 83,
-"consts": 58,
+"consts": 93,
 "refs": 88,
-"score": 76.6,
+"score": 88.3,
 "status": "DIFF"
 },
 "CacheGateSessionHandler::OnConnect": {
 "calls": 100,
-"consts": 86,
+"consts": 100,
 "refs": 97,
-"score": 94.1,
+"score": 98.9,
 "status": "DIFF"
 },
 "CacheGateSessionHandler::PacketHandler": {
-"calls": 100,
-"consts": 40,
-"refs": 100,
-"score": 80.0,
-"status": "DIFF"
-},
-"CachedWatchdog::addTimer": {
-"calls": 100,
-"consts": 83,
-"refs": 100,
-"score": 94.4,
-"status": "DIFF"
-},
-"CachedWatchdog::setServiceState": {
-"calls": 100,
-"consts": 67,
-"refs": 100,
-"score": 88.9,
-"status": "DIFF"
-},
-"CachedWatchdogManager::AddNextPing": {
-"calls": 100,
-"consts": 67,
-"refs": 100,
-"score": 88.9,
-"status": "DIFF"
-},
-"CachedWatchdogManager::SetAllServiceState": {
-"calls": 100,
-"consts": 71,
-"refs": 100,
-"score": 90.5,
-"status": "DIFF"
-},
-"CachedWatchdogManager::SetServiceState": {
-"calls": 100,
-"consts": 67,
-"refs": 100,
-"score": 88.9,
-"status": "DIFF"
-},
-"CachedWatchdogManager::addCachedWatchdog": {
-"calls": 88,
-"consts": 72,
-"refs": 86,
-"score": 81.7,
-"status": "DIFF"
-},
-"CachedWatchdogManager::getCachedWatchdog": {
-"calls": 100,
-"consts": 80,
-"refs": 100,
-"score": 93.3,
-"status": "DIFF"
-},
-"CachedWatchdogManager::initWatchdogManager": {
-"calls": 100,
-"consts": 53,
-"refs": 100,
-"score": 84.3,
-"status": "DIFF"
-},
-"CachedWatchdogManager::updateWorldList": {
-"calls": 94,
-"consts": 56,
-"refs": 93,
-"score": 81.0,
-"status": "DIFF"
-},
-"Channel::Close": {
-"calls": 100,
-"consts": 50,
-"refs": 0,
-"score": 50.0,
-"status": "DIFF"
-},
-"Channel::GetSession": {
-"calls": 100,
-"consts": 67,
-"refs": 100,
-"score": 88.9,
-"status": "DIFF"
-},
-"Channel::MakeSession": {
 "calls": 100,
 "consts": 57,
 "refs": 100,
 "score": 85.7,
 "status": "DIFF"
 },
+"CachedWatchdog::addTimer": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CachedWatchdog::setServiceState": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CachedWatchdogManager::AddNextPing": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CachedWatchdogManager::SetAllServiceState": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CachedWatchdogManager::SetServiceState": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CachedWatchdogManager::addCachedWatchdog": {
+"calls": 88,
+"consts": 90,
+"refs": 86,
+"score": 87.7,
+"status": "DIFF"
+},
+"CachedWatchdogManager::getCachedWatchdog": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CachedWatchdogManager::initWatchdogManager": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CachedWatchdogManager::updateWorldList": {
+"calls": 94,
+"consts": 100,
+"refs": 93,
+"score": 95.5,
+"status": "DIFF"
+},
+"Channel::Close": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
+"Channel::GetSession": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Channel::MakeSession": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Channel::RemoveSession": {
 "calls": 100,
-"consts": 55,
+"consts": 100,
 "refs": 100,
-"score": 84.8,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Channel::SetSession": {
 "calls": 100,
-"consts": 67,
+"consts": 100,
 "refs": 100,
-"score": 88.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Channel::removeSession": {
 "calls": 100,
-"consts": 50,
+"consts": 100,
 "refs": 100,
-"score": 83.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Channel::~Channel": {
 "calls": 100,
-"consts": 67,
+"consts": 100,
 "refs": 75,
-"score": 80.6,
+"score": 91.7,
 "status": "DIFF"
 },
 "CheckPostCapacityRelayContext::ComposeRequestPacket [?ComposeRequestPacket@CheckPostCapacityRelayContext@@UEBA_NAEAVFragmentPacket@@@Z]": {
@@ -540,16 +540,16 @@
 },
 "CheckPostCapacityRelayContext::ComposeRequestPacket [?ComposeRequestPacket@CheckPostCapacityRelayContext@@UEBA_NAEAVPacket@@@Z]": {
 "calls": 100,
-"consts": 86,
+"consts": 100,
 "refs": 100,
-"score": 95.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "CheckPostCapacityRelayContext::ComposeResponsePacket": {
 "calls": 59,
-"consts": 48,
+"consts": 57,
 "refs": 100,
-"score": 68.9,
+"score": 72.0,
 "status": "DIFF"
 },
 "CheckPostCapacityRelayContext::GetRequestWid": {
@@ -575,17 +575,17 @@
 },
 "CheckPostCapacityRelayContext::processRelayRequest": {
 "calls": 100,
-"consts": 75,
+"consts": 100,
 "refs": 100,
-"score": 91.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "CheckPostCapacityRelayContext::processRelayResponse": {
 "calls": 100,
-"consts": 80,
+"consts": 100,
 "refs": 100,
-"score": 93.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "CheckPostCapacityRelayContext::processRelayTimeout": {
 "calls": 100,
@@ -603,45 +603,45 @@
 },
 "Connection::Accept": {
 "calls": 100,
-"consts": 67,
+"consts": 100,
 "refs": 100,
-"score": 88.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Connection::AsyncConnect": {
 "calls": 100,
-"consts": 67,
+"consts": 100,
 "refs": 100,
-"score": 88.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Connection::AsyncRecv": {
 "calls": 100,
-"consts": 80,
+"consts": 100,
 "refs": 100,
-"score": 93.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Connection::AsyncSend": {
 "calls": 100,
-"consts": 75,
+"consts": 100,
 "refs": 100,
-"score": 91.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Connection::CompleteAsyncConnect": {
 "calls": 100,
-"consts": 89,
+"consts": 100,
 "refs": 100,
-"score": 96.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Connection::makeConnectSocket": {
 "calls": 100,
-"consts": 87,
+"consts": 100,
 "refs": 100,
-"score": 95.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Console::Console": {
 "calls": 100,
@@ -673,9 +673,9 @@
 },
 "CrashHandler::CrashHandler": {
 "calls": 100,
-"consts": 86,
+"consts": 100,
 "refs": 89,
-"score": 91.5,
+"score": 96.3,
 "status": "DIFF"
 },
 "CrashHandler::Handle": {
@@ -687,37 +687,37 @@
 },
 "CrashHandler::Initialize": {
 "calls": 100,
-"consts": 92,
+"consts": 100,
 "refs": 100,
-"score": 97.4,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "CrashHandler::MakeCrash": {
 "calls": 100,
-"consts": 80,
+"consts": 89,
 "refs": 100,
-"score": 93.3,
+"score": 96.3,
 "status": "DIFF"
 },
 "CrashHandler::SetLogPath": {
 "calls": 100,
-"consts": 86,
+"consts": 100,
 "refs": 100,
-"score": 95.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "CrashHandler::SetMailInfo": {
 "calls": 100,
-"consts": 67,
+"consts": 100,
 "refs": 100,
-"score": 88.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "CrashHandler::handleCrash": {
 "calls": 96,
-"consts": 53,
+"consts": 98,
 "refs": 93,
-"score": 80.8,
+"score": 95.6,
 "status": "DIFF"
 },
 "CriticalSection::~CriticalSection": {
@@ -729,17 +729,17 @@
 },
 "Crypto::Destroy": {
 "calls": 100,
-"consts": 71,
+"consts": 100,
 "refs": 100,
-"score": 90.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Crypto::Initialize": {
 "calls": 100,
-"consts": 50,
+"consts": 100,
 "refs": 100,
-"score": 83.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Ctr::Decrypt": {
 "calls": 100,
@@ -750,65 +750,65 @@
 },
 "Ctr::Encrypt": {
 "calls": 100,
-"consts": 20,
+"consts": 67,
 "refs": 100,
-"score": 73.3,
+"score": 88.9,
 "status": "DIFF"
 },
 "Ctr::Setup": {
 "calls": 100,
-"consts": 33,
+"consts": 100,
 "refs": 100,
-"score": 77.8,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Daemon::Cooldown": {
 "calls": 100,
-"consts": 57,
+"consts": 89,
 "refs": 100,
-"score": 85.7,
+"score": 96.3,
 "status": "DIFF"
 },
 "Daemon::Daemon": {
 "calls": 100,
-"consts": 92,
+"consts": 100,
 "refs": 100,
-"score": 97.4,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Daemon::LoadVersion": {
 "calls": 100,
-"consts": 77,
+"consts": 100,
 "refs": 100,
-"score": 92.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Daemon::Reload": {
 "calls": 100,
-"consts": 50,
+"consts": 86,
 "refs": 100,
-"score": 83.3,
+"score": 95.2,
 "status": "DIFF"
 },
 "Daemon::Start": {
 "calls": 82,
-"consts": 25,
+"consts": 44,
 "refs": 64,
-"score": 57.1,
+"score": 63.6,
 "status": "DIFF"
 },
 "Daemon::noTimerMain": {
 "calls": 100,
-"consts": 40,
+"consts": 100,
 "refs": 100,
-"score": 80.0,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Daemon::setAddress": {
 "calls": 100,
-"consts": 59,
+"consts": 85,
 "refs": 100,
-"score": 86.3,
+"score": 95.0,
 "status": "DIFF"
 },
 "Daemon::setCurrentDirectory": {
@@ -820,31 +820,31 @@
 },
 "Daemon::start": {
 "calls": 83,
-"consts": 42,
+"consts": 68,
 "refs": 55,
-"score": 60.0,
+"score": 68.7,
 "status": "DIFF"
 },
 "Daemon::startDaemon": {
 "calls": 100,
-"consts": 0,
+"consts": 100,
 "refs": 100,
-"score": 66.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Daemon::timerMain": {
 "calls": 94,
-"consts": 50,
+"consts": 100,
 "refs": 100,
-"score": 81.2,
+"score": 97.9,
 "status": "DIFF"
 },
 "Daemon::~Daemon": {
 "calls": 100,
-"consts": 50,
+"consts": 100,
 "refs": 100,
-"score": 83.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "DaemonConfig::AllocConfig": {
 "calls": 100,
@@ -855,51 +855,51 @@
 },
 "DaemonConfig::Load": {
 "calls": 91,
-"consts": 12,
+"consts": 67,
 "refs": 100,
-"score": 67.7,
+"score": 86.0,
 "status": "DIFF"
 },
 "Db::AllocTransaction": {
 "calls": 83,
-"consts": 29,
+"consts": 100,
 "refs": 100,
-"score": 70.6,
+"score": 94.4,
 "status": "DIFF"
 },
 "Db::Clear": {
 "calls": 80,
-"consts": 43,
+"consts": 86,
 "refs": 75,
-"score": 66.0,
+"score": 80.2,
 "status": "DIFF"
 },
 "Db::Initialize": {
 "calls": 91,
-"consts": 60,
+"consts": 100,
 "refs": 90,
-"score": 80.3,
+"score": 93.6,
 "status": "DIFF"
 },
 "Db::Log": {
 "calls": 100,
-"consts": 55,
+"consts": 75,
 "refs": 100,
-"score": 84.8,
+"score": 91.7,
 "status": "DIFF"
 },
 "Db::ReleaseTransaction": {
 "calls": 100,
-"consts": 60,
+"consts": 100,
 "refs": 100,
-"score": 86.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Db::clearList": {
 "calls": 46,
-"consts": 31,
+"consts": 67,
 "refs": 100,
-"score": 59.0,
+"score": 70.9,
 "status": "DIFF"
 },
 "Db::errorLog": {
@@ -911,58 +911,58 @@
 },
 "Db::initEnv": {
 "calls": 100,
-"consts": 55,
+"consts": 86,
 "refs": 100,
-"score": 84.8,
+"score": 95.2,
 "status": "DIFF"
 },
 "DbTransaction::BindCol": {
 "calls": 100,
-"consts": 57,
+"consts": 80,
 "refs": 100,
-"score": 85.7,
+"score": 93.3,
 "status": "DIFF"
 },
 "DbTransaction::BindParam": {
 "calls": 100,
-"consts": 50,
+"consts": 80,
 "refs": 100,
-"score": 83.3,
+"score": 93.3,
 "status": "DIFF"
 },
 "DbTransaction::Execute": {
 "calls": 100,
-"consts": 40,
+"consts": 67,
 "refs": 100,
-"score": 80.0,
+"score": 88.9,
 "status": "DIFF"
 },
 "DbTransaction::Fetch": {
 "calls": 86,
-"consts": 50,
+"consts": 80,
 "refs": 86,
-"score": 73.8,
+"score": 83.8,
 "status": "DIFF"
 },
 "DbTransaction::Prepare": {
 "calls": 86,
-"consts": 60,
+"consts": 86,
 "refs": 89,
-"score": 78.2,
+"score": 86.8,
 "status": "DIFF"
 },
 "DbTransaction::close": {
 "calls": 100,
-"consts": 50,
+"consts": 100,
 "refs": 100,
-"score": 83.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "DbTransaction::connect": {
 "calls": 100,
-"consts": 44,
+"consts": 80,
 "refs": 100,
-"score": 81.5,
+"score": 93.3,
 "status": "DIFF"
 },
 "DbTransaction::connectionErrorLog": {
@@ -974,16 +974,16 @@
 },
 "DbTransaction::initStatement": {
 "calls": 100,
-"consts": 50,
+"consts": 80,
 "refs": 100,
-"score": 83.3,
+"score": 93.3,
 "status": "DIFF"
 },
 "DbTransaction::initialize": {
 "calls": 100,
-"consts": 29,
+"consts": 67,
 "refs": 100,
-"score": 76.2,
+"score": 88.9,
 "status": "DIFF"
 },
 "DbTransaction::statmentErrorLog": {
@@ -995,23 +995,23 @@
 },
 "DelayedRelease::Add": {
 "calls": 100,
-"consts": 44,
+"consts": 100,
 "refs": 100,
-"score": 81.5,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "DelayedRelease::Release": {
 "calls": 100,
-"consts": 40,
+"consts": 100,
 "refs": 91,
-"score": 77.0,
+"score": 97.0,
 "status": "DIFF"
 },
 "DelayedRelease::releaseNode": {
 "calls": 75,
-"consts": 67,
+"consts": 100,
 "refs": 71,
-"score": 71.0,
+"score": 82.1,
 "status": "DIFF"
 },
 "DeliverPostRelayContext::ComposeRequestPacket": {
@@ -1023,9 +1023,9 @@
 },
 "DeliverPostRelayContext::DeliverPostRelayContext": {
 "calls": 100,
-"consts": 86,
+"consts": 100,
 "refs": 91,
-"score": 92.2,
+"score": 97.0,
 "status": "DIFF"
 },
 "DeliverPostRelayContext::GetRequestWid": {
@@ -1051,16 +1051,16 @@
 },
 "DeliverPostRelayContext::processRelayRequest": {
 "calls": 100,
-"consts": 75,
+"consts": 100,
 "refs": 100,
-"score": 91.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "DeliverPostRelayContext::processRelayResponse": {
 "calls": 86,
-"consts": 70,
+"consts": 78,
 "refs": 89,
-"score": 81.5,
+"score": 84.1,
 "status": "DIFF"
 },
 "DeliverPostRelayContext::processRelayTimeout": {
@@ -1072,24 +1072,24 @@
 },
 "DeliverPostRelayContext::~DeliverPostRelayContext": {
 "calls": 100,
-"consts": 80,
+"consts": 100,
 "refs": 83,
-"score": 87.8,
+"score": 94.4,
 "status": "DIFF"
 },
 "DumpRegister": {
 "calls": 100,
-"consts": 50,
+"consts": 100,
 "refs": 100,
-"score": 83.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "DumpStack": {
 "calls": 100,
-"consts": 58,
+"consts": 100,
 "refs": 100,
-"score": 86.1,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "DynamicEventObject::deallocate_me": {
 "calls": 100,
@@ -1114,17 +1114,17 @@
 },
 "ExceptionCodeString": {
 "calls": 100,
-"consts": 62,
-"refs": 96,
-"score": 85.9,
-"status": "DIFF"
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "FragmentPacket::Compose": {
 "calls": 100,
-"consts": 67,
+"consts": 100,
 "refs": 100,
-"score": 88.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "FragmentPacket::FreeSize": {
 "calls": 100,
@@ -1135,9 +1135,9 @@
 },
 "FragmentPacketConcatenater::Add": {
 "calls": 73,
-"consts": 67,
+"consts": 95,
 "refs": 94,
-"score": 77.8,
+"score": 87.4,
 "status": "DIFF"
 },
 "FragmentPacketConcatenater::AllocSize": {
@@ -1156,17 +1156,17 @@
 },
 "FragmentPacketConcatenater::Clone": {
 "calls": 100,
-"consts": 67,
+"consts": 80,
 "refs": 100,
-"score": 88.9,
+"score": 93.3,
 "status": "DIFF"
 },
 "FragmentPacketConcatenater::Copy": {
 "calls": 100,
-"consts": 50,
+"consts": 100,
 "refs": 100,
-"score": 83.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "FragmentPacketConcatenater::Destroy": {
 "calls": 100,
@@ -1177,44 +1177,44 @@
 },
 "FragmentPacketConcatenater::check": {
 "calls": 100,
-"consts": 67,
+"consts": 100,
 "refs": 100,
-"score": 88.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "FragmentPacketConcatenater::~FragmentPacketConcatenater": {
 "calls": 100,
-"consts": 86,
+"consts": 100,
 "refs": 100,
-"score": 95.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "HandleCacheEconomyCheckPostCapacityFail": {
 "calls": 83,
-"consts": 79,
+"consts": 96,
 "refs": 74,
-"score": 78.5,
+"score": 84.3,
 "status": "DIFF"
 },
 "HandleCacheEconomyCheckPostCapacityOk": {
 "calls": 83,
-"consts": 77,
+"consts": 96,
 "refs": 74,
-"score": 78.0,
+"score": 84.2,
 "status": "DIFF"
 },
 "HandleCacheEconomyDeliverPostFail": {
 "calls": 87,
-"consts": 79,
+"consts": 96,
 "refs": 72,
-"score": 79.3,
+"score": 85.1,
 "status": "DIFF"
 },
 "HandleCacheEconomyDeliverPostOk": {
 "calls": 87,
-"consts": 77,
+"consts": 96,
 "refs": 72,
-"score": 78.8,
+"score": 85.0,
 "status": "DIFF"
 },
 "HandleCacheEconomyFail": {
@@ -1240,16 +1240,16 @@
 },
 "HandleCacheEconomyPingFail": {
 "calls": 87,
-"consts": 67,
+"consts": 83,
 "refs": 72,
-"score": 75.2,
+"score": 80.8,
 "status": "DIFF"
 },
 "HandleCacheEconomyPingOk": {
 "calls": 87,
-"consts": 64,
+"consts": 82,
 "refs": 72,
-"score": 74.4,
+"score": 80.3,
 "status": "DIFF"
 },
 "HandleCacheEconomyRemovePawnFail": {
@@ -1268,23 +1268,23 @@
 },
 "HandleCacheEconomyRetrieveCharacterInfoFail": {
 "calls": 83,
-"consts": 79,
+"consts": 96,
 "refs": 74,
-"score": 78.5,
+"score": 84.3,
 "status": "DIFF"
 },
 "HandleCacheEconomyRetrieveCharacterInfoOk": {
 "calls": 87,
-"consts": 77,
+"consts": 96,
 "refs": 72,
-"score": 78.8,
+"score": 85.0,
 "status": "DIFF"
 },
 "HandleCacheGateFragmentRelay": {
 "calls": 91,
-"consts": 78,
+"consts": 93,
 "refs": 100,
-"score": 89.6,
+"score": 94.7,
 "status": "DIFF"
 },
 "HandleCacheGateHello": {
@@ -1296,37 +1296,37 @@
 },
 "HandleCacheGateHelloFail": {
 "calls": 100,
-"consts": 67,
+"consts": 100,
 "refs": 100,
-"score": 88.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "HandleCacheGateHelloOk": {
 "calls": 100,
-"consts": 91,
+"consts": 100,
 "refs": 100,
-"score": 97.0,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "HandleCacheGateRelay": {
 "calls": 88,
-"consts": 71,
+"consts": 91,
 "refs": 100,
-"score": 86.3,
+"score": 92.8,
 "status": "DIFF"
 },
 "HandleCacheGateRelayFail": {
 "calls": 70,
-"consts": 71,
+"consts": 90,
 "refs": 88,
-"score": 76.2,
+"score": 82.7,
 "status": "DIFF"
 },
 "HandleCacheGateRelayInvalid": {
 "calls": 70,
-"consts": 71,
+"consts": 90,
 "refs": 88,
-"score": 76.2,
+"score": 82.7,
 "status": "DIFF"
 },
 "HandleCacheGateTheOtherSideListAck": {
@@ -1359,30 +1359,30 @@
 },
 "HandlePostOfficeManagementLoadRetryReadyPostListReq": {
 "calls": 84,
-"consts": 82,
+"consts": 88,
 "refs": 100,
-"score": 88.9,
+"score": 90.6,
 "status": "DIFF"
 },
 "HandlePostOfficeManagementLoadRetryReadySinglePostReq": {
 "calls": 84,
-"consts": 78,
+"consts": 89,
 "refs": 100,
-"score": 87.4,
+"score": 91.0,
 "status": "DIFF"
 },
 "HandlePostOfficeManagementResetAllPostStatusReq": {
 "calls": 84,
-"consts": 82,
+"consts": 88,
 "refs": 100,
-"score": 88.9,
+"score": 90.6,
 "status": "DIFF"
 },
 "HandlePostOfficeManagementResetPostStatusReq": {
 "calls": 84,
-"consts": 72,
+"consts": 84,
 "refs": 100,
-"score": 85.4,
+"score": 89.3,
 "status": "DIFF"
 },
 "HandlePostOfficeRegisterPostReq": {
@@ -1443,38 +1443,38 @@
 },
 "HeapMemoryManager::Initialize": {
 "calls": 100,
-"consts": 67,
+"consts": 100,
 "refs": 100,
-"score": 88.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "HeapMemoryManager::Realloc": {
 "calls": 50,
-"consts": 0,
+"consts": 100,
 "refs": 100,
-"score": 50.0,
+"score": 83.3,
 "status": "DIFF"
 },
 "HeapMemoryManager::ReallocZero": {
 "calls": 50,
-"consts": 67,
+"consts": 100,
 "refs": 100,
-"score": 72.2,
+"score": 83.3,
 "status": "DIFF"
 },
 "InitSymbol": {
 "calls": 91,
-"consts": 67,
+"consts": 100,
 "refs": 95,
-"score": 84.3,
+"score": 95.4,
 "status": "DIFF"
 },
 "IoWorker::Initialize": {
 "calls": 100,
-"consts": 50,
+"consts": 100,
 "refs": 100,
-"score": 83.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "IoWorker::Name": {
 "calls": 100,
@@ -1485,9 +1485,9 @@
 },
 "IoWorker::run": {
 "calls": 54,
-"consts": 46,
+"consts": 73,
 "refs": 89,
-"score": 63.1,
+"score": 72.2,
 "status": "DIFF"
 },
 "IoWorker::stop": {
@@ -1506,24 +1506,24 @@
 },
 "Log::Add": {
 "calls": 33,
-"consts": 0,
+"consts": 100,
 "refs": 67,
-"score": 33.3,
+"score": 66.7,
 "status": "DIFF"
 },
 "Log::Close": {
 "calls": 100,
-"consts": 0,
+"consts": 100,
 "refs": 100,
-"score": 66.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Log::InitMedia": {
 "calls": 100,
-"consts": 46,
+"consts": 100,
 "refs": 100,
-"score": 82.1,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Log::Name": {
 "calls": 100,
@@ -1534,30 +1534,30 @@
 },
 "Log::Write [?Write@Log@@SAXPEB_WHJ0ZZ]": {
 "calls": 100,
-"consts": 0,
+"consts": 100,
 "refs": 100,
-"score": 66.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Log::Write [?Write@Log@@SAXW4Type@1@PEB_WH1ZZ]": {
 "calls": 100,
-"consts": 57,
+"consts": 67,
 "refs": 100,
-"score": 85.7,
+"score": 88.9,
 "status": "DIFF"
 },
 "Log::WriteV": {
 "calls": 100,
-"consts": 80,
+"consts": 86,
 "refs": 100,
-"score": 93.3,
+"score": 95.2,
 "status": "DIFF"
 },
 "Log::run": {
 "calls": 57,
-"consts": 22,
+"consts": 67,
 "refs": 0,
-"score": 26.5,
+"score": 41.3,
 "status": "DIFF"
 },
 "LogBuffer::Acquire": {
@@ -1604,31 +1604,31 @@
 },
 "LogBufferAllocator::allocate": {
 "calls": 100,
-"consts": 47,
+"consts": 89,
 "refs": 95,
-"score": 80.6,
+"score": 94.5,
 "status": "DIFF"
 },
 "LogBufferAllocator::initAllocator": {
 "calls": 80,
-"consts": 44,
+"consts": 67,
 "refs": 67,
-"score": 63.7,
+"score": 71.1,
 "status": "DIFF"
 },
 "LogBufferPool::allocate": {
 "calls": 100,
-"consts": 67,
+"consts": 86,
 "refs": 67,
-"score": 77.8,
+"score": 84.1,
 "status": "DIFF"
 },
 "LogBufferPool::deallocate": {
 "calls": 100,
-"consts": 29,
+"consts": 100,
 "refs": 100,
-"score": 76.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "LogFile::Flush": {
 "calls": 100,
@@ -1660,65 +1660,65 @@
 },
 "LogFile::MakeFilename": {
 "calls": 100,
-"consts": 57,
+"consts": 100,
 "refs": 100,
-"score": 85.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "LogFile::initialize": {
 "calls": 100,
-"consts": 71,
+"consts": 100,
 "refs": 100,
-"score": 90.5,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "LogFile::makeDirectory": {
 "calls": 70,
-"consts": 73,
+"consts": 89,
 "refs": 100,
-"score": 80.9,
+"score": 86.3,
 "status": "DIFF"
 },
 "LogFile::write": {
 "calls": 100,
-"consts": 0,
+"consts": 100,
 "refs": 100,
-"score": 66.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "LogFile::writeFile": {
 "calls": 75,
-"consts": 80,
-"refs": 100,
-"score": 85.0,
-"status": "DIFF"
-},
-"LogFile::writeToBuffer [?writeToBuffer@LogFile@@AEAAXPEB_WH0H0H0H0H@Z]": {
-"calls": 100,
-"consts": 33,
-"refs": 100,
-"score": 77.8,
-"status": "DIFF"
-},
-"LogFile::writeToBuffer [?writeToBuffer@LogFile@@AEAAXW4Type@Log@@U_SYSTEMTIME@@PEB_WH2@Z]": {
-"calls": 100,
-"consts": 83,
-"refs": 100,
-"score": 94.4,
-"status": "DIFF"
-},
-"LogFile::~LogFile": {
-"calls": 100,
-"consts": 75,
+"consts": 100,
 "refs": 100,
 "score": 91.7,
 "status": "DIFF"
 },
+"LogFile::writeToBuffer [?writeToBuffer@LogFile@@AEAAXPEB_WH0H0H0H0H@Z]": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LogFile::writeToBuffer [?writeToBuffer@LogFile@@AEAAXW4Type@Log@@U_SYSTEMTIME@@PEB_WH2@Z]": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LogFile::~LogFile": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "LogMedia::Write": {
 "calls": 55,
-"consts": 31,
+"consts": 57,
 "refs": 29,
-"score": 38.0,
+"score": 46.8,
 "status": "DIFF"
 },
 "ManagementSessionHandler::OnAccept": {
@@ -1751,86 +1751,86 @@
 },
 "Network::Clear": {
 "calls": 79,
-"consts": 28,
+"consts": 67,
 "refs": 69,
-"score": 58.5,
+"score": 71.5,
 "status": "DIFF"
 },
 "Network::ClosePort": {
 "calls": 100,
-"consts": 67,
+"consts": 100,
 "refs": 100,
-"score": 88.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Network::GetAddressStringW": {
 "calls": 100,
-"consts": 44,
+"consts": 50,
 "refs": 100,
-"score": 81.5,
+"score": 83.3,
 "status": "DIFF"
 },
 "Network::Initialize": {
 "calls": 91,
-"consts": 62,
+"consts": 83,
 "refs": 94,
-"score": 82.4,
+"score": 89.3,
 "status": "DIFF"
 },
 "Network::Network": {
 "calls": 100,
-"consts": 67,
+"consts": 86,
 "refs": 86,
-"score": 84.1,
+"score": 90.5,
 "status": "DIFF"
 },
 "Network::OpenPort [?OpenPort@Network@@SA_NI@Z]": {
 "calls": 100,
-"consts": 60,
+"consts": 100,
 "refs": 100,
-"score": 86.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Network::OpenPort [?OpenPort@Network@@SA_NIGHPEBVSessionHandler@@PEBVPacketBufferHandler@@I_N22@Z]": {
 "calls": 78,
-"consts": 44,
+"consts": 71,
 "refs": 74,
-"score": 65.4,
+"score": 74.1,
 "status": "DIFF"
 },
 "Network::ReconnectSession": {
 "calls": 100,
-"consts": 67,
+"consts": 100,
 "refs": 100,
-"score": 88.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Network::StopPort": {
 "calls": 100,
-"consts": 67,
+"consts": 100,
 "refs": 100,
-"score": 88.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Network::initInstance": {
 "calls": 91,
-"consts": 62,
+"consts": 83,
 "refs": 89,
-"score": 80.8,
+"score": 87.7,
 "status": "DIFF"
 },
 "Network::initWorkerThread": {
 "calls": 60,
-"consts": 40,
+"consts": 55,
 "refs": 38,
-"score": 45.8,
+"score": 50.7,
 "status": "DIFF"
 },
 "Network::initializeSocketInterface": {
 "calls": 88,
-"consts": 91,
+"consts": 100,
 "refs": 100,
-"score": 92.9,
+"score": 96.0,
 "status": "DIFF"
 },
 "Packet::Add": {
@@ -1842,10 +1842,10 @@
 },
 "Packet::AddSize": {
 "calls": 100,
-"consts": 80,
+"consts": 100,
 "refs": 100,
-"score": 93.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Packet::Allocate [?Allocate@Packet@@QEAAPEBDPEAVPacketComposer@@@Z]": {
 "calls": 100,
@@ -1856,31 +1856,31 @@
 },
 "Packet::Allocate [?Allocate@Packet@@QEAAPEBDXZ]": {
 "calls": 100,
-"consts": 50,
-"refs": 100,
-"score": 83.3,
-"status": "DIFF"
-},
-"Packet::Clear": {
-"calls": 60,
-"consts": 57,
-"refs": 67,
-"score": 61.3,
-"status": "DIFF"
-},
-"Packet::Compose": {
-"calls": 100,
-"consts": 75,
-"refs": 100,
-"score": 91.7,
-"status": "DIFF"
-},
-"Packet::ComposeText": {
-"calls": 100,
 "consts": 67,
 "refs": 100,
 "score": 88.9,
 "status": "DIFF"
+},
+"Packet::Clear": {
+"calls": 60,
+"consts": 100,
+"refs": 67,
+"score": 75.6,
+"status": "DIFF"
+},
+"Packet::Compose": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Packet::ComposeText": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Packet::ComposeV": {
 "calls": 100,
@@ -1898,10 +1898,10 @@
 },
 "Packet::DecomposeText": {
 "calls": 100,
-"consts": 67,
+"consts": 100,
 "refs": 100,
-"score": 88.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Packet::~Packet": {
 "calls": 100,
@@ -1912,9 +1912,9 @@
 },
 "PacketBuffer::CheckCompose": {
 "calls": 100,
-"consts": 89,
-"refs": 97,
-"score": 95.4,
+"consts": 96,
+"refs": 100,
+"score": 98.7,
 "status": "DIFF"
 },
 "PacketBuffer::Compose": {
@@ -1926,23 +1926,23 @@
 },
 "PacketBuffer::ComposeText": {
 "calls": 100,
-"consts": 94,
+"consts": 100,
 "refs": 100,
-"score": 98.0,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "PacketBuffer::Decompose": {
 "calls": 100,
-"consts": 88,
-"refs": 97,
-"score": 95.3,
+"consts": 93,
+"refs": 100,
+"score": 97.6,
 "status": "DIFF"
 },
 "PacketBuffer::DecomposeText": {
 "calls": 93,
-"consts": 89,
-"refs": 78,
-"score": 86.9,
+"consts": 90,
+"refs": 82,
+"score": 88.7,
 "status": "DIFF"
 },
 "PacketBuffer::deallocate_me": {
@@ -2052,9 +2052,9 @@
 },
 "PacketFormatIterator::SetFormat": {
 "calls": 100,
-"consts": 67,
+"consts": 100,
 "refs": 50,
-"score": 72.2,
+"score": 83.3,
 "status": "DIFF"
 },
 "PacketFormatIterator::skipRepeatFormat": {
@@ -2066,17 +2066,17 @@
 },
 "PagePoolMemoryManager::Alloc": {
 "calls": 100,
-"consts": 86,
+"consts": 100,
 "refs": 100,
-"score": 95.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "PagePoolMemoryManager::Initialize": {
 "calls": 100,
-"consts": 62,
+"consts": 100,
 "refs": 100,
-"score": 87.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "PagePoolMemoryManager::~PagePoolMemoryManager": {
 "calls": 100,
@@ -2087,24 +2087,24 @@
 },
 "PingGenerator::HandleEvent": {
 "calls": 100,
-"consts": 93,
+"consts": 100,
 "refs": 100,
-"score": 97.8,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "PingGenerator::sendPing": {
 "calls": 100,
-"consts": 74,
+"consts": 93,
 "refs": 90,
-"score": 88.1,
+"score": 94.6,
 "status": "DIFF"
 },
 "PingRelayContext::ComposeRequestPacket": {
 "calls": 100,
-"consts": 86,
+"consts": 100,
 "refs": 100,
-"score": 95.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "PingRelayContext::MakeRelayHeader": {
 "calls": 100,
@@ -2115,23 +2115,23 @@
 },
 "PingRelayContext::initResponse": {
 "calls": 100,
-"consts": 50,
+"consts": 100,
 "refs": 100,
-"score": 83.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "PingRelayContext::processRelayRequest": {
 "calls": 100,
-"consts": 75,
+"consts": 100,
 "refs": 100,
-"score": 91.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "PingRelayContext::processRelayResponse": {
 "calls": 96,
-"consts": 72,
+"consts": 100,
 "refs": 96,
-"score": 88.2,
+"score": 97.6,
 "status": "DIFF"
 },
 "PingRelayContext::processRelayTimeout": {
@@ -2220,9 +2220,9 @@
 },
 "PipeConsole::checkFrozenThread": {
 "calls": 76,
-"consts": 80,
+"consts": 92,
 "refs": 100,
-"score": 85.3,
+"score": 89.4,
 "status": "DIFF"
 },
 "PipeConsole::cleanup": {
@@ -2374,10 +2374,10 @@
 },
 "PortListener::HandleEvent": {
 "calls": 100,
-"consts": 67,
+"consts": 100,
 "refs": 100,
-"score": 88.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "PortListener::HandleFailedEvent": {
 "calls": 100,
@@ -2388,24 +2388,24 @@
 },
 "PortListener::Initialize": {
 "calls": 89,
-"consts": 68,
+"consts": 93,
 "refs": 97,
-"score": 84.9,
+"score": 93.0,
 "status": "DIFF"
 },
 "PortListener::accept": {
 "calls": 100,
-"consts": 82,
+"consts": 100,
 "refs": 100,
-"score": 94.1,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "PortListener::asyncAccept": {
 "calls": 100,
-"consts": 80,
+"consts": 100,
 "refs": 100,
-"score": 93.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "PostContext::ComposeDeliveryPacket": {
 "calls": 100,
@@ -2521,30 +2521,30 @@
 },
 "PostOfficeDB::LoadPostList": {
 "calls": 53,
-"consts": 54,
+"consts": 55,
 "refs": 72,
-"score": 59.6,
+"score": 60.1,
 "status": "DIFF"
 },
 "PostOfficeDB::LoadRetryReadyPostList": {
 "calls": 52,
-"consts": 56,
+"consts": 58,
 "refs": 71,
-"score": 59.8,
+"score": 60.3,
 "status": "DIFF"
 },
 "PostOfficeDB::LoadRetryReadySinglePost": {
 "calls": 59,
-"consts": 63,
+"consts": 65,
 "refs": 91,
-"score": 71.0,
+"score": 71.5,
 "status": "DIFF"
 },
 "PostOfficeDB::LoadSinglePost": {
 "calls": 56,
-"consts": 58,
+"consts": 60,
 "refs": 90,
-"score": 68.4,
+"score": 68.9,
 "status": "DIFF"
 },
 "PostOfficeDB::RegisterPost": {
@@ -2675,9 +2675,9 @@
 },
 "PostOfficeDaemon::initialize": {
 "calls": 48,
-"consts": 75,
+"consts": 78,
 "refs": 77,
-"score": 66.7,
+"score": 67.8,
 "status": "DIFF"
 },
 "PostOfficeDaemon::loadAllUnsentPostFromDB": {
@@ -2738,16 +2738,16 @@
 },
 "Prng::Initialize": {
 "calls": 100,
-"consts": 50,
+"consts": 67,
 "refs": 100,
-"score": 83.3,
+"score": 88.9,
 "status": "DIFF"
 },
 "Prng::setSeed": {
 "calls": 67,
-"consts": 44,
+"consts": 57,
 "refs": 100,
-"score": 70.4,
+"score": 74.6,
 "status": "DIFF"
 },
 "ReconnectTimer::HandleEvent": {
@@ -2773,16 +2773,16 @@
 },
 "RefCntObject::DumpRefCntHistory": {
 "calls": 100,
-"consts": 0,
+"consts": 100,
 "refs": 100,
-"score": 66.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "RefCntObject::addReferenceCount": {
 "calls": 67,
-"consts": 50,
+"consts": 100,
 "refs": 50,
-"score": 55.6,
+"score": 72.2,
 "status": "DIFF"
 },
 "RefCntObject::deallocate_object": {
@@ -2794,16 +2794,16 @@
 },
 "RefCntObject::removeReferenceCount": {
 "calls": 50,
-"consts": 67,
+"consts": 100,
 "refs": 50,
-"score": 55.6,
+"score": 66.7,
 "status": "DIFF"
 },
 "RefCntObject::~RefCntObject": {
 "calls": 100,
-"consts": 80,
+"consts": 100,
 "refs": 40,
-"score": 73.3,
+"score": 80.0,
 "status": "DIFF"
 },
 "RelayContext::ProcessRelayRequest": {
@@ -2864,23 +2864,23 @@
 },
 "RelayTimeContextManager::AddContext": {
 "calls": 79,
-"consts": 74,
+"consts": 100,
 "refs": 100,
-"score": 84.1,
+"score": 92.9,
 "status": "DIFF"
 },
 "RelayTimeContextManager::RemoveContext": {
 "calls": 69,
-"consts": 50,
+"consts": 100,
 "refs": 100,
-"score": 73.1,
+"score": 89.7,
 "status": "DIFF"
 },
 "RelayTimeContextManager::initContextManager": {
 "calls": 67,
-"consts": 33,
+"consts": 44,
 "refs": 73,
-"score": 57.6,
+"score": 61.3,
 "status": "DIFF"
 },
 "RelayTimeoutChecker::HandleEvent": {
@@ -3025,10 +3025,10 @@
 },
 "Ripemd160::Digest": {
 "calls": 100,
-"consts": 76,
+"consts": 100,
 "refs": 100,
-"score": 92.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Session::Accept": {
 "calls": 100,
@@ -3277,16 +3277,16 @@
 },
 "StaticPageMemoryManager::Free": {
 "calls": 100,
-"consts": 0,
+"consts": 100,
 "refs": 100,
-"score": 66.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "StaticPageMemoryManager::Initialize [?Initialize@StaticPageMemoryManager@@QEAA_NPEAX_K1PEBVMemoryManager@@@Z]": {
 "calls": 100,
-"consts": 86,
+"consts": 100,
 "refs": 89,
-"score": 91.5,
+"score": 96.3,
 "status": "DIFF"
 },
 "StaticPageMemoryManager::Initialize [?Initialize@StaticPageMemoryManager@@UEAA_NPEBX_K@Z]": {
@@ -3312,10 +3312,10 @@
 },
 "StaticPageMemoryManager::allocate": {
 "calls": 100,
-"consts": 73,
+"consts": 100,
 "refs": 100,
-"score": 90.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "StaticPageMemoryManager::~StaticPageMemoryManager": {
 "calls": 100,
@@ -3347,16 +3347,16 @@
 },
 "SystemEvent::~SystemEvent": {
 "calls": 100,
-"consts": 0,
+"consts": 100,
 "refs": 100,
-"score": 66.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "TFPP_PumpPacket": {
 "calls": 100,
-"consts": 50,
+"consts": 67,
 "refs": 50,
-"score": 66.7,
+"score": 72.2,
 "status": "DIFF"
 },
 "TextConsole::Close": {
@@ -3459,9 +3459,9 @@
 },
 "TextStreamPacketBufferHandler::ToBuffer": {
 "calls": 100,
-"consts": 91,
+"consts": 89,
 "refs": 100,
-"score": 97.0,
+"score": 96.3,
 "status": "DIFF"
 },
 "TextStreamPacketBufferHandler::ToPacket": {
@@ -3508,16 +3508,16 @@
 },
 "ThreadFreeFragmentPacketPump::Initialize": {
 "calls": 100,
-"consts": 33,
+"consts": 100,
 "refs": 50,
-"score": 61.1,
+"score": 83.3,
 "status": "DIFF"
 },
 "ThreadFreeFragmentPacketPump::~ThreadFreeFragmentPacketPump": {
 "calls": 100,
-"consts": 75,
+"consts": 100,
 "refs": 36,
-"score": 70.5,
+"score": 78.8,
 "status": "DIFF"
 },
 "ThreadFreePacketPump::HandleEvent": {
@@ -3529,16 +3529,16 @@
 },
 "ThreadFreePacketPump::Initialize": {
 "calls": 100,
-"consts": 33,
+"consts": 100,
 "refs": 50,
-"score": 61.1,
+"score": 83.3,
 "status": "DIFF"
 },
 "ThreadFreePacketPump::~ThreadFreePacketPump": {
 "calls": 100,
-"consts": 75,
+"consts": 100,
 "refs": 36,
-"score": 70.5,
+"score": 78.8,
 "status": "DIFF"
 },
 "ThreadFreePacketPumpEvent::EventId": {
@@ -3550,16 +3550,16 @@
 },
 "ThreadFreePacketPumpEvent::initialize": {
 "calls": 100,
-"consts": 40,
+"consts": 100,
 "refs": 40,
-"score": 60.0,
+"score": 80.0,
 "status": "DIFF"
 },
 "ThreadFreePacketPumpEvent::~ThreadFreePacketPumpEvent": {
 "calls": 100,
-"consts": 80,
+"consts": 100,
 "refs": 0,
-"score": 60.0,
+"score": 66.7,
 "status": "DIFF"
 },
 "ThreadManager::StartThread": {
@@ -3690,72 +3690,72 @@
 },
 "UnsentPostChecker::HandleEvent": {
 "calls": 100,
-"consts": 93,
+"consts": 100,
 "refs": 100,
-"score": 97.8,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "UnsentPostContextList::popUnsentPostContext": {
 "calls": 100,
-"consts": 67,
+"consts": 100,
 "refs": 100,
-"score": 88.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "UnsentPostContextList::pushUnsentPostContext": {
 "calls": 100,
-"consts": 50,
+"consts": 100,
 "refs": 100,
-"score": 83.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "UnsentPostContextManager::CheckUnsentPost": {
 "calls": 100,
-"consts": 69,
+"consts": 100,
 "refs": 100,
-"score": 89.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "UnsentPostContextManager::RegisterUnsentPost": {
 "calls": 100,
-"consts": 73,
+"consts": 100,
 "refs": 100,
-"score": 90.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "UnsentPostContextManager::addUnsentPostContextList": {
 "calls": 100,
-"consts": 73,
+"consts": 94,
 "refs": 100,
-"score": 90.9,
+"score": 98.0,
 "status": "DIFF"
 },
 "UnsentPostContextManager::deliverUnsentPost": {
 "calls": 92,
-"consts": 74,
+"consts": 100,
 "refs": 100,
-"score": 88.7,
+"score": 97.4,
 "status": "DIFF"
 },
 "UnsentPostContextManager::getUnsentPostContextList": {
 "calls": 100,
-"consts": 80,
+"consts": 100,
 "refs": 100,
-"score": 93.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "UnsentPostContextManager::initContextManager": {
 "calls": 90,
-"consts": 53,
+"consts": 100,
 "refs": 88,
-"score": 77.0,
+"score": 92.7,
 "status": "DIFF"
 },
 "UnsentPostContextManager::updateWorldList": {
 "calls": 88,
-"consts": 56,
+"consts": 100,
 "refs": 87,
-"score": 77.1,
+"score": 91.7,
 "status": "DIFF"
 },
 "WinMsgHandler::Name": {
@@ -3984,94 +3984,94 @@
 },
 "WorldConfigList::~WorldConfigList": {
 "calls": 50,
-"consts": 38,
+"consts": 100,
 "refs": 67,
-"score": 51.4,
+"score": 72.2,
 "status": "DIFF"
 },
 "WorldConfigManager::CheckWorldConfig": {
 "calls": 100,
-"consts": 57,
+"consts": 100,
 "refs": 100,
-"score": 85.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "WorldConfigManager::addWorldConfig": {
 "calls": 100,
-"consts": 75,
+"consts": 100,
 "refs": 100,
-"score": 91.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "WorldConfigManager::createWorldConfigFile": {
 "calls": 100,
-"consts": 80,
+"consts": 100,
 "refs": 100,
-"score": 93.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "WorldConfigManager::getWorldConfig": {
 "calls": 100,
-"consts": 80,
+"consts": 100,
 "refs": 100,
-"score": 93.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "WorldConfigManager::initConfigManager": {
 "calls": 100,
-"consts": 67,
+"consts": 100,
 "refs": 100,
-"score": 88.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "WorldConfigManager::loadWorldConfigFile": {
 "calls": 90,
-"consts": 67,
+"consts": 100,
 "refs": 100,
-"score": 85.7,
+"score": 96.8,
 "status": "DIFF"
 },
 "WorldConfigManager::setWorldConfigFilePath": {
 "calls": 100,
-"consts": 86,
+"consts": 100,
 "refs": 100,
-"score": 95.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "WorldConfigManager::setupWorldConfigList": {
 "calls": 94,
-"consts": 74,
+"consts": 100,
 "refs": 96,
-"score": 88.1,
+"score": 96.7,
 "status": "DIFF"
 },
 "WorldConfigManager::updateWorldConfig": {
 "calls": 100,
-"consts": 73,
+"consts": 100,
 "refs": 100,
-"score": 90.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "WorldConfigManager::updateWorldList": {
 "calls": 69,
-"consts": 46,
+"consts": 78,
 "refs": 89,
-"score": 68.1,
+"score": 78.8,
 "status": "DIFF"
 },
 "WorldConfigManager::writeConfigString": {
 "calls": 100,
-"consts": 87,
+"consts": 100,
 "refs": 100,
-"score": 95.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "WorldConfigManager::writeSampleConfigFormat": {
 "calls": 100,
-"consts": 80,
+"consts": 100,
 "refs": 100,
-"score": 93.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "WorldSessionHandler::OnAccept": {
 "calls": 100,
@@ -4432,30 +4432,30 @@
 },
 "aes128TableDecrypt": {
 "calls": 100,
-"consts": 55,
+"consts": 60,
 "refs": 50,
-"score": 68.2,
+"score": 70.0,
 "status": "DIFF"
 },
 "aes128TableEncrypt": {
 "calls": 100,
-"consts": 55,
+"consts": 60,
 "refs": 50,
-"score": 68.2,
+"score": 70.0,
 "status": "DIFF"
 },
 "aes128TableSetupDecKey": {
 "calls": 100,
-"consts": 60,
+"consts": 75,
 "refs": 100,
-"score": 86.7,
+"score": 91.7,
 "status": "DIFF"
 },
 "aes128TableSetupEncKey": {
 "calls": 100,
-"consts": 60,
+"consts": 67,
 "refs": 100,
-"score": 86.7,
+"score": 88.9,
 "status": "DIFF"
 },
 "atexit": {
@@ -4495,16 +4495,16 @@
 },
 "makeConsole": {
 "calls": 25,
-"consts": 38,
+"consts": 55,
 "refs": 50,
-"score": 37.5,
+"score": 43.2,
 "status": "DIFF"
 },
 "makeDirectory": {
 "calls": 67,
-"consts": 75,
+"consts": 100,
 "refs": 100,
-"score": 80.6,
+"score": 88.9,
 "status": "DIFF"
 },
 "operator delete": {
