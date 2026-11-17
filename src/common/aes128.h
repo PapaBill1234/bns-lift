@@ -7,7 +7,8 @@
 class Aes128 : public Crypto
 {
 public:
-    // ❓ The struct name and the member names are not in the PDB.
+    // PDB public symbol ?_Delegator@Aes128@@0UDelegator@1@A gives the struct name.
+    // ❓ The member names are not in the PDB. The PDB has no field list for this struct.
     struct Delegator
     {
         bool (*setup)(Aes128* aes, unsigned char const* key, int keySize, int round);
