@@ -45,7 +45,7 @@ public:
         _maxFrozenSeconds = 60;
         memset(_table, 0, sizeof(_table));
     }
-    virtual ~IdleWatcher();           // ❓ vftable 0x845C8
+    virtual ~IdleWatcher();           // slot 0 0x30B50 (vftable 0x845C8)
     virtual wchar_t const* Name();    // 0x24CC0
     virtual void run();               // 0x24FF0
 

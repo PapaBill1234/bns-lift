@@ -5,6 +5,11 @@
 #include <stdio.h>
 #include <wchar.h>
 #include <new>
+#include <locale.h>
+#include <stdarg.h>
+
+// msvcr100 export. The Wine msvcrt headers do not declare it.
+extern "C" int __cdecl _vswprintf_c_l(wchar_t* buffer, size_t count, wchar_t const* format, _locale_t locale, va_list args);
 #include "Db.h"
 #include "AlertSender.h"
 #include "CrashHandler.h"
@@ -169,7 +174,7 @@ void Db::Log(short type, void* handle, wchar_t const* fmt, va_list args)
     SQLINTEGER nativeError;
     SQLSMALLINT errMsgLen;
 
-    if (fmt != nullptr && _vsnwprintf(msg, 512, fmt, args) <= 0)  // ❓ original: _vswprintf_c_l(..., nullptr, args)
+    if (fmt != nullptr && _vswprintf_c_l(msg, 512, fmt, nullptr, args) <= 0)  // SmartCouponDaemon 0x20B41 (import _vswprintf_c_l)
         msg[0] = 0;
     // BUG: 0x20B00 msg is not set when fmt is null.
     SQLSMALLINT record = 1;

@@ -15,7 +15,8 @@ static wchar_t const IDLEWATCHER_FILE[] = L"source\\IdleWatcher.cpp";
 // 0x6D55C
 unsigned char const IdleStateTable::STATE_MASK[4] = {0xC0, 0x30, 0x0C, 0x03};
 
-// ❓ vftable 0x845C8. The PDB has no symbol for this destructor.
+// 0x30B50. PDB: IdleWatcher::`scalar deleting destructor' (vftable 0x845C8 slot 0).
+// The code is folded with Thread's. It only sets the vftable. It does not free memory.
 IdleWatcher::~IdleWatcher() {}
 
 // 0x24CC0
@@ -110,8 +111,7 @@ void IdleStateTable::scan()
 void IdleWatcher::run()
 {
     LogBufferAllocator::Initialize();
-    // ❓ The binary passes an extra argument -2. The format has no conversion for it.
-    Log::Write(Log::LT_DEBUG, IDLEWATCHER_FILE, 226, L"[idlewatcher], idle watcher start", -2);
+    Log::Write(Log::LT_DEBUG, IDLEWATCHER_FILE, 226, L"[idlewatcher], idle watcher start");  // 0x25038, 4 arguments
     HANDLE event = CreateEventW(nullptr, FALSE, FALSE, nullptr);
     while (_run)
     {
