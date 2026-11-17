@@ -15,7 +15,13 @@
 
 namespace
 {
-wchar_t const* const FILE_NAME = L"..\\..\\Shared\\BnsCommonConfigDefinition.cpp";  // LIFT: No PDB symbol. The binary uses the literal.
+// LIFT: The original builds this file in each exe project. The path in the literal is relative to the
+// project directory: CacheGate and PostOfficeDaemon use ..\..\Shared, LobbyGate and SmartCouponDaemon use
+// ..\Shared (BnsCommonConfigDefinitionShortPath.cpp sets the macro).
+#ifndef BNS_COMMON_CONFIG_FILE_NAME
+#define BNS_COMMON_CONFIG_FILE_NAME L"..\\..\\Shared\\BnsCommonConfigDefinition.cpp"
+#endif
+wchar_t const* const FILE_NAME = BNS_COMMON_CONFIG_FILE_NAME;  // LIFT: No PDB symbol. The binary uses the literal.
 wchar_t const* const CONFIG_FILENAME = L"bns.common.config.xml";    // 0x59278
 wchar_t const* const CONFIG_MODULENAME = L"bns-common-config";  // 0x59370
 }
@@ -118,13 +124,17 @@ bool BnsCommonConfig::LoadBnsCommonConfig()
     if (Config == nullptr)
         return false;
 
+    // LIFT: one error tail (errorLine, errorText). The original merges the three error exits at one
+    // `Config = nullptr; Log::Write` (CacheGate 0x13e0, r8d/r9 set before the jump).
+    int errorLine;
+    wchar_t const* errorText;
     ConfigNoReload = BnsCommonConfigLoad::Load();
     if (ConfigNoReload == nullptr)
     {
         Memory::_Manager[2]->Free(Config, FILE_NAME, 197);
-        Config = nullptr;
-        Log::Write(Log::LT_ERROR, FILE_NAME, 199, L"[BnsCommonConfig::LoadBnsCommonConfig], config file load failed");
-        return false;
+        errorText = L"[BnsCommonConfig::LoadBnsCommonConfig], config file load failed";
+        errorLine = 199;
+        goto failed;
     }
 
     if (!CheckMinMaxBoundary(ConfigNoReload, _Def, BnsCommonConfigLoad::_Def, 5))
@@ -132,9 +142,9 @@ bool BnsCommonConfig::LoadBnsCommonConfig()
         DaemonConfig::FreeConfig(ConfigNoReload);
         ConfigNoReload = nullptr;
         Memory::_Manager[2]->Free(Config, FILE_NAME, 207);
-        Config = nullptr;
-        Log::Write(Log::LT_ERROR, FILE_NAME, 209, L"[BnsCommonConfig::LoadBnsCommonConfig], boundary check failed");
-        return false;
+        errorText = L"[BnsCommonConfig::LoadBnsCommonConfig], boundary check failed";
+        errorLine = 209;
+        goto failed;
     }
 
     if (!Config->UpdateAllVariable(ConfigNoReload))
@@ -142,12 +152,17 @@ bool BnsCommonConfig::LoadBnsCommonConfig()
         DaemonConfig::FreeConfig(ConfigNoReload);
         ConfigNoReload = nullptr;
         Memory::_Manager[2]->Free(Config, FILE_NAME, 217);
-        Config = nullptr;
-        Log::Write(Log::LT_ERROR, FILE_NAME, 219, L"[BnsCommonConfig::LoadBnsCommonConfig], variable update failed");
-        return false;
+        errorText = L"[BnsCommonConfig::LoadBnsCommonConfig], variable update failed";
+        errorLine = 219;
+        goto failed;
     }
 
     return true;
+
+failed:
+    Config = nullptr;
+    Log::Write(Log::LT_ERROR, FILE_NAME, errorLine, errorText);
+    return false;
 }
 
 // 0x1600
@@ -179,14 +194,14 @@ bool BnsCommonConfig::ReloadBnsCommonConfig(bool& changed)
     }
 
     void* memory = Memory::_Manager[2]->Alloc(sizeof(BnsCommonConfig), FILE_NAME, 252);
-    if (memory == nullptr)
+    BnsCommonConfig* newConfig = memory != nullptr ? new (memory) BnsCommonConfig() : nullptr;
+    if (newConfig == nullptr)
     {
         DaemonConfig::FreeConfig(reload);
         Log::Write(Log::LT_ERROR, FILE_NAME, 256,
                    L"[BnsCommonConfig::ReloadBnsCommonConfig], new config make failed");
         return false;
     }
-    BnsCommonConfig* newConfig = new (memory) BnsCommonConfig();
 
     if (!newConfig->Copy(Config))
     {
@@ -227,9 +242,12 @@ void BnsCommonConfig::Dump()
 
     Log::Write(Log::LT_NOTICE, FILE_NAME, 317, L"[%s], %s : %u", CONFIG_MODULENAME, L"version", 2u);
     char const* base = reinterpret_cast<char const*>(config);
-    for (int i = 0; i < 5; ++i)
+    // LIFT: count down with a pointer step. The original loop has a counter 5 (CacheGate 0x1880).
+    // An index loop ends on the address of the next array (_DefReload).
+    XmlCfgDefLocal const* defPtr = _Def;
+    for (int i = 5; i != 0; --i, ++defPtr)
     {
-        XmlCfgDefLocal const& def = _Def[i];
+        XmlCfgDefLocal const& def = *defPtr;
         void const* field = base + def.offset;
         switch (def.type)
         {
@@ -275,10 +293,11 @@ bool BnsCommonConfig::CheckMinMaxBoundary(void const* const loaded, XmlCfgDefLoc
 
     bool result = true;
     char const* base = static_cast<char const*>(loaded);
-    for (int i = 0; i < defCount; ++i)
+    // LIFT: pointer steps. The original adds 0x28 to loadDefList each turn (CacheGate 0x1a40).
+    for (int i = defCount; i > 0; --i, ++defList, ++loadDefList)
     {
-        XmlCfgDefLocal const& def = defList[i];
-        void const* field = base + loadDefList[i].offset;
+        XmlCfgDefLocal const& def = *defList;
+        void const* field = base + loadDefList->offset;
         switch (def.type)
         {
         case XmlCfgDef::CFG_INT:
@@ -350,10 +369,13 @@ bool BnsCommonConfig::UpdateAllVariable(BnsCommonConfigLoad const* const load)
 
     char* dst = reinterpret_cast<char*>(this);
     char const* src = reinterpret_cast<char const*>(load);
-    for (int i = 0; i < 5; ++i)
+    // LIFT: count down with pointer steps, as the original (CacheGate 0x1c10, counter 5).
+    XmlCfgDef const* loadDefPtr = BnsCommonConfigLoad::_Def;
+    XmlCfgDefLocal const* defPtr = _Def;
+    for (int i = 5; i != 0; --i, ++defPtr, ++loadDefPtr)
     {
-        XmlCfgDefLocal const& def = _Def[i];
-        XmlCfgDef const& loadDef = BnsCommonConfigLoad::_Def[i];
+        XmlCfgDefLocal const& def = *defPtr;
+        XmlCfgDef const& loadDef = *loadDefPtr;
         switch (def.type)
         {
         case XmlCfgDef::CFG_INT:
@@ -410,10 +432,13 @@ bool BnsCommonConfig::UpdateReloadedVariable(BnsCommonConfigReload const* const 
 
     char* dst = reinterpret_cast<char*>(this);
     char const* src = reinterpret_cast<char const*>(reload);
-    for (int i = 0; i < 2; ++i)
+    // LIFT: count down with pointer steps, as the original (CacheGate 0x1e30, counter 2).
+    XmlCfgDef const* reloadDefPtr = BnsCommonConfigReload::_Def;
+    XmlCfgDefLocal const* defPtr = _DefReload;
+    for (int i = 2; i != 0; --i, ++defPtr, ++reloadDefPtr)
     {
-        XmlCfgDefLocal const& def = _DefReload[i];
-        XmlCfgDef const& reloadDef = BnsCommonConfigReload::_Def[i];
+        XmlCfgDefLocal const& def = *defPtr;
+        XmlCfgDef const& reloadDef = *reloadDefPtr;
         switch (def.type)
         {
         case XmlCfgDef::CFG_INT:

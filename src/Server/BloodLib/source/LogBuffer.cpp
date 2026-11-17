@@ -69,7 +69,7 @@ bool LogBuffer::GetLog(wchar_t* buffer, unsigned long long size) const
     return swprintf(buffer, size, L"%04d/%02d/%02d-%02d:%02d:%02d.%03d%s%s",
                     logtime.wYear, logtime.wMonth, logtime.wDay,
                     logtime.wHour, logtime.wMinute, logtime.wSecond,
-                    logtime.wMilliseconds, L",", _log) > 0;
+                    logtime.wMilliseconds, L",", _log != nullptr ? _log : L"") > 0;  // 0x132b0 (CacheGate): ref L"" and this != -0x6E
 }
 
 // 0x20200 (SmartCouponDaemon)
@@ -154,9 +154,10 @@ void LogBufferAllocator::initAllocator()
         while (size < sizeof(LogBuffer))
             size *= 2;
         void* memory = BASE_MEMORY_MANAGER.Alloc(sizeof(PagePoolMemoryManager), LOGBUFFER_FILE, 261);
-        _Allocator = memory != nullptr ? new (memory) PagePoolMemoryManager(SysInfo::MemnoryAllocationGranularity()) : nullptr;
+        PagePoolMemoryManager* allocator = memory != nullptr ? new (memory) PagePoolMemoryManager(SysInfo::MemnoryAllocationGranularity()) : nullptr;
+        _Allocator = allocator;
         // BUG: 0x20440 (SmartCouponDaemon) no null check of _Allocator before Initialize.
-        _Allocator->Initialize(size);
+        allocator->Initialize(size);
     }
     _Lock.Leave();
 }

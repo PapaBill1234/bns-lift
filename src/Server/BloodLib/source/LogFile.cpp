@@ -175,27 +175,29 @@ void LogFile::makeDirectory(wchar_t* directory)
     wchar_t parentPath[MAX_PATH];
     _wsplitpath_s(directory, drive, 3, dir, MAX_PATH, fileName, MAX_PATH, ext, MAX_PATH);
 
-    if (wcslen(drive) == 0)
+    // The drive branch is first: the original lays out GetCurrentDirectoryW last (CacheGate 0x11340).
+    if (wcslen(drive) != 0)
+    {
+        int dirlen = static_cast<int>(wcslen(dir));
+        if (dirlen > 1)
+        {
+            dir[dirlen - 1] = 0;
+            swprintf(parentPath, MAX_PATH, L"%s%s", drive, dir);
+            makeDirectory(parentPath);
+            if (!CreateDirectoryW(parentPath, nullptr) && GetLastError() != ERROR_ALREADY_EXISTS)
+            {
+                Log::Write(Log::LT_ERROR, LOGFILE_FILE, 229, L"== CRASH == ASSERT CRASH");
+                AlertSender::Write(LOGFILE_FILE, 229, L"== CRASH == ASSERT CRASH");
+                CrashHandler::MakeCrash("source\\LogFile.cpp", 229, L"");
+            }
+        }
+    }
+    else
     {
         GetCurrentDirectoryW(MAX_PATH, parentPath);
         wcsncat(parentPath, L"\\", MAX_PATH - wcslen(parentPath));
         wcsncat(parentPath, directory, MAX_PATH - wcslen(parentPath));
         makeDirectory(parentPath);
-        return;
-    }
-
-    int dirlen = static_cast<int>(wcslen(dir));
-    if (dirlen > 1)
-    {
-        dir[dirlen - 1] = 0;
-        swprintf(parentPath, MAX_PATH, L"%s%s", drive, dir);
-        makeDirectory(parentPath);
-        if (!CreateDirectoryW(parentPath, nullptr) && GetLastError() != ERROR_ALREADY_EXISTS)
-        {
-            Log::Write(Log::LT_ERROR, LOGFILE_FILE, 229, L"== CRASH == ASSERT CRASH");
-            AlertSender::Write(LOGFILE_FILE, 229, L"== CRASH == ASSERT CRASH");
-            CrashHandler::MakeCrash("source\\LogFile.cpp", 229, L"");
-        }
     }
 }
 
@@ -236,27 +238,20 @@ void LogFile::writeFile()
     _localtime64_s(&wtm, &_lastWritten);
     MakeFilename(&wtm, filename, MAX_PATH);  // LIFT: LTCG folded count; MakeFilename writes r9d before it reads it (LobbyGate 0x22256)
 
-    HANDLE file = CreateFileW(filename, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
-                              OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+    // CacheGate 0x11600: up to 100 CreateFileW calls with Sleep(100) between them.
+    HANDLE file;
+    int tries = 0;
+    while ((file = CreateFileW(filename, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
+                               OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr)) == INVALID_HANDLE_VALUE
+           && ++tries < 100)
+        Sleep(100);
     if (file == INVALID_HANDLE_VALUE)
     {
-        int tries = 1;
-        for (;;)
-        {
-            Sleep(100);
-            file = CreateFileW(filename, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
-                               OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
-            if (file != INVALID_HANDLE_VALUE)
-                break;
-            if (++tries >= 100)
-            {
-                ++_trycount;
-                AlertSender::Write(LOGFILE_FILE, 301,
-                                   L"[log], file create error, fname:%s, error:%d, trycount:%d",
-                                   filename, GetLastError(), _trycount);
-                return;
-            }
-        }
+        ++_trycount;
+        AlertSender::Write(LOGFILE_FILE, 301,
+                           L"[log], file create error, fname:%s, error:%d, trycount:%d",
+                           filename, GetLastError(), _trycount);
+        return;
     }
 
     wcsncpy(_lastFileName, filename, MAX_PATH);

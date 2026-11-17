@@ -49,11 +49,9 @@ public:
     {
         _pType[0] = 0;
         _npGameCode[0] = 0;
-        _npAppId.id[0] = 0;
-        _npAppId.id[1] = 0;
+        _npAppId = ID128_GUID_ZERO;
         _npAppIdStr[0] = 0;
-        _npClientAppId.id[0] = 0;
-        _npClientAppId.id[1] = 0;
+        _npClientAppId = ID128_GUID_ZERO;
         _npClientAppIdStr[0] = 0;
     }
 

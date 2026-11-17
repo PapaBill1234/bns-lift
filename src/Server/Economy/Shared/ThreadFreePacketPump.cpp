@@ -12,7 +12,11 @@
 #include "Log.h"
 #include "AlertSender.h"
 
+// LIFT: The original builds this file in each exe project. LobbyGate uses ..\Economy\Shared, the
+// Economy daemons use ..\Shared (ThreadFreePacketPumpShortPath.cpp sets the macro).
+#ifndef TFPP_FILE
 #define TFPP_FILE L"..\\Economy\\Shared\\ThreadFreePacketPump.cpp"
+#endif
 
 unsigned long long GPacketPumpEventKey = 0;
 

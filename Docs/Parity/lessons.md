@@ -201,3 +201,110 @@
 ## Did not work
 - `Session::HandleEvent` 0xf1c0: read `_connectContext` in place of the `context` argument (hr line 1074). Score 98.5 -> 97.4. Undone.
 - `Session::HandleEvent`: orig merges the 796 and 814 `Log::Write` calls (line in a register). Ours does not. Cause unknown.
+
+## Pattern 18 (worked, lift-parity-s3): zstd version = upstream dev commit bb6eaf64
+- v1.3.5 gave many zstd DIFFs. bb6eaf64 (2018-05, #1153) makes all zstd functions MATCH. See `vendor/zstd/README.md`.
+- Gain: CG 345 -> 361, LG 425 -> 450, SCD 388 -> 400, POD 423 -> 443.
+- Rule: if upstream code is DIFF, count the calls of one function (for example `ZSTD_litLengthContribution`) and bisect commits.
+
+## Pattern 19 (worked, lift-parity-s3): noinline for more shared functions (see pattern 11)
+- `AlertSender::createSocket` (callers run, init), `LogMedia::Add` (only caller `Log::Add`), `DbTransaction::close`.
+- `Log::Add` and `LogMedia::Add` became MATCH in all 4 exes.
+
+## Pattern 20 (worked, lift-parity-s3): first branch of the original first
+- `LogFile::makeDirectory`: `if (wcslen(drive) != 0) {dir} else {GetCurrentDirectoryW}` -> MATCH.
+- `Db::AllocTransaction`, `initEnv`, `Execute`, `BindCol`: good path first, `Log::Write` at the end.
+  SCD +6, POD +7 (AllocTransaction, clearList, initEnv, Execute, Prepare, initStatement, BindParam).
+- `LogFile::writeFile`: one `while ((file = CreateFileW(...)) == INVALID_HANDLE_VALUE)` loop, 91.7 -> 93.9 (still DIFF).
+- Did not work: `DbTransaction::connect` fully nested (93.3 -> 87.8). The original returns early when `envHandle == nullptr`.
+
+## Pattern 21 (found, lift-parity-s3): SQLRETURN compare with the constant first
+- Orig (SCD 0x21118): `xor ecx,ecx; cmp cx,ax; mov ecx,1; cmp cx,ax`.
+- VS2010 test: `0 == r || 1 == r` gives this code. `r == 0 || r == 1` gives `test ax,ax; cmp ax,1`.
+  `r < 2` or `(r & ~1) == 0` gives `test ax,-2`. `switch` gives `cmp ecx,1`.
+- Applied to all of `Db.cpp` (helper `sqlSucceeded`). Result not yet measured at the stage end.
+
+## Pattern 22 (worked, lift-parity-s3): copy the original refs and member reads one to one
+- `LogBuffer::GetLog`: `return _log != nullptr ? _log : L"";` (orig refs `L""`) -> MATCH in all 4 exes.
+- `LogBufferAllocator::initAllocator`: put the new allocator in a local, then `_Allocator = allocator;
+  allocator->Initialize(size)` (one less `_Allocator` read) -> MATCH in all 4 exes. Gain +2 per exe.
+
+## Pattern 23 (worked, lift-parity-s3): VS2010 folds `2*n + 20` into `(n+10)*2`
+- `AlertSender::writev2` (CG orig 0x9580): orig keeps const 0x14; ours did `lea ebx,[rax+0xa]; add bx,bx`.
+- Fix: one `short logBytes = 2 * logCount` local, used in the size and in the two later writes.
+  MATCH in all 4 exes (+1 each).
+
+## Pattern 24 (worked, lift-parity-s3): LTCG moves a callee null check into the callers
+- SCD `DbTransaction::BindParam` (orig 0x20fd0): ours had no `StmtHandle == nullptr` branch. The check and
+  the "Not initialized" ref were in the 10 `SmartCouponDB` callers (find refs: `.scratch/strxref.py <EXE> '<text>'`).
+- Fix: `__declspec(noinline)` on the function. SCD +1, and the 10 callers score +1.3 to +3.8.
+
+## Pattern 25 (worked, lift-parity-s3): POD `DbTransaction::BindCol` (orig 0x2d010)
+- Orig call order has `Log::Write` first. `if (StmtHandle == nullptr) {Log::Write; return false;}` first -> MATCH.
+  (Opposite of pattern 20 for the SCD overload 0x20E40.)
+
+## Did not work (lift-parity-s3)
+- `AlertSender::run`: `WSANETWORKEVENTS events = {0};` in place of `memset`. The `memset` call stays (97.8).
+- `LogFile::writeFile`: first `CreateFileW` out of the loop, then `for(;;){Sleep; CreateFileW; break; ++tries}`
+  = HEAD form, 91.7. The one-loop form gives 93.9 (alert calls still after CloseHandle in the layout).
+  `while ((file = CreateFileW(...)) == INVALID && ++tries < 100) Sleep(100);` then one alert block: also 93.9 (kept).
+
+## Open cause (lift-parity-s3): .tls layout order
+- Signal: const 0x18 (orig) vs 0x90 (ours) in `Log::Write`, `Log::WriteV`, `LogBuffer::deallocate_me`,
+  `LogBufferAllocator::Initialize` (all 4 exes). The const is the .tls offset of `LogBufferAllocator::_Local`.
+- CacheGate .tls offsets (llvm-pdbutil dump -globals -symbols). Orig: 8 `_Instance`, 16 `IoWorker::WorkerId`,
+  24 `LogBufferAllocator::_Local`, 32 `PacketBufferAllocator::_Local`, 40 `Thread::Current`, 48 `IoWorker::ZstdCCtx`,
+  56 `__delv_buf__`, 96 `__ip_addr_string_w__`. Ours: 16 WorkerId, 24 ZstdCCtx, 32 ip_a, 64 ip_w, 128 prng `_Instance`,
+  136 PacketBuffer `_Local`, 144 LogBuffer `_Local`, 152 `Thread::Current`.
+- Ours groups by obj, in definition order inside an obj. Orig splits WorkerId and ZstdCCtx, so the orig probably
+  defines them in different objs. `__delv_buf__` is not in our source. Not fixed: link order of lib objs.
+
+## Pattern 26 (worked, lift-parity-s3): BnsCommonConfig def-list loops
+- Cause: ours used the next array as loop end. Orig counts `count` down and steps the pointers.
+- Fix: `for (; count > 0; --count, ++defList, ++loadDefList)` form in `Dump`, `UpdateAllVariable`,
+  `UpdateReloadedVariable`, `CheckMinMaxBoundary` (orig const 0x28 = sizeof step). `LoadBnsCommonConfig`: one
+  `failed:` tail (errorLine, errorText), like orig CG 0x13e0.
+- Result: CG +4, POD +4, LG +2, SCD +2 MATCH. LG/SCD `CheckMinMaxBoundary`, `Dump` stay DIFF only by the
+  `FILE_NAME` literal (`..\Shared\` in LG/SCD, `..\..\Shared\` in CG/POD). One shared obj, see "header `__FILE__`".
+
+## Build fact (lift-parity-s3): no header dependency tracking
+- `tools/vs2010/build.sh` rebuilds an obj only when its `.cpp` is newer. A header change needs `touch` of the
+  `.cpp` files that use it, or `.scratch/run.sh clean`.
+
+## Pattern 27 (part worked, lift-parity-s3): inline BnsCommonConfig ctor copies ID128_GUID_ZERO
+- Orig CG 0x13e0 / 0x1600: `mov rcx,[0x46be8]` / `mov rax,[0x46bf0]` (two qword loads), so the ctor does
+  `_npAppId = ID128_GUID_ZERO; _npClientAppId = ID128_GUID_ZERO;`. 0x46be8 is in read-only data.
+- Fix: `extern id128 ID128_GUID_ZERO;` in StringUtil.h, define in StringUtil.cpp (❓ module), assign in the ctor.
+- Result: no MATCH, but Load/ReloadBnsCommonConfig score +1.0..+1.3 in all 4 exes. Kept.
+- POD Reload still shows one `ID128_GUID_ZERO` ref less than orig (orig loads the global two times).
+
+## Pattern 28 (worked, lift-parity-s3): null-checked placement new before the null test
+- Cause: `if (memory == nullptr) {fail} new (memory) T();` puts the fail block inline. Orig puts it at the end.
+- Fix: `T* p = memory != nullptr ? new (memory) T() : nullptr; if (p == nullptr) {fail}`.
+- Example: `BnsCommonConfig::ReloadBnsCommonConfig` -> MATCH in CG; LG/SCD/POD score +2.2.
+
+## Did not work (lift-parity-s3): move the `failed:` tail into the first error block
+- `LoadBnsCommonConfig`: orig falls through from the "load failed" block into the tail. A `failed:` label
+  inside that block gives the same code as the tail at the end. The Log::Write call-order diff stays.
+
+## Pattern 29 (worked, lift-parity-s3): inline destructor with a member destructor gives the EH state
+- Cause: orig `Db::Clear` stores EH state -2 (`#wind=1`). It calls an inlined `~Db()`: the Dsn free, then
+  the member `~CriticalSection`. Open code (Free + DeleteCriticalSection) has no unwind map.
+- Fix: `inline Db::~Db()` (Dsn free) in Db.cpp, `db->~Db();` in Clear.
+- Example: `Db::Clear` -> MATCH in SCD and POD.
+
+## Did not work (lift-parity-s3): merged FD_CONNECT/FD_WRITE branch in AlertSender::run
+- Orig (CacheGate 0x98f0) zeroes the 44-byte WSANETWORKEVENTS with 5 qword + 1 dword inline stores.
+  VS2010 cl (/O2) gives a `memset` call for both `= {0}` and `memset(&events, 0, 44)`.
+- One `?:` error select with one sendRemain call: score 97.8 -> 94.4 (cmovne, const 0x12). Undone.
+
+## 30. Per-exe source path literal (FIXED, stage 8)
+- Cause: the original builds a shared .cpp in each exe project. The file literal is relative to the project
+  directory. BnsCommonConfigDefinition.cpp: CG, POD `..\..\Shared\`; LG, SCD `..\Shared\`.
+  ThreadFreePacketPump.cpp: LG `..\Economy\Shared\`; POD `..\Shared\`. One obj for 4 exes gives a ref DIFF.
+- Change: the literal is a macro with `#ifndef` default. A wrapper .cpp (`BnsCommonConfigDefinitionShortPath.cpp`,
+  `ThreadFreePacketPumpShortPath.cpp`) sets the macro and includes the .cpp. CMakeLists.txt puts the plain file or
+  the wrapper in each exe target (not in lift_common). tools/vs2010/build.sh compiles each source one time
+  and has no per-target defines, so a wrapper file is necessary.
+- Example: LG BnsCommonConfig::Dump, POD ThreadFreePacketPump::Initialize -> MATCH. LG +7, SCD +2, POD +5.
+- Side effect: .rdata moved, more string_at noise (lesson 2): LG Memory::CreateManager, POD Console/LogFile.

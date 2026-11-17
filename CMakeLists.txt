@@ -87,7 +87,6 @@ add_library(lift_common STATIC
   src/Server/BloodLib/source/WinServiceConsole.cpp
   src/Server/BloodLib/source/Daemon.cpp
   src/Server/BloodLib/source/DaemonConfig.cpp
-  src/Server/Shared/BnsCommonConfigDefinition.cpp
   src/Security/source/BloodCrypto/crypto/Crypto.cpp
   src/Security/source/BloodCrypto/crypto/aes128.cpp
   src/Security/source/BloodCrypto/crypto/aes128Table.cpp
@@ -124,7 +123,6 @@ add_library(lift_common STATIC
   src/Server/BloodLib/source/Security.cpp
   src/Server/BloodLib/source/CrashHandler.cpp
   src/Server/Packet/FragmentPacket.cpp
-  src/Server/Economy/Shared/ThreadFreePacketPump.cpp
   src/Server/BloodLib/source/Db.cpp)
 # clang-cl needs the AES target feature for the <wmmintrin.h> intrinsics.
 set_source_files_properties(src/Security/source/BloodCrypto/crypto/aes128NI.cpp PROPERTIES COMPILE_OPTIONS "-maes")
@@ -162,7 +160,7 @@ lift_exe(CacheGate
   SOURCES src/Server/Economy/CacheGate/CacheGate.cpp src/Server/Economy/CacheGate/CacheGate.rc src/Server/Economy/CacheGate/CacheD.cpp src/Server/Economy/CacheGate/CacheDChannel.cpp
           src/Server/Economy/CacheGate/ClientManager.cpp src/Server/Economy/CacheGate/CacheGateSessionHandler.cpp
           src/Server/Economy/CacheGate/CacheGateServerSideHandlerList.cpp src/crt/wmain_bridge.c
-          src/crt/tlssup.c src/crt/new_delete.c
+          src/crt/tlssup.c src/crt/new_delete.c src/Server/Shared/BnsCommonConfigDefinition.cpp
   IMPORTS msvcr100 kernel32)
 target_compile_options(CacheGate PRIVATE /GR-)
 target_include_directories(CacheGate BEFORE PRIVATE ${LIFT_STL_INCLUDE})
@@ -171,6 +169,7 @@ target_link_libraries(CacheGate PRIVATE lift_common ${LIFT_MSVCP100_IMPLIB})
 
 # SmartCouponDaemon app modules (static lib).
 add_library(lift_smartcoupondaemon STATIC
+  src/Server/Shared/BnsCommonConfigDefinitionShortPath.cpp
   src/Server/SmartCouponDaemon/CouponJob.cpp
   src/Server/SmartCouponDaemon/EventNotiJob.cpp
   src/Server/SmartCouponDaemon/GameEventWorker.cpp
@@ -195,6 +194,8 @@ target_link_libraries(lift_smartcoupondaemon PUBLIC lift_common)
 
 # LobbyGate app modules (static lib).
 add_library(lift_lobbygate STATIC
+  src/Server/Economy/Shared/ThreadFreePacketPump.cpp
+  src/Server/Shared/BnsCommonConfigDefinitionShortPath.cpp
   src/Server/LobbyGate/Client.cpp
   src/Server/LobbyGate/LobbyDChannel.cpp
   src/Server/LobbyGate/LobbyGatePredefine.cpp
@@ -212,6 +213,8 @@ target_link_libraries(lift_lobbygate PUBLIC lift_common)
 
 # PostOfficeDaemon lifted modules (static library). Calls to code of later cards stay as declarations.
 add_library(lift_postofficedaemon STATIC
+  src/Server/Economy/Shared/ThreadFreePacketPumpShortPath.cpp
+  src/Server/Shared/BnsCommonConfigDefinition.cpp
   src/Server/Economy/PostOfficeDaemon/RelayContext.cpp
   src/Server/Economy/PostOfficeDaemon/RelayTimeContext.cpp
   src/Server/Economy/PostOfficeDaemon/RelayTimeoutChecker.cpp
@@ -250,6 +253,8 @@ target_link_libraries(lift_postofficedaemon PUBLIC lift_common)
 
 # MarketDealerDaemon lifted modules (static library). Calls to code of later cards stay as declarations.
 add_library(lift_marketdealerdaemon STATIC
+  src/Server/Economy/Shared/ThreadFreePacketPumpShortPath.cpp
+  src/Server/Shared/BnsCommonConfigDefinition.cpp
   src/Server/Economy/MarketDealerDaemon/SaleContext.cpp
   src/Server/Economy/MarketDealerDaemon/BidContext.cpp
   src/Server/Economy/MarketDealerDaemon/PurchaseContext.cpp

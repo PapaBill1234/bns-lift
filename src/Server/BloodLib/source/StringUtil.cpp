@@ -4,6 +4,9 @@
 #include <windows.h>
 #include <objbase.h>
 
+// LIFT: the PDB module of ID128_GUID_ZERO is not known. ❓ String.obj is a guess.
+id128 ID128_GUID_ZERO = {0};
+
 // 0x1B360 (SmartCouponDaemon)
 bool String::GetId128FromGuidString(wchar_t const* guidString, id128* id)
 {

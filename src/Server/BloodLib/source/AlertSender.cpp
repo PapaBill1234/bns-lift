@@ -130,7 +130,8 @@ void AlertSender::fini()
 }
 
 // 0x18C40 (SmartCouponDaemon)
-bool AlertSender::createSocket()
+// LIFT: noinline. The original calls it from run (CacheGate 0x98f0) and init in all 4 exes.
+__declspec(noinline) bool AlertSender::createSocket()
 {
     if (_socket != INVALID_SOCKET)
     {
@@ -192,7 +193,8 @@ void AlertSender::writev2(wchar_t const* file, int line, wchar_t const* format, 
     if (logCount < 0)
         return;
 
-    short size = static_cast<short>(fileBytes + 2 * logCount + _versionBytes + _daemonNameBytes + 20);
+    short logBytes = static_cast<short>(2 * logCount);
+    short size = static_cast<short>(fileBytes + logBytes + _versionBytes + _daemonNameBytes + 20);
     AlertBuffer* buffer = static_cast<AlertBuffer*>(
         Memory::_Manager[2]->AllocZero(size + sizeof(AlertBuffer), ALERT_SENDER_FILE, 399));
     if (buffer == nullptr)
@@ -220,9 +222,9 @@ void AlertSender::writev2(wchar_t const* file, int line, wchar_t const* format, 
     buffer->_count += fileBytes;
     *reinterpret_cast<int*>(&buffer->_buffer[buffer->_count]) = line;
     buffer->_count += 4;
-    *reinterpret_cast<short*>(&buffer->_buffer[buffer->_count]) = static_cast<short>(2 * logCount);
+    *reinterpret_cast<short*>(&buffer->_buffer[buffer->_count]) = logBytes;
     buffer->_count += 2;
-    bytes = 2 * logCount;
+    bytes = logBytes;
     memcpy(&buffer->_buffer[buffer->_count], log, bytes);
     buffer->_count += bytes;
 
@@ -287,31 +289,33 @@ bool AlertSender::sendRemain(AlertBufferList& bufferList)
         buf.len = buffer->_count - buffer->_sent;
         buf.buf = &buffer->_buffer[buffer->_sent];
         DWORD sent = 0;
-        if (WSASend(_socket, &buf, 1, &sent, 0, nullptr, nullptr) != 0)
+        // Success branch first: the original lays out WSAGetLastError after it (CacheGate 0x9b90).
+        if (WSASend(_socket, &buf, 1, &sent, 0, nullptr, nullptr) == 0)
         {
-            if (WSAGetLastError() != WSAEWOULDBLOCK)
-                return false;
-            continue;
-        }
-        buffer->_sent += sent;
-        if (buffer->_count <= buffer->_sent)
-        {
-            AlertBuffer* head = bufferList._head;
-            if (head != nullptr)
+            buffer->_sent += sent;
+            if (buffer->_count <= buffer->_sent)
             {
-                if (head == bufferList._tail)
+                AlertBuffer* head = bufferList._head;
+                if (head != nullptr)
                 {
-                    bufferList._head = nullptr;
-                    bufferList._tail = nullptr;
-                    bufferList._count = 0;
+                    if (head == bufferList._tail)
+                    {
+                        bufferList._head = nullptr;
+                        bufferList._tail = nullptr;
+                        bufferList._count = 0;
+                    }
+                    else
+                    {
+                        --bufferList._count;
+                        bufferList._head = head->_next;
+                    }
+                    Memory::_Manager[2]->Free(head, ALERT_SENDER_FILE, 85);
                 }
-                else
-                {
-                    --bufferList._count;
-                    bufferList._head = head->_next;
-                }
-                Memory::_Manager[2]->Free(head, ALERT_SENDER_FILE, 85);
             }
+        }
+        else if (WSAGetLastError() != WSAEWOULDBLOCK)
+        {
+            return false;
         }
     }
     return true;
@@ -354,8 +358,7 @@ void AlertSender::run()
                 result = WaitForSingleObject(_sockEvent, 0);
                 if (result == WAIT_OBJECT_0)
                 {
-                    WSANETWORKEVENTS events;
-                    memset(&events, 0, sizeof(events));
+                    WSANETWORKEVENTS events = {0};
                     if (WSAEnumNetworkEvents(_socket, _sockEvent, &events) == SOCKET_ERROR)
                     {
                         reconnect = true;

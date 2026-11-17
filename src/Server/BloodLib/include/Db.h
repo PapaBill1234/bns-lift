@@ -48,6 +48,9 @@ class Db
 {
 public:
     Db() : Dsn(nullptr), TranList(nullptr) {}  // LIFT: inlined in Initialize
+    // LIFT: no PDB name seen. Inlined in Clear (PostOfficeDaemon 0x2c9e0, EH state #wind=1).
+    // The body is in Db.cpp (only Clear uses it).
+    inline ~Db();
 
     static bool Initialize(unsigned int dbId, wchar_t const* dsn);  // 0x20690 (dbId is folded to 1)
     static void Clear(unsigned int dbId);                           // 0x20810

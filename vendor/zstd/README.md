@@ -6,23 +6,30 @@ We build the upstream source.
 
 ## Version
 
-- Version: **1.3.5** (inferred, ❓).
+- Version: upstream `dev` commit **bb6eaf64** ("Merge pull request #1153
+  from facebook/dynThreshold", 2018-05). This is between 1.3.4 and 1.3.5.
+- Set by lift-parity-s3 with funcdiff. With bb6eaf64, all zstd functions are
+  MATCH in the 4 exes. One exception: LobbyGate `ZSTD_compressBegin_internal`
+  (98.8, LTCG inlines `ZSTD_compress_insertDictionary`).
+- v1.3.5 gave DIFF in zstd_opt.c and other files.
+- Commit ac4f7ead (#1154, altOpt) gives 3 `ZSTD_litLengthContribution`
+  calls in zstd_opt.c. The original has 4, as bb6eaf64 has.
 - The binary has no version string and no `ZSTD_versionNumber`.
-- The PDB symbols agree with 1.3.5:
-  - `ZSTD_compressBlock_fast_dictMatchState` exists. The doubleFast and lazy
-    strategies have no `dictMatchState` variant. 1.3.6 added those.
-  - `ZSTD_compressBlock_btultra` exists. `btultra2` (1.3.8 and later) does not.
-  - `ZSTD_CCtx_resetParameters` exists (1.3.8 and later changed this API).
 
 ## Source
 
 - Upstream: https://github.com/facebook/zstd
-- This repo does not include the source. Get it with this command:
+- This repo does not include the source. Get it with these commands.
+  A shallow fetch of a short hash fails, so fetch by date:
 
 ```sh
-git clone --depth 1 --branch v1.3.5 https://github.com/facebook/zstd vendor/zstd/src
+git clone --depth 1 https://github.com/facebook/zstd vendor/zstd/src
+cd vendor/zstd/src
+git fetch --shallow-since=2018-05-01 origin dev
+git checkout bb6eaf64
 ```
 
 `CMakeLists.txt` builds the `lift_zstd` static library from
 `vendor/zstd/src/lib/` only if `vendor/zstd/src/` exists.
 Do not commit `vendor/zstd/src/`.
+After a change of `vendor/zstd/src/`, delete `build-vs2010/obj/vendor`.

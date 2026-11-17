@@ -15,7 +15,8 @@ wchar_t* LogMedia::GetLastFileName()
 }
 
 // 0x285B0 (SmartCouponDaemon)
-int LogMedia::Add(LogBuffer* logbuffer)
+// LIFT: noinline. The original calls it from its only caller Log::Add (CacheGate 0xa2c0) in all 4 exes.
+__declspec(noinline) int LogMedia::Add(LogBuffer* logbuffer)
 {
     int first = 0;
     logbuffer->addReferenceCount(L"source\\LogMedia.cpp", 40);
