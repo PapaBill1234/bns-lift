@@ -3316,3 +3316,848 @@ bool RegisterPurchaseJob::handleJob(short& failReason)
     moneyDeliveryContext->removeReferenceCount(JOB_CONTEXT_FILE, 2775);
     return true;
 }
+
+// ---- UpdateStatusToReportSuccessJob ----
+
+#define DECOMPOSED_DELIVERY L"[%s], %s; decomposed packet, tid:0x%I64X, deliveryId:0x%I64X"
+#define INVALID_DELIVERY_PARAM L"[%s], %s; invalid parameter, tid:0x%I64X, deliveryId:0x%I64X"
+
+// 0x15aa0
+bool UpdateStatusToReportSuccessJob::Initialize(Packet const*& packet)
+{
+    wchar_t const* const fn = L"UpdateStatusToReportSuccessJob::Initialize";
+    if (packet == nullptr)
+    {
+        JOB_CONTEXT_CRASH(2803, INVALID_PACKET, MODULE_NAME, fn, packet);
+        return false;
+    }
+    short cmd = 0;
+    if (packet->Decompose("hqq", &cmd, &_tid, &_deliveryId) == 0)
+    {
+        Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 2811, FAIL_DECOMPOSE, MODULE_NAME, fn);
+        return false;
+    }
+    Log::Write(Log::LT_DEBUG, JOB_CONTEXT_FILE, 2814, DECOMPOSED_DELIVERY, MODULE_NAME, fn, _tid, _deliveryId);
+    return true;
+}
+
+// 0x15bf0
+void UpdateStatusToReportSuccessJob::ReplySuccess(Session const*& session) const
+{
+    wchar_t const* const fn = L"UpdateStatusToReportSuccessJob::ReplySuccess";
+    if (session == nullptr)
+    {
+        JOB_CONTEXT_CRASH(2822, INVALID_SESSION, MODULE_NAME, fn, session);
+        return;
+    }
+    session->Send("hq", MarketDealer_UpdateStatusToReportSuccessOkCmd, _tid);
+    Log::Write(Log::LT_NOTICE, JOB_CONTEXT_FILE, 2827,
+               L"[%s], %s; sent job status update success ack [report success status], tid:0x%I64X, "
+               L"deliveryId:0x%I64X",
+               MODULE_NAME, fn, _tid, _deliveryId);
+}
+
+// 0x15cf0
+bool UpdateStatusToReportSuccessJob::verifyParameter(short& failReason) const
+{
+    if (_deliveryId > 0)
+        return true;
+    Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 2844, INVALID_DELIVERY_PARAM, MODULE_NAME,
+               L"UpdateStatusToReportSuccessJob::verifyParameter", _tid, _deliveryId);
+    failReason = MARKETDEALER_UPDATESTATUSTOREPORTSUCCESSFAIL_INVALID_PARAMETER;
+    return false;
+}
+
+// 0x15d60
+bool UpdateStatusToReportSuccessJob::handleJob(short& failReason)
+{
+    wchar_t const* const fn = L"UpdateStatusToReportSuccessJob::handleJob";
+    DeliveryContextManager* const deliveryContextManager = MarketDealerDaemon::_instance->_deliveryContextManager;
+    DeliveryContext* const deliveryContext = deliveryContextManager->GetContext(_deliveryId);
+    if (deliveryContext == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 2857,
+                   L"[%s], %s; there is no such delivery context, tid:0x%I64X, deliveryId:0x%I64X", MODULE_NAME, fn,
+                   _tid, _deliveryId);
+        failReason = MARKETDEALER_UPDATESTATUSTOREPORTSUCCESSFAIL_NO_SUCH_DELIVERY;
+        return false;
+    }
+
+    AutoCS autoLock(&deliveryContext->_lock);  // ❓ The original may call the out-of-line AutoCS::Enter 0x8780.
+    char const jobStatus = deliveryContext->_deliveryInfo._jobStatus;
+    int dbRetValue = 0;
+    if (jobStatus != DeliveryInfo::JOBSTATUS_REPORTING)
+    {
+        Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 2867,
+                   L"[%s], %s; invalid job status, tid:0x%I64X, deliveryId:0x%I64X, jobStatus:%d", MODULE_NAME, fn,
+                   _tid, _deliveryId, static_cast<int>(jobStatus));
+        failReason = MARKETDEALER_UPDATESTATUSTOREPORTSUCCESSFAIL_INVALID_JOB_STATUS;
+        autoLock.Leave();
+        deliveryContext->removeReferenceCount(JOB_CONTEXT_FILE, 2898);
+        return false;
+    }
+    if (!MarketDB::UpdateStatusToReportSuccess(dbRetValue, *this))
+    {
+        Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 2878,
+                   L"[%s], %s; failed to update job status [report success status], dbRetValue:%d, tid:0x%I64X, "
+                   L"deliveryId:0x%I64X",
+                   MODULE_NAME, fn, dbRetValue, _tid, _deliveryId);
+        failReason = MARKETDEALER_DB_ERROR;
+        autoLock.Leave();
+        deliveryContext->removeReferenceCount(JOB_CONTEXT_FILE, 2898);
+        return false;
+    }
+    deliveryContext->_deliveryInfo._jobStatus = DeliveryInfo::JOBSTATUS_REPORT_SUCCESS;
+    autoLock.Leave();
+
+    if (!deliveryContextManager->RemoveContext(_deliveryId))
+    {
+        JOB_CONTEXT_CRASH(2888,
+                          L"== CRASH == [%s], %s; exception occurred; failed to remove delivery context, "
+                          L"deliveryId:0x%I64X",
+                          MODULE_NAME, fn, _deliveryId);
+    }
+    Log::Write(Log::LT_DEBUG, JOB_CONTEXT_FILE, 2891,
+               L"[%s], %s; succeeded to update job status [report success status], tid:0x%I64X, deliveryId:0x%I64X",
+               MODULE_NAME, fn, _tid, _deliveryId);
+    deliveryContext->removeReferenceCount(JOB_CONTEXT_FILE, 2892);
+    return true;
+}
+
+// ---- UpdateStatusToPawnRemovalFailureJob ----
+
+// 0x16100
+bool UpdateStatusToPawnRemovalFailureJob::Initialize(Packet const*& packet)
+{
+    wchar_t const* const fn = L"UpdateStatusToPawnRemovalFailureJob::Initialize";
+    if (packet == nullptr)
+    {
+        JOB_CONTEXT_CRASH(2918, INVALID_PACKET, MODULE_NAME, fn, packet);
+        return false;
+    }
+    short cmd = 0;
+    if (packet->Decompose("hqq", &cmd, &_tid, &_deliveryId) == 0)
+    {
+        Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 2926, FAIL_DECOMPOSE, MODULE_NAME, fn);
+        return false;
+    }
+    Log::Write(Log::LT_DEBUG, JOB_CONTEXT_FILE, 2929, DECOMPOSED_DELIVERY, MODULE_NAME, fn, _tid, _deliveryId);
+    return true;
+}
+
+// 0x16250
+void UpdateStatusToPawnRemovalFailureJob::ReplySuccess(Session const*& session) const
+{
+    wchar_t const* const fn = L"UpdateStatusToPawnRemovalFailureJob::ReplySuccess";
+    if (session == nullptr)
+    {
+        JOB_CONTEXT_CRASH(2937, INVALID_SESSION, MODULE_NAME, fn, session);
+        return;
+    }
+    session->Send("hq", MarketDealer_UpdateStatusToPawnRemovalFailureOkCmd, _tid);
+    Log::Write(Log::LT_NOTICE, JOB_CONTEXT_FILE, 2942,
+               L"[%s], %s; sent job status update success ack [pawn removal failure status], tid:0x%I64X, "
+               L"deliveryId:0x%I64X",
+               MODULE_NAME, fn, _tid, _deliveryId);
+}
+
+// 0x16350
+bool UpdateStatusToPawnRemovalFailureJob::verifyParameter(short& failReason) const
+{
+    if (_deliveryId > 0)
+        return true;
+    Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 2959, INVALID_DELIVERY_PARAM, MODULE_NAME,
+               L"UpdateStatusToPawnRemovalFailureJob::verifyParameter", _tid, _deliveryId);
+    failReason = MARKETDEALER_UPDATESTATUSTOPAWNREMOVALFAILUREFAIL_INVALID_PARAMETER;
+    return false;
+}
+
+// 0x163c0
+bool UpdateStatusToPawnRemovalFailureJob::handleJob(short& failReason)
+{
+    wchar_t const* const fn = L"UpdateStatusToPawnRemovalFailureJob::handleJob";
+    int dbRetValue = 0;
+    if (!MarketDB::UpdateStatusToPawnRemovalFailure(dbRetValue, *this))
+    {
+        Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 2975,
+                   L"[%s], %s; failed to update job status [pawn removal failure status], dbRetValue:%d, "
+                   L"tid:0x%I64X, deliveryId:0x%I64X",
+                   MODULE_NAME, fn, dbRetValue, _tid, _deliveryId);
+        failReason = MARKETDEALER_DB_ERROR;
+        return false;
+    }
+    Log::Write(Log::LT_DEBUG, JOB_CONTEXT_FILE, 2980,
+               L"[%s], %s; succeeded to update job status [pawn removal failure status], tid:0x%I64X, "
+               L"deliveryId:0x%I64X",
+               MODULE_NAME, fn, _tid, _deliveryId);
+    return true;
+}
+
+// ---- UpdateStatusToPawnRemovalSuccessJob ----
+
+// 0x164a0
+bool UpdateStatusToPawnRemovalSuccessJob::Initialize(Packet const*& packet)
+{
+    wchar_t const* const fn = L"UpdateStatusToPawnRemovalSuccessJob::Initialize";
+    if (packet == nullptr)
+    {
+        JOB_CONTEXT_CRASH(3000, INVALID_PACKET, MODULE_NAME, fn, packet);
+        return false;
+    }
+    short cmd = 0;
+    if (packet->Decompose("hqq", &cmd, &_tid, &_deliveryId) == 0)
+    {
+        Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 3008, FAIL_DECOMPOSE, MODULE_NAME, fn);
+        return false;
+    }
+    Log::Write(Log::LT_DEBUG, JOB_CONTEXT_FILE, 3011, DECOMPOSED_DELIVERY, MODULE_NAME, fn, _tid, _deliveryId);
+    return true;
+}
+
+// 0x165f0
+void UpdateStatusToPawnRemovalSuccessJob::ReplySuccess(Session const*& session) const
+{
+    wchar_t const* const fn = L"UpdateStatusToPawnRemovalSuccessJob::ReplySuccess";
+    if (session == nullptr)
+    {
+        JOB_CONTEXT_CRASH(3019, INVALID_SESSION, MODULE_NAME, fn, session);
+        return;
+    }
+    session->Send("hq", MarketDealer_UpdateStatusToPawnRemovalSuccessOkCmd, _tid);
+    Log::Write(Log::LT_NOTICE, JOB_CONTEXT_FILE, 3024,
+               L"[%s], %s; sent job status update success ack [pawn removal success status], tid:0x%I64X, "
+               L"deliveryId:0x%I64X",
+               MODULE_NAME, fn, _tid, _deliveryId);
+}
+
+// 0x166f0
+bool UpdateStatusToPawnRemovalSuccessJob::verifyParameter(short& failReason) const
+{
+    if (_deliveryId > 0)
+        return true;
+    Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 3041, INVALID_DELIVERY_PARAM, MODULE_NAME,
+               L"UpdateStatusToPawnRemovalSuccessJob::verifyParameter", _tid, _deliveryId);
+    failReason = MARKETDEALER_UPDATESTATUSTOPAWNREMOVALSUCCESSFAIL_INVALID_PARAMETER;
+    return false;
+}
+
+// 0x16760
+bool UpdateStatusToPawnRemovalSuccessJob::handleJob(short& failReason)
+{
+    wchar_t const* const fn = L"UpdateStatusToPawnRemovalSuccessJob::handleJob";
+    int dbRetValue = 0;
+    if (!MarketDB::UpdateStatusToPawnRemovalSuccess(dbRetValue, *this))
+    {
+        Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 3057,
+                   L"[%s], %s; failed to update job status [pawn removal success status], dbRetValue:%d, "
+                   L"tid:0x%I64X, deliveryId:0x%I64X",
+                   MODULE_NAME, fn, dbRetValue, _tid, _deliveryId);
+        failReason = MARKETDEALER_DB_ERROR;
+        return false;
+    }
+    Log::Write(Log::LT_DEBUG, JOB_CONTEXT_FILE, 3062,
+               L"[%s], %s; succeeded to update job status [pawn removal success status], tid:0x%I64X, "
+               L"deliveryId:0x%I64X",
+               MODULE_NAME, fn, _tid, _deliveryId);
+    return true;
+}
+
+// ---- UpdateStatusToPostRegistrationFailureJob ----
+
+// 0x16840
+bool UpdateStatusToPostRegistrationFailureJob::Initialize(Packet const*& packet)
+{
+    wchar_t const* const fn = L"UpdateStatusToPostRegistrationFailureJob::Initialize";
+    if (packet == nullptr)
+    {
+        JOB_CONTEXT_CRASH(3082, INVALID_PACKET, MODULE_NAME, fn, packet);
+        return false;
+    }
+    short cmd = 0;
+    if (packet->Decompose("hqq", &cmd, &_tid, &_deliveryId) == 0)
+    {
+        Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 3090, FAIL_DECOMPOSE, MODULE_NAME, fn);
+        return false;
+    }
+    Log::Write(Log::LT_DEBUG, JOB_CONTEXT_FILE, 3093, DECOMPOSED_DELIVERY, MODULE_NAME, fn, _tid, _deliveryId);
+    return true;
+}
+
+// 0x16990
+void UpdateStatusToPostRegistrationFailureJob::ReplySuccess(Session const*& session) const
+{
+    wchar_t const* const fn = L"UpdateStatusToPostRegistrationFailureJob::ReplySuccess";
+    if (session == nullptr)
+    {
+        JOB_CONTEXT_CRASH(3101, INVALID_SESSION, MODULE_NAME, fn, session);
+        return;
+    }
+    session->Send("hq", MarketDealer_UpdateStatusToPostRegistrationFailureOkCmd, _tid);
+    Log::Write(Log::LT_NOTICE, JOB_CONTEXT_FILE, 3106,
+               L"[%s], %s; sent job status update success ack [post registration failure status], tid:0x%I64X, "
+               L"deliveryId:0x%I64X",
+               MODULE_NAME, fn, _tid, _deliveryId);
+}
+
+// 0x16a90
+bool UpdateStatusToPostRegistrationFailureJob::verifyParameter(short& failReason) const
+{
+    if (_deliveryId > 0)
+        return true;
+    Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 3123, INVALID_DELIVERY_PARAM, MODULE_NAME,
+               L"UpdateStatusToPostRegistrationFailureJob::verifyParameter", _tid, _deliveryId);
+    failReason = MARKETDEALER_UPDATESTATUSTOPOSTREGISTRATIONFAILUREFAIL_INVALID_PARAMETER;
+    return false;
+}
+
+// 0x16b00
+bool UpdateStatusToPostRegistrationFailureJob::handleJob(short& failReason)
+{
+    wchar_t const* const fn = L"UpdateStatusToPostRegistrationFailureJob::handleJob";
+    int dbRetValue = 0;
+    if (!MarketDB::UpdateStatusToPostRegistrationFailure(dbRetValue, *this))
+    {
+        Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 3139,
+                   L"[%s], %s; failed to update job status [post registration failure status], dbRetValue:%d, "
+                   L"tid:0x%I64X, deliveryId:0x%I64X",
+                   MODULE_NAME, fn, dbRetValue, _tid, _deliveryId);
+        failReason = MARKETDEALER_DB_ERROR;
+        return false;
+    }
+    Log::Write(Log::LT_DEBUG, JOB_CONTEXT_FILE, 3144,
+               L"[%s], %s; succeeded to update job status [post registration failure status], tid:0x%I64X, "
+               L"deliveryId:0x%I64X",
+               MODULE_NAME, fn, _tid, _deliveryId);
+    return true;
+}
+
+// ---- UpdateStatusToPostRegistrationSuccessJob ----
+
+// 0x16be0
+bool UpdateStatusToPostRegistrationSuccessJob::Initialize(Packet const*& packet)
+{
+    wchar_t const* const fn = L"UpdateStatusToPostRegistrationSuccessJob::Initialize";
+    if (packet == nullptr)
+    {
+        JOB_CONTEXT_CRASH(3165, INVALID_PACKET, MODULE_NAME, fn, packet);
+        return false;
+    }
+    short cmd = 0;
+    if (packet->Decompose("hqqq", &cmd, &_tid, &_deliveryId, &_receiptId) == 0)
+    {
+        Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 3174, FAIL_DECOMPOSE, MODULE_NAME, fn);
+        return false;
+    }
+    Log::Write(Log::LT_DEBUG, JOB_CONTEXT_FILE, 3177, DECOMPOSED_DELIVERY, MODULE_NAME, fn, _tid, _deliveryId);
+    return true;
+}
+
+// 0x16d40
+void UpdateStatusToPostRegistrationSuccessJob::ReplySuccess(Session const*& session) const
+{
+    wchar_t const* const fn = L"UpdateStatusToPostRegistrationSuccessJob::ReplySuccess";
+    if (session == nullptr)
+    {
+        JOB_CONTEXT_CRASH(3185, INVALID_SESSION, MODULE_NAME, fn, session);
+        return;
+    }
+    session->Send("hq", MarketDealer_UpdateStatusToPostRegistrationSuccessOkCmd, _tid);
+    Log::Write(Log::LT_NOTICE, JOB_CONTEXT_FILE, 3190,
+               L"[%s], %s; sent job status update success ack [post registration success status], tid:0x%I64X, "
+               L"deliveryId:0x%I64X",
+               MODULE_NAME, fn, _tid, _deliveryId);
+}
+
+// 0x16e40
+bool UpdateStatusToPostRegistrationSuccessJob::verifyParameter(short& failReason) const
+{
+    if (_deliveryId > 0 && _receiptId > 0)
+        return true;
+    Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 3208, INVALID_DELIVERY_PARAM, MODULE_NAME,
+               L"UpdateStatusToPostRegistrationSuccessJob::verifyParameter", _tid, _deliveryId);
+    failReason = MARKETDEALER_UPDATESTATUSTOPOSTREGISTRATIONSUCCESSFAIL_INVALID_PARAMETER;
+    return false;
+}
+
+// 0x16ec0
+bool UpdateStatusToPostRegistrationSuccessJob::handleJob(short& failReason)
+{
+    wchar_t const* const fn = L"UpdateStatusToPostRegistrationSuccessJob::handleJob";
+    int dbRetValue = 0;
+    if (!MarketDB::UpdateStatusToPostRegistrationSuccess(dbRetValue, *this))
+    {
+        Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 3224,
+                   L"[%s], %s; failed to update job status [post registration success status], dbRetValue:%d, "
+                   L"tid:0x%I64X, deliveryId:0x%I64X",
+                   MODULE_NAME, fn, dbRetValue, _tid, _deliveryId);
+        failReason = MARKETDEALER_DB_ERROR;
+        return false;
+    }
+    Log::Write(Log::LT_DEBUG, JOB_CONTEXT_FILE, 3229,
+               L"[%s], %s; succeeded to update job status [post registration success status], tid:0x%I64X, "
+               L"deliveryId:0x%I64X",
+               MODULE_NAME, fn, _tid, _deliveryId);
+    return true;
+}
+
+// ---- UpdateStatusToRetryReadyJob ----
+
+// 0x16fa0
+bool UpdateStatusToRetryReadyJob::Initialize(Packet const*& packet)
+{
+    wchar_t const* const fn = L"UpdateStatusToRetryReadyJob::Initialize";
+    if (packet == nullptr)
+    {
+        JOB_CONTEXT_CRASH(3249, INVALID_PACKET, MODULE_NAME, fn, packet);
+        return false;
+    }
+    short cmd = 0;
+    if (packet->Decompose("hqq", &cmd, &_tid, &_deliveryId) == 0)
+    {
+        Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 3257, FAIL_DECOMPOSE, MODULE_NAME, fn);
+        return false;
+    }
+    Log::Write(Log::LT_DEBUG, JOB_CONTEXT_FILE, 3260, DECOMPOSED_DELIVERY, MODULE_NAME, fn, _tid, _deliveryId);
+    return true;
+}
+
+// 0x170f0
+void UpdateStatusToRetryReadyJob::ReplySuccess(Session const*& session) const
+{
+    wchar_t const* const fn = L"UpdateStatusToRetryReadyJob::ReplySuccess";
+    if (session == nullptr)
+    {
+        JOB_CONTEXT_CRASH(3268, INVALID_SESSION, MODULE_NAME, fn, session);
+        return;
+    }
+    session->Send("hq", MarketDealer_UpdateStatusToRetryReadyOkCmd, _tid);
+    Log::Write(Log::LT_NOTICE, JOB_CONTEXT_FILE, 3273,
+               L"[%s], %s; sent job status update success ack [retry ready status], tid:0x%I64X, deliveryId:0x%I64X",
+               MODULE_NAME, fn, _tid, _deliveryId);
+}
+
+// 0x171f0
+bool UpdateStatusToRetryReadyJob::verifyParameter(short& failReason) const
+{
+    if (_deliveryId > 0)
+        return true;
+    Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 3302, INVALID_DELIVERY_PARAM, MODULE_NAME,
+               L"UpdateStatusToRetryReadyJob::verifyParameter", _tid, _deliveryId);
+    failReason = MARKETDEALER_UPDATESTATUSTORETRYREADYFAIL_INVALID_PARAMETER;
+    return false;
+}
+
+// 0x17260
+bool UpdateStatusToRetryReadyJob::handleJob(short& failReason)
+{
+    wchar_t const* const fn = L"UpdateStatusToRetryReadyJob::handleJob";
+    int dbRetValue = 0;
+    if (!MarketDB::UpdateStatusToRetryReady(dbRetValue, *this))
+    {
+        Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 3318,
+                   L"[%s], %s; failed to update job status [retry ready status], dbRetValue:%d, tid:0x%I64X, "
+                   L"deliveryId:0x%I64X",
+                   MODULE_NAME, fn, dbRetValue, _tid, _deliveryId);
+        failReason = MARKETDEALER_DB_ERROR;
+        return false;
+    }
+    Log::Write(Log::LT_DEBUG, JOB_CONTEXT_FILE, 3323,
+               L"[%s], %s; succeeded to update job status [retry ready status], tid:0x%I64X, deliveryId:0x%I64X",
+               MODULE_NAME, fn, _tid, _deliveryId);
+    return true;
+}
+
+#undef DECOMPOSED_DELIVERY
+#undef INVALID_DELIVERY_PARAM
+
+// ---- RetrieveReservationListJob ----
+
+// 0x17360
+RetrieveReservationListJob::~RetrieveReservationListJob()
+{
+    if (_header != nullptr)
+    {
+        MyReservationContext* next = _header->_next;
+        while (next != _header)
+        {
+            MyReservationContext* const node = next;
+            next = next->_next;
+            Memory::_Manager[2]->Free(node, JOB_CONTEXT_FILE, 3354);
+        }
+        Memory::_Manager[2]->Free(_header, JOB_CONTEXT_FILE, 3356);
+        const_cast<MyReservationContext*&>(_header) = nullptr;
+    }
+}
+
+// 0x17410
+bool RetrieveReservationListJob::Initialize(Packet const*& packet)
+{
+    wchar_t const* const fn = L"RetrieveReservationListJob::Initialize";
+    if (packet == nullptr)
+    {
+        JOB_CONTEXT_CRASH(3363, INVALID_PACKET, MODULE_NAME, fn, packet);
+        return false;
+    }
+    short cmd = 0;
+    if (packet->Decompose("hqhq", &cmd, &_tid, &_wid, &_pcId) == 0)
+    {
+        Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 3372, FAIL_DECOMPOSE, MODULE_NAME, fn);
+        return false;
+    }
+    Log::Write(Log::LT_DEBUG, JOB_CONTEXT_FILE, 3375, L"[%s], %s; decomposed packet, tid:0x%I64X, wid:%d, pcId:0x%I64X",
+               MODULE_NAME, fn, _tid, static_cast<int>(_wid), _pcId);
+    return true;
+}
+
+// 0x17570
+bool RetrieveReservationListJob::ReplySuccess(Session const*& session) const
+{
+    wchar_t const* const fn = L"RetrieveReservationListJob::ReplySuccess";
+    wchar_t const* const failFormat =
+        L"[%s], %s; failed to compose retrieve reservation list success packet, tid:0x%I64X, wid:%d, pcId:0x%I64X";
+    if (session == nullptr)
+    {
+        JOB_CONTEXT_CRASH(3383, INVALID_SESSION, MODULE_NAME, fn, session);
+        return false;
+    }
+
+    // LIFT: Packet has no constructor. The original sets all fields to zero (inlined).
+    Packet replyPacket;
+    replyPacket.Splitter = nullptr;
+    replyPacket.IsFragmentPacket = false;
+    replyPacket.FragmentPacketCmd = 0;
+    replyPacket.CurHeader = nullptr;
+    replyPacket.ListHead = nullptr;
+    replyPacket.ListTail = nullptr;
+    // LIFT: inlined RepeatPacketComposer setup.
+    RepeatPacketComposer rpc;
+    rpc.format = "hqhqCQqq;";
+    rpc.len = 9;
+    rpc.index = 0;
+    rpc.top = -1;
+    rpc.subTop = -1;
+    replyPacket.Allocate();
+    if (composeWith(replyPacket, &rpc, 4, MarketDealer_RetrieveReservationListOkCmd, _tid, static_cast<int>(_wid),
+                    _pcId) == 0)
+    {
+        Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 3395, failFormat, MODULE_NAME, fn, _tid, static_cast<int>(_wid),
+                   _pcId);
+        return false;
+    }
+    if (!composeResponsePacket(rpc, replyPacket))
+    {
+        Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 3400, failFormat, MODULE_NAME, fn, _tid, static_cast<int>(_wid),
+                   _pcId);
+        return false;
+    }
+    session->Send(&replyPacket);
+    Log::Write(Log::LT_NOTICE, JOB_CONTEXT_FILE, 3405,
+               L"[%s], %s; sent retrieve reservation list success ack, tid:0x%I64X, wid:%d, pcId:0x%I64X, "
+               L"contextCount:%d",
+               MODULE_NAME, fn, _tid, static_cast<int>(_wid), _pcId, _contextCount);
+    return true;
+}
+
+// 0x178a0
+void RetrieveReservationListJob::ReplyFailure(Session const*& session, short const& failReason) const
+{
+    wchar_t const* const fn = L"RetrieveReservationListJob::ReplyFailure";
+    if (session == nullptr)
+    {
+        JOB_CONTEXT_CRASH(3413, INVALID_SESSION, MODULE_NAME, fn, session);
+        return;
+    }
+    session->Send("hqhqE", MarketDealer_RetrieveReservationListFailCmd, _tid, static_cast<int>(_wid), _pcId,
+                  static_cast<int>(failReason));
+    Log::Write(Log::LT_NOTICE, JOB_CONTEXT_FILE, 3418,
+               L"[%s], %s; sent retrieve reservation list failure ack, tid:0x%I64X, wid:%d, pcId:0x%I64X, "
+               L"failReason:%d",
+               MODULE_NAME, fn, _tid, static_cast<int>(_wid), _pcId, static_cast<int>(failReason));
+}
+
+// 0x179d0
+bool RetrieveReservationListJob::verifyParameter(short& failReason) const
+{
+    if (_pcId > 0)
+        return true;
+    Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 3424, L"[%s], %s; invalid parameter, tid:0x%I64X, wid:%d, pcId:0x%I64X",
+               MODULE_NAME, L"RetrieveReservationListJob::verifyParameter", _tid, static_cast<int>(_wid), _pcId);
+    failReason = MARKETDEALER_RETRIEVERESERVATIONLISTFAIL_INVALID_PARAMETER;
+    return false;
+}
+
+// 0x17a50
+bool RetrieveReservationListJob::handleJob(short& failReason)
+{
+    int dbRetValue = 0;
+    if (MarketDB::RetrieveReservationList(dbRetValue, *this))
+        return true;
+    Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 3436,
+               L"[%s], %s; failed to retrieve reservation list, dbRetValue:%d, tid:0x%I64X, wid:%d, pcId:0x%I64X",
+               MODULE_NAME, L"RetrieveReservationListJob::handleJob", dbRetValue, _tid, static_cast<int>(_wid), _pcId);
+    failReason = MARKETDEALER_DB_ERROR;
+    return false;
+}
+
+#define INVALID_HEADER_NODE L"== CRASH == [%s], %s; invalid header node, header:0x%p, prev:0x%p, next:0x%p"
+
+// 0x17b00
+bool RetrieveReservationListJob::addMyReservationInfo(MyReservationInfo const& myReservationInfo)
+{
+    if (_header == nullptr || _header->_prev == nullptr || _header->_next == nullptr)
+    {
+        // BUG: 0x17b00 the log reads _header->_prev and _header->_next when _header is null.
+        JOB_CONTEXT_CRASH(3449, INVALID_HEADER_NODE, MODULE_NAME, L"RetrieveReservationListJob::addMyReservationInfo",
+                          _header, _header->_prev, _header->_next);
+        return false;
+    }
+    // LIFT: inlined new MyReservationContext (Memory::_Manager[2], 40 bytes).
+    MyReservationContext* node = static_cast<MyReservationContext*>(
+        Memory::_Manager[2]->Alloc(sizeof(MyReservationContext), JOB_CONTEXT_FILE, 3453));
+    if (node != nullptr)
+    {
+        node->_myReservationInfo = myReservationInfo;
+        node->_prev = nullptr;
+        node->_next = nullptr;
+    }
+    // BUG: 0x17b00 no null check after the alloc; the list link below writes to a null node.
+    MyReservationContext* const tail = _header->_prev;
+    if (tail == _header)
+    {
+        _header->_next = node;
+        node->_prev = _header;
+    }
+    else
+    {
+        tail->_next = node;
+        node->_prev = _header->_prev;
+    }
+    node->_next = _header;
+    _header->_prev = node;
+    ++_contextCount;
+    return true;
+}
+
+// 0x17c70
+bool RetrieveReservationListJob::composeResponsePacket(RepeatPacketComposer& rpc, Packet& packet) const
+{
+    wchar_t const* const fn = L"RetrieveReservationListJob::composeResponsePacket";
+    if (_header == nullptr || _header->_prev == nullptr || _header->_next == nullptr)
+    {
+        // BUG: 0x17c70 the log reads _header->_prev and _header->_next when _header is null.
+        JOB_CONTEXT_CRASH(3478, INVALID_HEADER_NODE, MODULE_NAME, fn, _header, _header->_prev, _header->_next);
+        return false;
+    }
+    rpc.PushRepeatCount(&packet);
+    for (MyReservationContext* next = _header->_next; next != _header; next = next->_next)
+    {
+        MyReservationInfo const& info = next->_myReservationInfo;
+        if (composeWith(packet, &rpc, 3, static_cast<int>(info._serviceType), info._saleId, info._serviceId) == 0)
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 3491,
+                       L"[%s], %s; failed to compose my reservation list packet, tid:0x%I64X, wid:%d, pcId:0x%I64X, "
+                       L"serviceType:%d, saleId:0x%I64X, serviceId:0x%I64X",
+                       MODULE_NAME, fn, _tid, static_cast<int>(_wid), _pcId, static_cast<int>(info._serviceType),
+                       info._saleId, info._serviceId);
+            return false;
+        }
+        Log::Write(Log::LT_DEBUG, JOB_CONTEXT_FILE, 3495,
+                   L"[%s], %s; composed reservation list packet, tid:0x%I64X, wid:%d, pcId:0x%I64X, serviceType:%d, "
+                   L"saleId:0x%I64X, serviceId:0x%I64X",
+                   MODULE_NAME, fn, _tid, static_cast<int>(_wid), _pcId, static_cast<int>(info._serviceType),
+                   info._saleId, info._serviceId);
+        incRepeatCount(rpc);
+    }
+    rpc.PopRepeatCount();
+    return true;
+}
+
+#undef INVALID_HEADER_NODE
+
+// ---- CancelReservationListJob ----
+
+// 0x17f30
+CancelReservationListJob::~CancelReservationListJob()
+{
+    if (_reservationList != nullptr)
+        jobArrayDelete(_reservationList, 3523);
+}
+
+// 0x17fa0
+bool CancelReservationListJob::Initialize(Packet const*& packet)
+{
+    wchar_t const* const fn = L"CancelReservationListJob::Initialize";
+    if (packet == nullptr)
+    {
+        JOB_CONTEXT_CRASH(3529, INVALID_PACKET, MODULE_NAME, fn, packet);
+        return false;
+    }
+
+    // LIFT: inlined RepeatPacketDecomposer setup (format "hqhqCQqq;", the command is skipped).
+    RepeatPacketDecomposer rpd;
+    rpd.format = "hqhqCQqq;";
+    rpd.len = 9;
+    rpd.index = 1;
+    rpd.offset = 2;
+    rpd.top = -1;
+    if (packet->Decompose(&rpd, 3, &_tid, &_wid, &_pcId) == 0)
+    {
+        Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 3537, FAIL_DECOMPOSE, MODULE_NAME, fn);
+        return false;
+    }
+    Log::Write(Log::LT_DEBUG, JOB_CONTEXT_FILE, 3540, L"[%s], %s; decomposed packet, tid:0x%I64X, wid:%d, pcId:0x%I64X",
+               MODULE_NAME, fn, _tid, static_cast<int>(_wid), _pcId);
+
+    // LIFT: inlined repeat count read of PacketUtil.cpp (assert at line 241).
+    Packet const* const p = packet;
+    if (p == nullptr)
+        assertCrash(L"source\\PacketUtil.cpp", "source\\PacketUtil.cpp", 241);
+    short const reservationCount = static_cast<short>(
+        rpd.PushRepeatCount(reinterpret_cast<char const*>(p->CurHeader + 1) + rpd.offset,
+                            static_cast<unsigned short>(p->CurHeader->size - 2) - rpd.offset));
+    _reservationCount = reservationCount;
+    if (reservationCount <= 0)
+    {
+        Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 3544,
+                   L"[%s], %s; invalid reservation count, tid:0x%I64X, wid:%d, pcId:0x%I64X, reservationCount:%d",
+                   MODULE_NAME, fn, _tid, static_cast<int>(_wid), _pcId, static_cast<int>(reservationCount));
+        return false;
+    }
+
+    _reservationList = jobArrayNew<MyReservationInfo>(reservationCount, 3548);
+    // BUG: 0x17fa0 no null check after the array new; the Decompose below writes to a null list.
+    for (int i = 0; i < _reservationCount; ++i)
+    {
+        MyReservationInfo& info = _reservationList[i];
+        if (packet->Decompose(&rpd, 3, &info._serviceType, &info._saleId, &info._serviceId) == 0)
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 3554, FAIL_DECOMPOSE, MODULE_NAME, fn);
+            return false;
+        }
+        Log::Write(Log::LT_DEBUG, JOB_CONTEXT_FILE, 3557,
+                   L"[%s], %s; decomposed packet, serviceType:%d, saleId:0x%I64X, serviceId:0x%I64X", MODULE_NAME,
+                   fn, static_cast<int>(info._serviceType), info._saleId, info._serviceId);
+        // LIFT: inlined decrement of the repeat count of RepeatPacketDecomposer.
+        rpd.index = rpd.start[rpd.top] + 1;
+        --rpd.counts[rpd.top];
+    }
+
+    // LIFT: inlined end of repeat of PacketUtil.cpp (assert at line 248: the repeat format must start with 'C').
+    if (rpd.top < 0 || rpd.format[rpd.start[rpd.top]] != 'C')
+        assertCrash(L"source\\PacketUtil.cpp", "source\\PacketUtil.cpp", 248);
+    rpd.skipRepeatFormat();
+    return true;
+}
+
+// 0x18400
+void CancelReservationListJob::ReplySuccess(Session const*& session) const
+{
+    wchar_t const* const fn = L"CancelReservationListJob::ReplySuccess";
+    if (session == nullptr)
+    {
+        JOB_CONTEXT_CRASH(3569, INVALID_SESSION, MODULE_NAME, fn, session);
+        return;
+    }
+    session->Send("hqhq", MarketDealer_CancelReservationListOkCmd, _tid, static_cast<int>(_wid), _pcId);
+    Log::Write(Log::LT_NOTICE, JOB_CONTEXT_FILE, 3574,
+               L"[%s], %s; sent cancel reservation list success ack, tid:0x%I64X, wid:%d, pcId:0x%I64X", MODULE_NAME,
+               fn, _tid, static_cast<int>(_wid), _pcId);
+}
+
+// 0x18520
+void CancelReservationListJob::ReplyFailure(Session const*& session, short const& failReason) const
+{
+    wchar_t const* const fn = L"CancelReservationListJob::ReplyFailure";
+    if (session == nullptr)
+    {
+        JOB_CONTEXT_CRASH(3580, INVALID_SESSION, MODULE_NAME, fn, session);
+        return;
+    }
+    session->Send("hqhqE", MarketDealer_CancelReservationListFailCmd, _tid, static_cast<int>(_wid), _pcId,
+                  static_cast<int>(failReason));
+    Log::Write(Log::LT_NOTICE, JOB_CONTEXT_FILE, 3585,
+               L"[%s], %s; sent cancel reservation list failure ack, tid:0x%I64X, wid:%d, pcId:0x%I64X, "
+               L"failReason:%d",
+               MODULE_NAME, fn, _tid, static_cast<int>(_wid), _pcId, static_cast<int>(failReason));
+}
+
+// 0x18650
+bool CancelReservationListJob::verifyParameter(short& failReason) const
+{
+    wchar_t const* const fn = L"CancelReservationListJob::verifyParameter";
+    if (_pcId <= 0)
+    {
+        Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 3591,
+                   L"[%s], %s; invalid parameter, tid:0x%I64X, wid:%d, pcId:0x%I64X", MODULE_NAME, fn, _tid,
+                   static_cast<int>(_wid), _pcId);
+        failReason = MARKETDEALER_CANCELRESERVATIONLISTFAIL_INVALID_PARAMETER;
+        return false;
+    }
+    for (int i = 0; i < _reservationCount; ++i)
+    {
+        MyReservationInfo const& info = _reservationList[i];
+        // ❓ 1, 2, 3 = sale, bid, purchase service type (the PDB enum name is not checked).
+        if (info._serviceType > 0 && info._serviceType < 4 && info._saleId > 0 && info._serviceId > 0)
+            continue;
+        Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 3602,
+                   L"[%s], %s; invalid reservation info, tid:0x%I64X, wid:%d, pcId:0x%I64X, serviceType:%d, "
+                   L"saleId:0x%I64X, serviceId:0x%I64X",
+                   MODULE_NAME, fn, _tid, static_cast<int>(_wid), _pcId, static_cast<int>(info._serviceType),
+                   info._saleId, info._serviceId);
+        failReason = MARKETDEALER_CANCELRESERVATIONLISTFAIL_INVALID_PARAMETER;
+        return false;
+    }
+    return true;
+}
+
+// 0x18780
+bool CancelReservationListJob::handleJob(short& failReason)
+{
+    for (int i = 0; i < _reservationCount; ++i)
+    {
+        MyReservationInfo const& info = _reservationList[i];
+        switch (info._serviceType)
+        {
+        case 1:  // ❓ sale
+        {
+            CancelSaleReservationJob jobContext;
+            jobContext._tid = _tid;
+            jobContext._saleId = info._serviceId;
+            jobContext._sellerPcId = _pcId;
+            if (jobContext.verifyParameter(failReason))
+                jobContext.handleJob(failReason);
+            break;
+        }
+        case 2:  // ❓ bid
+        {
+            CancelBidReservationJob jobContext;
+            jobContext._tid = _tid;
+            jobContext._saleId = info._saleId;
+            jobContext._bidId = info._serviceId;
+            jobContext._bidderPcId = _pcId;
+            if (jobContext.verifyParameter(failReason))
+                jobContext.handleJob(failReason);
+            break;
+        }
+        case 3:  // ❓ purchase
+        {
+            CancelPurchaseReservationJob jobContext;
+            jobContext._tid = _tid;
+            jobContext._saleId = info._saleId;
+            jobContext._purchaseId = info._serviceId;
+            jobContext._purchaserPcId = _pcId;
+            if (jobContext.verifyParameter(failReason))
+                jobContext.handleJob(failReason);
+            break;
+        }
+        default:
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 3630,
+                       L"[%s], %s; invalid service type; not support service type, tid:0x%I64X, wid:%d, "
+                       L"pcId:0x%I64X, serviceType:%d, saleId:0x%I64X, serviceId:0x%I64X",
+                       MODULE_NAME, L"CancelReservationListJob::handleJob", _tid, static_cast<int>(_wid), _pcId,
+                       static_cast<int>(info._serviceType), info._saleId, info._serviceId);
+            break;
+        }
+    }
+    return true;
+}

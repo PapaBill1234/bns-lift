@@ -221,10 +221,16 @@ public:
         RetrieveReservationListJob::MyReservationContext* _prev;
         RetrieveReservationListJob::MyReservationContext* _next;
     };
-    virtual ~RetrieveReservationListJob();
-    virtual bool verifyParameter(short& result) const;
-    virtual bool handleJob(short& result);
-    bool addMyReservationInfo(MyReservationInfo const& myReservationInfo);  // 0x17b00 ❓ const& or const*
+    // LIFT: The constructor is inlined at the call site (AgentPacketHandler.obj 0x6bb0, later card).
+    RetrieveReservationListJob();
+    virtual ~RetrieveReservationListJob();                              // 0x17360
+    virtual bool verifyParameter(short& failReason) const;              // 0x179d0
+    virtual bool handleJob(short& failReason);                          // 0x17a50
+    bool Initialize(Packet const*& packet);                             // 0x17410
+    bool ReplySuccess(Session const*& session) const;                   // 0x17570
+    void ReplyFailure(Session const*& session, short const& failReason) const;  // 0x178a0
+    bool addMyReservationInfo(MyReservationInfo const& myReservationInfo);  // 0x17b00
+    bool composeResponsePacket(RepeatPacketComposer& rpc, Packet& packet) const;  // 0x17c70
 
     unsigned long long _tid;
     short _wid;
@@ -232,6 +238,29 @@ public:
     RetrieveReservationListJob::MyReservationContext* const _header;
     int _contextCount;
 };
+
+class CancelReservationListJob : public JobContext
+{
+public:
+    // LIFT: The constructor is inlined at the call site (AgentPacketHandler.obj 0x6d80, later card).
+    CancelReservationListJob();
+    virtual ~CancelReservationListJob();                                // 0x17f30
+    virtual bool verifyParameter(short& failReason) const;              // 0x18650
+    virtual bool handleJob(short& failReason);                          // 0x18780
+    bool Initialize(Packet const*& packet);                             // 0x17fa0
+    void ReplySuccess(Session const*& session) const;                   // 0x18400
+    void ReplyFailure(Session const*& session, short const& failReason) const;  // 0x18520
+
+    unsigned long long _tid;
+    short _wid;
+    long long _pcId;
+    MyReservationInfo* _reservationList;
+    int _reservationCount;
+};
+static_assert(sizeof(CancelReservationListJob) == 0x30, "sizeof CancelReservationListJob");
+static_assert(offsetof(CancelReservationListJob, _reservationList) == 0x20, "CancelReservationListJob::_reservationList");
+static_assert(offsetof(CancelReservationListJob, _reservationCount) == 0x28,
+              "CancelReservationListJob::_reservationCount");
 
 class ReserveSaleJob : public JobContext
 {
@@ -624,8 +653,10 @@ public:
             MAX_PARAM_COUNT = 0x2,                             \
         };                                                     \
         virtual ~Name();                                       \
-        virtual bool verifyParameter(short& result) const;     \
-        virtual bool handleJob(short& result);                 \
+        virtual bool verifyParameter(short& failReason) const; \
+        virtual bool handleJob(short& failReason);             \
+        bool Initialize(Packet const*& packet);                \
+        void ReplySuccess(Session const*& session) const;      \
                                                                \
         unsigned long long _tid;                               \
         long long _deliveryId;                                 \
@@ -652,8 +683,10 @@ public:
         MAX_PARAM_COUNT = 0x3,
     };
     virtual ~UpdateStatusToPostRegistrationSuccessJob();
-    virtual bool verifyParameter(short& result) const;
-    virtual bool handleJob(short& result);
+    virtual bool verifyParameter(short& failReason) const;              // 0x16e40
+    virtual bool handleJob(short& failReason);                          // 0x16ec0
+    bool Initialize(Packet const*& packet);                             // 0x16be0
+    void ReplySuccess(Session const*& session) const;                   // 0x16d40
 
     unsigned long long _tid;
     long long _deliveryId;
