@@ -219,8 +219,8 @@ bool HandlePostOfficeServiceRetrieveCharacterInfoReq(Session const* session, Pac
                MODULE_NAME, L"HandlePostOfficeServiceRetrieveCharacterInfoReq",
                static_cast<unsigned int>(requestWid), request._gameTid, static_cast<unsigned int>(request._targetWid),
                request._targetCharacterName);
-    // ❓ BUG: 0x1fdd0 the check is wcslen(name) == 1 in the binary. A check for an empty name is probable.
-    if (request._gameTid == 0 || request._targetWid == 0 || wcslen(request._targetCharacterName) == 1)
+    // 0x1ff6e-0x1ff98: repne scasw; not; dec; je. The check is for an empty name.
+    if (request._gameTid == 0 || request._targetWid == 0 || wcslen(request._targetCharacterName) == 0)
     {
         Log::Write(Log::LT_ERROR, WORLD_PACKET_HANDLER_FILE, 158,
                    L"[%s], %s; invalid parameter, requestWid:%u, gameTid:0x%I64X, targetWid:%u, targetCharacterName:%s",
@@ -387,7 +387,7 @@ $_ERROR:
     return true;
 }
 
-// The log formats of HandlePostOfficeServiceRegisterPostReq. ❓ The source writes the text in each Log::Write call.
+// The log formats of HandlePostOfficeServiceRegisterPostReq. LIFT: the binary has one full literal per Log::Write call.
 #define ITEM_LOG_ARGS L", tid:0x%I64X, invoiceId:0x%I64X, itemNo:%d, itemType:%d, itemCategory:%d, itemInstanceId:0x%I64X, itemDataId:%d, itemLevel:%d, itemAmount:%I64d, itemXmlData:%s"
 #define POST_LOG_ARGS L", tid:0x%I64X, invoiceId:0x%I64X, postType:%d, deliveryReason:%d, postHint:0x%I64X, reservedHint:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X, senderServiceType:%d, senderWid:%d, senderPcId:0x%I64X, senderAccountId:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X, senderWorldName:%s, senderName:%s, recipientWid:%d, recipientPcId:0x%I64X, recipientName:%s, postTitle:%s, postMessage:%s"
 #define POST_LOG_VALUES                                                                                              \
@@ -589,7 +589,7 @@ bool HandlePostOfficeServiceRegisterPostReq(Session const* session, Packet const
             postContext = ::new (memory) PostContext();
         // BUG: 0x20720 no null check after the Alloc at line 443.
         postContext->_postInfo = postInfo;
-        // ❓ The list is not freed on this path (same as 0x1aaa0). InitAttachedItemInfo may keep it.
+        // 0x11630: InitAttachedItemInfo fails only for a null list (the count is > 0 here). The path has nothing to free.
         if (attachedItemCount > 0 && !postContext->InitAttachedItemInfo(attachedItemList, attachedItemCount))
         {
             Log::Write(Log::LT_ERROR, WORLD_PACKET_HANDLER_FILE, 447,

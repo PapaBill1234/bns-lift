@@ -50,7 +50,7 @@ void CacheGateChannel::SetServiceState(ServiceState const newState)
     InterlockedExchange(reinterpret_cast<long volatile*>(&_serviceState), newState);
     Log::Write(Log::LT_NOTICE, CACHEGATE_CHANNEL_FILE, 36, L"[%s], %s; current cachegate service state:%s",
                MODULE_NAME, L"CacheGateChannel::SetServiceState",
-               newState == SERVICE_STATE_AVAILABLE ? L"available" : L"unavailable");  // ❓ text for the unavailable state
+               newState == SERVICE_STATE_AVAILABLE ? L"available" : L"unavailable");  // inlined: 0x7bf7 state 0 -> L"unavailable", 0x7ed9 state 1 -> L"available"
 }
 
 // 0x75a0
@@ -93,7 +93,7 @@ bool CacheGateChannel::composeRelayHeader(FragmentPacket& packet, RelayHeader co
 bool CacheGateChannel::combineFragmentRelayFormat(char* const relayFormat, unsigned long long const bufferSize,
                                                    char const* const economyFormat)
 {
-    if (relayFormat == nullptr || economyFormat == nullptr)  // ❓ the second test
+    if (relayFormat == nullptr || economyFormat == nullptr)  // LIFT: 0x7422 tests only relayFormat; LTCG made economyFormat the constant 0x14007acd0
     {
         Log::Write(Log::LT_ERROR, CACHEGATE_CHANNEL_FILE, 91,
                    L"== CRASH == [%s], %s; invalid parameter, relayFormat:0x%p, bufferSize:%d, economyFormat:0x%p",
@@ -271,7 +271,7 @@ bool CacheGateSessionHandler::OnConnect(Session const* session, bool firstConnec
     if (daemon->pipeConsole != nullptr)
         daemon->pipeConsole->SetInvalidInfo(DISCONNECTED_CACHEGATE, false);
 
-    // ❓ the decompiler shows only "hhhh", 1. Cmd 1 = hello; 4 and 10 are the versions from the log below.
+    // 0x7a75-0x7a95: Send("hhhh" 0x74388, 1, 4, 0xA, word [daemon+0x750]).
     session->Send("hhhh", 1, 4, 10, daemon->_serviceWid);
     Log::Write(Log::LT_NOTICE, CACHEGATE_CHANNEL_FILE, 261,
                L"[%s], %s; sent hello request to cachegate, cachegate-packet-version:%d, economy-common-packet-version:%d, postofficeServiceWid:%u",
@@ -309,7 +309,7 @@ void CacheGateSessionHandler::OnClose(Session const* session, bool tryReconnect)
         channel->removeReferenceCount(CACHEGATE_CHANNEL_FILE, 277);
     }
 
-    daemon->_cachedWatchdogManager->SetAllServiceState(CachedWatchdog::SERVICE_STATE_UNAVAILABLE);  // ❓ the decompiler shows no value
+    daemon->_cachedWatchdogManager->SetAllServiceState(CachedWatchdog::SERVICE_STATE_UNAVAILABLE);  // 0x7cae; LTCG folded the value into 0x4a50 (r12d = 0 at 0x4a78)
 
     if (tryReconnect)
         Log::Write(Log::LT_DEBUG, CACHEGATE_CHANNEL_FILE, 284,
