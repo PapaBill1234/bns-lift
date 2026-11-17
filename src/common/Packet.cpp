@@ -94,7 +94,8 @@ unsigned short Packet::DecomposeText(char const* format, ...) const
     va_start(args, format);
     if (format == nullptr || CurHeader == nullptr)
         PACKET_ASSERT_CRASH(612);
-    // ❓ LTCG removed the count argument; the size - 2 value is taken from Packet::Decompose.
+    // LIFT: the count value is a guess. PDB: DecomposeText has 5 arguments. 0x22293-0x222a0 passes only
+    // buffer, format and args. DecomposeText (0x2FAB0) reads the length from the buffer, not count.
     unsigned short size = PacketBuffer::DecomposeText(reinterpret_cast<char const*>(CurHeader + 1),
                                                       CurHeader->size - 2, format,
                                                       static_cast<unsigned long long>(-1), args);

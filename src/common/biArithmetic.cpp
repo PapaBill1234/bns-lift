@@ -529,7 +529,8 @@ void BigInteger::Divide(BigInteger const* a, BigInteger const* b, BigInteger* qu
 }
 
 // 0x59ab0 (LobbyGate)
-// ❓ LTCG removed the quot code. All callers give quot = 0. The code uses only rem.
+// LIFT: LTCG removed quot. The binary gets rem in r8 (0x59AB4, 0x59ABA). The only call (0x561D2)
+// passes rcx = a, edx = b, r8 = &rem. The code uses only rem.
 void BigInteger::Divide(BigInteger const* a, unsigned int b, BigInteger* quot, unsigned int* rem)
 {
     (void)quot;

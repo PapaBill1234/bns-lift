@@ -462,7 +462,7 @@ PacketBuffer* PacketBufferPool::allocate()
             AlertSender::Write(PACKETBUFFER_FILE, 1285,
                                L"== CRASH == [PacketBuffer], _list는 NULL이지만 _count(%d)는 0이 아닙니다.", _count);
         }
-        // ❓ LTCG removed the count argument. PacketBufferAllocator::allocate uses 16.
+        // PDB: allocate has 1 argument. LTCG removed it: allocate (SmartCouponDaemon 0x241b0) does not read ecx and uses 0x10 (0x241e0, 0x24238).
         _pool = PacketBufferAllocator::allocate(16);
         _count = 16;
     }

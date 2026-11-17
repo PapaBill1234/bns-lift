@@ -340,8 +340,9 @@ bool BnsCommonConfig::CheckMinMaxBoundary(void const* const loaded, XmlCfgDefLoc
 }
 
 // 0x1c10
-// ❓ LTCG put the globals in place of the arguments: the binary reads Config as this and ConfigNoReload as load.
-// The only caller (LoadBnsCommonConfig) gives these values, so the result is the same.
+// LIFT: LTCG put the globals in place of the arguments. 0x1C1F reads Config (PDB 0003:5064) as this and
+// 0x1C18 reads ConfigNoReload (PDB 0003:5072) as load.
+// The only caller (LoadBnsCommonConfig, call at 0x158C) gives these values, so the result is the same.
 bool BnsCommonConfig::UpdateAllVariable(BnsCommonConfigLoad const* const load)
 {
     if (load == nullptr)
@@ -384,7 +385,8 @@ bool BnsCommonConfig::UpdateAllVariable(BnsCommonConfigLoad const* const load)
 }
 
 // 0x1d50
-// ❓ LTCG put the global Config in place of source. The only caller gives Config.
+// LIFT: LTCG put the global Config in place of source. 0x1D5A reads Config (PDB 0003:5064).
+// The only call is at 0x1748.
 bool BnsCommonConfig::Copy(BnsCommonConfig const* const source)
 {
     if (source == nullptr)
@@ -467,7 +469,8 @@ bool BnsCommonConfig::UpdateReloadedVariable(BnsCommonConfigReload const* const 
 }
 
 // 0x1fc0
-// ❓ LTCG put the global Config in place of this. The only caller gives Config.
+// LIFT: LTCG put the global Config in place of this. 0x1FC6 reads Config (PDB 0003:5064).
+// The only call is at 0x164C.
 bool BnsCommonConfig::CompareMatch(BnsCommonConfigReload const* reload) const
 {
     if (reload == nullptr)

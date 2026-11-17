@@ -27,7 +27,7 @@ AsyncSendContext* SessionSendBuffer::Add(PacketBuffer const** const pbufferList,
     AsyncSendContext* context = nullptr;
     if (pbufferList == nullptr)
     {
-        // ❓ The binary writes the constant 1 for count and 0 for pbufferList. All callers give count 1.
+        // LIFT: LTCG put constants in the log: count = 1 (0x1A4AD, 0x1A4BA), pbufferList = 0 (ebp, 0x1A35A).
         Log::Write(Log::LT_ERROR, SESSIONBUFFER_FILE, 94,
                    L"== CRASH == [session], send parameter is invalid, count %d, pbufferList: %p", count, pbufferList);
         AlertSender::Write(SESSIONBUFFER_FILE, 94,
