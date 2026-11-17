@@ -18,6 +18,8 @@ public:
         PARAM_SELLER_PCID = 0x2,
         MAX_PARAM_COUNT = 0x3,
     };
+    // LIFT: inlined in HandleMarketManagerSuspendSaleReq (0x1ac40).
+    SuspendSaleManagementJob() : _tid(0), _saleId(0), _sellerPcId(0) {}
     virtual ~SuspendSaleManagementJob();
     virtual bool verifyParameter(short& failReason) const;                    // 0x18c00
     virtual bool handleJob(short& failReason);                                // 0x18c80
@@ -42,6 +44,8 @@ public:
         PARAM_RECIPIENT_PCID = 0x3,
         MAX_PARAM_COUNT = 0x4,
     };
+    // LIFT: inlined in HandleMarketManagerRetrySingleDeliveryFailureReq (0x1ad20).
+    RetrySingleDeliveryFailureManagementJob() : _tid(0), _deliveryId(0), _saleId(0), _recipientPcId(0) {}
     virtual ~RetrySingleDeliveryFailureManagementJob();
     virtual bool verifyParameter(short& failReason) const;                    // 0x19510
     virtual bool handleJob(short& failReason);                                // 0x195a0
@@ -61,11 +65,15 @@ static_assert(offsetof(RetrySingleDeliveryFailureManagementJob, _recipientPcId) 
 class RetryAllDeliveryFailureManagementJob : public JobContext
 {
 public:
+    // LIFT: inlined in HandleMarketManagerRetryAllDeliveryFailureReq (0x1ae50).
+    RetryAllDeliveryFailureManagementJob() : _tid(0) {}
     virtual ~RetryAllDeliveryFailureManagementJob();
     virtual bool verifyParameter(short& failReason) const;  // 0x36600
     virtual bool handleJob(short& failReason);              // 0x199f0
     bool Initialize(Packet const*& packet);                 // 0x197c0
     void ReplySuccess(Session const*& session) const;       // 0x19900
+    // LIFT: inlined in HandleMarketManagerRetryAllDeliveryFailureReq (0x1ae50). Log lines 300, 305.
+    void ReplyFailure(Session const*& session, short const& failReason) const;
 
     unsigned long long _tid;
 };
@@ -80,6 +88,8 @@ public:
         PARAM_DELIVERY_ID = 0x1,
         MAX_PARAM_COUNT = 0x2,
     };
+    // LIFT: inlined in HandleMarketManagerUpdateStatusToReportFailureReq (0x1b040).
+    UpdateStatusToReportFailureManagementJob() : _tid(0), _deliveryId(0), _saleId(0), _recipientPcId(0) {}
     virtual ~UpdateStatusToReportFailureManagementJob();
     virtual bool verifyParameter(short& failReason) const;                    // 0x19ef0
     virtual bool handleJob(short& failReason);                                // 0x19f80

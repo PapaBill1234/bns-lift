@@ -235,26 +235,8 @@ enum MarketDealerSearchType
     MARKETDEALER_SEARCHTYPE_MAX_TYPE = 0x4,
 };
 
-// PDB enum 0x3127 (manager channel packets).
-enum MarketManagerPacketCommand
-{
-    MarketManager_HelloReqCmd = 1,
-    MarketManager_HelloOkCmd = 2,
-    MarketManager_HelloFailCmd = 3,
-    MarketManager_SuspendSaleReqCmd = 4,
-    MarketManager_SuspendSaleOkCmd = 5,
-    MarketManager_SuspendSaleFailCmd = 6,
-    MarketManager_RetrySingleDeliveryFailureReqCmd = 7,
-    MarketManager_RetrySingleDeliveryFailureOkCmd = 8,
-    MarketManager_RetrySingleDeliveryFailureFailCmd = 9,
-    MarketManager_RetryAllDeliveryFailureReqCmd = 10,
-    MarketManager_RetryAllDeliveryFailureOkCmd = 11,
-    MarketManager_RetryAllDeliveryFailureFailCmd = 12,
-    MarketManager_UpdateStatusToReportFailureReqCmd = 13,
-    MarketManager_UpdateStatusToReportFailureOkCmd = 14,
-    MarketManager_UpdateStatusToReportFailureFailCmd = 15,
-    MARKETMANAGER_CMD_MAX = 16,
-};
+// PDB enum 0x3127 (manager channel packets) is in src/Server/Packet/MarketManagerPacketCommand.h.
+#include "MarketManagerPacketCommand.h"
 
 enum MarketManagerFailReason
 {

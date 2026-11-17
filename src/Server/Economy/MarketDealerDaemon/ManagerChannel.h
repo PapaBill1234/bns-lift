@@ -11,6 +11,8 @@ class Packet;
 class ManagerChannel : public Channel
 {
 public:
+    // LIFT: inlined in HandleMarketManagerHelloReq (0x1a940).
+    explicit ManagerChannel(unsigned short const managerWid) : _managerWid(managerWid) {}
     virtual ~ManagerChannel();           // later card
     virtual unsigned long long GetId();  // later card
 
@@ -30,6 +32,8 @@ public:
 };
 static_assert(sizeof(ManagerSessionHandler) == 0x8, "sizeof ManagerSessionHandler");
 
-// Handler list objects (data only, later card). PDB type in types.h is void*; the element type is Daemon::PacketHandler.
+// Handler list objects (MarketManagerServerSideHandlerList.cpp). PDB type in types.h is void*; the element type is
+// Daemon::PacketHandler.
+extern wchar_t const* MarketManagerCommandList[16];
 extern Daemon::PacketHandler MarketManagerPacketServerSideHandlerList[16];
 extern Daemon::PacketHandler MarketManagerPacketServerSideFragmentHandlerList[16];

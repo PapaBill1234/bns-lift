@@ -307,6 +307,21 @@ void RetryAllDeliveryFailureManagementJob::ReplySuccess(Session const*& session)
                L"[%s], %s; sent retry all delivery failure success ack, tid:0x%I64X", MODULE_NAME, fn, _tid);
 }
 
+// LIFT: inlined in HandleMarketManagerRetryAllDeliveryFailureReq (0x1ae50). No out-of-line copy in the exe.
+void RetryAllDeliveryFailureManagementJob::ReplyFailure(Session const*& session, short const& failReason) const
+{
+    wchar_t const* const fn = L"RetryAllDeliveryFailureManagementJob::ReplyFailure";
+    if (session == nullptr)
+    {
+        MANAGEMENT_JOB_CRASH(300, INVALID_SESSION, MODULE_NAME, fn, session);
+        return;
+    }
+    session->Send("hqE", MarketManager_RetryAllDeliveryFailureFailCmd, _tid, static_cast<int>(failReason));
+    Log::Write(Log::LT_NOTICE, MANAGEMENT_JOB_FILE, 305,
+               L"[%s], %s; sent retry all delivery failure failure ack, tid:0x%I64X, failReason:%d", MODULE_NAME, fn,
+               _tid, static_cast<int>(failReason));
+}
+
 // 0x36600
 // LIFT: ICF folds this body with WindowConsole::controlHandler (return true).
 bool RetryAllDeliveryFailureManagementJob::verifyParameter(short& /*failReason*/) const

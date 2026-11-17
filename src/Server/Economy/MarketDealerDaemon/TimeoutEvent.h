@@ -1,5 +1,5 @@
 // TimeoutEvent.obj (MarketDealerDaemon PDB). Layouts from include/pdb/MarketDealerDaemon/types.h.
-// The virtual functions are a later card (declarations only). The ctors are inlined in
+// The member functions are in TimeoutEvent.cpp. The ctors are inlined in
 // TimeoutTimer::postTimeoutEvent (0x31e20).
 #pragma once
 #include <stddef.h>
@@ -18,6 +18,7 @@ public:
     virtual ~InstantSaleTimeoutEvent();
     virtual unsigned int EventId() const;
     virtual bool HandleEvent(EventContext* context, unsigned long bytes);
+    void processTimeout();  // 0x2fac0
 
     long long _saleId;
     SaleContext* _saleContext;
@@ -38,6 +39,7 @@ public:
     virtual ~AuctionTimeoutEvent();
     virtual unsigned int EventId() const;
     virtual bool HandleEvent(EventContext* context, unsigned long bytes);
+    void processTimeout();  // 0x30240
 
     long long _saleId;
     SaleContext* _saleContext;
