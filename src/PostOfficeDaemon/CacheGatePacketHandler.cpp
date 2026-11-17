@@ -12,7 +12,7 @@
 #include "Session.h"
 #include "ThreadFreePacketPump.h"
 
-extern TFPP_PacketHandler CacheEconomyPacketClientSideHandlerList[22];  // CacheEconomyClientSideHandlerList (card 4)
+extern TFPP_PacketHandler CacheEconomyPacketClientSideHandlerList[22];  // CacheEconomyClientSideHandlerList.cpp
 
 namespace
 {

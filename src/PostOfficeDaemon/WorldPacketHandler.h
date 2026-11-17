@@ -1,6 +1,6 @@
 // WorldPacketHandler.obj (PostOfficeDaemon PDB). Layouts from include/pdb/PostOfficeDaemon/types.h and 0x1f650.
-// The context functions that are not in WorldPacketHandler.obj are in the modules RetrieveCharacterInfoRelay
-// (0x1de30..0x1e410) and CheckPostCapacityRelay (0x9180..0x9740). A later card lifts them.
+// The context functions that are not in WorldPacketHandler.obj are in RetrieveCharacterInfoRelay.cpp
+// (0x1de30..0x1e410) and CheckPostCapacityRelay.cpp (0x9180..0x9740).
 #pragma once
 #include <stddef.h>
 #include "RelayContext.h"
@@ -47,15 +47,18 @@ public:
     virtual ~RetrieveCharacterInfoRelayContext() {}  // 0x1f7a0 (scalar deleting dtor)
 
     virtual unsigned short const GetRequestWid() const;            // ❓ folded with 0x1f800
-    virtual RelayHeader const MakeRelayHeader() const;             // later card (RetrieveCharacterInfoRelay)
-    virtual bool ComposeRequestPacket(FragmentPacket&) const;      // later card
-    virtual bool ComposeRequestPacket(Packet&) const;              // later card
-    virtual bool ComposeResponsePacket(FragmentPacket&) const;     // later card
-    virtual bool ComposeResponsePacket(Packet&) const;             // later card
-    virtual bool processRelayRequest(Channel* const) const;        // later card
-    virtual bool processRelayResponse() const;                     // later card
-    virtual bool processRelayTimeout();                            // later card
+    virtual RelayHeader const MakeRelayHeader() const;             // 0x1e110
+    virtual bool ComposeRequestPacket(FragmentPacket&) const;      // ❓ folded with 0x34c40
+    virtual bool ComposeRequestPacket(Packet&) const;              // 0x1e150
+    virtual bool ComposeResponsePacket(FragmentPacket&) const;     // ❓ folded with 0x34c40
+    virtual bool ComposeResponsePacket(Packet&) const;             // 0x1e230
+    virtual bool processRelayRequest(Channel* const) const;        // 0x1de30
+    virtual bool processRelayResponse() const;                     // 0x1df30
+    virtual bool processRelayTimeout();                            // 0x1e0b0
     virtual void initResponse(RelayResponse* const response);      // 0x1f770
+
+    static unsigned short convertFailReason(RelayResponse::RESULTSTATE const resultState,
+                                            short const failReason);  // 0x1e410 ❓ return type
 
     RetrieveCharacterInfoRelayRequest _request;
     RetrieveCharacterInfoRelayResponse _response;
@@ -98,15 +101,18 @@ public:
     virtual ~CheckPostCapacityRelayContext() {}  // 0x1f840 (scalar deleting dtor)
 
     virtual unsigned short const GetRequestWid() const;            // 0x1f800
-    virtual RelayHeader const MakeRelayHeader() const;             // later card (CheckPostCapacityRelay)
-    virtual bool ComposeRequestPacket(FragmentPacket&) const;      // later card
-    virtual bool ComposeRequestPacket(Packet&) const;              // later card
-    virtual bool ComposeResponsePacket(FragmentPacket&) const;     // later card
-    virtual bool ComposeResponsePacket(Packet&) const;             // later card
-    virtual bool processRelayRequest(Channel* const) const;        // later card
-    virtual bool processRelayResponse() const;                     // later card
-    virtual bool processRelayTimeout();                            // later card
+    virtual RelayHeader const MakeRelayHeader() const;             // 0x9450
+    virtual bool ComposeRequestPacket(FragmentPacket&) const;      // ❓ folded with 0x34c40
+    virtual bool ComposeRequestPacket(Packet&) const;              // 0x9490
+    virtual bool ComposeResponsePacket(FragmentPacket&) const;     // ❓ folded with 0x34c40
+    virtual bool ComposeResponsePacket(Packet&) const;             // 0x9570
+    virtual bool processRelayRequest(Channel* const) const;        // 0x9180
+    virtual bool processRelayResponse() const;                     // 0x9280
+    virtual bool processRelayTimeout();                            // 0x9400
     virtual void initResponse(RelayResponse* const response);      // 0x1f810
+
+    static unsigned short convertFailReason(RelayResponse::RESULTSTATE const resultState,
+                                            short const failReason);  // 0x9740 ❓ return type
 
     CheckPostCapacityRelayRequest _request;
     CheckPostCapacityRelayResponse _response;

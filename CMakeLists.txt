@@ -200,7 +200,14 @@ add_library(lift_postofficedaemon STATIC
   src/PostOfficeDaemon/PostOfficeManagementPacketHandlerList.cpp
   src/PostOfficeDaemon/WorldChannel.cpp
   src/PostOfficeDaemon/WorldPacketHandler.cpp
-  src/PostOfficeDaemon/PostOfficeServicePacketServerSideHandlerList.cpp)
+  src/PostOfficeDaemon/PostOfficeServicePacketServerSideHandlerList.cpp
+  src/PostOfficeDaemon/PostContext.cpp
+  src/PostOfficeDaemon/PostDeliveryEvent.cpp
+  src/PostOfficeDaemon/DeliverPostRelay.cpp
+  src/PostOfficeDaemon/CheckPostCapacityRelay.cpp
+  src/PostOfficeDaemon/RetrieveCharacterInfoRelay.cpp
+  src/PostOfficeDaemon/CacheEconomyPacketHandler.cpp
+  src/PostOfficeDaemon/CacheEconomyClientSideHandlerList.cpp)
 target_compile_options(lift_postofficedaemon PRIVATE /GR-)
 target_include_directories(lift_postofficedaemon BEFORE PRIVATE ${LIFT_STL_INCLUDE})
 target_include_directories(lift_postofficedaemon PUBLIC ${CMAKE_SOURCE_DIR}/src/PostOfficeDaemon)

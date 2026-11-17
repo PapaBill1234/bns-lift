@@ -1,0 +1,228 @@
+// RetrieveCharacterInfoRelay.obj (PostOfficeDaemon PDB). Class declarations are in WorldPacketHandler.h.
+#include "WorldPacketHandler.h"
+#include "Log.h"
+#include "AlertSender.h"
+#include "Packet.h"
+#include "CacheGateChannel.h"
+#include "WorldChannel.h"
+#include "PostOfficeDaemon.h"
+
+#define RETRIEVE_CHARACTER_INFO_RELAY_FILE L"RetrieveCharacterInfoRelay.cpp"
+#define RETRIEVE_CHARACTER_INFO_RELAY_TAG L"relay context"
+
+#define RETRIEVE_CHARACTER_INFO_RELAY_CRASH(line, fmt, ...)                                     \
+    do                                                                                          \
+    {                                                                                           \
+        Log::Write(Log::LT_ERROR, RETRIEVE_CHARACTER_INFO_RELAY_FILE, line, fmt, __VA_ARGS__);  \
+        AlertSender::Write(RETRIEVE_CHARACTER_INFO_RELAY_FILE, line, fmt, __VA_ARGS__);         \
+    } while (0)
+
+// ❓ folded with 0x34c40
+bool RetrieveCharacterInfoRelayContext::ComposeRequestPacket(FragmentPacket&) const
+{
+    return true;
+}
+
+// ❓ folded with 0x34c40
+bool RetrieveCharacterInfoRelayContext::ComposeResponsePacket(FragmentPacket&) const
+{
+    return true;
+}
+
+// 0x1de30
+bool RetrieveCharacterInfoRelayContext::processRelayRequest(Channel* const channel) const
+{
+    if (channel == nullptr)
+    {
+        RETRIEVE_CHARACTER_INFO_RELAY_CRASH(30, L"== CRASH == [%s], %s; invalid parameter, channel:0x%p",
+                                            RETRIEVE_CHARACTER_INFO_RELAY_TAG,
+                                            L"RetrieveCharacterInfoRelayContext::processRelayRequest",
+                                            static_cast<Channel*>(nullptr));
+        return false;
+    }
+
+    unsigned long long const relayTid = _economyHeader._relayTid;
+    // ❓ SendRelayRequest takes a non-const pointer.
+    if (!static_cast<CacheGateChannel*>(channel)->SendRelayRequest(const_cast<RetrieveCharacterInfoRelayContext*>(this)))
+    {
+        Log::Write(Log::LT_ERROR, RETRIEVE_CHARACTER_INFO_RELAY_FILE, 37,
+                   L"[%s], %s; failed to send retrieve character info relay request, relayTid:0x%I64X",
+                   RETRIEVE_CHARACTER_INFO_RELAY_TAG, L"RetrieveCharacterInfoRelayContext::processRelayRequest", relayTid);
+        return false;
+    }
+
+    Log::Write(Log::LT_NOTICE, RETRIEVE_CHARACTER_INFO_RELAY_FILE, 41,
+               L"[%s], %s; sent retrieve character info relay request, relayTid:0x%I64X", RETRIEVE_CHARACTER_INFO_RELAY_TAG,
+               L"RetrieveCharacterInfoRelayContext::processRelayRequest", relayTid);
+    return true;
+}
+
+// 0x1df30
+bool RetrieveCharacterInfoRelayContext::processRelayResponse() const
+{
+    unsigned long long const relayTid = _economyHeader._relayTid;
+    WorldChannel* const worldChannel = PostOfficeDaemon::_instance->_worldChannelManager->GetWorldChannel(GetRequestWid());
+    if (worldChannel == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, RETRIEVE_CHARACTER_INFO_RELAY_FILE, 51,
+                   L"[%s], %s; world is not connecting; cannot send packet, relayTid:0x%I64X",
+                   RETRIEVE_CHARACTER_INFO_RELAY_TAG, L"RetrieveCharacterInfoRelayContext::processRelayResponse", relayTid);
+        return false;
+    }
+
+    // ❓ SendRelayResponse takes a non-const pointer.
+    if (!worldChannel->SendRelayResponse(const_cast<RetrieveCharacterInfoRelayContext*>(this)))
+    {
+        Log::Write(Log::LT_ERROR, RETRIEVE_CHARACTER_INFO_RELAY_FILE, 56,
+                   L"[%s], %s; failed to send retrieve character info %s response ack, relayTid:0x%I64X",
+                   RETRIEVE_CHARACTER_INFO_RELAY_TAG, L"RetrieveCharacterInfoRelayContext::processRelayResponse",
+                   _response._resultState == RelayResponse::RESULTSTATE_SUCCESS ? L"success" : L"failure", relayTid);
+        worldChannel->removeReferenceCount(RETRIEVE_CHARACTER_INFO_RELAY_FILE, 57);
+        return false;
+    }
+
+    Log::Write(Log::LT_NOTICE, RETRIEVE_CHARACTER_INFO_RELAY_FILE, 61,
+               L"[%s], %s; sent retrieve character info %s response ack, relayTid:0x%I64X", RETRIEVE_CHARACTER_INFO_RELAY_TAG,
+               L"RetrieveCharacterInfoRelayContext::processRelayResponse",
+               _response._resultState == RelayResponse::RESULTSTATE_SUCCESS ? L"success" : L"failure", relayTid);
+    worldChannel->removeReferenceCount(RETRIEVE_CHARACTER_INFO_RELAY_FILE, 62);
+    return true;
+}
+
+// 0x1e0b0
+bool RetrieveCharacterInfoRelayContext::processRelayTimeout()
+{
+    RetrieveCharacterInfoRelayResponse response;
+    response._resultState = RelayResponse::RESULTSTATE_RELAY_TIMEOUT;
+    response._failReason = 13;
+    response._resultPcId = 0;
+    initResponse(&response);
+    return processRelayResponse();
+}
+
+// 0x1e110
+RelayHeader const RetrieveCharacterInfoRelayContext::MakeRelayHeader() const
+{
+    RelayHeader relayHeader;
+    relayHeader._fromWid = PostOfficeDaemon::_instance->_serviceWid;
+    relayHeader._toWid = _economyHeader._toWid;
+    relayHeader._relayTid = _economyHeader._relayTid;
+    relayHeader._hint = 1037;
+    relayHeader._reserved = 0;
+    return relayHeader;
+}
+
+// 0x1e150
+bool RetrieveCharacterInfoRelayContext::ComposeRequestPacket(Packet& packet) const
+{
+    wchar_t const* const targetCharacterName = _request._targetCharacterName;
+    bool const composed = packet.Compose("hhhqqs", 1037, static_cast<int>(_economyHeader._fromWid),
+                                         static_cast<int>(_economyHeader._toWid), _economyHeader._relayTid,
+                                         _request._gameTid, targetCharacterName) != 0;
+    long long const gameTid = _request._gameTid;
+    unsigned long long const relayTid = _economyHeader._relayTid;
+    unsigned int const toWid = _economyHeader._toWid;
+    unsigned int const fromWid = _economyHeader._fromWid;
+    if (!composed)
+    {
+        Log::Write(Log::LT_ERROR, RETRIEVE_CHARACTER_INFO_RELAY_FILE, 87,
+                   L"[%s], %s; failed to compose retrieve character info relay request packet, fromWid:%u, toWid:%u, relayTid:0x%I64X, gameTid:0x%I64X, targetCharacterName:%s",
+                   RETRIEVE_CHARACTER_INFO_RELAY_TAG, L"RetrieveCharacterInfoRelayContext::ComposeRequestPacket", fromWid,
+                   toWid, relayTid, gameTid, targetCharacterName);
+        return false;
+    }
+
+    Log::Write(Log::LT_DEBUG, RETRIEVE_CHARACTER_INFO_RELAY_FILE, 91,
+               L"[%s], %s; composed retrieve character info relay request packet, fromWid:%u, toWid:%u, relayTid:0x%I64X, gameTid:0x%I64X, targetCharacterName:%s",
+               RETRIEVE_CHARACTER_INFO_RELAY_TAG, L"RetrieveCharacterInfoRelayContext::ComposeRequestPacket", fromWid,
+               toWid, relayTid, gameTid, targetCharacterName);
+    return true;
+}
+
+// 0x1e230
+bool RetrieveCharacterInfoRelayContext::ComposeResponsePacket(Packet& packet) const
+{
+    int const resultState = _response._resultState;
+    unsigned long long const relayTid = _economyHeader._relayTid;
+    if (resultState == RelayResponse::RESULTSTATE_SUCCESS)
+    {
+        bool const composed = packet.Compose("hqq", 5, _request._gameTid, _response._resultPcId) != 0;
+        long long const resultPcId = _response._resultPcId;
+        long long const gameTid = _request._gameTid;
+        if (!composed)
+        {
+            Log::Write(Log::LT_ERROR, RETRIEVE_CHARACTER_INFO_RELAY_FILE, 107,
+                       L"[%s], %s; failed to compose retrieve character info success response packet, gameTid:0x%I64X, resultPcId:0x%I64X",
+                       RETRIEVE_CHARACTER_INFO_RELAY_TAG, L"RetrieveCharacterInfoRelayContext::ComposeResponsePacket",
+                       gameTid, resultPcId);
+            return false;
+        }
+        Log::Write(Log::LT_DEBUG, RETRIEVE_CHARACTER_INFO_RELAY_FILE, 110,
+                   L"[%s], %s; composed retrieve character info success response packet, gameTid:0x%I64X, resultPcId:0x%I64X",
+                   RETRIEVE_CHARACTER_INFO_RELAY_TAG, L"RetrieveCharacterInfoRelayContext::ComposeResponsePacket", gameTid,
+                   resultPcId);
+        return true;
+    }
+
+    if (resultState < RelayResponse::RESULTSTATE_FAILURE || resultState > RelayResponse::RESULTSTATE_RELAY_TIMEOUT)
+    {
+        RETRIEVE_CHARACTER_INFO_RELAY_CRASH(128,
+                                            L"== CRASH == [%s], %s; invalid response result state, relayTid:0x%I64X, resultState:%d",
+                                            RETRIEVE_CHARACTER_INFO_RELAY_TAG,
+                                            L"RetrieveCharacterInfoRelayContext::ComposeResponsePacket", relayTid,
+                                            resultState);
+        return false;
+    }
+
+    int const failReason = convertFailReason(static_cast<RelayResponse::RESULTSTATE>(resultState), _response._failReason);
+    bool const composed = packet.Compose("hqE", 6, _request._gameTid, failReason) != 0;
+    if (!composed)
+    {
+        Log::Write(Log::LT_ERROR, RETRIEVE_CHARACTER_INFO_RELAY_FILE, 121,
+                   L"[%s], %s; failed to compose retrieve character info failure response packet, gameTid:0x%I64X, failReason:%d",
+                   RETRIEVE_CHARACTER_INFO_RELAY_TAG, L"RetrieveCharacterInfoRelayContext::ComposeResponsePacket",
+                   _request._gameTid, failReason);
+        return false;
+    }
+    Log::Write(Log::LT_DEBUG, RETRIEVE_CHARACTER_INFO_RELAY_FILE, 124,
+               L"[%s], %s; composed retrieve character info failure response packet, gameTid:0x%I64X, failReason:%d",
+               RETRIEVE_CHARACTER_INFO_RELAY_TAG, L"RetrieveCharacterInfoRelayContext::ComposeResponsePacket",
+               _request._gameTid, failReason);
+    return true;
+}
+
+// 0x1e410
+// ❓ The case values 2/3/4 are the raw values in the binary. They do not match the RESULTSTATE values in RelayContext.h.
+unsigned short RetrieveCharacterInfoRelayContext::convertFailReason(RelayResponse::RESULTSTATE const resultState,
+                                                                    short const failReason)
+{
+    switch (static_cast<int>(resultState))
+    {
+    case 2:
+        if (failReason == 12)
+            return 10;
+        if (failReason == 11)
+            return 11;
+        break;
+    case 3:
+        switch (failReason)
+        {
+        case 3:
+        case 9:
+            return 4;
+        case 8:
+            return 14;
+        case 10:
+        case 11:
+            return 2;
+        default:
+            break;
+        }
+        break;
+    case 4:
+        return 13;
+    default:
+        break;
+    }
+    return 1;
+}

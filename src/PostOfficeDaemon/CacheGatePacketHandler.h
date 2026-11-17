@@ -5,13 +5,7 @@
 class Session;
 class Packet;
 
-// The class is in the PDB (types.h:1937). Its module is in a later card. The destructor is inlined here.
-class DeliverPostRelayResponse : public RelayResponse
-{
-public:
-    DeliverPostRelayResponse() { _resultState = RESULTSTATE_SUCCESS; _failReason = 0; }  // ❓ inlined
-    virtual ~DeliverPostRelayResponse() {}  // slot 0
-};
+#include "DeliverPostRelay.h"
 
 bool HandleCacheGateHelloOk(Session const* session, Packet const* packet);               // 0x7e90
 bool HandleCacheGateHelloFail(Session const* session, Packet const* packet);             // 0x7fc0

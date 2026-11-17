@@ -1,5 +1,4 @@
-// PostContext.obj and PostDeliveryEvent.obj (PostOfficeDaemon PDB). Layouts from include/pdb/PostOfficeDaemon/types.h.
-// Card lift-postofficedaemon-3 declares only what the packet handlers use. Card lift-postofficedaemon-4 lifts the bodies.
+// PostContext.obj (PostOfficeDaemon PDB). Layouts from include/pdb/PostOfficeDaemon/types.h.
 #pragma once
 #include <stddef.h>
 #include <map>
@@ -7,7 +6,7 @@
 #include "Lock.h"
 #include "StlMemory.h"
 
-class CacheGateChannel;
+class FragmentPacket;
 
 // types.h:1335. The member names of the guid part come from the decompiler (id1..id4).
 union id128
@@ -19,14 +18,15 @@ union id128
         unsigned short id3;
         unsigned char id4[8];
     } guid;
+    unsigned long long id[2];
 };
 static_assert(sizeof(id128) == 0x10, "sizeof id128");
 
 class PostInfo
 {
 public:
-    PostInfo();                           // 0x11140 (lift-postofficedaemon-4)
-    bool CheckValidityPostData();         // 0x11290 (lift-postofficedaemon-4)
+    PostInfo();                           // 0x11140
+    bool CheckValidityPostData();         // 0x11290
 
     long long _postId;
     long long _invoiceId;
@@ -52,7 +52,7 @@ static_assert(sizeof(PostInfo) == 2472, "sizeof PostInfo");
 class AttachedItemInfo
 {
 public:
-    int CheckValidityItemData();          // 0x10fc0 (lift-postofficedaemon-4). ❓ return type (0 = valid, 1..5 = error)
+    int CheckValidityItemData();          // 0x10fc0. ❓ return type (0 = valid, 1..5 = error)
 
     char _itemNo;
     char _itemType;
@@ -68,6 +68,8 @@ static_assert(sizeof(AttachedItemInfo) == 2088, "sizeof AttachedItemInfo");
 class AttachedItemContext
 {
 public:
+    AttachedItemContext& operator=(AttachedItemInfo const& rhs);  // 0x110e0
+
     char _itemNo;
     char _itemType;
     char _itemCategory;
@@ -82,9 +84,10 @@ static_assert(sizeof(AttachedItemContext) == 2088, "sizeof AttachedItemContext")
 class PostContext : public DynamicRefCntObj
 {
 public:
-    PostContext();                                                                       // 0x11510 (lift-postofficedaemon-4)
-    virtual ~PostContext();                                                              // 0x11590 (lift-postofficedaemon-4)
-    bool InitAttachedItemInfo(AttachedItemContext* attachedItemList, int attachedItemCount);  // 0x11620 (lift-postofficedaemon-4)
+    PostContext();                                                                       // 0x11510
+    virtual ~PostContext();                                                              // 0x11590
+    bool InitAttachedItemInfo(AttachedItemContext* attachedItemList, int attachedItemCount);  // 0x11620
+    bool ComposeDeliveryPacket(FragmentPacket& packet);                                  // 0x116e0
 
     CriticalSection _lock;
     PostInfo _postInfo;
@@ -93,6 +96,7 @@ public:
 };
 static_assert(sizeof(PostContext) == 2552, "sizeof PostContext");
 static_assert(offsetof(PostContext, _postInfo) == 0x40, "PostContext::_postInfo");
+static_assert(offsetof(PostContext, _attachedItemCount) == 0x9F0, "PostContext::_attachedItemCount");
 
 class PostContextManager
 {
@@ -100,20 +104,18 @@ public:
     typedef std::map<long long, PostContext*, std::less<long long>,
                      StlAllocator<std::pair<long long const, PostContext*>, 2> > Container;  // ❓ typedef name and allocator
 
-    bool AddContext(PostContext* postContext);   // 0x12110 (lift-postofficedaemon-4)
-    bool RemoveContext(long long postId);         // 0x123a0 (lift-postofficedaemon-4)
-    PostContext* GetContext(long long postId);    // ❓ address; adds a reference (lift-postofficedaemon-4)
+    bool initContextManager();                    // 0x11d10
+    PostContext* GetContext(long long postId);    // 0x11ea0. Adds a reference.
+    bool AddContext(PostContext* postContext);    // 0x12110
+    bool RemoveContext(long long postId);         // 0x123a0
 
     int const _bucketCount;
     CriticalSection* _lockList;
     Container* _containerList;
-    int _contextCount;
+    long volatile _contextCount;  // The PDB type is int. The code uses Interlocked calls on it.
 };
+static_assert(sizeof(PostContextManager) == 0x20, "sizeof PostContextManager");
+static_assert(offsetof(PostContextManager, _contextCount) == 0x18, "PostContextManager::_contextCount");
 
-// ❓ Only the static function that the packet handlers use. The full class (DynamicEventObject base,
-// _postContext, _cachegateChannel) is in card lift-postofficedaemon-4.
-class PostDeliveryEvent
-{
-public:
-    static bool OccurEvent(PostContext* const postContext, CacheGateChannel* const cachegateChannel);  // 0x105b0
-};
+// The users of PostDeliveryEvent include this header.
+#include "PostDeliveryEvent.h"

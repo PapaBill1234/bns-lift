@@ -15,6 +15,8 @@ public:
     static bool UpdateStatusToRetryReady(int* dbRetValue, long long postId, long long invoiceId,
                                          long long recipientPcId);                                        // 0x1a220
     static bool ResetAllDeliveryFailurePost(int* dbRetValue);                                             // 0x1a500
+    static bool UpdateStatusToDeliverySuccess(int* dbRetValue, long long postId);                         // 0x17bf0
+    static bool UpdateStatusToDeliveryFailure(int* dbRetValue, long long postId);                         // 0x17e00
 };
 
 // UnsentPostContext.obj. Card lift-postofficedaemon-5 lifts the bodies.
