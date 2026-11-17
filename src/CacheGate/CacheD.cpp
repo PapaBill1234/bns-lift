@@ -69,7 +69,7 @@ void CacheD::Initialize(unsigned short id, unsigned long addr, unsigned short po
             node = node->_next;
         }
         if (node == &console->_invalid._tail)
-            PipeConsole::addNode(console->_invalid, _daemonInvalidInfoKey, L"");  // ❓ value register is not set
+            PipeConsole::addNode(console->_invalid, _daemonInvalidInfoKey, L"");  // LIFT: LTCG folded valueString. addNode (0x15ED0) does not read r8 and copies L"" (0x3B700).
         console->_lock.Leave();
     }
 }

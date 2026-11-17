@@ -98,7 +98,7 @@ void CacheDChannel::onClose(Session const* session, bool tryReconnect, bool clos
             node = node->_next;
         }
         if (node == &console->_invalid._tail || node == nullptr)
-            PipeConsole::addNode(console->_invalid, cached->_daemonInvalidInfoKey, L"");  // ❓ value register is not set
+            PipeConsole::addNode(console->_invalid, cached->_daemonInvalidInfoKey, L"");  // LIFT: LTCG folded valueString. addNode (0x15ED0) does not read r8 and copies L"" (0x3B700).
         console->_lock.Leave();
     }
 

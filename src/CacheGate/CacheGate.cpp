@@ -168,7 +168,9 @@ bool CacheGate::setArgument(int argc, wchar_t const** argv)
 // 0x4510
 bool CacheGate::initialize()
 {
-    DaemonConfig::Dump(ShortName(), _config, CacheGateConfig::_Def, 13);  // ❓ arguments
+    // LIFT: the call (0x4535) passes only rcx = _config (+0x748). DaemonConfig::Dump (0xCA10) has the
+    // name (L"cachegate config", 0xCA45) and the definitions as constants. The lift passes them.
+    DaemonConfig::Dump(L"cachegate config", _config, CacheGateConfig::_Def, 13);
     if (!BnsCommonConfig::LoadBnsCommonConfig())
     {
         Log::Write(Log::LT_ERROR, CACHEGATE_FILE, 111, L"[cg], initialize, failed to initialize bns common config");
@@ -230,7 +232,9 @@ bool CacheGate::initNetwork()
     _sessionHandler[2] = &_cachedChannel;
     TrustedPacketBufferHandler trustedHandler;
     unsigned int maxSession = _config->_maxCachedSessionCount > 0 ? _config->_maxCachedSessionCount + 1 : 0;
-    if (!Network::OpenPort(2, 0, 2, &_cachedChannel, &trustedHandler, maxSession, true, true, false))  // ❓ bool args
+    // LIFT: LTCG folded the bool arguments. The calls (0x4801, 0x48C0) pass 6 of 9 PDB arguments. OpenPort stores
+    // 1 at 0xD564 and 0xD568 (accept, recv). Port::Initialize stores _nagle = 0 at 0x18C0A.
+    if (!Network::OpenPort(2, 0, 2, &_cachedChannel, &trustedHandler, maxSession, true, true, false))
     {
         Log::Write(Log::LT_ERROR, CACHEGATE_FILE, 165, L"[cg], cannot open cached port, port-id:%d", 2);
         return false;
@@ -243,7 +247,7 @@ bool CacheGate::initNetwork()
     _sessionHandler[1] = handler;
     unsigned int maxPublicSession = _config->_maxPublicSessionCount > 0 ? _config->_maxPublicSessionCount + 1 : 0;
     if (!Network::OpenPort(1, static_cast<unsigned short>(_config->_publicPort), 1, handler, &cachegateHandler,
-                           maxPublicSession, true, true, false))  // ❓ bool args
+                           maxPublicSession, true, true, false))  // LIFT: bools folded, see 0x4801
     {
         Log::Write(Log::LT_ERROR, CACHEGATE_FILE, 182, L"[cg], cannot open cachegate port, %d",
                    static_cast<int>(static_cast<unsigned short>(_config->_publicPort)));
