@@ -7,7 +7,7 @@
 #include "CachedWatchdog.h"
 
 #define PING_RELAY_FILE L"PingRelay.cpp"
-#define PING_RELAY_TAG L"relay context"
+static wchar_t const* const MODULE_NAME = L"relay context";  // PDB MODULE_NAME
 
 #define PING_RELAY_CRASH(line, fmt, ...)                                  \
     do                                                                    \
@@ -21,22 +21,21 @@ bool PingRelayContext::processRelayRequest(Channel* const channel) const
 {
     if (channel == nullptr)
     {
-        PING_RELAY_CRASH(28, L"== CRASH == [%s], %s; invalid parameter, channel:0x%p", PING_RELAY_TAG,
+        PING_RELAY_CRASH(28, L"== CRASH == [%s], %s; invalid parameter, channel:0x%p", MODULE_NAME,
                          L"PingRelayContext::processRelayRequest", static_cast<Channel*>(nullptr));
         return false;
     }
 
     unsigned long long const relayTid = _economyHeader._relayTid;
-    // ❓ SendRelayRequest takes a non-const pointer.
-    if (!static_cast<CacheGateChannel*>(channel)->SendRelayRequest(const_cast<PingRelayContext*>(this)))
+    if (!static_cast<CacheGateChannel*>(channel)->SendRelayRequest(this))
     {
         Log::Write(Log::LT_ERROR, PING_RELAY_FILE, 35, L"[%s], %s; failed to send ping relay request, relayTid:0x%I64X",
-                   PING_RELAY_TAG, L"PingRelayContext::processRelayRequest", relayTid);
+                   MODULE_NAME, L"PingRelayContext::processRelayRequest", relayTid);
         return false;
     }
 
     Log::Write(Log::LT_NOTICE, PING_RELAY_FILE, 39, L"[%s], %s; sent ping relay request, relayTid:0x%I64X",
-               PING_RELAY_TAG, L"PingRelayContext::processRelayRequest", relayTid);
+               MODULE_NAME, L"PingRelayContext::processRelayRequest", relayTid);
     return true;
 }
 
@@ -56,14 +55,14 @@ bool PingRelayContext::processRelayResponse() const
         {
             Log::Write(Log::LT_ERROR, PING_RELAY_FILE, 58,
                        L"[%s], %s; exception occurred; ping sequence number mismatch, relayTid:0x%I64X, destinationWid:%u, currentPingSeq:%I64u, responsePingSeq:%I64u",
-                       PING_RELAY_TAG, L"PingRelayContext::processRelayResponse", relayTid, toWid, currentPingSeq,
+                       MODULE_NAME, L"PingRelayContext::processRelayResponse", relayTid, toWid, currentPingSeq,
                        _response._pingSeq);
             return false;
         }
         cachedWatchdogManager->SetServiceState(toWid, CachedWatchdog::SERVICE_STATE_AVAILABLE);
         if (!cachedWatchdogManager->AddNextPing(toWid))
         {
-            PING_RELAY_CRASH(64, L"== CRASH == [%s], %s; failed to add next ping, destinationWid:%u", PING_RELAY_TAG,
+            PING_RELAY_CRASH(64, L"== CRASH == [%s], %s; failed to add next ping, destinationWid:%u", MODULE_NAME,
                              L"PingRelayContext::processRelayResponse", toWid);
             return false;
         }
@@ -72,12 +71,12 @@ bool PingRelayContext::processRelayResponse() const
     case RelayResponse::RESULTSTATE_FAILURE:
         Log::Write(Log::LT_ERROR, PING_RELAY_FILE, 72,
                    L"[%s], %s; exception occurred; received ping failure ack, relayTid:0x%I64X, destinationWid:%u",
-                   PING_RELAY_TAG, L"PingRelayContext::processRelayResponse", relayTid, toWid);
+                   MODULE_NAME, L"PingRelayContext::processRelayResponse", relayTid, toWid);
         if (currentPingSeq != _response._pingSeq)
         {
             Log::Write(Log::LT_ERROR, PING_RELAY_FILE, 77,
                        L"[%s], %s; exception occurred; ping sequence number mismatch, relayTid:0x%I64X, destinationWid:%u, currentPingSeq:%I64u, responsePingSeq:%I64u",
-                       PING_RELAY_TAG, L"PingRelayContext::processRelayResponse", relayTid, toWid, currentPingSeq,
+                       MODULE_NAME, L"PingRelayContext::processRelayResponse", relayTid, toWid, currentPingSeq,
                        _response._pingSeq);
             return false;
         }
@@ -89,14 +88,14 @@ bool PingRelayContext::processRelayResponse() const
 
     default:
         PING_RELAY_CRASH(92, L"== CRASH == [%s], %s; invalid result state, relayTid:0x%I64X, resultState:%d",
-                         PING_RELAY_TAG, L"PingRelayContext::processRelayResponse", relayTid, resultState);
+                         MODULE_NAME, L"PingRelayContext::processRelayResponse", relayTid, resultState);
         return false;
     }
 
     cachedWatchdogManager->SetServiceState(toWid, CachedWatchdog::SERVICE_STATE_UNAVAILABLE);
     if (!cachedWatchdogManager->AddNextPing(toWid))
     {
-        PING_RELAY_CRASH(86, L"== CRASH == [%s], %s; failed to add next ping, destinationWid:%u", PING_RELAY_TAG,
+        PING_RELAY_CRASH(86, L"== CRASH == [%s], %s; failed to add next ping, destinationWid:%u", MODULE_NAME,
                          L"PingRelayContext::processRelayResponse", toWid);
         return false;
     }
@@ -133,12 +132,12 @@ bool PingRelayContext::ComposeRequestPacket(Packet& packet) const
     {
         Log::Write(Log::LT_ERROR, PING_RELAY_FILE, 117,
                    L"[%s], %s; failed to compose ping relay request packet, fromWid:%u, toWid:%u, relayTid:0x%I64X, pingSeq:%I64u",
-                   PING_RELAY_TAG, L"PingRelayContext::ComposeRequestPacket", fromWid, toWid, relayTid, _request._pingSeq);
+                   MODULE_NAME, L"PingRelayContext::ComposeRequestPacket", fromWid, toWid, relayTid, _request._pingSeq);
         return false;
     }
 
     Log::Write(Log::LT_DEBUG, PING_RELAY_FILE, 120,
                L"[%s], %s; composed ping relay request packet, fromWid:%u, toWid:%u, relayTid:0x%I64X, pingSeq:%I64u",
-               PING_RELAY_TAG, L"PingRelayContext::ComposeRequestPacket", fromWid, toWid, relayTid, _request._pingSeq);
+               MODULE_NAME, L"PingRelayContext::ComposeRequestPacket", fromWid, toWid, relayTid, _request._pingSeq);
     return true;
 }

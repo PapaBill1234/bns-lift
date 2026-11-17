@@ -78,7 +78,7 @@ public:
     virtual bool processRelayResponse() const = 0;                    // slot 11
     virtual bool processRelayTimeout() = 0;                           // slot 12
     virtual void initResponse(RelayResponse* const) = 0;              // slot 13
-    virtual ~RelayContext() {}  // ❓ inlined in the child dtors
+    virtual ~RelayContext() {}  // 0x4c60, also inlined in the child dtors
 
     bool ProcessRelayRequest(Channel* const channel);         // 0x1bb30
     bool ProcessRelayResponse(RelayResponse* const response); // 0x1c090

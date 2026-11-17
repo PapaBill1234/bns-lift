@@ -17,7 +17,7 @@
 namespace
 {
 wchar_t const* const CEPH_FILE = L"CacheEconomyPacketHandler.cpp";  // ❓ name
-wchar_t const* const CEPH_TAG = L"cache economy packet handler";    // ❓ name
+static wchar_t const* const MODULE_NAME = L"cache economy packet handler";  // PDB MODULE_NAME
 
 // ❓ Not in the PDB. The original inlines these line numbers in each handler.
 struct ResponseLines
@@ -34,12 +34,12 @@ struct ResponseLines
 // ❓ Not in the PDB. Helper for the BEGIN/END logs that each handler inlines.
 void logBegin(wchar_t const* funcName, int line)
 {
-    Log::Write(Log::LT_DEBUG, CEPH_FILE, line, L"[%s], %s; <BEGIN PACKET HANDLER>", CEPH_TAG, funcName);
+    Log::Write(Log::LT_DEBUG, CEPH_FILE, line, L"[%s], %s; <BEGIN PACKET HANDLER>", MODULE_NAME, funcName);
 }
 
 void logEnd(wchar_t const* funcName, int line)
 {
-    Log::Write(Log::LT_DEBUG, CEPH_FILE, line, L"[%s], %s; <END PACKET HANDLER>", CEPH_TAG, funcName);
+    Log::Write(Log::LT_DEBUG, CEPH_FILE, line, L"[%s], %s; <END PACKET HANDLER>", MODULE_NAME, funcName);
 }
 
 // ❓ Not in the PDB. The original inlines this sequence in each handler (find context, check header, process response).
@@ -51,7 +51,7 @@ bool processEconomyResponse(wchar_t const* funcName, EconomyHeader const& econom
     if (relayContext == nullptr)
     {
         Log::Write(Log::LT_ERROR, CEPH_FILE, lines.noContext,
-                   L"[%s], %s; no such relay context, relayTid:0x%I64X, relayContext:0x%p", CEPH_TAG, funcName, relayTid,
+                   L"[%s], %s; no such relay context, relayTid:0x%I64X, relayContext:0x%p", MODULE_NAME, funcName, relayTid,
                    static_cast<RelayContext*>(nullptr));
         logEnd(funcName, lines.end);
         return false;
@@ -63,7 +63,7 @@ bool processEconomyResponse(wchar_t const* funcName, EconomyHeader const& econom
     {
         Log::Write(Log::LT_ERROR, CEPH_FILE, lines.mismatch,
                    L"[%s], %s; economy header mismatch; invalid economy header, [request] fromWid:%u, toWid:%u, relayTid:0x%I64X, [response] fromWid:%u, toWid:%u, relayTid:0x%I64X",
-                   CEPH_TAG, funcName, static_cast<unsigned int>(requestHeader._fromWid),
+                   MODULE_NAME, funcName, static_cast<unsigned int>(requestHeader._fromWid),
                    static_cast<unsigned int>(requestHeader._toWid), requestHeader._relayTid,
                    static_cast<unsigned int>(economyHeader._fromWid), static_cast<unsigned int>(economyHeader._toWid),
                    economyHeader._relayTid);
@@ -76,7 +76,7 @@ bool processEconomyResponse(wchar_t const* funcName, EconomyHeader const& econom
     }
     else
     {
-        Log::Write(Log::LT_ERROR, CEPH_FILE, lines.processFail, processFailText, CEPH_TAG, funcName, relayTid);
+        Log::Write(Log::LT_ERROR, CEPH_FILE, lines.processFail, processFailText, MODULE_NAME, funcName, relayTid);
     }
 
     relayContext->removeReferenceCount(CEPH_FILE, lines.failRef);
@@ -94,7 +94,7 @@ void clearHeader(EconomyHeader& economyHeader)
 bool notSupported(wchar_t const* funcName, int beginLine)
 {
     logBegin(funcName, beginLine);
-    Log::Write(Log::LT_ERROR, CEPH_FILE, beginLine + 2, L"[%s], %s; not support packet command", CEPH_TAG, funcName);
+    Log::Write(Log::LT_ERROR, CEPH_FILE, beginLine + 2, L"[%s], %s; not support packet command", MODULE_NAME, funcName);
     logEnd(funcName, beginLine + 4);
     return true;
 }
@@ -117,17 +117,17 @@ bool HandleCacheEconomyPingOk(Session const* session, Packet const* packet)
     if (packet->Decompose("hhhqq", &cmd, &economyHeader._fromWid, &economyHeader._toWid, &economyHeader._relayTid,
                           &response._pingSeq) == 0)
     {
-        Log::Write(Log::LT_ERROR, CEPH_FILE, 46, L"[%s], %s; failed to decompose packet", CEPH_TAG, funcName);
+        Log::Write(Log::LT_ERROR, CEPH_FILE, 46, L"[%s], %s; failed to decompose packet", MODULE_NAME, funcName);
         logEnd(funcName, 85);
         return false;
     }
     Log::Write(Log::LT_DEBUG, CEPH_FILE, 49,
-               L"[%s], %s; decomposed packet, fromWid:%u, toWid:%u, relayTid:0x%I64X, pingSeq:%I64u", CEPH_TAG, funcName,
+               L"[%s], %s; decomposed packet, fromWid:%u, toWid:%u, relayTid:0x%I64X, pingSeq:%I64u", MODULE_NAME, funcName,
                static_cast<unsigned int>(economyHeader._fromWid), static_cast<unsigned int>(economyHeader._toWid),
                economyHeader._relayTid, response._pingSeq);
     if (economyHeader._relayTid == 0)
     {
-        Log::Write(Log::LT_ERROR, CEPH_FILE, 53, L"[%s], %s; invalid parameter, relayTid:0x%I64X", CEPH_TAG, funcName,
+        Log::Write(Log::LT_ERROR, CEPH_FILE, 53, L"[%s], %s; invalid parameter, relayTid:0x%I64X", MODULE_NAME, funcName,
                    economyHeader._relayTid);
         logEnd(funcName, 85);
         return false;
@@ -155,18 +155,18 @@ bool HandleCacheEconomyPingFail(Session const* session, Packet const* packet)
     if (packet->Decompose("hhhqqE", &cmd, &economyHeader._fromWid, &economyHeader._toWid, &economyHeader._relayTid,
                           &response._pingSeq, &response._failReason) == 0)
     {
-        Log::Write(Log::LT_ERROR, CEPH_FILE, 105, L"[%s], %s; failed to decompose packet", CEPH_TAG, funcName);
+        Log::Write(Log::LT_ERROR, CEPH_FILE, 105, L"[%s], %s; failed to decompose packet", MODULE_NAME, funcName);
         logEnd(funcName, 144);
         return false;
     }
     Log::Write(Log::LT_DEBUG, CEPH_FILE, 108,
                L"[%s], %s; decomposed packet, fromWid:%u, toWid:%u, relayTid:0x%I64X, pingSeq:%I64u, failReason:%d",
-               CEPH_TAG, funcName, static_cast<unsigned int>(economyHeader._fromWid),
+               MODULE_NAME, funcName, static_cast<unsigned int>(economyHeader._fromWid),
                static_cast<unsigned int>(economyHeader._toWid), economyHeader._relayTid, response._pingSeq,
                static_cast<int>(response._failReason));
     if (economyHeader._relayTid == 0)
     {
-        Log::Write(Log::LT_ERROR, CEPH_FILE, 112, L"[%s], %s; invalid parameter, relayTid:0x%I64X", CEPH_TAG, funcName,
+        Log::Write(Log::LT_ERROR, CEPH_FILE, 112, L"[%s], %s; invalid parameter, relayTid:0x%I64X", MODULE_NAME, funcName,
                    economyHeader._relayTid);
         logEnd(funcName, 144);
         return false;
@@ -196,18 +196,18 @@ bool HandleCacheEconomyRetrieveCharacterInfoOk(Session const* session, Packet co
     if (packet->Decompose("hhhqqq", &cmd, &economyHeader._fromWid, &economyHeader._toWid, &economyHeader._relayTid,
                           &gameTid, &response._resultPcId) == 0)
     {
-        Log::Write(Log::LT_ERROR, CEPH_FILE, 165, L"[%s], %s; failed to decompose packet", CEPH_TAG, funcName);
+        Log::Write(Log::LT_ERROR, CEPH_FILE, 165, L"[%s], %s; failed to decompose packet", MODULE_NAME, funcName);
         logEnd(funcName, 204);
         return false;
     }
     Log::Write(Log::LT_DEBUG, CEPH_FILE, 168,
                L"[%s], %s; decomposed packet, fromWid:%u, toWid:%u, relayTid:0x%I64X, gameTid:0x%I64X, resultPcId:0x%I64X",
-               CEPH_TAG, funcName, static_cast<unsigned int>(economyHeader._fromWid),
+               MODULE_NAME, funcName, static_cast<unsigned int>(economyHeader._fromWid),
                static_cast<unsigned int>(economyHeader._toWid), economyHeader._relayTid, gameTid, response._resultPcId);
     if (economyHeader._relayTid == 0 || gameTid == 0 || response._resultPcId == 0)
     {
         Log::Write(Log::LT_ERROR, CEPH_FILE, 172,
-                   L"[%s], %s; invalid parameter, relayTid:0x%I64X, gameTid:0x%I64X, resultPcId:0x%I64X", CEPH_TAG,
+                   L"[%s], %s; invalid parameter, relayTid:0x%I64X, gameTid:0x%I64X, resultPcId:0x%I64X", MODULE_NAME,
                    funcName, economyHeader._relayTid, gameTid, response._resultPcId);
         logEnd(funcName, 204);
         return false;
@@ -237,19 +237,19 @@ bool HandleCacheEconomyRetrieveCharacterInfoFail(Session const* session, Packet 
     if (packet->Decompose("hhhqqE", &cmd, &economyHeader._fromWid, &economyHeader._toWid, &economyHeader._relayTid,
                           &gameTid, &response._failReason) == 0)
     {
-        Log::Write(Log::LT_ERROR, CEPH_FILE, 225, L"[%s], %s; failed to decompose packet", CEPH_TAG, funcName);
+        Log::Write(Log::LT_ERROR, CEPH_FILE, 225, L"[%s], %s; failed to decompose packet", MODULE_NAME, funcName);
         logEnd(funcName, 264);
         return false;
     }
     Log::Write(Log::LT_DEBUG, CEPH_FILE, 228,
                L"[%s], %s; decomposed packet, fromWid:%u, toWid:%u, relayTid:0x%I64X, gameTid:0x%I64X, failReason:%d",
-               CEPH_TAG, funcName, static_cast<unsigned int>(economyHeader._fromWid),
+               MODULE_NAME, funcName, static_cast<unsigned int>(economyHeader._fromWid),
                static_cast<unsigned int>(economyHeader._toWid), economyHeader._relayTid, gameTid,
                static_cast<int>(response._failReason));
     if (economyHeader._relayTid == 0 || gameTid == 0)
     {
         Log::Write(Log::LT_ERROR, CEPH_FILE, 232, L"[%s], %s; invalid parameter, relayTid:0x%I64X, gameTid:0x%I64X",
-                   CEPH_TAG, funcName, economyHeader._relayTid, gameTid);
+                   MODULE_NAME, funcName, economyHeader._relayTid, gameTid);
         logEnd(funcName, 264);
         return false;
     }
@@ -277,18 +277,18 @@ bool HandleCacheEconomyCheckPostCapacityOk(Session const* session, Packet const*
     if (packet->Decompose("hhhqq", &cmd, &economyHeader._fromWid, &economyHeader._toWid, &economyHeader._relayTid,
                           &gameTid) == 0)
     {
-        Log::Write(Log::LT_ERROR, CEPH_FILE, 284, L"[%s], %s; failed to decompose packet", CEPH_TAG, funcName);
+        Log::Write(Log::LT_ERROR, CEPH_FILE, 284, L"[%s], %s; failed to decompose packet", MODULE_NAME, funcName);
         logEnd(funcName, 323);
         return false;
     }
     Log::Write(Log::LT_DEBUG, CEPH_FILE, 287,
-               L"[%s], %s; decomposed packet, fromWid:%u, toWid:%u, relayTid:0x%I64X, gameTid:0x%I64X", CEPH_TAG,
+               L"[%s], %s; decomposed packet, fromWid:%u, toWid:%u, relayTid:0x%I64X, gameTid:0x%I64X", MODULE_NAME,
                funcName, static_cast<unsigned int>(economyHeader._fromWid),
                static_cast<unsigned int>(economyHeader._toWid), economyHeader._relayTid, gameTid);
     if (economyHeader._relayTid == 0 || gameTid == 0)
     {
         Log::Write(Log::LT_ERROR, CEPH_FILE, 291, L"[%s], %s; invalid parameter, relayTid:0x%I64X, gameTid:0x%I64X",
-                   CEPH_TAG, funcName, economyHeader._relayTid, gameTid);
+                   MODULE_NAME, funcName, economyHeader._relayTid, gameTid);
         logEnd(funcName, 323);
         return false;
     }
@@ -316,19 +316,19 @@ bool HandleCacheEconomyCheckPostCapacityFail(Session const* session, Packet cons
     if (packet->Decompose("hhhqqE", &cmd, &economyHeader._fromWid, &economyHeader._toWid, &economyHeader._relayTid,
                           &gameTid, &response._failReason) == 0)
     {
-        Log::Write(Log::LT_ERROR, CEPH_FILE, 344, L"[%s], %s; failed to decompose packet", CEPH_TAG, funcName);
+        Log::Write(Log::LT_ERROR, CEPH_FILE, 344, L"[%s], %s; failed to decompose packet", MODULE_NAME, funcName);
         logEnd(funcName, 383);
         return false;
     }
     Log::Write(Log::LT_DEBUG, CEPH_FILE, 347,
                L"[%s], %s; decomposed packet, fromWid:%u, toWid:%u, relayTid:0x%I64X, gameTid:0x%I64X, failReason:%d",
-               CEPH_TAG, funcName, static_cast<unsigned int>(economyHeader._fromWid),
+               MODULE_NAME, funcName, static_cast<unsigned int>(economyHeader._fromWid),
                static_cast<unsigned int>(economyHeader._toWid), economyHeader._relayTid, gameTid,
                static_cast<int>(response._failReason));
     if (economyHeader._relayTid == 0 || gameTid == 0)
     {
         Log::Write(Log::LT_ERROR, CEPH_FILE, 351, L"[%s], %s; invalid parameter, relayTid:0x%I64X, gameTid:0x%I64X",
-                   CEPH_TAG, funcName, economyHeader._relayTid, gameTid);
+                   MODULE_NAME, funcName, economyHeader._relayTid, gameTid);
         logEnd(funcName, 383);
         return false;
     }
@@ -354,17 +354,17 @@ bool HandleCacheEconomyDeliverPostOk(Session const* session, Packet const* packe
 
     if (packet->Decompose("hhhq", &cmd, &economyHeader._fromWid, &economyHeader._toWid, &economyHeader._relayTid) == 0)
     {
-        Log::Write(Log::LT_ERROR, CEPH_FILE, 401, L"[%s], %s; failed to decompose packet", CEPH_TAG, funcName);
+        Log::Write(Log::LT_ERROR, CEPH_FILE, 401, L"[%s], %s; failed to decompose packet", MODULE_NAME, funcName);
         logEnd(funcName, 440);
         return false;
     }
     Log::Write(Log::LT_DEBUG, CEPH_FILE, 404, L"[%s], %s; decomposed packet, fromWid:%u, toWid:%u, relayTid:0x%I64X",
-               CEPH_TAG, funcName, static_cast<unsigned int>(economyHeader._fromWid),
+               MODULE_NAME, funcName, static_cast<unsigned int>(economyHeader._fromWid),
                static_cast<unsigned int>(economyHeader._toWid), economyHeader._relayTid);
     if (economyHeader._relayTid == 0)
     {
         // The original passes the constant 0 (the relayTid is 0 on this path).
-        Log::Write(Log::LT_ERROR, CEPH_FILE, 408, L"[%s], %s; invalid parameter, relayTid:0x%I64X", CEPH_TAG, funcName,
+        Log::Write(Log::LT_ERROR, CEPH_FILE, 408, L"[%s], %s; invalid parameter, relayTid:0x%I64X", MODULE_NAME, funcName,
                    0ULL);
         logEnd(funcName, 440);
         return false;
@@ -391,19 +391,19 @@ bool HandleCacheEconomyDeliverPostFail(Session const* session, Packet const* pac
     if (packet->Decompose("hhhqE", &cmd, &economyHeader._fromWid, &economyHeader._toWid, &economyHeader._relayTid,
                           &response._failReason) == 0)
     {
-        Log::Write(Log::LT_ERROR, CEPH_FILE, 459, L"[%s], %s; failed to decompose packet", CEPH_TAG, funcName);
+        Log::Write(Log::LT_ERROR, CEPH_FILE, 459, L"[%s], %s; failed to decompose packet", MODULE_NAME, funcName);
         logEnd(funcName, 498);
         return false;
     }
     Log::Write(Log::LT_DEBUG, CEPH_FILE, 462,
-               L"[%s], %s; decomposed packet, fromWid:%u, toWid:%u, relayTid:0x%I64X, failReason:%d", CEPH_TAG,
+               L"[%s], %s; decomposed packet, fromWid:%u, toWid:%u, relayTid:0x%I64X, failReason:%d", MODULE_NAME,
                funcName, static_cast<unsigned int>(economyHeader._fromWid),
                static_cast<unsigned int>(economyHeader._toWid), economyHeader._relayTid,
                static_cast<int>(response._failReason));
     if (economyHeader._relayTid == 0)
     {
         // The original passes the constant 0 (the relayTid is 0 on this path).
-        Log::Write(Log::LT_ERROR, CEPH_FILE, 466, L"[%s], %s; invalid parameter, relayTid:0x%I64X", CEPH_TAG, funcName,
+        Log::Write(Log::LT_ERROR, CEPH_FILE, 466, L"[%s], %s; invalid parameter, relayTid:0x%I64X", MODULE_NAME, funcName,
                    0ULL);
         logEnd(funcName, 498);
         return false;

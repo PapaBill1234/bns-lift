@@ -14,7 +14,7 @@
 #include "UnsentPostContext.h"
 
 #define POSTOFFICEDB_FILE L"PostOfficeDB.cpp"
-#define POSTOFFICEDB_TAG L"postoffice db"
+static wchar_t const* const MODULE_NAME = L"postoffice db";  // PDB MODULE_NAME
 
 #define FAIL_ACQUIRE L"[%s], %s; failed to acquire transaction, dbId:%d"
 #define FAIL_PREPARE L"[%s], %s; failed to prepare sql, query:%s"
@@ -142,7 +142,7 @@ bool PostOfficeDB::LoadPostList(int* dbRetValue)
     AutoDbTran tran(kDbId);
     if (tran.Tran == nullptr)
     {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 29, FAIL_ACQUIRE, POSTOFFICEDB_TAG, fn, kDbId);
+        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 29, FAIL_ACQUIRE, MODULE_NAME, fn, kDbId);
         return false;
     }
     tran.TimeoutSec = 0;
@@ -151,18 +151,18 @@ bool PostOfficeDB::LoadPostList(int* dbRetValue)
     wchar_t const* const query = L"{?=CALL dbo.usp_LoadPostList}";
     if (!tran.Tran->Prepare(Query(query)))
     {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 35, FAIL_PREPARE, POSTOFFICEDB_TAG, fn, query);
+        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 35, FAIL_PREPARE, MODULE_NAME, fn, query);
         return false;
     }
     if (!tran.Tran->BindParam(1, SQL_PARAM_OUTPUT, dbRetValue, 0, 0, SQL_INTEGER, SQL_C_SLONG, &paramLen[0]) ||
         !BindPostColumns(tran.Tran, postInfo, attachedItemInfo, postLen, itemLen))
     {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 150, FAIL_BIND, POSTOFFICEDB_TAG, fn);
+        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 150, FAIL_BIND, MODULE_NAME, fn);
         return false;
     }
     if (!tran.Tran->Execute())
     {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 88, FAIL_EXECUTE, POSTOFFICEDB_TAG, fn, *dbRetValue);
+        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 88, FAIL_EXECUTE, MODULE_NAME, fn, *dbRetValue);
         return false;
     }
 
@@ -172,7 +172,7 @@ bool PostOfficeDB::LoadPostList(int* dbRetValue)
         int const result = tran.Tran->Fetch(0);  // ❓ argument
         if (result == -1)
         {
-            Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 103, FAIL_FETCH, POSTOFFICEDB_TAG, fn);
+            Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 103, FAIL_FETCH, MODULE_NAME, fn);
             return false;
         }
         if (result == 0)
@@ -182,21 +182,21 @@ bool PostOfficeDB::LoadPostList(int* dbRetValue)
         PostOfficeDaemon* const daemon = PostOfficeDaemon::_instance;
         if (!daemon->_postContextManager->AddContext(postContext))
         {
-            Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 127, FAIL_ADD_CRASH, POSTOFFICEDB_TAG, fn, postInfo._postId);
-            AlertSender::Write(POSTOFFICEDB_FILE, 127, FAIL_ADD_CRASH, POSTOFFICEDB_TAG, fn, postInfo._postId);
+            Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 127, FAIL_ADD_CRASH, MODULE_NAME, fn, postInfo._postId);
+            AlertSender::Write(POSTOFFICEDB_FILE, 127, FAIL_ADD_CRASH, MODULE_NAME, fn, postInfo._postId);
             postContext->removeReferenceCount(POSTOFFICEDB_FILE, 128);
             continue;
         }
         postContext->removeReferenceCount(POSTOFFICEDB_FILE, 132);
         if (!daemon->_unsentPostContextManager->RegisterUnsentPost(postInfo._recipientWid, postInfo._postId, true))
         {
-            Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 135, FAIL_REGISTER_UNSENT, POSTOFFICEDB_TAG, fn,
+            Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 135, FAIL_REGISTER_UNSENT, MODULE_NAME, fn,
                        static_cast<unsigned int>(postInfo._recipientWid), postInfo._postId);
             if (!daemon->_postContextManager->RemoveContext(postInfo._postId))
             {
-                Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 138, FAIL_REMOVE_CRASH, POSTOFFICEDB_TAG, fn,
+                Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 138, FAIL_REMOVE_CRASH, MODULE_NAME, fn,
                            postInfo._postId);
-                AlertSender::Write(POSTOFFICEDB_FILE, 138, FAIL_REMOVE_CRASH, POSTOFFICEDB_TAG, fn, postInfo._postId);
+                AlertSender::Write(POSTOFFICEDB_FILE, 138, FAIL_REMOVE_CRASH, MODULE_NAME, fn, postInfo._postId);
             }
         }
     }
@@ -217,25 +217,25 @@ bool PostOfficeDB::LoadSinglePost(int* dbRetValue, long long postId)
     AutoDbTran tran(kDbId);
     if (tran.Tran == nullptr)
     {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 158, FAIL_ACQUIRE, POSTOFFICEDB_TAG, fn, kDbId);
+        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 158, FAIL_ACQUIRE, MODULE_NAME, fn, kDbId);
         return false;
     }
     wchar_t const* const query = L"{?=CALL dbo.usp_LoadSinglePost(?)}";
     if (!tran.Tran->Prepare(Query(query)))
     {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 164, FAIL_PREPARE, POSTOFFICEDB_TAG, fn, query);
+        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 164, FAIL_PREPARE, MODULE_NAME, fn, query);
         return false;
     }
     if (!tran.Tran->BindParam(1, SQL_PARAM_OUTPUT, dbRetValue, 0, 0, SQL_INTEGER, SQL_C_SLONG, &paramLen[0]) ||
         !tran.Tran->BindParam(2, SQL_PARAM_INPUT, &postId, 0, 0, SQL_BIGINT, SQL_C_SBIGINT, &paramLen[1]) ||
         !BindPostColumns(tran.Tran, postInfo, attachedItemInfo, postLen, itemLen))
     {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 271, FAIL_BIND, POSTOFFICEDB_TAG, fn);
+        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 271, FAIL_BIND, MODULE_NAME, fn);
         return false;
     }
     if (!tran.Tran->Execute())
     {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 219, FAIL_EXECUTE, POSTOFFICEDB_TAG, fn, *dbRetValue);
+        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 219, FAIL_EXECUTE, MODULE_NAME, fn, *dbRetValue);
         return false;
     }
 
@@ -243,13 +243,13 @@ bool PostOfficeDB::LoadSinglePost(int* dbRetValue, long long postId)
     int const result = tran.Tran->Fetch(0);  // ❓ argument
     if (result == -1)
     {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 228, FAIL_FETCH, POSTOFFICEDB_TAG, fn);
+        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 228, FAIL_FETCH, MODULE_NAME, fn);
         return false;
     }
     if (result == 0)
     {
         Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 232, L"[%s], %s; there is no such post, postId:0x%I64X",
-                   POSTOFFICEDB_TAG, fn, postId);
+                   MODULE_NAME, fn, postId);
         return false;
     }
     if (*dbRetValue != 0)
@@ -258,8 +258,8 @@ bool PostOfficeDB::LoadSinglePost(int* dbRetValue, long long postId)
     PostContext* const postContext = MakePostContext(postInfo, attachedItemInfo, itemLen, 242, 254);
     if (!PostOfficeDaemon::_instance->_postContextManager->AddContext(postContext))
     {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 260, FAIL_ADD_CRASH, POSTOFFICEDB_TAG, fn, postInfo._postId);
-        AlertSender::Write(POSTOFFICEDB_FILE, 260, FAIL_ADD_CRASH, POSTOFFICEDB_TAG, fn, postInfo._postId);
+        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 260, FAIL_ADD_CRASH, MODULE_NAME, fn, postInfo._postId);
+        AlertSender::Write(POSTOFFICEDB_FILE, 260, FAIL_ADD_CRASH, MODULE_NAME, fn, postInfo._postId);
         postContext->removeReferenceCount(POSTOFFICEDB_FILE, 261);
         return false;
     }
@@ -277,31 +277,31 @@ bool PostOfficeDB::RegisterPost(int* dbRetValue, PostInfo* postInfo, AttachedIte
     if (attachedItemCount > static_cast<unsigned int>(kMaxAttachedItem))
     {
         Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 278, L"== CRASH == [%s], %s; invalid parameter, attachedItemCount:%d",
-                   POSTOFFICEDB_TAG, fn, attachedItemCount);
+                   MODULE_NAME, fn, attachedItemCount);
         AlertSender::Write(POSTOFFICEDB_FILE, 278, L"== CRASH == [%s], %s; invalid parameter, attachedItemCount:%d",
-                           POSTOFFICEDB_TAG, fn, attachedItemCount);
+                           MODULE_NAME, fn, attachedItemCount);
         return false;
     }
     if (attachedItemCount > 0 && attachedItemList == nullptr)
     {
         // BUG: 0x16f20 logs the error but does not return. The code continues with a null list.
         Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 283, L"== CRASH == [%s], %s; invalid parameter, attachedItemList:0x%p",
-                   POSTOFFICEDB_TAG, fn, static_cast<void*>(nullptr));
+                   MODULE_NAME, fn, static_cast<void*>(nullptr));
         AlertSender::Write(POSTOFFICEDB_FILE, 283, L"== CRASH == [%s], %s; invalid parameter, attachedItemList:0x%p",
-                           POSTOFFICEDB_TAG, fn, static_cast<void*>(nullptr));
+                           MODULE_NAME, fn, static_cast<void*>(nullptr));
     }
 
     AutoDbTran tran(kDbId);
     if (tran.Tran == nullptr)
     {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 290, FAIL_ACQUIRE, POSTOFFICEDB_TAG, fn, kDbId);
+        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 290, FAIL_ACQUIRE, MODULE_NAME, fn, kDbId);
         return false;
     }
     wchar_t const* const query =
         L"{?=CALL dbo.usp_RegisterPost(" Q10 Q10 Q10 Q10 Q10 Q10 Q10 Q10 L"?,?,?,?,?,?)}";
     if (!tran.Tran->Prepare(Query(query)))
     {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 306, FAIL_PREPARE, POSTOFFICEDB_TAG, fn, query);
+        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 306, FAIL_PREPARE, MODULE_NAME, fn, query);
         return false;
     }
 
@@ -380,12 +380,12 @@ bool PostOfficeDB::RegisterPost(int* dbRetValue, PostInfo* postInfo, AttachedIte
     }
     if (!bound)
     {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 404, FAIL_BIND, POSTOFFICEDB_TAG, fn);
+        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 404, FAIL_BIND, MODULE_NAME, fn);
         return false;
     }
     if (!t->Execute())
     {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 394, FAIL_EXECUTE, POSTOFFICEDB_TAG, fn, *dbRetValue);
+        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 394, FAIL_EXECUTE, MODULE_NAME, fn, *dbRetValue);
         return false;
     }
     return *dbRetValue == 0;
@@ -403,23 +403,23 @@ bool UpdatePostStatus(int* dbRetValue, long long postId, wchar_t const* fn, wcha
     AutoDbTran tran(kDbId);
     if (tran.Tran == nullptr)
     {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, acquireLine, FAIL_ACQUIRE, POSTOFFICEDB_TAG, fn, kDbId);
+        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, acquireLine, FAIL_ACQUIRE, MODULE_NAME, fn, kDbId);
         return false;
     }
     if (!tran.Tran->Prepare(Query(query)))
     {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, prepareLine, FAIL_PREPARE, POSTOFFICEDB_TAG, fn, query);
+        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, prepareLine, FAIL_PREPARE, MODULE_NAME, fn, query);
         return false;
     }
     if (!tran.Tran->BindParam(1, SQL_PARAM_OUTPUT, dbRetValue, 0, 0, SQL_INTEGER, SQL_C_SLONG, &paramLen[0]) ||
         !tran.Tran->BindParam(2, SQL_PARAM_INPUT, &postId, 0, 0, SQL_BIGINT, SQL_C_SBIGINT, &paramLen[1]))
     {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, bindLine, FAIL_BIND, POSTOFFICEDB_TAG, fn);
+        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, bindLine, FAIL_BIND, MODULE_NAME, fn);
         return false;
     }
     if (!tran.Tran->Execute())
     {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, executeLine, FAIL_EXECUTE, POSTOFFICEDB_TAG, fn, *dbRetValue);
+        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, executeLine, FAIL_EXECUTE, MODULE_NAME, fn, *dbRetValue);
         return false;
     }
     return *dbRetValue == 0;
@@ -455,13 +455,13 @@ bool PostOfficeDB::LoadRetryReadySinglePost(int* dbRetValue, long long postId, l
     AutoDbTran tran(kDbId);
     if (tran.Tran == nullptr)
     {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 498, FAIL_ACQUIRE, POSTOFFICEDB_TAG, fn, kDbId);
+        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 498, FAIL_ACQUIRE, MODULE_NAME, fn, kDbId);
         return false;
     }
     wchar_t const* const query = L"{?=CALL dbo.usp_LoadRetryReadySinglePost(?,?,?)}";
     if (!tran.Tran->Prepare(Query(query)))
     {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 504, FAIL_PREPARE, POSTOFFICEDB_TAG, fn, query);
+        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 504, FAIL_PREPARE, MODULE_NAME, fn, query);
         return false;
     }
     if (invoiceId == 0)
@@ -472,12 +472,12 @@ bool PostOfficeDB::LoadRetryReadySinglePost(int* dbRetValue, long long postId, l
         !tran.Tran->BindParam(4, SQL_PARAM_INPUT, &recipientPcId, 0, 0, SQL_BIGINT, SQL_C_SBIGINT, &paramLen[3]) ||
         !BindPostColumns(tran.Tran, postInfo, attachedItemInfo, postLen, itemLen))
     {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 628, FAIL_BIND, POSTOFFICEDB_TAG, fn);
+        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 628, FAIL_BIND, MODULE_NAME, fn);
         return false;
     }
     if (!tran.Tran->Execute())
     {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 567, FAIL_EXECUTE, POSTOFFICEDB_TAG, fn, *dbRetValue);
+        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 567, FAIL_EXECUTE, MODULE_NAME, fn, *dbRetValue);
         return false;
     }
 
@@ -485,7 +485,7 @@ bool PostOfficeDB::LoadRetryReadySinglePost(int* dbRetValue, long long postId, l
     int const result = tran.Tran->Fetch(0);  // ❓ argument
     if (result == -1)
     {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 576, FAIL_FETCH, POSTOFFICEDB_TAG, fn);
+        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 576, FAIL_FETCH, MODULE_NAME, fn);
         return false;
     }
     if (result == 0)
@@ -493,7 +493,7 @@ bool PostOfficeDB::LoadRetryReadySinglePost(int* dbRetValue, long long postId, l
         // ❓ The tail of the text is cut in the pseudocode. "recipientPcId:0x%I64X" is a guess.
         Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 580,
                    L"[%s], %s; there is no such post, postId:0x%I64X, invoiceId:0x%I64X, recipientPcId:0x%I64X",
-                   POSTOFFICEDB_TAG, fn, postId, invoiceId, recipientPcId);
+                   MODULE_NAME, fn, postId, invoiceId, recipientPcId);
         return false;
     }
     if (*dbRetValue != 0)
@@ -503,19 +503,19 @@ bool PostOfficeDB::LoadRetryReadySinglePost(int* dbRetValue, long long postId, l
     PostOfficeDaemon* const daemon = PostOfficeDaemon::_instance;
     if (!daemon->_postContextManager->AddContext(postContext))
     {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 608, FAIL_ADD_EXISTS, POSTOFFICEDB_TAG, fn, postInfo._postId);
+        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 608, FAIL_ADD_EXISTS, MODULE_NAME, fn, postInfo._postId);
         postContext->removeReferenceCount(POSTOFFICEDB_FILE, 609);
         return false;
     }
     postContext->removeReferenceCount(POSTOFFICEDB_FILE, 613);
     if (daemon->_unsentPostContextManager->RegisterUnsentPost(postInfo._recipientWid, postInfo._postId, true))
         return true;
-    Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 616, FAIL_REGISTER_UNSENT, POSTOFFICEDB_TAG, fn,
+    Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 616, FAIL_REGISTER_UNSENT, MODULE_NAME, fn,
                static_cast<unsigned int>(postInfo._recipientWid), postInfo._postId);
     if (!daemon->_postContextManager->RemoveContext(postInfo._postId))
     {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 619, FAIL_REMOVE_CRASH, POSTOFFICEDB_TAG, fn, postInfo._postId);
-        AlertSender::Write(POSTOFFICEDB_FILE, 619, FAIL_REMOVE_CRASH, POSTOFFICEDB_TAG, fn, postInfo._postId);
+        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 619, FAIL_REMOVE_CRASH, MODULE_NAME, fn, postInfo._postId);
+        AlertSender::Write(POSTOFFICEDB_FILE, 619, FAIL_REMOVE_CRASH, MODULE_NAME, fn, postInfo._postId);
     }
     return false;
 }
@@ -534,7 +534,7 @@ bool PostOfficeDB::LoadRetryReadyPostList(int* dbRetValue)
     AutoDbTran tran(kDbId);
     if (tran.Tran == nullptr)
     {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 636, FAIL_ACQUIRE, POSTOFFICEDB_TAG, fn, kDbId);
+        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 636, FAIL_ACQUIRE, MODULE_NAME, fn, kDbId);
         return false;
     }
     tran.TimeoutSec = 0;
@@ -543,18 +543,18 @@ bool PostOfficeDB::LoadRetryReadyPostList(int* dbRetValue)
     wchar_t const* const query = L"{?=CALL dbo.usp_LoadRetryReadyPostList}";
     if (!tran.Tran->Prepare(Query(query)))
     {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 642, FAIL_PREPARE, POSTOFFICEDB_TAG, fn, query);
+        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 642, FAIL_PREPARE, MODULE_NAME, fn, query);
         return false;
     }
     if (!tran.Tran->BindParam(1, SQL_PARAM_OUTPUT, dbRetValue, 0, 0, SQL_INTEGER, SQL_C_SLONG, &paramLen[0]) ||
         !BindPostColumns(tran.Tran, postInfo, attachedItemInfo, postLen, itemLen))
     {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 757, FAIL_BIND, POSTOFFICEDB_TAG, fn);
+        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 757, FAIL_BIND, MODULE_NAME, fn);
         return false;
     }
     if (!tran.Tran->Execute())
     {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 695, FAIL_EXECUTE, POSTOFFICEDB_TAG, fn, *dbRetValue);
+        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 695, FAIL_EXECUTE, MODULE_NAME, fn, *dbRetValue);
         return false;
     }
 
@@ -564,7 +564,7 @@ bool PostOfficeDB::LoadRetryReadyPostList(int* dbRetValue)
         int const result = tran.Tran->Fetch(0);  // ❓ argument
         if (result == -1)
         {
-            Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 710, FAIL_FETCH, POSTOFFICEDB_TAG, fn);
+            Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 710, FAIL_FETCH, MODULE_NAME, fn);
             return false;
         }
         if (result == 0)
@@ -574,20 +574,20 @@ bool PostOfficeDB::LoadRetryReadyPostList(int* dbRetValue)
         PostOfficeDaemon* const daemon = PostOfficeDaemon::_instance;
         if (!daemon->_postContextManager->AddContext(postContext))
         {
-            Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 734, FAIL_ADD_EXISTS, POSTOFFICEDB_TAG, fn, postInfo._postId);
+            Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 734, FAIL_ADD_EXISTS, MODULE_NAME, fn, postInfo._postId);
             postContext->removeReferenceCount(POSTOFFICEDB_FILE, 735);
             continue;
         }
         postContext->removeReferenceCount(POSTOFFICEDB_FILE, 739);
         if (!daemon->_unsentPostContextManager->RegisterUnsentPost(postInfo._recipientWid, postInfo._postId, true))
         {
-            Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 742, FAIL_REGISTER_UNSENT, POSTOFFICEDB_TAG, fn,
+            Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 742, FAIL_REGISTER_UNSENT, MODULE_NAME, fn,
                        static_cast<unsigned int>(postInfo._recipientWid), postInfo._postId);
             if (!daemon->_postContextManager->RemoveContext(postInfo._postId))
             {
-                Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 745, FAIL_REMOVE_CRASH, POSTOFFICEDB_TAG, fn,
+                Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 745, FAIL_REMOVE_CRASH, MODULE_NAME, fn,
                            postInfo._postId);
-                AlertSender::Write(POSTOFFICEDB_FILE, 745, FAIL_REMOVE_CRASH, POSTOFFICEDB_TAG, fn, postInfo._postId);
+                AlertSender::Write(POSTOFFICEDB_FILE, 745, FAIL_REMOVE_CRASH, MODULE_NAME, fn, postInfo._postId);
             }
         }
     }
@@ -603,13 +603,13 @@ bool PostOfficeDB::UpdateStatusToRetryReady(int* dbRetValue, long long postId, l
     AutoDbTran tran(kDbId);
     if (tran.Tran == nullptr)
     {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 765, FAIL_ACQUIRE, POSTOFFICEDB_TAG, fn, kDbId);
+        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 765, FAIL_ACQUIRE, MODULE_NAME, fn, kDbId);
         return false;
     }
     wchar_t const* const query = L"{?=CALL dbo.usp_UpdateStatusToRetryReady(?,?,?)}";
     if (!tran.Tran->Prepare(Query(query)))
     {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 771, FAIL_PREPARE, POSTOFFICEDB_TAG, fn, query);
+        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 771, FAIL_PREPARE, MODULE_NAME, fn, query);
         return false;
     }
     if (invoiceId == 0)
@@ -619,12 +619,12 @@ bool PostOfficeDB::UpdateStatusToRetryReady(int* dbRetValue, long long postId, l
         !tran.Tran->BindParam(3, SQL_PARAM_INPUT, &invoiceId, 0, 0, SQL_BIGINT, SQL_C_SBIGINT, &paramLen[2]) ||
         !tran.Tran->BindParam(4, SQL_PARAM_INPUT, &recipientPcId, 0, 0, SQL_BIGINT, SQL_C_SBIGINT, &paramLen[3]))
     {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 808, FAIL_BIND, POSTOFFICEDB_TAG, fn);
+        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 808, FAIL_BIND, MODULE_NAME, fn);
         return false;
     }
     if (!tran.Tran->Execute())
     {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 798, FAIL_EXECUTE, POSTOFFICEDB_TAG, fn, *dbRetValue);
+        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 798, FAIL_EXECUTE, MODULE_NAME, fn, *dbRetValue);
         return false;
     }
     return *dbRetValue == 0;
@@ -638,23 +638,23 @@ bool PostOfficeDB::ResetAllDeliveryFailurePost(int* dbRetValue)
     AutoDbTran tran(kDbId);
     if (tran.Tran == nullptr)
     {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 816, FAIL_ACQUIRE, POSTOFFICEDB_TAG, fn, kDbId);
+        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 816, FAIL_ACQUIRE, MODULE_NAME, fn, kDbId);
         return false;
     }
     wchar_t const* const query = L"{?=CALL dbo.usp_ResetAllDeliveryFailurePost}";
     if (!tran.Tran->Prepare(Query(query)))
     {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 822, FAIL_PREPARE, POSTOFFICEDB_TAG, fn, query);
+        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 822, FAIL_PREPARE, MODULE_NAME, fn, query);
         return false;
     }
     if (!tran.Tran->BindParam(1, SQL_PARAM_OUTPUT, dbRetValue, 0, 0, SQL_INTEGER, SQL_C_SLONG, &paramLen[0]))
     {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 849, FAIL_BIND, POSTOFFICEDB_TAG, fn);
+        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 849, FAIL_BIND, MODULE_NAME, fn);
         return false;
     }
     if (!tran.Tran->Execute())
     {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 839, FAIL_EXECUTE, POSTOFFICEDB_TAG, fn, *dbRetValue);
+        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 839, FAIL_EXECUTE, MODULE_NAME, fn, *dbRetValue);
         return false;
     }
     return *dbRetValue == 0;

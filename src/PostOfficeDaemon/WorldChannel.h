@@ -20,7 +20,7 @@ public:
     virtual unsigned long long GetId();  // ❓ folded with AgentChannel::GetId (0x1a6e0)
 
     static unsigned short GetWid(Session const* session);    // 0x1e490
-    bool SendRelayResponse(RelayContext* relayContext);       // 0x1e570
+    bool SendRelayResponse(RelayContext const* const relayContext);       // 0x1e570
 
     unsigned short const _wid;
     unsigned long const _ipAddress;

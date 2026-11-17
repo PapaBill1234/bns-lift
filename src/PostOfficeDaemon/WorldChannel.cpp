@@ -20,7 +20,7 @@ extern TFPP_PacketHandler PostOfficeServicePacketServerSideFragmentHandlerList[1
 namespace
 {
 wchar_t const* const WORLD_CHANNEL_FILE = L"WorldChannel.cpp";  // ❓ name
-wchar_t const* const WORLD_CHANNEL_TAG = L"world channel";     // ❓ name
+static wchar_t const* const MODULE_NAME = L"world channel";  // PDB MODULE_NAME
 wchar_t const* const CHANNEL_H_FILE =
     L"E:\\DailyBuild02\\PostOfficeDaemon-Common-0.0.348\\depot\\Branch\\348NC\\Program\\Server\\BloodLib\\include\\Channel.h";  // ❓ name
 }
@@ -49,7 +49,7 @@ unsigned short WorldChannel::GetWid(Session const* session)
 {
     if (session == nullptr)
     {
-        WORLD_CHANNEL_CRASH(32, L"== CRASH == [%s], %s; invalid parameter, session:0x%p", WORLD_CHANNEL_TAG,
+        WORLD_CHANNEL_CRASH(32, L"== CRASH == [%s], %s; invalid parameter, session:0x%p", MODULE_NAME,
                             L"WorldChannel::GetWid", static_cast<void const*>(nullptr));
         return 0;
     }
@@ -64,11 +64,11 @@ unsigned short WorldChannel::GetWid(Session const* session)
 }
 
 // 0x1e570
-bool WorldChannel::SendRelayResponse(RelayContext* relayContext)
+bool WorldChannel::SendRelayResponse(RelayContext const* const relayContext)
 {
     if (relayContext == nullptr)
     {
-        WORLD_CHANNEL_CRASH(50, L"== CRASH == [%s], %s; invalid parameter, relayContext:0x%p", WORLD_CHANNEL_TAG,
+        WORLD_CHANNEL_CRASH(50, L"== CRASH == [%s], %s; invalid parameter, relayContext:0x%p", MODULE_NAME,
                             L"WorldChannel::SendRelayResponse", static_cast<void*>(nullptr));
         return false;
     }
@@ -103,7 +103,7 @@ bool WorldChannelManager::initChannelManager()
     {
         WORLD_CHANNEL_CRASH(101,
                             L"== CRASH == [%s], %s; world channel manager is already initialized, lockList:0x%p, containerList:0x%p",
-                            WORLD_CHANNEL_TAG, L"WorldChannelManager::initChannelManager", _lockList, _containerList);
+                            MODULE_NAME, L"WorldChannelManager::initChannelManager", _lockList, _containerList);
         return false;
     }
     _lockList = liftArrayNew<CriticalSection>(_bucketCount, WORLD_CHANNEL_FILE, 105);
@@ -116,7 +116,7 @@ WorldChannel* WorldChannelManager::GetWorldChannel(unsigned short wid)
 {
     if (wid == 0)
     {
-        WORLD_CHANNEL_CRASH(114, L"== CRASH == [%s], %s; invalid parameter, wid:%u", WORLD_CHANNEL_TAG,
+        WORLD_CHANNEL_CRASH(114, L"== CRASH == [%s], %s; invalid parameter, wid:%u", MODULE_NAME,
                             L"WorldChannelManager::GetWorldChannel", 0u);
         return nullptr;
     }
@@ -124,7 +124,7 @@ WorldChannel* WorldChannelManager::GetWorldChannel(unsigned short wid)
     {
         WORLD_CHANNEL_CRASH(118,
                             L"== CRASH == [%s], %s; invalid world channel manager, lockList:0x%p, containerList:0x%p",
-                            WORLD_CHANNEL_TAG, L"WorldChannelManager::GetWorldChannel", _lockList, _containerList);
+                            MODULE_NAME, L"WorldChannelManager::GetWorldChannel", _lockList, _containerList);
         return nullptr;
     }
 
@@ -145,7 +145,7 @@ WorldChannel* WorldChannelManager::GetWorldChannel(unsigned short wid)
     }
     _lockList[index].Leave();
     WORLD_CHANNEL_CRASH(131, L"== CRASH == [%s], %s; world channel is null, wid:%u, worldChannel:0x%p",
-                        WORLD_CHANNEL_TAG, L"WorldChannelManager::GetWorldChannel", static_cast<unsigned int>(wid),
+                        MODULE_NAME, L"WorldChannelManager::GetWorldChannel", static_cast<unsigned int>(wid),
                         static_cast<void*>(nullptr));
     return nullptr;
 }
@@ -155,7 +155,7 @@ bool WorldChannelManager::AddWorldChannel(WorldChannel* const worldChannel)
 {
     if (worldChannel == nullptr)
     {
-        WORLD_CHANNEL_CRASH(144, L"== CRASH == [%s], %s; invalid parameter, worldChannel:0x%p", WORLD_CHANNEL_TAG,
+        WORLD_CHANNEL_CRASH(144, L"== CRASH == [%s], %s; invalid parameter, worldChannel:0x%p", MODULE_NAME,
                             L"WorldChannelManager::AddWorldChannel", static_cast<void*>(nullptr));
         return false;
     }
@@ -163,13 +163,13 @@ bool WorldChannelManager::AddWorldChannel(WorldChannel* const worldChannel)
     {
         WORLD_CHANNEL_CRASH(148,
                             L"== CRASH == [%s], %s; invalid world channel manager, lockList:0x%p, containerList:0x%p",
-                            WORLD_CHANNEL_TAG, L"WorldChannelManager::AddWorldChannel", _lockList, _containerList);
+                            MODULE_NAME, L"WorldChannelManager::AddWorldChannel", _lockList, _containerList);
         return false;
     }
     unsigned short const wid = worldChannel->_wid;
     if (wid == 0)
     {
-        Log::Write(Log::LT_ERROR, WORLD_CHANNEL_FILE, 154, L"[%s], %s; invalid world Id, wid:%u", WORLD_CHANNEL_TAG,
+        Log::Write(Log::LT_ERROR, WORLD_CHANNEL_FILE, 154, L"[%s], %s; invalid world Id, wid:%u", MODULE_NAME,
                    L"WorldChannelManager::AddWorldChannel", 0u);
         return false;
     }
@@ -185,7 +185,7 @@ bool WorldChannelManager::AddWorldChannel(WorldChannel* const worldChannel)
     }
     _lockList[index].Leave();
     Log::Write(Log::LT_ERROR, WORLD_CHANNEL_FILE, 165, L"[%s], %s; failed to add world channel, wid:%u",
-               WORLD_CHANNEL_TAG, L"WorldChannelManager::AddWorldChannel", static_cast<unsigned int>(wid));
+               MODULE_NAME, L"WorldChannelManager::AddWorldChannel", static_cast<unsigned int>(wid));
     return false;
 }
 
@@ -194,7 +194,7 @@ bool WorldChannelManager::RemoveWorldChannel(unsigned short wid)
 {
     if (wid == 0)
     {
-        WORLD_CHANNEL_CRASH(181, L"== CRASH == [%s], %s; invalid parameter, wid:%u", WORLD_CHANNEL_TAG,
+        WORLD_CHANNEL_CRASH(181, L"== CRASH == [%s], %s; invalid parameter, wid:%u", MODULE_NAME,
                             L"WorldChannelManager::RemoveWorldChannel", 0u);
         return false;
     }
@@ -202,7 +202,7 @@ bool WorldChannelManager::RemoveWorldChannel(unsigned short wid)
     {
         WORLD_CHANNEL_CRASH(185,
                             L"== CRASH == [%s], %s; invalid world channel manager, lockList:0x%p, containerList:0x%p",
-                            WORLD_CHANNEL_TAG, L"WorldChannelManager::RemoveWorldChannel", _lockList, _containerList);
+                            MODULE_NAME, L"WorldChannelManager::RemoveWorldChannel", _lockList, _containerList);
         return false;
     }
 
@@ -213,7 +213,7 @@ bool WorldChannelManager::RemoveWorldChannel(unsigned short wid)
     {
         _lockList[index].Leave();
         Log::Write(Log::LT_ERROR, WORLD_CHANNEL_FILE, 195, L"[%s], %s; no such world channel, wid:%u",
-                   WORLD_CHANNEL_TAG, L"WorldChannelManager::RemoveWorldChannel", static_cast<unsigned int>(wid));
+                   MODULE_NAME, L"WorldChannelManager::RemoveWorldChannel", static_cast<unsigned int>(wid));
         return false;
     }
     WorldChannel* const worldChannel = it->second;
@@ -227,7 +227,7 @@ bool WorldChannelManager::RemoveWorldChannel(unsigned short wid)
     }
     _lockList[index].Leave();
     WORLD_CHANNEL_CRASH(202, L"== CRASH == [%s], %s; world channel is null, wid:%u, worldChannel:0x%p",
-                        WORLD_CHANNEL_TAG, L"WorldChannelManager::RemoveWorldChannel", static_cast<unsigned int>(wid),
+                        MODULE_NAME, L"WorldChannelManager::RemoveWorldChannel", static_cast<unsigned int>(wid),
                         static_cast<void*>(nullptr));
     return false;
 }
@@ -242,7 +242,7 @@ bool WorldSessionHandler::OnAccept(Session const* session) const
 {
     unsigned long long const sessionId = session->_id;
     Log::Write(Log::LT_NOTICE, WORLD_CHANNEL_FILE, 224,
-               L"[%s], %s; accepted world session, sessionId:0x%I64X, portId:%u, sessionIndex:%u", WORLD_CHANNEL_TAG,
+               L"[%s], %s; accepted world session, sessionId:0x%I64X, portId:%u, sessionIndex:%u", MODULE_NAME,
                L"WorldSessionHandler::OnAccept", sessionId, static_cast<unsigned int>(sessionId >> 32),
                static_cast<unsigned int>(sessionId));
     return true;
@@ -254,7 +254,7 @@ bool WorldSessionHandler::OnConnect(Session const* session, bool firstConnected)
     unsigned long long const sessionId = session->_id;
     Log::Write(Log::LT_ERROR, WORLD_CHANNEL_FILE, 230,
                L"[%s], %s; cannot use WorldSessionHandler::OnConnect handler, sessionId:0x%I64X, portId:%u, sessionIndex:%u",
-               WORLD_CHANNEL_TAG, L"WorldSessionHandler::OnConnect", sessionId,
+               MODULE_NAME, L"WorldSessionHandler::OnConnect", sessionId,
                static_cast<unsigned int>(sessionId >> 32), static_cast<unsigned int>(sessionId));
     return false;
 }
@@ -268,7 +268,7 @@ void WorldSessionHandler::OnClose(Session const* session, bool tryReconnect) con
     {
         Log::Write(Log::LT_NOTICE, WORLD_CHANNEL_FILE, 247,
                    L"[%s], %s; closed connection with unknown world session, sessionId:0x%I64X, portId:%u, sessionIndex:%u",
-                   WORLD_CHANNEL_TAG, L"WorldSessionHandler::OnClose", sessionId,
+                   MODULE_NAME, L"WorldSessionHandler::OnClose", sessionId,
                    static_cast<unsigned int>(sessionId >> 32), static_cast<unsigned int>(sessionId));
         return;
     }
@@ -279,7 +279,7 @@ void WorldSessionHandler::OnClose(Session const* session, bool tryReconnect) con
     channel->removeReferenceCount(WORLD_CHANNEL_FILE, 242);
     Log::Write(Log::LT_NOTICE, WORLD_CHANNEL_FILE, 244,
                L"[%s], %s; closed connection with world session, wid:%u, sessionId:0x%I64X, portId:%u, sessionIndex:%u",
-               WORLD_CHANNEL_TAG, L"WorldSessionHandler::OnClose", static_cast<unsigned int>(wid), sessionId,
+               MODULE_NAME, L"WorldSessionHandler::OnClose", static_cast<unsigned int>(wid), sessionId,
                static_cast<unsigned int>(sessionId >> 32), static_cast<unsigned int>(sessionId));
 }
 
@@ -291,7 +291,7 @@ bool WorldSessionHandler::PacketHandler(Session const* session, Packet const* pa
     {
         Log::Write(Log::LT_ERROR, WORLD_CHANNEL_FILE, 255,
                    L"[%s], %s; invalid packet; command is null, cmd:0x%p, sessionId:0x%I64X, portId:%u, sessionIndex:%u",
-                   WORLD_CHANNEL_TAG, L"WorldSessionHandler::PacketHandler", static_cast<void*>(nullptr), sessionId,
+                   MODULE_NAME, L"WorldSessionHandler::PacketHandler", static_cast<void*>(nullptr), sessionId,
                    static_cast<unsigned int>(sessionId >> 32), static_cast<unsigned int>(sessionId));
         return false;
     }
@@ -305,7 +305,7 @@ bool WorldSessionHandler::PacketHandler(Session const* session, Packet const* pa
             return PostOfficeServicePacketServerSideHandlerList[1](session, packet);
         Log::Write(Log::LT_ERROR, WORLD_CHANNEL_FILE, 272,
                    L"[%s], %s; invalid packet command of not authorized world session, command:%d, sessionId:0x%I64X, portId:%u, sessionIndex:%u",
-                   WORLD_CHANNEL_TAG, L"WorldSessionHandler::PacketHandler", static_cast<int>(cmd), sessionId,
+                   MODULE_NAME, L"WorldSessionHandler::PacketHandler", static_cast<int>(cmd), sessionId,
                    static_cast<unsigned int>(sessionId >> 32), static_cast<unsigned int>(sessionId));
         return false;
     }
@@ -322,7 +322,7 @@ bool WorldSessionHandler::PacketHandler(Session const* session, Packet const* pa
     {
         Log::Write(Log::LT_ERROR, WORLD_CHANNEL_FILE, 284,
                    L"[%s], %s; invalid packet command of world session, command:%d, wid:%u, sessionId:0x%I64X, portId:%u, sessionIndex:%u",
-                   WORLD_CHANNEL_TAG, L"WorldSessionHandler::PacketHandler", static_cast<int>(cmd),
+                   MODULE_NAME, L"WorldSessionHandler::PacketHandler", static_cast<int>(cmd),
                    static_cast<unsigned int>(channel->_wid), sessionId, static_cast<unsigned int>(sessionId >> 32),
                    static_cast<unsigned int>(sessionId));
     }

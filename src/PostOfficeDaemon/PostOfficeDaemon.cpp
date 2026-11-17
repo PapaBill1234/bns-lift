@@ -39,7 +39,7 @@
 #include "WorldConfig.h"
 
 static wchar_t const* const kFile = L"PostOfficeDaemon.cpp";
-static wchar_t const* const kTag = L"postofficed";
+static wchar_t const* const MODULE_NAME = L"postofficed";  // PDB MODULE_NAME
 
 PostOfficeDaemon* PostOfficeDaemon::_instance = nullptr;
 
@@ -201,16 +201,16 @@ void PostOfficeDaemon::FailedEventObjectHandler(EventObject* eventObject)
 {
     if (eventObject == nullptr)
     {
-        Log::Write(Log::LT_ERROR, kFile, 138, L"== CRASH == [%s], %s; invalid parameter, eventObject:0x%p", kTag,
+        Log::Write(Log::LT_ERROR, kFile, 138, L"== CRASH == [%s], %s; invalid parameter, eventObject:0x%p", MODULE_NAME,
                    L"PostOfficeDaemon::FailedEventObjectHandler", nullptr);
-        AlertSender::Write(kFile, 138, L"== CRASH == [%s], %s; invalid parameter, eventObject:0x%p", kTag,
+        AlertSender::Write(kFile, 138, L"== CRASH == [%s], %s; invalid parameter, eventObject:0x%p", MODULE_NAME,
                            L"PostOfficeDaemon::FailedEventObjectHandler", nullptr);
         return;
     }
     unsigned int const eventId = eventObject->EventId();
     if (eventId != 3 && eventId != 5)
     {
-        Log::Write(Log::LT_ERROR, kFile, 149, L"[%s], %s; unknown event object id, id:%u, object:0x%p", kTag,
+        Log::Write(Log::LT_ERROR, kFile, 149, L"[%s], %s; unknown event object id, id:%u, object:0x%p", MODULE_NAME,
                    L"PostOfficeDaemon::FailedEventObjectHandler", eventObject->EventId(), eventObject);
     }
 }
@@ -223,7 +223,7 @@ bool PostOfficeDaemon::initLog()
         false));
     if (_config == nullptr)
     {
-        Log::Write(Log::LT_ERROR, kFile, 157, L"[%s], %s; failed to load config, config:0x%p", kTag,
+        Log::Write(Log::LT_ERROR, kFile, 157, L"[%s], %s; failed to load config, config:0x%p", MODULE_NAME,
                    L"PostOfficeDaemon::initLog", nullptr);
         return false;
     }
@@ -248,13 +248,13 @@ bool PostOfficeDaemon::initLog()
 
     if (!Log::InitMedia(console))
     {
-        Log::Write(Log::LT_ERROR, kFile, 197, L"[%s], %s; failed to initialize console media", kTag,
+        Log::Write(Log::LT_ERROR, kFile, 197, L"[%s], %s; failed to initialize console media", MODULE_NAME,
                    L"PostOfficeDaemon::initLog");
         return false;
     }
     if (!Log::InitMedia(logFile))
     {
-        Log::Write(Log::LT_ERROR, kFile, 201, L"[%s], %s; failed to initialize log file media", kTag,
+        Log::Write(Log::LT_ERROR, kFile, 201, L"[%s], %s; failed to initialize log file media", MODULE_NAME,
                    L"PostOfficeDaemon::initLog");
         return false;
     }
@@ -262,7 +262,7 @@ bool PostOfficeDaemon::initLog()
         _config->_relayTimeoutInterval < 0 || _config->_pingInterval <= 0 || _config->_deliveryRetryInterval <= 0 ||
         _config->_serviceWid == 0)
     {
-        Log::Write(Log::LT_ERROR, kFile, 206, L"[%s], %s; invalid configuration", kTag, L"PostOfficeDaemon::initLog");
+        Log::Write(Log::LT_ERROR, kFile, 206, L"[%s], %s; invalid configuration", MODULE_NAME, L"PostOfficeDaemon::initLog");
         return false;
     }
     return true;
@@ -297,11 +297,11 @@ bool PostOfficeDaemon::initialize()
         memset(certification, 0, sizeof(certification));
         if (!Db::Initialize(1, dsn))
         {
-            Log::Write(Log::LT_ERROR, kFile, 256, L"[%s], %s; failed to initialize db, dbId:%d", kTag,
+            Log::Write(Log::LT_ERROR, kFile, 256, L"[%s], %s; failed to initialize db, dbId:%d", MODULE_NAME,
                        L"PostOfficeDaemon::initialize", 1);
             return false;
         }
-        Log::Write(Log::LT_NOTICE, kFile, 265, L"[%s], %s; daemon initialization success", kTag,
+        Log::Write(Log::LT_NOTICE, kFile, 265, L"[%s], %s; daemon initialization success", MODULE_NAME,
                    L"PostOfficeDaemon::initialize");
         return true;
     }
@@ -309,7 +309,7 @@ bool PostOfficeDaemon::initialize()
     PostOfficeConfig* const config = const_cast<PostOfficeConfig*>(_config);
     memset(config->_certFile, 0, strlen(config->_certFile));  // BUG: 0x132b0 null dereference when error is 2.
     config->_certFile = nullptr;
-    Log::Write(Log::LT_ERROR, kFile, 229, L"[%s], %s; cannot execute, error:%d", kTag, L"PostOfficeDaemon::initialize",
+    Log::Write(Log::LT_ERROR, kFile, 229, L"[%s], %s; cannot execute, error:%d", MODULE_NAME, L"PostOfficeDaemon::initialize",
                error);
     return false;
 }
@@ -319,7 +319,7 @@ bool PostOfficeDaemon::initNetwork()
 {
     if (!Network::Initialize(&PostOfficeDaemon::FailedEventObjectHandler, _config->_workerThreadCount))
     {
-        Log::Write(Log::LT_ERROR, kFile, 273, L"[%s], %s; failed to initialize network", kTag,
+        Log::Write(Log::LT_ERROR, kFile, 273, L"[%s], %s; failed to initialize network", MODULE_NAME,
                    L"PostOfficeDaemon::initNetwork");
         return false;
     }
@@ -334,7 +334,7 @@ bool PostOfficeDaemon::initNetwork()
     _sessionHandler[1] = handler;
     if (!Network::OpenPort(1, 0, 2, handler, &trustedPacketBufferHandler, 0, true, false, false))  // ❓ nagle
     {
-        Log::Write(Log::LT_ERROR, kFile, 294, L"[%s], %s; failed to open cachegate connection port, portId:%u", kTag,
+        Log::Write(Log::LT_ERROR, kFile, 294, L"[%s], %s; failed to open cachegate connection port, portId:%u", MODULE_NAME,
                    L"PostOfficeDaemon::initNetwork", 1);
         return false;
     }
@@ -358,7 +358,7 @@ bool PostOfficeDaemon::initNetwork()
                                        static_cast<unsigned short>(_config->_cachegateListenPort), 0, true))  // ❓ args
     {
         Log::Write(Log::LT_ERROR, kFile, 303,
-                   L"[%s], %s; failed to make cachegate session, portId:%u, cachegateIpAddr:%s, cachegatePort:%u", kTag,
+                   L"[%s], %s; failed to make cachegate session, portId:%u, cachegateIpAddr:%s, cachegatePort:%u", MODULE_NAME,
                    L"PostOfficeDaemon::initNetwork", 1, Network::GetAddressStringW(_config->_cachegateIpAddr),
                    static_cast<unsigned short>(_config->_cachegateListenPort));
         cachegateChannel->removeReferenceCount(kFile, 304);
@@ -366,7 +366,7 @@ bool PostOfficeDaemon::initNetwork()
     }
     if (!_cachegateChannelManager->SetCacheGateChannel(cachegateChannel))
     {
-        Log::Write(Log::LT_ERROR, kFile, 309, L"[%s], %s; failed to set cachegate channel", kTag,
+        Log::Write(Log::LT_ERROR, kFile, 309, L"[%s], %s; failed to set cachegate channel", MODULE_NAME,
                    L"PostOfficeDaemon::initNetwork");
         cachegateChannel->Close();
         cachegateChannel->removeReferenceCount(kFile, 311);
@@ -381,7 +381,7 @@ bool PostOfficeDaemon::initNetwork()
                            &trustedPacketBufferHandler, _config->_maxAgentSessionCount, false, false, false))
     {
         Log::Write(Log::LT_ERROR, kFile, 328, L"[%s], %s; failed to open agent listen port, portId:%u, postNumber:%u",
-                   kTag, L"PostOfficeDaemon::initNetwork", 2, static_cast<unsigned short>(_config->_agentListenPort));
+                   MODULE_NAME, L"PostOfficeDaemon::initNetwork", 2, static_cast<unsigned short>(_config->_agentListenPort));
         return false;
     }
 
@@ -392,7 +392,7 @@ bool PostOfficeDaemon::initNetwork()
                            &trustedPacketBufferHandler, _config->_maxWorldSessionCount, false, false, false))
     {
         Log::Write(Log::LT_ERROR, kFile, 338, L"[%s], %s; failed to open world listen port, portId:%u, postNumber:%u",
-                   kTag, L"PostOfficeDaemon::initNetwork", 3, static_cast<unsigned short>(_config->_worldListenPort));
+                   MODULE_NAME, L"PostOfficeDaemon::initNetwork", 3, static_cast<unsigned short>(_config->_worldListenPort));
         return false;
     }
 
@@ -403,12 +403,12 @@ bool PostOfficeDaemon::initNetwork()
                            0, true, true, false))
     {
         Log::Write(Log::LT_ERROR, kFile, 348, L"[%s], %s; failed to open management port, portId:%u, postNumber:%u",
-                   kTag, L"PostOfficeDaemon::initNetwork", 4, static_cast<unsigned short>(_config->_managePort));
+                   MODULE_NAME, L"PostOfficeDaemon::initNetwork", 4, static_cast<unsigned short>(_config->_managePort));
         return false;
     }
     Log::Write(Log::LT_NOTICE, kFile, 351, L"[%s], %s; opened management port successfully, portId:%u, portNumber:%u",
-               kTag, L"PostOfficeDaemon::initNetwork", 4, static_cast<unsigned short>(_config->_managePort));
-    Log::Write(Log::LT_NOTICE, kFile, 354, L"[%s], %s; network initialization success", kTag,
+               MODULE_NAME, L"PostOfficeDaemon::initNetwork", 4, static_cast<unsigned short>(_config->_managePort));
+    Log::Write(Log::LT_NOTICE, kFile, 354, L"[%s], %s; network initialization success", MODULE_NAME,
                L"PostOfficeDaemon::initNetwork");
     return true;
 }
@@ -419,7 +419,7 @@ bool PostOfficeDaemon::onStart()
     if (!initContextManager(Network::Instance->_workerThreadCount) || !loadAllUnsentPostFromDB() || !openListenPort() ||
         !startTimer())
         return false;
-    Log::Write(Log::LT_NOTICE, kFile, 374, L"[%s], %s; service ready", kTag, L"PostOfficeDaemon::onStart");
+    Log::Write(Log::LT_NOTICE, kFile, 374, L"[%s], %s; service ready", MODULE_NAME, L"PostOfficeDaemon::onStart");
     return true;
 }
 
@@ -430,20 +430,20 @@ bool PostOfficeDaemon::initWorldConfigDependencyManager()
     _worldConfigManager = mem ? new (mem) WorldConfigManager() : nullptr;
     if (!_worldConfigManager->initConfigManager())
     {
-        Log::Write(Log::LT_ERROR, kFile, 384, L"[%s], %s; failed to initialize world config manager", kTag,
+        Log::Write(Log::LT_ERROR, kFile, 384, L"[%s], %s; failed to initialize world config manager", MODULE_NAME,
                    L"PostOfficeDaemon::initWorldConfigDependencyManager");
         return false;
     }
     WorldConfigList worldConfigList;
     if (!_worldConfigManager->loadWorldConfigFile(&worldConfigList))
     {
-        Log::Write(Log::LT_ERROR, kFile, 390, L"[%s], %s; failed to load world config file", kTag,
+        Log::Write(Log::LT_ERROR, kFile, 390, L"[%s], %s; failed to load world config file", MODULE_NAME,
                    L"PostOfficeDaemon::initWorldConfigDependencyManager");
         return false;
     }
     if (!_worldConfigManager->updateWorldList(&worldConfigList))
     {
-        Log::Write(Log::LT_ERROR, kFile, 394, L"[%s], %s; failed to update world config manager", kTag,
+        Log::Write(Log::LT_ERROR, kFile, 394, L"[%s], %s; failed to update world config manager", MODULE_NAME,
                    L"PostOfficeDaemon::initWorldConfigDependencyManager");
         return false;
     }
@@ -451,7 +451,7 @@ bool PostOfficeDaemon::initWorldConfigDependencyManager()
     _cachedWatchdogManager = mem ? new (mem) CachedWatchdogManager() : nullptr;
     if (!_cachedWatchdogManager->initWatchdogManager(&worldConfigList))
     {
-        Log::Write(Log::LT_ERROR, kFile, 400, L"[%s], %s; failed to initialize cached watchdog manager", kTag,
+        Log::Write(Log::LT_ERROR, kFile, 400, L"[%s], %s; failed to initialize cached watchdog manager", MODULE_NAME,
                    L"PostOfficeDaemon::initWorldConfigDependencyManager");
         return false;
     }
@@ -459,7 +459,7 @@ bool PostOfficeDaemon::initWorldConfigDependencyManager()
     _unsentPostContextManager = mem ? new (mem) UnsentPostContextManager() : nullptr;
     if (!_unsentPostContextManager->initContextManager(&worldConfigList))
     {
-        Log::Write(Log::LT_ERROR, kFile, 406, L"[%s], %s; failed to initialize unsent post context manager", kTag,
+        Log::Write(Log::LT_ERROR, kFile, 406, L"[%s], %s; failed to initialize unsent post context manager", MODULE_NAME,
                    L"PostOfficeDaemon::initWorldConfigDependencyManager");
         return false;
     }
@@ -471,9 +471,9 @@ bool PostOfficeDaemon::initChannelManager(int bucketCount)
 {
     if (bucketCount <= 0)
     {
-        Log::Write(Log::LT_ERROR, kFile, 435, L"== CRASH == [%s], %s; invalid parameter, bucketCount:%d", kTag,
+        Log::Write(Log::LT_ERROR, kFile, 435, L"== CRASH == [%s], %s; invalid parameter, bucketCount:%d", MODULE_NAME,
                    L"PostOfficeDaemon::initChannelManager", bucketCount);
-        AlertSender::Write(kFile, 435, L"== CRASH == [%s], %s; invalid parameter, bucketCount:%d", kTag,
+        AlertSender::Write(kFile, 435, L"== CRASH == [%s], %s; invalid parameter, bucketCount:%d", MODULE_NAME,
                            L"PostOfficeDaemon::initChannelManager", bucketCount);
         return false;
     }
@@ -481,7 +481,7 @@ bool PostOfficeDaemon::initChannelManager(int bucketCount)
     _agentChannelManager = mem ? new (mem) AgentChannelManager() : nullptr;
     if (!_agentChannelManager->initChannelManager())
     {
-        Log::Write(Log::LT_ERROR, kFile, 441, L"[%s], %s; failed to initialize agent channel manager", kTag,
+        Log::Write(Log::LT_ERROR, kFile, 441, L"[%s], %s; failed to initialize agent channel manager", MODULE_NAME,
                    L"PostOfficeDaemon::initChannelManager");
         return false;
     }
@@ -489,7 +489,7 @@ bool PostOfficeDaemon::initChannelManager(int bucketCount)
     _worldChannelManager = mem ? new (mem) WorldChannelManager(bucketCount) : nullptr;
     if (!_worldChannelManager->initChannelManager())
     {
-        Log::Write(Log::LT_ERROR, kFile, 447, L"[%s], %s; failed to initialize world channel manager", kTag,
+        Log::Write(Log::LT_ERROR, kFile, 447, L"[%s], %s; failed to initialize world channel manager", MODULE_NAME,
                    L"PostOfficeDaemon::initChannelManager");
         return false;
     }
@@ -497,7 +497,7 @@ bool PostOfficeDaemon::initChannelManager(int bucketCount)
     _cachegateChannelManager = mem ? new (mem) CacheGateChannelManager() : nullptr;
     if (!_cachegateChannelManager->initChannelManager())
     {
-        Log::Write(Log::LT_ERROR, kFile, 453, L"[%s], %s; failed to initialize cachegate channel manager", kTag,
+        Log::Write(Log::LT_ERROR, kFile, 453, L"[%s], %s; failed to initialize cachegate channel manager", MODULE_NAME,
                    L"PostOfficeDaemon::initChannelManager");
         return false;
     }
@@ -509,9 +509,9 @@ bool PostOfficeDaemon::initContextManager(int bucketCount)
 {
     if (bucketCount <= 0)
     {
-        Log::Write(Log::LT_ERROR, kFile, 463, L"== CRASH == [%s], %s; invalid parameter, bucketCount:%d", kTag,
+        Log::Write(Log::LT_ERROR, kFile, 463, L"== CRASH == [%s], %s; invalid parameter, bucketCount:%d", MODULE_NAME,
                    L"PostOfficeDaemon::initContextManager", bucketCount);
-        AlertSender::Write(kFile, 463, L"== CRASH == [%s], %s; invalid parameter, bucketCount:%d", kTag,
+        AlertSender::Write(kFile, 463, L"== CRASH == [%s], %s; invalid parameter, bucketCount:%d", MODULE_NAME,
                            L"PostOfficeDaemon::initContextManager", bucketCount);
         return false;
     }
@@ -519,7 +519,7 @@ bool PostOfficeDaemon::initContextManager(int bucketCount)
     _postContextManager = mem ? new (mem) PostContextManager(bucketCount) : nullptr;
     if (!_postContextManager->initContextManager())
     {
-        Log::Write(Log::LT_ERROR, kFile, 469, L"[%s], %s; failed to initialize post context manager", kTag,
+        Log::Write(Log::LT_ERROR, kFile, 469, L"[%s], %s; failed to initialize post context manager", MODULE_NAME,
                    L"PostOfficeDaemon::initContextManager");
         return false;
     }
@@ -527,7 +527,7 @@ bool PostOfficeDaemon::initContextManager(int bucketCount)
     _relayContextManager = mem ? new (mem) RelayContextManager(bucketCount) : nullptr;
     if (!_relayContextManager->initContextManager())
     {
-        Log::Write(Log::LT_ERROR, kFile, 475, L"[%s], %s; failed to initialize relay context manager", kTag,
+        Log::Write(Log::LT_ERROR, kFile, 475, L"[%s], %s; failed to initialize relay context manager", MODULE_NAME,
                    L"PostOfficeDaemon::initContextManager");
         return false;
     }
@@ -535,7 +535,7 @@ bool PostOfficeDaemon::initContextManager(int bucketCount)
     _relayTimeContextManager = mem ? new (mem) RelayTimeContextManager(bucketCount) : nullptr;
     if (!_relayTimeContextManager->initContextManager())
     {
-        Log::Write(Log::LT_ERROR, kFile, 481, L"[%s], %s; failed to initialize relaytime context manager", kTag,
+        Log::Write(Log::LT_ERROR, kFile, 481, L"[%s], %s; failed to initialize relaytime context manager", MODULE_NAME,
                    L"PostOfficeDaemon::initContextManager");
         return false;
     }
@@ -549,11 +549,11 @@ bool PostOfficeDaemon::loadAllUnsentPostFromDB()
     __time64_t const startTime = _time64(nullptr);
     if (!PostOfficeDB::LoadPostList(&dbRetValue))
     {
-        Log::Write(Log::LT_ERROR, kFile, 495, L"[%s], %s; failed to load unsent post list, dbRetValue:%d", kTag,
+        Log::Write(Log::LT_ERROR, kFile, 495, L"[%s], %s; failed to load unsent post list, dbRetValue:%d", MODULE_NAME,
                    L"PostOfficeDaemon::loadAllUnsentPostFromDB", dbRetValue);
         return false;
     }
-    Log::Write(Log::LT_NOTICE, kFile, 502, L"[%s], %s; database loading time:%I64dsec", kTag,
+    Log::Write(Log::LT_NOTICE, kFile, 502, L"[%s], %s; database loading time:%I64dsec", MODULE_NAME,
                L"PostOfficeDaemon::loadAllUnsentPostFromDB", _time64(nullptr) - startTime);
     return true;
 }
@@ -563,19 +563,19 @@ bool PostOfficeDaemon::openListenPort()
 {
     if (!Network::OpenPort(2))
     {
-        Log::Write(Log::LT_ERROR, kFile, 510, L"[%s], %s; failed to open agent port, portId:%u, portNumber:%u", kTag,
+        Log::Write(Log::LT_ERROR, kFile, 510, L"[%s], %s; failed to open agent port, portId:%u, portNumber:%u", MODULE_NAME,
                    L"PostOfficeDaemon::openListenPort", 2, static_cast<unsigned short>(_config->_agentListenPort));
         return false;
     }
-    Log::Write(Log::LT_NOTICE, kFile, 513, L"[%s], %s; opened agent port successfully, portId:%u, portNumber:%u", kTag,
+    Log::Write(Log::LT_NOTICE, kFile, 513, L"[%s], %s; opened agent port successfully, portId:%u, portNumber:%u", MODULE_NAME,
                L"PostOfficeDaemon::openListenPort", 2, static_cast<unsigned short>(_config->_agentListenPort));
     if (!Network::OpenPort(3))
     {
-        Log::Write(Log::LT_ERROR, kFile, 516, L"[%s], %s; failed to open world port, portId:%u, portNumber:%u", kTag,
+        Log::Write(Log::LT_ERROR, kFile, 516, L"[%s], %s; failed to open world port, portId:%u, portNumber:%u", MODULE_NAME,
                    L"PostOfficeDaemon::openListenPort", 3, static_cast<unsigned short>(_config->_worldListenPort));
         return false;
     }
-    Log::Write(Log::LT_NOTICE, kFile, 519, L"[%s], %s; opened world port successfully, portId:%u, portNumber:%u", kTag,
+    Log::Write(Log::LT_NOTICE, kFile, 519, L"[%s], %s; opened world port successfully, portId:%u, portNumber:%u", MODULE_NAME,
                L"PostOfficeDaemon::openListenPort", 3, static_cast<unsigned short>(_config->_worldListenPort));
     return true;
 }
@@ -589,7 +589,7 @@ bool PostOfficeDaemon::startTimer()
         _relayTimeoutChecker = mem ? new (mem) RelayTimeoutChecker() : nullptr;
         if (!GlobalTimerQueue->Add(1000, _relayTimeoutChecker))
         {
-            Log::Write(Log::LT_ERROR, kFile, 529, L"[%s], %s; failed to add relay timeout checker timer", kTag,
+            Log::Write(Log::LT_ERROR, kFile, 529, L"[%s], %s; failed to add relay timeout checker timer", MODULE_NAME,
                        L"PostOfficeDaemon::startTimer");
             return false;
         }
@@ -598,7 +598,7 @@ bool PostOfficeDaemon::startTimer()
     _unsentPostChecker = mem ? new (mem) UnsentPostChecker() : nullptr;
     if (!GlobalTimerQueue->Add(1000, _unsentPostChecker))
     {
-        Log::Write(Log::LT_ERROR, kFile, 537, L"[%s], %s; failed to add unsent post checker timer", kTag,
+        Log::Write(Log::LT_ERROR, kFile, 537, L"[%s], %s; failed to add unsent post checker timer", MODULE_NAME,
                    L"PostOfficeDaemon::startTimer");
         return false;
     }
@@ -610,9 +610,9 @@ CacheGateChannel* PostOfficeDaemon::checkDestinationServiceState(unsigned short 
 {
     if (destinationWid == 0)
     {
-        Log::Write(Log::LT_ERROR, kFile, 548, L"== CRASH == [%s], %s; invalid parameter, destinationWid:%u", kTag,
+        Log::Write(Log::LT_ERROR, kFile, 548, L"== CRASH == [%s], %s; invalid parameter, destinationWid:%u", MODULE_NAME,
                    L"PostOfficeDaemon::checkDestinationServiceState", 0);
-        AlertSender::Write(kFile, 548, L"== CRASH == [%s], %s; invalid parameter, destinationWid:%u", kTag,
+        AlertSender::Write(kFile, 548, L"== CRASH == [%s], %s; invalid parameter, destinationWid:%u", MODULE_NAME,
                            L"PostOfficeDaemon::checkDestinationServiceState", 0);
         return nullptr;
     }
@@ -626,7 +626,7 @@ CacheGateChannel* PostOfficeDaemon::checkDestinationServiceState(unsigned short 
     }
     if (cachedWatchdog == nullptr || cachedWatchdog->_serviceState != CachedWatchdog::SERVICE_STATE_AVAILABLE)
     {
-        Log::Write(Log::LT_ERROR, kFile, 553, L"[%s], %s; cached service state is unavailable, destinationWid:%u", kTag,
+        Log::Write(Log::LT_ERROR, kFile, 553, L"[%s], %s; cached service state is unavailable, destinationWid:%u", MODULE_NAME,
                    L"PostOfficeDaemon::checkDestinationServiceState", destinationWid);
         return nullptr;
     }
@@ -645,13 +645,13 @@ CacheGateChannel* PostOfficeDaemon::checkCacheGateServiceState()
     manager->_lock.Leave();
     if (cachegateChannel == nullptr)
     {
-        Log::Write(Log::LT_ERROR, kFile, 564, L"[%s], %s; cachegate service state is unavailable", kTag,
+        Log::Write(Log::LT_ERROR, kFile, 564, L"[%s], %s; cachegate service state is unavailable", MODULE_NAME,
                    L"PostOfficeDaemon::checkCacheGateServiceState");
         return nullptr;
     }
     if (cachegateChannel->_serviceState != CacheGateChannel::SERVICE_STATE_AVAILABLE)
     {
-        Log::Write(Log::LT_ERROR, kFile, 569, L"[%s], %s; cachegate service state is unavailable", kTag,
+        Log::Write(Log::LT_ERROR, kFile, 569, L"[%s], %s; cachegate service state is unavailable", MODULE_NAME,
                    L"PostOfficeDaemon::checkCacheGateServiceState");
         cachegateChannel->removeReferenceCount(kFile, 570);
         return nullptr;
@@ -662,7 +662,7 @@ CacheGateChannel* PostOfficeDaemon::checkCacheGateServiceState()
 // 0x14a30
 void PostOfficeDaemon::shutdown()
 {
-    Log::Write(Log::LT_NOTICE, kFile, 579, L"[%s], %s; service shutdown", kTag, L"PostOfficeDaemon::shutdown");
+    Log::Write(Log::LT_NOTICE, kFile, 579, L"[%s], %s; service shutdown", MODULE_NAME, L"PostOfficeDaemon::shutdown");
     _cachedWatchdogManager->SetAllServiceState(CachedWatchdog::SERVICE_STATE_UNAVAILABLE);
     CacheGateChannelManager* const manager = _cachegateChannelManager;
     manager->_lock.Enter();
@@ -692,50 +692,50 @@ void PostOfficeDaemon::shutdown()
 // 0x14b80
 bool PostOfficeDaemon::reload(wchar_t** /*args*/, int /*count*/)
 {
-    Log::Write(Log::LT_DEBUG, kFile, 601, L"[%s], %s; Reload start", kTag, L"PostOfficeDaemon::reload");
+    Log::Write(Log::LT_DEBUG, kFile, 601, L"[%s], %s; Reload start", MODULE_NAME, L"PostOfficeDaemon::reload");
     WorldConfigList worldConfigList;
     if (!_worldConfigManager->loadWorldConfigFile(&worldConfigList))
     {
-        Log::Write(Log::LT_ERROR, kFile, 605, L"[%s], %s; failed to load world config file", kTag,
+        Log::Write(Log::LT_ERROR, kFile, 605, L"[%s], %s; failed to load world config file", MODULE_NAME,
                    L"PostOfficeDaemon::reload");
     }
     else if (!_unsentPostContextManager->updateWorldList(&worldConfigList))
     {
         Log::Write(Log::LT_ERROR, kFile, 610, L"[%s], %s; failed to update world list of unsent post context manager",
-                   kTag, L"PostOfficeDaemon::reload");
+                   MODULE_NAME, L"PostOfficeDaemon::reload");
     }
     else if (!_cachedWatchdogManager->updateWorldList(&worldConfigList))
     {
-        Log::Write(Log::LT_ERROR, kFile, 614, L"[%s], %s; failed to update world list of cached watchdog manager", kTag,
+        Log::Write(Log::LT_ERROR, kFile, 614, L"[%s], %s; failed to update world list of cached watchdog manager", MODULE_NAME,
                    L"PostOfficeDaemon::reload");
     }
     else if (!_worldConfigManager->updateWorldList(&worldConfigList))
     {
-        Log::Write(Log::LT_ERROR, kFile, 618, L"[%s], %s; failed to update world list of world config manager", kTag,
+        Log::Write(Log::LT_ERROR, kFile, 618, L"[%s], %s; failed to update world list of world config manager", MODULE_NAME,
                    L"PostOfficeDaemon::reload");
     }
     else
     {
-        Log::Write(Log::LT_NOTICE, kFile, 623, L"[%s], %s; bns common config reloading...", kTag,
+        Log::Write(Log::LT_NOTICE, kFile, 623, L"[%s], %s; bns common config reloading...", MODULE_NAME,
                    L"PostOfficeDaemon::reload");
         bool changed = false;
         if (!BnsCommonConfig::ReloadBnsCommonConfig(changed))
         {
-            Log::Write(Log::LT_ERROR, kFile, 626, L"[%s], %s; bns common config reload fail", kTag,
+            Log::Write(Log::LT_ERROR, kFile, 626, L"[%s], %s; bns common config reload fail", MODULE_NAME,
                        L"PostOfficeDaemon::reload");
         }
         else if (changed)
         {
             BnsCommonConfig::Dump();
-            Log::Write(Log::LT_NOTICE, kFile, 637, L"[%s], %s; bns common config reload complete, done", kTag,
+            Log::Write(Log::LT_NOTICE, kFile, 637, L"[%s], %s; bns common config reload complete, done", MODULE_NAME,
                        L"PostOfficeDaemon::reload");
         }
         else
         {
-            Log::Write(Log::LT_NOTICE, kFile, 632, L"[%s], %s; bns common config reload complete, not changed", kTag,
+            Log::Write(Log::LT_NOTICE, kFile, 632, L"[%s], %s; bns common config reload complete, not changed", MODULE_NAME,
                        L"PostOfficeDaemon::reload");
         }
-        Log::Write(Log::LT_DEBUG, kFile, 641, L"[%s], %s; Reload success", kTag, L"PostOfficeDaemon::reload");
+        Log::Write(Log::LT_DEBUG, kFile, 641, L"[%s], %s; Reload success", MODULE_NAME, L"PostOfficeDaemon::reload");
     }
     return true;
 }

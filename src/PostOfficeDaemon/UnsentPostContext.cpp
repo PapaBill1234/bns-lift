@@ -13,7 +13,7 @@
 #include "CacheGateChannel.h"
 
 #define UNSENT_POST_CONTEXT_FILE L"UnsentPostContext.cpp"
-#define UNSENT_POST_CONTEXT_TAG L"unsent post context"
+static wchar_t const* const MODULE_NAME = L"unsent post context";  // PDB MODULE_NAME
 
 // The original writes each "== CRASH ==" text to Log (LT_ERROR) and to AlertSender.
 #define UNSENT_POST_CONTEXT_CRASH(line, fmt, ...)                                     \
@@ -29,7 +29,7 @@ bool UnsentPostContextList::pushUnsentPostContext(long long const postId, bool c
     if (postId == 0)
     {
         UNSENT_POST_CONTEXT_CRASH(52, L"== CRASH == [%s], %s; invalid parameter, postId:0x%I64X",
-                                  UNSENT_POST_CONTEXT_TAG, L"UnsentPostContextList::pushUnsentPostContext", postId);
+                                  MODULE_NAME, L"UnsentPostContextList::pushUnsentPostContext", postId);
         return false;
     }
     if (_header == nullptr || _header->_prev == nullptr || _header->_next == nullptr)
@@ -37,7 +37,7 @@ bool UnsentPostContextList::pushUnsentPostContext(long long const postId, bool c
         // BUG: 0xc3b0 reads _header->_prev and _header->_next also when _header is null.
         UNSENT_POST_CONTEXT_CRASH(56,
                                   L"== CRASH == [%s], %s; invalid header node, wid:%u, header:0x%p, prev:0x%p, next:0x%p",
-                                  UNSENT_POST_CONTEXT_TAG, L"UnsentPostContextList::pushUnsentPostContext", _wid, _header,
+                                  MODULE_NAME, L"UnsentPostContextList::pushUnsentPostContext", _wid, _header,
                                   _header->_prev, _header->_next);
         return false;
     }
@@ -88,7 +88,7 @@ UnsentPostContext* UnsentPostContextList::popUnsentPostContext()
     // BUG: 0xc5a0 reads _header->_prev and _header->_next also when _header is null.
     UNSENT_POST_CONTEXT_CRASH(86,
                               L"== CRASH == [%s], %s; invalid header node, wid:%u, header:0x%p, prev:0x%p, next:0x%p",
-                              UNSENT_POST_CONTEXT_TAG, L"UnsentPostContextList::popUnsentPostContext", _wid, _header,
+                              MODULE_NAME, L"UnsentPostContextList::popUnsentPostContext", _wid, _header,
                               _header->_prev, _header->_next);
     return nullptr;
 }
@@ -106,7 +106,7 @@ bool UnsentPostContextManager::initContextManager(WorldConfigList const* worldCo
         if (bucketIndex >= BUCKET_COUNT)
         {
             Log::Write(Log::LT_ERROR, UNSENT_POST_CONTEXT_FILE, 159,
-                       L"[%s], %s; wid out of range, wid:%u, bucketIndex:%d, bucketCount:%d", UNSENT_POST_CONTEXT_TAG,
+                       L"[%s], %s; wid out of range, wid:%u, bucketIndex:%d, bucketCount:%d", MODULE_NAME,
                        L"UnsentPostContextManager::initContextManager", wid, bucketIndex, BUCKET_COUNT);
             lock.Leave();
             return false;
@@ -118,7 +118,7 @@ bool UnsentPostContextManager::initContextManager(WorldConfigList const* worldCo
         {
             Log::Write(Log::LT_ERROR, UNSENT_POST_CONTEXT_FILE, 174,
                        L"[%s], %s; unsent post context list already exists, wid:%u, bucketIndex:%d, worldIndex:%d",
-                       UNSENT_POST_CONTEXT_TAG, L"UnsentPostContextManager::initContextManager", wid, bucketIndex,
+                       MODULE_NAME, L"UnsentPostContextManager::initContextManager", wid, bucketIndex,
                        worldIndex);
             lock.Leave();
             return false;
@@ -127,7 +127,7 @@ bool UnsentPostContextManager::initContextManager(WorldConfigList const* worldCo
         {
             UNSENT_POST_CONTEXT_CRASH(
                 169, L"== CRASH == [%s], %s; failed to add unsent post context list, wid:%u, bucketIndex:%d, worldIndex:%d",
-                UNSENT_POST_CONTEXT_TAG, L"UnsentPostContextManager::initContextManager", wid, bucketIndex, worldIndex);
+                MODULE_NAME, L"UnsentPostContextManager::initContextManager", wid, bucketIndex, worldIndex);
             lock.Leave();
             return false;
         }
@@ -149,7 +149,7 @@ bool UnsentPostContextManager::updateWorldList(WorldConfigList const* worldConfi
         if (bucketIndex >= BUCKET_COUNT)
         {
             Log::Write(Log::LT_ERROR, UNSENT_POST_CONTEXT_FILE, 198,
-                       L"[%s], %s; wid out of range, wid:%u, bucketIndex:%d, bucketCount:%d", UNSENT_POST_CONTEXT_TAG,
+                       L"[%s], %s; wid out of range, wid:%u, bucketIndex:%d, bucketCount:%d", MODULE_NAME,
                        L"UnsentPostContextManager::updateWorldList", wid, bucketIndex, BUCKET_COUNT);
             lock.Leave();
             return false;
@@ -161,14 +161,14 @@ bool UnsentPostContextManager::updateWorldList(WorldConfigList const* worldConfi
         {
             UNSENT_POST_CONTEXT_CRASH(
                 208, L"== CRASH == [%s], %s; failed to add unsent post context list, wid:%u, bucketIndex:%d, worldIndex:%d",
-                UNSENT_POST_CONTEXT_TAG, L"UnsentPostContextManager::updateWorldList", wid, bucketIndex, worldIndex);
+                MODULE_NAME, L"UnsentPostContextManager::updateWorldList", wid, bucketIndex, worldIndex);
             lock.Leave();
             return false;
         }
     }
     lock.Leave();
     Log::Write(Log::LT_DEBUG, UNSENT_POST_CONTEXT_FILE, 215,
-               L"[%s], %s; succeeded to update world list of unsent post context manager", UNSENT_POST_CONTEXT_TAG,
+               L"[%s], %s; succeeded to update world list of unsent post context manager", MODULE_NAME,
                L"UnsentPostContextManager::updateWorldList");
     return true;
 }
@@ -179,7 +179,7 @@ bool UnsentPostContextManager::addUnsentPostContextList(unsigned short wid, int 
     if (wid == 0 || bucketIndex >= BUCKET_COUNT || worldIndex >= ARRAY_SIZE)
     {
         UNSENT_POST_CONTEXT_CRASH(223, L"== CRASH == [%s], %s; invalid parameter, wid:%u, bucketIndex:%d, worldIndex:%d",
-                                  UNSENT_POST_CONTEXT_TAG, L"UnsentPostContextManager::addUnsentPostContextList", wid,
+                                  MODULE_NAME, L"UnsentPostContextManager::addUnsentPostContextList", wid,
                                   bucketIndex, worldIndex);
         return false;
     }
@@ -207,7 +207,7 @@ bool UnsentPostContextManager::addUnsentPostContextList(unsigned short wid, int 
 
     Log::Write(Log::LT_DEBUG, UNSENT_POST_CONTEXT_FILE, 237,
                L"[%s], %s; succeeded to add unsent post context list, wid:%u, bucketIndex:%d, worldIndex:%d",
-               UNSENT_POST_CONTEXT_TAG, L"UnsentPostContextManager::addUnsentPostContextList", wid, bucketIndex,
+               MODULE_NAME, L"UnsentPostContextManager::addUnsentPostContextList", wid, bucketIndex,
                worldIndex);
     return true;
 }
@@ -218,21 +218,21 @@ UnsentPostContextList* UnsentPostContextManager::getUnsentPostContextList(unsign
     if (wid == 0)
     {
         Log::Write(Log::LT_ERROR, UNSENT_POST_CONTEXT_FILE, 245, L"[%s], %s; invalid parameter, wid:%u",
-                   UNSENT_POST_CONTEXT_TAG, L"UnsentPostContextManager::getUnsentPostContextList", wid);
+                   MODULE_NAME, L"UnsentPostContextManager::getUnsentPostContextList", wid);
         return nullptr;
     }
     int const bucketIndex = wid / ARRAY_SIZE;
     if (bucketIndex >= BUCKET_COUNT)
     {
         Log::Write(Log::LT_ERROR, UNSENT_POST_CONTEXT_FILE, 255,
-                   L"[%s], %s; wid out of range, wid:%u, bucketIndex:%d, bucketCount:%d", UNSENT_POST_CONTEXT_TAG,
+                   L"[%s], %s; wid out of range, wid:%u, bucketIndex:%d, bucketCount:%d", MODULE_NAME,
                    L"UnsentPostContextManager::getUnsentPostContextList", wid, bucketIndex, BUCKET_COUNT);
         return nullptr;
     }
     if (_containerList[bucketIndex] == nullptr)
     {
         Log::Write(Log::LT_ERROR, UNSENT_POST_CONTEXT_FILE, 260,
-                   L"[%s], %s; no such container list, wid:%u, bucketIndex:%d", UNSENT_POST_CONTEXT_TAG,
+                   L"[%s], %s; no such container list, wid:%u, bucketIndex:%d", MODULE_NAME,
                    L"UnsentPostContextManager::getUnsentPostContextList", wid, bucketIndex);
         return nullptr;
     }
@@ -245,7 +245,7 @@ bool UnsentPostContextManager::RegisterUnsentPost(unsigned short wid, long long 
     if (postId == 0)
     {
         UNSENT_POST_CONTEXT_CRASH(270, L"== CRASH == [%s], %s; invalid parameter, postId:0x%I64X",
-                                  UNSENT_POST_CONTEXT_TAG, L"UnsentPostContextManager::RegisterUnsentPost", postId);
+                                  MODULE_NAME, L"UnsentPostContextManager::RegisterUnsentPost", postId);
         return false;
     }
     UnsentPostContextList* const unsentPostContextList = getUnsentPostContextList(wid);
@@ -253,17 +253,17 @@ bool UnsentPostContextManager::RegisterUnsentPost(unsigned short wid, long long 
     {
         Log::Write(Log::LT_ERROR, UNSENT_POST_CONTEXT_FILE, 276,
                    L"[%s], %s; no such unsent post context list, wid:%u, unsentPostContextList:0x%p",
-                   UNSENT_POST_CONTEXT_TAG, L"UnsentPostContextManager::RegisterUnsentPost", wid, unsentPostContextList);
+                   MODULE_NAME, L"UnsentPostContextManager::RegisterUnsentPost", wid, unsentPostContextList);
         return false;
     }
     if (!unsentPostContextList->pushUnsentPostContext(postId, hasPostContext))
     {
         UNSENT_POST_CONTEXT_CRASH(281, L"== CRASH == [%s], %s; failed to push unsent post context, wid:%u, postId:0x%I64X",
-                                  UNSENT_POST_CONTEXT_TAG, L"UnsentPostContextManager::RegisterUnsentPost", wid, postId);
+                                  MODULE_NAME, L"UnsentPostContextManager::RegisterUnsentPost", wid, postId);
         return false;
     }
     Log::Write(Log::LT_DEBUG, UNSENT_POST_CONTEXT_FILE, 285,
-               L"[%s], %s; succeeded to register unsent post, wid:%u, postId:0x%I64X", UNSENT_POST_CONTEXT_TAG,
+               L"[%s], %s; succeeded to register unsent post, wid:%u, postId:0x%I64X", MODULE_NAME,
                L"UnsentPostContextManager::RegisterUnsentPost", wid, postId);
     return true;
 }
@@ -293,7 +293,7 @@ void UnsentPostContextManager::CheckUnsentPost()
                 if (unsentPostContext == nullptr)
                 {
                     UNSENT_POST_CONTEXT_CRASH(315, L"== CRASH == [%s], %s; unsent post context is null, wid:%u",
-                                              UNSENT_POST_CONTEXT_TAG, L"UnsentPostContextManager::CheckUnsentPost", wid);
+                                              MODULE_NAME, L"UnsentPostContextManager::CheckUnsentPost", wid);
                     cachegateChannel->removeReferenceCount(UNSENT_POST_CONTEXT_FILE, 316);
                 }
                 else if (!deliverUnsentPost(unsentPostContext, cachegateChannel))
@@ -320,7 +320,7 @@ bool UnsentPostContextManager::deliverUnsentPost(UnsentPostContext* const unsent
     {
         UNSENT_POST_CONTEXT_CRASH(340,
                                   L"== CRASH == [%s], %s; invalid parameter, unsentPostContext:0x%p, cachegateChannel:0x%p",
-                                  UNSENT_POST_CONTEXT_TAG, L"UnsentPostContextManager::deliverUnsentPost",
+                                  MODULE_NAME, L"UnsentPostContextManager::deliverUnsentPost",
                                   unsentPostContext, cachegateChannel);
         return false;
     }
@@ -333,7 +333,7 @@ bool UnsentPostContextManager::deliverUnsentPost(UnsentPostContext* const unsent
         {
             Log::Write(Log::LT_ERROR, UNSENT_POST_CONTEXT_FILE, 349,
                        L"[%s], %s; exception occurred; failed to load single post, dbRetValue:%d, postId:0x%I64X",
-                       UNSENT_POST_CONTEXT_TAG, L"UnsentPostContextManager::deliverUnsentPost", dbRetValue, postId);
+                       MODULE_NAME, L"UnsentPostContextManager::deliverUnsentPost", dbRetValue, postId);
             return false;
         }
     }
@@ -342,7 +342,7 @@ bool UnsentPostContextManager::deliverUnsentPost(UnsentPostContext* const unsent
     if (postContext == nullptr)
     {
         Log::Write(Log::LT_ERROR, UNSENT_POST_CONTEXT_FILE, 356, L"[%s], %s; no such post context, postId:0x%I64X",
-                   UNSENT_POST_CONTEXT_TAG, L"UnsentPostContextManager::deliverUnsentPost", postId);
+                   MODULE_NAME, L"UnsentPostContextManager::deliverUnsentPost", postId);
         return false;
     }
 
@@ -354,10 +354,10 @@ bool UnsentPostContextManager::deliverUnsentPost(UnsentPostContext* const unsent
 
     Log::Write(Log::LT_ERROR, UNSENT_POST_CONTEXT_FILE, 361,
                L"[%s], %s; exception occurred; failed to occur post delivery event, postId:0x%I64X",
-               UNSENT_POST_CONTEXT_TAG, L"UnsentPostContextManager::deliverUnsentPost", postId);
+               MODULE_NAME, L"UnsentPostContextManager::deliverUnsentPost", postId);
     if (!PostOfficeDaemon::_instance->_postContextManager->RemoveContext(postId))
         UNSENT_POST_CONTEXT_CRASH(364, L"== CRASH == [%s], %s; exception occurred; failed to remove post context, postId:0x%I64X",
-                                  UNSENT_POST_CONTEXT_TAG, L"UnsentPostContextManager::deliverUnsentPost", postId);
+                                  MODULE_NAME, L"UnsentPostContextManager::deliverUnsentPost", postId);
     postContext->removeReferenceCount(UNSENT_POST_CONTEXT_FILE, 367);
     return false;
 }

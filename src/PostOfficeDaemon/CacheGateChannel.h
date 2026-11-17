@@ -22,8 +22,8 @@ public:
     virtual ~CacheGateChannel();
     virtual unsigned long long GetId();
 
-    bool SendRelayRequest(RelayContext* relayContext);                                           // 0x7000
-    bool SendFragmentRelayRequest(RelayContext* relayContext, char const* const economyFormat);  // 0x71e0
+    bool SendRelayRequest(RelayContext const* const relayContext);                                        // 0x7000
+    bool SendFragmentRelayRequest(RelayContext const* const relayContext, char const* const economyFormat);  // 0x71e0
 
     // PDB method, inlined in 0x7b50 and 0x7e90.
     void SetServiceState(ServiceState const newState);

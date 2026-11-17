@@ -8,7 +8,7 @@
 #include "RelayTimeContext.h"
 
 #define RELAY_CONTEXT_FILE L"RelayContext.cpp"
-#define RELAY_CONTEXT_TAG L"relay context"
+static wchar_t const* const MODULE_NAME = L"relay context";  // PDB MODULE_NAME
 
 // The original writes each "== CRASH ==" text to Log (LT_ERROR) and to AlertSender.
 #define RELAY_CONTEXT_CRASH(line, fmt, ...)                                                   \
@@ -21,7 +21,7 @@
 #define LOCK_H_WIDE L"e:\\dailybuild02\\postofficedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\bloodlib\\include\\Lock.h"
 #define LOCK_H_NARROW "e:\\dailybuild02\\postofficedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\bloodlib\\include\\Lock.h"
 
-unsigned long long RelayContextManager::_idSeed = 0;  // ❓ initial value
+unsigned long long RelayContextManager::_idSeed = 0xFFFFFFFFFFFFFFFFULL;  // .data rva 0x98BE0
 
 // ---- AutoCS (Lock.h, inline in the original) ----
 
@@ -66,7 +66,7 @@ bool RelayContext::ProcessRelayRequest(Channel* const channel)
     if (channel == nullptr)
     {
         RELAY_CONTEXT_CRASH(25, L"== CRASH == [%s], %s; invalid parameter, channel:0x%p",
-                            RELAY_CONTEXT_TAG, L"RelayContext::ProcessRelayRequest", nullptr);
+                            MODULE_NAME, L"RelayContext::ProcessRelayRequest", nullptr);
         return false;
     }
 
@@ -76,7 +76,7 @@ bool RelayContext::ProcessRelayRequest(Channel* const channel)
     if (_relayStatus != RELAYSTATUS_INIT)
     {
         RELAY_CONTEXT_CRASH(36, L"== CRASH == [%s], %s; relay status is not init, relayTid:0x%I64X, relayStatus:%d",
-                            RELAY_CONTEXT_TAG, L"RelayContext::ProcessRelayRequest", relayTid, _relayStatus);
+                            MODULE_NAME, L"RelayContext::ProcessRelayRequest", relayTid, _relayStatus);
         return false;
     }
 
@@ -84,7 +84,7 @@ bool RelayContext::ProcessRelayRequest(Channel* const channel)
     if (!daemon->_relayContextManager->AddContext(this))
     {
         RELAY_CONTEXT_CRASH(41, L"== CRASH == [%s], %s; exception occurred; faile to add relay context, relayTid:0x%I64X",
-                            RELAY_CONTEXT_TAG, L"RelayContext::ProcessRelayRequest", relayTid);
+                            MODULE_NAME, L"RelayContext::ProcessRelayRequest", relayTid);
         return false;
     }
 
@@ -96,7 +96,7 @@ bool RelayContext::ProcessRelayRequest(Channel* const channel)
         {
             RELAY_CONTEXT_CRASH(49,
                                 L"== CRASH == [%s], %s; exception occurred; failed to add relaytime context, relayTid:0x%I64X, relayLimitTime:%I64d",
-                                RELAY_CONTEXT_TAG, L"RelayContext::ProcessRelayRequest", relayTid, relayLimitTime);
+                                MODULE_NAME, L"RelayContext::ProcessRelayRequest", relayTid, relayLimitTime);
             failed = true;
         }
         else
@@ -108,7 +108,7 @@ bool RelayContext::ProcessRelayRequest(Channel* const channel)
     if (!failed && !processRelayRequest(channel))
     {
         Log::Write(Log::LT_ERROR, RELAY_CONTEXT_FILE, 57, L"[%s], %s; failed to send relay request packet, relayTid:0x%I64X",
-                   RELAY_CONTEXT_TAG, L"RelayContext::ProcessRelayRequest", relayTid);
+                   MODULE_NAME, L"RelayContext::ProcessRelayRequest", relayTid);
         failed = true;
     }
 
@@ -118,14 +118,14 @@ bool RelayContext::ProcessRelayRequest(Channel* const channel)
         if (!PostOfficeDaemon::_instance->_relayContextManager->RemoveContext(relayTid))
         {
             RELAY_CONTEXT_CRASH(69, L"== CRASH == [%s], %s; exception occurred; faile to remove relay context, relayTid:0x%I64X",
-                                RELAY_CONTEXT_TAG, L"RelayContext::ProcessRelayRequest", relayTid);
+                                MODULE_NAME, L"RelayContext::ProcessRelayRequest", relayTid);
         }
         if (_relayLimitTime > 0 &&
             !PostOfficeDaemon::_instance->_relayTimeContextManager->RemoveContext(relayTid, _relayLimitTime))
         {
             RELAY_CONTEXT_CRASH(74,
                                 L"== CRASH == [%s], %s; exception occurred; faile to remove relaytime context, relayTid:0x%I64X, relayLimitTime:%I64d",
-                                RELAY_CONTEXT_TAG, L"RelayContext::ProcessRelayRequest", relayTid, _relayLimitTime);
+                                MODULE_NAME, L"RelayContext::ProcessRelayRequest", relayTid, _relayLimitTime);
         }
         return false;
     }
@@ -141,7 +141,7 @@ bool RelayContext::ProcessRelayResponse(RelayResponse* const response)
     if (response == nullptr)
     {
         RELAY_CONTEXT_CRASH(84, L"== CRASH == [%s], %s; invalid parameter, response:0x%p",
-                            RELAY_CONTEXT_TAG, L"RelayContext::ProcessRelayResponse", nullptr);
+                            MODULE_NAME, L"RelayContext::ProcessRelayResponse", nullptr);
         return false;
     }
 
@@ -151,7 +151,7 @@ bool RelayContext::ProcessRelayResponse(RelayResponse* const response)
         response->_resultState != RelayResponse::RESULTSTATE_RELAY_ERROR)
     {
         RELAY_CONTEXT_CRASH(88, L"== CRASH == [%s], %s; invalid relay response result state, relayTid:0x%I64X, resultState:%d",
-                            RELAY_CONTEXT_TAG, L"RelayContext::ProcessRelayResponse", relayTid, response->_resultState);
+                            MODULE_NAME, L"RelayContext::ProcessRelayResponse", relayTid, response->_resultState);
         return false;
     }
 
@@ -159,7 +159,7 @@ bool RelayContext::ProcessRelayResponse(RelayResponse* const response)
     if (_relayStatus != RELAYSTATUS_WAITING)
     {
         Log::Write(Log::LT_ERROR, RELAY_CONTEXT_FILE, 99, L"[%s], %s; relay status is not waiting, relayTid:0x%I64X, relayStatus:%d",
-                   RELAY_CONTEXT_TAG, L"RelayContext::ProcessRelayResponse", relayTid, _relayStatus);
+                   MODULE_NAME, L"RelayContext::ProcessRelayResponse", relayTid, _relayStatus);
         lock.Leave();
         return false;
     }
@@ -168,7 +168,7 @@ bool RelayContext::ProcessRelayResponse(RelayResponse* const response)
     if (!processRelayResponse())
     {
         Log::Write(Log::LT_ERROR, RELAY_CONTEXT_FILE, 106, L"[%s], %s; failed to process relay response, relayTid:0x%I64X",
-                   RELAY_CONTEXT_TAG, L"RelayContext::ProcessRelayResponse", relayTid);
+                   MODULE_NAME, L"RelayContext::ProcessRelayResponse", relayTid);
     }
     _relayStatus = RELAYSTATUS_FINISH;
     lock.Leave();
@@ -179,12 +179,12 @@ bool RelayContext::ProcessRelayResponse(RelayResponse* const response)
     {
         RELAY_CONTEXT_CRASH(117,
                             L"== CRASH == [%s], %s; exception occurred; failed to remove relaytime context, relayTid:0x%I64X, relayLimitTime:%I64d",
-                            RELAY_CONTEXT_TAG, L"RelayContext::ProcessRelayResponse", relayTid, _relayLimitTime);
+                            MODULE_NAME, L"RelayContext::ProcessRelayResponse", relayTid, _relayLimitTime);
     }
     if (!PostOfficeDaemon::_instance->_relayContextManager->RemoveContext(relayTid))
     {
         RELAY_CONTEXT_CRASH(122, L"== CRASH == [%s], %s; exception occurred; faile to remove relay context, relayTid:0x%I64X",
-                            RELAY_CONTEXT_TAG, L"RelayContext::ProcessRelayResponse", relayTid);
+                            MODULE_NAME, L"RelayContext::ProcessRelayResponse", relayTid);
     }
     return true;
 }
@@ -197,7 +197,7 @@ bool RelayContext::ProcessRelayTimeout()
     if (_relayStatus != RELAYSTATUS_WAITING)
     {
         Log::Write(Log::LT_ERROR, RELAY_CONTEXT_FILE, 137, L"[%s], %s; relay status is not waiting, relayTid:0x%I64X, relayStatus:%d",
-                   RELAY_CONTEXT_TAG, L"RelayContext::ProcessRelayTimeout", relayTid, _relayStatus);
+                   MODULE_NAME, L"RelayContext::ProcessRelayTimeout", relayTid, _relayStatus);
         lock.Leave();
         return false;
     }
@@ -205,12 +205,12 @@ bool RelayContext::ProcessRelayTimeout()
     if (processRelayTimeout())
     {
         Log::Write(Log::LT_ERROR, RELAY_CONTEXT_FILE, 145, L"[%s], %s; succeeded to process relay timeout, relayTid:0x%I64X",
-                   RELAY_CONTEXT_TAG, L"RelayContext::ProcessRelayTimeout", relayTid);
+                   MODULE_NAME, L"RelayContext::ProcessRelayTimeout", relayTid);
     }
     else
     {
         Log::Write(Log::LT_ERROR, RELAY_CONTEXT_FILE, 142, L"[%s], %s; failed to process relay timeout, relayTid:0x%I64X",
-                   RELAY_CONTEXT_TAG, L"RelayContext::ProcessRelayTimeout", relayTid);
+                   MODULE_NAME, L"RelayContext::ProcessRelayTimeout", relayTid);
     }
     _relayStatus = RELAYSTATUS_TIMEOUT;
     lock.Leave();
@@ -221,12 +221,12 @@ bool RelayContext::ProcessRelayTimeout()
     {
         RELAY_CONTEXT_CRASH(153,
                             L"== CRASH == [%s], %s; exception occurred; failed to remove relaytime context, relayTid:0x%I64X, relayLimitTime:%I64d",
-                            RELAY_CONTEXT_TAG, L"RelayContext::ProcessRelayTimeout", relayTid, _relayLimitTime);
+                            MODULE_NAME, L"RelayContext::ProcessRelayTimeout", relayTid, _relayLimitTime);
     }
     if (!PostOfficeDaemon::_instance->_relayContextManager->RemoveContext(relayTid))
     {
         RELAY_CONTEXT_CRASH(158, L"== CRASH == [%s], %s; exception occurred; failed to remove relay context, relayTid:0x%I64X",
-                            RELAY_CONTEXT_TAG, L"RelayContext::ProcessRelayTimeout", relayTid);
+                            MODULE_NAME, L"RelayContext::ProcessRelayTimeout", relayTid);
     }
     return true;
 }
@@ -239,7 +239,7 @@ bool RelayContextManager::initContextManager()
     if (_lockList != nullptr || _containerList != nullptr)
     {
         RELAY_CONTEXT_CRASH(212, L"== CRASH == [%s], %s; relay context manager is already initialized, lockList:0x%p, containerList:0x%p",
-                            RELAY_CONTEXT_TAG, L"RelayContextManager::initContextManager", _lockList, _containerList);
+                            MODULE_NAME, L"RelayContextManager::initContextManager", _lockList, _containerList);
         return false;
     }
     _lockList = liftArrayNew<CriticalSection>(_bucketCount, RELAY_CONTEXT_FILE, 216);
@@ -253,13 +253,13 @@ RelayContext* RelayContextManager::GetContext(unsigned long long relayTid)
     if (relayTid == 0)
     {
         RELAY_CONTEXT_CRASH(225, L"== CRASH == [%s], %s; invalid parameter, relayTid:0x%I64X",
-                            RELAY_CONTEXT_TAG, L"RelayContextManager::GetContext", 0ULL);
+                            MODULE_NAME, L"RelayContextManager::GetContext", 0ULL);
         return nullptr;
     }
     if (_lockList == nullptr || _containerList == nullptr)
     {
         RELAY_CONTEXT_CRASH(229, L"== CRASH == [%s], %s; invalid relay context manager, lockList:0x%p, containerList:0x%p",
-                            RELAY_CONTEXT_TAG, L"RelayContextManager::GetContext", _lockList, _containerList);
+                            MODULE_NAME, L"RelayContextManager::GetContext", _lockList, _containerList);
         return nullptr;
     }
 
@@ -280,7 +280,7 @@ RelayContext* RelayContextManager::GetContext(unsigned long long relayTid)
     }
     _lockList[index].Leave();
     RELAY_CONTEXT_CRASH(242, L"== CRASH == [%s], %s; relay context is null, relayTid:0x%I64X, relayContext:0x%p",
-                        RELAY_CONTEXT_TAG, L"RelayContextManager::GetContext", relayTid, nullptr);
+                        MODULE_NAME, L"RelayContextManager::GetContext", relayTid, nullptr);
     return nullptr;
 }
 
@@ -290,20 +290,20 @@ bool RelayContextManager::AddContext(RelayContext* const relayContext)
     if (relayContext == nullptr)
     {
         RELAY_CONTEXT_CRASH(255, L"== CRASH == [%s], %s; invalid parameter, relayContext:0x%p",
-                            RELAY_CONTEXT_TAG, L"RelayContextManager::AddContext", nullptr);
+                            MODULE_NAME, L"RelayContextManager::AddContext", nullptr);
         return false;
     }
     if (_lockList == nullptr || _containerList == nullptr)
     {
         RELAY_CONTEXT_CRASH(259, L"== CRASH == [%s], %s; invalid relay context manager, lockList:0x%p, containerList:0x%p",
-                            RELAY_CONTEXT_TAG, L"RelayContextManager::AddContext", _lockList, _containerList);
+                            MODULE_NAME, L"RelayContextManager::AddContext", _lockList, _containerList);
         return false;
     }
     unsigned long long const relayTid = relayContext->_economyHeader._relayTid;
     if (relayTid == 0)
     {
         RELAY_CONTEXT_CRASH(265, L"== CRASH == [%s], %s; invalid relay tid, relayTid:0x%I64X",
-                            RELAY_CONTEXT_TAG, L"RelayContextManager::AddContext", 0ULL);
+                            MODULE_NAME, L"RelayContextManager::AddContext", 0ULL);
         return false;
     }
 
@@ -318,7 +318,7 @@ bool RelayContextManager::AddContext(RelayContext* const relayContext)
     }
     _lockList[index].Leave();
     Log::Write(Log::LT_ERROR, RELAY_CONTEXT_FILE, 276, L"[%s], %s; failed to add relay context, relayTid:0x%I64X",
-               RELAY_CONTEXT_TAG, L"RelayContextManager::AddContext", relayTid);
+               MODULE_NAME, L"RelayContextManager::AddContext", relayTid);
     return false;
 }
 
@@ -328,13 +328,13 @@ bool RelayContextManager::RemoveContext(unsigned long long relayTid)
     if (relayTid == 0)
     {
         RELAY_CONTEXT_CRASH(292, L"== CRASH == [%s], %s; invalid parameter, relayTid:0x%I64X",
-                            RELAY_CONTEXT_TAG, L"RelayContextManager::RemoveContext", 0ULL);
+                            MODULE_NAME, L"RelayContextManager::RemoveContext", 0ULL);
         return false;
     }
     if (_lockList == nullptr || _containerList == nullptr)
     {
         RELAY_CONTEXT_CRASH(296, L"== CRASH == [%s], %s; invalid relay context manager, lockList:0x%p, containerList:0x%p",
-                            RELAY_CONTEXT_TAG, L"RelayContextManager::RemoveContext", _lockList, _containerList);
+                            MODULE_NAME, L"RelayContextManager::RemoveContext", _lockList, _containerList);
         return false;
     }
 
@@ -345,7 +345,7 @@ bool RelayContextManager::RemoveContext(unsigned long long relayTid)
     {
         _lockList[index].Leave();
         Log::Write(Log::LT_ERROR, RELAY_CONTEXT_FILE, 306, L"[%s], %s; no such relay context, relayTid:0x%I64X",
-                   RELAY_CONTEXT_TAG, L"RelayContextManager::RemoveContext", relayTid);
+                   MODULE_NAME, L"RelayContextManager::RemoveContext", relayTid);
         return false;
     }
     RelayContext* const relayContext = it->second;
@@ -359,6 +359,6 @@ bool RelayContextManager::RemoveContext(unsigned long long relayTid)
     }
     _lockList[index].Leave();
     RELAY_CONTEXT_CRASH(313, L"== CRASH == [%s], %s; relay context is null, relayTid:0x%I64X, relayContext:0x%p",
-                        RELAY_CONTEXT_TAG, L"RelayContextManager::RemoveContext", relayTid, nullptr);
+                        MODULE_NAME, L"RelayContextManager::RemoveContext", relayTid, nullptr);
     return false;
 }

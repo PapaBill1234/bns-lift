@@ -21,14 +21,14 @@
 namespace
 {
 wchar_t const* const AGENT_PACKET_HANDLER_FILE = L"AgentPacketHandler.cpp";  // ❓ name
-wchar_t const* const AGENT_PACKET_HANDLER_TAG = L"agent packet handler";     // ❓ name
+static wchar_t const* const MODULE_NAME = L"agent packet handler";  // PDB MODULE_NAME
 }
 
 // 0x1a6f0
 bool HandlePostOfficeHelloReq(Session const* session, Packet const* packet)
 {
     Log::Write(Log::LT_DEBUG, AGENT_PACKET_HANDLER_FILE, 38, L"[%s], %s; <BEGIN PACKET HANDLER>",
-               AGENT_PACKET_HANDLER_TAG, L"HandlePostOfficeHelloReq");
+               MODULE_NAME, L"HandlePostOfficeHelloReq");
     short cmd = 0;
     short postofficePacketVersion = 0;
     short postofficeAgentPacketVersion = 0;
@@ -43,13 +43,13 @@ bool HandlePostOfficeHelloReq(Session const* session, Packet const* packet)
                           &economyCommonPacketVersion, &agentWid, &connectionType) == 0)
     {
         Log::Write(Log::LT_ERROR, AGENT_PACKET_HANDLER_FILE, 56, L"[%s], %s; failed to decompose packet",
-                   AGENT_PACKET_HANDLER_TAG, L"HandlePostOfficeHelloReq");
+                   MODULE_NAME, L"HandlePostOfficeHelloReq");
         failReason = 2;
         goto $_ERROR;
     }
     Log::Write(Log::LT_DEBUG, AGENT_PACKET_HANDLER_FILE, 61,
                L"[%s], %s; decomposed packet, postoffice-packet-version:%d, postofficeAgent-packet-version:%d, economy-common-packet-version:%d, agentWid:%u, connectionType:%d",
-               AGENT_PACKET_HANDLER_TAG, L"HandlePostOfficeHelloReq", static_cast<int>(postofficePacketVersion),
+               MODULE_NAME, L"HandlePostOfficeHelloReq", static_cast<int>(postofficePacketVersion),
                static_cast<int>(postofficeAgentPacketVersion), static_cast<int>(economyCommonPacketVersion),
                static_cast<unsigned int>(agentWid), static_cast<int>(connectionType));
     if (connectionType != 0)
@@ -57,11 +57,11 @@ bool HandlePostOfficeHelloReq(Session const* session, Packet const* packet)
         // ❓ The source has a switch here. The case for connection type 1 only writes this log.
         if (connectionType == 1)
             Log::Write(Log::LT_ERROR, AGENT_PACKET_HANDLER_FILE, 80,
-                       L"[%s], %s; invalid connection type, agentWid:%u, connectionType:%d", AGENT_PACKET_HANDLER_TAG,
+                       L"[%s], %s; invalid connection type, agentWid:%u, connectionType:%d", MODULE_NAME,
                        L"HandlePostOfficeHelloReq", static_cast<unsigned int>(agentWid), 1);
         else
             Log::Write(Log::LT_ERROR, AGENT_PACKET_HANDLER_FILE, 65,
-                       L"[%s], %s; invalid connection type, connectionType:%d", AGENT_PACKET_HANDLER_TAG,
+                       L"[%s], %s; invalid connection type, connectionType:%d", MODULE_NAME,
                        L"HandlePostOfficeHelloReq", static_cast<int>(connectionType));
         failReason = 4;
         goto $_ERROR;
@@ -70,7 +70,7 @@ bool HandlePostOfficeHelloReq(Session const* session, Packet const* packet)
     {
         Log::Write(Log::LT_ERROR, AGENT_PACKET_HANDLER_FILE, 73,
                    L"[%s], %s; invalid packet version, my postoffice-packet-version:%d, client version:%d, my economy-common-packet-version:%d, client version:%d",
-                   AGENT_PACKET_HANDLER_TAG, L"HandlePostOfficeHelloReq", 15, static_cast<int>(postofficePacketVersion),
+                   MODULE_NAME, L"HandlePostOfficeHelloReq", 15, static_cast<int>(postofficePacketVersion),
                    10, static_cast<int>(economyCommonPacketVersion));
         failReason = 5;
         goto $_ERROR;
@@ -84,20 +84,20 @@ bool HandlePostOfficeHelloReq(Session const* session, Packet const* packet)
     channel->removeReferenceCount(AGENT_PACKET_HANDLER_FILE, 118);
     session->Send("h", 2);
     Log::Write(Log::LT_NOTICE, AGENT_PACKET_HANDLER_FILE, 121,
-               L"[%s], %s; sent hello success ack, agentWid:%u, connectionType:%d", AGENT_PACKET_HANDLER_TAG,
+               L"[%s], %s; sent hello success ack, agentWid:%u, connectionType:%d", MODULE_NAME,
                L"HandlePostOfficeHelloReq", static_cast<unsigned int>(agentWid), static_cast<int>(connectionType));
     Log::Write(Log::LT_DEBUG, AGENT_PACKET_HANDLER_FILE, 123, L"[%s], %s; <END PACKET HANDLER>",
-               AGENT_PACKET_HANDLER_TAG, L"HandlePostOfficeHelloReq");
+               MODULE_NAME, L"HandlePostOfficeHelloReq");
     return true;
 
 $_ERROR:
     session->Send("hh", 3, static_cast<int>(failReason));
     Log::Write(Log::LT_NOTICE, AGENT_PACKET_HANDLER_FILE, 128,
                L"[%s], %s; sent hello failure ack, agentWid:%u, connectionType:%d, failReason:%d",
-               AGENT_PACKET_HANDLER_TAG, L"HandlePostOfficeHelloReq", static_cast<unsigned int>(agentWid),
+               MODULE_NAME, L"HandlePostOfficeHelloReq", static_cast<unsigned int>(agentWid),
                static_cast<int>(connectionType), static_cast<int>(failReason));
     Log::Write(Log::LT_DEBUG, AGENT_PACKET_HANDLER_FILE, 133, L"[%s], %s; <END PACKET HANDLER>",
-               AGENT_PACKET_HANDLER_TAG, L"HandlePostOfficeHelloReq");
+               MODULE_NAME, L"HandlePostOfficeHelloReq");
     return false;
 }
 
@@ -109,7 +109,7 @@ $_ERROR:
 bool HandlePostOfficeRegisterPostReq(Session const* session, Packet const* packet)
 {
     Log::Write(Log::LT_DEBUG, AGENT_PACKET_HANDLER_FILE, 140, L"[%s], %s; <BEGIN PACKET HANDLER>",
-               AGENT_PACKET_HANDLER_TAG, L"HandlePostOfficeRegisterPostReq");
+               MODULE_NAME, L"HandlePostOfficeRegisterPostReq");
     // The fragment pump gives a PacketConcatenateBuffer in place of a Packet.
     PacketConcatenateBuffer* pcb = reinterpret_cast<PacketConcatenateBuffer*>(const_cast<Packet*>(packet));
     long long tid = 0;
@@ -134,11 +134,11 @@ bool HandlePostOfficeRegisterPostReq(Session const* session, Packet const* packe
                         postInfo._postMessage, 1025))
     {
         Log::Write(Log::LT_ERROR, AGENT_PACKET_HANDLER_FILE, 194, L"[%s], %s; failed to decompose packet",
-                   AGENT_PACKET_HANDLER_TAG, L"HandlePostOfficeRegisterPostReq");
+                   MODULE_NAME, L"HandlePostOfficeRegisterPostReq");
         goto $_ERROR;
     }
     Log::Write(Log::LT_DEBUG, AGENT_PACKET_HANDLER_FILE, 198, L"[%s], %s; decomposed post data packet" POST_LOG_ARGS,
-               AGENT_PACKET_HANDLER_TAG, L"HandlePostOfficeRegisterPostReq", tid, postInfo._invoiceId,
+               MODULE_NAME, L"HandlePostOfficeRegisterPostReq", tid, postInfo._invoiceId,
                static_cast<int>(postInfo._postType), static_cast<int>(postInfo._deliveryReason), postInfo._postHint,
                static_cast<unsigned int>(postInfo._reservedHint.guid.id1),
                static_cast<unsigned int>(postInfo._reservedHint.guid.id2),
@@ -168,7 +168,7 @@ bool HandlePostOfficeRegisterPostReq(Session const* session, Packet const* packe
     if (postInfo._postType <= 0 || !postInfo.CheckValidityPostData())
     {
         Log::Write(Log::LT_ERROR, AGENT_PACKET_HANDLER_FILE, 201, L"[%s], %s; invalid post data" POST_LOG_ARGS,
-                   AGENT_PACKET_HANDLER_TAG, L"HandlePostOfficeRegisterPostReq", tid, postInfo._invoiceId,
+                   MODULE_NAME, L"HandlePostOfficeRegisterPostReq", tid, postInfo._invoiceId,
                    static_cast<int>(postInfo._postType), static_cast<int>(postInfo._deliveryReason),
                    postInfo._postHint, static_cast<unsigned int>(postInfo._reservedHint.guid.id1),
                    static_cast<unsigned int>(postInfo._reservedHint.guid.id2),
@@ -205,7 +205,7 @@ bool HandlePostOfficeRegisterPostReq(Session const* session, Packet const* packe
     {
         Log::Write(Log::LT_ERROR, AGENT_PACKET_HANDLER_FILE, 208,
                    L"[%s], %s; invalid attached item count, attachedItemCount:%d, maxAttachedItemCount:%d",
-                   AGENT_PACKET_HANDLER_TAG, L"HandlePostOfficeRegisterPostReq", static_cast<int>(attachedItemCount), 10);
+                   MODULE_NAME, L"HandlePostOfficeRegisterPostReq", static_cast<int>(attachedItemCount), 10);
         failReason = 7;
         goto $_ERROR;
     }
@@ -246,12 +246,12 @@ bool HandlePostOfficeRegisterPostReq(Session const* session, Packet const* packe
                             itemInfo._itemXmlData, 1025))
         {
             Log::Write(Log::LT_ERROR, AGENT_PACKET_HANDLER_FILE, 227, L"[%s], %s; failed to decompose packet",
-                       AGENT_PACKET_HANDLER_TAG, L"HandlePostOfficeRegisterPostReq");
+                       MODULE_NAME, L"HandlePostOfficeRegisterPostReq");
             failReason = 2;
             goto $_ERROR;
         }
         Log::Write(Log::LT_DEBUG, AGENT_PACKET_HANDLER_FILE, 231, L"[%s], %s; decomposed item data packet" ITEM_LOG_ARGS,
-                   AGENT_PACKET_HANDLER_TAG, L"HandlePostOfficeRegisterPostReq", tid, postInfo._invoiceId,
+                   MODULE_NAME, L"HandlePostOfficeRegisterPostReq", tid, postInfo._invoiceId,
                    static_cast<int>(itemInfo._itemNo), static_cast<int>(itemInfo._itemType),
                    static_cast<int>(itemInfo._itemCategory), itemInfo._itemInstanceId, itemInfo._itemDataId,
                    static_cast<int>(itemInfo._itemLevel), itemInfo._itemAmount, itemInfo._itemXmlData);
@@ -263,7 +263,7 @@ bool HandlePostOfficeRegisterPostReq(Session const* session, Packet const* packe
             {
             case 1:
                 Log::Write(Log::LT_ERROR, AGENT_PACKET_HANDLER_FILE, 237, L"[%s], %s; invalid item data" ITEM_LOG_ARGS,
-                           AGENT_PACKET_HANDLER_TAG, L"HandlePostOfficeRegisterPostReq", tid, postInfo._invoiceId,
+                           MODULE_NAME, L"HandlePostOfficeRegisterPostReq", tid, postInfo._invoiceId,
                            static_cast<int>(itemInfo._itemNo), static_cast<int>(itemInfo._itemType),
                            static_cast<int>(itemInfo._itemCategory), itemInfo._itemInstanceId, itemInfo._itemDataId,
                            static_cast<int>(itemInfo._itemLevel), itemInfo._itemAmount, itemInfo._itemXmlData);
@@ -271,7 +271,7 @@ bool HandlePostOfficeRegisterPostReq(Session const* session, Packet const* packe
                 break;
             case 2:
                 Log::Write(Log::LT_ERROR, AGENT_PACKET_HANDLER_FILE, 241,
-                           L"[%s], %s; invalid money item data" ITEM_LOG_ARGS, AGENT_PACKET_HANDLER_TAG,
+                           L"[%s], %s; invalid money item data" ITEM_LOG_ARGS, MODULE_NAME,
                            L"HandlePostOfficeRegisterPostReq", tid, postInfo._invoiceId,
                            static_cast<int>(itemInfo._itemNo), static_cast<int>(itemInfo._itemType),
                            static_cast<int>(itemInfo._itemCategory), itemInfo._itemInstanceId, itemInfo._itemDataId,
@@ -280,7 +280,7 @@ bool HandlePostOfficeRegisterPostReq(Session const* session, Packet const* packe
                 break;
             case 3:
                 Log::Write(Log::LT_ERROR, AGENT_PACKET_HANDLER_FILE, 245,
-                           L"[%s], %s; invalid default item data" ITEM_LOG_ARGS, AGENT_PACKET_HANDLER_TAG,
+                           L"[%s], %s; invalid default item data" ITEM_LOG_ARGS, MODULE_NAME,
                            L"HandlePostOfficeRegisterPostReq", tid, postInfo._invoiceId,
                            static_cast<int>(itemInfo._itemNo), static_cast<int>(itemInfo._itemType),
                            static_cast<int>(itemInfo._itemCategory), itemInfo._itemInstanceId, itemInfo._itemDataId,
@@ -289,7 +289,7 @@ bool HandlePostOfficeRegisterPostReq(Session const* session, Packet const* packe
                 break;
             case 4:
                 Log::Write(Log::LT_ERROR, AGENT_PACKET_HANDLER_FILE, 249,
-                           L"[%s], %s; invalid custom item data" ITEM_LOG_ARGS, AGENT_PACKET_HANDLER_TAG,
+                           L"[%s], %s; invalid custom item data" ITEM_LOG_ARGS, MODULE_NAME,
                            L"HandlePostOfficeRegisterPostReq", tid, postInfo._invoiceId,
                            static_cast<int>(itemInfo._itemNo), static_cast<int>(itemInfo._itemType),
                            static_cast<int>(itemInfo._itemCategory), itemInfo._itemInstanceId, itemInfo._itemDataId,
@@ -298,7 +298,7 @@ bool HandlePostOfficeRegisterPostReq(Session const* session, Packet const* packe
                 break;
             case 5:
                 Log::Write(Log::LT_ERROR, AGENT_PACKET_HANDLER_FILE, 253, L"[%s], %s; unknown item type" ITEM_LOG_ARGS,
-                           AGENT_PACKET_HANDLER_TAG, L"HandlePostOfficeRegisterPostReq", tid, postInfo._invoiceId,
+                           MODULE_NAME, L"HandlePostOfficeRegisterPostReq", tid, postInfo._invoiceId,
                            static_cast<int>(itemInfo._itemNo), static_cast<int>(itemInfo._itemType),
                            static_cast<int>(itemInfo._itemCategory), itemInfo._itemInstanceId, itemInfo._itemDataId,
                            static_cast<int>(itemInfo._itemLevel), itemInfo._itemAmount, itemInfo._itemXmlData);
@@ -306,7 +306,7 @@ bool HandlePostOfficeRegisterPostReq(Session const* session, Packet const* packe
                 break;
             default:
                 Log::Write(Log::LT_ERROR, AGENT_PACKET_HANDLER_FILE, 257, L"[%s], %s; unknown error" ITEM_LOG_ARGS,
-                           AGENT_PACKET_HANDLER_TAG, L"HandlePostOfficeRegisterPostReq", tid, postInfo._invoiceId,
+                           MODULE_NAME, L"HandlePostOfficeRegisterPostReq", tid, postInfo._invoiceId,
                            static_cast<int>(itemInfo._itemNo), static_cast<int>(itemInfo._itemType),
                            static_cast<int>(itemInfo._itemCategory), itemInfo._itemInstanceId, itemInfo._itemDataId,
                            static_cast<int>(itemInfo._itemLevel), itemInfo._itemAmount, itemInfo._itemXmlData);
@@ -341,7 +341,7 @@ bool HandlePostOfficeRegisterPostReq(Session const* session, Packet const* packe
     {
         Log::Write(Log::LT_ERROR, AGENT_PACKET_HANDLER_FILE, 272,
                    L"[%s], %s; failed to register post, dbRetValue:%d, tid:0x%I64X, invoiceId:0x%I64X",
-                   AGENT_PACKET_HANDLER_TAG, L"HandlePostOfficeRegisterPostReq", dbRetValue, tid, postInfo._invoiceId);
+                   MODULE_NAME, L"HandlePostOfficeRegisterPostReq", dbRetValue, tid, postInfo._invoiceId);
         failReason = dbRetValue == 2 ? 12 : 3;
         goto $_ERROR;
     }
@@ -352,7 +352,7 @@ bool HandlePostOfficeRegisterPostReq(Session const* session, Packet const* packe
     session->Send("hqq", 5, tid, postInfo._postId);
     Log::Write(Log::LT_NOTICE, AGENT_PACKET_HANDLER_FILE, 290,
                L"[%s], %s; sent post registration success ack, tid:0x%I64X, invoiceId:0x%I64X, postId:0x%I64X",
-               AGENT_PACKET_HANDLER_TAG, L"HandlePostOfficeRegisterPostReq", tid, postInfo._invoiceId, postId);
+               MODULE_NAME, L"HandlePostOfficeRegisterPostReq", tid, postInfo._invoiceId, postId);
 
     cachegateChannel = PostOfficeDaemon::checkDestinationServiceState(recipientWid);
     if (cachegateChannel != nullptr)
@@ -366,33 +366,33 @@ bool HandlePostOfficeRegisterPostReq(Session const* session, Packet const* packe
         {
             Log::Write(Log::LT_ERROR, AGENT_PACKET_HANDLER_FILE, 300,
                        L"== CRASH == [%s], %s; exception occurred; failed to initialize attached item info, tid:0x%I64X, postId:0x%I64X",
-                       AGENT_PACKET_HANDLER_TAG, L"HandlePostOfficeRegisterPostReq", tid, postId);
+                       MODULE_NAME, L"HandlePostOfficeRegisterPostReq", tid, postId);
             AlertSender::Write(AGENT_PACKET_HANDLER_FILE, 300,
                                L"== CRASH == [%s], %s; exception occurred; failed to initialize attached item info, tid:0x%I64X, postId:0x%I64X",
-                               AGENT_PACKET_HANDLER_TAG, L"HandlePostOfficeRegisterPostReq", tid, postId);
+                               MODULE_NAME, L"HandlePostOfficeRegisterPostReq", tid, postId);
         }
         if (!PostOfficeDaemon::_instance->_postContextManager->AddContext(postContext))
         {
             Log::Write(Log::LT_ERROR, AGENT_PACKET_HANDLER_FILE, 304,
                        L"== CRASH == [%s], %s; exception occurred; failed to add post context, postId:0x%I64X",
-                       AGENT_PACKET_HANDLER_TAG, L"HandlePostOfficeRegisterPostReq", postId);
+                       MODULE_NAME, L"HandlePostOfficeRegisterPostReq", postId);
             AlertSender::Write(AGENT_PACKET_HANDLER_FILE, 304,
                                L"== CRASH == [%s], %s; exception occurred; failed to add post context, postId:0x%I64X",
-                               AGENT_PACKET_HANDLER_TAG, L"HandlePostOfficeRegisterPostReq", postId);
+                               MODULE_NAME, L"HandlePostOfficeRegisterPostReq", postId);
         }
         if (!PostDeliveryEvent::OccurEvent(postContext, cachegateChannel))
         {
             Log::Write(Log::LT_ERROR, AGENT_PACKET_HANDLER_FILE, 308,
-                       L"[%s], %s; failed to occur post delivery event, postId:0x%I64X", AGENT_PACKET_HANDLER_TAG,
+                       L"[%s], %s; failed to occur post delivery event, postId:0x%I64X", MODULE_NAME,
                        L"HandlePostOfficeRegisterPostReq", postId);
             if (!PostOfficeDaemon::_instance->_postContextManager->RemoveContext(postId))
             {
                 Log::Write(Log::LT_ERROR, AGENT_PACKET_HANDLER_FILE, 311,
                            L"== CRASH == [%s], %s; exception occurred; failed to remove post context, postId:0x%I64X",
-                           AGENT_PACKET_HANDLER_TAG, L"HandlePostOfficeRegisterPostReq", postId);
+                           MODULE_NAME, L"HandlePostOfficeRegisterPostReq", postId);
                 AlertSender::Write(AGENT_PACKET_HANDLER_FILE, 311,
                                    L"== CRASH == [%s], %s; exception occurred; failed to remove post context, postId:0x%I64X",
-                                   AGENT_PACKET_HANDLER_TAG, L"HandlePostOfficeRegisterPostReq", postId);
+                                   MODULE_NAME, L"HandlePostOfficeRegisterPostReq", postId);
             }
         }
         postContext->removeReferenceCount(AGENT_PACKET_HANDLER_FILE, 315);
@@ -402,31 +402,31 @@ bool HandlePostOfficeRegisterPostReq(Session const* session, Packet const* packe
     {
         Log::Write(Log::LT_ERROR, AGENT_PACKET_HANDLER_FILE, 320,
                    L"[%s], %s; cannot send deliver post relay request, recipientWid:%u, postId:0x%I64X",
-                   AGENT_PACKET_HANDLER_TAG, L"HandlePostOfficeRegisterPostReq", static_cast<unsigned int>(recipientWid),
+                   MODULE_NAME, L"HandlePostOfficeRegisterPostReq", static_cast<unsigned int>(recipientWid),
                    postId);
         Memory::_Manager[2]->Free(attachedItemList, AGENT_PACKET_HANDLER_FILE, 321);
         if (!PostOfficeDaemon::_instance->_unsentPostContextManager->RegisterUnsentPost(recipientWid, postId, false))
             Log::Write(Log::LT_ERROR, AGENT_PACKET_HANDLER_FILE, 324,
                        L"[%s], %s; exception occurred; failed to register unsent post, recipientWid:%u, postId:0x%I64X",
-                       AGENT_PACKET_HANDLER_TAG, L"HandlePostOfficeRegisterPostReq",
+                       MODULE_NAME, L"HandlePostOfficeRegisterPostReq",
                        static_cast<unsigned int>(recipientWid), postId);
     }
     Log::Write(Log::LT_DEBUG, AGENT_PACKET_HANDLER_FILE, 328, L"[%s], %s; <END PACKET HANDLER>",
-               AGENT_PACKET_HANDLER_TAG, L"HandlePostOfficeRegisterPostReq");
+               MODULE_NAME, L"HandlePostOfficeRegisterPostReq");
     return true;
 
 $_ERROR:
     session->Send("hqqE", 6, tid, postInfo._postId, static_cast<int>(failReason));
     Log::Write(Log::LT_NOTICE, AGENT_PACKET_HANDLER_FILE, 333,
                L"[%s], %s; sent post registration failure ack, tid:0x%I64X, postId:0x%I64X, failReason:%d",
-               AGENT_PACKET_HANDLER_TAG, L"HandlePostOfficeRegisterPostReq", tid, postInfo._postId,
+               MODULE_NAME, L"HandlePostOfficeRegisterPostReq", tid, postInfo._postId,
                static_cast<int>(failReason));
     if (pcb != nullptr)
         pcb->Clear();
     if (attachedItemList != nullptr)
         Memory::_Manager[2]->Free(attachedItemList, AGENT_PACKET_HANDLER_FILE, 338);
     Log::Write(Log::LT_DEBUG, AGENT_PACKET_HANDLER_FILE, 340, L"[%s], %s; <END PACKET HANDLER>",
-               AGENT_PACKET_HANDLER_TAG, L"HandlePostOfficeRegisterPostReq");
+               MODULE_NAME, L"HandlePostOfficeRegisterPostReq");
     return true;
 }
 

@@ -13,7 +13,7 @@
 #include "RelayTimeoutEvent.h"
 
 #define RELAY_TIMEOUT_CHECKER_FILE L"RelayTimeoutChecker.cpp"
-#define RELAY_TIMEOUT_CHECKER_TAG L"relay timeout checker"
+static wchar_t const* const MODULE_NAME = L"relay timeout checker";  // PDB MODULE_NAME
 
 #define RELAY_TIMEOUT_CHECKER_CRASH(line, fmt, ...)                                           \
     do                                                                                        \
@@ -35,16 +35,16 @@ bool RelayTimeoutChecker::HandleEvent(EventContext* context, unsigned long bytes
         return true;
 
     Log::Write(Log::LT_DEBUG, RELAY_TIMEOUT_CHECKER_FILE, 24, L"[%s], %s; <BEGIN TIMER HANDLER>",
-               RELAY_TIMEOUT_CHECKER_TAG, L"RelayTimeoutChecker::HandleEvent");
+               MODULE_NAME, L"RelayTimeoutChecker::HandleEvent");
     checkRelayTimeout();
     Log::Write(Log::LT_DEBUG, RELAY_TIMEOUT_CHECKER_FILE, 28, L"[%s], %s; <END TIMER HANDLER>",
-               RELAY_TIMEOUT_CHECKER_TAG, L"RelayTimeoutChecker::HandleEvent");
+               MODULE_NAME, L"RelayTimeoutChecker::HandleEvent");
 
     if (isStopState(Daemon::Instance->State) || PostOfficeDaemon::_instance->GlobalTimerQueue->Add(1000, this))
         return true;
 
     Log::Write(Log::LT_ERROR, RELAY_TIMEOUT_CHECKER_FILE, 32, L"[%s], %s; failed to add relay timeout checker timer",
-               RELAY_TIMEOUT_CHECKER_TAG, L"RelayTimeoutChecker::HandleEvent");
+               MODULE_NAME, L"RelayTimeoutChecker::HandleEvent");
     return false;
 }
 
@@ -56,7 +56,7 @@ void RelayTimeoutChecker::checkRelayTimeout()
     {
         RELAY_TIMEOUT_CHECKER_CRASH(46,
                                     L"== CRASH == [%s], %s; invalid relaytime context manager, lockList:0x%p, containerList:0x%p",
-                                    RELAY_TIMEOUT_CHECKER_TAG, L"RelayTimeoutChecker::checkRelayTimeout",
+                                    MODULE_NAME, L"RelayTimeoutChecker::checkRelayTimeout",
                                     manager->_lockList, manager->_containerList);
         return;
     }
@@ -65,7 +65,7 @@ void RelayTimeoutChecker::checkRelayTimeout()
     if (currentTime == -1)
     {
         RELAY_TIMEOUT_CHECKER_CRASH(52, L"== CRASH == [%s], %s; time fuction error, currentTime:%I64d",
-                                    RELAY_TIMEOUT_CHECKER_TAG, L"RelayTimeoutChecker::checkRelayTimeout", currentTime);
+                                    MODULE_NAME, L"RelayTimeoutChecker::checkRelayTimeout", currentTime);
         return;
     }
 
@@ -82,7 +82,7 @@ void RelayTimeoutChecker::checkRelayTimeout()
             {
                 RELAY_TIMEOUT_CHECKER_CRASH(63,
                                             L"== CRASH == [%s], %s; relaytime context is null, relayTid:0x%I64X, relaytimeContext:0x%p",
-                                            RELAY_TIMEOUT_CHECKER_TAG, L"RelayTimeoutChecker::checkRelayTimeout",
+                                            MODULE_NAME, L"RelayTimeoutChecker::checkRelayTimeout",
                                             it->first._relayTid, static_cast<RelayTimeContext*>(nullptr));
             }
             else if (!relayTimeContext->_disuse)
@@ -95,7 +95,7 @@ void RelayTimeoutChecker::checkRelayTimeout()
                 {
                     Log::Write(Log::LT_ERROR, RELAY_TIMEOUT_CHECKER_FILE, 69,
                                L"[%s], %s; failed to occur relay timeout event, relayTid:0x%I64X",
-                               RELAY_TIMEOUT_CHECKER_TAG, L"RelayTimeoutChecker::checkRelayTimeout", relayTimeContext->_relayTid);
+                               MODULE_NAME, L"RelayTimeoutChecker::checkRelayTimeout", relayTimeContext->_relayTid);
                 }
             }
         }
@@ -104,12 +104,12 @@ void RelayTimeoutChecker::checkRelayTimeout()
 }
 
 // 0x1db40
-bool RelayTimeoutChecker::occurTimeoutEvent(unsigned long long relayTid, RelayContext* const relayContext)
+bool RelayTimeoutChecker::occurTimeoutEvent(unsigned long long const relayTid, RelayContext* const relayContext) const
 {
     if (relayTid == 0 || relayContext == nullptr)
     {
         RELAY_TIMEOUT_CHECKER_CRASH(88, L"== CRASH == [%s], %s; invalid parameter, relayTid:0x%I64X, relayContext:0x%p",
-                                    RELAY_TIMEOUT_CHECKER_TAG, L"RelayTimeoutChecker::occurTimeoutEvent", relayTid, relayContext);
+                                    MODULE_NAME, L"RelayTimeoutChecker::occurTimeoutEvent", relayTid, relayContext);
         return false;
     }
 
@@ -122,7 +122,7 @@ bool RelayTimeoutChecker::occurTimeoutEvent(unsigned long long relayTid, RelayCo
 
     Log::Write(RELAY_TIMEOUT_CHECKER_FILE, 95, GetLastError(),
                L"[%s], %s; exception occurred; failed to occur relay timeout event, relayTid:0x%I64X",
-               RELAY_TIMEOUT_CHECKER_TAG, L"RelayTimeoutChecker::occurTimeoutEvent", relayTid);
+               MODULE_NAME, L"RelayTimeoutChecker::occurTimeoutEvent", relayTid);
     // BUG: 0x1db40 relayTimeoutEvent can be null here (Alloc failed); the call does not check it.
     relayTimeoutEvent->removeReferenceCount(RELAY_TIMEOUT_CHECKER_FILE, 96);
     return false;

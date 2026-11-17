@@ -40,7 +40,17 @@ static_assert(sizeof(PostInfo) == 2472, "sizeof PostInfo");
 class AttachedItemInfo
 {
 public:
-    int CheckValidityItemData();          // 0x10fc0. ❓ return type (0 = valid, 1..5 = error)
+    enum CheckResult
+    {
+        CHECKRESULT_NO_ERROR = 0,
+        CHECKRESULT_INVALID_ITEM_DATA = 1,
+        CHECKRESULT_INVALID_MONEY_DATA = 2,
+        CHECKRESULT_INVALID_DEFAULT_ITEM_DATA = 3,
+        CHECKRESULT_INVALID_CUSTOM_ITEM_DATA = 4,
+        CHECKRESULT_NO_SUCH_ITEM_TYPE = 5,
+    };
+
+    CheckResult const CheckValidityItemData() const;  // 0x10fc0
 
     char _itemNo;
     char _itemType;

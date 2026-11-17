@@ -18,7 +18,7 @@ extern TFPP_PacketHandler PostOfficePacketServerSideFragmentHandlerList[7];
 namespace
 {
 wchar_t const* const AGENT_CHANNEL_FILE = L"AgentChannel.cpp";  // ❓ name
-wchar_t const* const AGENT_CHANNEL_TAG = L"agent channel";     // ❓ name
+static wchar_t const* const MODULE_NAME = L"agent channel";  // PDB MODULE_NAME
 }
 
 // 0x1f620
@@ -39,10 +39,10 @@ bool AgentChannelManager::initChannelManager()
         return true;
     Log::Write(Log::LT_ERROR, AGENT_CHANNEL_FILE, 46,
                L"== CRASH == [%s], %s; agent channel manager is already initialized, postAgentChannel:0x%p",
-               AGENT_CHANNEL_TAG, L"AgentChannelManager::initChannelManager", _postAgentChannel);
+               MODULE_NAME, L"AgentChannelManager::initChannelManager", _postAgentChannel);
     AlertSender::Write(AGENT_CHANNEL_FILE, 46,
                        L"== CRASH == [%s], %s; agent channel manager is already initialized, postAgentChannel:0x%p",
-                       AGENT_CHANNEL_TAG, L"AgentChannelManager::initChannelManager", _postAgentChannel);
+                       MODULE_NAME, L"AgentChannelManager::initChannelManager", _postAgentChannel);
     return false;
 }
 
@@ -56,7 +56,7 @@ bool AgentSessionHandler::OnAccept(Session const* session) const
 {
     unsigned long long const sessionId = session->_id;
     Log::Write(Log::LT_NOTICE, AGENT_CHANNEL_FILE, 112,
-               L"[%s], %s; accepted agent session, sessionId:0x%I64X, portId:%u, sessionIndex:%u", AGENT_CHANNEL_TAG,
+               L"[%s], %s; accepted agent session, sessionId:0x%I64X, portId:%u, sessionIndex:%u", MODULE_NAME,
                L"AgentSessionHandler::OnAccept", sessionId, static_cast<unsigned int>(sessionId >> 32),
                static_cast<unsigned int>(sessionId));
     return true;
@@ -68,7 +68,7 @@ bool AgentSessionHandler::OnConnect(Session const* session, bool firstConnected)
     unsigned long long const sessionId = session->_id;
     Log::Write(Log::LT_ERROR, AGENT_CHANNEL_FILE, 118,
                L"[%s], %s; cannot use AgentSessionHandler::OnConnect handler, sessionId:0x%I64X, portId:%u, sessionIndex:%u",
-               AGENT_CHANNEL_TAG, L"AgentSessionHandler::OnConnect", sessionId,
+               MODULE_NAME, L"AgentSessionHandler::OnConnect", sessionId,
                static_cast<unsigned int>(sessionId >> 32), static_cast<unsigned int>(sessionId));
     return false;
 }
@@ -82,7 +82,7 @@ void AgentSessionHandler::OnClose(Session const* session, bool tryReconnect) con
     {
         Log::Write(Log::LT_NOTICE, AGENT_CHANNEL_FILE, 143,
                    L"[%s], %s; closed connection with unknown agent session, sessionId:0x%I64X, portId:%u, sessionIndex:%u",
-                   AGENT_CHANNEL_TAG, L"AgentSessionHandler::OnClose", sessionId,
+                   MODULE_NAME, L"AgentSessionHandler::OnClose", sessionId,
                    static_cast<unsigned int>(sessionId >> 32), static_cast<unsigned int>(sessionId));
         return;
     }
@@ -107,12 +107,12 @@ void AgentSessionHandler::OnClose(Session const* session, bool tryReconnect) con
     if (isPostAgent)
         Log::Write(Log::LT_NOTICE, AGENT_CHANNEL_FILE, 136,
                    L"[%s], %s; closed connection with post agent session, agentWid:%u, sessionId:0x%I64X, portId:%u, sessionIndex:%u",
-                   AGENT_CHANNEL_TAG, L"AgentSessionHandler::OnClose", static_cast<unsigned int>(agentWid), sessionId,
+                   MODULE_NAME, L"AgentSessionHandler::OnClose", static_cast<unsigned int>(agentWid), sessionId,
                    static_cast<unsigned int>(sessionId >> 32), static_cast<unsigned int>(sessionId));
     else
         Log::Write(Log::LT_NOTICE, AGENT_CHANNEL_FILE, 139,
                    L"[%s], %s; closed connection with client agent session, agentWid:%u, sessionId:0x%I64X, portId:%u, sessionIndex:%u",
-                   AGENT_CHANNEL_TAG, L"AgentSessionHandler::OnClose", static_cast<unsigned int>(agentWid), sessionId,
+                   MODULE_NAME, L"AgentSessionHandler::OnClose", static_cast<unsigned int>(agentWid), sessionId,
                    static_cast<unsigned int>(sessionId >> 32), static_cast<unsigned int>(sessionId));
 }
 
@@ -124,7 +124,7 @@ bool AgentSessionHandler::PacketHandler(Session const* session, Packet const* pa
     {
         Log::Write(Log::LT_ERROR, AGENT_CHANNEL_FILE, 151,
                    L"[%s], %s; invalid packet; command is null, cmd:0x%p, sessionId:0x%I64X, portId:%u, sessionIndex:%u",
-                   AGENT_CHANNEL_TAG, L"AgentSessionHandler::PacketHandler", static_cast<void*>(nullptr), sessionId,
+                   MODULE_NAME, L"AgentSessionHandler::PacketHandler", static_cast<void*>(nullptr), sessionId,
                    static_cast<unsigned int>(sessionId >> 32), static_cast<unsigned int>(sessionId));
         return false;
     }
@@ -138,7 +138,7 @@ bool AgentSessionHandler::PacketHandler(Session const* session, Packet const* pa
             return PostOfficePacketServerSideHandlerList[1](session, packet);
         Log::Write(Log::LT_ERROR, AGENT_CHANNEL_FILE, 168,
                    L"[%s], %s; invalid packet command of not authorized session, command:%d, sessionId:0x%I64X, portId:%u, sessionIndex:%u",
-                   AGENT_CHANNEL_TAG, L"AgentSessionHandler::PacketHandler", static_cast<int>(cmd), sessionId,
+                   MODULE_NAME, L"AgentSessionHandler::PacketHandler", static_cast<int>(cmd), sessionId,
                    static_cast<unsigned int>(sessionId >> 32), static_cast<unsigned int>(sessionId));
         return false;
     }
@@ -154,7 +154,7 @@ bool AgentSessionHandler::PacketHandler(Session const* session, Packet const* pa
     {
         Log::Write(Log::LT_ERROR, AGENT_CHANNEL_FILE, 181,
                    L"[%s], %s; invalid clientagent packet command, command:%d, agentWid:%u, connectionType:%d, sessionId:0x%I64X, portId:%u, sessionIndex:%u",
-                   AGENT_CHANNEL_TAG, L"AgentSessionHandler::PacketHandler", static_cast<int>(cmd),
+                   MODULE_NAME, L"AgentSessionHandler::PacketHandler", static_cast<int>(cmd),
                    static_cast<unsigned int>(channel->_agentWid), static_cast<int>(channel->_connectionType), sessionId,
                    static_cast<unsigned int>(sessionId >> 32), static_cast<unsigned int>(sessionId));
     }

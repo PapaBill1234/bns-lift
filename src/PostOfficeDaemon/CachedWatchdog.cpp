@@ -9,7 +9,7 @@
 #include "WorldConfig.h"
 
 #define CACHED_WATCHDOG_FILE L"CachedWatchdog.cpp"
-#define CACHED_WATCHDOG_TAG L"cached watchdog"
+static wchar_t const* const MODULE_NAME = L"cached watchdog";  // PDB MODULE_NAME
 
 #define CACHED_WATCHDOG_CRASH(line, fmt, ...)                                  \
     do                                                                         \
@@ -55,7 +55,7 @@ bool CachedWatchdog::addTimer(bool const startup)
         return true;
 
     Log::Write(Log::LT_ERROR, CACHED_WATCHDOG_FILE, 43, L"[%s], %s; failed to add ping generator timer, wid:%u",
-               CACHED_WATCHDOG_TAG, L"CachedWatchdog::addTimer", _wid);
+               MODULE_NAME, L"CachedWatchdog::addTimer", _wid);
     return false;
 }
 
@@ -67,7 +67,7 @@ void CachedWatchdog::setServiceState(ServiceState const newState)
         newState)
     {
         Log::Write(Log::LT_NOTICE, CACHED_WATCHDOG_FILE, 58, L"[%s], %s; [wid:%u] current cached service state:%s",
-                   CACHED_WATCHDOG_TAG, L"CachedWatchdog::setServiceState", _wid,
+                   MODULE_NAME, L"CachedWatchdog::setServiceState", _wid,
                    newState == SERVICE_STATE_AVAILABLE ? L"available" : L"unavailable");
     }
 }
@@ -85,7 +85,7 @@ bool CachedWatchdogManager::initWatchdogManager(WorldConfigList const* worldConf
         if (bucketIndex >= BUCKET_COUNT)
         {
             Log::Write(Log::LT_ERROR, CACHED_WATCHDOG_FILE, 107,
-                       L"[%s], %s; wid out of range, wid:%u, bucketIndex:%d, bucketCount:%d", CACHED_WATCHDOG_TAG,
+                       L"[%s], %s; wid out of range, wid:%u, bucketIndex:%d, bucketCount:%d", MODULE_NAME,
                        L"CachedWatchdogManager::initWatchdogManager", wid, bucketIndex, BUCKET_COUNT);
             return false;
         }
@@ -98,7 +98,7 @@ bool CachedWatchdogManager::initWatchdogManager(WorldConfigList const* worldConf
         {
             Log::Write(Log::LT_ERROR, CACHED_WATCHDOG_FILE, 122,
                        L"[%s], %s; cached watchdog already exists, wid:%u, bucketIndex:%d, worldIndex:%d",
-                       CACHED_WATCHDOG_TAG, L"CachedWatchdogManager::initWatchdogManager", wid, bucketIndex, worldIndex);
+                       MODULE_NAME, L"CachedWatchdogManager::initWatchdogManager", wid, bucketIndex, worldIndex);
             return false;
         }
 
@@ -106,7 +106,7 @@ bool CachedWatchdogManager::initWatchdogManager(WorldConfigList const* worldConf
         {
             CACHED_WATCHDOG_CRASH(117,
                                   L"== CRASH == [%s], %s; failed to add cached watchdog, wid:%u, bucketIndex:%d, worldIndex:%d",
-                                  CACHED_WATCHDOG_TAG, L"CachedWatchdogManager::initWatchdogManager", wid, bucketIndex,
+                                  MODULE_NAME, L"CachedWatchdogManager::initWatchdogManager", wid, bucketIndex,
                                   worldIndex);
             return false;
         }
@@ -127,7 +127,7 @@ bool CachedWatchdogManager::updateWorldList(WorldConfigList const* worldConfigLi
         if (bucketIndex >= BUCKET_COUNT)
         {
             Log::Write(Log::LT_ERROR, CACHED_WATCHDOG_FILE, 147,
-                       L"[%s], %s; wid out of range, wid:%u, bucketIndex:%d, bucketCount:%d", CACHED_WATCHDOG_TAG,
+                       L"[%s], %s; wid out of range, wid:%u, bucketIndex:%d, bucketCount:%d", MODULE_NAME,
                        L"CachedWatchdogManager::updateWorldList", wid, bucketIndex, BUCKET_COUNT);
             return false;
         }
@@ -140,7 +140,7 @@ bool CachedWatchdogManager::updateWorldList(WorldConfigList const* worldConfigLi
         {
             CACHED_WATCHDOG_CRASH(157,
                                   L"== CRASH == [%s], %s; failed to add cached watchdog, wid:%u, bucketIndex:%d, worldIndex:%d",
-                                  CACHED_WATCHDOG_TAG, L"CachedWatchdogManager::updateWorldList", wid, bucketIndex,
+                                  MODULE_NAME, L"CachedWatchdogManager::updateWorldList", wid, bucketIndex,
                                   worldIndex);
             return false;
         }
@@ -148,7 +148,7 @@ bool CachedWatchdogManager::updateWorldList(WorldConfigList const* worldConfigLi
     lock.Leave();
 
     Log::Write(Log::LT_DEBUG, CACHED_WATCHDOG_FILE, 164,
-               L"[%s], %s; succeeded to update world list of cached watchdog manager", CACHED_WATCHDOG_TAG,
+               L"[%s], %s; succeeded to update world list of cached watchdog manager", MODULE_NAME,
                L"CachedWatchdogManager::updateWorldList");
     return true;
 }
@@ -159,7 +159,7 @@ bool CachedWatchdogManager::addCachedWatchdog(unsigned short wid, int bucketInde
     if (wid == 0 || bucketIndex >= BUCKET_COUNT || worldIndex >= ARRAY_SIZE)
     {
         CACHED_WATCHDOG_CRASH(172, L"== CRASH == [%s], %s; invalid parameter, wid:%u, bucketIndex:%d, worldIndex:%d",
-                              CACHED_WATCHDOG_TAG, L"CachedWatchdogManager::addCachedWatchdog", wid, bucketIndex,
+                              MODULE_NAME, L"CachedWatchdogManager::addCachedWatchdog", wid, bucketIndex,
                               worldIndex);
         return false;
     }
@@ -177,13 +177,13 @@ bool CachedWatchdogManager::addCachedWatchdog(unsigned short wid, int bucketInde
     // BUG: 0x46b0 cachedWatchdog can be null here (Alloc failed); the call does not check it.
     if (!cachedWatchdog->addTimer(true))
     {
-        CACHED_WATCHDOG_CRASH(188, L"== CRASH == [%s], %s; failed to add timer, wid:%u", CACHED_WATCHDOG_TAG,
+        CACHED_WATCHDOG_CRASH(188, L"== CRASH == [%s], %s; failed to add timer, wid:%u", MODULE_NAME,
                               L"CachedWatchdogManager::addCachedWatchdog", wid);
         return false;
     }
 
     Log::Write(Log::LT_DEBUG, CACHED_WATCHDOG_FILE, 192,
-               L"[%s], %s; succeeded to add cached watchdog, wid:%u, bucketIndex:%d, worldIndex:%d", CACHED_WATCHDOG_TAG,
+               L"[%s], %s; succeeded to add cached watchdog, wid:%u, bucketIndex:%d, worldIndex:%d", MODULE_NAME,
                L"CachedWatchdogManager::addCachedWatchdog", wid, bucketIndex, worldIndex);
     return true;
 }
@@ -193,7 +193,7 @@ CachedWatchdog* const CachedWatchdogManager::getCachedWatchdog(unsigned short co
 {
     if (wid == 0)
     {
-        Log::Write(Log::LT_ERROR, CACHED_WATCHDOG_FILE, 200, L"[%s], %s; invalid parameter, wid:%u", CACHED_WATCHDOG_TAG,
+        Log::Write(Log::LT_ERROR, CACHED_WATCHDOG_FILE, 200, L"[%s], %s; invalid parameter, wid:%u", MODULE_NAME,
                    L"CachedWatchdogManager::getCachedWatchdog", 0);
         return nullptr;
     }
@@ -202,7 +202,7 @@ CachedWatchdog* const CachedWatchdogManager::getCachedWatchdog(unsigned short co
     if (bucketIndex >= BUCKET_COUNT)
     {
         Log::Write(Log::LT_ERROR, CACHED_WATCHDOG_FILE, 210,
-                   L"[%s], %s; wid out of range, wid:%u, bucketIndex:%d, bucketCount:%d", CACHED_WATCHDOG_TAG,
+                   L"[%s], %s; wid out of range, wid:%u, bucketIndex:%d, bucketCount:%d", MODULE_NAME,
                    L"CachedWatchdogManager::getCachedWatchdog", wid, bucketIndex, BUCKET_COUNT);
         return nullptr;
     }
@@ -210,7 +210,7 @@ CachedWatchdog* const CachedWatchdogManager::getCachedWatchdog(unsigned short co
     if (_containerList[bucketIndex] == nullptr)
     {
         Log::Write(Log::LT_ERROR, CACHED_WATCHDOG_FILE, 215, L"[%s], %s; no such container list, wid:%u, bucketIndex:%d",
-                   CACHED_WATCHDOG_TAG, L"CachedWatchdogManager::getCachedWatchdog", wid, bucketIndex);
+                   MODULE_NAME, L"CachedWatchdogManager::getCachedWatchdog", wid, bucketIndex);
         return nullptr;
     }
 
@@ -224,7 +224,7 @@ void CachedWatchdogManager::SetServiceState(unsigned short wid, CachedWatchdog::
     if (cachedWatchdog == nullptr)
     {
         Log::Write(Log::LT_ERROR, CACHED_WATCHDOG_FILE, 237, L"[%s], %s; no such cached watchdog, wid:%u, cachedWatchdog:0x%p",
-                   CACHED_WATCHDOG_TAG, L"CachedWatchdogManager::SetServiceState", wid, static_cast<CachedWatchdog*>(nullptr));
+                   MODULE_NAME, L"CachedWatchdogManager::SetServiceState", wid, static_cast<CachedWatchdog*>(nullptr));
         return;
     }
     cachedWatchdog->setServiceState(newState);
@@ -245,7 +245,7 @@ void CachedWatchdogManager::SetAllServiceState(CachedWatchdog::ServiceState cons
     }
 
     Log::Write(Log::LT_NOTICE, CACHED_WATCHDOG_FILE, 256, L"[%s], %s; [all] current cached service state:%s",
-               CACHED_WATCHDOG_TAG, L"CachedWatchdogManager::SetAllServiceState",
+               MODULE_NAME, L"CachedWatchdogManager::SetAllServiceState",
                newState == CachedWatchdog::SERVICE_STATE_AVAILABLE ? L"available" : L"unavailable");  // ❓ the binary has "unavailable"
 }
 
@@ -256,7 +256,7 @@ bool CachedWatchdogManager::AddNextPing(unsigned short wid)
     if (cachedWatchdog == nullptr)
     {
         Log::Write(Log::LT_ERROR, CACHED_WATCHDOG_FILE, 263, L"[%s], %s; no such cached watchdog, wid:%u, cachedWatchdog:0x%p",
-                   CACHED_WATCHDOG_TAG, L"CachedWatchdogManager::AddNextPing", wid, static_cast<CachedWatchdog*>(nullptr));
+                   MODULE_NAME, L"CachedWatchdogManager::AddNextPing", wid, static_cast<CachedWatchdog*>(nullptr));
         return false;
     }
     return cachedWatchdog->addTimer(false);
@@ -269,7 +269,7 @@ unsigned long long const CachedWatchdogManager::GetCurrentPingSeq(unsigned short
     if (cachedWatchdog == nullptr)
     {
         Log::Write(Log::LT_ERROR, CACHED_WATCHDOG_FILE, 274, L"[%s], %s; no such cached watchdog, wid:%u, cachedWatchdog:0x%p",
-                   CACHED_WATCHDOG_TAG, L"CachedWatchdogManager::GetCurrentPingSeq", wid, static_cast<CachedWatchdog*>(nullptr));
+                   MODULE_NAME, L"CachedWatchdogManager::GetCurrentPingSeq", wid, static_cast<CachedWatchdog*>(nullptr));
         return 0;
     }
     return cachedWatchdog->_pingGenerator->_pingSeq;

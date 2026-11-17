@@ -8,7 +8,7 @@
 #include "PingRelay.h"
 
 #define PING_GENERATOR_FILE L"PingGenerator.cpp"
-#define PING_GENERATOR_TAG L"ping generator"
+static wchar_t const* const MODULE_NAME = L"ping generator";  // PDB MODULE_NAME
 
 static bool isStopState(int state)  // ❓ inlined switch
 {
@@ -54,10 +54,10 @@ bool PingGenerator::HandleEvent(EventContext* context, unsigned long bytes)
     if (isStopState(Daemon::Instance->State))
         return true;
 
-    Log::Write(Log::LT_DEBUG, PING_GENERATOR_FILE, 25, L"[%s], %s; <BEGIN TIMER HANDLER>", PING_GENERATOR_TAG,
+    Log::Write(Log::LT_DEBUG, PING_GENERATOR_FILE, 25, L"[%s], %s; <BEGIN TIMER HANDLER>", MODULE_NAME,
                L"PingGenerator::HandleEvent");
     bool const result = sendPing();
-    Log::Write(Log::LT_DEBUG, PING_GENERATOR_FILE, 29, L"[%s], %s; <END TIMER HANDLER>", PING_GENERATOR_TAG,
+    Log::Write(Log::LT_DEBUG, PING_GENERATOR_FILE, 29, L"[%s], %s; <END TIMER HANDLER>", MODULE_NAME,
                L"PingGenerator::HandleEvent");
     if (result)
         return true;
@@ -67,7 +67,7 @@ bool PingGenerator::HandleEvent(EventContext* context, unsigned long bytes)
         return true;
 
     Log::Write(Log::LT_ERROR, PING_GENERATOR_FILE, 34, L"[%s], %s; failed to add ping generator timer, wid:%u",
-               PING_GENERATOR_TAG, L"PingGenerator::HandleEvent", _wid);
+               MODULE_NAME, L"PingGenerator::HandleEvent", _wid);
     return false;
 }
 
@@ -78,7 +78,7 @@ bool PingGenerator::sendPing()
     if (channel == nullptr)
     {
         Log::Write(Log::LT_ERROR, PING_GENERATOR_FILE, 49, L"[%s], %s; cannot send ping relay request, wid:%u",
-                   PING_GENERATOR_TAG, L"PingGenerator::sendPing", _wid);
+                   MODULE_NAME, L"PingGenerator::sendPing", _wid);
         return false;
     }
 
@@ -105,7 +105,7 @@ bool PingGenerator::sendPing()
     {
         Log::Write(Log::LT_ERROR, PING_GENERATOR_FILE, 64,
                    L"[%s], %s; failed to send ping relay request, relayTid:0x%I64X, wid:%u, pingSeq:%I64u",
-                   PING_GENERATOR_TAG, L"PingGenerator::sendPing", relayTid, _wid, pingSeq);
+                   MODULE_NAME, L"PingGenerator::sendPing", relayTid, _wid, pingSeq);
         relayContext->removeReferenceCount(PING_GENERATOR_FILE, 65);
         channel->removeReferenceCount(PING_GENERATOR_FILE, 66);
         return false;

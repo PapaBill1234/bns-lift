@@ -12,7 +12,7 @@
 #include "RelayContext.h"
 
 #define POST_CONTEXT_FILE L"PostContext.cpp"
-#define POST_CONTEXT_TAG L"post context"
+static wchar_t const* const MODULE_NAME = L"post context";  // PDB MODULE_NAME
 
 #define POST_CONTEXT_CRASH(line, fmt, ...)                                       \
     do                                                                           \
@@ -24,33 +24,33 @@
 // ---- AttachedItemInfo ----
 
 // 0x10fc0
-int AttachedItemInfo::CheckValidityItemData()
+AttachedItemInfo::CheckResult const AttachedItemInfo::CheckValidityItemData() const
 {
     if (_itemType >= 4)
-        return 1;
+        return CHECKRESULT_INVALID_ITEM_DATA;
     if (_itemCategory <= 0 || _itemCategory >= 7 || _itemAmount <= 0)
-        return 1;
+        return CHECKRESULT_INVALID_ITEM_DATA;
 
     switch (_itemType)
     {
     case 1:
         if (_itemCategory != 1 || _itemInstanceId != 0 || _itemDataId != 0 || _itemLevel != 0 || wcslen(_itemXmlData) != 0)
-            return 2;
+            return CHECKRESULT_INVALID_MONEY_DATA;
         break;
     case 2:
         if (_itemCategory == 1 || _itemInstanceId == 0 || _itemDataId == 0 || _itemLevel <= 0 || wcslen(_itemXmlData) != 0)
-            return 3;
+            return CHECKRESULT_INVALID_DEFAULT_ITEM_DATA;
         break;
     case 3:
         if (_itemCategory == 1 || _itemInstanceId == 0 || _itemDataId == 0 || _itemLevel <= 0)
-            return 3;
+            return CHECKRESULT_INVALID_DEFAULT_ITEM_DATA;
         if (wcslen(_itemXmlData) == 0)
-            return 4;
+            return CHECKRESULT_INVALID_CUSTOM_ITEM_DATA;
         break;
     default:
-        return 5;
+        return CHECKRESULT_NO_SUCH_ITEM_TYPE;
     }
-    return 0;
+    return CHECKRESULT_NO_ERROR;
 }
 
 // ---- AttachedItemContext ----
@@ -169,7 +169,7 @@ bool PostContext::InitAttachedItemInfo(AttachedItemContext* attachedItemList, in
         return true;
     }
     POST_CONTEXT_CRASH(239, L"== CRASH == [%s], %s; invalid parameter, attachedItemList:0x%p, attachedItemCount:%d",
-                       POST_CONTEXT_TAG, L"PostContext::InitAttachedItemInfo", attachedItemList, attachedItemCount);
+                       MODULE_NAME, L"PostContext::InitAttachedItemInfo", attachedItemList, attachedItemCount);
     return false;
 }
 
@@ -187,7 +187,7 @@ bool PostContext::ComposeDeliveryPacket(FragmentPacket& packet)
                         info._postTitle, info._postMessage))
     {
         Log::Write(Log::LT_ERROR, POST_CONTEXT_FILE, 269, L"[%s], %s; failed to compose post body packet, postId:0x%I64X",
-                   POST_CONTEXT_TAG, L"PostContext::ComposeDeliveryPacket", info._postId);
+                   MODULE_NAME, L"PostContext::ComposeDeliveryPacket", info._postId);
         return false;
     }
 
@@ -197,7 +197,7 @@ bool PostContext::ComposeDeliveryPacket(FragmentPacket& packet)
                L"senderWid:%d, senderPcId:0x%I64X, senderAccountId:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X, "
                L"senderWorldName:%s, senderName:%s, recipientWid:%d, recipientPcId:0x%I64X, recipientName:%s, postTitle:%s, "
                L"postMessage:%s",
-               POST_CONTEXT_TAG, L"PostContext::ComposeDeliveryPacket", info._postId, info._invoiceId,
+               MODULE_NAME, L"PostContext::ComposeDeliveryPacket", info._postId, info._invoiceId,
                static_cast<int>(info._postType), static_cast<int>(info._deliveryReason), info._postHint,
                reservedHint.guid.id1, reservedHint.guid.id2, reservedHint.guid.id3, reservedHint.guid.id4[0],
                reservedHint.guid.id4[1], reservedHint.guid.id4[2], reservedHint.guid.id4[3], reservedHint.guid.id4[4],
@@ -221,14 +221,14 @@ bool PostContext::ComposeDeliveryPacket(FragmentPacket& packet)
                             item._itemXmlData))
         {
             Log::Write(Log::LT_ERROR, POST_CONTEXT_FILE, 294, L"[%s], %s; failed to compose post attachment packet, postId:0x%I64X",
-                       POST_CONTEXT_TAG, L"PostContext::ComposeDeliveryPacket", info._postId);
+                       MODULE_NAME, L"PostContext::ComposeDeliveryPacket", info._postId);
             return false;
         }
 
         Log::Write(Log::LT_DEBUG, POST_CONTEXT_FILE, 297,
                    L"[%s], %s; composed post attachment packet, postId:0x%I64X, itemNo:%d, itemType:%d, itemCategory:%d, "
                    L"itemInstanceId:0x%I64X, itemDataId:%d, itemLevel:%d, itemAmount:%I64d, itemXmlData:%s",
-                   POST_CONTEXT_TAG, L"PostContext::ComposeDeliveryPacket", info._postId, static_cast<int>(item._itemNo),
+                   MODULE_NAME, L"PostContext::ComposeDeliveryPacket", info._postId, static_cast<int>(item._itemNo),
                    static_cast<int>(item._itemType), static_cast<int>(item._itemCategory), item._itemInstanceId,
                    item._itemDataId, static_cast<int>(item._itemLevel), item._itemAmount, item._itemXmlData);
         packet.IncRepeatCount();
@@ -245,7 +245,7 @@ bool PostContextManager::initContextManager()
     if (_lockList != nullptr || _containerList != nullptr)
     {
         POST_CONTEXT_CRASH(342, L"== CRASH == [%s], %s; post context manager is already initialized, lockList:0x%p, containerList:0x%p",
-                           POST_CONTEXT_TAG, L"PostContextManager::initContextManager", _lockList, _containerList);
+                           MODULE_NAME, L"PostContextManager::initContextManager", _lockList, _containerList);
         return false;
     }
     _lockList = liftArrayNew<CriticalSection>(_bucketCount, POST_CONTEXT_FILE, 346);
@@ -259,13 +259,13 @@ PostContext* PostContextManager::GetContext(long long postId)
     if (postId == 0)
     {
         POST_CONTEXT_CRASH(355, L"== CRASH == [%s], %s; invalid parameter, postId:0x%I64X",
-                           POST_CONTEXT_TAG, L"PostContextManager::GetContext", 0LL);
+                           MODULE_NAME, L"PostContextManager::GetContext", 0LL);
         return nullptr;
     }
     if (_lockList == nullptr || _containerList == nullptr)
     {
         POST_CONTEXT_CRASH(359, L"== CRASH == [%s], %s; invalid post context manager, lockList:0x%p, containerList:0x%p",
-                           POST_CONTEXT_TAG, L"PostContextManager::GetContext", _lockList, _containerList);
+                           MODULE_NAME, L"PostContextManager::GetContext", _lockList, _containerList);
         return nullptr;
     }
 
@@ -286,7 +286,7 @@ PostContext* PostContextManager::GetContext(long long postId)
     }
     _lockList[index].Leave();
     POST_CONTEXT_CRASH(372, L"== CRASH == [%s], %s; post context is null, postId:0x%I64X, postContext:0x%p",
-                       POST_CONTEXT_TAG, L"PostContextManager::GetContext", postId, nullptr);
+                       MODULE_NAME, L"PostContextManager::GetContext", postId, nullptr);
     return nullptr;
 }
 
@@ -296,20 +296,20 @@ bool PostContextManager::AddContext(PostContext* postContext)
     if (postContext == nullptr)
     {
         POST_CONTEXT_CRASH(385, L"== CRASH == [%s], %s; invalid parameter, postContext:0x%p",
-                           POST_CONTEXT_TAG, L"PostContextManager::AddContext", nullptr);
+                           MODULE_NAME, L"PostContextManager::AddContext", nullptr);
         return false;
     }
     if (_lockList == nullptr || _containerList == nullptr)
     {
         POST_CONTEXT_CRASH(389, L"== CRASH == [%s], %s; invalid post context manager, lockList:0x%p, containerList:0x%p",
-                           POST_CONTEXT_TAG, L"PostContextManager::AddContext", _lockList, _containerList);
+                           MODULE_NAME, L"PostContextManager::AddContext", _lockList, _containerList);
         return false;
     }
     long long const postId = postContext->_postInfo._postId;
     if (postId == 0)
     {
         POST_CONTEXT_CRASH(395, L"== CRASH == [%s], %s; invalid post Id, postId:0x%I64X",
-                           POST_CONTEXT_TAG, L"PostContextManager::AddContext", 0LL);
+                           MODULE_NAME, L"PostContextManager::AddContext", 0LL);
         return false;
     }
 
@@ -324,7 +324,7 @@ bool PostContextManager::AddContext(PostContext* postContext)
     }
     _lockList[index].Leave();
     Log::Write(Log::LT_ERROR, POST_CONTEXT_FILE, 406, L"[%s], %s; failed to add post context, postId:0x%I64X",
-               POST_CONTEXT_TAG, L"PostContextManager::AddContext", postId);
+               MODULE_NAME, L"PostContextManager::AddContext", postId);
     return false;
 }
 
@@ -334,13 +334,13 @@ bool PostContextManager::RemoveContext(long long postId)
     if (postId == 0)
     {
         POST_CONTEXT_CRASH(422, L"== CRASH == [%s], %s; invalid parameter, postId:0x%I64X",
-                           POST_CONTEXT_TAG, L"PostContextManager::RemoveContext", 0LL);
+                           MODULE_NAME, L"PostContextManager::RemoveContext", 0LL);
         return false;
     }
     if (_lockList == nullptr || _containerList == nullptr)
     {
         POST_CONTEXT_CRASH(426, L"== CRASH == [%s], %s; invalid post context manager, lockList:0x%p, containerList:0x%p",
-                           POST_CONTEXT_TAG, L"PostContextManager::RemoveContext", _lockList, _containerList);
+                           MODULE_NAME, L"PostContextManager::RemoveContext", _lockList, _containerList);
         return false;
     }
 
@@ -351,7 +351,7 @@ bool PostContextManager::RemoveContext(long long postId)
     {
         _lockList[index].Leave();
         Log::Write(Log::LT_ERROR, POST_CONTEXT_FILE, 436, L"[%s], %s; no such post context, postId:0x%I64X",
-                   POST_CONTEXT_TAG, L"PostContextManager::RemoveContext", postId);
+                   MODULE_NAME, L"PostContextManager::RemoveContext", postId);
         return false;
     }
     PostContext* const postContext = it->second;
@@ -365,6 +365,6 @@ bool PostContextManager::RemoveContext(long long postId)
     }
     _lockList[index].Leave();
     POST_CONTEXT_CRASH(443, L"== CRASH == [%s], %s; post context is null, postId:0x%I64X, postContext:0x%p",
-                       POST_CONTEXT_TAG, L"PostContextManager::RemoveContext", postId, nullptr);
+                       MODULE_NAME, L"PostContextManager::RemoveContext", postId, nullptr);
     return false;
 }
