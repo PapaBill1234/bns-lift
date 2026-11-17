@@ -53,7 +53,7 @@ static_assert(offsetof(LobbyGateConfig, _useChannelDelayedRelease) == 0x5C, "Lob
 class LobbyGate : public Daemon
 {
 public:
-    // ❓ The constructor is inlined in wmain (0x128b0).
+    // LIFT: The constructor is inlined in wmain (0x128b0).
     LobbyGate()
         : _config(nullptr), _sessionHandlerList(nullptr), _sessionHandlerCount(0), _lobbyD(nullptr),
           _gatekeyManager(nullptr), _clientManager(nullptr), _worldListManger(nullptr),
@@ -104,7 +104,7 @@ static_assert(offsetof(LobbyGate, _restoreReloadTimer) == 0x7A8, "LobbyGate::_re
 class LobbyGateCooldownTimer : public Timer
 {
 public:
-    // ❓ The constructor is inlined in LobbyGate::cooldown (0x13d20).
+    // LIFT: The constructor is inlined in LobbyGate::cooldown (0x13d20).
     explicit LobbyGateCooldownTimer(int completeDelay)
         : _elapsed(0), _completeDelay(completeDelay), _disconnectStarted(false)
     {
@@ -129,7 +129,7 @@ static_assert(sizeof(LobbyGateCooldownTimer) == 0x48, "sizeof LobbyGateCooldownT
 class LobbyGateReloadInvalidRestoreTimer : public Timer
 {
 public:
-    // ❓ The constructor is inlined in LobbyGate::reload (0x13770).
+    // LIFT: The constructor is inlined in LobbyGate::reload (0x13770).
     LobbyGateReloadInvalidRestoreTimer() : _isExecuted(false)
     {
         StartTick = 0;

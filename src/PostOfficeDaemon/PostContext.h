@@ -112,7 +112,7 @@ public:
     Container* _containerList;
     long volatile _contextCount;  // The PDB type is int. The code uses Interlocked calls on it.
 
-    // ❓ Inlined at 0x14280.
+    // LIFT: Inlined at 0x14280.
     explicit PostContextManager(int bucketCount)
         : _bucketCount(bucketCount), _lockList(nullptr), _containerList(nullptr), _contextCount(0)
     {

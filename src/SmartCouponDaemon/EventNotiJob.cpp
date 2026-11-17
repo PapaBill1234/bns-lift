@@ -18,7 +18,7 @@ static wchar_t const* const kFile = L"EventNotiJob.cpp";
 namespace
 {
 // ❓ Not in the PDB. The log reads id128 as a GUID (Data1, Data2, Data3, Data4[8]).
-struct GuidParts  // ❓ lift helper name, not in any PDB
+struct GuidParts  // LIFT: lift helper name, not in any PDB
 {
     unsigned long id1;
     unsigned short id2;
@@ -27,7 +27,7 @@ struct GuidParts  // ❓ lift helper name, not in any PDB
 };
 static_assert(sizeof(GuidParts) == 0x10, "sizeof GuidParts");
 
-inline GuidParts const& Parts(id128 const& id)  // ❓ lift helper name, not in any PDB
+inline GuidParts const& Parts(id128 const& id)  // LIFT: lift helper name, not in any PDB
 {
     return *reinterpret_cast<GuidParts const*>(&id);
 }

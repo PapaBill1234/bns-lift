@@ -12,7 +12,7 @@
 // 0x14005a378
 WinServiceConsole* _WinServiceConsole = nullptr;
 
-// ❓ Inlined in makeConsole (0xa540): Console() and then all members are 0.
+// LIFT: Inlined in makeConsole (0xa540): Console() and then all members are 0.
 WinServiceConsole::WinServiceConsole()
     : ErrorCode(0), CheckPoint(0), Handle(nullptr)
 {

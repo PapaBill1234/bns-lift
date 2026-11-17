@@ -91,5 +91,5 @@ public:
                       wchar_t const* configName, bool readOnly);                                    // 0xc600
     static void* AllocConfig(unsigned long long size);                                             // 0xc9f0
     static void Dump(wchar_t const* name, void const* config, XmlCfgDef const* defs, int count);  // 0xca10
-    static void FreeConfig(void* config);  // ❓ inline, source line 115
+    static void FreeConfig(void* config);  // LIFT: inline, source line 115
 };

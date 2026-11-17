@@ -10,8 +10,8 @@ class SpinLock
 public:
     SpinLock() { InitializeCriticalSectionAndSpinCount(&SL, 4000); }
     ~SpinLock() { DeleteCriticalSection(&SL); }
-    void Enter() { EnterCriticalSection(&SL); }  // ❓ name not in PDB (inlined)
-    void Leave() { LeaveCriticalSection(&SL); }  // ❓ name not in PDB (inlined)
+    void Enter() { EnterCriticalSection(&SL); }  // LIFT: name not in PDB (inlined)
+    void Leave() { LeaveCriticalSection(&SL); }  // LIFT: name not in PDB (inlined)
 
     CRITICAL_SECTION SL;
 };
@@ -21,11 +21,11 @@ class CriticalSection
 {
 public:
     CriticalSection() { InitializeCriticalSection(&CS); }
-    // ❓ Not in PDB. Inlined at PostOfficeDaemon 0xce80 (InitializeCriticalSectionAndSpinCount).
+    // LIFT: Not in PDB. Inlined at PostOfficeDaemon 0xce80 (InitializeCriticalSectionAndSpinCount).
     explicit CriticalSection(unsigned long spinCount) { InitializeCriticalSectionAndSpinCount(&CS, spinCount); }
     ~CriticalSection();
-    void Enter() { EnterCriticalSection(&CS); }  // ❓ name not in PDB (inlined)
-    void Leave() { LeaveCriticalSection(&CS); }  // ❓ name not in PDB (inlined)
+    void Enter() { EnterCriticalSection(&CS); }  // LIFT: name not in PDB (inlined)
+    void Leave() { LeaveCriticalSection(&CS); }  // LIFT: name not in PDB (inlined)
 
     CRITICAL_SECTION CS;
 };
@@ -42,7 +42,7 @@ inline CriticalSection::~CriticalSection()
 class AutoCS
 {
 public:
-    explicit AutoCS(CriticalSection* cs);  // ❓ inlined; asserts at Lock.h line 113
+    explicit AutoCS(CriticalSection* cs);  // LIFT: inlined; asserts at Lock.h line 113
     ~AutoCS();                             // 0x3c80
     void Leave();                          // 0x3c90
 

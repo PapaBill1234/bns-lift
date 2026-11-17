@@ -20,7 +20,7 @@ class ReleaseEvent : public DynamicEventObject
 public:
     explicit ReleaseEvent(DelayedRelease::Node* head) : _head(head)
     {
-        // ❓ The inlined RefCntObject constructor at 0x22DA0 sets these fields.
+        // LIFT: The inlined RefCntObject constructor at 0x22DA0 sets these fields.
         _tag = 10;
         _ref = 1;
         _history = nullptr;
@@ -93,7 +93,7 @@ void DelayedRelease::Release(long long current, int maxRelease, bool forceNow, b
 {
     Node* head = nullptr;
     Node* last = nullptr;
-    // ❓ LTCG folded maxRelease (0) to the limit 0x7FFFFFFF.
+    // LIFT: LTCG folded maxRelease (0) to the limit 0x7FFFFFFF.
     int limit = maxRelease > 0 ? maxRelease : 0x7FFFFFFF;
     _lock.Enter();
     if (forceNow || _lastReleased == 0 || current - _lastReleased > _interval)

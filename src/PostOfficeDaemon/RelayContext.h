@@ -65,7 +65,7 @@ public:
         RELAYSTATUS_FINISH = 3,
     };
 
-    RelayContext(EconomyHeader const& economyHeader)  // ❓ inlined in the child ctors
+    RelayContext(EconomyHeader const& economyHeader)  // LIFT: inlined in the child ctors
         : _economyHeader(economyHeader), _relayStatus(RELAYSTATUS_INIT), _relayLimitTime(0) {}
 
     virtual unsigned short const GetRequestWid() const = 0;           // slot 4
@@ -95,7 +95,7 @@ static_assert(offsetof(RelayContext, _economyHeader) == 0x40, "RelayContext::_ec
 static_assert(offsetof(RelayContext, _relayStatus) == 0x50, "RelayContext::_relayStatus");
 static_assert(offsetof(RelayContext, _relayLimitTime) == 0x58, "RelayContext::_relayLimitTime");
 
-// ❓ Not in the PDB. The original inlines an array new (`eh vector constructor iterator') with
+// LIFT: Not in the PDB. The original inlines an array new (`eh vector constructor iterator') with
 // Memory::_Manager[2]->Alloc: the count is at the first int, the objects start at +8.
 template<class T>
 inline T* liftArrayNew(int count, wchar_t const* file, int line)
@@ -128,7 +128,7 @@ public:
 
     static unsigned long long _idSeed;
 
-    // ❓ Inlined at 0x14280.
+    // LIFT: Inlined at 0x14280.
     explicit RelayContextManager(int bucketCount)
         : _bucketCount(bucketCount), _lockList(nullptr), _containerList(nullptr), _contextCount(0)
     {

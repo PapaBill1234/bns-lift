@@ -8,7 +8,7 @@
 #define UNSENT_POST_CHECKER_FILE L"UnsentPostChecker.cpp"
 static wchar_t const* const MODULE_NAME = L"unsent post checker";  // PDB MODULE_NAME
 
-static bool isStopState(int state)  // ❓ inlined switch
+static bool isStopState(int state)  // LIFT: inlined switch
 {
     return state == Daemon::STATE_STOPPED || state == Daemon::STATE_STOPPING ||
            state == Daemon::STATE_COOLDOWNING || state == Daemon::STATE_COOLDOWNED;

@@ -32,12 +32,12 @@ public:
     DeliverPostRelayContext(EconomyHeader const& economyHeader, PostContext* const postContext);  // 0xfb80
     virtual ~DeliverPostRelayContext();                                // 0xfc70
 
-    virtual unsigned short const GetRequestWid() const;            // ❓ folded with 0xfb40 (PingGenerator.cpp)
+    virtual unsigned short const GetRequestWid() const;            // LIFT: folded with 0xfb40 (PingGenerator.cpp)
     virtual RelayHeader const MakeRelayHeader() const;             // 0x10310
     virtual bool ComposeRequestPacket(FragmentPacket&) const;      // 0x10350
-    virtual bool ComposeRequestPacket(Packet&) const;              // ❓ folded with 0x34c40
-    virtual bool ComposeResponsePacket(FragmentPacket&) const;     // ❓ folded with 0x34c40
-    virtual bool ComposeResponsePacket(Packet&) const;             // ❓ folded with 0x34c40
+    virtual bool ComposeRequestPacket(Packet&) const;              // LIFT: folded with 0x34c40
+    virtual bool ComposeResponsePacket(FragmentPacket&) const;     // LIFT: folded with 0x34c40
+    virtual bool ComposeResponsePacket(Packet&) const;             // LIFT: folded with 0x34c40
     virtual bool processRelayRequest(Channel* const) const;        // 0xfd00
     virtual bool processRelayResponse() const;                     // 0xfe00
     virtual bool processRelayTimeout();                            // 0x102c0

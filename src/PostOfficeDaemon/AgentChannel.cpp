@@ -46,7 +46,7 @@ bool AgentChannelManager::initChannelManager()
     return false;
 }
 
-// ❓ no out-of-line copy found
+// LIFT: no out-of-line copy found
 AgentSessionHandler::~AgentSessionHandler()
 {
 }
@@ -91,7 +91,7 @@ void AgentSessionHandler::OnClose(Session const* session, bool tryReconnect) con
     bool const isPostAgent = channel->_connectionType == 1;
     if (isPostAgent)
     {
-        // ❓ inlined AgentChannelManager release (log line 98). The name is not in the PDB.
+        // LIFT: inlined AgentChannelManager release (log line 98). The name is not in the PDB.
         AgentChannelManager* const manager = PostOfficeDaemon::_instance->_agentChannelManager;
         manager->_lock.Enter();
         if (manager->_postAgentChannel != nullptr)
@@ -146,7 +146,7 @@ bool AgentSessionHandler::PacketHandler(Session const* session, Packet const* pa
     bool result = false;
     if (cmd > 0 && cmd < 7 && PostOfficePacketServerSideHandlerList[cmd] != nullptr)
     {
-        // ❓ LTCG folded the event id and the offset. The values come from the LobbyGate call.
+        // LIFT: LTCG folded the event id and the offset. The values come from the LobbyGate call.
         result = TFPP_PumpPacket(128, Network::iocpHandle(), session, packet, cmd, 0,
                                  PostOfficePacketServerSideHandlerList, PostOfficePacketServerSideFragmentHandlerList);
     }

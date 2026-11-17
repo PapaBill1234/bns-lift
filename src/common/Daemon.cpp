@@ -46,7 +46,7 @@ int const CONFIG_DIR_OPTION_LEN = 6;            // wcslen(L"--conf")
 
 namespace
 {
-// ❓ Inlined helper of Memory.cpp (source line 57). It creates the manager of one section.
+// LIFT: Inlined helper of Memory.cpp (source line 57). It creates the manager of one section.
 void initMemorySection(int section, void const* option)
 {
     if (Memory::_Manager[section] != nullptr)
@@ -62,7 +62,7 @@ void initMemorySection(int section, void const* option)
     }
 }
 
-// ❓ Inlined helper of Memory.cpp (source line 85). It releases the manager of one section.
+// LIFT: Inlined helper of Memory.cpp (source line 85). It releases the manager of one section.
 void finiMemorySection(int section)
 {
     MemoryManager* manager = const_cast<MemoryManager*>(Memory::_Manager[section]);
@@ -77,11 +77,11 @@ void finiMemorySection(int section)
     }
 }
 
-// ❓ Inlined helper. The IPv4 text buffers are in .tls (+0x40 char[32], +0x60 wchar_t[32]).
+// LIFT: Inlined helper. The IPv4 text buffers are in .tls (+0x40 char[32], +0x60 wchar_t[32]).
 __declspec(thread) char addressStringA[32];
 __declspec(thread) wchar_t addressStringW[32];
 
-wchar_t const* addressToString(unsigned long address)  // ❓ lift helper name, not in any PDB
+wchar_t const* addressToString(unsigned long address)  // LIFT: lift helper name, not in any PDB
 {
     wchar_t* wide = addressStringW;
     char* narrow = addressStringA;
@@ -100,7 +100,7 @@ wchar_t const* addressToString(unsigned long address)  // ❓ lift helper name, 
     return wide;
 }
 
-// ❓ Inlined helper. 3 = 10/8, 2 = 172.16/12, 1 = 192.168/16, 0 = other.
+// LIFT: Inlined helper. 3 = 10/8, 2 = 172.16/12, 1 = 192.168/16, 0 = other.
 int privateClass(unsigned long address)
 {
     if ((htonl(address) & 0xFF000000) == 0x0A000000)
@@ -286,7 +286,7 @@ Daemon::~Daemon()
     // EndEvent: SystemEvent::~SystemEvent closes the handle.
 }
 
-// ❓ Inlined helper. It sets the state of the pipe console and of the console.
+// LIFT: Inlined helper. It sets the state of the pipe console and of the console.
 void Daemon::setState(int state)
 {
     State = state;
@@ -486,7 +486,7 @@ bool Daemon::start(int argc, wchar_t const** argv)
     return true;
 
 fail:
-    // ❓ Inlined Log code: flush and close the log.
+    // LIFT: Inlined Log code: flush and close the log.
     if (Log::instance != nullptr)
     {
         Log::Flush();
@@ -650,7 +650,7 @@ void Daemon::noTimerMain(Network* networkInstance)
         {
             if (--flushCount == 0)
             {
-                Log::Flush();  // ❓ inlined
+                Log::Flush();  // LIFT: inlined
                 flushCount = 1;
             }
             flushTime += 600;
@@ -713,7 +713,7 @@ void Daemon::timerMain(Network* networkInstance)
         {
             if (--flushCount == 0)
             {
-                Log::Flush();  // ❓ inlined
+                Log::Flush();  // LIFT: inlined
                 flushCount = 1;
             }
             flushTime += 600;

@@ -19,14 +19,14 @@ namespace
 wchar_t const* const MANAGEMENT_PACKET_FILE = L"ManagementPacketHandler.cpp";  // ❓ name
 static wchar_t const* const MODULE_NAME = L"management packet handler";  // PDB MODULE_NAME
 
-// ❓ Inlined in each handler: zero the packet and allocate the first buffer.
+// LIFT: Inlined in each handler: zero the packet and allocate the first buffer.
 void initReply(Packet* reply)
 {
     memset(static_cast<void*>(reply), 0, sizeof(*reply));
     reply->Allocate();
 }
 
-// ❓ Inlined in each handler: compose "ss", encrypt and send under the session lock.
+// LIFT: Inlined in each handler: compose "ss", encrypt and send under the session lock.
 void sendTextReply(Session const* session, Packet* reply, wchar_t const* text1, wchar_t const* text2)
 {
     ManagementSessionHandler::SendTextReply(session, reply, text1, text2);

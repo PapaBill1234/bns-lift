@@ -56,7 +56,7 @@ void* NotAuthedLobbyGatePacketHandlerList[110] = {
     reinterpret_cast<void*>(&HandleLobbyGate_LoginWithLobbyTokenReq),  // 6
 };
 
-#define LG_NOP reinterpret_cast<void*>(&HandleLobbyLobbyGate_ChangedGradeLevelNotify)  // ❓ folded `return true;` body
+#define LG_NOP reinterpret_cast<void*>(&HandleLobbyLobbyGate_ChangedGradeLevelNotify)  // LIFT: folded `return true;` body
 
 // 0x921e0. The PacketHandler of ClientSessionHandler (0x6b70) calls the handlers for 24 and 103 and calls
 // HandleLobbyGate_BypassPacket for all other entries that are not null.
@@ -90,7 +90,7 @@ bool HandleLobbyGate_PingReq(Session const* session, Packet const* packet)
 // 0x142e0
 bool HandleLobbyGate_ContentsRuleListReq(Session* session, Packet const* packet)
 {
-    Packet sendPacket{};  // ❓ inlined constructor
+    Packet sendPacket{};  // LIFT: inlined constructor
     long long* extraData = static_cast<long long*>(session->_extraData);
     long long lastSendTime = extraData != nullptr ? *extraData : 0;
     long long now = static_cast<long long>(GetTickCount64()) - Daemon::Instance->StartSystemTick64;
@@ -144,7 +144,7 @@ bool HandleLobbyGate_HelloReq(Session* session, Packet* packet)
         return false;
     }
 
-    Packet reply{};  // ❓ inlined constructor
+    Packet reply{};  // LIFT: inlined constructor
     reply.Allocate();
     reply.Compose("hb", 2);  // ❓ no argument for "b" in the original
     if (handshakeDataSize <= 0)
@@ -301,7 +301,7 @@ bool HandleLobbyGate_BypassPacket(Client* client, Packet const* packet)
         return false;
     }
 
-    Packet p{};  // ❓ inlined constructor
+    Packet p{};  // LIFT: inlined constructor
     p.Allocate();
     if (p.Compose("hq", static_cast<int>(cmd), cliKey) == 0)
     {

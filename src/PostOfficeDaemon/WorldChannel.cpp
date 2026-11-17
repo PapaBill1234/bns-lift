@@ -34,12 +34,12 @@ wchar_t const* const CHANNEL_H_FILE =
         AlertSender::Write(WORLD_CHANNEL_FILE, line, fmt, __VA_ARGS__);           \
     } while (0)
 
-// ❓ folded with ~AgentChannel (0x1f620)
+// LIFT: folded with ~AgentChannel (0x1f620)
 WorldChannel::~WorldChannel()
 {
 }
 
-// ❓ folded with AgentChannel::GetId (0x1a6e0)
+// LIFT: folded with AgentChannel::GetId (0x1a6e0)
 unsigned long long WorldChannel::GetId()
 {
     return _wid;
@@ -89,7 +89,7 @@ bool WorldChannel::SendRelayResponse(RelayContext const* const relayContext)
         packet.ListHead->encrypt(session->_currentCrypt, session->_security3rd);
         PacketBuffer const* buffer = packet.ListHead;
         session->_lock.Enter();
-        session->send(&buffer, 1);  // ❓ inlined send
+        session->send(&buffer, 1);  // LIFT: inlined send
         session->_lock.Leave();
         session->removeReferenceCount(CHANNEL_H_FILE, 52);
     }
@@ -233,7 +233,7 @@ bool WorldChannelManager::RemoveWorldChannel(unsigned short wid)
     return false;
 }
 
-// ❓ no out-of-line copy found
+// LIFT: no out-of-line copy found
 WorldSessionHandler::~WorldSessionHandler()
 {
 }
@@ -314,7 +314,7 @@ bool WorldSessionHandler::PacketHandler(Session const* session, Packet const* pa
     bool result = false;
     if (cmd > 0 && cmd < 13 && PostOfficeServicePacketServerSideHandlerList[cmd] != nullptr)
     {
-        // ❓ LTCG folded the event id and the offset. The values come from the LobbyGate call.
+        // LIFT: LTCG folded the event id and the offset. The values come from the LobbyGate call.
         result = TFPP_PumpPacket(128, Network::iocpHandle(), session, packet, cmd, 0,
                                  PostOfficeServicePacketServerSideHandlerList,
                                  PostOfficeServicePacketServerSideFragmentHandlerList);

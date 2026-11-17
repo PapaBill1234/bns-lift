@@ -7,7 +7,7 @@
 class PacketFormatIterator
 {
 public:
-    virtual void Reset() { index = 0; }  // slot 0 ❓ no out-of-line copy in LobbyGate.exe
+    virtual void Reset() { index = 0; }  // slot 0 LIFT: no out-of-line copy in LobbyGate.exe
     virtual void SetFormat(char const* format, int start);  // slot 1
     virtual void Forward(int index);                        // slot 2
     virtual void Rewind(int index);                         // slot 3
@@ -79,7 +79,7 @@ static_assert(sizeof(PacketConcatenater) == 0x8, "sizeof PacketConcatenater");
 class SendFragmentPacketConcatenater : public PacketConcatenater
 {
 public:
-    // ❓ The constructor is inlined (Clone 0x1220, HandleCacheGateFragmentRelay 0x5880). Packet has no constructor.
+    // LIFT: The constructor is inlined (Clone 0x1220, HandleCacheGateFragmentRelay 0x5880). Packet has no constructor.
     SendFragmentPacketConcatenater()
     {
         _packet.Splitter = nullptr;
@@ -103,7 +103,7 @@ static_assert(offsetof(SendFragmentPacketConcatenater, _packet) == 0x8, "SendFra
 class PacketDecomposer : public PacketFormatIterator
 {
 public:
-    virtual void Reset()  // ❓ no out-of-line copy in LobbyGate.exe
+    virtual void Reset()  // LIFT: no out-of-line copy in LobbyGate.exe
     {
         index = 0;
         offset = 0;

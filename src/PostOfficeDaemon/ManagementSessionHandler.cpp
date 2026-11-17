@@ -16,7 +16,7 @@ wchar_t const* const MANAGEMENT_SESSION_FILE = L"ManagementSessionHandler.cpp"; 
 static wchar_t const* const MODULE_NAME = L"management session handler";  // PDB MODULE_NAME
 }
 
-// ❓ no out-of-line copy found
+// LIFT: no out-of-line copy found
 ManagementSessionHandler::~ManagementSessionHandler()
 {
 }
@@ -105,7 +105,7 @@ bool ManagementSessionHandler::PacketHandler(Session const* session, Packet cons
     return false;
 }
 
-// ❓ inlined in each caller
+// LIFT: inlined in each caller
 void ManagementSessionHandler::SendTextReply(Session const* session, Packet* reply, wchar_t const* text1,
                                              wchar_t const* text2)
 {
@@ -114,6 +114,6 @@ void ManagementSessionHandler::SendTextReply(Session const* session, Packet* rep
     reply->ListHead->encrypt(session->_currentCrypt, session->_security3rd);
     Session* lockedSession = const_cast<Session*>(session);  // the original locks through a const session
     lockedSession->_lock.Enter();
-    session->send(&buffer, 1);  // ❓ inlined send
+    session->send(&buffer, 1);  // LIFT: inlined send
     lockedSession->_lock.Leave();
 }

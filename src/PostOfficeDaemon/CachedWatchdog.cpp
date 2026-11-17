@@ -18,7 +18,7 @@ static wchar_t const* const MODULE_NAME = L"cached watchdog";  // PDB MODULE_NAM
         AlertSender::Write(CACHED_WATCHDOG_FILE, line, fmt, __VA_ARGS__);      \
     } while (0)
 
-static bool isStopState(int state)  // ❓ inlined switch
+static bool isStopState(int state)  // LIFT: inlined switch
 {
     return state == Daemon::STATE_STOPPED || state == Daemon::STATE_STOPPING ||
            state == Daemon::STATE_COOLDOWNING || state == Daemon::STATE_COOLDOWNED;
@@ -262,7 +262,7 @@ bool CachedWatchdogManager::AddNextPing(unsigned short wid)
     return cachedWatchdog->addTimer(false);
 }
 
-// ❓ inlined in PingRelayContext::processRelayResponse (0xabd0). The name comes from the log text.
+// LIFT: inlined in PingRelayContext::processRelayResponse (0xabd0). The name comes from the log text.
 unsigned long long const CachedWatchdogManager::GetCurrentPingSeq(unsigned short const wid) const
 {
     CachedWatchdog* const cachedWatchdog = getCachedWatchdog(wid);

@@ -114,12 +114,12 @@ private:
     void* _events[4];
 
     friend class Daemon;
-    friend class CacheD;  // ❓ CacheD::Initialize (CacheGate 0x2430) calls addNode (inlined SetInvalidInfo).
-    friend class CacheDChannel;  // ❓ CacheDChannel::onClose (CacheGate 0x3E40) calls addNode (inlined SetInvalidInfo).
-    friend class LobbyD;  // ❓ LobbyD::Hello (LobbyGate 0x9bd0) uses _invalid and addNode (inlined SetInvalidInfo).
+    friend class CacheD;  // LIFT: CacheD::Initialize (CacheGate 0x2430) calls addNode (inlined SetInvalidInfo).
+    friend class CacheDChannel;  // LIFT: CacheDChannel::onClose (CacheGate 0x3E40) calls addNode (inlined SetInvalidInfo).
+    friend class LobbyD;  // LIFT: LobbyD::Hello (LobbyGate 0x9bd0) uses _invalid and addNode (inlined SetInvalidInfo).
     friend class LobbyDSessionHandler;  // ❓ OnConnect/OnClose (LobbyGate 0x9310, 0x94c0) use _invalid and addNode.
-    friend class LobbyGate;  // ❓ LobbyGate::reload (LobbyGate 0x13770) calls addNode (inlined SetInvalidInfo).
-    friend class PostOfficeDaemon;  // ❓ initNetwork (PostOfficeDaemon 0x135e0) inlines SetInvalidInfo.
+    friend class LobbyGate;  // LIFT: LobbyGate::reload (LobbyGate 0x13770) calls addNode (inlined SetInvalidInfo).
+    friend class PostOfficeDaemon;  // LIFT: initNetwork (PostOfficeDaemon 0x135e0) inlines SetInvalidInfo.
     friend class LobbyGateReloadInvalidRestoreTimer;  // ❓ restoreInvalid (LobbyGate 0x127a0) uses _invalid.
 };
 static_assert(sizeof(PipeConsole) == 0x10AA8, "sizeof PipeConsole");

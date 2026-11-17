@@ -9,7 +9,7 @@ class ThreadManager;
 class Thread
 {
 public:
-    Thread() : _id(0), _lastExecuted(0), _maxFrozenSeconds(0), _threadManager(nullptr), _run(false) {}  // ❓ inlined
+    Thread() : _id(0), _lastExecuted(0), _maxFrozenSeconds(0), _threadManager(nullptr), _run(false) {}  // LIFT: inlined
     virtual ~Thread();                     // slot 0
     virtual void yield();                  // slot 1
     virtual wchar_t const* Name() = 0;     // slot 2
@@ -38,7 +38,7 @@ static_assert(offsetof(Thread, _run) == 0x28, "Thread::_run");
 class ThreadManager
 {
 public:
-    ThreadManager() : _maxThreadCount(0), _runningThreadCount(0), _threads(nullptr), _threadHandles(nullptr), _now(_time64(nullptr)) {}  // ❓ inlined in Daemon::Start (0xad50)
+    ThreadManager() : _maxThreadCount(0), _runningThreadCount(0), _threads(nullptr), _threadHandles(nullptr), _now(_time64(nullptr)) {}  // LIFT: inlined in Daemon::Start (0xad50)
     ~ThreadManager();
     bool Initialize(unsigned int maxThreadCount);
     bool StartThread(Thread* thread, unsigned long long* threadId);

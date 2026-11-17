@@ -108,7 +108,7 @@ static void hash(unsigned int* X, unsigned int* MDbuf)
     MDbuf[0] = ddd;
 }
 
-// 0x27FC0 (folded with Rsa::KeySize). ❓ No Ripemd128::GetType symbol.
+// 0x27FC0 (folded with Rsa::KeySize). LIFT: No Ripemd128::GetType symbol.
 int Ripemd128::GetType() const
 {
     return 0;

@@ -9,7 +9,7 @@ class Daemon;
 class WinServiceConsole : public Console
 {
 public:
-    // ❓ Inlined in makeConsole (0xa540). The PDB has no out-of-line copy.
+    // LIFT: Inlined in makeConsole (0xa540). The PDB has no out-of-line copy.
     WinServiceConsole();
     virtual ~WinServiceConsole() {}          // slot 0 (0x17600, folded)
     virtual bool Writable();                 // slot 1

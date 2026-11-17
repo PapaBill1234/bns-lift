@@ -144,7 +144,7 @@ void* DaemonConfig::AllocConfig(unsigned long long size)
     return Memory::_Manager[1]->Alloc(size, L"source\\DaemonConfig.cpp", 110);
 }
 
-// ❓ inline only (seen in 0x13e0 and 0x1600)
+// LIFT: inline only (seen in 0x13e0 and 0x1600)
 void DaemonConfig::FreeConfig(void* config)
 {
     Memory::_Manager[1]->Free(config, L"source\\DaemonConfig.cpp", 115);

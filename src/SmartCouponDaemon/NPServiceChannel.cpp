@@ -23,7 +23,7 @@ static wchar_t const NPMESSAGEHANDLER_FILE[] = L"NPMessageHandler.cpp";
 namespace
 {
 // ❓ Not in the PDB. The log reads id128 as a GUID (Data1, Data2, Data3, Data4[8]).
-struct GuidParts  // ❓ lift helper name, not in any PDB
+struct GuidParts  // LIFT: lift helper name, not in any PDB
 {
     unsigned long id1;
     unsigned short id2;

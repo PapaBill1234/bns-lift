@@ -45,7 +45,7 @@ static_assert(offsetof(EventNotiJob, _managementReason) == 0x88, "EventNotiJob::
 class SendRetryCouponPublicationOkEvent : public DynamicEventObject
 {
 public:
-    // ❓ Inlined in EventNotiJob::finalize (0x9CC0).
+    // LIFT: Inlined in EventNotiJob::finalize (0x9CC0).
     SendRetryCouponPublicationOkEvent(long long tid, long long acceptTid) : _tid(tid), _acceptTid(acceptTid) {}
     virtual ~SendRetryCouponPublicationOkEvent();                    // 0x9980
     virtual unsigned int EventId() const;                            // 0x9970
@@ -59,7 +59,7 @@ static_assert(offsetof(SendRetryCouponPublicationOkEvent, _tid) == 0x18, "SendRe
 class SendRetryCouponPublicationFailEvent : public DynamicEventObject
 {
 public:
-    // ❓ Inlined in EventNotiJob::finalize (0x9CC0).
+    // LIFT: Inlined in EventNotiJob::finalize (0x9CC0).
     SendRetryCouponPublicationFailEvent(long long tid, short reason) : _tid(tid), _reason(reason) {}
     virtual ~SendRetryCouponPublicationFailEvent();                  // 0x99C0
     virtual unsigned int EventId() const;                            // 0x99B0

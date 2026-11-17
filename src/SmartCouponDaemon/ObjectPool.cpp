@@ -11,7 +11,7 @@
 static wchar_t const* const kObjPoolFile = L"..\\LobbyDaemon\\ObjectPool.cpp";
 static unsigned long long const kObjPoolGuard = 0xB10D1C2FB10D1C2FULL;
 
-static wchar_t const* descOf(ObjPool const* pool)  // ❓ inlined helper
+static wchar_t const* descOf(ObjPool const* pool)  // LIFT: inlined helper
 {
     return pool->_desc != nullptr ? pool->_desc : L"null";
 }

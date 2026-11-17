@@ -41,7 +41,7 @@ public:
     unsigned long long _count;
     unsigned char* _buffer;
 
-    friend class RawPacketBufferHandler;  // ❓ ToPacket (0x21860) calls the inlined grow path.
+    friend class RawPacketBufferHandler;  // LIFT: ToPacket (0x21860) calls the inlined grow path.
     friend class TextStreamPacketBufferHandler;  // ❓ ToPacket (0x2C570) calls grow.
 };
 static_assert(sizeof(GrowingBuffer) == 0x30, "sizeof GrowingBuffer");

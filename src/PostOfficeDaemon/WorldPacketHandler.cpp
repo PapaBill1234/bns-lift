@@ -24,7 +24,7 @@ namespace
 wchar_t const* const WORLD_PACKET_HANDLER_FILE = L"WorldPacketHandler.cpp";  // ❓ name
 static wchar_t const* const MODULE_NAME = L"world packet handler";  // PDB MODULE_NAME
 
-// ❓ inline of the RelayContextManager id generator
+// LIFT: inline of the RelayContextManager id generator
 unsigned long long liftNextRelayTid()
 {
     long long volatile* const idSeed = reinterpret_cast<long long volatile*>(&RelayContextManager::_idSeed);
@@ -58,7 +58,7 @@ unsigned short const CheckPostCapacityRelayContext::GetRequestWid() const
     return _request._requestWid;
 }
 
-// 0x1f800 ❓ folded: the vtable of RetrieveCharacterInfoRelayContext points to the same body.
+// 0x1f800 LIFT: folded: the vtable of RetrieveCharacterInfoRelayContext points to the same body.
 unsigned short const RetrieveCharacterInfoRelayContext::GetRequestWid() const
 {
     return _request._requestWid;
@@ -552,7 +552,7 @@ bool HandlePostOfficeServiceRegisterPostReq(Session const* session, Packet const
         attachedItemList[i]._itemAmount = itemInfo._itemAmount;
         wcsncpy(attachedItemList[i]._itemXmlData, itemInfo._itemXmlData, 0x401);
         {
-            // ❓ inlined RepeatPacketDecomposer step to the next repeat.
+            // LIFT: inlined RepeatPacketDecomposer step to the next repeat.
             int const top = pcb->decomposer.top;
             pcb->decomposer.index = pcb->decomposer.start[top] + 1;
             --pcb->decomposer.counts[top];

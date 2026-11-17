@@ -4,7 +4,7 @@
 
 namespace
 {
-// ❓ No PDB symbol. The compiler put this loop inline. It counts the zero bits above the top set bit.
+// LIFT: No PDB symbol. The compiler put this loop inline. It counts the zero bits above the top set bit.
 int leadingZeros(unsigned int value, unsigned int const* bitTable)
 {
     int count = 0;

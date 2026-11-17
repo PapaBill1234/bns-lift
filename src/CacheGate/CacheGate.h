@@ -33,7 +33,7 @@ static_assert(offsetof(CacheGateConfig, _wid) == 0x34, "CacheGateConfig::_wid");
 class CacheGate : public Daemon
 {
 public:
-    // ❓ The constructor is inlined in wmain (0x4180).
+    // LIFT: The constructor is inlined in wmain (0x4180).
     CacheGate() : _clientManager(nullptr) {}
     virtual ~CacheGate();                                    // 0x4290
     virtual wchar_t const* ShortName();                      // 0x4050

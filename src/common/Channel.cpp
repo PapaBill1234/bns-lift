@@ -63,7 +63,7 @@ bool Channel::MakeSession(unsigned int portId, unsigned long ip, unsigned short 
         return false;
     }
 
-    // ❓ LTCG folded the nagle argument. Session::Connect (0xE570) reads port->_nagle.
+    // LIFT: LTCG folded the nagle argument. Session::Connect (0xE570) reads port->_nagle.
     if (port->MakeNewSession(ip, portNo, this, timeout, port->_nagle, reconnect, &_session))
         return true;
 
@@ -113,7 +113,7 @@ void Channel::RemoveSession(Session const* session, bool forceNow)
         Daemon* daemon = Daemon::Instance;
         _waitForRelease = true;
         _session->_waitForRelease = true;
-        // ❓ LTCG folded the callback (removeSession) and ref3 (nullptr) into DelayedRelease::Add.
+        // LIFT: LTCG folded the callback (removeSession) and ref3 (nullptr) into DelayedRelease::Add.
         daemon->GlobalDelayedRelease->Add(GetTickCount64() - Daemon::Instance->StartSystemTick64, &Channel::removeSession,
                                           this, _session, nullptr);
     }

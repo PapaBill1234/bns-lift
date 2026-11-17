@@ -19,7 +19,7 @@ extern "C" ZSTD_CCtx_s* ZSTD_createCCtx_advanced(ZSTD_customMem customMem);  // 
 class IoWorker : public Thread
 {
 public:
-    // ❓ Inlined in Network::initWorkerThread (0xD8E0). It sets _maxFrozenSeconds to 60 and the TLS ZstdCCtx to null.
+    // LIFT: Inlined in Network::initWorkerThread (0xD8E0). It sets _maxFrozenSeconds to 60 and the TLS ZstdCCtx to null.
     IoWorker() : _workerId(0), _networkInstance(nullptr), _failedEventHandler(nullptr)
     {
         _maxFrozenSeconds = 60;

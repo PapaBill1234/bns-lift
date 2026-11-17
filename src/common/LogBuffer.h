@@ -36,7 +36,7 @@ extern ConsoleLog::Type const CONSOLE_LOG_TYPE[11];
 class LogBuffer : public RefCntObject, public ConsoleLog
 {
 public:
-    LogBuffer()  // ❓ inlined in LogBufferPool::allocate (0x20200) and LogBufferAllocator::allocate (0x20500)
+    LogBuffer()  // LIFT: inlined in LogBufferPool::allocate (0x20200) and LogBufferAllocator::allocate (0x20500)
         : _flush(false)
     {
         _ref = 1;
@@ -74,7 +74,7 @@ static_assert(offsetof(LogBuffer, _log) == 0x86, "LogBuffer::_log");
 class LogBufferPool
 {
 public:
-    LogBufferPool() : _count(0), _pool(nullptr) {}  // ❓ inlined in LogBufferAllocator::Initialize (0x203D0)
+    LogBufferPool() : _count(0), _pool(nullptr) {}  // LIFT: inlined in LogBufferAllocator::Initialize (0x203D0)
     LogBuffer* allocate();
     void deallocate(LogBuffer* logbuf);
 

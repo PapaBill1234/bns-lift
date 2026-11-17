@@ -17,13 +17,13 @@ static wchar_t const* const MODULE_NAME = L"relay context";  // PDB MODULE_NAME
         AlertSender::Write(CHECK_POST_CAPACITY_RELAY_FILE, line, fmt, __VA_ARGS__);         \
     } while (0)
 
-// ❓ folded with 0x34c40
+// LIFT: folded with 0x34c40
 bool CheckPostCapacityRelayContext::ComposeRequestPacket(FragmentPacket&) const
 {
     return true;
 }
 
-// ❓ folded with 0x34c40
+// LIFT: folded with 0x34c40
 bool CheckPostCapacityRelayContext::ComposeResponsePacket(FragmentPacket&) const
 {
     return true;

@@ -10,7 +10,7 @@ class Packet;
 class AgentChannel : public Channel
 {
 public:
-    // ❓ Inlined in HandlePostOfficeHelloReq (0x1a6f0).
+    // LIFT: Inlined in HandlePostOfficeHelloReq (0x1a6f0).
     AgentChannel(unsigned short agentWid, char connectionType) : _agentWid(agentWid), _connectionType(connectionType) {}
     virtual ~AgentChannel();                  // 0x1f620 (scalar deleting destructor)
     virtual unsigned long long GetId();       // 0x1a6e0
@@ -30,7 +30,7 @@ public:
     CriticalSection _lock;
     AgentChannel* _postAgentChannel;
 
-    // ❓ Inlined at 0x14090.
+    // LIFT: Inlined at 0x14090.
     AgentChannelManager() : _lock(4000), _postAgentChannel(nullptr) {}
 };
 static_assert(sizeof(AgentChannelManager) == 0x30, "sizeof AgentChannelManager");

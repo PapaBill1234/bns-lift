@@ -36,7 +36,7 @@ int const kItemColumnCount = 7;
 
 wchar_t* Query(wchar_t const* text) { return const_cast<wchar_t*>(text); }
 
-// ❓ Not a PDB function. The 87 column binds are inlined in each loader. This keeps the order and types.
+// LIFT: Not a PDB function. The 87 column binds are inlined in each loader. This keeps the order and types.
 bool BindPostColumns(DbTransaction* tran, PostInfo& postInfo, AttachedItemInfo* items, unsigned long long* postLen,
                      unsigned long long (*itemLen)[kItemColumnCount])
 {
@@ -72,13 +72,13 @@ bool BindPostColumns(DbTransaction* tran, PostInfo& postInfo, AttachedItemInfo* 
     return true;
 }
 
-void ClearRow(PostInfo& postInfo, AttachedItemInfo* items)  // ❓ lift helper name, not in any PDB
+void ClearRow(PostInfo& postInfo, AttachedItemInfo* items)  // LIFT: lift helper name, not in any PDB
 {
     memset(&postInfo, 0, sizeof(postInfo));
     memset(items, 0, sizeof(AttachedItemInfo) * kMaxAttachedItem);
 }
 
-// ❓ Not a PDB function. Inlined in each loader: allocate the PostContext and copy the fetched row.
+// LIFT: Not a PDB function. Inlined in each loader: allocate the PostContext and copy the fetched row.
 PostContext* MakePostContext(PostInfo const& postInfo, AttachedItemInfo* items,
                              unsigned long long (*itemLen)[kItemColumnCount], int contextLine, int itemLine)
 {
@@ -395,7 +395,7 @@ bool PostOfficeDB::RegisterPost(int* dbRetValue, PostInfo* postInfo, AttachedIte
 
 namespace
 {
-// ❓ Not a PDB function. The two UpdateStatusToDelivery* functions have the same body (inlined twice).
+// LIFT: Not a PDB function. The two UpdateStatusToDelivery* functions have the same body (inlined twice).
 bool UpdatePostStatus(int* dbRetValue, long long postId, wchar_t const* fn, wchar_t const* query, int acquireLine,
                       int prepareLine, int bindLine, int executeLine)
 {

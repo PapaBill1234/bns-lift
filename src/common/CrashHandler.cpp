@@ -222,7 +222,7 @@ void CrashHandler::SetLogPath(wchar_t const* path)
     long long start = Daemon::Instance->StartTime;
     tm startTime;
     _localtime64_s(&startTime, &start);
-    swprintf(daemonName, 260, L"%s(", Daemon::Instance->ShortName());  // ❓ inline CRT swprintf 0x21CE0
+    swprintf(daemonName, 260, L"%s(", Daemon::Instance->ShortName());  // LIFT: inline CRT swprintf 0x21CE0
     length = wcslen(daemonName);
     wcsftime(&daemonName[length], 260 - length, L"%Y%m%d-%H%M%S", &startTime);
     length = wcslen(daemonName);

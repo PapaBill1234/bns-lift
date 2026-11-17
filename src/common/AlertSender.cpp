@@ -22,7 +22,7 @@ AlertSender AlertSender::_alertSender;
 // 0x18A10 (SmartCouponDaemon)
 AlertSender::AlertSender()
 {
-    _maxFrozenSeconds = 60;  // ❓ The inlined Thread constructor in this exe writes 60.
+    _maxFrozenSeconds = 60;  // LIFT: The inlined Thread constructor in this exe writes 60.
     _bufferList._head = nullptr;
     _bufferList._tail = nullptr;
     _bufferList._count = 0;

@@ -79,7 +79,7 @@ private:
     void clearPool();                              // 0x195A0
 
 public:
-    // ❓ Inlined in Network::OpenPort (0xD2C0). The message is from source\\Port.cpp line 330.
+    // LIFT: Inlined in Network::OpenPort (0xD2C0). The message is from source\\Port.cpp line 330.
     bool StartAccept();
 
 public:

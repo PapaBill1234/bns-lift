@@ -9,7 +9,7 @@ class Packet;
 class Channel : public DynamicRefCntObj
 {
 public:
-    Channel() : _session(nullptr), _useDelayedRemove(false), _waitForRelease(false) {}  // ❓ inlined in the callers
+    Channel() : _session(nullptr), _useDelayedRemove(false), _waitForRelease(false) {}  // LIFT: inlined in the callers
     virtual ~Channel();                                                // 0x103C0
     virtual void SetSession(Session const* session);                   // 0x10560 (slot 4)
     virtual void RemoveSession(Session const* session, bool forceNow); // 0x10620 (slot 5)
@@ -29,7 +29,7 @@ public:
     bool _useDelayedRemove;
     bool _waitForRelease;
 
-    friend class DelayedRelease;  // ❓ access for DelayedRelease::Add, LTCG folded the callback
+    friend class DelayedRelease;  // LIFT: access for DelayedRelease::Add, LTCG folded the callback
 };
 static_assert(sizeof(Channel) == 0x28, "sizeof Channel");
 static_assert(offsetof(Channel, _session) == 0x18, "Channel::_session");
@@ -54,7 +54,7 @@ static_assert(sizeof(SessionHandler) == 0x8, "sizeof SessionHandler");
 class DaemonChannel : public SessionHandler
 {
 public:
-    DaemonChannel() : ConnectedSessionCount(0) {}  // ❓ inlined in the callers
+    DaemonChannel() : ConnectedSessionCount(0) {}  // LIFT: inlined in the callers
     virtual ~DaemonChannel();                                                    // 0x108A0
     virtual bool OnAccept(Session const* session) const;                         // 0x108B0
     virtual bool OnConnect(Session const* session, bool firstConnected) const;   // 0x108E0

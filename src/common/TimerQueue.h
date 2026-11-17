@@ -93,7 +93,7 @@ public:
     friend class Daemon;
     friend class Session;  // ❓ access for Session::tryReconnect, reconnect, close (Add/Remove)
     friend class ObjPoolTimer;       // ❓ access for ObjPoolTimer::Start (0x1940, SmartCouponDaemon)
-    friend class SmartCouponDaemon;  // ❓ access for the inlined ObjPoolTimer stop in shutdown (0x15AD0)
+    friend class SmartCouponDaemon;  // LIFT: access for the inlined ObjPoolTimer stop in shutdown (0x15AD0)
     friend class NPPing;             // ❓ access for NPPing::HandleEvent (0x4490, SmartCouponDaemon)
     friend class NPChannel;          // ❓ access for NPChannel::onConnect (0x5AD0, SmartCouponDaemon)
     friend class LobbyGate;                           // ❓ access for LobbyGate (LobbyGate.obj)

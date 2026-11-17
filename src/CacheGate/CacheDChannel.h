@@ -9,7 +9,7 @@ class Packet;
 class CacheDChannel : public ClientSideDaemonChannel
 {
 public:
-    // ❓ The constructor is inlined in wmain (0x4180). It sets the fields to 0.
+    // LIFT: The constructor is inlined in wmain (0x4180). It sets the fields to 0.
     CacheDChannel()
     {
         PortId = 0;

@@ -62,7 +62,7 @@ bool SessionPool::Initialize(int maxSession, int prepareRatio, bool useUnusedSes
         AlertSender::Write(PORT_FILE, 54, L"== CRASH == [port], session pool is already initialized, id: %d", _portId);
         return false;
     }
-    // ❓ LTCG folded useUnusedSessionReadOnly to false (the binary stores 0).
+    // LIFT: LTCG folded useUnusedSessionReadOnly to false (the binary stores 0).
     _useUnusedSessionReadOnly = useUnusedSessionReadOnly;
     int count = prepareRatio * maxSession / 100;
     for (int i = 0; i < count; ++i)
@@ -169,7 +169,7 @@ bool Port::Initialize(unsigned int id, unsigned short portNumber, unsigned int m
         PORT_ASSERT_CRASH(216);
     _id = id;
     _portNumber = portNumber;
-    _nagle = nagle;  // ❓ LTCG folded nagle to false (the binary stores 0).
+    _nagle = nagle;  // LIFT: LTCG folded nagle to false (the binary stores 0).
     _maxSession = maxSession;
     _sessionHandler = sessionHandler;
     _bufferHandler = bufferHandler->Clone(nullptr);
@@ -254,7 +254,7 @@ void Port::Clear()
     }
 }
 
-// ❓ Inlined in Network::OpenPort (0xD2C0).
+// LIFT: Inlined in Network::OpenPort (0xD2C0).
 bool Port::StartAccept()
 {
     if (_listener == nullptr)

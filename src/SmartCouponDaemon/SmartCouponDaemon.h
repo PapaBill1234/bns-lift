@@ -45,7 +45,7 @@ static_assert(offsetof(SmartCouponConfig, _serviceWid) == 0x50, "SmartCouponConf
 class SmartCouponDaemon : public Daemon
 {
 public:
-    // ❓ The constructor is inlined in wmain (0x14B70).
+    // LIFT: The constructor is inlined in wmain (0x14B70).
     SmartCouponDaemon() : _config(nullptr), _gameEventConfig(nullptr), _wid(0)
     {
         _npChannelMgr = nullptr;

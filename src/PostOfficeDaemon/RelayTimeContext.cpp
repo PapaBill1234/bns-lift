@@ -16,7 +16,7 @@ static wchar_t const* const MODULE_NAME = L"relaytime context";  // PDB MODULE_N
         AlertSender::Write(RELAY_TIME_CONTEXT_FILE, line, fmt, __VA_ARGS__);                  \
     } while (0)
 
-// ❓ inlined in RelayTimeContextManager::AddContext (0xb2a0)
+// LIFT: inlined in RelayTimeContextManager::AddContext (0xb2a0)
 RelayTimeContext::RelayTimeContext(unsigned long long relayTid, RelayContext* const relayContext)
     : _relayTid(relayTid), _relayContext(relayContext), _disuse(false)
 {

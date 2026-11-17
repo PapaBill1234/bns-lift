@@ -11,7 +11,7 @@ class IdleWatcher;
 class IdleStateTable
 {
 public:
-    IdleStateTable() : _port(nullptr), _maxIdleTime(60), _disconnect(false), _size(0), _table(nullptr) {}  // ❓ inlined in Create (0x24CD0)
+    IdleStateTable() : _port(nullptr), _maxIdleTime(60), _disconnect(false), _size(0), _table(nullptr) {}  // LIFT: inlined in Create (0x24CD0)
 
     static IdleStateTable* Create(Port* port, int size, long maxIdleTime, bool disconnect);  // 0x24CD0
 
@@ -40,7 +40,7 @@ static_assert(offsetof(IdleStateTable, _table) == 0x18, "IdleStateTable::_table"
 class IdleWatcher : public Thread
 {
 public:
-    IdleWatcher()  // ❓ inlined in Network::SetMaxIdleTime (0x20860)
+    IdleWatcher()  // LIFT: inlined in Network::SetMaxIdleTime (0x20860)
     {
         _maxFrozenSeconds = 60;
         memset(_table, 0, sizeof(_table));

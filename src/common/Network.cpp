@@ -177,7 +177,7 @@ void Network::Clear()
             Instance->_port[i] = nullptr;
         }
     }
-    _InterlockedDecrement(&s_initializedCount);  // ❓ inlined PacketCrypt clean-up
+    _InterlockedDecrement(&s_initializedCount);  // LIFT: inlined PacketCrypt clean-up
     if (Instance->_iocpHandle != nullptr)
         CloseHandle(Instance->_iocpHandle);
     // BUG: 0xCFD0 Instance and EndEventObject are not released and WSACleanup is not called.
@@ -255,7 +255,7 @@ bool Network::OpenPort(unsigned int portId, unsigned short portNo, SessionHandle
 
     void* memory = BaseMemoryManager::_Instance.Alloc(sizeof(Port), NETWORK_FILE, 184);
     Port* port = memory != nullptr ? new (memory) Port() : nullptr;
-    // ❓ LTCG folded Port::Initialize (0x28E10): initialMode 2, enableRecv true, nagle false.
+    // LIFT: LTCG folded Port::Initialize (0x28E10): initialMode 2, enableRecv true, nagle false.
     if (!port->Initialize(portId, portNo, maxSession, 2, true, false, Instance->_iocpHandle, sessionHandler,
                           bufferHandler))
     {

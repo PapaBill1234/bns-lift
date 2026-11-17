@@ -17,7 +17,7 @@ namespace
 wchar_t const* const GAME_EVENT_CONFIG_FILE = L"..\\Shared\\CouponGameEventConfig.cpp";  // ❓ name
 }
 
-// ❓ Inlined in each fail path: write the start log to the console, then wait 5 seconds.
+// LIFT: Inlined in each fail path: write the start log to the console, then wait 5 seconds.
 void GameEventConfig::writeStartLog(Console* console, wchar_t const* message)
 {
     if (console != nullptr)

@@ -48,25 +48,25 @@ DeliverPostRelayContext::~DeliverPostRelayContext()
     }
 }
 
-// ❓ folded with 0xfb40 (PingRelayContext::GetRequestWid)
+// LIFT: folded with 0xfb40 (PingRelayContext::GetRequestWid)
 unsigned short const DeliverPostRelayContext::GetRequestWid() const
 {
     return _economyHeader._fromWid;
 }
 
-// ❓ folded with 0x34c40
+// LIFT: folded with 0x34c40
 bool DeliverPostRelayContext::ComposeRequestPacket(Packet&) const
 {
     return true;
 }
 
-// ❓ folded with 0x34c40
+// LIFT: folded with 0x34c40
 bool DeliverPostRelayContext::ComposeResponsePacket(FragmentPacket&) const
 {
     return true;
 }
 
-// ❓ folded with 0x34c40
+// LIFT: folded with 0x34c40
 bool DeliverPostRelayContext::ComposeResponsePacket(Packet&) const
 {
     return true;

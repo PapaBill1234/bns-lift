@@ -15,14 +15,14 @@ inline unsigned short FreeBody(FragmentPacket* fp)
     return fp->packet.CurHeader != nullptr ? static_cast<unsigned short>(4000 - fp->packet.CurHeader->size) : 0;
 }
 
-inline void Reserve(FragmentPacket* fp, unsigned long long size)  // ❓ lift helper name, not in any PDB
+inline void Reserve(FragmentPacket* fp, unsigned long long size)  // LIFT: lift helper name, not in any PDB
 {
     Packet::Header* header = fp->packet.CurHeader;
     if (header == nullptr || static_cast<unsigned short>(4000 - header->size) < size)
         fp->packet.Allocate(&fp->composer);
 }
 
-inline void ReserveVar(FragmentPacket* fp, unsigned long long size)  // ❓ lift helper name, not in any PDB
+inline void ReserveVar(FragmentPacket* fp, unsigned long long size)  // LIFT: lift helper name, not in any PDB
 {
     if (FreeBody(fp) < size)
         fp->packet.Allocate(&fp->composer);

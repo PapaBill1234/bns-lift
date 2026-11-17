@@ -12,7 +12,7 @@ class ThreadManager;
 class GameEventWorker : public Thread
 {
 public:
-    // ❓ Inlined in GameEventManager::initWorkerThread (0xAE20).
+    // LIFT: Inlined in GameEventManager::initWorkerThread (0xAE20).
     GameEventWorker() : _workerId(0), _mgrInstance(nullptr), _failedEventHandler(nullptr) { _maxFrozenSeconds = 60; }
     virtual ~GameEventWorker() {}
     virtual wchar_t const* Name();  // 0xAA80
@@ -60,7 +60,7 @@ static_assert(offsetof(GameEventManager, _gameEventHandle) == 0x10, "GameEventMa
 class GameEventEndEvent : public DynamicEventObject
 {
 public:
-    // ❓ Inlined in GameEventManager::GameEventManager (0xAAE0).
+    // LIFT: Inlined in GameEventManager::GameEventManager (0xAAE0).
     GameEventEndEvent() { _tag = 1546; }
     virtual unsigned int EventId() const;                       // 0x231F0
     virtual bool HandleEvent(EventContext* ctx, unsigned long);  // 0xAAD0
@@ -71,7 +71,7 @@ static_assert(sizeof(GameEventEndEvent) == 0x18, "sizeof GameEventEndEvent");
 class GameEventLogEvent : public DynamicEventObject
 {
 public:
-    // ❓ Inlined in GameEventManager::PostGameEventLogList (0xB140).
+    // LIFT: Inlined in GameEventManager::PostGameEventLogList (0xB140).
     GameEventLogEvent()
         : _gameEventLogId(0), _wid(0), _pcdbid(0), _gameEventId(0), _eventTargetType(0)
     {

@@ -41,7 +41,7 @@ long NPPing::_interval = 0;
 static __declspec(thread) unsigned char t_buildBuffer[64000];
 static __declspec(thread) char t_addressBuffer[32];
 
-// ❓ Packet has no constructor. The original sets these fields inline.
+// LIFT: Packet has no constructor. The original sets these fields inline.
 static void zeroPacket(Packet* packet)
 {
     packet->Splitter = nullptr;
@@ -52,7 +52,7 @@ static void zeroPacket(Packet* packet)
     packet->ListTail = nullptr;
 }
 
-// ❓ Inlined Session::GetChannel with the add-ref (Session.cpp line 1051).
+// LIFT: Inlined Session::GetChannel with the add-ref (Session.cpp line 1051).
 static Channel* acquireChannel(Session const* session)
 {
     Channel* channel = session->_channel;
@@ -64,7 +64,7 @@ static Channel* acquireChannel(Session const* session)
     return nullptr;
 }
 
-static NPChannel* ownerOf(Channel* channel)  // ❓ lift helper name, not in any PDB
+static NPChannel* ownerOf(Channel* channel)  // LIFT: lift helper name, not in any PDB
 {
     return static_cast<NPChannel*>(static_cast<SharedChannel::RawChannel*>(channel)->_owner);
 }
@@ -472,7 +472,7 @@ bool NPChannel::SendMsg(_StsMsg* msg, bool response, void* context)
                     PacketBuffer const* head = p.ListHead;
                     p.ListHead->encrypt(s->_currentCrypt, s->_security3rd);
                     s->_lock.Enter();
-                    s->send(&head, 1);  // ❓ inlined send
+                    s->send(&head, 1);  // LIFT: inlined send
                     s->_lock.Leave();
                     s->removeReferenceCount(CHANNEL_H_FILE, 52);
                 }

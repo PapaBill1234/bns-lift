@@ -38,7 +38,7 @@ CacheD::~CacheD()
 bool CacheD::TryConnect()
 {
     _lock.Enter();
-    // ❓ LTCG folded the portId (2), timeout and reconnect arguments.
+    // LIFT: LTCG folded the portId (2), timeout and reconnect arguments.
     bool result = MakeSession(2, _addr, _port, 0, true);
     _lock.Leave();
     return result;
@@ -134,7 +134,7 @@ bool CacheDList::MakeSessionAll()
         {
             // Inlined CacheD::TryConnect.
             cached->_lock.Enter();
-            bool connected = cached->MakeSession(2, cached->_addr, cached->_port, 0, true);  // ❓ folded args
+            bool connected = cached->MakeSession(2, cached->_addr, cached->_port, 0, true);  // LIFT: folded args
             cached->_lock.Leave();
             if (connected)
                 Log::Write(Log::LT_DEBUG, CACHED_FILE, 169, L"[cached list], connect, wid:%d, ipAddress:%s",
