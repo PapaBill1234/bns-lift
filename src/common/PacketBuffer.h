@@ -7,6 +7,10 @@
 
 class PagePoolMemoryManager;
 
+// PDB global typedef (S_UDT ExternalCompressFunc, type 0x11FD, LobbyGate).
+typedef int (*ExternalCompressFunc)(unsigned char* dest, int* destLen, unsigned char const* src, int srcLen,
+                                    unsigned char const* dict, int dictSize);
+
 class PacketCrypt
 {
 public:
@@ -30,6 +34,19 @@ public:
         FAILED_SET_EXT_COMP_FUNC = 15,
         FAILED_COMP = 16,
     };
+    enum Code
+    {
+        NONE = 0,
+        INITIAL_KEY = 4,
+        CLI_HANDSHAKE_KEY = 5,
+        SESSION_KEY_1 = 8,
+        SESSION_KEY_2 = 9,
+        SESSION_KEY_1_AND_3RD_PARTY = 10,
+        SESSION_KEY_2_AND_3RD_PARTY = 11,
+        BROADCAST_LOCAL_KEY = 12,
+        BROADCAST_LOCAL_KEY_COMPRESS = 13,
+        BROADCAST_GLOBAL_KEY = 14,
+    };
     enum Type
     {
         NO_CRYPT = 0x0,
@@ -37,14 +54,6 @@ public:
         HANDSHAKE_CRYPT = 0x2,
         SESSION_CRYPT = 0x3,
         BROADCAST_CRYPT = 0x4,
-    };
-    enum Algorithm
-    {
-        ALGORITHM_DEFAULT = 0x0,
-        ALGORITHM_TYPE1 = 0x1,
-        ALGORITHM_TYPE2 = 0x2,
-        ALGORITHM_TYPE3 = 0x3,
-        ALGORITHM_TYPE4 = 0x4,
     };
     enum Param
     {
@@ -54,20 +63,53 @@ public:
         PARAM_BROADCAST_GLOBAL = 0x3,
         PARAM_BROADCAST_LOCAL_COMPRESS = 0x4,
     };
+    enum Algorithm
+    {
+        ALGORITHM_DEFAULT = 0x0,
+        ALGORITHM_TYPE1 = 0x1,
+        ALGORITHM_TYPE2 = 0x2,
+        ALGORITHM_TYPE3 = 0x3,
+        ALGORITHM_TYPE4 = 0x4,
+    };
+    enum CompressType
+    {
+        COMPRESS_NONE = 0,
+        COMPRESS_TYPE1 = 1,
+        COMPRESS_TYPE2 = 2,
+    };
+    typedef unsigned char Byte;
+    union Header
+    {
+        struct
+        {
+            unsigned short size : 12;
+            unsigned short code : 4;
+        } enc;
+        struct
+        {
+            unsigned short size : 14;
+            unsigned short code : 2;
+        } plain;
+    };
+
     static ErrCode Setup(int maxSize);  // 0x327E0 (PacketCrypt module, not in this card)
     static int InstanceSize(Type type, Algorithm algorithm);                                   // 0x4CC60 (LobbyGate, PacketCrypt module)
     static PacketCrypt* Create(Type type, Algorithm algorithm, unsigned char* buffer, int size);  // 0x4CCE0 (LobbyGate, PacketCrypt module)
+
+protected:
     static int _MaxSize;
 
-    virtual int GetType() = 0;                                                     // slot 0
-    virtual int SetEncryptParam(int param) = 0;                                    // slot 1
-    virtual int SetKey(unsigned char const* key, int keySize) = 0;                 // slot 2
-    virtual int GenerateKey(unsigned char* key1, int* size1, unsigned char* key2, int* size2) = 0;  // slot 3
-    virtual int Encrypt(unsigned char* buffer, int* bufferSize, int size, bool with3rdParty) = 0;   // slot 4
-    virtual int Decrypt(unsigned char* buffer, int size, int* outSize, bool* with3rdParty) = 0;     // slot 5
-    virtual int SetExternalCompressFunc(void* func, unsigned char const* data, int size) = 0;        // slot 6
+public:
+    virtual int GetType() = 0;                                                        // slot 0
+    virtual ErrCode SetEncryptParam(Param param) = 0;                                 // slot 1
+    virtual ErrCode SetKey(unsigned char const* key, int keySize) = 0;                // slot 2
+    virtual ErrCode GenerateKey(unsigned char* key1, int* size1, unsigned char* key2, int* size2) = 0;  // slot 3
+    virtual ErrCode Encrypt(unsigned char* buffer, int* bufferSize, int size, bool with3rdParty) = 0;   // slot 4
+    virtual ErrCode Decrypt(unsigned char* buffer, int size, int* outSize, bool* with3rdParty) = 0;     // slot 5
+    virtual ErrCode SetExternalCompressFunc(ExternalCompressFunc func, unsigned char const* data, int size) = 0;  // slot 6
     virtual ~PacketCrypt() {}  // slot 7, vector deleting destructor (BroadcastPacketCrypt 0x4DBB0, LobbyGate)
 };
+static_assert(sizeof(PacketCrypt::Header) == 0x2, "sizeof PacketCrypt::Header");
 static_assert(sizeof(PacketCrypt) == 0x8, "sizeof PacketCrypt");
 
 class Security3rdParty
