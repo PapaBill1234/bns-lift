@@ -11,7 +11,7 @@
 #include <new>
 
 #include "AlertSender.h"
-#include "BnsCommonConfig.h"
+#include "BnsCommonConfigDefinition.h"
 #include "Client.h"
 #include "Console.h"
 #include "ContentsRuleConfigDefinition.h"

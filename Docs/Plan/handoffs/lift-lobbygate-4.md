@@ -8,7 +8,7 @@
   0x4DF30, 0x4DF40. Layout with static_asserts in src/common/Security.h.
 - CMake exe target `LobbyGate` (lift_exe) links. build/LobbyGate.exe is built.
 - BnsCommonConfig _Def compare: the three tables (0x140092640, 0x140092780, 0x1400925f0) match
-  src/common/BnsCommonConfig.cpp. No difference. The RVA comments in BnsCommonConfig.h are CacheGate RVAs.
+  src/common/BnsCommonConfigDefinition.cpp. No difference. The RVA comments in BnsCommonConfigDefinition.h are CacheGate RVAs.
 
 ## Not done (stub bodies, TODO(lift-lobbygate-4))
 - compress2 ❓ 0x4DFE0 (src/common/Security.cpp): returns -2. zlib is not in the tree.

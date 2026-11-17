@@ -40,7 +40,7 @@ long long Daemon::Now = 0;
 wchar_t const* Daemon::StateString[10] = {
     L"UNKNOWN", L"STOPPED", L"STOPPING", L"STARTING", L"RUNNING",
     L"INVALID", L"FLUSHING", L"COOLDOWNING", L"COOLDOWNED", L"RELOADING",
-};  // ❓ strings from the STATE enum names; check them in .rdata
+};  // 0x59180
 RUN_MODE RunMode = static_cast<RUN_MODE>(-1);  // ❓ initial data is 0xFFFFFFFF
 int const CONFIG_DIR_OPTION_LEN = 6;            // wcslen(L"--conf")
 

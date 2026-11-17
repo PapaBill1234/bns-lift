@@ -64,7 +64,7 @@ add_library(lift_common STATIC
   src/common/WinServiceConsole.cpp
   src/common/Daemon.cpp
   src/common/DaemonConfig.cpp
-  src/common/BnsCommonConfig.cpp
+  src/common/BnsCommonConfigDefinition.cpp
   src/common/Crypto.cpp
   src/common/aes128.cpp
   src/common/aes128Table.cpp

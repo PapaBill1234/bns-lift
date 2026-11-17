@@ -19,7 +19,7 @@ struct _cidraddress
 };
 static_assert(sizeof(_cidraddress) == 0x8, "sizeof _cidraddress");
 
-// ❓ The enum has no name in the PDB. Values from the IDA type of RunMode.
+// PDB: the enum has no name (type <unnamed-type-RunMode>, 0x304D). The value names are PDB names.
 enum RUN_MODE  // ❓ name
 {
     DAEMON_MODE = 0,
@@ -34,8 +34,7 @@ void BloodDaemonMain(int argc, wchar_t** argv);  // 0xa690
 class Daemon
 {
 public:
-    // ❓ The enum names are not in the PDB. The values come from Daemon::StateString.
-    enum STATE  // ❓ name
+    enum DaemonState  // PDB type 0x259A
     {
         STATE_UNKNOWN = 0,
         STATE_STOPPED = 1,
@@ -47,9 +46,10 @@ public:
         STATE_COOLDOWNING = 7,
         STATE_COOLDOWNED = 8,
         STATE_RELOADING = 9,
+        STATE_MAX = 10,
     };
 
-    // ❓ The member layout is from the IDA union $4BB7D1A1B0DCAF0AB4C1CFFB1F93E3C4.
+    // PDB type 0x25E8: unit and version are at offset 0.
     struct Version
     {
         union

@@ -12,10 +12,10 @@
 
 namespace
 {
-// Function types of the XmlReader_sv64.dll exports.  // ❓ names
-// GetInterfaceVersionFunc, CreateXmlReaderFunc and DestroyXmlReaderFunc are in XmlReader.h.
-typedef XmlConfigReader* (*CreateXmlConfigReaderFunc)(XmlReader*);   // ❓
-typedef void (*DestroyXmlConfigReaderFunc)(XmlConfigReader* config); // ❓
+// Function types of the XmlReader_sv64.dll exports (PDB typedefs).
+// XriGetInterfaceVersion, XriCreateFunc and XriDestoryFunc are in XmlReader.h.
+typedef XmlConfigReader const* (*XciCreateFunc)(XmlReader const*);
+typedef void (*XciDestoryFunc)(XmlConfigReader const*);
 
 wchar_t const* const XML_READER_DLL = L"XmlReader_sv64.dll";  // ❓ name
 wchar_t const* const XML_READER_VERSION = L"15";              // ❓ name
@@ -45,12 +45,12 @@ void* DaemonConfig::Load(XmlCfgDef const* def, int count, unsigned long long siz
         return nullptr;
     }
 
-    GetInterfaceVersionFunc getInterfaceVersion =
-        reinterpret_cast<GetInterfaceVersionFunc>(GetProcAddress(module, "GetInterfaceVersion"));
+    XriGetInterfaceVersion getInterfaceVersion =
+        reinterpret_cast<XriGetInterfaceVersion>(GetProcAddress(module, "GetInterfaceVersion"));
     GetProcAddress(module, "SetMemAllocator");
-    CreateXmlReaderFunc createXmlReader = reinterpret_cast<CreateXmlReaderFunc>(GetProcAddress(module, "CreateXmlReader"));
-    DestroyXmlReaderFunc destroyXmlReader =
-        reinterpret_cast<DestroyXmlReaderFunc>(GetProcAddress(module, "DestroyXmlReader"));
+    XriCreateFunc createXmlReader = reinterpret_cast<XriCreateFunc>(GetProcAddress(module, "CreateXmlReader"));
+    XriDestoryFunc destroyXmlReader =
+        reinterpret_cast<XriDestoryFunc>(GetProcAddress(module, "DestroyXmlReader"));
 
     if (_wcsicmp(XML_READER_VERSION, getInterfaceVersion()) != 0)
     {
@@ -66,7 +66,7 @@ void* DaemonConfig::Load(XmlCfgDef const* def, int count, unsigned long long siz
         return nullptr;
     }
 
-    XmlReader* reader = createXmlReader();
+    XmlReader const* reader = createXmlReader();
     if (reader == nullptr)
     {
         if (console != nullptr)
@@ -90,11 +90,11 @@ void* DaemonConfig::Load(XmlCfgDef const* def, int count, unsigned long long siz
         return nullptr;
     }
 
-    CreateXmlConfigReaderFunc createXmlConfigReader =
-        reinterpret_cast<CreateXmlConfigReaderFunc>(GetProcAddress(module, "CreateXmlConfigReader"));
-    DestroyXmlConfigReaderFunc destroyXmlConfigReader =
-        reinterpret_cast<DestroyXmlConfigReaderFunc>(GetProcAddress(module, "DestroyXmlConfigReader"));
-    XmlConfigReader* config = createXmlConfigReader(reader);
+    XciCreateFunc createXmlConfigReader =
+        reinterpret_cast<XciCreateFunc>(GetProcAddress(module, "CreateXmlConfigReader"));
+    XciDestoryFunc destroyXmlConfigReader =
+        reinterpret_cast<XciDestoryFunc>(GetProcAddress(module, "DestroyXmlConfigReader"));
+    XmlConfigReader const* config = createXmlConfigReader(reader);
     GetProcAddress(module, "EncodeToConfigPacket");
     GetProcAddress(module, "DecodeFromConfigPacket");
 
@@ -170,30 +170,30 @@ void DaemonConfig::Dump(wchar_t const* name, void const* config, XmlCfgDef const
         void const* field = base + def.offset;
         switch (def.type)
         {
-        case XML_CFG_TYPE_INT:
+        case XmlCfgDef::CFG_INT:
             Log::Write(Log::LT_DEBUG, file, 141, L"[%s], %s : %d", name, def.name, *static_cast<int const*>(field));
             break;
-        case XML_CFG_TYPE_INT64:
+        case XmlCfgDef::CFG_INT64:
             Log::Write(Log::LT_DEBUG, file, 142, L"[%s], %s : %I64d", name, def.name,
                        *static_cast<long long const*>(field));
             break;
-        case XML_CFG_TYPE_FLOAT:
+        case XmlCfgDef::CFG_FLOAT:
             Log::Write(Log::LT_DEBUG, file, 143, L"[%s], %s : %f", name, def.name,
                        static_cast<double>(*static_cast<float const*>(field)));
             break;
-        case XML_CFG_TYPE_BOOL:
+        case XmlCfgDef::CFG_BOOL:
             Log::Write(Log::LT_DEBUG, file, 144, L"[%s], %s : %s", name, def.name,
                        *static_cast<bool const*>(field) ? L"yes" : L"no");
             break;
-        case XML_CFG_TYPE_ADDRESS:
+        case XmlCfgDef::CFG_IP:
         {
             unsigned long long address = *static_cast<unsigned long long const*>(field);
             wchar_t const* text = address != 0 ? Network::GetAddressStringW(static_cast<unsigned long>(address)) : L"N/A";
             Log::Write(Log::LT_DEBUG, file, 148, L"[%s], %s : %s", name, def.name, text);
             break;
         }
-        case XML_CFG_TYPE_WSTRING:
-        case XML_CFG_TYPE_WSTRING2:
+        case XmlCfgDef::CFG_STR:
+        case XmlCfgDef::CFG_DIR:
         {
             wchar_t const* text = *static_cast<wchar_t const* const*>(field);
             if (text == nullptr || *text == 0)
@@ -201,7 +201,7 @@ void DaemonConfig::Dump(wchar_t const* name, void const* config, XmlCfgDef const
             Log::Write(Log::LT_DEBUG, file, 156, L"[%s], %s : %s", name, def.name, text);
             break;
         }
-        case XML_CFG_TYPE_STRING:
+        case XmlCfgDef::CFG_ANSI:
         {
             temp[0] = 0;
             char const* text = *static_cast<char const* const*>(field);

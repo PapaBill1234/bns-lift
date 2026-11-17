@@ -9,7 +9,7 @@
 #include <new>
 
 #include "AlertSender.h"
-#include "BnsCommonConfig.h"
+#include "BnsCommonConfigDefinition.h"
 #include "CacheGateSessionHandler.h"
 #include "ClientManager.h"
 #include "Console.h"
@@ -33,23 +33,23 @@ static int const DEFAULT_PUBLIC_PORT = 20800;  // ❓ name
 // 0x596c0
 XmlCfgDef const CacheGateConfig::_Def[13] = {
     {static_cast<unsigned long long>(-1), nullptr, 0, 0, nullptr, L"path"},
-    {offsetof(CacheGateConfig, _rootPath), L"root-path", XML_CFG_TYPE_WSTRING2, 1, nullptr, L"full root path"},
-    {offsetof(CacheGateConfig, _logPath), L"log-path", XML_CFG_TYPE_WSTRING2, 1, nullptr, L"full log path"},
-    {offsetof(CacheGateConfig, _configPath), L"config-path", XML_CFG_TYPE_WSTRING2, 1, nullptr, L"full config path"},
+    {offsetof(CacheGateConfig, _rootPath), L"root-path", XmlCfgDef::CFG_DIR, 1, nullptr, L"full root path"},
+    {offsetof(CacheGateConfig, _logPath), L"log-path", XmlCfgDef::CFG_DIR, 1, nullptr, L"full log path"},
+    {offsetof(CacheGateConfig, _configPath), L"config-path", XmlCfgDef::CFG_DIR, 1, nullptr, L"full config path"},
     {static_cast<unsigned long long>(-1), L"system configuration", 0, 0, nullptr, nullptr},
-    {offsetof(CacheGateConfig, _workerThreadCount), L"worker-thread", XML_CFG_TYPE_INT, 0, nullptr,
+    {offsetof(CacheGateConfig, _workerThreadCount), L"worker-thread", XmlCfgDef::CFG_INT, 0, nullptr,
      L"0 is system recommend"},
-    {offsetof(CacheGateConfig, _dumpType), L"dump-type", XML_CFG_TYPE_INT, 0, &DEFAULT_DUMP_TYPE,
+    {offsetof(CacheGateConfig, _dumpType), L"dump-type", XmlCfgDef::CFG_INT, 0, &DEFAULT_DUMP_TYPE,
      L"0: no dump, 1: minimal dump(default), 2: full dump"},
-    {offsetof(CacheGateConfig, _maxCachedSessionCount), L"max-cached-session-count", XML_CFG_TYPE_INT, 1, nullptr,
+    {offsetof(CacheGateConfig, _maxCachedSessionCount), L"max-cached-session-count", XmlCfgDef::CFG_INT, 1, nullptr,
      L"max session count for connect to cached. 0 is system default."},
-    {offsetof(CacheGateConfig, _maxPublicSessionCount), L"max-public-session-count", XML_CFG_TYPE_INT, 1, nullptr,
+    {offsetof(CacheGateConfig, _maxPublicSessionCount), L"max-public-session-count", XmlCfgDef::CFG_INT, 1, nullptr,
      L"max session count for public port. 0 is system default."},
     {static_cast<unsigned long long>(-1), L"network configuration", 0, 0, nullptr, nullptr},
-    {offsetof(CacheGateConfig, _publicPort), L"public-port", XML_CFG_TYPE_INT, 0, &DEFAULT_PUBLIC_PORT,
+    {offsetof(CacheGateConfig, _publicPort), L"public-port", XmlCfgDef::CFG_INT, 0, &DEFAULT_PUBLIC_PORT,
      L"daemon public access port"},
     {static_cast<unsigned long long>(-1), L"economy service configuration", 0, 0, nullptr, nullptr},
-    {offsetof(CacheGateConfig, _wid), L"wid", XML_CFG_TYPE_INT, 0, nullptr, L"cachegate wid"},
+    {offsetof(CacheGateConfig, _wid), L"wid", XmlCfgDef::CFG_INT, 0, nullptr, L"cachegate wid"},
 };
 
 // 0x4050

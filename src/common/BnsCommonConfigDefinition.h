@@ -1,4 +1,4 @@
-// BnsCommonConfigDefinition.obj (CacheGate PDB).  // ❓ file name
+// BnsCommonConfigDefinition.obj (CacheGate PDB).
 // Layout from include/pdb/CacheGate/types.h lines 877-927.
 #pragma once
 #include "DaemonConfig.h"

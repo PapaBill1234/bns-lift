@@ -185,11 +185,11 @@ bool CacheDList::LoadCachedListConfigFile(wchar_t const* fileName, bool reload)
         return false;
     }
 
-    GetInterfaceVersionFunc getVersion = reinterpret_cast<GetInterfaceVersionFunc>(GetProcAddress(module, "GetInterfaceVersion"));
-    SetMemAllocatorFunc setAllocator = reinterpret_cast<SetMemAllocatorFunc>(GetProcAddress(module, "SetMemAllocator"));
+    XriGetInterfaceVersion getVersion = reinterpret_cast<XriGetInterfaceVersion>(GetProcAddress(module, "GetInterfaceVersion"));
+    XriSetMemAllocator setAllocator = reinterpret_cast<XriSetMemAllocator>(GetProcAddress(module, "SetMemAllocator"));
     (void)setAllocator;  // The function does not call it.
-    CreateXmlReaderFunc createReader = reinterpret_cast<CreateXmlReaderFunc>(GetProcAddress(module, "CreateXmlReader"));
-    DestroyXmlReaderFunc destroyReader = reinterpret_cast<DestroyXmlReaderFunc>(GetProcAddress(module, "DestroyXmlReader"));
+    XriCreateFunc createReader = reinterpret_cast<XriCreateFunc>(GetProcAddress(module, "CreateXmlReader"));
+    XriDestoryFunc destroyReader = reinterpret_cast<XriDestoryFunc>(GetProcAddress(module, "DestroyXmlReader"));
 
     wchar_t const* version = getVersion();
     if (version == nullptr)
@@ -203,7 +203,7 @@ bool CacheDList::LoadCachedListConfigFile(wchar_t const* fileName, bool reload)
 
     bool result = false;
     _lock.Enter();
-    XmlReader* reader = createReader();
+    XmlReader const* reader = createReader();
     if (reader == nullptr)
     {
         result = true;  // BUG: 0x2b20 a failed reader gives success.

@@ -13,7 +13,7 @@
 
 #include "AgentChannel.h"
 #include "AlertSender.h"
-#include "BnsCommonConfig.h"
+#include "BnsCommonConfigDefinition.h"
 #include "CacheGateChannel.h"
 #include "CachedWatchdog.h"
 #include "Console.h"
@@ -58,40 +58,40 @@ static int const DEFAULT_SERVICE_WORLD_ID = 1010;
 // 0x97ab0
 XmlCfgDef const PostOfficeConfig::_Def[23] = {
     {static_cast<unsigned long long>(-1), nullptr, 0, 0, nullptr, L"path"},
-    {offsetof(PostOfficeConfig, _rootPath), L"root-path", XML_CFG_TYPE_WSTRING2, 1, nullptr, L"full root path"},
-    {offsetof(PostOfficeConfig, _logPath), L"log-path", XML_CFG_TYPE_WSTRING2, 1, nullptr, L"full log path"},
-    {offsetof(PostOfficeConfig, _configPath), L"config-path", XML_CFG_TYPE_WSTRING2, 1, nullptr, L"full config path"},
+    {offsetof(PostOfficeConfig, _rootPath), L"root-path", XmlCfgDef::CFG_DIR, 1, nullptr, L"full root path"},
+    {offsetof(PostOfficeConfig, _logPath), L"log-path", XmlCfgDef::CFG_DIR, 1, nullptr, L"full log path"},
+    {offsetof(PostOfficeConfig, _configPath), L"config-path", XmlCfgDef::CFG_DIR, 1, nullptr, L"full config path"},
     {static_cast<unsigned long long>(-1), nullptr, 0, 0, nullptr, L"certification"},
-    {offsetof(PostOfficeConfig, _certFile), L"cert-file", XML_CFG_TYPE_STRING, 1, nullptr, L"certification file path"},
+    {offsetof(PostOfficeConfig, _certFile), L"cert-file", XmlCfgDef::CFG_ANSI, 1, nullptr, L"certification file path"},
     {static_cast<unsigned long long>(-1), nullptr, 0, 0, nullptr, L"system configuration"},
-    {offsetof(PostOfficeConfig, _workerThreadCount), L"worker-thread", XML_CFG_TYPE_INT, 0, nullptr,
+    {offsetof(PostOfficeConfig, _workerThreadCount), L"worker-thread", XmlCfgDef::CFG_INT, 0, nullptr,
      L"0 is system recommend"},
-    {offsetof(PostOfficeConfig, _maxAgentSessionCount), L"max-agent-session-count", XML_CFG_TYPE_INT, 0, nullptr,
+    {offsetof(PostOfficeConfig, _maxAgentSessionCount), L"max-agent-session-count", XmlCfgDef::CFG_INT, 0, nullptr,
      L"0 is default"},
-    {offsetof(PostOfficeConfig, _maxWorldSessionCount), L"max-world-session-count", XML_CFG_TYPE_INT, 0, nullptr,
+    {offsetof(PostOfficeConfig, _maxWorldSessionCount), L"max-world-session-count", XmlCfgDef::CFG_INT, 0, nullptr,
      L"0 is default"},
-    {offsetof(PostOfficeConfig, _dumpType), L"dump-type", XML_CFG_TYPE_INT, 0, &DEFAULT_DUMPTYPE,
+    {offsetof(PostOfficeConfig, _dumpType), L"dump-type", XmlCfgDef::CFG_INT, 0, &DEFAULT_DUMPTYPE,
      L"0: no dump, 1: minimal dump(default), 2: full dump"},
-    {offsetof(PostOfficeConfig, _relayTimeoutInterval), L"relay-timeout-interval", XML_CFG_TYPE_INT, 0,
+    {offsetof(PostOfficeConfig, _relayTimeoutInterval), L"relay-timeout-interval", XmlCfgDef::CFG_INT, 0,
      &DEFAULT_RELAY_TIMEOUT_INTERVAL, L"relay timeout interval(sec). default = 15"},  // ❓ text tail
-    {offsetof(PostOfficeConfig, _pingInterval), L"ping-interval", XML_CFG_TYPE_INT, 0, &DEFAULT_PING_INTERVAL,
+    {offsetof(PostOfficeConfig, _pingInterval), L"ping-interval", XmlCfgDef::CFG_INT, 0, &DEFAULT_PING_INTERVAL,
      L"ping interval with cached(sec). default = 60"},
-    {offsetof(PostOfficeConfig, _deliveryRetryInterval), L"delivery-retry-interval", XML_CFG_TYPE_INT, 0,
+    {offsetof(PostOfficeConfig, _deliveryRetryInterval), L"delivery-retry-interval", XmlCfgDef::CFG_INT, 0,
      &DEFAULT_DELIVERY_RETRY_INTERVAL, L"delivery retry interval(sec). default = 5"},  // ❓ text tail
     {static_cast<unsigned long long>(-1), nullptr, 0, 0, nullptr, L"network configuration"},
-    {offsetof(PostOfficeConfig, _agentListenPort), L"agent-listen-port", XML_CFG_TYPE_INT, 0, &DEFAULT_AGENT_LISTEN_PORT,
+    {offsetof(PostOfficeConfig, _agentListenPort), L"agent-listen-port", XmlCfgDef::CFG_INT, 0, &DEFAULT_AGENT_LISTEN_PORT,
      L"agent listen port"},
-    {offsetof(PostOfficeConfig, _worldListenPort), L"world-listen-port", XML_CFG_TYPE_INT, 0, &DEFAULT_WORLD_LISTEN_PORT,
+    {offsetof(PostOfficeConfig, _worldListenPort), L"world-listen-port", XmlCfgDef::CFG_INT, 0, &DEFAULT_WORLD_LISTEN_PORT,
      L"world listen port"},
-    {offsetof(PostOfficeConfig, _managePort), L"manage-port", XML_CFG_TYPE_INT, 0, &DEFAULT_MANAGE_PORT,
+    {offsetof(PostOfficeConfig, _managePort), L"manage-port", XmlCfgDef::CFG_INT, 0, &DEFAULT_MANAGE_PORT,
      L"daemon debug port"},
     {static_cast<unsigned long long>(-1), nullptr, 0, 0, nullptr, L"cachegate configuration"},
-    {offsetof(PostOfficeConfig, _cachegateIpAddr), L"cachegate-ip-address", XML_CFG_TYPE_ADDRESS, 0, &a127001,
+    {offsetof(PostOfficeConfig, _cachegateIpAddr), L"cachegate-ip-address", XmlCfgDef::CFG_IP, 0, &a127001,
      L"cachegate ip address"},
-    {offsetof(PostOfficeConfig, _cachegateListenPort), L"cachegate_listen-port", XML_CFG_TYPE_INT, 0,
+    {offsetof(PostOfficeConfig, _cachegateListenPort), L"cachegate_listen-port", XmlCfgDef::CFG_INT, 0,
      &DEFAULT_CACHEGATE_LISTEN_PORT, L"cachegate listen port"},
     {static_cast<unsigned long long>(-1), nullptr, 0, 0, nullptr, L"economy service configuration"},
-    {offsetof(PostOfficeConfig, _serviceWid), L"service-world-id", XML_CFG_TYPE_INT, 1, &DEFAULT_SERVICE_WORLD_ID,
+    {offsetof(PostOfficeConfig, _serviceWid), L"service-world-id", XmlCfgDef::CFG_INT, 1, &DEFAULT_SERVICE_WORLD_ID,
      L"service world id"},
 };
 

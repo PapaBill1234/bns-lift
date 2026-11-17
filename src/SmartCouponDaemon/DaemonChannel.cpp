@@ -65,7 +65,7 @@ bool DChannelMgr::SetupDaemonListFromXml(wchar_t const* xml)
 
     std::vector<DaemonInfo, StlAllocator<DaemonInfo, 2> > tempDaemonList;
     bool result = false;
-    XmlReader* reader = nullptr;
+    XmlReader const* reader = nullptr;
     XmlDoc* doc = nullptr;
     DaemonInfo** list = nullptr;
     int count = 0;
@@ -81,12 +81,12 @@ bool DChannelMgr::SetupDaemonListFromXml(wchar_t const* xml)
         return false;
     }
 
-    GetInterfaceVersionFunc getInterfaceVersion =
-        reinterpret_cast<GetInterfaceVersionFunc>(GetProcAddress(library, "GetInterfaceVersion"));
+    XriGetInterfaceVersion getInterfaceVersion =
+        reinterpret_cast<XriGetInterfaceVersion>(GetProcAddress(library, "GetInterfaceVersion"));
     GetProcAddress(library, "SetMemAllocator");
-    CreateXmlReaderFunc createXmlReader = reinterpret_cast<CreateXmlReaderFunc>(GetProcAddress(library, "CreateXmlReader"));
-    DestroyXmlReaderFunc destroyXmlReader =
-        reinterpret_cast<DestroyXmlReaderFunc>(GetProcAddress(library, "DestroyXmlReader"));
+    XriCreateFunc createXmlReader = reinterpret_cast<XriCreateFunc>(GetProcAddress(library, "CreateXmlReader"));
+    XriDestoryFunc destroyXmlReader =
+        reinterpret_cast<XriDestoryFunc>(GetProcAddress(library, "DestroyXmlReader"));
 
     reader = createXmlReader();
     if (reader == nullptr)

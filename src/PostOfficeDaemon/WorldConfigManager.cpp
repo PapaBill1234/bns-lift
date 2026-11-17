@@ -238,13 +238,13 @@ bool WorldConfigManager::loadWorldConfigFile(WorldConfigList* worldConfigList)
                    L"loadWorldConfigFile", XML_READER_DLL);
         return false;
     }
-    GetInterfaceVersionFunc getInterfaceVersion =
-        reinterpret_cast<GetInterfaceVersionFunc>(GetProcAddress(library, "GetInterfaceVersion"));
+    XriGetInterfaceVersion getInterfaceVersion =
+        reinterpret_cast<XriGetInterfaceVersion>(GetProcAddress(library, "GetInterfaceVersion"));
     GetProcAddress(library, "SetMemAllocator");
-    CreateXmlReaderFunc createXmlReader = reinterpret_cast<CreateXmlReaderFunc>(GetProcAddress(library, "CreateXmlReader"));
-    DestroyXmlReaderFunc destroyXmlReader =
-        reinterpret_cast<DestroyXmlReaderFunc>(GetProcAddress(library, "DestroyXmlReader"));
-    XmlReader* reader = createXmlReader();
+    XriCreateFunc createXmlReader = reinterpret_cast<XriCreateFunc>(GetProcAddress(library, "CreateXmlReader"));
+    XriDestoryFunc destroyXmlReader =
+        reinterpret_cast<XriDestoryFunc>(GetProcAddress(library, "DestroyXmlReader"));
+    XmlReader const* reader = createXmlReader();
     XmlDoc* doc = nullptr;
     if (reader == nullptr)
     {

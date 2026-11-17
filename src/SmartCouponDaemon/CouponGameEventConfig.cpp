@@ -70,13 +70,13 @@ bool GameEventConfig::SetupGameEventListFromXml(wchar_t const* xml)
     }
 
     // BUG: 0x2c80 DestroyXmlReader and FreeLibrary are never called. The reader, the doc and the dll leak.
-    GetInterfaceVersionFunc getInterfaceVersion =
-        reinterpret_cast<GetInterfaceVersionFunc>(GetProcAddress(library, "GetInterfaceVersion"));
+    XriGetInterfaceVersion getInterfaceVersion =
+        reinterpret_cast<XriGetInterfaceVersion>(GetProcAddress(library, "GetInterfaceVersion"));
     GetProcAddress(library, "SetMemAllocator");
-    CreateXmlReaderFunc createXmlReader = reinterpret_cast<CreateXmlReaderFunc>(GetProcAddress(library, "CreateXmlReader"));
+    XriCreateFunc createXmlReader = reinterpret_cast<XriCreateFunc>(GetProcAddress(library, "CreateXmlReader"));
     GetProcAddress(library, "DestroyXmlReader");
 
-    XmlReader* reader = createXmlReader();
+    XmlReader const* reader = createXmlReader();
     if (reader == nullptr)
     {
         wchar_t const* message = L"[game-event-cfg], setup game event list fail, create xmlreader fail";

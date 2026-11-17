@@ -63,6 +63,58 @@ def sections(server):
     return [0] + [struct.unpack_from("<I", d, base + 40 * i + 12)[0] for i in range(n)]
 
 
+_IMG = {}
+
+
+def image(server):
+    """(data, [(va, vsize, raw offset, raw size)], image base) of the exe."""
+    if server not in _IMG:
+        with open(os.path.join(ida_dir(), server, server + ".exe"), "rb") as f:
+            d = f.read()
+        pe = struct.unpack_from("<I", d, 0x3C)[0]
+        n = struct.unpack_from("<H", d, pe + 6)[0]
+        opt = struct.unpack_from("<H", d, pe + 20)[0]
+        base = struct.unpack_from("<Q", d, pe + 24 + 24)[0]
+        t = pe + 24 + opt
+        secs = [struct.unpack_from("<IIII", d, t + 40 * i + 8) for i in range(n)]
+        _IMG[server] = (d, [(va, vs, ro, rs) for vs, va, rs, ro in secs], base)
+    return _IMG[server]
+
+
+def read(server, rva, size):
+    d, secs, _b = image(server)
+    for va, vs, ro, rs in secs:
+        if va <= rva < va + max(vs, rs):
+            o = rva - va
+            return d[ro + o:ro + o + size] if o < rs else b"\0" * size
+    return b""
+
+
+def value(server, rva, ty):
+    """Text of the initial value of a datum, for simple types."""
+    _d, _s, base = image(server)
+
+    def text(a, wide):
+        raw = read(server, a - base, 400)
+        if wide:
+            e = next((i for i in range(0, len(raw) - 1, 2) if raw[i:i + 2] == b"\0\0"), len(raw))
+            return 'L"%s"' % raw[:e].decode("utf-16-le", "replace")
+        return '"%s"' % raw.split(b"\0")[0].decode("latin-1")
+    try:
+        if "wchar_t*" in ty or "char*" in ty:
+            a = struct.unpack("<Q", read(server, rva, 8))[0]
+            return "= " + (text(a, "wchar_t" in ty) if a else "nullptr")
+        if re.search(r"\((const )?(unsigned )?(int|long|short)\)", ty):
+            return "= %d" % struct.unpack("<i", read(server, rva, 4))[0]
+        if re.search(r"\((const )?(unsigned )?__int64\)", ty):
+            return "= %d" % struct.unpack("<q", read(server, rva, 8))[0]
+        if re.search(r"\((const )?bool\)", ty):
+            return "= %d" % read(server, rva, 1)[0]
+    except (struct.error, IndexError):
+        pass
+    return ""
+
+
 def rx(p):
     if re.search(r"[.*+?\[\]()|^$\\]", p):
         return re.compile(p)
@@ -111,7 +163,8 @@ def cmd_data(server, pat):
             d = " ".join(det)
             a = rva_of(secs, d)
             d = re.sub(r", addr = [\d:]+", "", d)
-            row = "%s  %s  %s  [%s]" % (name, d, "rva 0x%X" % a if a is not None else "", mod)
+            row = "%s  %s  %s %s  [%s]" % (name, d, "rva 0x%X" % a if a is not None else "",
+                                           value(server, a, d) if a is not None else "", mod)
             if row not in seen:
                 seen.add(row)
                 print(row)
@@ -148,7 +201,7 @@ def cmd_fn(server, pat):
             d = " ".join(det)
             a = rva_of(secs, d) if kind == "S_LDATA32" else None
             print("    %-10s %s  %s%s" % (kind[2:].lower(), name, re.sub(r", addr = [\d:]+", "", d),
-                                          "  rva 0x%X" % a if a is not None else ""))
+                                          "  rva 0x%X %s" % (a, value(server, a, d)) if a is not None else ""))
 
 
 TREC = re.compile(r"^\s*(0x[0-9A-F]+) \| (LF_\w+) \[size = \d+\](?: `(.*)`)?\s*$")
@@ -192,7 +245,7 @@ def cmd_type(server, pat):
                     if m:
                         todo.append(int(m.group(0), 16))
                 elif x.startswith("- LF_ENUMERATE"):
-                    print("    " + x[15:-1])
+                    print("    " + x[16:-1])
                 elif x.startswith(("- LF_MEMBER", "- LF_BCLASS", "- LF_STMEMBER", "- LF_NESTTYPE", "- LF_VFUNCTAB",
                                    "- LF_ONEMETHOD", "- LF_METHOD")):
                     extra = lines[i + 1] if i + 1 < len(lines) and not lines[i + 1].startswith("- ") else ""

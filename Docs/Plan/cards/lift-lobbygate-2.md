@@ -7,7 +7,7 @@ Read `Docs/Plan/plan.md` "Lift method" first. Read the handoffs of the earlier l
 Function counts are PDB symbol counts. They include EH funclets (`dtor$N`, `catch$N`) and scalar deleting destructors. The real lift count is lower. Before you lift a function, look for it in `src/common/` (grep the PDB name). Do not lift it two times.
 - Missing functions in base modules: PipeConsole (17), AlertSender (12), Timer (10: `std::priority_queue<Timer*>`, TimerQueue), WindowConsole (8: WindowConsoleOnLogoff, WindowConsoleOnShutdown), Daemon (7: cooldown), TextConsole (7: Console base members), LogFile (5), BaseMemory (4: DumpLeak), MemoryManager (4: HeapMemoryManager::Clear), LogBuffer (3), Log (2), LogMedia (2), WinServiceConsole (2), RefCntObject (1), DaemonConfig (1), Thread (1), Console (1), DelayedRelease (1). About 88.
 - Crypto (BloodCrypto): NumberTheory (31 missing; `NumberTheory.cpp` is not in `lift_common` yet), rsa (26), dh (14), oaep_encoder (9), CryptoKey (6), biArithmetic (6 missing), ripemd128 (4), prng (4: Prng::Generate, GeneratePrime), ripemd160 (2), Crypto (2: InstanceSize, Create), aes128 (1), mgf (1). About 106.
-- Shared config: ContentsRuleConfigDefinition (9). Put it in `src/common/` like `BnsCommonConfig.cpp` ❓ (source path not in the PDB module name).
+- Shared config: ContentsRuleConfigDefinition (9). Put it in `src/common/` like `BnsCommonConfigDefinition.cpp` ❓ (source path not in the PDB module name).
 - About 203 symbols. Read `Docs/Plan/handoffs/lift-smartcoupondaemon-3.md` for the open crypto items (BUG addresses, `RSA = 65 // ❓`).
 - Add `LogFile.cpp` and `NumberTheory.cpp` to `lift_common`, if they are not in it.
 

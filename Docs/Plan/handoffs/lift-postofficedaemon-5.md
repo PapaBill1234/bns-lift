@@ -8,7 +8,7 @@
   vendor/zstd is not in this worktree, so the exe links src/crt/zstd_stub.c when the lift_zstd target is missing.
 - common: id128 in StringUtil.h (PDB guid layout + id[2]); Db.h/.cpp full-signature BindCol 0x2d010, BindParam 0x2d190.
 
-## PostOfficeConfig::_Def (0x97ab0, 23 rows) vs BnsCommonConfig.cpp:43-90
+## PostOfficeConfig::_Def (0x97ab0, 23 rows) vs BnsCommonConfigDefinition.cpp:43-90
 - PostOfficeConfig has no p-type, np-program-id, np-game-code, np-app-id or np-client-app-id rows. It does not use BnsCommonConfig.
 - It has its own rows: path (root/log/config), cert-file, worker-thread, max-agent/world-session-count, dump-type (2),
   relay-timeout-interval (15), ping-interval (60), delivery-retry-interval (5), agent/world/manage port (20500/20501/30500),
