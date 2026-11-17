@@ -253,7 +253,9 @@ add_library(lift_marketdealerdaemon STATIC
   src/Server/Economy/MarketDealerDaemon/SaleContext.cpp
   src/Server/Economy/MarketDealerDaemon/BidContext.cpp
   src/Server/Economy/MarketDealerDaemon/PurchaseContext.cpp
-  src/Server/Economy/MarketDealerDaemon/Postman.cpp)
+  src/Server/Economy/MarketDealerDaemon/Postman.cpp
+  src/Server/Economy/MarketDealerDaemon/DeliveryContext.cpp
+  src/Server/Economy/MarketDealerDaemon/TaxRateDataManager.cpp)
 target_compile_options(lift_marketdealerdaemon PRIVATE /GR-)
 target_include_directories(lift_marketdealerdaemon BEFORE PRIVATE ${LIFT_STL_INCLUDE})
 target_include_directories(lift_marketdealerdaemon PUBLIC ${LIFT_SRC_INCLUDE})

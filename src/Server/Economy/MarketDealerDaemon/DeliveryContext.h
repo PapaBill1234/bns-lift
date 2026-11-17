@@ -1,13 +1,15 @@
 // DeliveryContext.obj (MarketDealerDaemon PDB). Layouts from include/pdb/MarketDealerDaemon/types.h.
-// The functions of this module come from a later card.
 #pragma once
 #include <stddef.h>
+#include <map>
 #include "RefCntObject.h"
 #include "Lock.h"
+#include "StlMemory.h"
 #include "Participant.h"
 #include "MarketStatement.h"
 
 class FragmentPacket;
+class SaleItemInfo;
 
 class DeliveryInfo
 {
@@ -46,6 +48,8 @@ public:
         JOBSTATUS_MAX = 10,
     };
 
+    DeliveryInfo();  // 0x7100
+
     long long _deliveryId;
     char _deliveryReason;
     long long _saleId;
@@ -79,9 +83,11 @@ static_assert(offsetof(DeliveryItemInfo, _itemXmlData) == 0x20, "DeliveryItemInf
 class DeliveryContext : public DynamicRefCntObj
 {
 public:
-    virtual ~DeliveryContext();  // Later card.
+    DeliveryContext(DeliveryInfo const& deliveryInfo, SaleItemInfo const& saleItemInfo);  // 0x72a0
+    DeliveryContext(DeliveryInfo const& deliveryInfo, long long moneyAmount);             // 0x7370
+    virtual ~DeliveryContext();  // Inlined in the scalar deleting destructor 0x70c0.
 
-    bool ComposeReportPacket(FragmentPacket& packet) const;  // 0x7420. Later card.
+    bool ComposeReportPacket(FragmentPacket& packet) const;  // 0x7420
 
     CriticalSection _lock;
     DeliveryInfo _deliveryInfo;
@@ -89,6 +95,35 @@ public:
     long long _reportTime;
 };
 static_assert(sizeof(DeliveryContext) == 0x1270, "sizeof DeliveryContext");
+static_assert(offsetof(DeliveryContext, _lock) == 0x18, "DeliveryContext::_lock");
 static_assert(offsetof(DeliveryContext, _deliveryInfo) == 0x40, "DeliveryContext::_deliveryInfo");
 static_assert(offsetof(DeliveryContext, _deliveryItemInfo) == 0xA40, "DeliveryContext::_deliveryItemInfo");
 static_assert(offsetof(DeliveryContext, _reportTime) == 0x1268, "DeliveryContext::_reportTime");
+
+class DeliveryContextManager
+{
+public:
+    // LIFT: no typedef name in the PDB. Member type: std::map<__int64,DeliveryContext *,...,StlAllocator<...,2>>.
+    typedef std::map<long long, DeliveryContext*, std::less<long long>,
+                     StlAllocator<std::pair<long long const, DeliveryContext*>, 2> > Container;
+
+    bool InitContextManager();                                 // 0x7710
+    DeliveryContext* GetContext(long long deliveryId) const;   // 0x78a0. Adds a reference.
+    bool AddContext(DeliveryContext* const deliveryContext);   // 0x7b10
+    bool RemoveContext(long long deliveryId);                  // 0x7d70
+
+    int const _bucketCount;
+    CriticalSection* _lockList;
+    Container* _containerList;
+    long volatile _contextCount;  // The PDB type is int. The code uses Interlocked calls on it.
+
+    // LIFT: inlined in the MarketDealerDaemon code (later card).
+    explicit DeliveryContextManager(int bucketCount)
+        : _bucketCount(bucketCount), _lockList(nullptr), _containerList(nullptr), _contextCount(0)
+    {
+    }
+};
+static_assert(sizeof(DeliveryContextManager) == 0x20, "sizeof DeliveryContextManager");
+static_assert(offsetof(DeliveryContextManager, _lockList) == 0x8, "DeliveryContextManager::_lockList");
+static_assert(offsetof(DeliveryContextManager, _containerList) == 0x10, "DeliveryContextManager::_containerList");
+static_assert(offsetof(DeliveryContextManager, _contextCount) == 0x18, "DeliveryContextManager::_contextCount");
