@@ -405,7 +405,7 @@ Network* Network::initInstance(ThreadManager* threadManager)
 bool Network::initWorkerThread(void (*failedEventHandler)(EventObject*), unsigned int workerThreadCount)
 {
     if (workerThreadCount == 0)
-        workerThreadCount = 2 * SysInfo::_ProcessorCount;
+        workerThreadCount = 2 * SysInfo::ProcessorCount();
     _workerThreads = static_cast<IoWorker**>(
         BaseMemoryManager::_Instance.AllocZero(sizeof(IoWorker*) * workerThreadCount, NETWORK_FILE, 377));
     for (unsigned int i = 0; i < workerThreadCount; ++i)

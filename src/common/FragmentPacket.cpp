@@ -12,10 +12,10 @@
 #include "Log.h"
 #include "Packet.h"
 
-// ❓ CacheGate and PostOfficeDaemon use "..\..\Packet\FragmentPacket.cpp".
-// LobbyGate uses "..\Packet\FragmentPacket.cpp". This shared file uses the first path.
+// CacheGate and PostOfficeDaemon use "..\..\Packet\FragmentPacket.cpp" (CacheGate file 0x3abd0, PostOfficeDaemon file 0x604be).
+// LobbyGate uses "..\Packet\FragmentPacket.cpp" (LobbyGate 0x62ef8). This shared file uses the first path.
 static wchar_t const FRAGMENT_PACKET_FILE[] = L"..\\..\\Packet\\FragmentPacket.cpp";
-static wchar_t const* const kFile = FRAGMENT_PACKET_FILE;  // ❓ local name
+static wchar_t const* const kFile = FRAGMENT_PACKET_FILE;  // LIFT: name; the binary loads the string address direct (LobbyGate 0x278c)
 
 // 0x11c0
 SendFragmentPacketConcatenater::~SendFragmentPacketConcatenater()
@@ -281,7 +281,7 @@ bool FragmentPacketConcatenater::Copy(FragmentPacketConcatenater* fpc)
     {
         Log::Write(Log::LT_ERROR, kFile, 232, L"== CRASH == ASSERT CRASH");
         AlertSender::Write(kFile, 232, L"== CRASH == ASSERT CRASH");
-        CrashHandler::MakeCrash("..\\..\\Packet\\FragmentPacket.cpp", 232, L"");  // ❓ format is an empty global string
+        CrashHandler::MakeCrash("..\\..\\Packet\\FragmentPacket.cpp", 232, L"");  // fmt = empty wide string "valueString" (LobbyGate 0x27b8)
     }
     bool result = PacketConcatenateBuffer::copy(fpc);
     if (result)

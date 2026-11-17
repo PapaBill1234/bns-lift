@@ -33,7 +33,7 @@ long long SessionPool::Using = 0;
 // 0x184E0
 SessionPool::SessionPool(unsigned int portId)
     : _portId(portId), _valid(false), _useUnusedSessionReadOnly(false), _head(nullptr), _tail(nullptr),
-      _allocator(SysInfo::_Granularity)
+      _allocator(SysInfo::MemnoryAllocationGranularity())
 {
     _tag = 2058;
     _allocator.Initialize(0x2000);

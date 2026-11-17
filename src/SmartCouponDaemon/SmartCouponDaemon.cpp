@@ -295,7 +295,7 @@ bool SmartCouponDaemon::initialize()
     BnsCommonConfig::Dump();
 
     void* mem = Memory::_Manager[1]->Alloc(sizeof(SmartCouponObjPoolMemoryAllocator), kFile, 252);
-    GObjPoolMemAlloc = mem ? new (mem) SmartCouponObjPoolMemoryAllocator(SysInfo::_Granularity, 16) : nullptr;
+    GObjPoolMemAlloc = mem ? new (mem) SmartCouponObjPoolMemoryAllocator(SysInfo::MemnoryAllocationGranularity(), 16) : nullptr;
     mem = Memory::_Manager[2]->Alloc(sizeof(ObjPoolTimer), kFile, 253);
     GObjPoolTimer = mem ? new (mem) ObjPoolTimer() : nullptr;
 
@@ -313,7 +313,7 @@ bool SmartCouponDaemon::initialize()
     _jobMgr = mem ? new (mem) JobManager(GenerateJobid) : nullptr;
     int hashCount = _config->_jobHashCount;
     if (hashCount <= 0)
-        hashCount = 2 * SysInfo::_ProcessorCount;
+        hashCount = 2 * SysInfo::ProcessorCount();
     if (!_jobMgr->Initialize(hashCount))
     {
         Log::Write(Log::LT_ERROR, kFile, 263, L"[scd], initialize job manager fail");

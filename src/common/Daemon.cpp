@@ -81,7 +81,7 @@ void finiMemorySection(int section)
         manager->Clear();
         manager = const_cast<MemoryManager*>(Memory::_Manager[section]);
         if (manager != nullptr)
-            manager->~MemoryManager();  // ❓ binary calls the deleting destructor with flag 1
+            manager->~MemoryManager();  // LIFT: binary calls the deleting destructor with flag 1; it does not free (MemoryManager 0x268b0, LobbyGate)
         BaseMemoryManager::_Instance.Free(manager, L"source\\Memory.cpp", 85);
         Memory::_Manager[section] = nullptr;
     }
@@ -169,11 +169,7 @@ static Console* makeConsole()
 // 0xa690
 void BloodDaemonMain(int argc, wchar_t** argv)
 {
-    SYSTEM_INFO systemInfo;
-    GetSystemInfo(&systemInfo);
-    SysInfo::_PageSize = systemInfo.dwPageSize;
-    SysInfo::_ProcessorCount = systemInfo.dwNumberOfProcessors;
-    SysInfo::_Granularity = systemInfo.dwAllocationGranularity;
+    SysInfo::Get();
     CrashHandler::Initialize(0, false);  // LIFT: LTCG folded the arguments; callee writes rcx and edx first (LobbyGate 0x1cbc8, call 0x1dc63)
     initMemorySection(1, nullptr);
     initMemorySection(2, HeapMemoryManager::LFH);
@@ -472,8 +468,9 @@ bool Daemon::start(int argc, wchar_t const** argv)
     pipeConsole->cleanup();
     threadManager->StopAll(3000, false);  // LIFT: LTCG folded forceTerminate; callee does not read r8 (LobbyGate 0x27780, call 0x1edb1)
 
-    // ❓ The binary calls each destructor and then BaseMemoryManager::Free (a delete macro).
-    // ❓ LobbyGate calls ~ThreadManager direct (0x1edc0), but PipeConsole through vtable slot 0 with flag 1 (0x1edfa).
+    // The binary calls each destructor and then BaseMemoryManager::Free (LobbyGate 0x1edc5, 0x1ee01).
+    // LobbyGate calls ~ThreadManager direct (0x1edc0) and PipeConsole through vtable slot 0 with flag 1 (0x1edfa).
+    // LIFT: explicit destructor call; the slot 0 target only runs ~PipeConsole and does not free (0x295c0).
     if (threadManager != nullptr)
         threadManager->~ThreadManager();
     BaseMemoryManager::_Instance.Free(threadManager, DAEMON_FILE, 570);
@@ -732,14 +729,13 @@ void Daemon::timerMain(Network* networkInstance)
     }
 }
 
-// ❓ Not in the CacheGate hr export (the CacheGate class overrides it).
+// 0x12650 (LobbyGate, ICF-folded): b0 01 c3. CacheGate 0xcd80, code size 3.
 bool Daemon::cooldown()
 {
-    return true;  // TODO(lift-cg-5)
+    return true;
 }
 
-// ❓ Not in the CacheGate hr export (the CacheGate class overrides it).
+// 0x126f0 (LobbyGate, ICF-folded): c2 00 00. CacheGate 0x16f50, code size 3.
 void Daemon::FlushExtraLog()
 {
-    // TODO(lift-cg-5)
 }
