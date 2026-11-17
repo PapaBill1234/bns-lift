@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Print the interface of the lifted C++ headers: classes, method signatures and fields. No bodies.
 Usage: tools/cpp_api.py [-C <repo root>] [-i] [dir or header ...] [-n <Name> ...]
-  no paths   = src/common
+  no paths   = src/Server/BloodLib/include
   -n Name    = only the classes and free functions whose name has this text (more names: more -n)
   -i         = index only: one line per header with its class names
 One call gives the signatures that many grep and sed calls give."""
@@ -86,7 +86,7 @@ def main(argv):
         else:
             paths.append(a)
     files = []
-    for p in paths or ["src/common"]:
+    for p in paths or ["src/Server/BloodLib/include"]:
         p = root / p
         files += sorted(p.glob("*.h")) if p.is_dir() else [p]
     for f in files:
