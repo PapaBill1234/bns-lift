@@ -303,7 +303,9 @@ bool Session::Connect(Port* port, unsigned long long id, unsigned long ip, unsig
     context->_session = this;
     context->_socket = INVALID_SOCKET;
     context->_firstConnect = true;
-    context->_timeout = 0;  // ❓ the timeout argument is not used in the pseudocode
+    // LTCG folded the timeout constant in each exe. CacheGate 0xe6ad stores 0 (callers give 0). LobbyGate 0x17bed
+    // stores GetTickCount64() - StartSystemTick64 + 5000 (the caller gives 5000).
+    context->_timeout = timeout > 0 ? static_cast<long long>(GetTickCount64()) - Daemon::Instance->StartSystemTick64 + timeout : 0;
     context->_tryReconnectCount = 0;
     context->_remoteAddr.sin_family = AF_INET;
     context->_remoteAddr.sin_port = htons(portNumber);

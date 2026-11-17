@@ -64,7 +64,8 @@ wchar_t* LogFile::GetLastFileName()
 void LogFile::initialize(wchar_t const* rootDir, int logType, int fileType)
 {
     (void)logType;
-    // LTCG folded fileType to 2 (the one caller gives 2).
+    // LIFT: LTCG folded fileType to 2 in each exe (SmartCouponDaemon 0x21b45, PostOfficeDaemon 0x2d935,
+    // CacheGate 0x10da5, LobbyGate 0x21ef5). All callers give 2.
     _filetype = fileType;
     if (_bufmax <= 0)
         _bufmax = 8000;

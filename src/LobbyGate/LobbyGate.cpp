@@ -115,7 +115,7 @@ void LobbyGateReloadInvalidRestoreTimer::restoreInvalid()
             {
                 node->_next->_prev = node->_prev;
                 node->_prev->_next = node->_next;
-                Memory::_Manager[2]->Free(node, L"source\\PipeConsole.cpp", 837);  // ❓ file string
+                Memory::_Manager[2]->Free(node, L"source\\PipeConsole.cpp", 837);  // 0x12876: r8 = L"source\\PipeConsole.cpp", r9d = 837.
                 break;
             }
         }
@@ -264,7 +264,7 @@ bool LobbyGate::initLog()
     CrashHandler::SetLogPath(_config->_logPath);
 
     void* const buffer = Memory::_Manager[2]->Alloc(sizeof(LogFile), kFile, 240);
-    _logfile = buffer ? new (buffer) LogFile(_config->_logPath, 1, 0) : nullptr;  // ❓ fileType and logType
+    _logfile = buffer ? new (buffer) LogFile(_config->_logPath, 2, 0) : nullptr;  // LIFT: LTCG folded the args. initialize 0x21ef5 sets _filetype = 2. logType is not read.
     // BUG: 0x12d40 _logfile is not checked for null.
     _logfile->_enable[2] = false;
     Log::InitMedia(console);
@@ -300,7 +300,7 @@ bool LobbyGate::initialize()
     int err = 0;
     if (_config->_certFile == nullptr)
         err = 2;
-    else if (fopen_s(&fp, _config->_certFile, "rb") != 0 || fp == nullptr ||  // ❓ mode
+    else if (fopen_s(&fp, _config->_certFile, "rb") != 0 || fp == nullptr ||  // 0x12f3f: "rb"
              static_cast<long long>(fread(buffer, 1, sizeof(buffer), fp)) <= 0)
         err = 3;
     if (err != 0)
@@ -347,7 +347,7 @@ bool LobbyGate::initNetwork()
         Log::Write(Log::LT_ERROR, kFile, 337, L"[lobbygate], init network fail");
         return false;
     }
-    if (!_broadcastCrypt.Initialize(BroadcastCrypt::BROADCAST_DAEMON, PacketCrypt::ALGORITHM_DEFAULT, 0))  // ❓ args
+    if (!_broadcastCrypt.Initialize(BroadcastCrypt::BROADCAST_DAEMON, PacketCrypt::ALGORITHM_DEFAULT, 0))  // LIFT: LTCG folded all args into 0x23000. 0x13266 sets rcx only. The callee logs type 0.
     {
         Log::Write(Log::LT_ERROR, kFile, 346, L"[lobbygate], init broadcast crypt fail");
         return false;
@@ -367,10 +367,11 @@ bool LobbyGate::initNetwork()
     _sessionHandlerList[1] = clientHandler;
     _sessionHandlerList[2] = lobbydHandler;
 
-    TrustedPacketBufferHandler trustedBufferHandler;  // ❓ the original takes the address of a vtable-only object
-    if (!Network::OpenPort(2, 0, 2, _sessionHandlerList[2], &trustedBufferHandler, 0, true, true, false))  // ❓ flags
+    // 0x13344: the binary puts an object with only a vftable on the stack and gives its address.
+    TrustedPacketBufferHandler trustedBufferHandler;
+    if (!Network::OpenPort(2, 0, 2, _sessionHandlerList[2], &trustedBufferHandler, 0, true, true, false))  // LIFT: LTCG removed the bools. 0x20500 sets _enableAccept and _enableRecv (0x207a3, 0x207a7). Port::Initialize sets _nagle = 0 (0x2588a).
     {
-        Log::Write(Log::LT_ERROR, kFile, 369, L"[lobbygate], failed to open lobbyd channel");  // ❓ full string
+        Log::Write(Log::LT_ERROR, kFile, 369, L"[lobbygate], failed to open lobbyd channel port");  // 0x13370
         return false;
     }
 
@@ -383,29 +384,35 @@ bool LobbyGate::initNetwork()
         lobbyD->_wid = 0;
     }
     _lobbyD = lobbyD;
-    // ❓ The call gives _lobbyAddr and _lobbyPort. The header names the arguments waitAck and portId.
-    if (!_lobbyD->Hello(static_cast<LobbyDSessionHandler*>(_sessionHandlerList[2]), _config->_lobbyAddr,
-                        static_cast<unsigned short>(_config->_lobbyPort)))
+    // 0x13408: r8d = _lobbyAddr (+0x4C), r9w = _lobbyPort (+0x50). LTCG changed the PDB prototype. IDA labels are wrong.
+    // LIFT: waitAck true, portId 2 (0x21373), timeout 5000 (0x17bfe), reconnect false. LTCG folded these constants.
+    if (!_lobbyD->Hello(static_cast<LobbyDSessionHandler*>(_sessionHandlerList[2]), true, 2, _config->_lobbyAddr,
+                        static_cast<unsigned short>(_config->_lobbyPort), 5000, false))
     {
         Log::Write(Log::LT_ERROR, kFile, 375, L"[lobbygate], init lobbyd channel fail");
         return false;
     }
     Log::Write(Log::LT_NOTICE, kFile, 379, L"[lobbygate], init lobbyd channel ok");
 
-    ClientPacketBufferHandler clientBufferHandler;  // ❓ see trustedBufferHandler
+    // 0x13470: the same vftable-only stack object.
+    ClientPacketBufferHandler clientBufferHandler;
     if (!Network::OpenPort(1, static_cast<unsigned short>(_config->_clientPort), 0, _sessionHandlerList[1],
-                           &clientBufferHandler, _config->_maxClientSession, true, true, false))  // ❓ flags
+                           &clientBufferHandler, _config->_maxClientSession, true, true, false))  // LIFT: the same callee 0x20500. See above.
     {
-        Log::Write(Log::LT_ERROR, kFile, 405, L"Cannot open Client port, %d", _config->_clientPort);
+        Log::Write(Log::LT_ERROR, kFile, 405, L"Cannot open Client port, %d",
+                   static_cast<unsigned short>(_config->_clientPort));  // 0x134b6: the binary reads a word.
         return false;
     }
 
-    AlertSender::_alertSender.init(_config->_alertSendAddress, ShortName(), 0, 0);  // ❓ worldId and maxLogCount
+    AlertSender::_alertSender.init(_config->_alertSendAddress, ShortName(), 0, 1000);  // LIFT: LTCG folded the args. 0x19e5b: _worldId = 0. 0x19e61: _maxLogCount = 1000.
 
+    // LIFT: LTCG removed portId. 0x20860 reads _port[0], thus port id 1.
+    // BUG: 0x134d9 and 0x13500 read _maxIdleTime (int) as a word. Values above 65535 wrap.
     if (_config->_maxIdleTimeEnable &&
-        !Network::SetMaxIdleTime(1, _config->_disconnectAfterIdleTime, _config->_maxIdleTime))  // ❓ port id
+        !Network::SetMaxIdleTime(1, _config->_disconnectAfterIdleTime,
+                                 static_cast<unsigned short>(_config->_maxIdleTime)))
     {
-        Log::Write(Log::LT_ERROR, kFile, 415, L"Cannot Set Max Idle Time, %d", _config->_maxIdleTime);
+        Log::Write(Log::LT_ERROR, kFile, 415, L"Cannot Set Max Idle Time, %d", static_cast<unsigned short>(_config->_maxIdleTime));
         return false;
     }
     Log::Write(Log::LT_NOTICE, kFile, 420, L"[lobbygate], init network ok");
@@ -528,7 +535,7 @@ bool LobbyGate::reload(wchar_t** argv, int argc)
                 {
                     node->_next->_prev = node->_prev;
                     node->_prev->_next = node->_next;
-                    Memory::_Manager[2]->Free(node, L"source\\PipeConsole.cpp", 837);  // ❓ file string
+                    Memory::_Manager[2]->Free(node, L"source\\PipeConsole.cpp", 837);  // 0x13940: r8 = L"source\\PipeConsole.cpp", r9d = 837.
                     break;
                 }
             }
@@ -546,7 +553,7 @@ bool LobbyGate::reload(wchar_t** argv, int argc)
             while (node != &pc->_invalid._tail && wcscmp(node->_key, reason) != 0)
                 node = node->_next;
             if (node == &pc->_invalid._tail)
-                PipeConsole::addNode(pc->_invalid, reason, L"");  // ❓ value string
+                PipeConsole::addNode(pc->_invalid, reason, L"");  // 0x139d6: valueString (0x1400627d8) is L"".
             pc->_lock.Leave();
         }
         void* const mem = Memory::_Manager[2]->Alloc(sizeof(LobbyGateReloadInvalidRestoreTimer), kFile, 499);
@@ -609,7 +616,7 @@ bool LobbyGateCooldownTimer::HandleEvent(EventContext* context, unsigned long nu
 bool LobbyGate::cooldown()
 {
     Log::Write(Log::LT_NOTICE, kFile, 618, L"[lobbygate], cooldown started");
-    Network::ClosePort(1);  // ❓ port id (the register is not set in the pseudocode)
+    Network::ClosePort(1);  // LIFT: LTCG removed portId. 0x207e0 reads _port[0].
     void* const mem = Memory::_Manager[2]->Alloc(sizeof(LobbyGateCooldownTimer), kFile, 624);
     Timer* const timer = mem ? new (mem) LobbyGateCooldownTimer(1000 * _config->_cooldownCompleteDelay) : nullptr;
     GlobalTimerQueue->Add(3000, timer);
@@ -627,7 +634,7 @@ unsigned long long ClientSessionTimerJob::TimerId() const
 {
     return 0;
 }
-
+// LIFT: empty body. vftable 0x7c030 slot 0 is the folded Timer scalar deleting destructor (0x13bb0).
 // ❓ Not in index.tsv. The vtable needs a body.
 ClientSessionTimerJob::~ClientSessionTimerJob()
 {

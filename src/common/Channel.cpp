@@ -52,7 +52,7 @@ Channel::~Channel()
 // 0x10450
 bool Channel::MakeSession(unsigned int portId, unsigned long ip, unsigned short portNo, long timeout, bool reconnect)
 {
-    // ❓ LTCG put the constant portId 2 into the code (it reads _port[1]).
+    // LIFT: LTCG folded portId 2. CacheGate 0x104c3 and LobbyGate 0x21373 read Network+0x18 (_port[1]).
     if (_session != nullptr)
         CHANNEL_ASSERT_CRASH(30);
 

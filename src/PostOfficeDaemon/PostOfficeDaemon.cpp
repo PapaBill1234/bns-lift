@@ -242,7 +242,7 @@ bool PostOfficeDaemon::initLog()
     CrashHandler::SetLogPath(_config->_logPath);
 
     void* const buffer = Memory::_Manager[2]->Alloc(sizeof(LogFile), kFile, 183);
-    LogFile* const logFile = buffer ? new (buffer) LogFile(_config->_logPath, 1, 0) : nullptr;  // ❓ fileType, logType
+    LogFile* const logFile = buffer ? new (buffer) LogFile(_config->_logPath, 2, 0) : nullptr;  // LIFT: LTCG folded the args. initialize 0x2d935 sets _filetype = 2. logType is not read.
     // ❓ logFile->_enable[2] = false; the _enable member is not in LogFile.h.
     // BUG: 0x130c0 the binary writes _enable[2] with no null check after the alloc.
 

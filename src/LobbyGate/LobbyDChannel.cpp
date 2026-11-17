@@ -23,22 +23,6 @@ wchar_t const* const CHANNEL_H_FILE =
     L"E:\\DailyBuild02\\LobbyGate-Common-0.0.348\\depot\\Branch\\348NC\\Program\\Server\\BloodLib\\include\\Channel.h";
 wchar_t const* const DISCONNECTED_LOBBYD = L"disconnected lobbyd";
 
-// ❓ The PDB type id128::<unnamed-type-guid> has the fields id1, id2, id3 and id4[8].
-struct GuidFields  // LIFT: lift helper name, not in any PDB
-{
-    unsigned int id1;
-    unsigned short id2;
-    unsigned short id3;
-    unsigned char id4[8];
-};
-
-GuidFields guidOf(id128 const* value)  // LIFT: lift helper name, not in any PDB
-{
-    GuidFields g;
-    memcpy(&g, value->guid, sizeof(g));
-    return g;
-}
-
 // LIFT: Inlined search in PipeConsole::_invalid (wcsncmp with 20 characters).
 PipeConsole::ItemNode* findDisconnectedNode(PipeConsole* console)
 {
@@ -62,7 +46,7 @@ PipeConsole::ItemNode* findDisconnectedNode(PipeConsole* console)
             PipeConsole* console = Daemon::Instance->pipeConsole;                                            \
             console->_lock.Enter();                                                                          \
             if (findDisconnectedNode(console) == nullptr)                                                    \
-                PipeConsole::addNode(console->_invalid, DISCONNECTED_LOBBYD, L""); /* ❓ value: valueString */ \
+                PipeConsole::addNode(console->_invalid, DISCONNECTED_LOBBYD, L""); /* valueString is L"" */          \
             console->_lock.Leave();                                                                          \
         }                                                                                                    \
     } while (0)
@@ -79,7 +63,7 @@ void clearDisconnectedInfo()
     {
         node->_next->_prev = node->_prev;
         node->_prev->_next = node->_next;
-        Memory::_Manager[2]->Free(node, L"", 837);  // ❓ file string at 0x1400857D8
+        Memory::_Manager[2]->Free(node, L"source\\PipeConsole.cpp", 837);  // 0x1400857D8
     }
     console->_lock.Leave();
 }
@@ -94,7 +78,9 @@ LobbyD* acquireChannel(Session const* session)
     return static_cast<LobbyD*>(session->_channel);
 }
 
-// ❓ Inlined connection check of the LobbyD::Send* functions.
+// LIFT: inlined connection check of the LobbyD::Send* functions (0xad5c). The PDB has Session::IsConnected
+// and Session::isConnected (both bool, no arguments, inlined). Their bodies are not in the binary, so the lift
+// keeps this helper.
 bool isConnected(Session* session)
 {
     session->_lock.Enter();
@@ -318,7 +304,8 @@ short LobbyDSessionHandler::SwitchCmdLobbyDaemonToLobbyGate(short cmd)
 }
 
 // 0x9bd0
-bool LobbyD::Hello(LobbyDSessionHandler* handler, unsigned int waitAck, unsigned short portId)
+bool LobbyD::Hello(LobbyDSessionHandler* handler, bool waitAck, unsigned int portId, unsigned long ip, unsigned short port,
+                   long connectTimeout, bool reconnect)
 {
     LOBBYD_SET_DISCONNECTED_INFO();
 
@@ -331,8 +318,11 @@ bool LobbyD::Hello(LobbyDSessionHandler* handler, unsigned int waitAck, unsigned
 
     if (handler != nullptr)
         handler->_connlock.Enter();
-    // ❓ The pseudocode forwards only rdx and r8. The other arguments are not visible.
-    bool made = MakeSession(waitAck, portId, 0, 0, false);
+    // LIFT: LTCG folded the constant arguments. 0x9bd0 reads only rdx (handler), r8d (ip) and r9w (port).
+    // MakeSession 0x21300 uses portId 2 (0x21373). Session::Connect 0x17a70 uses timeout 5000 (0x17bfe) and does
+    // not read reconnect. The binary always waits on the hello event, so waitAck is not read.
+    (void)waitAck;
+    bool made = MakeSession(portId, ip, port, connectTimeout, reconnect);
     if (handler != nullptr)
         handler->_connlock.Leave();
     if (!made)
@@ -390,13 +380,13 @@ bool LobbyD::SendInitSessionWithNPTokenReq(unsigned long long gateKey, id128 con
     packet.ListHead->encrypt(session->_currentCrypt, session->_security3rd);
     PacketBuffer const* list[1] = {packet.ListHead};
     session->_lock.Enter();
-    session->send(list, 1);  // ❓ count is not initialized in the pseudocode
+    session->send(list, 1);  // LIFT: LTCG dropped the count. Session::send (0x19360) does not read r8.
     session->_lock.Leave();
 
     wchar_t ipStr[20];
     formatIpAddress(ipAddress, ipStr);
-    GuidFields np = guidOf(npToken);
-    GuidFields pa = guidOf(portalAccountId);
+    auto const& np = npToken->guid;
+    auto const& pa = portalAccountId->guid;
     Log::Write(Log::LT_DEBUG, LOBBYD_FILE, 347,
                L"[channel], 0x%.16I64X, send, cmd:%d, gateKey:0x%I64X, "
                L"npToken:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X, "
@@ -429,13 +419,13 @@ bool LobbyD::SendStartSessionWithNPTokenReq(unsigned long long cliKey, id128 con
     packet.ListHead->encrypt(session->_currentCrypt, session->_security3rd);
     PacketBuffer const* list[1] = {packet.ListHead};
     session->_lock.Enter();
-    session->send(list, 1);  // ❓ count is not initialized in the pseudocode
+    session->send(list, 1);  // LIFT: LTCG dropped the count. Session::send (0x19360) does not read r8.
     session->_lock.Leave();
 
     wchar_t ipStr[20];
     formatIpAddress(ipAddress, ipStr);
-    GuidFields np = guidOf(npToken);
-    GuidFields pa = guidOf(portalAccountId);
+    auto const& np = npToken->guid;
+    auto const& pa = portalAccountId->guid;
     Log::Write(Log::LT_DEBUG, LOBBYD_FILE, 379,
                L"[channel], 0x%.16I64X, send, cmd:%d, cliKey:0x%I64X, "
                L"npToken:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X, "
@@ -465,7 +455,7 @@ bool LobbyD::SendInitSessionWithLobbyTokenReq(unsigned long long gateKey, unsign
     packet.ListHead->encrypt(session->_currentCrypt, session->_security3rd);
     PacketBuffer const* list[1] = {packet.ListHead};
     session->_lock.Enter();
-    session->send(list, 1);  // ❓ count is not initialized in the pseudocode
+    session->send(list, 1);  // LIFT: LTCG dropped the count. Session::send (0x19360) does not read r8.
     session->_lock.Leave();
 
     wchar_t ipStr[20];
@@ -495,7 +485,7 @@ bool LobbyD::SendStartSessionWithLobbyTokenReq(unsigned long long cliKey)
     packet.ListHead->encrypt(session->_currentCrypt, session->_security3rd);
     PacketBuffer const* list[1] = {packet.ListHead};
     session->_lock.Enter();
-    session->send(list, 1);  // ❓ count is not initialized in the pseudocode
+    session->send(list, 1);  // LIFT: LTCG dropped the count. Session::send (0x19360) does not read r8.
     session->_lock.Leave();
 
     Log::Write(Log::LT_DEBUG, LOBBYD_FILE, 440, L"[channel], 0x%.16I64X, send, cmd:%d, cliKey:0x%I64X", session->_id,
@@ -521,7 +511,7 @@ bool LobbyD::SendLostAnonymousConnectionNotify(long long gateKey)
     packet.ListHead->encrypt(session->_currentCrypt, session->_security3rd);
     PacketBuffer const* list[1] = {packet.ListHead};
     session->_lock.Enter();
-    session->send(list, 1);  // ❓ count is not initialized in the pseudocode
+    session->send(list, 1);  // LIFT: LTCG dropped the count. Session::send (0x19360) does not read r8.
     session->_lock.Leave();
 
     Log::Write(Log::LT_DEBUG, LOBBYD_FILE, 469, L"[channel], 0x%.16I64X, send, cmd:%d, gateKey:0x%I64X", session->_id,
@@ -547,7 +537,7 @@ bool LobbyD::SendLostConnectionNotify(unsigned long long cliKey)
     packet.ListHead->encrypt(session->_currentCrypt, session->_security3rd);
     PacketBuffer const* list[1] = {packet.ListHead};
     session->_lock.Enter();
-    session->send(list, 1);  // ❓ count is not initialized in the pseudocode
+    session->send(list, 1);  // LIFT: LTCG dropped the count. Session::send (0x19360) does not read r8.
     session->_lock.Leave();
 
     Log::Write(Log::LT_DEBUG, LOBBYD_FILE, 498, L"[channel], 0x%.16I64X, send, cmd:%d, cliKey:0x%I64X", session->_id,
