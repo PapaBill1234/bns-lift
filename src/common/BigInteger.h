@@ -11,7 +11,7 @@ class BigInteger
     friend class Dh; // LIFT: Dh uses the inline compare (absCompare).
 
 public:
-    enum { MAX_DIGITS = 128 }; // ❓
+    enum { MAX_DIGITS = 128 }; // LobbyGate Set 0x55fe6 clears 0x200 bytes
 
     // 0x46580
     BigInteger()
@@ -25,7 +25,7 @@ public:
 
     void Set(BigInteger const* src, int sign);
     void Set(long long value);
-    // ❓ The PDB name is Set(int,uchar const*,int). The code uses only (data, size).
+    // LIFT: PDB name Set(int,uchar const*,int). LobbyGate 0x560a0 reads rdx as data and r8d as size only.
     bool Set(unsigned char const* data, int size);
     bool InvMod(BigInteger const* a, BigInteger const* b);
     void Sqr(BigInteger const* a);
@@ -71,9 +71,9 @@ private:
     static void mul(BigInteger const* a, BigInteger const* b, BigInteger* r);
 
 public:
-    int sign;                         // ❓ +0, 1 or -1
-    int bits;                         // ❓ +4, bit count (1 for zero, 0 for an invalid value)
-    unsigned int digits[MAX_DIGITS];  // ❓ +8, 32-bit digits, low digit first
+    int sign;                         // +0 (LobbyGate 0x55fd2), 1 or -1
+    int bits;                         // +4 (LobbyGate 0x55fd8), bit count (1 for zero, 0 for an invalid value)
+    unsigned int digits[MAX_DIGITS];  // +8 (LobbyGate 0x55fdf), 32-bit digits, low digit first
 };
 static_assert(sizeof(BigInteger) == 0x208, "sizeof BigInteger");
 static_assert(offsetof(BigInteger, digits) == 8, "BigInteger::digits");

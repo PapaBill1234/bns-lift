@@ -24,13 +24,13 @@ public:
 
     static void Initialize();
     static void Destroy(Crypto* crypto);
-    // ❓ InstanceSize and Create use the value GetType() - 1 (2, 3, 64, 80).
+    // LIFT: LobbyGate table 0x551a4 maps 2, 3, 64, 80. GetType gives 4 (0x5c570), 0x41 (0x52a40), 0x51 (0x52a50). The callers give GetType() - 1.
     static int InstanceSize(Type type);
-    // ❓ The PDB name gives (Type, void*, int). The code uses rcx=buffer, edx=size, r8d=type.
+    // LIFT: LobbyGate Create 0x55200 reads r8d as type (0x5520a), rcx as buffer (0x5520d), edx as size (0x55242).
     static Crypto* Create(void* buffer, int size, Type type);
 
-    mutable int _error; // ❓ +8, the const Encrypt and Decrypt write it
-    bool _alloc; // ❓ +12, true when the object came from malloc
+    mutable int _error; // +8 (LobbyGate 0x55279), the const Encrypt and Decrypt write it
+    bool _alloc; // +12 (LobbyGate 0x55281), true when the object came from malloc
 
 protected:
     Crypto() : _error(0), _alloc(false) {}
