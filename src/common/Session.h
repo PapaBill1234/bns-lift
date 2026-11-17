@@ -126,6 +126,8 @@ public:
     friend class LobbyD;          // ❓ access for the inlined send in LobbyD::Send* (LobbyGate)
     friend class NPChannel;        // ❓ access for the inlined send in NPChannel::SendMsg (SmartCouponDaemon)
     friend class NPSessionHandler; // ❓ access for NPSessionHandler::OnConnect/OnClose (SmartCouponDaemon)
+    friend class ManagementSessionHandler; // ❓ access for the inlined send in the management handlers (PostOfficeDaemon)
+    friend class WorldChannel;             // ❓ access for the inlined send in WorldChannel::SendRelayResponse (PostOfficeDaemon)
     // ❓ access for the inlined send and completeHandshake in the LobbyGate packet handlers
     friend bool HandleLobbyGate_ContentsRuleListReq(Session* session, Packet const* packet);
     friend bool HandleLobbyGate_HelloReq(Session* session, Packet* packet);

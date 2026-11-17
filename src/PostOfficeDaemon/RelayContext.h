@@ -21,6 +21,7 @@ public:
         RESULTSTATE_FAILURE = 1,
         RESULTSTATE_RELAY_ERROR = 2,
         RESULTSTATE_RELAY_TIMEOUT = 3,
+        RESULTSTATE_INVALID = 4,  // ❓ value (0x1f650 uses the name, the PDB export has no value)
     };
 
     int _resultState;

@@ -43,21 +43,13 @@ public:
 static_assert(offsetof(PostOfficeConfig, _relayTimeoutInterval) == 0x30, "PostOfficeConfig::_relayTimeoutInterval");
 static_assert(offsetof(PostOfficeConfig, _pingInterval) == 0x34, "PostOfficeConfig::_pingInterval");
 
-// PDB: CacheGateChannel : Channel (CacheGateChannel.obj, later card).
-class CacheGateChannel : public Channel
-{
-public:
-    virtual ~CacheGateChannel();
-    virtual unsigned long long GetId();
-    bool SendRelayRequest(RelayContext* relayContext);  // 0x7000 (later card) ❓ signature
-
-    int _serviceState;
-};
+#include "CacheGateChannel.h"
 
 class PostOfficeDaemon : public Daemon
 {
 public:
     CacheGateChannel* checkCacheGateServiceState();  // 0x14930 (later card)
+    static CacheGateChannel* checkDestinationServiceState(unsigned short destinationWid);  // 0x147d0 (later card)
 
     PostOfficeConfig const* _config;
     unsigned short const _serviceWid;

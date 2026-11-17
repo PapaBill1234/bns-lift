@@ -188,7 +188,19 @@ add_library(lift_postofficedaemon STATIC
   src/PostOfficeDaemon/RelayTimeoutEvent.cpp
   src/PostOfficeDaemon/PingRelay.cpp
   src/PostOfficeDaemon/PingGenerator.cpp
-  src/PostOfficeDaemon/CachedWatchdog.cpp)
+  src/PostOfficeDaemon/CachedWatchdog.cpp
+  src/PostOfficeDaemon/CacheGateChannel.cpp
+  src/PostOfficeDaemon/CacheGatePacketHandler.cpp
+  src/PostOfficeDaemon/CacheGateClientSideHandlerList.cpp
+  src/PostOfficeDaemon/AgentChannel.cpp
+  src/PostOfficeDaemon/AgentPacketHandler.cpp
+  src/PostOfficeDaemon/PostOfficePacketServerSideHandlerList.cpp
+  src/PostOfficeDaemon/ManagementSessionHandler.cpp
+  src/PostOfficeDaemon/ManagementPacketHandler.cpp
+  src/PostOfficeDaemon/PostOfficeManagementPacketHandlerList.cpp
+  src/PostOfficeDaemon/WorldChannel.cpp
+  src/PostOfficeDaemon/WorldPacketHandler.cpp
+  src/PostOfficeDaemon/PostOfficeServicePacketServerSideHandlerList.cpp)
 target_compile_options(lift_postofficedaemon PRIVATE /GR-)
 target_include_directories(lift_postofficedaemon BEFORE PRIVATE ${LIFT_STL_INCLUDE})
 target_include_directories(lift_postofficedaemon PUBLIC ${CMAKE_SOURCE_DIR}/src/PostOfficeDaemon)
