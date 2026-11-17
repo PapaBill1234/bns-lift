@@ -136,7 +136,7 @@ bool ClientSideDaemonChannel::onAccept(Session const* session)
 // 0x4150 (COMDAT folded with CacheGateSessionHandler::PacketHandler)
 bool CacheDChannel::PacketHandler(Session const* session, Packet const* packet) const
 {
-    CacheGatePacketHandler handler =
+    Daemon::PacketHandler handler =
         CacheGatePacketServerSideHandlerList[static_cast<unsigned short>(packet->CurHeader[1].size)];
     return handler != nullptr && handler(session, packet);
 }

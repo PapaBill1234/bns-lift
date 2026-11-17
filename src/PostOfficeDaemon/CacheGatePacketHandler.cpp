@@ -12,7 +12,7 @@
 #include "Session.h"
 #include "ThreadFreePacketPump.h"
 
-extern TFPP_PacketHandler CacheEconomyPacketClientSideHandlerList[22];  // CacheEconomyClientSideHandlerList.cpp
+extern Daemon::PacketHandler CacheEconomyPacketClientSideHandlerList[22];  // CacheEconomyClientSideHandlerList.cpp
 
 namespace
 {
@@ -115,7 +115,7 @@ bool HandleCacheGateRelay(Session const* session, Packet const* packet)
         else
         {
             // BUG: 0x8070 economyCmd - 1024 has no bounds check before the table read.
-            TFPP_PacketHandler const handler = CacheEconomyPacketClientSideHandlerList[economyCmd - ECONOMY_CMD_BASE];
+            Daemon::PacketHandler const handler = CacheEconomyPacketClientSideHandlerList[economyCmd - ECONOMY_CMD_BASE];
             if (handler != nullptr)
             {
                 handler(session, packet);
@@ -172,7 +172,7 @@ bool HandleCacheGateFragmentRelay(Session const* session, Packet const* packet)
         else
         {
             // BUG: 0x82c0 economyCmd - 1024 has no bounds check before the table read.
-            TFPP_PacketHandler const handler = CacheEconomyPacketClientSideHandlerList[economyCmd - ECONOMY_CMD_BASE];
+            Daemon::PacketHandler const handler = CacheEconomyPacketClientSideHandlerList[economyCmd - ECONOMY_CMD_BASE];
             if (handler != nullptr)
             {
                 handler(session, packet);

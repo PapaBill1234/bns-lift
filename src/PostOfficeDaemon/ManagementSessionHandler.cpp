@@ -84,7 +84,7 @@ bool ManagementSessionHandler::PacketHandler(Session const* session, Packet cons
         }
         else
         {
-            ManagementPacketHandlerFunc const handler = PostOfficeManagementPacketServerSideHandlerList[index];
+            Daemon::PacketHandler const handler = PostOfficeManagementPacketServerSideHandlerList[index];
             if (handler != nullptr)
                 return handler(session, packet);
             line = 68;

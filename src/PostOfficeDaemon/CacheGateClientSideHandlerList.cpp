@@ -3,7 +3,7 @@
 #include "ThreadFreePacketPump.h"
 
 // 0x97570
-TFPP_PacketHandler CacheGatePacketClientSideHandlerList[10] = {
+Daemon::PacketHandler CacheGatePacketClientSideHandlerList[10] = {
     nullptr,
     HandleCacheGateHello,
     HandleCacheGateHelloOk,
@@ -17,7 +17,7 @@ TFPP_PacketHandler CacheGatePacketClientSideHandlerList[10] = {
 };
 
 // 0x975c0
-TFPP_PacketHandler CacheGatePacketClientSideFragmentHandlerList[10] = {
+Daemon::PacketHandler CacheGatePacketClientSideFragmentHandlerList[10] = {
     nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
     HandleCacheGateFragmentRelay,
 };

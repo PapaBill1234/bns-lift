@@ -3,12 +3,12 @@
 #include "ThreadFreePacketPump.h"
 
 // 0x97340
-TFPP_PacketHandler PostOfficeServicePacketServerSideHandlerList[13] = {
+Daemon::PacketHandler PostOfficeServicePacketServerSideHandlerList[13] = {
     nullptr, HandlePostOfficeServiceHelloReq, nullptr, nullptr, HandlePostOfficeServiceRetrieveCharacterInfoReq,
     nullptr, nullptr, HandlePostOfficeServiceCheckPostCapacityReq, nullptr, nullptr,
     HandlePostOfficeServiceRegisterPostReq, nullptr, nullptr};
 
 // 0x973b0
-TFPP_PacketHandler PostOfficeServicePacketServerSideFragmentHandlerList[13] = {
+Daemon::PacketHandler PostOfficeServicePacketServerSideFragmentHandlerList[13] = {
     nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
     HandlePostOfficeServiceRegisterPostReq, nullptr, nullptr};

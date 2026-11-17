@@ -538,13 +538,13 @@ public:
 };
 static_assert(sizeof(NPServiceChannel) == 0x40, "sizeof NPServiceChannel");
 
+typedef bool (*NPServiceMessageHandler)(NPChannel*, StsMsgLib::_StsMsg*, NPTransaction*);  // PDB S_UDT (0x4B4E)
+
 class NPMsgHandleEvent : public DynamicEventObject
 {
 public:
-    typedef bool (*Handler)(NPChannel*, StsMsgLib::_StsMsg*, NPTransaction*);  // ❓ typedef name
-
     // LIFT: Inlined in NPServiceChannelManager::HandleMessage (0x10700).
-    NPMsgHandleEvent(NPChannel* channel, StsMsgLib::_StsMsg* msg, NPTransaction* tran, Handler handler)
+    NPMsgHandleEvent(NPChannel* channel, StsMsgLib::_StsMsg* msg, NPTransaction* tran, NPServiceMessageHandler handler)
         : _channel(channel), _msg(msg), _tran(tran), _handler(handler)
     {
     }
@@ -555,7 +555,7 @@ public:
     NPChannel* _channel;
     StsMsgLib::_StsMsg* _msg;
     NPTransaction* _tran;
-    Handler _handler;
+    NPServiceMessageHandler _handler;
 };
 static_assert(sizeof(NPMsgHandleEvent) == 56, "sizeof NPMsgHandleEvent");
 

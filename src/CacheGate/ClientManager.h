@@ -12,10 +12,10 @@ class ClientManager
 public:
     typedef std::map<unsigned short, Session*, std::less<unsigned short>,
                      StlAllocator<std::pair<unsigned short const, Session*>, 2> >
-        ClientMap;  // ❓ typedef name
+        SessionMap;  // PDB nested type (0x29AE)
     typedef std::map<unsigned long long, unsigned short, std::less<unsigned long long>,
                      StlAllocator<std::pair<unsigned long long const, unsigned short>, 2> >
-        IdIndexMap;  // ❓ typedef name
+        IndexMap;  // PDB nested type (0x29B1)
 
     // LIFT: The constructor is inlined in CacheGate::initialize (0x4510).
     ClientManager() : _clientMap(nullptr), _idIndexMap(nullptr) {}
@@ -27,8 +27,8 @@ public:
     void ReleaseSession(unsigned long long sessionID);               // 0x6250
     void ReleaseAllSession();                                        // 0x6380
 
-    ClientMap* _clientMap;
-    IdIndexMap* _idIndexMap;
+    SessionMap* _clientMap;
+    IndexMap* _idIndexMap;
     CriticalSection _lock;
 };
 static_assert(sizeof(ClientManager) == 0x38, "sizeof ClientManager");

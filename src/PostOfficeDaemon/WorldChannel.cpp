@@ -14,8 +14,8 @@
 #include "Session.h"
 #include "ThreadFreePacketPump.h"
 
-extern TFPP_PacketHandler PostOfficeServicePacketServerSideHandlerList[13];
-extern TFPP_PacketHandler PostOfficeServicePacketServerSideFragmentHandlerList[13];
+extern Daemon::PacketHandler PostOfficeServicePacketServerSideHandlerList[13];
+extern Daemon::PacketHandler PostOfficeServicePacketServerSideFragmentHandlerList[13];
 
 namespace
 {

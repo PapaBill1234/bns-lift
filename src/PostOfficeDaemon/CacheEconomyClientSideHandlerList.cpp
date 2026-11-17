@@ -3,7 +3,7 @@
 #include "ThreadFreePacketPump.h"
 
 // 0x976c0 (index = economy cmd - 1024)
-TFPP_PacketHandler CacheEconomyPacketClientSideHandlerList[22] = {
+Daemon::PacketHandler CacheEconomyPacketClientSideHandlerList[22] = {
     nullptr,
     nullptr,
     HandleCacheEconomyHelloOk,
@@ -29,4 +29,4 @@ TFPP_PacketHandler CacheEconomyPacketClientSideHandlerList[22] = {
 };
 
 // 0x98aa0 (.bss, all entries are zero). ❓ size 22 from the distance to the next symbol (0x98b50).
-TFPP_PacketHandler CacheEconomyPacketClientSideFragmentHandlerList[22] = {};
+Daemon::PacketHandler CacheEconomyPacketClientSideFragmentHandlerList[22] = {};

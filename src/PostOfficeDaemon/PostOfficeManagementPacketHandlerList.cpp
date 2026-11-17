@@ -23,7 +23,7 @@ wchar_t const* PostOfficeManagementCommandList[16] = {
 };
 
 // 0x974a0
-ManagementPacketHandlerFunc PostOfficeManagementPacketServerSideHandlerList[16] = {
+Daemon::PacketHandler PostOfficeManagementPacketServerSideHandlerList[16] = {
     nullptr,
     HandlePostOfficeManagementHelloReq,
     nullptr,

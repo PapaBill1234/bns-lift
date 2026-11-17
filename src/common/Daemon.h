@@ -5,6 +5,8 @@
 struct ZSTD_CDict_s;
 extern "C" size_t ZSTD_freeCDict(ZSTD_CDict_s* cdict);  // 0x18380 TODO(lift-zstd)
 class Console;
+class Session;
+class Packet;
 class PipeConsole;
 class ThreadManager;
 class TimerQueue;
@@ -34,6 +36,8 @@ void BloodDaemonMain(int argc, wchar_t** argv);  // 0xa690
 class Daemon
 {
 public:
+    typedef bool (*PacketHandler)(Session const* session, Packet const* packet);  // PDB nested type (0x259E)
+
     enum DaemonState  // PDB type 0x259A
     {
         STATE_UNKNOWN = 0,

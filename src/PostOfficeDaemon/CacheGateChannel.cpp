@@ -16,8 +16,8 @@
 #include "Session.h"
 #include "ThreadFreePacketPump.h"
 
-extern TFPP_PacketHandler CacheGatePacketClientSideHandlerList[10];
-extern TFPP_PacketHandler CacheGatePacketClientSideFragmentHandlerList[10];
+extern Daemon::PacketHandler CacheGatePacketClientSideHandlerList[10];
+extern Daemon::PacketHandler CacheGatePacketClientSideFragmentHandlerList[10];
 
 namespace
 {
