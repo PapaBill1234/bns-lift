@@ -241,9 +241,9 @@ int ClientPacketBufferHandler::ToPacket(Session const* session, char const* buff
         if (security3rd != nullptr)
         {
             int size3rd = reinterpret_cast<short const*>(buffer)[1] - 2;
-            int err3rd = security3rd->Decrypt(reinterpret_cast<unsigned char*>(const_cast<char*>(buffer)) + 4,
-                                              &size3rd, with3rdParty);
-            if (err3rd != 0)  // Security3rdParty::S3ERR_SUCCESS
+            Security3rdParty::ErrCode err3rd = security3rd->Decrypt(reinterpret_cast<unsigned char*>(const_cast<char*>(buffer)) + 4,
+                                                                     &size3rd, with3rdParty);
+            if (err3rd != Security3rdParty::S3ERR_SUCCESS)
             {
                 Log::Write(Log::LT_ERROR, PBH_FILE, 198,
                            L"Session(%I64X), Session 3rd party decrypt failed, error-code: %d", session->_id, err3rd);

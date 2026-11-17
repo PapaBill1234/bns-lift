@@ -115,9 +115,18 @@ static_assert(sizeof(PacketCrypt) == 0x8, "sizeof PacketCrypt");
 class Security3rdParty
 {
 public:
-    virtual ~Security3rdParty() {}                                                  // slot 0
-    virtual int Encrypt(unsigned char* buffer, int* size, bool* with3rdParty) = 0;  // slot 1
-    virtual int Decrypt(unsigned char* buffer, int* size, bool with3rdParty) = 0;   // slot 2
+    // PDB type 0x333E (CacheGate).
+    enum ErrCode
+    {
+        S3ERR_SUCCESS = 0,
+        S3ERR_FAILED = 1,
+        S3ERR_NO_NEED_ENCRYPT = 2,
+        S3ERR_INSUFFICIENT_BUFFER = 3,
+    };
+
+    virtual ~Security3rdParty() {}                                                      // slot 0
+    virtual ErrCode Encrypt(unsigned char* buffer, int* size, bool* with3rdParty) = 0;  // slot 1
+    virtual ErrCode Decrypt(unsigned char* buffer, int* size, bool with3rdParty) = 0;   // slot 2
 };
 static_assert(sizeof(Security3rdParty) == 0x8, "sizeof Security3rdParty");
 

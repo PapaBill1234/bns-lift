@@ -427,13 +427,13 @@ bool PacketBuffer::encrypt(PacketCrypt* crypt, Security3rdParty* crypt3rd)
         if (crypt3rd != nullptr)
         {
             int size3rd = size - 2;
-            // ❓ S3ERR_SUCCESS is not in types.h. The code compares with 0.
-            if (crypt3rd->Encrypt(reinterpret_cast<unsigned char*>(&pktbuf->Buffer[10]), &size3rd, &with3rdParty) == 0)
+            if (crypt3rd->Encrypt(reinterpret_cast<unsigned char*>(&pktbuf->Buffer[10]), &size3rd, &with3rdParty) ==
+                Security3rdParty::S3ERR_SUCCESS)
                 size = size3rd + 2;
         }
-        int error = crypt->Encrypt(reinterpret_cast<unsigned char*>(&pktbuf->Buffer[6]), &encBufSize, size, with3rdParty);
-        // ❓ SPCE_NO_ERROR is not in types.h. The code compares with 0.
-        if (error != 0)
+        PacketCrypt::ErrCode error =
+            crypt->Encrypt(reinterpret_cast<unsigned char*>(&pktbuf->Buffer[6]), &encBufSize, size, with3rdParty);
+        if (error != PacketCrypt::SPCE_NO_ERROR)
         {
             Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 1221, L"PacketBuffer, cannot ecrypt packet, error-code:%d", error);
             return false;
