@@ -1599,5 +1599,5 @@ void* LobbyLobbyGatePacketLobbyGateSideFragmentHandlerList[111] = {
     /*  78 */ nullptr, nullptr, LD_H(HandleLobbyLobbyGate_GetServiceEntryListOk),
 };
 
-TFPP_PacketHandler bypassHandler[2] = {nullptr, reinterpret_cast<TFPP_PacketHandler>(&HandleLobbyLobbyGate_BypassPacket)};
-TFPP_PacketHandler bypassHandlerFF[2] = {nullptr, nullptr};  // .bss, zero
+Daemon::PacketHandler bypassHandler[2] = {nullptr, reinterpret_cast<Daemon::PacketHandler>(&HandleLobbyLobbyGate_BypassPacket)};
+Daemon::PacketHandler bypassHandlerFF[2] = {nullptr, nullptr};  // .bss, zero

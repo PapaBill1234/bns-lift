@@ -20,7 +20,7 @@
 
 namespace
 {
-wchar_t const* const AGENT_PACKET_HANDLER_FILE = L"AgentPacketHandler.cpp";  // ❓ name
+wchar_t const* const AGENT_PACKET_HANDLER_FILE = L"AgentPacketHandler.cpp";  // LIFT: No PDB symbol. The binary uses the literal.
 static wchar_t const* const MODULE_NAME = L"agent packet handler";  // PDB MODULE_NAME
 }
 

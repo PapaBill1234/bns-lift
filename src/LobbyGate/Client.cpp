@@ -1,4 +1,5 @@
 // Client.obj (LobbyGate PDB). Source: .scratch/hr/Client.c
+#include "Daemon.h"
 #include "Network.h"
 #include <new>
 #include <vector>
@@ -150,9 +151,9 @@ bool GateKeyManager::Initialize(int hashCount)
 {
     if (hashCount < 1)
         return false;
-    _gkMap = newArray<GateKeyMap>(hashCount, 86);
+    _gkMap = newArray<GateKeyManager::GKEMapType>(hashCount, 86);
     _gkLock = newArray<CriticalSection>(hashCount, 87);
-    _sgkMap = newArray<SessionGateKeyMap>(hashCount, 89);
+    _sgkMap = newArray<GateKeyManager::SessionGateKeyMapType>(hashCount, 89);
     _sgkLock = newArray<CriticalSection>(hashCount, 90);
     _hashCount = hashCount;
     _tidSeed = 0;
@@ -178,7 +179,7 @@ void GateKeyManager::Finalize()
     {
         for (int i = 0; i < _hashCount; ++i)
         {
-            for (GateKeyMap::iterator it = _gkMap[i].begin(); it != _gkMap[i].end(); ++it)
+            for (GateKeyManager::GKEMapType::iterator it = _gkMap[i].begin(); it != _gkMap[i].end(); ++it)
             {
                 if (it->second != nullptr)
                 {
@@ -214,7 +215,7 @@ long long GateKeyManager::MakeGateKey(Session* session)
     GateKeyEntry* entry = new (mem) GateKeyEntry(session);
 
     _gkLock[index].Enter();
-    bool inserted = _gkMap[index].insert(GateKeyMap::value_type(gateKey, entry)).second;
+    bool inserted = _gkMap[index].insert(GateKeyManager::GKEMapType::value_type(gateKey, entry)).second;
     _gkLock[index].Leave();
     if (!inserted)
     {
@@ -225,7 +226,7 @@ long long GateKeyManager::MakeGateKey(Session* session)
 
     _sgkLock[sessionIndex].Enter();
     inserted = _sgkMap[sessionIndex]
-                   .insert(SessionGateKeyMap::value_type(static_cast<long long>(session->_id), gateKey))
+                   .insert(GateKeyManager::SessionGateKeyMapType::value_type(static_cast<long long>(session->_id), gateKey))
                    .second;
     _sgkLock[sessionIndex].Leave();
     if (inserted)
@@ -247,7 +248,7 @@ GateKeyEntry* GateKeyManager::RemoveGateKey(long long gateKey)
     int index = static_cast<int>(gateKey % _hashCount);
     GateKeyEntry* entry = nullptr;
     _gkLock[index].Enter();
-    GateKeyMap::iterator it = _gkMap[index].find(gateKey);
+    GateKeyManager::GKEMapType::iterator it = _gkMap[index].find(gateKey);
     if (it != _gkMap[index].end())
     {
         entry = it->second;
@@ -272,7 +273,7 @@ GateKeyEntry* GateKeyManager::GetGKEntry(long long gateKey)
     int index = static_cast<int>(gateKey % _hashCount);
     GateKeyEntry* entry = nullptr;
     _gkLock[index].Enter();
-    GateKeyMap::iterator it = _gkMap[index].find(gateKey);
+    GateKeyManager::GKEMapType::iterator it = _gkMap[index].find(gateKey);
     if (it != _gkMap[index].end())
         entry = it->second;
     _gkLock[index].Leave();
@@ -285,7 +286,7 @@ long long GateKeyManager::GetGateKey(unsigned long long sessionId)
     int index = static_cast<int>(sessionId % static_cast<unsigned long long>(_hashCount));
     long long gateKey = 0;
     _sgkLock[index].Enter();
-    SessionGateKeyMap::iterator it = _sgkMap[index].find(static_cast<long long>(sessionId));
+    GateKeyManager::SessionGateKeyMapType::iterator it = _sgkMap[index].find(static_cast<long long>(sessionId));
     if (it != _sgkMap[index].end())
         gateKey = it->second;
     _sgkLock[index].Leave();
@@ -467,7 +468,7 @@ bool ClientManager::Initialize(int hashCount)
 {
     if (hashCount < 1)
         return false;
-    _cliMap = newArray<ClientMap>(hashCount, 679);
+    _cliMap = newArray<ClientManager::CliMapType>(hashCount, 679);
     _cliLock = newArray<CriticalSection>(hashCount, 680);
     _hashCount = hashCount;
     return true;
@@ -481,7 +482,7 @@ void ClientManager::Finalize()
         for (int i = 0; i < _hashCount; ++i)
         {
             _cliLock[i].Enter();
-            for (ClientMap::iterator it = _cliMap[i].begin(); it != _cliMap[i].end(); ++it)
+            for (ClientManager::CliMapType::iterator it = _cliMap[i].begin(); it != _cliMap[i].end(); ++it)
             {
                 if (it->second != nullptr)
                 {
@@ -518,7 +519,7 @@ bool ClientManager::AddClient(Session* session, long long gateKey, long long cli
 
     int index = static_cast<int>(cliKey % _hashCount);
     _cliLock[index].Enter();
-    if (_cliMap[index].insert(ClientMap::value_type(cliKey, client)).second)
+    if (_cliMap[index].insert(ClientManager::CliMapType::value_type(cliKey, client)).second)
     {
         client->SetSession(session);
         _cliLock[index].Leave();
@@ -537,7 +538,7 @@ bool ClientManager::RemoveClient(long long cliKey)
     bool result = false;
     int index = static_cast<int>(cliKey % _hashCount);
     _cliLock[index].Enter();
-    ClientMap::iterator it = _cliMap[index].find(cliKey);
+    ClientManager::CliMapType::iterator it = _cliMap[index].find(cliKey);
     if (it != _cliMap[index].end())
     {
         if (it->second != nullptr)
@@ -558,7 +559,7 @@ Client* ClientManager::AcquireClient(long long cliKey)
     int index = static_cast<int>(cliKey % _hashCount);
     Client* client = nullptr;
     _cliLock[index].Enter();
-    ClientMap::iterator it = _cliMap[index].find(cliKey);
+    ClientManager::CliMapType::iterator it = _cliMap[index].find(cliKey);
     if (it != _cliMap[index].end())
     {
         client = it->second;
@@ -614,7 +615,7 @@ bool ClientManager::broadcast(Packet* packet)
     for (int i = 0; i < _hashCount; ++i)
     {
         _cliLock[i].Enter();
-        for (ClientMap::iterator it = _cliMap[i].begin(); it != _cliMap[i].end(); ++it)
+        for (ClientManager::CliMapType::iterator it = _cliMap[i].begin(); it != _cliMap[i].end(); ++it)
         {
             Client* client = it->second;
             if (client != nullptr && client->_broadcast)
@@ -736,8 +737,8 @@ bool ClientSessionHandler::PacketHandler(Session const* session, Packet const* p
     short cmd = packet->CurHeader[1].size;
     if (static_cast<unsigned short>(cmd) <= 0x6D)
     {
-        LobbyGatePacketHandlerFunc handler =
-            reinterpret_cast<LobbyGatePacketHandlerFunc>(AnyAuthedLobbyGatePacketHandlerList[cmd]);
+        Daemon::PacketHandler handler =
+            reinterpret_cast<Daemon::PacketHandler>(AnyAuthedLobbyGatePacketHandlerList[cmd]);
         if (handler != nullptr)
             return handler(session, packet);
     }
@@ -754,8 +755,8 @@ bool ClientSessionHandler::PacketHandler(Session const* session, Packet const* p
         // BUG: 0x6b70 index 0x6E is out of bounds for the 110 entries of NotAuthedLobbyGatePacketHandlerList.
         if (static_cast<unsigned short>(cmd) <= 0x6E)
         {
-            LobbyGatePacketHandlerFunc handler =
-                reinterpret_cast<LobbyGatePacketHandlerFunc>(NotAuthedLobbyGatePacketHandlerList[cmd]);
+            Daemon::PacketHandler handler =
+                reinterpret_cast<Daemon::PacketHandler>(NotAuthedLobbyGatePacketHandlerList[cmd]);
             if (handler != nullptr)
                 return handler(session, packet);
         }
@@ -897,7 +898,7 @@ int ClientManager::DisconnectAll()
     for (int i = 0; i < _hashCount; ++i)
     {
         _cliLock[i].Enter();
-        for (ClientMap::iterator it = _cliMap[i].begin(); it != _cliMap[i].end(); ++it)
+        for (ClientManager::CliMapType::iterator it = _cliMap[i].begin(); it != _cliMap[i].end(); ++it)
         {
             if (it->second != nullptr)
             {

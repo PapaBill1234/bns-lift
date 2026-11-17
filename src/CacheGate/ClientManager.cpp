@@ -19,12 +19,12 @@ ClientManager::~ClientManager()
     if (_clientMap != nullptr)
     {
         ReleaseAllSession();
-        _clientMap->~ClientMap();
+        _clientMap->~SessionMap();
         Memory::_Manager[2]->Free(_clientMap, CLIENT_MANAGER_FILE, 19);
     }
     if (_idIndexMap != nullptr)
     {
-        _idIndexMap->~IdIndexMap();
+        _idIndexMap->~IndexMap();
         Memory::_Manager[2]->Free(_idIndexMap, CLIENT_MANAGER_FILE, 23);
     }
 }
@@ -41,18 +41,18 @@ bool ClientManager::Initialize()
         return false;
     }
 
-    void* buffer = Memory::_Manager[2]->Alloc(sizeof(IdIndexMap), CLIENT_MANAGER_FILE, 33);
-    _idIndexMap = buffer != nullptr ? new (buffer) IdIndexMap() : nullptr;
+    void* buffer = Memory::_Manager[2]->Alloc(sizeof(IndexMap), CLIENT_MANAGER_FILE, 33);
+    _idIndexMap = buffer != nullptr ? new (buffer) IndexMap() : nullptr;
     if (_idIndexMap == nullptr)
         return false;
 
-    buffer = Memory::_Manager[2]->Alloc(sizeof(ClientMap), CLIENT_MANAGER_FILE, 37);
-    _clientMap = buffer != nullptr ? new (buffer) ClientMap() : nullptr;
+    buffer = Memory::_Manager[2]->Alloc(sizeof(SessionMap), CLIENT_MANAGER_FILE, 37);
+    _clientMap = buffer != nullptr ? new (buffer) SessionMap() : nullptr;
     if (_clientMap != nullptr)
         return true;
 
     if (_idIndexMap != nullptr)
-        _idIndexMap->~IdIndexMap();
+        _idIndexMap->~IndexMap();
     // BUG: 0x5e90 _idIndexMap is not set to null after Free. The destructor frees it again.
     Memory::_Manager[2]->Free(_idIndexMap, CLIENT_MANAGER_FILE, 39);
     return false;
@@ -64,7 +64,7 @@ Session* ClientManager::GetSession(unsigned short wid)
     if (_clientMap == nullptr)
         return nullptr;
     _lock.Enter();
-    ClientMap::iterator it = _clientMap->find(wid);
+    SessionMap::iterator it = _clientMap->find(wid);
     Session* session = nullptr;
     if (it != _clientMap->end())
         session = it->second;
@@ -80,13 +80,13 @@ bool ClientManager::AddSession(unsigned short wid, Session const* session)
     _lock.Enter();
     Session* target = const_cast<Session*>(session);
     target->addReferenceCount(CLIENT_MANAGER_FILE, 77);
-    if (!_clientMap->insert(ClientMap::value_type(wid, target)).second)
+    if (!_clientMap->insert(SessionMap::value_type(wid, target)).second)
     {
         target->removeReferenceCount(CLIENT_MANAGER_FILE, 80);
         _lock.Leave();
         return false;
     }
-    bool result = _idIndexMap->insert(IdIndexMap::value_type(session->_id, wid)).second;
+    bool result = _idIndexMap->insert(IndexMap::value_type(session->_id, wid)).second;
     if (!result)
     {
         _clientMap->erase(wid);
@@ -101,11 +101,11 @@ void ClientManager::ReleaseSession(unsigned long long sessionID)
 {
     // BUG: 0x6250 No null check of _idIndexMap and _clientMap (the other functions check).
     _lock.Enter();
-    IdIndexMap::iterator idIt = _idIndexMap->find(sessionID);
+    IndexMap::iterator idIt = _idIndexMap->find(sessionID);
     if (idIt != _idIndexMap->end())
     {
         unsigned short wid = idIt->second;
-        ClientMap::iterator it = _clientMap->find(wid);
+        SessionMap::iterator it = _clientMap->find(wid);
         if (it != _clientMap->end())
         {
             if (it->second != nullptr)
@@ -123,7 +123,7 @@ void ClientManager::ReleaseAllSession()
     if (_clientMap == nullptr)
         return;
     _lock.Enter();
-    for (ClientMap::iterator it = _clientMap->begin(); it != _clientMap->end(); ++it)
+    for (SessionMap::iterator it = _clientMap->begin(); it != _clientMap->end(); ++it)
     {
         if (it->second != nullptr)
             it->second->removeReferenceCount(CLIENT_MANAGER_FILE, 134);

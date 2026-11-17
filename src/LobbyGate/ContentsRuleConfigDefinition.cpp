@@ -14,11 +14,11 @@
 
 namespace
 {
-wchar_t const* const FILE_NAME = L"ContentsRuleConfigDefinition.cpp";        // ❓ name
+wchar_t const* const FILE_NAME = L"ContentsRuleConfigDefinition.cpp";        // LIFT: No PDB symbol. The binary uses the literal.
 wchar_t const* const CONTENTS_RULE_CONFIG_FILENAME = L"ContentsRule.lobbygate.config.xml";  // rva 0x91328
 wchar_t const* const CONTENTS_RULE_CONFIG_MODULENAME = L"lobbygate-contents-rule-config";  // rva 0x91330
 wchar_t const valueString[] = L"";  // ❓ name and value. The binary uses &valueString as an empty string.
-int const ROW_COUNT = 13;           // ❓ name
+int const ROW_COUNT = 13;           // LIFT: No PDB symbol. The binary uses the literal.
 }
 
 // Defaults, minimums and maximums. The PDB names are from the globals at the addresses.

@@ -18,7 +18,7 @@
 static wchar_t const MANAGERPACKETHANDLER_FILE[] = L"ManagerPacketHandler.cpp";
 static wchar_t const SESSION_SOURCE_FILE[] = L"source\\Session.cpp";
 
-static int const SMARTCOUPONMANAGER_PACKET_VERSION = 2;  // ❓ name
+static int const SMARTCOUPONMANAGER_PACKET_VERSION = 2;  // LIFT: No PDB symbol. The binary uses the literal.
 
 // ❓ The guid prints as DWORD, WORD, WORD and 8 bytes.
 #define GUID_ARGS(g)                                                                                               \

@@ -1,6 +1,6 @@
 // mgf.obj (LobbyGate PDB). MGF1 mask generator.
 // The PDB has no type records for this class. The layout comes from the code.
-// ❓ member names.
+// LIFT: Member names. The PDB has no field list.
 #pragma once
 #include <stddef.h>
 #include <string.h>

@@ -9,8 +9,8 @@
 class LobbyDSessionHandler;
 
 // ❓ Globals of the bypass packet pump. The PDB type is void*[2]. The definition comes from a later card.
-extern TFPP_PacketHandler bypassHandler[2];
-extern TFPP_PacketHandler bypassHandlerFF[2];
+extern Daemon::PacketHandler bypassHandler[2];
+extern Daemon::PacketHandler bypassHandlerFF[2];
 
 class LobbyD : public Channel
 {

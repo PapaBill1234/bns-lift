@@ -247,8 +247,8 @@ bool LobbyDSessionHandler::PacketHandler(Session const* session, Packet const* p
     {
         void* iocp = Network::Instance != nullptr ? Network::Instance->_iocpHandle : nullptr;
         result = TFPP_PumpPacket(128, iocp, session, packet, header[1].size, 0,  // ❓ event-id and offset
-                                 reinterpret_cast<TFPP_PacketHandler const*>(_lobbydHandlerList),
-                                 reinterpret_cast<TFPP_PacketHandler const*>(_lobbydFragmentHandlerList));
+                                 reinterpret_cast<Daemon::PacketHandler const*>(_lobbydHandlerList),
+                                 reinterpret_cast<Daemon::PacketHandler const*>(_lobbydFragmentHandlerList));
     }
 
     if (lobbyD != nullptr)

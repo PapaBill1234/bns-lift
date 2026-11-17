@@ -21,7 +21,7 @@
 
 namespace
 {
-wchar_t const* const WORLD_PACKET_HANDLER_FILE = L"WorldPacketHandler.cpp";  // ❓ name
+wchar_t const* const WORLD_PACKET_HANDLER_FILE = L"WorldPacketHandler.cpp";  // LIFT: No PDB symbol. The binary uses the literal.
 static wchar_t const* const MODULE_NAME = L"world packet handler";  // PDB MODULE_NAME
 
 // LIFT: inline of the RelayContextManager id generator

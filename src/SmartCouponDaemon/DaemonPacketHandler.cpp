@@ -23,7 +23,7 @@ static wchar_t const SESSION_SOURCE_FILE[] = L"source\\Session.cpp";
 static wchar_t const CHANNEL_H_FILE[] =
     L"E:\\DailyBuild02\\SmartCouponDaemon-Common-0.0.348\\depot\\Branch\\348NC\\Program\\Server\\BloodLib\\include\\Channel.h";
 
-static short const SMARTCOUPON_PACKET_VERSION = 1;  // ❓ name
+static short const SMARTCOUPON_PACKET_VERSION = 1;  // LIFT: No PDB symbol. The binary uses the literal.
 
 // ❓ The guid prints as DWORD, WORD, WORD and 8 bytes.
 #define GUID_ARGS(g)                                                                                               \

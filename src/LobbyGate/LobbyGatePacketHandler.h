@@ -5,8 +5,8 @@ class Session;
 class Packet;
 class Client;
 
-// ❓ The PDB type of the list entries is void*. Callers cast an entry to this type.
-typedef bool (*LobbyGatePacketHandlerFunc)(Session const* session, Packet const* packet);  // ❓ name
+// ❓ The PDB type of the list entries is void*. Callers cast an entry to Daemon::PacketHandler
+// (PDB nested type 0x20EA, also LobbyGate::NotAuthedPacketHandler).
 
 extern void* AnyAuthedLobbyGatePacketHandlerList[110];  // 0x91b00
 extern void* AuthedLobbyGatePacketHandlerList[110];     // 0x921e0

@@ -14,16 +14,16 @@
 #include "Session.h"
 #include "ThreadFreePacketPump.h"
 
-extern TFPP_PacketHandler PostOfficeServicePacketServerSideHandlerList[13];
-extern TFPP_PacketHandler PostOfficeServicePacketServerSideFragmentHandlerList[13];
+extern Daemon::PacketHandler PostOfficeServicePacketServerSideHandlerList[13];
+extern Daemon::PacketHandler PostOfficeServicePacketServerSideFragmentHandlerList[13];
 
 namespace
 {
-wchar_t const* const WORLD_CHANNEL_FILE = L"WorldChannel.cpp";  // ❓ name
+wchar_t const* const WORLD_CHANNEL_FILE = L"WorldChannel.cpp";  // LIFT: No PDB symbol. The binary uses the literal.
 static wchar_t const* const MODULE_NAME = L"world channel";  // PDB MODULE_NAME
 wchar_t const* const SESSION_FILE = L"source\\Session.cpp";
 wchar_t const* const CHANNEL_H_FILE =
-    L"E:\\DailyBuild02\\PostOfficeDaemon-Common-0.0.348\\depot\\Branch\\348NC\\Program\\Server\\BloodLib\\include\\Channel.h";  // ❓ name
+    L"E:\\DailyBuild02\\PostOfficeDaemon-Common-0.0.348\\depot\\Branch\\348NC\\Program\\Server\\BloodLib\\include\\Channel.h";  // LIFT: No PDB symbol. The binary uses the literal.
 }
 
 // The original writes each "== CRASH ==" text to Log (LT_ERROR) and to AlertSender.

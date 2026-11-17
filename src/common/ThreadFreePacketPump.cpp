@@ -46,7 +46,7 @@ ThreadFreePacketPumpEvent::~ThreadFreePacketPumpEvent()
 }
 
 // 0x1440
-bool ThreadFreePacketPumpEvent::initialize(Session const* session, TFPP_PacketHandler handler)
+bool ThreadFreePacketPumpEvent::initialize(Session const* session, Daemon::PacketHandler handler)
 {
     if (session != nullptr && handler != nullptr)
     {
@@ -75,7 +75,7 @@ ThreadFreePacketPump::~ThreadFreePacketPump()
 }
 
 // 0x15b0
-bool ThreadFreePacketPump::Initialize(Session const* session, Packet const* packet, TFPP_PacketHandler handler)
+bool ThreadFreePacketPump::Initialize(Session const* session, Packet const* packet, Daemon::PacketHandler handler)
 {
     if (packet == nullptr)
     {
@@ -119,7 +119,7 @@ ThreadFreeFragmentPacketPump::~ThreadFreeFragmentPacketPump()
 
 // 0x17f0
 bool ThreadFreeFragmentPacketPump::Initialize(Session const* session, FragmentPacketConcatenater* fpc,
-                                              TFPP_PacketHandler handler)
+                                              Daemon::PacketHandler handler)
 {
     if (fpc == nullptr)
     {
@@ -153,7 +153,7 @@ bool ThreadFreeFragmentPacketPump::HandleEvent(EventContext* context, unsigned l
 
 // 0x1980
 bool __pump_packet(unsigned int eventId, void* iocp, Session const* session, Packet const* packet, int cmd,
-                   TFPP_PacketHandler handler)
+                   Daemon::PacketHandler handler)
 {
     Packet* copy = ::new (Memory::_Manager[2]->Alloc(sizeof(Packet), TFPP_FILE, 172)) Packet;
     copy->Splitter = nullptr;
@@ -196,7 +196,7 @@ bool __pump_packet(unsigned int eventId, void* iocp, Session const* session, Pac
 
 // 0x1bc0
 bool __pump_fragment_packet(unsigned int eventId, void* iocp, Session const* session, Packet const* packet, int cmd,
-                            TFPP_PacketHandler handler)
+                            Daemon::PacketHandler handler)
 {
     bool completed = false;
     FragmentPacketConcatenater* concatenater = static_cast<FragmentPacketConcatenater*>(session->_concatenater);
@@ -268,7 +268,7 @@ fail:
 
 // 0x1fc0
 bool TFPP_PumpPacket(unsigned int eventId, void* iocp, Session const* session, Packet const* packet, int cmd,
-                     int offset, TFPP_PacketHandler const* PH, TFPP_PacketHandler const* fragmentPH)
+                     int offset, Daemon::PacketHandler const* PH, Daemon::PacketHandler const* fragmentPH)
 {
     if (iocp == INVALID_HANDLE_VALUE || session == nullptr || packet == nullptr || PH == nullptr ||
         fragmentPH == nullptr || cmd - offset < 0)  // LIFT: offset is 0 in the binary (folded)

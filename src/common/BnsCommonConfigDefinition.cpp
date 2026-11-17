@@ -15,7 +15,7 @@
 
 namespace
 {
-wchar_t const* const FILE_NAME = L"..\\..\\Shared\\BnsCommonConfigDefinition.cpp";  // ❓ name
+wchar_t const* const FILE_NAME = L"..\\..\\Shared\\BnsCommonConfigDefinition.cpp";  // LIFT: No PDB symbol. The binary uses the literal.
 wchar_t const* const CONFIG_FILENAME = L"bns.common.config.xml";    // 0x59278
 wchar_t const* const CONFIG_MODULENAME = L"bns-common-config";  // 0x59370
 }

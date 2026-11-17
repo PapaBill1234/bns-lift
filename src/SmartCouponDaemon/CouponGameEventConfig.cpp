@@ -14,7 +14,7 @@
 
 namespace
 {
-wchar_t const* const GAME_EVENT_CONFIG_FILE = L"..\\Shared\\CouponGameEventConfig.cpp";  // ❓ name
+wchar_t const* const GAME_EVENT_CONFIG_FILE = L"..\\Shared\\CouponGameEventConfig.cpp";  // LIFT: No PDB symbol. The binary uses the literal.
 }
 
 // LIFT: Inlined in each fail path: write the start log to the console, then wait 5 seconds.

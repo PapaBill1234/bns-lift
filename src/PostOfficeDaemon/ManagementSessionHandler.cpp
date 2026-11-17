@@ -12,7 +12,7 @@
 
 namespace
 {
-wchar_t const* const MANAGEMENT_SESSION_FILE = L"ManagementSessionHandler.cpp";  // ❓ name
+wchar_t const* const MANAGEMENT_SESSION_FILE = L"ManagementSessionHandler.cpp";  // LIFT: No PDB symbol. The binary uses the literal.
 static wchar_t const* const MODULE_NAME = L"management session handler";  // PDB MODULE_NAME
 }
 
@@ -84,7 +84,7 @@ bool ManagementSessionHandler::PacketHandler(Session const* session, Packet cons
         }
         else
         {
-            ManagementPacketHandlerFunc const handler = PostOfficeManagementPacketServerSideHandlerList[index];
+            Daemon::PacketHandler const handler = PostOfficeManagementPacketServerSideHandlerList[index];
             if (handler != nullptr)
                 return handler(session, packet);
             line = 68;

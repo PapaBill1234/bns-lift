@@ -1,5 +1,6 @@
 // ManagementSessionHandler.obj (PostOfficeDaemon PDB). Layouts from include/pdb/PostOfficeDaemon/types.h.
 #pragma once
+#include "Daemon.h"
 #include "Channel.h"
 
 class Session;
@@ -20,6 +21,5 @@ public:
 static_assert(sizeof(ManagementSessionHandler) == 0x8, "sizeof ManagementSessionHandler");
 
 // PostOfficeManagementPacketHandlerList (data only).
-typedef bool (*ManagementPacketHandlerFunc)(Session const* session, Packet const* packet);  // ❓ typedef name
 extern wchar_t const* PostOfficeManagementCommandList[16];
-extern ManagementPacketHandlerFunc PostOfficeManagementPacketServerSideHandlerList[16];
+extern Daemon::PacketHandler PostOfficeManagementPacketServerSideHandlerList[16];

@@ -94,16 +94,15 @@ public:
 };
 static_assert(sizeof(GateKeyEntry) == 0x10, "sizeof GateKeyEntry");
 
-typedef std::map<long long, GateKeyEntry*, std::less<long long>,
-                 StlAllocator<std::pair<long long const, GateKeyEntry*>, 2> > GateKeyMap;  // ❓ typedef name
-typedef std::map<long long, long long, std::less<long long>,
-                 StlAllocator<std::pair<long long const, long long>, 2> > SessionGateKeyMap;  // ❓ typedef name
-typedef std::map<long long, Client*, std::less<long long>,
-                 StlAllocator<std::pair<long long const, Client*>, 2> > ClientMap;  // ❓ typedef name
 
 class GateKeyManager
 {
 public:
+    typedef std::map<long long, GateKeyEntry*, std::less<long long>,
+                     StlAllocator<std::pair<long long const, GateKeyEntry*>, 2> > GKEMapType;  // PDB nested type (0x29AA)
+    typedef std::map<long long, long long, std::less<long long>,
+                     StlAllocator<std::pair<long long const, long long>, 2> > SessionGateKeyMapType;  // PDB nested type (0x2A7D)
+
     bool Initialize(int hashCount);                            // 0x3910
     void Finalize();                                           // 0x3b10
     long long MakeGateKey(Session* session);                   // 0x3ec0
@@ -111,9 +110,9 @@ public:
     GateKeyEntry* GetGKEntry(long long gateKey);               // 0x4330
     long long GetGateKey(unsigned long long sessionId);        // 0x4400
 
-    GateKeyMap* _gkMap;
+    GKEMapType* _gkMap;
     CriticalSection* _gkLock;
-    SessionGateKeyMap* _sgkMap;
+    SessionGateKeyMapType* _sgkMap;
     CriticalSection* _sgkLock;
     long long volatile _tidSeed;
     int _hashCount;
@@ -125,6 +124,9 @@ static_assert(offsetof(GateKeyManager, _hashCount) == 0x28, "GateKeyManager::_ha
 class ClientManager
 {
 public:
+    typedef std::map<long long, Client*, std::less<long long>,
+                     StlAllocator<std::pair<long long const, Client*>, 2> > CliMapType;  // PDB nested type (0x2C49)
+
     bool Initialize(int hashCount);                                          // 0x5b90
     void Finalize();                                                         // 0x5cf0
     bool AddClient(Session* session, long long gateKey, long long cliKey);   // 0x5f70
@@ -137,7 +139,7 @@ private:
     bool broadcast(Packet* packet);                                          // 0x6410
 
 public:
-    ClientMap* _cliMap;
+    CliMapType* _cliMap;
     CriticalSection* _cliLock;
     int _hashCount;
 };

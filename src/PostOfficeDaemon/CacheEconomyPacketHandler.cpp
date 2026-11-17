@@ -16,7 +16,7 @@
 
 namespace
 {
-wchar_t const* const CEPH_FILE = L"CacheEconomyPacketHandler.cpp";  // ❓ name
+wchar_t const* const CEPH_FILE = L"CacheEconomyPacketHandler.cpp";  // LIFT: No PDB symbol. The binary uses the literal.
 static wchar_t const* const MODULE_NAME = L"cache economy packet handler";  // PDB MODULE_NAME
 
 // LIFT: Not in the PDB. The original inlines these line numbers in each handler.

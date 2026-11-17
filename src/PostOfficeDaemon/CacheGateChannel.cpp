@@ -16,16 +16,16 @@
 #include "Session.h"
 #include "ThreadFreePacketPump.h"
 
-extern TFPP_PacketHandler CacheGatePacketClientSideHandlerList[10];
-extern TFPP_PacketHandler CacheGatePacketClientSideFragmentHandlerList[10];
+extern Daemon::PacketHandler CacheGatePacketClientSideHandlerList[10];
+extern Daemon::PacketHandler CacheGatePacketClientSideFragmentHandlerList[10];
 
 namespace
 {
-wchar_t const* const CACHEGATE_CHANNEL_FILE = L"CacheGateChannel.cpp";  // ❓ name
-wchar_t const* const CHANNEL_HEADER_FILE =                               // ❓ name
+wchar_t const* const CACHEGATE_CHANNEL_FILE = L"CacheGateChannel.cpp";  // LIFT: No PDB symbol. The binary uses the literal.
+wchar_t const* const CHANNEL_HEADER_FILE =                               // LIFT: No PDB symbol. The binary uses the literal.
     L"E:\\DailyBuild02\\PostOfficeDaemon-Common-0.0.348\\depot\\Branch\\348NC\\Program\\Server\\BloodLib\\include\\Channel.h";
 static wchar_t const* const MODULE_NAME = L"cachegate channel";  // PDB MODULE_NAME
-wchar_t const* const DISCONNECTED_CACHEGATE = L"disconnected cachegate";  // ❓ name
+wchar_t const* const DISCONNECTED_CACHEGATE = L"disconnected cachegate";  // LIFT: No PDB symbol. The binary uses the literal.
 }
 
 // 0x12c30 (scalar deleting dtor; the dtor body is empty)

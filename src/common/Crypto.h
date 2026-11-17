@@ -1,5 +1,5 @@
 // Crypto.obj (CacheGate PDB). The PDB has no type records for this class.
-// The layout and the member names come from the code. ❓ member names.
+// The layout and the member names come from the code. LIFT: Member names. The PDB has no field list.
 #pragma once
 
 class Crypto
@@ -7,10 +7,10 @@ class Crypto
 public:
     enum Type
     {
-        AES128 = 3,   // ❓ name
-        BLOWFISH = 4, // ❓ name
-        RSA_PUBLIC = 65,  // ❓ name
-        RSA_PRIVATE = 81, // ❓ name
+        AES128 = 3,   // LIFT: No PDB type record.
+        BLOWFISH = 4, // LIFT: No PDB type record.
+        RSA_PUBLIC = 65,  // LIFT: No PDB type record.
+        RSA_PRIVATE = 81, // LIFT: No PDB type record.
     };
 
     virtual bool Setup(unsigned char const* key, int keySize, int round) = 0;

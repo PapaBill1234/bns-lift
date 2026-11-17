@@ -86,7 +86,7 @@ void CacheGateSessionHandler::OnClose(Session const* session, bool tryReconnect)
 // 0x4150 (COMDAT folded with CacheDChannel::PacketHandler)
 bool CacheGateSessionHandler::PacketHandler(Session const* session, Packet const* packet) const
 {
-    CacheGatePacketHandler handler =
+    Daemon::PacketHandler handler =
         CacheGatePacketServerSideHandlerList[static_cast<unsigned short>(packet->CurHeader[1].size)];
     return handler != nullptr && handler(session, packet);
 }

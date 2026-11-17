@@ -12,17 +12,17 @@
 #include "Session.h"
 #include "ThreadFreePacketPump.h"
 
-extern TFPP_PacketHandler CacheEconomyPacketClientSideHandlerList[22];  // CacheEconomyClientSideHandlerList.cpp
+extern Daemon::PacketHandler CacheEconomyPacketClientSideHandlerList[22];  // CacheEconomyClientSideHandlerList.cpp
 
 namespace
 {
-wchar_t const* const CGPH_FILE = L"CacheGatePacketHandler.cpp";  // ❓ name
+wchar_t const* const CGPH_FILE = L"CacheGatePacketHandler.cpp";  // LIFT: No PDB symbol. The binary uses the literal.
 static wchar_t const* const MODULE_NAME = L"cachegate packet handler";  // PDB MODULE_NAME
 
 // PDB enum CacheEconomyPacketCommand (PostOfficeDaemon type 0x2C8F).
 enum
 {
-    ECONOMY_CMD_BASE = 1024,  // ❓ name; the PDB enum has no 1024 entry
+    ECONOMY_CMD_BASE = 1024,  // LIFT: The PDB enum has no 1024 entry. The binary uses the literal.
     CacheEconomy_PingReqCmd = 1031,
     CacheEconomy_RetrieveCharacterInfoReqCmd = 1037,
     CacheEconomy_CheckPostCapacityReqCmd = 1040,
@@ -115,7 +115,7 @@ bool HandleCacheGateRelay(Session const* session, Packet const* packet)
         else
         {
             // BUG: 0x8070 economyCmd - 1024 has no bounds check before the table read.
-            TFPP_PacketHandler const handler = CacheEconomyPacketClientSideHandlerList[economyCmd - ECONOMY_CMD_BASE];
+            Daemon::PacketHandler const handler = CacheEconomyPacketClientSideHandlerList[economyCmd - ECONOMY_CMD_BASE];
             if (handler != nullptr)
             {
                 handler(session, packet);
@@ -172,7 +172,7 @@ bool HandleCacheGateFragmentRelay(Session const* session, Packet const* packet)
         else
         {
             // BUG: 0x82c0 economyCmd - 1024 has no bounds check before the table read.
-            TFPP_PacketHandler const handler = CacheEconomyPacketClientSideHandlerList[economyCmd - ECONOMY_CMD_BASE];
+            Daemon::PacketHandler const handler = CacheEconomyPacketClientSideHandlerList[economyCmd - ECONOMY_CMD_BASE];
             if (handler != nullptr)
             {
                 handler(session, packet);

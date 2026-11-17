@@ -1,5 +1,6 @@
 // CacheGateSessionHandler.obj and CacheGateServerSideHandlerList.obj (CacheGate PDB).
 #pragma once
+#include "Daemon.h"
 #include "Channel.h"
 
 class Session;
@@ -16,10 +17,8 @@ public:
 };
 static_assert(sizeof(CacheGateSessionHandler) == 0x8, "sizeof CacheGateSessionHandler");
 
-typedef bool (*CacheGatePacketHandler)(Session const* session, Packet const* packet);  // ❓ typedef name
-
-extern CacheGatePacketHandler CacheGatePacketServerSideHandlerList[10];          // 0x592D0
-extern CacheGatePacketHandler CacheGatePacketServerSideFragmentHandlerList[10];  // 0x59320
+extern Daemon::PacketHandler CacheGatePacketServerSideHandlerList[10];          // 0x592D0
+extern Daemon::PacketHandler CacheGatePacketServerSideFragmentHandlerList[10];  // 0x59320
 
 bool HandleCacheGateHello(Session const* session, Packet const* packet);          // 0x4C00
 bool HandleCacheGateHelloOk(Session const* session, Packet const* packet);        // 0x4F20

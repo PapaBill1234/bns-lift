@@ -3,12 +3,11 @@
 #include <stddef.h>
 #include "TimerQueue.h"
 #include "Packet.h"
+#include "Daemon.h"
 
 class Session;
 class FragmentPacketConcatenater;
 
-// ❓ typedef name. The PDB has only the type bool (*)(Session const*, Packet const*).
-typedef bool (*TFPP_PacketHandler)(Session const* session, Packet const* packet);
 
 extern unsigned long long GPacketPumpEventKey;
 
@@ -32,13 +31,13 @@ public:
     unsigned long long GetKey() const { return _key; }
 
 protected:
-    virtual bool initialize(Session const* session, TFPP_PacketHandler handler);  // 0x1440, slot 6
+    virtual bool initialize(Session const* session, Daemon::PacketHandler handler);  // 0x1440, slot 6
 
     unsigned int _eventId;
     Type _type;
     unsigned long long _key;
     Session const* _session;
-    TFPP_PacketHandler _handler;
+    Daemon::PacketHandler _handler;
 };
 static_assert(sizeof(ThreadFreePacketPumpEvent) == 0x38, "sizeof ThreadFreePacketPumpEvent");
 
@@ -50,7 +49,7 @@ public:
         : ThreadFreePacketPumpEvent(eventId, TYPE_PACKET, key), _packet(nullptr) {}
     virtual ~ThreadFreePacketPump();                                                    // 0x1530
     virtual bool HandleEvent(EventContext* context, unsigned long param);               // 0x1680
-    bool Initialize(Session const* session, Packet const* packet, TFPP_PacketHandler handler);  // 0x15b0
+    bool Initialize(Session const* session, Packet const* packet, Daemon::PacketHandler handler);  // 0x15b0
 
 private:
     Packet const* _packet;
@@ -65,7 +64,7 @@ public:
         : ThreadFreePacketPumpEvent(eventId, TYPE_FRAGMENT_PACKET, key), _fpc(nullptr) {}
     virtual ~ThreadFreeFragmentPacketPump();                                            // 0x1760
     virtual bool HandleEvent(EventContext* context, unsigned long param);               // 0x18c0
-    bool Initialize(Session const* session, FragmentPacketConcatenater* fpc, TFPP_PacketHandler handler);  // 0x17f0
+    bool Initialize(Session const* session, FragmentPacketConcatenater* fpc, Daemon::PacketHandler handler);  // 0x17f0
 
 private:
     FragmentPacketConcatenater* _fpc;
@@ -73,8 +72,8 @@ private:
 static_assert(sizeof(ThreadFreeFragmentPacketPump) == 0x40, "sizeof ThreadFreeFragmentPacketPump");
 
 bool __pump_packet(unsigned int eventId, void* iocp, Session const* session, Packet const* packet, int cmd,
-                   TFPP_PacketHandler handler);  // 0x1980
+                   Daemon::PacketHandler handler);  // 0x1980
 bool __pump_fragment_packet(unsigned int eventId, void* iocp, Session const* session, Packet const* packet, int cmd,
-                            TFPP_PacketHandler handler);  // 0x1bc0
+                            Daemon::PacketHandler handler);  // 0x1bc0
 bool TFPP_PumpPacket(unsigned int eventId, void* iocp, Session const* session, Packet const* packet, int cmd,
-                     int offset, TFPP_PacketHandler const* PH, TFPP_PacketHandler const* fragmentPH);  // 0x1fc0
+                     int offset, Daemon::PacketHandler const* PH, Daemon::PacketHandler const* fragmentPH);  // 0x1fc0

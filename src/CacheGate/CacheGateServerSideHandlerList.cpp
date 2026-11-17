@@ -8,7 +8,7 @@ static bool CacheGateReturnTrue(Session const* session, Packet const* packet)
 }
 
 // 0x592d0
-CacheGatePacketHandler CacheGatePacketServerSideHandlerList[10] = {
+Daemon::PacketHandler CacheGatePacketServerSideHandlerList[10] = {
     nullptr,
     HandleCacheGateHello,
     HandleCacheGateHelloOk,
@@ -22,7 +22,7 @@ CacheGatePacketHandler CacheGatePacketServerSideHandlerList[10] = {
 };
 
 // 0x59320
-CacheGatePacketHandler CacheGatePacketServerSideFragmentHandlerList[10] = {
+Daemon::PacketHandler CacheGatePacketServerSideFragmentHandlerList[10] = {
     nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
     HandleCacheGateFragmentRelay,
 };
