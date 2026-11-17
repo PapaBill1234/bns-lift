@@ -21,8 +21,6 @@ wchar_t const* const WORLD_CONFIG_FILE = L"WorldConfigManager.cpp";  // ❓ name
 wchar_t const* const WORLD_CONFIG_TAG = L"world config manager";    // ❓ name
 wchar_t const* const XML_READER_DLL = L"XmlReader_sv64.dll";        // ❓ name
 wchar_t const* const XML_READER_VERSION = L"15";                    // ❓ name
-int const BUCKET_COUNT = 33;                                        // ❓ name
-int const WORLD_COUNT_PER_BUCKET = 1000;                            // ❓ name
 }
 
 // The original writes each "== CRASH ==" text to Log (LT_ERROR) and to AlertSender.
@@ -71,7 +69,7 @@ bool WorldConfigManager::updateWorldList(WorldConfigList const* worldConfigList)
     {
         unsigned short wid = it->first;
         WorldConfig const* worldConfig = it->second;
-        int bucketIndex = wid / WORLD_COUNT_PER_BUCKET;
+        int bucketIndex = wid / ARRAY_SIZE;
         if (bucketIndex >= BUCKET_COUNT)
         {
             Log::Write(Log::LT_ERROR, WORLD_CONFIG_FILE, 107,
@@ -80,7 +78,7 @@ bool WorldConfigManager::updateWorldList(WorldConfigList const* worldConfigList)
             lock.Leave();
             return false;
         }
-        int worldIndex = wid - WORLD_COUNT_PER_BUCKET * bucketIndex;
+        int worldIndex = wid - ARRAY_SIZE * bucketIndex;
         if (_containerList[bucketIndex] == nullptr)
             _containerList[bucketIndex] =
                 static_cast<WorldConfig**>(Memory::_Manager[2]->AllocZero(8000, WORLD_CONFIG_FILE, 112));
@@ -116,7 +114,7 @@ bool WorldConfigManager::updateWorldList(WorldConfigList const* worldConfigList)
 bool WorldConfigManager::addWorldConfig(unsigned short wid, int bucketIndex, int worldIndex,
                                         WorldConfig const* const worldConfig)
 {
-    if (wid == 0 || bucketIndex >= BUCKET_COUNT || worldIndex >= WORLD_COUNT_PER_BUCKET || worldConfig == nullptr)
+    if (wid == 0 || bucketIndex >= BUCKET_COUNT || worldIndex >= ARRAY_SIZE || worldConfig == nullptr)
     {
         WORLD_CONFIG_CRASH(136,
                            L"== CRASH == [%s], %s; invalid parameter, wid:%u, bucketIndex:%d, worldIndex:%d, "
@@ -145,7 +143,7 @@ bool WorldConfigManager::addWorldConfig(unsigned short wid, int bucketIndex, int
 bool WorldConfigManager::updateWorldConfig(unsigned short wid, int bucketIndex, int worldIndex,
                                            WorldConfig const* const worldConfig)
 {
-    if (wid == 0 || bucketIndex >= BUCKET_COUNT || worldIndex >= WORLD_COUNT_PER_BUCKET || worldConfig == nullptr)
+    if (wid == 0 || bucketIndex >= BUCKET_COUNT || worldIndex >= ARRAY_SIZE || worldConfig == nullptr)
     {
         WORLD_CONFIG_CRASH(158,
                            L"== CRASH == [%s], %s; invalid parameter, wid:%u, bucketIndex:%d, worldIndex:%d, "
@@ -177,7 +175,7 @@ WorldConfig* WorldConfigManager::getWorldConfig(unsigned short const wid)
                    L"getWorldConfig", wid);
         return nullptr;
     }
-    int bucketIndex = wid / WORLD_COUNT_PER_BUCKET;
+    int bucketIndex = wid / ARRAY_SIZE;
     if (bucketIndex >= BUCKET_COUNT)
     {
         Log::Write(Log::LT_ERROR, WORLD_CONFIG_FILE, 186,
@@ -191,7 +189,7 @@ WorldConfig* WorldConfigManager::getWorldConfig(unsigned short const wid)
                    WORLD_CONFIG_TAG, L"getWorldConfig", wid, bucketIndex);
         return nullptr;
     }
-    return _containerList[bucketIndex][wid - WORLD_COUNT_PER_BUCKET * bucketIndex];
+    return _containerList[bucketIndex][wid - ARRAY_SIZE * bucketIndex];
 }
 
 // 0xe430

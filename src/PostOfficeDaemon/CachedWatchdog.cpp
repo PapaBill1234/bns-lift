@@ -80,19 +80,19 @@ bool CachedWatchdogManager::initWatchdogManager(WorldConfigList const* worldConf
          it != worldConfigList->_configList.end(); ++it)
     {
         unsigned short const wid = it->first;
-        int const bucketIndex = wid / 1000;
-        int const worldIndex = wid % 1000;
-        if (bucketIndex >= 33)
+        int const bucketIndex = wid / ARRAY_SIZE;
+        int const worldIndex = wid % ARRAY_SIZE;
+        if (bucketIndex >= BUCKET_COUNT)
         {
             Log::Write(Log::LT_ERROR, CACHED_WATCHDOG_FILE, 107,
                        L"[%s], %s; wid out of range, wid:%u, bucketIndex:%d, bucketCount:%d", CACHED_WATCHDOG_TAG,
-                       L"CachedWatchdogManager::initWatchdogManager", wid, bucketIndex, 33);
+                       L"CachedWatchdogManager::initWatchdogManager", wid, bucketIndex, BUCKET_COUNT);
             return false;
         }
 
         if (_containerList[bucketIndex] == nullptr)
             _containerList[bucketIndex] = static_cast<CachedWatchdog**>(
-                Memory::_Manager[2]->AllocZero(sizeof(CachedWatchdog*) * 1000, CACHED_WATCHDOG_FILE, 112));
+                Memory::_Manager[2]->AllocZero(sizeof(CachedWatchdog*) * ARRAY_SIZE, CACHED_WATCHDOG_FILE, 112));
 
         if (_containerList[bucketIndex][worldIndex] != nullptr)
         {
@@ -122,19 +122,19 @@ bool CachedWatchdogManager::updateWorldList(WorldConfigList const* worldConfigLi
          it != worldConfigList->_configList.end(); ++it)
     {
         unsigned short const wid = it->first;
-        int const bucketIndex = wid / 1000;
-        int const worldIndex = wid % 1000;
-        if (bucketIndex >= 33)
+        int const bucketIndex = wid / ARRAY_SIZE;
+        int const worldIndex = wid % ARRAY_SIZE;
+        if (bucketIndex >= BUCKET_COUNT)
         {
             Log::Write(Log::LT_ERROR, CACHED_WATCHDOG_FILE, 147,
                        L"[%s], %s; wid out of range, wid:%u, bucketIndex:%d, bucketCount:%d", CACHED_WATCHDOG_TAG,
-                       L"CachedWatchdogManager::updateWorldList", wid, bucketIndex, 33);
+                       L"CachedWatchdogManager::updateWorldList", wid, bucketIndex, BUCKET_COUNT);
             return false;
         }
 
         if (_containerList[bucketIndex] == nullptr)
             _containerList[bucketIndex] = static_cast<CachedWatchdog**>(
-                Memory::_Manager[2]->AllocZero(sizeof(CachedWatchdog*) * 1000, CACHED_WATCHDOG_FILE, 152));
+                Memory::_Manager[2]->AllocZero(sizeof(CachedWatchdog*) * ARRAY_SIZE, CACHED_WATCHDOG_FILE, 152));
 
         if (_containerList[bucketIndex][worldIndex] == nullptr && !addCachedWatchdog(wid, bucketIndex, worldIndex))
         {
@@ -156,7 +156,7 @@ bool CachedWatchdogManager::updateWorldList(WorldConfigList const* worldConfigLi
 // 0x46b0
 bool CachedWatchdogManager::addCachedWatchdog(unsigned short wid, int bucketIndex, int worldIndex)
 {
-    if (wid == 0 || bucketIndex >= 33 || worldIndex >= 1000)
+    if (wid == 0 || bucketIndex >= BUCKET_COUNT || worldIndex >= ARRAY_SIZE)
     {
         CACHED_WATCHDOG_CRASH(172, L"== CRASH == [%s], %s; invalid parameter, wid:%u, bucketIndex:%d, worldIndex:%d",
                               CACHED_WATCHDOG_TAG, L"CachedWatchdogManager::addCachedWatchdog", wid, bucketIndex,
@@ -189,7 +189,7 @@ bool CachedWatchdogManager::addCachedWatchdog(unsigned short wid, int bucketInde
 }
 
 // 0x48b0
-CachedWatchdog* CachedWatchdogManager::getCachedWatchdog(unsigned short const wid)
+CachedWatchdog* const CachedWatchdogManager::getCachedWatchdog(unsigned short const wid) const
 {
     if (wid == 0)
     {
@@ -198,12 +198,12 @@ CachedWatchdog* CachedWatchdogManager::getCachedWatchdog(unsigned short const wi
         return nullptr;
     }
 
-    int const bucketIndex = wid / 1000;
-    if (bucketIndex >= 33)
+    int const bucketIndex = wid / ARRAY_SIZE;
+    if (bucketIndex >= BUCKET_COUNT)
     {
         Log::Write(Log::LT_ERROR, CACHED_WATCHDOG_FILE, 210,
                    L"[%s], %s; wid out of range, wid:%u, bucketIndex:%d, bucketCount:%d", CACHED_WATCHDOG_TAG,
-                   L"CachedWatchdogManager::getCachedWatchdog", wid, bucketIndex, 33);
+                   L"CachedWatchdogManager::getCachedWatchdog", wid, bucketIndex, BUCKET_COUNT);
         return nullptr;
     }
 
@@ -214,11 +214,11 @@ CachedWatchdog* CachedWatchdogManager::getCachedWatchdog(unsigned short const wi
         return nullptr;
     }
 
-    return _containerList[bucketIndex][wid - 1000 * bucketIndex];
+    return _containerList[bucketIndex][wid - ARRAY_SIZE * bucketIndex];
 }
 
 // 0x49d0
-void CachedWatchdogManager::SetServiceState(unsigned short wid, ServiceState const newState)
+void CachedWatchdogManager::SetServiceState(unsigned short wid, CachedWatchdog::ServiceState const newState)
 {
     CachedWatchdog* const cachedWatchdog = getCachedWatchdog(wid);
     if (cachedWatchdog == nullptr)
@@ -231,9 +231,9 @@ void CachedWatchdogManager::SetServiceState(unsigned short wid, ServiceState con
 }
 
 // 0x4a50
-void CachedWatchdogManager::SetAllServiceState(ServiceState const newState)
+void CachedWatchdogManager::SetAllServiceState(CachedWatchdog::ServiceState const newState)
 {
-    for (int bucketIndex = 0; bucketIndex < 33; ++bucketIndex)
+    for (int bucketIndex = 0; bucketIndex < BUCKET_COUNT; ++bucketIndex)
     {
         for (int worldIndex = _arrayBoundary[bucketIndex][0];
              worldIndex != -1 && worldIndex <= _arrayBoundary[bucketIndex][1]; ++worldIndex)
@@ -246,7 +246,7 @@ void CachedWatchdogManager::SetAllServiceState(ServiceState const newState)
 
     Log::Write(Log::LT_NOTICE, CACHED_WATCHDOG_FILE, 256, L"[%s], %s; [all] current cached service state:%s",
                CACHED_WATCHDOG_TAG, L"CachedWatchdogManager::SetAllServiceState",
-               newState == SERVICE_STATE_AVAILABLE ? L"available" : L"unavailable");  // ❓ the binary has "unavailable"
+               newState == CachedWatchdog::SERVICE_STATE_AVAILABLE ? L"available" : L"unavailable");  // ❓ the binary has "unavailable"
 }
 
 // 0x4b60
@@ -263,7 +263,7 @@ bool CachedWatchdogManager::AddNextPing(unsigned short wid)
 }
 
 // ❓ inlined in PingRelayContext::processRelayResponse (0xabd0). The name comes from the log text.
-unsigned long long CachedWatchdogManager::GetCurrentPingSeq(unsigned short wid)
+unsigned long long const CachedWatchdogManager::GetCurrentPingSeq(unsigned short const wid) const
 {
     CachedWatchdog* const cachedWatchdog = getCachedWatchdog(wid);
     if (cachedWatchdog == nullptr)

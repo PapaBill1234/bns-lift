@@ -10,7 +10,7 @@ class CacheGateChannel;
 class UnsentPostContext
 {
 public:
-    // ❓ Inlined ctor at 0xc3b0 and 0xce80.
+    // PDB constructor, inlined at 0xc3b0 and 0xce80.
     UnsentPostContext(long long const postId, bool const hasPostContext)
         : _postId(postId), _hasPostContext(hasPostContext), _prev(nullptr), _next(nullptr)
     {
@@ -27,7 +27,7 @@ static_assert(offsetof(UnsentPostContext, _prev) == 0x10, "UnsentPostContext::_p
 class UnsentPostContextList
 {
 public:
-    // ❓ Inlined ctor at 0xce80. The lock uses InitializeCriticalSectionAndSpinCount(4000).
+    // PDB constructor, inlined at 0xce80. The lock uses InitializeCriticalSectionAndSpinCount(4000).
     explicit UnsentPostContextList(unsigned short const wid) : _wid(wid), _lock(4000), _header(nullptr), _contextCount(0) {}
 
     bool pushUnsentPostContext(long long const postId, bool const hasPostContext);  // 0xc3b0
@@ -46,7 +46,7 @@ static_assert(offsetof(UnsentPostContextList, _contextCount) == 0x38, "UnsentPos
 class UnsentPostContextManager
 {
 public:
-    // ❓ Inlined at 0x13d30: the CriticalSection ctor, then memset of the arrays.
+    // PDB constructor, inlined at 0x13d30: the CriticalSection ctor, then memset of the arrays.
     UnsentPostContextManager()
     {
         memset(_containerList, 0, sizeof(_containerList));
@@ -63,8 +63,11 @@ public:
                                   CacheGateChannel* const cachegateChannel);               // 0xd510
 
     CriticalSection _reloadLock;
-    UnsentPostContextList** _containerList[33];
-    int _arrayBoundary[33][2];
+    static int const BUCKET_COUNT = 33;
+    static int const ARRAY_SIZE = 1000;
+
+    UnsentPostContextList** _containerList[BUCKET_COUNT];
+    int _arrayBoundary[BUCKET_COUNT][2];
 };
 static_assert(sizeof(UnsentPostContextManager) == 0x238, "sizeof UnsentPostContextManager");
 static_assert(offsetof(UnsentPostContextManager, _containerList) == 0x28, "UnsentPostContextManager::_containerList");

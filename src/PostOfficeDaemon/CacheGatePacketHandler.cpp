@@ -58,7 +58,7 @@ bool HandleCacheGateHelloOk(Session const* session, Packet const* packet)
                    L"HandleCacheGateHelloOk", static_cast<void*>(nullptr));
         return false;
     }
-    static_cast<CacheGateChannel*>(channel)->SetServiceState(SERVICE_STATE_AVAILABLE);
+    static_cast<CacheGateChannel*>(channel)->SetServiceState(CacheGateChannel::SERVICE_STATE_AVAILABLE);
     channel->removeReferenceCount(CGPH_FILE, 47);
     Log::Write(Log::LT_NOTICE, CGPH_FILE, 49, L"[%s], %s; hello success", CGPH_TAG, L"HandleCacheGateHelloOk");
     return true;

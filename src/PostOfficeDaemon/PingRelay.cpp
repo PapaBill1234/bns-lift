@@ -60,7 +60,7 @@ bool PingRelayContext::processRelayResponse() const
                        _response._pingSeq);
             return false;
         }
-        cachedWatchdogManager->SetServiceState(toWid, SERVICE_STATE_AVAILABLE);
+        cachedWatchdogManager->SetServiceState(toWid, CachedWatchdog::SERVICE_STATE_AVAILABLE);
         if (!cachedWatchdogManager->AddNextPing(toWid))
         {
             PING_RELAY_CRASH(64, L"== CRASH == [%s], %s; failed to add next ping, destinationWid:%u", PING_RELAY_TAG,
@@ -93,7 +93,7 @@ bool PingRelayContext::processRelayResponse() const
         return false;
     }
 
-    cachedWatchdogManager->SetServiceState(toWid, SERVICE_STATE_UNAVAILABLE);
+    cachedWatchdogManager->SetServiceState(toWid, CachedWatchdog::SERVICE_STATE_UNAVAILABLE);
     if (!cachedWatchdogManager->AddNextPing(toWid))
     {
         PING_RELAY_CRASH(86, L"== CRASH == [%s], %s; failed to add next ping, destinationWid:%u", PING_RELAY_TAG,

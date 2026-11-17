@@ -624,7 +624,7 @@ CacheGateChannel* PostOfficeDaemon::checkDestinationServiceState(unsigned short 
                    L"[%s], %s; no such cached watchdog, wid:%u, cachedWatchdog:0x%p", L"cached watchdog",
                    L"CachedWatchdogManager::IsServiceAvailable", destinationWid, nullptr);
     }
-    if (cachedWatchdog == nullptr || cachedWatchdog->_serviceState != SERVICE_STATE_AVAILABLE)
+    if (cachedWatchdog == nullptr || cachedWatchdog->_serviceState != CachedWatchdog::SERVICE_STATE_AVAILABLE)
     {
         Log::Write(Log::LT_ERROR, kFile, 553, L"[%s], %s; cached service state is unavailable, destinationWid:%u", kTag,
                    L"PostOfficeDaemon::checkDestinationServiceState", destinationWid);
@@ -649,7 +649,7 @@ CacheGateChannel* PostOfficeDaemon::checkCacheGateServiceState()
                    L"PostOfficeDaemon::checkCacheGateServiceState");
         return nullptr;
     }
-    if (cachegateChannel->_serviceState != SERVICE_STATE_AVAILABLE)
+    if (cachegateChannel->_serviceState != CacheGateChannel::SERVICE_STATE_AVAILABLE)
     {
         Log::Write(Log::LT_ERROR, kFile, 569, L"[%s], %s; cachegate service state is unavailable", kTag,
                    L"PostOfficeDaemon::checkCacheGateServiceState");
@@ -663,11 +663,11 @@ CacheGateChannel* PostOfficeDaemon::checkCacheGateServiceState()
 void PostOfficeDaemon::shutdown()
 {
     Log::Write(Log::LT_NOTICE, kFile, 579, L"[%s], %s; service shutdown", kTag, L"PostOfficeDaemon::shutdown");
-    _cachedWatchdogManager->SetAllServiceState(SERVICE_STATE_UNAVAILABLE);
+    _cachedWatchdogManager->SetAllServiceState(CachedWatchdog::SERVICE_STATE_UNAVAILABLE);
     CacheGateChannelManager* const manager = _cachegateChannelManager;
     manager->_lock.Enter();
     if (manager->_cachegateChannel != nullptr)
-        manager->_cachegateChannel->SetServiceState(SERVICE_STATE_UNAVAILABLE);
+        manager->_cachegateChannel->SetServiceState(CacheGateChannel::SERVICE_STATE_UNAVAILABLE);
     manager->_lock.Leave();
     Network::StopPort(2);
     Network::ClosePort(2);

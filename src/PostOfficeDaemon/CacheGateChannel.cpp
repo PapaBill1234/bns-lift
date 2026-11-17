@@ -44,10 +44,10 @@ CacheGateSessionHandler::~CacheGateSessionHandler()
 {
 }
 
-// ❓ inlined (log line 36)
-void CacheGateChannel::SetServiceState(int newState)
+// Inlined (log line 36)
+void CacheGateChannel::SetServiceState(ServiceState const newState)
 {
-    InterlockedExchange(&_serviceState, newState);
+    InterlockedExchange(reinterpret_cast<long volatile*>(&_serviceState), newState);
     Log::Write(Log::LT_NOTICE, CACHEGATE_CHANNEL_FILE, 36, L"[%s], %s; current cachegate service state:%s",
                CACHEGATE_CHANNEL_TAG, L"CacheGateChannel::SetServiceState",
                newState == SERVICE_STATE_AVAILABLE ? L"available" : L"unavailable");  // ❓ text for the unavailable state
@@ -292,7 +292,7 @@ void CacheGateSessionHandler::OnClose(Session const* session, bool tryReconnect)
     Channel* const channel = session->GetChannel();
     if (channel != nullptr)
     {
-        static_cast<CacheGateChannel*>(channel)->SetServiceState(SERVICE_STATE_UNAVAILABLE);
+        static_cast<CacheGateChannel*>(channel)->SetServiceState(CacheGateChannel::SERVICE_STATE_UNAVAILABLE);
         if (!tryReconnect)
         {
             // ❓ inlined CacheGateChannelManager release (log line 202). The name is not in the PDB.
@@ -309,7 +309,7 @@ void CacheGateSessionHandler::OnClose(Session const* session, bool tryReconnect)
         channel->removeReferenceCount(CACHEGATE_CHANNEL_FILE, 277);
     }
 
-    daemon->_cachedWatchdogManager->SetAllServiceState(SERVICE_STATE_UNAVAILABLE);  // ❓ the decompiler shows no value
+    daemon->_cachedWatchdogManager->SetAllServiceState(CachedWatchdog::SERVICE_STATE_UNAVAILABLE);  // ❓ the decompiler shows no value
 
     if (tryReconnect)
         Log::Write(Log::LT_DEBUG, CACHEGATE_CHANNEL_FILE, 284,

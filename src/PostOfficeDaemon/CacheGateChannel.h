@@ -13,16 +13,22 @@ class RelayHeader;
 class CacheGateChannel : public Channel
 {
 public:
+    enum ServiceState
+    {
+        SERVICE_STATE_UNAVAILABLE = 0,
+        SERVICE_STATE_AVAILABLE = 1,
+    };
+
     virtual ~CacheGateChannel();
     virtual unsigned long long GetId();
 
     bool SendRelayRequest(RelayContext* relayContext);                                           // 0x7000
     bool SendFragmentRelayRequest(RelayContext* relayContext, char const* const economyFormat);  // 0x71e0
 
-    // ❓ Inlined in 0x7b50 and 0x7e90. The log text gives the name.
-    void SetServiceState(int newState);
+    // PDB method, inlined in 0x7b50 and 0x7e90.
+    void SetServiceState(ServiceState const newState);
 
-    volatile long _serviceState;
+    ServiceState _serviceState;
 };
 static_assert(sizeof(CacheGateChannel) == 0x30, "sizeof CacheGateChannel");
 static_assert(offsetof(CacheGateChannel, _serviceState) == 0x28, "CacheGateChannel::_serviceState");
@@ -36,7 +42,7 @@ public:
     CriticalSection _lock;
     CacheGateChannel* _cachegateChannel;
 
-    // ❓ Inlined at 0x14090.
+    // PDB constructor, inlined at 0x14090.
     CacheGateChannelManager() : _lock(4000), _cachegateChannel(nullptr) {}
 };
 static_assert(sizeof(CacheGateChannelManager) == 0x30, "sizeof CacheGateChannelManager");

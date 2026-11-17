@@ -14,8 +14,6 @@
 
 #define UNSENT_POST_CONTEXT_FILE L"UnsentPostContext.cpp"
 #define UNSENT_POST_CONTEXT_TAG L"unsent post context"
-#define UNSENT_POST_BUCKET_COUNT 33               // ❓ name
-#define UNSENT_POST_WORLD_COUNT_PER_BUCKET 1000   // ❓ name
 
 // The original writes each "== CRASH ==" text to Log (LT_ERROR) and to AlertSender.
 #define UNSENT_POST_CONTEXT_CRASH(line, fmt, ...)                                     \
@@ -103,19 +101,19 @@ bool UnsentPostContextManager::initContextManager(WorldConfigList const* worldCo
          it != worldConfigList->_configList.end(); ++it)
     {
         unsigned short const wid = it->first;
-        int const bucketIndex = wid / UNSENT_POST_WORLD_COUNT_PER_BUCKET;
-        int const worldIndex = wid % UNSENT_POST_WORLD_COUNT_PER_BUCKET;
-        if (bucketIndex >= UNSENT_POST_BUCKET_COUNT)
+        int const bucketIndex = wid / ARRAY_SIZE;
+        int const worldIndex = wid % ARRAY_SIZE;
+        if (bucketIndex >= BUCKET_COUNT)
         {
             Log::Write(Log::LT_ERROR, UNSENT_POST_CONTEXT_FILE, 159,
                        L"[%s], %s; wid out of range, wid:%u, bucketIndex:%d, bucketCount:%d", UNSENT_POST_CONTEXT_TAG,
-                       L"UnsentPostContextManager::initContextManager", wid, bucketIndex, UNSENT_POST_BUCKET_COUNT);
+                       L"UnsentPostContextManager::initContextManager", wid, bucketIndex, BUCKET_COUNT);
             lock.Leave();
             return false;
         }
         if (_containerList[bucketIndex] == nullptr)
             _containerList[bucketIndex] = static_cast<UnsentPostContextList**>(Memory::_Manager[2]->AllocZero(
-                sizeof(UnsentPostContextList*) * UNSENT_POST_WORLD_COUNT_PER_BUCKET, UNSENT_POST_CONTEXT_FILE, 164));
+                sizeof(UnsentPostContextList*) * ARRAY_SIZE, UNSENT_POST_CONTEXT_FILE, 164));
         if (_containerList[bucketIndex][worldIndex] != nullptr)
         {
             Log::Write(Log::LT_ERROR, UNSENT_POST_CONTEXT_FILE, 174,
@@ -146,19 +144,19 @@ bool UnsentPostContextManager::updateWorldList(WorldConfigList const* worldConfi
          it != worldConfigList->_configList.end(); ++it)
     {
         unsigned short const wid = it->first;
-        int const bucketIndex = wid / UNSENT_POST_WORLD_COUNT_PER_BUCKET;
-        int const worldIndex = wid % UNSENT_POST_WORLD_COUNT_PER_BUCKET;
-        if (bucketIndex >= UNSENT_POST_BUCKET_COUNT)
+        int const bucketIndex = wid / ARRAY_SIZE;
+        int const worldIndex = wid % ARRAY_SIZE;
+        if (bucketIndex >= BUCKET_COUNT)
         {
             Log::Write(Log::LT_ERROR, UNSENT_POST_CONTEXT_FILE, 198,
                        L"[%s], %s; wid out of range, wid:%u, bucketIndex:%d, bucketCount:%d", UNSENT_POST_CONTEXT_TAG,
-                       L"UnsentPostContextManager::updateWorldList", wid, bucketIndex, UNSENT_POST_BUCKET_COUNT);
+                       L"UnsentPostContextManager::updateWorldList", wid, bucketIndex, BUCKET_COUNT);
             lock.Leave();
             return false;
         }
         if (_containerList[bucketIndex] == nullptr)
             _containerList[bucketIndex] = static_cast<UnsentPostContextList**>(Memory::_Manager[2]->AllocZero(
-                sizeof(UnsentPostContextList*) * UNSENT_POST_WORLD_COUNT_PER_BUCKET, UNSENT_POST_CONTEXT_FILE, 203));
+                sizeof(UnsentPostContextList*) * ARRAY_SIZE, UNSENT_POST_CONTEXT_FILE, 203));
         if (_containerList[bucketIndex][worldIndex] == nullptr && !addUnsentPostContextList(wid, bucketIndex, worldIndex))
         {
             UNSENT_POST_CONTEXT_CRASH(
@@ -178,7 +176,7 @@ bool UnsentPostContextManager::updateWorldList(WorldConfigList const* worldConfi
 // 0xce80
 bool UnsentPostContextManager::addUnsentPostContextList(unsigned short wid, int bucketIndex, int worldIndex)
 {
-    if (wid == 0 || bucketIndex >= UNSENT_POST_BUCKET_COUNT || worldIndex >= UNSENT_POST_WORLD_COUNT_PER_BUCKET)
+    if (wid == 0 || bucketIndex >= BUCKET_COUNT || worldIndex >= ARRAY_SIZE)
     {
         UNSENT_POST_CONTEXT_CRASH(223, L"== CRASH == [%s], %s; invalid parameter, wid:%u, bucketIndex:%d, worldIndex:%d",
                                   UNSENT_POST_CONTEXT_TAG, L"UnsentPostContextManager::addUnsentPostContextList", wid,
@@ -223,12 +221,12 @@ UnsentPostContextList* UnsentPostContextManager::getUnsentPostContextList(unsign
                    UNSENT_POST_CONTEXT_TAG, L"UnsentPostContextManager::getUnsentPostContextList", wid);
         return nullptr;
     }
-    int const bucketIndex = wid / UNSENT_POST_WORLD_COUNT_PER_BUCKET;
-    if (bucketIndex >= UNSENT_POST_BUCKET_COUNT)
+    int const bucketIndex = wid / ARRAY_SIZE;
+    if (bucketIndex >= BUCKET_COUNT)
     {
         Log::Write(Log::LT_ERROR, UNSENT_POST_CONTEXT_FILE, 255,
                    L"[%s], %s; wid out of range, wid:%u, bucketIndex:%d, bucketCount:%d", UNSENT_POST_CONTEXT_TAG,
-                   L"UnsentPostContextManager::getUnsentPostContextList", wid, bucketIndex, UNSENT_POST_BUCKET_COUNT);
+                   L"UnsentPostContextManager::getUnsentPostContextList", wid, bucketIndex, BUCKET_COUNT);
         return nullptr;
     }
     if (_containerList[bucketIndex] == nullptr)
@@ -238,7 +236,7 @@ UnsentPostContextList* UnsentPostContextManager::getUnsentPostContextList(unsign
                    L"UnsentPostContextManager::getUnsentPostContextList", wid, bucketIndex);
         return nullptr;
     }
-    return _containerList[bucketIndex][wid - UNSENT_POST_WORLD_COUNT_PER_BUCKET * bucketIndex];
+    return _containerList[bucketIndex][wid - ARRAY_SIZE * bucketIndex];
 }
 
 // 0xd190
@@ -277,7 +275,7 @@ void UnsentPostContextManager::CheckUnsentPost()
     do
     {
         delivered = false;
-        for (int bucketIndex = 0; bucketIndex < UNSENT_POST_BUCKET_COUNT; ++bucketIndex)
+        for (int bucketIndex = 0; bucketIndex < BUCKET_COUNT; ++bucketIndex)
         {
             int const minIndex = _arrayBoundary[bucketIndex][0];
             if (minIndex == -1)
