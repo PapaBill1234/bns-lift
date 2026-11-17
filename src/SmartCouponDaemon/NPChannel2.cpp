@@ -110,8 +110,8 @@ bool NPPing::HandleEvent(EventContext*, unsigned long)
     if (_run)
     {
         _StsMsgRequestPing msg;
-        msg.msgInfo.eCmd = 1002;
-        msg.msgInfo.msgType = 1;
+        msg.msgInfo.eCmd = COMMAND_PING;
+        msg.msgInfo.msgType = MESSAGE_TYPE_REQUEST;
         msg.msgInfo.nTxnId = 0;
         _owner->SendMsg(&msg, false, nullptr);
         Daemon::Instance->GlobalTimerQueue->Add(_interval, this);
@@ -419,7 +419,7 @@ bool NPChannel::SendMsg(_StsMsg* msg, bool response, void* context)
         Log::Write(Log::LT_ERROR, NPCHANNEL_FILE, 435, L"[np], send fail; not connected session");
         return false;
     }
-    if (response && msg->GetMessageType() == 1 &&
+    if (response && msg->GetMessageType() == MESSAGE_TYPE_REQUEST &&
         !_tranRegistry->Register(msg->GetCommand(), context, &static_cast<_StsMsgRequest*>(msg)->msgInfo.nTxnId))
     {
         Log::Write(Log::LT_ERROR, NPCHANNEL_FILE, 442, L"== CRASH == [np], register transaction failed");
@@ -611,8 +611,8 @@ bool NPChannel::sendInitialConnectMessage(Session const* session)
     strcpy_s(localIP, sizeof(localIP), t_addressBuffer);
 
     _StsMsgRequestInitialConnect msg;
-    msg.msgInfo.eCmd = 1001;
-    msg.msgInfo.msgType = 1;
+    msg.msgInfo.eCmd = COMMAND_INITIAL_CONNECT;
+    msg.msgInfo.msgType = MESSAGE_TYPE_REQUEST;
     msg.msgInfo.nTxnId = 0;
     msg.pszIpAddress = localIP;
     Log::Write(Log::LT_DEBUG, NPCHANNEL_FILE, 642, L"[np], send initial connect message, local-ip:%s",
