@@ -41,7 +41,7 @@ static wchar_t const* const kFile = L"SmartCouponDaemon.cpp";
 SmartCouponDaemon* SmartCouponDaemon::_instance = nullptr;
 SmartCouponObjPoolMemoryAllocator* GObjPoolMemAlloc = nullptr;  // rva 0x84B18
 ObjPoolTimer* GObjPoolTimer = nullptr;                          // rva 0x84B20
-static volatile long long _seed__ = 0;                          // ❓ GenerateJobid counter
+static unsigned long long __seed__ = 0;  // PDB __seed__ (SmartCouponDaemon.obj, 0x850a8). GenerateJobid counter.
 
 // Default values of SmartCouponConfig::_Def. The names come from the PDB (SmartCouponConfig.obj).
 static int const DEFAULT_DUMPTYPE = 1;
@@ -133,7 +133,7 @@ void* SmartCouponObjPoolMemoryAllocator::Alloc(unsigned long long size, wchar_t 
 // 0x14b50
 unsigned long long GenerateJobid()
 {
-    return static_cast<unsigned long long>(_InterlockedIncrement64(&_seed__));
+    return static_cast<unsigned long long>(_InterlockedIncrement64(reinterpret_cast<long long volatile*>(&__seed__)));
 }
 
 // 0x14b70
