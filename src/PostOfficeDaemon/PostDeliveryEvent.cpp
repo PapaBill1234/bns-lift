@@ -64,7 +64,7 @@ bool PostDeliveryEvent::OccurEvent(PostContext* const postContext, CacheGateChan
         return false;
     }
 
-    void* const memory = Memory::_Manager[2]->Alloc(sizeof(PostDeliveryEvent), POST_DELIVERY_EVENT_FILE, 53);  // ❓ line
+    void* const memory = Memory::_Manager[2]->Alloc(sizeof(PostDeliveryEvent), POST_DELIVERY_EVENT_FILE, 54);
     PostDeliveryEvent* const postDeliveryEvent =
         memory != nullptr ? ::new (memory) PostDeliveryEvent(postContext, cachegateChannel) : nullptr;
 
@@ -131,7 +131,7 @@ bool PostDeliveryEvent::deliverPost(unsigned short recipientWid, long long postI
     economyHeader._toWid = recipientWid;
     economyHeader._relayTid = relayTid;
 
-    void* const memory = Memory::_Manager[2]->Alloc(sizeof(DeliverPostRelayContext), POST_DELIVERY_EVENT_FILE, 106);  // ❓ line
+    void* const memory = Memory::_Manager[2]->Alloc(sizeof(DeliverPostRelayContext), POST_DELIVERY_EVENT_FILE, 107);
     DeliverPostRelayContext* const relayContext =
         memory != nullptr ? ::new (memory) DeliverPostRelayContext(economyHeader, _postContext) : nullptr;
 

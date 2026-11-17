@@ -307,7 +307,7 @@ FragmentPacket* ContentsRuleConfig::MakeListPacket(ContentsRuleConfig* config)
     (void)config;
     ContentsRuleConfig* current = Config;
 
-    void* memory = Memory::_Manager[2]->Alloc(sizeof(FragmentPacket), FILE_NAME, 0);  // ❓ line
+    void* memory = Memory::_Manager[2]->Alloc(sizeof(FragmentPacket), FILE_NAME, 0);
     FragmentPacket* fp = memory != nullptr ? new (memory) FragmentPacket(107, "hihhiCb;") : nullptr;
     if (fp == nullptr)
         return nullptr;

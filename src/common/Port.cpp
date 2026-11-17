@@ -190,7 +190,7 @@ bool Port::Initialize(unsigned int id, unsigned short portNumber, unsigned int m
         PORT_ASSERT_CRASH(239);
         break;
     }
-    void* memory = BaseMemoryManager::_Instance.Alloc(sizeof(SessionPool), PORT_FILE, 242);  // ❓ line (LTCG dropped it)
+    void* memory = BaseMemoryManager::_Instance.Alloc(sizeof(SessionPool), PORT_FILE, 243);
     _pool = memory != nullptr ? new (memory) SessionPool(_id) : nullptr;
     _pool->Initialize(_maxSession, prepareRatio, false);
     _unusedSessionIndex = 1;

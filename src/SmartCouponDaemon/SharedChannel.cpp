@@ -29,7 +29,7 @@ bool SharedChannel::Connect(unsigned long long id, unsigned int portId, unsigned
         return false;
     }
 
-    void* buffer = Memory::_Manager[2]->Alloc(sizeof(RawChannel), SHARED_CHANNEL_FILE, 19);  // ❓ line
+    void* buffer = Memory::_Manager[2]->Alloc(sizeof(RawChannel), SHARED_CHANNEL_FILE, 20);
     _rawChannel = buffer != nullptr ? new (buffer) RawChannel(id, this) : nullptr;
     // BUG: 0x6400 no check for a null _rawChannel before MakeSession.
     if (!_rawChannel->MakeSession(portId, ip, portNo, timeout, reconnect))
@@ -61,7 +61,7 @@ bool SharedChannel::Accept(unsigned long long id, Session const* session)
         return false;
     }
 
-    void* buffer = Memory::_Manager[2]->Alloc(sizeof(RawChannel), SHARED_CHANNEL_FILE, 43);  // ❓ line
+    void* buffer = Memory::_Manager[2]->Alloc(sizeof(RawChannel), SHARED_CHANNEL_FILE, 44);
     _rawChannel = buffer != nullptr ? new (buffer) RawChannel(id, this) : nullptr;
     // BUG: 0x6610 calls SetSession on a null _rawChannel when the alloc fails.
     _rawChannel->SetSession(session);

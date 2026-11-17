@@ -202,7 +202,7 @@ void LobbyGate::AddJobTimer(unsigned long long gateKey, char reason)
 {
     if (_config->_closeTimeout <= 0)
         return;
-    void* const mem = Memory::_Manager[2]->Alloc(sizeof(ClientSessionTimerJob), kFile, 170);  // ❓ line
+    void* const mem = Memory::_Manager[2]->Alloc(sizeof(ClientSessionTimerJob), kFile, 171);
     ClientSessionTimerJob* timer = nullptr;
     if (mem != nullptr)
     {
@@ -335,7 +335,7 @@ bool LobbyGate::initialize()
 
     _sessionHandlerCount = 25;
     _sessionHandlerList = static_cast<SessionHandler**>(
-        Memory::_Manager[2]->Alloc(sizeof(SessionHandler*) * _sessionHandlerCount, kFile, 320));  // ❓ line
+        Memory::_Manager[2]->Alloc(sizeof(SessionHandler*) * _sessionHandlerCount, kFile, 325));
     return true;
 }
 

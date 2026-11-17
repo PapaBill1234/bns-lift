@@ -41,12 +41,12 @@ bool ClientManager::Initialize()
         return false;
     }
 
-    void* buffer = Memory::_Manager[2]->Alloc(sizeof(IdIndexMap), CLIENT_MANAGER_FILE, 32);  // ❓ line
+    void* buffer = Memory::_Manager[2]->Alloc(sizeof(IdIndexMap), CLIENT_MANAGER_FILE, 33);
     _idIndexMap = buffer != nullptr ? new (buffer) IdIndexMap() : nullptr;
     if (_idIndexMap == nullptr)
         return false;
 
-    buffer = Memory::_Manager[2]->Alloc(sizeof(ClientMap), CLIENT_MANAGER_FILE, 35);  // ❓ line
+    buffer = Memory::_Manager[2]->Alloc(sizeof(ClientMap), CLIENT_MANAGER_FILE, 37);
     _clientMap = buffer != nullptr ? new (buffer) ClientMap() : nullptr;
     if (_clientMap != nullptr)
         return true;

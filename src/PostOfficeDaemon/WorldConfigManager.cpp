@@ -123,7 +123,7 @@ bool WorldConfigManager::addWorldConfig(unsigned short wid, int bucketIndex, int
         return false;
     }
     WorldConfig* newConfig =
-        static_cast<WorldConfig*>(Memory::_Manager[2]->Alloc(sizeof(WorldConfig), WORLD_CONFIG_FILE, 143));  // ❓ line
+        static_cast<WorldConfig*>(Memory::_Manager[2]->Alloc(sizeof(WorldConfig), WORLD_CONFIG_FILE, 140));
     newConfig->_wid = worldConfig->_wid;
     newConfig->_ipAddress = worldConfig->_ipAddress;
     newConfig->_port = worldConfig->_port;
