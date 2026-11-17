@@ -100,7 +100,7 @@ class PostContextManager
 {
 public:
     typedef std::map<long long, PostContext*, std::less<long long>,
-                     StlAllocator<std::pair<long long const, PostContext*>, 2> > Container;  // ❓ typedef name and allocator
+                     StlAllocator<std::pair<long long const, PostContext*>, 2> > Container;  // PDB PostContextManager::Container
 
     bool initContextManager();                    // 0x11d10
     PostContext* GetContext(long long postId);    // 0x11ea0. Adds a reference.

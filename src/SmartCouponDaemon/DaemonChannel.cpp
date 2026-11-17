@@ -349,12 +349,12 @@ void DChannelMgr::writeFileUtf8(void* handle, wchar_t const* format, ...)
 }
 
 // 0xdab0
-int DChannelMgr::AddDaemon(DChannel* channel)
+DChannelMgr::ErrCode DChannelMgr::AddDaemon(DChannel* channel)
 {
     if (channel == nullptr)
     {
         Log::Write(Log::LT_ERROR, DCHANNEL_FILE, 316, L"[daemon-mgr], register daemon fail; null daemon parameter");
-        return 1;
+        return ERR_INVALID_PARAM;
     }
 
     _lock.Enter();
@@ -369,7 +369,7 @@ int DChannelMgr::AddDaemon(DChannel* channel)
                    L"[daemon-mgr], daemon registered, id:%d, wid:%d, type:%d, ip:%s, port:%d",
                    static_cast<unsigned int>(channel->GetId()), channel->_daemonId._wid, channel->_daemonId._type,
                    Network::GetAddressStringW(channel->_addr), channel->_port);
-        return 0;
+        return ERR_SUCCESS;
     }
 
     Log::Write(Log::LT_ERROR, DCHANNEL_FILE, 336,
@@ -377,7 +377,7 @@ int DChannelMgr::AddDaemon(DChannel* channel)
                L"req-port:%d",
                static_cast<unsigned int>(channel->GetId()), channel->_daemonId._wid, channel->_daemonId._type,
                Network::GetAddressStringW(channel->_addr), channel->_port);
-    return 3;
+    return ERR_ADDWORLD_ALREADY_REGISTERED;
 }
 
 // 0xdc50

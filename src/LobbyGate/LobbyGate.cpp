@@ -588,7 +588,7 @@ bool LobbyGateCooldownTimer::HandleEvent(EventContext* context, unsigned long nu
 {
     LobbyGate* const lobbyGate = LobbyGate::_instance;
     _elapsed += 3000;
-    int const remainClient = static_cast<int>(lobbyGate->_clientManager->DisconnectAll());
+    int const remainClient = lobbyGate->_clientManager->DisconnectAll();
     int remainTime = 0;
     if (_completeDelay - _elapsed > 0)
         remainTime = _completeDelay - _elapsed;

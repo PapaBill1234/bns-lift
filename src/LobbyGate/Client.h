@@ -131,7 +131,7 @@ public:
     bool RemoveClient(long long cliKey);                                     // 0x60c0
     Client* AcquireClient(long long cliKey);                                 // 0x61e0
     void BroadcastAnnounceNotify(wchar_t const* message);                    // 0x62c0
-    unsigned int DisconnectAll();                                            // 0x7180 ❓ return type
+    int DisconnectAll();                                                     // 0x7180
 
 private:
     bool broadcast(Packet* packet);                                          // 0x6410
@@ -158,7 +158,7 @@ public:
     virtual bool PacketHandler(Session const* session, Packet const* packet) const;  // 0x6b70
     virtual ~ClientSessionHandler();                                              // 0x126e0 (LobbyGate.obj, later card)
 
-    static short SwitchCmdLobbyGateToLobbyDaemon(short cmd);                      // 0x6da0 ❓ static
+    static short SwitchCmdLobbyGateToLobbyDaemon(short lobbyGateCmd);             // 0x6da0
 };
 static_assert(sizeof(ClientSessionHandler) == 0x8, "sizeof ClientSessionHandler");
 

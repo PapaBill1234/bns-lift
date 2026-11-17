@@ -61,13 +61,14 @@ public:
     ~JobManager();  // 0x6CE0
 
     typedef std::map<unsigned long long, CouponJob*, std::less<unsigned long long>,
-                     StlAllocator<std::pair<const unsigned long long, CouponJob*>, 2> > JobMap;  // ❓ typedef name
+                     StlAllocator<std::pair<const unsigned long long, CouponJob*>, 2> > JobMap;  // PDB JobManager::JobMap
 
     bool Initialize(int hashCount);                                   // 0x6E10
     bool Register(CouponJob* job);                                    // 0x6F60
     void Clear();                                                     // 0x6FF0
     void Execute(CouponJob* job, int task, void* param);              // 0x71A0
-    bool ExecuteW(unsigned long long jobid, void* param);             // 0x7220 ❓ arguments
+    // PDB: 3 arguments. LTCG removed task in the binary (the callers give 2).
+    bool ExecuteW(unsigned long long jobid, int task, void* param);   // 0x7220
     bool ResumeW(unsigned long long jobid, int state, int task);      // 0x72B0
 
 private:

@@ -24,7 +24,7 @@ bool NPHandlerEventNoti(NPChannel* channel, _StsMsg* msg, NPTransaction* tran)
         if (tran->GetKind() != 1)
             return false;
         NPJobTransaction* job = static_cast<NPJobTransaction*>(tran);
-        if (!SmartCouponDaemon::_instance->_jobMgr->ExecuteW(job->_jobid, msg))
+        if (!SmartCouponDaemon::_instance->_jobMgr->ExecuteW(job->_jobid, 2, msg))
         {
             Log::Write(Log::LT_ERROR, NPMESSAGEHANDLER_FILE, 61,
                        L"[np], handle event-noti fail; execute job fail, np-tid:%u, jobid:0x%I64X",

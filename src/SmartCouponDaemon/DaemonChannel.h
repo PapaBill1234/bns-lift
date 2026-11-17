@@ -58,7 +58,16 @@ public:
     bool SetupDaemonListFromXml(wchar_t const* xml);
     bool SetupDaemonList(DaemonInfo** list, int count);
     static bool CreateDaemonListXml(wchar_t const* xml);
-    int AddDaemon(DChannel* channel);                      // ❓ return type
+    // PDB DChannelMgr::ErrCode (SmartCouponDaemon type 0x47D3).
+    enum ErrCode
+    {
+        ERR_SUCCESS = 0,
+        ERR_INVALID_PARAM = 1,
+        ERR_ADDWORLD_NOT_CAPABLE = 2,
+        ERR_ADDWORLD_ALREADY_REGISTERED = 3,
+    };
+
+    ErrCode AddDaemon(DChannel* channel);  // 0xdab0
     DChannel* FindDaemon(GameEventDaemonId const* daemonId);
     bool ReplaceDaemon(DChannel* newDaemon);
 

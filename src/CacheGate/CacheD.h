@@ -45,7 +45,7 @@ class CacheDList
 public:
     typedef std::map<unsigned short, CacheD*, std::less<unsigned short>,
                      StlAllocator<std::pair<unsigned short const, CacheD*>, 2> >
-        CacheDMap;  // ❓ typedef name
+        CacheDMap;  // PDB CacheDList::CacheDMap
 
     // ❓ The constructor is inlined in the CacheGate constructor.
     CacheDList() : _capacity(0), _cachedMap(nullptr) {}
