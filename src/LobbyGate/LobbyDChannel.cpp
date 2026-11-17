@@ -232,7 +232,7 @@ bool LobbyDSessionHandler::PacketHandler(Session const* session, Packet const* p
     else
     {
         void* iocp = Network::Instance != nullptr ? Network::Instance->_iocpHandle : nullptr;
-        result = TFPP_PumpPacket(128, iocp, session, packet, header[1].size, 0,  // ❓ event-id and offset
+        result = TFPP_PumpPacket(128, iocp, session, packet, header[1].size, 0,  // LIFT: TFPP 0x1fc0 folded eventId 128 (0x207e) and offset 0 (0x204d). cmd = word +2 (0x980f).
                                  reinterpret_cast<Daemon::PacketHandler const*>(_lobbydHandlerList),
                                  reinterpret_cast<Daemon::PacketHandler const*>(_lobbydFragmentHandlerList));
     }

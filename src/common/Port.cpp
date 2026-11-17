@@ -163,7 +163,7 @@ bool Port::Initialize(unsigned int id, unsigned short portNumber, unsigned int m
                       bool enableRecv, bool nagle, void* iocpHandle, SessionHandler const* sessionHandler,
                       PacketBufferHandler const* bufferHandler)
 {
-    (void)enableRecv;  // ❓ the binary does not read it here; Network::OpenPort sets _enableRecv.
+    (void)enableRecv;  // LIFT: LTCG folded enableRecv. Initialize does not read it. OpenPort sets _enableRecv (LobbyGate 0x207a7).
     int prepareRatio = 100;
     if (_listener != nullptr || sessionHandler == nullptr)
         PORT_ASSERT_CRASH(216);
