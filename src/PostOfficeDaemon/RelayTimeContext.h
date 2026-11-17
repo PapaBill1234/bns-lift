@@ -54,8 +54,11 @@ public:
     Container* _containerList;
     long volatile _contextCount;
 
-private:
-    RelayTimeContextManager();  // later card (PostOfficeDaemon)
+    // ❓ Inlined at 0x14280.
+    explicit RelayTimeContextManager(int bucketCount)
+        : _bucketCount(bucketCount), _lockList(nullptr), _containerList(nullptr), _contextCount(0)
+    {
+    }
 };
 static_assert(sizeof(RelayTimeContextManager) == 0x20, "sizeof RelayTimeContextManager");
 static_assert(offsetof(RelayTimeContextManager, _contextCount) == 0x18, "RelayTimeContextManager::_contextCount");

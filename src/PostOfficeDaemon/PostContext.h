@@ -8,19 +8,7 @@
 
 class FragmentPacket;
 
-// types.h:1335. The member names of the guid part come from the decompiler (id1..id4).
-union id128
-{
-    struct
-    {
-        unsigned long id1;
-        unsigned short id2;
-        unsigned short id3;
-        unsigned char id4[8];
-    } guid;
-    unsigned long long id[2];
-};
-static_assert(sizeof(id128) == 0x10, "sizeof id128");
+#include "StringUtil.h"  // id128 (types.h:1335)
 
 class PostInfo
 {
@@ -113,6 +101,12 @@ public:
     CriticalSection* _lockList;
     Container* _containerList;
     long volatile _contextCount;  // The PDB type is int. The code uses Interlocked calls on it.
+
+    // ❓ Inlined at 0x14280.
+    explicit PostContextManager(int bucketCount)
+        : _bucketCount(bucketCount), _lockList(nullptr), _containerList(nullptr), _contextCount(0)
+    {
+    }
 };
 static_assert(sizeof(PostContextManager) == 0x20, "sizeof PostContextManager");
 static_assert(offsetof(PostContextManager, _contextCount) == 0x18, "PostContextManager::_contextCount");

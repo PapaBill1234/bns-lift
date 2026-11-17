@@ -207,7 +207,12 @@ add_library(lift_postofficedaemon STATIC
   src/PostOfficeDaemon/CheckPostCapacityRelay.cpp
   src/PostOfficeDaemon/RetrieveCharacterInfoRelay.cpp
   src/PostOfficeDaemon/CacheEconomyPacketHandler.cpp
-  src/PostOfficeDaemon/CacheEconomyClientSideHandlerList.cpp)
+  src/PostOfficeDaemon/CacheEconomyClientSideHandlerList.cpp
+  src/PostOfficeDaemon/WorldConfigManager.cpp
+  src/PostOfficeDaemon/UnsentPostContext.cpp
+  src/PostOfficeDaemon/UnsentPostChecker.cpp
+  src/PostOfficeDaemon/PostOfficeDB.cpp
+  src/PostOfficeDaemon/PostOfficeDaemon.cpp)
 target_compile_options(lift_postofficedaemon PRIVATE /GR-)
 target_include_directories(lift_postofficedaemon BEFORE PRIVATE ${LIFT_STL_INCLUDE})
 target_include_directories(lift_postofficedaemon PUBLIC ${CMAKE_SOURCE_DIR}/src/PostOfficeDaemon)
@@ -232,3 +237,18 @@ target_compile_options(LobbyGate PRIVATE /GR-)
 target_include_directories(LobbyGate BEFORE PRIVATE ${LIFT_STL_INCLUDE})
 add_dependencies(LobbyGate lift_msvcp100_implib)
 target_link_libraries(LobbyGate PRIVATE lift_lobbygate lift_common ${LIFT_MSVCP100_IMPLIB})
+
+# PostOfficeDaemon server exe. XmlReader_sv64.dll, bsConsole_sv64.dll and dbghelp.dll load at run time (not linked).
+lift_exe(PostOfficeDaemon
+  SOURCES src/PostOfficeDaemon/LinkStubs.cpp src/crt/wmain_bridge.c src/crt/tlssup.c src/crt/new_delete.c
+  IMPORTS msvcr100 kernel32 user32 advapi32 shell32 ole32 odbc32 shlwapi version ws2_32 iphlpapi)
+target_compile_options(PostOfficeDaemon PRIVATE /GR-)
+target_include_directories(PostOfficeDaemon BEFORE PRIVATE ${LIFT_STL_INCLUDE})
+add_dependencies(PostOfficeDaemon lift_msvcp100_implib)
+target_link_libraries(PostOfficeDaemon PRIVATE lift_postofficedaemon lift_common ${LIFT_MSVCP100_IMPLIB})
+# vendor/zstd is optional. Without it, use the zstd stub (as LobbyGate does).
+if(TARGET lift_zstd)
+  target_link_libraries(PostOfficeDaemon PRIVATE lift_zstd)
+else()
+  target_sources(PostOfficeDaemon PRIVATE src/crt/zstd_stub.c)
+endif()

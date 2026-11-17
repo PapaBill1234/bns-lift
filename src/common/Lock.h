@@ -21,6 +21,8 @@ class CriticalSection
 {
 public:
     CriticalSection() { InitializeCriticalSection(&CS); }
+    // ❓ Not in PDB. Inlined at PostOfficeDaemon 0xce80 (InitializeCriticalSectionAndSpinCount).
+    explicit CriticalSection(unsigned long spinCount) { InitializeCriticalSectionAndSpinCount(&CS, spinCount); }
     ~CriticalSection();
     void Enter() { EnterCriticalSection(&CS); }  // ❓ name not in PDB (inlined)
     void Leave() { LeaveCriticalSection(&CS); }  // ❓ name not in PDB (inlined)

@@ -35,6 +35,9 @@ public:
 
     CriticalSection _lock;
     CacheGateChannel* _cachegateChannel;
+
+    // ❓ Inlined at 0x14090.
+    CacheGateChannelManager() : _lock(4000), _cachegateChannel(nullptr) {}
 };
 static_assert(sizeof(CacheGateChannelManager) == 0x30, "sizeof CacheGateChannelManager");
 static_assert(offsetof(CacheGateChannelManager, _cachegateChannel) == 0x28, "CacheGateChannelManager::_cachegateChannel");

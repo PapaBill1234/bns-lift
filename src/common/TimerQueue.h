@@ -102,6 +102,8 @@ public:
     friend class CachedWatchdog;         // ❓ access for 0x3dc0 (PostOfficeDaemon)
     friend class CachedWatchdogManager;  // ❓ access (PostOfficeDaemon)
     friend class RelayTimeoutChecker;    // ❓ access for 0x1d700 (PostOfficeDaemon)
+    friend class UnsentPostChecker;      // ❓ access for 0xd770 (PostOfficeDaemon)
+    friend class PostOfficeDaemon;       // ❓ access for startTimer 0x14660 (PostOfficeDaemon)
 };
 static_assert(sizeof(TimerQueue) == 0x78, "sizeof TimerQueue");
 static_assert(offsetof(TimerQueue, StqSlot) == 0x40, "TimerQueue::StqSlot");

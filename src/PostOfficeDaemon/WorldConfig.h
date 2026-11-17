@@ -1,9 +1,12 @@
-// WorldConfig.obj (PostOfficeDaemon PDB). Layouts from include/pdb/PostOfficeDaemon/types.h.
-// Card lift-postofficedaemon-2 declares only the data layout. A later card lifts the functions.
+// WorldConfig.obj / WorldConfigManager.obj (PostOfficeDaemon PDB). Layouts from include/pdb/PostOfficeDaemon/types.h.
 #pragma once
 #include <stddef.h>
+#include <string.h>
 #include <map>
 #include "Lock.h"
+#include "StlMemory.h"
+
+class XmlDoc;
 
 class WorldConfig
 {
@@ -19,22 +22,45 @@ static_assert(offsetof(WorldConfig, _port) == 0x8, "WorldConfig::_port");
 class WorldConfigList
 {
 public:
-    std::map<unsigned short, WorldConfig*> _configList;
+    typedef std::map<unsigned short, WorldConfig*, std::less<unsigned short>,
+                     StlAllocator<std::pair<unsigned short const, WorldConfig*>, 2> > Container;  // ❓ typedef name
+
+    ~WorldConfigList();  // 0xd910
+
+    Container _configList;
 };
 static_assert(sizeof(WorldConfigList) == 0x20, "sizeof WorldConfigList");
 
 class WorldConfigManager
 {
 public:
-    bool CheckWorldConfig(unsigned short wid, unsigned long ipAddr, unsigned short const port);  // 0xe430 (later card)
+    // ❓ Inlined at 0x13d30: the CriticalSection ctor, then memset of the arrays.
+    WorldConfigManager()
+    {
+        memset(_containerList, 0, sizeof(_containerList));
+        memset(_arrayBoundary, -1, sizeof(_arrayBoundary));
+        memset(_filePath, 0, sizeof(_filePath));
+    }
+
+    bool initConfigManager();                                                       // 0xda70
+    bool updateWorldList(WorldConfigList const* worldConfigList);                   // 0xdb30
+    bool addWorldConfig(unsigned short wid, int bucketIndex, int worldIndex,
+                        WorldConfig const* const worldConfig);                      // 0xdfd0
+    bool updateWorldConfig(unsigned short wid, int bucketIndex, int worldIndex,
+                           WorldConfig const* const worldConfig);                   // 0xe190
+    WorldConfig* getWorldConfig(unsigned short const wid);                          // 0xe310
+    bool CheckWorldConfig(unsigned short wid, unsigned long ipAddr, unsigned short const port);  // 0xe430
+    bool setWorldConfigFilePath();                                                  // 0xe560
+    bool loadWorldConfigFile(WorldConfigList* worldConfigList);                     // 0xe5f0
+    static bool setupWorldConfigList(XmlDoc* xmlDoc, WorldConfigList* worldConfigList);  // 0xe8c0
+    static bool createWorldConfigFile(wchar_t const* const worldConfigFilePath);     // 0xede0
+    static void writeSampleConfigFormat(void* fileHandle);                          // 0xef40
+    static bool writeConfigString(void* fileHandle, wchar_t const* const configString);  // 0xeff0
 
     CriticalSection _reloadLock;
     WorldConfig** _containerList[33];
     int _arrayBoundary[33][2];
     wchar_t _filePath[260];
-
-private:
-    WorldConfigManager();  // later card (PostOfficeDaemon)
 };
 static_assert(sizeof(WorldConfigManager) == 0x440, "sizeof WorldConfigManager");
 static_assert(offsetof(WorldConfigManager, _containerList) == 0x28, "WorldConfigManager::_containerList");

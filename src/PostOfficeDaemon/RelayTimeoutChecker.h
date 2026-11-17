@@ -8,7 +8,7 @@ class RelayTimeoutChecker : public Timer
 {
 public:
     // ❓ The bodies are folded (ICF) with other functions. Not in index.tsv.
-    virtual unsigned int TimerClass() const { return 1; }         // ❓ value
+    virtual unsigned int TimerClass() const { return 2; }         // ❓ folded body 0x4f5c0
     virtual unsigned long long TimerId() const { return 0; }      // ❓ value
     virtual bool HandleEvent(EventContext* context, unsigned long bytes);  // 0x1d700
     virtual ~RelayTimeoutChecker() {}  // ❓ folded with Timer dtor 0x12c60

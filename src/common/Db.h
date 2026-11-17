@@ -14,6 +14,11 @@ public:
     // decimalDigits is the length/indicator pointer.
     bool BindParam(unsigned int index, unsigned int inout, void* buffer, unsigned long long bufferSize,
                    unsigned long long columnSize, unsigned long long* decimalDigits);
+    // Full PDB signatures (PostOfficeDaemon 0x2d010, 0x2d190). The SmartCouponDaemon copies above are LTCG forms.
+    bool BindCol(unsigned int index, void* buffer, long long bufferSize, unsigned int varType,
+                 unsigned long long* result);
+    bool BindParam(unsigned int index, unsigned int inout, void* buffer, long long bufferSize,
+                   unsigned long long columnSize, int decimalDigits, int dbType, unsigned long long* varType);
     bool Execute();
     int Fetch(int fetchCount);
 

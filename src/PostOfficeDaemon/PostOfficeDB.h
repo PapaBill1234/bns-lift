@@ -1,12 +1,27 @@
 // PostOfficeDB.obj (PostOfficeDaemon PDB). Card lift-postofficedaemon-5 lifts the bodies.
 #pragma once
 
+#include "Db.h"
+
 class PostInfo;
 class AttachedItemContext;
+
+// RAII holder of a DbTransaction. The ctor is inlined in the callers.
+struct AutoDbTran
+{
+    // ❓ Inlined ctor.
+    explicit AutoDbTran(unsigned int dbId) : Tran(Db::AllocTransaction(dbId)), TimeoutSec(10) {}
+    ~AutoDbTran();  // 0x14e00
+
+    DbTransaction* Tran;
+    int TimeoutSec;
+};
 
 class PostOfficeDB
 {
 public:
+    static bool LoadPostList(int* dbRetValue);                                                            // 0x14e50
+    static bool LoadSinglePost(int* dbRetValue, long long postId);                                        // 0x15fa0
     static bool RegisterPost(int* dbRetValue, PostInfo* postInfo, AttachedItemContext* const attachedItemList,
                              unsigned int attachedItemCount);                                             // 0x16f20
     static bool LoadRetryReadySinglePost(int* dbRetValue, long long postId, long long invoiceId,
@@ -19,17 +34,5 @@ public:
     static bool UpdateStatusToDeliveryFailure(int* dbRetValue, long long postId);                         // 0x17e00
 };
 
-// UnsentPostContext.obj. Card lift-postofficedaemon-5 lifts the bodies.
-#include "Lock.h"
-
-class UnsentPostContextList;
-
-class UnsentPostContextManager
-{
-public:
-    bool RegisterUnsentPost(unsigned short wid, long long postId, bool hasPostContext);  // 0xd190
-
-    CriticalSection _reloadLock;
-    UnsentPostContextList** _containerList[33];
-    int _arrayBoundary[33][2];
-};
+// The users of UnsentPostContextManager include this header. Keep them working.
+#include "UnsentPostContext.h"

@@ -47,8 +47,11 @@ public:
     Container* _containerList;
     long volatile _worldCount;
 
-private:
-    WorldChannelManager();  // later card (PostOfficeDaemon)
+    // ❓ Inlined at 0x14090.
+    explicit WorldChannelManager(int bucketCount)
+        : _bucketCount(bucketCount), _lockList(nullptr), _containerList(nullptr), _worldCount(0)
+    {
+    }
 };
 static_assert(sizeof(WorldChannelManager) == 0x20, "sizeof WorldChannelManager");
 static_assert(offsetof(WorldChannelManager, _worldCount) == 0x18, "WorldChannelManager::_worldCount");

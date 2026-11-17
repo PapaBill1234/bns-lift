@@ -28,6 +28,22 @@ wchar_t const* const CACHEGATE_CHANNEL_TAG = L"cachegate channel";  // ❓ name
 wchar_t const* const DISCONNECTED_CACHEGATE = L"disconnected cachegate";  // ❓ name
 }
 
+// 0x12c30 (scalar deleting dtor; the dtor body is empty)
+CacheGateChannel::~CacheGateChannel()
+{
+}
+
+// 0x5d860 (folded by ICF with PingGenerator::TimerId: xor eax, eax)
+unsigned long long CacheGateChannel::GetId()
+{
+    return 0;
+}
+
+// 0x12c20 (folded by ICF with ~AgentSessionHandler; the body is empty)
+CacheGateSessionHandler::~CacheGateSessionHandler()
+{
+}
+
 // ❓ inlined (log line 36)
 void CacheGateChannel::SetServiceState(int newState)
 {

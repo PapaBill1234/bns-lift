@@ -44,8 +44,12 @@ public:
     CachedWatchdog** _containerList[33];
     int _arrayBoundary[33][2];
 
-private:
-    CachedWatchdogManager();  // later card (PostOfficeDaemon)
+    // ❓ Inlined at 0x13d30: the CriticalSection ctor, then memset of the arrays.
+    CachedWatchdogManager()
+    {
+        memset(_containerList, 0, sizeof(_containerList));
+        memset(_arrayBoundary, -1, sizeof(_arrayBoundary));
+    }
 };
 static_assert(sizeof(CachedWatchdogManager) == 0x238, "sizeof CachedWatchdogManager");
 static_assert(offsetof(CachedWatchdogManager, _containerList) == 0x28, "CachedWatchdogManager::_containerList");

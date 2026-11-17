@@ -123,8 +123,11 @@ public:
 
     static unsigned long long _idSeed;
 
-private:
-    RelayContextManager();  // later card (PostOfficeDaemon)
+    // ❓ Inlined at 0x14280.
+    explicit RelayContextManager(int bucketCount)
+        : _bucketCount(bucketCount), _lockList(nullptr), _containerList(nullptr), _contextCount(0)
+    {
+    }
 };
 static_assert(sizeof(RelayContextManager) == 0x20, "sizeof RelayContextManager");
 static_assert(offsetof(RelayContextManager, _contextCount) == 0x18, "RelayContextManager::_contextCount");

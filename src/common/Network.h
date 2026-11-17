@@ -89,6 +89,7 @@ private:
     friend class IdleStateTable;
     friend class DelayedRelease;  // ❓ access for DelayedRelease::Release (0x22DA0)
     friend class LobbyDSessionHandler;  // ❓ access for LobbyDSessionHandler::PacketHandler (LobbyGate 0x9660)
+    friend class PostOfficeDaemon;  // ❓ initNetwork and onStart (PostOfficeDaemon 0x135e0, 0x13ca0) read Instance
 };
 static_assert(sizeof(Network) == 0xE0, "sizeof Network");
 static_assert(offsetof(Network, _iocpHandle) == 0xD8, "Network::_iocpHandle");

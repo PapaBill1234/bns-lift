@@ -29,6 +29,9 @@ public:
 
     CriticalSection _lock;
     AgentChannel* _postAgentChannel;
+
+    // ❓ Inlined at 0x14090.
+    AgentChannelManager() : _lock(4000), _postAgentChannel(nullptr) {}
 };
 static_assert(sizeof(AgentChannelManager) == 0x30, "sizeof AgentChannelManager");
 static_assert(offsetof(AgentChannelManager, _postAgentChannel) == 0x28, "AgentChannelManager::_postAgentChannel");

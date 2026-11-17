@@ -307,6 +307,52 @@ bool DbTransaction::BindParam(unsigned int index, unsigned int inout, void* buff
     return false;
 }
 
+// 0x2d010 (PostOfficeDaemon)
+bool DbTransaction::BindCol(unsigned int index, void* buffer, long long bufferSize, unsigned int varType,
+                            unsigned long long* result)
+{
+    if (StmtHandle == nullptr)
+    {
+        ::Log::Write(::Log::LT_ERROR, kFile, 286, L"DbTransaction::BindCol(), Not initialized");
+        return false;
+    }
+    *result = static_cast<unsigned long long>(SQL_NTS);
+    if (static_cast<unsigned short>(SQLBindCol(StmtHandle, static_cast<SQLUSMALLINT>(index),
+                                               static_cast<SQLSMALLINT>(varType), buffer, bufferSize,
+                                               reinterpret_cast<SQLLEN*>(result))) < 2)
+    {
+        BoundCol = true;
+        return true;
+    }
+    statmentErrorLog(L"SQLBindCol(%d, %d, %d, %p, %p)", index, varType, buffer, bufferSize, result);
+    return false;
+}
+
+// 0x2d190 (PostOfficeDaemon)
+bool DbTransaction::BindParam(unsigned int index, unsigned int inout, void* buffer, long long bufferSize,
+                              unsigned long long columnSize, int decimalDigits, int dbType,
+                              unsigned long long* varType)
+{
+    if (StmtHandle == nullptr)
+    {
+        ::Log::Write(::Log::LT_ERROR, kFile, 373, L"DbTransaction::BindParam(), Not initialized");
+        return false;
+    }
+    if (!BoundParam)
+    {
+        ::Log::Write(::Log::LT_ERROR, kFile, 377, L"DbTransaction::BindParam(), Not prepared");
+        return false;
+    }
+    if (static_cast<unsigned short>(SQLBindParameter(StmtHandle, static_cast<SQLUSMALLINT>(index),
+                                                     static_cast<SQLSMALLINT>(inout), static_cast<SQLSMALLINT>(dbType),
+                                                     static_cast<SQLSMALLINT>(decimalDigits), columnSize, 0, buffer,
+                                                     bufferSize, reinterpret_cast<SQLLEN*>(varType))) < 2)
+        return true;
+    statmentErrorLog(L"SQLBindParameter(%d, %d, %d, %d, %d, %d, %p, %d, %p)", index, inout, dbType, decimalDigits,
+                     columnSize, 0, buffer, bufferSize, varType);
+    return false;
+}
+
 // 0x21100
 bool DbTransaction::Execute()
 {

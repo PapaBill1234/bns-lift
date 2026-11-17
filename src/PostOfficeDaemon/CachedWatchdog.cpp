@@ -76,7 +76,7 @@ void CachedWatchdog::setServiceState(ServiceState const newState)
 bool CachedWatchdogManager::initWatchdogManager(WorldConfigList const* worldConfigList)
 {
     AutoCS lock(&_reloadLock);
-    for (std::map<unsigned short, WorldConfig*>::const_iterator it = worldConfigList->_configList.begin();
+    for (WorldConfigList::Container::const_iterator it = worldConfigList->_configList.begin();
          it != worldConfigList->_configList.end(); ++it)
     {
         unsigned short const wid = it->first;
@@ -118,7 +118,7 @@ bool CachedWatchdogManager::initWatchdogManager(WorldConfigList const* worldConf
 bool CachedWatchdogManager::updateWorldList(WorldConfigList const* worldConfigList)
 {
     AutoCS lock(&_reloadLock);
-    for (std::map<unsigned short, WorldConfig*>::const_iterator it = worldConfigList->_configList.begin();
+    for (WorldConfigList::Container::const_iterator it = worldConfigList->_configList.begin();
          it != worldConfigList->_configList.end(); ++it)
     {
         unsigned short const wid = it->first;
