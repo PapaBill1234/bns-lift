@@ -17,13 +17,13 @@ static wchar_t const* const MODULE_NAME = L"relay context";  // PDB MODULE_NAME
         AlertSender::Write(RETRIEVE_CHARACTER_INFO_RELAY_FILE, line, fmt, __VA_ARGS__);         \
     } while (0)
 
-// ❓ folded with 0x34c40
+// LIFT: folded with 0x34c40
 bool RetrieveCharacterInfoRelayContext::ComposeRequestPacket(FragmentPacket&) const
 {
     return true;
 }
 
-// ❓ folded with 0x34c40
+// LIFT: folded with 0x34c40
 bool RetrieveCharacterInfoRelayContext::ComposeResponsePacket(FragmentPacket&) const
 {
     return true;

@@ -8,7 +8,7 @@
 class SendPublicationEvent : public DynamicEventObject
 {
 public:
-    // ❓ Inlined in SmartCouponDaemon::loadUnhandledCouponPublication (0x161A0).
+    // LIFT: Inlined in SmartCouponDaemon::loadUnhandledCouponPublication (0x161A0).
     SendPublicationEvent(long long publicationId, id128 const& gameAccountId, int couponEventId)
         : _publicationId(publicationId), _gameAccountId(gameAccountId), _couponEventId(couponEventId), _managementTid(0)
     {

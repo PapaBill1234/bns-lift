@@ -8,7 +8,7 @@ class RelayContext;
 class RelayTimeoutEvent : public DynamicEventObject
 {
 public:
-    RelayTimeoutEvent(unsigned long long relayTid, RelayContext* const relayContext);  // ❓ inlined in 0x1db40
+    RelayTimeoutEvent(unsigned long long relayTid, RelayContext* const relayContext);  // LIFT: inlined in 0x1db40
     virtual unsigned int EventId() const;                                    // 0x1dcf0
     virtual bool HandleEvent(EventContext* context, unsigned long param);    // 0x1dd60
     virtual ~RelayTimeoutEvent();                                            // 0x1dd00

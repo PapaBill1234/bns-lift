@@ -129,7 +129,7 @@ FragmentPacket::FragmentPacket(short command, char const* format)
     packet.ListTail = nullptr;
     packet.IsFragmentPacket = false;
     packet.FragmentPacketCmd = 0;
-    // ❓ RepeatPacketComposer has no constructor in common; the inline one sets these fields.
+    // LIFT: RepeatPacketComposer has no constructor in common; the inline one sets these fields.
     composer.format = nullptr;
     composer.len = 0;
     composer.index = 0;

@@ -53,7 +53,7 @@ void Timer::preprocessExpireEvent()
 class ReconnectTimer : public Timer
 {
 public:
-    // ❓ Inlined in Session::Connect (0xE570).
+    // LIFT: Inlined in Session::Connect (0xE570).
     explicit ReconnectTimer(unsigned long long sessionId) : _sessionId(sessionId)
     {
         _tag = 66058;

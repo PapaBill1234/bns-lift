@@ -134,7 +134,7 @@ bool CacheGateChannel::SendRelayRequest(RelayContext const* const relayContext)
         return false;
     }
 
-    Packet packet{};  // ❓ inlined constructor
+    Packet packet{};  // LIFT: inlined constructor
     packet.Allocate();
     if (composeRelayHeader(packet, relayContext->MakeRelayHeader()) && relayContext->ComposeRequestPacket(packet))
     {
@@ -295,7 +295,7 @@ void CacheGateSessionHandler::OnClose(Session const* session, bool tryReconnect)
         static_cast<CacheGateChannel*>(channel)->SetServiceState(CacheGateChannel::SERVICE_STATE_UNAVAILABLE);
         if (!tryReconnect)
         {
-            // ❓ inlined CacheGateChannelManager release (log line 202). The name is not in the PDB.
+            // LIFT: inlined CacheGateChannelManager release (log line 202). The name is not in the PDB.
             CacheGateChannelManager* const manager = daemon->_cachegateChannelManager;
             manager->_lock.Enter();
             if (manager->_cachegateChannel != nullptr)
@@ -317,7 +317,7 @@ void CacheGateSessionHandler::OnClose(Session const* session, bool tryReconnect)
                    L"cachegate session handler", L"CacheGateSessionHandler::OnClose", sessionId,
                    static_cast<unsigned int>(sessionId >> 32), static_cast<unsigned int>(sessionId));
 
-    // ❓ inlined search and addNode; same logic as SetInvalidInfo(key, true).
+    // LIFT: inlined search and addNode; same logic as SetInvalidInfo(key, true).
     if (daemon->pipeConsole != nullptr)
         daemon->pipeConsole->SetInvalidInfo(DISCONNECTED_CACHEGATE, true);
 }
@@ -345,7 +345,7 @@ bool CacheGateSessionHandler::PacketHandler(Session const* session, Packet const
         return false;
     }
 
-    // ❓ LTCG folded the event id and the offset. The values come from the LobbyGate call.
+    // LIFT: LTCG folded the event id and the offset. The values come from the LobbyGate call.
     return TFPP_PumpPacket(128, Network::iocpHandle(), session, packet, cmd, 0,
                            CacheGatePacketClientSideHandlerList, CacheGatePacketClientSideFragmentHandlerList);
 }

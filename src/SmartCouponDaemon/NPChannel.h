@@ -426,7 +426,7 @@ static_assert(sizeof(NPSessionHandler) == 48, "sizeof NPSessionHandler");
 class NPPing : public Timer
 {
 public:
-    // ❓ Inlined in NPChannel::Initialize (0x5120).
+    // LIFT: Inlined in NPChannel::Initialize (0x5120).
     explicit NPPing(NPChannel* owner) : _owner(owner), _run(false)
     {
         StartTick = 0;
@@ -483,7 +483,7 @@ public:
 class NPJobTransaction : public NPTransaction
 {
 public:
-    NPJobTransaction() : _jobid(0), _state(-1), _task(0) {}  // ❓ inlined in SendRequestEventNoti (0xFF10)
+    NPJobTransaction() : _jobid(0), _state(-1), _task(0) {}  // LIFT: inlined in SendRequestEventNoti (0xFF10)
     virtual ~NPJobTransaction() {}
     virtual int GetKind() const { return 1; }  // 0x231F0
     virtual void Expire();                     // 0xFE70
@@ -497,7 +497,7 @@ static_assert(sizeof(NPJobTransaction) == 24, "sizeof NPJobTransaction");
 class NPChannel : public SharedChannel
 {
 public:
-    NPChannel() : _sts(nullptr), _handler(nullptr), _tranRegistry(nullptr), _ping(nullptr) {}  // ❓ inlined
+    NPChannel() : _sts(nullptr), _handler(nullptr), _tranRegistry(nullptr), _ping(nullptr) {}  // LIFT: inlined
     virtual ~NPChannel();  // 0x5000
     virtual bool Connect(unsigned long long id, unsigned int portId, unsigned long ip, unsigned short portNo,
                          long timeout, bool reconnect);  // 0x5300
@@ -530,7 +530,7 @@ static_assert(sizeof(NPChannel) == 0x40, "sizeof NPChannel");
 class NPServiceChannel : public NPChannel
 {
 public:
-    NPServiceChannel() {}            // ❓ inlined in NPServiceChannelManager::Initialize (0x10340)
+    NPServiceChannel() {}            // LIFT: inlined in NPServiceChannelManager::Initialize (0x10340)
     virtual ~NPServiceChannel() {}   // 0xFD50 (scalar deleting destructor only)
 
     bool SendRequestEventNoti(CouponJob* job, id128 const* gameAccountId, int couponEventId,
@@ -543,7 +543,7 @@ class NPMsgHandleEvent : public DynamicEventObject
 public:
     typedef bool (*Handler)(NPChannel*, StsMsgLib::_StsMsg*, NPTransaction*);  // ❓ typedef name
 
-    // ❓ Inlined in NPServiceChannelManager::HandleMessage (0x10700).
+    // LIFT: Inlined in NPServiceChannelManager::HandleMessage (0x10700).
     NPMsgHandleEvent(NPChannel* channel, StsMsgLib::_StsMsg* msg, NPTransaction* tran, Handler handler)
         : _channel(channel), _msg(msg), _tran(tran), _handler(handler)
     {
@@ -562,7 +562,7 @@ static_assert(sizeof(NPMsgHandleEvent) == 56, "sizeof NPMsgHandleEvent");
 class NPServiceChannelManager : public NPMessageHandler
 {
 public:
-    // ❓ Inlined in SmartCouponDaemon::initialize (0x150E0).
+    // LIFT: Inlined in SmartCouponDaemon::initialize (0x150E0).
     NPServiceChannelManager() : _init(false), _npServChannel(nullptr) {}
     virtual bool OnConnect(NPChannel*, bool) const;                                  // 0x104A0
     virtual bool OnClose(NPChannel*, bool) const;                                    // 0x10560

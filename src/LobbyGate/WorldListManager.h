@@ -30,7 +30,7 @@ static_assert(offsetof(WorldInfo, publicAddress) == 0x2C, "WorldInfo::publicAddr
 class WorldList : public DynamicRefCntObj
 {
 public:
-    // ❓ The constructor is inlined in WorldListManager::SetWorldList (0x16530).
+    // LIFT: The constructor is inlined in WorldListManager::SetWorldList (0x16530).
     WorldList() : _worldInfos(nullptr), _worldCount(0), _fp(25, "hiChhsQQihiQQQQQQQ;") {}
     virtual ~WorldList();  // 0x16200
 

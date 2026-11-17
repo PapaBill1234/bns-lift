@@ -6,19 +6,19 @@
 
 namespace
 {
-// ❓ Inline helper. No PDB symbol.
+// LIFT: Inline helper. No PDB symbol.
 inline bool isOdd(BigInteger const& x)
 {
     return x.bits != 0 && (x.digits[0] & 1) != 0;
 }
 
-// ❓ Inline helper. No PDB symbol. A value is "even" for the loops when bits != 0 and bit 0 is clear.
+// LIFT: Inline helper. No PDB symbol. A value is "even" for the loops when bits != 0 and bit 0 is clear.
 inline bool isEvenNonZero(BigInteger const& x)
 {
     return x.bits != 0 && (x.digits[0] & 1) == 0;
 }
 
-// ❓ Inline helper. No PDB symbol. Same test as the code: sign, bits, then the digits.
+// LIFT: Inline helper. No PDB symbol. Same test as the code: sign, bits, then the digits.
 inline bool isEqual(BigInteger const& x, BigInteger const& y, int (*absCompare)(BigInteger const*, BigInteger const*))
 {
     return x.sign == y.sign && x.bits == y.bits && absCompare(&x, &y) == 0;

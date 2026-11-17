@@ -22,7 +22,7 @@ static wchar_t const* const MODULE_NAME = L"relay timeout checker";  // PDB MODU
         AlertSender::Write(RELAY_TIMEOUT_CHECKER_FILE, line, fmt, __VA_ARGS__);               \
     } while (0)
 
-static bool isStopState(int state)  // ❓ inlined switch
+static bool isStopState(int state)  // LIFT: inlined switch
 {
     return state == Daemon::STATE_STOPPED || state == Daemon::STATE_STOPPING ||
            state == Daemon::STATE_COOLDOWNING || state == Daemon::STATE_COOLDOWNED;

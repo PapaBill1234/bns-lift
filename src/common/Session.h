@@ -119,16 +119,16 @@ public:
     friend class ReconnectTimer;
     friend class PortListener;
     friend class ClientPacketBufferHandler;
-    friend class ManagerChannel;  // ❓ access for the inlined send in ManagerChannel::SendRetryCouponPublication* (SmartCouponDaemon)
-    friend class DChannel;        // ❓ access for the inlined send in DChannel (SmartCouponDaemon)
-    friend class Client;          // ❓ access for the inlined send in Client::Send* (LobbyGate)
-    friend class ClientManager;   // ❓ access for the inlined send in ClientManager::broadcast (LobbyGate)
-    friend class LobbyD;          // ❓ access for the inlined send in LobbyD::Send* (LobbyGate)
-    friend class NPChannel;        // ❓ access for the inlined send in NPChannel::SendMsg (SmartCouponDaemon)
+    friend class ManagerChannel;  // LIFT: access for the inlined send in ManagerChannel::SendRetryCouponPublication* (SmartCouponDaemon)
+    friend class DChannel;        // LIFT: access for the inlined send in DChannel (SmartCouponDaemon)
+    friend class Client;          // LIFT: access for the inlined send in Client::Send* (LobbyGate)
+    friend class ClientManager;   // LIFT: access for the inlined send in ClientManager::broadcast (LobbyGate)
+    friend class LobbyD;          // LIFT: access for the inlined send in LobbyD::Send* (LobbyGate)
+    friend class NPChannel;        // LIFT: access for the inlined send in NPChannel::SendMsg (SmartCouponDaemon)
     friend class NPSessionHandler; // ❓ access for NPSessionHandler::OnConnect/OnClose (SmartCouponDaemon)
-    friend class ManagementSessionHandler; // ❓ access for the inlined send in the management handlers (PostOfficeDaemon)
-    friend class WorldChannel;             // ❓ access for the inlined send in WorldChannel::SendRelayResponse (PostOfficeDaemon)
-    // ❓ access for the inlined send and completeHandshake in the LobbyGate packet handlers
+    friend class ManagementSessionHandler; // LIFT: access for the inlined send in the management handlers (PostOfficeDaemon)
+    friend class WorldChannel;             // LIFT: access for the inlined send in WorldChannel::SendRelayResponse (PostOfficeDaemon)
+    // LIFT: access for the inlined send and completeHandshake in the LobbyGate packet handlers
     friend bool HandleLobbyGate_ContentsRuleListReq(Session* session, Packet const* packet);
     friend bool HandleLobbyGate_HelloReq(Session* session, Packet* packet);
     friend bool HandleLobbyGate_BypassPacket(Client* client, Packet const* packet);

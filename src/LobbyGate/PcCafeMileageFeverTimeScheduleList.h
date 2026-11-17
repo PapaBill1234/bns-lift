@@ -20,7 +20,7 @@ static_assert(sizeof(PcCafeMileageFeverTimeScheduleInfo) == 0x28, "sizeof PcCafe
 class PcCafeMileageFeverTimeScheduleList : public DynamicRefCntObj
 {
 public:
-    // ❓ The constructor is inlined in SetPcCafeMileageFeverTimeScheduleList (0x16080).
+    // LIFT: The constructor is inlined in SetPcCafeMileageFeverTimeScheduleList (0x16080).
     PcCafeMileageFeverTimeScheduleList() : _fp(104, "hiQQqCqqiQiic;") {}
     virtual ~PcCafeMileageFeverTimeScheduleList();  // 0x15e30
 

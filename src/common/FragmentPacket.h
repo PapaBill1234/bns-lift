@@ -7,7 +7,7 @@
 class FragmentPacketSplitter : public PacketSplitter
 {
 public:
-    // ❓ The constructor is inlined (FragmentPacket 0x2420).
+    // LIFT: The constructor is inlined (FragmentPacket 0x2420).
     FragmentPacketSplitter() : Command(0), TotalSize(nullptr), CurSize(nullptr) {}
 
     // The PDB parameters are Packet::Header const* prevHeader, Packet::Header* newHeader.
@@ -49,7 +49,7 @@ static_assert(offsetof(FragmentPacket, composer) == 0x50, "FragmentPacket::compo
 class FragmentPacketConcatenater : public PacketConcatenateBuffer
 {
 public:
-    // ❓ The constructor is inlined (Clone 0x2870, __pump_fragment_packet 0x1bc0).
+    // LIFT: The constructor is inlined (Clone 0x2870, __pump_fragment_packet 0x1bc0).
     FragmentPacketConcatenater()
     {
         buffer = nullptr;

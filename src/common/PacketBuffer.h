@@ -133,7 +133,7 @@ static_assert(sizeof(Security3rdParty) == 0x8, "sizeof Security3rdParty");
 class PacketBuffer : public RefCntObject
 {
 public:
-    PacketBuffer()  // ❓ inlined in PacketBufferPool::allocate (0x23EC0) and PacketBufferAllocator::allocate (0x241B0)
+    PacketBuffer()  // LIFT: inlined in PacketBufferPool::allocate (0x23EC0) and PacketBufferAllocator::allocate (0x241B0)
         : sendSize(0), sendBuffer(nullptr), Next(nullptr)
     {
         _ref = 1;
@@ -174,7 +174,7 @@ static_assert(offsetof(PacketBuffer, Next) == 0xFD0, "PacketBuffer::Next");
 class PacketBufferPool
 {
 public:
-    PacketBufferPool() : _count(0), _pool(nullptr) {}  // ❓ inlined in PacketBufferAllocator::Initialize (0x24090)
+    PacketBufferPool() : _count(0), _pool(nullptr) {}  // LIFT: inlined in PacketBufferAllocator::Initialize (0x24090)
     PacketBuffer* allocate();
     void deallocate(PacketBuffer* pktbuf);
 

@@ -76,7 +76,7 @@ bool HandlePostOfficeHelloReq(Session const* session, Packet const* packet)
         goto $_ERROR;
     }
 
-    // ❓ The inlined ctor writes WorldChannel::`vftable' (identical COMDAT folding with AgentChannel).
+    // LIFT: The inlined ctor writes WorldChannel::`vftable' (identical COMDAT folding with AgentChannel).
     memory = Memory::_Manager[2]->Alloc(sizeof(AgentChannel), AGENT_PACKET_HANDLER_FILE, 95);
     channel = memory != nullptr ? ::new (memory) AgentChannel(agentWid, connectionType) : nullptr;
     // BUG: 0x1a6f0 no null check after the Alloc. A failed Alloc gives a null call.
@@ -326,7 +326,7 @@ bool HandlePostOfficeRegisterPostReq(Session const* session, Packet const* packe
         attachedItemList[i]._itemAmount = itemInfo._itemAmount;
         wcsncpy(attachedItemList[i]._itemXmlData, itemInfo._itemXmlData, 0x401);
         {
-            // ❓ inlined RepeatPacketDecomposer step to the next repeat.
+            // LIFT: inlined RepeatPacketDecomposer step to the next repeat.
             int const top = pcb->decomposer.top;
             pcb->decomposer.index = pcb->decomposer.start[top] + 1;
             --pcb->decomposer.counts[top];

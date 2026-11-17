@@ -47,7 +47,7 @@ private:
     void clear();
     bool setupFactors(unsigned char const* data, int size);
     bool getValue(unsigned char* out, int* size);
-    // ❓ Inline code: (p <= g).
+    // LIFT: Inline code: (p <= g).
     bool pNotAboveG() const
     {
         return _p.sign <= _g.sign &&

@@ -25,7 +25,7 @@ unsigned long long RelayContextManager::_idSeed = 0xFFFFFFFFFFFFFFFFULL;  // .da
 
 // ---- AutoCS (Lock.h, inline in the original) ----
 
-// ❓ inlined
+// LIFT: inlined
 AutoCS::AutoCS(CriticalSection* cs) : CS(cs), EnterCount(0)
 {
     if (cs == nullptr)

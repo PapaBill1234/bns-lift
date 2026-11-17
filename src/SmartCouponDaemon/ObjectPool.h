@@ -17,7 +17,7 @@ static_assert(sizeof(ObjPoolMemoryAllocator) == 0x8, "sizeof ObjPoolMemoryAlloca
 class SmartCouponObjPoolMemoryAllocator : public ObjPoolMemoryAllocator
 {
 public:
-    // ❓ Inlined in SmartCouponDaemon::initialize (0x150E0).
+    // LIFT: Inlined in SmartCouponDaemon::initialize (0x150E0).
     SmartCouponObjPoolMemoryAllocator(unsigned long long systemAllocationGranularity, unsigned long long alignment)
         : _systemAllocationGranularity(systemAllocationGranularity), _alignment(alignment), _mem(nullptr), _end(nullptr)
     {
@@ -89,7 +89,7 @@ static_assert(offsetof(ObjPool, _waitlock) == 136, "ObjPool::_waitlock");
 class ObjPoolTimer : public Timer
 {
 public:
-    // ❓ Inlined in SmartCouponDaemon::initialize (0x150E0).
+    // LIFT: Inlined in SmartCouponDaemon::initialize (0x150E0).
     ObjPoolTimer() : _run(false), _resolution(0) {}
     virtual ~ObjPoolTimer();
     virtual unsigned int TimerClass() const;

@@ -28,7 +28,7 @@ wchar_t const* const CHANNEL_H_FILE =
 // PDB S_UDT ClientList (LobbyGate type 0x2A2F, in ClientManager::DisconnectAll).
 typedef std::vector<Client*, StlAllocator<Client*, 2> > ClientList;
 
-// ❓ Inlined array new: the element count is in the first 8 bytes, then each element is constructed.
+// LIFT: Inlined array new: the element count is in the first 8 bytes, then each element is constructed.
 template <class T>
 T* newArray(int count, int line)
 {
@@ -42,7 +42,7 @@ T* newArray(int count, int line)
     return list;
 }
 
-// ❓ Inlined array delete: destroy each element, then free the block.
+// LIFT: Inlined array delete: destroy each element, then free the block.
 template <class T>
 void deleteArray(T* list, int line)
 {
@@ -62,7 +62,7 @@ inline void reserveFragment(FragmentPacket& fp, int need)
         fp.packet.Allocate(&fp.composer);
 }
 
-// ❓ Inlined send preamble of the Client::Send* functions.
+// LIFT: Inlined send preamble of the Client::Send* functions.
 Session* acquireSendSession(Client* client, short cmd, int invalidLine, int notConnectedLine)
 {
     Session* session = const_cast<Session*>(client->GetSession());
@@ -87,7 +87,7 @@ Session* acquireSendSession(Client* client, short cmd, int invalidLine, int notC
     return session;
 }
 
-// ❓ Inlined fail path of the Client::Send* functions.
+// LIFT: Inlined fail path of the Client::Send* functions.
 bool failSend(Client* client, Session* session, FragmentPacket& fp, short cmd, int line, wchar_t const* format)
 {
     Log::Write(Log::LT_ERROR, CLIENT_FILE, line, format, session->_id, client->GetId(), static_cast<int>(cmd));
@@ -96,7 +96,7 @@ bool failSend(Client* client, Session* session, FragmentPacket& fp, short cmd, i
     return false;
 }
 
-// ❓ Inlined end of the Client::Send* functions before the send.
+// LIFT: Inlined end of the Client::Send* functions before the send.
 void finalizeFragment(FragmentPacket& fp)
 {
     fp.composer.PopRepeatCount();
@@ -104,7 +104,7 @@ void finalizeFragment(FragmentPacket& fp)
         fp.packet.Splitter->Finalize(fp.packet.CurHeader);
 }
 
-// ❓ Inlined ok path of the Client::Send* functions.
+// LIFT: Inlined ok path of the Client::Send* functions.
 bool okSend(Client* client, Session* session, FragmentPacket& fp, short cmd, int line)
 {
     Log::Write(Log::LT_DEBUG, CLIENT_FILE, line, L"[channel], 0x%.16I64X, %I64d, send, cmd:%d", session->_id,
@@ -126,7 +126,7 @@ Client::~Client()
 {
 }
 
-// ❓ inlined in GateKeyManager::MakeGateKey (0x3ec0)
+// LIFT: inlined in GateKeyManager::MakeGateKey (0x3ec0)
 GateKeyEntry::GateKeyEntry(Session* session)
 {
     session->addReferenceCount(CLIENT_FILE, 39);
@@ -577,7 +577,7 @@ void ClientManager::BroadcastAnnounceNotify(wchar_t const* message)
                    L"[client session handler], broadcast announce notify fail; invalid parameter");
         return;
     }
-    Packet packet{};  // ❓ inlined constructor
+    Packet packet{};  // LIFT: inlined constructor
     if (packet.Compose("hs", 11, message) == 0)
     {
         Log::Write(Log::LT_ERROR, CLIENT_FILE, 806,

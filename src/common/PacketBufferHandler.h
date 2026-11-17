@@ -38,7 +38,7 @@ static_assert(sizeof(TrustedPacketBufferHandler) == 0x8, "sizeof TrustedPacketBu
 class RawPacketBufferHandler : public PacketBufferHandler
 {
 public:
-    RawPacketBufferHandler() : Buffer(2, 512) {}  // ❓ inlined in Clone (0x216F0)
+    RawPacketBufferHandler() : Buffer(2, 512) {}  // LIFT: inlined in Clone (0x216F0)
     virtual unsigned long long AllocSize() const;
     virtual PacketBufferHandler* Clone(void* buffer) const;
     virtual void Destroy(void* buffer);
@@ -74,7 +74,7 @@ static_assert(sizeof(ClientPacketBufferHandler) == 0x8, "sizeof ClientPacketBuff
 class TextStreamPacketBufferHandler : public PacketBufferHandler
 {
 public:
-    // ❓ Inlined in Clone (0x2C3F0). Clone does not set delimiter; Initialize sets it.
+    // LIFT: Inlined in Clone (0x2C3F0). Clone does not set delimiter; Initialize sets it.
     TextStreamPacketBufferHandler() : Buffer(2, 512) {}
     virtual unsigned long long AllocSize() const;
     virtual PacketBufferHandler* Clone(void* buffer) const;

@@ -17,7 +17,7 @@ public:
                      StlAllocator<std::pair<unsigned long long const, unsigned short>, 2> >
         IdIndexMap;  // ❓ typedef name
 
-    // ❓ The constructor is inlined in CacheGate::initialize (0x4510).
+    // LIFT: The constructor is inlined in CacheGate::initialize (0x4510).
     ClientManager() : _clientMap(nullptr), _idIndexMap(nullptr) {}
     ~ClientManager();                                                // 0x5D60
 

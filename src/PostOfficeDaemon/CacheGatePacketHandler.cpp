@@ -34,12 +34,12 @@ void logBegin(int line, wchar_t const* func)
     Log::Write(Log::LT_DEBUG, CGPH_FILE, line, L"[%s], %s; <BEGIN PACKET HANDLER>", MODULE_NAME, func);
 }
 
-void logEnd(int line, wchar_t const* func)  // ❓ lift helper name, not in any PDB
+void logEnd(int line, wchar_t const* func)  // LIFT: lift helper name, not in any PDB
 {
     Log::Write(Log::LT_DEBUG, CGPH_FILE, line, L"[%s], %s; <END PACKET HANDLER>", MODULE_NAME, func);
 }
 
-void logInvalidDestination(int line, wchar_t const* func, unsigned short serviceWid, RelayHeader const& relayHeader)  // ❓ lift helper name, not in any PDB
+void logInvalidDestination(int line, wchar_t const* func, unsigned short serviceWid, RelayHeader const& relayHeader)  // LIFT: lift helper name, not in any PDB
 {
     Log::Write(Log::LT_ERROR, CGPH_FILE, line,
                L"[%s], %s; invalid destination, postofficeServiceWid:%u, fromWid:%u, toWid:%u, relayTid:0x%I64X, hint:%u, reserved:%I64u",

@@ -19,7 +19,7 @@ public:
         unsigned int _remoteAddrSize;
     };
 
-    PortListener() : _portInstance(nullptr), _socket(~0ULL) {}  // ❓ inlined in Port::Initialize
+    PortListener() : _portInstance(nullptr), _socket(~0ULL) {}  // LIFT: inlined in Port::Initialize
     virtual ~PortListener();                                                     // 0x31F60
     virtual unsigned int EventId() const;                                        // 0x11E80
     virtual bool HandleEvent(EventContext* context, unsigned long bytes);        // 0x322B0

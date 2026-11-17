@@ -16,7 +16,7 @@ struct GameEventDaemonId
     unsigned short _wid;
     unsigned char _reserved;
 
-    // ❓ inlined. The map compare uses the same key as DChannel::GetId (0x7D30), _reserved included.
+    // LIFT: inlined. The map compare uses the same key as DChannel::GetId (0x7D30), _reserved included.
     unsigned int Key() const { return ((static_cast<unsigned int>(_type) << 16) + _wid << 8) + _reserved; }  // ❓
     bool operator<(GameEventDaemonId const& other) const { return Key() < other.Key(); }
 };
@@ -25,7 +25,7 @@ static_assert(sizeof(GameEventDaemonId) == 0x6, "sizeof GameEventDaemonId");
 class DChannel : public Channel
 {
 public:
-    // ❓ inlined in DChannelMgr::SetupDaemonList (0xD270).
+    // LIFT: inlined in DChannelMgr::SetupDaemonList (0xD270).
     DChannel(GameEventDaemonId const& daemonId, unsigned long addr, unsigned short port)
         : _daemonId(daemonId), _addr(addr), _port(port) {}
     virtual ~DChannel();             // 0x7D50

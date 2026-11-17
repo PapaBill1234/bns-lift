@@ -14,7 +14,7 @@ static wchar_t const* const WINDOW_CONSOLE_FILE = L"source\\WindowConsole.cpp";
 
 WindowConsole* WinMsgHandler::_console = nullptr;
 
-// ❓ Inlined in WindowConsole::Open (0x17090). The PDB has no out-of-line copy.
+// LIFT: Inlined in WindowConsole::Open (0x17090). The PDB has no out-of-line copy.
 WinMsgHandler::WinMsgHandler(WindowConsole* console)
 {
     _console = console;
@@ -107,7 +107,7 @@ bool WindowConsoleOnSafeShutdown()
 }
 
 // 0x16f50 is Console::Flush (empty, folded). Open stores its address as a plain function.
-static void ConsoleFlushHandler()  // ❓ stands for the folded 0x16f50
+static void ConsoleFlushHandler()  // LIFT: stands for the folded 0x16f50
 {
 }
 

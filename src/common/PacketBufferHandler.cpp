@@ -179,7 +179,7 @@ void ClientPacketBufferHandler::Destroy(void* buffer)
         Memory::_Manager[2]->Free(this, PBH_FILE, 103);
 }
 
-// (LobbyGate) folded with Console::Flush ❓ no own address
+// (LobbyGate) folded with Console::Flush LIFT: no own address
 void ClientPacketBufferHandler::Initialize()
 {
 }

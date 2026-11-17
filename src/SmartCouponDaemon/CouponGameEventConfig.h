@@ -28,7 +28,7 @@ public:
     GameEventInfo* FindGameEventInfo(int id);             // 0x3390
 
 private:
-    // ❓ Not in the PDB. Inlined in each fail path of the original.
+    // LIFT: Not in the PDB. Inlined in each fail path of the original.
     static void writeStartLog(class Console* console, wchar_t const* message);
 
 public:

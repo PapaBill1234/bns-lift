@@ -10,7 +10,7 @@
 #define PING_GENERATOR_FILE L"PingGenerator.cpp"
 static wchar_t const* const MODULE_NAME = L"ping generator";  // PDB MODULE_NAME
 
-static bool isStopState(int state)  // ❓ inlined switch
+static bool isStopState(int state)  // LIFT: inlined switch
 {
     return state == Daemon::STATE_STOPPED || state == Daemon::STATE_STOPPING ||
            state == Daemon::STATE_COOLDOWNING || state == Daemon::STATE_COOLDOWNED;
@@ -30,13 +30,13 @@ unsigned short const PingRelayContext::GetRequestWid() const
     return _economyHeader._fromWid;
 }
 
-// ❓ folded (ICF) with 0x34c40
+// LIFT: folded (ICF) with 0x34c40
 bool PingRelayContext::ComposeRequestPacket(FragmentPacket&) const
 {
     return true;  // ❓ value
 }
 
-// ❓ folded (ICF) with 0x34c40
+// LIFT: folded (ICF) with 0x34c40
 bool PingRelayContext::ComposeResponsePacket(FragmentPacket&) const
 {
     return true;
@@ -82,7 +82,7 @@ bool PingGenerator::sendPing()
         return false;
     }
 
-    // ❓ inline of the RelayContextManager id generator
+    // LIFT: inline of the RelayContextManager id generator
     long long volatile* const idSeed = reinterpret_cast<long long volatile*>(&RelayContextManager::_idSeed);
     unsigned long long relayTid = static_cast<unsigned long long>(InterlockedIncrement64(idSeed));
     if (relayTid == 0)

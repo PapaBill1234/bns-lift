@@ -64,7 +64,7 @@ class WindowConsole;
 class WinMsgHandler : public Thread
 {
 public:
-    explicit WinMsgHandler(WindowConsole* console);  // ❓ inlined in 0x17090
+    explicit WinMsgHandler(WindowConsole* console);  // LIFT: inlined in 0x17090
     virtual ~WinMsgHandler();
     virtual wchar_t const* Name();
     void WaitInit();

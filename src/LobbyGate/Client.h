@@ -59,7 +59,7 @@ static_assert(offsetof(ServiceEntry, hint1) == 0x30, "ServiceEntry::hint1");
 class Client : public Channel
 {
 public:
-    // ❓ The constructor is inlined in ClientManager::AddClient (0x5f70).
+    // LIFT: The constructor is inlined in ClientManager::AddClient (0x5f70).
     Client() : _state(0), _broadcast(false), _gateKey(0), _cliKey(0) {}
     virtual ~Client();                                                                     // 0x44d0
     virtual unsigned long long GetId();                                                    // 0x37e0
@@ -86,7 +86,7 @@ static_assert(offsetof(Client, _cliKey) == 0x38, "Client::_cliKey");
 class GateKeyEntry
 {
 public:
-    explicit GateKeyEntry(Session* session);  // ❓ inlined in GateKeyManager::MakeGateKey (0x3ec0)
+    explicit GateKeyEntry(Session* session);  // LIFT: inlined in GateKeyManager::MakeGateKey (0x3ec0)
     ~GateKeyEntry();                          // 0x3e80
 
     long long _cliKey;

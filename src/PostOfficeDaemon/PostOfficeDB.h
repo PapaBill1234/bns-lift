@@ -9,7 +9,7 @@ class AttachedItemContext;
 // RAII holder of a DbTransaction. The ctor is inlined in the callers.
 struct AutoDbTran
 {
-    // ❓ Inlined ctor.
+    // LIFT: Inlined ctor.
     explicit AutoDbTran(unsigned int dbId) : Tran(Db::AllocTransaction(dbId)), TimeoutSec(10) {}
     ~AutoDbTran();  // 0x14e00
 

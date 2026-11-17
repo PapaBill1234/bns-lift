@@ -53,7 +53,7 @@ static_assert(offsetof(CouponJob, _lock) == 0x28, "CouponJob::_lock");
 class JobManager
 {
 public:
-    // ❓ Inlined in SmartCouponDaemon::initialize (0x150E0).
+    // LIFT: Inlined in SmartCouponDaemon::initialize (0x150E0).
     explicit JobManager(unsigned long long (*idgen)())
         : _idgen(reinterpret_cast<void*>(idgen)), _hashCount(0), _jobs(nullptr), _lock(nullptr)
     {

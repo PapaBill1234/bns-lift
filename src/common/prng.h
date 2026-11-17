@@ -21,7 +21,7 @@ public:
 private:
     bool setSeed();
     bool addEntropy(unsigned char const* entropy, int size);
-    // ❓ No PDB symbol. CryptoKey::Initialize reads the TLS instance directly.
+    // LIFT: No PDB symbol. CryptoKey::Initialize reads the TLS instance directly.
     static Prng* instance();
 
 public:

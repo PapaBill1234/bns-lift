@@ -44,7 +44,7 @@ static_assert(offsetof(DbTransaction, Next) == 0x20, "DbTransaction::Next");
 class Db
 {
 public:
-    Db() : Dsn(nullptr), TranList(nullptr) {}  // ❓ inlined in Initialize
+    Db() : Dsn(nullptr), TranList(nullptr) {}  // LIFT: inlined in Initialize
 
     static bool Initialize(unsigned int dbId, wchar_t const* dsn);  // 0x20690 (dbId is folded to 1)
     static void Clear(unsigned int dbId);                           // 0x20810

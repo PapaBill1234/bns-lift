@@ -83,7 +83,7 @@ static_assert(sizeof(StaticPageMemoryManager) == 0x28, "sizeof StaticPageMemoryM
 class PagePoolMemoryManager
 {
 public:
-    PagePoolMemoryManager(unsigned long long granularity)  // ❓ inlined constructor (0x135D0)
+    PagePoolMemoryManager(unsigned long long granularity)  // LIFT: inlined constructor (0x135D0)
         : _allocSize(0), _granularity(granularity), _block(nullptr), _blockEnd(nullptr) {}
     ~PagePoolMemoryManager();
     bool Initialize(unsigned long long size);

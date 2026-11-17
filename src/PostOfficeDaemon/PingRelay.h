@@ -43,9 +43,9 @@ public:
 
     virtual unsigned short const GetRequestWid() const;            // 0xfb40 (PingGenerator.cpp)
     virtual RelayHeader const MakeRelayHeader() const;             // 0xaf30
-    virtual bool ComposeRequestPacket(FragmentPacket&) const;      // ❓ folded (PingGenerator.cpp)
+    virtual bool ComposeRequestPacket(FragmentPacket&) const;      // LIFT: folded (PingGenerator.cpp)
     virtual bool ComposeRequestPacket(Packet&) const;              // 0xaf70
-    virtual bool ComposeResponsePacket(FragmentPacket&) const;     // ❓ folded with 0x34c40
+    virtual bool ComposeResponsePacket(FragmentPacket&) const;     // LIFT: folded with 0x34c40
     virtual bool ComposeResponsePacket(Packet&) const;             // 0x34c40 (PingGenerator.cpp)
     virtual bool processRelayRequest(Channel* const) const;        // 0xaad0
     virtual bool processRelayResponse() const;                     // 0xabd0

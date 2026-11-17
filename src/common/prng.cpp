@@ -8,7 +8,7 @@
 // ❓ The PDB has no name for this TLS variable (TLS block offset +8).
 static __declspec(thread) Prng* _Instance = 0;
 
-// ❓ Accessor for CryptoKey. The original code reads the TLS slot inline.
+// LIFT: Accessor for CryptoKey. The original code reads the TLS slot inline.
 Prng* Prng::instance()
 {
     return _Instance;

@@ -17,7 +17,7 @@ Lift the 2019 + PDB server executables to C++ source that compiles again. Then c
 - This repo is PRIVATE. The code comes from NCSoft binaries. Never push it to a public repo (slopemulator).
 - Do not put binaries in git: no `.exe`, `.dll`, `.pdb`, `.i64`, `.lib`, `.obj` or data files.
 - Never write keys, passwords or certificates. Write `keyhere`.
-- Use names from the PDB only. Do not invent names. If a name is not in the PDB, use the IDA name and mark it `// ❓`.
+- Use names from the PDB only. Do not invent names. If a name is not in the PDB, use the IDA name and mark it `// ❓`. If the code can have no PDB name (inlined code, folded code, lift helper), mark it `// LIFT:`.
 - Phase 1 is a mechanical lift. Keep the original logic, including bugs. Mark each bug with `// BUG:` and one line. Phase 5 fixes the bugs.
 - Commit author: `Claude <noreply@anthropic.com>`.
 - Write all text in ASD-STE100.

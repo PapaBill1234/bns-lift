@@ -12,7 +12,7 @@ class Packet;
 class ManagerChannel : public Channel
 {
 public:
-    // ❓ Inlined in HandleSmartCouponManager_HelloReq (0xEF40).
+    // LIFT: Inlined in HandleSmartCouponManager_HelloReq (0xEF40).
     ManagerChannel(unsigned short managerWid) : _managerWid(managerWid)
     {
         _ref = 1;
@@ -44,7 +44,7 @@ static_assert(sizeof(ManagerSessionHandler) == 0x8, "sizeof ManagerSessionHandle
 class RetryCouponPublicationEvent : public DynamicEventObject
 {
 public:
-    // ❓ Inlined in HandleSmartCouponManager_RetryCouponPublicationReq (0xF2F0).
+    // LIFT: Inlined in HandleSmartCouponManager_RetryCouponPublicationReq (0xF2F0).
     RetryCouponPublicationEvent() : _tid(0), _publicationId(0), _couponEventId(0)
     {
         _ref = 1;

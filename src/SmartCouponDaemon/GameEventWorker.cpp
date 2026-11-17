@@ -24,7 +24,7 @@ namespace
 wchar_t const* const kFile = L"GameEventWorker.cpp";
 
 // ❓ Not in the PDB. The log reads id128 as a GUID (Data1, Data2, Data3, Data4[8]).
-struct GuidParts  // ❓ lift helper name, not in any PDB
+struct GuidParts  // LIFT: lift helper name, not in any PDB
 {
     unsigned long id1;
     unsigned short id2;
@@ -33,12 +33,12 @@ struct GuidParts  // ❓ lift helper name, not in any PDB
 };
 static_assert(sizeof(GuidParts) == 0x10, "sizeof GuidParts");
 
-inline GuidParts const& Parts(id128 const& id)  // ❓ lift helper name, not in any PDB
+inline GuidParts const& Parts(id128 const& id)  // LIFT: lift helper name, not in any PDB
 {
     return *reinterpret_cast<GuidParts const*>(&id);
 }
 
-// ❓ Not in the PDB. Inlined assert crash (Log, AlertSender, MakeCrash).
+// LIFT: Not in the PDB. Inlined assert crash (Log, AlertSender, MakeCrash).
 void assertCrash(int line)
 {
     Log::Write(Log::LT_ERROR, kFile, line, L"== CRASH == ASSERT CRASH");
@@ -61,7 +61,7 @@ wchar_t const* GameEventWorker::Name()
     return L"GameEvent";
 }
 
-// 0x231f0 ❓ COMDAT folded with NetworkEndEvent::EventId. The body is empty (eax is not set).
+// 0x231f0 LIFT: COMDAT folded with NetworkEndEvent::EventId. The body is empty (eax is not set).
 unsigned int GameEventEndEvent::EventId() const
 {
     return 0;  // ❓

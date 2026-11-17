@@ -58,7 +58,7 @@ public:
 
 protected:
     CrashHandler();                 // 0x1CA70
-    virtual ~CrashHandler() {}      // ❓ body inlined in the scalar deleting destructor
+    virtual ~CrashHandler() {}      // LIFT: body inlined in the scalar deleting destructor
 
 private:
     long handleCrash(_EXCEPTION_POINTERS* exceptionInfo);  // 0x1CF90

@@ -13,7 +13,7 @@ public:
     class RawChannel : public Channel
     {
     public:
-        // ❓ Inlined in SharedChannel::Connect (0x63D0) and SharedChannel::Accept (0x6510).
+        // LIFT: Inlined in SharedChannel::Connect (0x63D0) and SharedChannel::Accept (0x6510).
         RawChannel(unsigned long long id, SharedChannel* owner) : _id(id), _owner(owner)
         {
             _ref = 1;
@@ -27,7 +27,7 @@ public:
         SharedChannel* _owner;
     };
 
-    SharedChannel() : _rawChannel(nullptr) {}  // ❓ inlined in the callers
+    SharedChannel() : _rawChannel(nullptr) {}  // LIFT: inlined in the callers
     virtual bool Connect(unsigned long long id, unsigned int portId, unsigned long ip, unsigned short portNo,
                          long timeout, bool reconnect);          // 0x63D0 (slot 4)
     virtual bool Accept(unsigned long long id, Session const* session);  // 0x6510 (slot 5)

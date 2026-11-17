@@ -49,11 +49,11 @@ public:
                                       RetrieveCharacterInfoRelayRequest const& request);  // 0x1f650
     virtual ~RetrieveCharacterInfoRelayContext() {}  // 0x1f7a0 (scalar deleting dtor)
 
-    virtual unsigned short const GetRequestWid() const;            // ❓ folded with 0x1f800
+    virtual unsigned short const GetRequestWid() const;            // LIFT: folded with 0x1f800
     virtual RelayHeader const MakeRelayHeader() const;             // 0x1e110
-    virtual bool ComposeRequestPacket(FragmentPacket&) const;      // ❓ folded with 0x34c40
+    virtual bool ComposeRequestPacket(FragmentPacket&) const;      // LIFT: folded with 0x34c40
     virtual bool ComposeRequestPacket(Packet&) const;              // 0x1e150
-    virtual bool ComposeResponsePacket(FragmentPacket&) const;     // ❓ folded with 0x34c40
+    virtual bool ComposeResponsePacket(FragmentPacket&) const;     // LIFT: folded with 0x34c40
     virtual bool ComposeResponsePacket(Packet&) const;             // 0x1e230
     virtual bool processRelayRequest(Channel* const) const;        // 0x1de30
     virtual bool processRelayResponse() const;                     // 0x1df30
@@ -105,9 +105,9 @@ public:
 
     virtual unsigned short const GetRequestWid() const;            // 0x1f800
     virtual RelayHeader const MakeRelayHeader() const;             // 0x9450
-    virtual bool ComposeRequestPacket(FragmentPacket&) const;      // ❓ folded with 0x34c40
+    virtual bool ComposeRequestPacket(FragmentPacket&) const;      // LIFT: folded with 0x34c40
     virtual bool ComposeRequestPacket(Packet&) const;              // 0x9490
-    virtual bool ComposeResponsePacket(FragmentPacket&) const;     // ❓ folded with 0x34c40
+    virtual bool ComposeResponsePacket(FragmentPacket&) const;     // LIFT: folded with 0x34c40
     virtual bool ComposeResponsePacket(Packet&) const;             // 0x9570
     virtual bool processRelayRequest(Channel* const) const;        // 0x9180
     virtual bool processRelayResponse() const;                     // 0x9280

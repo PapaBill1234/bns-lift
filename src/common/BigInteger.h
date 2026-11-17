@@ -8,7 +8,7 @@
 
 class BigInteger
 {
-    friend class Dh; // ❓ Dh uses the inline compare (absCompare).
+    friend class Dh; // LIFT: Dh uses the inline compare (absCompare).
 
 public:
     enum { MAX_DIGITS = 128 }; // ❓
@@ -41,7 +41,7 @@ public:
     void ExpMod(BigInteger const* a, BigInteger const* e, BigInteger const* n);
     bool IsPrime() const;
 
-    // ❓ Inline helpers. The compiler put this code inline. No PDB symbol.
+    // LIFT: Inline helpers. The compiler put this code inline. No PDB symbol.
     int digitCount() const { return (bits + 31) >> 5; }
     bool isZero() const { return sign == 1 && bits == 1 && digits[0] == 0; }
     void setZero()

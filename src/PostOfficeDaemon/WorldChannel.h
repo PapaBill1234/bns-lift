@@ -13,11 +13,11 @@ class RelayContext;
 class WorldChannel : public Channel
 {
 public:
-    // ❓ Inlined in HandlePostOfficeServiceHelloReq (0x1f890).
+    // LIFT: Inlined in HandlePostOfficeServiceHelloReq (0x1f890).
     WorldChannel(unsigned short wid, unsigned long ipAddress, unsigned short portNo)
         : _wid(wid), _ipAddress(ipAddress), _portNo(portNo) {}
-    virtual ~WorldChannel();             // ❓ folded with ~AgentChannel (0x1f620)
-    virtual unsigned long long GetId();  // ❓ folded with AgentChannel::GetId (0x1a6e0)
+    virtual ~WorldChannel();             // LIFT: folded with ~AgentChannel (0x1f620)
+    virtual unsigned long long GetId();  // LIFT: folded with AgentChannel::GetId (0x1a6e0)
 
     static unsigned short GetWid(Session const* session);    // 0x1e490
     bool SendRelayResponse(RelayContext const* const relayContext);       // 0x1e570
@@ -47,7 +47,7 @@ public:
     Container* _containerList;
     long volatile _worldCount;
 
-    // ❓ Inlined at 0x14090.
+    // LIFT: Inlined at 0x14090.
     explicit WorldChannelManager(int bucketCount)
         : _bucketCount(bucketCount), _lockList(nullptr), _containerList(nullptr), _worldCount(0)
     {

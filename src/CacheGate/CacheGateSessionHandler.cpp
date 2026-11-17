@@ -36,7 +36,7 @@ struct OuterWorldDdataHeader
 #pragma pack(pop)
 static_assert(sizeof(OuterWorldDdataHeader) == 22, "sizeof OuterWorldDdataHeader");
 
-// ❓ Packet has no constructor. The original sets these fields inline.
+// LIFT: Packet has no constructor. The original sets these fields inline.
 static void zeroPacket(Packet* packet)
 {
     packet->Splitter = nullptr;
@@ -47,7 +47,7 @@ static void zeroPacket(Packet* packet)
     packet->ListTail = nullptr;
 }
 
-static void setRepeatDecomposer(RepeatPacketDecomposer* rpd, char const* format, int len)  // ❓ lift helper name, not in any PDB
+static void setRepeatDecomposer(RepeatPacketDecomposer* rpd, char const* format, int len)  // LIFT: lift helper name, not in any PDB
 {
     rpd->format = format;
     rpd->len = len;

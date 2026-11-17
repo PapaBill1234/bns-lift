@@ -271,7 +271,7 @@ bool TFPP_PumpPacket(unsigned int eventId, void* iocp, Session const* session, P
                      int offset, TFPP_PacketHandler const* PH, TFPP_PacketHandler const* fragmentPH)
 {
     if (iocp == INVALID_HANDLE_VALUE || session == nullptr || packet == nullptr || PH == nullptr ||
-        fragmentPH == nullptr || cmd - offset < 0)  // ❓ offset is 0 in the binary (folded)
+        fragmentPH == nullptr || cmd - offset < 0)  // LIFT: offset is 0 in the binary (folded)
     {
         Log::Write(Log::LT_ERROR, TFPP_FILE, 262,
                    L"== CRASH == [packet-pump], invalid parameter, event-id:%u, iocp:%I64u, session:0x%p, packet:0x%p, cmd:%d, offset:%d, PH:0x%p, fragmentPH:0x%p",

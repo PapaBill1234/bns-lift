@@ -24,7 +24,7 @@ wchar_t const* const CHANNEL_H_FILE =
 wchar_t const* const DISCONNECTED_LOBBYD = L"disconnected lobbyd";
 
 // ❓ The PDB type id128::<unnamed-type-guid> has the fields id1, id2, id3 and id4[8].
-struct GuidFields  // ❓ lift helper name, not in any PDB
+struct GuidFields  // LIFT: lift helper name, not in any PDB
 {
     unsigned int id1;
     unsigned short id2;
@@ -32,14 +32,14 @@ struct GuidFields  // ❓ lift helper name, not in any PDB
     unsigned char id4[8];
 };
 
-GuidFields guidOf(id128 const* value)  // ❓ lift helper name, not in any PDB
+GuidFields guidOf(id128 const* value)  // LIFT: lift helper name, not in any PDB
 {
     GuidFields g;
     memcpy(&g, value->guid, sizeof(g));
     return g;
 }
 
-// ❓ Inlined search in PipeConsole::_invalid (wcsncmp with 20 characters).
+// LIFT: Inlined search in PipeConsole::_invalid (wcsncmp with 20 characters).
 PipeConsole::ItemNode* findDisconnectedNode(PipeConsole* console)
 {
     PipeConsole::ItemNode* node = console->_invalid._head._next;
@@ -52,7 +52,7 @@ PipeConsole::ItemNode* findDisconnectedNode(PipeConsole* console)
     return nullptr;
 }
 
-// ❓ Inlined PipeConsole::SetInvalidInfo(L"disconnected lobbyd", true). PipeConsole::addNode is private,
+// LIFT: Inlined PipeConsole::SetInvalidInfo(L"disconnected lobbyd", true). PipeConsole::addNode is private,
 // thus the friend classes call it. Each caller writes the add step inline.
 #define LOBBYD_SET_DISCONNECTED_INFO()                                                                       \
     do                                                                                                       \
@@ -67,7 +67,7 @@ PipeConsole::ItemNode* findDisconnectedNode(PipeConsole* console)
         }                                                                                                    \
     } while (0)
 
-// ❓ Inlined PipeConsole::SetInvalidInfo(L"disconnected lobbyd", false).
+// LIFT: Inlined PipeConsole::SetInvalidInfo(L"disconnected lobbyd", false).
 void clearDisconnectedInfo()
 {
     if (Daemon::Instance == nullptr || Daemon::Instance->pipeConsole == nullptr)
@@ -84,7 +84,7 @@ void clearDisconnectedInfo()
     console->_lock.Leave();
 }
 
-// ❓ Inlined Session::GetChannel with the reference (source\Session.cpp 1051).
+// LIFT: Inlined Session::GetChannel with the reference (source\Session.cpp 1051).
 LobbyD* acquireChannel(Session const* session)
 {
     Channel* channel = session->_channel;
@@ -103,7 +103,7 @@ bool isConnected(Session* session)
     return connected;
 }
 
-// ❓ Inlined fail path "not connected" of the LobbyD::Send* functions.
+// LIFT: Inlined fail path "not connected" of the LobbyD::Send* functions.
 bool failNotConnected(Session* session, short cmd, int line)
 {
     Log::Write(Log::LT_ERROR, LOBBYD_FILE, line, L"[channel], 0x%.16I64X, send fail, not connected, cmd:%d",
@@ -113,7 +113,7 @@ bool failNotConnected(Session* session, short cmd, int line)
     return false;
 }
 
-// ❓ Inlined fail path "compose fail" of the LobbyD::Send* functions.
+// LIFT: Inlined fail path "compose fail" of the LobbyD::Send* functions.
 bool failCompose(Session* session, Packet& packet, short cmd, int line)
 {
     Log::Write(Log::LT_ERROR, LOBBYD_FILE, line, L"[channel], 0x%.16I64X, send fail, compose fail, cmd:%d",
@@ -123,7 +123,7 @@ bool failCompose(Session* session, Packet& packet, short cmd, int line)
     return false;
 }
 
-// ❓ Inlined masking of the client IP address in the logs.
+// LIFT: Inlined masking of the client IP address in the logs.
 void formatIpAddress(unsigned int ipAddress, wchar_t (&ipStr)[20])
 {
     if (LobbyGate::_instance != nullptr)
@@ -380,7 +380,7 @@ bool LobbyD::SendInitSessionWithNPTokenReq(unsigned long long gateKey, id128 con
     if (session == nullptr || !isConnected(session))
         return failNotConnected(session, cmd, 328);
 
-    Packet packet{};  // ❓ inlined constructor
+    Packet packet{};  // LIFT: inlined constructor
     packet.Allocate();
     id128 portalCopy = *portalAccountId;
     id128 npCopy = *npToken;
@@ -418,7 +418,7 @@ bool LobbyD::SendStartSessionWithNPTokenReq(unsigned long long cliKey, id128 con
     if (session == nullptr || !isConnected(session))
         return failNotConnected(session, cmd, 360);
 
-    Packet packet{};  // ❓ inlined constructor
+    Packet packet{};  // LIFT: inlined constructor
     packet.Allocate();
     id128 portalCopy = *portalAccountId;
     id128 npCopy = *npToken;
@@ -457,7 +457,7 @@ bool LobbyD::SendInitSessionWithLobbyTokenReq(unsigned long long gateKey, unsign
     if (session == nullptr || !isConnected(session))
         return failNotConnected(session, cmd, 392);
 
-    Packet packet{};  // ❓ inlined constructor
+    Packet packet{};  // LIFT: inlined constructor
     packet.Allocate();
     if (packet.Compose("hqqqi", static_cast<int>(cmd), gateKey, cliKey, lobbyToken, ipAddress) == 0)
         return failCompose(session, packet, cmd, 402);
@@ -487,7 +487,7 @@ bool LobbyD::SendStartSessionWithLobbyTokenReq(unsigned long long cliKey)
     if (session == nullptr || !isConnected(session))
         return failNotConnected(session, cmd, 424);
 
-    Packet packet{};  // ❓ inlined constructor
+    Packet packet{};  // LIFT: inlined constructor
     packet.Allocate();
     if (packet.Compose("hq", static_cast<int>(cmd), cliKey) == 0)
         return failCompose(session, packet, cmd, 434);
@@ -513,7 +513,7 @@ bool LobbyD::SendLostAnonymousConnectionNotify(long long gateKey)
     if (session == nullptr || !isConnected(session))
         return failNotConnected(session, cmd, 453);
 
-    Packet packet{};  // ❓ inlined constructor
+    Packet packet{};  // LIFT: inlined constructor
     packet.Allocate();
     if (packet.Compose("hq", static_cast<int>(cmd), gateKey) == 0)
         return failCompose(session, packet, cmd, 463);
@@ -539,7 +539,7 @@ bool LobbyD::SendLostConnectionNotify(unsigned long long cliKey)
     if (session == nullptr || !isConnected(session))
         return failNotConnected(session, cmd, 482);
 
-    Packet packet{};  // ❓ inlined constructor
+    Packet packet{};  // LIFT: inlined constructor
     packet.Allocate();
     if (packet.Compose("hq", static_cast<int>(cmd), cliKey) == 0)
         return failCompose(session, packet, cmd, 492);

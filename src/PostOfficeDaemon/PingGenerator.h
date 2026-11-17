@@ -6,12 +6,12 @@
 class PingGenerator : public Timer
 {
 public:
-    explicit PingGenerator(unsigned short wid) : _wid(wid), _pingSeq(0) {}  // ❓ inlined in 0x3d20
+    explicit PingGenerator(unsigned short wid) : _wid(wid), _pingSeq(0) {}  // LIFT: inlined in 0x3d20
 
     virtual unsigned int TimerClass() const;         // 0x54a70 (CachedWatchdog.cpp)
     virtual unsigned long long TimerId() const;      // 0x5d860 (CachedWatchdog.cpp)
     virtual bool HandleEvent(EventContext* context, unsigned long bytes);  // 0x4d70
-    virtual ~PingGenerator() {}  // ❓ folded with Timer dtor 0x12c60
+    virtual ~PingGenerator() {}  // LIFT: folded with Timer dtor 0x12c60
 
     unsigned short const _wid;
     unsigned long long _pingSeq;

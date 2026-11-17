@@ -14,7 +14,7 @@
 
 static wchar_t const MANAGERCHANNEL_FILE[] = L"ManagerChannel.cpp";
 
-// ❓ Packet has no constructor. The original sets these fields inline.
+// LIFT: Packet has no constructor. The original sets these fields inline.
 static void zeroPacket(Packet* packet)
 {
     packet->Splitter = nullptr;
@@ -154,7 +154,7 @@ void ManagerChannel::SendRetryCouponPublicationOk(Session* session, long long ti
         PacketBuffer const* buffer = p.ListHead;
         p.ListHead->encrypt(session->_currentCrypt, session->_security3rd);
         session->_lock.Enter();
-        session->send(&buffer, 1);  // ❓ inlined send
+        session->send(&buffer, 1);  // LIFT: inlined send
         session->_lock.Leave();
     }
     else
@@ -185,7 +185,7 @@ void ManagerChannel::SendRetryCouponPublicationFail(Session* session, long long 
         PacketBuffer const* buffer = p.ListHead;
         p.ListHead->encrypt(session->_currentCrypt, session->_security3rd);
         session->_lock.Enter();
-        session->send(&buffer, 1);  // ❓ inlined send
+        session->send(&buffer, 1);  // LIFT: inlined send
         session->_lock.Leave();
     }
     else

@@ -11,7 +11,7 @@ class Session;
 class CacheD : public Channel
 {
 public:
-    // ❓ The constructor is inlined in CacheDList::addCacheD (0x3700).
+    // LIFT: The constructor is inlined in CacheDList::addCacheD (0x3700).
     CacheD() : _id(0), _addr(0), _port(0), _status(0)
     {
         _tag = 10;
@@ -47,7 +47,7 @@ public:
                      StlAllocator<std::pair<unsigned short const, CacheD*>, 2> >
         CacheDMap;  // PDB CacheDList::CacheDMap
 
-    // ❓ The constructor is inlined in the CacheGate constructor.
+    // LIFT: The constructor is inlined in the CacheGate constructor.
     CacheDList() : _capacity(0), _cachedMap(nullptr) {}
     ~CacheDList();                                                             // 0x25C0
 
