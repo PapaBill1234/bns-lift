@@ -20,7 +20,7 @@
 #include "WorldListManager.h"
 #include "PcCafeMileageFeverTimeScheduleList.h"
 
-// ❓ The PDB gives no module for these structs. Layout from include/pdb/LobbyGate/types.h.
+// LIFT: PDB types (TPI) have no module, so the lift puts these structs here. Layout from include/pdb/LobbyGate/types.h.
 struct GradeInfo
 {
     int gameGradeKey;

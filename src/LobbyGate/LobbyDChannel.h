@@ -8,7 +8,7 @@
 
 class LobbyDSessionHandler;
 
-// ❓ Globals of the bypass packet pump. The PDB type is void*[2]. The definition comes from a later card.
+// PDB: globals of the bypass packet pump. Type 0x2EC3 is an array of 2 pointers (16 bytes) to bool(Session const*, Packet const*).
 extern Daemon::PacketHandler bypassHandler[2];
 extern Daemon::PacketHandler bypassHandlerFF[2];
 

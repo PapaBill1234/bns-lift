@@ -635,7 +635,7 @@ unsigned long long ClientSessionTimerJob::TimerId() const
     return 0;
 }
 // LIFT: empty body. vftable 0x7c030 slot 0 is the folded Timer scalar deleting destructor (0x13bb0).
-// ❓ Not in index.tsv. The vtable needs a body.
+// PDB: only the scalar deleting destructor exists (S_GPROC32 at 0001:76720 = 0x13bb0, 50 bytes). The vtable needs a body.
 ClientSessionTimerJob::~ClientSessionTimerJob()
 {
 }
