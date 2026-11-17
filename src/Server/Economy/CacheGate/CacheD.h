@@ -11,8 +11,8 @@ class Session;
 class CacheD : public Channel
 {
 public:
-    // LIFT: The constructor is inlined in CacheDList::addCacheD (0x3700).
-    CacheD() : _id(0), _addr(0), _port(0), _status(0)
+    // LIFT: The constructor is inlined in CacheDList::addCacheD (0x3700). __forceinline: no out-of-line copy (0x10b0 in ours).
+    __forceinline CacheD() :_id(0), _addr(0), _port(0), _status(0)
     {
         _tag = 10;
         _ref = 1;
@@ -21,7 +21,8 @@ public:
     virtual ~CacheD();                                                         // 0x23B0
     virtual unsigned long long GetId();                                        // 0x23A0
 
-    bool TryConnect();                                                         // 0x23E0
+    // LIFT: noinline. The orig calls it from addCacheD (0x3700) and inlines it only in MakeSessionAll.
+    __declspec(noinline) bool TryConnect();                                    // 0x23E0
     void Initialize(unsigned short id, unsigned long addr, unsigned short port, char status);  // 0x2430
     int Verify(Session const* session);                                        // 0x2530
 
@@ -44,7 +45,7 @@ class CacheDList
 {
 public:
     typedef std::map<unsigned short, CacheD*, std::less<unsigned short>,
-                     StlAllocator<std::pair<unsigned short const, CacheD*>, 2> >
+                     StlAllocator<std::pair<unsigned short, CacheD*>, 2> >
         CacheDMap;  // PDB CacheDList::CacheDMap
 
     // LIFT: The constructor is inlined in the CacheGate constructor.

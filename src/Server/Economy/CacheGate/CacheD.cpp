@@ -17,6 +17,9 @@
 #include "PipeConsole.h"
 #include "Session.h"
 #include "XmlReader.h"
+#if defined(__clang__)
+#include <crt_cpp_overload.h>  // The Wine headers do not have swprintf_s<N>. VS2010 has it.
+#endif
 
 static wchar_t const CACHED_FILE[] = L"CacheD.cpp";
 // The inlined Channel::Close and Session release use the Channel.h path.
@@ -54,7 +57,7 @@ void CacheD::Initialize(unsigned short id, unsigned long addr, unsigned short po
     _status = 0;  // The status argument is not used.
     _lock.Leave();
 
-    swprintf_s(_daemonInvalidInfoKey, 129, L"cached disconnected wid:%d", id);
+    swprintf_s(_daemonInvalidInfoKey, L"cached disconnected wid:%d", id);
 
     // Inlined PipeConsole::SetInvalidInfo(_daemonInvalidInfoKey, true).
     if (CacheGate::_instance != nullptr && CacheGate::_instance->pipeConsole != nullptr)
@@ -179,130 +182,136 @@ void CacheDList::RemoveSessionAll()
 bool CacheDList::LoadCachedListConfigFile(wchar_t const* fileName, bool reload)
 {
     HMODULE module = LoadLibraryW(L"XmlReader_sv64.dll");
-    if (module == nullptr)
+    if (module != nullptr)
+    {
+        XriGetInterfaceVersion getVersion = reinterpret_cast<XriGetInterfaceVersion>(GetProcAddress(module, "GetInterfaceVersion"));
+        XriSetMemAllocator setAllocator = reinterpret_cast<XriSetMemAllocator>(GetProcAddress(module, "SetMemAllocator"));
+        (void)setAllocator;  // The function does not call it.
+        XriCreateFunc createReader = reinterpret_cast<XriCreateFunc>(GetProcAddress(module, "CreateXmlReader"));
+        XriDestoryFunc destroyReader = reinterpret_cast<XriDestoryFunc>(GetProcAddress(module, "DestroyXmlReader"));
+
+        wchar_t const* version = getVersion();
+        if (version != nullptr)
+        {
+            if (_wcsicmp(L"15", version) != 0)
+            {
+                Log::Write(Log::LT_ERROR, CACHED_FILE, 240,
+                           L"xml-reader version invalid, current version : %s, loaded version : %s", L"15", version);
+                return false;  // BUG: 0x2b20 the library is not freed on this path.
+            }
+
+            bool result = false;
+            _lock.Enter();
+            XmlReader const* reader = createReader();
+            if (reader == nullptr)
+            {
+                result = true;  // BUG: 0x2b20 a failed reader gives success.
+            }
+            else
+            {
+                reader->Initialize(nullptr, nullptr, false);
+                XmlDoc* doc = reader->Read(fileName, static_cast<XmlPieceReader*>(nullptr));
+                if (doc != nullptr && doc->Root() != nullptr)
+                {
+                    XmlElement* root = doc->Root();
+                    XmlNode* rootNode = root->ToXmlNode();
+                    if (rootNode == nullptr)
+                    {
+                        reader->Close(doc);
+                    }
+                    else
+                    {
+                        XmlNode const* node = rootNode->FirstChild();
+                        result = true;
+                        while (node != nullptr && node->IsValid())
+                        {
+                            if (node->Type() == 1)
+                            {
+                                XmlElement const* element = node->ToXmlElement();
+                                // An element that is not "cached" stops the load with failure.
+                                if (element == nullptr || wcsncmp(element->Name(), L"cached", 7) != 0)
+                                {
+                                    result = false;
+                                    break;
+                                }
+                                unsigned short wid = static_cast<unsigned short>(_wtoi(element->Attribute(L"wid")));
+                                char ipText[32];
+                                WideCharToMultiByte(CP_ACP, 0, element->Attribute(L"ip-address"), -1, ipText, 31, nullptr, nullptr);
+                                unsigned long ip = inet_addr(ipText);
+                                unsigned short port = static_cast<unsigned short>(_wtoi(element->Attribute(L"economy-port")));
+
+                                CacheD* existing = Find(wid);
+                                if (existing == nullptr)
+                                {
+                                    if (!addCacheD(wid, ip, port, reload))
+                                        Log::Write(Log::LT_ERROR, CACHED_FILE, 285,
+                                                   L"[cached list], failed to add new cached, wid:%d, ip-address:%s, port:%d",
+                                                   wid, Network::GetAddressStringW(ip), port);
+                                }
+                                else if (existing->_addr == ip && existing->_port == port)
+                                {
+                                    Log::Write(Log::LT_DEBUG, CACHED_FILE, 295,
+                                               L"[cached list], load cached success, already exists, wid:%d, ip-address:%s, port:%d",
+                                               wid, Network::GetAddressStringW(ip), port);
+                                    existing->removeReferenceCount(CACHED_FILE, 296);
+                                }
+                                else
+                                {
+                                    Log::Write(Log::LT_DEBUG, CACHED_FILE, 302,
+                                               L"[cached list], load cached success, update cached info OLD , wid:%d, ip-address:%s, port:%d"
+                                               L"NEW , wid:%d, ip-address:%s, port:%d",
+                                               existing->_id, Network::GetAddressStringW(existing->_addr), existing->_port,
+                                               wid, Network::GetAddressStringW(ip), port);
+                                    if (!del(existing->_id))
+                                    {
+                                        Log::Write(Log::LT_ERROR, CACHED_FILE, 307,
+                                                   L"[cached list], failed to delete old cahed info, wid:%d, ip-address:%s, port:%d",
+                                                   existing->_id, Network::GetAddressStringW(existing->_addr), existing->_port);
+                                        existing->removeReferenceCount(CACHED_FILE, 308);
+                                    }
+                                    else if (!addCacheD(wid, ip, port, reload))
+                                    {
+                                        Log::Write(Log::LT_ERROR, CACHED_FILE, 315,
+                                                   L"[cached list], failed to add new cached, wid:%d, ip-address:%s, port:%d",
+                                                   wid, Network::GetAddressStringW(ip), port);
+                                        existing->removeReferenceCount(CACHED_FILE, 316);
+                                    }
+                                    else
+                                    {
+                                        Session* session = const_cast<Session*>(existing->GetSession());
+                                        if (session != nullptr)
+                                        {
+                                            session->StopReconnect();
+                                            session->removeReferenceCount(CHANNEL_HEADER_FILE, 52);
+                                        }
+                                        existing->Close();
+                                        existing->removeReferenceCount(CACHED_FILE, 329);
+                                    }
+                                }
+                            }
+                            node = node->Next();
+                        }
+                        reader->Close(doc);
+                    }
+                }
+            }
+            _lock.Leave();
+            if (reader != nullptr)
+                destroyReader(reader);
+            FreeLibrary(module);
+            return result;
+        }
+        else
+        {
+            Log::Write(Log::LT_ERROR, CACHED_FILE, 245, L"xml-reader version invalid");
+            return false;  // BUG: 0x2b20 the library is not freed on this path.
+        }
+    }
+    else
     {
         Log::Write(Log::LT_ERROR, CACHED_FILE, 233, L"%s missing.", L"XmlReader_sv64.dll");
         return false;
     }
-
-    XriGetInterfaceVersion getVersion = reinterpret_cast<XriGetInterfaceVersion>(GetProcAddress(module, "GetInterfaceVersion"));
-    XriSetMemAllocator setAllocator = reinterpret_cast<XriSetMemAllocator>(GetProcAddress(module, "SetMemAllocator"));
-    (void)setAllocator;  // The function does not call it.
-    XriCreateFunc createReader = reinterpret_cast<XriCreateFunc>(GetProcAddress(module, "CreateXmlReader"));
-    XriDestoryFunc destroyReader = reinterpret_cast<XriDestoryFunc>(GetProcAddress(module, "DestroyXmlReader"));
-
-    wchar_t const* version = getVersion();
-    if (version == nullptr)
-    {
-        Log::Write(Log::LT_ERROR, CACHED_FILE, 245, L"xml-reader version invalid");
-        return false;  // BUG: 0x2b20 the library is not freed on this path.
-    }
-    if (_wcsicmp(L"15", version) != 0)
-        Log::Write(Log::LT_ERROR, CACHED_FILE, 240,
-                   L"xml-reader version invalid, current version : %s, loaded version : %s", L"15", version);
-
-    bool result = false;
-    _lock.Enter();
-    XmlReader const* reader = createReader();
-    if (reader == nullptr)
-    {
-        result = true;  // BUG: 0x2b20 a failed reader gives success.
-    }
-    else
-    {
-        reader->Initialize(nullptr, nullptr, false);
-        XmlDoc* doc = reader->Read(fileName, static_cast<XmlPieceReader*>(nullptr));
-        if (doc != nullptr && doc->Root() != nullptr)
-        {
-            XmlElement* root = doc->Root();
-            XmlNode* rootNode = root->ToXmlNode();
-            if (rootNode == nullptr)
-            {
-                reader->Close(doc);
-            }
-            else
-            {
-                XmlNode const* node = rootNode->FirstChild();
-                result = true;
-                while (node != nullptr && node->IsValid())
-                {
-                    if (node->Type() == 1)
-                    {
-                        XmlElement const* element = node->ToXmlElement();
-                        if (element == nullptr)
-                        {
-                            result = false;
-                            break;
-                        }
-                        if (wcsncmp(element->Name(), L"cached", 7) == 0)
-                        {
-                            unsigned short wid = static_cast<unsigned short>(_wtoi(element->Attribute(L"wid")));
-                            char ipText[32];
-                            WideCharToMultiByte(CP_ACP, 0, element->Attribute(L"ip-address"), -1, ipText, 31, nullptr, nullptr);
-                            unsigned long ip = inet_addr(ipText);
-                            unsigned short port = static_cast<unsigned short>(_wtoi(element->Attribute(L"economy-port")));
-
-                            CacheD* existing = Find(wid);
-                            if (existing == nullptr)
-                            {
-                                if (!addCacheD(wid, ip, port, reload))
-                                    Log::Write(Log::LT_ERROR, CACHED_FILE, 285,
-                                               L"[cached list], failed to add new cached, wid:%d, ip-address:%s, port:%d",
-                                               wid, Network::GetAddressStringW(ip), port);
-                            }
-                            else if (existing->_addr == ip && existing->_port == port)
-                            {
-                                Log::Write(Log::LT_DEBUG, CACHED_FILE, 295,
-                                           L"[cached list], load cached success, already exists, wid:%d, ip-address:%s, port:%d",
-                                           wid, Network::GetAddressStringW(ip), port);
-                                existing->removeReferenceCount(CACHED_FILE, 296);
-                            }
-                            else
-                            {
-                                Log::Write(Log::LT_DEBUG, CACHED_FILE, 302,
-                                           L"[cached list], load cached success, update cached info OLD , wid:%d, ip-address:%s, port:%d"
-                                           L"NEW , wid:%d, ip-address:%s, port:%d",
-                                           existing->_id, Network::GetAddressStringW(existing->_addr), existing->_port,
-                                           wid, Network::GetAddressStringW(ip), port);
-                                if (!del(existing->_id))
-                                {
-                                    Log::Write(Log::LT_ERROR, CACHED_FILE, 307,
-                                               L"[cached list], failed to delete old cahed info, wid:%d, ip-address:%s, port:%d",
-                                               existing->_id, Network::GetAddressStringW(existing->_addr), existing->_port);
-                                    existing->removeReferenceCount(CACHED_FILE, 308);
-                                }
-                                else if (!addCacheD(wid, ip, port, reload))
-                                {
-                                    Log::Write(Log::LT_ERROR, CACHED_FILE, 315,
-                                               L"[cached list], failed to add new cached, wid:%d, ip-address:%s, port:%d",
-                                               wid, Network::GetAddressStringW(ip), port);
-                                    existing->removeReferenceCount(CACHED_FILE, 316);
-                                }
-                                else
-                                {
-                                    Session* session = const_cast<Session*>(existing->GetSession());
-                                    if (session != nullptr)
-                                    {
-                                        session->StopReconnect();
-                                        session->removeReferenceCount(CHANNEL_HEADER_FILE, 52);
-                                    }
-                                    existing->Close();
-                                    existing->removeReferenceCount(CACHED_FILE, 329);
-                                }
-                            }
-                        }
-                    }
-                    node = node->Next();
-                }
-                reader->Close(doc);
-            }
-        }
-    }
-    _lock.Leave();
-    if (reader != nullptr)
-        destroyReader(reader);
-    FreeLibrary(module);
-    return result;
 }
 
 // 0x3120

@@ -41,32 +41,34 @@ bool CacheDChannel::onConnect(Session const* session, bool firstConnected)
         session->_channel->addReferenceCount(SESSION_FILE, 1051);
         cached = static_cast<CacheD*>(session->_channel);
     }
-    if (cached == nullptr)
+    if (cached != nullptr)
+    {
+        int ret = cached->Verify(session);
+        if (ret == 0)
+        {
+            session->Send("hhhh", CacheGate_HelloCmd, 4, 10, cached->_id);
+            Log::Write(Log::LT_DEBUG, CACHED_CHANNEL_FILE, 80, L"[cg], cached connect, hello send, wid:%d, ip:%s",
+                       static_cast<int>(cached->_id), Network::GetAddressStringW(session->_connection->_ip));
+        }
+        else
+        {
+            Log::Write(Log::LT_DEBUG, CACHED_CHANNEL_FILE, 83, L"[cg], cached register fail, ret-code:%d, wid:%d, ip:%s", ret,
+                       static_cast<int>(cached->_id), Network::GetAddressStringW(session->_connection->_ip));
+            result = false;
+        }
+
+        if (CacheGate::_instance != nullptr && CacheGate::_instance->pipeConsole != nullptr)
+            CacheGate::_instance->pipeConsole->SetInvalidInfo(cached->_daemonInvalidInfoKey, false);
+
+        // Inlined Session::ReleaseChannel.
+        cached->removeReferenceCount(SESSION_FILE, 1059);
+        return result;
+    }
+    else
     {
         Log::Write(Log::LT_DEBUG, CACHED_CHANNEL_FILE, 70, L"[cg], cached channel bind fail");
         return false;
     }
-
-    int ret = cached->Verify(session);
-    if (ret != 0)
-    {
-        Log::Write(Log::LT_DEBUG, CACHED_CHANNEL_FILE, 83, L"[cg], cached register fail, ret-code:%d, wid:%d, ip:%s", ret,
-                   static_cast<int>(cached->_id), Network::GetAddressStringW(session->_connection->_ip));
-        result = false;
-    }
-    else
-    {
-        session->Send("hhhh", CacheGate_HelloCmd, 4, 10, cached->_id);
-        Log::Write(Log::LT_DEBUG, CACHED_CHANNEL_FILE, 80, L"[cg], cached connect, hello send, wid:%d, ip:%s",
-                   static_cast<int>(cached->_id), Network::GetAddressStringW(session->_connection->_ip));
-    }
-
-    if (CacheGate::_instance != nullptr && CacheGate::_instance->pipeConsole != nullptr)
-        CacheGate::_instance->pipeConsole->SetInvalidInfo(cached->_daemonInvalidInfoKey, false);
-
-    // Inlined Session::ReleaseChannel.
-    cached->removeReferenceCount(SESSION_FILE, 1059);
-    return result;
 }
 
 // 0x3e40
@@ -139,5 +141,7 @@ bool CacheDChannel::PacketHandler(Session const* session, Packet const* packet) 
 {
     Daemon::PacketHandler handler =
         CacheGatePacketServerSideHandlerList[static_cast<unsigned short>(packet->CurHeader[1].size)];
-    return handler != nullptr && handler(session, packet);
+    if (handler == nullptr)
+        return false;
+    return handler(session, packet);
 }

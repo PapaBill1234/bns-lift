@@ -65,9 +65,12 @@ Session* ClientManager::GetSession(unsigned short wid)
         return nullptr;
     _lock.Enter();
     SessionMap::iterator it = _clientMap->find(wid);
-    Session* session = nullptr;
-    if (it != _clientMap->end())
-        session = it->second;
+    if (it == _clientMap->end() || it->second == nullptr)
+    {
+        _lock.Leave();
+        return nullptr;
+    }
+    Session* session = it->second;
     _lock.Leave();
     return session;
 }

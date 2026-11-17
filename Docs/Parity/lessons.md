@@ -308,3 +308,42 @@
   and has no per-target defines, so a wrapper file is necessary.
 - Example: LG BnsCommonConfig::Dump, POD ThreadFreePacketPump::Initialize -> MATCH. LG +7, SCD +2, POD +5.
 - Side effect: .rdata moved, more string_at noise (lesson 2): LG Memory::CreateManager, POD Console/LogFile.
+
+## Pattern 22 (worked, lift-parity-cg-1): PDB map allocator has no `const` in the pair
+- Cause: PDB map types are `StlAllocator<std::pair<K, V>,2>`. Ours used `pair<K const, V>`, so the `_Tree` callee names differ.
+- Source: `CacheD.h` CacheDMap, `ClientManager.h` SessionMap and IndexMap use `std::pair<K, V>`.
+  With `ClientManager::GetSession` (2 `Leave` calls, null `second` exits) and the version-check `return false`
+  in `CacheDList::LoadCachedListConfigFile`: CG MATCH 374 -> 380, other exes +0. Example: `ClientManager::ReleaseSession` 0x6250.
+
+## Noise (lift-parity-cg-1): `_Buynode<std::pair<K const ,V>>` vs `<K const,V>`
+- Orig PDB demangles with `const ,`, ours with `const,`. Only this differs in `CacheDList::add` 0x3490 and
+  `ClientManager::AddSession` 0x6120. Not fixable in source. Tooling card: normalize `const ,`.
+
+## Pattern 31 (worked, lift-parity-cg-1): handler table dispatch as a tail call
+- Cause: `return handler != nullptr && handler(s, p);` converts the result to bool, so the call is not a tail jump.
+- Source: `if (handler == nullptr) return false; return handler(s, p);`. Example: `CacheDChannel::PacketHandler` 0x4150 -> MATCH.
+
+## Pattern 32 (worked, lift-parity-cg-1): `__forceinline` on an in-class ctor that the orig never emits
+- Cause: ours emitted `CacheD::CacheD` out of line (only in ours). Source: `__forceinline CacheD()` in `CacheD.h`.
+
+## Part worked (lift-parity-cg-1): HandleCacheGateHello 0x4c00 block order
+- Early return for both version checks, then `if (GetSession == nullptr) {add path} else-tail {duplicate}`, read
+  `CacheGate::_instance->_clientManager` at each call: calls 68 -> 88. Nested `==4`/`==10` ifs gave 63 (worse).
+- Batch 2 (CacheD Verify/LoadCachedListConfigFile/Initialize swprintf_s, onConnect order, TryConnect noinline): CG 380 -> 382.
+- Else-if chain with one shared `return false` (no early returns): score 87.2 -> 88.9, still DIFF. Undone (rule: MATCH only).
+
+## Pattern 33 (worked, lift-parity-cg-1): branch order is the inverse of the HR `if`
+- Cause: VS2010 puts the `else` block of the source first when the HR shows `if (x != 0) A else B`.
+  The HR condition is the inverse of the source condition.
+- Change: write `if (x == 0) { B } else { A }`. Example: CacheDChannel::onConnect 0x3c80
+  (`if (ret == 0) { Send; Log 80 } else { Log 83 }`): DIFF 92.2 -> MATCH. CG 384 -> 385.
+
+## Did not work (lift-parity-cg-1)
+- Inlined PipeConsole find with `node = nullptr; for (...) { if (wcscmp == 0) { node = it; break; } } if (node == nullptr)`
+  in CacheD::Initialize 0x2430 and CacheDChannel::onClose 0x3e40: const 0x278 stays (`add rbx,0x278`). No gain.
+- `_cachedMap = new (Alloc(...)) CacheDMap();` in CacheDList::Initialize 0x2660 (compiler null check): const 0x3c stays
+  in `lea r9d,[rdi+0x3c]`. No gain.
+- CacheD::Verify 0x2530 with the fail test first (`!=`, early return): same score 91.7 as the HR form.
+- `__declspec(noinline)` on `_Tree::clear`: no gain (CacheDList::clear, RemoveSessionAll still call `_Erase`).
+- Tool fact: tools/vs2010/build.sh rebuilds an object only when the .cpp is newer than the obj. It does not
+  track headers. After a header edit, run `rm -rf build-vs2010/obj`.

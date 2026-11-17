@@ -90,7 +90,9 @@ bool CacheGateSessionHandler::PacketHandler(Session const* session, Packet const
 {
     Daemon::PacketHandler handler =
         CacheGatePacketServerSideHandlerList[static_cast<unsigned short>(packet->CurHeader[1].size)];
-    return handler != nullptr && handler(session, packet);
+    if (handler == nullptr)
+        return false;
+    return handler(session, packet);
 }
 
 // 0x4c00
@@ -125,32 +127,29 @@ bool HandleCacheGateHello(Session const* session, Packet const* packet)
         return false;
     }
 
-    ClientManager* clientManager = CacheGate::_instance->_clientManager;
-    Session* current = clientManager->GetSession(wid);
-    if (current != nullptr)
+    Session* current = CacheGate::_instance->_clientManager->GetSession(wid);
+    if (current == nullptr)
     {
-        current->Close(false);
+        if (CacheGate::_instance->_clientManager->AddSession(wid, session))
+        {
+            session->Send("h", CacheGate_HelloOkCmd);
+            Log::Write(Log::LT_DEBUG, HANDLER_FILE, 68, L"[cg], HelloOK Send, sessionId:0x%.16I64X, wid:%d, ipAddress:%s",
+                       session->_id, wid, Network::GetAddressStringW(ip));
+            return true;
+        }
+        current = CacheGate::_instance->_clientManager->GetSession(wid);
+        if (current != nullptr)
+            current->Close(false);
         session->Send("hE", CacheGate_HelloFailCmd);  // BUG: 0x4C00 the format has an error code, but no error code is given.
-        Log::Write(Log::LT_ERROR, HANDLER_FILE, 63,
-                   L"[cg], Hello Recv, Duplicate ServerID:%d, CurrSessionId:0x%.16I64X, NewSessionId:0x%.16I64X",
-                   wid, current->_id, session->_id);
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 52, L"[cg], client add session fail, wid:%d, ipAddress:%s", wid,
+                   Network::GetAddressStringW(ip));
         return false;
     }
-
-    if (clientManager->AddSession(wid, session))
-    {
-        session->Send("h", CacheGate_HelloOkCmd);
-        Log::Write(Log::LT_DEBUG, HANDLER_FILE, 68, L"[cg], HelloOK Send, sessionId:0x%.16I64X, wid:%d, ipAddress:%s",
-                   session->_id, wid, Network::GetAddressStringW(ip));
-        return true;
-    }
-
-    current = clientManager->GetSession(wid);
-    if (current != nullptr)
-        current->Close(false);
+    current->Close(false);
     session->Send("hE", CacheGate_HelloFailCmd);  // BUG: 0x4C00 the format has an error code, but no error code is given.
-    Log::Write(Log::LT_ERROR, HANDLER_FILE, 52, L"[cg], client add session fail, wid:%d, ipAddress:%s", wid,
-               Network::GetAddressStringW(ip));
+    Log::Write(Log::LT_ERROR, HANDLER_FILE, 63,
+               L"[cg], Hello Recv, Duplicate ServerID:%d, CurrSessionId:0x%.16I64X, NewSessionId:0x%.16I64X", wid,
+               current->_id, session->_id);
     return false;
 }
 
@@ -225,6 +224,11 @@ bool HandleCacheGateRelay(Session const* session, Packet const* packet)
     RepeatPacketDecomposer rpd;
     setRepeatDecomposer(&rpd, "hhhqhq", 6);
     OuterWorldDdataHeader recv;
+    recv.fromWid = 0;
+    recv.toWid = 0;
+    recv.tid = 0;
+    recv.hint = 0;
+    recv.reserved = 0;
     if (packet->Decompose(&rpd, 5, &recv.fromWid, &recv.toWid, &recv.tid, &recv.hint, &recv.reserved) == 0)
     {
         Log::Write(Log::LT_ERROR, HANDLER_FILE, 129, L"[cg], relay recv, packet decompose fail");
@@ -284,23 +288,24 @@ bool HandleCacheGateRelay(Session const* session, Packet const* packet)
     }
     else
     {
-        unsigned short wid = static_cast<unsigned short>(CacheGate::_instance->_config->_wid);
-        owdh.fromWid = wid;
+        owdh.fromWid = static_cast<unsigned short>(CacheGate::_instance->_config->_wid);
         owdh.toWid = recv.fromWid;
+        unsigned short reason = 8;
+        if (cached != nullptr)
+            reason = 3;
         short cmd = 5;
-        short reason = cached != nullptr ? 3 : 8;
         p.Add(&cmd, sizeof(cmd));
         p.Add(&owdh, sizeof(owdh));
         p.Add(&reason, sizeof(reason));
         session->Send(&p);
         if (isClient)
             Log::Write(Log::LT_ERROR, HANDLER_FILE, 193,
-                       L"[cg], relay fail, cachegate(wid:%d) -> client(wid:%d), tid:0x%.16I64X, reason:%d", wid,
-                       recv.fromWid, recv.tid, reason);
+                       L"[cg], relay fail, cachegate(wid:%d) -> client(wid:%d), tid:0x%.16I64X, reason:%d",
+                       static_cast<unsigned short>(CacheGate::_instance->_config->_wid), recv.fromWid, recv.tid, reason);
         else
             Log::Write(Log::LT_ERROR, HANDLER_FILE, 196,
-                       L"[cg], relay fail, cachegate(wid:%d) -> cached(wid:%d), tid:0x%.16I64X, reason:%d", wid,
-                       recv.fromWid, recv.tid, reason);
+                       L"[cg], relay fail, cachegate(wid:%d) -> cached(wid:%d), tid:0x%.16I64X, reason:%d",
+                       static_cast<unsigned short>(CacheGate::_instance->_config->_wid), recv.fromWid, recv.tid, reason);
     }
     if (isClient && cached != nullptr)
         cached->removeReferenceCount(HANDLER_FILE, 200);
@@ -372,6 +377,11 @@ bool HandleCacheGateFragmentRelay(Session const* session, Packet const* packet)
     pd.index = 2;
     pd.offset = 6;
     OuterWorldDdataHeader recv;
+    recv.fromWid = 0;
+    recv.toWid = 0;
+    recv.tid = 0;
+    recv.hint = 0;
+    recv.reserved = 0;
     if (sfc->_packet.Decompose(&pd, 5, &recv.fromWid, &recv.toWid, &recv.tid, &recv.hint, &recv.reserved) == 0)
     {
         Log::Write(Log::LT_ERROR, HANDLER_FILE, 268, L"[cg], fragment relay recv, packet decompose fail");
@@ -401,45 +411,47 @@ bool HandleCacheGateFragmentRelay(Session const* session, Packet const* packet)
     if (target != nullptr)
     {
         target->Send(&sfc->_packet);
-        if (!isClient)
+        if (isClient)
+        {
+            Log::Write(Log::LT_DEBUG, HANDLER_FILE, 295,
+                       L"[cg], fragment relay send, client(wid:%d) -> cached(wid:%d), tid:0x%.16I64X, sendDataSize:fragment",
+                       recv.fromWid, recv.toWid, recv.tid);
+            const_cast<Session*>(target)->removeReferenceCount(HANDLER_FILE, 296);
+        }
+        else
         {
             Log::Write(Log::LT_DEBUG, HANDLER_FILE, 299,
                        L"[cg], fragment relay send, client(wid:%d) <- cached(wid:%d), tid:0x%.16I64X, sendDataSize:fragment",
                        recv.toWid, recv.fromWid, recv.tid);
-            concatenater->Clear();
-            return true;
         }
-        Log::Write(Log::LT_DEBUG, HANDLER_FILE, 295,
-                   L"[cg], fragment relay send, client(wid:%d) -> cached(wid:%d), tid:0x%.16I64X, sendDataSize:fragment",
-                   recv.fromWid, recv.toWid, recv.tid);
-        const_cast<Session*>(target)->removeReferenceCount(HANDLER_FILE, 296);
     }
     else
     {
         Packet failPacket;
         zeroPacket(&failPacket);
         failPacket.Allocate();
-        unsigned short wid = static_cast<unsigned short>(CacheGate::_instance->_config->_wid);
+        unsigned short cmd = 5;
         OuterWorldDdataHeader owdh;
-        owdh.fromWid = wid;
-        owdh.toWid = recv.fromWid;
         owdh.tid = recv.tid;
         owdh.hint = recv.hint;
         owdh.reserved = recv.reserved;
-        short cmd = 5;
-        short reason = cached != nullptr ? 3 : 8;
+        owdh.fromWid = static_cast<unsigned short>(CacheGate::_instance->_config->_wid);
+        owdh.toWid = recv.fromWid;
+        unsigned short reason = 8;
+        if (cached != nullptr)
+            reason = 3;
         failPacket.Add(&cmd, sizeof(cmd));
         failPacket.Add(&owdh, sizeof(owdh));
         failPacket.Add(&reason, sizeof(reason));
         session->Send(&failPacket);
         if (isClient)
             Log::Write(Log::LT_ERROR, HANDLER_FILE, 325,
-                       L"[cg], fragment relay fail, cachegate(wid:%d) -> client(wid:%d), tid:0x%.16I64X, reason:%d", wid,
-                       recv.fromWid, recv.tid, reason);
+                       L"[cg], fragment relay fail, cachegate(wid:%d) -> client(wid:%d), tid:0x%.16I64X, reason:%d",
+                       static_cast<unsigned short>(CacheGate::_instance->_config->_wid), recv.fromWid, recv.tid, reason);
         else
             Log::Write(Log::LT_ERROR, HANDLER_FILE, 328,
-                       L"[cg], fragment relay fail, cachegate(wid:%d) -> cached(wid:%d), tid:0x%.16I64X, reason:%d", wid,
-                       recv.fromWid, recv.tid, reason);
+                       L"[cg], fragment relay fail, cachegate(wid:%d) -> cached(wid:%d), tid:0x%.16I64X, reason:%d",
+                       static_cast<unsigned short>(CacheGate::_instance->_config->_wid), recv.fromWid, recv.tid, reason);
     }
     if (isClient && cached != nullptr)
         cached->removeReferenceCount(HANDLER_FILE, 332);

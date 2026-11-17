@@ -11,10 +11,10 @@ class ClientManager
 {
 public:
     typedef std::map<unsigned short, Session*, std::less<unsigned short>,
-                     StlAllocator<std::pair<unsigned short const, Session*>, 2> >
+                     StlAllocator<std::pair<unsigned short, Session*>, 2> >
         SessionMap;  // PDB nested type (0x29AE)
     typedef std::map<unsigned long long, unsigned short, std::less<unsigned long long>,
-                     StlAllocator<std::pair<unsigned long long const, unsigned short>, 2> >
+                     StlAllocator<std::pair<unsigned long long, unsigned short>, 2> >
         IndexMap;  // PDB nested type (0x29B1)
 
     // LIFT: The constructor is inlined in CacheGate::initialize (0x4510).
