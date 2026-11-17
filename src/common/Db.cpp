@@ -36,7 +36,7 @@ bool Db::Initialize(unsigned int dbId, wchar_t const* dsn)
         DB_ASSERT_CRASH(42);
     if (EnvHandle == nullptr && !initEnv())
         return false;
-    void* mem = Memory::_Manager[2]->Alloc(sizeof(Db), kFile, 46);  // ❓ line
+    void* mem = Memory::_Manager[2]->Alloc(sizeof(Db), kFile, 50);
     Db* db = mem != nullptr ? new (mem) Db() : nullptr;
     Instance[dbId] = db;
     db->TranList = nullptr;  // BUG: 0x20690 no null check after a failed Alloc.

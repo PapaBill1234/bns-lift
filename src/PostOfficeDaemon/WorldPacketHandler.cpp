@@ -138,7 +138,7 @@ bool HandlePostOfficeServiceHelloReq(Session const* session, Packet const* packe
         goto $_ERROR;
     }
 
-    memory = Memory::_Manager[2]->Alloc(sizeof(WorldChannel), WORLD_PACKET_HANDLER_FILE, 91);  // ❓ line
+    memory = Memory::_Manager[2]->Alloc(sizeof(WorldChannel), WORLD_PACKET_HANDLER_FILE, 91);
     worldChannel = memory != nullptr ? ::new (memory) WorldChannel(wid, ipAddress, portNo) : nullptr;
     // BUG: 0x1f890 no null check after the Alloc. A failed Alloc gives a null call in AddWorldChannel.
     if (!PostOfficeDaemon::_instance->_worldChannelManager->AddWorldChannel(worldChannel))
@@ -254,7 +254,7 @@ bool HandlePostOfficeServiceRetrieveCharacterInfoReq(Session const* session, Pac
     economyHeader._toWid = request._targetWid;
     economyHeader._relayTid = liftNextRelayTid();
     memory = Memory::_Manager[2]->Alloc(sizeof(RetrieveCharacterInfoRelayContext), WORLD_PACKET_HANDLER_FILE,
-                                        180);  // ❓ line
+                                        181);
     if (memory != nullptr)
         relayContext = ::new (memory) RetrieveCharacterInfoRelayContext(economyHeader, request);
     // BUG: 0x1fdd0 no null check after the Alloc. A failed Alloc gives a null call.
@@ -356,7 +356,7 @@ bool HandlePostOfficeServiceCheckPostCapacityReq(Session const* session, Packet 
     economyHeader._toWid = request._targetWid;
     economyHeader._relayTid = liftNextRelayTid();
     memory = Memory::_Manager[2]->Alloc(sizeof(CheckPostCapacityRelayContext), WORLD_PACKET_HANDLER_FILE,
-                                        256);  // ❓ line
+                                        258);
     if (memory != nullptr)
         relayContext = ::new (memory) CheckPostCapacityRelayContext(economyHeader, request);
     // BUG: 0x20250 no null check after the Alloc. A failed Alloc gives a null call.

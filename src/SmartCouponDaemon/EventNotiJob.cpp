@@ -163,7 +163,7 @@ void EventNotiJob::finalize()
     }
     if (_managementReason > 0)
     {
-        void* mem = Memory::_Manager[2]->Alloc(sizeof(SendRetryCouponPublicationFailEvent), kFile, 121);  // ❓ line
+        void* mem = Memory::_Manager[2]->Alloc(sizeof(SendRetryCouponPublicationFailEvent), kFile, 121);
         SendRetryCouponPublicationFailEvent* evt =
             mem ? new (mem) SendRetryCouponPublicationFailEvent(_managementTid, _managementReason) : nullptr;
         PostQueuedCompletionStatus(Network::iocpHandle(), 0,

@@ -184,7 +184,7 @@ bool CacheGate::initialize()
         CrashHandler::MakeCrash("CacheGate.cpp", 117, L"");
     }
 
-    void* buffer = Memory::_Manager[2]->Alloc(sizeof(ClientManager), CACHEGATE_FILE, 119);  // ❓ line
+    void* buffer = Memory::_Manager[2]->Alloc(sizeof(ClientManager), CACHEGATE_FILE, 119);
     _clientManager = buffer != nullptr ? new (buffer) ClientManager() : nullptr;
     if (_clientManager == nullptr)
     {

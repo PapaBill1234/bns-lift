@@ -21,6 +21,7 @@ namespace
 {
 wchar_t const* const WORLD_CHANNEL_FILE = L"WorldChannel.cpp";  // ❓ name
 static wchar_t const* const MODULE_NAME = L"world channel";  // PDB MODULE_NAME
+wchar_t const* const SESSION_FILE = L"source\\Session.cpp";
 wchar_t const* const CHANNEL_H_FILE =
     L"E:\\DailyBuild02\\PostOfficeDaemon-Common-0.0.348\\depot\\Branch\\348NC\\Program\\Server\\BloodLib\\include\\Channel.h";  // ❓ name
 }
@@ -58,7 +59,7 @@ unsigned short WorldChannel::GetWid(Session const* session)
     if (channel != nullptr)
     {
         wid = channel->_wid;
-        channel->removeReferenceCount(WORLD_CHANNEL_FILE, 37);  // ❓ line
+        channel->removeReferenceCount(SESSION_FILE, 1059);  // inlined Session code
     }
     return wid;
 }

@@ -42,7 +42,7 @@ bool UnsentPostContextList::pushUnsentPostContext(long long const postId, bool c
         return false;
     }
 
-    void* const memory = Memory::_Manager[2]->Alloc(sizeof(UnsentPostContext), UNSENT_POST_CONTEXT_FILE, 60);  // ❓ line
+    void* const memory = Memory::_Manager[2]->Alloc(sizeof(UnsentPostContext), UNSENT_POST_CONTEXT_FILE, 60);
     // BUG: 0xc3b0 does not stop when Alloc fails. It uses the null node below.
     UnsentPostContext* const unsentPostContext =
         memory != nullptr ? new (memory) UnsentPostContext(postId, hasPostContext) : nullptr;

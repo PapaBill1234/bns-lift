@@ -124,7 +124,7 @@ bool GameEventManager::Initialize(void (*failedEventHandler)(EventObject*), Thre
 {
     if (Instance != nullptr || failedEventHandler == nullptr)
         assertCrash(75);
-    void* mem = Memory::_Manager[1]->Alloc(sizeof(GameEventManager), kFile, 76);  // ❓ line
+    void* mem = Memory::_Manager[1]->Alloc(sizeof(GameEventManager), kFile, 77);
     GameEventManager* mgr = mem ? new (mem) GameEventManager() : nullptr;
     Instance = mgr;
     WorkerManager = threadManager;
@@ -154,7 +154,7 @@ bool GameEventManager::initWorkerThread(unsigned int threadCount)
         Memory::_Manager[2]->AllocZero(sizeof(GameEventWorker*) * count, kFile, 113));
     for (unsigned int i = 0; i < count; ++i)
     {
-        void* mem = Memory::_Manager[2]->Alloc(sizeof(GameEventWorker), kFile, 116);  // ❓ line
+        void* mem = Memory::_Manager[2]->Alloc(sizeof(GameEventWorker), kFile, 116);
         if (mem != nullptr)
         {
             GameEventWorker* worker = new (mem) GameEventWorker();
@@ -256,7 +256,7 @@ bool GameEventManager::PostGameEventLogList(RetrieveEventLogContext* context)
                        context->_count);
             continue;
         }
-        void* mem = Memory::_Manager[2]->Alloc(sizeof(GameEventLogEvent), kFile, 186);  // ❓ line
+        void* mem = Memory::_Manager[2]->Alloc(sizeof(GameEventLogEvent), kFile, 186);
         GameEventLogEvent* ev = nullptr;
         if (mem != nullptr)
         {
@@ -440,7 +440,7 @@ bool SendPublicationEvent::HandleEvent(EventContext*, unsigned long)
     Log::Write(Log::LT_DEBUG, kFile, 399,
                L"[publication-event], handle event start, acc:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X, publication-id:%I64d, coupon-event-id:%d",
                GEW_ACC_ARGS(acc), _publicationId, _couponEventId);
-    void* mem = EventNotiJob::_pool.Checkout(kFile, 400);  // ❓ line
+    void* mem = EventNotiJob::_pool.Checkout(kFile, 400);  // ❓ line (LTCG dropped it)
     EventNotiJob* job = mem ? new (mem) EventNotiJob() : nullptr;
     if (!job->Initialize(&_gameAccountId, _couponEventId, _publicationId, _managementTid))
     {

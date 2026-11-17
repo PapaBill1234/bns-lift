@@ -113,7 +113,7 @@ bool RelayTimeoutChecker::occurTimeoutEvent(unsigned long long const relayTid, R
         return false;
     }
 
-    void* const memory = Memory::_Manager[2]->Alloc(sizeof(RelayTimeoutEvent), RELAY_TIMEOUT_CHECKER_FILE, 92);  // ❓ line
+    void* const memory = Memory::_Manager[2]->Alloc(sizeof(RelayTimeoutEvent), RELAY_TIMEOUT_CHECKER_FILE, 92);
     RelayTimeoutEvent* const relayTimeoutEvent =
         memory != nullptr ? ::new (memory) RelayTimeoutEvent(relayTid, relayContext) : nullptr;
 

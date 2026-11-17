@@ -128,7 +128,7 @@ bool HandleSmartCoupon_HelloReq(Session const* session, Packet const* packet)
     {
         Log::Write(Log::LT_ERROR, DAEMONPACKETHANDLER_FILE, 89,
                    L"register world fail, session already exists, old-session:0x%016I64X", oldSession->_id);
-        void* mem = Memory::_Manager[2]->Alloc(sizeof(DChannel), DAEMONPACKETHANDLER_FILE, 92);  // ❓ line
+        void* mem = Memory::_Manager[2]->Alloc(sizeof(DChannel), DAEMONPACKETHANDLER_FILE, 92);
         DChannel* newDaemon = nullptr;
         if (mem != nullptr)
         {

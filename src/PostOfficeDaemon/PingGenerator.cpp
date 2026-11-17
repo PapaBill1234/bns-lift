@@ -96,7 +96,7 @@ bool PingGenerator::sendPing()
     unsigned long long const pingSeq =
         static_cast<unsigned long long>(InterlockedIncrement64(reinterpret_cast<long long volatile*>(&_pingSeq)));
 
-    void* const memory = Memory::_Manager[2]->Alloc(sizeof(PingRelayContext), PING_GENERATOR_FILE, 59);  // ❓ line
+    void* const memory = Memory::_Manager[2]->Alloc(sizeof(PingRelayContext), PING_GENERATOR_FILE, 60);
     PingRelayContext* const relayContext =
         memory != nullptr ? ::new (memory) PingRelayContext(economyHeader, PingRelayRequest(pingSeq)) : nullptr;
 

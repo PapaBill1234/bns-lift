@@ -211,7 +211,7 @@ bool Network::OpenPort(unsigned int id, unsigned short portNumber, int initialMo
         }
     }
 
-    void* memory = BaseMemoryManager::_Instance.Alloc(sizeof(Port), NETWORK_FILE, 184);  // ❓ line (LTCG dropped it)
+    void* memory = BaseMemoryManager::_Instance.Alloc(sizeof(Port), NETWORK_FILE, 184);
     Port* port = memory != nullptr ? new (memory) Port() : nullptr;
     if (!port->Initialize(id, portNumber, maxSession, initialMode, enableRecv, nagle, Instance->_iocpHandle,
                           sessionHandler, bufferHandler))
@@ -253,7 +253,7 @@ bool Network::OpenPort(unsigned int portId, unsigned short portNo, SessionHandle
             maxSession = 16;
     }
 
-    void* memory = BaseMemoryManager::_Instance.Alloc(sizeof(Port), NETWORK_FILE, 184);  // ❓ line
+    void* memory = BaseMemoryManager::_Instance.Alloc(sizeof(Port), NETWORK_FILE, 184);
     Port* port = memory != nullptr ? new (memory) Port() : nullptr;
     // ❓ LTCG folded Port::Initialize (0x28E10): initialMode 2, enableRecv true, nagle false.
     if (!port->Initialize(portId, portNo, maxSession, 2, true, false, Instance->_iocpHandle, sessionHandler,
@@ -387,7 +387,7 @@ Network* Network::initInstance(ThreadManager* threadManager)
 {
     if (Instance != nullptr)
         NETWORK_ASSERT_CRASH(338);
-    void* memory = BaseMemoryManager::_Instance.Alloc(sizeof(Network), NETWORK_FILE, 340);  // ❓ line (LTCG dropped it)
+    void* memory = BaseMemoryManager::_Instance.Alloc(sizeof(Network), NETWORK_FILE, 340);
     Network* network = memory != nullptr ? new (memory) Network() : nullptr;
     WorkerManager = threadManager;
     if (network == nullptr)

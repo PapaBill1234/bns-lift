@@ -80,7 +80,7 @@ bool HandleSmartCouponManager_HelloReq(Session const* session, Packet const* pac
             if (version == SMARTCOUPONMANAGER_PACKET_VERSION)
             {
                 // BUG: 0xEF40 no null check of the alloc result.
-                void* mem = Memory::_Manager[1]->Alloc(sizeof(ManagerChannel), MANAGERPACKETHANDLER_FILE, 72);  // ❓ line
+                void* mem = Memory::_Manager[1]->Alloc(sizeof(ManagerChannel), MANAGERPACKETHANDLER_FILE, 69);
                 ManagerChannel* managerChannel = new (mem) ManagerChannel(managerWid);
                 managerChannel->SetSession(session);
                 SmartCouponDaemon::SetManagerChannel(managerChannel);
