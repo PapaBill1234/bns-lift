@@ -1,6 +1,6 @@
 // CryptoKey.obj (BloodCrypto, LobbyGate PDB). CryptoKey and Dh.
 // The PDB has no type records for these classes. The layout comes from the code.
-// LIFT: Member names. The PDB has no field list. ❓ The PDB module of Dh is not known. It is here with CryptoKey.
+// LIFT: Member names. The PDB has no field list. LIFT: file. The PDB puts Dh in dh.obj (BloodCrypto, Mod 0071). It is here with CryptoKey.
 #pragma once
 #include <stddef.h>
 #include "BigInteger.h"

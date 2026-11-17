@@ -12,6 +12,6 @@ public:
     virtual int Size() const;
     virtual bool Digest(unsigned char const* in, int size, unsigned char* digest, int* digestSize) const;
 
-    bool _flag; // ❓ +8, the constructor sets 0. No code reads it.
+    bool _flag; // LIFT: name. +8, the constructor sets 0. No code reads it. The PDB has no type records for Ripemd128.
 };
 static_assert(sizeof(Ripemd128) == 16, "sizeof Ripemd128");

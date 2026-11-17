@@ -36,8 +36,8 @@ static_assert(offsetof(Channel, _session) == 0x18, "Channel::_session");
 static_assert(offsetof(Channel, _useDelayedRemove) == 0x20, "Channel::_useDelayedRemove");
 static_assert(offsetof(Channel, _waitForRelease) == 0x21, "Channel::_waitForRelease");
 
-// ❓ The PDB does not give a module for SessionHandler. The exe has only the
-// vector deleting destructor (0x4040). The empty bodies are a guess.
+// PDB: SessionHandler::OnCreated and OnDestroyed are in LobbyGate.obj (Mod 0010).
+// Both are at 0x126F0 (code size 3, `ret 0`). The empty bodies are correct.
 class SessionHandler
 {
 public:
