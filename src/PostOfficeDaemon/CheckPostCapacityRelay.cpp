@@ -91,9 +91,7 @@ bool CheckPostCapacityRelayContext::processRelayResponse() const
 // 0x9400
 bool CheckPostCapacityRelayContext::processRelayTimeout()
 {
-    CheckPostCapacityRelayResponse response;
-    response._resultState = RelayResponse::RESULTSTATE_RELAY_TIMEOUT;
-    response._failReason = 19;
+    CheckPostCapacityRelayResponse response(RelayResponse::RESULTSTATE_RELAY_TIMEOUT, 19);
     initResponse(&response);
     return processRelayResponse();
 }
@@ -168,7 +166,7 @@ bool CheckPostCapacityRelayContext::ComposeResponsePacket(Packet& packet) const
         return false;
     }
 
-    int const failReason = convertFailReason(static_cast<RelayResponse::RESULTSTATE>(resultState), _response._failReason);
+    int const failReason = convertFailReason(static_cast<RelayResponse::ResultState>(resultState), _response._failReason);
     bool const composed = packet.Compose("hqE", 9, _request._gameTid, failReason) != 0;
     if (!composed)
     {
@@ -186,13 +184,11 @@ bool CheckPostCapacityRelayContext::ComposeResponsePacket(Packet& packet) const
 }
 
 // 0x9740
-// ❓ The case values 2/3/4 are the raw values in the binary. They do not match the RESULTSTATE values in RelayContext.h.
-unsigned short CheckPostCapacityRelayContext::convertFailReason(RelayResponse::RESULTSTATE const resultState,
-                                                                short const failReason)
+short const CheckPostCapacityRelayContext::convertFailReason(RelayResponse::ResultState const resultState, short const failReason) const
 {
-    switch (static_cast<int>(resultState))
+    switch (resultState)
     {
-    case 2:
+    case RelayResponse::RESULTSTATE_FAILURE:
         switch (failReason)
         {
         case 14:
@@ -205,7 +201,7 @@ unsigned short CheckPostCapacityRelayContext::convertFailReason(RelayResponse::R
             break;
         }
         break;
-    case 3:
+    case RelayResponse::RESULTSTATE_RELAY_ERROR:
         switch (failReason)
         {
         case 3:
@@ -220,7 +216,7 @@ unsigned short CheckPostCapacityRelayContext::convertFailReason(RelayResponse::R
             break;
         }
         break;
-    case 4:
+    case RelayResponse::RESULTSTATE_RELAY_TIMEOUT:
         return 19;
     default:
         break;

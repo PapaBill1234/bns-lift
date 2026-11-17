@@ -15,16 +15,20 @@ class FragmentPacket;
 class RelayResponse
 {
 public:
-    enum RESULTSTATE  // ❓ enum type name
+    // PDB enum RelayResponse::ResultState (0x2B08). The binary tests these values at 0x9570, 0xabd0 and 0x1c090.
+    enum ResultState
     {
-        RESULTSTATE_SUCCESS = 0,
-        RESULTSTATE_FAILURE = 1,
-        RESULTSTATE_RELAY_ERROR = 2,
-        RESULTSTATE_RELAY_TIMEOUT = 3,
-        RESULTSTATE_INVALID = 4,  // ❓ value (0x1f650 uses the name, the PDB export has no value)
+        RESULTSTATE_INVALID = 0,
+        RESULTSTATE_SUCCESS = 1,
+        RESULTSTATE_FAILURE = 2,
+        RESULTSTATE_RELAY_ERROR = 3,
+        RESULTSTATE_RELAY_TIMEOUT = 4,
     };
 
-    int _resultState;
+    RelayResponse(ResultState const resultState, short const failReason)
+        : _resultState(resultState), _failReason(failReason) {}
+
+    int _resultState;  // PDB type ResultState
     short _failReason;
 };
 static_assert(sizeof(RelayResponse) == 0x8, "sizeof RelayResponse");
@@ -52,12 +56,13 @@ static_assert(sizeof(RelayHeader) == 0x20, "sizeof RelayHeader");
 class RelayContext : public DynamicRefCntObj
 {
 public:
-    enum RELAYSTATUS  // ❓ enum type name
+    // PDB enum RelayContext::RelayStatus (0x2BC0). 0x1c090 stores 3 (FINISH). 0x1c480 stores 2 (TIMEOUT).
+    enum RelayStatus
     {
         RELAYSTATUS_INIT = 0,
         RELAYSTATUS_WAITING = 1,
-        RELAYSTATUS_FINISH = 2,
-        RELAYSTATUS_TIMEOUT = 3,
+        RELAYSTATUS_TIMEOUT = 2,
+        RELAYSTATUS_FINISH = 3,
     };
 
     RelayContext(EconomyHeader const& economyHeader)  // ❓ inlined in the child ctors
@@ -81,7 +86,7 @@ public:
 
     CriticalSection _lock;
     EconomyHeader const _economyHeader;
-    int _relayStatus;
+    int _relayStatus;  // PDB type RelayStatus
     long long _relayLimitTime;
 };
 static_assert(sizeof(RelayContext) == 0x60, "sizeof RelayContext");
@@ -109,7 +114,7 @@ class RelayContextManager
 {
 public:
     typedef std::map<unsigned long long, RelayContext*, std::less<unsigned long long>,
-                     StlAllocator<std::pair<unsigned long long const, RelayContext*>, 2> > Container;  // ❓ typedef name
+                     StlAllocator<std::pair<unsigned long long const, RelayContext*>, 2> > Container;
 
     bool initContextManager();                            // 0x1c780
     RelayContext* GetContext(unsigned long long relayTid);  // 0x1c910

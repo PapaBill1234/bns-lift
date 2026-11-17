@@ -92,10 +92,7 @@ bool RetrieveCharacterInfoRelayContext::processRelayResponse() const
 // 0x1e0b0
 bool RetrieveCharacterInfoRelayContext::processRelayTimeout()
 {
-    RetrieveCharacterInfoRelayResponse response;
-    response._resultState = RelayResponse::RESULTSTATE_RELAY_TIMEOUT;
-    response._failReason = 13;
-    response._resultPcId = 0;
+    RetrieveCharacterInfoRelayResponse response(RelayResponse::RESULTSTATE_RELAY_TIMEOUT, 13);
     initResponse(&response);
     return processRelayResponse();
 }
@@ -174,7 +171,7 @@ bool RetrieveCharacterInfoRelayContext::ComposeResponsePacket(Packet& packet) co
         return false;
     }
 
-    int const failReason = convertFailReason(static_cast<RelayResponse::RESULTSTATE>(resultState), _response._failReason);
+    int const failReason = convertFailReason(static_cast<RelayResponse::ResultState>(resultState), _response._failReason);
     bool const composed = packet.Compose("hqE", 6, _request._gameTid, failReason) != 0;
     if (!composed)
     {
@@ -192,19 +189,17 @@ bool RetrieveCharacterInfoRelayContext::ComposeResponsePacket(Packet& packet) co
 }
 
 // 0x1e410
-// ❓ The case values 2/3/4 are the raw values in the binary. They do not match the RESULTSTATE values in RelayContext.h.
-unsigned short RetrieveCharacterInfoRelayContext::convertFailReason(RelayResponse::RESULTSTATE const resultState,
-                                                                    short const failReason)
+short const RetrieveCharacterInfoRelayContext::convertFailReason(RelayResponse::ResultState const resultState, short const failReason) const
 {
-    switch (static_cast<int>(resultState))
+    switch (resultState)
     {
-    case 2:
+    case RelayResponse::RESULTSTATE_FAILURE:
         if (failReason == 12)
             return 10;
         if (failReason == 11)
             return 11;
         break;
-    case 3:
+    case RelayResponse::RESULTSTATE_RELAY_ERROR:
         switch (failReason)
         {
         case 3:
@@ -219,7 +214,7 @@ unsigned short RetrieveCharacterInfoRelayContext::convertFailReason(RelayRespons
             break;
         }
         break;
-    case 4:
+    case RelayResponse::RESULTSTATE_RELAY_TIMEOUT:
         return 13;
     default:
         break;

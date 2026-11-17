@@ -189,9 +189,7 @@ bool DeliverPostRelayContext::processRelayResponse() const
 // 0x102c0
 bool DeliverPostRelayContext::processRelayTimeout()
 {
-    DeliverPostRelayResponse response;
-    response._resultState = RelayResponse::RESULTSTATE_RELAY_TIMEOUT;
-    response._failReason = 0;
+    DeliverPostRelayResponse response(RelayResponse::RESULTSTATE_RELAY_TIMEOUT, 0);
     initResponse(&response);
     return processRelayResponse();
 }

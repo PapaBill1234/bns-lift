@@ -148,9 +148,7 @@ bool HandleCacheEconomyPingFail(Session const* session, Packet const* packet)
     EconomyHeader economyHeader;
     clearHeader(economyHeader);
     PingRelayResponse response;
-    // ❓ The binary stores the raw value 2 here. With the RESULTSTATE values in RelayContext.h this is RELAY_ERROR.
-    // It can be FAILURE if the PDB enum starts at 1 (see convertFailReason).
-    response._resultState = 2;
+    response._resultState = RelayResponse::RESULTSTATE_FAILURE;
     response._failReason = 0;
     response._pingSeq = 0;
 

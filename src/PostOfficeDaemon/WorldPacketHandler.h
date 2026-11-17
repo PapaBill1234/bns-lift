@@ -9,18 +9,18 @@
 class Session;
 class Packet;
 
-// ❓ The PDB has no body for this class. Layout from the ctor 0x1f650 and the handler 0x1fdd0.
+// PDB type 0x2BF2.
 class RetrieveCharacterInfoRelayRequest : public RelayRequest
 {
 public:
-    RetrieveCharacterInfoRelayRequest() : _gameTid(0), _requestWid(0), _targetWid(0)  // ❓ inline
+    RetrieveCharacterInfoRelayRequest() : _gameTid(0), _requestWid(0), _targetWid(0)  // ❓ body
     {
         for (int i = 0; i < 33; ++i)
             _targetCharacterName[i] = 0;
     }
-    virtual ~RetrieveCharacterInfoRelayRequest() {}  // ❓ inline (vtable folded, pipe.chRequest+3860)
+    virtual ~RetrieveCharacterInfoRelayRequest() {}  // vtable folded, pipe.chRequest+3860
 
-    long long _gameTid;
+    unsigned long long _gameTid;
     unsigned short _requestWid;
     unsigned short _targetWid;
     wchar_t _targetCharacterName[33];
@@ -32,7 +32,10 @@ static_assert(offsetof(RetrieveCharacterInfoRelayRequest, _targetCharacterName) 
 class RetrieveCharacterInfoRelayResponse : public RelayResponse
 {
 public:
-    virtual ~RetrieveCharacterInfoRelayResponse() {}  // ❓ inline
+    // PDB ctor (ResultState, short const) with default arguments. 0x57f0 stores (1, 0).
+    RetrieveCharacterInfoRelayResponse(ResultState resultState = RESULTSTATE_SUCCESS, short const failReason = 0)
+        : RelayResponse(resultState, failReason), _resultPcId(0) {}  // ❓ _resultPcId value
+    virtual ~RetrieveCharacterInfoRelayResponse() {}
 
     long long _resultPcId;
 };
@@ -57,8 +60,7 @@ public:
     virtual bool processRelayTimeout();                            // 0x1e0b0
     virtual void initResponse(RelayResponse* const response);      // 0x1f770
 
-    static unsigned short convertFailReason(RelayResponse::RESULTSTATE const resultState,
-                                            short const failReason);  // 0x1e410 ❓ return type
+    short const convertFailReason(RelayResponse::ResultState const resultState, short const failReason) const;  // 0x1e410
 
     RetrieveCharacterInfoRelayRequest _request;
     RetrieveCharacterInfoRelayResponse _response;
@@ -67,14 +69,14 @@ static_assert(sizeof(RetrieveCharacterInfoRelayContext) == 208, "sizeof Retrieve
 static_assert(offsetof(RetrieveCharacterInfoRelayContext, _request) == 0x60, "_request");
 static_assert(offsetof(RetrieveCharacterInfoRelayContext, _response) == 0xB8, "_response");
 
-// ❓ The PDB has no body for this class. Layout from the handler 0x20250.
+// PDB type 0x2C44.
 class CheckPostCapacityRelayRequest : public RelayRequest
 {
 public:
-    CheckPostCapacityRelayRequest() : _gameTid(0), _requestWid(0), _targetWid(0), _targetPcId(0) {}  // ❓ inline
-    virtual ~CheckPostCapacityRelayRequest() {}  // ❓ inline
+    CheckPostCapacityRelayRequest() : _gameTid(0), _requestWid(0), _targetWid(0), _targetPcId(0) {}  // ❓ body
+    virtual ~CheckPostCapacityRelayRequest() {}
 
-    long long _gameTid;
+    unsigned long long _gameTid;
     unsigned short _requestWid;
     unsigned short _targetWid;
     long long _targetPcId;
@@ -85,7 +87,10 @@ static_assert(offsetof(CheckPostCapacityRelayRequest, _targetPcId) == 0x18, "_ta
 class CheckPostCapacityRelayResponse : public RelayResponse
 {
 public:
-    virtual ~CheckPostCapacityRelayResponse() {}  // ❓ inline
+    // PDB ctor (ResultState, short const) with default arguments. 0x5ee0 stores (1, 0).
+    CheckPostCapacityRelayResponse(ResultState resultState = RESULTSTATE_SUCCESS, short const failReason = 0)
+        : RelayResponse(resultState, failReason) {}
+    virtual ~CheckPostCapacityRelayResponse() {}
 };
 static_assert(sizeof(CheckPostCapacityRelayResponse) == 0x10, "sizeof CheckPostCapacityRelayResponse");
 
@@ -93,10 +98,8 @@ class CheckPostCapacityRelayContext : public RelayContext
 {
 public:
     CheckPostCapacityRelayContext(EconomyHeader const& economyHeader, CheckPostCapacityRelayRequest const& request)
-        : RelayContext(economyHeader), _request(request)  // ❓ inlined in 0x20250
+        : RelayContext(economyHeader), _request(request)  // inlined in 0x20250
     {
-        _response._resultState = RelayResponse::RESULTSTATE_SUCCESS;
-        _response._failReason = 0;
     }
     virtual ~CheckPostCapacityRelayContext() {}  // 0x1f840 (scalar deleting dtor)
 
@@ -111,8 +114,7 @@ public:
     virtual bool processRelayTimeout();                            // 0x9400
     virtual void initResponse(RelayResponse* const response);      // 0x1f810
 
-    static unsigned short convertFailReason(RelayResponse::RESULTSTATE const resultState,
-                                            short const failReason);  // 0x9740 ❓ return type
+    short const convertFailReason(RelayResponse::ResultState const resultState, short const failReason) const;  // 0x9740
 
     CheckPostCapacityRelayRequest _request;
     CheckPostCapacityRelayResponse _response;

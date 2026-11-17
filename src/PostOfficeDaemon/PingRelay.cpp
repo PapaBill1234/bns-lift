@@ -106,10 +106,7 @@ bool PingRelayContext::processRelayResponse() const
 // 0xaed0
 bool PingRelayContext::processRelayTimeout()
 {
-    PingRelayResponse response;
-    response._resultState = RelayResponse::RESULTSTATE_RELAY_TIMEOUT;
-    response._failReason = 0;
-    response._pingSeq = 0;
+    PingRelayResponse response(RelayResponse::RESULTSTATE_RELAY_TIMEOUT, 0);
     initResponse(&response);
     return processRelayResponse();
 }

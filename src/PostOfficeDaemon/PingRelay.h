@@ -3,31 +3,30 @@
 #include <stddef.h>
 #include "RelayContext.h"
 
-// PDB: RelayRequest has no data. The vtable layout of PingRelayRequest (vtable + _pingSeq) is ❓.
+// PDB type 0x2BA9: RelayRequest is not virtual, has no data and has only a constructor.
 class RelayRequest
 {
 public:
-    virtual ~RelayRequest() {}  // ❓ inline
+    RelayRequest() {}
 };
 
-class PingRelayRequest : public RelayRequest  // ❓ types.h has only a raw block (PDB type 0x2B2E)
+// PDB type 0x2B56. The derived request classes put the vfptr at +0 and the empty base at +8.
+class PingRelayRequest : public RelayRequest
 {
 public:
-    PingRelayRequest() : _pingSeq(0) {}  // ❓ inline
-    virtual ~PingRelayRequest() {}       // ❓ inline
+    explicit PingRelayRequest(unsigned long long const pingSeq) : _pingSeq(pingSeq) {}  // inlined in 0x4ed0
+    virtual ~PingRelayRequest() {}
 
-    unsigned long long _pingSeq;  // ❓ name
+    unsigned long long const _pingSeq;
 };
 static_assert(sizeof(PingRelayRequest) == 0x10, "sizeof PingRelayRequest");
 
 class PingRelayResponse : public RelayResponse
 {
 public:
-    PingRelayResponse() : _pingSeq(0)  // ❓ inline
-    {
-        _resultState = RESULTSTATE_SUCCESS;
-        _failReason = 0;
-    }
+    // PDB ctor (ResultState, short const) with default arguments. 0x5120 stores (1, 0) and _pingSeq 0.
+    PingRelayResponse(ResultState resultState = RESULTSTATE_SUCCESS, short const failReason = 0)
+        : RelayResponse(resultState, failReason), _pingSeq(0) {}
     virtual ~PingRelayResponse() {}  // 0x4ce0 (inline)
 
     unsigned long long _pingSeq;
@@ -38,11 +37,8 @@ static_assert(offsetof(PingRelayResponse, _pingSeq) == 0x10, "PingRelayResponse:
 class PingRelayContext : public RelayContext
 {
 public:
-    PingRelayContext(EconomyHeader const& economyHeader, unsigned long long pingSeq)  // ❓ inlined in 0x4ed0
-        : RelayContext(economyHeader)
-    {
-        _request._pingSeq = pingSeq;
-    }
+    PingRelayContext(EconomyHeader const& economyHeader, PingRelayRequest const& request)  // inlined in 0x4ed0
+        : RelayContext(economyHeader), _request(request) {}
     virtual ~PingRelayContext() {}  // 0x4d20 (inline)
 
     virtual unsigned short const GetRequestWid() const;            // 0xfb40 (PingGenerator.cpp)

@@ -98,7 +98,7 @@ bool PingGenerator::sendPing()
 
     void* const memory = Memory::_Manager[2]->Alloc(sizeof(PingRelayContext), PING_GENERATOR_FILE, 59);  // ❓ line
     PingRelayContext* const relayContext =
-        memory != nullptr ? ::new (memory) PingRelayContext(economyHeader, pingSeq) : nullptr;
+        memory != nullptr ? ::new (memory) PingRelayContext(economyHeader, PingRelayRequest(pingSeq)) : nullptr;
 
     // BUG: 0x4ed0 relayContext can be null here (Alloc failed); the call does not check it.
     if (!relayContext->ProcessRelayRequest(channel))
