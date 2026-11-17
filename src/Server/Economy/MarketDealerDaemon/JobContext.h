@@ -14,6 +14,7 @@ class Packet;
 class Session;
 class FragmentPacket;
 class RepeatPacketComposer;
+class PacketConcatenateBuffer;
 
 class JobContext
 {
@@ -254,8 +255,11 @@ public:
         MAX_PARAM_COUNT = 0xE,
     };
     virtual ~ReserveSaleJob();
-    virtual bool verifyParameter(short& result) const;
-    virtual bool handleJob(short& result);
+    virtual bool verifyParameter(short& failReason) const;              // 0xbc10
+    virtual bool handleJob(short& failReason);                          // 0xbe20
+    bool Initialize(Packet const*& packet);                             // 0xb6d0
+    void ReplySuccess(Session const*& session) const;                   // 0xb9c0
+    void ReplyFailure(Session const*& session, short const& failReason) const;  // 0xbae0
 
     unsigned long long _tid;
     SaleInfo _saleInfo;
@@ -275,8 +279,10 @@ public:
         MAX_PARAM_COUNT = 0x3,
     };
     virtual ~CancelSaleReservationJob();
-    virtual bool verifyParameter(short& result) const;
-    virtual bool handleJob(short& result);
+    virtual bool verifyParameter(short& failReason) const;              // 0xc3d0
+    virtual bool handleJob(short& failReason);                          // 0xc450
+    bool Initialize(Packet const*& packet);                             // 0xc160
+    void ReplySuccess(Session const*& session) const;                   // 0xc2c0
 
     unsigned long long _tid;
     long long _saleId;
@@ -298,8 +304,10 @@ public:
         MAX_PARAM_COUNT = 0x7,
     };
     virtual ~RegisterSaleJob();
-    virtual bool verifyParameter(short& result) const;
-    virtual bool handleJob(short& result);
+    virtual bool verifyParameter(short& failReason) const;              // 0xcd60
+    virtual bool handleJob(short& failReason);                          // 0xd170
+    bool Initialize(PacketConcatenateBuffer*& fpc);                     // 0xc8a0
+    void ReplySuccess(Session const*& session) const;                   // 0xcc50
 
     unsigned long long _tid;
     long long _saleId;
@@ -326,8 +334,11 @@ public:
         MAX_PARAM_COUNT = 0x7,
     };
     virtual ~UpdateSalePriceJob();
-    virtual bool verifyParameter(short& result) const;
-    virtual bool handleJob(short& result);
+    virtual bool verifyParameter(short& failReason) const;              // 0xdaa0
+    virtual bool handleJob(short& failReason);                          // 0xdb30
+    bool Initialize(Packet const*& packet);                             // 0xd700
+    void ReplySuccess(Session const*& session) const;                   // 0xd870
+    void ReplyFailure(Session const*& session, short const& failReason) const;  // 0xd980
 
     unsigned long long _tid;
     long long _saleId;
@@ -353,8 +364,10 @@ public:
         MAX_PARAM_COUNT = 0x7,
     };
     virtual ~AbandonSaleJob();
-    virtual bool verifyParameter(short& result) const;
-    virtual bool handleJob(short& result);
+    virtual bool verifyParameter(short& failReason) const;              // 0xe440
+    virtual bool handleJob(short& failReason);                          // 0xe4c0
+    bool Initialize(Packet const*& packet);                             // 0xe1d0
+    void ReplySuccess(Session const*& session) const;                   // 0xe330
 
     unsigned long long _tid;
     long long _saleId;

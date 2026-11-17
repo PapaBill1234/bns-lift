@@ -14,6 +14,9 @@
 #include "MarketDB.h"
 #include "MarketDealerDaemon.h"
 #include "SaleContext.h"
+#include "SaleTimeContext.h"
+#include "DeliveryContext.h"
+#include "Postman.h"
 #include "FragmentPacket.h"
 #include "PacketUtil.h"
 #include "Packet.h"
@@ -94,7 +97,33 @@ static void incRepeatCount(RepeatPacketComposer& rpc)
     ++*rpc.counts[rpc.top];
 }
 
+// LIFT: format arguments of an id128 in the "%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X" form (inlined).
+#define ID128_ARGS(id)                                                                                          \
+    (id).guid.id1, static_cast<int>((id).guid.id2), static_cast<int>((id).guid.id3),                            \
+        static_cast<int>((id).guid.id4[0]), static_cast<int>((id).guid.id4[1]),                                 \
+        static_cast<int>((id).guid.id4[2]), static_cast<int>((id).guid.id4[3]),                                 \
+        static_cast<int>((id).guid.id4[4]), static_cast<int>((id).guid.id4[5]),                                 \
+        static_cast<int>((id).guid.id4[6]), static_cast<int>((id).guid.id4[7])
+
+// LIFT: format arguments of a SaleItemInfo (the same order in all RegisterSaleJob logs).
+#define SALE_ITEM_ARGS(item)                                                                                    \
+    static_cast<int>((item)._itemCommonCategory), static_cast<int>((item)._itemFirstCategory),                  \
+        static_cast<int>((item)._itemSecondCategory), static_cast<int>((item)._itemThirdCategory),              \
+        static_cast<int>((item)._itemType), (item)._itemInstanceId, (item)._itemDataId,                          \
+        static_cast<int>((item)._itemLevel), (item)._itemExp, (item)._itemAmount,                                \
+        static_cast<int>((item)._itemGrade), static_cast<int>((item)._itemEquipLevel), (item)._itemXmlData
+
 // ---- AutoCS (Lock.h COMDAT) ----
+
+// LIFT: inlined in 0xc450 and the other handleJob functions (assert at Lock.h line 113).
+// The same code as PostOfficeDaemon CachedWatchdog.cpp. The MarketDealerDaemon exe has no other copy.
+AutoCS::AutoCS(CriticalSection* cs) : CS(cs), EnterCount(0)
+{
+    if (cs == nullptr)
+        assertCrash(LOCK_H_WIDE, LOCK_H_NARROW, 113);
+    EnterCriticalSection(&CS->CS);
+    EnterCount = 1;
+}
 
 // 0x8770
 AutoCS::~AutoCS()
@@ -804,4 +833,804 @@ bool RetrieveBidRankStatusJob::composeResponsePacket(RepeatPacketComposer& rpc, 
     }
     rpc.PopRepeatCount();
     return true;
+}
+
+// ---- ReserveSaleJob ----
+
+// 0xb6d0
+bool ReserveSaleJob::Initialize(Packet const*& packet)
+{
+    wchar_t const* const fn = L"ReserveSaleJob::Initialize";
+    if (packet == nullptr)
+    {
+        JOB_CONTEXT_CRASH(664, INVALID_PACKET, MODULE_NAME, fn, packet);
+        return false;
+    }
+    short cmd = 0;
+    int concurrentSaleCountBonus = 0;
+    int accumulatedSaleCountBonus = 0;
+    Participant& seller = _saleInfo._seller;
+    if (packet->Decompose("hqQhqossqii", &cmd, &_tid, &_saleInfo._saleType, &seller._participantWid,
+                          &seller._participantPcId, &seller._participantAccountId, seller._participantWorldName, 33,
+                          seller._participantName, 33, &_saleInfo._salePrice, &concurrentSaleCountBonus,
+                          &accumulatedSaleCountBonus) == 0)
+    {
+        Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 683, FAIL_DECOMPOSE, MODULE_NAME, fn);
+        return false;
+    }
+    Log::Write(Log::LT_DEBUG, JOB_CONTEXT_FILE, 686,
+               L"[%s], %s; decomposed packet, tid:0x%I64X, saleType:%d, participantWid:%d, participantPcId:0x%I64X, "
+               L"participantAccountId:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X, participantWorldName:%s, "
+               L"participantName:%s, salePrice:%I64d, bonus:(%d/%d)",
+               MODULE_NAME, fn, _tid, static_cast<int>(_saleInfo._saleType), static_cast<int>(seller._participantWid),
+               seller._participantPcId, ID128_ARGS(seller._participantAccountId), seller._participantWorldName,
+               seller._participantName, _saleInfo._salePrice, concurrentSaleCountBonus, accumulatedSaleCountBonus);
+    _concurrentSaleCount += concurrentSaleCountBonus;
+    _accumulatedSaleCount += accumulatedSaleCountBonus;
+    return true;
+}
+
+// 0xb9c0
+void ReserveSaleJob::ReplySuccess(Session const*& session) const
+{
+    wchar_t const* const fn = L"ReserveSaleJob::ReplySuccess";
+    if (session == nullptr)
+    {
+        JOB_CONTEXT_CRASH(696, INVALID_SESSION, MODULE_NAME, fn, session);
+        return;
+    }
+    session->Send("hqq", MarketDealer_ReserveSaleOkCmd, _tid, _saleInfo._saleId);
+    Log::Write(Log::LT_NOTICE, JOB_CONTEXT_FILE, 701,
+               L"[%s], %s; sent reserve sale success ack, tid:0x%I64X, saleId:0x%I64X, sellerPcId:0x%I64X, "
+               L"salePrice:%I64d",
+               MODULE_NAME, fn, _tid, _saleInfo._saleId, _saleInfo._seller._participantPcId, _saleInfo._salePrice);
+}
+
+// 0xbae0
+void ReserveSaleJob::ReplyFailure(Session const*& session, short const& failReason) const
+{
+    wchar_t const* const fn = L"ReserveSaleJob::ReplyFailure";
+    if (session == nullptr)
+    {
+        JOB_CONTEXT_CRASH(707, INVALID_SESSION, MODULE_NAME, fn, session);
+        return;
+    }
+    session->Send("hqE", MarketDealer_ReserveSaleFailCmd, _tid, static_cast<int>(failReason));
+    Log::Write(Log::LT_NOTICE, JOB_CONTEXT_FILE, 712,
+               L"[%s], %s; sent reserve sale failure ack, tid:0x%I64X, saleId:0x%I64X, sellerPcId:0x%I64X, "
+               L"salePrice:%I64d, failReason:%d",
+               MODULE_NAME, fn, _tid, _saleInfo._saleId, _saleInfo._seller._participantPcId, _saleInfo._salePrice,
+               static_cast<int>(failReason));
+}
+
+// 0xbc10
+bool ReserveSaleJob::verifyParameter(short& failReason) const
+{
+    Participant const& seller = _saleInfo._seller;
+    char const saleType = _saleInfo._saleType;
+    if (saleType > ECONOMY_SALETYPE_INVALID_TYPE && saleType < ECONOMY_SALETYPE_GLOBAL_MAX &&
+        seller._participantWid > 0 && seller._participantPcId > 0 &&
+        (seller._participantAccountId.id[0] != 0 || seller._participantAccountId.id[1] != 0) &&
+        wcslen(seller._participantWorldName) != 0 && wcslen(seller._participantName) != 0 && _saleInfo._salePrice > 0)
+    {
+        return true;
+    }
+    Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 730,
+               L"[%s], %s; invalid parameter, tid:0x%I64X, saleType:%d, participantWid:%d, participantPcId:0x%I64X, "
+               L"participantAccountId:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X, participantWorldName:%s, "
+               L"participantName:%s, salePrice:%I64d",
+               MODULE_NAME, L"ReserveSaleJob::verifyParameter", _tid, static_cast<int>(saleType),
+               static_cast<int>(seller._participantWid), seller._participantPcId,
+               ID128_ARGS(seller._participantAccountId), seller._participantWorldName, seller._participantName,
+               _saleInfo._salePrice);
+    failReason = MARKETDEALER_RESERVESALEFAIL_INVALID_PARAMETER;
+    return false;
+}
+
+// 0xbe20
+bool ReserveSaleJob::handleJob(short& failReason)
+{
+    wchar_t const* const fn = L"ReserveSaleJob::handleJob";
+    if (_saleInfo._saleType == ECONOMY_SALETYPE_AUCTION &&
+        !SaleContext::DetermineBidUnitPrice(_saleInfo._salePrice, _saleInfo._bidUnitPrice))
+    {
+        JOB_CONTEXT_CRASH(742,
+                          L"== CRASH == [%s], %s; failed to determine bid unit price, tid:0x%I64X, saleId:0x%I64X, "
+                          L"sellerPcId:0x%I64X, salePrice:%I64d",
+                          MODULE_NAME, fn, _tid, _saleInfo._saleId, _saleInfo._seller._participantPcId,
+                          _saleInfo._salePrice);
+        failReason = MARKETDEALER_SYSTEM_ERROR;
+        return false;
+    }
+
+    _saleInfo._unitPrice = _saleInfo._salePrice;
+    SaleContext* saleContext = nullptr;
+    int dbRetValue = 0;
+    if (!MarketDB::ReserveSale(dbRetValue, *this))
+    {
+        Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 751,
+                   L"[%s], %s; failed to reserve sale, dbRetValue:%d, tid:0x%I64X, saleId:0x%I64X, sellerPcId:0x%I64X, "
+                   L"salePrice:%I64d",
+                   MODULE_NAME, fn, dbRetValue, _tid, _saleInfo._saleId, _saleInfo._seller._participantPcId,
+                   _saleInfo._salePrice);
+        if (dbRetValue == 2)
+            failReason = MARKETDEALER_RESERVESALEFAIL_EXCEEDED_CONCURRENT_SALE_COUNT;
+        else if (dbRetValue == 3)
+            failReason = MARKETDEALER_RESERVESALEFAIL_EXCEEDED_ACCUMULATED_SALE_COUNT;
+        else
+            failReason = MARKETDEALER_DB_ERROR;
+        return false;
+    }
+
+    _saleInfo._saleStatus = SaleInfo::SALESTATUS_RESERVING;
+    void* const memory = Memory::_Manager[2]->Alloc(sizeof(SaleContext), JOB_CONTEXT_FILE, 768);
+    if (memory != nullptr)
+        saleContext = ::new (memory) SaleContext(_saleInfo);
+    // BUG: 0xbe20 no null check: a failed alloc gives AddContext and removeReferenceCount a null context.
+    if (!MarketDealerDaemon::_instance->_saleContextManager->AddContext(saleContext))
+    {
+        JOB_CONTEXT_CRASH(770,
+                          L"== CRASH == [%s], %s; exception occurred; failed to add sale context, tid:0x%I64X, "
+                          L"saleId:0x%I64X, sellerPcId:0x%I64X, salePrice:%I64d",
+                          MODULE_NAME, fn, _tid, _saleInfo._saleId, _saleInfo._seller._participantPcId,
+                          _saleInfo._salePrice);
+    }
+    Log::Write(Log::LT_DEBUG, JOB_CONTEXT_FILE, 773,
+               L"[%s], %s; succeeded to reserve sale, tid:0x%I64X, saleId:0x%I64X, sellerPcId:0x%I64X, salePrice:%I64d",
+               MODULE_NAME, fn, _tid, _saleInfo._saleId, _saleInfo._seller._participantPcId, _saleInfo._salePrice);
+    saleContext->removeReferenceCount(JOB_CONTEXT_FILE, 774);
+    return true;
+}
+
+// ---- CancelSaleReservationJob ----
+
+// 0xc160
+bool CancelSaleReservationJob::Initialize(Packet const*& packet)
+{
+    wchar_t const* const fn = L"CancelSaleReservationJob::Initialize";
+    if (packet == nullptr)
+    {
+        JOB_CONTEXT_CRASH(803, INVALID_PACKET, MODULE_NAME, fn, packet);
+        return false;
+    }
+    short cmd = 0;
+    if (packet->Decompose("hqqq", &cmd, &_tid, &_saleId, &_sellerPcId) == 0)
+    {
+        Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 812, FAIL_DECOMPOSE, MODULE_NAME, fn);
+        return false;
+    }
+    Log::Write(Log::LT_DEBUG, JOB_CONTEXT_FILE, 815,
+               L"[%s], %s; decomposed packet, tid:0x%I64X, saleId:0x%I64X, sellerPcId:0x%I64X", MODULE_NAME, fn, _tid,
+               _saleId, _sellerPcId);
+    return true;
+}
+
+// 0xc2c0
+void CancelSaleReservationJob::ReplySuccess(Session const*& session) const
+{
+    wchar_t const* const fn = L"CancelSaleReservationJob::ReplySuccess";
+    if (session == nullptr)
+    {
+        JOB_CONTEXT_CRASH(823, INVALID_SESSION, MODULE_NAME, fn, session);
+        return;
+    }
+    session->Send("hq", MarketDealer_CancelSaleReservationOkCmd, _tid);
+    Log::Write(Log::LT_NOTICE, JOB_CONTEXT_FILE, 828,
+               L"[%s], %s; sent cancel sale reservation success ack, tid:0x%I64X, saleId:0x%I64X, sellerPcId:0x%I64X",
+               MODULE_NAME, fn, _tid, _saleId, _sellerPcId);
+}
+
+// 0xc3d0
+bool CancelSaleReservationJob::verifyParameter(short& failReason) const
+{
+    if (_saleId > 0 && _sellerPcId > 0)
+        return true;
+    Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 846,
+               L"[%s], %s; invalid parameter, tid:0x%I64X, saleId:0x%I64X, sellerPcId:0x%I64X", MODULE_NAME,
+               L"CancelSaleReservationJob::verifyParameter", _tid, _saleId, _sellerPcId);
+    failReason = MARKETDEALER_CANCELSALERESERVATIONFAIL_INVALID_PARAMETER;
+    return false;
+}
+
+// 0xc450
+bool CancelSaleReservationJob::handleJob(short& failReason)
+{
+    wchar_t const* const fn = L"CancelSaleReservationJob::handleJob";
+    SaleContext* const saleContext = MarketDealerDaemon::_instance->_saleContextManager->GetContext(_saleId);
+    if (saleContext == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 858,
+                   L"[%s], %s; there is no such sale context, tid:0x%I64X, saleId:0x%I64X, sellerPcId:0x%I64X",
+                   MODULE_NAME, fn, _tid, _saleId, _sellerPcId);
+        failReason = MARKETDEALER_CANCELSALERESERVATIONFAIL_NO_SUCH_SALE;
+        return false;
+    }
+
+    {
+        AutoCS autoLock(&saleContext->_lock);
+        if (saleContext->_saleInfo._saleStatus != SaleInfo::SALESTATUS_RESERVING)
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 868,
+                       L"[%s], %s; sale status is not reserving, tid:0x%I64X, saleId:0x%I64X, sellerPcId:0x%I64X, "
+                       L"saleStatus:%d",
+                       MODULE_NAME, fn, _tid, _saleId, _sellerPcId, static_cast<int>(saleContext->_saleInfo._saleStatus));
+            failReason = MARKETDEALER_CANCELSALERESERVATIONFAIL_NO_SUCH_SALE;
+        }
+        else if (saleContext->_saleInfo._seller._participantPcId != _sellerPcId)
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 873,
+                       L"[%s], %s; seller pcid is not same, tid:0x%I64X, saleId:0x%I64X, sellerPcId:0x%I64X, "
+                       L"contextPcId:0x%I64X",
+                       MODULE_NAME, fn, _tid, _saleId, _sellerPcId, saleContext->_saleInfo._seller._participantPcId);
+            failReason = MARKETDEALER_CANCELSALERESERVATIONFAIL_NO_SUCH_SALE;
+        }
+        else
+        {
+            int dbRetValue = 0;
+            if (MarketDB::CancelSaleReservation(dbRetValue, *this))
+            {
+                saleContext->_saleInfo._saleStatus = SaleInfo::SALESTATUS_RESERVATION_CANCELLATION;
+                autoLock.Leave();
+                if (!MarketDealerDaemon::_instance->_saleContextManager->RemoveContext(_saleId))
+                {
+                    JOB_CONTEXT_CRASH(888,
+                                      L"== CRASH == [%s], %s; exception occurred; failed to remove sale context, "
+                                      L"tid:0x%I64X, saleId:0x%I64X, sellerPcId:0x%I64X",
+                                      MODULE_NAME, fn, _tid, _saleId, _sellerPcId);
+                }
+                Log::Write(Log::LT_DEBUG, JOB_CONTEXT_FILE, 891,
+                           L"[%s], %s; succeeded to cancel sale reservation, tid:0x%I64X, saleId:0x%I64X, "
+                           L"sellerPcId:0x%I64X",
+                           MODULE_NAME, fn, _tid, _saleId, _sellerPcId);
+                saleContext->removeReferenceCount(JOB_CONTEXT_FILE, 892);
+                return true;
+            }
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 880,
+                       L"[%s], %s; failed to cancel sale reservation, dbRetValue:%d, tid:0x%I64X, saleId:0x%I64X, "
+                       L"sellerPcId:0x%I64X",
+                       MODULE_NAME, fn, dbRetValue, _tid, _saleId, _sellerPcId);
+            failReason = MARKETDEALER_DB_ERROR;
+        }
+    }
+    saleContext->removeReferenceCount(JOB_CONTEXT_FILE, 898);
+    return false;
+}
+
+// ---- RegisterSaleJob ----
+
+// 0xc8a0
+bool RegisterSaleJob::Initialize(PacketConcatenateBuffer*& fpc)
+{
+    wchar_t const* const fn = L"RegisterSaleJob::Initialize";
+    if (fpc == nullptr)
+    {
+        JOB_CONTEXT_CRASH(923, L"== CRASH == [%s], %s; invalid parameter, fpc:0x%p", MODULE_NAME, fn, fpc);
+        return false;
+    }
+    fpc->decomposer.SetFormat("hiqqqqiQcccQqihiiccs", 2);
+    SaleItemInfo& item = _saleItemInfo;
+    if (!fpc->Decompose(18, &_tid, &_saleId, &_sellerPcId, &_pawnId, &_saleDuration, &item._itemCommonCategory,
+                        &item._itemFirstCategory, &item._itemSecondCategory, &item._itemThirdCategory, &item._itemType,
+                        &item._itemInstanceId, &item._itemDataId, &item._itemLevel, &item._itemExp, &item._itemAmount,
+                        &item._itemGrade, &item._itemEquipLevel, item._itemXmlData, 1025))
+    {
+        Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 946, FAIL_DECOMPOSE, MODULE_NAME, fn);
+        return false;
+    }
+    Log::Write(Log::LT_DEBUG, JOB_CONTEXT_FILE, 949,
+               L"[%s], %s; decomposed packet, tid:0x%I64X, saleId:0x%I64X, sellerPcId:0x%I64X, pawnId:0x%I64X, "
+               L"saleDuration:%d, itemCommonCategory:%d, itemFirstCategory:%d, itemSecondCategory:%d, "
+               L"itemThirdCategory:%d, itemType:%d, itemInstanceId:0x%I64X, itemDataId:%d, itemLevel:%d, itemExp:%d, "
+               L"itemAmount:%d, itemGrade:%d, itemEquipLevel:%d, itemXmlData:%s",
+               MODULE_NAME, fn, _tid, _saleId, _sellerPcId, _pawnId, _saleDuration, SALE_ITEM_ARGS(item));
+    return true;
+}
+
+// 0xcc50
+void RegisterSaleJob::ReplySuccess(Session const*& session) const
+{
+    wchar_t const* const fn = L"RegisterSaleJob::ReplySuccess";
+    if (session == nullptr)
+    {
+        JOB_CONTEXT_CRASH(957, INVALID_SESSION, MODULE_NAME, fn, session);
+        return;
+    }
+    session->Send("hq", MarketDealer_RegisterSaleOkCmd, _tid);
+    Log::Write(Log::LT_NOTICE, JOB_CONTEXT_FILE, 962,
+               L"[%s], %s; sent register sale success ack, tid:0x%I64X, saleId:0x%I64X, sellerPcId:0x%I64X",
+               MODULE_NAME, fn, _tid, _saleId, _sellerPcId);
+}
+
+// 0xcd60
+bool RegisterSaleJob::verifyParameter(short& failReason) const
+{
+    wchar_t const* const fn = L"RegisterSaleJob::verifyParameter";
+    SaleItemInfo const& item = _saleItemInfo;
+    if (_saleId <= 0 || _sellerPcId <= 0 || _pawnId <= 0 || _saleDuration <= 0)
+    {
+        Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 982,
+                   L"[%s], %s; invalid parameter, tid:0x%I64X, saleId:0x%I64X, sellerPcId:0x%I64X, pawnId:0x%I64X, "
+                   L"saleDuration:%d, itemCommonCategory:%d, itemFirstCategory:%d, itemSecondCategory:%d, "
+                   L"itemThirdCategory:%d, itemType:%d, itemInstanceId:0x%I64X, itemDataId:%d, itemLevel:%d, itemExp:%d, "
+                   L"itemAmount:%d, itemGrade:%d, itemEquipLevel:%d, itemXmlData:%s",
+                   MODULE_NAME, fn, _tid, _saleId, _sellerPcId, _pawnId, _saleDuration, SALE_ITEM_ARGS(item));
+        failReason = MARKETDEALER_REGISTERSALEFAIL_INVALID_PARAMETER;
+        return false;
+    }
+
+    MarketDealerFailReason const validity = item.CheckItemDataValidity();
+    failReason = static_cast<short>(validity);
+    if (validity == MARKETDEALER_NO_ERROR)
+        return true;
+
+    int line = 0;
+    wchar_t const* format = nullptr;
+    switch (validity)
+    {
+    case MARKETDEALER_REGISTERSALEFAIL_INVALID_ITEM_DATA:
+        line = 990;
+        format = L"[%s], %s; invalid item data, tid:0x%I64X, saleId:0x%I64X, sellerPcId:0x%I64X, pawnId:0x%I64X, "
+                 L"saleDuration:%d, itemCommonCategory:%d, itemFirstCategory:%d, itemSecondCategory:%d, "
+                 L"itemThirdCategory:%d, itemType:%d, itemInstanceId:0x%I64X, itemDataId:%d, itemLevel:%d, itemExp:%d, "
+                 L"itemAmount:%d, itemGrade:%d, itemEquipLevel:%d, itemXmlData:%s";
+        break;
+    case MARKETDEALER_REGISTERSALEFAIL_INVALID_MONEY_ITEM_DATA:
+        line = 993;
+        format = L"[%s], %s; invalid money item data, tid:0x%I64X, saleId:0x%I64X, sellerPcId:0x%I64X, "
+                 L"pawnId:0x%I64X, saleDuration:%d, itemCommonCategory:%d, itemFirstCategory:%d, "
+                 L"itemSecondCategory:%d, itemThirdCategory:%d, itemType:%d, itemInstanceId:0x%I64X, itemDataId:%d, "
+                 L"itemLevel:%d, itemExp:%d, itemAmount:%d, itemGrade:%d, itemEquipLevel:%d, itemXmlData:%s";
+        break;
+    case MARKETDEALER_REGISTERSALEFAIL_INVALID_DEFAULT_ITEM_DATA:
+        line = 996;
+        format = L"[%s], %s; invalid default item data, tid:0x%I64X, saleId:0x%I64X, sellerPcId:0x%I64X, "
+                 L"pawnId:0x%I64X, saleDuration:%d, itemCommonCategory:%d, itemFirstCategory:%d, "
+                 L"itemSecondCategory:%d, itemThirdCategory:%d, itemType:%d, itemInstanceId:0x%I64X, itemDataId:%d, "
+                 L"itemLevel:%d, itemExp:%d, itemAmount:%d, itemGrade:%d, itemEquipLevel:%d, itemXmlData:%s";
+        break;
+    case MARKETDEALER_REGISTERSALEFAIL_INVALID_CUSTOM_ITEM_DATA:
+        line = 999;
+        format = L"[%s], %s; invalid custom item data, tid:0x%I64X, saleId:0x%I64X, sellerPcId:0x%I64X, "
+                 L"pawnId:0x%I64X, saleDuration:%d, itemCommonCategory:%d, itemFirstCategory:%d, "
+                 L"itemSecondCategory:%d, itemThirdCategory:%d, itemType:%d, itemInstanceId:0x%I64X, itemDataId:%d, "
+                 L"itemLevel:%d, itemExp:%d, itemAmount:%d, itemGrade:%d, itemEquipLevel:%d, itemXmlData:%s";
+        break;
+    default:
+        Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1002,
+                   L"[%s], %s; unknown error, tid:0x%I64X, saleId:0x%I64X, sellerPcId:0x%I64X, pawnId:0x%I64X, "
+                   L"saleDuration:%d, itemCommonCategory:%d, itemFirstCategory:%d, itemSecondCategory:%d, "
+                   L"itemThirdCategory:%d, itemType:%d, itemInstanceId:0x%I64X, itemDataId:%d, itemLevel:%d, itemExp:%d, "
+                   L"itemAmount:%d, itemGrade:%d, itemEquipLevel:%d, itemXmlData:%s",
+                   MODULE_NAME, fn, _tid, _saleId, _sellerPcId, _pawnId, _saleDuration, SALE_ITEM_ARGS(item));
+        failReason = MARKETDEALER_UNKNOWN_ERROR;
+        return false;
+    }
+    Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, line, format, MODULE_NAME, fn, _tid, _saleId, _sellerPcId, _pawnId,
+               _saleDuration, SALE_ITEM_ARGS(item));
+    return false;
+}
+
+// 0xd170
+bool RegisterSaleJob::handleJob(short& failReason)
+{
+    wchar_t const* const fn = L"RegisterSaleJob::handleJob";
+    SaleContext* const saleContext = MarketDealerDaemon::_instance->_saleContextManager->GetContext(_saleId);
+    if (saleContext == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1016,
+                   L"[%s], %s; there is no such sale context, tid:0x%I64X, saleId:0x%I64X, sellerPcId:0x%I64X",
+                   MODULE_NAME, fn, _tid, _saleId, _sellerPcId);
+        failReason = MARKETDEALER_REGISTERSALEFAIL_NO_SUCH_SALE;
+        return false;
+    }
+
+    {
+        AutoCS autoLock(&saleContext->_lock);
+        SaleInfo& saleInfo = saleContext->_saleInfo;
+        int dbRetValue = 0;
+        if (saleInfo._saleStatus != SaleInfo::SALESTATUS_RESERVING)
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1026,
+                       L"[%s], %s; sale status is not reserving, tid:0x%I64X, saleId:0x%I64X, sellerPcId:0x%I64X, "
+                       L"saleStatus:%d",
+                       MODULE_NAME, fn, _tid, _saleId, _sellerPcId, static_cast<int>(saleInfo._saleStatus));
+            failReason = MARKETDEALER_REGISTERSALEFAIL_INVALID_SALE_STATUS;
+        }
+        else if (saleInfo._seller._participantPcId != _sellerPcId)
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1031,
+                       L"[%s], %s; seller pcid is not same, tid:0x%I64X, saleId:0x%I64X, sellerPcId:0x%I64X, "
+                       L"contextPcId:0x%I64X",
+                       MODULE_NAME, fn, _tid, _saleId, _sellerPcId, saleInfo._seller._participantPcId);
+            failReason = MARKETDEALER_REGISTERSALEFAIL_PCID_IS_NOT_SAME;
+        }
+        else if (!SaleContext::DetermineUnitPrice(saleInfo._salePrice, _saleItemInfo._itemAmount, _unitPrice))
+        {
+            JOB_CONTEXT_CRASH(1038,
+                              L"== CRASH == [%s], %s; failed to determine unit price, tid:0x%I64X, saleId:0x%I64X, "
+                              L"sellerPcId:0x%I64X, salePrice:%I64d, itemAmount:%d",
+                              MODULE_NAME, fn, _tid, _saleId, _sellerPcId, saleInfo._salePrice,
+                              _saleItemInfo._itemAmount);
+            failReason = MARKETDEALER_SYSTEM_ERROR;
+        }
+        else if (!MarketDB::RegisterSale(dbRetValue, *this))
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1045,
+                       L"[%s], %s; failed to register sale, dbRetValue:%d, tid:0x%I64X, saleId:0x%I64X, "
+                       L"sellerPcId:0x%I64X",
+                       MODULE_NAME, fn, dbRetValue, _tid, _saleId, _sellerPcId);
+            failReason = MARKETDEALER_DB_ERROR;
+        }
+        else
+        {
+            saleInfo._pawnId = _pawnId;
+            saleInfo._unitPrice = _unitPrice;
+            saleInfo._saleExpirationTime = _saleExpirationTime;
+            saleInfo._saleStatus = SaleInfo::SALESTATUS_SELLING;
+            memcpy(&saleContext->_saleItemInfo, &_saleItemInfo, sizeof(SaleItemInfo));
+            autoLock.Leave();
+
+            if (!MarketDealerDaemon::_instance->_saleTimeContextManager->AddContext(_saleId, _saleExpirationTime,
+                                                                                    saleInfo._saleType, saleContext))
+            {
+                JOB_CONTEXT_CRASH(1059,
+                                  L"== CRASH == [%s], %s; exception occurred; failed to add saletime context, "
+                                  L"tid:0x%I64X, saleId:0x%I64X, sellerPcId:0x%I64X",
+                                  MODULE_NAME, fn, _tid, _saleId, _sellerPcId);
+            }
+            Log::Write(Log::LT_DEBUG, JOB_CONTEXT_FILE, 1062,
+                       L"[%s], %s; succeeded to register sale, tid:0x%I64X, saleId:0x%I64X, sellerPcId:0x%I64X",
+                       MODULE_NAME, fn, _tid, _saleId, _sellerPcId);
+            saleContext->removeReferenceCount(JOB_CONTEXT_FILE, 1063);
+            return true;
+        }
+    }
+    saleContext->removeReferenceCount(JOB_CONTEXT_FILE, 1069);
+    return false;
+}
+
+// ---- UpdateSalePriceJob ----
+
+// 0xd700
+bool UpdateSalePriceJob::Initialize(Packet const*& packet)
+{
+    wchar_t const* const fn = L"UpdateSalePriceJob::Initialize";
+    if (packet == nullptr)
+    {
+        JOB_CONTEXT_CRASH(1094, INVALID_PACKET, MODULE_NAME, fn, packet);
+        return false;
+    }
+    short cmd = 0;
+    if (packet->Decompose("hqqqq", &cmd, &_tid, &_saleId, &_sellerPcId, &_newSalePrice) == 0)
+    {
+        Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1104, FAIL_DECOMPOSE, MODULE_NAME, fn);
+        return false;
+    }
+    Log::Write(Log::LT_DEBUG, JOB_CONTEXT_FILE, 1107,
+               L"[%s], %s; decomposed packet, tid:0x%I64X, saleId:0x%I64X, sellerPcId:0x%I64X, newSalePrice:%I64d",
+               MODULE_NAME, fn, _tid, _saleId, _sellerPcId, _newSalePrice);
+    return true;
+}
+
+// 0xd870
+void UpdateSalePriceJob::ReplySuccess(Session const*& session) const
+{
+    wchar_t const* const fn = L"UpdateSalePriceJob::ReplySuccess";
+    if (session == nullptr)
+    {
+        JOB_CONTEXT_CRASH(1115, INVALID_SESSION, MODULE_NAME, fn, session);
+        return;
+    }
+    session->Send("hq", MarketDealer_UpdateSalePriceOkCmd, _tid);
+    Log::Write(Log::LT_NOTICE, JOB_CONTEXT_FILE, 1120,
+               L"[%s], %s; sent update sale price success ack, tid:0x%I64X, saleId:0x%I64X, sellerPcId:0x%I64X, "
+               L"newSalePrice:%I64d",
+               MODULE_NAME, fn, _tid, _saleId, _sellerPcId, _newSalePrice);
+}
+
+// 0xd980
+void UpdateSalePriceJob::ReplyFailure(Session const*& session, short const& failReason) const
+{
+    wchar_t const* const fn = L"UpdateSalePriceJob::ReplyFailure";
+    if (session == nullptr)
+    {
+        JOB_CONTEXT_CRASH(1126, INVALID_SESSION, MODULE_NAME, fn, session);
+        return;
+    }
+    session->Send("hqE", MarketDealer_UpdateSalePriceFailCmd, _tid, static_cast<int>(failReason));
+    Log::Write(Log::LT_NOTICE, JOB_CONTEXT_FILE, 1131,
+               L"[%s], %s; sent update sale price failure ack, tid:0x%I64X, saleId:0x%I64X, sellerPcId:0x%I64X, "
+               L"newSalePrice:%I64d, failReason:%d",
+               MODULE_NAME, fn, _tid, _saleId, _sellerPcId, _newSalePrice, static_cast<int>(failReason));
+}
+
+// 0xdaa0
+bool UpdateSalePriceJob::verifyParameter(short& failReason) const
+{
+    if (_saleId > 0 && _sellerPcId > 0 && _newSalePrice > 0)
+        return true;
+    Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1139,
+               L"[%s], %s; invalid parameter, tid:0x%I64X, saleId:0x%I64X, sellerPcId:0x%I64X, newSalePrice:%I64d",
+               MODULE_NAME, L"UpdateSalePriceJob::verifyParameter", _tid, _saleId, _sellerPcId, _newSalePrice);
+    failReason = MARKETDEALER_UPDATESALEPRICEFAIL_INVALID_PARAMETER;
+    return false;
+}
+
+// 0xdb30
+bool UpdateSalePriceJob::handleJob(short& failReason)
+{
+    wchar_t const* const fn = L"UpdateSalePriceJob::handleJob";
+    SaleContext* const saleContext = MarketDealerDaemon::_instance->_saleContextManager->GetContext(_saleId);
+    if (saleContext == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1151,
+                   L"[%s], %s; there is no such sale context, tid:0x%I64X, saleId:0x%I64X, sellerPcId:0x%I64X, "
+                   L"newSalePrice:%I64d",
+                   MODULE_NAME, fn, _tid, _saleId, _sellerPcId, _newSalePrice);
+        failReason = MARKETDEALER_UPDATESALEPRICEFAIL_NO_SUCH_SALE;
+        return false;
+    }
+
+    {
+        AutoCS autoLock(&saleContext->_lock);
+        SaleInfo& saleInfo = saleContext->_saleInfo;
+        _saleType = saleInfo._saleType;
+        bool ready = false;
+        if (saleInfo._saleStatus != SaleInfo::SALESTATUS_SELLING)
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1162,
+                       L"[%s], %s; sale status is not selling, tid:0x%I64X, saleId:0x%I64X, sellerPcId:0x%I64X, "
+                       L"newSalePrice:%I64d, saleStatus:%d",
+                       MODULE_NAME, fn, _tid, _saleId, _sellerPcId, _newSalePrice,
+                       static_cast<int>(saleInfo._saleStatus));
+            failReason = MARKETDEALER_UPDATESALEPRICEFAIL_INVALID_SALE_STATUS;
+        }
+        else if (saleInfo._seller._participantPcId != _sellerPcId)
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1167,
+                       L"[%s], %s; seller pcid is not same, tid:0x%I64X, saleId:0x%I64X, sellerPcId:0x%I64X, "
+                       L"newSalePrice:%I64d, contextPcId:0x%I64X",
+                       MODULE_NAME, fn, _tid, _saleId, _sellerPcId, _newSalePrice, saleInfo._seller._participantPcId);
+            failReason = MARKETDEALER_UPDATESALEPRICEFAIL_PCID_IS_NOT_SAME;
+        }
+        else if (_saleType == ECONOMY_SALETYPE_AUCTION && saleContext->_bidCount > 0)
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1174,
+                       L"[%s], %s; exists bid, tid:0x%I64X, saleId:0x%I64X, sellerPcId:0x%I64X, newSalePrice:%I64d, "
+                       L"bidCount:%d",
+                       MODULE_NAME, fn, _tid, _saleId, _sellerPcId, _newSalePrice, saleContext->_bidCount);
+            failReason = MARKETDEALER_UPDATESALEPRICEFAIL_EXISTS_BID;
+        }
+        else if (_saleType == ECONOMY_SALETYPE_AUCTION &&
+                 !SaleContext::DetermineBidUnitPrice(_newSalePrice, _newBidUnitPrice))
+        {
+            JOB_CONTEXT_CRASH(1179,
+                              L"== CRASH == [%s], %s; failed to determine bid unit price, tid:0x%I64X, saleId:0x%I64X, "
+                              L"sellerPcId:0x%I64X, newSalePrice:%I64d",
+                              MODULE_NAME, fn, _tid, _saleId, _sellerPcId, _newSalePrice);
+            failReason = MARKETDEALER_SYSTEM_ERROR;
+        }
+        else if (!SaleContext::DetermineUnitPrice(_newSalePrice, saleContext->_saleItemInfo._itemAmount, _newUnitPrice))
+        {
+            JOB_CONTEXT_CRASH(1187,
+                              L"== CRASH == [%s], %s; failed to determine unit price, tid:0x%I64X, saleId:0x%I64X, "
+                              L"sellerPcId:0x%I64X, newSalePrice:%I64d, itemAmount:%d",
+                              MODULE_NAME, fn, _tid, _saleId, _sellerPcId, _newSalePrice,
+                              saleContext->_saleItemInfo._itemAmount);
+            failReason = MARKETDEALER_SYSTEM_ERROR;
+        }
+        else
+        {
+            ready = true;
+        }
+
+        if (ready)
+        {
+            int dbRetValue = 0;
+            if (MarketDB::UpdateSalePrice(dbRetValue, *this))
+            {
+                if (_saleType == ECONOMY_SALETYPE_AUCTION)
+                    saleInfo._bidUnitPrice = _newBidUnitPrice;
+                saleInfo._unitPrice = _newUnitPrice;
+                saleInfo._salePrice = _newSalePrice;
+                autoLock.Leave();
+                if (_saleType == ECONOMY_SALETYPE_AUCTION)
+                {
+                    Log::Write(Log::LT_DEBUG, JOB_CONTEXT_FILE, 1213,
+                               L"[%s], %s; succeeded to update sale price, tid:0x%I64X, saleId:0x%I64X, "
+                               L"sellerPcId:0x%I64X, newSalePrice:%I64d, newUnitPrice:%I64d, newBidUnitPrice:%I64d",
+                               MODULE_NAME, fn, _tid, _saleId, _sellerPcId, _newSalePrice, _newUnitPrice,
+                               _newBidUnitPrice);
+                }
+                else
+                {
+                    Log::Write(Log::LT_DEBUG, JOB_CONTEXT_FILE, 1215,
+                               L"[%s], %s; succeeded to update sale price, tid:0x%I64X, saleId:0x%I64X, "
+                               L"sellerPcId:0x%I64X, newSalePrice:%I64d, newUnitPrice:%I64d",
+                               MODULE_NAME, fn, _tid, _saleId, _sellerPcId, _newSalePrice, _newUnitPrice);
+                }
+                saleContext->removeReferenceCount(JOB_CONTEXT_FILE, 1216);
+                return true;
+            }
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1194,
+                       L"[%s], %s; failed to update sale price, dbRetValue:%d, tid:0x%I64X, saleId:0x%I64X, "
+                       L"sellerPcId:0x%I64X, newSalePrice:%I64d",
+                       MODULE_NAME, fn, dbRetValue, _tid, _saleId, _sellerPcId, _newSalePrice);
+            failReason = (dbRetValue == 2) ? MARKETDEALER_UPDATESALEPRICEFAIL_EXISTS_BID : MARKETDEALER_DB_ERROR;
+        }
+    }
+    saleContext->removeReferenceCount(JOB_CONTEXT_FILE, 1222);
+    return false;
+}
+
+// ---- AbandonSaleJob ----
+
+// 0xe1d0
+bool AbandonSaleJob::Initialize(Packet const*& packet)
+{
+    wchar_t const* const fn = L"AbandonSaleJob::Initialize";
+    if (packet == nullptr)
+    {
+        JOB_CONTEXT_CRASH(1245, INVALID_PACKET, MODULE_NAME, fn, packet);
+        return false;
+    }
+    short cmd = 0;
+    if (packet->Decompose("hqqq", &cmd, &_tid, &_saleId, &_sellerPcId) == 0)
+    {
+        Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1254, FAIL_DECOMPOSE, MODULE_NAME, fn);
+        return false;
+    }
+    Log::Write(Log::LT_DEBUG, JOB_CONTEXT_FILE, 1257,
+               L"[%s], %s; decomposed packet, tid:0x%I64X, saleId:0x%I64X, sellerPcId:0x%I64X", MODULE_NAME, fn, _tid,
+               _saleId, _sellerPcId);
+    return true;
+}
+
+// 0xe330
+void AbandonSaleJob::ReplySuccess(Session const*& session) const
+{
+    wchar_t const* const fn = L"AbandonSaleJob::ReplySuccess";
+    if (session == nullptr)
+    {
+        JOB_CONTEXT_CRASH(1265, INVALID_SESSION, MODULE_NAME, fn, session);
+        return;
+    }
+    session->Send("hq", MarketDealer_AbandonSaleOkCmd, _tid);
+    Log::Write(Log::LT_NOTICE, JOB_CONTEXT_FILE, 1270,
+               L"[%s], %s; sent abandon sale success ack, tid:0x%I64X, saleId:0x%I64X, sellerPcId:0x%I64X",
+               MODULE_NAME, fn, _tid, _saleId, _sellerPcId);
+}
+
+// 0xe440
+bool AbandonSaleJob::verifyParameter(short& failReason) const
+{
+    if (_saleId > 0 && _sellerPcId > 0)
+        return true;
+    Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1288,
+               L"[%s], %s; invalid parameter, tid:0x%I64X, saleId:0x%I64X, sellerPcId:0x%I64X", MODULE_NAME,
+               L"AbandonSaleJob::verifyParameter", _tid, _saleId, _sellerPcId);
+    failReason = MARKETDEALER_ABANDONSALEFAIL_INVALID_PARAMETER;
+    return false;
+}
+
+// 0xe4c0
+bool AbandonSaleJob::handleJob(short& failReason)
+{
+    wchar_t const* const fn = L"AbandonSaleJob::handleJob";
+    char const kDeliveryReasonSaleAbandonment = 3;  // ECONOMY_MARKET_DELIVERYREASON_SALE_ABANDONMENT (types.h:352)
+    SaleContextManager* const saleContextManager = MarketDealerDaemon::_instance->_saleContextManager;
+    SaleContext* const saleContext = saleContextManager->GetContext(_saleId);
+    if (saleContext == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1301,
+                   L"[%s], %s; there is no such sale context, tid:0x%I64X, saleId:0x%I64X, sellerPcId:0x%I64X",
+                   MODULE_NAME, fn, _tid, _saleId, _sellerPcId);
+        failReason = MARKETDEALER_ABANDONSALEFAIL_NO_SUCH_SALE;
+        return false;
+    }
+
+    {
+        AutoCS autoLock(&saleContext->_lock);
+        SaleInfo& saleInfo = saleContext->_saleInfo;
+        _saleType = saleInfo._saleType;
+        int dbRetValue = 0;
+        if (saleInfo._saleStatus != SaleInfo::SALESTATUS_SELLING)
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1312,
+                       L"[%s], %s; sale status is not selling, tid:0x%I64X, saleId:0x%I64X, sellerPcId:0x%I64X, "
+                       L"saleStatus:%d",
+                       MODULE_NAME, fn, _tid, _saleId, _sellerPcId, static_cast<int>(saleInfo._saleStatus));
+            failReason = MARKETDEALER_ABANDONSALEFAIL_INVALID_SALE_STATUS;
+        }
+        else if (saleInfo._seller._participantPcId != _sellerPcId)
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1317,
+                       L"[%s], %s; seller pcid is not same, tid:0x%I64X, saleId:0x%I64X, sellerPcId:0x%I64X, "
+                       L"contextPcId:0x%I64X",
+                       MODULE_NAME, fn, _tid, _saleId, _sellerPcId, saleInfo._seller._participantPcId);
+            failReason = MARKETDEALER_ABANDONSALEFAIL_PCID_IS_NOT_SAME;
+        }
+        else if (_saleType == ECONOMY_SALETYPE_AUCTION && saleContext->_bidCount > 0)
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1324,
+                       L"[%s], %s; exists bid, tid:0x%I64X, saleId:0x%I64X, sellerPcId:0x%I64X, bidCount:%d",
+                       MODULE_NAME, fn, _tid, _saleId, _sellerPcId, saleContext->_bidCount);
+            failReason = MARKETDEALER_ABANDONSALEFAIL_EXISTS_BID;
+        }
+        else if (!MarketDB::AbandonSale(dbRetValue, *this))
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1332,
+                       L"[%s], %s; failed to abandon sale, dbRetValue:%d, tid:0x%I64X, saleId:0x%I64X, "
+                       L"sellerPcId:0x%I64X",
+                       MODULE_NAME, fn, dbRetValue, _tid, _saleId, _sellerPcId);
+            failReason = (dbRetValue == 2) ? MARKETDEALER_ABANDONSALEFAIL_EXISTS_BID : MARKETDEALER_DB_ERROR;
+        }
+        else
+        {
+            saleInfo._saleStatus = SaleInfo::SALESTATUS_SALE_ABANDONMENT;
+            autoLock.Leave();
+
+            if (!MarketDealerDaemon::_instance->_saleTimeContextManager->RemoveContext(_saleId,
+                                                                                       saleInfo._saleExpirationTime))
+            {
+                JOB_CONTEXT_CRASH(1355,
+                                  L"== CRASH == [%s], %s; exception occurred; failed to remove saletime context, "
+                                  L"tid:0x%I64X, saleId:0x%I64X, sellerPcId:0x%I64X, saleExpirationTime:%I64d",
+                                  MODULE_NAME, fn, _tid, _saleId, _sellerPcId, saleInfo._saleExpirationTime);
+            }
+
+            DeliveryContext* deliveryContext = nullptr;
+            void* const memory = Memory::_Manager[2]->Alloc(sizeof(DeliveryContext), JOB_CONTEXT_FILE, 1359);
+            if (memory != nullptr)
+            {
+                DeliveryInfo deliveryInfo;
+                deliveryInfo._deliveryId = _deliveryId;
+                deliveryInfo._deliveryReason = kDeliveryReasonSaleAbandonment;
+                deliveryInfo._saleId = _saleId;
+                deliveryInfo._pawnId = saleInfo._pawnId;
+                deliveryInfo._pawnServiceId = saleInfo._saleId;
+                memcpy(&deliveryInfo._pawnOwner, &saleInfo._seller, sizeof(Participant));
+                memcpy(&deliveryInfo._recipient, &saleInfo._seller, sizeof(Participant));
+                memcpy(&deliveryInfo._marketStatement, &_marketStatement, sizeof(MarketStatement));
+                deliveryInfo._jobStatus = DeliveryInfo::JOBSTATUS_DELIVERY_READY;
+                deliveryContext = ::new (memory) DeliveryContext(deliveryInfo, saleContext->_saleItemInfo);
+            }
+
+            if (!saleContextManager->RemoveContext(_saleId))
+            {
+                JOB_CONTEXT_CRASH(1371,
+                                  L"== CRASH == [%s], %s; exception occurred; failed to remove sale context, "
+                                  L"saleId:0x%I64X",
+                                  MODULE_NAME, fn, _saleId);
+            }
+            Log::Write(Log::LT_DEBUG, JOB_CONTEXT_FILE, 1375,
+                       L"[%s], %s; succeeded to abandon sale, tid:0x%I64X, saleId:0x%I64X, sellerPcId:0x%I64X, "
+                       L"saleType:%d, deliveryId:0x%I64X, statementTitle:%s, statementBody:%s",
+                       MODULE_NAME, fn, _tid, _saleId, _sellerPcId, static_cast<int>(_saleType), _deliveryId,
+                       _marketStatement._statementTitle, _marketStatement._statementBody);
+
+            {
+                // BUG: 0xe4c0 no null check after the DeliveryContext Alloc; the lock uses a null context.
+                AutoCS deliveryLock(&deliveryContext->_lock);  // ❓ The original calls the out-of-line AutoCS::Enter 0x8780.
+                if (!MarketDealerDaemon::_instance->_deliveryContextManager->AddContext(deliveryContext))
+                {
+                    JOB_CONTEXT_CRASH(1383,
+                                      L"== CRASH == [%s], %s; exception occurred; failed to add delivery context, "
+                                      L"deliveryId:0x%I64X, saleId:0x%I64X",
+                                      MODULE_NAME, fn, _deliveryId, _saleId);
+                }
+                if (!Postman::DeliverPost(deliveryContext))
+                {
+                    Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1388,
+                               L"[%s], %s; failed to deliver post, deliveryId:0x%I64X, saleId:0x%I64X", MODULE_NAME,
+                               fn, _deliveryId, _saleId);
+                }
+            }
+            saleContext->removeReferenceCount(JOB_CONTEXT_FILE, 1392);
+            deliveryContext->removeReferenceCount(JOB_CONTEXT_FILE, 1393);
+            return true;
+        }
+    }
+    saleContext->removeReferenceCount(JOB_CONTEXT_FILE, 1399);
+    return false;
 }

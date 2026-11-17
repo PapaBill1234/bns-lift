@@ -26,7 +26,26 @@ enum MarketDealerFailReason
     MARKETDEALER_REGISTERSALEFAIL_INVALID_DEFAULT_ITEM_DATA = 19,
     MARKETDEALER_REGISTERSALEFAIL_INVALID_CUSTOM_ITEM_DATA = 20,
     MARKETDEALER_REGISTERSALEFAIL_INVALID_SALE_STATUS = 21,
-    // TODO(lift-marketdealerdaemon-2): the other values (types.h:544).
+    MARKETDEALER_UPDATESALEPRICEFAIL_INVALID_PARAMETER = 22,
+    MARKETDEALER_UPDATESALEPRICEFAIL_NO_SUCH_SALE = 23,
+    MARKETDEALER_UPDATESALEPRICEFAIL_PCID_IS_NOT_SAME = 24,
+    MARKETDEALER_UPDATESALEPRICEFAIL_INVALID_SALE_STATUS = 25,
+    MARKETDEALER_UPDATESALEPRICEFAIL_EXISTS_BID = 26,
+    MARKETDEALER_ABANDONSALEFAIL_INVALID_PARAMETER = 27,
+    MARKETDEALER_ABANDONSALEFAIL_NO_SUCH_SALE = 28,
+    MARKETDEALER_ABANDONSALEFAIL_PCID_IS_NOT_SAME = 29,
+    MARKETDEALER_ABANDONSALEFAIL_INVALID_SALE_STATUS = 30,
+    MARKETDEALER_ABANDONSALEFAIL_EXISTS_BID = 31,
+    // TODO(lift-marketdealerdaemon-2): the other values (types.h:577).
+};
+
+// PDB enum EconomySaleType (types.h:367).
+enum EconomySaleType : int
+{
+    ECONOMY_SALETYPE_INVALID_TYPE = 0x0,
+    ECONOMY_SALETYPE_AUCTION = 0x1,
+    ECONOMY_SALETYPE_INSTANT_SALE = 0x2,
+    ECONOMY_SALETYPE_GLOBAL_MAX = 0x3,
 };
 
 // PDB enum MarketDealerPacketCommand (types.h:655). Only the values that the lifted code uses are here.
@@ -41,6 +60,21 @@ enum MarketDealerPacketCommand
     MarketDealer_RetrieveBidRankStatusReqCmd = 0xA,
     MarketDealer_RetrieveBidRankStatusOkCmd = 0xB,
     MarketDealer_RetrieveBidRankStatusFailCmd = 0xC,
+    MarketDealer_ReserveSaleReqCmd = 0xD,
+    MarketDealer_ReserveSaleOkCmd = 0xE,
+    MarketDealer_ReserveSaleFailCmd = 0xF,
+    MarketDealer_CancelSaleReservationReqCmd = 0x10,
+    MarketDealer_CancelSaleReservationOkCmd = 0x11,
+    MarketDealer_CancelSaleReservationFailCmd = 0x12,
+    MarketDealer_RegisterSaleReqCmd = 0x13,
+    MarketDealer_RegisterSaleOkCmd = 0x14,
+    MarketDealer_RegisterSaleFailCmd = 0x15,
+    MarketDealer_UpdateSalePriceReqCmd = 0x16,
+    MarketDealer_UpdateSalePriceOkCmd = 0x17,
+    MarketDealer_UpdateSalePriceFailCmd = 0x18,
+    MarketDealer_AbandonSaleReqCmd = 0x19,
+    MarketDealer_AbandonSaleOkCmd = 0x1A,
+    MarketDealer_AbandonSaleFailCmd = 0x1B,
 };
 
 // PDB enum MarketDealerBidRankStatus (types.h:532).
