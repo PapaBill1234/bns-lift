@@ -61,13 +61,16 @@ src ──► tools/gate.sh (clang) ──► build/build.ninja ──► tools/
 - Progress: `progress.tsv` (one row per accepted card).
 
 ## Model per card
-The queue column `model` takes `opus`, `sonnet:high` or `sonnet:medium`. The runner gives `--model` and `--effort` to the session. A fix round 2 or later always uses `opus`.
+The queue column `model` takes `opus:high`, `opus`, `sonnet:high` or `sonnet:medium`. The runner gives `--model` and `--effort` to the session. Plain `opus` = effort medium. A fix round 2 or later of a Sonnet card uses `opus`. An `opus:high` card keeps high effort.
 
 | Model | Use it for |
 | --- | --- |
+| `opus:high` | Only these 4 areas. An error here goes into many later cards or stops an exe below its goal: (1) the second stall check of an exe (the last check before `stopped`); (2) a review that writes `rules-proposal.md` (rules for the GameDaemon lift); (3) a lift plan card for a new exe; (4) bug and exploit judgement (fix or port, see the no-bug-port rule) |
 | `opus` | Complex code reversing, IDA work, plans, specs, rules, bug and exploit judgement, parity reviews, stall checks, DIFF functions with no known cause |
 | `sonnet:high` | Apply a known fix pattern to named functions, Rust from a spec, gate and build errors, helper scripts (IDAPython, Diaphora, funcdiff), tests |
 | `sonnet:medium` | Docs and README updates, ASD-STE100 rewrites, notes tidying, card files after a review named the causes, rules-proposal text into the lift rules, log summaries |
+
+Cost: high uses about 1.4× the tokens of medium. Do not use `xhigh` or `max`. Check after the first 2 `opus:high` stall checks: did each name a cause that a later card fixed? If not, use `opus` again.
 
 ## Rules
 | Rule | Why |
