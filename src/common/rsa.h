@@ -1,6 +1,6 @@
 // rsa.obj (LobbyGate PDB). RSA with OAEP (RIPEMD-128) padding.
 // The PDB has no type records for these classes. The layout comes from the code.
-// ❓ member names.
+// LIFT: Member names. The PDB has no field list.
 #pragma once
 #include <stddef.h>
 #include "Crypto.h"

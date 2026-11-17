@@ -1,7 +1,7 @@
 // BigInteger (BloodCrypto). Modules: CryptoKey.obj (ctor, dtor), BigInteger.obj,
 // NumberTheory.obj, biArithmetic.obj, biMontgomery.obj, biSqr.obj, biMultiplication.obj.
 // The PDB has no type records for this class. The layout comes from the code.
-// ❓ member names.
+// LIFT: Member names. The PDB has no field list.
 #pragma once
 #include <stddef.h>
 #include <string.h>

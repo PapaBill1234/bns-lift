@@ -17,7 +17,7 @@ extern Daemon::PacketHandler PostOfficePacketServerSideFragmentHandlerList[7];
 
 namespace
 {
-wchar_t const* const AGENT_CHANNEL_FILE = L"AgentChannel.cpp";  // ❓ name
+wchar_t const* const AGENT_CHANNEL_FILE = L"AgentChannel.cpp";  // LIFT: No PDB symbol. The binary uses the literal.
 static wchar_t const* const MODULE_NAME = L"agent channel";  // PDB MODULE_NAME
 }
 

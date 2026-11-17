@@ -17,8 +17,8 @@
 #include "WorldListManager.h"
 #include "PcCafeMileageFeverTimeScheduleList.h"
 
-static wchar_t const* const HANDLER_FILE = L"LobbyGatePacketHandler.cpp";  // ❓ name
-static wchar_t const* const CHANNEL_H_FILE =                                // ❓ name
+static wchar_t const* const HANDLER_FILE = L"LobbyGatePacketHandler.cpp";  // LIFT: No PDB symbol. The binary uses the literal.
+static wchar_t const* const CHANNEL_H_FILE =                                // LIFT: No PDB symbol. The binary uses the literal.
     L"E:\\DailyBuild02\\LobbyGate-Common-0.0.348\\depot\\Branch\\348NC\\Program\\Server\\BloodLib\\include\\Channel.h";
 
 // ❓ The GUID fields of an id128 in the order of the "%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X" format.

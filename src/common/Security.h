@@ -5,7 +5,7 @@
 class Crypto;
 
 // BroadcastPacketCrypt: the PDB has no type record for this class. The layout comes from the
-// inlined constructor in BroadcastCrypt::Initialize (0x23000). ❓ member names.
+// inlined constructor in BroadcastCrypt::Initialize (0x23000). LIFT: Member names. The PDB has no field list.
 // The methods (0x4CF60, 0x4DBA0 - 0x4DF40, LobbyGate) are in no LobbyGate card. Declarations only.
 class BroadcastPacketCrypt : public PacketCrypt
 {

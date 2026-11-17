@@ -30,7 +30,7 @@ class CrashHandler
 public:
     enum
     {
-        USER_ASSERT_FAILED = 0xC000FFFF  // ❓ name from ExceptionCodeString text
+        USER_ASSERT_FAILED = 0xC000FFFF  // LIFT: No PDB name. The name comes from the ExceptionCodeString text.
     };
 
     // PDB: struct CrashHandler::CrashMail.

@@ -16,7 +16,7 @@
 
 namespace
 {
-wchar_t const* const MANAGEMENT_PACKET_FILE = L"ManagementPacketHandler.cpp";  // ❓ name
+wchar_t const* const MANAGEMENT_PACKET_FILE = L"ManagementPacketHandler.cpp";  // LIFT: No PDB symbol. The binary uses the literal.
 static wchar_t const* const MODULE_NAME = L"management packet handler";  // PDB MODULE_NAME
 
 // LIFT: Inlined in each handler: zero the packet and allocate the first buffer.

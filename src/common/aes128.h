@@ -1,5 +1,5 @@
 // aes128.obj (CacheGate PDB). The PDB has no type records for this class.
-// The layout comes from the code. ❓ member names.
+// The layout comes from the code. LIFT: Member names. The PDB has no field list.
 #pragma once
 #include <stddef.h>
 #include "Crypto.h"
@@ -8,7 +8,7 @@ class Aes128 : public Crypto
 {
 public:
     // PDB public symbol ?_Delegator@Aes128@@0UDelegator@1@A gives the struct name.
-    // ❓ The member names are not in the PDB. The PDB has no field list for this struct.
+    // LIFT: The member names are not in the PDB. The PDB has no field list for this struct.
     struct Delegator
     {
         bool (*setup)(Aes128* aes, unsigned char const* key, int keySize, int round);

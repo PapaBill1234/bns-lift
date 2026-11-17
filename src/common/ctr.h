@@ -1,5 +1,5 @@
 // ctr.obj (CacheGate PDB). The PDB has no type records for these classes.
-// The layout comes from the code. ❓ member names.
+// The layout comes from the code. LIFT: Member names. The PDB has no field list.
 #pragma once
 #include <stddef.h>
 

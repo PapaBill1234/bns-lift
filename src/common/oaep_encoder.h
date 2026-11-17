@@ -1,6 +1,6 @@
 // oaep_encoder.obj (LobbyGate PDB). OAEP encoder for RSA.
 // The PDB has no type records for these classes. The layout comes from the code.
-// ❓ member names.
+// LIFT: Member names. The PDB has no field list.
 #pragma once
 #include <stddef.h>
 #include <string.h>

@@ -17,8 +17,8 @@ namespace
 typedef XmlConfigReader const* (*XciCreateFunc)(XmlReader const*);
 typedef void (*XciDestoryFunc)(XmlConfigReader const*);
 
-wchar_t const* const XML_READER_DLL = L"XmlReader_sv64.dll";  // ❓ name
-wchar_t const* const XML_READER_VERSION = L"15";              // ❓ name
+wchar_t const* const XML_READER_DLL = L"XmlReader_sv64.dll";  // LIFT: No PDB symbol. The binary uses the literal.
+wchar_t const* const XML_READER_VERSION = L"15";              // LIFT: No PDB symbol. The binary uses the literal.
 }
 
 // 0xc600

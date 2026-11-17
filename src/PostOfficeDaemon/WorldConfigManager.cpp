@@ -17,10 +17,10 @@
 
 namespace
 {
-wchar_t const* const WORLD_CONFIG_FILE = L"WorldConfigManager.cpp";  // ❓ name
+wchar_t const* const WORLD_CONFIG_FILE = L"WorldConfigManager.cpp";  // LIFT: No PDB symbol. The binary uses the literal.
 static wchar_t const* const MODULE_NAME = L"world config manager";  // PDB MODULE_NAME
-wchar_t const* const XML_READER_DLL = L"XmlReader_sv64.dll";        // ❓ name
-wchar_t const* const XML_READER_VERSION = L"15";                    // ❓ name
+wchar_t const* const XML_READER_DLL = L"XmlReader_sv64.dll";        // LIFT: No PDB symbol. The binary uses the literal.
+wchar_t const* const XML_READER_VERSION = L"15";                    // LIFT: No PDB symbol. The binary uses the literal.
 }
 
 // The original writes each "== CRASH ==" text to Log (LT_ERROR) and to AlertSender.

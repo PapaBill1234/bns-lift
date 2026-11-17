@@ -20,9 +20,9 @@
 
 namespace
 {
-wchar_t const* const DCHANNEL_FILE = L"DaemonChannel.cpp";  // ❓ name
-wchar_t const* const SESSION_SOURCE_FILE = L"source\\Session.cpp";  // ❓ name
-wchar_t const* const CHANNEL_HEADER_FILE =                          // ❓ name
+wchar_t const* const DCHANNEL_FILE = L"DaemonChannel.cpp";  // LIFT: No PDB symbol. The binary uses the literal.
+wchar_t const* const SESSION_SOURCE_FILE = L"source\\Session.cpp";  // LIFT: No PDB symbol. The binary uses the literal.
+wchar_t const* const CHANNEL_HEADER_FILE =                          // LIFT: No PDB symbol. The binary uses the literal.
     L"E:\\DailyBuild02\\SmartCouponDaemon-Common-0.0.348\\depot\\Branch\\348NC\\Program\\Server\\BloodLib\\include\\Channel.h";
 }
 
