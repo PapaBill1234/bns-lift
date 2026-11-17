@@ -124,15 +124,15 @@ void LobbyGateReloadInvalidRestoreTimer::restoreInvalid()
     _isExecuted = true;
 }
 
-// ❓ Not in index.tsv. The vtable needs a body.
+// 0x13BB0 (scalar deleting dtor, folded with LobbyGateCooldownTimer)
 LobbyGateReloadInvalidRestoreTimer::~LobbyGateReloadInvalidRestoreTimer()
 {
 }
 
-// ❓ Not in index.tsv. The vtable needs a body.
+// 0x21830
 unsigned int LobbyGateReloadInvalidRestoreTimer::TimerClass() const
 {
-    return 0;  // ❓
+    return 2;
 }
 
 // 0x128b0
@@ -577,10 +577,10 @@ LobbyGateCooldownTimer::~LobbyGateCooldownTimer()
 {
 }
 
-// ❓ Not in index.tsv. The vtable needs a body.
+// 0x28750
 unsigned int LobbyGateCooldownTimer::TimerClass() const
 {
-    return 0;  // ❓
+    return 1;
 }
 
 // 0x13bf0
@@ -633,14 +633,14 @@ ClientSessionTimerJob::~ClientSessionTimerJob()
 {
 }
 
-// ❓ Not in index.tsv. The vtable needs a body.
+// 0x27FC0 (folded with ReconnectTimer::TimerClass)
 unsigned int ClientSessionTimerJob::TimerClass() const
 {
-    return 0;  // ❓
+    return 0;
 }
 
 // 0x28750
 unsigned long long LobbyGateCooldownTimer::TimerId() const
 {
-    return 0;  // ❓ the pseudocode is a shared empty body
+    return 1;  // bytes at 0x28750: mov eax, 1; ret
 }
