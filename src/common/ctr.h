@@ -27,11 +27,11 @@ public:
     virtual bool Encrypt(unsigned char const* in, int size, unsigned char* out, int* encCount);
     virtual bool Decrypt(unsigned char const* in, int size, unsigned char* out, int* encCount);
 
-    Crypto* _crypto;              // ❓ +8
-    int _blockSize;               // ❓ +16
-    int _pos;                     // ❓ +20
-    unsigned char _counter[32];   // ❓ +24
-    unsigned char _keyStream[32]; // ❓ +56
+    Crypto* _crypto;              // +8 (LobbyGate Ctr::Setup 0x5d8bc)
+    int _blockSize;               // +16 (LobbyGate Ctr::Setup 0x5d8d2)
+    int _pos;                     // +20 (LobbyGate Ctr::Setup 0x5d8d5)
+    unsigned char _counter[32];   // +24 (LobbyGate Ctr::Setup 0x5d925)
+    unsigned char _keyStream[32]; // +56 (LobbyGate Ctr::Setup 0x5d96d)
 };
 static_assert(sizeof(Ctr) == 88, "sizeof Ctr");
 static_assert(offsetof(Ctr, _counter) == 24, "Ctr::_counter");

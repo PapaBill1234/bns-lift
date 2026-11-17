@@ -23,8 +23,8 @@ public:
                         void* label, int labelSize) const = 0;
     virtual bool Decode(unsigned char const* in, int size, unsigned char* out, int* outSize) const = 0;
 
-    int _maxSize;   // ❓ +8, largest plain text of one block
-    int _blockSize; // ❓ +12, size of one encoded block (k)
+    int _maxSize;   // +8 (LobbyGate Setup 0x5abe6), largest plain text of one block
+    int _blockSize; // +12 (LobbyGate Setup 0x5abdb), size of one encoded block (k)
 };
 static_assert(sizeof(CryptoEncoder) == 16, "sizeof CryptoEncoder");
 
@@ -49,10 +49,10 @@ private:
     bool decode(unsigned char const* in, int size, unsigned char* out, int* outSize);
 
 public:
-    Ripemd128 _hash;             // ❓ +16
-    MaskGenerator _mgf;          // ❓ +32
-    unsigned char _buffer[256];  // ❓ +112
-    int _dbSize;                 // ❓ +368
+    Ripemd128 _hash;             // +16 (LobbyGate Setup 0x5abb2)
+    MaskGenerator _mgf;          // +32 (LobbyGate Setup 0x5ac32, mgf+0)
+    unsigned char _buffer[256];  // +112 (LobbyGate dtor 0x5ab41)
+    int _dbSize;                 // +368 (LobbyGate Setup 0x5abf4)
 };
 static_assert(sizeof(OaepEncoder) == 376, "sizeof OaepEncoder");
 static_assert(offsetof(OaepEncoder, _hash) == 16, "OaepEncoder::_hash");

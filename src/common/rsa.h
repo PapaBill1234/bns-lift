@@ -28,9 +28,9 @@ protected:
     bool decrypt(BigInteger const* key, unsigned char const* in, int size, unsigned char* out, int* outSize) const;
 
 public:
-    OaepEncoder _encoder; // ❓ +16
-    BigInteger _e;        // ❓ +392, public exponent
-    BigInteger _n;        // ❓ +912, modulus
+    OaepEncoder _encoder; // +16 (LobbyGate 0x532f9)
+    BigInteger _e;        // +392 (LobbyGate 0x533ac), public exponent
+    BigInteger _n;        // +912 (LobbyGate 0x53320), modulus
 };
 static_assert(sizeof(Rsa) == 1432, "sizeof Rsa");
 static_assert(offsetof(Rsa, _encoder) == 16, "Rsa::_encoder");
@@ -67,7 +67,7 @@ public:
     virtual bool Encrypt(unsigned char const* in, int size, unsigned char* out, int* outSize) const;
     virtual bool Decrypt(unsigned char const* in, int size, unsigned char* out, int* outSize) const;
 
-    BigInteger _d; // ❓ +1432, private exponent
+    BigInteger _d; // +1432 (LobbyGate 0x53627), private exponent
 };
 static_assert(sizeof(RsaPrivate) == 1952, "sizeof RsaPrivate");
 static_assert(offsetof(RsaPrivate, _d) == 1432, "RsaPrivate::_d");

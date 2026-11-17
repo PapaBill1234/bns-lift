@@ -25,9 +25,9 @@ private:
     static Prng* instance();
 
 public:
-    unsigned char _state[20]; // ❓ +0, RIPEMD-160 digest
-    Ctr _ctr;                 // ❓ +24
-    Aes128 _aes;              // ❓ +112
+    unsigned char _state[20]; // +0 (LobbyGate Prng::setSeed 0x5a7ff), RIPEMD-160 digest
+    Ctr _ctr;                 // +24 (LobbyGate Prng::setSeed 0x5a7ef)
+    Aes128 _aes;              // +112 (LobbyGate Prng::setSeed 0x5a7fb)
 };
 static_assert(sizeof(Prng) == 480, "sizeof Prng");
 static_assert(offsetof(Prng, _ctr) == 24, "Prng::_ctr");
