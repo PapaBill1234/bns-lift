@@ -89,7 +89,7 @@ public:
     GateKeyManager* _gatekeyManager;
     ClientManager* _clientManager;
     WorldListManager* _worldListManger;
-    PcCafeMileageFeverTimeScheduleListManager* _pcCafeMileageFeverTimeScheduleListManager;  // ❓ member name
+    PcCafeMileageFeverTimeScheduleListManager* _pcCafeMileageFeverTimeScheduleListManager;  // PDB LF_MEMBER offset 1920
     LogFile* _logfile;
     BroadcastCrypt _broadcastCrypt;
     Timer* _restoreReloadTimer;
@@ -97,6 +97,7 @@ public:
 static_assert(sizeof(LobbyGate) == 0x7B0, "sizeof LobbyGate");
 static_assert(offsetof(LobbyGate, _config) == 0x748, "LobbyGate::_config");
 static_assert(offsetof(LobbyGate, _lobbyD) == 0x760, "LobbyGate::_lobbyD");
+static_assert(offsetof(LobbyGate, _pcCafeMileageFeverTimeScheduleListManager) == 0x780, "LobbyGate::_pcCafeMileageFeverTimeScheduleListManager");
 static_assert(offsetof(LobbyGate, _broadcastCrypt) == 0x790, "LobbyGate::_broadcastCrypt");
 static_assert(offsetof(LobbyGate, _restoreReloadTimer) == 0x7A8, "LobbyGate::_restoreReloadTimer");
 
