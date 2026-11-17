@@ -496,7 +496,7 @@ bool LobbyD::SendStartSessionWithLobbyTokenReq(unsigned long long cliKey)
 }
 
 // 0xab20
-bool LobbyD::SendLostAnonymousConnectionNotify(long long gateKey)
+bool LobbyD::SendLostAnonymousConnectionNotify(unsigned long long gateKey)
 {
     short const cmd = 18;
     Session* session = const_cast<Session*>(GetSession());

@@ -56,7 +56,7 @@ void deleteArray(T* list, int line)
     Memory::_Manager[1]->Free(base, CLIENT_FILE, line);
 }
 
-// ❓ Inlined free-size check of the fragment packet.
+// LIFT: inlined FragmentPacket free-size check, e.g. LobbyGate 0x482b-0x485c (4000 - CurHeader->size < need, then Packet::Allocate).
 inline void reserveFragment(FragmentPacket& fp, int need)
 {
     if (fp.FreeSize() < need)
@@ -320,7 +320,8 @@ bool Client::SendGetCharacterInfoListOk(long long now, short timeZoneBias, Chara
         if (ok) reserveFragment(fp, 0x44);
         ok = ok && fp.Compose(1, info.characterName) != 0;
         if (ok) reserveFragment(fp, info.characterDataSize + 2);
-        ok = ok && fp.Compose(1, info.characterData, info.characterDataSize) != 0;  // ❓ blob arguments
+        // 0x4861: r9d = size (+0x5C), r8 = data (+0x60). rdi = info + 0x18.
+        ok = ok && fp.Compose(1, info.characterData, info.characterDataSize) != 0;
         if (ok) reserveFragment(fp, 8);
         ok = ok && fp.Compose(1, info.lastPlayEndDate) != 0;
         if (ok) reserveFragment(fp, 1);
@@ -437,7 +438,7 @@ bool Client::SendGetServiceEntryListOk(PacketBuffer* serviceEntryList, int servi
     if (session == nullptr)
         return false;
 
-    // ❓ The PDB type of the list is PacketBuffer*. The code reads it as ServiceEntry records (stride 0x38).
+    // PDB: the list type is PacketBuffer*. LobbyGate 0x5a2e steps the list by 0x38 (one ServiceEntry record).
     ServiceEntry const* entryList = reinterpret_cast<ServiceEntry const*>(serviceEntryList);
     FragmentPacket fp(cmd, "hiCqQqohq;");
     reserveFragment(fp, 2);
@@ -486,7 +487,8 @@ void ClientManager::Finalize()
             {
                 if (it->second != nullptr)
                 {
-                    it->second->SetSession(nullptr);  // ❓ slot 4
+                    // 0x5d84 calls vtable +0x28 (slot 5, Channel::RemoveSession 0x214d0) with edx = 0 and r8d = 0.
+                    it->second->RemoveSession(nullptr, false);
                     it->second->removeReferenceCount(CLIENT_FILE, 702);
                 }
             }
