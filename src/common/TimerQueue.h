@@ -82,7 +82,8 @@ private:
     void addLongTermQueue(unsigned int slice, Timer* timer);  // 0x26560 (SmartCouponDaemon)
     void clearLongTermQueueSlot();                        // 0x26680 (SmartCouponDaemon)
 
-public:
+private:
+    // PDB: all members are private. Only Daemon (friend) reaches the protected methods.
     long TimerInterval;
     SpinLock Lock;
     unsigned int StqSize;
@@ -91,21 +92,12 @@ public:
     LtqType LtQueue;
 
     friend class Daemon;
-    friend class Session;  // ❓ access for Session::tryReconnect, reconnect, close (Add/Remove)
-    friend class ObjPoolTimer;       // ❓ access for ObjPoolTimer::Start (0x1940, SmartCouponDaemon)
-    friend class SmartCouponDaemon;  // LIFT: access for the inlined ObjPoolTimer stop in shutdown (0x15AD0)
-    friend class NPPing;             // ❓ access for NPPing::HandleEvent (0x4490, SmartCouponDaemon)
-    friend class NPChannel;          // ❓ access for NPChannel::onConnect (0x5AD0, SmartCouponDaemon)
-    friend class LobbyGate;                           // ❓ access for LobbyGate (LobbyGate.obj)
-    friend class LobbyGateCooldownTimer;              // ❓ access for 0x13bf0 (LobbyGate)
-    friend class LobbyGateReloadInvalidRestoreTimer;  // ❓ access for 0x127a0 (LobbyGate)
-    friend class PingGenerator;          // ❓ access for 0x4d70 (PostOfficeDaemon)
-    friend class CachedWatchdog;         // ❓ access for 0x3dc0 (PostOfficeDaemon)
-    friend class CachedWatchdogManager;  // ❓ access (PostOfficeDaemon)
-    friend class RelayTimeoutChecker;    // ❓ access for 0x1d700 (PostOfficeDaemon)
-    friend class UnsentPostChecker;      // ❓ access for 0xd770 (PostOfficeDaemon)
-    friend class PostOfficeDaemon;       // ❓ access for startTimer 0x14660 (PostOfficeDaemon)
+
+    // Layout checks. They are in the class because the members are private.
+    static void checkLayout()
+    {
+        static_assert(offsetof(TimerQueue, StqSlot) == 0x40, "TimerQueue::StqSlot");
+        static_assert(offsetof(TimerQueue, LtQueue) == 0x50, "TimerQueue::LtQueue");
+    }
 };
 static_assert(sizeof(TimerQueue) == 0x78, "sizeof TimerQueue");
-static_assert(offsetof(TimerQueue, StqSlot) == 0x40, "TimerQueue::StqSlot");
-static_assert(offsetof(TimerQueue, LtQueue) == 0x50, "TimerQueue::LtQueue");

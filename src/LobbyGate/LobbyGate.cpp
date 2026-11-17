@@ -215,7 +215,7 @@ void LobbyGate::AddJobTimer(unsigned long long gateKey, char reason)
         timer->_timerReason = static_cast<ClientSessionTimerJob::TimerReason>(reason);
         timer->_key = gateKey;
     }
-    if (!GlobalTimerQueue->Add(_config->_closeTimeout, timer))
+    if (!AddTimer(_config->_closeTimeout, timer))
     {
         // BUG: 0x12bf0 timer is not checked for null.
         timer->removeReferenceCount(kFile, 173);
@@ -485,7 +485,7 @@ bool LobbyGate::reload(wchar_t** argv, int argc)
     if (_restoreReloadTimer != nullptr)
     {
         Log::Write(Log::LT_DEBUG, kFile, 473, L"[lobbygate], remove reload timer");
-        if (GlobalTimerQueue->Remove(_restoreReloadTimer))
+        if (RemoveTimer(_restoreReloadTimer))
         {
             LobbyGateReloadInvalidRestoreTimer* const restoreTimer =
                 static_cast<LobbyGateReloadInvalidRestoreTimer*>(_restoreReloadTimer);
@@ -559,7 +559,7 @@ bool LobbyGate::reload(wchar_t** argv, int argc)
         void* const mem = Memory::_Manager[2]->Alloc(sizeof(LobbyGateReloadInvalidRestoreTimer), kFile, 499);
         Timer* const timer = mem ? new (mem) LobbyGateReloadInvalidRestoreTimer() : nullptr;
         _restoreReloadTimer = timer;
-        GlobalTimerQueue->Add(60000, timer);
+        AddTimer(60000, timer);
     }
 
     Log::Write(Log::LT_NOTICE, kFile, 519, L"[lobbygate], contents rule config reloading...");
@@ -603,7 +603,7 @@ bool LobbyGateCooldownTimer::HandleEvent(EventContext* context, unsigned long nu
                remainClient, remainTime);
     if (remainClient != 0 && _completeDelay >= _elapsed)
     {
-        Daemon::Instance->GlobalTimerQueue->Add(3000, this);
+        Daemon::Instance->AddTimer(3000, this);
         return true;
     }
     Daemon::Instance->setState(8);  // STATE_COOLDOWNED
@@ -619,7 +619,7 @@ bool LobbyGate::cooldown()
     Network::ClosePort(1);  // LIFT: LTCG removed portId. 0x207e0 reads _port[0].
     void* const mem = Memory::_Manager[2]->Alloc(sizeof(LobbyGateCooldownTimer), kFile, 624);
     Timer* const timer = mem ? new (mem) LobbyGateCooldownTimer(1000 * _config->_cooldownCompleteDelay) : nullptr;
-    GlobalTimerQueue->Add(3000, timer);
+    AddTimer(3000, timer);
     return false;
 }
 

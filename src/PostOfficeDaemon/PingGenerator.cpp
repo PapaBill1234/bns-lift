@@ -63,7 +63,7 @@ bool PingGenerator::HandleEvent(EventContext* context, unsigned long bytes)
         return true;
 
     if (isStopState(Daemon::Instance->State) ||
-        PostOfficeDaemon::_instance->GlobalTimerQueue->Add(1000 * PostOfficeDaemon::_instance->_config->_pingInterval, this))
+        PostOfficeDaemon::_instance->AddTimer(1000 * PostOfficeDaemon::_instance->_config->_pingInterval, this))
         return true;
 
     Log::Write(Log::LT_ERROR, PING_GENERATOR_FILE, 34, L"[%s], %s; failed to add ping generator timer, wid:%u",

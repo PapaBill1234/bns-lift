@@ -40,7 +40,7 @@ bool RelayTimeoutChecker::HandleEvent(EventContext* context, unsigned long bytes
     Log::Write(Log::LT_DEBUG, RELAY_TIMEOUT_CHECKER_FILE, 28, L"[%s], %s; <END TIMER HANDLER>",
                MODULE_NAME, L"RelayTimeoutChecker::HandleEvent");
 
-    if (isStopState(Daemon::Instance->State) || PostOfficeDaemon::_instance->GlobalTimerQueue->Add(1000, this))
+    if (isStopState(Daemon::Instance->State) || PostOfficeDaemon::_instance->AddTimer(1000, this))
         return true;
 
     Log::Write(Log::LT_ERROR, RELAY_TIMEOUT_CHECKER_FILE, 32, L"[%s], %s; failed to add relay timeout checker timer",

@@ -10,6 +10,7 @@ class Packet;
 class PipeConsole;
 class ThreadManager;
 class TimerQueue;
+class Timer;
 class DelayedRelease;
 class Network;
 
@@ -105,6 +106,10 @@ private:
     friend class LobbyGateCooldownTimer;           // ❓ access for LobbyGateCooldownTimer::HandleEvent (0x13bf0, LobbyGate)
 
 public:
+    // PDB: Daemon::AddTimer, RemoveTimer (public). LIFT: no S_GPROC32 in the PDB; LTCG inlines them into the callers.
+    bool AddTimer(long elapse, Timer* timer);
+    bool RemoveTimer(Timer* timer);
+
     static Daemon* Instance;
     static long long Now;
     static wchar_t const* StateString[10];

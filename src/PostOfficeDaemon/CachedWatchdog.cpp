@@ -51,7 +51,7 @@ bool CachedWatchdog::addTimer(bool const startup)
         return true;
 
     long const elapse = startup ? 1000 : 1000 * PostOfficeDaemon::_instance->_config->_pingInterval;
-    if (PostOfficeDaemon::_instance->GlobalTimerQueue->Add(elapse, _pingGenerator))
+    if (PostOfficeDaemon::_instance->AddTimer(elapse, _pingGenerator))
         return true;
 
     Log::Write(Log::LT_ERROR, CACHED_WATCHDOG_FILE, 43, L"[%s], %s; failed to add ping generator timer, wid:%u",
