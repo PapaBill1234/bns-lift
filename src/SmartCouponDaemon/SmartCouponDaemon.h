@@ -102,4 +102,4 @@ static_assert(offsetof(SmartCouponDaemon, _logFile) == 0x780, "SmartCouponDaemon
 static_assert(offsetof(SmartCouponDaemon, _managerChannel) == 0x790, "SmartCouponDaemon::_managerChannel");
 static_assert(offsetof(SmartCouponDaemon, _managerChannelLock) == 0x798, "SmartCouponDaemon::_managerChannelLock");
 
-unsigned long long GenerateJobid();  // 0x14B50 ❓ free function
+unsigned long long GenerateJobid();  // 0x14B50 PDB: S_GPROC32 free function, type 0x464E

@@ -23,7 +23,7 @@ public:
     {
     }
     virtual void* Alloc(unsigned long long size, wchar_t const* file, int line);  // 0x14AB0
-    virtual void Free(void* ptr, wchar_t const* file, int line);                  // ❓ address
+    virtual void Free(void* ptr, wchar_t const* file, int line);                  // 0x14AA0 (retn 0)
 
     CriticalSection _lock;
     unsigned long long const _systemAllocationGranularity;

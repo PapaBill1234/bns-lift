@@ -196,7 +196,7 @@ bool ObjPoolTimer::HandleEvent(EventContext*, unsigned long)
 // 0x1940
 bool ObjPoolTimer::Start(long resolution)
 {
-    (void)resolution;  // ❓ LTCG put 1000 in the body.
+    (void)resolution;  // LIFT: LTCG const 1000 in the body; 0x1940 does not read edx
     ObjPoolTimer* timer = GObjPoolTimer;
     if (timer->_run)
     {
@@ -214,7 +214,7 @@ bool ObjPoolTimer::Start(long resolution)
 // 0x19F0
 bool ObjPoolTimer::Add(ObjPool* listener)
 {
-    // ❓ LTCG uses GObjPoolTimer and not `this`.
+    // LIFT: 0x19fa loads GObjPoolTimer; LTCG drops `this`.
     GObjPoolTimer->_listeners.push_back(listener);
     Log::Write(Log::LT_NOTICE, kObjPoolFile, 410, L"[objpool], objpool added to timer, id:%I64d", listener->_id);
     return true;

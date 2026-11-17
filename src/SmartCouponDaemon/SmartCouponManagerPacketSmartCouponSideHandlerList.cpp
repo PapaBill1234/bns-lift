@@ -16,5 +16,5 @@ bool (*SmartCouponManagerPacketSmartCouponSideHandlerList[10])(Session const* se
 };
 
 // 0x84a10 (bss, all slots are zero)
-// ❓ element type. The PDB slot type is not checked. It uses the same type as the list above.
+// PDB: S_GDATA32 type 0x23B7, the same type as the list above.
 bool (*SmartCouponManagerPacketSmartCouponSideFragmentHandlerList[10])(Session const* session, Packet const* packet) = {};
