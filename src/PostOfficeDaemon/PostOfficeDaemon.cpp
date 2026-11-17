@@ -73,11 +73,11 @@ XmlCfgDef const PostOfficeConfig::_Def[23] = {
     {offsetof(PostOfficeConfig, _dumpType), L"dump-type", XmlCfgDef::CFG_INT, 0, &DEFAULT_DUMPTYPE,
      L"0: no dump, 1: minimal dump(default), 2: full dump"},
     {offsetof(PostOfficeConfig, _relayTimeoutInterval), L"relay-timeout-interval", XmlCfgDef::CFG_INT, 0,
-     &DEFAULT_RELAY_TIMEOUT_INTERVAL, L"relay timeout interval(sec). default = 15"},  // ❓ text tail
+     &DEFAULT_RELAY_TIMEOUT_INTERVAL, L"relay timeout interval(sec). default = 15"},  // LIFT: full text in .rdata 0x7fec0
     {offsetof(PostOfficeConfig, _pingInterval), L"ping-interval", XmlCfgDef::CFG_INT, 0, &DEFAULT_PING_INTERVAL,
      L"ping interval with cached(sec). default = 60"},
     {offsetof(PostOfficeConfig, _deliveryRetryInterval), L"delivery-retry-interval", XmlCfgDef::CFG_INT, 0,
-     &DEFAULT_DELIVERY_RETRY_INTERVAL, L"delivery retry interval(sec). default = 5"},  // ❓ text tail
+     &DEFAULT_DELIVERY_RETRY_INTERVAL, L"delivery retry interval(sec). default = 5"},  // LIFT: full text in .rdata 0x7fe00
     {static_cast<unsigned long long>(-1), nullptr, 0, 0, nullptr, L"network configuration"},
     {offsetof(PostOfficeConfig, _agentListenPort), L"agent-listen-port", XmlCfgDef::CFG_INT, 0, &DEFAULT_AGENT_LISTEN_PORT,
      L"agent listen port"},
@@ -243,7 +243,7 @@ bool PostOfficeDaemon::initLog()
 
     void* const buffer = Memory::_Manager[2]->Alloc(sizeof(LogFile), kFile, 183);
     LogFile* const logFile = buffer ? new (buffer) LogFile(_config->_logPath, 2, 0) : nullptr;  // LIFT: LTCG folded the args. initialize 0x2d935 sets _filetype = 2. logType is not read.
-    // ❓ logFile->_enable[2] = false; the _enable member is not in LogFile.h.
+    logFile->_enable[2] = false;  // LogMedia::_enable +104 (PDB). The binary writes byte [rbx+6Ah] = 0 (0x131fa).
     // BUG: 0x130c0 the binary writes _enable[2] with no null check after the alloc.
 
     if (!Log::InitMedia(console))
@@ -273,7 +273,7 @@ bool PostOfficeDaemon::initialize()
 {
     wchar_t dsn[1024] = {0};
     char certification[1024] = {0};
-    char buffer[1008];  // ❓ size from the stack layout
+    char buffer[1008];  // LIFT: frame +1120 to +2128 (next local), 0x132b0
     FILE* fp = nullptr;
     int error;
 
@@ -283,7 +283,7 @@ bool PostOfficeDaemon::initialize()
     {
         error = 2;
     }
-    else if (fopen_s(&fp, certFile, "rb") != 0 || fp == nullptr ||  // ❓ mode string
+    else if (fopen_s(&fp, certFile, "rb") != 0 || fp == nullptr ||  // LIFT: mode "rb" at .rdata 0x8cf40 (0x13356)
              static_cast<int>(fread(buffer, 1, 1000, fp)) <= 0)
     {
         error = 3;  // BUG: 0x132b0 fp is not closed when fread fails.
@@ -332,7 +332,7 @@ bool PostOfficeDaemon::initNetwork()
     void* mem = Memory::_Manager[1]->Alloc(sizeof(CacheGateSessionHandler), kFile, 291);
     SessionHandler* handler = mem ? new (mem) CacheGateSessionHandler() : nullptr;
     _sessionHandler[1] = handler;
-    if (!Network::OpenPort(1, 0, 2, handler, &trustedPacketBufferHandler, 0, true, false, false))  // ❓ nagle
+    if (!Network::OpenPort(1, 0, 2, handler, &trustedPacketBufferHandler, 0, true, false, false))  // LIFT: nagle = dl = 0 (0x136ff). The last bool is not set at the call (folded).
     {
         Log::Write(Log::LT_ERROR, kFile, 294, L"[%s], %s; failed to open cachegate connection port, portId:%u", MODULE_NAME,
                    L"PostOfficeDaemon::initNetwork", 1);
@@ -348,14 +348,14 @@ bool PostOfficeDaemon::initNetwork()
         while (node != &pipeConsole->_invalid._tail && wcscmp(node->_key, L"disconnected cachegate") != 0)
             node = node->_next;
         if (node == &pipeConsole->_invalid._tail)
-            PipeConsole::addNode(pipeConsole->_invalid, L"disconnected cachegate", L"");  // ❓ value string
+            PipeConsole::addNode(pipeConsole->_invalid, L"disconnected cachegate", L"");  // LIFT: folded. r8 is not set (0x137fe). addNode copies the empty string 0x617e0 (0x33562).
         pipeConsole->_lock.Leave();
     }
 
     mem = Memory::_Manager[2]->Alloc(sizeof(CacheGateChannel), kFile, 301);
     CacheGateChannel* const cachegateChannel = mem ? new (mem) CacheGateChannel() : nullptr;
     if (!cachegateChannel->MakeSession(1, _config->_cachegateIpAddr,
-                                       static_cast<unsigned short>(_config->_cachegateListenPort), 0, true))  // ❓ args
+                                       static_cast<unsigned short>(_config->_cachegateListenPort), 0, true))  // LIFT: portId, connectTimeout and reconnect are folded. The call sets only ip and port (0x13869). MakeSession 0x2bda0 does not read them.
     {
         Log::Write(Log::LT_ERROR, kFile, 303,
                    L"[%s], %s; failed to make cachegate session, portId:%u, cachegateIpAddr:%s, cachegatePort:%u", MODULE_NAME,
@@ -616,7 +616,7 @@ CacheGateChannel* PostOfficeDaemon::checkDestinationServiceState(unsigned short 
                            L"PostOfficeDaemon::checkDestinationServiceState", 0);
         return nullptr;
     }
-    // Inlined CachedWatchdogManager::IsServiceAvailable(destinationWid). ❓ name from the log text
+    // Inlined CachedWatchdogManager::IsServiceAvailable(destinationWid). LIFT: name from the log string 0x71d90
     CachedWatchdog* const cachedWatchdog = _instance->_cachedWatchdogManager->getCachedWatchdog(destinationWid);
     if (cachedWatchdog == nullptr)
     {
@@ -637,7 +637,7 @@ CacheGateChannel* PostOfficeDaemon::checkDestinationServiceState(unsigned short 
 CacheGateChannel* PostOfficeDaemon::checkCacheGateServiceState()
 {
     CacheGateChannelManager* const manager = _cachegateChannelManager;
-    // Inlined CacheGateChannelManager::GetCacheGateChannel. ❓ name
+    // Inlined CacheGateChannelManager::GetCacheGateChannel. LIFT: the PDB type record has this public method. It has no body (inlined).
     manager->_lock.Enter();
     CacheGateChannel* const cachegateChannel = manager->_cachegateChannel;
     if (cachegateChannel != nullptr)
@@ -676,7 +676,7 @@ void PostOfficeDaemon::shutdown()
     Network::StopPort(1);
     Network::ClosePort(1);
     Network::Clear();
-    // Inlined Db cleanup. ❓ name
+    // Inlined Db cleanup. ❓ name. The Db type record has no cleanup method (only Clear(uint) and initEnv).
     if (Db::EnvHandle != nullptr)
     {
         SQLFreeHandle(SQL_HANDLE_ENV, Db::EnvHandle);
