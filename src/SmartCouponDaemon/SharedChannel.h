@@ -33,7 +33,7 @@ public:
     virtual bool Accept(unsigned long long id, Session const* session);  // 0x6510 (slot 5)
     virtual void Close();                                        // 0x6690 (slot 6)
     virtual void StopReconnect();                                // 0x6720 (slot 7)
-    virtual ~SharedChannel() {}                                  // ❓ no body in the module
+    virtual ~SharedChannel();                                    // 0x4270 (body in SharedChannel.h line 36)
 
     bool IsConnected();                                          // 0x67B0
 

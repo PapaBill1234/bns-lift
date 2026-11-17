@@ -12,6 +12,19 @@ static wchar_t const* const SHARED_CHANNEL_FILE = L"..\\Shared\\SharedChannel.cp
 static wchar_t const* const CHANNEL_H_FILE =
     L"E:\\DailyBuild02\\SmartCouponDaemon-Common-0.0.348\\depot\\Branch\\348NC\\Program\\Server\\BloodLib\\include\\Channel.h";
 
+// 0x4270. The original body is inline in SharedChannel.h.
+SharedChannel::~SharedChannel()
+{
+    if (_rawChannel != nullptr)
+    {
+        _rawChannel->RemoveSession(nullptr, false);  // slot 5 at 0x42a1
+        _rawChannel->removeReferenceCount(
+            L"e:\\dailybuild02\\smartcoupondaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\shared\\SharedChannel.h",
+            36);
+        _rawChannel = nullptr;
+    }
+}
+
 // 0x6390
 unsigned long long SharedChannel::RawChannel::GetId()
 {
@@ -101,7 +114,7 @@ bool SharedChannel::IsConnected()
         return false;
     Session* session = const_cast<Session*>(_rawChannel->GetSession());
     if (session == nullptr)
-        return false;  // ❓ Hex-Rays gives the low byte of the null pointer (0).
+        return false;  // LIFT: 0x67d4 jumps with rax = 0, so al = 0 at 0x683a
     session->_lock.Enter();
     bool connected = session->_state == Session::CONNECTED && session->_connection->_socket != INVALID_SOCKET;
     session->_lock.Leave();
