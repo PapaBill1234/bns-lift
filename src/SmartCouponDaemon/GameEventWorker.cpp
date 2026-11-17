@@ -23,21 +23,6 @@ namespace
 {
 wchar_t const* const kFile = L"GameEventWorker.cpp";
 
-// ❓ Not in the PDB. The log reads id128 as a GUID (Data1, Data2, Data3, Data4[8]).
-struct GuidParts  // LIFT: lift helper name, not in any PDB
-{
-    unsigned long id1;
-    unsigned short id2;
-    unsigned short id3;
-    unsigned char id4[8];
-};
-static_assert(sizeof(GuidParts) == 0x10, "sizeof GuidParts");
-
-inline GuidParts const& Parts(id128 const& id)  // LIFT: lift helper name, not in any PDB
-{
-    return *reinterpret_cast<GuidParts const*>(&id);
-}
-
 // LIFT: Not in the PDB. Inlined assert crash (Log, AlertSender, MakeCrash).
 void assertCrash(int line)
 {
@@ -47,7 +32,7 @@ void assertCrash(int line)
 }
 }  // namespace
 
-// ❓ The 12 GUID arguments of the "acc:%08X-..." format.
+// LIFT: lift macro, not in any PDB. The 11 id128::guid arguments of the "acc:%08X-..." format.
 #define GEW_ACC_ARGS(a) \
     (a).id1, (a).id2, (a).id3, (a).id4[0], (a).id4[1], (a).id4[2], (a).id4[3], (a).id4[4], (a).id4[5], (a).id4[6], (a).id4[7]
 
@@ -61,10 +46,10 @@ wchar_t const* GameEventWorker::Name()
     return L"GameEvent";
 }
 
-// 0x231f0 LIFT: COMDAT folded with NetworkEndEvent::EventId. The body is empty (eax is not set).
+// 0x231f0 PDB: S_GPROC32 code size 6. COMDAT folded with NetworkEndEvent::EventId.
 unsigned int GameEventEndEvent::EventId() const
 {
-    return 0;  // ❓
+    return 1;  // LIFT: mov eax, 1 at 0x231f0
 }
 
 // 0xaad0
@@ -159,9 +144,9 @@ bool GameEventManager::initWorkerThread(unsigned int threadCount)
         {
             GameEventWorker* worker = new (mem) GameEventWorker();
             mgr->_threads[i] = worker;
-            // ❓ The handler argument is a stale register (r9). Initialize does not read it.
+            // LIFT: r9 is not set at 0xaeef. Initialize (0xb370) writes r9 before it reads it.
             worker->Initialize(static_cast<int>(i + 1), mgr, nullptr);
-            WorkerManager->StartThread(worker, nullptr);  // ❓ threadId argument is a stale register (r8)
+            WorkerManager->StartThread(worker, nullptr);  // LIFT: r8 not set at 0xaefe; StartThread (0x1f820) writes r8 first
         }
     }
     mgr->_threadCount = count;
@@ -196,7 +181,7 @@ void GameEventManager::Clear()
                     continue;
                 if (tm->_threadHandles[idx] != nullptr)
                 {
-                    static_cast<GameEventWorker*>(t)->stop();  // ❓ the binary calls Thread slot 4
+                    static_cast<GameEventWorker*>(t)->stop();  // LIFT: call [rax+20h] at 0xb033 = vftable slot 4 = stop
                     if (WaitForSingleObject(tm->_threadHandles[idx], 2000) != 0)
                         TerminateThread(tm->_threadHandles[idx], 0);
                     tm->_threads[idx] = nullptr;
@@ -364,7 +349,7 @@ void GameEventWorker::handleFailedEvent(EventObject* eventObject, EventContext*,
 // 0xb6e0
 bool GameEventLogEvent::HandleEvent(EventContext*, unsigned long)
 {
-    GuidParts const& acc = Parts(_gameAccountId);
+    auto const& acc = _gameAccountId.guid;
     Log::Write(Log::LT_DEBUG, kFile, 335,
                L"[event-log], handle event, log-id:%I64d, acc:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X, wid:%d, pcdbid:0x%I64X, game-event-id:%d",
                _gameEventLogId, GEW_ACC_ARGS(acc), static_cast<int>(_wid), _pcdbid, _gameEventId);
@@ -424,7 +409,7 @@ bool GameEventLogEvent::HandleEvent(EventContext*, unsigned long)
             mem ? new (mem) SendPublicationEvent(info->publicationId, info->gameAccountId, info->couponEventId) : nullptr;
         PostQueuedCompletionStatus(Network::iocpHandle(), 0, reinterpret_cast<ULONG_PTR>(static_cast<EventObject*>(ev)),
                                    nullptr);
-        GuidParts const& pacc = Parts(info->gameAccountId);
+        auto const& pacc = info->gameAccountId.guid;
         Log::Write(Log::LT_DEBUG, kFile, 388,
                    L"[event-log], post publication event, publication-id:%I64d, acc:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X, coupon-event-id:%d",
                    info->publicationId, GEW_ACC_ARGS(pacc), info->couponEventId);
@@ -436,11 +421,11 @@ bool GameEventLogEvent::HandleEvent(EventContext*, unsigned long)
 // 0xbe30
 bool SendPublicationEvent::HandleEvent(EventContext*, unsigned long)
 {
-    GuidParts const& acc = Parts(_gameAccountId);
+    auto const& acc = _gameAccountId.guid;
     Log::Write(Log::LT_DEBUG, kFile, 399,
                L"[publication-event], handle event start, acc:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X, publication-id:%I64d, coupon-event-id:%d",
                GEW_ACC_ARGS(acc), _publicationId, _couponEventId);
-    void* mem = EventNotiJob::_pool.Checkout(kFile, 400);  // ❓ line (LTCG dropped it)
+    void* mem = EventNotiJob::_pool.Checkout(kFile, 401);  // LIFT: LTCG put the args into Checkout (0x15ff: line 0x191)
     EventNotiJob* job = mem ? new (mem) EventNotiJob() : nullptr;
     if (!job->Initialize(&_gameAccountId, _couponEventId, _publicationId, _managementTid))
     {
@@ -497,7 +482,7 @@ bool SendPublicationEvent::HandleEvent(EventContext*, unsigned long)
 // 0xc2f0
 bool RetryCouponPublicationEvent::HandleEvent(EventContext*, unsigned long)
 {
-    GuidParts const& acc = Parts(_gameAccountId);
+    auto const& acc = _gameAccountId.guid;
     Log::Write(Log::LT_DEBUG, kFile, 439,
                L"[retry-coupon-publication], handle event, tid:%I64d, acc:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X, publication-id:%I64d",
                _tid, GEW_ACC_ARGS(acc), _publicationId);
