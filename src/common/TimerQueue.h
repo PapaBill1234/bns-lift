@@ -63,9 +63,10 @@ public:
     {
         bool operator()(Timer const* left, Timer const* right) const { return left->SlotIndex > right->SlotIndex; }
     };
-    typedef std::priority_queue<Timer*, std::vector<Timer*, StlAllocator<Timer*, 2> >, GreaterBySlotIndex> LongTermQueue;  // ❓ typedef name
+    typedef std::vector<Timer*, StlAllocator<Timer*, 2> > LtqList;
+    typedef std::priority_queue<Timer*, LtqList, GreaterBySlotIndex> LtqType;
 
-    // ❓ Inlined in Daemon::start (0xb140).
+    // Inlined in Daemon::start (0xb140). The PDB has this constructor (protected).
     TimerQueue() : TimerInterval(0), StqSize(0), StqSlot(nullptr), StqCurrent(0), LtQueue() {}
     virtual ~TimerQueue();  // 0x25EC0 (SmartCouponDaemon)
 
@@ -87,7 +88,7 @@ public:
     unsigned int StqSize;
     Slot* StqSlot;
     unsigned int StqCurrent;
-    LongTermQueue LtQueue;
+    LtqType LtQueue;
 
     friend class Daemon;
     friend class Session;  // ❓ access for Session::tryReconnect, reconnect, close (Add/Remove)

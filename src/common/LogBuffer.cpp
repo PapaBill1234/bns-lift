@@ -9,7 +9,9 @@
 static wchar_t const LOGBUFFER_FILE[] = L"source\\LogBuffer.cpp";
 
 // PDB global. Maps Log::Type to the ConsoleLog type.
-int const CONSOLE_LOG_TYPE[11] = {2, 3, 5, 4, 0, 0, 0, 0, 0, 0, 0};
+ConsoleLog::Type const CONSOLE_LOG_TYPE[11] = {
+    ConsoleLog::L_ERROR, ConsoleLog::L_DEBUG, ConsoleLog::L_TRACE, ConsoleLog::L_INFO, ConsoleLog::L_NONE, ConsoleLog::L_NONE,
+    ConsoleLog::L_NONE,  ConsoleLog::L_NONE,  ConsoleLog::L_NONE,  ConsoleLog::L_NONE, ConsoleLog::L_NONE};
 
 __declspec(thread) LogBufferPool* LogBufferAllocator::_Local = nullptr;
 long long LogBufferAllocator::Using = 0;
@@ -36,7 +38,7 @@ void LogBuffer::Prepare(Log::Type type, wchar_t const* file, int line)
 }
 
 // 0x20010 (SmartCouponDaemon)
-int LogBuffer::GetType() const
+ConsoleLog::Type LogBuffer::GetType() const
 {
     return CONSOLE_LOG_TYPE[_type];
 }
