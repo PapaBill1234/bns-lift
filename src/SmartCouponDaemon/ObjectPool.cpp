@@ -25,10 +25,11 @@ void SmartCouponObjPoolMemoryAllocator::Free(void*, wchar_t const*, int)
 ObjPool::ObjPool(unsigned long long id, int objsize, wchar_t const* desc)
     : _id(id), _objsize(objsize), _desc(desc), _alloc(nullptr), _vtbl(nullptr), _timeToWait(0), _total(0)
 {
-    _pool._top = nullptr;
-    _pool._count = 0;
-    for (unsigned int i = 0; i < sizeof(_wait); ++i)
-        _wait[i] = 0;
+    _pool._head = nullptr;
+    _pool._size = 0;
+    _wait._head = nullptr;
+    _wait._tail = nullptr;
+    _wait._size = 0;
 }
 
 // 0x1210
@@ -65,12 +66,12 @@ bool ObjPool::Initialize(void* vtbl, int initialPoolCapacity, long timeToWait)
         node->next = nullptr;
         node->file = nullptr;
         node->line = 0;
-        node->time = 0;
+        node->when = 0;
         ++_total;
         _lock.Enter();
-        node->next = _pool._top;
-        ++_pool._count;
-        _pool._top = node;
+        node->next = _pool._head;
+        ++_pool._size;
+        _pool._head = node;
         _lock.Leave();
     }
     Log::Write(Log::LT_NOTICE, kObjPoolFile, 178,
@@ -84,13 +85,13 @@ void ObjPool::Finalize()
 {
     Log::Write(Log::LT_NOTICE, kObjPoolFile, 187,
                L"[objpool], finalized, total-count:%d, object-count:%d, id:%d(%s), obj-size:%d", _total,
-               _pool._count, _id, descOf(this), _objsize);
+               _pool._size, _id, descOf(this), _objsize);
     _lock.Enter();
-    while (_pool._top != nullptr)
+    while (_pool._head != nullptr)
     {
-        Node* node = _pool._top;
-        --_pool._count;
-        _pool._top = node->next;
+        Node* node = _pool._head;
+        --_pool._size;
+        _pool._head = node->next;
         node->next = nullptr;
         _alloc->Free(node, kObjPoolFile, 195);
     }
@@ -102,11 +103,11 @@ void ObjPool::Finalize()
 void* ObjPool::Checkout(wchar_t const* file, int line)
 {
     _lock.Enter();
-    Node* node = _pool._top;
+    Node* node = _pool._head;
     if (node != nullptr)
     {
-        --_pool._count;
-        _pool._top = node->next;
+        --_pool._size;
+        _pool._head = node->next;
         node->next = nullptr;
     }
     _lock.Leave();
@@ -117,12 +118,12 @@ void* ObjPool::Checkout(wchar_t const* file, int line)
         node->next = nullptr;
         node->file = nullptr;
         node->line = 0;
-        node->time = 0;
+        node->when = 0;
     }
     long long now = GetTickCount64() - Daemon::Instance->StartSystemTick64;
     node->line = line;
     node->file = file;
-    node->time = now;
+    node->when = now;
     unsigned char* object = reinterpret_cast<unsigned char*>(node + 1);
     *reinterpret_cast<unsigned long long*>(object + _objsize) = kObjPoolGuard;
     return object;
@@ -144,18 +145,18 @@ void ObjPool::Checkin(void* mem, wchar_t const* file, int line)
         Log::Write(Log::LT_ERROR, kObjPoolFile, 273,
                    L"== CRASH == object memory overrun occurs, node:%p, checkout-file:%s, checkout-line:%d, "
                    L"checkout-time:%I64d, checkin-file:%s, checkin-line:%d, id:%d(%s), obj-size:%d",
-                   node, node->file, node->line, node->time, file, line, _id, descOf(this), _objsize);
+                   node, node->file, node->line, node->when, file, line, _id, descOf(this), _objsize);
         AlertSender::Write(kObjPoolFile, 273,
                            L"== CRASH == object memory overrun occurs, node:%p, checkout-file:%s, checkout-line:%d, "
                            L"checkout-time:%I64d, checkin-file:%s, checkin-line:%d, id:%d(%s), obj-size:%d",
-                           node, node->file, node->line, node->time, file, line, _id, descOf(this), _objsize);
+                           node, node->file, node->line, node->when, file, line, _id, descOf(this), _objsize);
     }
     _lock.Enter();
     if (node != nullptr)
     {
-        node->next = _pool._top;
-        ++_pool._count;
-        _pool._top = node;
+        node->next = _pool._head;
+        ++_pool._size;
+        _pool._head = node;
     }
     _lock.Leave();
 }

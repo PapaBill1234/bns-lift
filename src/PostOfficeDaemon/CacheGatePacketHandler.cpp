@@ -19,13 +19,14 @@ namespace
 wchar_t const* const CGPH_FILE = L"CacheGatePacketHandler.cpp";  // ❓ name
 static wchar_t const* const MODULE_NAME = L"cachegate packet handler";  // PDB MODULE_NAME
 
+// PDB enum CacheEconomyPacketCommand (PostOfficeDaemon type 0x2C8F).
 enum
 {
-    ECONOMY_CMD_BASE = 1024,              // ❓ name
-    ECONOMY_PING_RELAY = 1031,            // ❓ name
-    ECONOMY_RETRIEVE_CHARACTER_INFO = 1037,  // ❓ name
-    ECONOMY_CHECK_POST_CAPACITY = 1040,   // ❓ name
-    ECONOMY_DELIVER_POST = 1043,          // ❓ name
+    ECONOMY_CMD_BASE = 1024,  // ❓ name; the PDB enum has no 1024 entry
+    CacheEconomy_PingReqCmd = 1031,
+    CacheEconomy_RetrieveCharacterInfoReqCmd = 1037,
+    CacheEconomy_CheckPostCapacityReqCmd = 1040,
+    CacheEconomy_DeliverPostReqCmd = 1043,
 };
 
 void logBegin(int line, wchar_t const* func)
@@ -241,25 +242,25 @@ bool HandleCacheGateRelayFail(Session const* session, Packet const* packet)
     int failLine = 0;
     switch (relayHeader._hint)
     {
-    case ECONOMY_PING_RELAY:
+    case CacheEconomy_PingReqCmd:
         errorLine = 224;
         errorText = L"[%s], %s; ping relay error, relayTid:0x%I64X, relayFailReason:%d";
         failLine = 229;
         failText = L"[%s], %s; failed to process ping relay error response, relayTid:0x%I64X";
         break;
-    case ECONOMY_RETRIEVE_CHARACTER_INFO:
+    case CacheEconomy_RetrieveCharacterInfoReqCmd:
         errorLine = 236;
         errorText = L"[%s], %s; retrieve character info relay error, relayTid:0x%I64X, relayFailReason:%d";
         failLine = 241;
         failText = L"[%s], %s; failed to process retrieve character info relay error response, relayTid:0x%I64X";
         break;
-    case ECONOMY_CHECK_POST_CAPACITY:
+    case CacheEconomy_CheckPostCapacityReqCmd:
         errorLine = 248;
         errorText = L"[%s], %s; check post capacity relay error, relayTid:0x%I64X, relayFailReason:%d";
         failLine = 253;
         failText = L"[%s], %s; failed to process check post capacity relay error response, relayTid:0x%I64X";
         break;
-    case ECONOMY_DELIVER_POST:
+    case CacheEconomy_DeliverPostReqCmd:
         errorLine = 260;
         errorText = L"[%s], %s; deliver post relay error, relayTid:0x%I64X, relayFailReason:%d";
         failLine = 265;
@@ -344,25 +345,25 @@ bool HandleCacheGateRelayInvalid(Session const* session, Packet const* packet)
     int failLine = 0;
     switch (relayHeader._hint)
     {
-    case ECONOMY_PING_RELAY:
+    case CacheEconomy_PingReqCmd:
         errorLine = 329;
         errorText = L"[%s], %s; invalid ping relay, relayTid:0x%I64X, relayFailReason:%d";
         failLine = 334;
         failText = L"[%s], %s; failed to process ping relay error response, relayTid:0x%I64X";
         break;
-    case ECONOMY_RETRIEVE_CHARACTER_INFO:
+    case CacheEconomy_RetrieveCharacterInfoReqCmd:
         errorLine = 341;
         errorText = L"[%s], %s; invalid retrieve character info relay, relayTid:0x%I64X, relayFailReason:%d";
         failLine = 346;
         failText = L"[%s], %s; failed to process retrieve character info relay error response, relayTid:0x%I64X";
         break;
-    case ECONOMY_CHECK_POST_CAPACITY:
+    case CacheEconomy_CheckPostCapacityReqCmd:
         errorLine = 353;
         errorText = L"[%s], %s; invalid check post capacity relay, relayTid:0x%I64X, relayFailReason:%d";
         failLine = 358;
         failText = L"[%s], %s; failed to process check post capacity relay error response, relayTid:0x%I64X";
         break;
-    case ECONOMY_DELIVER_POST:
+    case CacheEconomy_DeliverPostReqCmd:
         errorLine = 365;
         errorText = L"[%s], %s; invalid deliver post relay, relayTid:0x%I64X, relayFailReason:%d";
         failLine = 370;

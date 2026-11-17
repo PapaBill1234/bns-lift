@@ -37,21 +37,29 @@ class ObjPool
 {
 public:
     // Header in front of each object. The object follows at +0x20, then an 8-byte guard.
-    struct Node  // ❓ layout from ObjPool::Checkout (0x1560)
+    struct Node  // PDB type 0x1F00, field list 0x1EFF
     {
         Node* next;
         wchar_t const* file;
         int line;
-        long long time;
+        long long when;
     };
     static_assert(sizeof(Node) == 0x20, "sizeof ObjPool::Node");
 
-    struct Stack  // ❓ PDB type 0x1ED7, layout from ObjPool::Initialize (0x1250)
+    struct Stack  // PDB type 0x1EFA, field list 0x1EF9
     {
-        Node* _top;
-        int _count;
+        Node* _head;
+        int _size;
     };
     static_assert(sizeof(Stack) == 0x10, "sizeof ObjPool::Stack");
+
+    struct Queue  // PDB type 0x1EEF, field list 0x1EEE. This exe does not use it.
+    {
+        Node* _head;
+        Node* _tail;
+        int _size;
+    };
+    static_assert(sizeof(Queue) == 0x18, "sizeof ObjPool::Queue");
 
     ObjPool(unsigned long long id, int objsize, wchar_t const* desc);  // 0x1180
     virtual ~ObjPool();                                                 // 0x1210
@@ -70,10 +78,13 @@ public:
     int _total;
     Stack _pool;
     CriticalSection _lock;
-    alignas(8) unsigned char _wait[0x18];  // ❓ PDB type 0x1ED8: ObjPool::Queue (not used in this exe)
+    Queue _wait;
     CriticalSection _waitlock;
 };
 static_assert(sizeof(ObjPool) == 0xB0, "sizeof ObjPool");
+static_assert(offsetof(ObjPool, _pool) == 56, "ObjPool::_pool");
+static_assert(offsetof(ObjPool, _wait) == 112, "ObjPool::_wait");
+static_assert(offsetof(ObjPool, _waitlock) == 136, "ObjPool::_waitlock");
 
 class ObjPoolTimer : public Timer
 {
