@@ -5,17 +5,18 @@ The 4 lifted exes compile to the same code as the original 2019 + PDB exes. The 
 
 After each exe has 90 % or more, do "90+ rounds". The 90+ target is **99 % parity** for each exe. Each 90+ round fixes the DIFF functions that are left and that have a fixable cause. Its last card is a review.
 
-The review after each 90+ round decides if a new 90+ round starts:
+The review after each 90+ round sets the state of each exe in `Docs/Parity/plus-state.tsv` (columns: exe, round, parity, gain, zero_rounds, state). `zero_rounds` counts the rounds in sequence with no gain.
 
-| Condition | Result |
+| Exe result in the last round | Action |
 | --- | --- |
-| Each exe has 99 % or more | Stop. The parity phase ends. |
-| The DIFF functions that are left have no fixable cause | Stop. |
-| 10 rounds after the 90 % point are done | Stop. |
-| Rounds still needed ≥ 10 − rounds done | Stop. |
-| Other | Write the next 90+ round. |
+| Parity 99 % or more | State `done`. Write no more cards for this exe. |
+| Gain more than 0 | Set `zero_rounds` to 0. Write cards for the fixable DIFF functions that are left. |
+| No gain, first time (`zero_rounds` = 1) | Find the cause of the stall. Write it in the review. Write a card that fixes the cause. |
+| No gain, second time (`zero_rounds` = 2) | Do the check again. Find what the first fix did not solve. Write a card that fixes it. |
+| No gain, third time (`zero_rounds` = 3) | State `stopped`. Write no more cards for this exe. Write the cause in the handoff. |
 
-Rounds still needed = for each exe, (99 % − parity now) / (parity gain of the last round), rounded up. Use the highest value of the 4 exes. If the last round gained 0 for an exe below 99 %, stop.
+A card for a cause in more than 1 exe stays 1 card. An exe with state `done` or `stopped` gets no new cards, but the gate still runs on it. It must not lose MATCH functions.
+The parity phase stops when each exe has state `done` or `stopped`. There is no limit on the number of rounds.
 When the phase stops, the review writes no new cards. The handoff gives the parity of each exe and the reason for the stop.
 
 | Exe | Start parity |
