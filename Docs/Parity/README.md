@@ -3,6 +3,8 @@
 ## Goal
 The 4 lifted exes compile to the same code as the original 2019 + PDB exes. The target is **90 % parity** for each exe.
 
+After each exe has 90 % or more, do 1 more round of cards (the "90+ round"). This round fixes the DIFF functions that are left and that have a fixable cause. The review after the 90+ round ends the parity phase. It writes no new cards.
+
 | Exe | Start parity |
 | --- | --- |
 | CacheGate | 216 / 491 = 44.0 % |
