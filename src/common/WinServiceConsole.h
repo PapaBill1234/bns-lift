@@ -28,7 +28,7 @@ private:
 
 public:
     static void ServiceMain(unsigned long argCount, wchar_t** argVector);
-    // ❓ The code uses "daemon" as a name postfix string and "postfix" as the conf path.
+    // PDB: arglists 0x4D56 and 0x4D58 use Daemon*. The caller at 0x16aea gives argv strings, so "daemon" is a name postfix string.
     static bool InstallService(Daemon* daemon, wchar_t const* postfix, wchar_t const* confdir);
     static bool UninstallService(Daemon* daemon, wchar_t const* postfix);
 

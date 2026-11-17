@@ -138,7 +138,7 @@ void WinServiceConsole::ServiceMain(unsigned long argCount, wchar_t** argVector)
     wchar_t const* message;
     if (SetServiceStatus(self->Handle, &self->Status))
     {
-        // ❓ The code does not set edx/r8 for this call. The lift gives 0 and nullptr.
+        // LIFT: SmartCouponDaemon 0x27512 sets only rcx. Daemon::start (0x171e0) writes edx/r8 before it reads them. The args are not used.
         if (Daemon::Instance->start(0, nullptr))
             return;
         message = L"Daemon Start failed";
@@ -168,7 +168,7 @@ bool WinServiceConsole::controlHandler(unsigned long ctrlCode)
 {
     if (ctrlCode != SERVICE_CONTROL_STOP)
     {
-        // ❓ The code gives undefined values for exitCode and waitHint. They are not used.
+        // LIFT: SmartCouponDaemon 0x275e2 tail jump sets only edx. The callee does not use exitCode and waitHint here.
         return reportStatusToSCManager(Status.dwCurrentState, 0, 0);
     }
     if (Daemon::Instance != nullptr && Daemon::Instance->EndEvent.Event != nullptr)
@@ -195,7 +195,7 @@ bool WinServiceConsole::reportStatusToSCManager(unsigned long currentState, unsi
 }
 
 // 0x17aa0
-// ❓ The callers do not set "size". The body uses 255 only.
+// LIFT: SmartCouponDaemon 0x27690 writes edx at 0x276ba before it reads it. The body uses 255 (0x27708).
 wchar_t const* WinServiceConsole::getLastErrorText(wchar_t* errorString, int size)
 {
     wchar_t* tempString = nullptr;
@@ -249,7 +249,7 @@ bool WinServiceConsole::InstallService(Daemon* daemon, wchar_t const* postfix, w
     wcscpy_s(desc, 260, instance->Descriptions());
     if (daemon != nullptr)
     {
-        // ❓ The code uses "daemon" as a string.
+        // PDB: param type is Daemon* (0x4D56, 0x4D58). The caller at 0x16aea gives an argv string. 0x278e4 passes it to wcscat_s as Source.
         wcscat_s(name, 260, (wchar_t const*)daemon);
         wcscat_s(desc, 260, (wchar_t const*)daemon);
     }
@@ -301,7 +301,7 @@ bool WinServiceConsole::UninstallService(Daemon* daemon, wchar_t const* postfix)
     wcscpy_s(desc, 260, instance->Descriptions());
     if (daemon != nullptr)
     {
-        // ❓ The code uses "daemon" as a string.
+        // PDB: param type is Daemon* (0x4D56, 0x4D58). The caller at 0x16aea gives an argv string. 0x278e4 passes it to wcscat_s as Source.
         wcscat_s(name, 260, (wchar_t const*)daemon);
         wcscat_s(desc, 260, (wchar_t const*)daemon);
     }
