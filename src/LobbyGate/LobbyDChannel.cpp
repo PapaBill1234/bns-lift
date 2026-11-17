@@ -24,7 +24,7 @@ wchar_t const* const CHANNEL_H_FILE =
 wchar_t const* const DISCONNECTED_LOBBYD = L"disconnected lobbyd";
 
 // ❓ The PDB type id128::<unnamed-type-guid> has the fields id1, id2, id3 and id4[8].
-struct GuidFields
+struct GuidFields  // ❓ lift helper name, not in any PDB
 {
     unsigned int id1;
     unsigned short id2;
@@ -32,7 +32,7 @@ struct GuidFields
     unsigned char id4[8];
 };
 
-GuidFields guidOf(id128 const* value)
+GuidFields guidOf(id128 const* value)  // ❓ lift helper name, not in any PDB
 {
     GuidFields g;
     memcpy(&g, value->guid, sizeof(g));

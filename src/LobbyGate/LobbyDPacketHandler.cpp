@@ -86,24 +86,24 @@ static Channel* LobbyDHandlerChannel(Session const* session, int line)
     return ch;
 }
 
-static void LobbyDHandlerRelease(Channel* ch)
+static void LobbyDHandlerRelease(Channel* ch)  // ❓ lift helper name, not in any PDB
 {
     ch->removeReferenceCount(SESSION_FILE, 1059);
 }
 
-static void LobbyDRepeatNext(PacketConcatenateBuffer* pcb)
+static void LobbyDRepeatNext(PacketConcatenateBuffer* pcb)  // ❓ lift helper name, not in any PDB
 {
     pcb->decomposer.index = pcb->decomposer.start[pcb->decomposer.top] + 1;
     --pcb->decomposer.counts[pcb->decomposer.top];
 }
 
-static void LobbyDFpReserve(FragmentPacket& fp, int need)
+static void LobbyDFpReserve(FragmentPacket& fp, int need)  // ❓ lift helper name, not in any PDB
 {
     if (4000 - fp.packet.CurHeader->size < need)
         fp.packet.Allocate(&fp.composer);
 }
 
-static void LobbyDBroadcastReload(Session const* clientSession)
+static void LobbyDBroadcastReload(Session const* clientSession)  // ❓ lift helper name, not in any PDB
 {
     long long const* extraData = static_cast<long long const*>(clientSession->_extraData);
     if (extraData != nullptr && *extraData > 0 && *extraData < ContentsRuleConfig::ConfigLastReloadTime)

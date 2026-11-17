@@ -64,7 +64,7 @@ static Channel* acquireChannel(Session const* session)
     return nullptr;
 }
 
-static NPChannel* ownerOf(Channel* channel)
+static NPChannel* ownerOf(Channel* channel)  // ❓ lift helper name, not in any PDB
 {
     return static_cast<NPChannel*>(static_cast<SharedChannel::RawChannel*>(channel)->_owner);
 }

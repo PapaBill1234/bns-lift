@@ -81,7 +81,7 @@ void finiMemorySection(int section)
 __declspec(thread) char addressStringA[32];
 __declspec(thread) wchar_t addressStringW[32];
 
-wchar_t const* addressToString(unsigned long address)
+wchar_t const* addressToString(unsigned long address)  // ❓ lift helper name, not in any PDB
 {
     wchar_t* wide = addressStringW;
     char* narrow = addressStringA;

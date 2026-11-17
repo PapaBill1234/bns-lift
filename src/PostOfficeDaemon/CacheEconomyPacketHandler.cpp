@@ -20,7 +20,7 @@ wchar_t const* const CEPH_FILE = L"CacheEconomyPacketHandler.cpp";  // ❓ name
 static wchar_t const* const MODULE_NAME = L"cache economy packet handler";  // PDB MODULE_NAME
 
 // ❓ Not in the PDB. The original inlines these line numbers in each handler.
-struct ResponseLines
+struct ResponseLines  // ❓ lift helper name, not in any PDB
 {
     int noContext;
     int mismatch;
@@ -37,7 +37,7 @@ void logBegin(wchar_t const* funcName, int line)
     Log::Write(Log::LT_DEBUG, CEPH_FILE, line, L"[%s], %s; <BEGIN PACKET HANDLER>", MODULE_NAME, funcName);
 }
 
-void logEnd(wchar_t const* funcName, int line)
+void logEnd(wchar_t const* funcName, int line)  // ❓ lift helper name, not in any PDB
 {
     Log::Write(Log::LT_DEBUG, CEPH_FILE, line, L"[%s], %s; <END PACKET HANDLER>", MODULE_NAME, funcName);
 }
@@ -84,14 +84,14 @@ bool processEconomyResponse(wchar_t const* funcName, EconomyHeader const& econom
     return false;
 }
 
-void clearHeader(EconomyHeader& economyHeader)
+void clearHeader(EconomyHeader& economyHeader)  // ❓ lift helper name, not in any PDB
 {
     economyHeader._fromWid = 0;
     economyHeader._toWid = 0;
     economyHeader._relayTid = 0;
 }
 
-bool notSupported(wchar_t const* funcName, int beginLine)
+bool notSupported(wchar_t const* funcName, int beginLine)  // ❓ lift helper name, not in any PDB
 {
     logBegin(funcName, beginLine);
     Log::Write(Log::LT_ERROR, CEPH_FILE, beginLine + 2, L"[%s], %s; not support packet command", MODULE_NAME, funcName);

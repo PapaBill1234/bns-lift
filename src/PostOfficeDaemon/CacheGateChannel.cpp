@@ -54,7 +54,7 @@ void CacheGateChannel::SetServiceState(ServiceState const newState)
 }
 
 // 0x75a0
-static bool composeRelayHeader(Packet& packet, RelayHeader const& relayHeader)
+bool CacheGateChannel::composeRelayHeader(Packet& packet, RelayHeader const& relayHeader)
 {
     bool const result = packet.Compose("hhhqhq", 4, relayHeader._fromWid, relayHeader._toWid, relayHeader._relayTid,
                                        relayHeader._hint, relayHeader._reserved) != 0;
@@ -72,7 +72,7 @@ static bool composeRelayHeader(Packet& packet, RelayHeader const& relayHeader)
 }
 
 // 0x7670
-static bool composeRelayHeader(FragmentPacket& packet, RelayHeader const& relayHeader)
+bool CacheGateChannel::composeRelayHeader(FragmentPacket& packet, RelayHeader const& relayHeader)
 {
     bool const result = packet.Compose(5, relayHeader._fromWid, relayHeader._toWid, relayHeader._relayTid,
                                        relayHeader._hint, relayHeader._reserved) != 0;
@@ -90,8 +90,8 @@ static bool composeRelayHeader(FragmentPacket& packet, RelayHeader const& relayH
 }
 
 // 0x7410
-static bool combineFragmentRelayFormat(char* const relayFormat, unsigned long long const bufferSize,
-                                       char const* const economyFormat)
+bool CacheGateChannel::combineFragmentRelayFormat(char* const relayFormat, unsigned long long const bufferSize,
+                                                   char const* const economyFormat)
 {
     if (relayFormat == nullptr || economyFormat == nullptr)  // ❓ the second test
     {

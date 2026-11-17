@@ -47,7 +47,7 @@ static void zeroPacket(Packet* packet)
     packet->ListTail = nullptr;
 }
 
-static void setRepeatDecomposer(RepeatPacketDecomposer* rpd, char const* format, int len)
+static void setRepeatDecomposer(RepeatPacketDecomposer* rpd, char const* format, int len)  // ❓ lift helper name, not in any PDB
 {
     rpd->format = format;
     rpd->len = len;
