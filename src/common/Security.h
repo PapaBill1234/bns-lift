@@ -25,15 +25,15 @@ public:
     virtual ErrCode SetExternalCompressFunc(ExternalCompressFunc func, unsigned char const* data, int size);      // 0x4DF40
     virtual ~BroadcastPacketCrypt();                                                        // 0x4DBB0
 
-    Crypto* _crypto;               // ❓ +0x8
-    Param _param;                       // ❓ +0x10
-    bool _keySet;                       // ❓ +0x14
-    char _compressType;                 // ❓ +0x15, 1 = compress2, 2 = _compressFunc
-    unsigned char _buffer[0x2818 - 0x16];  // ❓ +0x16, compress output
-    int _bufferSize;                    // ❓ +0x2818
-    ExternalCompressFunc _compressFunc;  // ❓ +0x2820
-    unsigned char* _dict;               // ❓ +0x2828
-    int _dictSize;                      // ❓ +0x2830
+    Crypto* _crypto;               // LIFT: +0x8, Encrypt calls [rdi+8] vtable (LobbyGate 0x4de4a); dtor Crypto::Destroy (0x4dbc7)
+    Param _param;                       // LIFT: +0x10, SetEncryptParam writes it (LobbyGate 0x4dc15)
+    bool _keySet;                       // LIFT: +0x14, Encrypt returns 3 when 0 (LobbyGate 0x4dd7c)
+    char _compressType;                 // LIFT: +0x15, 1 = compress2, 2 = _compressFunc (LobbyGate 0x4ddf4)
+    unsigned char _buffer[0x2818 - 0x16];  // LIFT: +0x16, compress output (LobbyGate 0x4de3a)
+    int _bufferSize;                    // LIFT: +0x2818, Encrypt sets 0x2800 (LobbyGate 0x4ddc8)
+    ExternalCompressFunc _compressFunc;  // LIFT: +0x2820, SetExternalCompressFunc (LobbyGate 0x4df77)
+    unsigned char* _dict;               // LIFT: +0x2828, malloc copy (LobbyGate 0x4dfb7)
+    int _dictSize;                      // LIFT: +0x2830, dtor clears it (LobbyGate 0x4dbea)
 };
 static_assert(sizeof(BroadcastPacketCrypt) == 0x2838, "sizeof BroadcastPacketCrypt");
 static_assert(offsetof(BroadcastPacketCrypt, _bufferSize) == 0x2818, "BroadcastPacketCrypt::_bufferSize");
