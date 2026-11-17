@@ -42,6 +42,15 @@ struct GradeLevelInfo
 };
 static_assert(sizeof(GradeLevelInfo) == 0x14, "sizeof GradeLevelInfo");
 
+// PDB type AccountExpInfo (include/pdb/LobbyGate/types.h).
+struct AccountExpInfo
+{
+    long long exp;
+    int expQuotaPerDay;
+    long long lastUpdateTime;
+};
+static_assert(sizeof(AccountExpInfo) == 0x18, "sizeof AccountExpInfo");
+
 static wchar_t const* const HANDLER_FILE = L"LobbyDPacketHandler.cpp";
 static wchar_t const* const SESSION_FILE = L"source\\Session.cpp";
 static wchar_t const* const CHANNEL_H_FILE =
@@ -392,9 +401,7 @@ bool HandleLobbyLobbyGate_StartSessionWithNPTokenOk(Session const* session, Pack
     char teen = 0;
     long long closestEndTime = 0;
     int remainJumpingCharacterCreationQuota = 0;
-    long long accountExp = 0;          // ❓ name
-    int accountLevel = 0;              // ❓ name
-    long long accountExpUpdateTime = 0;  // ❓ name
+    AccountExpInfo acountExpInfo = {};  // PDB local name (0xcd00, 0xf230)
     Client* client = nullptr;
     Session const* clientSession = nullptr;
 
@@ -451,7 +458,7 @@ bool HandleLobbyLobbyGate_StartSessionWithNPTokenOk(Session const* session, Pack
                     L"StartSessionWithNPTokenOk, cliKey:0x%I64X", cliKey);
         goto cleanup;
     }
-    if (!pcb->Decompose(3, &accountExp, &accountLevel, &accountExpUpdateTime))
+    if (!pcb->Decompose(3, &acountExpInfo.exp, &acountExpInfo.expQuotaPerDay, &acountExpInfo.lastUpdateTime))
     {
         LD_ERR(622, L"accountExpInfo decompose fail, StartSessionWithNPTokenOk, cliKey:0x%I64X", cliKey);
         goto cleanup;
@@ -515,7 +522,7 @@ bool HandleLobbyLobbyGate_StartSessionWithNPTokenOk(Session const* session, Pack
             if (ok)
             {
                 LobbyDFpReserve(fp, 0x14);
-                if (!fp.Compose(3, accountExp, accountLevel, accountExpUpdateTime))
+                if (!fp.Compose(3, acountExpInfo.exp, acountExpInfo.expQuotaPerDay, acountExpInfo.lastUpdateTime))
                 {
                     LD_ERR(722, L"accountExpInfo compose fail, StartSessionWithNPTokenOk, cliKey:0x%I64X", cliKey);
                     ok = false;
@@ -733,9 +740,7 @@ bool HandleLobbyLobbyGate_StartSessionWithLobbyTokenOk(Session const* session, P
     int gradeCount = 0;
     GradeInfo* gradeList = nullptr;
     int remainJumpingCharacterCreationQuota = 0;
-    long long accountExp = 0;            // ❓ name
-    int accountLevel = 0;                // ❓ name
-    long long accountExpUpdateTime = 0;  // ❓ name
+    AccountExpInfo acountExpInfo = {};  // PDB local name (0xcd00, 0xf230)
     Client* client = nullptr;
     Session const* clientSession = nullptr;
 
@@ -791,7 +796,7 @@ bool HandleLobbyLobbyGate_StartSessionWithLobbyTokenOk(Session const* session, P
                cliKey);
         goto cleanup;
     }
-    if (!pcb->Decompose(3, &accountExp, &accountLevel, &accountExpUpdateTime))
+    if (!pcb->Decompose(3, &acountExpInfo.exp, &acountExpInfo.expQuotaPerDay, &acountExpInfo.lastUpdateTime))
     {
         LD_ERR(1138, L"accountExpInfo decompose fail, StartSessionWithLobbyTokenOk, cliKey:0x%I64X", cliKey);
         goto cleanup;
@@ -855,7 +860,7 @@ bool HandleLobbyLobbyGate_StartSessionWithLobbyTokenOk(Session const* session, P
             if (ok)
             {
                 LobbyDFpReserve(fp, 0x14);
-                if (!fp.Compose(3, accountExp, accountLevel, accountExpUpdateTime))
+                if (!fp.Compose(3, acountExpInfo.exp, acountExpInfo.expQuotaPerDay, acountExpInfo.lastUpdateTime))
                 {
                     LD_ERR(1233, L"accountExpInfo compose fail, StartSessionWithLobbyTokenOk, cliKey:0x%I64X", cliKey);
                     ok = false;
