@@ -12,7 +12,7 @@
 #include <string.h>
 #include <wchar.h>
 
-static wchar_t const PIPE_CONSOLE_FILE[] = L"source\\PipeConsole.cpp";  // ❓ string literal, not a PDB name
+static wchar_t const PIPE_CONSOLE_FILE[] = L"source\\PipeConsole.cpp";  // LIFT: name; LobbyGate wide string at 0x857d8 (Log::Write arg at 0x296d3).
 
 // 0x14810
 wchar_t const* PipeCommandProcess::Name()
@@ -195,7 +195,7 @@ PipeConsole::~PipeConsole()
 // 0x14f10
 bool PipeConsole::init()
 {
-    // ❓ 0x14f10 r8 (threadId) is not set before the StartThread calls. The lift gives nullptr.
+    // 0x29690 (LobbyGate): xor r8d, r8d (threadId = nullptr) before both StartThread calls (0x296b0, 0x296f4).
     if (!initPipe())
         return false;
     if (!Daemon::Instance->threadManager->StartThread(&_commandProcess, nullptr))
@@ -637,7 +637,7 @@ void PipeConsole::SetRunningInfo(wchar_t const* keyString, wchar_t const* valueS
 // 0x25000 (SmartCouponDaemon)
 void PipeConsole::SetDetectFrozenThread(bool detect, int crashCount)
 {
-    // ❓ LTCG removed the arguments. The binary always sets true and 0.
+    // LIFT: LTCG removed the arguments. 0x25000 overwrites edx (0x25035) and r8d (0x2503c) before any read. The binary always sets true and 0.
     (void)detect;
     (void)crashCount;
     ThreadManager* threadManager = Daemon::Instance->threadManager;

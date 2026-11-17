@@ -2,7 +2,7 @@
 // LTCG folded the arguments of the only callers:
 //   Add: callback = Channel::removeSession, ref3 = nullptr.
 //   Release: maxRelease = 0, forceNow = false, all = false.
-// The lift keeps the PDB signatures and writes the general logic.  // ❓
+// The lift keeps the PDB signatures and writes the general logic.  // LIFT: mangled names prove the signatures (LobbyGate ?Add@DelayedRelease@@QEAA_N_JP6AXPEAVRefCntObject@@11@Z111@Z, ?Release@DelayedRelease@@QEAAX_JH_N1@Z).
 #include "DelayedRelease.h"
 #include <windows.h>
 #include <new>

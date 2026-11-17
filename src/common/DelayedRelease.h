@@ -50,7 +50,7 @@ private:
     // 0x22F40 (SmartCouponDaemon)
     static void releaseNode(Node* delHead);
 
-    friend class ReleaseEvent;  // ❓ access for ReleaseEvent::HandleEvent (0x23140)
+    friend class ReleaseEvent;  // LIFT: friend; PDB: Node and releaseNode are private. HandleEvent calls releaseNode (SmartCouponDaemon 0x2314d).
 
 public:
     CriticalSection _lock;
