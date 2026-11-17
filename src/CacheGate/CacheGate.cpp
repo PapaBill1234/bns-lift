@@ -27,8 +27,8 @@ static wchar_t const CACHED_LIST_CONFIG_FILE[] = L"cached-list.config.xml";
 
 CacheGate* CacheGate::_instance = nullptr;
 
-static int const DEFAULT_DUMP_TYPE = 1;       // ❓ name
-static int const DEFAULT_PUBLIC_PORT = 20800;  // ❓ name
+static int const DEFAULT_DUMPTYPE = 1;                 // 0x46314 (CacheGateConfig.obj)
+static int const CACHEGATE_PUBLIC_PORT_VALUE = 20800;  // 0x4611C (CacheGateConfig.obj)
 
 // 0x596c0
 XmlCfgDef const CacheGateConfig::_Def[13] = {
@@ -39,14 +39,14 @@ XmlCfgDef const CacheGateConfig::_Def[13] = {
     {static_cast<unsigned long long>(-1), L"system configuration", 0, 0, nullptr, nullptr},
     {offsetof(CacheGateConfig, _workerThreadCount), L"worker-thread", XmlCfgDef::CFG_INT, 0, nullptr,
      L"0 is system recommend"},
-    {offsetof(CacheGateConfig, _dumpType), L"dump-type", XmlCfgDef::CFG_INT, 0, &DEFAULT_DUMP_TYPE,
+    {offsetof(CacheGateConfig, _dumpType), L"dump-type", XmlCfgDef::CFG_INT, 0, &DEFAULT_DUMPTYPE,
      L"0: no dump, 1: minimal dump(default), 2: full dump"},
     {offsetof(CacheGateConfig, _maxCachedSessionCount), L"max-cached-session-count", XmlCfgDef::CFG_INT, 1, nullptr,
      L"max session count for connect to cached. 0 is system default."},
     {offsetof(CacheGateConfig, _maxPublicSessionCount), L"max-public-session-count", XmlCfgDef::CFG_INT, 1, nullptr,
      L"max session count for public port. 0 is system default."},
     {static_cast<unsigned long long>(-1), L"network configuration", 0, 0, nullptr, nullptr},
-    {offsetof(CacheGateConfig, _publicPort), L"public-port", XmlCfgDef::CFG_INT, 0, &DEFAULT_PUBLIC_PORT,
+    {offsetof(CacheGateConfig, _publicPort), L"public-port", XmlCfgDef::CFG_INT, 0, &CACHEGATE_PUBLIC_PORT_VALUE,
      L"daemon public access port"},
     {static_cast<unsigned long long>(-1), L"economy service configuration", 0, 0, nullptr, nullptr},
     {offsetof(CacheGateConfig, _wid), L"wid", XmlCfgDef::CFG_INT, 0, nullptr, L"cachegate wid"},

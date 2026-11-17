@@ -32,15 +32,16 @@ inline GuidParts const& Parts(id128 const& id)
     return *reinterpret_cast<GuidParts const*>(&id);
 }
 
-JobStateDef const kStateDef[] = {  // ❓ name and contents
-    {0, L"init"},
-    {1, L"event-noti"},
-    {2, L"fin"},
+// 0x60828 (PDB StateDef, EventNotiJob.obj)
+JobStateDef const StateDef[] = {
+    {0, L"INIT"},
+    {1, L"EVENT_NOTI"},
+    {2, L"FIN"},
 };
 }  // namespace
 
 ObjPool EventNotiJob::_pool(1, sizeof(EventNotiJob), L"EventNotiJob");  // 0x52A30 ❓ id argument
-JobDef const EventNotiJob::_def = {1, kStateDef, 2, L"EventNotiJob"};    // ❓ contents
+JobDef const EventNotiJob::_def = {1, StateDef, 2, L"EventNotiJob"};  // 0x83230
 
 // 0x9860
 RefCntPoolObj::~RefCntPoolObj()
