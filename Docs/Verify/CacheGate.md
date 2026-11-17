@@ -4,7 +4,7 @@ Status: PASS. 2026-11-17: the fixes are in `src/`. The patch file and the fixsrc
 Before the fixes, the exe failed at start (0xc0000417 in `XmlReader_sv64.dll`, 0 log lines, no port).
 With the 6 fixes, the lifted exe
 starts, listens on 20800, and the packet log, peer bytes and client replies are the same as the original.
-Only the version string in the log is different (no VERSIONINFO resource).
+2026-11-17 (parity-runtime): `.rc` VERSIONINFO added. The compare gives 0 changed lines in all diffs, also the log.
 
 ## How to run
 | Command | Use |
@@ -64,12 +64,12 @@ Checks with the fixed copy (`CG_LIFTED_EXE=$PWD/build/verify/fixsrc/build/CacheG
 | - (config) | `CacheGateConfig::_Def` rows 2, 7, 10 (section headers): label is in `desc`, `name` = nullptr | `{-1, nullptr, 0, 0, nullptr, L"system configuration"}` (same for network, economy service) | label in `name`, `desc` = nullptr | data RVA 0x596c0; used by `CacheGate::initLog` 0x43f0 → `DaemonConfig::Load` 0xc600. Source: `src/CacheGate/CacheGate.cpp:39,48,51` |
 
 | - (config) | `XmlConfigReader` vtable: `Initialize(XmlCfgDef const*, ...)` is slot 1 | `call [vtbl+8]` | `call [vtbl+0]` (slot 0, the `XmlCfgDef2` overload) → `_wcsicmp(NULL, "root-path")` crash in XmlReader | `DaemonConfig::Load` 0xc600. Source: `src/common/DaemonConfig.h:53-54`. Cause: the MSVC ABI puts overloads of a virtual function in reverse declaration order. Fix: declare the `XmlCfgDef` overload first. |
-| - (cached list) | `_wtoi` argument after `wcsncmp(name, L"cached", 7)` | value of the attribute (original log: `CacheD.cpp,169 [cached list], connect, wid:1, ipAddress:127.0.0.1`) | NULL → `_wtoi(NULL)` → 0xc0000417 | lifted call ret 0x14000262b; source `src/CacheGate/CacheD.cpp:239,243` (`element->Attribute(L"wid")`, `L"economy-port"`); original pseudocode `.scratch/hr/CacheD.c:741,753`. Cause not found yet ❓ |
+| - (cached list) | `_wtoi` argument after `wcsncmp(name, L"cached", 7)` | value of the attribute (original log: `CacheD.cpp,169 [cached list], connect, wid:1, ipAddress:127.0.0.1`) | NULL → `_wtoi(NULL)` → 0xc0000417 | lifted call ret 0x14000262b; source `src/CacheGate/CacheD.cpp:239,243` (`element->Attribute(L"wid")`, `L"economy-port"`); original pseudocode `.scratch/hr/CacheD.c:741,753`. Cause: see the next row. FIXED |
 | - (cached list) | cause of the `_wtoi(NULL)` row above: `XmlElement::Attribute(wchar_t const*)` must be slot 8 (`call [vtbl+64]`, CacheD.c:758) | slot 8 | slot 6 (MSVC reverses overload groups) | `src/common/XmlReader.h`: declare each overload group in reverse (Attribute, ToXmlNode, ToXmlElement, ToXmlTextNode, XmlReader::Read, IsBinary). FIXED in test copy |
 | - (client close) | `Session::EventId` return value | 3 (bytes `b8 03 00 00 00 c3` at 0xded0) | 0 → `[cg], unknown event object id, id: 0` (CacheGate.cpp 267), no `on close`, no session remove | `Session::EventId` 0xded0, `src/common/Session.cpp`. FIXED in test copy |
 | - (refcount) | `RefCntObject` constructor | inlined `_ref = 1; _tag = 10; _history = nullptr` (Session::Session 0xdee0) | no constructor; `_ref` 0, then -1 after the decrement in `Session::Session` → `== CRASH == [ref obj] ... ref:-1, tag:0x0000070a` | `src/common/RefCntObject.h`. FIXED in test copy |
 | - (log) | config dump tag | `[cachegate config]` | `[cacheGate]` | caller `CacheGate.cpp:171` must pass `L"cachegate config"` (LTCG constant in `DaemonConfig::Dump` 0xca10). FIXED in test copy |
-| - (log) | version | `0.0.348.524` | empty | `Daemon::LoadVersion` reads the exe VERSIONINFO resource. The lifted exe has no `.rc`. OPEN |
+| - (log) | version | `0.0.348.524` | empty | `Daemon::LoadVersion` reads the exe VERSIONINFO resource. FIXED: `src/Server/Economy/CacheGate/CacheGate.rc` |
 | - (log) | extra line `[crash-mail], PrintMailInfo` | none | seen in an earlier run | Not seen in the last runs (log.diff 4). Closed ❓ |
 
 All 6 fixes are in `src/` now.
@@ -77,7 +77,7 @@ All other `_Def` rows agree with the original table.
 
 ## Next steps
 1. DONE: all 6 fixes are in `src/` (the `_Def` section rows are in `src/Server/Economy/CacheGate/CacheGate.cpp`).
-2. Add a VERSIONINFO resource (FileVersion 0.0.348.524) to the CacheGate target.
+2. DONE: VERSIONINFO resource (FileVersion 0.0.348.524) in the CacheGate target.
 3. Look for the same patterns in the other servers: overloaded virtuals declared in PDB order,
    `EventId` stubs that return 0 ❓, and classes with inlined base constructors.
 4. Check 7 needs the 381 CacheDaemon (`bns-wine/`). Not run.

@@ -23,3 +23,6 @@ Db.ini
 .scratch/
 build-cov/
 __pycache__/
+
+# Upstream zstd source (vendor/zstd/README.md). Do not commit.
+vendor/zstd/src

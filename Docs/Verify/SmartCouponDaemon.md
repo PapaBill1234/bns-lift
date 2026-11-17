@@ -4,7 +4,7 @@ Status (verify-3, 2026-11-16, `SCD_CERT=sql`): **lifted = original for all packe
 (`build/SmartCouponDaemon.exe` from commit 1013fcb, 368128 B, built by `tools/gate.sh`) passes the DB step, listens
 on 22000 and 32000, sends the same STS `/Sts/Connect` to NP and accepts the manager and daemon clients. 6 of 7 diffs
 have 0 changed lines. The log diff has 4 changed lines: `version:` is empty in `Daemon.cpp,496` and `Daemon.cpp,545`
-(no VERSIONINFO resource in the lifted exe). Check 9 is open (no 381 NP or GameDaemon). Earlier status (verify-2):
+(no VERSIONINFO resource in the lifted exe). 2026-11-17 (parity-runtime): `.rc` VERSIONINFO added. The compare gives 0 changed lines in all diffs, also the log. Check 9 is open (no 381 NP or GameDaemon). Earlier status (verify-2):
 `Network.cpp,175` ASSERT CRASH, fixed by lift-smartcoupondaemon-6 (0x1A8B0).
 
 ## How to run
@@ -80,14 +80,14 @@ Lifted = gate build of 1013fcb (after lift-smartcoupondaemon-6). Verify-2 result
 ## Differences (verify-3, `SCD_CERT=sql`)
 | Packet | Field | Original value | Lifted value | Function address |
 | --- | --- | --- | --- | --- |
-| log | `Daemon.cpp,496` Starting, `version:` | `0.0.348.352` | empty | `Daemon::LoadVersion` 0xBB30 reads the VERSIONINFO resource of the exe. The lifted code is correct. The lifted exe has no VERSIONINFO resource (build fault, not a code fault). Known since round 1 |
+| log | `Daemon.cpp,496` Starting, `version:` | `0.0.348.352` | empty | `Daemon::LoadVersion` 0xBB30 reads the VERSIONINFO resource of the exe. The lifted code is correct. FIXED: `src/Server/SmartCouponDaemon/SmartCouponDaemon.rc` |
 | log | `Daemon.cpp,545` start, `version:` | `0.0.348.352` | empty | same cause (0xBB30) |
 
 Closed in verify-3 (fixed in 1013fcb): `Network.cpp,175` ASSERT CRASH (0x1A8B0), `RefCntObject.h,129 ... tag:0xfa`,
 `CrashHandler.cpp,490` extra line. All verify-2 rows that followed from the ASSERT are closed.
 
 ## Next steps
-1. Build card (not queued, see the verify-3 handoff): add a VERSIONINFO resource to the SmartCouponDaemon target
+1. DONE: add a VERSIONINFO resource to the SmartCouponDaemon target
    (FileVersion 0.0.348.352, same strings as the original exe). Needs a change in `cmake/` or `CMakeLists.txt`.
 2. Check 6 with data: capture a GameDaemon Hello stream (HandleSmartCoupon_HelloReq 0x7DC0, lifted in 1013fcb)
    and give it as `SCD_DAEMON_STREAM`. Do the same for 0x8360 and 0x8E80.

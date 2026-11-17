@@ -332,7 +332,7 @@ bool PostOfficeDaemon::initNetwork()
     void* mem = Memory::_Manager[1]->Alloc(sizeof(CacheGateSessionHandler), kFile, 291);
     SessionHandler* handler = mem ? new (mem) CacheGateSessionHandler() : nullptr;
     _sessionHandler[1] = handler;
-    if (!Network::OpenPort(1, 0, 2, handler, &trustedPacketBufferHandler, 0, true, false, false))  // LIFT: nagle = dl = 0 (0x136ff). The last bool is not set at the call (folded).
+    if (!Network::OpenPort(1, 0, 2, handler, &trustedPacketBufferHandler, 0, true, true, false))  // LIFT: LTCG folded enableRecv to true (0x28AB0). nagle = dl = 0 (0x136ff).
     {
         Log::Write(Log::LT_ERROR, kFile, 294, L"[%s], %s; failed to open cachegate connection port, portId:%u", MODULE_NAME,
                    L"PostOfficeDaemon::initNetwork", 1);
@@ -378,7 +378,7 @@ bool PostOfficeDaemon::initNetwork()
     handler = mem ? new (mem) AgentSessionHandler() : nullptr;
     _sessionHandler[2] = handler;
     if (!Network::OpenPort(2, static_cast<unsigned short>(_config->_agentListenPort), 2, handler,
-                           &trustedPacketBufferHandler, _config->_maxAgentSessionCount, false, false, false))
+                           &trustedPacketBufferHandler, _config->_maxAgentSessionCount, false, true, false))
     {
         Log::Write(Log::LT_ERROR, kFile, 328, L"[%s], %s; failed to open agent listen port, portId:%u, postNumber:%u",
                    MODULE_NAME, L"PostOfficeDaemon::initNetwork", 2, static_cast<unsigned short>(_config->_agentListenPort));
@@ -389,7 +389,7 @@ bool PostOfficeDaemon::initNetwork()
     handler = mem ? new (mem) WorldSessionHandler() : nullptr;
     _sessionHandler[3] = handler;
     if (!Network::OpenPort(3, static_cast<unsigned short>(_config->_worldListenPort), 2, handler,
-                           &trustedPacketBufferHandler, _config->_maxWorldSessionCount, false, false, false))
+                           &trustedPacketBufferHandler, _config->_maxWorldSessionCount, false, true, false))
     {
         Log::Write(Log::LT_ERROR, kFile, 338, L"[%s], %s; failed to open world listen port, portId:%u, postNumber:%u",
                    MODULE_NAME, L"PostOfficeDaemon::initNetwork", 3, static_cast<unsigned short>(_config->_worldListenPort));
@@ -400,7 +400,7 @@ bool PostOfficeDaemon::initNetwork()
     handler = mem ? new (mem) ManagementSessionHandler() : nullptr;
     _sessionHandler[4] = handler;
     if (!Network::OpenPort(4, static_cast<unsigned short>(_config->_managePort), 3, handler, &textPacketBufferHandler,
-                           0, true, true, false))
+                           0, true, true, true))  // 0x13B59: autoOpen = 1, nagle = 1
     {
         Log::Write(Log::LT_ERROR, kFile, 348, L"[%s], %s; failed to open management port, portId:%u, postNumber:%u",
                    MODULE_NAME, L"PostOfficeDaemon::initNetwork", 4, static_cast<unsigned short>(_config->_managePort));

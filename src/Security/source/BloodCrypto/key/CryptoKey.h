@@ -26,7 +26,7 @@ protected:
 public:
     bool _alloc; // LIFT: +8. Dh::Dh writes byte [rcx+8] = 0 (LobbyGate 0x554c0)
 
-private:
+    // LIFT: public. Network::Clear decrements it inline (LobbyGate 0x204cb).
     static long s_initializedCount; // 0x94108
 };
 

@@ -1,0 +1,30 @@
+// VERSIONINFO of the original LobbyGate.exe (Service_348_8349). Daemon::LoadVersion (0xbb30) reads it.
+// The values come from the original resource. Language 0x0412, code page 1200.
+1 VERSIONINFO
+ FILEVERSION 0,0,348,527
+ PRODUCTVERSION 0,0,348,527
+ FILEFLAGSMASK 0x3fL
+ FILEFLAGS 0x0L
+ FILEOS 0x40004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "041204b0"
+        BEGIN
+            VALUE "CompanyName", "NCSoft"
+            VALUE "FileDescription", "Blade & Soul Lobby Gate"
+            VALUE "FileVersion", "0, 0, 348, 527"
+            VALUE "InternalName", "LobbyGate"
+            VALUE "LegalCopyright", "Copyright (C) 2007-2011, Team Bloodlust, NCSoft Corporation. All Rights Reserved."
+            VALUE "OriginalFilename", "LobbyGate.exe"
+            VALUE "ProductName", "Blade & Soul Lobby Gate"
+            VALUE "ProductVersion", "0, 0, 348, 527"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x412, 1200
+    END
+END

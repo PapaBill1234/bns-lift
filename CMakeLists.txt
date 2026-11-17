@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(bns-lift LANGUAGES C CXX)
+project(bns-lift LANGUAGES C CXX RC)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -146,16 +146,21 @@ if(EXISTS ${LIFT_ZSTD_DIR}/lib/zstd.h)
     ${LIFT_ZSTD_DIR}/lib/decompress/*.c)
   add_library(lift_zstd STATIC ${LIFT_ZSTD_SOURCES})
   target_include_directories(lift_zstd PUBLIC ${LIFT_ZSTD_DIR}/lib ${LIFT_ZSTD_DIR}/lib/common)
-  target_compile_definitions(lift_zstd PRIVATE ZSTD_MULTITHREAD=0)
-  target_link_libraries(lift_common PUBLIC lift_zstd)
+  # Do not define ZSTD_MULTITHREAD. zstd tests it with #ifdef, so any value turns multithreading on.
+  set(LIFT_ZSTD_LINK lift_zstd)
+else()
+  # Without vendor/zstd, the exes use src/crt/zstd_stub.c.
+  set(LIFT_ZSTD_LINK lift_zstd_stub)
+  add_library(lift_zstd_stub STATIC src/crt/zstd_stub.c)
 endif()
+target_link_libraries(lift_common PUBLIC ${LIFT_ZSTD_LINK})
 
 # CacheGate server exe. wmain_bridge.c gives the narrow main that crt0.c calls.
 lift_exe(CacheGate
-  SOURCES src/Server/Economy/CacheGate/CacheGate.cpp src/Server/Economy/CacheGate/CacheD.cpp src/Server/Economy/CacheGate/CacheDChannel.cpp
+  SOURCES src/Server/Economy/CacheGate/CacheGate.cpp src/Server/Economy/CacheGate/CacheGate.rc src/Server/Economy/CacheGate/CacheD.cpp src/Server/Economy/CacheGate/CacheDChannel.cpp
           src/Server/Economy/CacheGate/ClientManager.cpp src/Server/Economy/CacheGate/CacheGateSessionHandler.cpp
           src/Server/Economy/CacheGate/CacheGateServerSideHandlerList.cpp src/crt/wmain_bridge.c
-          src/crt/tlssup.c src/crt/new_delete.c src/crt/zstd_stub.c
+          src/crt/tlssup.c src/crt/new_delete.c
   IMPORTS msvcr100 kernel32)
 target_compile_options(CacheGate PRIVATE /GR-)
 target_include_directories(CacheGate BEFORE PRIVATE ${LIFT_STL_INCLUDE})
@@ -243,8 +248,8 @@ target_link_libraries(lift_postofficedaemon PUBLIC lift_common)
 
 # SmartCouponDaemon server exe. LinkStubs.cpp has stub bodies for the modules in the handoff "Not done" list.
 lift_exe(SmartCouponDaemon
-  SOURCES src/Server/SmartCouponDaemon/LinkStubs.cpp src/crt/wmain_bridge.c
-          src/crt/tlssup.c src/crt/new_delete.c src/crt/zstd_stub.c
+  SOURCES src/Server/SmartCouponDaemon/LinkStubs.cpp src/Server/SmartCouponDaemon/SmartCouponDaemon.rc src/crt/wmain_bridge.c
+          src/crt/tlssup.c src/crt/new_delete.c
   IMPORTS msvcr100 kernel32 odbc32 iphlpapi version shlwapi ws2_32)
 target_compile_options(SmartCouponDaemon PRIVATE /GR-)
 target_include_directories(SmartCouponDaemon BEFORE PRIVATE ${LIFT_STL_INCLUDE})
@@ -253,8 +258,7 @@ target_link_libraries(SmartCouponDaemon PRIVATE lift_smartcoupondaemon lift_comm
 
 # LobbyGate server exe. XmlReader_sv64.dll, bsConsole_sv64.dll and dbghelp.dll load at run time (not linked).
 lift_exe(LobbyGate
-  SOURCES src/Server/LobbyGate/LinkStubs.cpp src/crt/wmain_bridge.c src/crt/tlssup.c src/crt/new_delete.c
-          src/crt/zstd_stub.c
+  SOURCES src/Server/LobbyGate/LinkStubs.cpp src/Server/LobbyGate/LobbyGate.rc src/crt/wmain_bridge.c src/crt/tlssup.c src/crt/new_delete.c
   IMPORTS msvcr100 kernel32 user32 advapi32 shell32 ole32 shlwapi version ws2_32 iphlpapi)
 target_compile_options(LobbyGate PRIVATE /GR-)
 target_include_directories(LobbyGate BEFORE PRIVATE ${LIFT_STL_INCLUDE})
@@ -263,15 +267,9 @@ target_link_libraries(LobbyGate PRIVATE lift_lobbygate lift_common ${LIFT_MSVCP1
 
 # PostOfficeDaemon server exe. XmlReader_sv64.dll, bsConsole_sv64.dll and dbghelp.dll load at run time (not linked).
 lift_exe(PostOfficeDaemon
-  SOURCES src/Server/Economy/PostOfficeDaemon/LinkStubs.cpp src/crt/wmain_bridge.c src/crt/tlssup.c src/crt/new_delete.c
+  SOURCES src/Server/Economy/PostOfficeDaemon/LinkStubs.cpp src/Server/Economy/PostOfficeDaemon/PostOfficeDaemon.rc src/crt/wmain_bridge.c src/crt/tlssup.c src/crt/new_delete.c
   IMPORTS msvcr100 kernel32 user32 advapi32 shell32 ole32 odbc32 shlwapi version ws2_32 iphlpapi)
 target_compile_options(PostOfficeDaemon PRIVATE /GR-)
 target_include_directories(PostOfficeDaemon BEFORE PRIVATE ${LIFT_STL_INCLUDE})
 add_dependencies(PostOfficeDaemon lift_msvcp100_implib)
 target_link_libraries(PostOfficeDaemon PRIVATE lift_postofficedaemon lift_common ${LIFT_MSVCP100_IMPLIB})
-# vendor/zstd is optional. Without it, use the zstd stub (as LobbyGate does).
-if(TARGET lift_zstd)
-  target_link_libraries(PostOfficeDaemon PRIVATE lift_zstd)
-else()
-  target_sources(PostOfficeDaemon PRIVATE src/crt/zstd_stub.c)
-endif()

@@ -49,6 +49,8 @@ public:
         BROADCAST_LOCAL = 1,
     };
 
+    // LIFT: Inlined constructor. LobbyGate wmain 0x128B0 sets 36 bytes from 0x780 to 0. This clears crypt, key and size.
+    BroadcastCrypt() : crypt(nullptr), key(nullptr), size(0) {}
     ~BroadcastCrypt();  // 0x22FF0
     bool Initialize(Type type, PacketCrypt::Algorithm algorithm, int broadcastCompressType);  // 0x23000
 

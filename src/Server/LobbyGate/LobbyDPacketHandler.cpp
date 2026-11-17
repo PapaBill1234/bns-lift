@@ -136,8 +136,9 @@ bool HandleLobbyLobbyGate_HelloOk(Session const* session, Packet* packet)
     PcCafeMileageFeverTimeScheduleInfo* scheduleList = nullptr;
 
     pcb->decomposer.SetFormat("hiChhsQQiihhiQQQQQQQ;QQqCqqiQiic;", 2);
-    worldCount = pcb->decomposer.PushRepeatCount(pcb->buffer, pcb->size);
-    worldList = static_cast<WorldInfo*>(LD_ALLOCZERO(68 * worldCount, 89));
+    worldCount = pcb->decomposer.PushRepeatCount(&pcb->buffer[pcb->decomposer.offset], pcb->size - pcb->decomposer.offset);
+    if (worldCount > 0)
+        worldList = static_cast<WorldInfo*>(LD_ALLOCZERO(68 * worldCount, 89));
     for (int i = 0; i < worldCount; ++i)
     {
         WorldInfo& w = worldList[i];
@@ -162,9 +163,10 @@ bool HandleLobbyLobbyGate_HelloOk(Session const* session, Packet* packet)
         goto fail;
     }
 
-    scheduleCount = pcb->decomposer.PushRepeatCount(pcb->buffer, pcb->size);
-    scheduleList = static_cast<PcCafeMileageFeverTimeScheduleInfo*>(
-        LD_ALLOCZERO(sizeof(PcCafeMileageFeverTimeScheduleInfo) * scheduleCount, 130));
+    scheduleCount = pcb->decomposer.PushRepeatCount(&pcb->buffer[pcb->decomposer.offset], pcb->size - pcb->decomposer.offset);
+    if (scheduleCount > 0)
+        scheduleList = static_cast<PcCafeMileageFeverTimeScheduleInfo*>(
+            LD_ALLOCZERO(sizeof(PcCafeMileageFeverTimeScheduleInfo) * scheduleCount, 130));
     for (int i = 0; i < scheduleCount; ++i)
     {
         PcCafeMileageFeverTimeScheduleInfo& s = scheduleList[i];
@@ -190,7 +192,7 @@ bool HandleLobbyLobbyGate_HelloOk(Session const* session, Packet* packet)
         LD_FREE(worldList, 160);
     }
     if (!gate->_pcCafeMileageFeverTimeScheduleListManager->SetPcCafeMileageFeverTimeScheduleList(
-            enablePcCafeMileage != 0, enablePcCafeMileageDeposit != 0, pcCafeMileageSeasonExpireTime, scheduleList,
+            enablePcCafeMileage == 1, enablePcCafeMileageDeposit == 1, pcCafeMileageSeasonExpireTime, scheduleList,
             scheduleCount))
     {
         LD_ERR(170, L"set pc-cafe-mileage-fever-time-schedule-list fail, ");
@@ -234,7 +236,7 @@ bool HandleLobbyLobbyGate_UpdateWorldInfoListNotify(Session const* session, Pack
     long long chId = static_cast<long long>(ch->GetId());
 
     pcb->decomposer.SetFormat("hiChhsQQiihhiQQQQQQQ;", 2);
-    int worldCount = pcb->decomposer.PushRepeatCount(pcb->buffer, pcb->size);
+    int worldCount = pcb->decomposer.PushRepeatCount(&pcb->buffer[pcb->decomposer.offset], pcb->size - pcb->decomposer.offset);
     WorldInfo* worldList = static_cast<WorldInfo*>(LD_ALLOCZERO(68 * worldCount, 260));
     for (int i = 0; i < worldCount; ++i)
     {
@@ -428,7 +430,7 @@ bool HandleLobbyLobbyGate_StartSessionWithNPTokenOk(Session const* session, Pack
     }
     LD_DBG(555, L"recv ok, " SSNP_TEXT, SSNP_ARGS);
 
-    gradeLevelCount = pcb->decomposer.PushRepeatCount(pcb->buffer, pcb->size);
+    gradeLevelCount = pcb->decomposer.PushRepeatCount(&pcb->buffer[pcb->decomposer.offset], pcb->size - pcb->decomposer.offset);
     if (gradeLevelCount > 0)
         gradeLevelList = static_cast<GradeLevelInfo*>(LD_ALLOCZERO(sizeof(GradeLevelInfo) * gradeLevelCount, 561));
     for (int i = 0; i < gradeLevelCount; ++i)
@@ -447,7 +449,7 @@ bool HandleLobbyLobbyGate_StartSessionWithNPTokenOk(Session const* session, Pack
     }
     pcb->decomposer.PopRepeatCount();
 
-    gradeCount = pcb->decomposer.PushRepeatCount(pcb->buffer, pcb->size);
+    gradeCount = pcb->decomposer.PushRepeatCount(&pcb->buffer[pcb->decomposer.offset], pcb->size - pcb->decomposer.offset);
     if (gradeCount > 0)
         gradeList = static_cast<GradeInfo*>(LD_ALLOCZERO(sizeof(GradeInfo) * gradeCount, 590));
     for (int i = 0; i < gradeCount; ++i)
@@ -779,7 +781,7 @@ bool HandleLobbyLobbyGate_StartSessionWithLobbyTokenOk(Session const* session, P
     LD_DBG(1070, L"recv ok, StartSessionWithLobbyTokenOk, cliKey:0x%I64X, remainJumpingCharacterCreationQuota:%d",
            cliKey, remainJumpingCharacterCreationQuota);
 
-    gradeLevelCount = pcb->decomposer.PushRepeatCount(pcb->buffer, pcb->size);
+    gradeLevelCount = pcb->decomposer.PushRepeatCount(&pcb->buffer[pcb->decomposer.offset], pcb->size - pcb->decomposer.offset);
     if (gradeLevelCount > 0)
         gradeLevelList = static_cast<GradeLevelInfo*>(LD_ALLOCZERO(sizeof(GradeLevelInfo) * gradeLevelCount, 1076));
     for (int i = 0; i < gradeLevelCount; ++i)
@@ -804,7 +806,7 @@ bool HandleLobbyLobbyGate_StartSessionWithLobbyTokenOk(Session const* session, P
     }
     pcb->decomposer.PopRepeatCount();
 
-    gradeCount = pcb->decomposer.PushRepeatCount(pcb->buffer, pcb->size);
+    gradeCount = pcb->decomposer.PushRepeatCount(&pcb->buffer[pcb->decomposer.offset], pcb->size - pcb->decomposer.offset);
     if (gradeCount > 0)
         gradeList = static_cast<GradeInfo*>(LD_ALLOCZERO(sizeof(GradeInfo) * gradeCount, 1105));
     for (int i = 0; i < gradeCount; ++i)
@@ -1146,7 +1148,7 @@ bool HandleLobbyLobbyGate_GetCharacterInfoListOk(Session const* session, Packet*
         LobbyDHandlerRelease(ch);
         return false;
     }
-    characterCount = pcb->decomposer.PushRepeatCount(pcb->buffer, pcb->size);
+    characterCount = pcb->decomposer.PushRepeatCount(&pcb->buffer[pcb->decomposer.offset], pcb->size - pcb->decomposer.offset);
     if (characterCount > 0)
     {
         characterList = static_cast<CharacterInfo*>(LD_ALLOCZERO(sizeof(CharacterInfo) * characterCount, 1561));
@@ -1239,7 +1241,7 @@ bool HandleLobbyLobbyGate_ListGoodsOk(Session const* session, Packet* packet)
         LobbyDHandlerRelease(ch);
         return true;
     }
-    goodsCount = pcb->decomposer.PushRepeatCount(pcb->buffer, pcb->size);
+    goodsCount = pcb->decomposer.PushRepeatCount(&pcb->buffer[pcb->decomposer.offset], pcb->size - pcb->decomposer.offset);
     if (goodsCount > 0)
         goodsList = static_cast<Goods*>(LD_ALLOCZERO(sizeof(Goods) * goodsCount, 1702));
     for (int i = 0; i < goodsCount; ++i)
@@ -1297,7 +1299,7 @@ bool HandleLobbyLobbyGate_TakeGoodsOk(Session const* session, Packet* packet)
         LobbyDHandlerRelease(ch);
         return true;
     }
-    itemCount = pcb->decomposer.PushRepeatCount(pcb->buffer, pcb->size);
+    itemCount = pcb->decomposer.PushRepeatCount(&pcb->buffer[pcb->decomposer.offset], pcb->size - pcb->decomposer.offset);
     if (itemCount > 0)
         itemList = static_cast<LobbyServiceItem*>(LD_ALLOCZERO(sizeof(LobbyServiceItem) * itemCount, 1811));
     for (int i = 0; i < itemCount; ++i)
@@ -1357,7 +1359,7 @@ bool HandleLobbyLobbyGate_ListLobbyServiceItemInfoOk(Session const* session, Pac
         LobbyDHandlerRelease(ch);
         return true;
     }
-    itemCount = pcb->decomposer.PushRepeatCount(pcb->buffer, pcb->size);
+    itemCount = pcb->decomposer.PushRepeatCount(&pcb->buffer[pcb->decomposer.offset], pcb->size - pcb->decomposer.offset);
     if (itemCount > 0)
         itemList = static_cast<LobbyServiceItem*>(LD_ALLOCZERO(sizeof(LobbyServiceItem) * itemCount, 1921));
     for (int i = 0; i < itemCount; ++i)
@@ -1412,7 +1414,7 @@ bool HandleLobbyLobbyGate_GetServiceEntryListOk(Session const* session, Packet* 
         LobbyDHandlerRelease(ch);
         return true;
     }
-    serviceEntryCount = pcb->decomposer.PushRepeatCount(pcb->buffer, pcb->size);
+    serviceEntryCount = pcb->decomposer.PushRepeatCount(&pcb->buffer[pcb->decomposer.offset], pcb->size - pcb->decomposer.offset);
     if (serviceEntryCount > 0)
         serviceEntryList = static_cast<ServiceEntry*>(LD_ALLOCZERO(sizeof(ServiceEntry) * serviceEntryCount, 2029));
     for (int i = 0; i < serviceEntryCount; ++i)

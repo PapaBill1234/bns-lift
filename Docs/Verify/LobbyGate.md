@@ -1,6 +1,6 @@
 # LobbyGate verify (lift-lobbygate-verify)
 
-Status: PASS. 2026-11-17: the fixes are in `src/`. The patch file and the fixsrc script are removed. The lifted exe gives the same ports, packets and packet log as the original. Only the version string in the log is different (Difference 2). Before the fixes, the lifted exe crashed during start (Differences 1, 5, 6).
+Status: PASS. 2026-11-17: the fixes are in `src/`. The patch file and the fixsrc script are removed. The lifted exe gives the same ports, packets and packet log as the original. Difference 2 is fixed. 2026-11-17 (parity-runtime): `.rc` VERSIONINFO added. The compare gives 0 changed lines in all diffs, also the log. The `HelloOk` alloc guards and the PacketCrypt setup (CryptoKey::Initialize) are fixed too. Before the fixes, the lifted exe crashed during start (Differences 1, 5, 6).
 
 ## How to run
 
@@ -30,7 +30,7 @@ Cert file `E:\Service\cert\Lobbygate.cfg`: placeholder text `keyhere`. initializ
 | # | Check | Original | Lifted | Function address |
 |---|---|---|---|---|
 | 1 | Start | Runs, connects to LobbyDaemon | ACCESS_VIOLATION rip=0 about 1 s after start, before the LobbyD connect | Network::Initialize 0x200D0 |
-| 2 | Log line "Starting" | version 0.0.348.527 | empty version (no VERSIONINFO resource, same as SmartCouponDaemon) | - |
+| 2 | Log line "Starting" | version 0.0.348.527 | FIXED: `src/Server/LobbyGate/LobbyGate.rc` | - |
 | 3 | Start after fix 1 | connects to LobbyDaemon | page fault in Channel::MakeSession (wrong args) | LobbyD::Hello 0x9BD0, Channel::MakeSession 0x21300 |
 | 4 | Log after fixes 1+3 | 6 lines | 7 lines: extra `Connection.cpp,151 test, reconnect` ❓ | Connection::AsyncConnect 0x26FA0 |
 
