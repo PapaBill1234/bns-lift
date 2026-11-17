@@ -180,6 +180,20 @@ target_include_directories(lift_lobbygate BEFORE PRIVATE ${LIFT_STL_INCLUDE})
 target_include_directories(lift_lobbygate PUBLIC ${CMAKE_SOURCE_DIR}/src/LobbyGate)
 target_link_libraries(lift_lobbygate PUBLIC lift_common)
 
+# PostOfficeDaemon lifted modules (static library). Calls to code of later cards stay as declarations.
+add_library(lift_postofficedaemon STATIC
+  src/PostOfficeDaemon/RelayContext.cpp
+  src/PostOfficeDaemon/RelayTimeContext.cpp
+  src/PostOfficeDaemon/RelayTimeoutChecker.cpp
+  src/PostOfficeDaemon/RelayTimeoutEvent.cpp
+  src/PostOfficeDaemon/PingRelay.cpp
+  src/PostOfficeDaemon/PingGenerator.cpp
+  src/PostOfficeDaemon/CachedWatchdog.cpp)
+target_compile_options(lift_postofficedaemon PRIVATE /GR-)
+target_include_directories(lift_postofficedaemon BEFORE PRIVATE ${LIFT_STL_INCLUDE})
+target_include_directories(lift_postofficedaemon PUBLIC ${CMAKE_SOURCE_DIR}/src/PostOfficeDaemon)
+target_link_libraries(lift_postofficedaemon PUBLIC lift_common)
+
 # SmartCouponDaemon server exe. LinkStubs.cpp has stub bodies for the modules in the handoff "Not done" list.
 lift_exe(SmartCouponDaemon
   SOURCES src/SmartCouponDaemon/LinkStubs.cpp src/crt/wmain_bridge.c

@@ -35,6 +35,20 @@ inline CriticalSection::~CriticalSection()
     DeleteCriticalSection(&CS);
 }
 
+// PDB: AutoCS (PostOfficeDaemon). The ctor is inline. Leave (0x3c90) and the dtor (0x3c80)
+// have their bodies in src/PostOfficeDaemon/RelayContext.cpp (❓ module: COMDAT, no own .obj).
+class AutoCS
+{
+public:
+    explicit AutoCS(CriticalSection* cs);  // ❓ inlined; asserts at Lock.h line 113
+    ~AutoCS();                             // 0x3c80
+    void Leave();                          // 0x3c90
+
+    CriticalSection* CS;
+    unsigned int EnterCount;
+};
+static_assert(sizeof(AutoCS) == 0x10, "sizeof AutoCS");
+
 class SystemEvent
 {
 public:

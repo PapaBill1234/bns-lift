@@ -98,6 +98,10 @@ public:
     friend class LobbyGate;                           // ❓ access for LobbyGate (LobbyGate.obj)
     friend class LobbyGateCooldownTimer;              // ❓ access for 0x13bf0 (LobbyGate)
     friend class LobbyGateReloadInvalidRestoreTimer;  // ❓ access for 0x127a0 (LobbyGate)
+    friend class PingGenerator;          // ❓ access for 0x4d70 (PostOfficeDaemon)
+    friend class CachedWatchdog;         // ❓ access for 0x3dc0 (PostOfficeDaemon)
+    friend class CachedWatchdogManager;  // ❓ access (PostOfficeDaemon)
+    friend class RelayTimeoutChecker;    // ❓ access for 0x1d700 (PostOfficeDaemon)
 };
 static_assert(sizeof(TimerQueue) == 0x78, "sizeof TimerQueue");
 static_assert(offsetof(TimerQueue, StqSlot) == 0x40, "TimerQueue::StqSlot");
