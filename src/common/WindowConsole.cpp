@@ -185,7 +185,8 @@ bool WindowConsole::Open()
     void* memory = BaseMemoryManager::_Instance.Alloc(sizeof(WinMsgHandler), WINDOW_CONSOLE_FILE, 157);
     WinMsgHandler* handler = (memory != nullptr) ? new (memory) WinMsgHandler(this) : nullptr;
     _messageHandler = handler;
-    // ❓ 0x17090 r8 (threadId) is not set before StartThread. The lift gives nullptr.
+    // LIFT: LTCG folded threadId. The call (0x17325) sets no r8. StartThread (0x12E40) writes r8
+    // at 0x12E5F before it reads it.
     Daemon::Instance->threadManager->StartThread(handler, nullptr);
     _messageHandler->WaitInit();
     FreeConsole();

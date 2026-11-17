@@ -65,7 +65,7 @@ protected:
     virtual void releaseSession(Session* session) = 0;                           // slot 8
     virtual bool onAccept(Session const* session) = 0;                           // slot 9
     virtual bool onConnect(Session const* session, bool firstConnected) = 0;     // slot 10
-    virtual void onClose(Session const* session, bool tryReconnect, bool allClosed) = 0;  // slot 11 (❓ allClosed)
+    virtual void onClose(Session const* session, bool tryReconnect, bool closeAll) = 0;  // slot 11 (PDB CacheDChannel::onClose: closeAll)
 
 public:
     // The const methods change the count. The PDB type is int.

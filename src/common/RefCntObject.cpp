@@ -14,7 +14,8 @@
     L"e:\\dailybuild02\\cachegate-common-0.0.348\\depot\\branch\\348nc\\program\\server\\bloodlib\\include\\RefCntObject.h"
 
 // 0x20f0
-// ❓ The code reads arg 1 (ptr) as the file text and arg 2 (file) as the line number.
+// BUG: 0x20f0 the format gets ptr for %s and the low 32 bits of file for %d (0x20FA, 0x2103).
+// The caller 0x3A93D passes rcx = ptr, rdx = file, r8 = line. The code does not read line.
 void RefCntObject::operator delete(void* ptr, wchar_t const* file, int line)
 {
     wchar_t const* argFile = static_cast<wchar_t const*>(ptr);
