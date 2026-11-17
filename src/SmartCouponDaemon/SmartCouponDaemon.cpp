@@ -39,8 +39,8 @@
 static wchar_t const* const kFile = L"SmartCouponDaemon.cpp";
 
 SmartCouponDaemon* SmartCouponDaemon::_instance = nullptr;
-SmartCouponObjPoolMemoryAllocator* GObjPoolMemAlloc = nullptr;  // ❓ name and type
-ObjPoolTimer* GObjPoolTimer = nullptr;                          // ❓ name and type
+SmartCouponObjPoolMemoryAllocator* GObjPoolMemAlloc = nullptr;  // rva 0x84B18
+ObjPoolTimer* GObjPoolTimer = nullptr;                          // rva 0x84B20
 static volatile long long _seed__ = 0;                          // ❓ GenerateJobid counter
 
 // Default values of SmartCouponConfig::_Def. ❓ The names come from the export script.
@@ -307,8 +307,7 @@ bool SmartCouponDaemon::initialize()
         EventNotiJob* tmp = new (tmpStorage) EventNotiJob();
         EventNotiJob::_pool.Initialize(*reinterpret_cast<void**>(tmp), _config->_initJobCount,
                                        _config->_reuseWaitTime);
-        ObjPool* pool = &EventNotiJob::_pool;  // ❓ Add takes ObjPool**
-        GObjPoolTimer->Add(&pool);
+        GObjPoolTimer->Add(&EventNotiJob::_pool);
     }
 
     mem = Memory::_Manager[2]->Alloc(sizeof(JobManager), kFile, 261);
@@ -411,7 +410,7 @@ bool SmartCouponDaemon::initNetwork()
 // 0x159e0
 bool SmartCouponDaemon::onStart()
 {
-    ObjPoolTimer::Start(1000);  // ❓ resolution
+    ObjPoolTimer::Start(1000);  // LTCG put 1000 in the body of 0x1940
     if (_config->_npEnabled && !startNPChannel())
     {
         Log::Write(Log::LT_ERROR, kFile, 407, L"[scd], start np fail");
@@ -573,7 +572,7 @@ bool SmartCouponDaemon::startNPChannel()
         Log::Write(Log::LT_ERROR, kFile, 570, L"start np channel fail; np channel manager is null");
         return false;
     }
-    if (!_npChannelMgr->Initialize(_config->_npAddress, static_cast<unsigned short>(_config->_npPort)))
+    if (!_npChannelMgr->Initialize(1, _config->_npAddress, static_cast<unsigned short>(_config->_npPort), 5))
     {
         Log::Write(Log::LT_ERROR, kFile, 575,
                    L"[scd], start np channel fail; initialize np service channel manager fail");

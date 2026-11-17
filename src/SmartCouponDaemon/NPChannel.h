@@ -2,6 +2,8 @@
 // Layouts from include/pdb/SmartCouponDaemon/types.h.
 #pragma once
 #include <stddef.h>
+
+struct HINSTANCE__;
 #include <map>
 #include <vector>
 #include "SharedChannel.h"
@@ -138,7 +140,7 @@ struct _StsMsgResponseRewardBrokerEventNoti : public _StsMsgResponse
 static_assert(sizeof(_StsMsgResponseRewardBrokerEventNoti) == 0x68, "sizeof _StsMsgResponseRewardBrokerEventNoti");
 }  // namespace StsMsgLib
 
-bool STSMSGLIB_CHECK_DLL_VERSION();  // 0x4350 ❓ arguments
+bool STSMSGLIB_CHECK_DLL_VERSION(HINSTANCE__* module);  // 0x4350
 
 class NPMessageHandler
 {
@@ -177,9 +179,9 @@ public:
     virtual unsigned long long TimerId() const;                     // 0x4480
     virtual bool HandleEvent(EventContext* ctx, unsigned long);     // 0x4490
 
-    static unsigned int _class;        // ❓ type
-    static unsigned long long _id;     // ❓ type
-    static int _interval;              // ❓ type
+    static unsigned int _class;        // rva 0x84AC0
+    static unsigned long long _id;     // rva 0x84AC8
+    static long _interval;             // rva 0x84AC4
 
     NPChannel* _owner;
     bool _run;
@@ -214,7 +216,7 @@ class NPTransaction
 {
 public:
     virtual ~NPTransaction() {}
-    virtual int GetKind() const = 0;  // ❓ return type
+    virtual int GetKind() const = 0;
     virtual void Expire() = 0;
 };
 
@@ -223,7 +225,7 @@ class NPJobTransaction : public NPTransaction
 public:
     NPJobTransaction() : _jobid(0), _state(-1), _task(0) {}  // ❓ inlined in SendRequestEventNoti (0xFF10)
     virtual ~NPJobTransaction() {}
-    virtual int GetKind() const { return 1; }  // ❓ value
+    virtual int GetKind() const { return 1; }  // 0x231F0
     virtual void Expire();                     // 0xFE70
 
     unsigned long long _jobid;
@@ -251,7 +253,7 @@ public:
     static bool checkLibError(StsMsgLib::EStsMsgError err);                // 0x5D50
 
     static NPSessionHandler* _sessionHandler;
-    static void* _module;  // ❓ HMODULE
+    static HINSTANCE__* _module;
     static int _programId;
     static wchar_t _gameCode[9];
     static StsMsgLib::IStsMsg* (*_stsCreate)();
@@ -306,7 +308,7 @@ public:
     virtual bool OnClose(NPChannel*, bool) const;                                    // 0x10560
     virtual bool HandleMessage(NPChannel*, StsMsgLib::_StsMsg*, void*) const;        // 0x10700
 
-    bool Initialize(unsigned long ip, unsigned short port);  // 0x10340 ❓ arguments
+    bool Initialize(unsigned int portId, unsigned long ip, unsigned short portNo, long timeout);  // 0x10340
 
     bool _init;
     NPServiceChannel* _npServChannel;

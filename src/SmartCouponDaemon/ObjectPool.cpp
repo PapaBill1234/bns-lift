@@ -193,7 +193,7 @@ bool ObjPoolTimer::HandleEvent(EventContext*, unsigned long)
 }
 
 // 0x1940
-bool ObjPoolTimer::Start(int resolution)
+bool ObjPoolTimer::Start(long resolution)
 {
     (void)resolution;  // ❓ LTCG put 1000 in the body.
     ObjPoolTimer* timer = GObjPoolTimer;
@@ -211,11 +211,11 @@ bool ObjPoolTimer::Start(int resolution)
 }
 
 // 0x19F0
-bool ObjPoolTimer::Add(ObjPool** listener)
+bool ObjPoolTimer::Add(ObjPool* listener)
 {
     // ❓ LTCG uses GObjPoolTimer and not `this`.
-    GObjPoolTimer->_listeners.push_back(*listener);
-    Log::Write(Log::LT_NOTICE, kObjPoolFile, 410, L"[objpool], objpool added to timer, id:%I64d", (*listener)->_id);
+    GObjPoolTimer->_listeners.push_back(listener);
+    Log::Write(Log::LT_NOTICE, kObjPoolFile, 410, L"[objpool], objpool added to timer, id:%I64d", listener->_id);
     return true;
 }
 

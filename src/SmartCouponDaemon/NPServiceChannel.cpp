@@ -164,7 +164,7 @@ bool NPMsgHandleEvent::HandleEvent(EventContext*, unsigned long)
 }
 
 // 0x10340
-bool NPServiceChannelManager::Initialize(unsigned long ip, unsigned short port)
+bool NPServiceChannelManager::Initialize(unsigned int portId, unsigned long ip, unsigned short portNo, long timeout)
 {
     if (_init)
     {
@@ -180,15 +180,15 @@ bool NPServiceChannelManager::Initialize(unsigned long ip, unsigned short port)
                    L"[npchmgr], initialize fail; init game-service channel fail");
         return false;
     }
-    if (!_npServChannel->Connect(0, 1, ip, port, 5, true))
+    if (!_npServChannel->Connect(0, portId, ip, portNo, timeout, true))
     {
         Log::Write(Log::LT_ERROR, NPSERVICECHANNEL_FILE, 209,
                    L"[npchmgr], initialize fail; connect game service channel fail");
         return false;
     }
     Log::Write(Log::LT_DEBUG, NPSERVICECHANNEL_FILE, 213,
-               L"[npchmgr], initialize ok, port-id:%d, ip:%s, port:%d, timeout:%d(sec)", 1,
-               Network::GetAddressStringW(ip), port, 5);
+               L"[npchmgr], initialize ok, port-id:%d, ip:%s, port:%d, timeout:%d(sec)", portId,
+               Network::GetAddressStringW(ip), portNo, timeout);
     return true;
 }
 
