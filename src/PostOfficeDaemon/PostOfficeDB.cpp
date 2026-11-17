@@ -98,7 +98,7 @@ PostContext* MakePostContext(PostInfo const& postInfo, AttachedItemInfo* items,
     if (postContext->_attachedItemCount > 0)
     {
         int const count = postContext->_attachedItemCount;
-        // ❓ new AttachedItemContext[count]. The +8 is the array count slot, but the code uses the raw pointer.
+        // 0x15c85-0x15cc0 (one inlined copy): Alloc(count * 0x828 + 8). The code stores no count and uses the raw pointer.
         AttachedItemContext* list = static_cast<AttachedItemContext*>(Memory::_Manager[2]->Alloc(
             sizeof(AttachedItemContext) * static_cast<long long>(count) + 8, POSTOFFICEDB_FILE, itemLine));
         if (list != nullptr)

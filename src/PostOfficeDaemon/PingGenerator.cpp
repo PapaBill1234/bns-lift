@@ -33,7 +33,7 @@ unsigned short const PingRelayContext::GetRequestWid() const
 // LIFT: folded (ICF) with 0x34c40
 bool PingRelayContext::ComposeRequestPacket(FragmentPacket&) const
 {
-    return true;  // ❓ value
+    return true;  // 0x34c40 (ICF): mov al,1; ret.
 }
 
 // LIFT: folded (ICF) with 0x34c40

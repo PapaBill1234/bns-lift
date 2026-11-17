@@ -13,7 +13,7 @@ class Packet;
 class RetrieveCharacterInfoRelayRequest : public RelayRequest
 {
 public:
-    RetrieveCharacterInfoRelayRequest() : _gameTid(0), _requestWid(0), _targetWid(0)  // ❓ body
+    RetrieveCharacterInfoRelayRequest() : _gameTid(0), _requestWid(0), _targetWid(0)  // inlined at 0x1fe48-0x1fe64: vtable, 0, 0, memset 0x42
     {
         for (int i = 0; i < 33; ++i)
             _targetCharacterName[i] = 0;
@@ -34,7 +34,7 @@ class RetrieveCharacterInfoRelayResponse : public RelayResponse
 public:
     // PDB ctor (ResultState, short const) with default arguments. 0x57f0 stores (1, 0).
     RetrieveCharacterInfoRelayResponse(ResultState resultState = RESULTSTATE_SUCCESS, short const failReason = 0)
-        : RelayResponse(resultState, failReason), _resultPcId(0) {}  // ❓ _resultPcId value
+        : RelayResponse(resultState, failReason), _resultPcId(0) {}  // inlined at 0x5853-0x5874: +8 = 1, +0xC = 0, +0x10 = 0
     virtual ~RetrieveCharacterInfoRelayResponse() {}
 
     long long _resultPcId;
@@ -73,7 +73,7 @@ static_assert(offsetof(RetrieveCharacterInfoRelayContext, _response) == 0xB8, "_
 class CheckPostCapacityRelayRequest : public RelayRequest
 {
 public:
-    CheckPostCapacityRelayRequest() : _gameTid(0), _requestWid(0), _targetWid(0), _targetPcId(0) {}  // ❓ body
+    CheckPostCapacityRelayRequest() : _gameTid(0), _requestWid(0), _targetWid(0), _targetPcId(0) {}  // inlined at 0x202bd-0x202cf: vtable, 0, 0, 0
     virtual ~CheckPostCapacityRelayRequest() {}
 
     unsigned long long _gameTid;

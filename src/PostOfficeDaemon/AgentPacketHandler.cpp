@@ -54,7 +54,7 @@ bool HandlePostOfficeHelloReq(Session const* session, Packet const* packet)
                static_cast<unsigned int>(agentWid), static_cast<int>(connectionType));
     if (connectionType != 0)
     {
-        // ❓ The source has a switch here. The case for connection type 1 only writes this log.
+        // 0x1a829-0x1a896: type 1 writes line 80 (0x50), other types write line 65 (0x41). Both give failReason 4.
         if (connectionType == 1)
             Log::Write(Log::LT_ERROR, AGENT_PACKET_HANDLER_FILE, 80,
                        L"[%s], %s; invalid connection type, agentWid:%u, connectionType:%d", MODULE_NAME,
@@ -101,7 +101,7 @@ $_ERROR:
     return false;
 }
 
-// The item log format of HandlePostOfficeRegisterPostReq. ❓ The source writes the text in each Log::Write call.
+// The item log format of HandlePostOfficeRegisterPostReq. LIFT: the binary has one full literal per Log::Write call.
 #define ITEM_LOG_ARGS L", tid:0x%I64X, invoiceId:0x%I64X, itemNo:%d, itemType:%d, itemCategory:%d, itemInstanceId:0x%I64X, itemDataId:%d, itemLevel:%d, itemAmount:%I64d, itemXmlData:%s"
 #define POST_LOG_ARGS L", tid:0x%I64X, invoiceId:0x%I64X, postType:%d, deliveryReason:%d, postHint:0x%I64X, reservedHint:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X, senderServiceType:%d, senderWid:%d, senderPcId:0x%I64X, senderAccountId:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X, senderWorldName:%s, senderName:%s, recipientWid:%d, recipientPcId:0x%I64X, recipientName:%s, postTitle:%s, postMessage:%s"
 
@@ -211,7 +211,7 @@ bool HandlePostOfficeRegisterPostReq(Session const* session, Packet const* packe
     }
     if (attachedItemCount > 0)
     {
-        // ❓ new AttachedItemContext[count]. The +8 is the array count slot, but the code uses the raw pointer.
+        // 0x1aead-0x1aec6: Alloc(count * 0x828 + 8). The code stores no count and uses the raw pointer.
         attachedItemList = static_cast<AttachedItemContext*>(Memory::_Manager[2]->Alloc(
             sizeof(AttachedItemContext) * static_cast<long long>(attachedItemCount) + 8, AGENT_PACKET_HANDLER_FILE,
             214));

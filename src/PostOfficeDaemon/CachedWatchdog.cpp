@@ -240,13 +240,13 @@ void CachedWatchdogManager::SetAllServiceState(CachedWatchdog::ServiceState cons
         {
             CachedWatchdog* const cachedWatchdog = _containerList[bucketIndex][worldIndex];
             if (cachedWatchdog != nullptr)
-                cachedWatchdog->setServiceState(newState);  // ❓ the binary has UNAVAILABLE as a constant here
+                cachedWatchdog->setServiceState(newState);  // LTCG: the only caller (0x7cae) passes UNAVAILABLE; 0x4a78 r12d = 0
         }
     }
 
     Log::Write(Log::LT_NOTICE, CACHED_WATCHDOG_FILE, 256, L"[%s], %s; [all] current cached service state:%s",
                MODULE_NAME, L"CachedWatchdogManager::SetAllServiceState",
-               newState == CachedWatchdog::SERVICE_STATE_AVAILABLE ? L"available" : L"unavailable");  // ❓ the binary has "unavailable"
+               newState == CachedWatchdog::SERVICE_STATE_AVAILABLE ? L"available" : L"unavailable");  // LTCG: 0x4a7b r13 = L"unavailable" (constant)
 }
 
 // 0x4b60
