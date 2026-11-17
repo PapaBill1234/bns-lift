@@ -437,15 +437,15 @@ bool Network::initializeSocketInterface()
         Log::Write(NETWORK_FILE, 402, WSAGetLastError(), L"WSASocket()");
         return false;
     }
-    int line = 0;
     if (AcceptExFunc == nullptr)
     {
         GUID guidAcceptEx = WSAID_ACCEPTEX;
         if (WSAIoctl(sock, SIO_GET_EXTENSION_FUNCTION_POINTER, &guidAcceptEx, sizeof(guidAcceptEx), &AcceptExFunc,
                      sizeof(AcceptExFunc), &bytes, nullptr, nullptr) == SOCKET_ERROR)
         {
-            line = 413;
-            goto failed;
+            Log::Write(NETWORK_FILE, 413, WSAGetLastError(), L"WSAIoctl()");
+            closesocket(sock);
+            return false;
         }
     }
     if (AcceptSockAddrsFunc == nullptr)
@@ -455,8 +455,9 @@ bool Network::initializeSocketInterface()
                      sizeof(guidGetAcceptExSockAddrs), &AcceptSockAddrsFunc, sizeof(AcceptSockAddrsFunc), &bytes,
                      nullptr, nullptr) == SOCKET_ERROR)
         {
-            line = 426;
-            goto failed;
+            Log::Write(NETWORK_FILE, 426, WSAGetLastError(), L"WSAIoctl()");
+            closesocket(sock);
+            return false;
         }
     }
     if (ConnectExFunc == nullptr)
@@ -465,8 +466,9 @@ bool Network::initializeSocketInterface()
         if (WSAIoctl(sock, SIO_GET_EXTENSION_FUNCTION_POINTER, &guidConnectEx, sizeof(guidConnectEx), &ConnectExFunc,
                      sizeof(ConnectExFunc), &bytes, nullptr, nullptr) == SOCKET_ERROR)
         {
-            line = 439;
-            goto failed;
+            Log::Write(NETWORK_FILE, 439, WSAGetLastError(), L"WSAIoctl()");
+            closesocket(sock);
+            return false;
         }
     }
     if (DisconnectExFunc == nullptr)
@@ -475,15 +477,11 @@ bool Network::initializeSocketInterface()
         if (WSAIoctl(sock, SIO_GET_EXTENSION_FUNCTION_POINTER, &guidDiconnectEx, sizeof(guidDiconnectEx),
                      &DisconnectExFunc, sizeof(DisconnectExFunc), &bytes, nullptr, nullptr) == SOCKET_ERROR)
         {
-            line = 452;
-            goto failed;
+            Log::Write(NETWORK_FILE, 452, WSAGetLastError(), L"WSAIoctl()");
+            closesocket(sock);
+            return false;
         }
     }
     closesocket(sock);
     return true;
-
-failed:
-    Log::Write(NETWORK_FILE, line, WSAGetLastError(), L"WSAIoctl()");
-    closesocket(sock);
-    return false;
 }

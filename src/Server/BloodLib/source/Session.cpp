@@ -295,35 +295,37 @@ bool Session::Connect(Port* port, unsigned long long id, unsigned long ip, unsig
     void* timerMemory = Memory::_Manager[2]->Alloc(sizeof(ReconnectTimer), SESSION_FILE, 363);
     _reconnectTimer = timerMemory != nullptr ? new (timerMemory) ReconnectTimer(id) : nullptr;
 
-    AsyncConnectContext* context = reinterpret_cast<AsyncConnectContext*>(this + 1);
-    _connectContext = context;
-    memset(context, 0, sizeof(AsyncConnectContext));
-    context->_id = EVID_IO_CONNECT;
-    context->_session = this;
-    context->_socket = INVALID_SOCKET;
-    context->_firstConnect = true;
+    _connectContext = reinterpret_cast<AsyncConnectContext*>(this + 1);
+    if (_connectContext == nullptr)  // 0xe5f1: the original tests this + 1 for null
+        return false;
+    memset(_connectContext, 0, sizeof(AsyncConnectContext));
+    _connectContext->_id = EVID_IO_CONNECT;
+    _connectContext->_session = this;
+    _connectContext->_socket = INVALID_SOCKET;
+    _connectContext->_firstConnect = true;
+    // LobbyGate 0x17b40: htons comes before GetTickCount64.
+    _connectContext->_remoteAddr.sin_family = AF_INET;
+    _connectContext->_remoteAddr.sin_port = htons(portNumber);
+    _connectContext->_remoteAddr.sin_addr.s_addr = ip;
     // LTCG folded the timeout constant in each exe. CacheGate 0xe6ad stores 0 (callers give 0). LobbyGate 0x17bed
     // stores GetTickCount64() - StartSystemTick64 + 5000 (the caller gives 5000).
-    context->_timeout = timeout > 0 ? static_cast<long long>(GetTickCount64()) - Daemon::Instance->StartSystemTick64 + timeout : 0;
-    context->_tryReconnectCount = 0;
-    context->_remoteAddr.sin_family = AF_INET;
-    context->_remoteAddr.sin_port = htons(portNumber);
-    context->_remoteAddr.sin_addr.s_addr = ip;
+    _connectContext->_timeout =
+        timeout > 0 ? static_cast<long long>(GetTickCount64()) - Daemon::Instance->StartSystemTick64 + timeout : 0;
+    _connectContext->_tryReconnectCount = 0;
     _connectPending = true;
 
-    if (_connection->AsyncConnect(context, port->_nagle))
+    if (!_connection->AsyncConnect(_connectContext, port->_nagle))
     {
-        Log::Write(Log::LT_DEBUG, SESSION_FILE, 431,
-                   L"[session], connect to, port id: %u, id:%I64x, this:%p, ip:%s, port:%d", port->_id, id, this,
-                   Network::GetAddressStringW(ip), portNumber);
-        return true;
+        _state = CLOSED;
+        _connectPending = false;
+        Log::Write(Log::LT_ERROR, SESSION_FILE, 395,
+                   L"[session], Connection::AsyncConnect failed, id:%I64x, this:%p, error:%d", id, this,
+                   WSAGetLastError());
+        return false;
     }
-    _state = CLOSED;
-    _connectPending = false;
-    Log::Write(Log::LT_ERROR, SESSION_FILE, 395,
-               L"[session], Connection::AsyncConnect failed, id:%I64x, this:%p, error:%d", id, this,
-               WSAGetLastError());
-    return false;
+    Log::Write(Log::LT_DEBUG, SESSION_FILE, 431, L"[session], connect to, port id: %u, id:%I64x, this:%p, ip:%s, port:%d",
+               port->_id, id, this, Network::GetAddressStringW(ip), portNumber);
+    return true;
 }
 
 // 0xE7C0
@@ -524,7 +526,8 @@ keep_session:
 }
 
 // 0xF090
-bool Session::Recv()
+// LIFT: noinline. The original HandleEvent calls this function in all 4 exes. VS2010 /LTCG inlines it without the attribute.
+__declspec(noinline) bool Session::Recv()
 {
     EnterCriticalSection(&_lock.CS);
     bool result = recv();
@@ -563,6 +566,7 @@ bool Session::HandleEvent(EventContext* context, unsigned long numOfBytes)
     {
     case EVID_IO_CONNECT:
     {
+        // 0xf1c0 hr line 1074: the original reads _connectContext. That form lowered the score (98.5 -> 97.4). ❓
         AsyncConnectContext* connectContext = static_cast<AsyncConnectContext*>(context);
         bool firstConnect = connectContext->_firstConnect;
         if (!_connection->CompleteAsyncConnect(connectContext))
@@ -604,13 +608,12 @@ bool Session::HandleEvent(EventContext* context, unsigned long numOfBytes)
             return false;
         }
         unsigned int total = numOfBytes + _recvBuffer->_recvdSize;
-        if (total > 4008)
+        if (total > 4008 || (_recvBuffer->_recvdSize = total) == 0)  // ❓ the original also tests the new size for 0
         {
             Log::Write(Log::LT_ERROR, SESSION_FILE, 785, L"[session], invalid received size, id:%I64x, this:%p, bytes:%d",
                        _id, this, numOfBytes);
             return false;
         }
-        _recvBuffer->_recvdSize = total;
         if (!handlePacket())
         {
             Log::Write(Log::LT_DEBUG, SESSION_FILE, 791, L"[session], handle packet failed, id:%I64x, this:%p", _id,
@@ -700,21 +703,18 @@ void Session::HandleFailedEvent(EventContext* context, unsigned long numOfBytes)
 // 0xF750
 bool Session::handlePacket()
 {
-    Packet packet;
-    memset(&packet, 0, sizeof(packet));
-    SessionRecvBuffer* recvBuffer = _recvBuffer;
+    // ~Packet() calls Clear() on each return (0xF750 has one unwind state).
+    // 0xF750 sets Splitter and IsFragmentPacket, then zeroes 28 bytes from FragmentPacketCmd (inline).
+    Packet packet = {nullptr, false};
     unsigned int offset = 0;
-    while (_minPacketSize <= recvBuffer->_recvdSize - offset)
+    while (_minPacketSize <= _recvBuffer->_recvdSize - offset)
     {
         char const* pkt = nullptr;
         // LobbyGate 0x18cc4: the 5th argument is 0xFA8 - _recvdSize (free space), not 0xFA8 - offset.
-        int size = _bufferHandler->ToPacket(this, &recvBuffer->_buffer[offset], recvBuffer->_recvdSize - offset,
-                                            4008 - recvBuffer->_recvdSize, &pkt);
+        int size = _bufferHandler->ToPacket(this, &_recvBuffer->_buffer[offset], _recvBuffer->_recvdSize - offset,
+                                            4008 - _recvBuffer->_recvdSize, &pkt);
         if (size < 0)
-        {
-            packet.Clear();
             return false;
-        }
         if (size == 0)
             break;
         if (pkt == nullptr)
@@ -726,21 +726,20 @@ bool Session::handlePacket()
             Log::Write(Log::LT_ERROR, SESSION_FILE, 984,
                        L"[session], packet handler failed, id:%I64x, this:%p, port-running:%s", _id, this,
                        _port->_enableRecv ? L"true" : L"false");
-            packet.Clear();
             return false;
         }
         offset += size;
     }
+    SessionRecvBuffer* recvBuffer = _recvBuffer;
     if (offset > recvBuffer->_recvdSize)
     {
         Log::Write(Log::LT_ERROR, SESSION_FILE, 998, L"[session], clear recv buffer error, id:%I64x, this:%p", _id,
                    this);
-        packet.Clear();
         return false;
     }
-    memmove(recvBuffer->_buffer, &recvBuffer->_buffer[offset], recvBuffer->_recvdSize - offset);
+    if (offset < recvBuffer->_recvdSize)
+        memmove(recvBuffer->_buffer, &recvBuffer->_buffer[offset], recvBuffer->_recvdSize - offset);
     recvBuffer->_recvdSize -= offset;
-    packet.Clear();
     return true;
 }
 
@@ -804,8 +803,7 @@ void Session::SendV(char const* format, char* args) const
     Session* self = const_cast<Session*>(this);
     if (format == nullptr)
         SESSION_ASSERT_CRASH(SESSION_FILE, "source\\Session.cpp", 1153);
-    Packet packet;
-    memset(&packet, 0, sizeof(packet));
+    Packet packet = {nullptr, false};
     PacketBuffer* buffer = PacketBufferAllocator::_Local->allocate();
     packet.ListTail = buffer;
     packet.ListHead = buffer;
@@ -822,7 +820,6 @@ void Session::SendV(char const* format, char* args) const
     EnterCriticalSection(&self->_lock.CS);
     send(list, 1);
     LeaveCriticalSection(&self->_lock.CS);
-    packet.Clear();
 }
 
 // 0xFC40
@@ -885,14 +882,17 @@ bool Session::sendNext(unsigned long sentSize)
     DWORD sent = 0;
     SendBufferList* list = context->_bufferList;
     if (WSASend(socket, static_cast<WSABUF*>(list->_wsaBuffer), list->_count, &sent, 0, context, nullptr)
-            != SOCKET_ERROR
-        || WSAGetLastError() == WSA_IO_PENDING)
+        == SOCKET_ERROR)
     {
-        _sendPending = true;
-        return true;
+        int error = WSAGetLastError();
+        if (error != WSA_IO_PENDING)
+        {
+            Log::Write(L"source\\Connection.cpp", 225, error, L"WSASend()");
+            return false;
+        }
     }
-    Log::Write(L"source\\Connection.cpp", 225, WSAGetLastError(), L"WSASend()");
-    return false;
+    _sendPending = true;
+    return true;
 }
 
 // 0xFE90

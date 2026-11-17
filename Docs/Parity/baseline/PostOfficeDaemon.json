@@ -457,8 +457,8 @@
 "CachedWatchdogManager::addCachedWatchdog": {
 "calls": 88,
 "consts": 90,
-"refs": 86,
-"score": 87.7,
+"refs": 88,
+"score": 88.6,
 "status": "DIFF"
 },
 "CachedWatchdogManager::getCachedWatchdog": {
@@ -646,9 +646,9 @@
 "Console::Console": {
 "calls": 100,
 "consts": 100,
-"refs": 100,
-"score": 100.0,
-"status": "MATCH"
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
 },
 "Console::GetType": {
 "calls": 100,
@@ -667,9 +667,9 @@
 "Console::~Console": {
 "calls": 100,
 "consts": 100,
-"refs": 100,
-"score": 100.0,
-"status": "MATCH"
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
 },
 "CrashHandler::CrashHandler": {
 "calls": 100,
@@ -821,8 +821,8 @@
 "Daemon::start": {
 "calls": 96,
 "consts": 98,
-"refs": 88,
-"score": 94.0,
+"refs": 86,
+"score": 93.4,
 "status": "DIFF"
 },
 "Daemon::startDaemon": {
@@ -1003,9 +1003,9 @@
 "DelayedRelease::Release": {
 "calls": 100,
 "consts": 100,
-"refs": 91,
-"score": 97.0,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "DelayedRelease::releaseNode": {
 "calls": 100,
@@ -1024,9 +1024,9 @@
 "DeliverPostRelayContext::DeliverPostRelayContext": {
 "calls": 100,
 "consts": 100,
-"refs": 91,
-"score": 97.0,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "DeliverPostRelayContext::GetRequestWid": {
 "calls": 100,
@@ -1346,8 +1346,8 @@
 "HandlePostOfficeHelloReq": {
 "calls": 100,
 "consts": 87,
-"refs": 98,
-"score": 95.0,
+"refs": 100,
+"score": 95.6,
 "status": "DIFF"
 },
 "HandlePostOfficeManagementHelloReq": {
@@ -1395,16 +1395,16 @@
 "HandlePostOfficeServiceCheckPostCapacityReq": {
 "calls": 100,
 "consts": 100,
-"refs": 96,
-"score": 98.7,
+"refs": 97,
+"score": 99.1,
 "status": "DIFF"
 },
 "HandlePostOfficeServiceHelloReq": {
 "calls": 100,
 "consts": 100,
-"refs": 99,
-"score": 99.6,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "HandlePostOfficeServiceRegisterPostReq": {
 "calls": 98,
@@ -1611,10 +1611,10 @@
 },
 "LogBufferAllocator::allocate": {
 "calls": 100,
-"consts": 89,
-"refs": 95,
-"score": 94.5,
-"status": "DIFF"
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "LogBufferAllocator::initAllocator": {
 "calls": 100,
@@ -1625,10 +1625,10 @@
 },
 "LogBufferPool::allocate": {
 "calls": 100,
-"consts": 86,
-"refs": 67,
-"score": 84.1,
-"status": "DIFF"
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "LogBufferPool::deallocate": {
 "calls": 100,
@@ -1661,9 +1661,9 @@
 "LogFile::LogFile": {
 "calls": 100,
 "consts": 100,
-"refs": 100,
-"score": 100.0,
-"status": "MATCH"
+"refs": 50,
+"score": 83.3,
+"status": "DIFF"
 },
 "LogFile::MakeFilename": {
 "calls": 100,
@@ -1717,9 +1717,9 @@
 "LogFile::~LogFile": {
 "calls": 100,
 "consts": 100,
-"refs": 100,
-"score": 100.0,
-"status": "MATCH"
+"refs": 83,
+"score": 94.4,
+"status": "DIFF"
 },
 "LogMedia::Write": {
 "calls": 55,
@@ -1793,9 +1793,9 @@
 },
 "Network::Network": {
 "calls": 100,
-"consts": 86,
-"refs": 86,
-"score": 90.5,
+"consts": 100,
+"refs": 89,
+"score": 96.3,
 "status": "DIFF"
 },
 "Network::OpenPort [?OpenPort@Network@@SA_NI@Z]": {
@@ -1841,11 +1841,11 @@
 "status": "DIFF"
 },
 "Network::initializeSocketInterface": {
-"calls": 88,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 96.0,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Packet::Add": {
 "calls": 100,
@@ -1982,10 +1982,10 @@
 },
 "PacketBufferAllocator::allocate": {
 "calls": 100,
-"consts": 89,
-"refs": 94,
-"score": 94.3,
-"status": "DIFF"
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "PacketBufferAllocator::initAllocator": {
 "calls": 100,
@@ -1996,10 +1996,10 @@
 },
 "PacketBufferPool::allocate": {
 "calls": 100,
-"consts": 86,
-"refs": 62,
-"score": 82.4,
-"status": "DIFF"
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "PacketBufferPool::deallocate": {
 "calls": 100,
@@ -2116,8 +2116,8 @@
 "PingGenerator::sendPing": {
 "calls": 100,
 "consts": 93,
-"refs": 90,
-"score": 94.6,
+"refs": 93,
+"score": 95.3,
 "status": "DIFF"
 },
 "PingRelayContext::ComposeRequestPacket": {
@@ -2339,16 +2339,16 @@
 },
 "Port::Clear": {
 "calls": 100,
-"consts": 91,
-"refs": 100,
-"score": 97.0,
+"consts": 80,
+"refs": 91,
+"score": 90.3,
 "status": "DIFF"
 },
 "Port::Initialize": {
 "calls": 97,
 "consts": 83,
-"refs": 98,
-"score": 92.6,
+"refs": 100,
+"score": 93.4,
 "status": "DIFF"
 },
 "Port::MakeNewSession [?MakeNewSession@Port@@IEAAPEAVSession@@PEA_KKGH@Z]": {
@@ -2393,6 +2393,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"PortListener::Clear": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "PortListener::HandleEvent": {
 "calls": 100,
 "consts": 100,
@@ -2408,11 +2415,11 @@
 "status": "MATCH"
 },
 "PortListener::Initialize": {
-"calls": 89,
-"consts": 93,
-"refs": 97,
-"score": 93.0,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "PortListener::accept": {
 "calls": 100,
@@ -2445,9 +2452,9 @@
 "PostContext::PostContext": {
 "calls": 100,
 "consts": 100,
-"refs": 67,
-"score": 88.9,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "PostContext::~PostContext": {
 "calls": 100,
@@ -2508,9 +2515,9 @@
 "PostDeliveryEvent::PostDeliveryEvent": {
 "calls": 100,
 "consts": 100,
-"refs": 86,
-"score": 95.2,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "PostDeliveryEvent::deliverPost": {
 "calls": 71,
@@ -2683,9 +2690,9 @@
 "PostOfficeDaemon::initNetwork": {
 "calls": 100,
 "consts": 100,
-"refs": 99,
-"score": 99.7,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "PostOfficeDaemon::initWorldConfigDependencyManager": {
 "calls": 100,
@@ -2746,9 +2753,9 @@
 "PostOfficeDaemon::startTimer": {
 "calls": 100,
 "consts": 100,
-"refs": 96,
-"score": 98.6,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "PostOfficeDaemon::~PostOfficeDaemon": {
 "calls": 100,
@@ -2921,9 +2928,9 @@
 "RelayTimeoutChecker::occurTimeoutEvent": {
 "calls": 100,
 "consts": 100,
-"refs": 97,
-"score": 99.0,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "RelayTimeoutEvent::EventId": {
 "calls": 100,
@@ -3012,9 +3019,9 @@
 "RetrieveCharacterInfoRelayContext::RetrieveCharacterInfoRelayContext": {
 "calls": 100,
 "consts": 100,
-"refs": 89,
-"score": 96.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "RetrieveCharacterInfoRelayContext::initResponse": {
 "calls": 100,
@@ -3059,17 +3066,17 @@
 "status": "DIFF"
 },
 "Session::Connect": {
-"calls": 80,
-"consts": 93,
-"refs": 93,
-"score": 88.9,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Session::HandleEvent": {
-"calls": 87,
+"calls": 98,
 "consts": 100,
 "refs": 97,
-"score": 94.9,
+"score": 98.5,
 "status": "DIFF"
 },
 "Session::HandleFailedEvent": {
@@ -3079,6 +3086,13 @@
 "score": 97.0,
 "status": "DIFF"
 },
+"Session::Recv": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Session::Send": {
 "calls": 100,
 "consts": 100,
@@ -3087,25 +3101,25 @@
 "status": "MATCH"
 },
 "Session::SendV": {
-"calls": 96,
+"calls": 100,
 "consts": 88,
 "refs": 100,
-"score": 94.6,
+"score": 95.8,
 "status": "DIFF"
 },
 "Session::Session [??0Session@@IEAA@IPEBVPacketBufferHandler@@@Z]": {
 "calls": 100,
 "consts": 100,
-"refs": 75,
-"score": 91.7,
+"refs": 86,
+"score": 95.2,
 "status": "DIFF"
 },
 "Session::Session [??0Session@@IEAA@XZ]": {
 "calls": 100,
 "consts": 100,
-"refs": 80,
-"score": 93.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Session::SetChannel": {
 "calls": 100,
@@ -3143,10 +3157,10 @@
 "status": "MATCH"
 },
 "Session::handlePacket": {
-"calls": 71,
+"calls": 83,
 "consts": 100,
 "refs": 100,
-"score": 90.5,
+"score": 94.4,
 "status": "DIFF"
 },
 "Session::initialize": {
@@ -3178,11 +3192,11 @@
 "status": "MATCH"
 },
 "Session::sendNext": {
-"calls": 89,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 96.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Session::tryReconnect": {
 "calls": 100,
@@ -3222,8 +3236,8 @@
 "SessionPool::SessionPool": {
 "calls": 100,
 "consts": 100,
-"refs": 67,
-"score": 88.9,
+"refs": 75,
+"score": 91.7,
 "status": "DIFF"
 },
 "SessionPool::addToPool": {
@@ -3248,11 +3262,11 @@
 "status": "DIFF"
 },
 "SessionSendBuffer::Clear": {
-"calls": 67,
-"consts": 80,
-"refs": 92,
-"score": 79.7,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "SessionSendBuffer::Initialize": {
 "calls": 100,
@@ -3266,6 +3280,13 @@
 "consts": 100,
 "refs": 100,
 "score": 88.9,
+"status": "DIFF"
+},
+"SessionSendBuffer::clearPacketBufferList": {
+"calls": 75,
+"consts": 89,
+"refs": 55,
+"score": 72.8,
 "status": "DIFF"
 },
 "SessionSendBuffer::increaseBuffer": {
@@ -3698,8 +3719,8 @@
 "TimerQueue::~TimerQueue": {
 "calls": 100,
 "consts": 100,
-"refs": 83,
-"score": 94.4,
+"refs": 67,
+"score": 88.9,
 "status": "DIFF"
 },
 "TrustedPacketBufferHandler::Clone": {
@@ -3971,9 +3992,9 @@
 "WindowConsole::~WindowConsole": {
 "calls": 100,
 "consts": 100,
-"refs": 100,
-"score": 100.0,
-"status": "MATCH"
+"refs": 80,
+"score": 93.3,
+"status": "DIFF"
 },
 "WindowConsoleOnClose": {
 "calls": 100,
@@ -4552,8 +4573,8 @@
 "makeConsole": {
 "calls": 50,
 "consts": 60,
-"refs": 100,
-"score": 70.0,
+"refs": 93,
+"score": 67.8,
 "status": "DIFF"
 },
 "makeDirectory": {

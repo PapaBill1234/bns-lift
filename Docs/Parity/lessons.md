@@ -143,3 +143,61 @@
 - SCD and LG losses of vtable-only functions (`Thread::~Thread`, `PipeConsole::~PipeConsole`,
   `PipeCommandProcess::~PipeCommandProcess`, `GameEventManager::initWorkerThread`, `CrashHandler::CrashHandler`) are
   string_at noise. They come and go when the data layout changes. They are in `allow-worse.txt`.
+
+## lift-parity-s2 facts (stage 1, no source change yet)
+- `??_7RefCntObject@@6B@` is not novtable. Orig CG refs it only in `RefCntObject::~RefCntObject` 0xccd0 (dtor stores it).
+  Ours refs it in 13 constructors/allocators (`Session::Session` x2, `Network::Network`, `SessionPool::SessionPool`,
+  `PacketBufferPool::allocate`, `PacketBufferAllocator::allocate`, `Session::Connect`, `Port::Initialize`, `CacheD::CacheD`,
+  `DelayedRelease::Release`, `LogBufferPool::allocate`, `LogBufferAllocator::allocate`).
+- VS2010 test (`/O2`, `build/nvt/t.cpp`): `__declspec(novtable)` removes the vptr store from the ctor AND the dtor, so it is wrong.
+  Without novtable, VS2010 removes the dead base vptr store in a simple inline ctor. So our build keeps it for another reason ❓
+  (ours stores `_tag=10` before the vptr; orig stores `_ref=1`, `_tag=10`, then only the derived vptr).
+- `const 0x20` (orig) against `0x88` (ours) in `Packet::Allocate`, `Packet::Concatenate`, `PacketBuffer::deallocate_me`,
+  `PacketBufferAllocator::Initialize`, `Session::SendV`: TLS offset of `PacketBufferAllocator::_Local` (TLS order group).
+- `tools/vs2010/build.sh` links the objects in `sort -u` path order. Our TLS order is not that order either.
+
+## Pattern 11 again (worked, lift-parity-s2): noinline for `Session::Recv`, `SessionSendBuffer::clearPacketBufferList`, `PortListener::Clear`
+- All 4 orig exes have these as separate functions. CG +3 (`SessionSendBuffer::Clear` 0x1a750 is now MATCH).
+
+## Pattern 13 (worked): UTF-8 BOM for a source file with Korean string literals
+- VS2010 reads a UTF-8 file without a BOM in the ANSI code page. A Korean character becomes 3 wide characters.
+- Signal: orig literal `??_C@_1IA@` (0x80 bytes), ours `??_C@_1KI@` (0xA8 bytes), same text.
+- Fix: add a UTF-8 BOM. Done: `PacketBuffer.cpp`, `LogBuffer.cpp`. Not done (not in the s2 file list):
+  `src/Server/LobbyGate/ContentsRuleConfigDefinition.cpp`. Example: `PacketBufferPool::allocate` 0x128d0.
+
+## Pattern 14 (worked): one error block per failed call, not a shared `goto` label
+- Orig `Network::initializeSocketInterface` 0xda30 calls `WSAGetLastError` in each failed branch. VS2010 merges
+  the `Log::Write` + `closesocket` tails, but not the `WSAGetLastError` calls. Source: a full error block per branch.
+- `Session::sendNext` 0xfdc0: `if (WSASend(..) == SOCKET_ERROR) { int error = WSAGetLastError(); if (error != WSA_IO_PENDING) {Log; return false;} }`.
+  One `WSAGetLastError` call. `Connection::AsyncSend` also MATCH after this change.
+
+## Not fixable in source: `Network::Initialize` callee name
+- Orig PDB names the callee `?Setup@PacketCrypt@@SA?AW4ErrCode@1@H@Z` (not demangled). Ours is `PacketCrypt::Setup`. Same function: tooling card.
+
+## RefCntObject vptr store (open)
+- Ours `PacketBufferPool::allocate`: the inlined `RefCntObject()` stores `_tag=0xa`, `_history`, `_ref=1`, the RefCntObject vptr,
+  then `PacketBuffer()` stores the PacketBuffer vptr, `_ref=1`, `_tag=0x50a`, `_history` again. Orig stores only once
+  (`_ref=1`, `_history`, vptr, `_tag=0x50a`). So VS2010 does not merge the base ctor stores with the derived stores.
+- Solved (pattern 15). Cause: our header had `long volatile _ref`. The PDB type is plain `long` (0x0012). A volatile
+  store is a barrier: VS2010 cannot remove the dead base stores (`_tag=0xa`, RefCntObject vptr) before it.
+- Fix: `long _ref;` in `RefCntObject.h`. `InterlockedIncrement(&_ref)` still compiles (`long*` → `long volatile*`).
+- Example: `PacketBufferPool::allocate` CG 0x128d0 DIFF → MATCH. Also `PacketBufferAllocator::allocate`, `Session::Session()`.
+  Gain: CG +7, all 4 exes up (LG 424, SCD 387, POD 421).
+- Did not work: remove `_ref = 1; _history = nullptr;` from the `PacketBuffer()` body (no change; kept removed, base ctor stores them).
+- Rule: check each `volatile` member against the PDB type. `pdbq <EXE> type <Class>` shows a plain type as `0x0012 (long)`.
+
+## Pattern 16 (worked, lift-parity-s2 stage 4): write the loop in the form that VS2010 does not unroll
+- `PortListener::Initialize` 0x31fd0: `for (i = 0; i < 128; ++i) { ...; if (!asyncAccept(i)) break; } if (i >= 128) return true;`.
+  The old loop form gave an extra `memset` + a 2nd `asyncAccept` call (unrolled). Now MATCH in all 4 exes.
+- `Session::Connect` 0xe570: null test of `this + 1`, stores through `_connectContext`, failure branch first. MATCH in CG and POD.
+  The `sin_*` stores before the timeout store put `htons` before `GetTickCount64` (LG 94.7 -> 97.8).
+
+## Pattern 17 (score up, no MATCH): `Packet packet = {nullptr, false};` in place of `memset` or `= {}`
+- Orig sets `Splitter`, `IsFragmentPacket`, then an inline 28-byte zero fill. `= {}` or `memset` gives a `memset` call.
+- No explicit `packet.Clear()` before a return: `~Packet()` calls it (orig has 1 unwind state).
+- Example: `Session::handlePacket` 0xf750 90.5 -> 94.4, `Session::SendV` 0xfaa0 91.1 -> 92.3 (CG).
+- Still DIFF: orig shares one `Clear; return false` tail for the error paths; ours has one more `Clear` block. Source form unknown.
+
+## Did not work
+- `Session::HandleEvent` 0xf1c0: read `_connectContext` in place of the `context` argument (hr line 1074). Score 98.5 -> 97.4. Undone.
+- `Session::HandleEvent`: orig merges the 796 and 814 `Log::Write` calls (line in a register). Ours does not. Cause unknown.

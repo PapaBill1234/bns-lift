@@ -87,7 +87,8 @@ bool PortListener::Initialize(Port* port, void* iocpHandle, unsigned short portN
     }
     else
     {
-        for (int i = 0;;)
+        int i;
+        for (i = 0; i < 128; ++i)
         {
             memset(&_context[i], 0, sizeof(_context[i]));
             _context[i]._id = EVID_IO_ACCEPT;
@@ -97,16 +98,17 @@ bool PortListener::Initialize(Port* port, void* iocpHandle, unsigned short portN
             _context[i]._remoteAddrSize = sizeof(sockaddr_in) + 16;
             if (!asyncAccept(i))
                 break;
-            if (++i >= 128)
-                return true;
         }
+        if (i >= 128)
+            return true;
     }
     Clear();
     return false;
 }
 
 // 0x32270
-void PortListener::Clear()
+// LIFT: noinline. The original Initialize (0x31fd0) calls this function in all 4 exes. VS2010 /LTCG inlines it without the attribute.
+__declspec(noinline) void PortListener::Clear()
 {
     SOCKET listenSocket = static_cast<SOCKET>(
         _InterlockedExchange64(reinterpret_cast<volatile long long*>(&_socket), static_cast<long long>(INVALID_SOCKET)));

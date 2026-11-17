@@ -1,4 +1,4 @@
-// LogBuffer.obj (SmartCouponDaemon PDB).
+﻿// LogBuffer.obj (SmartCouponDaemon PDB).
 #include "LogBuffer.h"
 #include <stdio.h>
 #include <new>

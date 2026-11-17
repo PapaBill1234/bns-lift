@@ -136,8 +136,6 @@ public:
     PacketBuffer()  // LIFT: inlined in PacketBufferPool::allocate (0x23EC0) and PacketBufferAllocator::allocate (0x241B0)
         : sendSize(0), sendBuffer(nullptr), Next(nullptr)
     {
-        _ref = 1;
-        _history = nullptr;
         _tag = 1290;
         *reinterpret_cast<long long*>(&Buffer[0]) = 0;
         *reinterpret_cast<short*>(&Buffer[8]) = 0;

@@ -66,7 +66,7 @@ public:
     long removeReferenceCount(wchar_t const* file, int line);
 
     long _tag;
-    long volatile _ref;
+    long _ref;  // PDB: plain long (0x0012), not volatile. A volatile store blocks the dead-store removal of the base vptr store.
     RefCntHistory* _history;
 };
 static_assert(sizeof(RefCntObject) == 0x18, "sizeof RefCntObject");

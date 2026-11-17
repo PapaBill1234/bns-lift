@@ -1,4 +1,4 @@
-// PacketBuffer.obj (SmartCouponDaemon PDB).
+﻿// PacketBuffer.obj (SmartCouponDaemon PDB).
 #include "PacketBuffer.h"
 #include <windows.h>
 #include <stdarg.h>

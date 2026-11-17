@@ -186,7 +186,8 @@ void SessionSendBuffer::increaseBuffer(SendBufferList* bufferList)
 }
 
 // 0x1A980
-void SessionSendBuffer::clearPacketBufferList(SendBufferList* bufferList)
+// LIFT: noinline. The original Clear (0x1a750) calls this function in all 4 exes. VS2010 /LTCG inlines it without the attribute.
+__declspec(noinline) void SessionSendBuffer::clearPacketBufferList(SendBufferList* bufferList)
 {
     if (bufferList->_pbuffer != nullptr)
     {
