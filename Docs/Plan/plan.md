@@ -134,6 +134,27 @@ Source: PDB S_COMPILE3, PE linker version, Rich header.
 3. Tool candidates: reccmp (per-function accuracy score, HTML report, JSON baseline), objdiff (per-object), BinDiff, Diaphora.
 4. Fix the source until each function matches, or mark the difference with `// LIFT:`.
 
+Step 2 now (without VS2010): `tools/funcdiff.py <Server>`. reccmp is x86 only, so this is x64 glue.
+
+| Signal | Compared |
+| --- | --- |
+| calls | callee names in call order. Our helpers that the original inlined are expanded. |
+| refs | strings, vftables and globals that the function reads |
+| consts | immediates (no RVAs, no frame sizes) |
+
+- Build with PDBs first: `cmake -S . -B build-pdb -G Ninja -DCMAKE_TOOLCHAIN_FILE=cmake/clangcl-wine.cmake -DCMAKE_BUILD_TYPE=Release "-DCMAKE_CXX_FLAGS_RELEASE=/O2 /Ob0 /DNDEBUG /Z7" "-DCMAKE_C_FLAGS_RELEASE=/O2 /Ob2 /DNDEBUG /Z7" "-DCMAKE_EXE_LINKER_FLAGS_RELEASE=/debug /opt:ref,icf"`.
+- `--show <regex>` prints the differences. `--json` writes a baseline. `--diff <json>` prints the functions that got worse.
+- Baseline 2026-11-17 (clang-cl build):
+
+| Server | Paired | MATCH | Mean score | Only in original |
+| --- | --- | --- | --- | --- |
+| CacheGate | 443 | 94 (21 %) | 74.2 | 48 |
+| LobbyGate | 647 | 118 (18 %) | 73.0 | 92 |
+| SmartCouponDaemon | 577 | 116 (20 %) | 74.9 | 92 |
+| PostOfficeDaemon | 666 | 119 (18 %) | 74.4 | 93 |
+
+- Typical real differences: missing log strings, missing `__FILE__`/`__LINE__` arguments (`Client.cpp`, `Channel.h`), lift helpers in place of inline code.
+
 ## Goal 2 path (2019 → 381, planned)
 
 1. Build our 2019 source with VS2019 16.4 (14.24). Use the real MSVC STL in place of `include/vs2010/`. msvc-wine can give the toolchain under Wine.
