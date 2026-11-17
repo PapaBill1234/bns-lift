@@ -1,7 +1,11 @@
 # Parity phase (2026-11-17)
 
 ## Goal
-The 4 lifted exes compile to the same code as the original 2019 + PDB exes. The target is **90 % parity** for each exe.
+The 4 lifted exes compile to the same code as the original 2019 + PDB exes. | Level | Parity per exe | Meaning |
+| --- | ---: | --- |
+| Checkpoint | 90 % | End of the base rounds. Then the 90+ rounds start. |
+| Goal | **95 %** | Minimum result for the phase. |
+| Preferred | **99 %** | Target of the 90+ rounds. |
 
 After each exe has 90 % or more, do "90+ rounds". The 90+ target is **99 % parity** for each exe. Each 90+ round fixes the DIFF functions that are left and that have a fixable cause. Its last card is a review.
 
@@ -13,7 +17,7 @@ The review after each 90+ round sets the state of each exe in `Docs/Parity/plus-
 | Gain more than 0 | Set `zero_rounds` to 0. Write cards for the fixable DIFF functions that are left. |
 | No gain, first time (`zero_rounds` = 1) | Find the cause of the stall. Write it in the review. Write a card that fixes the cause. |
 | No gain, second time (`zero_rounds` = 2) | Do the check again. Find what the first fix did not solve. Write a card that fixes it. |
-| No gain, third time (`zero_rounds` = 3) | State `stopped`. Write no more cards for this exe. Write the cause in the handoff. |
+| No gain, third time (`zero_rounds` = 3) | State `stopped`. Write no more cards for this exe. Write the cause in the handoff. If parity is below 95 %, write "BELOW GOAL" at the top of the handoff with the cause and the options that are left. |
 
 A card for a cause in more than 1 exe stays 1 card. An exe with state `done` or `stopped` gets no new cards, but the gate still runs on it. It must not lose MATCH functions.
 The parity phase stops when each exe has state `done` or `stopped`. There is no limit on the number of rounds.
