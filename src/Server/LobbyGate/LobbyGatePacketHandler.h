@@ -21,3 +21,31 @@ bool HandleLobbyGate_LoginWithLobbyTokenReq(Session* session, Packet* packet);  
 bool HandleLobbyGate_BypassPacket(Client* client, Packet const* packet);                              // 0x14c90
 bool HandleLobbyGate_GetWorldInfoListReq(Client* client, Packet const* packet);                       // 0x14f40
 bool HandleLobbyGate_GetPcCafeMileageFeverTimeScheduleListReq(Client* client, Packet const* packet);  // 0x150f0
+bool HandleLobbyGate_LogoutReq(Client*, Packet const*);  // 0x12650
+bool HandleLobbyGate_GetEnterWorldTokenReq(Client*, Packet const*);  // 0x12650
+bool HandleLobbyGate_GetWaitInfoReq(Client*, Packet const*);  // 0x12650
+bool HandleLobbyGate_GiveupWaitReq(Client*, Packet const*);  // 0x12650
+bool HandleLobbyGate_GetCharacterInfoListReq(Client*, Packet const*);  // 0x12650
+bool HandleLobbyGate_GetCharacterInfoReq(Client*, Packet const*);  // 0x12650
+bool HandleLobbyGate_CheckCharacterNameReq(Client*, Packet const*);  // 0x12650
+bool HandleLobbyGate_CreateCharacterReq(Client*, Packet const*);  // 0x12650
+bool HandleLobbyGate_DeleteCharacterReq(Client*, Packet const*);  // 0x12650
+bool HandleLobbyGate_CancelWaitCharacterDeletionReq(Client*, Packet const*);  // 0x12650
+bool HandleLobbyGate_RecoverCharacterReq(Client*, Packet const*);  // 0x12650
+bool HandleLobbyGate_BindCharacterSlotReq(Client*, Packet const*);  // 0x12650
+bool HandleLobbyGate_GetChargeInfoReq(Client*, Packet const*);  // 0x12650
+bool HandleLobbyGate_GetGoodsCountReq(Client*, Packet const*);  // 0x12650
+bool HandleLobbyGate_ListGoodsReq(Client*, Packet const*);  // 0x12650
+bool HandleLobbyGate_TakeGoodsReq(Client*, Packet const*);  // 0x12650
+bool HandleLobbyGate_ListLobbyServiceItemInfoReq(Client*, Packet const*);  // 0x12650
+bool HandleLobbyGate_GetLobbyServiceItemInfoReq(Client*, Packet const*);  // 0x12650
+bool HandleLobbyGate_GetServiceEntryListReq(Client*, Packet const*);  // 0x12650
+bool HandleLobbyGate_ChangeCharacterAppearanceWithAccountInventoryItemReq(Client*, Packet const*);  // 0x12650
+bool HandleLobbyGate_ChangeCharacterSexWithAccountInventoryItemReq(Client*, Packet const*);  // 0x12650
+bool HandleLobbyGate_ChangeCharacterRaceWithAccountInventoryItemReq(Client*, Packet const*);  // 0x12650
+bool HandleLobbyGate_RenameCharacterWithAccountInventoryItemReq(Client*, Packet const*);  // 0x12650
+bool HandleLobbyGate_AddSlotWithAccountInventoryItemReq(Client*, Packet const*);  // 0x12650
+bool HandleLobbyGate_ChangeUserNameWithAccountInventoryItemReq(Client*, Packet const*);  // 0x12650
+bool HandleLobbyGate_ExtendJumpingCharacterCreationQuotaWithAccountInventoryItemReq(Client*, Packet const*);  // 0x12650
+bool HandleLobbyGate_CreateInitialUserNameReq(Client*, Packet const*);  // 0x12650
+bool HandleLobbyGate_ActivateGradeReq(Client*, Packet const*);  // 0x12650

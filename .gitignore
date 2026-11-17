@@ -21,3 +21,5 @@ build/
 *.key
 Db.ini
 .scratch/
+build-cov/
+__pycache__/

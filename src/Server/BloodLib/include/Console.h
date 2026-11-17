@@ -7,7 +7,7 @@ class Console : public LogMedia
 {
 public:
     Console();
-    virtual ~Console() {}                    // inline (0x17600 folds the LogMedia part)
+    virtual ~Console();                      // 0x13850 (CacheGate), TextConsole.cpp
     virtual int GetType() const;             // slot 4
     virtual void Flush();                    // slot 2
 

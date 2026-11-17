@@ -112,6 +112,11 @@ bool Rsa::decrypt(BigInteger const* key, unsigned char const* in, int size, unsi
     return true;
 }
 
+// 0x531F0. The compiler adds the destructor calls of the members (_n, _e, _encoder).
+RsaPublic::~RsaPublic()
+{
+}
+
 // 0x532A0
 bool RsaPublic::Setup(unsigned char const* key, int keySize, int round)
 {

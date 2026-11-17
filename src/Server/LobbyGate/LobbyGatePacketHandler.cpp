@@ -57,29 +57,55 @@ void* NotAuthedLobbyGatePacketHandlerList[110] = {
     reinterpret_cast<void*>(&HandleLobbyGate_LoginWithLobbyTokenReq),  // 6
 };
 
-#define LG_NOP reinterpret_cast<void*>(&HandleLobbyLobbyGate_ChangedGradeLevelNotify)  // LIFT: folded `return true;` body
+// 0x12650. ICF folded these 28 `return true;` handlers with the LobbyLobbyGate handlers (LobbyDPacketHandler.cpp).
+bool HandleLobbyGate_LogoutReq(Client*, Packet const*) { return true; }  // 0x12650 (ICF fold), cmd 0x0C
+bool HandleLobbyGate_GetEnterWorldTokenReq(Client*, Packet const*) { return true; }  // 0x12650 (ICF fold), cmd 0x0D
+bool HandleLobbyGate_GetWaitInfoReq(Client*, Packet const*) { return true; }  // 0x12650 (ICF fold), cmd 0x11
+bool HandleLobbyGate_GiveupWaitReq(Client*, Packet const*) { return true; }  // 0x12650 (ICF fold), cmd 0x14
+bool HandleLobbyGate_GetCharacterInfoListReq(Client*, Packet const*) { return true; }  // 0x12650 (ICF fold), cmd 0x1B
+bool HandleLobbyGate_GetCharacterInfoReq(Client*, Packet const*) { return true; }  // 0x12650 (ICF fold), cmd 0x1E
+bool HandleLobbyGate_CheckCharacterNameReq(Client*, Packet const*) { return true; }  // 0x12650 (ICF fold), cmd 0x21
+bool HandleLobbyGate_CreateCharacterReq(Client*, Packet const*) { return true; }  // 0x12650 (ICF fold), cmd 0x24
+bool HandleLobbyGate_DeleteCharacterReq(Client*, Packet const*) { return true; }  // 0x12650 (ICF fold), cmd 0x27
+bool HandleLobbyGate_CancelWaitCharacterDeletionReq(Client*, Packet const*) { return true; }  // 0x12650 (ICF fold), cmd 0x2B
+bool HandleLobbyGate_RecoverCharacterReq(Client*, Packet const*) { return true; }  // 0x12650 (ICF fold), cmd 0x2E
+bool HandleLobbyGate_BindCharacterSlotReq(Client*, Packet const*) { return true; }  // 0x12650 (ICF fold), cmd 0x31
+bool HandleLobbyGate_GetChargeInfoReq(Client*, Packet const*) { return true; }  // 0x12650 (ICF fold), cmd 0x34
+bool HandleLobbyGate_GetGoodsCountReq(Client*, Packet const*) { return true; }  // 0x12650 (ICF fold), cmd 0x38
+bool HandleLobbyGate_ListGoodsReq(Client*, Packet const*) { return true; }  // 0x12650 (ICF fold), cmd 0x3B
+bool HandleLobbyGate_TakeGoodsReq(Client*, Packet const*) { return true; }  // 0x12650 (ICF fold), cmd 0x3E
+bool HandleLobbyGate_ListLobbyServiceItemInfoReq(Client*, Packet const*) { return true; }  // 0x12650 (ICF fold), cmd 0x41
+bool HandleLobbyGate_GetLobbyServiceItemInfoReq(Client*, Packet const*) { return true; }  // 0x12650 (ICF fold), cmd 0x44
+bool HandleLobbyGate_GetServiceEntryListReq(Client*, Packet const*) { return true; }  // 0x12650 (ICF fold), cmd 0x47
+bool HandleLobbyGate_ChangeCharacterAppearanceWithAccountInventoryItemReq(Client*, Packet const*) { return true; }  // 0x12650 (ICF fold), cmd 0x4A
+bool HandleLobbyGate_ChangeCharacterSexWithAccountInventoryItemReq(Client*, Packet const*) { return true; }  // 0x12650 (ICF fold), cmd 0x4D
+bool HandleLobbyGate_ChangeCharacterRaceWithAccountInventoryItemReq(Client*, Packet const*) { return true; }  // 0x12650 (ICF fold), cmd 0x50
+bool HandleLobbyGate_RenameCharacterWithAccountInventoryItemReq(Client*, Packet const*) { return true; }  // 0x12650 (ICF fold), cmd 0x53
+bool HandleLobbyGate_AddSlotWithAccountInventoryItemReq(Client*, Packet const*) { return true; }  // 0x12650 (ICF fold), cmd 0x56
+bool HandleLobbyGate_ChangeUserNameWithAccountInventoryItemReq(Client*, Packet const*) { return true; }  // 0x12650 (ICF fold), cmd 0x59
+bool HandleLobbyGate_ExtendJumpingCharacterCreationQuotaWithAccountInventoryItemReq(Client*, Packet const*) { return true; }  // 0x12650 (ICF fold), cmd 0x5C
+bool HandleLobbyGate_CreateInitialUserNameReq(Client*, Packet const*) { return true; }  // 0x12650 (ICF fold), cmd 0x5F
+bool HandleLobbyGate_ActivateGradeReq(Client*, Packet const*) { return true; }  // 0x12650 (ICF fold), cmd 0x62
 
 // 0x921e0. The PacketHandler of ClientSessionHandler (0x6b70) calls the handlers for 24 and 103 and calls
 // HandleLobbyGate_BypassPacket for all other entries that are not null.
 void* AuthedLobbyGatePacketHandlerList[110] = {
     nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,  // 0..9
-    nullptr, nullptr, LG_NOP, LG_NOP, nullptr, nullptr, nullptr, LG_NOP, nullptr, nullptr,    // 10..19
-    LG_NOP, nullptr, nullptr, nullptr,
+    nullptr, nullptr, reinterpret_cast<void*>(&HandleLobbyGate_LogoutReq), reinterpret_cast<void*>(&HandleLobbyGate_GetEnterWorldTokenReq), nullptr, nullptr, nullptr, reinterpret_cast<void*>(&HandleLobbyGate_GetWaitInfoReq), nullptr, nullptr,    // 10..19
+    reinterpret_cast<void*>(&HandleLobbyGate_GiveupWaitReq), nullptr, nullptr, nullptr,
     reinterpret_cast<void*>(&HandleLobbyGate_GetWorldInfoListReq),  // 24
-    nullptr, nullptr, LG_NOP, nullptr, nullptr,                     // 25..29
-    LG_NOP, nullptr, nullptr, LG_NOP, nullptr, nullptr, LG_NOP, nullptr, nullptr, LG_NOP,     // 30..39
-    nullptr, nullptr, nullptr, LG_NOP, nullptr, nullptr, LG_NOP, nullptr, nullptr, LG_NOP,    // 40..49
-    nullptr, nullptr, LG_NOP, nullptr, nullptr, nullptr, LG_NOP, nullptr, nullptr, LG_NOP,    // 50..59
-    nullptr, nullptr, LG_NOP, nullptr, nullptr, LG_NOP, nullptr, nullptr, LG_NOP, nullptr,    // 60..69
-    nullptr, LG_NOP, nullptr, nullptr, LG_NOP, nullptr, nullptr, LG_NOP, nullptr, nullptr,    // 70..79
-    LG_NOP, nullptr, nullptr, LG_NOP, nullptr, nullptr, LG_NOP, nullptr, nullptr, LG_NOP,     // 80..89
-    nullptr, nullptr, LG_NOP, nullptr, nullptr, LG_NOP, nullptr, nullptr, LG_NOP, nullptr,    // 90..99
+    nullptr, nullptr, reinterpret_cast<void*>(&HandleLobbyGate_GetCharacterInfoListReq), nullptr, nullptr,                     // 25..29
+    reinterpret_cast<void*>(&HandleLobbyGate_GetCharacterInfoReq), nullptr, nullptr, reinterpret_cast<void*>(&HandleLobbyGate_CheckCharacterNameReq), nullptr, nullptr, reinterpret_cast<void*>(&HandleLobbyGate_CreateCharacterReq), nullptr, nullptr, reinterpret_cast<void*>(&HandleLobbyGate_DeleteCharacterReq),     // 30..39
+    nullptr, nullptr, nullptr, reinterpret_cast<void*>(&HandleLobbyGate_CancelWaitCharacterDeletionReq), nullptr, nullptr, reinterpret_cast<void*>(&HandleLobbyGate_RecoverCharacterReq), nullptr, nullptr, reinterpret_cast<void*>(&HandleLobbyGate_BindCharacterSlotReq),    // 40..49
+    nullptr, nullptr, reinterpret_cast<void*>(&HandleLobbyGate_GetChargeInfoReq), nullptr, nullptr, nullptr, reinterpret_cast<void*>(&HandleLobbyGate_GetGoodsCountReq), nullptr, nullptr, reinterpret_cast<void*>(&HandleLobbyGate_ListGoodsReq),    // 50..59
+    nullptr, nullptr, reinterpret_cast<void*>(&HandleLobbyGate_TakeGoodsReq), nullptr, nullptr, reinterpret_cast<void*>(&HandleLobbyGate_ListLobbyServiceItemInfoReq), nullptr, nullptr, reinterpret_cast<void*>(&HandleLobbyGate_GetLobbyServiceItemInfoReq), nullptr,    // 60..69
+    nullptr, reinterpret_cast<void*>(&HandleLobbyGate_GetServiceEntryListReq), nullptr, nullptr, reinterpret_cast<void*>(&HandleLobbyGate_ChangeCharacterAppearanceWithAccountInventoryItemReq), nullptr, nullptr, reinterpret_cast<void*>(&HandleLobbyGate_ChangeCharacterSexWithAccountInventoryItemReq), nullptr, nullptr,    // 70..79
+    reinterpret_cast<void*>(&HandleLobbyGate_ChangeCharacterRaceWithAccountInventoryItemReq), nullptr, nullptr, reinterpret_cast<void*>(&HandleLobbyGate_RenameCharacterWithAccountInventoryItemReq), nullptr, nullptr, reinterpret_cast<void*>(&HandleLobbyGate_AddSlotWithAccountInventoryItemReq), nullptr, nullptr, reinterpret_cast<void*>(&HandleLobbyGate_ChangeUserNameWithAccountInventoryItemReq),     // 80..89
+    nullptr, nullptr, reinterpret_cast<void*>(&HandleLobbyGate_ExtendJumpingCharacterCreationQuotaWithAccountInventoryItemReq), nullptr, nullptr, reinterpret_cast<void*>(&HandleLobbyGate_CreateInitialUserNameReq), nullptr, nullptr, reinterpret_cast<void*>(&HandleLobbyGate_ActivateGradeReq), nullptr,    // 90..99
     nullptr, nullptr, nullptr,
     reinterpret_cast<void*>(&HandleLobbyGate_GetPcCafeMileageFeverTimeScheduleListReq),  // 103
     nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
 };
-
-#undef LG_NOP
 
 // 0x142a0
 bool HandleLobbyGate_PingReq(Session const* session, Packet const* packet)

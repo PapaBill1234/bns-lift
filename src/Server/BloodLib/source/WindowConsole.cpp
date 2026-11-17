@@ -106,8 +106,13 @@ bool WindowConsoleOnSafeShutdown()
     return false;
 }
 
-// 0x16f50 is Console::Flush (empty, folded). Open stores its address as a plain function.
-static void ConsoleFlushHandler()  // LIFT: stands for the folded 0x16f50
+// 0x16f50 (CacheGate), 0x126f0 (LobbyGate). Both handlers are empty. ICF folded them with other empty functions.
+static void WindowConsoleOnLogoff()
+{
+}
+
+// 0x16f50 (CacheGate), 0x126f0 (LobbyGate). Same folded body as WindowConsoleOnLogoff.
+static void WindowConsoleOnShutdown()
 {
 }
 
@@ -154,8 +159,8 @@ bool WindowConsole::Open()
     _reloadHandler.reload = (void (*)())WindowConsoleOnReload;
     _shutdownHandler.autoEnable = true;
     _shutdownHandler.shutdown = (void (*)())WindowConsoleOnSafeShutdown;
-    _endSessionHandler.logoff = ConsoleFlushHandler;
-    _endSessionHandler.shutdown = ConsoleFlushHandler;
+    _endSessionHandler.logoff = WindowConsoleOnLogoff;
+    _endSessionHandler.shutdown = WindowConsoleOnShutdown;
 
     _consoleWindow.module = nullptr;
     _consoleWindow.console = nullptr;
