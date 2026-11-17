@@ -5,7 +5,7 @@
 #include <new>
 #include "ripemd160.h"
 
-// ❓ The PDB has no name for this TLS variable (TLS block offset +8).
+// LIFT: The PDB has no name for this TLS variable (TLS block offset +8).
 static __declspec(thread) Prng* _Instance = 0;
 
 // LIFT: Accessor for CryptoKey. The original code reads the TLS slot inline.

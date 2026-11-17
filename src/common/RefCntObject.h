@@ -56,11 +56,12 @@ public:
     virtual void DumpRefCntHistory();                                          // slot 3
 
     static void operator delete(void* ptr, wchar_t const* file, int line);
-    // ❓ Not in the PDB. The placement form above hides the global form. The virtual
-    // destructor needs a usual form (MSVC does not require it).
+    // LIFT: Not in the PDB. The placement form above hides the global form. The virtual
+    // destructor needs a usual form for clang-cl.
     static void operator delete(void* ptr) { ::operator delete(ptr); }
-    // ❓ The PDB name is addReferenceCount(bool,wchar_t const *,int). The code at 0x2150
-    // reads arg 1 as the file and arg 2 as the line. Callers give (file, line).
+    // LIFT: LTCG folded ignoreHistory. The PDB signature is addReferenceCount(bool ignoreHistory,
+    // wchar_t const* file, int line). ignoreHistory has PDB offset 0. file is at offset 104 (rdx home)
+    // (CacheGate 0x2150).
     long addReferenceCount(wchar_t const* file, int line);
     long removeReferenceCount(wchar_t const* file, int line);
 

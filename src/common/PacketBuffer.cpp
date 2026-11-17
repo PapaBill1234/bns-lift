@@ -835,7 +835,7 @@ unsigned short PacketBuffer::DecomposeText(char const* buffer, unsigned int coun
             return 0;
         }
     decompose_text_range:
-        // ❓ BUG: 0x2FAB0 the binary gives only v; %C gets the value and %I64d gets no argument.
+        // BUG: The call (0x2FD16) gives only v (rcx at 0x2FD01, stack +0x20). %C gets the value. %I64d gets no argument.
         Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, errorLine, L"Decompose Text, format('%C'), value(%I64d)", v);
         return 0;
     }

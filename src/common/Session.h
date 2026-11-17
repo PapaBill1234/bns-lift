@@ -58,8 +58,9 @@ public:
     void Send(Packet const* packet) const;                                        // 0xFA40
     void SendV(char const* format, char* args) const;                             // 0xFAA0
     PacketConcatenater* SetPacketConcatenater(PacketConcatenater const* concatenater) const;  // 0xFC40
-    // ❓ The PDB name is SetHandshakeParameter(PacketCrypt::Algorithm, char const*, int, char*, int*) const,
-    // but the code uses only four arguments (rdx, r8d, r9, stack). This declaration follows the code.
+    // LIFT: LTCG folded algorithm. The PDB signature is SetHandshakeParameter(PacketCrypt::Algorithm algorithm,
+    // char const* param, int paramSize, char* replyParam, int* replyParamSize) const. algorithm has PDB
+    // offset 0. param is at offset 232 (rdx home) (LobbyGate 0x19530).
     bool SetHandshakeParameter(unsigned char const* param, int paramSize, unsigned char* replyParam,
                                int* replyParamSize) const;                        // 0x19530 (LobbyGate)
     bool FailHandshake() const;                                                   // 0x19790 (LobbyGate)
