@@ -6,7 +6,7 @@
 
 #define CONFIG_FILE L"LobbyGateConfig.cpp"
 
-// Default values of LobbyGateConfig::_Def. The names come from IDA.
+// Default values of LobbyGateConfig::_Def. The names come from the PDB (LobbyGateConfig.obj).
 static int const DEFAULT_MAX_CLIENT_SESSION_COUNT = 200000;
 static int const DEFAULT_DUMPTYPE = 1;
 static int const DEFAULT_TIMER_INTERVAL = 1000;
@@ -15,7 +15,6 @@ static int const DEFAULT_CLI_SESSION_HASH_COUNT = 1;
 static int const DEFAULT_PREDEFINED_WORLD_ID = 4001;
 static int const DEFAULT_INTERNAL_PORT = 20900;
 static int const DEFAULT_CLIENT_PORT = 10900;
-static unsigned long const a127001 = 3276849;  // ❓ value as in the binary
 static int const DEFAULT_LOBBY_DAEMON_PORT = 21801;
 static int const DEFAULT_IDLE_TIME = 300;
 static int const DEFAULT_COOLDOWN_COMPLETE = 180;
@@ -52,7 +51,7 @@ XmlCfgDef const LobbyGateConfig::_Def[29] = {
     {offsetof(LobbyGateConfig, _internalPort), L"internal-port", XmlCfgDef::CFG_INT, 1, &DEFAULT_INTERNAL_PORT,
      L"lobbygate access port"},
     {offsetof(LobbyGateConfig, _clientPort), L"client-port", XmlCfgDef::CFG_INT, 1, &DEFAULT_CLIENT_PORT, L"client port"},
-    {offsetof(LobbyGateConfig, _lobbyAddr), L"lobby-daemon-addr", XmlCfgDef::CFG_IP, 1, &a127001,
+    {offsetof(LobbyGateConfig, _lobbyAddr), L"lobby-daemon-addr", XmlCfgDef::CFG_IP, 1, L"127.0.0.1",  /* 0x7c298 text, no PDB name */
      L"lobby daemon ip address"},
     {offsetof(LobbyGateConfig, _lobbyPort), L"lobby-daemon-port", XmlCfgDef::CFG_INT, 1, &DEFAULT_LOBBY_DAEMON_PORT,
      L"lobby daemon port"},

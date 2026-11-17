@@ -43,7 +43,7 @@ static wchar_t const* const MODULE_NAME = L"postofficed";  // PDB MODULE_NAME
 
 PostOfficeDaemon* PostOfficeDaemon::_instance = nullptr;
 
-// Default values of PostOfficeConfig::_Def. ❓ The names come from the export script.
+// Default values of PostOfficeConfig::_Def. The names come from the PDB (PostOfficeConfig.obj).
 static int const DEFAULT_DUMPTYPE = 2;
 static int const DEFAULT_RELAY_TIMEOUT_INTERVAL = 15;
 static int const DEFAULT_PING_INTERVAL = 60;
@@ -51,7 +51,7 @@ static int const DEFAULT_DELIVERY_RETRY_INTERVAL = 5;
 static int const DEFAULT_AGENT_LISTEN_PORT = 20500;
 static int const DEFAULT_WORLD_LISTEN_PORT = 20501;
 static int const DEFAULT_MANAGE_PORT = 30500;
-static unsigned long const a127001 = 3276849;  // ❓ value as in the binary (as in SmartCouponDaemon)
+static wchar_t const* const LOOPBACK_ADDRESS = L"127.0.0.1";  // 0x6e608; the XML reader reads a CFG_IP default as text
 static int const DEFAULT_CACHEGATE_LISTEN_PORT = 20800;
 static int const DEFAULT_SERVICE_WORLD_ID = 1010;
 
@@ -86,7 +86,7 @@ XmlCfgDef const PostOfficeConfig::_Def[23] = {
     {offsetof(PostOfficeConfig, _managePort), L"manage-port", XmlCfgDef::CFG_INT, 0, &DEFAULT_MANAGE_PORT,
      L"daemon debug port"},
     {static_cast<unsigned long long>(-1), nullptr, 0, 0, nullptr, L"cachegate configuration"},
-    {offsetof(PostOfficeConfig, _cachegateIpAddr), L"cachegate-ip-address", XmlCfgDef::CFG_IP, 0, &a127001,
+    {offsetof(PostOfficeConfig, _cachegateIpAddr), L"cachegate-ip-address", XmlCfgDef::CFG_IP, 0, LOOPBACK_ADDRESS,
      L"cachegate ip address"},
     {offsetof(PostOfficeConfig, _cachegateListenPort), L"cachegate_listen-port", XmlCfgDef::CFG_INT, 0,
      &DEFAULT_CACHEGATE_LISTEN_PORT, L"cachegate listen port"},

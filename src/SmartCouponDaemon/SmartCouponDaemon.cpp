@@ -43,9 +43,8 @@ SmartCouponObjPoolMemoryAllocator* GObjPoolMemAlloc = nullptr;  // rva 0x84B18
 ObjPoolTimer* GObjPoolTimer = nullptr;                          // rva 0x84B20
 static volatile long long _seed__ = 0;                          // ❓ GenerateJobid counter
 
-// Default values of SmartCouponConfig::_Def. ❓ The names come from the export script.
+// Default values of SmartCouponConfig::_Def. The names come from the PDB (SmartCouponConfig.obj).
 static int const DEFAULT_DUMPTYPE = 1;
-static unsigned long const a127001 = 3276849;  // ❓ value as in the binary
 static int const NP_PORT = 6601;
 static int const DEFAULT_MANAGE_LISTEN_PORT = 32000;
 static int const DEFAULT_DAEMON_LISTEN_PORT = 22000;
@@ -76,7 +75,7 @@ XmlCfgDef const SmartCouponConfig::_Def[23] = {
      L"job hash count. 0 means system default."},
     {static_cast<unsigned long long>(-1), nullptr, 0, 0, nullptr, L"network configuration"},
     {offsetof(SmartCouponConfig, _npEnabled), L"np-enabled", XmlCfgDef::CFG_BOOL, 1, nullptr, L"work with next-platform "},
-    {offsetof(SmartCouponConfig, _npAddress), L"np-address", XmlCfgDef::CFG_IP, 0, &a127001,
+    {offsetof(SmartCouponConfig, _npAddress), L"np-address", XmlCfgDef::CFG_IP, 0, L"127.0.0.1",  /* 0x72948 text, no PDB name */
      L"next-platform\taddress"},
     {offsetof(SmartCouponConfig, _npPort), L"np-port", XmlCfgDef::CFG_INT, 0, &NP_PORT, L"next-platform access port"},
     {offsetof(SmartCouponConfig, _manageListenPort), L"manage-listen-port", XmlCfgDef::CFG_INT, 0,
