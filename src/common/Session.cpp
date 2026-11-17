@@ -410,7 +410,7 @@ bool Session::tryReconnect(long timeout)
     _state = POSTPONE_CONNECTING;
     if (_connectCount == 0)
         return reconnect();
-    if (Daemon::Instance->GlobalTimerQueue->Add(timeout, reinterpret_cast<Timer*>(_reconnectTimer)))
+    if (Daemon::Instance->AddTimer(timeout, reinterpret_cast<Timer*>(_reconnectTimer)))
         return true;
     Log::Write(Log::LT_ERROR, SESSION_FILE, 561,
                L"[session], reconnect failed; add to global timer error, id:%I64x, this:%p", _id, this);
@@ -449,7 +449,7 @@ bool Session::reconnect()
                Network::GetAddressStringW(context->_remoteAddr.sin_addr.s_addr), ntohs(context->_remoteAddr.sin_port));
     _state = POSTPONE_CONNECTING;
     _connectPending = false;
-    if (Daemon::Instance->GlobalTimerQueue->Add(5000, reinterpret_cast<Timer*>(_reconnectTimer)))
+    if (Daemon::Instance->AddTimer(5000, reinterpret_cast<Timer*>(_reconnectTimer)))
         return true;
     Log::Write(Log::LT_ERROR, SESSION_FILE, 615,
                L"[session], reconnect failed; add to global timer error, id:%I64x, this:%p, error:%d", _id, this,
@@ -496,7 +496,7 @@ check_state:
     {
         if (_reconnectTimer != nullptr)
         {
-            bool result = Daemon::Instance->GlobalTimerQueue->Remove(reinterpret_cast<Timer*>(_reconnectTimer));
+            bool result = Daemon::Instance->RemoveTimer(reinterpret_cast<Timer*>(_reconnectTimer));
             Log::Write(Log::LT_DEBUG, SESSION_FILE, 671,
                        L"[session], close called; stop reconnect, id:%I64x, this:%p, state:%d, result:%s", _id, this,
                        _state, result ? L"true" : L"false");
@@ -773,7 +773,7 @@ void Session::StopReconnect() const
     {
         self->_option = 1;
         if (self->_reconnectTimer != nullptr)
-            Daemon::Instance->GlobalTimerQueue->Remove(reinterpret_cast<Timer*>(self->_reconnectTimer));
+            Daemon::Instance->RemoveTimer(reinterpret_cast<Timer*>(self->_reconnectTimer));
     }
     LeaveCriticalSection(&self->_lock.CS);
 }

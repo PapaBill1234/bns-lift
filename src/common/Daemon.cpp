@@ -36,6 +36,16 @@
     } while (0)
 
 Daemon* Daemon::Instance = nullptr;
+
+bool Daemon::AddTimer(long elapse, Timer* timer)
+{
+    return GlobalTimerQueue->Add(elapse, timer);
+}
+
+bool Daemon::RemoveTimer(Timer* timer)
+{
+    return GlobalTimerQueue->Remove(timer);
+}
 long long Daemon::Now = 0;
 wchar_t const* Daemon::StateString[10] = {
     L"UNKNOWN", L"STOPPED", L"STOPPING", L"STARTING", L"RUNNING",

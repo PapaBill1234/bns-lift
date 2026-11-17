@@ -167,7 +167,7 @@ ObjPoolTimer::~ObjPoolTimer()
     if (_run)
     {
         _run = false;
-        Daemon::Instance->GlobalTimerQueue->Remove(this);
+        Daemon::Instance->RemoveTimer(this);
         Log::Write(Log::LT_DEBUG, kObjPoolFile, 372, L"[objpool], objpool timer stopped, uptime:%I64d",
                    GetTickCount64() - Daemon::Instance->StartSystemTick64);
     }
@@ -189,7 +189,7 @@ unsigned long long ObjPoolTimer::TimerId() const
 bool ObjPoolTimer::HandleEvent(EventContext*, unsigned long)
 {
     if (_run)
-        Daemon::Instance->GlobalTimerQueue->Add(process(), this);
+        Daemon::Instance->AddTimer(process(), this);
     return true;
 }
 
@@ -205,7 +205,7 @@ bool ObjPoolTimer::Start(long resolution)
         return false;
     }
     timer->_resolution = 1000;
-    Daemon::Instance->GlobalTimerQueue->Add(1000, timer);
+    Daemon::Instance->AddTimer(1000, timer);
     timer->_run = true;
     Log::Write(Log::LT_DEBUG, kObjPoolFile, 389, L"[objpool], objpool timer start, resolution:%d", 1000);
     return true;

@@ -27,7 +27,7 @@ bool UnsentPostChecker::HandleEvent(EventContext* context, unsigned long bytes)
                MODULE_NAME, L"UnsentPostChecker::HandleEvent");
 
     if (isStopState(Daemon::Instance->State) ||
-        PostOfficeDaemon::_instance->GlobalTimerQueue->Add(1000 * PostOfficeDaemon::_instance->_config->_deliveryRetryInterval,
+        PostOfficeDaemon::_instance->AddTimer(1000 * PostOfficeDaemon::_instance->_config->_deliveryRetryInterval,
                                                            this))
         return true;
 

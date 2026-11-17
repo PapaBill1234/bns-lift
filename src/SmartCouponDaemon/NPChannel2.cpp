@@ -114,7 +114,7 @@ bool NPPing::HandleEvent(EventContext*, unsigned long)
         msg.msgInfo.msgType = MESSAGE_TYPE_REQUEST;
         msg.msgInfo.nTxnId = 0;
         _owner->SendMsg(&msg, false, nullptr);
-        Daemon::Instance->GlobalTimerQueue->Add(_interval, this);
+        Daemon::Instance->AddTimer(_interval, this);
     }
     return true;
 }
@@ -587,7 +587,7 @@ bool NPChannel::onConnect(Session const* session, bool firstConnected)
     if (firstConnected && _ping != nullptr && !_ping->_run)
     {
         _ping->_run = true;
-        Daemon::Instance->GlobalTimerQueue->Add(NPPing::_interval, _ping);
+        Daemon::Instance->AddTimer(NPPing::_interval, _ping);
     }
     if (_handler != nullptr && !_handler->OnConnect(this, firstConnected))
     {

@@ -587,7 +587,7 @@ bool PostOfficeDaemon::startTimer()
     {
         void* const mem = Memory::_Manager[2]->Alloc(sizeof(RelayTimeoutChecker), kFile, 527);
         _relayTimeoutChecker = mem ? new (mem) RelayTimeoutChecker() : nullptr;
-        if (!GlobalTimerQueue->Add(1000, _relayTimeoutChecker))
+        if (!AddTimer(1000, _relayTimeoutChecker))
         {
             Log::Write(Log::LT_ERROR, kFile, 529, L"[%s], %s; failed to add relay timeout checker timer", MODULE_NAME,
                        L"PostOfficeDaemon::startTimer");
@@ -596,7 +596,7 @@ bool PostOfficeDaemon::startTimer()
     }
     void* const mem = Memory::_Manager[2]->Alloc(sizeof(UnsentPostChecker), kFile, 535);
     _unsentPostChecker = mem ? new (mem) UnsentPostChecker() : nullptr;
-    if (!GlobalTimerQueue->Add(1000, _unsentPostChecker))
+    if (!AddTimer(1000, _unsentPostChecker))
     {
         Log::Write(Log::LT_ERROR, kFile, 537, L"[%s], %s; failed to add unsent post checker timer", MODULE_NAME,
                    L"PostOfficeDaemon::startTimer");

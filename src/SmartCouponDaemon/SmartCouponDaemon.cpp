@@ -476,7 +476,7 @@ void SmartCouponDaemon::shutdown()
         if (GObjPoolTimer->_run)
         {
             GObjPoolTimer->_run = false;
-            Daemon::Instance->GlobalTimerQueue->Remove(GObjPoolTimer);  // ❓
+            Daemon::Instance->RemoveTimer(GObjPoolTimer);
             Log::Write(Log::LT_DEBUG, L"..\\LobbyDaemon\\ObjectPool.cpp", 372,
                        L"[objpool], objpool timer stopped, uptime:%I64d",
                        static_cast<long long>(GetTickCount64()) - Daemon::Instance->StartSystemTick64);
