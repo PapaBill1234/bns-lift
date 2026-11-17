@@ -26,7 +26,7 @@ wchar_t const* const CHANNEL_HEADER_FILE =                          // LIFT: No 
     L"E:\\DailyBuild02\\SmartCouponDaemon-Common-0.0.348\\depot\\Branch\\348NC\\Program\\Server\\BloodLib\\include\\Channel.h";
 }
 
-// 0x835F8 ❓ module. The data is next to the DaemonChannel.obj strings.
+// 0x835F8 PDB: S_GDATA32 (globals stream, no module). LIFT: file choice. The data is next to the DaemonChannel.obj strings.
 wchar_t const* SmartCouponDaemonTypeDesc[2] = {L"none", L"gamed"};
 
 // 0xc8c0

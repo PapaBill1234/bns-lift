@@ -1,6 +1,6 @@
 // CacheEconomyPacketHandler.obj (PostOfficeDaemon PDB). Source: .scratch/hr/CacheEconomyPacketHandler.c
 // Each handler inlines the static guard init of RelayHeader::GetMemberOffset. The lift skips it (no effect here).
-// Each Decompose call in the original is Packet::Decompose(packet, 0x18, 6, fmt, ...). ❓ Packet.h has no overload
+// Each Decompose call in the original is Packet::Decompose(packet, 0x18, 6, fmt, ...). LIFT: Packet.h has no overload
 // with these two arguments. The lift calls Decompose(fmt, ...).
 #include <winsock2.h>
 #include <windows.h>
@@ -42,7 +42,7 @@ void logEnd(wchar_t const* funcName, int line)  // LIFT: lift helper name, not i
     Log::Write(Log::LT_DEBUG, CEPH_FILE, line, L"[%s], %s; <END PACKET HANDLER>", MODULE_NAME, funcName);
 }
 
-// ❓ Not in the PDB. The original inlines this sequence in each handler (find context, check header, process response).
+// LIFT: Not in the PDB. The original inlines this sequence in each handler (find context, check header, process response).
 bool processEconomyResponse(wchar_t const* funcName, EconomyHeader const& economyHeader, RelayResponse* const response,
                             wchar_t const* processFailText, ResponseLines const& lines)
 {

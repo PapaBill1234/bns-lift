@@ -83,7 +83,7 @@ bool DeliverPostRelayContext::processRelayRequest(Channel* const channel) const
     }
 
     unsigned long long const relayTid = _economyHeader._relayTid;
-    // ❓ The original passes an uninitialized register (r8) as economyFormat.
+    // LIFT: LTCG folded economyFormat (PDB offset 0). The call (0xFD88) sets only rcx and rdx. The callee (0x71E0) does not read r8.
     if (!static_cast<CacheGateChannel*>(channel)->SendFragmentRelayRequest(this, nullptr))
     {
         Log::Write(Log::LT_ERROR, DELIVER_POST_RELAY_FILE, 56, L"[%s], %s; failed to send deliver post relay request, relayTid:0x%I64X",

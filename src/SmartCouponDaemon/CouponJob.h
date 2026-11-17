@@ -72,7 +72,7 @@ public:
     bool ResumeW(unsigned long long jobid, int state, int task);      // 0x72B0
 
 private:
-    friend class SendPublicationEvent;  // ❓ access for HandleEvent (0xBE30)
+    friend class SendPublicationEvent;  // LIFT: access. SendPublicationEvent::HandleEvent calls remove (0xC12D).
     bool add(CouponJob* job);                     // 0x7360
     void remove(unsigned long long jobid);        // 0x7440
     CouponJob* find(unsigned long long jobid);    // 0x7540

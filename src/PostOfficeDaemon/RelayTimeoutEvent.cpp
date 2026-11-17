@@ -6,7 +6,7 @@
 #define RELAY_TIMEOUT_EVENT_FILE L"RelayTimeoutEvent.cpp"
 static wchar_t const* const MODULE_NAME = L"relay timeout event";  // PDB MODULE_NAME
 
-// ❓ inlined in RelayTimeoutChecker::occurTimeoutEvent (0x1db40)
+// LIFT: inlined in RelayTimeoutChecker::occurTimeoutEvent (0x1db40). RelayTimeoutEvent.obj (Mod 0032) has no constructor.
 RelayTimeoutEvent::RelayTimeoutEvent(unsigned long long relayTid, RelayContext* const relayContext)
     : _relayTid(relayTid), _relayContext(relayContext)
 {

@@ -253,7 +253,7 @@ bool WorldConfigManager::loadWorldConfigFile(WorldConfigList* worldConfigList)
     {
         Log::Write(Log::LT_ERROR, WORLD_CONFIG_FILE, 263,
                    L"[%s], %s; xml interface version mismatch, current-version:%s, load-version:%s", MODULE_NAME,
-                   L"loadWorldConfigFile", XML_READER_VERSION, getInterfaceVersion());  // ❓ argument order
+                   L"loadWorldConfigFile", XML_READER_VERSION, getInterfaceVersion());  // 0xE6D6: +0x30 version constant, +0x38 getInterfaceVersion()
     }
     else if (!reader->Initialize(nullptr, nullptr, false))
     {

@@ -312,7 +312,7 @@ void UnsentPostContextManager::CheckUnsentPost()
     } while (delivered);
 }
 
-// 0xd510 ❓ The caller passes no this pointer. The lift makes it static.
+// 0xd510 LIFT: LTCG folded this (PDB offset 0). The lift makes it static.
 bool UnsentPostContextManager::deliverUnsentPost(UnsentPostContext* const unsentPostContext,
                                                  CacheGateChannel* const cachegateChannel)
 {
