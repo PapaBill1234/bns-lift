@@ -84,6 +84,13 @@ static_assert(sizeof(DChannelMgr) == 0x50, "sizeof DChannelMgr");
 static_assert(offsetof(DChannelMgr, _list) == 0x30, "DChannelMgr::_list");
 
 // 0x835F8
+// PDB: LF_ENUM 0x2731
+enum SmartCouponDaemonType
+{
+    SMARTCOUPON_DAEMONTYPE_NONE = 0,
+    SMARTCOUPON_DAEMONTYPE_GAME = 1,
+};
+
 extern wchar_t const* SmartCouponDaemonTypeDesc[2];
 
 bool HandleSmartCoupon_HelloReq(Session const* session, Packet const* packet);                 // 0x7DC0
