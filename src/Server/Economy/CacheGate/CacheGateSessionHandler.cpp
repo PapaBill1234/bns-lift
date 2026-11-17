@@ -15,6 +15,7 @@
 #include "Packet.h"
 #include "PacketUtil.h"
 #include "Session.h"
+#include "CacheGatePacketCommand.h"
 
 static wchar_t const HANDLER_FILE[] = L"CacheGateSessionHandler.cpp";
 static wchar_t const HANDLER_HEADER_FILE[] =
@@ -109,7 +110,7 @@ bool HandleCacheGateHello(Session const* session, Packet const* packet)
     unsigned long ip = session->_connection->_ip;
     if (packetVersion != 4)
     {
-        session->Send("hE", 3);  // BUG: 0x4C00 the format has an error code, but no error code is given.
+        session->Send("hE", CacheGate_HelloFailCmd);  // BUG: 0x4C00 the format has an error code, but no error code is given.
         Log::Write(Log::LT_ERROR, HANDLER_FILE, 31,
                    L"[cg], Hello Recv, Missmatch CurrPacketVersion:%d, RecvPacketVersion:%d, wid:%d, ipAddress:%s",
                    4, packetVersion, wid, Network::GetAddressStringW(ip));
@@ -117,7 +118,7 @@ bool HandleCacheGateHello(Session const* session, Packet const* packet)
     }
     if (economyPacketVersion != 10)
     {
-        session->Send("hE", 3, 5);
+        session->Send("hE", CacheGate_HelloFailCmd, CACHEGATE_HELLOFAIL_INVALID_PACKET_VERSION);
         Log::Write(Log::LT_ERROR, HANDLER_FILE, 38,
                    L"[cg], Hello Recv, Missmatch EconomyPacketVersion EconomyPacketVersion:%d, RecvPacketVersion:%d, wid:%d, ipAddress:%s",
                    10, economyPacketVersion, wid, Network::GetAddressStringW(ip));
@@ -129,7 +130,7 @@ bool HandleCacheGateHello(Session const* session, Packet const* packet)
     if (current != nullptr)
     {
         current->Close(false);
-        session->Send("hE", 3);  // BUG: 0x4C00 the format has an error code, but no error code is given.
+        session->Send("hE", CacheGate_HelloFailCmd);  // BUG: 0x4C00 the format has an error code, but no error code is given.
         Log::Write(Log::LT_ERROR, HANDLER_FILE, 63,
                    L"[cg], Hello Recv, Duplicate ServerID:%d, CurrSessionId:0x%.16I64X, NewSessionId:0x%.16I64X",
                    wid, current->_id, session->_id);
@@ -138,7 +139,7 @@ bool HandleCacheGateHello(Session const* session, Packet const* packet)
 
     if (clientManager->AddSession(wid, session))
     {
-        session->Send("h", 2);
+        session->Send("h", CacheGate_HelloOkCmd);
         Log::Write(Log::LT_DEBUG, HANDLER_FILE, 68, L"[cg], HelloOK Send, sessionId:0x%.16I64X, wid:%d, ipAddress:%s",
                    session->_id, wid, Network::GetAddressStringW(ip));
         return true;
@@ -147,7 +148,7 @@ bool HandleCacheGateHello(Session const* session, Packet const* packet)
     current = clientManager->GetSession(wid);
     if (current != nullptr)
         current->Close(false);
-    session->Send("hE", 3);  // BUG: 0x4C00 the format has an error code, but no error code is given.
+    session->Send("hE", CacheGate_HelloFailCmd);  // BUG: 0x4C00 the format has an error code, but no error code is given.
     Log::Write(Log::LT_ERROR, HANDLER_FILE, 52, L"[cg], client add session fail, wid:%d, ipAddress:%s", wid,
                Network::GetAddressStringW(ip));
     return false;

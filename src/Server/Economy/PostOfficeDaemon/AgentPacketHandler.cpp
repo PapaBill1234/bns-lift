@@ -17,6 +17,7 @@
 #include "PostOfficeDB.h"
 #include "PostOfficeDaemon.h"
 #include "Session.h"
+#include "PostOfficePacketCommand.h"
 
 namespace
 {
@@ -82,7 +83,7 @@ bool HandlePostOfficeHelloReq(Session const* session, Packet const* packet)
     // BUG: 0x1a6f0 no null check after the Alloc. A failed Alloc gives a null call.
     channel->SetSession(session);
     channel->removeReferenceCount(AGENT_PACKET_HANDLER_FILE, 118);
-    session->Send("h", 2);
+    session->Send("h", PostOffice_HelloOkCmd);
     Log::Write(Log::LT_NOTICE, AGENT_PACKET_HANDLER_FILE, 121,
                L"[%s], %s; sent hello success ack, agentWid:%u, connectionType:%d", MODULE_NAME,
                L"HandlePostOfficeHelloReq", static_cast<unsigned int>(agentWid), static_cast<int>(connectionType));
@@ -91,7 +92,7 @@ bool HandlePostOfficeHelloReq(Session const* session, Packet const* packet)
     return true;
 
 $_ERROR:
-    session->Send("hh", 3, static_cast<int>(failReason));
+    session->Send("hh", PostOffice_HelloFailCmd, static_cast<int>(failReason));
     Log::Write(Log::LT_NOTICE, AGENT_PACKET_HANDLER_FILE, 128,
                L"[%s], %s; sent hello failure ack, agentWid:%u, connectionType:%d, failReason:%d",
                MODULE_NAME, L"HandlePostOfficeHelloReq", static_cast<unsigned int>(agentWid),
@@ -349,7 +350,7 @@ bool HandlePostOfficeRegisterPostReq(Session const* session, Packet const* packe
     postId = postInfo._postId;
     recipientWid = static_cast<unsigned short>(postInfo._recipientWid);
     postInfo._postStatus = 1;
-    session->Send("hqq", 5, tid, postInfo._postId);
+    session->Send("hqq", PostOffice_RegisterPostOkCmd, tid, postInfo._postId);
     Log::Write(Log::LT_NOTICE, AGENT_PACKET_HANDLER_FILE, 290,
                L"[%s], %s; sent post registration success ack, tid:0x%I64X, invoiceId:0x%I64X, postId:0x%I64X",
                MODULE_NAME, L"HandlePostOfficeRegisterPostReq", tid, postInfo._invoiceId, postId);
@@ -416,7 +417,7 @@ bool HandlePostOfficeRegisterPostReq(Session const* session, Packet const* packe
     return true;
 
 $_ERROR:
-    session->Send("hqqE", 6, tid, postInfo._postId, static_cast<int>(failReason));
+    session->Send("hqqE", PostOffice_RegisterPostFailCmd, tid, postInfo._postId, static_cast<int>(failReason));
     Log::Write(Log::LT_NOTICE, AGENT_PACKET_HANDLER_FILE, 333,
                L"[%s], %s; sent post registration failure ack, tid:0x%I64X, postId:0x%I64X, failReason:%d",
                MODULE_NAME, L"HandlePostOfficeRegisterPostReq", tid, postInfo._postId,

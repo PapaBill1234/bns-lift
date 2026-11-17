@@ -17,6 +17,7 @@
 #include "Session.h"
 #include "SmartCouponDB.h"
 #include "SmartCouponDaemon.h"
+#include "SmartCouponPacketCommand.h"
 
 static wchar_t const DAEMONPACKETHANDLER_FILE[] = L"DaemonPacketHandler.cpp";
 static wchar_t const SESSION_SOURCE_FILE[] = L"source\\Session.cpp";
@@ -68,7 +69,7 @@ bool HandleSmartCoupon_HelloReq(Session const* session, Packet const* packet)
     if (packet->Decompose("hhQhh", &cmd, &packetVersion, &daemonType, &worldId, &internalPort) == 0)
     {
         Log::Write(Log::LT_ERROR, DAEMONPACKETHANDLER_FILE, 41, L"failed to decompose packet");
-        session->Send("hh", 3, 2);
+        session->Send("hh", SmartCoupon_HelloFailCmd, SMARTCOUPON_SYSTEM_ERROR);
         return false;
     }
 
@@ -77,7 +78,7 @@ bool HandleSmartCoupon_HelloReq(Session const* session, Packet const* packet)
         Log::Write(Log::LT_ERROR, DAEMONPACKETHANDLER_FILE, 48,
                    L"invalid packet version, world-id:%d, packet-version:%d, client version:%d", worldId,
                    SMARTCOUPON_PACKET_VERSION, packetVersion);
-        session->Send("hh", 3, 9);
+        session->Send("hh", SmartCoupon_HelloFailCmd, SMARTCOUPON_HELLOFAIL_INVALID_PACKET_VERSION);
         return false;
     }
 
@@ -87,7 +88,7 @@ bool HandleSmartCoupon_HelloReq(Session const* session, Packet const* packet)
                    L"service not available, packet-version:%d, daemon-type:%s(%d), world-id:%d, internal-port:%d",
                    SMARTCOUPON_PACKET_VERSION, SmartCouponDaemonTypeDesc[daemonType], daemonType, worldId,
                    internalPort);
-        session->Send("hh", 3, 8);
+        session->Send("hh", SmartCoupon_HelloFailCmd, SMARTCOUPON_SERVICE_NOT_AVAILABLE);
         return false;
     }
 
@@ -104,7 +105,7 @@ bool HandleSmartCoupon_HelloReq(Session const* session, Packet const* packet)
     {
         Log::Write(Log::LT_ERROR, DAEMONPACKETHANDLER_FILE, 65, L"register world fail, not capable world, world-id:%d",
                    worldId);
-        session->Send("hh", 3, 2);
+        session->Send("hh", SmartCoupon_HelloFailCmd, SMARTCOUPON_SYSTEM_ERROR);
         return false;
     }
 
@@ -117,7 +118,7 @@ bool HandleSmartCoupon_HelloReq(Session const* session, Packet const* packet)
         wcscpy_s(exp, 15, Network::GetAddressStringW(daemon->_addr));
         Log::Write(Log::LT_ERROR, DAEMONPACKETHANDLER_FILE, 74,
                    L"register world fail, ip validation fail, world-id:%d, ip:%s, required-ip:%s ", worldId, acc, exp);
-        session->Send("hh", 3, 11);
+        session->Send("hh", SmartCoupon_HelloFailCmd, SMARTCOUPON_HELLOFAIL_IP_ADDRESS_MISMATCH);
         daemon->removeReferenceCount(DAEMONPACKETHANDLER_FILE, 76);
         return false;
     }
@@ -148,7 +149,7 @@ bool HandleSmartCoupon_HelloReq(Session const* session, Packet const* packet)
         daemon->Close();
         Log::Write(Log::LT_DEBUG, DAEMONPACKETHANDLER_FILE, 100, L"close old session, old-session:0x%016I64X",
                    oldSession->_id);
-        session->Send("hh", 3, 13);
+        session->Send("hh", SmartCoupon_HelloFailCmd, SMARTCOUPON_HELLOFAIL_DUPLICATED_WORLD);
         // BUG: 0x7DC0 no null check of newDaemon when the alloc fails.
         newDaemon->removeReferenceCount(DAEMONPACKETHANDLER_FILE, 104);
         const_cast<Session*>(oldSession)->removeReferenceCount(CHANNEL_H_FILE, 52);
@@ -157,7 +158,7 @@ bool HandleSmartCoupon_HelloReq(Session const* session, Packet const* packet)
     }
 
     daemon->SetSession(session);
-    session->Send("h", 2);
+    session->Send("h", SmartCoupon_HelloOkCmd);
     int wid = daemon->_daemonId._wid;
     Log::Write(Log::LT_NOTICE, DAEMONPACKETHANDLER_FILE, 113, L"hello success, daemon-type:%s(%d), wid:%d, ip:%s",
                SmartCouponDaemonTypeDesc[daemonType], daemonType, wid, Network::GetAddressStringW(daemon->_addr));
@@ -280,7 +281,7 @@ bool HandleSmartCoupon_GameEventByCharacterReq(Session const* session, Packet co
     }
 
     // BUG: 0x8360 the event leaks on each failure path.
-    session->Send("hqE", 6, tid, static_cast<int>(failReason));
+    session->Send("hqE", SmartCoupon_GameEventByCharacterFailCmd, tid, static_cast<int>(failReason));
     Log::Write(Log::LT_ERROR, DAEMONPACKETHANDLER_FILE, 221,
                L"[packet], 0x%.16I64X, %I64d, sent game-event-by-char failure ack, cmd:%d, wid:%d, channel-tid:0x%.16I64X, "
                L"account-id:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X, pcdbid:0x%I64X, game-event-id:%d, "
@@ -402,7 +403,7 @@ bool HandleSmartCoupon_GameEventByAccountReq(Session const* session, Packet cons
     }
 
     // BUG: 0x8E80 the event leaks on each failure path.
-    session->Send("hqE", 9, tid, static_cast<int>(failReason));
+    session->Send("hqE", SmartCoupon_GameEventByAccountFailCmd, tid, static_cast<int>(failReason));
     Log::Write(Log::LT_ERROR, DAEMONPACKETHANDLER_FILE, 327,
                L"[packet], 0x%.16I64X, %I64d, sent game-event-by-acc failure ack, cmd:%d, wid:%d, channel-tid:0x%.16I64X, "
                L"account-id:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X, game-event-id:%d, failReason:%d",

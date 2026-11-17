@@ -19,6 +19,7 @@
 #include "ContentsRuleConfigDefinition.h"
 #include "WorldListManager.h"
 #include "PcCafeMileageFeverTimeScheduleList.h"
+#include "LobbyGatePacketCommand.h"
 
 // LIFT: PDB types (TPI) have no module, so the lift puts these structs here. Layout from include/pdb/LobbyGate/types.h.
 struct GradeInfo
@@ -108,7 +109,7 @@ static void LobbyDBroadcastReload(Session const* clientSession)  // LIFT: lift h
 {
     long long const* extraData = static_cast<long long const*>(clientSession->_extraData);
     if (extraData != nullptr && *extraData > 0 && *extraData < ContentsRuleConfig::ConfigLastReloadTime)
-        clientSession->Send("hi", 109, ContentsRuleConfig::ConfigReloadCount);
+        clientSession->Send("hi", LobbyGate_ContentsRuleReloadNotifyCmd, ContentsRuleConfig::ConfigReloadCount);
 }
 
 // 0xaf20
@@ -328,7 +329,7 @@ bool HandleLobbyLobbyGate_InitSessionWithNPTokenOk(Session const* session, Packe
     else if (!gate->_clientManager->AddClient(e->_session, gateKey, cliKey))
     {
         LD_ERR(404, L"failed to add clien in climgr" INITNP_SUFFIX, INITNP_ARGS);
-        e->_session->Send("hh", 5);  // BUG: 0xbe90 the format has two fields, but the reason is missing.
+        e->_session->Send("hh", LobbyGate_LoginWithNPTokenFailCmd);  // BUG: 0xbe90 the format has two fields, but the reason is missing.
     }
     else
     {
@@ -337,7 +338,7 @@ bool HandleLobbyLobbyGate_InitSessionWithNPTokenOk(Session const* session, Packe
                                                            e->_session->_connection->_ip))
         {
             LD_ERR(414, L"failed to SendStartSessionWithNPTokenReq" INITNP_SUFFIX, INITNP_ARGS);
-            e->_session->Send("hh", 5);  // BUG: 0xbe90 the format has two fields, but the reason is missing.
+            e->_session->Send("hh", LobbyGate_LoginWithNPTokenFailCmd);  // BUG: 0xbe90 the format has two fields, but the reason is missing.
         }
     }
     LobbyDHandlerRelease(ch);
@@ -367,7 +368,7 @@ bool HandleLobbyLobbyGate_InitSessionWithNPTokenFail(Session const* session, Pac
         // BUG: 0xca10 the suffix text is passed as an argument, not appended to the format.
         LD_ERR(457, L"SendLoginWitNPTokenFail, ", L"InitSessionWithNPTokenFail, gateKey:0x%I64X, failReason:%d",
                gateKey, failReason);
-        e->_session->Send("hh", 5, failReason);
+        e->_session->Send("hh", LobbyGate_LoginWithNPTokenFailCmd, failReason);
     }
     else
     {
@@ -634,7 +635,7 @@ bool HandleLobbyLobbyGate_StartSessionWithNPTokenFail(Session const* session, Pa
             case 18: reason = 13; break;
             default: break;
             }
-            e->_session->Send("hh", 5, reason);
+            e->_session->Send("hh", LobbyGate_LoginWithNPTokenFailCmd, reason);
         }
         e->~GateKeyEntry();
         LD_FREE(e, 841);
@@ -681,7 +682,7 @@ bool HandleLobbyLobbyGate_InitSessionWithLobbyTokenOk(Session const* session, Pa
         else if (!gate->_clientManager->AddClient(e->_session, gateKey, cliKey))
         {
             LD_ERR(907, L"failed to AddClient" INITLT_SUFFIX, gateKey, cliKey);
-            e->_session->Send("hh", 8);  // BUG: 0xeb30 the format has two fields, but the reason is missing.
+            e->_session->Send("hh", LobbyGate_LoginWithLobbyTokenFailCmd);  // BUG: 0xeb30 the format has two fields, but the reason is missing.
         }
         else
         {
@@ -689,7 +690,7 @@ bool HandleLobbyLobbyGate_InitSessionWithLobbyTokenOk(Session const* session, Pa
             if (!gate->_lobbyD->SendStartSessionWithLobbyTokenReq(cliKey))
             {
                 LD_ERR(916, L"failed to SendStartSessionWithLobbyTokenReq" INITLT_SUFFIX, gateKey, cliKey);
-                e->_session->Send("hh", 8);  // BUG: 0xeb30 the format has two fields, but the reason is missing.
+                e->_session->Send("hh", LobbyGate_LoginWithLobbyTokenFailCmd);  // BUG: 0xeb30 the format has two fields, but the reason is missing.
             }
         }
     }
@@ -731,7 +732,7 @@ bool HandleLobbyLobbyGate_InitSessionWithLobbyTokenFail(Session const* session, 
             case 21: reason = 16; break;
             default: break;
             }
-            e->_session->Send("hh", 8, reason);
+            e->_session->Send("hh", LobbyGate_LoginWithLobbyTokenFailCmd, reason);
         }
         else
         {
@@ -1007,7 +1008,7 @@ bool HandleLobbyLobbyGate_StartSessionWithLobbyTokenFail(Session const* session,
             // BUG: 0xffc0 the suffix text is passed as an argument, not appended to the format.
             LD_DBG(1330, L"SendLoginWitLobbyTokenFail, ", L"StartSessionWithLobbyTokenFail, cliKey:0x%I64X, failReason:%d",
                    cliKey, failReason);
-            e->_session->Send("hh", 8, failReason);
+            e->_session->Send("hh", LobbyGate_LoginWithLobbyTokenFailCmd, failReason);
         }
         e->~GateKeyEntry();
         LD_FREE(e, 1333);
@@ -1472,7 +1473,7 @@ bool HandleLobbyLobbyGate_GetEnterWorldTokenOk(Session const* session, Packet* p
     }
     else
     {
-        client->Send("hq", 14, lobbyToken);
+        client->Send("hq", LobbyGate_GetEnterWorldTokenOkCmd, lobbyToken);
         LD_DBG(2115, L"send to client ok, " GEWT_SUFFIX, cliKey, lobbyToken, worldId);
         client->removeReferenceCount(HANDLER_FILE, 2117);
         ch->removeReferenceCount(HANDLER_FILE, 2118);

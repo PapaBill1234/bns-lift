@@ -18,6 +18,7 @@
 #include "Session.h"
 #include "WorldChannel.h"
 #include "WorldConfig.h"
+#include "PostOfficeServicePacketCommand.h"
 
 namespace
 {
@@ -164,7 +165,7 @@ bool HandlePostOfficeServiceHelloReq(Session const* session, Packet const* packe
     }
     worldChannel->SetSession(session);
     worldChannel->removeReferenceCount(WORLD_PACKET_HANDLER_FILE, 111);
-    session->Send("h", 2);
+    session->Send("h", PostOfficeService_HelloOkCmd);
     Log::Write(Log::LT_NOTICE, WORLD_PACKET_HANDLER_FILE, 114, L"[%s], %s; sent hello success ack, wid:%u",
                MODULE_NAME, L"HandlePostOfficeServiceHelloReq", static_cast<unsigned int>(wid));
     Log::Write(Log::LT_DEBUG, WORLD_PACKET_HANDLER_FILE, 116, L"[%s], %s; <END PACKET HANDLER>",
@@ -172,7 +173,7 @@ bool HandlePostOfficeServiceHelloReq(Session const* session, Packet const* packe
     return true;
 
 $_ERROR:
-    session->Send("hh", 3, static_cast<int>(failReason));
+    session->Send("hh", PostOfficeService_HelloFailCmd, static_cast<int>(failReason));
     Log::Write(Log::LT_NOTICE, WORLD_PACKET_HANDLER_FILE, 121, L"[%s], %s; sent hello failure ack, wid:%u, failReason:%d",
                MODULE_NAME, L"HandlePostOfficeServiceHelloReq", static_cast<unsigned int>(wid),
                static_cast<int>(failReason));
@@ -276,7 +277,7 @@ bool HandlePostOfficeServiceRetrieveCharacterInfoReq(Session const* session, Pac
     return true;
 
 $_ERROR:
-    session->Send("hqE", 6, request._gameTid, static_cast<int>(failReason));
+    session->Send("hqE", PostOfficeService_RetrieveCharacterInfoFailCmd, request._gameTid, static_cast<int>(failReason));
     Log::Write(Log::LT_NOTICE, WORLD_PACKET_HANDLER_FILE, 201,
                L"[%s], %s; sent retrieve character info failure ack, requestWid:%u, gameTid:0x%I64X, failReason:%d",
                MODULE_NAME, L"HandlePostOfficeServiceRetrieveCharacterInfoReq",
@@ -377,7 +378,7 @@ bool HandlePostOfficeServiceCheckPostCapacityReq(Session const* session, Packet 
     return true;
 
 $_ERROR:
-    session->Send("hqE", 9, request._gameTid, static_cast<int>(failReason));
+    session->Send("hqE", PostOfficeService_CheckPostCapacityFailCmd, request._gameTid, static_cast<int>(failReason));
     Log::Write(Log::LT_NOTICE, WORLD_PACKET_HANDLER_FILE, 278,
                L"[%s], %s; sent check post capacity failure ack, requestWid:%u, gameTid:0x%I64X, failReason:%d",
                MODULE_NAME, L"HandlePostOfficeServiceCheckPostCapacityReq",
@@ -576,7 +577,7 @@ bool HandlePostOfficeServiceRegisterPostReq(Session const* session, Packet const
     postId = postInfo._postId;
     recipientWid = static_cast<unsigned short>(postInfo._recipientWid);
     postInfo._postStatus = 1;
-    session->Send("hqq", 11, tid, postInfo._postId);
+    session->Send("hqq", PostOfficeService_RegisterPostOkCmd, tid, postInfo._postId);
     Log::Write(Log::LT_NOTICE, WORLD_PACKET_HANDLER_FILE, 437,
                L"[%s], %s; sent post registration success ack, tid:0x%I64X, invoiceId:0x%I64X, postId:0x%I64X",
                MODULE_NAME, L"HandlePostOfficeServiceRegisterPostReq", tid, postInfo._invoiceId, postId);
@@ -644,7 +645,7 @@ bool HandlePostOfficeServiceRegisterPostReq(Session const* session, Packet const
     return true;
 
 $_ERROR:
-    session->Send("hqE", 12, tid, static_cast<int>(failReason));
+    session->Send("hqE", PostOfficeService_RegisterPostFailCmd, tid, static_cast<int>(failReason));
     Log::Write(Log::LT_NOTICE, WORLD_PACKET_HANDLER_FILE, 481,
                L"[%s], %s; sent post registration failure ack, tid:0x%I64X, failReason:%d", MODULE_NAME,
                L"HandlePostOfficeServiceRegisterPostReq", tid, static_cast<int>(failReason));
