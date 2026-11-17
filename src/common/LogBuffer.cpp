@@ -154,7 +154,7 @@ void LogBufferAllocator::initAllocator()
         while (size < sizeof(LogBuffer))
             size *= 2;
         void* memory = BaseMemoryManager::_Instance.Alloc(sizeof(PagePoolMemoryManager), LOGBUFFER_FILE, 261);
-        _Allocator = memory != nullptr ? new (memory) PagePoolMemoryManager(SysInfo::_Granularity) : nullptr;
+        _Allocator = memory != nullptr ? new (memory) PagePoolMemoryManager(SysInfo::MemnoryAllocationGranularity()) : nullptr;
         // BUG: 0x20440 (SmartCouponDaemon) no null check of _Allocator before Initialize.
         _Allocator->Initialize(size);
     }

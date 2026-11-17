@@ -5,6 +5,10 @@
 #include <stdio.h>
 #include <wchar.h>
 #include <new>
+#include <locale.h>
+
+// msvcr100 export (LobbyGate import __imp__vswprintf_c_l). The Wine msvcrt headers do not declare it.
+extern "C" int __cdecl _vswprintf_c_l(wchar_t* buffer, size_t count, wchar_t const* format, _locale_t locale, va_list args);
 #include "Daemon.h"
 #include "LogBuffer.h"
 #include "LogMedia.h"
@@ -38,7 +42,7 @@ bool Log::Initialize()
         return true;
     void* memory = BaseMemoryManager::_Instance.Alloc(sizeof(Log), LOG_FILE, 45);
     instance = memory != nullptr ? new (memory) Log() : nullptr;
-    return Daemon::Instance->threadManager->StartThread(instance, nullptr);  // ❓ threadId is an uninitialized register (r8)
+    return Daemon::Instance->threadManager->StartThread(instance, nullptr);  // threadId = nullptr (LobbyGate 0x1aa43 xor r8d)
 }
 
 // 0x19730 (SmartCouponDaemon)
@@ -113,7 +117,7 @@ void Log::WriteV(wchar_t const* file, int line, long errorCode, wchar_t const* f
     swprintf(fmt, 512, L"%s, error: %d, msg: %s", format, errorCode, msg);
     LogBuffer* logbuf = LogBufferAllocator::_Local->allocate();
     logbuf->Prepare(LT_ERROR, file, line);
-    _vsnwprintf(logbuf->_log, 1980, fmt, args);  // ❓ original: _vswprintf_c_l(..., nullptr, args)
+    _vswprintf_c_l(logbuf->_log, 1980, fmt, nullptr, args);
     Add(logbuf);
     logbuf->removeReferenceCount(LOG_FILE, 184);
 }
@@ -127,7 +131,7 @@ void Log::Write(Type type, wchar_t const* file, int line, wchar_t const* format,
     {
         LogBuffer* logbuf = LogBufferAllocator::_Local->allocate();
         logbuf->Prepare(type, file, line);
-        _vsnwprintf(logbuf->_log, 1980, format, args);  // ❓ original: _vswprintf_c_l(..., nullptr, args)
+        _vswprintf_c_l(logbuf->_log, 1980, format, nullptr, args);  // LobbyGate 0x1adcf
         Add(logbuf);
         logbuf->removeReferenceCount(LOG_FILE, 209);
     }

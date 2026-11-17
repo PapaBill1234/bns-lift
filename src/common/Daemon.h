@@ -86,8 +86,8 @@ public:
     virtual void FlushExtraLog();
 
     static bool Start(Console* console, bool debugMode, int argc, wchar_t const** argv);  // 0xad50
-    // ❓ The PDB name is "public: bool Daemon::Reload(wchar_t**,int)" (not static), but the code
-    // uses Daemon::Instance and the call gives argv in rcx. Thus the lift declares them static.
+    // LIFT: static. PDB types 0x23AC and 0x23AD give a this type, but CacheGate 0xaf30 takes argv in rcx
+    // and argc in edx (0xaf47, 0xaf49) and reads Daemon::Instance (0xaf40).
     static bool Reload(wchar_t** argv, int argc);  // 0xaf30
     static bool Cooldown();                        // 0xb050
 
@@ -102,8 +102,11 @@ private:
     void setAddress();                             // 0xbda0
     void noTimerMain(Network* networkInstance);    // 0xc220
     void timerMain(Network* networkInstance);      // 0xc370
-    void setState(int state);                      // LIFT: inlined helper (PipeConsole and Console state)
-    friend class LobbyGateCooldownTimer;           // ❓ access for LobbyGateCooldownTimer::HandleEvent (0x13bf0, LobbyGate)
+    // LIFT: friend. LobbyGateCooldownTimer::HandleEvent (LobbyGate 0x13bf0) has setState inlined: State, pipeConsole and console.
+    friend class LobbyGateCooldownTimer;
+
+protected:
+    void setState(int state);                      // PDB: protected, no S_GPROC32 (inlined; PipeConsole and Console state)
 
 public:
     // PDB: Daemon::AddTimer, RemoveTimer (public). LIFT: no S_GPROC32 in the PDB; LTCG inlines them into the callers.

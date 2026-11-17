@@ -531,7 +531,7 @@ void PacketBufferAllocator::initAllocator()
         while (size < sizeof(PacketBuffer))
             size *= 2;
         void* memory = BaseMemoryManager::_Instance.Alloc(sizeof(PagePoolMemoryManager), PACKETBUFFER_FILE, 1374);
-        _Allocator = memory != nullptr ? new (memory) PagePoolMemoryManager(SysInfo::_Granularity) : nullptr;
+        _Allocator = memory != nullptr ? new (memory) PagePoolMemoryManager(SysInfo::MemnoryAllocationGranularity()) : nullptr;
         // BUG: 0x24100 (SmartCouponDaemon) no null check of _Allocator before Initialize. No lock.
         _Allocator->Initialize(size);
     }

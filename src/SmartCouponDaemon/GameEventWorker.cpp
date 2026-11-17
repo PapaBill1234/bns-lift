@@ -134,7 +134,7 @@ bool GameEventManager::initWorkerThread(unsigned int threadCount)
     GameEventManager* mgr = Instance;
     unsigned int count = threadCount;
     if (count == 0)
-        count = 2 * SysInfo::_ProcessorCount;
+        count = 2 * SysInfo::ProcessorCount();
     mgr->_threads = static_cast<GameEventWorker**>(
         Memory::_Manager[2]->AllocZero(sizeof(GameEventWorker*) * count, kFile, 113));
     for (unsigned int i = 0; i < count; ++i)

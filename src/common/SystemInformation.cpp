@@ -6,10 +6,19 @@
 #include <stdlib.h>
 #include <windows.h>
 
-// Set by BloodDaemonMain (Daemon.cpp) from GetSystemInfo.
-int SysInfo::_PageSize = 0;
 int SysInfo::_ProcessorCount = 0;
+int SysInfo::_PageSize = 0;
 int SysInfo::_Granularity = 0;
+
+// Inlined into BloodDaemonMain (LobbyGate 0xa690).
+void SysInfo::Get()
+{
+    SYSTEM_INFO systemInfo;
+    GetSystemInfo(&systemInfo);
+    _PageSize = systemInfo.dwPageSize;
+    _ProcessorCount = systemInfo.dwNumberOfProcessors;
+    _Granularity = systemInfo.dwAllocationGranularity;
+}
 
 // Adds value to address[] if it is not there and there is space.  // LIFT: inline helper, no PDB name
 static void addUniqueAddress(unsigned long* address, int capacity, int* found, unsigned long value)
