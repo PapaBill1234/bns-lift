@@ -18,7 +18,7 @@ static wchar_t const* const MODULE_NAME = L"db";  // PDB MODULE_NAME
 
 namespace
 {
-// ❓ word_1400544F4: an empty text.
+// PDB: ??_C@_11LOCGONAA@ (rva 0x544f4)
 wchar_t const kEmpty[] = L"";
 
 unsigned long long const kNullData = static_cast<unsigned long long>(-1);  // SQL_NULL_DATA
@@ -272,7 +272,7 @@ bool SmartCouponDB::ProcessCharacterGameEventLog(int* dbRetValue, long long game
         for (;;)
         {
             memset(&publicationInfo, 0, sizeof(publicationInfo));
-            int const result = tran.Tran->Fetch(0);  // ❓ argument
+            int const result = tran.Tran->Fetch(0);  // LIFT: Fetch (0x21180) never reads edx; no call site sets it
             if (result == -1)
             {
                 Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 302,
@@ -357,7 +357,7 @@ bool SmartCouponDB::ProcessAccountGameEventLog(int* dbRetValue, long long gameEv
         for (;;)
         {
             memset(&publicationInfo, 0, sizeof(publicationInfo));
-            int const result = tran.Tran->Fetch(0);  // ❓ argument
+            int const result = tran.Tran->Fetch(0);  // LIFT: Fetch (0x21180) never reads edx; no call site sets it
             if (result == -1)
             {
                 Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 394,
@@ -508,23 +508,22 @@ bool SmartCouponDB::UpdateStatusToPublicationFailure(int* dbRetValue, long long 
     return false;
 }
 
-// ❓ Shared body of LoadGameEventLogList and LoadRetryReadyGameEventLogList. The compiler made two copies.
-static bool loadEventLogList(int* dbRetValue, RetrieveEventLogContext* outEventLogContext, wchar_t const* tag,
-                             wchar_t const* query, int lineAcquire, int linePrepare, int lineExecute, int lineFetch,
-                             int lineInvalid, int lineBind)
+// 0x13620
+bool SmartCouponDB::LoadGameEventLogList(int* dbRetValue, RetrieveEventLogContext* outEventLogContext)
 {
     *dbRetValue = 0;
     AutoDbTran tran(1);
     if (tran.Tran == nullptr)
     {
-        Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, lineAcquire,
-                   L"[%s], failed to acquire transaction, dbId:%d,  %s %s", MODULE_NAME, 1, tag, kEmpty);
+        Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 600,
+                   L"[%s], failed to acquire transaction, dbId:%d,  load-game-event-log %s", MODULE_NAME, 1, kEmpty);
         return false;
     }
+    wchar_t const* const query = L"{?=CALL dbo.usp_LoadGameEventLogList}";
     if (!tran.Tran->Prepare(const_cast<wchar_t*>(query)))
     {
-        Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, linePrepare, L"[%s], failed to prepare sql, %s %s, query:%s",
-                   MODULE_NAME, tag, kEmpty, query);
+        Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 606, L"[%s], failed to prepare sql, load-game-event-log %s, query:%s",
+                   MODULE_NAME, kEmpty, query);
         return false;
     }
     unsigned long long retLen = 0;
@@ -539,44 +538,36 @@ static bool loadEventLogList(int* dbRetValue, RetrieveEventLogContext* outEventL
     {
         if (!tran.Tran->Execute())
         {
-            Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, lineExecute, L"[%s], failed to execute sql, %s %s, query:%s",
-                       MODULE_NAME, tag, kEmpty, query);
+            Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 628, L"[%s], failed to execute sql, load-game-event-log %s, query:%s",
+                       MODULE_NAME, kEmpty, query);
             return false;
         }
         for (;;)
         {
             memset(&eventLogInfo, 0, sizeof(eventLogInfo));
-            int const result = tran.Tran->Fetch(0);  // ❓ argument
+            int const result = tran.Tran->Fetch(0);  // LIFT: Fetch (0x21180) never reads edx; no call site sets it
             if (result == -1)
             {
-                Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, lineFetch, L"[%s], failed to fetch, %s %s", MODULE_NAME, tag,
+                Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 640, L"[%s], failed to fetch, load-game-event-log %s", MODULE_NAME,
                            kEmpty);
                 return false;
             }
             if (result == 0)
                 break;
             if (eventLogLen[0] == -1 || eventLogLen[1] == -1 || eventLogLen[4] == -1)
-                Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, lineInvalid,
-                           L"[%s], invalid db data, %s %s, logIdLen:0x%I64X, gameAccountIdLen:0x%I64X, "
+                Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 655,
+                           L"[%s], invalid db data, load-game-event-log %s, logIdLen:0x%I64X, gameAccountIdLen:0x%I64X, "
                            L"widLen:0x%I64X, pcIdLen:0x%I64X, EventIdLen:0x%I64X",
-                           MODULE_NAME, tag, kEmpty, eventLogLen[0], eventLogLen[1], eventLogLen[2], eventLogLen[3],
+                           MODULE_NAME, kEmpty, eventLogLen[0], eventLogLen[1], eventLogLen[2], eventLogLen[3],
                            eventLogLen[4]);
             else
                 outEventLogContext->AddEventLogInfo(&eventLogInfo);
         }
         return *dbRetValue == 0;
     }
-    Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, lineBind, L"[%s], failed to bind parameter, %s %s", MODULE_NAME, tag,
+    Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 670, L"[%s], failed to bind parameter, load-game-event-log %s", MODULE_NAME,
                kEmpty);
     return false;
-}
-
-// 0x13620
-bool SmartCouponDB::LoadGameEventLogList(int* dbRetValue, RetrieveEventLogContext* outEventLogContext)
-{
-    // ❓ The original has the tag inside each format text ("load-game-event-log %s"). The output text is the same.
-    return loadEventLogList(dbRetValue, outEventLogContext, L"load-game-event-log",
-                            L"{?=CALL dbo.usp_LoadGameEventLogList}", 600, 606, 628, 640, 655, 670);
 }
 
 // 0x13a30
@@ -614,7 +605,7 @@ bool SmartCouponDB::LoadCouponPublicationList(int* dbRetValue, RetrievePublicati
         for (;;)
         {
             memset(&publicationInfo, 0, sizeof(publicationInfo));
-            int const result = tran.Tran->Fetch(0);  // ❓ argument
+            int const result = tran.Tran->Fetch(0);  // LIFT: Fetch (0x21180) never reads edx; no call site sets it
             if (result == -1)
             {
                 Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 723, L"[%s], failed to fetch, load-coupon-publication %s",
@@ -685,7 +676,7 @@ bool SmartCouponDB::LoadSingleCouponPublication(int* dbRetValue, long long publi
         for (;;)
         {
             memset(&publicationInfo, 0, sizeof(publicationInfo));
-            int const result = tran.Tran->Fetch(0);  // ❓ argument
+            int const result = tran.Tran->Fetch(0);  // LIFT: Fetch (0x21180) never reads edx; no call site sets it
             if (result == -1)
             {
                 Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 808,
@@ -726,6 +717,61 @@ bool SmartCouponDB::LoadSingleCouponPublication(int* dbRetValue, long long publi
 // 0x145f0
 bool SmartCouponDB::LoadRetryReadyGameEventLogList(int* dbRetValue, RetrieveEventLogContext* outEventLogContext)
 {
-    return loadEventLogList(dbRetValue, outEventLogContext, L"load-retryready-game-event-log",
-                            L"{?=CALL dbo.usp_LoadRetryReadyGameEventLogList}", 860, 866, 888, 900, 915, 930);
+    *dbRetValue = 0;
+    AutoDbTran tran(1);
+    if (tran.Tran == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 860,
+                   L"[%s], failed to acquire transaction, dbId:%d,  load-retryready-game-event-log %s", MODULE_NAME, 1, kEmpty);
+        return false;
+    }
+    wchar_t const* const query = L"{?=CALL dbo.usp_LoadRetryReadyGameEventLogList}";
+    if (!tran.Tran->Prepare(const_cast<wchar_t*>(query)))
+    {
+        Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 866, L"[%s], failed to prepare sql, load-retryready-game-event-log %s, query:%s",
+                   MODULE_NAME, kEmpty, query);
+        return false;
+    }
+    unsigned long long retLen = 0;
+    EventLogInfo eventLogInfo;
+    long long eventLogLen[5] = {0};
+    if (tran.Tran->BindParam(1, SQL_PARAM_OUTPUT, dbRetValue, SQL_INTEGER, SQL_C_SLONG, &retLen) &&
+        tran.Tran->BindCol(1, &eventLogInfo.logId, SQL_C_SBIGINT, &eventLogLen[0]) &&
+        tran.Tran->BindCol(2, &eventLogInfo.gameAccountId, SQL_C_GUID, &eventLogLen[1]) &&
+        tran.Tran->BindCol(3, &eventLogInfo.wid, SQL_C_SSHORT, &eventLogLen[2]) &&
+        tran.Tran->BindCol(4, &eventLogInfo.pcdbid, SQL_C_SBIGINT, &eventLogLen[3]) &&
+        tran.Tran->BindCol(5, &eventLogInfo.gameEventId, SQL_C_SLONG, &eventLogLen[4]))
+    {
+        if (!tran.Tran->Execute())
+        {
+            Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 888, L"[%s], failed to execute sql, load-retryready-game-event-log %s, query:%s",
+                       MODULE_NAME, kEmpty, query);
+            return false;
+        }
+        for (;;)
+        {
+            memset(&eventLogInfo, 0, sizeof(eventLogInfo));
+            int const result = tran.Tran->Fetch(0);  // LIFT: Fetch (0x21180) never reads edx; no call site sets it
+            if (result == -1)
+            {
+                Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 900, L"[%s], failed to fetch, load-retryready-game-event-log %s", MODULE_NAME,
+                           kEmpty);
+                return false;
+            }
+            if (result == 0)
+                break;
+            if (eventLogLen[0] == -1 || eventLogLen[1] == -1 || eventLogLen[4] == -1)
+                Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 915,
+                           L"[%s], invalid db data, load-retryready-game-event-log %s, logIdLen:0x%I64X, gameAccountIdLen:0x%I64X, "
+                           L"widLen:0x%I64X, pcIdLen:0x%I64X, EventIdLen:0x%I64X",
+                           MODULE_NAME, kEmpty, eventLogLen[0], eventLogLen[1], eventLogLen[2], eventLogLen[3],
+                           eventLogLen[4]);
+            else
+                outEventLogContext->AddEventLogInfo(&eventLogInfo);
+        }
+        return *dbRetValue == 0;
+    }
+    Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 930, L"[%s], failed to bind parameter, load-retryready-game-event-log %s", MODULE_NAME,
+               kEmpty);
+    return false;
 }
