@@ -27,3 +27,4 @@ __pycache__/
 
 # Upstream zstd source (vendor/zstd/README.md). Do not commit.
 vendor/zstd/src
+build-vs2010/

@@ -5,6 +5,7 @@
 #include "AlertSender.h"
 #include "CrashHandler.h"
 #include <shellapi.h>
+#include <stdlib.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <wchar.h>

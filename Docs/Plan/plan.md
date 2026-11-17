@@ -143,6 +143,41 @@ VS2010 SP1 compiler (user approved the download and the Microsoft licence, 2026-
 
 - Location: `~/toolchains/vs2010/` (outside the repo). Never commit it.
 
+VS2010 build (`tools/vs2010/build.sh`, tested 2026-11-17):
+
+```
+clang build (build/build.ninja) ──► object list + .res per exe
+                                      │
+            cl 16.00 /O2 /GL /MD /Z7 ─┘──► build-vs2010/obj/
+                                              │
+                      link 10.0 /LTCG /DEBUG ─┘──► build-vs2010/<EXE>.exe + .pdb
+```
+
+1. Run `tools/gate.sh` first. The script reads the object list from `build/build.ninja`.
+2. Run `tools/vs2010/build.sh [EXE...]` in tmux. With no argument, it builds CacheGate, LobbyGate, SmartCouponDaemon and PostOfficeDaemon.
+3. Read `build-vs2010/obj/<src>.log` for a compile error. Read `build-vs2010/<EXE>.link.log` for a link error.
+4. Run `uv run -q --no-project --with capstone --with pefile python tools/funcdiff.py <EXE> --build build-vs2010`.
+
+| Rule | Reason |
+| --- | --- |
+| Use `/Z7`, not `/Zi`. | `/Zi` starts `mspdbsrv.exe`. It hangs under Wine. |
+| Use `/FIwinsock2.h`. | Some headers include `windows.h` before `winsock2.h`. |
+| Do not compile `src/crt/`. | The VS2010 build links the real `msvcrt.lib` (`/MD`). |
+| Include `<stdlib.h>` for `_countof`. | cl 16.00 does not get it from other headers. clang-cl does. |
+
+- The zstd C files compile under cl 16.00 with no change.
+- Baseline 2026-11-17 (VS2010 build, `/GL` + `/LTCG`):
+
+| Server | Paired | MATCH | Mean score | Only in original |
+| --- | --- | --- | --- | --- |
+| CacheGate | 456 | 216 (47 %) | 88.6 | 35 |
+| LobbyGate | 623 | 280 (45 %) | 88.9 | 116 |
+| SmartCouponDaemon | 584 | 225 (39 %) | 88.2 | 85 |
+| PostOfficeDaemon | 653 | 262 (40 %) | 88.7 | 106 |
+
+- The VS2010 build doubles the MATCH count and adds about 14 points to the mean score, compared with the clang-cl build below.
+- LTCG inlines more functions. Thus LobbyGate and PostOfficeDaemon have fewer paired functions than in the clang-cl build.
+
 Step 2 now (without VS2010): `tools/funcdiff.py <Server>`. reccmp is x86 only, so this is x64 glue.
 
 | Signal | Compared |
