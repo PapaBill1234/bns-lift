@@ -88,9 +88,9 @@ private:
     friend class Channel;
     friend class ReconnectTimer;
     friend class IdleStateTable;
-    friend class DelayedRelease;  // ❓ access for DelayedRelease::Release (0x22DA0)
-    friend class LobbyDSessionHandler;  // ❓ access for LobbyDSessionHandler::PacketHandler (LobbyGate 0x9660)
-    friend class PostOfficeDaemon;  // ❓ initNetwork and onStart (PostOfficeDaemon 0x135e0, 0x13ca0) read Instance
+    friend class DelayedRelease;  // LIFT: friend; PDB: Network::Instance is private. Release reads it (SmartCouponDaemon 0x22DA0, LobbyGate 0x283fb).
+    friend class LobbyDSessionHandler;  // LIFT: friend; PDB: Network::Instance is private. PacketHandler reads it (LobbyGate 0x96f5, 0x97f8).
+    friend class PostOfficeDaemon;  // LIFT: friend; PDB: Network::Instance is private. initNetwork and onStart read it (PostOfficeDaemon 0x13670, 0x13ca6).
 };
 static_assert(sizeof(Network) == 0xE0, "sizeof Network");
 static_assert(offsetof(Network, _iocpHandle) == 0xD8, "Network::_iocpHandle");

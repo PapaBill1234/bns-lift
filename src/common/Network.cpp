@@ -54,17 +54,17 @@ DynamicEventObject::~DynamicEventObject()
 {
 }
 
-// ❓ Not in the CacheGate hr export. Same body as DynamicRefCntObj::deallocate_me (0x2350).
+// 0x2350 (CacheGate PDB; folded with DynamicRefCntObj::deallocate_me). LobbyGate 0x1330.
 void DynamicEventObject::deallocate_me(void* ptr, wchar_t const* file, int line)
 {
     this->~DynamicEventObject();
     Memory::_Manager[2]->Free(ptr, file, line);
 }
 
-// ❓ IDA dword_14004E408: default maxSession for each initialMode (0..3).
+// LIFT: name; CacheGate .rdata 0x4e408 = {10000, 10000, 16, 16}, indexed by initialMode at 0xd40b-0xd412.
 static unsigned int const s_defaultMaxSession[4] = {10000, 10000, 16, 16};
 
-// ❓ TLS buffers of GetAddressStringW (TLS +64 and TLS +96).
+// LIFT: names; GetAddressStringW (LobbyGate 0x20b20) uses TLS slot 0 +0x40 char[32] (strcpy_s size 0x20, 0x20b5e) and +0x60 wchar_t[32] (cch 0x1F, 0x20b7d).
 static __declspec(thread) char s_addressStringA[32];
 static __declspec(thread) wchar_t s_addressStringW[32];
 
