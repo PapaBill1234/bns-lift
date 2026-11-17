@@ -38,7 +38,7 @@ inline CriticalSection::~CriticalSection()
 }
 
 // PDB: AutoCS (PostOfficeDaemon). The ctor is inline. Leave (0x3c90) and the dtor (0x3c80)
-// have their bodies in src/PostOfficeDaemon/RelayContext.cpp (❓ module: COMDAT, no own .obj).
+// have their bodies in src/PostOfficeDaemon/CachedWatchdog.cpp (PDB: COMDAT in CachedWatchdog.obj, Mod 0010).
 class AutoCS
 {
 public:

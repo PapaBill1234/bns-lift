@@ -7,18 +7,19 @@
 class DbTransaction
 {
 public:
-    // ❓ The PDB parameter names do not match the role. BindCol: bufferSize is the C type.
-    bool BindCol(unsigned int index, void* buffer, unsigned long long bufferSize, long long* varType);
+    // PDB names (SmartCouponDaemon S_REGREL32). LIFT: LTCG folded bufferSize (0x20E40, PDB offset 0).
+    bool BindCol(unsigned int index, void* buffer, unsigned int varType, long long* result);
     bool Prepare(wchar_t* query);
-    // ❓ The PDB parameter names do not match the role. bufferSize is the SQL type, columnSize is the C type,
-    // decimalDigits is the length/indicator pointer.
-    bool BindParam(unsigned int index, unsigned int inout, void* buffer, unsigned long long bufferSize,
-                   unsigned long long columnSize, unsigned long long* decimalDigits);
+    // PDB names (SmartCouponDaemon S_REGREL32). LIFT: LTCG folded bufferSize, columnSize and
+    // decimalDigits (0x20FD0, PDB offset 0). dbType is the SQL type. varType is the C type.
+    bool BindParam(unsigned int index, unsigned int inout, void* buffer, unsigned int dbType,
+                   unsigned int varType, unsigned long long* result);
     // Full PDB signatures (PostOfficeDaemon 0x2d010, 0x2d190). The SmartCouponDaemon copies above are LTCG forms.
     bool BindCol(unsigned int index, void* buffer, long long bufferSize, unsigned int varType,
                  unsigned long long* result);
+    // LIFT: LTCG folded decimalDigits (0x2d190, PDB offset 0).
     bool BindParam(unsigned int index, unsigned int inout, void* buffer, long long bufferSize,
-                   unsigned long long columnSize, int decimalDigits, int dbType, unsigned long long* varType);
+                   unsigned long long columnSize, int dbType, int varType, unsigned long long* result);
     bool Execute();
     int Fetch(int fetchCount);
 

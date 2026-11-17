@@ -9,8 +9,9 @@
 class LogFile : public LogMedia
 {
 public:
-    // LTCG folded the constant arguments of the one caller (SmartCouponDaemon::initLog, 0x1504F):
-    // bufmax 0, codePage 0, fileType 2. The IDA prototype is (rootDir, fileType, logType). ❓
+    // LIFT: LTCG folded all arguments except rootDir. The PDB parameters are (rootDir, fileType, logType,
+    // maxbuf, prefix, codePage). All except rootDir have PDB offset 0. The code (0x21970) reads only rdx
+    // and writes edx at 0x2199C. The one caller is SmartCouponDaemon::initLog (0x1504F).
     LogFile(wchar_t const* rootDir, int fileType, int logType);  // 0x21970 (SmartCouponDaemon)
     virtual ~LogFile();                        // 0x21A70 (SmartCouponDaemon)
     virtual int GetType() const;               // 0x41CC0 (SmartCouponDaemon)

@@ -18,45 +18,7 @@ static wchar_t const* const MODULE_NAME = L"relay context";  // PDB MODULE_NAME
         AlertSender::Write(RELAY_CONTEXT_FILE, line, fmt, __VA_ARGS__);                       \
     } while (0)
 
-#define LOCK_H_WIDE L"e:\\dailybuild02\\postofficedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\bloodlib\\include\\Lock.h"
-#define LOCK_H_NARROW "e:\\dailybuild02\\postofficedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\bloodlib\\include\\Lock.h"
-
 unsigned long long RelayContextManager::_idSeed = 0xFFFFFFFFFFFFFFFFULL;  // .data rva 0x98BE0
-
-// ---- AutoCS (Lock.h, inline in the original) ----
-
-// LIFT: inlined
-AutoCS::AutoCS(CriticalSection* cs) : CS(cs), EnterCount(0)
-{
-    if (cs == nullptr)
-    {
-        Log::Write(Log::LT_ERROR, LOCK_H_WIDE, 113, L"== CRASH == ASSERT CRASH");
-        AlertSender::Write(LOCK_H_WIDE, 113, L"== CRASH == ASSERT CRASH");
-        CrashHandler::MakeCrash(LOCK_H_NARROW, 113, L"");
-    }
-    EnterCriticalSection(&CS->CS);
-    EnterCount = 1;
-}
-
-// 0x3c80
-AutoCS::~AutoCS()
-{
-    Leave();
-}
-
-// 0x3c90
-void AutoCS::Leave()
-{
-    if (CS == nullptr)
-    {
-        Log::Write(Log::LT_ERROR, LOCK_H_WIDE, 122, L"== CRASH == ASSERT CRASH");
-        AlertSender::Write(LOCK_H_WIDE, 122, L"== CRASH == ASSERT CRASH");
-        CrashHandler::MakeCrash(LOCK_H_NARROW, 122, L"");
-    }
-    if (EnterCount == 1)
-        LeaveCriticalSection(&CS->CS);
-    --EnterCount;  // BUG: 0x3c90 the dtor after an explicit Leave makes EnterCount wrap to 0xFFFFFFFF.
-}
 
 // ---- RelayContext ----
 

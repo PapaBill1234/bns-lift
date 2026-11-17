@@ -28,7 +28,7 @@ public:
 
     virtual bool Initialize(HINSTANCE__* instance, wchar_t const* className, wchar_t const* title,
                             void* icon, void* onClose, void* reloadHandler, void* shutdownHandler,
-                            void* connectHandler, void* endSessionHandler) = 0;  // slot 0 (❓ parameter names)
+                            void* connectHandler, void* endSessionHandler) = 0;  // slot 0 (LIFT: parameter names. The code is in bsConsole_sv64.dll. It has no PDB.)
     virtual void Clear() = 0;                                                     // slot 1
     virtual int Run() = 0;                                                        // slot 2
     virtual HWND__* GetMainWindowHandle() = 0;                                    // slot 3

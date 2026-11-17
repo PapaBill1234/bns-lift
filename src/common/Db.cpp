@@ -244,23 +244,22 @@ void Db::clearList()
 }
 
 // 0x20E40
-bool DbTransaction::BindCol(unsigned int index, void* buffer, unsigned long long bufferSize, long long* varType)
+bool DbTransaction::BindCol(unsigned int index, void* buffer, unsigned int varType, long long* result)
 {
     if (StmtHandle == nullptr)
     {
         ::Log::Write(::Log::LT_ERROR, kFile, 286, L"DbTransaction::BindCol(), Not initialized");
         return false;
     }
-    *varType = SQL_NTS;
+    *result = SQL_NTS;
     if (static_cast<unsigned short>(SQLBindCol(StmtHandle, static_cast<SQLUSMALLINT>(index),
-                                               static_cast<SQLSMALLINT>(bufferSize), buffer, 0,
-                                               reinterpret_cast<SQLLEN*>(varType))) < 2)
+                                               static_cast<SQLSMALLINT>(varType), buffer, 0,
+                                               reinterpret_cast<SQLLEN*>(result))) < 2)
     {
         BoundCol = true;
         return true;
     }
-    statmentErrorLog(L"SQLBindCol(%d, %d, %d, %p, %p)", index, static_cast<unsigned int>(bufferSize), buffer, 0,
-                     varType);
+    statmentErrorLog(L"SQLBindCol(%d, %d, %d, %p, %p)", index, varType, buffer, 0, result);
     return false;
 }
 
@@ -287,8 +286,8 @@ bool DbTransaction::Prepare(wchar_t* query)
 }
 
 // 0x20FD0
-bool DbTransaction::BindParam(unsigned int index, unsigned int inout, void* buffer, unsigned long long bufferSize,
-                              unsigned long long columnSize, unsigned long long* decimalDigits)
+bool DbTransaction::BindParam(unsigned int index, unsigned int inout, void* buffer, unsigned int dbType,
+                              unsigned int varType, unsigned long long* result)
 {
     if (StmtHandle == nullptr)
     {
@@ -302,13 +301,12 @@ bool DbTransaction::BindParam(unsigned int index, unsigned int inout, void* buff
     }
     if (static_cast<unsigned short>(SQLBindParameter(StmtHandle, static_cast<SQLUSMALLINT>(index),
                                                      static_cast<SQLSMALLINT>(inout),
-                                                     static_cast<SQLSMALLINT>(columnSize),
-                                                     static_cast<SQLSMALLINT>(bufferSize), 0, 0, buffer, 0,
-                                                     reinterpret_cast<SQLLEN*>(decimalDigits))) < 2)
+                                                     static_cast<SQLSMALLINT>(varType),
+                                                     static_cast<SQLSMALLINT>(dbType), 0, 0, buffer, 0,
+                                                     reinterpret_cast<SQLLEN*>(result))) < 2)
         return true;
-    statmentErrorLog(L"SQLBindParameter(%d, %d, %d, %d, %d, %d, %p, %d, %p)", index, inout,
-                     static_cast<unsigned int>(columnSize), static_cast<unsigned int>(bufferSize), 0, 0, buffer, 0,
-                     decimalDigits);
+    statmentErrorLog(L"SQLBindParameter(%d, %d, %d, %d, %d, %d, %p, %d, %p)", index, inout, varType, dbType, 0, 0,
+                     buffer, 0, result);
     return false;
 }
 
@@ -335,8 +333,7 @@ bool DbTransaction::BindCol(unsigned int index, void* buffer, long long bufferSi
 
 // 0x2d190 (PostOfficeDaemon)
 bool DbTransaction::BindParam(unsigned int index, unsigned int inout, void* buffer, long long bufferSize,
-                              unsigned long long columnSize, int decimalDigits, int dbType,
-                              unsigned long long* varType)
+                              unsigned long long columnSize, int dbType, int varType, unsigned long long* result)
 {
     if (StmtHandle == nullptr)
     {
@@ -349,12 +346,12 @@ bool DbTransaction::BindParam(unsigned int index, unsigned int inout, void* buff
         return false;
     }
     if (static_cast<unsigned short>(SQLBindParameter(StmtHandle, static_cast<SQLUSMALLINT>(index),
-                                                     static_cast<SQLSMALLINT>(inout), static_cast<SQLSMALLINT>(dbType),
-                                                     static_cast<SQLSMALLINT>(decimalDigits), columnSize, 0, buffer,
-                                                     bufferSize, reinterpret_cast<SQLLEN*>(varType))) < 2)
+                                                     static_cast<SQLSMALLINT>(inout), static_cast<SQLSMALLINT>(varType),
+                                                     static_cast<SQLSMALLINT>(dbType), columnSize, 0, buffer,
+                                                     bufferSize, reinterpret_cast<SQLLEN*>(result))) < 2)
         return true;
-    statmentErrorLog(L"SQLBindParameter(%d, %d, %d, %d, %d, %d, %p, %d, %p)", index, inout, dbType, decimalDigits,
-                     columnSize, 0, buffer, bufferSize, varType);
+    statmentErrorLog(L"SQLBindParameter(%d, %d, %d, %d, %d, %d, %p, %d, %p)", index, inout, varType, dbType,
+                     columnSize, 0, buffer, bufferSize, result);
     return false;
 }
 

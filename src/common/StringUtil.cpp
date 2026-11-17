@@ -1,4 +1,4 @@
-// String.obj (SmartCouponDaemon PDB).  // ❓ file name, see StringUtil.h
+// String.obj (SmartCouponDaemon PDB). LIFT: file name, see StringUtil.h.
 #include "StringUtil.h"
 #include <wchar.h>
 #include <windows.h>
