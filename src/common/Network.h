@@ -16,7 +16,7 @@ class PacketBufferHandler;
 class NetworkEndEvent : public DynamicEventObject
 {
 public:
-    // ❓ Inlined in Network::Network (0xCDB0).
+    // PDB constructor, inlined in Network::Network (0xCDB0).
     NetworkEndEvent()
     {
         _tag = 1546;

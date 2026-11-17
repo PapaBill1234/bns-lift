@@ -1,5 +1,5 @@
 // Connection.obj (CacheGate PDB). Layouts from include/pdb/CacheGate/types.h.
-// The Async*Context layouts are from IDA only (❓). The PDB gives only the names and sizes.
+// The EventContext and Async*Context layouts match the LobbyGate PDB (types 0x11A0, 0x3130, 0x3092, 0x3171).
 #pragma once
 #include <winsock2.h>
 #include <stddef.h>
@@ -7,7 +7,7 @@
 class Session;
 struct SendBufferList;
 
-// ❓ layout from IDA. Session, SessionRecvBuffer, SessionSendBuffer set _id (3, 16, 18).
+// PDB enum EventContextId. Session, SessionRecvBuffer, SessionSendBuffer set _id (3, 16, 18).
 enum EventContextId : int
 {
     EVID_INVALID = 0x0,
@@ -26,7 +26,7 @@ struct EventContext : public _OVERLAPPED
 };
 static_assert(sizeof(EventContext) == 0x28, "sizeof EventContext");
 
-// ❓ layout from IDA (Session::Connect 0xE570).
+// Used by Session::Connect (0xE570).
 struct AsyncConnectContext : public EventContext
 {
     Session* _session;
@@ -40,7 +40,7 @@ static_assert(sizeof(AsyncConnectContext) == 0x60, "sizeof AsyncConnectContext")
 static_assert(offsetof(AsyncConnectContext, _remoteAddr) == 0x38, "AsyncConnectContext::_remoteAddr");
 static_assert(offsetof(AsyncConnectContext, _timeout) == 0x50, "AsyncConnectContext::_timeout");
 
-// ❓ layout from IDA (Session::recv 0xF0D0).
+// Used by Session::recv (0xF0D0).
 struct AsyncRecvContext : public EventContext
 {
     Session* _session;
@@ -48,7 +48,7 @@ struct AsyncRecvContext : public EventContext
 };
 static_assert(sizeof(AsyncRecvContext) == 0x40, "sizeof AsyncRecvContext");
 
-// ❓ layout from IDA (SessionSendBuffer::Add 0x1A350).
+// Used by SessionSendBuffer::Add (0x1A350).
 struct AsyncSendContext : public EventContext
 {
     Session* _session;
@@ -59,7 +59,7 @@ static_assert(sizeof(AsyncSendContext) == 0x38, "sizeof AsyncSendContext");
 class Connection
 {
 public:
-    Connection() : _socket(INVALID_SOCKET), _ip(0), _portNumber(0) {}  // ❓ inlined in Session::Session (0xDEE0)
+    Connection() : _socket(INVALID_SOCKET), _ip(0), _portNumber(0) {}  // PDB constructor, inlined in Session::Session (0xDEE0)
     virtual ~Connection();  // 0x1AAE0 (vector deleting destructor)
 
     bool Accept(Session* session, unsigned long long socket, unsigned long ip, unsigned short portNumber);  // 0x1AB20

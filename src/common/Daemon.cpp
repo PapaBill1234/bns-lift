@@ -424,7 +424,7 @@ bool Daemon::start(int argc, wchar_t const** argv)
     }
     {
         void* memory = BaseMemoryManager::_Instance.Alloc(sizeof(DelayedRelease), DAEMON_FILE, 525);
-        GlobalDelayedRelease = memory != nullptr ? new (memory) DelayedRelease() : nullptr;
+        GlobalDelayedRelease = memory != nullptr ? new (memory) DelayedRelease(DelayedRelease::DEFAULT_INTERVAL, DelayedRelease::DEFAULT_DELAY) : nullptr;
     }
 
     network = Network::initInstance(threadManager);

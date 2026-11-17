@@ -16,14 +16,18 @@
 
 unsigned long long GPacketPumpEventKey = 0;
 
-ThreadFreePacketPumpEvent::ThreadFreePacketPumpEvent(unsigned int eventId, int type)
+ThreadFreePacketPumpEvent::ThreadFreePacketPumpEvent(unsigned int eventId, Type type, unsigned long long key)
 {
+    // The members are protected. Check the PDB offsets here.
+    static_assert(offsetof(ThreadFreePacketPumpEvent, _eventId) == 0x18, "ThreadFreePacketPumpEvent::_eventId");
+    static_assert(offsetof(ThreadFreePacketPumpEvent, _key) == 0x20, "ThreadFreePacketPumpEvent::_key");
+    static_assert(offsetof(ThreadFreePacketPumpEvent, _handler) == 0x30, "ThreadFreePacketPumpEvent::_handler");
     _ref = 1;
     _tag = 10;
     _history = nullptr;
     _eventId = eventId;
     _type = type;
-    _key = _InterlockedIncrement64(reinterpret_cast<long long volatile*>(&GPacketPumpEventKey));
+    _key = key;
     _session = nullptr;
     _handler = nullptr;
 }
@@ -42,7 +46,7 @@ ThreadFreePacketPumpEvent::~ThreadFreePacketPumpEvent()
 }
 
 // 0x1440
-bool ThreadFreePacketPumpEvent::initialize(Session const* session, void* handler)
+bool ThreadFreePacketPumpEvent::initialize(Session const* session, TFPP_PacketHandler handler)
 {
     if (session != nullptr && handler != nullptr)
     {
@@ -53,10 +57,10 @@ bool ThreadFreePacketPumpEvent::initialize(Session const* session, void* handler
     }
     Log::Write(Log::LT_ERROR, TFPP_FILE, 38,
                L"== CRASH == [packet-pump], 0x%016I64X, invalid parameter, session:0x%p, handler:0x%p",
-               session != nullptr ? session->_id : 0ULL, session, handler);
+               session != nullptr ? session->_id : 0ULL, session, reinterpret_cast<void*>(handler));
     AlertSender::Write(TFPP_FILE, 38,
                        L"== CRASH == [packet-pump], 0x%016I64X, invalid parameter, session:0x%p, handler:0x%p",
-                       session != nullptr ? session->_id : 0ULL, session, handler);
+                       session != nullptr ? session->_id : 0ULL, session, reinterpret_cast<void*>(handler));
     return false;
 }
 
@@ -83,7 +87,7 @@ bool ThreadFreePacketPump::Initialize(Session const* session, Packet const* pack
                            session != nullptr ? session->_id : 0ULL, session, packet, handler);
         return false;
     }
-    if (!initialize(session, reinterpret_cast<void*>(handler)))
+    if (!initialize(session, handler))
         return false;
     _packet = packet;
     return true;
@@ -95,7 +99,7 @@ bool ThreadFreePacketPump::HandleEvent(EventContext* context, unsigned long para
     int command = _packet->CurHeader[1].size;
     Log::Write(Log::LT_DEBUG, TFPP_FILE, 87, L"[packet-pump], handle start, %I64u, session:0x%016I64X, command:%d",
                _key, _session->_id, command);
-    reinterpret_cast<TFPP_PacketHandler>(_handler)(_session, _packet);
+    _handler(_session, _packet);
     Log::Write(Log::LT_DEBUG, TFPP_FILE, 93, L"[packet-pump], handle end, %I64u, session:0x%016I64X, command:%d",
                _key, _session->_id, command);
     removeReferenceCount(TFPP_FILE, 96);
@@ -127,7 +131,7 @@ bool ThreadFreeFragmentPacketPump::Initialize(Session const* session, FragmentPa
                            session != nullptr ? session->_id : 0ULL, session, fpc, handler);
         return false;
     }
-    if (!initialize(session, reinterpret_cast<void*>(handler)))
+    if (!initialize(session, handler))
         return false;
     _fpc = fpc;
     return true;
@@ -140,7 +144,7 @@ bool ThreadFreeFragmentPacketPump::HandleEvent(EventContext* context, unsigned l
     Log::Write(Log::LT_DEBUG, TFPP_FILE, 138, L"[packet-pump], handle start, %I64u, session:0x%016I64X, command:%d",
                _key, _session->_id, command);
     // The handler gets the concatenater as a packet (original cast).
-    reinterpret_cast<TFPP_PacketHandler>(_handler)(_session, reinterpret_cast<Packet const*>(_fpc));
+    _handler(_session, reinterpret_cast<Packet const*>(_fpc));
     Log::Write(Log::LT_DEBUG, TFPP_FILE, 144, L"[packet-pump], handle end, %I64u, session:0x%016I64X, command:%d",
                _key, _session->_id, command);
     removeReferenceCount(TFPP_FILE, 147);
@@ -163,7 +167,8 @@ bool __pump_packet(unsigned int eventId, void* iocp, Session const* session, Pac
 
     // ❓ Line 174: the line of this Alloc is not visible in the pseudocode.
     ThreadFreePacketPump* pump =
-        ::new (Memory::_Manager[2]->Alloc(sizeof(ThreadFreePacketPump), TFPP_FILE, 174)) ThreadFreePacketPump(eventId);
+        ::new (Memory::_Manager[2]->Alloc(sizeof(ThreadFreePacketPump), TFPP_FILE, 174)) ThreadFreePacketPump(
+            eventId, _InterlockedIncrement64(reinterpret_cast<long long volatile*>(&GPacketPumpEventKey)));
     if (!pump->Initialize(session, copy, handler))
     {
         Log::Write(Log::LT_ERROR, TFPP_FILE, 179,
@@ -178,7 +183,7 @@ bool __pump_packet(unsigned int eventId, void* iocp, Session const* session, Pac
         pump->removeReferenceCount(TFPP_FILE, 182);
         return false;
     }
-    Log::Write(Log::LT_DEBUG, TFPP_FILE, 187, L"[packet-pump], post, %I64u", pump->_key);
+    Log::Write(Log::LT_DEBUG, TFPP_FILE, 187, L"[packet-pump], post, %I64u", pump->GetKey());
     if (PostQueuedCompletionStatus(iocp, 0, reinterpret_cast<ULONG_PTR>(pump), nullptr))
         return true;
     Log::Write(Log::LT_ERROR, TFPP_FILE, 192,
@@ -227,7 +232,8 @@ bool __pump_fragment_packet(unsigned int eventId, void* iocp, Session const* ses
 
         ThreadFreeFragmentPacketPump* pump =
             ::new (Memory::_Manager[2]->Alloc(sizeof(ThreadFreeFragmentPacketPump), TFPP_FILE, 233))
-                ThreadFreeFragmentPacketPump(eventId);
+                ThreadFreeFragmentPacketPump(
+                    eventId, _InterlockedIncrement64(reinterpret_cast<long long volatile*>(&GPacketPumpEventKey)));
         if (!pump->Initialize(session, fpc, handler))
         {
             Log::Write(Log::LT_ERROR, TFPP_FILE, 236,
@@ -243,7 +249,7 @@ bool __pump_fragment_packet(unsigned int eventId, void* iocp, Session const* ses
             pump->removeReferenceCount(TFPP_FILE, 239);
             return true;
         }
-        Log::Write(Log::LT_DEBUG, TFPP_FILE, 244, L"[packet-pump], post, %I64u", pump->_key);
+        Log::Write(Log::LT_DEBUG, TFPP_FILE, 244, L"[packet-pump], post, %I64u", pump->GetKey());
         if (PostQueuedCompletionStatus(iocp, 0, reinterpret_cast<ULONG_PTR>(pump), nullptr))
             return true;
         Log::Write(Log::LT_ERROR, TFPP_FILE, 249,

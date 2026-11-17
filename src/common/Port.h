@@ -52,7 +52,7 @@ static_assert(offsetof(SessionPool, _sessionQueue) == 0xA0, "SessionPool::_sessi
 class Port
 {
 public:
-    // ❓ Inlined in Network::OpenPort (0xD2C0) and Network::Clear (0xCFD0).
+    // PDB constructor, inlined in Network::OpenPort (0xD2C0) and Network::Clear (0xCFD0).
     Port()
         : _iocpHandle(nullptr), _sessionList(nullptr), _pool(nullptr), _listener(nullptr), _idleStateTable(nullptr),
           _sessionHandler(nullptr), _bufferHandler(nullptr)
