@@ -63,7 +63,8 @@ int SysInfo::Hostname(unsigned long address, wchar_t* hostname, int length)
     }
     else
     {
-        // ❓ LTCG removed the address != 0 branch. The binary has no code for it.
+        // LIFT: the binary has no code for address != 0. The only call (0x17240) passes only rcx = hostname,
+        // and 0x1FBB7 stores 0 in sin_addr. The lift returns 5 here. This branch never runs.
         result = 5;
     }
     WSACleanup();

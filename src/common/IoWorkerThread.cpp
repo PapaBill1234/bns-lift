@@ -44,7 +44,8 @@ IoWorker::~IoWorker()
 // 0x19A00
 bool IoWorker::Initialize(int workerId, Network* networkInstance, void (*failedEventHandler)(EventObject*))
 {
-    // ❓ LTCG put the constant CacheGate::FailedEventObjectHandler in place of failedEventHandler.
+    // LIFT: LTCG put a constant in place of failedEventHandler. 0x19A1C loads 0x4B40
+    // (PDB: CacheGate::FailedEventObjectHandler) and 0x19A80 stores it.
     if (workerId <= 0 || failedEventHandler == nullptr)
         IOWORKER_ASSERT_CRASH(42);
 

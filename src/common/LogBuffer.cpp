@@ -84,7 +84,7 @@ LogBuffer* LogBufferPool::allocate()
             AlertSender::Write(LOGBUFFER_FILE, 174,
                                L"== CRASH == [LogBuffer], _list는 NULL이지만 _count(%d)는 0이 아닙니다.", _count);
         }
-        // ❓ LTCG removed the count argument. LogBufferAllocator::allocate uses 16.
+        // PDB: allocate has 1 argument. LTCG removed it: allocate (SmartCouponDaemon 0x20500) does not read ecx and uses 0x10 (0x20530, 0x2056a).
         _pool = LogBufferAllocator::allocate(16);
         _count = 16;
     }

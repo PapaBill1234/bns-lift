@@ -512,7 +512,8 @@ bool CrashHandler::Initialize(int option, bool catchUnhandledException)
     void* memory = HeapAlloc(GetProcessHeap(), 0, sizeof(CrashHandler));
     if (memory != nullptr)
         new (memory) CrashHandler();
-    // ❓ LTCG put constants here (option 3, true). The source most likely uses the arguments.
+    // LIFT: LTCG put constants here. 0x1CBF8 writes 3 and 0x1CC0C writes 1. The function never reads ecx or dl.
+    // The only call is at 0x1DC63.
     Instance->_option = 3;
     Instance->_dumpType = MiniDumpWithDataSegs | MiniDumpWithHandleData;
     Instance->_catchUnhandledException = true;
