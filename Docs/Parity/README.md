@@ -6,6 +6,9 @@ The 4 lifted exes compile to the same code as the original 2019 + PDB exes. | Le
 | Checkpoint | 90 % | End of the base rounds. Then the 90+ rounds start. |
 | Goal | **95 %** | Minimum result for the phase. |
 | Preferred | **99 %** | Target of the 90+ rounds. |
+| Shared library | **99 %** preferred | Functions that 2 or more exes have (BloodLib, Shared, Packet, CRT). A shared function is MATCH only if it is MATCH in each exe. Measure: `tools/parity_shared.py` (`--list` gives the DIFF functions). |
+
+Shared library cards come first in each round. One fix in shared code helps each exe and later GameDaemon. Start (after `lift-parity-s3`): 354/478 = 74.1 %.
 
 After each exe has 90 % or more, do "90+ rounds". The 90+ target is **99 % parity** for each exe. Each 90+ round fixes the DIFF functions that are left and that have a fixable cause. Its last card is a review.
 
@@ -14,6 +17,7 @@ The review after each 90+ round sets the state of each exe in `Docs/Parity/plus-
 | Exe result in the last round | Action |
 | --- | --- |
 | Parity 99 % or more | State `done`. Write no more cards for this exe. |
+| Shared library below 99 % | Row `shared` in `plus-state.tsv`. Same stall rule as an exe. Shared cards come before exe cards. |
 | Gain more than 0 | Set `zero_rounds` to 0. Write cards for the fixable DIFF functions that are left. |
 | No gain, first time (`zero_rounds` = 1) | Find the cause of the stall. Write it in the review. Write a card that fixes the cause. |
 | No gain, second time (`zero_rounds` = 2) | Do the check again. Find what the first fix did not solve. Write a card that fixes it. |
