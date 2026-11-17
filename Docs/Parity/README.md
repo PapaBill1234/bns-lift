@@ -3,7 +3,20 @@
 ## Goal
 The 4 lifted exes compile to the same code as the original 2019 + PDB exes. The target is **90 % parity** for each exe.
 
-After each exe has 90 % or more, do 1 more round of cards (the "90+ round"). This round fixes the DIFF functions that are left and that have a fixable cause. The review after the 90+ round ends the parity phase. It writes no new cards.
+After each exe has 90 % or more, do "90+ rounds". The 90+ target is **99 % parity** for each exe. Each 90+ round fixes the DIFF functions that are left and that have a fixable cause. Its last card is a review.
+
+The review after each 90+ round decides if a new 90+ round starts:
+
+| Condition | Result |
+| --- | --- |
+| Each exe has 99 % or more | Stop. The parity phase ends. |
+| The DIFF functions that are left have no fixable cause | Stop. |
+| 10 rounds after the 90 % point are done | Stop. |
+| Rounds still needed ≥ 10 − rounds done | Stop. |
+| Other | Write the next 90+ round. |
+
+Rounds still needed = for each exe, (99 % − parity now) / (parity gain of the last round), rounded up. Use the highest value of the 4 exes. If the last round gained 0 for an exe below 99 %, stop.
+When the phase stops, the review writes no new cards. The handoff gives the parity of each exe and the reason for the stop.
 
 | Exe | Start parity |
 | --- | --- |

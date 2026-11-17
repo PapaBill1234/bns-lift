@@ -23,8 +23,8 @@ We know what works. The next round of parity cards is queued if an exe is below 
 4. Write `Docs/Parity/rules-proposal.md`: the changes to the lift rules and the lift method that would prevent each miss class in a new lift (for GameDaemon). Write each change as a rule in ASD-STE100 with the reason.
    Add a section "Behaviour misses (rev-small-348)". For each miss class in that review (for example: SQL store, NP transport, request decoding, packet widths), write if funcdiff parity can find it. If it cannot, propose a check that can (runtime test, packet log, layout check), and say which lift step must run it.
 5. If an exe is below 90 %: write the next cards (`Docs/Plan/cards/lift-parity-<name>-2.md` and so on) in the same form as the cards of round 1. Group the work by cause, not by exe, where a cause is in more than one exe. Add `lift-parity-review-2` as the last card. Write the rows in `Docs/Plan/queue/lift-parity-review-1.tsv`.
-6. If each exe has 90 % or more: write the 90+ round (see `Docs/Parity/README.md`, Goal). Write 1 card for each cause class of the DIFF functions that are left and that have a fixable cause (`lift-parity-plus-<cause>.md`). Add `lift-parity-review-plus` as the last card. That review ends the parity phase and writes no new cards.
-7. Each later review (`lift-parity-review-2` and on) uses tasks 5 and 6 of this card in the same way.
+6. If each exe has 90 % or more: apply the 90+ rule in `Docs/Parity/README.md` (Goal). If it says "write the next 90+ round": write 1 card for each cause class of the DIFF functions that are left and that have a fixable cause (`lift-parity-plus<N>-<cause>.md`, N = 90+ round number). Add `lift-parity-review-plus<N>` as the last card. If it says "stop": write no new cards. Give the reason in the handoff.
+7. Each later review (`lift-parity-review-2`, `lift-parity-review-plus<N>`) uses tasks 5 and 6 of this card in the same way. Each review writes the round count and the "rounds still needed" value in the handoff.
 
 ## Files
 - `Docs/Parity/`
@@ -34,4 +34,4 @@ We know what works. The next round of parity cards is queued if an exe is below 
 
 ## Done when
 - `Docs/Parity/review-1.md` and `Docs/Parity/rules-proposal.md` exist.
-- The next round is queued: a round to 90 %, or the 90+ round.
+- The next round is queued (a round to 90 % or a 90+ round), or the handoff gives the reason for the stop.
