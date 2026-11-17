@@ -113,6 +113,38 @@ The shared framework comes first, in the pilot. Each later server reuses the sha
 - Give the same input to the original 2019 + PDB exe and to the lifted exe. Compare the packet logs.
 - The Wine server set (`bns-wine/`) is the 381 set. A 2019 + PDB exe can have a different protocol to its peers. If it does, write a replay harness: it sends a captured stream to the exe and records the replies.
 
+## Original toolchains (verified 2026-11-17)
+
+Source: PDB S_COMPILE3, PE linker version, Rich header.
+
+| Binary set | Compiler | Linker | Notes |
+| --- | --- | --- | --- |
+| 2019 + PDB servers | VS2010 SP1, cl 16.0.40219.1 | 10.0 | `/GL` `/LTCG`, `/GS`, hot patchable. ICF folds identical functions. |
+| 381 servers (LobbyDaemon, AccountInventoryDaemon, AchievementDaemon) | VS2019 16.4 | 14.24 (Rich build 28315) | Built 2020-05/06. |
+| 2020 ArenaLobby | VS2019 16.3 | 14.23 | |
+| 2020 ArenaDaemon GameDaemon.exe | VS2010 | 10.0 | Built 2019-01-07. |
+
+- A PDB fits only its own exe (GUID + age). Do not apply the 2019 PDB to a 381 exe.
+- A VS2010 PDB has no inline-site records. LTCG removed some code.
+
+## Function-diff verify (phase 1, planned)
+
+1. Build the lift with the real VS2010 SP1 cl and link (`/GL` `/LTCG`). Use a Windows VM or Wine (command-line cl only).
+2. Diff each function of our exe against the original 2019 exe. Use our PDB on our exe and the original PDB on the original exe.
+3. Tool candidates: reccmp (per-function accuracy score, HTML report, JSON baseline), objdiff (per-object), BinDiff, Diaphora.
+4. Fix the source until each function matches, or mark the difference with `// LIFT:`.
+
+## Goal 2 path (2019 → 381, planned)
+
+1. Build our 2019 source with VS2019 16.4 (14.24). Use the real MSVC STL in place of `include/vs2010/`. msvc-wine can give the toolchain under Wine.
+2. Run Diaphora (or BinDiff) from our exe + our PDB against the 381 exe. The same compiler gives strong matches.
+3. Treat the unmatched functions as the 381 changes. Port them.
+4. Rebuild and diff again until each function matches the 381 exe.
+
+## Known issues
+
+- `build-cov`: `lift_selftest.exe` does not link (undefined `operator new(unsigned __int64)` and `operator delete(void*)`). The `build/` tree is fine. The daemons are not affected.
+
 ## Orchestrator
 
 - Queue: `bns-server/tools/slices/queue.tsv`, kind `lift`.
