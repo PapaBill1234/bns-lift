@@ -29,6 +29,48 @@ enum MarketDealerFailReason
     // TODO(lift-marketdealerdaemon-2): the other values (types.h:544).
 };
 
+// PDB enum MarketDealerPacketCommand (types.h:655). Only the values that the lifted code uses are here.
+enum MarketDealerPacketCommand
+{
+    MarketDealer_RetrieveSaleListReqCmd = 0x4,
+    MarketDealer_RetrieveSaleListOkCmd = 0x5,
+    MarketDealer_RetrieveSaleListFailCmd = 0x6,
+    MarketDealer_RetrieveBidListReqCmd = 0x7,
+    MarketDealer_RetrieveBidListOkCmd = 0x8,
+    MarketDealer_RetrieveBidListFailCmd = 0x9,
+    MarketDealer_RetrieveBidRankStatusReqCmd = 0xA,
+    MarketDealer_RetrieveBidRankStatusOkCmd = 0xB,
+    MarketDealer_RetrieveBidRankStatusFailCmd = 0xC,
+};
+
+// PDB enum MarketDealerBidRankStatus (types.h:532).
+enum MarketDealerBidRankStatus
+{
+    MARKETDEALER_BIDRANKSTATUS_INVALID_STATUS = 0x0,
+    MARKETDEALER_BIDRANKSTATUS_NO_SUCH_SALE = 0x1,
+    MARKETDEALER_BIDRANKSTATUS_TOP_BIDDER = 0x2,
+    MARKETDEALER_BIDRANKSTATUS_NO_TOP_BIDDER = 0x3,
+};
+
+// PDB enum MarketDealerOrderType (types.h:648).
+enum MarketDealerOrderType
+{
+    MARKETDEALER_ORDERTYPE_INVALID_TYPE = 0x0,
+    MARKETDEALER_ORDERTYPE_ASCENDING = 0x1,
+    MARKETDEALER_ORDERTYPE_DESCENDING = 0x2,
+    MARKETDEALER_ORDERTYPE_MAX_TYPE = 0x3,
+};
+
+// PDB enum MarketDealerSearchType (types.h:734). "SERACH" is the PDB spelling.
+enum MarketDealerSearchType
+{
+    MARKETDEALER_SEARCHTYPE_INVALID_TYPE = 0x0,
+    MARKETDEALER_SEARCHTYPE_FIRST_SERACH = 0x1,
+    MARKETDEALER_SEARCHTYPE_NEXT_SEARCH = 0x2,
+    MARKETDEALER_SEARCHTYPE_PREV_SEARCH = 0x3,
+    MARKETDEALER_SEARCHTYPE_MAX_TYPE = 0x4,
+};
+
 // PDB enum 0x3127 (manager channel packets).
 enum MarketManagerPacketCommand
 {

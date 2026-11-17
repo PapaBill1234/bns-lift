@@ -4,10 +4,16 @@
 #pragma once
 
 #include <stddef.h>
+#include <string.h>
 #include "Participant.h"
 #include "MarketStatement.h"
 #include "Dealings.h"
 #include "SaleContext.h"
+
+class Packet;
+class Session;
+class FragmentPacket;
+class RepeatPacketComposer;
 
 class JobContext
 {
@@ -30,6 +36,25 @@ public:
         COLUMN_SALE_EXPIRATION_TIME = 0x5,
         MAX_COLUMN_COUNT = 0x6,
     };
+    // LIFT: inlined in the array new of RetrieveSaleListJob (0x8890). It sets all SaleItemInfo fields to zero.
+    MySaleInfo() { ZeroSaleItemInfo(_saleItemInfo); }
+    static void ZeroSaleItemInfo(SaleItemInfo& info)  // LIFT: no PDB name (inlined zero of SaleItemInfo, 0x8890)
+    {
+        info._itemCommonCategory = 0;
+        info._itemFirstCategory = 0;
+        info._itemSecondCategory = 0;
+        info._itemThirdCategory = 0;
+        info._itemType = 0;
+        info._itemInstanceId = 0;
+        info._itemDataId = 0;
+        info._itemLevel = 0;
+        info._itemExp = 0;
+        info._itemAmount = 0;
+        info._itemGrade = 0;
+        info._itemEquipLevel = 0;
+        memset(info._itemXmlData, 0, sizeof(info._itemXmlData));
+    }
+
     SaleInfo _saleInfo;
     SaleItemInfo _saleItemInfo;
 };
@@ -49,6 +74,9 @@ public:
         COLUMN_SALE_EXPIRATION_TIME = 0x7,
         MAX_COLUMN_COUNT = 0x8,
     };
+    // LIFT: inlined in the array new of RetrieveBidListJob (0x9d10).
+    MyBidInfo() : _bidId(0), _bidPrice(0) { MySaleInfo::ZeroSaleItemInfo(_saleItemInfo); }
+
     long long _bidId;
     long long _bidPrice;
     SaleInfo _saleInfo;
@@ -83,10 +111,16 @@ public:
         PARAM_SEARCH_KEY = 0x5,
         MAX_PARAM_COUNT = 0x6,
     };
-    virtual ~RetrieveSaleListJob();
-    virtual bool verifyParameter(short& result) const;
-    virtual bool handleJob(short& result);
+    explicit RetrieveSaleListJob(int searchCount);                      // 0x8890
+    virtual ~RetrieveSaleListJob();                                     // 0x8a10
+    virtual bool verifyParameter(short& failReason) const;              // 0x91e0
+    virtual bool handleJob(short& failReason);                          // 0x92e0
+    bool Initialize(Packet const*& packet);                             // 0x8a80
+    bool ReplySuccess(Session const*& session) const;                   // 0x8c60
+    void ReplyFailure(Session const*& session, short const& failReason) const;  // 0x9060
     bool addMySaleInfo(MySaleInfo const& mySaleInfo);  // 0x93c0 ❓ const& or const*
+    bool composeResponsePacket(FragmentPacket& packet) const;           // 0x9540 ❓ & or *
+    bool composeResponsePacketReversely(FragmentPacket& packet) const;  // 0x9930 ❓ & or *
 
     unsigned long long _tid;
     short _wid;
@@ -110,10 +144,15 @@ public:
         PARAM_BIDDER_PCID = 0x1,
         MAX_PARAM_COUNT = 0x2,
     };
-    virtual ~RetrieveBidListJob();
-    virtual bool verifyParameter(short& result) const;
-    virtual bool handleJob(short& result);
+    explicit RetrieveBidListJob(int concurrentBidCount);                // 0x9d10
+    virtual ~RetrieveBidListJob();                                      // 0x9e90
+    virtual bool verifyParameter(short& failReason) const;              // 0xa470
+    virtual bool handleJob(short& failReason);                          // 0xa4f0
+    bool Initialize(Packet const*& packet);                             // 0x9f00
+    bool ReplySuccess(Session const*& session) const;                   // 0xa060
+    void ReplyFailure(Session const*& session, short const& failReason) const;  // 0xa340
     bool addMyBidInfo(MyBidInfo const& myBidInfo);  // 0xa5a0 ❓ const& or const*
+    bool composeResponsePacket(FragmentPacket& packet) const;           // 0xa6e0 ❓ & or *
 
     unsigned long long _tid;
     short _wid;
@@ -122,6 +161,47 @@ public:
     int _maxListCount;
     int _currListCount;
 };
+
+class MyBidRankStatusInfo
+{
+public:
+    // LIFT: inlined in the array new of RetrieveBidRankStatusJob::Initialize (0xab50).
+    MyBidRankStatusInfo() : _saleId(0), _bidRankStatus(0) {}
+
+    long long _saleId;
+    char _bidRankStatus;
+};
+static_assert(sizeof(MyBidRankStatusInfo) == 0x10, "sizeof MyBidRankStatusInfo");
+static_assert(offsetof(MyBidRankStatusInfo, _bidRankStatus) == 0x8, "MyBidRankStatusInfo::_bidRankStatus");
+
+class RetrieveBidRankStatusJob : public JobContext
+{
+public:
+    enum Param : int
+    {
+        PARAM_BIDDER_PCID = 0x0,
+        MAX_PARAM_COUNT = 0x1,
+    };
+    // LIFT: The constructor is inlined at the call site (AgentPacketHandler.obj, later card). ❓ Field values.
+    RetrieveBidRankStatusJob() : _tid(0), _wid(0), _bidderPcId(0), _myBidRankStatusList(nullptr), _currListCount(0) {}
+    virtual ~RetrieveBidRankStatusJob();                                // 0xaae0
+    virtual bool verifyParameter(short& failReason) const;              // 0xb3f0
+    virtual bool handleJob(short& failReason);                          // 0xb4f0
+    bool Initialize(Packet const*& packet);                             // 0xab50
+    bool ReplySuccess(Session const*& session) const;                   // 0xaf90
+    void ReplyFailure(Session const*& session, short const& failReason) const;  // 0xb2c0
+    bool composeResponsePacket(RepeatPacketComposer& rpc, Packet& packet) const;  // 0xb590 ❓ & or *
+
+    unsigned long long _tid;
+    short _wid;
+    long long _bidderPcId;
+    MyBidRankStatusInfo* _myBidRankStatusList;
+    int _currListCount;
+};
+static_assert(sizeof(RetrieveBidRankStatusJob) == 0x30, "sizeof RetrieveBidRankStatusJob");
+static_assert(offsetof(RetrieveBidRankStatusJob, _myBidRankStatusList) == 0x20,
+              "RetrieveBidRankStatusJob::_myBidRankStatusList");
+static_assert(offsetof(RetrieveBidRankStatusJob, _currListCount) == 0x28, "RetrieveBidRankStatusJob::_currListCount");
 
 class RetrieveReservationListJob : public JobContext
 {
