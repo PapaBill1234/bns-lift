@@ -301,7 +301,7 @@ public:
     virtual void WriteReceiveData(unsigned char* data, unsigned int len) = 0;   // slot 2
     virtual EStsMsgError Parse(_StsMsg** msg, void* cmdDispatcher) = 0;         // slot 3
     virtual void ReleaseStsMsg(_StsMsg* msg) = 0;                               // slot 4
-    virtual int SetCryptFilterWhenUsingExternalAuth() = 0;                      // slot 5 ❓ signature
+    virtual int SetCryptFilterWhenUsingExternalAuth() = 0;                      // slot 5 PDB: type 0x412B int ()
 };
 
 struct _StsMsgInfo
@@ -456,14 +456,13 @@ public:
         StsMsgLib::ECommand cmd;
         void* context;
     };
-    typedef void (*CmdDispatcher)(unsigned int, StsMsgLib::ECommand*);  // ❓ typedef name
+    typedef void (*CmdDispatcher)(unsigned int, StsMsgLib::ECommand&);  // LIFT: no PDB typedef; type from LF_ARGLIST 0x2D9E
 
     explicit NPTransactionRegistry(CmdDispatcher cmdDispatcher);  // 0x4500
     bool Find(unsigned int id, Item* item);                         // 0x4580
     bool Register(StsMsgLib::ECommand cmd, void* context, unsigned int* id);  // 0x4690
     void* Release(unsigned int id);                                 // 0x47D0
-    // ❓ The PDB type is std::vector<Timer*,StlAllocator<Timer*,2>>* (COMDAT folding). The code stores void*.
-    void ReleaseAll(std::vector<void*, StlAllocator<void*, 2> >* e);  // 0x48B0
+    void ReleaseAll(std::vector<void*, StlAllocator<void*, 2> >& e);  // 0x48B0 PDB: LF_ARGLIST 0x2C66
 
     CmdDispatcher _cmdDispatcher;
     unsigned int volatile _seed;
@@ -549,7 +548,7 @@ public:
     {
     }
     virtual ~NPMsgHandleEvent();                                   // 0x10230
-    virtual unsigned int EventId() const { return 0; }             // ❓ value
+    virtual unsigned int EventId() const { return 0; }             // LIFT: xor eax, eax at 0x1d7a0
     virtual bool HandleEvent(EventContext* ctx, unsigned long);    // 0x102C0
 
     NPChannel* _channel;
@@ -575,5 +574,5 @@ public:
 };
 static_assert(sizeof(NPServiceChannelManager) == 0x18, "sizeof NPServiceChannelManager");
 
-void NPServiceChannelCmdDispatcher(unsigned int id, StsMsgLib::ECommand* eCmd);           // 0xFD80
+void NPServiceChannelCmdDispatcher(unsigned int id, StsMsgLib::ECommand& eCmd);            // 0xFD80
 bool NPHandlerEventNoti(NPChannel* channel, StsMsgLib::_StsMsg* msg, NPTransaction* tran);  // 0xFBC0

@@ -122,7 +122,7 @@ bool NPPing::HandleEvent(EventContext*, unsigned long)
 // 0x4500
 NPTransactionRegistry::NPTransactionRegistry(CmdDispatcher cmdDispatcher) : _cmdDispatcher(cmdDispatcher), _seed(0)
 {
-    // ❓ The binary stores the constant NPServiceChannelCmdDispatcher, not the argument.
+    // LIFT: LTCG folds the only caller (0x51fd). 0x4506 stores NPServiceChannelCmdDispatcher, not the argument.
 }
 
 // 0x4580
@@ -191,14 +191,14 @@ void* NPTransactionRegistry::Release(unsigned int id)
 }
 
 // 0x48B0
-void NPTransactionRegistry::ReleaseAll(std::vector<void*, StlAllocator<void*, 2> >* e)
+void NPTransactionRegistry::ReleaseAll(std::vector<void*, StlAllocator<void*, 2> >& e)
 {
     _lock.Enter();
     for (auto it = _dict.begin(); it != _dict.end(); ++it)
     {
         if (it->second != nullptr)
         {
-            e->push_back(it->second->context);
+            e.push_back(it->second->context);
             Memory::_Manager[2]->Free(it->second, NPCHANNEL_FILE, 191);
         }
     }
