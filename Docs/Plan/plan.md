@@ -199,6 +199,22 @@ Step 2 now (without VS2010): `tools/funcdiff.py <Server>`. reccmp is x86 only, s
 
 - Typical real differences: missing log strings, missing `__FILE__`/`__LINE__` arguments (`Client.cpp`, `Channel.h`), lift helpers in place of inline code.
 
+## Parity phase (from 2026-11-17)
+
+No new daemon work starts before CacheGate, LobbyGate, SmartCouponDaemon and PostOfficeDaemon reach 90 % parity. The MarketDealerDaemon cards 14, 15, verify and `lift-infogatedaemon-plan` have the status `hold`. The phase is a test ground: the lessons go into the lift rules before GameDaemon.
+
+- Details, definition and rules: `Docs/Parity/README.md`.
+- Gate: the runner runs `tools/parity.sh` for each `lift-parity-*` card. It fails when an exe loses a MATCH function. The runner accepts the new baseline after a pass.
+
+| Order | Card | Scope |
+| --- | --- | --- |
+| 1 | lift-parity-0 | funcdiff noise, miss list, triage |
+| 2 | lift-parity-s1 | shared: memory, Daemon, threads, timers, console |
+| 3 | lift-parity-s2 | shared: network, sessions, packets |
+| 4 | lift-parity-s3 | shared: Db, logs, config, zstd, rest |
+| 5 to 8 | lift-parity-cg-1, -lg-1, -scd-1, -pod-1 | exe-only code |
+| 9 | lift-parity-review-1 | lessons, rules proposal, next round |
+
 ## Goal 2 path (2019 → 381, planned)
 
 1. Build our 2019 source with VS2019 16.4 (14.24). Use the real MSVC STL in place of `include/vs2010/`. msvc-wine can give the toolchain under Wine.

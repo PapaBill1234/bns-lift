@@ -1,0 +1,3194 @@
+{
+"Aes128::BlockSize": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Aes128::Cleanup": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Aes128::Decrypt": {
+"calls": 0,
+"consts": 100,
+"refs": 100,
+"score": 66.7,
+"status": "DIFF"
+},
+"Aes128::EncSize": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Aes128::Encrypt": {
+"calls": 0,
+"consts": 100,
+"refs": 100,
+"score": 66.7,
+"status": "DIFF"
+},
+"Aes128::GetType": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Aes128::Setup": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Aes128NI_Decrypt": {
+"calls": 100,
+"consts": 60,
+"refs": 100,
+"score": 86.7,
+"status": "DIFF"
+},
+"Aes128NI_Encrypt": {
+"calls": 100,
+"consts": 55,
+"refs": 100,
+"score": 84.8,
+"status": "DIFF"
+},
+"Aes128NI_Setup": {
+"calls": 100,
+"consts": 76,
+"refs": 100,
+"score": 92.2,
+"status": "DIFF"
+},
+"Aes128Table_Decrypt": {
+"calls": 100,
+"consts": 57,
+"refs": 100,
+"score": 85.7,
+"status": "DIFF"
+},
+"Aes128Table_Encrypt": {
+"calls": 100,
+"consts": 50,
+"refs": 100,
+"score": 83.3,
+"status": "DIFF"
+},
+"Aes128Table_Setup": {
+"calls": 100,
+"consts": 80,
+"refs": 100,
+"score": 93.3,
+"status": "DIFF"
+},
+"AlertSender::AlertSender": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"AlertSender::Name": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"AlertSender::Write": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"AlertSender::fini": {
+"calls": 100,
+"consts": 33,
+"refs": 100,
+"score": 77.8,
+"status": "DIFF"
+},
+"AlertSender::run": {
+"calls": 76,
+"consts": 31,
+"refs": 100,
+"score": 69.1,
+"status": "DIFF"
+},
+"AlertSender::sendRemain": {
+"calls": 80,
+"consts": 29,
+"refs": 100,
+"score": 69.5,
+"status": "DIFF"
+},
+"AlertSender::writev2": {
+"calls": 85,
+"consts": 42,
+"refs": 100,
+"score": 75.7,
+"status": "DIFF"
+},
+"BaseRefCntObj::deallocate_me": {
+"calls": 67,
+"consts": 100,
+"refs": 0,
+"score": 55.6,
+"status": "DIFF"
+},
+"BaseRefCntObj::~BaseRefCntObj": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BloodDaemonMain": {
+"calls": 75,
+"consts": 19,
+"refs": 82,
+"score": 58.5,
+"status": "DIFF"
+},
+"Blowfish::BlockSize": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Blowfish::Cleanup": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Blowfish::Decrypt": {
+"calls": 100,
+"consts": 50,
+"refs": 100,
+"score": 83.3,
+"status": "DIFF"
+},
+"Blowfish::EncSize": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Blowfish::Encrypt": {
+"calls": 100,
+"consts": 44,
+"refs": 100,
+"score": 81.5,
+"status": "DIFF"
+},
+"Blowfish::GetType": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Blowfish::Setup": {
+"calls": 100,
+"consts": 53,
+"refs": 100,
+"score": 84.4,
+"status": "DIFF"
+},
+"BnsCommonConfig::CheckMinMaxBoundary": {
+"calls": 100,
+"consts": 56,
+"refs": 100,
+"score": 85.3,
+"status": "DIFF"
+},
+"BnsCommonConfig::CompareMatch": {
+"calls": 100,
+"consts": 42,
+"refs": 100,
+"score": 80.7,
+"status": "DIFF"
+},
+"BnsCommonConfig::Copy": {
+"calls": 100,
+"consts": 80,
+"refs": 100,
+"score": 93.3,
+"status": "DIFF"
+},
+"BnsCommonConfig::Dump": {
+"calls": 75,
+"consts": 88,
+"refs": 97,
+"score": 86.6,
+"status": "DIFF"
+},
+"BnsCommonConfig::LoadBnsCommonConfig": {
+"calls": 93,
+"consts": 79,
+"refs": 90,
+"score": 87.3,
+"status": "DIFF"
+},
+"BnsCommonConfig::ReloadBnsCommonConfig": {
+"calls": 93,
+"consts": 73,
+"refs": 97,
+"score": 87.7,
+"status": "DIFF"
+},
+"BnsCommonConfig::UpdateAllVariable": {
+"calls": 100,
+"consts": 77,
+"refs": 92,
+"score": 89.7,
+"status": "DIFF"
+},
+"BnsCommonConfig::UpdateReloadedVariable": {
+"calls": 100,
+"consts": 63,
+"refs": 89,
+"score": 84.0,
+"status": "DIFF"
+},
+"BnsCommonConfigLoad::Load": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BnsCommonConfigReload::Load": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CacheD::GetId": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CacheD::Initialize": {
+"calls": 83,
+"consts": 20,
+"refs": 100,
+"score": 67.8,
+"status": "DIFF"
+},
+"CacheD::Verify": {
+"calls": 75,
+"consts": 44,
+"refs": 100,
+"score": 73.1,
+"status": "DIFF"
+},
+"CacheDChannel::PacketHandler": {
+"calls": 0,
+"consts": 0,
+"refs": 100,
+"score": 33.3,
+"status": "DIFF"
+},
+"CacheDChannel::onClose": {
+"calls": 100,
+"consts": 33,
+"refs": 100,
+"score": 77.8,
+"status": "DIFF"
+},
+"CacheDChannel::onConnect": {
+"calls": 91,
+"consts": 55,
+"refs": 100,
+"score": 81.8,
+"status": "DIFF"
+},
+"CacheDChannel::~CacheDChannel": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
+"CacheDList::CreateCachedListConfigFile": {
+"calls": 100,
+"consts": 67,
+"refs": 100,
+"score": 88.9,
+"status": "DIFF"
+},
+"CacheDList::Find": {
+"calls": 100,
+"consts": 17,
+"refs": 100,
+"score": 72.2,
+"status": "DIFF"
+},
+"CacheDList::Initialize": {
+"calls": 100,
+"consts": 57,
+"refs": 100,
+"score": 85.7,
+"status": "DIFF"
+},
+"CacheDList::LoadCachedListConfigFile": {
+"calls": 94,
+"consts": 48,
+"refs": 98,
+"score": 79.9,
+"status": "DIFF"
+},
+"CacheDList::MakeSessionAll": {
+"calls": 89,
+"consts": 25,
+"refs": 100,
+"score": 71.3,
+"status": "DIFF"
+},
+"CacheDList::RemoveSessionAll": {
+"calls": 91,
+"consts": 24,
+"refs": 77,
+"score": 64.2,
+"status": "DIFF"
+},
+"CacheDList::add": {
+"calls": 67,
+"consts": 50,
+"refs": 100,
+"score": 72.2,
+"status": "DIFF"
+},
+"CacheDList::addCacheD": {
+"calls": 75,
+"consts": 46,
+"refs": 89,
+"score": 70.0,
+"status": "DIFF"
+},
+"CacheDList::clear": {
+"calls": 67,
+"consts": 10,
+"refs": 50,
+"score": 42.1,
+"status": "DIFF"
+},
+"CacheDList::del": {
+"calls": 80,
+"consts": 22,
+"refs": 100,
+"score": 67.4,
+"status": "DIFF"
+},
+"CacheDList::writeConfigString": {
+"calls": 100,
+"consts": 77,
+"refs": 100,
+"score": 92.3,
+"status": "DIFF"
+},
+"CacheDList::writeSampleConfigFormat": {
+"calls": 100,
+"consts": 67,
+"refs": 100,
+"score": 88.9,
+"status": "DIFF"
+},
+"CacheDList::~CacheDList": {
+"calls": 80,
+"consts": 67,
+"refs": 100,
+"score": 82.2,
+"status": "DIFF"
+},
+"CacheGate::Descriptions": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CacheGate::FailedEventObjectHandler": {
+"calls": 100,
+"consts": 75,
+"refs": 100,
+"score": 91.7,
+"status": "DIFF"
+},
+"CacheGate::GetTimerInterval": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CacheGate::GetTimerMaxTime": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CacheGate::Name": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CacheGate::PrintDependency": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CacheGate::ServiceName": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CacheGate::ShortName": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CacheGate::initLog": {
+"calls": 100,
+"consts": 69,
+"refs": 100,
+"score": 89.7,
+"status": "DIFF"
+},
+"CacheGate::initNetwork": {
+"calls": 100,
+"consts": 57,
+"refs": 92,
+"score": 82.9,
+"status": "DIFF"
+},
+"CacheGate::initialize": {
+"calls": 100,
+"consts": 56,
+"refs": 100,
+"score": 85.4,
+"status": "DIFF"
+},
+"CacheGate::onStart": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CacheGate::reload": {
+"calls": 100,
+"consts": 73,
+"refs": 100,
+"score": 91.1,
+"status": "DIFF"
+},
+"CacheGate::setArgument": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CacheGate::shutdown": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CacheGate::~CacheGate": {
+"calls": 100,
+"consts": 42,
+"refs": 88,
+"score": 76.6,
+"status": "DIFF"
+},
+"CacheGateSessionHandler::OnClose": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CacheGateSessionHandler::OnConnect": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Channel::Close": {
+"calls": 100,
+"consts": 50,
+"refs": 100,
+"score": 83.3,
+"status": "DIFF"
+},
+"Channel::GetSession": {
+"calls": 100,
+"consts": 67,
+"refs": 100,
+"score": 88.9,
+"status": "DIFF"
+},
+"Channel::MakeSession": {
+"calls": 100,
+"consts": 67,
+"refs": 100,
+"score": 88.9,
+"status": "DIFF"
+},
+"Channel::RemoveSession": {
+"calls": 100,
+"consts": 55,
+"refs": 100,
+"score": 84.8,
+"status": "DIFF"
+},
+"Channel::SetSession": {
+"calls": 100,
+"consts": 67,
+"refs": 100,
+"score": 88.9,
+"status": "DIFF"
+},
+"Channel::removeSession": {
+"calls": 100,
+"consts": 50,
+"refs": 100,
+"score": 83.3,
+"status": "DIFF"
+},
+"Channel::~Channel": {
+"calls": 100,
+"consts": 67,
+"refs": 100,
+"score": 88.9,
+"status": "DIFF"
+},
+"ClientManager::AddSession": {
+"calls": 55,
+"consts": 57,
+"refs": 100,
+"score": 70.6,
+"status": "DIFF"
+},
+"ClientManager::GetSession": {
+"calls": 80,
+"consts": 14,
+"refs": 100,
+"score": 64.8,
+"status": "DIFF"
+},
+"ClientManager::Initialize": {
+"calls": 88,
+"consts": 50,
+"refs": 100,
+"score": 79.2,
+"status": "DIFF"
+},
+"ClientManager::ReleaseAllSession": {
+"calls": 60,
+"consts": 18,
+"refs": 100,
+"score": 59.4,
+"status": "DIFF"
+},
+"ClientManager::ReleaseSession": {
+"calls": 60,
+"consts": 17,
+"refs": 100,
+"score": 58.9,
+"status": "DIFF"
+},
+"ClientManager::~ClientManager": {
+"calls": 67,
+"consts": 62,
+"refs": 86,
+"score": 71.3,
+"status": "DIFF"
+},
+"ClientSideDaemonChannel::getSession": {
+"calls": 100,
+"consts": 46,
+"refs": 100,
+"score": 82.1,
+"status": "DIFF"
+},
+"ClientSideDaemonChannel::releaseSession": {
+"calls": 100,
+"consts": 67,
+"refs": 100,
+"score": 88.9,
+"status": "DIFF"
+},
+"ClientSideDaemonChannel::~ClientSideDaemonChannel": {
+"calls": 60,
+"consts": 60,
+"refs": 82,
+"score": 67.5,
+"status": "DIFF"
+},
+"Connection::Accept": {
+"calls": 100,
+"consts": 67,
+"refs": 100,
+"score": 88.9,
+"status": "DIFF"
+},
+"Connection::AsyncConnect": {
+"calls": 100,
+"consts": 67,
+"refs": 100,
+"score": 88.9,
+"status": "DIFF"
+},
+"Connection::AsyncRecv": {
+"calls": 100,
+"consts": 80,
+"refs": 100,
+"score": 93.3,
+"status": "DIFF"
+},
+"Connection::AsyncSend": {
+"calls": 100,
+"consts": 75,
+"refs": 100,
+"score": 91.7,
+"status": "DIFF"
+},
+"Connection::CompleteAsyncConnect": {
+"calls": 100,
+"consts": 89,
+"refs": 100,
+"score": 96.3,
+"status": "DIFF"
+},
+"Connection::makeConnectSocket": {
+"calls": 100,
+"consts": 87,
+"refs": 100,
+"score": 95.7,
+"status": "DIFF"
+},
+"Console::Console": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Console::GetType": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Console::SetTitle": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Console::~Console": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CrashHandler::CrashHandler": {
+"calls": 100,
+"consts": 75,
+"refs": 100,
+"score": 91.7,
+"status": "DIFF"
+},
+"CrashHandler::Handle": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CrashHandler::Initialize": {
+"calls": 100,
+"consts": 86,
+"refs": 100,
+"score": 95.2,
+"status": "DIFF"
+},
+"CrashHandler::MakeCrash": {
+"calls": 100,
+"consts": 73,
+"refs": 100,
+"score": 90.9,
+"status": "DIFF"
+},
+"CrashHandler::SetLogPath": {
+"calls": 100,
+"consts": 75,
+"refs": 100,
+"score": 91.7,
+"status": "DIFF"
+},
+"CrashHandler::SetMailInfo": {
+"calls": 100,
+"consts": 50,
+"refs": 100,
+"score": 83.3,
+"status": "DIFF"
+},
+"CrashHandler::handleCrash": {
+"calls": 96,
+"consts": 39,
+"refs": 93,
+"score": 76.0,
+"status": "DIFF"
+},
+"CriticalSection::~CriticalSection": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Crypto::Destroy": {
+"calls": 100,
+"consts": 71,
+"refs": 100,
+"score": 90.2,
+"status": "DIFF"
+},
+"Crypto::Initialize": {
+"calls": 100,
+"consts": 50,
+"refs": 100,
+"score": 83.3,
+"status": "DIFF"
+},
+"Ctr::Decrypt": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Ctr::Encrypt": {
+"calls": 100,
+"consts": 20,
+"refs": 100,
+"score": 73.3,
+"status": "DIFF"
+},
+"Ctr::Setup": {
+"calls": 100,
+"consts": 33,
+"refs": 100,
+"score": 77.8,
+"status": "DIFF"
+},
+"Daemon::Cooldown": {
+"calls": 100,
+"consts": 42,
+"refs": 100,
+"score": 80.7,
+"status": "DIFF"
+},
+"Daemon::Daemon": {
+"calls": 100,
+"consts": 86,
+"refs": 100,
+"score": 95.2,
+"status": "DIFF"
+},
+"Daemon::LoadVersion": {
+"calls": 100,
+"consts": 62,
+"refs": 100,
+"score": 87.5,
+"status": "DIFF"
+},
+"Daemon::Reload": {
+"calls": 100,
+"consts": 35,
+"refs": 100,
+"score": 78.4,
+"status": "DIFF"
+},
+"Daemon::Start": {
+"calls": 82,
+"consts": 17,
+"refs": 64,
+"score": 54.6,
+"status": "DIFF"
+},
+"Daemon::noTimerMain": {
+"calls": 100,
+"consts": 25,
+"refs": 100,
+"score": 75.0,
+"status": "DIFF"
+},
+"Daemon::setAddress": {
+"calls": 100,
+"consts": 43,
+"refs": 100,
+"score": 81.2,
+"status": "DIFF"
+},
+"Daemon::setCurrentDirectory": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Daemon::start": {
+"calls": 83,
+"consts": 31,
+"refs": 57,
+"score": 56.8,
+"status": "DIFF"
+},
+"Daemon::startDaemon": {
+"calls": 100,
+"consts": 0,
+"refs": 100,
+"score": 66.7,
+"status": "DIFF"
+},
+"Daemon::timerMain": {
+"calls": 94,
+"consts": 36,
+"refs": 100,
+"score": 76.7,
+"status": "DIFF"
+},
+"Daemon::~Daemon": {
+"calls": 100,
+"consts": 33,
+"refs": 100,
+"score": 77.8,
+"status": "DIFF"
+},
+"DaemonChannel::OnAccept": {
+"calls": 100,
+"consts": 0,
+"refs": 100,
+"score": 66.7,
+"status": "DIFF"
+},
+"DaemonChannel::OnClose": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DaemonChannel::OnConnect": {
+"calls": 100,
+"consts": 0,
+"refs": 100,
+"score": 66.7,
+"status": "DIFF"
+},
+"DaemonChannel::~DaemonChannel": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
+"DaemonConfig::AllocConfig": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DaemonConfig::Dump": {
+"calls": 100,
+"consts": 53,
+"refs": 94,
+"score": 82.4,
+"status": "DIFF"
+},
+"DaemonConfig::Load": {
+"calls": 91,
+"consts": 6,
+"refs": 100,
+"score": 65.9,
+"status": "DIFF"
+},
+"DelayedRelease::Add": {
+"calls": 100,
+"consts": 44,
+"refs": 100,
+"score": 81.5,
+"status": "DIFF"
+},
+"DelayedRelease::Release": {
+"calls": 100,
+"consts": 40,
+"refs": 91,
+"score": 77.0,
+"status": "DIFF"
+},
+"DelayedRelease::releaseNode": {
+"calls": 75,
+"consts": 67,
+"refs": 100,
+"score": 80.6,
+"status": "DIFF"
+},
+"DumpRegister": {
+"calls": 100,
+"consts": 33,
+"refs": 100,
+"score": 77.8,
+"status": "DIFF"
+},
+"DumpStack": {
+"calls": 100,
+"consts": 41,
+"refs": 100,
+"score": 80.4,
+"status": "DIFF"
+},
+"DynamicEventObject::deallocate_me": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DynamicEventObject::~DynamicEventObject": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
+"DynamicRefCntObj::~DynamicRefCntObj": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ExceptionCodeString": {
+"calls": 100,
+"consts": 36,
+"refs": 100,
+"score": 78.8,
+"status": "DIFF"
+},
+"HandleCacheGateFragmentRelay": {
+"calls": 78,
+"consts": 59,
+"refs": 69,
+"score": 68.5,
+"status": "DIFF"
+},
+"HandleCacheGateHello": {
+"calls": 68,
+"consts": 53,
+"refs": 93,
+"score": 71.3,
+"status": "DIFF"
+},
+"HandleCacheGateHelloFail": {
+"calls": 100,
+"consts": 71,
+"refs": 100,
+"score": 90.2,
+"status": "DIFF"
+},
+"HandleCacheGateHelloOk": {
+"calls": 100,
+"consts": 67,
+"refs": 100,
+"score": 88.9,
+"status": "DIFF"
+},
+"HandleCacheGateRelay": {
+"calls": 100,
+"consts": 64,
+"refs": 99,
+"score": 87.4,
+"status": "DIFF"
+},
+"HandleCacheGateRelayFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HeapMemoryManager::Alloc": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HeapMemoryManager::AllocZero": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HeapMemoryManager::Free": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HeapMemoryManager::Initialize": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HeapMemoryManager::Realloc": {
+"calls": 50,
+"consts": 100,
+"refs": 100,
+"score": 83.3,
+"status": "DIFF"
+},
+"HeapMemoryManager::ReallocZero": {
+"calls": 50,
+"consts": 100,
+"refs": 100,
+"score": 83.3,
+"status": "DIFF"
+},
+"InitSymbol": {
+"calls": 91,
+"consts": 33,
+"refs": 95,
+"score": 73.2,
+"status": "DIFF"
+},
+"IoWorker::Initialize": {
+"calls": 100,
+"consts": 50,
+"refs": 100,
+"score": 83.3,
+"status": "DIFF"
+},
+"IoWorker::Name": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"IoWorker::run": {
+"calls": 54,
+"consts": 50,
+"refs": 89,
+"score": 64.4,
+"status": "DIFF"
+},
+"IoWorker::stop": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"IoWorker::yield": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Log::Add": {
+"calls": 33,
+"consts": 0,
+"refs": 67,
+"score": 33.3,
+"status": "DIFF"
+},
+"Log::Close": {
+"calls": 100,
+"consts": 0,
+"refs": 100,
+"score": 66.7,
+"status": "DIFF"
+},
+"Log::InitMedia": {
+"calls": 100,
+"consts": 46,
+"refs": 100,
+"score": 82.1,
+"status": "DIFF"
+},
+"Log::Name": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Log::Write [?Write@Log@@SAXPEB_WHJ0ZZ]": {
+"calls": 100,
+"consts": 0,
+"refs": 100,
+"score": 66.7,
+"status": "DIFF"
+},
+"Log::Write [?Write@Log@@SAXW4Type@1@PEB_WH1ZZ]": {
+"calls": 100,
+"consts": 57,
+"refs": 100,
+"score": 85.7,
+"status": "DIFF"
+},
+"Log::WriteV": {
+"calls": 100,
+"consts": 80,
+"refs": 100,
+"score": 93.3,
+"status": "DIFF"
+},
+"Log::run": {
+"calls": 57,
+"consts": 29,
+"refs": 0,
+"score": 28.6,
+"status": "DIFF"
+},
+"LogBuffer::Acquire": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LogBuffer::GetLog": {
+"calls": 100,
+"consts": 100,
+"refs": 80,
+"score": 93.3,
+"status": "DIFF"
+},
+"LogBuffer::GetType": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LogBuffer::Prepare": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LogBuffer::Release": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LogBuffer::deallocate_me": {
+"calls": 100,
+"consts": 0,
+"refs": 100,
+"score": 66.7,
+"status": "DIFF"
+},
+"LogBufferAllocator::allocate": {
+"calls": 100,
+"consts": 89,
+"refs": 95,
+"score": 94.5,
+"status": "DIFF"
+},
+"LogBufferAllocator::initAllocator": {
+"calls": 80,
+"consts": 67,
+"refs": 67,
+"score": 71.1,
+"status": "DIFF"
+},
+"LogBufferPool::allocate": {
+"calls": 100,
+"consts": 86,
+"refs": 67,
+"score": 84.1,
+"status": "DIFF"
+},
+"LogBufferPool::deallocate": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LogFile::Flush": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LogFile::GetLastFileName": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LogFile::GetType": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LogFile::LogFile": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LogFile::MakeFilename": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LogFile::initialize": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LogFile::makeDirectory": {
+"calls": 70,
+"consts": 89,
+"refs": 100,
+"score": 86.3,
+"status": "DIFF"
+},
+"LogFile::write": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LogFile::writeFile": {
+"calls": 75,
+"consts": 100,
+"refs": 100,
+"score": 91.7,
+"status": "DIFF"
+},
+"LogFile::writeToBuffer [?writeToBuffer@LogFile@@AEAAXPEB_WH0H0H0H0H@Z]": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LogFile::writeToBuffer [?writeToBuffer@LogFile@@AEAAXW4Type@Log@@U_SYSTEMTIME@@PEB_WH2@Z]": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LogFile::~LogFile": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LogMedia::GetLastFileName": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LogMedia::Write": {
+"calls": 55,
+"consts": 57,
+"refs": 29,
+"score": 46.8,
+"status": "DIFF"
+},
+"Network::Clear": {
+"calls": 79,
+"consts": 28,
+"refs": 69,
+"score": 58.5,
+"status": "DIFF"
+},
+"Network::ClosePort": {
+"calls": 100,
+"consts": 67,
+"refs": 100,
+"score": 88.9,
+"status": "DIFF"
+},
+"Network::GetAddressStringW": {
+"calls": 100,
+"consts": 40,
+"refs": 100,
+"score": 80.0,
+"status": "DIFF"
+},
+"Network::Initialize": {
+"calls": 91,
+"consts": 71,
+"refs": 100,
+"score": 87.4,
+"status": "DIFF"
+},
+"Network::Network": {
+"calls": 100,
+"consts": 67,
+"refs": 93,
+"score": 86.5,
+"status": "DIFF"
+},
+"Network::OpenPort": {
+"calls": 78,
+"consts": 44,
+"refs": 73,
+"score": 65.1,
+"status": "DIFF"
+},
+"Network::ReconnectSession": {
+"calls": 100,
+"consts": 67,
+"refs": 100,
+"score": 88.9,
+"status": "DIFF"
+},
+"Network::initInstance": {
+"calls": 91,
+"consts": 62,
+"refs": 89,
+"score": 80.8,
+"status": "DIFF"
+},
+"Network::initWorkerThread": {
+"calls": 60,
+"consts": 40,
+"refs": 50,
+"score": 50.0,
+"status": "DIFF"
+},
+"Network::initializeSocketInterface": {
+"calls": 88,
+"consts": 91,
+"refs": 100,
+"score": 92.9,
+"status": "DIFF"
+},
+"Packet::Add": {
+"calls": 100,
+"consts": 50,
+"refs": 100,
+"score": 83.3,
+"status": "DIFF"
+},
+"Packet::Allocate": {
+"calls": 100,
+"consts": 57,
+"refs": 100,
+"score": 85.7,
+"status": "DIFF"
+},
+"Packet::Clear": {
+"calls": 60,
+"consts": 57,
+"refs": 100,
+"score": 72.4,
+"status": "DIFF"
+},
+"Packet::Concatenate [?Concatenate@Packet@@QEAAXPEBV1@PEBVPacketConcatenateHandler@@@Z]": {
+"calls": 100,
+"consts": 36,
+"refs": 100,
+"score": 78.8,
+"status": "DIFF"
+},
+"Packet::Decompose": {
+"calls": 100,
+"consts": 67,
+"refs": 100,
+"score": 88.9,
+"status": "DIFF"
+},
+"Packet::~Packet": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PacketBuffer::Compose": {
+"calls": 89,
+"consts": 80,
+"refs": 100,
+"score": 89.6,
+"status": "DIFF"
+},
+"PacketBuffer::Decompose": {
+"calls": 100,
+"consts": 81,
+"refs": 100,
+"score": 93.6,
+"status": "DIFF"
+},
+"PacketBuffer::deallocate_me": {
+"calls": 100,
+"consts": 0,
+"refs": 100,
+"score": 66.7,
+"status": "DIFF"
+},
+"PacketBuffer::encrypt": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PacketBufferAllocator::allocate": {
+"calls": 100,
+"consts": 89,
+"refs": 94,
+"score": 94.3,
+"status": "DIFF"
+},
+"PacketBufferAllocator::initAllocator": {
+"calls": 67,
+"consts": 67,
+"refs": 55,
+"score": 62.6,
+"status": "DIFF"
+},
+"PacketBufferPool::allocate": {
+"calls": 100,
+"consts": 86,
+"refs": 62,
+"score": 82.4,
+"status": "DIFF"
+},
+"PacketBufferPool::deallocate": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PacketDecomposer::Reset": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PacketFormatIterator::CurrentFormat": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PacketFormatIterator::Forward": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PacketFormatIterator::GetIndex": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PacketFormatIterator::Rewind": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PacketFormatIterator::SetFormat": {
+"calls": 100,
+"consts": 67,
+"refs": 50,
+"score": 72.2,
+"status": "DIFF"
+},
+"PacketFormatIterator::skipRepeatFormat": {
+"calls": 100,
+"consts": 55,
+"refs": 100,
+"score": 84.8,
+"status": "DIFF"
+},
+"PagePoolMemoryManager::Alloc": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PagePoolMemoryManager::Initialize": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PagePoolMemoryManager::~PagePoolMemoryManager": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PipeCommandProcess::Name": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PipeCommandProcess::PipeCommandProcess": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PipeCommandProcess::addCommand": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PipeCommandProcess::clear": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PipeCommandProcess::processCommand": {
+"calls": 100,
+"consts": 89,
+"refs": 100,
+"score": 96.3,
+"status": "DIFF"
+},
+"PipeCommandProcess::run": {
+"calls": 62,
+"consts": 50,
+"refs": 0,
+"score": 37.5,
+"status": "DIFF"
+},
+"PipeCommandProcess::~PipeCommandProcess": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PipeConsole::Name": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PipeConsole::PipeConsole": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PipeConsole::SetInvalidInfo": {
+"calls": 55,
+"consts": 67,
+"refs": 57,
+"score": 59.5,
+"status": "DIFF"
+},
+"PipeConsole::addNode": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PipeConsole::checkFrozenThread": {
+"calls": 76,
+"consts": 80,
+"refs": 100,
+"score": 85.3,
+"status": "DIFF"
+},
+"PipeConsole::cleanup": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PipeConsole::clear": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PipeConsole::connectPipe": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PipeConsole::disconnectAndReconnect": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PipeConsole::init": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PipeConsole::initPipe": {
+"calls": 61,
+"consts": 80,
+"refs": 86,
+"score": 75.5,
+"status": "DIFF"
+},
+"PipeConsole::processCommand": {
+"calls": 100,
+"consts": 91,
+"refs": 100,
+"score": 97.0,
+"status": "DIFF"
+},
+"PipeConsole::run": {
+"calls": 54,
+"consts": 89,
+"refs": 83,
+"score": 75.5,
+"status": "DIFF"
+},
+"PipeConsole::writeReply": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PipeConsole::writeStateInfo": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PipeConsole::writeStateReply": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PipeConsole::writeStateReply2": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PipeConsole::~PipeConsole": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Port::Clear": {
+"calls": 89,
+"consts": 80,
+"refs": 60,
+"score": 76.3,
+"status": "DIFF"
+},
+"Port::Initialize": {
+"calls": 84,
+"consts": 67,
+"refs": 77,
+"score": 75.8,
+"status": "DIFF"
+},
+"Port::MakeNewSession [?MakeNewSession@Port@@IEAAPEAVSession@@PEA_KKGH@Z]": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Port::MakeNewSession [?MakeNewSession@Port@@IEAA_NKGPEAVChannel@@J_N1PEAPEAVSession@@@Z]": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Port::ReconnectSession": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Port::RemoveSession": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Port::clearPool": {
+"calls": 100,
+"consts": 67,
+"refs": 100,
+"score": 88.9,
+"status": "DIFF"
+},
+"Port::makeSession": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PortListener::HandleEvent": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PortListener::HandleFailedEvent": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PortListener::Initialize": {
+"calls": 89,
+"consts": 93,
+"refs": 97,
+"score": 93.0,
+"status": "DIFF"
+},
+"PortListener::accept": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PortListener::asyncAccept": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Prng::Initialize": {
+"calls": 100,
+"consts": 50,
+"refs": 100,
+"score": 83.3,
+"status": "DIFF"
+},
+"Prng::setSeed": {
+"calls": 67,
+"consts": 44,
+"refs": 100,
+"score": 70.4,
+"status": "DIFF"
+},
+"ReconnectTimer::HandleEvent": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RefCntHistory::add": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RefCntHistory::dump": {
+"calls": 100,
+"consts": 92,
+"refs": 100,
+"score": 97.4,
+"status": "DIFF"
+},
+"RefCntObject::DumpRefCntHistory": {
+"calls": 100,
+"consts": 0,
+"refs": 100,
+"score": 66.7,
+"status": "DIFF"
+},
+"RefCntObject::addReferenceCount": {
+"calls": 67,
+"consts": 50,
+"refs": 100,
+"score": 72.2,
+"status": "DIFF"
+},
+"RefCntObject::deallocate_object": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RefCntObject::removeReferenceCount": {
+"calls": 50,
+"consts": 67,
+"refs": 100,
+"score": 72.2,
+"status": "DIFF"
+},
+"RefCntObject::~RefCntObject": {
+"calls": 100,
+"consts": 80,
+"refs": 100,
+"score": 93.3,
+"status": "DIFF"
+},
+"ReleaseEvent::EventId": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ReleaseEvent::HandleEvent": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RepeatPacketDecomposer::Reset": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Ripemd160::Digest": {
+"calls": 100,
+"consts": 76,
+"refs": 100,
+"score": 92.2,
+"status": "DIFF"
+},
+"SendFragmentPacketConcatenater::AllocSize": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"SendFragmentPacketConcatenater::Clear": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"SendFragmentPacketConcatenater::Clone": {
+"calls": 100,
+"consts": 67,
+"refs": 100,
+"score": 88.9,
+"status": "DIFF"
+},
+"SendFragmentPacketConcatenater::Destroy": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"SendFragmentPacketConcatenater::~SendFragmentPacketConcatenater": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Session::Accept": {
+"calls": 100,
+"consts": 57,
+"refs": 100,
+"score": 85.7,
+"status": "DIFF"
+},
+"Session::Close": {
+"calls": 100,
+"consts": 67,
+"refs": 100,
+"score": 88.9,
+"status": "DIFF"
+},
+"Session::Connect": {
+"calls": 80,
+"consts": 74,
+"refs": 93,
+"score": 82.3,
+"status": "DIFF"
+},
+"Session::HandleEvent": {
+"calls": 87,
+"consts": 74,
+"refs": 97,
+"score": 86.4,
+"status": "DIFF"
+},
+"Session::HandleFailedEvent": {
+"calls": 100,
+"consts": 62,
+"refs": 100,
+"score": 87.5,
+"status": "DIFF"
+},
+"Session::Send [?Send@Session@@QEBAXPEBDZZ]": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Session::Send [?Send@Session@@QEBAXPEBVPacket@@@Z]": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Session::SendV": {
+"calls": 96,
+"consts": 67,
+"refs": 100,
+"score": 87.7,
+"status": "DIFF"
+},
+"Session::Session [??0Session@@IEAA@IPEBVPacketBufferHandler@@@Z]": {
+"calls": 100,
+"consts": 83,
+"refs": 75,
+"score": 86.1,
+"status": "DIFF"
+},
+"Session::Session [??0Session@@IEAA@XZ]": {
+"calls": 100,
+"consts": 100,
+"refs": 80,
+"score": 93.3,
+"status": "DIFF"
+},
+"Session::SetChannel": {
+"calls": 100,
+"consts": 67,
+"refs": 100,
+"score": 88.9,
+"status": "DIFF"
+},
+"Session::SetPacketConcatenater": {
+"calls": 100,
+"consts": 67,
+"refs": 100,
+"score": 88.9,
+"status": "DIFF"
+},
+"Session::StopReconnect": {
+"calls": 100,
+"consts": 80,
+"refs": 100,
+"score": 93.3,
+"status": "DIFF"
+},
+"Session::clear": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Session::close": {
+"calls": 100,
+"consts": 64,
+"refs": 100,
+"score": 87.9,
+"status": "DIFF"
+},
+"Session::deallocate_me": {
+"calls": 100,
+"consts": 67,
+"refs": 100,
+"score": 88.9,
+"status": "DIFF"
+},
+"Session::handlePacket": {
+"calls": 71,
+"consts": 59,
+"refs": 100,
+"score": 76.8,
+"status": "DIFF"
+},
+"Session::initialize": {
+"calls": 100,
+"consts": 60,
+"refs": 75,
+"score": 78.3,
+"status": "DIFF"
+},
+"Session::reconnect": {
+"calls": 100,
+"consts": 78,
+"refs": 100,
+"score": 92.8,
+"status": "DIFF"
+},
+"Session::recv": {
+"calls": 100,
+"consts": 77,
+"refs": 100,
+"score": 92.3,
+"status": "DIFF"
+},
+"Session::send": {
+"calls": 100,
+"consts": 73,
+"refs": 100,
+"score": 90.9,
+"status": "DIFF"
+},
+"Session::sendNext": {
+"calls": 89,
+"consts": 62,
+"refs": 100,
+"score": 83.5,
+"status": "DIFF"
+},
+"Session::tryReconnect": {
+"calls": 100,
+"consts": 72,
+"refs": 100,
+"score": 90.7,
+"status": "DIFF"
+},
+"Session::~Session": {
+"calls": 100,
+"consts": 32,
+"refs": 92,
+"score": 74.9,
+"status": "DIFF"
+},
+"SessionPool::Initialize": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"SessionPool::MakeSession": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"SessionPool::RemoveSession": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"SessionPool::SessionPool": {
+"calls": 100,
+"consts": 100,
+"refs": 89,
+"score": 96.3,
+"status": "DIFF"
+},
+"SessionPool::addToPool": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"SessionPool::~SessionPool": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"SessionSendBuffer::Add": {
+"calls": 60,
+"consts": 80,
+"refs": 100,
+"score": 80.0,
+"status": "DIFF"
+},
+"SessionSendBuffer::Clear": {
+"calls": 22,
+"consts": 50,
+"refs": 22,
+"score": 31.5,
+"status": "DIFF"
+},
+"SessionSendBuffer::Initialize": {
+"calls": 100,
+"consts": 92,
+"refs": 100,
+"score": 97.4,
+"status": "DIFF"
+},
+"SessionSendBuffer::RemoveSentBuffer": {
+"calls": 67,
+"consts": 100,
+"refs": 100,
+"score": 88.9,
+"status": "DIFF"
+},
+"SessionSendBuffer::increaseBuffer": {
+"calls": 29,
+"consts": 29,
+"refs": 0,
+"score": 19.0,
+"status": "DIFF"
+},
+"StaticPageMemoryManager::Alloc": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"StaticPageMemoryManager::AllocZero": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"StaticPageMemoryManager::Clear": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"StaticPageMemoryManager::Free": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"StaticPageMemoryManager::Initialize [?Initialize@StaticPageMemoryManager@@QEAA_NPEAX_K1PEBVMemoryManager@@@Z]": {
+"calls": 100,
+"consts": 100,
+"refs": 89,
+"score": 96.3,
+"status": "DIFF"
+},
+"StaticPageMemoryManager::Initialize [?Initialize@StaticPageMemoryManager@@UEAA_NPEBX_K@Z]": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"StaticPageMemoryManager::Realloc": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"StaticPageMemoryManager::ReallocZero": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"StaticPageMemoryManager::allocate": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"StaticPageMemoryManager::~StaticPageMemoryManager": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"String::GetId128FromGuidString": {
+"calls": 86,
+"consts": 80,
+"refs": 100,
+"score": 88.6,
+"status": "DIFF"
+},
+"SysInfo::Hostname": {
+"calls": 100,
+"consts": 88,
+"refs": 100,
+"score": 95.8,
+"status": "DIFF"
+},
+"SysInfo::IpAddress": {
+"calls": 80,
+"consts": 95,
+"refs": 100,
+"score": 91.7,
+"status": "DIFF"
+},
+"SystemEvent::~SystemEvent": {
+"calls": 100,
+"consts": 0,
+"refs": 100,
+"score": 66.7,
+"status": "DIFF"
+},
+"TextConsole::Close": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TextConsole::Open": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TextConsole::TextConsole": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TextConsole::Write": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TextConsole::WriteStartLog": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TextConsole::WriteStatusLog": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TextConsole::controlHandler": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TextConsole::setTitle": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TextConsole::write": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TextConsoleControlHandler": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Thread::stop": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Thread::yield": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Thread::~Thread": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ThreadManager::StartThread": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ThreadManager::StopAll": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ThreadManager::StopThread": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ThreadManager::entry": {
+"calls": 100,
+"consts": 0,
+"refs": 100,
+"score": 66.7,
+"status": "DIFF"
+},
+"ThreadManager::stopThread": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Timer::EventId": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TimerQueue::Add": {
+"calls": 86,
+"consts": 100,
+"refs": 100,
+"score": 95.2,
+"status": "DIFF"
+},
+"TimerQueue::Initialize": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TimerQueue::Remove": {
+"calls": 88,
+"consts": 67,
+"refs": 94,
+"score": 82.8,
+"status": "DIFF"
+},
+"TimerQueue::TimeExpired": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TimerQueue::addLongTermQueue": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TimerQueue::clearLongTermQueueSlot": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TimerQueue::clearShortTermQueueSlot": {
+"calls": 36,
+"consts": 67,
+"refs": 29,
+"score": 43.9,
+"status": "DIFF"
+},
+"TimerQueue::~TimerQueue": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TrustedPacketBufferHandler::Clone": {
+"calls": 100,
+"consts": 0,
+"refs": 100,
+"score": 66.7,
+"status": "DIFF"
+},
+"TrustedPacketBufferHandler::Destroy": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TrustedPacketBufferHandler::ToBuffer": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TrustedPacketBufferHandler::ToPacket": {
+"calls": 100,
+"consts": 75,
+"refs": 100,
+"score": 91.7,
+"status": "DIFF"
+},
+"WinMsgHandler::Name": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WinMsgHandler::run": {
+"calls": 25,
+"consts": 0,
+"refs": 50,
+"score": 25.0,
+"status": "DIFF"
+},
+"WinMsgHandler::~WinMsgHandler": {
+"calls": 50,
+"consts": 0,
+"refs": 44,
+"score": 31.5,
+"status": "DIFF"
+},
+"WinServiceConsole::Close": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WinServiceConsole::InstallService": {
+"calls": 77,
+"consts": 100,
+"refs": 86,
+"score": 87.7,
+"status": "DIFF"
+},
+"WinServiceConsole::Open": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WinServiceConsole::ServiceMain": {
+"calls": 85,
+"consts": 92,
+"refs": 100,
+"score": 92.3,
+"status": "DIFF"
+},
+"WinServiceConsole::SetState": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WinServiceConsole::UninstallService": {
+"calls": 82,
+"consts": 100,
+"refs": 100,
+"score": 94.0,
+"status": "DIFF"
+},
+"WinServiceConsole::WriteStartLog": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WinServiceConsole::addLog": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WinServiceConsole::controlHandler": {
+"calls": 40,
+"consts": 0,
+"refs": 67,
+"score": 35.6,
+"status": "DIFF"
+},
+"WinServiceConsole::getLastErrorText": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WinServiceControlHandler": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WindowConsole::Close": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WindowConsole::Open": {
+"calls": 76,
+"consts": 40,
+"refs": 71,
+"score": 62.5,
+"status": "DIFF"
+},
+"WindowConsole::SetState": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WindowConsole::WindowConsole": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WindowConsole::Write": {
+"calls": 100,
+"consts": 50,
+"refs": 100,
+"score": 83.3,
+"status": "DIFF"
+},
+"WindowConsole::WriteStartLog": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WindowConsole::setTitle": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WindowConsole::write": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WindowConsole::~WindowConsole": {
+"calls": 75,
+"consts": 67,
+"refs": 50,
+"score": 63.9,
+"status": "DIFF"
+},
+"WindowConsoleOnClose": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WindowConsoleOnReload": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WindowConsoleOnSafeShutdown": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_BtFindBestMatch_selectMLS": {
+"calls": 0,
+"consts": 67,
+"refs": 100,
+"score": 55.6,
+"status": "DIFF"
+},
+"ZSTD_CCtx_resetParameters": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_DUBT_findBestMatch": {
+"calls": 91,
+"consts": 67,
+"refs": 100,
+"score": 85.9,
+"status": "DIFF"
+},
+"ZSTD_HcFindBestMatch_extDict_selectMLS": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_HcFindBestMatch_selectMLS": {
+"calls": 100,
+"consts": 93,
+"refs": 100,
+"score": 97.8,
+"status": "DIFF"
+},
+"ZSTD_compressBlock_btlazy2": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_compressBlock_btlazy2_extDict": {
+"calls": 73,
+"consts": 100,
+"refs": 100,
+"score": 90.9,
+"status": "DIFF"
+},
+"ZSTD_compressBlock_btopt": {
+"calls": 98,
+"consts": 98,
+"refs": 77,
+"score": 91.2,
+"status": "DIFF"
+},
+"ZSTD_compressBlock_btopt_extDict": {
+"calls": 99,
+"consts": 98,
+"refs": 77,
+"score": 91.4,
+"status": "DIFF"
+},
+"ZSTD_compressBlock_btultra": {
+"calls": 98,
+"consts": 96,
+"refs": 100,
+"score": 98.2,
+"status": "DIFF"
+},
+"ZSTD_compressBlock_btultra_extDict": {
+"calls": 99,
+"consts": 95,
+"refs": 100,
+"score": 97.9,
+"status": "DIFF"
+},
+"ZSTD_compressBlock_doubleFast": {
+"calls": 98,
+"consts": 100,
+"refs": 100,
+"score": 99.3,
+"status": "DIFF"
+},
+"ZSTD_compressBlock_doubleFast_extDict": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_compressBlock_doubleFast_extDict_generic": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_compressBlock_fast": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_compressBlock_fast_dictMatchState": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_compressBlock_fast_extDict": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_compressBlock_fast_extDict_generic": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_compressBlock_greedy": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_compressBlock_greedy_extDict": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_compressBlock_lazy": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_compressBlock_lazy2": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_compressBlock_lazy2_extDict": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_compressBlock_lazy_extDict": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_count": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_count_2segments": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_downscaleStat": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_freeCDict": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_hashPtr": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_insertAndFindFirstIndexHash3": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_insertAndFindFirstIndex_internal": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_insertBt1": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_insertDUBT1": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_litLengthContribution": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_readMINMATCH": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_rescaleFreqs": {
+"calls": 83,
+"consts": 100,
+"refs": 100,
+"score": 94.4,
+"status": "DIFF"
+},
+"ZSTD_storeSeq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_updateDUBT": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_updateRep": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_updateStats": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"_FindPESection": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"_IsNonwritableInCurrentImage": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"_IsNonwritableInCurrentImage$filt$0": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"_ValidateImageBase": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"_matherr": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"_onexit": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"_onexit$fin$0": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"aes128TableDecrypt": {
+"calls": 100,
+"consts": 55,
+"refs": 50,
+"score": 68.2,
+"status": "DIFF"
+},
+"aes128TableEncrypt": {
+"calls": 100,
+"consts": 55,
+"refs": 50,
+"score": 68.2,
+"status": "DIFF"
+},
+"aes128TableSetupDecKey": {
+"calls": 100,
+"consts": 60,
+"refs": 100,
+"score": 86.7,
+"status": "DIFF"
+},
+"aes128TableSetupEncKey": {
+"calls": 100,
+"consts": 60,
+"refs": 67,
+"score": 75.6,
+"status": "DIFF"
+},
+"atexit": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"decrypt": {
+"calls": 100,
+"consts": 0,
+"refs": 100,
+"score": 66.7,
+"status": "DIFF"
+},
+"encrypt": {
+"calls": 100,
+"consts": 0,
+"refs": 100,
+"score": 66.7,
+"status": "DIFF"
+},
+"hash": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"makeConsole": {
+"calls": 25,
+"consts": 29,
+"refs": 50,
+"score": 34.5,
+"status": "DIFF"
+},
+"makeDirectory": {
+"calls": 67,
+"consts": 60,
+"refs": 100,
+"score": 75.6,
+"status": "DIFF"
+},
+"operator delete": {
+"calls": 0,
+"consts": 0,
+"refs": 0,
+"score": 0.0,
+"status": "DIFF"
+},
+"pre_c_init": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"pre_cpp_init": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"printUsage": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"swprintf": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"wmain": {
+"calls": 100,
+"consts": 0,
+"refs": 29,
+"score": 42.9,
+"status": "DIFF"
+},
+"wmainCRTStartup": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+}
+}
