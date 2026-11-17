@@ -6,6 +6,11 @@
 #include <time.h>
 #include <stdlib.h>
 #include <new>
+#include <locale.h>
+#include <stdarg.h>
+
+// msvcr100 export. The Wine msvcrt headers do not declare it.
+extern "C" int __cdecl _vswprintf_c_l(wchar_t* buffer, size_t count, wchar_t const* format, _locale_t locale, va_list args);
 #include <dbghelp.h>
 #include "AlertSender.h"
 #include "Daemon.h"
@@ -270,7 +275,7 @@ void CrashHandler::MakeCrash(char const* file, int line, wchar_t const* fmt, ...
     // BUG: 0x1CEE0 no check of the HeapAlloc result.
     info->file = file;
     info->line = line;
-    _vsnwprintf(info->log, 4096, fmt, args);  // ❓ original: _vswprintf_c_l(..., nullptr, args)
+    _vswprintf_c_l(info->log, 4096, fmt, nullptr, args);  // LobbyGate 0x1CF3C (import _vswprintf_c_l)
     ULONG_PTR parameter = reinterpret_cast<ULONG_PTR>(info);
     RaiseException(USER_ASSERT_FAILED, EXCEPTION_NONCONTINUABLE, 1, &parameter);
     if (Daemon::Instance->EndEvent.Event != nullptr)
