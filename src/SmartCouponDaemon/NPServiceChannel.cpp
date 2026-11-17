@@ -20,31 +20,18 @@ using namespace StsMsgLib;
 static wchar_t const NPSERVICECHANNEL_FILE[] = L"NPServiceChannel.cpp";
 static wchar_t const NPMESSAGEHANDLER_FILE[] = L"NPMessageHandler.cpp";
 
-namespace
-{
-// ❓ Not in the PDB. The log reads id128 as a GUID (Data1, Data2, Data3, Data4[8]).
-struct GuidParts  // LIFT: lift helper name, not in any PDB
-{
-    unsigned long id1;
-    unsigned short id2;
-    unsigned short id3;
-    unsigned char id4[8];
-};
-static_assert(sizeof(GuidParts) == 0x10, "sizeof GuidParts");
-}  // namespace
-
 // 0xFD80
 void NPServiceChannelCmdDispatcher(unsigned int id, ECommand* eCmd)
 {
     NPServiceChannel* channel = SmartCouponDaemon::_instance->_npChannelMgr->_npServChannel;
-    if (channel == nullptr || channel->_tranRegistry == nullptr)
+    if (channel == nullptr)  // LIFT: 0xfda1 tests only the channel
     {
         Log::Write(Log::LT_ERROR, NPSERVICECHANNEL_FILE, 22,
                    L"[np], [np-game-service-channel], dispatch command fail; no channel exists, txn-id:%u", id);
         return;
     }
     NPTransactionRegistry* registry = channel->_tranRegistry;
-    if (registry == nullptr)  // ❓ the binary checks the registry again
+    if (registry == nullptr)  // LIFT: 0xfdd0
     {
         Log::Write(Log::LT_ERROR, NPSERVICECHANNEL_FILE, 28,
                    L"== CRASH == [np], [np-gameservch-tran-reg], not ready to dispatch command");
@@ -75,7 +62,7 @@ void NPJobTransaction::Expire()
 bool NPServiceChannel::SendRequestEventNoti(CouponJob* job, id128 const* gameAccountId, int couponEventId,
                                             long long publicationId)
 {
-    GuidParts const& acc = *reinterpret_cast<GuidParts const*>(gameAccountId);
+    auto const& acc = gameAccountId->guid;
     if (job == nullptr)
     {
         Log::Write(Log::LT_DEBUG, NPSERVICECHANNEL_FILE, 85,
