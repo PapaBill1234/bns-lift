@@ -162,23 +162,26 @@ public:
 };
 static_assert(sizeof(ClientSessionHandler) == 0x8, "sizeof ClientSessionHandler");
 
-// ❓ IDA shows TR_NONE and TR_MAX. The values and the other names are a guess.
-enum ClientSessionTimerReason  // ❓ name
-{
-    TR_NONE = 0,
-    TR_MAX = 3,  // ❓
-};
-
 class ClientSessionTimerJob : public Timer
 {
 public:
+    // PDB ClientSessionTimerJob::TimerReason (LobbyGate type 0x276C).
+    enum TimerReason
+    {
+        TR_NONE = 0,
+        TR_KICK = 1,
+        TR_CLOSE_ANONYMOUS = 2,
+        TR_CLOSE = 3,
+        TR_MAX = 4,
+    };
+
     virtual ~ClientSessionTimerJob();                                    // later card
     virtual unsigned int TimerClass() const;                             // later card
     virtual unsigned long long TimerId() const;                          // 0x27fc0 (LobbyGate.obj, later card)
     virtual bool HandleEvent(EventContext* context, unsigned long numOfBytes);  // 0x6fa0
 
     unsigned long long _key;
-    int _timerReason;
+    TimerReason _timerReason;
 };
 static_assert(sizeof(ClientSessionTimerJob) == 0x48, "sizeof ClientSessionTimerJob");
 static_assert(offsetof(ClientSessionTimerJob, _key) == 0x38, "ClientSessionTimerJob::_key");

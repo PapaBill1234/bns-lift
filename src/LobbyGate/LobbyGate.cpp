@@ -212,7 +212,7 @@ void LobbyGate::AddJobTimer(unsigned long long gateKey, char reason)
         timer->prev = nullptr;
         timer->SlotIndex = -1;
         timer->InLtq = false;
-        timer->_timerReason = reason;
+        timer->_timerReason = static_cast<ClientSessionTimerJob::TimerReason>(reason);
         timer->_key = gateKey;
     }
     if (!GlobalTimerQueue->Add(_config->_closeTimeout, timer))
