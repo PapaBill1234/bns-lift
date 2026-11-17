@@ -9,7 +9,7 @@
 #include <new>
 
 #include "AlertSender.h"
-#include "BnsCommonConfig.h"
+#include "BnsCommonConfigDefinition.h"
 #include "CacheGateSessionHandler.h"
 #include "ClientManager.h"
 #include "Console.h"
@@ -27,29 +27,29 @@ static wchar_t const CACHED_LIST_CONFIG_FILE[] = L"cached-list.config.xml";
 
 CacheGate* CacheGate::_instance = nullptr;
 
-static int const DEFAULT_DUMP_TYPE = 1;       // ❓ name
-static int const DEFAULT_PUBLIC_PORT = 20800;  // ❓ name
+static int const DEFAULT_DUMPTYPE = 1;                 // 0x46314 (CacheGateConfig.obj)
+static int const CACHEGATE_PUBLIC_PORT_VALUE = 20800;  // 0x4611C (CacheGateConfig.obj)
 
 // 0x596c0
 XmlCfgDef const CacheGateConfig::_Def[13] = {
     {static_cast<unsigned long long>(-1), nullptr, 0, 0, nullptr, L"path"},
-    {offsetof(CacheGateConfig, _rootPath), L"root-path", XML_CFG_TYPE_WSTRING2, 1, nullptr, L"full root path"},
-    {offsetof(CacheGateConfig, _logPath), L"log-path", XML_CFG_TYPE_WSTRING2, 1, nullptr, L"full log path"},
-    {offsetof(CacheGateConfig, _configPath), L"config-path", XML_CFG_TYPE_WSTRING2, 1, nullptr, L"full config path"},
+    {offsetof(CacheGateConfig, _rootPath), L"root-path", XmlCfgDef::CFG_DIR, 1, nullptr, L"full root path"},
+    {offsetof(CacheGateConfig, _logPath), L"log-path", XmlCfgDef::CFG_DIR, 1, nullptr, L"full log path"},
+    {offsetof(CacheGateConfig, _configPath), L"config-path", XmlCfgDef::CFG_DIR, 1, nullptr, L"full config path"},
     {static_cast<unsigned long long>(-1), L"system configuration", 0, 0, nullptr, nullptr},
-    {offsetof(CacheGateConfig, _workerThreadCount), L"worker-thread", XML_CFG_TYPE_INT, 0, nullptr,
+    {offsetof(CacheGateConfig, _workerThreadCount), L"worker-thread", XmlCfgDef::CFG_INT, 0, nullptr,
      L"0 is system recommend"},
-    {offsetof(CacheGateConfig, _dumpType), L"dump-type", XML_CFG_TYPE_INT, 0, &DEFAULT_DUMP_TYPE,
+    {offsetof(CacheGateConfig, _dumpType), L"dump-type", XmlCfgDef::CFG_INT, 0, &DEFAULT_DUMPTYPE,
      L"0: no dump, 1: minimal dump(default), 2: full dump"},
-    {offsetof(CacheGateConfig, _maxCachedSessionCount), L"max-cached-session-count", XML_CFG_TYPE_INT, 1, nullptr,
+    {offsetof(CacheGateConfig, _maxCachedSessionCount), L"max-cached-session-count", XmlCfgDef::CFG_INT, 1, nullptr,
      L"max session count for connect to cached. 0 is system default."},
-    {offsetof(CacheGateConfig, _maxPublicSessionCount), L"max-public-session-count", XML_CFG_TYPE_INT, 1, nullptr,
+    {offsetof(CacheGateConfig, _maxPublicSessionCount), L"max-public-session-count", XmlCfgDef::CFG_INT, 1, nullptr,
      L"max session count for public port. 0 is system default."},
     {static_cast<unsigned long long>(-1), L"network configuration", 0, 0, nullptr, nullptr},
-    {offsetof(CacheGateConfig, _publicPort), L"public-port", XML_CFG_TYPE_INT, 0, &DEFAULT_PUBLIC_PORT,
+    {offsetof(CacheGateConfig, _publicPort), L"public-port", XmlCfgDef::CFG_INT, 0, &CACHEGATE_PUBLIC_PORT_VALUE,
      L"daemon public access port"},
     {static_cast<unsigned long long>(-1), L"economy service configuration", 0, 0, nullptr, nullptr},
-    {offsetof(CacheGateConfig, _wid), L"wid", XML_CFG_TYPE_INT, 0, nullptr, L"cachegate wid"},
+    {offsetof(CacheGateConfig, _wid), L"wid", XmlCfgDef::CFG_INT, 0, nullptr, L"cachegate wid"},
 };
 
 // 0x4050
@@ -159,10 +159,10 @@ bool CacheGate::initLog()
     return true;
 }
 
-// ❓ Not in index.tsv. The PDB has the slot. The lift returns true.
+// 0x40B0 (size 3: returns true)
 bool CacheGate::setArgument(int argc, wchar_t const** argv)
 {
-    return true;  // ❓
+    return true;
 }
 
 // 0x4510

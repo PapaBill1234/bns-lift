@@ -5,9 +5,9 @@
 class UnsentPostChecker : public Timer
 {
 public:
-    // ❓ The bodies are folded (ICF) with other functions (TimerClass at 0x29950). Not in index.tsv.
-    virtual unsigned int TimerClass() const { return 2; }         // ❓ value
-    virtual unsigned long long TimerId() const { return 0; }      // ❓ value
+    // The bodies are folded (ICF) with other functions. Not in index.tsv.
+    virtual unsigned int TimerClass() const { return 3; }         // 0x29950
+    virtual unsigned long long TimerId() const { return 0; }      // 0x5d860
     virtual bool HandleEvent(EventContext* context, unsigned long bytes);  // 0xd770
     virtual ~UnsentPostChecker() {}  // ❓ folded with Timer dtor 0x12c60
 };

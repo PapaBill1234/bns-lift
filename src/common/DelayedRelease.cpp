@@ -14,7 +14,7 @@
 
 static wchar_t const DELAYED_RELEASE_FILE[] = L"source\\DelayedRelease.cpp";
 
-// ❓ ReleaseEvent is local to DelayedRelease.obj. Layout from the IDA type (0x20 bytes).
+// ReleaseEvent is local to DelayedRelease.obj. PDB type 0x224D (LobbyGate), size 0x20.
 class ReleaseEvent : public DynamicEventObject
 {
 public:
@@ -29,6 +29,7 @@ public:
     virtual unsigned int EventId() const;
     virtual bool HandleEvent(EventContext* context, unsigned long param);
 
+private:
     DelayedRelease::Node* _head;
 };
 static_assert(sizeof(ReleaseEvent) == 0x20, "sizeof ReleaseEvent");

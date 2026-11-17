@@ -22,7 +22,7 @@
 namespace
 {
 wchar_t const* const WORLD_PACKET_HANDLER_FILE = L"WorldPacketHandler.cpp";  // ❓ name
-wchar_t const* const WORLD_PACKET_HANDLER_TAG = L"world packet handler";     // ❓ name
+static wchar_t const* const MODULE_NAME = L"world packet handler";  // PDB MODULE_NAME
 
 // ❓ inline of the RelayContextManager id generator
 unsigned long long liftNextRelayTid()
@@ -74,7 +74,7 @@ void CheckPostCapacityRelayContext::initResponse(RelayResponse* const response)
 bool HandlePostOfficeServiceHelloReq(Session const* session, Packet const* packet)
 {
     Log::Write(Log::LT_DEBUG, WORLD_PACKET_HANDLER_FILE, 39, L"[%s], %s; <BEGIN PACKET HANDLER>",
-               WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceHelloReq");
+               MODULE_NAME, L"HandlePostOfficeServiceHelloReq");
     short cmd = 0;
     short postofficeServicePacketVersion = 0;
     short economyCommonPacketVersion = 0;
@@ -90,13 +90,13 @@ bool HandlePostOfficeServiceHelloReq(Session const* session, Packet const* packe
                           &ipAddress, &portNo) == 0)
     {
         Log::Write(Log::LT_ERROR, WORLD_PACKET_HANDLER_FILE, 57, L"[%s], %s; failed to decompose packet",
-                   WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceHelloReq");
+                   MODULE_NAME, L"HandlePostOfficeServiceHelloReq");
         failReason = 2;
         goto $_ERROR;
     }
     Log::Write(Log::LT_DEBUG, WORLD_PACKET_HANDLER_FILE, 62,
                L"[%s], %s; decomposed packet, postoffice-service-packet-version:%d, economy-common-packet-version:%d, wid:%u, ipAddress:%s, portNo:%u",
-               WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceHelloReq",
+               MODULE_NAME, L"HandlePostOfficeServiceHelloReq",
                static_cast<int>(postofficeServicePacketVersion), static_cast<int>(economyCommonPacketVersion),
                static_cast<unsigned int>(wid), Network::GetAddressStringW(ipAddress), static_cast<unsigned int>(portNo));
     if (postofficeServicePacketVersion <= 0 || economyCommonPacketVersion <= 0 || wid == 0 || ipAddress == 0 ||
@@ -104,7 +104,7 @@ bool HandlePostOfficeServiceHelloReq(Session const* session, Packet const* packe
     {
         Log::Write(Log::LT_ERROR, WORLD_PACKET_HANDLER_FILE, 67,
                    L"[%s], %s; invalid parameter, postoffice-service-packet-version:%d, economy-common-packet-version:%d, wid:%u, ipAddress:%d, portNo:%u",
-                   WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceHelloReq",
+                   MODULE_NAME, L"HandlePostOfficeServiceHelloReq",
                    static_cast<int>(postofficeServicePacketVersion), static_cast<int>(economyCommonPacketVersion),
                    static_cast<unsigned int>(wid), ipAddress, static_cast<unsigned int>(portNo));
         failReason = 5;
@@ -114,7 +114,7 @@ bool HandlePostOfficeServiceHelloReq(Session const* session, Packet const* packe
     {
         Log::Write(Log::LT_ERROR, WORLD_PACKET_HANDLER_FILE, 74,
                    L"[%s], %s; postoffice service packet version is not same, request version:%d, my version:%d",
-                   WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceHelloReq",
+                   MODULE_NAME, L"HandlePostOfficeServiceHelloReq",
                    static_cast<int>(postofficeServicePacketVersion), 16);
         failReason = 6;
         goto $_ERROR;
@@ -123,7 +123,7 @@ bool HandlePostOfficeServiceHelloReq(Session const* session, Packet const* packe
     {
         Log::Write(Log::LT_ERROR, WORLD_PACKET_HANDLER_FILE, 79,
                    L"[%s], %s; economy common packet version is not same, request version:%d, my version:%d",
-                   WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceHelloReq",
+                   MODULE_NAME, L"HandlePostOfficeServiceHelloReq",
                    static_cast<int>(economyCommonPacketVersion), 10);
         failReason = 7;
         goto $_ERROR;
@@ -131,7 +131,7 @@ bool HandlePostOfficeServiceHelloReq(Session const* session, Packet const* packe
     if (!PostOfficeDaemon::_instance->_worldConfigManager->CheckWorldConfig(wid, ipAddress, portNo))
     {
         Log::Write(Log::LT_ERROR, WORLD_PACKET_HANDLER_FILE, 86,
-                   L"[%s], %s; world config mismatch, wid:%u, ipAddress:%s, port:%u", WORLD_PACKET_HANDLER_TAG,
+                   L"[%s], %s; world config mismatch, wid:%u, ipAddress:%s, port:%u", MODULE_NAME,
                    L"HandlePostOfficeServiceHelloReq", static_cast<unsigned int>(wid),
                    Network::GetAddressStringW(ipAddress), static_cast<unsigned int>(portNo));
         failReason = 8;
@@ -147,7 +147,7 @@ bool HandlePostOfficeServiceHelloReq(Session const* session, Packet const* packe
         if (oldWorldChannel != nullptr)
         {
             Log::Write(Log::LT_ERROR, WORLD_PACKET_HANDLER_FILE, 97,
-                       L"[%s], %s; world channel duplication; kick old world channel, wid:%u", WORLD_PACKET_HANDLER_TAG,
+                       L"[%s], %s; world channel duplication; kick old world channel, wid:%u", MODULE_NAME,
                        L"HandlePostOfficeServiceHelloReq", static_cast<unsigned int>(wid));
             PostOfficeDaemon::_instance->_worldChannelManager->RemoveWorldChannel(wid);
             oldWorldChannel->Close();
@@ -157,7 +157,7 @@ bool HandlePostOfficeServiceHelloReq(Session const* session, Packet const* packe
         else
         {
             Log::Write(Log::LT_ERROR, WORLD_PACKET_HANDLER_FILE, 104, L"[%s], %s; failed to add world channel, wid:%u",
-                       WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceHelloReq", static_cast<unsigned int>(wid));
+                       MODULE_NAME, L"HandlePostOfficeServiceHelloReq", static_cast<unsigned int>(wid));
             failReason = 2;
         }
         goto $_ERROR;
@@ -166,20 +166,20 @@ bool HandlePostOfficeServiceHelloReq(Session const* session, Packet const* packe
     worldChannel->removeReferenceCount(WORLD_PACKET_HANDLER_FILE, 111);
     session->Send("h", 2);
     Log::Write(Log::LT_NOTICE, WORLD_PACKET_HANDLER_FILE, 114, L"[%s], %s; sent hello success ack, wid:%u",
-               WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceHelloReq", static_cast<unsigned int>(wid));
+               MODULE_NAME, L"HandlePostOfficeServiceHelloReq", static_cast<unsigned int>(wid));
     Log::Write(Log::LT_DEBUG, WORLD_PACKET_HANDLER_FILE, 116, L"[%s], %s; <END PACKET HANDLER>",
-               WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceHelloReq");
+               MODULE_NAME, L"HandlePostOfficeServiceHelloReq");
     return true;
 
 $_ERROR:
     session->Send("hh", 3, static_cast<int>(failReason));
     Log::Write(Log::LT_NOTICE, WORLD_PACKET_HANDLER_FILE, 121, L"[%s], %s; sent hello failure ack, wid:%u, failReason:%d",
-               WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceHelloReq", static_cast<unsigned int>(wid),
+               MODULE_NAME, L"HandlePostOfficeServiceHelloReq", static_cast<unsigned int>(wid),
                static_cast<int>(failReason));
     if (worldChannel != nullptr)
         worldChannel->removeReferenceCount(WORLD_PACKET_HANDLER_FILE, 124);
     Log::Write(Log::LT_DEBUG, WORLD_PACKET_HANDLER_FILE, 126, L"[%s], %s; <END PACKET HANDLER>",
-               WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceHelloReq");
+               MODULE_NAME, L"HandlePostOfficeServiceHelloReq");
     return false;
 }
 
@@ -187,7 +187,7 @@ $_ERROR:
 bool HandlePostOfficeServiceRetrieveCharacterInfoReq(Session const* session, Packet const* packet)
 {
     Log::Write(Log::LT_DEBUG, WORLD_PACKET_HANDLER_FILE, 133, L"[%s], %s; <BEGIN PACKET HANDLER>",
-               WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceRetrieveCharacterInfoReq");
+               MODULE_NAME, L"HandlePostOfficeServiceRetrieveCharacterInfoReq");
     RetrieveCharacterInfoRelayRequest request;
     short cmd = 0;
     short failReason = 0;
@@ -202,7 +202,7 @@ bool HandlePostOfficeServiceRetrieveCharacterInfoReq(Session const* session, Pac
     {
         Log::Write(Log::LT_ERROR, WORLD_PACKET_HANDLER_FILE, 141,
                    L"[%s], %s; unknown world channel, sessionId:0x%I64X, portId:%u, sessionIndex:%u",
-                   WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceRetrieveCharacterInfoReq", session->_id,
+                   MODULE_NAME, L"HandlePostOfficeServiceRetrieveCharacterInfoReq", session->_id,
                    static_cast<unsigned int>(session->_id >> 32), static_cast<unsigned int>(session->_id));
         failReason = 2;
         goto $_ERROR;
@@ -210,13 +210,13 @@ bool HandlePostOfficeServiceRetrieveCharacterInfoReq(Session const* session, Pac
     if (packet->Decompose("hqhs", &cmd, &request._gameTid, &request._targetWid, request._targetCharacterName, 33) == 0)
     {
         Log::Write(Log::LT_ERROR, WORLD_PACKET_HANDLER_FILE, 150, L"[%s], %s; failed to decompose packet",
-                   WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceRetrieveCharacterInfoReq");
+                   MODULE_NAME, L"HandlePostOfficeServiceRetrieveCharacterInfoReq");
         failReason = 2;
         goto $_ERROR;
     }
     Log::Write(Log::LT_DEBUG, WORLD_PACKET_HANDLER_FILE, 154,
                L"[%s], %s; decomposed packet, requestWid:%u, gameTid:0x%I64X, targetWid:%u, targetCharacterName:%s",
-               WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceRetrieveCharacterInfoReq",
+               MODULE_NAME, L"HandlePostOfficeServiceRetrieveCharacterInfoReq",
                static_cast<unsigned int>(requestWid), request._gameTid, static_cast<unsigned int>(request._targetWid),
                request._targetCharacterName);
     // ❓ BUG: 0x1fdd0 the check is wcslen(name) == 1 in the binary. A check for an empty name is probable.
@@ -224,7 +224,7 @@ bool HandlePostOfficeServiceRetrieveCharacterInfoReq(Session const* session, Pac
     {
         Log::Write(Log::LT_ERROR, WORLD_PACKET_HANDLER_FILE, 158,
                    L"[%s], %s; invalid parameter, requestWid:%u, gameTid:0x%I64X, targetWid:%u, targetCharacterName:%s",
-                   WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceRetrieveCharacterInfoReq",
+                   MODULE_NAME, L"HandlePostOfficeServiceRetrieveCharacterInfoReq",
                    static_cast<unsigned int>(requestWid), request._gameTid,
                    static_cast<unsigned int>(request._targetWid), request._targetCharacterName);
         failReason = 10;
@@ -234,7 +234,7 @@ bool HandlePostOfficeServiceRetrieveCharacterInfoReq(Session const* session, Pac
     {
         Log::Write(Log::LT_ERROR, WORLD_PACKET_HANDLER_FILE, 163,
                    L"[%s], %s; from-wid and to-wid are same, gameTid:0x%I64X, fromWid:%u, toWid:%u",
-                   WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceRetrieveCharacterInfoReq", request._gameTid,
+                   MODULE_NAME, L"HandlePostOfficeServiceRetrieveCharacterInfoReq", request._gameTid,
                    static_cast<unsigned int>(requestWid), static_cast<unsigned int>(request._targetWid));
         failReason = 12;
         goto $_ERROR;
@@ -244,7 +244,7 @@ bool HandlePostOfficeServiceRetrieveCharacterInfoReq(Session const* session, Pac
     if (cachegateChannel == nullptr)
     {
         Log::Write(Log::LT_ERROR, WORLD_PACKET_HANDLER_FILE, 173,
-                   L"[%s], %s; cannot send retrieve character info relay request", WORLD_PACKET_HANDLER_TAG,
+                   L"[%s], %s; cannot send retrieve character info relay request", MODULE_NAME,
                    L"HandlePostOfficeServiceRetrieveCharacterInfoReq");
         failReason = 4;
         goto $_ERROR;
@@ -262,7 +262,7 @@ bool HandlePostOfficeServiceRetrieveCharacterInfoReq(Session const* session, Pac
     {
         Log::Write(Log::LT_ERROR, WORLD_PACKET_HANDLER_FILE, 184,
                    L"[%s], %s; failed to send retrieve character info relay request, relayTid:0x%I64X",
-                   WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceRetrieveCharacterInfoReq",
+                   MODULE_NAME, L"HandlePostOfficeServiceRetrieveCharacterInfoReq",
                    economyHeader._relayTid);
         relayContext->removeReferenceCount(WORLD_PACKET_HANDLER_FILE, 185);
         cachegateChannel->removeReferenceCount(WORLD_PACKET_HANDLER_FILE, 186);
@@ -272,17 +272,17 @@ bool HandlePostOfficeServiceRetrieveCharacterInfoReq(Session const* session, Pac
     relayContext->removeReferenceCount(WORLD_PACKET_HANDLER_FILE, 192);
     cachegateChannel->removeReferenceCount(WORLD_PACKET_HANDLER_FILE, 193);
     Log::Write(Log::LT_DEBUG, WORLD_PACKET_HANDLER_FILE, 196, L"[%s], %s; <END PACKET HANDLER>",
-               WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceRetrieveCharacterInfoReq");
+               MODULE_NAME, L"HandlePostOfficeServiceRetrieveCharacterInfoReq");
     return true;
 
 $_ERROR:
     session->Send("hqE", 6, request._gameTid, static_cast<int>(failReason));
     Log::Write(Log::LT_NOTICE, WORLD_PACKET_HANDLER_FILE, 201,
                L"[%s], %s; sent retrieve character info failure ack, requestWid:%u, gameTid:0x%I64X, failReason:%d",
-               WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceRetrieveCharacterInfoReq",
+               MODULE_NAME, L"HandlePostOfficeServiceRetrieveCharacterInfoReq",
                static_cast<unsigned int>(requestWid), request._gameTid, static_cast<int>(failReason));
     Log::Write(Log::LT_DEBUG, WORLD_PACKET_HANDLER_FILE, 203, L"[%s], %s; <END PACKET HANDLER>",
-               WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceRetrieveCharacterInfoReq");
+               MODULE_NAME, L"HandlePostOfficeServiceRetrieveCharacterInfoReq");
     return true;
 }
 
@@ -290,7 +290,7 @@ $_ERROR:
 bool HandlePostOfficeServiceCheckPostCapacityReq(Session const* session, Packet const* packet)
 {
     Log::Write(Log::LT_DEBUG, WORLD_PACKET_HANDLER_FILE, 210, L"[%s], %s; <BEGIN PACKET HANDLER>",
-               WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceCheckPostCapacityReq");
+               MODULE_NAME, L"HandlePostOfficeServiceCheckPostCapacityReq");
     CheckPostCapacityRelayRequest request;
     short cmd = 0;
     short failReason = 0;
@@ -305,7 +305,7 @@ bool HandlePostOfficeServiceCheckPostCapacityReq(Session const* session, Packet 
     {
         Log::Write(Log::LT_ERROR, WORLD_PACKET_HANDLER_FILE, 218,
                    L"[%s], %s; unknown world channel, sessionId:0x%I64X, portId:%u, sessionIndex:%u",
-                   WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceCheckPostCapacityReq", session->_id,
+                   MODULE_NAME, L"HandlePostOfficeServiceCheckPostCapacityReq", session->_id,
                    static_cast<unsigned int>(session->_id >> 32), static_cast<unsigned int>(session->_id));
         failReason = 2;
         goto $_ERROR;
@@ -313,20 +313,20 @@ bool HandlePostOfficeServiceCheckPostCapacityReq(Session const* session, Packet 
     if (packet->Decompose("hqhq", &cmd, &request._gameTid, &request._targetWid, &request._targetPcId) == 0)
     {
         Log::Write(Log::LT_ERROR, WORLD_PACKET_HANDLER_FILE, 227, L"[%s], %s; failed to decompose packet",
-                   WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceCheckPostCapacityReq");
+                   MODULE_NAME, L"HandlePostOfficeServiceCheckPostCapacityReq");
         failReason = 2;
         goto $_ERROR;
     }
     Log::Write(Log::LT_DEBUG, WORLD_PACKET_HANDLER_FILE, 231,
                L"[%s], %s; decomposed packet, requestWid:%u, gameTid:0x%I64X, targetWid:%u, targetPcId:0x%I64X",
-               WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceCheckPostCapacityReq",
+               MODULE_NAME, L"HandlePostOfficeServiceCheckPostCapacityReq",
                static_cast<unsigned int>(requestWid), request._gameTid, static_cast<unsigned int>(request._targetWid),
                request._targetPcId);
     if (request._gameTid == 0 || request._targetWid == 0 || request._targetPcId == 0)
     {
         Log::Write(Log::LT_ERROR, WORLD_PACKET_HANDLER_FILE, 235,
                    L"[%s], %s; invalid parameter, requestWid:%u, gameTid:0x%I64X, targetWid:%u, targetPcId:0x%I64X",
-                   WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceCheckPostCapacityReq",
+                   MODULE_NAME, L"HandlePostOfficeServiceCheckPostCapacityReq",
                    static_cast<unsigned int>(requestWid), request._gameTid,
                    static_cast<unsigned int>(request._targetWid), request._targetPcId);
         failReason = 15;
@@ -336,7 +336,7 @@ bool HandlePostOfficeServiceCheckPostCapacityReq(Session const* session, Packet 
     {
         Log::Write(Log::LT_ERROR, WORLD_PACKET_HANDLER_FILE, 240,
                    L"[%s], %s; from-wid and to-wid are same, gameTid:0x%I64X, fromWid:%u, toWid:%u",
-                   WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceCheckPostCapacityReq", request._gameTid,
+                   MODULE_NAME, L"HandlePostOfficeServiceCheckPostCapacityReq", request._gameTid,
                    static_cast<unsigned int>(requestWid), static_cast<unsigned int>(request._targetWid));
         failReason = 18;
         goto $_ERROR;
@@ -346,7 +346,7 @@ bool HandlePostOfficeServiceCheckPostCapacityReq(Session const* session, Packet 
     if (cachegateChannel == nullptr)
     {
         Log::Write(Log::LT_ERROR, WORLD_PACKET_HANDLER_FILE, 250,
-                   L"[%s], %s; cannot send check post capacity relay request", WORLD_PACKET_HANDLER_TAG,
+                   L"[%s], %s; cannot send check post capacity relay request", MODULE_NAME,
                    L"HandlePostOfficeServiceCheckPostCapacityReq");
         failReason = 4;
         goto $_ERROR;
@@ -364,7 +364,7 @@ bool HandlePostOfficeServiceCheckPostCapacityReq(Session const* session, Packet 
     {
         Log::Write(Log::LT_ERROR, WORLD_PACKET_HANDLER_FILE, 261,
                    L"[%s], %s; failed to send check post capacity relay request, relayTid:0x%I64X",
-                   WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceCheckPostCapacityReq", economyHeader._relayTid);
+                   MODULE_NAME, L"HandlePostOfficeServiceCheckPostCapacityReq", economyHeader._relayTid);
         relayContext->removeReferenceCount(WORLD_PACKET_HANDLER_FILE, 262);
         cachegateChannel->removeReferenceCount(WORLD_PACKET_HANDLER_FILE, 263);
         failReason = 2;
@@ -373,17 +373,17 @@ bool HandlePostOfficeServiceCheckPostCapacityReq(Session const* session, Packet 
     relayContext->removeReferenceCount(WORLD_PACKET_HANDLER_FILE, 269);
     cachegateChannel->removeReferenceCount(WORLD_PACKET_HANDLER_FILE, 270);
     Log::Write(Log::LT_DEBUG, WORLD_PACKET_HANDLER_FILE, 273, L"[%s], %s; <END PACKET HANDLER>",
-               WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceCheckPostCapacityReq");
+               MODULE_NAME, L"HandlePostOfficeServiceCheckPostCapacityReq");
     return true;
 
 $_ERROR:
     session->Send("hqE", 9, request._gameTid, static_cast<int>(failReason));
     Log::Write(Log::LT_NOTICE, WORLD_PACKET_HANDLER_FILE, 278,
                L"[%s], %s; sent check post capacity failure ack, requestWid:%u, gameTid:0x%I64X, failReason:%d",
-               WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceCheckPostCapacityReq",
+               MODULE_NAME, L"HandlePostOfficeServiceCheckPostCapacityReq",
                static_cast<unsigned int>(requestWid), request._gameTid, static_cast<int>(failReason));
     Log::Write(Log::LT_DEBUG, WORLD_PACKET_HANDLER_FILE, 280, L"[%s], %s; <END PACKET HANDLER>",
-               WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceCheckPostCapacityReq");
+               MODULE_NAME, L"HandlePostOfficeServiceCheckPostCapacityReq");
     return true;
 }
 
@@ -426,7 +426,7 @@ $_ERROR:
 bool HandlePostOfficeServiceRegisterPostReq(Session const* session, Packet const* packet)
 {
     Log::Write(Log::LT_DEBUG, WORLD_PACKET_HANDLER_FILE, 287, L"[%s], %s; <BEGIN PACKET HANDLER>",
-               WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceRegisterPostReq");
+               MODULE_NAME, L"HandlePostOfficeServiceRegisterPostReq");
     // The fragment pump gives a PacketConcatenateBuffer in place of a Packet.
     PacketConcatenateBuffer* pcb = reinterpret_cast<PacketConcatenateBuffer*>(const_cast<Packet*>(packet));
     long long tid = 0;
@@ -451,15 +451,15 @@ bool HandlePostOfficeServiceRegisterPostReq(Session const* session, Packet const
                         postInfo._postMessage, 1025))
     {
         Log::Write(Log::LT_ERROR, WORLD_PACKET_HANDLER_FILE, 341, L"[%s], %s; failed to decompose packet",
-                   WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceRegisterPostReq");
+                   MODULE_NAME, L"HandlePostOfficeServiceRegisterPostReq");
         goto $_ERROR;
     }
     Log::Write(Log::LT_DEBUG, WORLD_PACKET_HANDLER_FILE, 345, L"[%s], %s; decomposed post data packet" POST_LOG_ARGS,
-               WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceRegisterPostReq", POST_LOG_VALUES);
+               MODULE_NAME, L"HandlePostOfficeServiceRegisterPostReq", POST_LOG_VALUES);
     if (postInfo._postType <= 0 || !postInfo.CheckValidityPostData())
     {
         Log::Write(Log::LT_ERROR, WORLD_PACKET_HANDLER_FILE, 348, L"[%s], %s; invalid post data" POST_LOG_ARGS,
-                   WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceRegisterPostReq", POST_LOG_VALUES);
+                   MODULE_NAME, L"HandlePostOfficeServiceRegisterPostReq", POST_LOG_VALUES);
         failReason = 23;
         goto $_ERROR;
     }
@@ -470,7 +470,7 @@ bool HandlePostOfficeServiceRegisterPostReq(Session const* session, Packet const
     {
         Log::Write(Log::LT_ERROR, WORLD_PACKET_HANDLER_FILE, 355,
                    L"[%s], %s; invalid attached item count, attachedItemCount:%d, maxAttachedItemCount:%d",
-                   WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceRegisterPostReq",
+                   MODULE_NAME, L"HandlePostOfficeServiceRegisterPostReq",
                    static_cast<int>(attachedItemCount), 10);
         failReason = 24;
         goto $_ERROR;
@@ -493,12 +493,12 @@ bool HandlePostOfficeServiceRegisterPostReq(Session const* session, Packet const
                             itemInfo._itemXmlData, 1025))
         {
             Log::Write(Log::LT_ERROR, WORLD_PACKET_HANDLER_FILE, 374, L"[%s], %s; failed to decompose packet",
-                       WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceRegisterPostReq");
+                       MODULE_NAME, L"HandlePostOfficeServiceRegisterPostReq");
             failReason = 2;
             goto $_ERROR;
         }
         Log::Write(Log::LT_DEBUG, WORLD_PACKET_HANDLER_FILE, 378, L"[%s], %s; decomposed item data packet" ITEM_LOG_ARGS,
-                   WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceRegisterPostReq", ITEM_LOG_VALUES);
+                   MODULE_NAME, L"HandlePostOfficeServiceRegisterPostReq", ITEM_LOG_VALUES);
 
         itemError = itemInfo._itemType <= 0 ? 1 : itemInfo.CheckValidityItemData();
         if (itemError != 0)
@@ -507,35 +507,35 @@ bool HandlePostOfficeServiceRegisterPostReq(Session const* session, Packet const
             {
             case 1:
                 Log::Write(Log::LT_ERROR, WORLD_PACKET_HANDLER_FILE, 384, L"[%s], %s; invalid item data" ITEM_LOG_ARGS,
-                           WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceRegisterPostReq", ITEM_LOG_VALUES);
+                           MODULE_NAME, L"HandlePostOfficeServiceRegisterPostReq", ITEM_LOG_VALUES);
                 failReason = 24;
                 break;
             case 2:
                 Log::Write(Log::LT_ERROR, WORLD_PACKET_HANDLER_FILE, 388,
-                           L"[%s], %s; invalid money item data" ITEM_LOG_ARGS, WORLD_PACKET_HANDLER_TAG,
+                           L"[%s], %s; invalid money item data" ITEM_LOG_ARGS, MODULE_NAME,
                            L"HandlePostOfficeServiceRegisterPostReq", ITEM_LOG_VALUES);
                 failReason = 25;
                 break;
             case 3:
                 Log::Write(Log::LT_ERROR, WORLD_PACKET_HANDLER_FILE, 392,
-                           L"[%s], %s; invalid default item data" ITEM_LOG_ARGS, WORLD_PACKET_HANDLER_TAG,
+                           L"[%s], %s; invalid default item data" ITEM_LOG_ARGS, MODULE_NAME,
                            L"HandlePostOfficeServiceRegisterPostReq", ITEM_LOG_VALUES);
                 failReason = 26;
                 break;
             case 4:
                 Log::Write(Log::LT_ERROR, WORLD_PACKET_HANDLER_FILE, 396,
-                           L"[%s], %s; invalid custom item data" ITEM_LOG_ARGS, WORLD_PACKET_HANDLER_TAG,
+                           L"[%s], %s; invalid custom item data" ITEM_LOG_ARGS, MODULE_NAME,
                            L"HandlePostOfficeServiceRegisterPostReq", ITEM_LOG_VALUES);
                 failReason = 27;
                 break;
             case 5:
                 Log::Write(Log::LT_ERROR, WORLD_PACKET_HANDLER_FILE, 400, L"[%s], %s; unknown item type" ITEM_LOG_ARGS,
-                           WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceRegisterPostReq", ITEM_LOG_VALUES);
+                           MODULE_NAME, L"HandlePostOfficeServiceRegisterPostReq", ITEM_LOG_VALUES);
                 failReason = 28;
                 break;
             default:
                 Log::Write(Log::LT_ERROR, WORLD_PACKET_HANDLER_FILE, 404, L"[%s], %s; unknown error" ITEM_LOG_ARGS,
-                           WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceRegisterPostReq", ITEM_LOG_VALUES);
+                           MODULE_NAME, L"HandlePostOfficeServiceRegisterPostReq", ITEM_LOG_VALUES);
                 failReason = 1;
                 break;
             }
@@ -567,7 +567,7 @@ bool HandlePostOfficeServiceRegisterPostReq(Session const* session, Packet const
     {
         Log::Write(Log::LT_ERROR, WORLD_PACKET_HANDLER_FILE, 419,
                    L"[%s], %s; failed to register post, dbRetValue:%d, tid:0x%I64X, invoiceId:0x%I64X",
-                   WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceRegisterPostReq", dbRetValue, tid,
+                   MODULE_NAME, L"HandlePostOfficeServiceRegisterPostReq", dbRetValue, tid,
                    postInfo._invoiceId);
         failReason = dbRetValue == 2 ? 29 : 3;
         goto $_ERROR;
@@ -579,7 +579,7 @@ bool HandlePostOfficeServiceRegisterPostReq(Session const* session, Packet const
     session->Send("hqq", 11, tid, postInfo._postId);
     Log::Write(Log::LT_NOTICE, WORLD_PACKET_HANDLER_FILE, 437,
                L"[%s], %s; sent post registration success ack, tid:0x%I64X, invoiceId:0x%I64X, postId:0x%I64X",
-               WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceRegisterPostReq", tid, postInfo._invoiceId, postId);
+               MODULE_NAME, L"HandlePostOfficeServiceRegisterPostReq", tid, postInfo._invoiceId, postId);
 
     cachegateChannel = PostOfficeDaemon::checkDestinationServiceState(recipientWid);
     if (cachegateChannel != nullptr)
@@ -594,33 +594,33 @@ bool HandlePostOfficeServiceRegisterPostReq(Session const* session, Packet const
         {
             Log::Write(Log::LT_ERROR, WORLD_PACKET_HANDLER_FILE, 447,
                        L"== CRASH == [%s], %s; exception occurred; failed to initialize attached item info, tid:0x%I64X, postId:0x%I64X",
-                       WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceRegisterPostReq", tid, postId);
+                       MODULE_NAME, L"HandlePostOfficeServiceRegisterPostReq", tid, postId);
             AlertSender::Write(WORLD_PACKET_HANDLER_FILE, 447,
                                L"== CRASH == [%s], %s; exception occurred; failed to initialize attached item info, tid:0x%I64X, postId:0x%I64X",
-                               WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceRegisterPostReq", tid, postId);
+                               MODULE_NAME, L"HandlePostOfficeServiceRegisterPostReq", tid, postId);
         }
         if (!PostOfficeDaemon::_instance->_postContextManager->AddContext(postContext))
         {
             Log::Write(Log::LT_ERROR, WORLD_PACKET_HANDLER_FILE, 452,
                        L"== CRASH == [%s], %s; exception occurred; failed to add post context, postId:0x%I64X",
-                       WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceRegisterPostReq", postId);
+                       MODULE_NAME, L"HandlePostOfficeServiceRegisterPostReq", postId);
             AlertSender::Write(WORLD_PACKET_HANDLER_FILE, 452,
                                L"== CRASH == [%s], %s; exception occurred; failed to add post context, postId:0x%I64X",
-                               WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceRegisterPostReq", postId);
+                               MODULE_NAME, L"HandlePostOfficeServiceRegisterPostReq", postId);
         }
         if (!PostDeliveryEvent::OccurEvent(postContext, cachegateChannel))
         {
             Log::Write(Log::LT_ERROR, WORLD_PACKET_HANDLER_FILE, 456,
                        L"[%s], %s; exception occurred; failed to occur post delivery event, postId:0x%I64X",
-                       WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceRegisterPostReq", postId);
+                       MODULE_NAME, L"HandlePostOfficeServiceRegisterPostReq", postId);
             if (!PostOfficeDaemon::_instance->_postContextManager->RemoveContext(postId))
             {
                 Log::Write(Log::LT_ERROR, WORLD_PACKET_HANDLER_FILE, 459,
                            L"== CRASH == [%s], %s; exception occurred; failed to remove post context, postId:0x%I64X",
-                           WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceRegisterPostReq", postId);
+                           MODULE_NAME, L"HandlePostOfficeServiceRegisterPostReq", postId);
                 AlertSender::Write(WORLD_PACKET_HANDLER_FILE, 459,
                                    L"== CRASH == [%s], %s; exception occurred; failed to remove post context, postId:0x%I64X",
-                                   WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceRegisterPostReq", postId);
+                                   MODULE_NAME, L"HandlePostOfficeServiceRegisterPostReq", postId);
             }
         }
         postContext->removeReferenceCount(WORLD_PACKET_HANDLER_FILE, 463);
@@ -630,30 +630,30 @@ bool HandlePostOfficeServiceRegisterPostReq(Session const* session, Packet const
     {
         Log::Write(Log::LT_ERROR, WORLD_PACKET_HANDLER_FILE, 468,
                    L"[%s], %s; cannot send deliver post relay request, recipientWid:%u, postId:0x%I64X",
-                   WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceRegisterPostReq",
+                   MODULE_NAME, L"HandlePostOfficeServiceRegisterPostReq",
                    static_cast<unsigned int>(recipientWid), postId);
         Memory::_Manager[2]->Free(attachedItemList, WORLD_PACKET_HANDLER_FILE, 469);
         if (!PostOfficeDaemon::_instance->_unsentPostContextManager->RegisterUnsentPost(recipientWid, postId, false))
             Log::Write(Log::LT_ERROR, WORLD_PACKET_HANDLER_FILE, 472,
                        L"[%s], %s; exception occurred; failed to register unsent post, recipientWid:%u, postId:0x%I64X",
-                       WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceRegisterPostReq",
+                       MODULE_NAME, L"HandlePostOfficeServiceRegisterPostReq",
                        static_cast<unsigned int>(recipientWid), postId);
     }
     Log::Write(Log::LT_DEBUG, WORLD_PACKET_HANDLER_FILE, 476, L"[%s], %s; <END PACKET HANDLER>",
-               WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceRegisterPostReq");
+               MODULE_NAME, L"HandlePostOfficeServiceRegisterPostReq");
     return true;
 
 $_ERROR:
     session->Send("hqE", 12, tid, static_cast<int>(failReason));
     Log::Write(Log::LT_NOTICE, WORLD_PACKET_HANDLER_FILE, 481,
-               L"[%s], %s; sent post registration failure ack, tid:0x%I64X, failReason:%d", WORLD_PACKET_HANDLER_TAG,
+               L"[%s], %s; sent post registration failure ack, tid:0x%I64X, failReason:%d", MODULE_NAME,
                L"HandlePostOfficeServiceRegisterPostReq", tid, static_cast<int>(failReason));
     if (pcb != nullptr)
         pcb->Clear();
     if (attachedItemList != nullptr)
         Memory::_Manager[2]->Free(attachedItemList, WORLD_PACKET_HANDLER_FILE, 486);
     Log::Write(Log::LT_DEBUG, WORLD_PACKET_HANDLER_FILE, 488, L"[%s], %s; <END PACKET HANDLER>",
-               WORLD_PACKET_HANDLER_TAG, L"HandlePostOfficeServiceRegisterPostReq");
+               MODULE_NAME, L"HandlePostOfficeServiceRegisterPostReq");
     return true;
 }
 

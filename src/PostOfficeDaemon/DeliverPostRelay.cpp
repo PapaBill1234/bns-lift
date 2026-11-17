@@ -10,7 +10,7 @@
 #include "PostOfficeDaemon.h"
 
 #define DELIVER_POST_RELAY_FILE L"DeliverPostRelay.cpp"
-#define DELIVER_POST_RELAY_TAG L"relay context"
+static wchar_t const* const MODULE_NAME = L"relay context";  // PDB MODULE_NAME
 
 #define DELIVER_POST_RELAY_CRASH(line, fmt, ...)                                     \
     do                                                                               \
@@ -77,22 +77,22 @@ bool DeliverPostRelayContext::processRelayRequest(Channel* const channel) const
 {
     if (channel == nullptr)
     {
-        DELIVER_POST_RELAY_CRASH(49, L"== CRASH == [%s], %s; invalid parameter, channel:0x%p", DELIVER_POST_RELAY_TAG,
+        DELIVER_POST_RELAY_CRASH(49, L"== CRASH == [%s], %s; invalid parameter, channel:0x%p", MODULE_NAME,
                                  L"DeliverPostRelayContext::processRelayRequest", static_cast<Channel*>(nullptr));
         return false;
     }
 
     unsigned long long const relayTid = _economyHeader._relayTid;
-    // ❓ The original passes an uninitialized register (r8) as economyFormat. SendFragmentRelayRequest takes a non-const pointer.
-    if (!static_cast<CacheGateChannel*>(channel)->SendFragmentRelayRequest(const_cast<DeliverPostRelayContext*>(this), nullptr))
+    // ❓ The original passes an uninitialized register (r8) as economyFormat.
+    if (!static_cast<CacheGateChannel*>(channel)->SendFragmentRelayRequest(this, nullptr))
     {
         Log::Write(Log::LT_ERROR, DELIVER_POST_RELAY_FILE, 56, L"[%s], %s; failed to send deliver post relay request, relayTid:0x%I64X",
-                   DELIVER_POST_RELAY_TAG, L"DeliverPostRelayContext::processRelayRequest", relayTid);
+                   MODULE_NAME, L"DeliverPostRelayContext::processRelayRequest", relayTid);
         return false;
     }
 
     Log::Write(Log::LT_NOTICE, DELIVER_POST_RELAY_FILE, 60, L"[%s], %s; sent deliver post relay request, relayTid:0x%I64X",
-               DELIVER_POST_RELAY_TAG, L"DeliverPostRelayContext::processRelayRequest", relayTid);
+               MODULE_NAME, L"DeliverPostRelayContext::processRelayRequest", relayTid);
     return true;
 }
 
@@ -111,7 +111,7 @@ bool DeliverPostRelayContext::processRelayResponse() const
     {
         Log::Write(Log::LT_ERROR, DELIVER_POST_RELAY_FILE, 77,
                    L"[%s], %s; invalid post status, relayTid:0x%I64X, postId:0x%I64X, postStatus:%d",
-                   DELIVER_POST_RELAY_TAG, L"DeliverPostRelayContext::processRelayResponse", relayTid, postId,
+                   MODULE_NAME, L"DeliverPostRelayContext::processRelayResponse", relayTid, postId,
                    static_cast<int>(postStatus));
         return false;
     }
@@ -125,7 +125,7 @@ bool DeliverPostRelayContext::processRelayResponse() const
         {
             Log::Write(Log::LT_ERROR, DELIVER_POST_RELAY_FILE, 86,
                        L"[%s], %s; exception occurred; failed to update post status [delivery success status], dbRetValue:%d, relayTid:0x%I64X, postId:0x%I64X",
-                       DELIVER_POST_RELAY_TAG, L"DeliverPostRelayContext::processRelayResponse", dbRetValue, relayTid, postId);
+                       MODULE_NAME, L"DeliverPostRelayContext::processRelayResponse", dbRetValue, relayTid, postId);
         }
         _postContext->_postInfo._postStatus = 4;
         break;
@@ -138,7 +138,7 @@ bool DeliverPostRelayContext::processRelayResponse() const
             {
                 Log::Write(Log::LT_ERROR, DELIVER_POST_RELAY_FILE, 99,
                            L"[%s], %s; exception occurred; failed to update post status [incomplete delivery status], dbRetValue:%d, relayTid:0x%I64X, postId:0x%I64X",
-                           DELIVER_POST_RELAY_TAG, L"DeliverPostRelayContext::processRelayResponse", dbRetValue, relayTid,
+                           MODULE_NAME, L"DeliverPostRelayContext::processRelayResponse", dbRetValue, relayTid,
                            postId);
             }
             _postContext->_postInfo._postStatus = 6;
@@ -149,7 +149,7 @@ bool DeliverPostRelayContext::processRelayResponse() const
             {
                 Log::Write(Log::LT_ERROR, DELIVER_POST_RELAY_FILE, 108,
                            L"[%s], %s; exception occurred; failed to update post status [delivery failure status], dbRetValue:%d, relayTid:0x%I64X, postId:0x%I64X",
-                           DELIVER_POST_RELAY_TAG, L"DeliverPostRelayContext::processRelayResponse", dbRetValue, relayTid,
+                           MODULE_NAME, L"DeliverPostRelayContext::processRelayResponse", dbRetValue, relayTid,
                            postId);
             }
             _postContext->_postInfo._postStatus = 5;
@@ -165,7 +165,7 @@ bool DeliverPostRelayContext::processRelayResponse() const
     default:
         DELIVER_POST_RELAY_CRASH(125,
                                  L"== CRASH == [%s], %s; invalid response result state, relayTid:0x%I64X, postId:0x%I64X, resultState:%d",
-                                 DELIVER_POST_RELAY_TAG, L"DeliverPostRelayContext::processRelayResponse", relayTid, postId,
+                                 MODULE_NAME, L"DeliverPostRelayContext::processRelayResponse", relayTid, postId,
                                  resultState);
         return false;
     }
@@ -174,13 +174,13 @@ bool DeliverPostRelayContext::processRelayResponse() const
     if (!PostOfficeDaemon::_instance->_postContextManager->RemoveContext(postId))
     {
         DELIVER_POST_RELAY_CRASH(131, L"== CRASH == [%s], %s; exception occurred; failed to remove post context, postId:0x%I64X",
-                                 DELIVER_POST_RELAY_TAG, L"DeliverPostRelayContext::processRelayResponse", postId);
+                                 MODULE_NAME, L"DeliverPostRelayContext::processRelayResponse", postId);
     }
     if (needRegister && !PostOfficeDaemon::_instance->_unsentPostContextManager->RegisterUnsentPost(recipientWid, postId, false))
     {
         Log::Write(Log::LT_ERROR, DELIVER_POST_RELAY_FILE, 136,
                    L"[%s], %s; exception occurred; failed to register unsent post, recipientWid:%u, postId:0x%I64X",
-                   DELIVER_POST_RELAY_TAG, L"DeliverPostRelayContext::processRelayResponse",
+                   MODULE_NAME, L"DeliverPostRelayContext::processRelayResponse",
                    static_cast<unsigned int>(recipientWid), postId);
     }
     return true;
@@ -189,9 +189,7 @@ bool DeliverPostRelayContext::processRelayResponse() const
 // 0x102c0
 bool DeliverPostRelayContext::processRelayTimeout()
 {
-    DeliverPostRelayResponse response;
-    response._resultState = RelayResponse::RESULTSTATE_RELAY_TIMEOUT;
-    response._failReason = 0;
+    DeliverPostRelayResponse response(RelayResponse::RESULTSTATE_RELAY_TIMEOUT, 0);
     initResponse(&response);
     return processRelayResponse();
 }
@@ -218,21 +216,21 @@ bool DeliverPostRelayContext::ComposeRequestPacket(FragmentPacket& packet) const
     {
         Log::Write(Log::LT_ERROR, DELIVER_POST_RELAY_FILE, 159,
                    L"[%s], %s; failed to compose deliver post relay request packet, fromWid:%u, toWid:%u, relayTid:0x%I64X",
-                   DELIVER_POST_RELAY_TAG, L"DeliverPostRelayContext::ComposeRequestPacket", static_cast<unsigned int>(fromWid),
+                   MODULE_NAME, L"DeliverPostRelayContext::ComposeRequestPacket", static_cast<unsigned int>(fromWid),
                    static_cast<unsigned int>(toWid), relayTid);
         return false;
     }
 
     Log::Write(Log::LT_DEBUG, DELIVER_POST_RELAY_FILE, 162,
                L"[%s], %s; composed deliver post relay request packet, fromWid:%u, toWid:%u, relayTid:0x%I64X",
-               DELIVER_POST_RELAY_TAG, L"DeliverPostRelayContext::ComposeRequestPacket", static_cast<unsigned int>(fromWid),
+               MODULE_NAME, L"DeliverPostRelayContext::ComposeRequestPacket", static_cast<unsigned int>(fromWid),
                static_cast<unsigned int>(toWid), relayTid);
 
     if (!_postContext->ComposeDeliveryPacket(packet))
     {
         Log::Write(Log::LT_ERROR, DELIVER_POST_RELAY_FILE, 165,
                    L"[%s], %s; failed to compose deliver post packet in context, relayTid:0x%I64X, postId:0x%I64X",
-                   DELIVER_POST_RELAY_TAG, L"DeliverPostRelayContext::ComposeRequestPacket", relayTid,
+                   MODULE_NAME, L"DeliverPostRelayContext::ComposeRequestPacket", relayTid,
                    _postContext->_postInfo._postId);
         return false;
     }

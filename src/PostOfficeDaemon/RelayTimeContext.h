@@ -10,10 +10,10 @@ class RelayContext;
 class CompoundKey
 {
 public:
-    CompoundKey(unsigned long long relayTid, long long relayLimitTime)  // ❓ inlined
+    CompoundKey(unsigned long long const relayTid, long long const relayLimitTime)  // PDB constructor, inlined
         : _relayTid(relayTid), _relayLimitTime(relayLimitTime) {}
 
-    // ❓ inlined in the map code: the limit time first, then the tid.
+    // PDB operator, inlined in the map code: the limit time first, then the tid.
     bool operator<(CompoundKey const& other) const
     {
         if (_relayLimitTime == other._relayLimitTime)
@@ -29,7 +29,7 @@ static_assert(sizeof(CompoundKey) == 0x10, "sizeof CompoundKey");
 class RelayTimeContext
 {
 public:
-    RelayTimeContext(unsigned long long relayTid, RelayContext* const relayContext);  // ❓ inlined in 0xb2a0
+    RelayTimeContext(unsigned long long relayTid, RelayContext* const relayContext);  // PDB constructor, inlined in 0xb2a0
     ~RelayTimeContext();                                                             // 0xb080
 
     unsigned long long const _relayTid;
@@ -43,7 +43,7 @@ class RelayTimeContextManager
 {
 public:
     typedef std::map<CompoundKey, RelayTimeContext*, std::less<CompoundKey>,
-                     StlAllocator<std::pair<CompoundKey const, RelayTimeContext*>, 2> > Container;  // ❓ typedef name
+                     StlAllocator<std::pair<CompoundKey const, RelayTimeContext*>, 2> > Container;
 
     bool initContextManager();  // 0xb110
     bool AddContext(unsigned long long relayTid, long long relayLimitTime, RelayContext* const relayContext);  // 0xb2a0
@@ -54,8 +54,8 @@ public:
     Container* _containerList;
     long volatile _contextCount;
 
-    // ❓ Inlined at 0x14280.
-    explicit RelayTimeContextManager(int bucketCount)
+    // PDB constructor, inlined at 0x14280.
+    explicit RelayTimeContextManager(int const bucketCount)
         : _bucketCount(bucketCount), _lockList(nullptr), _containerList(nullptr), _contextCount(0)
     {
     }

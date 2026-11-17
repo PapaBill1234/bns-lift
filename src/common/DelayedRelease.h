@@ -17,9 +17,16 @@ public:
         RefCntObject* _ref3;
     };
 
-    // ❓ Inlined in Daemon::start (0xb140).
-    DelayedRelease() : _head(nullptr), _tail(nullptr), _count(0), _lastReleased(0), _interval(1000), _delay(10000) {}
-    // ❓ Inlined in Daemon::start (0xb140).
+    // PDB static constants. The compiler folded them. The values come from the inlined constructor.
+    static long const DEFAULT_INTERVAL = 1000;
+    static long const DEFAULT_DELAY = 10000;
+
+    // PDB constructor, inlined in Daemon::start (0xb140).
+    DelayedRelease(long interval, long delay)
+        : _head(nullptr), _tail(nullptr), _count(0), _lastReleased(0), _interval(interval), _delay(delay)
+    {
+    }
+    // PDB destructor, inlined in Daemon::start (0xb140).
     ~DelayedRelease()
     {
         _lock.Enter();

@@ -6,6 +6,28 @@
 
 struct XmlCfgDef
 {
+    enum  // PDB type 0x2433
+    {
+        CFG_NONE = 0,
+        CFG_INT = 1,
+        CFG_INT64 = 2,
+        CFG_FLOAT = 3,
+        CFG_BOOL = 4,
+        CFG_IP = 5,
+        CFG_STR = 6,
+        CFG_DIR = 7,
+        CFG_ANSI = 8,
+        CFG_GROUP = 9,
+        CFG_TYPE_MAX = 10,
+    };
+    enum  // PDB type 0x2435
+    {
+        CFG_OPTIONAL = 0,
+        CFG_REQUIRED = 1,
+        CFG_DERIVED = 2,
+        CFG_DEV = 3,
+    };
+
     unsigned long long offset;
     wchar_t const* name;
     int type;
@@ -18,10 +40,23 @@ static_assert(offsetof(XmlCfgDef, desc) == 0x20, "XmlCfgDef::desc");
 
 struct XmlCfgDefLocal
 {
+    enum CFG_DEF_TYPE  // PDB type 0x239A
+    {
+        CFG_DEF_TYPE_INT = 0,
+        CFG_DEF_TYPE_INT64 = 1,
+        CFG_DEF_TYPE_FLOAT = 2,
+        CFG_DEF_TYPE_BOOL = 3,
+        CFG_DEF_TYPE_STRING = 4,
+        CFG_DEF_TYPE_ANSI_STRING = 5,
+        CFG_DEF_TYPE_IP = 6,
+        CFG_DEF_TYPE_DIRECTORY = 7,
+        CFG_DEF_TYPE_GUID = 8,
+    };
+
     unsigned long long offset;
     wchar_t const* name;
     int type;
-    int defType;
+    CFG_DEF_TYPE defType;
     void const* minValue;
     void const* maxValue;
     bool reload;
@@ -31,19 +66,6 @@ struct XmlCfgDefLocal
 static_assert(sizeof(XmlCfgDefLocal) == 0x40, "sizeof XmlCfgDefLocal");
 static_assert(offsetof(XmlCfgDefLocal, refOffset) == 0x38, "XmlCfgDefLocal::refOffset");
 
-// ❓ The value names are not in the PDB. Values from the Dump switch (0xca10, 0x1880).
-enum XML_CFG_TYPE  // ❓ name
-{
-    XML_CFG_TYPE_INT = 1,       // ❓
-    XML_CFG_TYPE_INT64 = 2,     // ❓
-    XML_CFG_TYPE_FLOAT = 3,     // ❓
-    XML_CFG_TYPE_BOOL = 4,      // ❓
-    XML_CFG_TYPE_ADDRESS = 5,   // ❓
-    XML_CFG_TYPE_WSTRING = 6,   // ❓
-    XML_CFG_TYPE_WSTRING2 = 7,  // ❓
-    XML_CFG_TYPE_STRING = 8,    // ❓
-};
-enum { CFG_DEF_TYPE_GUID = 8 };  // defType value
 
 struct XmlCfgDef2;
 
@@ -53,10 +75,12 @@ public:
     // The MSVC ABI puts overloads of a virtual function in the vtable in reverse order. Declare slot 1 first.
     virtual bool Initialize(XmlCfgDef const* def, int count, void* (*alloc)(unsigned long long), unsigned long long size) const = 0;   // slot 1
     virtual bool Initialize(XmlCfgDef2 const* def, int count, void* (*alloc)(unsigned long long), unsigned long long size) const = 0;  // slot 0
-    virtual void Cleanup() = 0;                                                                                                       // slot 2
-    virtual void* Read3() const = 0;  // ❓ slot 3, Read overload, not used
-    virtual void* Read4() const = 0;  // ❓ slot 4, Read overload, not used
+    virtual void Cleanup() const = 0;                                                                                                 // slot 2
     virtual void* Read(wchar_t const* fileName, wchar_t const* configName, bool const readOnly) const = 0;                           // slot 5
+    virtual void* Read(unsigned long long&, wchar_t const*, wchar_t const*, bool const, int const, int const, bool const,
+                       bool const) const = 0;                                                                                         // slot 4, not used
+    virtual void* Read(unsigned long long&, unsigned char*, unsigned int, wchar_t const*, wchar_t const*, bool const, int const,
+                       int const, bool const, bool const) const = 0;                                                                  // slot 3, not used
     virtual wchar_t const* GetLastErrorString() const = 0;                                                                            // slot 6
 };
 

@@ -20,7 +20,7 @@ public:
     virtual unsigned long long GetId();  // ❓ folded with AgentChannel::GetId (0x1a6e0)
 
     static unsigned short GetWid(Session const* session);    // 0x1e490
-    bool SendRelayResponse(RelayContext* relayContext);       // 0x1e570
+    bool SendRelayResponse(RelayContext const* const relayContext);       // 0x1e570
 
     unsigned short const _wid;
     unsigned long const _ipAddress;
@@ -35,7 +35,7 @@ class WorldChannelManager
 {
 public:
     typedef std::map<unsigned short, WorldChannel*, std::less<unsigned short>,
-                     StlAllocator<std::pair<unsigned short const, WorldChannel*>, 2> > Container;  // ❓ typedef name
+                     StlAllocator<std::pair<unsigned short const, WorldChannel*>, 2> > Container;
 
     bool initChannelManager();                                // 0x1e720
     WorldChannel* GetWorldChannel(unsigned short wid);        // 0x1e8b0

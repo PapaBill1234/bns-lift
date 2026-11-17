@@ -15,14 +15,14 @@
 namespace
 {
 wchar_t const* const FILE_NAME = L"ContentsRuleConfigDefinition.cpp";        // ❓ name
-wchar_t const* const CONFIG_FILE = L"ContentsRule.lobbygate.config.xml";     // ❓ name
-wchar_t const* const CONFIG_NAME = L"lobbygate-contents-rule-config";        // ❓ name
+wchar_t const* const CONTENTS_RULE_CONFIG_FILENAME = L"ContentsRule.lobbygate.config.xml";  // rva 0x91328
+wchar_t const* const CONTENTS_RULE_CONFIG_MODULENAME = L"lobbygate-contents-rule-config";  // rva 0x91330
 wchar_t const valueString[] = L"";  // ❓ name and value. The binary uses &valueString as an empty string.
 int const ROW_COUNT = 13;           // ❓ name
 }
 
 // Defaults, minimums and maximums. The PDB names are from the globals at the addresses.
-static int const DEFAULT_DUMMY_DATA = 123;                                           // ❓ address
+static int const DEFAULT_DUMMY_DATA = 123;                                           // 0x14006e354
 static bool const DEFAULT_USE_TIME_BASED_PLAY_SCHEDULE = false;                      // 0x14006324b
 static bool const DEFAULT_ENABLE_PLAY_WARRIOR = true;                                // 0x14006b8aa
 static bool const DEFAULT_ENABLE_FISH_SYSTEM = false;                                // 0x14006b8ab
@@ -33,7 +33,7 @@ static int const DEFAULT_ACCOUNT_CONTENTS_REQUIRED_ACCOUNT_TOP_PC_LEVEL = 0;    
 static int const DEFAULT_ACCOUNT_CONTENTS_REQUIRED_ACCOUNT_TOP_PC_MASTERY_LEVEL = 0; // 0x14006f3ec
 static int const DEFAULT_ACCOUNT_EXP_QUOTA_PER_DAY = 0;                              // 0x14006f400
 static int const DEFAULT_ACCOUNT_EXP_QUOTA_RESET_TIME = 6;                           // 0x14006f404
-static int const DEFAULT_ACCOUNT_LEVEL_MAX = 50;                                     // ❓ address
+static int const DEFAULT_ACCOUNT_LEVEL_MAX = 50;                                     // 0x14006f408
 static bool const DEFAULT_ENABLE_GUILD_JOIN_RENEWAL = false;                         // 0x14006cbab
 
 static int const MIN_DUMMY_DATA = 0;                                                 // 0x14006f42c
@@ -65,76 +65,76 @@ long long ContentsRuleConfig::ConfigLastReloadTime = 0;                // 0x93f9
 // "[REQ] [<topic>] <Korean text> (default ...) (min ~ max)". The Korean text is not kept here.
 // 0x140092850
 XmlCfgDef const ContentsRuleConfigLoad::_Def[13] = {
-    {offsetof(ContentsRuleConfigLoad, _dummyData), L"dummy-data", XML_CFG_TYPE_INT, 1, &DEFAULT_DUMMY_DATA,
+    {offsetof(ContentsRuleConfigLoad, _dummyData), L"dummy-data", XmlCfgDef::CFG_INT, 1, &DEFAULT_DUMMY_DATA,
      L"dummy data (0 ~ 1234)"},
-    {offsetof(ContentsRuleConfigLoad, _useTimeBasedPlaySchedule), L"use-time-based-play-schedule", XML_CFG_TYPE_BOOL, 1,
+    {offsetof(ContentsRuleConfigLoad, _useTimeBasedPlaySchedule), L"use-time-based-play-schedule", XmlCfgDef::CFG_BOOL, 1,
      &DEFAULT_USE_TIME_BASED_PLAY_SCHEDULE, L"[TimeBased] TimeBased Play Schedule ❓"},
-    {offsetof(ContentsRuleConfigLoad, _enablePlayWarrior), L"enable-play-warrior", XML_CFG_TYPE_BOOL, 1,
+    {offsetof(ContentsRuleConfigLoad, _enablePlayWarrior), L"enable-play-warrior", XmlCfgDef::CFG_BOOL, 1,
      &DEFAULT_ENABLE_PLAY_WARRIOR, L"[Character] ❓"},
-    {offsetof(ContentsRuleConfigLoad, _enableFishSystem), L"enable-fish-system", XML_CFG_TYPE_BOOL, 1,
+    {offsetof(ContentsRuleConfigLoad, _enableFishSystem), L"enable-fish-system", XmlCfgDef::CFG_BOOL, 1,
      &DEFAULT_ENABLE_FISH_SYSTEM, L"[REQ] [❓] ❓ (default = n)"},
-    {offsetof(ContentsRuleConfigLoad, _enableAccountContents), L"enable-account-contents", XML_CFG_TYPE_BOOL, 1,
+    {offsetof(ContentsRuleConfigLoad, _enableAccountContents), L"enable-account-contents", XmlCfgDef::CFG_BOOL, 1,
      &DEFAULT_ENABLE_ACCOUNT_CONTENTS, L"[REQ] [❓] ❓ (default = n)"},
     {offsetof(ContentsRuleConfigLoad, _accountContentsRequiredPcLevel), L"account-contents-required-pc-level",
-     XML_CFG_TYPE_INT, 1, &DEFAULT_ACCOUNT_CONTENTS_REQUIRED_PC_LEVEL,
+     XmlCfgDef::CFG_INT, 1, &DEFAULT_ACCOUNT_CONTENTS_REQUIRED_PC_LEVEL,
      L"[REQ] [❓] ❓ account-contents-required-pc-mastery-level > 0 ❓ rule config ❓ pc-level-max ❓.(default : 0) (0 ~ 1000)"},
     {offsetof(ContentsRuleConfigLoad, _accountContentsRequiredPcMasteryLevel),
-     L"account-contents-required-pc-mastery-level", XML_CFG_TYPE_INT, 1,
+     L"account-contents-required-pc-mastery-level", XmlCfgDef::CFG_INT, 1,
      &DEFAULT_ACCOUNT_CONTENTS_REQUIRED_PC_MASTERY_LEVEL, L"[REQ] [❓] ❓ Mastery ❓ (default : 0) (0 ~ 1000)"},
     {offsetof(ContentsRuleConfigLoad, _accountContentsRequiredAccountTopPcLevel),
-     L"account-contents-required-account-top-pc-level", XML_CFG_TYPE_INT, 1,
+     L"account-contents-required-account-top-pc-level", XmlCfgDef::CFG_INT, 1,
      &DEFAULT_ACCOUNT_CONTENTS_REQUIRED_ACCOUNT_TOP_PC_LEVEL,
      L"[REQ] [❓] ❓ account-contents-required-account-top-pc-mastery-level > 0 ❓ rule config ❓ pc-level-max ❓.(default : 0) (0 ~ 1000)"},
     {offsetof(ContentsRuleConfigLoad, _accountContentsRequiredAccountTopPcMasteryLevel),
-     L"account-contents-required-account-top-pc-mastery-level", XML_CFG_TYPE_INT, 1,
+     L"account-contents-required-account-top-pc-mastery-level", XmlCfgDef::CFG_INT, 1,
      &DEFAULT_ACCOUNT_CONTENTS_REQUIRED_ACCOUNT_TOP_PC_MASTERY_LEVEL,
      L"[REQ] [❓] ❓ Mastery ❓ (default : 0) (0 ~ 1000)"},
-    {offsetof(ContentsRuleConfigLoad, _accountExpQuotaPerDay), L"account-exp-quota-per-day", XML_CFG_TYPE_INT, 1,
+    {offsetof(ContentsRuleConfigLoad, _accountExpQuotaPerDay), L"account-exp-quota-per-day", XmlCfgDef::CFG_INT, 1,
      &DEFAULT_ACCOUNT_EXP_QUOTA_PER_DAY, L"[REQ] [❓] ❓ (default : 0) (0 ~ 2147483647)"},
-    {offsetof(ContentsRuleConfigLoad, _accountExpQuotaResetTime), L"account-exp-quota-reset-time", XML_CFG_TYPE_INT, 1,
+    {offsetof(ContentsRuleConfigLoad, _accountExpQuotaResetTime), L"account-exp-quota-reset-time", XmlCfgDef::CFG_INT, 1,
      &DEFAULT_ACCOUNT_EXP_QUOTA_RESET_TIME, L"[REQ] [❓] ❓ hour. 0~23 ❓. (default : 6) (0 ~ 23)"},
-    {offsetof(ContentsRuleConfigLoad, _accountLevelMax), L"account-level-max", XML_CFG_TYPE_INT, 1,
+    {offsetof(ContentsRuleConfigLoad, _accountLevelMax), L"account-level-max", XmlCfgDef::CFG_INT, 1,
      &DEFAULT_ACCOUNT_LEVEL_MAX, L"[REQ] [❓] ❓ max. (default : 50) (0 ~ 1000)"},
-    {offsetof(ContentsRuleConfigLoad, _enableGuildJoinRenewal), L"enable-guild-join-renewal", XML_CFG_TYPE_BOOL, 1,
+    {offsetof(ContentsRuleConfigLoad, _enableGuildJoinRenewal), L"enable-guild-join-renewal", XmlCfgDef::CFG_BOOL, 1,
      &DEFAULT_ENABLE_GUILD_JOIN_RENEWAL, L"[REQ] [❓] ❓ (default=n)"},
 };
 
 // 0x140092a60
 ContentsRuleXmlCfgDefLocal const ContentsRuleConfig::_Def[13] = {
-    {offsetof(ContentsRuleConfig, _dummyData), L"dummy-data", XML_CFG_TYPE_INT, 0, &MIN_DUMMY_DATA, &MAX_DUMMY_DATA,
+    {offsetof(ContentsRuleConfig, _dummyData), L"dummy-data", XmlCfgDef::CFG_INT, 0, &MIN_DUMMY_DATA, &MAX_DUMMY_DATA,
      false, &DEFAULT_DUMMY_DATA},
-    {offsetof(ContentsRuleConfig, _useTimeBasedPlaySchedule), L"use-time-based-play-schedule", XML_CFG_TYPE_BOOL, 0,
+    {offsetof(ContentsRuleConfig, _useTimeBasedPlaySchedule), L"use-time-based-play-schedule", XmlCfgDef::CFG_BOOL, 0,
      nullptr, nullptr, false, &DEFAULT_USE_TIME_BASED_PLAY_SCHEDULE},
-    {offsetof(ContentsRuleConfig, _enablePlayWarrior), L"enable-play-warrior", XML_CFG_TYPE_BOOL, 0, nullptr, nullptr,
+    {offsetof(ContentsRuleConfig, _enablePlayWarrior), L"enable-play-warrior", XmlCfgDef::CFG_BOOL, 0, nullptr, nullptr,
      false, &DEFAULT_ENABLE_PLAY_WARRIOR},
-    {offsetof(ContentsRuleConfig, _enableFishSystem), L"enable-fish-system", XML_CFG_TYPE_BOOL, 0, nullptr, nullptr,
+    {offsetof(ContentsRuleConfig, _enableFishSystem), L"enable-fish-system", XmlCfgDef::CFG_BOOL, 0, nullptr, nullptr,
      false, &DEFAULT_ENABLE_FISH_SYSTEM},
-    {offsetof(ContentsRuleConfig, _enableAccountContents), L"enable-account-contents", XML_CFG_TYPE_BOOL, 0, nullptr,
+    {offsetof(ContentsRuleConfig, _enableAccountContents), L"enable-account-contents", XmlCfgDef::CFG_BOOL, 0, nullptr,
      nullptr, false, &DEFAULT_ENABLE_ACCOUNT_CONTENTS},
     {offsetof(ContentsRuleConfig, _accountContentsRequiredPcLevel), L"account-contents-required-pc-level",
-     XML_CFG_TYPE_INT, 0, &MIN_ACCOUNT_CONTENTS_REQUIRED_PC_LEVEL, &MAX_ACCOUNT_CONTENTS_REQUIRED_PC_LEVEL, false,
+     XmlCfgDef::CFG_INT, 0, &MIN_ACCOUNT_CONTENTS_REQUIRED_PC_LEVEL, &MAX_ACCOUNT_CONTENTS_REQUIRED_PC_LEVEL, false,
      &DEFAULT_ACCOUNT_CONTENTS_REQUIRED_PC_LEVEL},
     {offsetof(ContentsRuleConfig, _accountContentsRequiredPcMasteryLevel),
-     L"account-contents-required-pc-mastery-level", XML_CFG_TYPE_INT, 0,
+     L"account-contents-required-pc-mastery-level", XmlCfgDef::CFG_INT, 0,
      &MIN_ACCOUNT_CONTENTS_REQUIRED_PC_MASTERY_LEVEL, &MAX_ACCOUNT_CONTENTS_REQUIRED_PC_MASTERY_LEVEL, false,
      &DEFAULT_ACCOUNT_CONTENTS_REQUIRED_PC_MASTERY_LEVEL},
     {offsetof(ContentsRuleConfig, _accountContentsRequiredAccountTopPcLevel),
-     L"account-contents-required-account-top-pc-level", XML_CFG_TYPE_INT, 0,
+     L"account-contents-required-account-top-pc-level", XmlCfgDef::CFG_INT, 0,
      &MIN_ACCOUNT_CONTENTS_REQUIRED_ACCOUNT_TOP_PC_LEVEL, &MAX_ACCOUNT_CONTENTS_REQUIRED_ACCOUNT_TOP_PC_LEVEL, false,
      &DEFAULT_ACCOUNT_CONTENTS_REQUIRED_ACCOUNT_TOP_PC_LEVEL},
     {offsetof(ContentsRuleConfig, _accountContentsRequiredAccountTopPcMasteryLevel),
-     L"account-contents-required-account-top-pc-mastery-level", XML_CFG_TYPE_INT, 0,
+     L"account-contents-required-account-top-pc-mastery-level", XmlCfgDef::CFG_INT, 0,
      &MIN_ACCOUNT_CONTENTS_REQUIRED_ACCOUNT_TOP_PC_MASTERY_LEVEL,
      &MAX_ACCOUNT_CONTENTS_REQUIRED_ACCOUNT_TOP_PC_MASTERY_LEVEL, false,
      &DEFAULT_ACCOUNT_CONTENTS_REQUIRED_ACCOUNT_TOP_PC_MASTERY_LEVEL},
-    {offsetof(ContentsRuleConfig, _accountExpQuotaPerDay), L"account-exp-quota-per-day", XML_CFG_TYPE_INT, 0,
+    {offsetof(ContentsRuleConfig, _accountExpQuotaPerDay), L"account-exp-quota-per-day", XmlCfgDef::CFG_INT, 0,
      &MIN_ACCOUNT_EXP_QUOTA_PER_DAY, &MAX_ACCOUNT_EXP_QUOTA_PER_DAY, false, &DEFAULT_ACCOUNT_EXP_QUOTA_PER_DAY},
-    {offsetof(ContentsRuleConfig, _accountExpQuotaResetTime), L"account-exp-quota-reset-time", XML_CFG_TYPE_INT, 0,
+    {offsetof(ContentsRuleConfig, _accountExpQuotaResetTime), L"account-exp-quota-reset-time", XmlCfgDef::CFG_INT, 0,
      &MIN_ACCOUNT_EXP_QUOTA_RESET_TIME, &MAX_ACCOUNT_EXP_QUOTA_RESET_TIME, false,
      &DEFAULT_ACCOUNT_EXP_QUOTA_RESET_TIME},
-    {offsetof(ContentsRuleConfig, _accountLevelMax), L"account-level-max", XML_CFG_TYPE_INT, 0, &MIN_ACCOUNT_LEVEL_MAX,
+    {offsetof(ContentsRuleConfig, _accountLevelMax), L"account-level-max", XmlCfgDef::CFG_INT, 0, &MIN_ACCOUNT_LEVEL_MAX,
      &MAX_ACCOUNT_LEVEL_MAX, false, &DEFAULT_ACCOUNT_LEVEL_MAX},
-    {offsetof(ContentsRuleConfig, _enableGuildJoinRenewal), L"enable-guild-join-renewal", XML_CFG_TYPE_BOOL, 0,
+    {offsetof(ContentsRuleConfig, _enableGuildJoinRenewal), L"enable-guild-join-renewal", XmlCfgDef::CFG_BOOL, 0,
      nullptr, nullptr, false, &DEFAULT_ENABLE_GUILD_JOIN_RENEWAL},
 };
 
@@ -142,9 +142,9 @@ ContentsRuleXmlCfgDefLocal const ContentsRuleConfig::_Def[13] = {
 ContentsRuleConfigLoad* ContentsRuleConfigLoad::Load()
 {
     wchar_t configPath[MAX_PATH] = {0};
-    PathCombineW(configPath, Daemon::Instance->confDir, CONFIG_FILE);
+    PathCombineW(configPath, Daemon::Instance->confDir, CONTENTS_RULE_CONFIG_FILENAME);
     return static_cast<ContentsRuleConfigLoad*>(
-        DaemonConfig::Load(_Def, 13, sizeof(ContentsRuleConfigLoad), configPath, CONFIG_NAME, false));
+        DaemonConfig::Load(_Def, 13, sizeof(ContentsRuleConfigLoad), configPath, CONTENTS_RULE_CONFIG_MODULENAME, false));
 }
 
 // 0x82c0
@@ -241,9 +241,9 @@ void ContentsRuleConfig::Dump()
     if (config == nullptr)
         return;
 
-    Log::Write(Log::LT_NOTICE, FILE_NAME, 345, L"[%s], %s : %u-%u, %s : %u-%u", CONFIG_NAME, L"client-version", 65, 0,
+    Log::Write(Log::LT_NOTICE, FILE_NAME, 345, L"[%s], %s : %u-%u, %s : %u-%u", CONTENTS_RULE_CONFIG_MODULENAME, L"client-version", 65, 0,
                L"server-version", 72, 0);
-    Log::Write(Log::LT_NOTICE, FILE_NAME, 346, L"[%s], %s : %d", CONFIG_NAME, L"reload-count", ConfigReloadCount);
+    Log::Write(Log::LT_NOTICE, FILE_NAME, 346, L"[%s], %s : %d", CONTENTS_RULE_CONFIG_MODULENAME, L"reload-count", ConfigReloadCount);
 
     char const* base = reinterpret_cast<char const*>(config);
     for (int i = 0; i < ROW_COUNT; ++i)
@@ -252,28 +252,28 @@ void ContentsRuleConfig::Dump()
         char const* field = base + def.offset;
         switch (def.type)
         {
-        case XML_CFG_TYPE_INT:
-            Log::Write(Log::LT_NOTICE, FILE_NAME, 356, L"[%s], %s : %d", CONFIG_NAME, def.name,
+        case XmlCfgDef::CFG_INT:
+            Log::Write(Log::LT_NOTICE, FILE_NAME, 356, L"[%s], %s : %d", CONTENTS_RULE_CONFIG_MODULENAME, def.name,
                        *reinterpret_cast<int const*>(field));
             break;
-        case XML_CFG_TYPE_INT64:
-            Log::Write(Log::LT_NOTICE, FILE_NAME, 357, L"[%s], %s : %I64d", CONFIG_NAME, def.name,
+        case XmlCfgDef::CFG_INT64:
+            Log::Write(Log::LT_NOTICE, FILE_NAME, 357, L"[%s], %s : %I64d", CONTENTS_RULE_CONFIG_MODULENAME, def.name,
                        *reinterpret_cast<long long const*>(field));
             break;
-        case XML_CFG_TYPE_FLOAT:
-            Log::Write(Log::LT_NOTICE, FILE_NAME, 358, L"[%s], %s : %f", CONFIG_NAME, def.name,
+        case XmlCfgDef::CFG_FLOAT:
+            Log::Write(Log::LT_NOTICE, FILE_NAME, 358, L"[%s], %s : %f", CONTENTS_RULE_CONFIG_MODULENAME, def.name,
                        static_cast<double>(*reinterpret_cast<float const*>(field)));
             break;
-        case XML_CFG_TYPE_BOOL:
-            Log::Write(Log::LT_NOTICE, FILE_NAME, 359, L"[%s], %s : %s", CONFIG_NAME, def.name,
+        case XmlCfgDef::CFG_BOOL:
+            Log::Write(Log::LT_NOTICE, FILE_NAME, 359, L"[%s], %s : %s", CONTENTS_RULE_CONFIG_MODULENAME, def.name,
                        *field != 0 ? L"yes" : L"no");
             break;
-        case XML_CFG_TYPE_WSTRING:
+        case XmlCfgDef::CFG_STR:
         {
             wchar_t const* value = reinterpret_cast<wchar_t const*>(field);
             if (value == nullptr || *value == 0)
                 value = L"N/A";
-            Log::Write(Log::LT_NOTICE, FILE_NAME, 363, L"[%s], %s : %s", CONFIG_NAME, def.name, value);
+            Log::Write(Log::LT_NOTICE, FILE_NAME, 363, L"[%s], %s : %s", CONTENTS_RULE_CONFIG_MODULENAME, def.name, value);
             break;
         }
         default:
@@ -334,23 +334,23 @@ FragmentPacket* ContentsRuleConfig::MakeListPacket(ContentsRuleConfig* config)
         char const* field = base + def.offset;
         switch (def.type)
         {
-        case XML_CFG_TYPE_INT:
+        case XmlCfgDef::CFG_INT:
             length = swprintf_s(elementWStr, 260, L"<option name='%s' value='%d'/>", def.name,
                                 *reinterpret_cast<int const*>(field));
             break;
-        case XML_CFG_TYPE_INT64:
+        case XmlCfgDef::CFG_INT64:
             length = swprintf_s(elementWStr, 260, L"<option name='%s' value='%I64d'/>", def.name,
                                 *reinterpret_cast<long long const*>(field));
             break;
-        case XML_CFG_TYPE_FLOAT:
+        case XmlCfgDef::CFG_FLOAT:
             length = swprintf_s(elementWStr, 260, L"<option name='%s' value='%f'/>", def.name,
                                 static_cast<double>(*reinterpret_cast<float const*>(field)));
             break;
-        case XML_CFG_TYPE_BOOL:
+        case XmlCfgDef::CFG_BOOL:
             length = swprintf_s(elementWStr, 260, L"<option name='%s' value='%s'/>", def.name,
                                 *field != 0 ? L"yes" : L"no");
             break;
-        case XML_CFG_TYPE_WSTRING:
+        case XmlCfgDef::CFG_STR:
         {
             wchar_t const* value = reinterpret_cast<wchar_t const*>(field);
             if (value == nullptr)
@@ -436,7 +436,7 @@ bool ContentsRuleConfig::CheckMinMaxBoundary(void const* const loaded, ContentsR
         char const* field = base + ContentsRuleConfigLoad::_Def[i].offset;
         switch (def.type)
         {
-        case XML_CFG_TYPE_INT:
+        case XmlCfgDef::CFG_INT:
         {
             int value = *reinterpret_cast<int const*>(field);
             int minValue = *static_cast<int const*>(def.minValue);
@@ -450,7 +450,7 @@ bool ContentsRuleConfig::CheckMinMaxBoundary(void const* const loaded, ContentsR
             }
             break;
         }
-        case XML_CFG_TYPE_INT64:
+        case XmlCfgDef::CFG_INT64:
         {
             long long value = *reinterpret_cast<long long const*>(field);
             long long minValue = *static_cast<long long const*>(def.minValue);
@@ -464,7 +464,7 @@ bool ContentsRuleConfig::CheckMinMaxBoundary(void const* const loaded, ContentsR
             }
             break;
         }
-        case XML_CFG_TYPE_FLOAT:
+        case XmlCfgDef::CFG_FLOAT:
         {
             float value = *reinterpret_cast<float const*>(field);
             float minValue = *static_cast<float const*>(def.minValue);
@@ -507,17 +507,17 @@ bool ContentsRuleConfig::UpdateAllVariable(ContentsRuleConfigLoad const* const l
         char* to = target + def.offset;
         switch (def.type)
         {
-        case XML_CFG_TYPE_INT:
-        case XML_CFG_TYPE_FLOAT:
+        case XmlCfgDef::CFG_INT:
+        case XmlCfgDef::CFG_FLOAT:
             *reinterpret_cast<int*>(to) = *reinterpret_cast<int const*>(from);
             break;
-        case XML_CFG_TYPE_INT64:
+        case XmlCfgDef::CFG_INT64:
             *reinterpret_cast<long long*>(to) = *reinterpret_cast<long long const*>(from);
             break;
-        case XML_CFG_TYPE_BOOL:
+        case XmlCfgDef::CFG_BOOL:
             *to = *from;
             break;
-        case XML_CFG_TYPE_WSTRING:
+        case XmlCfgDef::CFG_STR:
         {
             wchar_t const* value = *reinterpret_cast<wchar_t const* const*>(from);
             if (value == nullptr)

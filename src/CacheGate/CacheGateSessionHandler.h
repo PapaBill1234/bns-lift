@@ -9,7 +9,7 @@ class CacheGateSessionHandler : public SessionHandler
 {
 public:
     virtual ~CacheGateSessionHandler();                                              // 0x4040
-    virtual bool OnAccept(Session const* session) const;                             // ❓ not in index
+    virtual bool OnAccept(Session const* session) const;                             // 0xCD80
     virtual bool OnConnect(Session const* session, bool firstConnected) const;       // 0x40C0
     virtual void OnClose(Session const* session, bool tryReconnect) const;           // 0x4100
     virtual bool PacketHandler(Session const* session, Packet const* packet) const;  // 0x4150 (folded)

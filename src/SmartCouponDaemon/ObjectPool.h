@@ -85,8 +85,8 @@ public:
     virtual unsigned long long TimerId() const;
     virtual bool HandleEvent(EventContext* ctx, unsigned long);
 
-    bool Add(ObjPool** listener);       // ❓ name and arguments
-    static bool Start(int resolution);  // 0x1940 ❓ arguments
+    bool Add(ObjPool* listener);         // 0x19F0
+    static bool Start(long resolution);  // 0x1940
 
 private:
     long process();  // 0x1AC0
@@ -99,5 +99,5 @@ public:
 };
 static_assert(sizeof(ObjPoolTimer) == 0x68, "sizeof ObjPoolTimer");
 
-extern SmartCouponObjPoolMemoryAllocator* GObjPoolMemAlloc;  // ❓ name and type
-extern ObjPoolTimer* GObjPoolTimer;                           // ❓ name and type
+extern SmartCouponObjPoolMemoryAllocator* GObjPoolMemAlloc;  // rva 0x84B18
+extern ObjPoolTimer* GObjPoolTimer;                           // rva 0x84B20

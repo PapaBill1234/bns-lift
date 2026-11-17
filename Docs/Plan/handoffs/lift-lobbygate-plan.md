@@ -4,7 +4,7 @@
 - Checks: exe and PDB exist. PDB GUID A888A14A-92D2-4FE1-B491-96B539B7DBD2 is the same in the exe (RSDS). PDB age 2, exe age 1 (normal).
   Imports: system DLLs, msvcr100, msvcp100. No ODBC. The exe loads XmlReader_sv64, bsConsole_sv64 and dbghelp at run time (not linked).
 - PDB: 1,212 function symbols in 88 modules. Removed: CRT 33, zstd (vendor) 112, lifted names in `src/common/` 319.
-- BnsCommonConfigDefinition (10) is already in `src/common/BnsCommonConfig.cpp`. Card 4 only compares the `_Def` tables.
+- BnsCommonConfigDefinition (10) is already in `src/common/BnsCommonConfigDefinition.cpp`. Card 4 only compares the `_Def` tables.
 - Cards:
   - `lift-lobbygate-1` (common: Session, PacketUtil, Security, CrashHandler, IdleWatcher, network delta; ~153)
   - `-2` (common: base delta ~88, crypto rsa/dh/NumberTheory/oaep ~106, ContentsRuleConfigDefinition 9; ~203)

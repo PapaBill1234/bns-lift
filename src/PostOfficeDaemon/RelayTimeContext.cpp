@@ -7,7 +7,7 @@
 #include "RelayContext.h"
 
 #define RELAY_TIME_CONTEXT_FILE L"RelayTimeContext.cpp"
-#define RELAY_TIME_CONTEXT_TAG L"relaytime context"
+static wchar_t const* const MODULE_NAME = L"relaytime context";  // PDB MODULE_NAME
 
 #define RELAY_TIME_CONTEXT_CRASH(line, fmt, ...)                                              \
     do                                                                                        \
@@ -40,7 +40,7 @@ bool RelayTimeContextManager::initContextManager()
     {
         RELAY_TIME_CONTEXT_CRASH(74,
                                  L"== CRASH == [%s], %s; relaytime context manager is already initialized, lockList:0x%p, containerList:0x%p",
-                                 RELAY_TIME_CONTEXT_TAG, L"RelayTimeContextManager::initContextManager", _lockList, _containerList);
+                                 MODULE_NAME, L"RelayTimeContextManager::initContextManager", _lockList, _containerList);
         return false;
     }
     _lockList = liftArrayNew<CriticalSection>(_bucketCount, RELAY_TIME_CONTEXT_FILE, 78);
@@ -55,13 +55,13 @@ bool RelayTimeContextManager::AddContext(unsigned long long relayTid, long long 
     {
         RELAY_TIME_CONTEXT_CRASH(87,
                                  L"== CRASH == [%s], %s; invalid parameter, relayTid:0x%I64X, relayLimitTime:%I64d, relayContext:0x%p",
-                                 RELAY_TIME_CONTEXT_TAG, L"RelayTimeContextManager::AddContext", relayTid, relayLimitTime, relayContext);
+                                 MODULE_NAME, L"RelayTimeContextManager::AddContext", relayTid, relayLimitTime, relayContext);
         return false;
     }
     if (_lockList == nullptr || _containerList == nullptr)
     {
         RELAY_TIME_CONTEXT_CRASH(91, L"== CRASH == [%s], %s; invalid relaytime context manager, lockList:0x%p, containerList:0x%p",
-                                 RELAY_TIME_CONTEXT_TAG, L"RelayTimeContextManager::AddContext", _lockList, _containerList);
+                                 MODULE_NAME, L"RelayTimeContextManager::AddContext", _lockList, _containerList);
         return false;
     }
 
@@ -79,7 +79,7 @@ bool RelayTimeContextManager::AddContext(unsigned long long relayTid, long long 
     }
     _lockList[index].Leave();
     Log::Write(Log::LT_ERROR, RELAY_TIME_CONTEXT_FILE, 105, L"[%s], %s; failed to add relaytime context, relayTid:0x%I64X, relayLimitTime:%I64d",
-               RELAY_TIME_CONTEXT_TAG, L"RelayTimeContextManager::AddContext", relayTid, relayLimitTime);
+               MODULE_NAME, L"RelayTimeContextManager::AddContext", relayTid, relayLimitTime);
     if (relayTimeContext != nullptr)
         relayTimeContext->~RelayTimeContext();
     Memory::_Manager[2]->Free(relayTimeContext, RELAY_TIME_CONTEXT_FILE, 106);
@@ -92,13 +92,13 @@ bool RelayTimeContextManager::RemoveContext(unsigned long long relayTid, long lo
     if (relayTid == 0 || relayLimitTime <= 0)
     {
         RELAY_TIME_CONTEXT_CRASH(121, L"== CRASH == [%s], %s; invalid parameter, relayTid:0x%I64X, relayLimitTime:%I64d",
-                                 RELAY_TIME_CONTEXT_TAG, L"RelayTimeContextManager::RemoveContext", relayTid, relayLimitTime);
+                                 MODULE_NAME, L"RelayTimeContextManager::RemoveContext", relayTid, relayLimitTime);
         return false;
     }
     if (_lockList == nullptr || _containerList == nullptr)
     {
         RELAY_TIME_CONTEXT_CRASH(125, L"== CRASH == [%s], %s; invalid relaytime context manager, lockList:0x%p, containerList:0x%p",
-                                 RELAY_TIME_CONTEXT_TAG, L"RelayTimeContextManager::RemoveContext", _lockList, _containerList);
+                                 MODULE_NAME, L"RelayTimeContextManager::RemoveContext", _lockList, _containerList);
         return false;
     }
 
@@ -109,7 +109,7 @@ bool RelayTimeContextManager::RemoveContext(unsigned long long relayTid, long lo
     {
         _lockList[index].Leave();
         Log::Write(Log::LT_ERROR, RELAY_TIME_CONTEXT_FILE, 135, L"[%s], %s; no such relaytime context, relayTid:0x%I64X, relayLimitTime:%I64d",
-                   RELAY_TIME_CONTEXT_TAG, L"RelayTimeContextManager::RemoveContext", relayTid, relayLimitTime);
+                   MODULE_NAME, L"RelayTimeContextManager::RemoveContext", relayTid, relayLimitTime);
         return false;
     }
     RelayTimeContext* const relayTimeContext = it->second;
@@ -125,6 +125,6 @@ bool RelayTimeContextManager::RemoveContext(unsigned long long relayTid, long lo
     _lockList[index].Leave();
     RELAY_TIME_CONTEXT_CRASH(142,
                              L"== CRASH == [%s], %s; relaytime context is null, relayTid:0x%I64X, relayLimitTime:%I64d, relaytimeContext:0x%p",
-                             RELAY_TIME_CONTEXT_TAG, L"RelayTimeContextManager::RemoveContext", relayTid, relayLimitTime, nullptr);
+                             MODULE_NAME, L"RelayTimeContextManager::RemoveContext", relayTid, relayLimitTime, nullptr);
     return false;
 }

@@ -12,7 +12,7 @@
 #include <new>
 
 #include "AlertSender.h"
-#include "BnsCommonConfig.h"
+#include "BnsCommonConfigDefinition.h"
 #include "Console.h"
 #include "CouponGameEventConfig.h"
 #include "CouponJob.h"
@@ -39,13 +39,12 @@
 static wchar_t const* const kFile = L"SmartCouponDaemon.cpp";
 
 SmartCouponDaemon* SmartCouponDaemon::_instance = nullptr;
-SmartCouponObjPoolMemoryAllocator* GObjPoolMemAlloc = nullptr;  // ❓ name and type
-ObjPoolTimer* GObjPoolTimer = nullptr;                          // ❓ name and type
-static volatile long long _seed__ = 0;                          // ❓ GenerateJobid counter
+SmartCouponObjPoolMemoryAllocator* GObjPoolMemAlloc = nullptr;  // rva 0x84B18
+ObjPoolTimer* GObjPoolTimer = nullptr;                          // rva 0x84B20
+static unsigned long long __seed__ = 0;  // PDB __seed__ (SmartCouponDaemon.obj, 0x850a8). GenerateJobid counter.
 
-// Default values of SmartCouponConfig::_Def. ❓ The names come from the export script.
+// Default values of SmartCouponConfig::_Def. The names come from the PDB (SmartCouponConfig.obj).
 static int const DEFAULT_DUMPTYPE = 1;
-static unsigned long const a127001 = 3276849;  // ❓ value as in the binary
 static int const NP_PORT = 6601;
 static int const DEFAULT_MANAGE_LISTEN_PORT = 32000;
 static int const DEFAULT_DAEMON_LISTEN_PORT = 22000;
@@ -53,40 +52,40 @@ static int const DEFAULT_SERVICE_WORLD_ID = 1;
 
 XmlCfgDef const SmartCouponConfig::_Def[23] = {
     {static_cast<unsigned long long>(-1), nullptr, 0, 0, nullptr, L"path"},
-    {offsetof(SmartCouponConfig, _rootPath), L"root-path", XML_CFG_TYPE_WSTRING2, 1, nullptr, L"full root path"},
-    {offsetof(SmartCouponConfig, _logPath), L"log-path", XML_CFG_TYPE_WSTRING2, 1, nullptr, L"full log path"},
-    {offsetof(SmartCouponConfig, _configPath), L"config-path", XML_CFG_TYPE_WSTRING2, 1, nullptr, L"full config path"},
+    {offsetof(SmartCouponConfig, _rootPath), L"root-path", XmlCfgDef::CFG_DIR, 1, nullptr, L"full root path"},
+    {offsetof(SmartCouponConfig, _logPath), L"log-path", XmlCfgDef::CFG_DIR, 1, nullptr, L"full log path"},
+    {offsetof(SmartCouponConfig, _configPath), L"config-path", XmlCfgDef::CFG_DIR, 1, nullptr, L"full config path"},
     {static_cast<unsigned long long>(-1), nullptr, 0, 0, nullptr, L"certification"},
-    {offsetof(SmartCouponConfig, _certFile), L"cert-file", XML_CFG_TYPE_STRING, 1, nullptr, L"certification file path"},
+    {offsetof(SmartCouponConfig, _certFile), L"cert-file", XmlCfgDef::CFG_ANSI, 1, nullptr, L"certification file path"},
     {static_cast<unsigned long long>(-1), nullptr, 0, 0, nullptr, L"system configuration"},
-    {offsetof(SmartCouponConfig, _workerThreadCount), L"worker-thread", XML_CFG_TYPE_INT, 0, nullptr,
+    {offsetof(SmartCouponConfig, _workerThreadCount), L"worker-thread", XmlCfgDef::CFG_INT, 0, nullptr,
      L"0 is system recommend"},
-    {offsetof(SmartCouponConfig, _gameEventWorkerThreadCount), L"game-event-worker-thread", XML_CFG_TYPE_INT, 0, nullptr,
+    {offsetof(SmartCouponConfig, _gameEventWorkerThreadCount), L"game-event-worker-thread", XmlCfgDef::CFG_INT, 0, nullptr,
      L"0 is system recommend"},
-    {offsetof(SmartCouponConfig, _maxDaemonSessionCount), L"max-world", XML_CFG_TYPE_INT, 0, nullptr,
+    {offsetof(SmartCouponConfig, _maxDaemonSessionCount), L"max-world", XmlCfgDef::CFG_INT, 0, nullptr,
      L"0 is default = 1000"},
-    {offsetof(SmartCouponConfig, _dumpType), L"dump-type", XML_CFG_TYPE_INT, 0, &DEFAULT_DUMPTYPE,
+    {offsetof(SmartCouponConfig, _dumpType), L"dump-type", XmlCfgDef::CFG_INT, 0, &DEFAULT_DUMPTYPE,
      L"0: no dump, 1: minimal dump(default), 2: full dump"},
-    {offsetof(SmartCouponConfig, _initJobCount), L"init-job-count", XML_CFG_TYPE_INT, 1, nullptr,
+    {offsetof(SmartCouponConfig, _initJobCount), L"init-job-count", XmlCfgDef::CFG_INT, 1, nullptr,
      L"job initial object pool size. 0 means no preparance"},
-    {offsetof(SmartCouponConfig, _reuseWaitTime), L"wait-time-for-reuse-pool-object", XML_CFG_TYPE_INT, 0, nullptr,
+    {offsetof(SmartCouponConfig, _reuseWaitTime), L"wait-time-for-reuse-pool-object", XmlCfgDef::CFG_INT, 0, nullptr,
      L"msec. for debugging. 0 means pool object be reused immediately. caution, in service mode, pool object do not "
      L"wait for reuse"},
-    {offsetof(SmartCouponConfig, _jobHashCount), L"job-hash-count", XML_CFG_TYPE_INT, 0, nullptr,
+    {offsetof(SmartCouponConfig, _jobHashCount), L"job-hash-count", XmlCfgDef::CFG_INT, 0, nullptr,
      L"job hash count. 0 means system default."},
     {static_cast<unsigned long long>(-1), nullptr, 0, 0, nullptr, L"network configuration"},
-    {offsetof(SmartCouponConfig, _npEnabled), L"np-enabled", XML_CFG_TYPE_BOOL, 1, nullptr, L"work with next-platform "},
-    {offsetof(SmartCouponConfig, _npAddress), L"np-address", XML_CFG_TYPE_ADDRESS, 0, &a127001,
+    {offsetof(SmartCouponConfig, _npEnabled), L"np-enabled", XmlCfgDef::CFG_BOOL, 1, nullptr, L"work with next-platform "},
+    {offsetof(SmartCouponConfig, _npAddress), L"np-address", XmlCfgDef::CFG_IP, 0, L"127.0.0.1",  /* 0x72948 text, no PDB name */
      L"next-platform\taddress"},
-    {offsetof(SmartCouponConfig, _npPort), L"np-port", XML_CFG_TYPE_INT, 0, &NP_PORT, L"next-platform access port"},
-    {offsetof(SmartCouponConfig, _manageListenPort), L"manage-listen-port", XML_CFG_TYPE_INT, 0,
+    {offsetof(SmartCouponConfig, _npPort), L"np-port", XmlCfgDef::CFG_INT, 0, &NP_PORT, L"next-platform access port"},
+    {offsetof(SmartCouponConfig, _manageListenPort), L"manage-listen-port", XmlCfgDef::CFG_INT, 0,
      &DEFAULT_MANAGE_LISTEN_PORT, L"management listen port"},
-    {offsetof(SmartCouponConfig, _daemonListenPort), L"daemon-listen-port", XML_CFG_TYPE_INT, 0,
+    {offsetof(SmartCouponConfig, _daemonListenPort), L"daemon-listen-port", XmlCfgDef::CFG_INT, 0,
      &DEFAULT_DAEMON_LISTEN_PORT, L"daemon listen port"},
     {static_cast<unsigned long long>(-1), nullptr, 0, 0, nullptr, L"smart coupon service configuration"},
-    {offsetof(SmartCouponConfig, _serviceWid), L"service-world-id", XML_CFG_TYPE_INT, 1, &DEFAULT_SERVICE_WORLD_ID,
+    {offsetof(SmartCouponConfig, _serviceWid), L"service-world-id", XmlCfgDef::CFG_INT, 1, &DEFAULT_SERVICE_WORLD_ID,
      L"service world id"},
-    {offsetof(SmartCouponConfig, _npRewardChangeoverEnable), L"np-reward-changeover-enable", XML_CFG_TYPE_BOOL, 0,
+    {offsetof(SmartCouponConfig, _npRewardChangeoverEnable), L"np-reward-changeover-enable", XmlCfgDef::CFG_BOOL, 0,
      nullptr, L"np reward changeover enable. nshop np"},
 };
 
@@ -134,7 +133,7 @@ void* SmartCouponObjPoolMemoryAllocator::Alloc(unsigned long long size, wchar_t 
 // 0x14b50
 unsigned long long GenerateJobid()
 {
-    return static_cast<unsigned long long>(_InterlockedIncrement64(&_seed__));
+    return static_cast<unsigned long long>(_InterlockedIncrement64(reinterpret_cast<long long volatile*>(&__seed__)));
 }
 
 // 0x14b70
@@ -307,8 +306,7 @@ bool SmartCouponDaemon::initialize()
         EventNotiJob* tmp = new (tmpStorage) EventNotiJob();
         EventNotiJob::_pool.Initialize(*reinterpret_cast<void**>(tmp), _config->_initJobCount,
                                        _config->_reuseWaitTime);
-        ObjPool* pool = &EventNotiJob::_pool;  // ❓ Add takes ObjPool**
-        GObjPoolTimer->Add(&pool);
+        GObjPoolTimer->Add(&EventNotiJob::_pool);
     }
 
     mem = Memory::_Manager[2]->Alloc(sizeof(JobManager), kFile, 261);
@@ -411,7 +409,7 @@ bool SmartCouponDaemon::initNetwork()
 // 0x159e0
 bool SmartCouponDaemon::onStart()
 {
-    ObjPoolTimer::Start(1000);  // ❓ resolution
+    ObjPoolTimer::Start(1000);  // LTCG put 1000 in the body of 0x1940
     if (_config->_npEnabled && !startNPChannel())
     {
         Log::Write(Log::LT_ERROR, kFile, 407, L"[scd], start np fail");
@@ -573,7 +571,7 @@ bool SmartCouponDaemon::startNPChannel()
         Log::Write(Log::LT_ERROR, kFile, 570, L"start np channel fail; np channel manager is null");
         return false;
     }
-    if (!_npChannelMgr->Initialize(_config->_npAddress, static_cast<unsigned short>(_config->_npPort)))
+    if (!_npChannelMgr->Initialize(1, _config->_npAddress, static_cast<unsigned short>(_config->_npPort), 5))
     {
         Log::Write(Log::LT_ERROR, kFile, 575,
                    L"[scd], start np channel fail; initialize np service channel manager fail");

@@ -8,7 +8,7 @@
 #include "PostOfficeDaemon.h"
 
 #define RETRIEVE_CHARACTER_INFO_RELAY_FILE L"RetrieveCharacterInfoRelay.cpp"
-#define RETRIEVE_CHARACTER_INFO_RELAY_TAG L"relay context"
+static wchar_t const* const MODULE_NAME = L"relay context";  // PDB MODULE_NAME
 
 #define RETRIEVE_CHARACTER_INFO_RELAY_CRASH(line, fmt, ...)                                     \
     do                                                                                          \
@@ -35,24 +35,23 @@ bool RetrieveCharacterInfoRelayContext::processRelayRequest(Channel* const chann
     if (channel == nullptr)
     {
         RETRIEVE_CHARACTER_INFO_RELAY_CRASH(30, L"== CRASH == [%s], %s; invalid parameter, channel:0x%p",
-                                            RETRIEVE_CHARACTER_INFO_RELAY_TAG,
+                                            MODULE_NAME,
                                             L"RetrieveCharacterInfoRelayContext::processRelayRequest",
                                             static_cast<Channel*>(nullptr));
         return false;
     }
 
     unsigned long long const relayTid = _economyHeader._relayTid;
-    // ❓ SendRelayRequest takes a non-const pointer.
-    if (!static_cast<CacheGateChannel*>(channel)->SendRelayRequest(const_cast<RetrieveCharacterInfoRelayContext*>(this)))
+    if (!static_cast<CacheGateChannel*>(channel)->SendRelayRequest(this))
     {
         Log::Write(Log::LT_ERROR, RETRIEVE_CHARACTER_INFO_RELAY_FILE, 37,
                    L"[%s], %s; failed to send retrieve character info relay request, relayTid:0x%I64X",
-                   RETRIEVE_CHARACTER_INFO_RELAY_TAG, L"RetrieveCharacterInfoRelayContext::processRelayRequest", relayTid);
+                   MODULE_NAME, L"RetrieveCharacterInfoRelayContext::processRelayRequest", relayTid);
         return false;
     }
 
     Log::Write(Log::LT_NOTICE, RETRIEVE_CHARACTER_INFO_RELAY_FILE, 41,
-               L"[%s], %s; sent retrieve character info relay request, relayTid:0x%I64X", RETRIEVE_CHARACTER_INFO_RELAY_TAG,
+               L"[%s], %s; sent retrieve character info relay request, relayTid:0x%I64X", MODULE_NAME,
                L"RetrieveCharacterInfoRelayContext::processRelayRequest", relayTid);
     return true;
 }
@@ -66,23 +65,22 @@ bool RetrieveCharacterInfoRelayContext::processRelayResponse() const
     {
         Log::Write(Log::LT_ERROR, RETRIEVE_CHARACTER_INFO_RELAY_FILE, 51,
                    L"[%s], %s; world is not connecting; cannot send packet, relayTid:0x%I64X",
-                   RETRIEVE_CHARACTER_INFO_RELAY_TAG, L"RetrieveCharacterInfoRelayContext::processRelayResponse", relayTid);
+                   MODULE_NAME, L"RetrieveCharacterInfoRelayContext::processRelayResponse", relayTid);
         return false;
     }
 
-    // ❓ SendRelayResponse takes a non-const pointer.
-    if (!worldChannel->SendRelayResponse(const_cast<RetrieveCharacterInfoRelayContext*>(this)))
+    if (!worldChannel->SendRelayResponse(this))
     {
         Log::Write(Log::LT_ERROR, RETRIEVE_CHARACTER_INFO_RELAY_FILE, 56,
                    L"[%s], %s; failed to send retrieve character info %s response ack, relayTid:0x%I64X",
-                   RETRIEVE_CHARACTER_INFO_RELAY_TAG, L"RetrieveCharacterInfoRelayContext::processRelayResponse",
+                   MODULE_NAME, L"RetrieveCharacterInfoRelayContext::processRelayResponse",
                    _response._resultState == RelayResponse::RESULTSTATE_SUCCESS ? L"success" : L"failure", relayTid);
         worldChannel->removeReferenceCount(RETRIEVE_CHARACTER_INFO_RELAY_FILE, 57);
         return false;
     }
 
     Log::Write(Log::LT_NOTICE, RETRIEVE_CHARACTER_INFO_RELAY_FILE, 61,
-               L"[%s], %s; sent retrieve character info %s response ack, relayTid:0x%I64X", RETRIEVE_CHARACTER_INFO_RELAY_TAG,
+               L"[%s], %s; sent retrieve character info %s response ack, relayTid:0x%I64X", MODULE_NAME,
                L"RetrieveCharacterInfoRelayContext::processRelayResponse",
                _response._resultState == RelayResponse::RESULTSTATE_SUCCESS ? L"success" : L"failure", relayTid);
     worldChannel->removeReferenceCount(RETRIEVE_CHARACTER_INFO_RELAY_FILE, 62);
@@ -92,10 +90,7 @@ bool RetrieveCharacterInfoRelayContext::processRelayResponse() const
 // 0x1e0b0
 bool RetrieveCharacterInfoRelayContext::processRelayTimeout()
 {
-    RetrieveCharacterInfoRelayResponse response;
-    response._resultState = RelayResponse::RESULTSTATE_RELAY_TIMEOUT;
-    response._failReason = 13;
-    response._resultPcId = 0;
+    RetrieveCharacterInfoRelayResponse response(RelayResponse::RESULTSTATE_RELAY_TIMEOUT, 13);
     initResponse(&response);
     return processRelayResponse();
 }
@@ -127,14 +122,14 @@ bool RetrieveCharacterInfoRelayContext::ComposeRequestPacket(Packet& packet) con
     {
         Log::Write(Log::LT_ERROR, RETRIEVE_CHARACTER_INFO_RELAY_FILE, 87,
                    L"[%s], %s; failed to compose retrieve character info relay request packet, fromWid:%u, toWid:%u, relayTid:0x%I64X, gameTid:0x%I64X, targetCharacterName:%s",
-                   RETRIEVE_CHARACTER_INFO_RELAY_TAG, L"RetrieveCharacterInfoRelayContext::ComposeRequestPacket", fromWid,
+                   MODULE_NAME, L"RetrieveCharacterInfoRelayContext::ComposeRequestPacket", fromWid,
                    toWid, relayTid, gameTid, targetCharacterName);
         return false;
     }
 
     Log::Write(Log::LT_DEBUG, RETRIEVE_CHARACTER_INFO_RELAY_FILE, 91,
                L"[%s], %s; composed retrieve character info relay request packet, fromWid:%u, toWid:%u, relayTid:0x%I64X, gameTid:0x%I64X, targetCharacterName:%s",
-               RETRIEVE_CHARACTER_INFO_RELAY_TAG, L"RetrieveCharacterInfoRelayContext::ComposeRequestPacket", fromWid,
+               MODULE_NAME, L"RetrieveCharacterInfoRelayContext::ComposeRequestPacket", fromWid,
                toWid, relayTid, gameTid, targetCharacterName);
     return true;
 }
@@ -153,13 +148,13 @@ bool RetrieveCharacterInfoRelayContext::ComposeResponsePacket(Packet& packet) co
         {
             Log::Write(Log::LT_ERROR, RETRIEVE_CHARACTER_INFO_RELAY_FILE, 107,
                        L"[%s], %s; failed to compose retrieve character info success response packet, gameTid:0x%I64X, resultPcId:0x%I64X",
-                       RETRIEVE_CHARACTER_INFO_RELAY_TAG, L"RetrieveCharacterInfoRelayContext::ComposeResponsePacket",
+                       MODULE_NAME, L"RetrieveCharacterInfoRelayContext::ComposeResponsePacket",
                        gameTid, resultPcId);
             return false;
         }
         Log::Write(Log::LT_DEBUG, RETRIEVE_CHARACTER_INFO_RELAY_FILE, 110,
                    L"[%s], %s; composed retrieve character info success response packet, gameTid:0x%I64X, resultPcId:0x%I64X",
-                   RETRIEVE_CHARACTER_INFO_RELAY_TAG, L"RetrieveCharacterInfoRelayContext::ComposeResponsePacket", gameTid,
+                   MODULE_NAME, L"RetrieveCharacterInfoRelayContext::ComposeResponsePacket", gameTid,
                    resultPcId);
         return true;
     }
@@ -168,43 +163,41 @@ bool RetrieveCharacterInfoRelayContext::ComposeResponsePacket(Packet& packet) co
     {
         RETRIEVE_CHARACTER_INFO_RELAY_CRASH(128,
                                             L"== CRASH == [%s], %s; invalid response result state, relayTid:0x%I64X, resultState:%d",
-                                            RETRIEVE_CHARACTER_INFO_RELAY_TAG,
+                                            MODULE_NAME,
                                             L"RetrieveCharacterInfoRelayContext::ComposeResponsePacket", relayTid,
                                             resultState);
         return false;
     }
 
-    int const failReason = convertFailReason(static_cast<RelayResponse::RESULTSTATE>(resultState), _response._failReason);
+    int const failReason = convertFailReason(static_cast<RelayResponse::ResultState>(resultState), _response._failReason);
     bool const composed = packet.Compose("hqE", 6, _request._gameTid, failReason) != 0;
     if (!composed)
     {
         Log::Write(Log::LT_ERROR, RETRIEVE_CHARACTER_INFO_RELAY_FILE, 121,
                    L"[%s], %s; failed to compose retrieve character info failure response packet, gameTid:0x%I64X, failReason:%d",
-                   RETRIEVE_CHARACTER_INFO_RELAY_TAG, L"RetrieveCharacterInfoRelayContext::ComposeResponsePacket",
+                   MODULE_NAME, L"RetrieveCharacterInfoRelayContext::ComposeResponsePacket",
                    _request._gameTid, failReason);
         return false;
     }
     Log::Write(Log::LT_DEBUG, RETRIEVE_CHARACTER_INFO_RELAY_FILE, 124,
                L"[%s], %s; composed retrieve character info failure response packet, gameTid:0x%I64X, failReason:%d",
-               RETRIEVE_CHARACTER_INFO_RELAY_TAG, L"RetrieveCharacterInfoRelayContext::ComposeResponsePacket",
+               MODULE_NAME, L"RetrieveCharacterInfoRelayContext::ComposeResponsePacket",
                _request._gameTid, failReason);
     return true;
 }
 
 // 0x1e410
-// ❓ The case values 2/3/4 are the raw values in the binary. They do not match the RESULTSTATE values in RelayContext.h.
-unsigned short RetrieveCharacterInfoRelayContext::convertFailReason(RelayResponse::RESULTSTATE const resultState,
-                                                                    short const failReason)
+short const RetrieveCharacterInfoRelayContext::convertFailReason(RelayResponse::ResultState const resultState, short const failReason) const
 {
-    switch (static_cast<int>(resultState))
+    switch (resultState)
     {
-    case 2:
+    case RelayResponse::RESULTSTATE_FAILURE:
         if (failReason == 12)
             return 10;
         if (failReason == 11)
             return 11;
         break;
-    case 3:
+    case RelayResponse::RESULTSTATE_RELAY_ERROR:
         switch (failReason)
         {
         case 3:
@@ -219,7 +212,7 @@ unsigned short RetrieveCharacterInfoRelayContext::convertFailReason(RelayRespons
             break;
         }
         break;
-    case 4:
+    case RelayResponse::RESULTSTATE_RELAY_TIMEOUT:
         return 13;
     default:
         break;

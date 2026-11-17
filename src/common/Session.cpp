@@ -921,8 +921,8 @@ bool Session::send(PacketBuffer const** const pbufferList, int count) const
     return true;
 }
 
-// ❓ IDA name of the TLS slot at offset 0x10 (LobbyGate .tls). The PacketCrypt module owns it.
-__declspec(thread) int Thread_LastCryptError;
+// PDB Thread_LastCryptError (LobbyGate Session.obj, TLS 0x9a010).
+__declspec(thread) PacketCrypt::ErrCode Thread_LastCryptError;
 
 // 0x4CC60 (LobbyGate, PacketCrypt module). Not in this card.
 int PacketCrypt::InstanceSize(Type type, Algorithm algorithm)
@@ -983,7 +983,7 @@ bool Session::SetHandshakeParameter(unsigned char const* param, int paramSize, u
         Log::Write(Log::LT_ERROR, SESSION_FILE, 1346, L"[session], invalid crypt step, id:%I64x, this:%p", _id, this);
         return false;
     }
-    int errCode = currentCrypt->SetKey(param, paramSize);
+    PacketCrypt::ErrCode errCode = currentCrypt->SetKey(param, paramSize);
     Thread_LastCryptError = errCode;
     if (errCode != PacketCrypt::SPCE_NO_ERROR)
     {

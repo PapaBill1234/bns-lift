@@ -23,7 +23,7 @@ class WorldConfigList
 {
 public:
     typedef std::map<unsigned short, WorldConfig*, std::less<unsigned short>,
-                     StlAllocator<std::pair<unsigned short const, WorldConfig*>, 2> > Container;  // ❓ typedef name
+                     StlAllocator<std::pair<unsigned short const, WorldConfig*>, 2> > Container;
 
     ~WorldConfigList();  // 0xd910
 
@@ -34,7 +34,7 @@ static_assert(sizeof(WorldConfigList) == 0x20, "sizeof WorldConfigList");
 class WorldConfigManager
 {
 public:
-    // ❓ Inlined at 0x13d30: the CriticalSection ctor, then memset of the arrays.
+    // PDB constructor, inlined at 0x13d30: the CriticalSection ctor, then memset of the arrays.
     WorldConfigManager()
     {
         memset(_containerList, 0, sizeof(_containerList));
@@ -58,8 +58,11 @@ public:
     static bool writeConfigString(void* fileHandle, wchar_t const* const configString);  // 0xeff0
 
     CriticalSection _reloadLock;
-    WorldConfig** _containerList[33];
-    int _arrayBoundary[33][2];
+    static int const BUCKET_COUNT = 33;
+    static int const ARRAY_SIZE = 1000;
+
+    WorldConfig** _containerList[BUCKET_COUNT];
+    int _arrayBoundary[BUCKET_COUNT][2];
     wchar_t _filePath[260];
 };
 static_assert(sizeof(WorldConfigManager) == 0x440, "sizeof WorldConfigManager");

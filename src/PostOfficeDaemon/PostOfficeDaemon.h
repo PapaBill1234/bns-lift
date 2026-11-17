@@ -108,7 +108,7 @@ public:
     RelayTimeoutChecker* _relayTimeoutChecker;
     UnsentPostChecker* _unsentPostChecker;
 
-    static PostOfficeDaemon* _instance;  // ❓ address not checked
+    static PostOfficeDaemon* _instance;  // rva 0x98BD8
 };
 static_assert(sizeof(PostOfficeDaemon) == 0x878, "sizeof PostOfficeDaemon");
 static_assert(offsetof(PostOfficeDaemon, _config) == 0x748, "PostOfficeDaemon::_config");

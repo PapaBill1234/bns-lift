@@ -26,16 +26,16 @@ static wchar_t const CHANNEL_H_FILE[] =
     L"E:\\DailyBuild02\\SmartCouponDaemon-Common-0.0.348\\depot\\Branch\\348NC\\Program\\Server\\BloodLib\\include\\Channel.h";
 
 NPSessionHandler* NPChannel::_sessionHandler = nullptr;
-void* NPChannel::_module = nullptr;
-int NPChannel::_programId = 0;  // ❓ initial value
+HINSTANCE__* NPChannel::_module = nullptr;
+int NPChannel::_programId = -1;  // .data rva 0x83250
 wchar_t NPChannel::_gameCode[9] = {0};
 IStsMsg* (*NPChannel::_stsCreate)() = nullptr;
 void (*NPChannel::_stsCleanUp)(IStsMsg*) = nullptr;
-bool NPChannel::_recvCompletionLog = false;  // ❓ initial value
+bool NPChannel::_recvCompletionLog = false;  // .bss rva 0x84AF0
 
 unsigned int NPPing::_class = 0;
 unsigned long long NPPing::_id = 0;
-int NPPing::_interval = 0;
+long NPPing::_interval = 0;
 
 // ❓ Thread-local buffers of the original (TLS area).
 static __declspec(thread) unsigned char t_buildBuffer[64000];
@@ -70,10 +70,10 @@ static NPChannel* ownerOf(Channel* channel)
 }
 
 // 0x4350
-bool STSMSGLIB_CHECK_DLL_VERSION()
+bool STSMSGLIB_CHECK_DLL_VERSION(HINSTANCE__* module)
 {
     wchar_t path[260];
-    if (GetModuleFileNameW(static_cast<HMODULE>(NPChannel::_module), path, 260) == 260)
+    if (GetModuleFileNameW(module, path, 260) == 260)
         return false;
     DWORD handle = 0;
     DWORD size = GetFileVersionInfoSizeW(path, &handle);
@@ -110,8 +110,8 @@ bool NPPing::HandleEvent(EventContext*, unsigned long)
     if (_run)
     {
         _StsMsgRequestPing msg;
-        msg.msgInfo.eCmd = 1002;
-        msg.msgInfo.msgType = 1;
+        msg.msgInfo.eCmd = COMMAND_PING;
+        msg.msgInfo.msgType = MESSAGE_TYPE_REQUEST;
         msg.msgInfo.nTxnId = 0;
         _owner->SendMsg(&msg, false, nullptr);
         Daemon::Instance->GlobalTimerQueue->Add(_interval, this);
@@ -286,7 +286,7 @@ bool NPChannel::Setup(int programId, wchar_t const* gameCode)
         Log::Write(Log::LT_ERROR, NPCHANNEL_FILE, 311, L"[np], setup np channel failed; load dll failed");
         return false;
     }
-    if (!STSMSGLIB_CHECK_DLL_VERSION())
+    if (!STSMSGLIB_CHECK_DLL_VERSION(_module))
     {
         Log::Write(Log::LT_ERROR, NPCHANNEL_FILE, 316,
                    L"[np], setup np channel failed; check dll version failed, required:%d.%d.%d.0", 0, 119, 0);
@@ -294,9 +294,9 @@ bool NPChannel::Setup(int programId, wchar_t const* gameCode)
     }
     _programId = programId;
     wcscpy_s(_gameCode, 9, gameCode);
-    _stsCreate = reinterpret_cast<IStsMsg* (*)()>(GetProcAddress(static_cast<HMODULE>(_module), "CreateStsMsg"));
+    _stsCreate = reinterpret_cast<IStsMsg* (*)()>(GetProcAddress(_module, "CreateStsMsg"));
     _stsCleanUp =
-        reinterpret_cast<void (*)(IStsMsg*)>(GetProcAddress(static_cast<HMODULE>(_module), "CleanUpStsMsg"));
+        reinterpret_cast<void (*)(IStsMsg*)>(GetProcAddress(_module, "CleanUpStsMsg"));
     if (_stsCreate == nullptr || _stsCleanUp == nullptr)
     {
         Log::Write(Log::LT_ERROR, NPCHANNEL_FILE, 326,
@@ -323,7 +323,7 @@ void NPChannel::Cleanup()
     }
     if (_module != nullptr)
     {
-        FreeLibrary(static_cast<HMODULE>(_module));
+        FreeLibrary(_module);
         _programId = -1;
         _gameCode[0] = 0;
         _module = nullptr;
@@ -419,7 +419,7 @@ bool NPChannel::SendMsg(_StsMsg* msg, bool response, void* context)
         Log::Write(Log::LT_ERROR, NPCHANNEL_FILE, 435, L"[np], send fail; not connected session");
         return false;
     }
-    if (response && msg->GetMessageType() == 1 &&
+    if (response && msg->GetMessageType() == MESSAGE_TYPE_REQUEST &&
         !_tranRegistry->Register(msg->GetCommand(), context, &static_cast<_StsMsgRequest*>(msg)->msgInfo.nTxnId))
     {
         Log::Write(Log::LT_ERROR, NPCHANNEL_FILE, 442, L"== CRASH == [np], register transaction failed");
@@ -611,8 +611,8 @@ bool NPChannel::sendInitialConnectMessage(Session const* session)
     strcpy_s(localIP, sizeof(localIP), t_addressBuffer);
 
     _StsMsgRequestInitialConnect msg;
-    msg.msgInfo.eCmd = 1001;
-    msg.msgInfo.msgType = 1;
+    msg.msgInfo.eCmd = COMMAND_INITIAL_CONNECT;
+    msg.msgInfo.msgType = MESSAGE_TYPE_REQUEST;
     msg.msgInfo.nTxnId = 0;
     msg.pszIpAddress = localIP;
     Log::Write(Log::LT_DEBUG, NPCHANNEL_FILE, 642, L"[np], send initial connect message, local-ip:%s",

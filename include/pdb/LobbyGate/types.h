@@ -22,6 +22,8 @@ struct AlertBufferList;
 class AlertSender;
 struct AssertInfo;
 struct AsyncConnectContext;
+struct AsyncRecvContext;
+struct AsyncSendContext;
 class AtomicOperation;
 class AutoCS;
 class AutoSRW;
@@ -157,6 +159,7 @@ class RelationalRefCntObject;
 class ReleaseEvent;
 class RepeatPacketComposer;
 class RepeatPacketDecomposer;
+struct SCOPE_ID;
 struct SC_HANDLE__;
 struct SERVICE_STATUS_HANDLE__;
 class Security3rdParty;
@@ -233,11 +236,24 @@ struct ZSTD_outBuffer_s;
 struct ZSTD_parameters;
 struct ZSTD_prefixDict_s;
 struct ZSTD_window_t;
+struct _FILETIME;
+struct _GUID;
+union _LARGE_INTEGER;
+struct _OVERLAPPED;
+struct _RTL_CRITICAL_SECTION;
+struct _RTL_SRWLOCK;
+struct _SERVICE_STATUS;
+struct _SYSTEMTIME;
+union _ULARGE_INTEGER;
+struct _WSABUF;
+struct _cidraddress;
+struct _s_ThrowInfo;
 struct addrinfo;
 struct cachedLiteralPrice_t;
 struct fseWkspMax_t;
 struct group_filter;
 union id128;
+struct in_addr;
 struct ip_msfilter;
 struct ldmEntry_t;
 struct ldmParams_t;
@@ -250,6 +266,9 @@ struct rawSeqStore_t;
 struct repcodes_s;
 struct seqDef_s;
 struct seqStore_t;
+struct sockaddr;
+struct sockaddr_in;
+struct sockaddr_storage;
 
 enum ADDRESS_MODE : int {
     AddrMode1616 = 0x0,
@@ -1293,6 +1312,32 @@ static_assert(offsetof(Thread, _maxFrozenSeconds) == 0x18, "Thread::_maxFrozenSe
 static_assert(offsetof(Thread, _threadManager) == 0x20, "Thread::_threadManager");
 static_assert(offsetof(Thread, _run) == 0x28, "Thread::_run");
 
+struct _RTL_CRITICAL_SECTION {
+public:
+    void * DebugInfo;
+    long LockCount;
+    long RecursionCount;
+    void * OwningThread;
+    void * LockSemaphore;
+    unsigned long long SpinCount;
+};
+static_assert(sizeof(_RTL_CRITICAL_SECTION) == 0x28, "sizeof _RTL_CRITICAL_SECTION");
+static_assert(offsetof(_RTL_CRITICAL_SECTION, DebugInfo) == 0x0, "_RTL_CRITICAL_SECTION::DebugInfo");
+static_assert(offsetof(_RTL_CRITICAL_SECTION, LockCount) == 0x8, "_RTL_CRITICAL_SECTION::LockCount");
+static_assert(offsetof(_RTL_CRITICAL_SECTION, RecursionCount) == 0xC, "_RTL_CRITICAL_SECTION::RecursionCount");
+static_assert(offsetof(_RTL_CRITICAL_SECTION, OwningThread) == 0x10, "_RTL_CRITICAL_SECTION::OwningThread");
+static_assert(offsetof(_RTL_CRITICAL_SECTION, LockSemaphore) == 0x18, "_RTL_CRITICAL_SECTION::LockSemaphore");
+static_assert(offsetof(_RTL_CRITICAL_SECTION, SpinCount) == 0x20, "_RTL_CRITICAL_SECTION::SpinCount");
+
+struct sockaddr {
+public:
+    unsigned short sa_family;
+    char sa_data[14];
+};
+static_assert(sizeof(sockaddr) == 0x10, "sizeof sockaddr");
+static_assert(offsetof(sockaddr, sa_family) == 0x0, "sockaddr::sa_family");
+static_assert(offsetof(sockaddr, sa_data) == 0x2, "sockaddr::sa_data");
+
 class AlertSender : public Thread {
 public:
     virtual wchar_t const * Name();
@@ -1304,13 +1349,13 @@ public:
     unsigned long long _threadId;
     int _maxLogCount;
     bool _init;
-    alignas(2) unsigned char _remoteAddr[0x10];  // ❓ PDB type 0x2404: sockaddr
+    sockaddr _remoteAddr;
     short _daemonNameBytes;
     wchar_t _daemonName[64];
     short _versionBytes;
     wchar_t _version[64];
     int _worldId;
-    alignas(8) unsigned char _cs[0x28];  // ❓ PDB type 0x109B: _RTL_CRITICAL_SECTION
+    _RTL_CRITICAL_SECTION _cs;
     AlertBufferList _bufferList;
 };
 static_assert(sizeof(AlertSender) == 0x1B0, "sizeof AlertSender");
@@ -1340,9 +1385,112 @@ static_assert(offsetof(AssertInfo, file) == 0x0, "AssertInfo::file");
 static_assert(offsetof(AssertInfo, line) == 0x8, "AssertInfo::line");
 static_assert(offsetof(AssertInfo, log) == 0xC, "AssertInfo::log");
 
+struct _OVERLAPPED {
+public:
+    unsigned long long Internal;
+    unsigned long long InternalHigh;
+    union {
+        struct {
+            unsigned long Offset;
+            unsigned long OffsetHigh;
+        };
+        void * Pointer;
+    };
+    void * hEvent;
+};
+static_assert(sizeof(_OVERLAPPED) == 0x20, "sizeof _OVERLAPPED");
+static_assert(offsetof(_OVERLAPPED, Internal) == 0x0, "_OVERLAPPED::Internal");
+static_assert(offsetof(_OVERLAPPED, InternalHigh) == 0x8, "_OVERLAPPED::InternalHigh");
+static_assert(offsetof(_OVERLAPPED, Offset) == 0x10, "_OVERLAPPED::Offset");
+static_assert(offsetof(_OVERLAPPED, OffsetHigh) == 0x14, "_OVERLAPPED::OffsetHigh");
+static_assert(offsetof(_OVERLAPPED, Pointer) == 0x10, "_OVERLAPPED::Pointer");
+static_assert(offsetof(_OVERLAPPED, hEvent) == 0x18, "_OVERLAPPED::hEvent");
+
+struct EventContext : public _OVERLAPPED {
+public:
+    int _id;
+};
+static_assert(sizeof(EventContext) == 0x28, "sizeof EventContext");
+static_assert(offsetof(EventContext, _id) == 0x20, "EventContext::_id");
+
+struct in_addr {
+public:
+    union {
+        struct {
+            unsigned char s_b1;
+            unsigned char s_b2;
+            unsigned char s_b3;
+            unsigned char s_b4;
+        } S_un_b;
+        struct {
+            unsigned short s_w1;
+            unsigned short s_w2;
+        } S_un_w;
+        unsigned long S_addr;
+    } S_un;
+};
+static_assert(sizeof(in_addr) == 0x4, "sizeof in_addr");
+static_assert(offsetof(in_addr, S_un) == 0x0, "in_addr::S_un");
+
+struct sockaddr_in {
+public:
+    unsigned short sin_family;
+    unsigned short sin_port;
+    in_addr sin_addr;
+    char sin_zero[8];
+};
+static_assert(sizeof(sockaddr_in) == 0x10, "sizeof sockaddr_in");
+static_assert(offsetof(sockaddr_in, sin_family) == 0x0, "sockaddr_in::sin_family");
+static_assert(offsetof(sockaddr_in, sin_port) == 0x2, "sockaddr_in::sin_port");
+static_assert(offsetof(sockaddr_in, sin_addr) == 0x4, "sockaddr_in::sin_addr");
+static_assert(offsetof(sockaddr_in, sin_zero) == 0x8, "sockaddr_in::sin_zero");
+
+struct AsyncConnectContext : public EventContext {
+public:
+    Session * _session;
+    unsigned long long _socket;
+    sockaddr_in _remoteAddr;
+    bool _firstConnect;
+    long long _timeout;
+    int _tryReconnectCount;
+};
+static_assert(sizeof(AsyncConnectContext) == 0x60, "sizeof AsyncConnectContext");
+static_assert(offsetof(AsyncConnectContext, _session) == 0x28, "AsyncConnectContext::_session");
+static_assert(offsetof(AsyncConnectContext, _socket) == 0x30, "AsyncConnectContext::_socket");
+static_assert(offsetof(AsyncConnectContext, _remoteAddr) == 0x38, "AsyncConnectContext::_remoteAddr");
+static_assert(offsetof(AsyncConnectContext, _firstConnect) == 0x48, "AsyncConnectContext::_firstConnect");
+static_assert(offsetof(AsyncConnectContext, _timeout) == 0x50, "AsyncConnectContext::_timeout");
+static_assert(offsetof(AsyncConnectContext, _tryReconnectCount) == 0x58, "AsyncConnectContext::_tryReconnectCount");
+
+struct _WSABUF {
+public:
+    unsigned long len;
+    char * buf;
+};
+static_assert(sizeof(_WSABUF) == 0x10, "sizeof _WSABUF");
+static_assert(offsetof(_WSABUF, len) == 0x0, "_WSABUF::len");
+static_assert(offsetof(_WSABUF, buf) == 0x8, "_WSABUF::buf");
+
+struct AsyncRecvContext : public EventContext {
+public:
+    Session * _session;
+    _WSABUF _wsaBuffer;
+};
+static_assert(sizeof(AsyncRecvContext) == 0x40, "sizeof AsyncRecvContext");
+static_assert(offsetof(AsyncRecvContext, _session) == 0x28, "AsyncRecvContext::_session");
+static_assert(offsetof(AsyncRecvContext, _wsaBuffer) == 0x30, "AsyncRecvContext::_wsaBuffer");
+
+struct AsyncSendContext : public EventContext {
+public:
+    Session * _session;
+    SendBufferList * _bufferList;
+};
+static_assert(sizeof(AsyncSendContext) == 0x38, "sizeof AsyncSendContext");
+static_assert(offsetof(AsyncSendContext, _session) == 0x28, "AsyncSendContext::_session");
+static_assert(offsetof(AsyncSendContext, _bufferList) == 0x30, "AsyncSendContext::_bufferList");
+
 class AtomicOperation {
 public:
-    char _pdb_tail[0x1];
 };
 static_assert(sizeof(AtomicOperation) == 0x1, "sizeof AtomicOperation");
 
@@ -1357,8 +1505,12 @@ static_assert(offsetof(AutoCS, EnterCount) == 0x8, "AutoCS::EnterCount");
 
 class AutoSRW {
 public:
-    void * _lock;
-    int const _mode;
+    enum Mode : int {
+        EXCLUSIVE = 0x0,
+        SHARED = 0x1,
+    };
+    _RTL_SRWLOCK const * _lock;
+    AutoSRW::Mode const _mode;
 };
 static_assert(sizeof(AutoSRW) == 0x10, "sizeof AutoSRW");
 static_assert(offsetof(AutoSRW, _lock) == 0x0, "AutoSRW::_lock");
@@ -1431,6 +1583,21 @@ static_assert(sizeof(BaseMemoryManager) == 0x10, "sizeof BaseMemoryManager");
 
 class RefCntObject {
 public:
+    enum Tag : int {
+        TAG_INIT = 0xA,
+        TAG_FINI = 0xF0,
+        TAG_TYPE_LOGBUFFER = 0x1,
+        TAG_TYPE_TIMER = 0x2,
+        TAG_TYPE_PORTLISTENER = 0x3,
+        TAG_TYPE_CHANNEL = 0x4,
+        TAG_TYPE_PACKETBUFFER = 0x5,
+        TAG_TYPE_END_NETWORK_EVENT = 0x6,
+        TAG_TYPE_SESSION = 0x7,
+        TAG_TYPE_SESSION_POOL = 0x8,
+        TAG_TYPE_USER_DEFINED = 0x14,
+        TAG_SUBTYPE_TIMER_RECONNECT = 0x1,
+        TAG_SUBTYPE_TIMER_USER_DEFINED = 0xA,
+    };
     virtual ~RefCntObject();  // slot 0
     virtual void deallocate_object(wchar_t const *, int);  // slot 1
     virtual void deallocate_me(void *, wchar_t const *, int) = 0;  // slot 2
@@ -1453,16 +1620,71 @@ static_assert(sizeof(BaseRefCntObj) == 0x18, "sizeof BaseRefCntObj");
 
 class BloodCert {
 public:
-    char _pdb_tail[0x1];
+    enum ErrCode : int {
+        SCERR_NO_ERROR = 0x0,
+        UNKOWN_ERROR = 0x1,
+        INVALID_PARAM = 0x2,
+        INVALID_CERTFILE = 0x3,
+        INVALID_CERT = 0x4,
+        INVALID_VER = 0x5,
+        INVALID_SERIAL = 0x6,
+        INVALID_DSN = 0x7,
+        INVALID_ISSUE = 0x8,
+        NOT_MATCH_SERIAL = 0x9,
+        EXPIRED = 0xA,
+    };
+    enum Flag : int {
+        TEST = 0x1,
+    };
+    enum Module : int {
+        INVALID = 0x0,
+        TOOL = 0x1,
+        ISSUE = 0x2,
+        GAMED = 0x3,
+        CACHED = 0x4,
+        UNIVD = 0x5,
+        BAZZARD = 0x6,
+        ARENAD = 0x7,
+        AUTHD = 0x8,
+        LOGD = 0x9,
+        POSTOFFICED = 0xA,
+        CRAFTD = 0xB,
+        MARKET_DEALERD = 0xC,
+        MARKET_READERD = 0xD,
+        UNIVCHARMGRD = 0xE,
+        SNS_CACHED = 0xF,
+        SNS_WRITERD = 0x10,
+        PROXYD = 0x11,
+        MANAGEMENTD = 0x12,
+        GM_AUDITLOG = 0x13,
+        PLAYJOURNALD = 0x14,
+        LOBBYD = 0x15,
+        LOBBYGATE = 0x16,
+        ACCOUNTINVENTORYD = 0x17,
+        SMARTCOUPOND = 0x18,
+        INFOGATE = 0x19,
+        ACHIEVEMENTD = 0x1A,
+        ENGINETOOL = 0x1B,
+        ARENALOBBY = 0x1C,
+        RANKINGD = 0x1D,
+        MODULE_MAX = 0x1E,
+    };
 };
 static_assert(sizeof(BloodCert) == 0x1, "sizeof BloodCert");
 
 union id128 {
 public:
-    alignas(4) unsigned char guid[0x10];  // ❓ PDB type 0x2540: id128::<unnamed-type-guid>
+    struct {
+        unsigned int id1;
+        unsigned short id2;
+        unsigned short id3;
+        unsigned char id4[8];
+    } guid;
     unsigned long long id[2];
 };
 static_assert(sizeof(id128) == 0x10, "sizeof id128");
+static_assert(offsetof(id128, guid) == 0x0, "id128::guid");
+static_assert(offsetof(id128, id) == 0x0, "id128::id");
 
 class BnsCommonConfig {
 public:
@@ -1511,6 +1733,10 @@ static_assert(offsetof(BnsCommonConfigReload, _npClientAppIdStr) == 0x8, "BnsCom
 
 class BroadcastCrypt {
 public:
+    enum Type : int {
+        BROADCAST_DAEMON = 0x0,
+        BROADCAST_LOCAL = 0x1,
+    };
     PacketCrypt * crypt;
     char * key;
     int size;
@@ -1570,6 +1796,10 @@ static_assert(offsetof(CharacterInfo, deleteRemainTime) == 0x74, "CharacterInfo:
 
 class Client : public Channel {
 public:
+    enum ClientState : int {
+        TRY_START_SESSION = 0x0,
+        START_SESSION = 0x1,
+    };
     virtual ~Client();
     virtual unsigned long long GetId();
     int _state;
@@ -1684,12 +1914,19 @@ static_assert(offsetof(Timer, InLtq) == 0x34, "Timer::InLtq");
 
 class ClientSessionTimerJob : public Timer {
 public:
+    enum TimerReason : int {
+        TR_NONE = 0x0,
+        TR_KICK = 0x1,
+        TR_CLOSE_ANONYMOUS = 0x2,
+        TR_CLOSE = 0x3,
+        TR_MAX = 0x4,
+    };
     virtual ~ClientSessionTimerJob();
     virtual unsigned int TimerClass() const;
     virtual unsigned long long TimerId() const;
     virtual bool HandleEvent(EventContext *, unsigned long);
     unsigned long long _key;
-    int _timerReason;
+    ClientSessionTimerJob::TimerReason _timerReason;
 };
 static_assert(sizeof(ClientSessionTimerJob) == 0x48, "sizeof ClientSessionTimerJob");
 static_assert(offsetof(ClientSessionTimerJob, _key) == 0x38, "ClientSessionTimerJob::_key");
@@ -1768,20 +2005,74 @@ static_assert(offsetof(Connection, _socket) == 0x8, "Connection::_socket");
 static_assert(offsetof(Connection, _ip) == 0x10, "Connection::_ip");
 static_assert(offsetof(Connection, _portNumber) == 0x14, "Connection::_portNumber");
 
+class SystemEvent {
+public:
+    void * Event;
+};
+static_assert(sizeof(SystemEvent) == 0x8, "sizeof SystemEvent");
+static_assert(offsetof(SystemEvent, Event) == 0x0, "SystemEvent::Event");
+
+class Log : public Thread {
+public:
+    enum Type : int {
+        LT_ERROR = 0x0,
+        LT_DEBUG = 0x1,
+        LT_TRACE = 0x2,
+        LT_NOTICE = 0x3,
+        LT_RESOURCE = 0x4,
+        LT_ARCHIVE = 0x5,
+        LT_USER_DEFINED_MIN = 0x6,
+        LT_USER_DEFINED_1 = 0x6,
+        LT_USER_DEFINED_2 = 0x7,
+        LT_USER_DEFINED_3 = 0x8,
+        LT_USER_DEFINED_4 = 0x9,
+        LT_USER_DEFINED_5 = 0xA,
+        LT_USER_DEFINED_MAX = 0xA,
+        LT_MAX = 0xB,
+    };
+    virtual ~Log();
+    virtual wchar_t const * Name();
+    virtual void run();
+    bool open;
+    bool flush;
+    SystemEvent notifyEvent;
+    LogMedia * media[8];
+    int mediaCount;
+    LogMedia * mediaList[11];
+    int mediaCountPerList[11];
+};
+static_assert(sizeof(Log) == 0x110, "sizeof Log");
+static_assert(offsetof(Log, open) == 0x30, "Log::open");
+static_assert(offsetof(Log, flush) == 0x31, "Log::flush");
+static_assert(offsetof(Log, notifyEvent) == 0x38, "Log::notifyEvent");
+static_assert(offsetof(Log, media) == 0x40, "Log::media");
+static_assert(offsetof(Log, mediaCount) == 0x80, "Log::mediaCount");
+static_assert(offsetof(Log, mediaList) == 0x88, "Log::mediaList");
+static_assert(offsetof(Log, mediaCountPerList) == 0xE0, "Log::mediaCountPerList");
+
 class SpinLock {
 public:
-    alignas(8) unsigned char SL[0x28];  // ❓ PDB type 0x109B: _RTL_CRITICAL_SECTION
+    _RTL_CRITICAL_SECTION SL;
 };
 static_assert(sizeof(SpinLock) == 0x28, "sizeof SpinLock");
 static_assert(offsetof(SpinLock, SL) == 0x0, "SpinLock::SL");
 
 class LogMedia {
 public:
+    enum Type : int {
+        LM_NULL = 0x0,
+        LM_CONSOLE = 0x1,
+        LM_FILE = 0x2,
+        LM_NETWORK = 0x3,
+        LM_DB = 0x4,
+        LM_ARCHIVE = 0x5,
+        LM_FGT_FILE = 0x6,
+    };
     virtual ~LogMedia();  // slot 0
     virtual bool Writable();  // slot 1
     virtual void Flush() = 0;  // slot 2
     virtual wchar_t * GetLastFileName();  // slot 3
-    virtual int GetType() const = 0;  // slot 4
+    virtual LogMedia::Type GetType() const = 0;  // slot 4
     virtual void write(LogBuffer const *) = 0;  // slot 5
     int _bufferNodePos;
     LogMedia * _next[11];
@@ -1805,27 +2096,63 @@ public:
     virtual void SetState(int) = 0;  // slot 8
     virtual void WriteStartLog(int, wchar_t const *, void *) = 0;  // slot 9
     virtual void WriteStatusLog(wchar_t const *, void *) = 0;  // slot 10
-    virtual void Write(int, wchar_t const *, int, wchar_t const *, char *) = 0;  // slot 11
+    virtual void Write(Log::Type, wchar_t const *, int, wchar_t const *, char *) = 0;  // slot 11
     virtual bool controlHandler(unsigned long) = 0;  // slot 12
     virtual void setTitle(wchar_t const *);  // slot 13
     virtual ~Console();
-    virtual int GetType() const;
+    virtual LogMedia::Type GetType() const;
     virtual void Flush();
 };
 static_assert(sizeof(Console) == 0xB0, "sizeof Console");
 
 class ConsoleLog {
 public:
+    enum Type : int {
+        L_NONE = 0x0,
+        L_INTERNAL = 0x1,
+        L_ERROR = 0x2,
+        L_DEBUG = 0x3,
+        L_INFO = 0x4,
+        L_TRACE = 0x5,
+        L_MAX = 0x6,
+    };
     virtual bool Acquire() = 0;  // slot 0
     virtual void Release() = 0;  // slot 1
-    virtual int GetType() const = 0;  // slot 2
+    virtual ConsoleLog::Type GetType() const = 0;  // slot 2
     virtual bool GetLog(wchar_t *, unsigned long long) const = 0;  // slot 3
 };
 static_assert(sizeof(ConsoleLog) == 0x8, "sizeof ConsoleLog");
 
 class ConsoleWindow {
 public:
-    virtual bool Initialize(HINSTANCE__ *, wchar_t const *, wchar_t const *, void *, void *, void *, void *, void *, void *) = 0;  // slot 0
+    struct EndSessionHandler;
+    struct ReloadHandler;
+    struct ShutdownHandler;
+    struct SocketHandler;
+    struct EndSessionHandler {
+    public:
+        void * logoff;
+        void * shutdown;
+    };
+    struct ReloadHandler {
+    public:
+        bool autoEnable;
+        void * reload;
+    };
+    struct ShutdownHandler {
+    public:
+        bool autoEnable;
+        void * shutdown;
+    };
+    struct SocketHandler {
+    public:
+        void * connect;
+        void * close;
+        void * send;
+        void * handle;
+        void * option;
+    };
+    virtual bool Initialize(HINSTANCE__ *, wchar_t const *, wchar_t const *, void *, void *, ConsoleWindow::ReloadHandler *, ConsoleWindow::ShutdownHandler *, ConsoleWindow::SocketHandler *, ConsoleWindow::EndSessionHandler *) = 0;  // slot 0
     virtual void Clear() = 0;  // slot 1
     virtual int Run() = 0;  // slot 2
     virtual HWND__ * GetMainWindowHandle() = 0;  // slot 3
@@ -1843,6 +2170,21 @@ public:
     virtual void WriteStatus(int, int, int, int, int, int) = 0;  // slot 15
 };
 static_assert(sizeof(ConsoleWindow) == 0x8, "sizeof ConsoleWindow");
+static_assert(sizeof(ConsoleWindow::EndSessionHandler) == 0x10, "sizeof ConsoleWindow::EndSessionHandler");
+static_assert(offsetof(ConsoleWindow::EndSessionHandler, logoff) == 0x0, "ConsoleWindow::EndSessionHandler::logoff");
+static_assert(offsetof(ConsoleWindow::EndSessionHandler, shutdown) == 0x8, "ConsoleWindow::EndSessionHandler::shutdown");
+static_assert(sizeof(ConsoleWindow::ReloadHandler) == 0x10, "sizeof ConsoleWindow::ReloadHandler");
+static_assert(offsetof(ConsoleWindow::ReloadHandler, autoEnable) == 0x0, "ConsoleWindow::ReloadHandler::autoEnable");
+static_assert(offsetof(ConsoleWindow::ReloadHandler, reload) == 0x8, "ConsoleWindow::ReloadHandler::reload");
+static_assert(sizeof(ConsoleWindow::ShutdownHandler) == 0x10, "sizeof ConsoleWindow::ShutdownHandler");
+static_assert(offsetof(ConsoleWindow::ShutdownHandler, autoEnable) == 0x0, "ConsoleWindow::ShutdownHandler::autoEnable");
+static_assert(offsetof(ConsoleWindow::ShutdownHandler, shutdown) == 0x8, "ConsoleWindow::ShutdownHandler::shutdown");
+static_assert(sizeof(ConsoleWindow::SocketHandler) == 0x28, "sizeof ConsoleWindow::SocketHandler");
+static_assert(offsetof(ConsoleWindow::SocketHandler, connect) == 0x0, "ConsoleWindow::SocketHandler::connect");
+static_assert(offsetof(ConsoleWindow::SocketHandler, close) == 0x8, "ConsoleWindow::SocketHandler::close");
+static_assert(offsetof(ConsoleWindow::SocketHandler, send) == 0x10, "ConsoleWindow::SocketHandler::send");
+static_assert(offsetof(ConsoleWindow::SocketHandler, handle) == 0x18, "ConsoleWindow::SocketHandler::handle");
+static_assert(offsetof(ConsoleWindow::SocketHandler, option) == 0x20, "ConsoleWindow::SocketHandler::option");
 
 struct ConsoleWindowInterface {
 public:
@@ -1925,7 +2267,6 @@ static_assert(offsetof(ContentsRuleConfigLoad, _enableGuildJoinRenewal) == 0x24,
 
 class ContentsRuleConfigReload {
 public:
-    char _pdb_tail[0x1];
 };
 static_assert(sizeof(ContentsRuleConfigReload) == 0x1, "sizeof ContentsRuleConfigReload");
 
@@ -1962,7 +2303,7 @@ static_assert(offsetof(CrashHandler, _crashMail) == 0x222, "CrashHandler::_crash
 
 class CriticalSection {
 public:
-    alignas(8) unsigned char CS[0x28];  // ❓ PDB type 0x109B: _RTL_CRITICAL_SECTION
+    _RTL_CRITICAL_SECTION CS;
 };
 static_assert(sizeof(CriticalSection) == 0x28, "sizeof CriticalSection");
 static_assert(offsetof(CriticalSection, CS) == 0x0, "CriticalSection::CS");
@@ -1976,15 +2317,38 @@ static_assert(sizeof(CsFrame) == 0x10, "sizeof CsFrame");
 static_assert(offsetof(CsFrame, SavedR10) == 0x0, "CsFrame::SavedR10");
 static_assert(offsetof(CsFrame, SavedR11) == 0x8, "CsFrame::SavedR11");
 
-class SystemEvent {
+struct _cidraddress {
 public:
-    void * Event;
+    unsigned long address;
+    unsigned long netmask;
 };
-static_assert(sizeof(SystemEvent) == 0x8, "sizeof SystemEvent");
-static_assert(offsetof(SystemEvent, Event) == 0x0, "SystemEvent::Event");
+static_assert(sizeof(_cidraddress) == 0x8, "sizeof _cidraddress");
+static_assert(offsetof(_cidraddress, address) == 0x0, "_cidraddress::address");
+static_assert(offsetof(_cidraddress, netmask) == 0x4, "_cidraddress::netmask");
 
 class Daemon {
 public:
+    struct Version;
+    enum DaemonState : int {
+        STATE_UNKNOWN = 0x0,
+        STATE_STOPPED = 0x1,
+        STATE_STOPPING = 0x2,
+        STATE_STARTING = 0x3,
+        STATE_RUNNING = 0x4,
+        STATE_INVALID = 0x5,
+        STATE_FLUSHING = 0x6,
+        STATE_COOLDOWNING = 0x7,
+        STATE_COOLDOWNED = 0x8,
+        STATE_RELOADING = 0x9,
+        STATE_MAX = 0xA,
+    };
+    struct Version {
+    public:
+        union {
+            unsigned long long version;
+            unsigned short unit[4];
+        };
+    };
     virtual ~Daemon();  // slot 0
     virtual wchar_t const * ServiceName() = 0;  // slot 1
     virtual wchar_t const * ShortName() = 0;  // slot 2
@@ -2008,13 +2372,13 @@ public:
     Console * console;
     PipeConsole * pipeConsole;
     ThreadManager * threadManager;
-    int State;
+    Daemon::DaemonState State;
     SystemEvent EndEvent;
     long StartSystemTick;
     long long StartSystemTick64;
     long CurrentTick;
     long long StartTime;
-    alignas(8) unsigned char Ver[0x8];  // ❓ PDB type 0x239B: Daemon::Version
+    Daemon::Version Ver;
     wchar_t VerStr[32];
     wchar_t hostname[256];
     unsigned long publicAddress;
@@ -2022,8 +2386,8 @@ public:
     unsigned long internalAddress;
     wchar_t internalAddrString[20];
     wchar_t confDir[520];
-    alignas(4) unsigned char internalCIDR[0x8];  // ❓ PDB type 0x23DF: _cidraddress
-    alignas(4) unsigned char publicCIDR[0x8];  // ❓ PDB type 0x23DF: _cidraddress
+    _cidraddress internalCIDR;
+    _cidraddress publicCIDR;
     bool setInternalCIDR;
     bool setPublicCIDR;
     TimerQueue * GlobalTimerQueue;
@@ -2060,18 +2424,29 @@ static_assert(offsetof(Daemon, GlobalTimerQueue) == 0x730, "Daemon::GlobalTimerQ
 static_assert(offsetof(Daemon, GlobalDelayedRelease) == 0x738, "Daemon::GlobalDelayedRelease");
 static_assert(offsetof(Daemon, allowClientIPAddressInLogs) == 0x740, "Daemon::allowClientIPAddressInLogs");
 static_assert(offsetof(Daemon, allowClientSessionLifeCycleInLogs) == 0x741, "Daemon::allowClientSessionLifeCycleInLogs");
+static_assert(sizeof(Daemon::Version) == 0x8, "sizeof Daemon::Version");
+static_assert(offsetof(Daemon::Version, version) == 0x0, "Daemon::Version::version");
+static_assert(offsetof(Daemon::Version, unit) == 0x0, "Daemon::Version::unit");
 
 class DaemonConfig {
 public:
-    char _pdb_tail[0x1];
 };
 static_assert(sizeof(DaemonConfig) == 0x1, "sizeof DaemonConfig");
 
 class DelayedDelete {
 public:
+    struct Node;
+    struct Node {
+    public:
+        DelayedDelete::Node * _next;
+        long long _added;
+        void * _checkDelete;
+        void * _doDelete;
+        void * _ptr;
+    };
     CriticalSection _lock;
-    void * _head;
-    void * _tail;
+    DelayedDelete::Node * _head;
+    DelayedDelete::Node * _tail;
     int _count;
     long long _lastDeleted;
     long _interval;
@@ -2085,12 +2460,28 @@ static_assert(offsetof(DelayedDelete, _count) == 0x38, "DelayedDelete::_count");
 static_assert(offsetof(DelayedDelete, _lastDeleted) == 0x40, "DelayedDelete::_lastDeleted");
 static_assert(offsetof(DelayedDelete, _interval) == 0x48, "DelayedDelete::_interval");
 static_assert(offsetof(DelayedDelete, _delay) == 0x4C, "DelayedDelete::_delay");
+static_assert(sizeof(DelayedDelete::Node) == 0x28, "sizeof DelayedDelete::Node");
+static_assert(offsetof(DelayedDelete::Node, _next) == 0x0, "DelayedDelete::Node::_next");
+static_assert(offsetof(DelayedDelete::Node, _added) == 0x8, "DelayedDelete::Node::_added");
+static_assert(offsetof(DelayedDelete::Node, _checkDelete) == 0x10, "DelayedDelete::Node::_checkDelete");
+static_assert(offsetof(DelayedDelete::Node, _doDelete) == 0x18, "DelayedDelete::Node::_doDelete");
+static_assert(offsetof(DelayedDelete::Node, _ptr) == 0x20, "DelayedDelete::Node::_ptr");
 
 class DelayedRelease {
 public:
+    struct Node;
+    struct Node {
+    public:
+        DelayedRelease::Node * _next;
+        long long _added;
+        void * _callback;
+        RefCntObject * _ref1;
+        RefCntObject * _ref2;
+        RefCntObject * _ref3;
+    };
     CriticalSection _lock;
-    void * _head;
-    void * _tail;
+    DelayedRelease::Node * _head;
+    DelayedRelease::Node * _tail;
     int _count;
     long long _lastReleased;
     long _interval;
@@ -2104,25 +2495,40 @@ static_assert(offsetof(DelayedRelease, _count) == 0x38, "DelayedRelease::_count"
 static_assert(offsetof(DelayedRelease, _lastReleased) == 0x40, "DelayedRelease::_lastReleased");
 static_assert(offsetof(DelayedRelease, _interval) == 0x48, "DelayedRelease::_interval");
 static_assert(offsetof(DelayedRelease, _delay) == 0x4C, "DelayedRelease::_delay");
+static_assert(sizeof(DelayedRelease::Node) == 0x30, "sizeof DelayedRelease::Node");
+static_assert(offsetof(DelayedRelease::Node, _next) == 0x0, "DelayedRelease::Node::_next");
+static_assert(offsetof(DelayedRelease::Node, _added) == 0x8, "DelayedRelease::Node::_added");
+static_assert(offsetof(DelayedRelease::Node, _callback) == 0x10, "DelayedRelease::Node::_callback");
+static_assert(offsetof(DelayedRelease::Node, _ref1) == 0x18, "DelayedRelease::Node::_ref1");
+static_assert(offsetof(DelayedRelease::Node, _ref2) == 0x20, "DelayedRelease::Node::_ref2");
+static_assert(offsetof(DelayedRelease::Node, _ref3) == 0x28, "DelayedRelease::Node::_ref3");
 
 class DeleteEvent : public DynamicEventObject {
 public:
     virtual ~DeleteEvent();
     virtual unsigned int EventId() const;
     virtual bool HandleEvent(EventContext *, unsigned long);
-    void * _head;
+    DelayedDelete::Node * _head;
 };
 static_assert(sizeof(DeleteEvent) == 0x20, "sizeof DeleteEvent");
 static_assert(offsetof(DeleteEvent, _head) == 0x18, "DeleteEvent::_head");
 
 struct EHExceptionRecord {
 public:
+    struct EHParameters;
+    struct EHParameters {
+    public:
+        unsigned long magicNumber;
+        void * pExceptionObject;
+        _s_ThrowInfo const * pThrowInfo;
+        void * pThrowImageBase;
+    };
     unsigned long ExceptionCode;
     unsigned long ExceptionFlags;
     void * ExceptionRecord;
     void * ExceptionAddress;
     unsigned long NumberParameters;
-    alignas(8) unsigned char params[0x20];  // ❓ PDB type 0x38C4: EHExceptionRecord::EHParameters
+    EHExceptionRecord::EHParameters params;
 };
 static_assert(sizeof(EHExceptionRecord) == 0x40, "sizeof EHExceptionRecord");
 static_assert(offsetof(EHExceptionRecord, ExceptionCode) == 0x0, "EHExceptionRecord::ExceptionCode");
@@ -2131,6 +2537,11 @@ static_assert(offsetof(EHExceptionRecord, ExceptionRecord) == 0x8, "EHExceptionR
 static_assert(offsetof(EHExceptionRecord, ExceptionAddress) == 0x10, "EHExceptionRecord::ExceptionAddress");
 static_assert(offsetof(EHExceptionRecord, NumberParameters) == 0x18, "EHExceptionRecord::NumberParameters");
 static_assert(offsetof(EHExceptionRecord, params) == 0x20, "EHExceptionRecord::params");
+static_assert(sizeof(EHExceptionRecord::EHParameters) == 0x20, "sizeof EHExceptionRecord::EHParameters");
+static_assert(offsetof(EHExceptionRecord::EHParameters, magicNumber) == 0x0, "EHExceptionRecord::EHParameters::magicNumber");
+static_assert(offsetof(EHExceptionRecord::EHParameters, pExceptionObject) == 0x8, "EHExceptionRecord::EHParameters::pExceptionObject");
+static_assert(offsetof(EHExceptionRecord::EHParameters, pThrowInfo) == 0x10, "EHExceptionRecord::EHParameters::pThrowInfo");
+static_assert(offsetof(EHExceptionRecord::EHParameters, pThrowImageBase) == 0x18, "EHExceptionRecord::EHParameters::pThrowImageBase");
 
 struct FSE_CState_t {
 public:
@@ -2183,41 +2594,47 @@ static_assert(sizeof(FSE_symbolCompressionTransform) == 0x8, "sizeof FSE_symbolC
 static_assert(offsetof(FSE_symbolCompressionTransform, deltaFindState) == 0x0, "FSE_symbolCompressionTransform::deltaFindState");
 static_assert(offsetof(FSE_symbolCompressionTransform, deltaNbBits) == 0x4, "FSE_symbolCompressionTransform::deltaNbBits");
 
+struct _FILETIME {
+public:
+    unsigned long dwLowDateTime;
+    unsigned long dwHighDateTime;
+};
+static_assert(sizeof(_FILETIME) == 0x8, "sizeof _FILETIME");
+static_assert(offsetof(_FILETIME, dwLowDateTime) == 0x0, "_FILETIME::dwLowDateTime");
+static_assert(offsetof(_FILETIME, dwHighDateTime) == 0x4, "_FILETIME::dwHighDateTime");
+
 union FT {
 public:
     unsigned long long ft_scalar;
-    alignas(4) unsigned char ft_struct[0x8];  // ❓ PDB type 0x10CD: _FILETIME
+    _FILETIME ft_struct;
 };
 static_assert(sizeof(FT) == 0x8, "sizeof FT");
-
-class PacketSplitter {
-public:
-    virtual bool AddBuffer(void *, void *) = 0;  // slot 0
-    virtual bool Finalize(void *) = 0;  // slot 1
-    virtual void Clear() = 0;  // slot 2
-};
-static_assert(sizeof(PacketSplitter) == 0x8, "sizeof PacketSplitter");
-
-class FragmentPacketSplitter : public PacketSplitter {
-public:
-    virtual bool AddBuffer(void *, void *);
-    virtual bool Finalize(void *);
-    virtual void Clear();
-    short Command;
-    int * TotalSize;
-    int * CurSize;
-};
-static_assert(sizeof(FragmentPacketSplitter) == 0x20, "sizeof FragmentPacketSplitter");
-static_assert(offsetof(FragmentPacketSplitter, Command) == 0x8, "FragmentPacketSplitter::Command");
-static_assert(offsetof(FragmentPacketSplitter, TotalSize) == 0x10, "FragmentPacketSplitter::TotalSize");
-static_assert(offsetof(FragmentPacketSplitter, CurSize) == 0x18, "FragmentPacketSplitter::CurSize");
+static_assert(offsetof(FT, ft_scalar) == 0x0, "FT::ft_scalar");
+static_assert(offsetof(FT, ft_struct) == 0x0, "FT::ft_struct");
 
 class Packet {
 public:
+    struct Header;
+    struct VarData;
+    struct VarStr;
+    struct Header {
+    public:
+        short size;
+    };
+    struct VarData {
+    public:
+        short * size;
+        char * buffer;
+    };
+    struct VarStr {
+    public:
+        short * len;
+        wchar_t * str;
+    };
     PacketSplitter * Splitter;
     bool IsFragmentPacket;
     int FragmentPacketCmd;
-    void * CurHeader;
+    Packet::Header * CurHeader;
     PacketBuffer * ListHead;
     PacketBuffer * ListTail;
 };
@@ -2228,6 +2645,36 @@ static_assert(offsetof(Packet, FragmentPacketCmd) == 0xC, "Packet::FragmentPacke
 static_assert(offsetof(Packet, CurHeader) == 0x10, "Packet::CurHeader");
 static_assert(offsetof(Packet, ListHead) == 0x18, "Packet::ListHead");
 static_assert(offsetof(Packet, ListTail) == 0x20, "Packet::ListTail");
+static_assert(sizeof(Packet::Header) == 0x2, "sizeof Packet::Header");
+static_assert(offsetof(Packet::Header, size) == 0x0, "Packet::Header::size");
+static_assert(sizeof(Packet::VarData) == 0x10, "sizeof Packet::VarData");
+static_assert(offsetof(Packet::VarData, size) == 0x0, "Packet::VarData::size");
+static_assert(offsetof(Packet::VarData, buffer) == 0x8, "Packet::VarData::buffer");
+static_assert(sizeof(Packet::VarStr) == 0x10, "sizeof Packet::VarStr");
+static_assert(offsetof(Packet::VarStr, len) == 0x0, "Packet::VarStr::len");
+static_assert(offsetof(Packet::VarStr, str) == 0x8, "Packet::VarStr::str");
+
+class PacketSplitter {
+public:
+    virtual bool AddBuffer(Packet::Header const *, Packet::Header *) = 0;  // slot 0
+    virtual bool Finalize(Packet::Header const *) = 0;  // slot 1
+    virtual void Clear() = 0;  // slot 2
+};
+static_assert(sizeof(PacketSplitter) == 0x8, "sizeof PacketSplitter");
+
+class FragmentPacketSplitter : public PacketSplitter {
+public:
+    virtual bool AddBuffer(Packet::Header const *, Packet::Header *);
+    virtual bool Finalize(Packet::Header const *);
+    virtual void Clear();
+    short Command;
+    int * TotalSize;
+    int * CurSize;
+};
+static_assert(sizeof(FragmentPacketSplitter) == 0x20, "sizeof FragmentPacketSplitter");
+static_assert(offsetof(FragmentPacketSplitter, Command) == 0x8, "FragmentPacketSplitter::Command");
+static_assert(offsetof(FragmentPacketSplitter, TotalSize) == 0x10, "FragmentPacketSplitter::TotalSize");
+static_assert(offsetof(FragmentPacketSplitter, CurSize) == 0x18, "FragmentPacketSplitter::CurSize");
 
 class PacketFormatIterator {
 public:
@@ -2255,6 +2702,14 @@ static_assert(sizeof(PacketComposer) == 0x18, "sizeof PacketComposer");
 
 class RepeatPacketComposer : public PacketComposer {
 public:
+    struct SubPacketInfo;
+    struct SubPacketInfo {
+    public:
+        unsigned char * size;
+        char const * startPos;
+        char const * format;
+        int index;
+    };
     virtual void Reset();
     virtual void Forward(int);
     virtual void Rewind(int);
@@ -2264,7 +2719,7 @@ public:
     short * counts[3];
     int start[3];
     int top;
-    alignas(8) unsigned char sub[0x60];  // ❓ PDB type 0x11EF: leaf 0x1503
+    RepeatPacketComposer::SubPacketInfo sub[3];
     int subTop;
 };
 static_assert(sizeof(RepeatPacketComposer) == 0xA8, "sizeof RepeatPacketComposer");
@@ -2273,6 +2728,11 @@ static_assert(offsetof(RepeatPacketComposer, start) == 0x30, "RepeatPacketCompos
 static_assert(offsetof(RepeatPacketComposer, top) == 0x3C, "RepeatPacketComposer::top");
 static_assert(offsetof(RepeatPacketComposer, sub) == 0x40, "RepeatPacketComposer::sub");
 static_assert(offsetof(RepeatPacketComposer, subTop) == 0xA0, "RepeatPacketComposer::subTop");
+static_assert(sizeof(RepeatPacketComposer::SubPacketInfo) == 0x20, "sizeof RepeatPacketComposer::SubPacketInfo");
+static_assert(offsetof(RepeatPacketComposer::SubPacketInfo, size) == 0x0, "RepeatPacketComposer::SubPacketInfo::size");
+static_assert(offsetof(RepeatPacketComposer::SubPacketInfo, startPos) == 0x8, "RepeatPacketComposer::SubPacketInfo::startPos");
+static_assert(offsetof(RepeatPacketComposer::SubPacketInfo, format) == 0x10, "RepeatPacketComposer::SubPacketInfo::format");
+static_assert(offsetof(RepeatPacketComposer::SubPacketInfo, index) == 0x18, "RepeatPacketComposer::SubPacketInfo::index");
 
 class FragmentPacket {
 public:
@@ -2318,6 +2778,18 @@ static_assert(offsetof(RepeatPacketDecomposer, top) == 0x34, "RepeatPacketDecomp
 
 class PacketConcatenateBuffer : public PacketConcatenater {
 public:
+    struct VarData;
+    struct VarStr;
+    struct VarData {
+    public:
+        short * size;
+        char * buffer;
+    };
+    struct VarStr {
+    public:
+        short * len;
+        wchar_t * str;
+    };
     virtual ~PacketConcatenateBuffer();  // slot 4
     virtual short check(char const *, short) = 0;  // slot 5
     virtual bool copy(PacketConcatenateBuffer *);  // slot 6
@@ -2334,6 +2806,12 @@ static_assert(offsetof(PacketConcatenateBuffer, size) == 0x10, "PacketConcatenat
 static_assert(offsetof(PacketConcatenateBuffer, gbuffer) == 0x18, "PacketConcatenateBuffer::gbuffer");
 static_assert(offsetof(PacketConcatenateBuffer, gbufsize) == 0x20, "PacketConcatenateBuffer::gbufsize");
 static_assert(offsetof(PacketConcatenateBuffer, decomposer) == 0x28, "PacketConcatenateBuffer::decomposer");
+static_assert(sizeof(PacketConcatenateBuffer::VarData) == 0x10, "sizeof PacketConcatenateBuffer::VarData");
+static_assert(offsetof(PacketConcatenateBuffer::VarData, size) == 0x0, "PacketConcatenateBuffer::VarData::size");
+static_assert(offsetof(PacketConcatenateBuffer::VarData, buffer) == 0x8, "PacketConcatenateBuffer::VarData::buffer");
+static_assert(sizeof(PacketConcatenateBuffer::VarStr) == 0x10, "sizeof PacketConcatenateBuffer::VarStr");
+static_assert(offsetof(PacketConcatenateBuffer::VarStr, len) == 0x0, "PacketConcatenateBuffer::VarStr::len");
+static_assert(offsetof(PacketConcatenateBuffer::VarStr, str) == 0x8, "PacketConcatenateBuffer::VarStr::str");
 
 class FragmentPacketConcatenater : public PacketConcatenateBuffer {
 public:
@@ -2372,6 +2850,11 @@ static_assert(offsetof(GateKeyEntry, _session) == 0x8, "GateKeyEntry::_session")
 
 class GateKeyManager {
 public:
+    enum EERR : int {
+        ERR_SUCCESS = 0x0,
+        ERR_UNKNOWN = 0x1,
+        ERR_DUPLICATED = 0x2,
+    };
     std::map<long long, GateKeyEntry *> * _gkMap;
     CriticalSection * _gkLock;
     std::map<long long, long long> * _sgkMap;
@@ -2477,10 +2960,26 @@ static_assert(offsetof(GradeLevelInfo, minLevelScore) == 0x8, "GradeLevelInfo::m
 static_assert(offsetof(GradeLevelInfo, maxLevelScore) == 0xC, "GradeLevelInfo::maxLevelScore");
 static_assert(offsetof(GradeLevelInfo, maxGradeScore) == 0x10, "GradeLevelInfo::maxGradeScore");
 
+class Memory {
+public:
+    enum MgrType : int {
+        MMGR_DEFAULT = 0x0,
+        MMGR_DEBUG = 0x1,
+        MMGR_MAX = 0x2,
+    };
+    enum Section : int {
+        INIT = 0x0,
+        STATIC = 0x1,
+        DYNAMIC = 0x2,
+        MEMSEC_MAX = 0x3,
+    };
+};
+static_assert(sizeof(Memory) == 0x1, "sizeof Memory");
+
 class GrowingBuffer {
 public:
     virtual ~GrowingBuffer();  // slot 0
-    int _sec;
+    Memory::Section _sec;
     unsigned long long _initSize;
     unsigned long long _size;
     unsigned long long _count;
@@ -2542,7 +3041,7 @@ static_assert(offsetof(HWND__, unused) == 0x0, "HWND__::unused");
 
 struct IUnknown {
 public:
-    virtual long QueryInterface(void *, void * *) = 0;  // slot 0
+    virtual long QueryInterface(_GUID const &, void * *) = 0;  // slot 0
     virtual unsigned long AddRef() = 0;  // slot 1
     virtual unsigned long Release() = 0;  // slot 2
 };
@@ -2552,8 +3051,8 @@ struct IDispatch : public IUnknown {
 public:
     virtual long GetTypeInfoCount(unsigned int *) = 0;  // slot 3
     virtual long GetTypeInfo(unsigned int, unsigned long, ITypeInfo * *) = 0;  // slot 4
-    virtual long GetIDsOfNames(void *, wchar_t * *, unsigned int, unsigned long, long *) = 0;  // slot 5
-    virtual long Invoke(long, void *, unsigned long, unsigned short, void *, void *, void *, unsigned int *) = 0;  // slot 6
+    virtual long GetIDsOfNames(_GUID const &, wchar_t * *, unsigned int, unsigned long, long *) = 0;  // slot 5
+    virtual long Invoke(long, _GUID const &, unsigned long, unsigned short, void *, void *, void *, unsigned int *) = 0;  // slot 6
 };
 static_assert(sizeof(IDispatch) == 0x8, "sizeof IDispatch");
 
@@ -2571,7 +3070,7 @@ public:
     virtual long RecordInit(void *) = 0;  // slot 3
     virtual long RecordClear(void *) = 0;  // slot 4
     virtual long RecordCopy(void *, void *) = 0;  // slot 5
-    virtual long GetGuid(void *) = 0;  // slot 6
+    virtual long GetGuid(_GUID *) = 0;  // slot 6
     virtual long GetName(wchar_t * *) = 0;  // slot 7
     virtual long GetSize(unsigned long *) = 0;  // slot 8
     virtual long GetTypeInfo(ITypeInfo * *) = 0;  // slot 9
@@ -2600,15 +3099,15 @@ public:
     virtual long OpenStream(wchar_t const *, void *, unsigned long, unsigned long, IStream * *) = 0;  // slot 4
     virtual long CreateStorage(wchar_t const *, unsigned long, unsigned long, unsigned long, IStorage * *) = 0;  // slot 5
     virtual long OpenStorage(wchar_t const *, IStorage *, unsigned long, wchar_t * *, unsigned long, IStorage * *) = 0;  // slot 6
-    virtual long CopyTo(unsigned long, void *, wchar_t * *, IStorage *) = 0;  // slot 7
+    virtual long CopyTo(unsigned long, _GUID const *, wchar_t * *, IStorage *) = 0;  // slot 7
     virtual long MoveElementTo(wchar_t const *, IStorage *, wchar_t const *, unsigned long) = 0;  // slot 8
     virtual long Commit(unsigned long) = 0;  // slot 9
     virtual long Revert() = 0;  // slot 10
     virtual long EnumElements(unsigned long, void *, unsigned long, IEnumSTATSTG * *) = 0;  // slot 11
     virtual long DestroyElement(wchar_t const *) = 0;  // slot 12
     virtual long RenameElement(wchar_t const *, wchar_t const *) = 0;  // slot 13
-    virtual long SetElementTimes(wchar_t const *, void *, void *, void *) = 0;  // slot 14
-    virtual long SetClass(void *) = 0;  // slot 15
+    virtual long SetElementTimes(wchar_t const *, _FILETIME const *, _FILETIME const *, _FILETIME const *) = 0;  // slot 14
+    virtual long SetClass(_GUID const &) = 0;  // slot 15
     virtual long SetStateBits(unsigned long, unsigned long) = 0;  // slot 16
     virtual long Stat(void *, unsigned long) = 0;  // slot 17
 };
@@ -2616,13 +3115,13 @@ static_assert(sizeof(IStorage) == 0x8, "sizeof IStorage");
 
 struct IStream : public ISequentialStream {
 public:
-    virtual long Seek(void *, unsigned long, void *) = 0;  // slot 5
-    virtual long SetSize(void *) = 0;  // slot 6
-    virtual long CopyTo(IStream *, void *, void *, void *) = 0;  // slot 7
+    virtual long Seek(_LARGE_INTEGER, unsigned long, _ULARGE_INTEGER *) = 0;  // slot 5
+    virtual long SetSize(_ULARGE_INTEGER) = 0;  // slot 6
+    virtual long CopyTo(IStream *, _ULARGE_INTEGER, _ULARGE_INTEGER *, _ULARGE_INTEGER *) = 0;  // slot 7
     virtual long Commit(unsigned long) = 0;  // slot 8
     virtual long Revert() = 0;  // slot 9
-    virtual long LockRegion(void *, void *, unsigned long) = 0;  // slot 10
-    virtual long UnlockRegion(void *, void *, unsigned long) = 0;  // slot 11
+    virtual long LockRegion(_ULARGE_INTEGER, _ULARGE_INTEGER, unsigned long) = 0;  // slot 10
+    virtual long UnlockRegion(_ULARGE_INTEGER, _ULARGE_INTEGER, unsigned long) = 0;  // slot 11
     virtual long Stat(void *, unsigned long) = 0;  // slot 12
     virtual long Clone(IStream * *) = 0;  // slot 13
 };
@@ -2650,7 +3149,7 @@ public:
     virtual long GetDllEntry(long, int, wchar_t * *, wchar_t * *, unsigned short *) = 0;  // slot 13
     virtual long GetRefTypeInfo(unsigned long, ITypeInfo * *) = 0;  // slot 14
     virtual long AddressOfMember(long, int, void * *) = 0;  // slot 15
-    virtual long CreateInstance(IUnknown *, void *, void * *) = 0;  // slot 16
+    virtual long CreateInstance(IUnknown *, _GUID const &, void * *) = 0;  // slot 16
     virtual long GetMops(long, wchar_t * *) = 0;  // slot 17
     virtual long GetContainingTypeLib(ITypeLib * *, unsigned int *) = 0;  // slot 18
     virtual void ReleaseTypeAttr(void *) = 0;  // slot 19
@@ -2664,7 +3163,7 @@ public:
     virtual unsigned int GetTypeInfoCount() = 0;  // slot 3
     virtual long GetTypeInfo(unsigned int, ITypeInfo * *) = 0;  // slot 4
     virtual long GetTypeInfoType(unsigned int, int *) = 0;  // slot 5
-    virtual long GetTypeInfoOfGuid(void *, ITypeInfo * *) = 0;  // slot 6
+    virtual long GetTypeInfoOfGuid(_GUID const &, ITypeInfo * *) = 0;  // slot 6
     virtual long GetLibAttr(void * *) = 0;  // slot 7
     virtual long GetTypeComp(ITypeComp * *) = 0;  // slot 8
     virtual long GetDocumentation(int, wchar_t * *, wchar_t * *, unsigned long *, wchar_t * *) = 0;  // slot 9
@@ -2676,6 +3175,16 @@ static_assert(sizeof(ITypeLib) == 0x8, "sizeof ITypeLib");
 
 class IdleStateTable {
 public:
+    union Pos;
+    union Pos {
+    public:
+        long long pos;
+        struct {
+            short port;
+            short bit;
+            int index;
+        };
+    };
     Port * _port;
     long _maxIdleTime;
     bool _disconnect;
@@ -2688,6 +3197,11 @@ static_assert(offsetof(IdleStateTable, _maxIdleTime) == 0x8, "IdleStateTable::_m
 static_assert(offsetof(IdleStateTable, _disconnect) == 0xC, "IdleStateTable::_disconnect");
 static_assert(offsetof(IdleStateTable, _size) == 0x10, "IdleStateTable::_size");
 static_assert(offsetof(IdleStateTable, _table) == 0x18, "IdleStateTable::_table");
+static_assert(sizeof(IdleStateTable::Pos) == 0x8, "sizeof IdleStateTable::Pos");
+static_assert(offsetof(IdleStateTable::Pos, pos) == 0x0, "IdleStateTable::Pos::pos");
+static_assert(offsetof(IdleStateTable::Pos, port) == 0x0, "IdleStateTable::Pos::port");
+static_assert(offsetof(IdleStateTable::Pos, bit) == 0x2, "IdleStateTable::Pos::bit");
+static_assert(offsetof(IdleStateTable::Pos, index) == 0x4, "IdleStateTable::Pos::index");
 
 class IdleWatcher : public Thread {
 public:
@@ -2735,6 +3249,10 @@ static_assert(offsetof(LIST_ENTRY64, Blink) == 0x8, "LIST_ENTRY64::Blink");
 
 class LobbyD : public Channel {
 public:
+    enum State : int {
+        STATE_SERVICE_NOT_AVAILABLE = 0x0,
+        STATE_SERVICE_AVAILABLE = 0x1,
+    };
     virtual ~LobbyD();
     virtual unsigned long long GetId();
     int _state;
@@ -2809,6 +3327,12 @@ static_assert(offsetof(LobbyGate, _restoreReloadTimer) == 0x7A8, "LobbyGate::_re
 
 class LobbyGateConfig {
 public:
+    enum DumpType : int {
+        DUMP_NONE = 0x0,
+        DUMP_MINIMAL = 0x1,
+        DUMP_FULL = 0x2,
+        DUMP_MAX = 0x3,
+    };
     wchar_t * _rootPath;
     wchar_t * _logPath;
     wchar_t * _configPath;
@@ -2878,6 +3402,12 @@ static_assert(offsetof(LobbyGateCooldownTimer, _disconnectStarted) == 0x40, "Lob
 
 class LobbyGateReloadInvalidRestoreTimer : public Timer {
 public:
+    enum ReloadInvalidReason : int {
+        RELOAD_INVALID_REASON_DAEMON_CONFIG_RELOAD_FAILED = 0x0,
+        RELOAD_INVALID_REASON_CONTENTS_RULE_CONFIG_RELOAD_FAILED = 0x1,
+        RELOAD_INVALID_REASON_BNS_COMMON_CONFIG_RELOAD_FAILED = 0x2,
+        RELOAD_INVALID_REASON_MAX = 0x3,
+    };
     virtual unsigned int TimerClass() const;
     virtual unsigned long long TimerId() const;
     virtual unsigned int EventId() const;
@@ -2903,39 +3433,44 @@ static_assert(offsetof(LobbyServiceItem, labelId) == 0x10, "LobbyServiceItem::la
 static_assert(offsetof(LobbyServiceItem, dataId) == 0x18, "LobbyServiceItem::dataId");
 static_assert(offsetof(LobbyServiceItem, state) == 0x1C, "LobbyServiceItem::state");
 
-class Log : public Thread {
+struct _SYSTEMTIME {
 public:
-    virtual ~Log();
-    virtual wchar_t const * Name();
-    virtual void run();
-    bool open;
-    bool flush;
-    SystemEvent notifyEvent;
-    LogMedia * media[8];
-    int mediaCount;
-    LogMedia * mediaList[11];
-    int mediaCountPerList[11];
+    unsigned short wYear;
+    unsigned short wMonth;
+    unsigned short wDayOfWeek;
+    unsigned short wDay;
+    unsigned short wHour;
+    unsigned short wMinute;
+    unsigned short wSecond;
+    unsigned short wMilliseconds;
 };
-static_assert(sizeof(Log) == 0x110, "sizeof Log");
-static_assert(offsetof(Log, open) == 0x30, "Log::open");
-static_assert(offsetof(Log, flush) == 0x31, "Log::flush");
-static_assert(offsetof(Log, notifyEvent) == 0x38, "Log::notifyEvent");
-static_assert(offsetof(Log, media) == 0x40, "Log::media");
-static_assert(offsetof(Log, mediaCount) == 0x80, "Log::mediaCount");
-static_assert(offsetof(Log, mediaList) == 0x88, "Log::mediaList");
-static_assert(offsetof(Log, mediaCountPerList) == 0xE0, "Log::mediaCountPerList");
+static_assert(sizeof(_SYSTEMTIME) == 0x10, "sizeof _SYSTEMTIME");
+static_assert(offsetof(_SYSTEMTIME, wYear) == 0x0, "_SYSTEMTIME::wYear");
+static_assert(offsetof(_SYSTEMTIME, wMonth) == 0x2, "_SYSTEMTIME::wMonth");
+static_assert(offsetof(_SYSTEMTIME, wDayOfWeek) == 0x4, "_SYSTEMTIME::wDayOfWeek");
+static_assert(offsetof(_SYSTEMTIME, wDay) == 0x6, "_SYSTEMTIME::wDay");
+static_assert(offsetof(_SYSTEMTIME, wHour) == 0x8, "_SYSTEMTIME::wHour");
+static_assert(offsetof(_SYSTEMTIME, wMinute) == 0xA, "_SYSTEMTIME::wMinute");
+static_assert(offsetof(_SYSTEMTIME, wSecond) == 0xC, "_SYSTEMTIME::wSecond");
+static_assert(offsetof(_SYSTEMTIME, wMilliseconds) == 0xE, "_SYSTEMTIME::wMilliseconds");
 
 class LogBuffer : public RefCntObject, public ConsoleLog {
 public:
+    class Iterator;
+    class Iterator {
+    public:
+        LogMedia const * _media;
+        LogBuffer const * _logbuf;
+    };
     virtual ~LogBuffer();
     virtual void deallocate_me(void *, wchar_t const *, int);
-    virtual int GetType() const;
+    virtual ConsoleLog::Type GetType() const;
     virtual bool Acquire();
     virtual void Release();
     virtual bool GetLog(wchar_t *, unsigned long long) const;
     LogBuffer * _next[8];
-    alignas(2) unsigned char _logtime[0x10];  // ❓ PDB type 0x2600: _SYSTEMTIME
-    int _type;
+    _SYSTEMTIME _logtime;
+    Log::Type _type;
     wchar_t const * _file;
     int _line;
     bool _flush;
@@ -2949,10 +3484,12 @@ static_assert(offsetof(LogBuffer, _file) == 0x78, "LogBuffer::_file");
 static_assert(offsetof(LogBuffer, _line) == 0x80, "LogBuffer::_line");
 static_assert(offsetof(LogBuffer, _flush) == 0x84, "LogBuffer::_flush");
 static_assert(offsetof(LogBuffer, _log) == 0x86, "LogBuffer::_log");
+static_assert(sizeof(LogBuffer::Iterator) == 0x10, "sizeof LogBuffer::Iterator");
+static_assert(offsetof(LogBuffer::Iterator, _media) == 0x0, "LogBuffer::Iterator::_media");
+static_assert(offsetof(LogBuffer::Iterator, _logbuf) == 0x8, "LogBuffer::Iterator::_logbuf");
 
 class LogBufferAllocator {
 public:
-    char _pdb_tail[0x1];
 };
 static_assert(sizeof(LogBufferAllocator) == 0x1, "sizeof LogBufferAllocator");
 
@@ -2968,7 +3505,7 @@ static_assert(offsetof(LogBufferPool, _pool) == 0x8, "LogBufferPool::_pool");
 class LogFile : public LogMedia {
 public:
     virtual ~LogFile();
-    virtual int GetType() const;
+    virtual LogMedia::Type GetType() const;
     virtual void Flush();
     virtual wchar_t * GetLastFileName();
     virtual void write(LogBuffer const *);
@@ -3001,16 +3538,10 @@ static_assert(offsetof(LogFile, _lastFileName) == 0x2F8, "LogFile::_lastFileName
 
 class LogFgtFile : public LogFile {
 public:
-    virtual int GetType() const;
+    virtual LogMedia::Type GetType() const;
     virtual ~LogFgtFile();
 };
 static_assert(sizeof(LogFgtFile) == 0x500, "sizeof LogFgtFile");
-
-class Memory {
-public:
-    char _pdb_tail[0x1];
-};
-static_assert(sizeof(Memory) == 0x1, "sizeof Memory");
 
 struct ModuleInfo {
 public:
@@ -3025,6 +3556,22 @@ static_assert(offsetof(ModuleInfo, offset) == 0x108, "ModuleInfo::offset");
 
 class Network {
 public:
+    enum Const : int {
+        INVALID_PORT_ID = 0x0,
+        CLIENT_PORT_ID = 0x1,
+        MAX_PORT_ID = 0x18,
+        MAX_SESSION = 0x8000,
+        DEFAULT_INTERNAL_MAX_SESSION = 0x10,
+        DEFAULT_PUBLIC_MAX_SESSION = 0x2710,
+        USE_DEFAULT_MAX_SESSION = 0x0,
+        LOOPBACK_ADDRESS = 0x100007F,
+    };
+    enum Ports : int {
+        PUBLIC_CRYPT_PORT = 0x0,
+        PUBLIC_NOCRYPT_PORT = 0x1,
+        INTERNAL_PORT = 0x2,
+        MANAGE_PORT = 0x3,
+    };
     unsigned int _workerThreadCount;
     IoWorker * * _workerThreads;
     Port * _port[24];
@@ -3063,7 +3610,6 @@ static_assert(offsetof(PacketBuffer, Next) == 0xFD0, "PacketBuffer::Next");
 
 class PacketBufferAllocator {
 public:
-    char _pdb_tail[0x1];
 };
 static_assert(sizeof(PacketBufferAllocator) == 0x1, "sizeof PacketBufferAllocator");
 
@@ -3091,15 +3637,87 @@ static_assert(sizeof(PacketConcatenateHandler) == 0x8, "sizeof PacketConcatenate
 
 class PacketCrypt {
 public:
+    union Header;
+    enum Algorithm : int {
+        ALGORITHM_DEFAULT = 0x0,
+        ALGORITHM_TYPE1 = 0x1,
+        ALGORITHM_TYPE2 = 0x2,
+        ALGORITHM_TYPE3 = 0x3,
+        ALGORITHM_TYPE4 = 0x4,
+    };
+    enum Code : int {
+        NONE = 0x0,
+        INITIAL_KEY = 0x4,
+        CLI_HANDSHAKE_KEY = 0x5,
+        SESSION_KEY_1 = 0x8,
+        SESSION_KEY_2 = 0x9,
+        SESSION_KEY_1_AND_3RD_PARTY = 0xA,
+        SESSION_KEY_2_AND_3RD_PARTY = 0xB,
+        BROADCAST_LOCAL_KEY = 0xC,
+        BROADCAST_LOCAL_KEY_COMPRESS = 0xD,
+        BROADCAST_GLOBAL_KEY = 0xE,
+    };
+    enum CompressType : int {
+        COMPRESS_NONE = 0x0,
+        COMPRESS_TYPE1 = 0x1,
+        COMPRESS_TYPE2 = 0x2,
+    };
+    enum ErrCode : int {
+        SPCE_NO_ERROR = 0x0,
+        UNKOWN_ERROR = 0x1,
+        NO_RESULT = 0x2,
+        NOT_INITIALIZED = 0x3,
+        ALREADY_INITIALIZED = 0x4,
+        INVALID_PARAM = 0x5,
+        FAILED_SETUP_CRYPTO = 0x6,
+        FAILED_INVALID_CODE = 0x7,
+        FAILED_TOO_LARGE_PACKET = 0x8,
+        FAILED_INSUFFIENT_BUFFER = 0x9,
+        FAILED_NOT_COMPLETE_PACKET = 0xA,
+        FAILED_KEYGEN = 0xB,
+        FAILED_ENCRYPT = 0xC,
+        FAILED_DECRYPT = 0xD,
+        ALREADY_CHANGE_KEY = 0xE,
+        FAILED_SET_EXT_COMP_FUNC = 0xF,
+        FAILED_COMP = 0x10,
+    };
+    enum Param : int {
+        PARAM_NONE = 0x0,
+        PARAM_HANDSHAKE_FAIL = 0x1,
+        PARAM_BROADCAST_LOCAL = 0x2,
+        PARAM_BROADCAST_GLOBAL = 0x3,
+        PARAM_BROADCAST_LOCAL_COMPRESS = 0x4,
+    };
+    enum Type : int {
+        NO_CRYPT = 0x0,
+        NO_HANDSHAKE_CRYPT = 0x1,
+        HANDSHAKE_CRYPT = 0x2,
+        SESSION_CRYPT = 0x3,
+        BROADCAST_CRYPT = 0x4,
+    };
+    union Header {
+    public:
+        struct {
+            unsigned short size : 12;
+            unsigned short code : 4;
+        } enc;
+        struct {
+            unsigned short size : 14;
+            unsigned short code : 2;
+        } plain;
+    };
     virtual int GetType() = 0;  // slot 0
-    virtual int SetEncryptParam(int) = 0;  // slot 1
-    virtual int SetKey(unsigned char const *, int) = 0;  // slot 2
-    virtual int GenerateKey(unsigned char *, int *, unsigned char *, int *) = 0;  // slot 3
-    virtual int Encrypt(unsigned char *, int *, int, bool) = 0;  // slot 4
-    virtual int Decrypt(unsigned char *, int, int *, bool *) = 0;  // slot 5
-    virtual int SetExternalCompressFunc(void *, unsigned char const *, int) = 0;  // slot 6
+    virtual PacketCrypt::ErrCode SetEncryptParam(PacketCrypt::Param) = 0;  // slot 1
+    virtual PacketCrypt::ErrCode SetKey(unsigned char const *, int) = 0;  // slot 2
+    virtual PacketCrypt::ErrCode GenerateKey(unsigned char *, int *, unsigned char *, int *) = 0;  // slot 3
+    virtual PacketCrypt::ErrCode Encrypt(unsigned char *, int *, int, bool) = 0;  // slot 4
+    virtual PacketCrypt::ErrCode Decrypt(unsigned char *, int, int *, bool *) = 0;  // slot 5
+    virtual PacketCrypt::ErrCode SetExternalCompressFunc(void *, unsigned char const *, int) = 0;  // slot 6
 };
 static_assert(sizeof(PacketCrypt) == 0x8, "sizeof PacketCrypt");
+static_assert(sizeof(PacketCrypt::Header) == 0x2, "sizeof PacketCrypt::Header");
+static_assert(offsetof(PacketCrypt::Header, enc) == 0x0, "PacketCrypt::Header::enc");
+static_assert(offsetof(PacketCrypt::Header, plain) == 0x0, "PacketCrypt::Header::plain");
 
 class PacketList {
 public:
@@ -3169,9 +3787,16 @@ public:
 static_assert(sizeof(PcCafeMileageFeverTimeScheduleList) == 0x110, "sizeof PcCafeMileageFeverTimeScheduleList");
 static_assert(offsetof(PcCafeMileageFeverTimeScheduleList, _fp) == 0x18, "PcCafeMileageFeverTimeScheduleList::_fp");
 
+struct _RTL_SRWLOCK {
+public:
+    void * Ptr;
+};
+static_assert(sizeof(_RTL_SRWLOCK) == 0x8, "sizeof _RTL_SRWLOCK");
+static_assert(offsetof(_RTL_SRWLOCK, Ptr) == 0x0, "_RTL_SRWLOCK::Ptr");
+
 class PcCafeMileageFeverTimeScheduleListManager {
 public:
-    alignas(8) unsigned char _srwLock[0x8];  // ❓ PDB type 0x10F6: _RTL_SRWLOCK
+    _RTL_SRWLOCK _srwLock;
     long long _mileageExpireTime;
     PcCafeMileageFeverTimeScheduleList * _scheduleList;
 };
@@ -3182,23 +3807,45 @@ static_assert(offsetof(PcCafeMileageFeverTimeScheduleListManager, _scheduleList)
 
 class PipeCommandProcess : public Thread {
 public:
+    struct Command;
+    struct CommandList;
+    struct Command {
+    public:
+        PipeCommandProcess::Command * _next;
+        PipeCommandProcess::Command * _prev;
+        wchar_t * * _argv;
+        int _argc;
+    };
+    struct CommandList {
+    public:
+        PipeCommandProcess::Command _head;
+        PipeCommandProcess::Command _tail;
+    };
     virtual ~PipeCommandProcess();
     virtual wchar_t const * Name();
     virtual void run();
     SystemEvent _notifyEvent;
     CriticalSection _lock;
-    alignas(8) unsigned char _remote[0x40];  // ❓ PDB type 0x33B9: PipeCommandProcess::CommandList
-    alignas(8) unsigned char _local[0x40];  // ❓ PDB type 0x33B9: PipeCommandProcess::CommandList
+    PipeCommandProcess::CommandList _remote;
+    PipeCommandProcess::CommandList _local;
 };
 static_assert(sizeof(PipeCommandProcess) == 0xE0, "sizeof PipeCommandProcess");
 static_assert(offsetof(PipeCommandProcess, _notifyEvent) == 0x30, "PipeCommandProcess::_notifyEvent");
 static_assert(offsetof(PipeCommandProcess, _lock) == 0x38, "PipeCommandProcess::_lock");
 static_assert(offsetof(PipeCommandProcess, _remote) == 0x60, "PipeCommandProcess::_remote");
 static_assert(offsetof(PipeCommandProcess, _local) == 0xA0, "PipeCommandProcess::_local");
+static_assert(sizeof(PipeCommandProcess::Command) == 0x20, "sizeof PipeCommandProcess::Command");
+static_assert(offsetof(PipeCommandProcess::Command, _next) == 0x0, "PipeCommandProcess::Command::_next");
+static_assert(offsetof(PipeCommandProcess::Command, _prev) == 0x8, "PipeCommandProcess::Command::_prev");
+static_assert(offsetof(PipeCommandProcess::Command, _argv) == 0x10, "PipeCommandProcess::Command::_argv");
+static_assert(offsetof(PipeCommandProcess::Command, _argc) == 0x18, "PipeCommandProcess::Command::_argc");
+static_assert(sizeof(PipeCommandProcess::CommandList) == 0x40, "sizeof PipeCommandProcess::CommandList");
+static_assert(offsetof(PipeCommandProcess::CommandList, _head) == 0x0, "PipeCommandProcess::CommandList::_head");
+static_assert(offsetof(PipeCommandProcess::CommandList, _tail) == 0x20, "PipeCommandProcess::CommandList::_tail");
 
 struct PipeInstance {
 public:
-    alignas(8) unsigned char oOverlap[0x20];  // ❓ PDB type 0x119E: _OVERLAPPED
+    _OVERLAPPED oOverlap;
     void * hPipeInst;
     unsigned long cbRead;
     unsigned long cbToWrite;
@@ -3219,13 +3866,32 @@ static_assert(offsetof(PipeInstance, chReply) == 0x2038, "PipeInstance::chReply"
 
 class PipeConsole : public Thread {
 public:
+    struct ItemList;
+    struct ItemNode;
+    enum PipeState : int {
+        STATE_CONNECTING = 0x0,
+        STATE_READING = 0x1,
+        STATE_WRITING = 0x2,
+    };
+    struct ItemNode {
+    public:
+        PipeConsole::ItemNode * _next;
+        PipeConsole::ItemNode * _prev;
+        wchar_t _key[129];
+        wchar_t _value[129];
+    };
+    struct ItemList {
+    public:
+        PipeConsole::ItemNode _head;
+        PipeConsole::ItemNode _tail;
+    };
     virtual ~PipeConsole();
     virtual wchar_t const * Name();
     virtual void run();
     CriticalSection _lock;
     int _state;
-    alignas(8) unsigned char _invalid[0x430];  // ❓ PDB type 0x3352: PipeConsole::ItemList
-    alignas(8) unsigned char _running[0x430];  // ❓ PDB type 0x3352: PipeConsole::ItemList
+    PipeConsole::ItemList _invalid;
+    PipeConsole::ItemList _running;
     bool _detectFrozenThread;
     int _crashIfExistFrozenThreadCount;
     PipeCommandProcess _commandProcess;
@@ -3242,6 +3908,14 @@ static_assert(offsetof(PipeConsole, _crashIfExistFrozenThreadCount) == 0x8C4, "P
 static_assert(offsetof(PipeConsole, _commandProcess) == 0x8C8, "PipeConsole::_commandProcess");
 static_assert(offsetof(PipeConsole, _pipe) == 0x9A8, "PipeConsole::_pipe");
 static_assert(offsetof(PipeConsole, _events) == 0x10A88, "PipeConsole::_events");
+static_assert(sizeof(PipeConsole::ItemNode) == 0x218, "sizeof PipeConsole::ItemNode");
+static_assert(offsetof(PipeConsole::ItemNode, _next) == 0x0, "PipeConsole::ItemNode::_next");
+static_assert(offsetof(PipeConsole::ItemNode, _prev) == 0x8, "PipeConsole::ItemNode::_prev");
+static_assert(offsetof(PipeConsole::ItemNode, _key) == 0x10, "PipeConsole::ItemNode::_key");
+static_assert(offsetof(PipeConsole::ItemNode, _value) == 0x112, "PipeConsole::ItemNode::_value");
+static_assert(sizeof(PipeConsole::ItemList) == 0x430, "sizeof PipeConsole::ItemList");
+static_assert(offsetof(PipeConsole::ItemList, _head) == 0x0, "PipeConsole::ItemList::_head");
+static_assert(offsetof(PipeConsole::ItemList, _tail) == 0x218, "PipeConsole::ItemList::_tail");
 
 class Port {
 public:
@@ -3284,17 +3958,38 @@ static_assert(offsetof(Port, _bufferHandler) == 0x78, "Port::_bufferHandler");
 
 class PortListener : public DynamicEventObject {
 public:
+    struct AcceptContext;
+    enum Const : int {
+        CONTEXT_COUNT = 0x80,
+        CONTEXT_BUFFER = 0x80,
+    };
+    struct AcceptContext : public EventContext {
+    public:
+        unsigned int _index;
+        unsigned long long _socket;
+        unsigned char _buffer[128];
+        unsigned long _recvdSize;
+        unsigned long _localAddrSize;
+        unsigned long _remoteAddrSize;
+    };
     virtual ~PortListener();
     virtual unsigned int EventId() const;
     virtual bool HandleEvent(EventContext *, unsigned long);
     Port * _portInstance;
     unsigned long long _socket;
-    alignas(8) unsigned char _context[0x6400];  // ❓ PDB type 0x35DC: leaf 0x1503
+    PortListener::AcceptContext _context[128];
 };
 static_assert(sizeof(PortListener) == 0x6428, "sizeof PortListener");
 static_assert(offsetof(PortListener, _portInstance) == 0x18, "PortListener::_portInstance");
 static_assert(offsetof(PortListener, _socket) == 0x20, "PortListener::_socket");
 static_assert(offsetof(PortListener, _context) == 0x28, "PortListener::_context");
+static_assert(sizeof(PortListener::AcceptContext) == 0xC8, "sizeof PortListener::AcceptContext");
+static_assert(offsetof(PortListener::AcceptContext, _index) == 0x28, "PortListener::AcceptContext::_index");
+static_assert(offsetof(PortListener::AcceptContext, _socket) == 0x30, "PortListener::AcceptContext::_socket");
+static_assert(offsetof(PortListener::AcceptContext, _buffer) == 0x38, "PortListener::AcceptContext::_buffer");
+static_assert(offsetof(PortListener::AcceptContext, _recvdSize) == 0xB8, "PortListener::AcceptContext::_recvdSize");
+static_assert(offsetof(PortListener::AcceptContext, _localAddrSize) == 0xBC, "PortListener::AcceptContext::_localAddrSize");
+static_assert(offsetof(PortListener::AcceptContext, _remoteAddrSize) == 0xC0, "PortListener::AcceptContext::_remoteAddrSize");
 
 class RawPacketBufferHandler : public PacketBufferHandler {
 public:
@@ -3323,6 +4018,11 @@ static_assert(offsetof(ReconnectTimer, _sessionId) == 0x38, "ReconnectTimer::_se
 
 class RefCntHistory {
 public:
+    enum Operation : int {
+        OP_NONE = 0x0,
+        OP_ADDREF = 0x1,
+        OP_DELREF = 0x2,
+    };
     long volatile _dumped;
     long volatile _historyPos;
     long _historyMax;
@@ -3355,26 +4055,59 @@ static_assert(offsetof(RefCntHistoryItem, _op) == 0x1E, "RefCntHistoryItem::_op"
 
 class RelationalRefCntObject : public RefCntObject {
 public:
+    struct ChildRole;
+    struct ParentRole;
+    struct ChildRole {
+    public:
+        RelationalRefCntObject * _prev;
+        RelationalRefCntObject * _next;
+        RelationalRefCntObject * _parent;
+    };
+    struct ParentRole {
+    public:
+        CriticalSection _lock;
+        RelationalRefCntObject * _objects;
+    };
     virtual MemoryManager * parentRoleAllocator();  // slot 4
     virtual MemoryManager * childRoleAllocator();  // slot 5
     virtual ~RelationalRefCntObject();
     virtual void deallocate_object(wchar_t const *, int);
-    void * _parentRole;
-    void * _childRole;
+    RelationalRefCntObject::ParentRole * _parentRole;
+    RelationalRefCntObject::ChildRole * _childRole;
 };
 static_assert(sizeof(RelationalRefCntObject) == 0x28, "sizeof RelationalRefCntObject");
 static_assert(offsetof(RelationalRefCntObject, _parentRole) == 0x18, "RelationalRefCntObject::_parentRole");
 static_assert(offsetof(RelationalRefCntObject, _childRole) == 0x20, "RelationalRefCntObject::_childRole");
+static_assert(sizeof(RelationalRefCntObject::ChildRole) == 0x18, "sizeof RelationalRefCntObject::ChildRole");
+static_assert(offsetof(RelationalRefCntObject::ChildRole, _prev) == 0x0, "RelationalRefCntObject::ChildRole::_prev");
+static_assert(offsetof(RelationalRefCntObject::ChildRole, _next) == 0x8, "RelationalRefCntObject::ChildRole::_next");
+static_assert(offsetof(RelationalRefCntObject::ChildRole, _parent) == 0x10, "RelationalRefCntObject::ChildRole::_parent");
+static_assert(sizeof(RelationalRefCntObject::ParentRole) == 0x30, "sizeof RelationalRefCntObject::ParentRole");
+static_assert(offsetof(RelationalRefCntObject::ParentRole, _lock) == 0x0, "RelationalRefCntObject::ParentRole::_lock");
+static_assert(offsetof(RelationalRefCntObject::ParentRole, _objects) == 0x28, "RelationalRefCntObject::ParentRole::_objects");
 
 class ReleaseEvent : public DynamicEventObject {
 public:
     virtual ~ReleaseEvent();
     virtual unsigned int EventId() const;
     virtual bool HandleEvent(EventContext *, unsigned long);
-    void * _head;
+    DelayedRelease::Node * _head;
 };
 static_assert(sizeof(ReleaseEvent) == 0x20, "sizeof ReleaseEvent");
 static_assert(offsetof(ReleaseEvent, _head) == 0x18, "ReleaseEvent::_head");
+
+struct SCOPE_ID {
+public:
+    union {
+        struct {
+            unsigned long Zone : 28;
+            unsigned long Level : 4;
+        };
+        unsigned long Value;
+    };
+};
+static_assert(sizeof(SCOPE_ID) == 0x4, "sizeof SCOPE_ID");
+static_assert(offsetof(SCOPE_ID, Value) == 0x0, "SCOPE_ID::Value");
 
 struct SC_HANDLE__ {
 public:
@@ -3392,9 +4125,15 @@ static_assert(offsetof(SERVICE_STATUS_HANDLE__, unused) == 0x0, "SERVICE_STATUS_
 
 class Security3rdParty {
 public:
+    enum ErrCode : int {
+        S3ERR_SUCCESS = 0x0,
+        S3ERR_FAILED = 0x1,
+        S3ERR_NO_NEED_ENCRYPT = 0x2,
+        S3ERR_INSUFFICIENT_BUFFER = 0x3,
+    };
     virtual ~Security3rdParty();  // slot 0
-    virtual int Encrypt(unsigned char *, int *, bool *) = 0;  // slot 1
-    virtual int Decrypt(unsigned char *, int *, bool) = 0;  // slot 2
+    virtual Security3rdParty::ErrCode Encrypt(unsigned char *, int *, bool *) = 0;  // slot 1
+    virtual Security3rdParty::ErrCode Decrypt(unsigned char *, int *, bool) = 0;  // slot 2
 };
 static_assert(sizeof(Security3rdParty) == 0x8, "sizeof Security3rdParty");
 
@@ -3403,7 +4142,7 @@ public:
     bool _external;
     unsigned int _size;
     unsigned int _count;
-    void * _wsaBuffer;
+    _WSABUF * _wsaBuffer;
     PacketBuffer * * _pbuffer;
     SendBufferList * _next;
 };
@@ -3496,6 +4235,27 @@ static_assert(offsetof(StaticPageMemoryManager, _additional) == 0x20, "StaticPag
 
 class Session : public EventObject {
 public:
+    enum Encryption : int {
+        ENC_INVALID = 0x0,
+        ENC_NONE = 0x1,
+        ENC_HS = 0x2,
+        ENC_HS_ACK = 0x3,
+        ENC_HS_FAIL = 0x4,
+        ENC_SESSION = 0x5,
+    };
+    enum Option : int {
+        ACCEPT = 0x0,
+        CONNECT = 0x1,
+        RECONNECT = 0x2,
+    };
+    enum State : int {
+        CLOSED = 0x0,
+        CLOSING = 0x1,
+        FORCE_CLOSING = 0x2,
+        CONNECTING = 0x3,
+        POSTPONE_CONNECTING = 0x4,
+        CONNECTED = 0x5,
+    };
     virtual ~Session();
     virtual unsigned int EventId() const;
     virtual bool HandleEvent(EventContext *, unsigned long);
@@ -3503,7 +4263,7 @@ public:
     CriticalSection _lock;
     Connection * _connection;
     SessionSendBuffer * _sendBuffer;
-    int _state;
+    Session::State _state;
     int _option;
     bool _recvPending;
     bool _sendPending;
@@ -3587,8 +4347,11 @@ static_assert(offsetof(SessionPool, _sessionQueue) == 0xA0, "SessionPool::_sessi
 
 class SessionRecvBuffer {
 public:
+    enum Const : int {
+        MAX_SIZE = 0xFA8,
+    };
     virtual ~SessionRecvBuffer();  // slot 0
-    alignas(8) unsigned char _context[0x40];  // ❓ PDB type 0x318B: AsyncRecvContext
+    AsyncRecvContext _context;
     unsigned int _recvdSize;
     char _buffer[4008];
 };
@@ -3599,8 +4362,12 @@ static_assert(offsetof(SessionRecvBuffer, _buffer) == 0x4C, "SessionRecvBuffer::
 
 class SessionSendBuffer {
 public:
+    enum Const : int {
+        SIZE_NOCHECK = -1,
+        DEFAULT_BUFFER_SIZE = 0x20,
+    };
     virtual ~SessionSendBuffer();  // slot 0
-    alignas(8) unsigned char _context[0x38];  // ❓ PDB type 0x311F: AsyncSendContext
+    AsyncSendContext _context;
     PacketBufferHandler * _bufferHandler;
     SendBufferList _bufferList[2];
     SendBufferList * _curSendingList;
@@ -3615,8 +4382,8 @@ static_assert(offsetof(SessionSendBuffer, _maxBufferCount) == 0xA0, "SessionSend
 
 class SimplePacketSplitter : public PacketSplitter {
 public:
-    virtual bool AddBuffer(void *, void *);
-    virtual bool Finalize(void *);
+    virtual bool AddBuffer(Packet::Header const *, Packet::Header *);
+    virtual bool Finalize(Packet::Header const *);
     virtual void Clear();
     short Command;
 };
@@ -3625,7 +4392,6 @@ static_assert(offsetof(SimplePacketSplitter, Command) == 0x8, "SimplePacketSplit
 
 class String {
 public:
-    char _pdb_tail[0x1];
 };
 static_assert(sizeof(String) == 0x1, "sizeof String");
 
@@ -3660,7 +4426,6 @@ static_assert(offsetof(SymbolFunctions, symMiniDumpWriteDump) == 0x58, "SymbolFu
 
 class SysInfo {
 public:
-    char _pdb_tail[0x1];
 };
 static_assert(sizeof(SysInfo) == 0x1, "sizeof SysInfo");
 
@@ -3687,7 +4452,7 @@ public:
     virtual bool controlHandler(unsigned long);
     virtual void setTitle(wchar_t const *);
     virtual void WriteStatusLog(wchar_t const *, void *);
-    virtual void Write(int, wchar_t const *, int, wchar_t const *, char *);
+    virtual void Write(Log::Type, wchar_t const *, int, wchar_t const *, char *);
     virtual void write(LogBuffer const *);
     void * stdoutHandle;
     unsigned short originalAttr;
@@ -3716,11 +4481,15 @@ static_assert(offsetof(TextStreamPacketBufferHandler, Buffer) == 0x10, "TextStre
 
 class ThreadFreePacketPumpEvent : public DynamicEventObject {
 public:
+    enum Type : int {
+        TYPE_PACKET = 0x0,
+        TYPE_FRAGMENT_PACKET = 0x1,
+    };
     virtual bool initialize(Session const *, void *);  // slot 6
     virtual ~ThreadFreePacketPumpEvent();
     virtual unsigned int EventId() const;
     unsigned int _eventId;
-    int _type;
+    ThreadFreePacketPumpEvent::Type _type;
     unsigned long long _key;
     Session const * _session;
     void * _handler;
@@ -3767,13 +4536,24 @@ static_assert(offsetof(ThreadManager, _now) == 0x18, "ThreadManager::_now");
 
 class TimerQueue {
 public:
+    struct GreaterBySlotIndex;
+    struct Slot;
+    struct GreaterBySlotIndex {
+    public:
+    };
+    struct Slot {
+    public:
+        int index;
+        Timer * head;
+        Timer * tail;
+    };
     virtual ~TimerQueue();  // slot 0
     long TimerInterval;
     SpinLock Lock;
     unsigned int StqSize;
-    void * StqSlot;
+    TimerQueue::Slot * StqSlot;
     unsigned int StqCurrent;
-    alignas(8) unsigned char LtQueue[0x28];  // ❓ PDB type 0x142D: std::priority_queue<Timer *,std::vector<Timer *,StlAllocator<Timer *,2> >,TimerQueue::GreaterBySlotIndex>
+    std::priority_queue<Timer *, std::vector<Timer *>, TimerQueue::GreaterBySlotIndex> LtQueue;
 };
 static_assert(sizeof(TimerQueue) == 0x78, "sizeof TimerQueue");
 static_assert(offsetof(TimerQueue, TimerInterval) == 0x8, "TimerQueue::TimerInterval");
@@ -3782,6 +4562,11 @@ static_assert(offsetof(TimerQueue, StqSize) == 0x38, "TimerQueue::StqSize");
 static_assert(offsetof(TimerQueue, StqSlot) == 0x40, "TimerQueue::StqSlot");
 static_assert(offsetof(TimerQueue, StqCurrent) == 0x48, "TimerQueue::StqCurrent");
 static_assert(offsetof(TimerQueue, LtQueue) == 0x50, "TimerQueue::LtQueue");
+static_assert(sizeof(TimerQueue::GreaterBySlotIndex) == 0x1, "sizeof TimerQueue::GreaterBySlotIndex");
+static_assert(sizeof(TimerQueue::Slot) == 0x18, "sizeof TimerQueue::Slot");
+static_assert(offsetof(TimerQueue::Slot, index) == 0x0, "TimerQueue::Slot::index");
+static_assert(offsetof(TimerQueue::Slot, head) == 0x8, "TimerQueue::Slot::head");
+static_assert(offsetof(TimerQueue::Slot, tail) == 0x10, "TimerQueue::Slot::tail");
 
 class TrustedPacketBufferHandler : public PacketBufferHandler {
 public:
@@ -3805,6 +4590,25 @@ public:
 static_assert(sizeof(WinMsgHandler) == 0x38, "sizeof WinMsgHandler");
 static_assert(offsetof(WinMsgHandler, _initEvent) == 0x30, "WinMsgHandler::_initEvent");
 
+struct _SERVICE_STATUS {
+public:
+    unsigned long dwServiceType;
+    unsigned long dwCurrentState;
+    unsigned long dwControlsAccepted;
+    unsigned long dwWin32ExitCode;
+    unsigned long dwServiceSpecificExitCode;
+    unsigned long dwCheckPoint;
+    unsigned long dwWaitHint;
+};
+static_assert(sizeof(_SERVICE_STATUS) == 0x1C, "sizeof _SERVICE_STATUS");
+static_assert(offsetof(_SERVICE_STATUS, dwServiceType) == 0x0, "_SERVICE_STATUS::dwServiceType");
+static_assert(offsetof(_SERVICE_STATUS, dwCurrentState) == 0x4, "_SERVICE_STATUS::dwCurrentState");
+static_assert(offsetof(_SERVICE_STATUS, dwControlsAccepted) == 0x8, "_SERVICE_STATUS::dwControlsAccepted");
+static_assert(offsetof(_SERVICE_STATUS, dwWin32ExitCode) == 0xC, "_SERVICE_STATUS::dwWin32ExitCode");
+static_assert(offsetof(_SERVICE_STATUS, dwServiceSpecificExitCode) == 0x10, "_SERVICE_STATUS::dwServiceSpecificExitCode");
+static_assert(offsetof(_SERVICE_STATUS, dwCheckPoint) == 0x14, "_SERVICE_STATUS::dwCheckPoint");
+static_assert(offsetof(_SERVICE_STATUS, dwWaitHint) == 0x18, "_SERVICE_STATUS::dwWaitHint");
+
 class WinServiceConsole : public Console {
 public:
     virtual ~WinServiceConsole();
@@ -3813,13 +4617,13 @@ public:
     virtual void SetState(int);
     virtual bool Writable();
     virtual void write(LogBuffer const *);
-    virtual void Write(int, wchar_t const *, int, wchar_t const *, char *);
+    virtual void Write(Log::Type, wchar_t const *, int, wchar_t const *, char *);
     virtual void WriteStartLog(int, wchar_t const *, void *);
     virtual bool controlHandler(unsigned long);
     virtual void WriteStatusLog(wchar_t const *, void *);
     unsigned long ErrorCode;
     unsigned long CheckPoint;
-    alignas(4) unsigned char Status[0x1C];  // ❓ PDB type 0x33F4: _SERVICE_STATUS
+    _SERVICE_STATUS Status;
     SERVICE_STATUS_HANDLE__ * Handle;
 };
 static_assert(sizeof(WinServiceConsole) == 0xE0, "sizeof WinServiceConsole");
@@ -3836,15 +4640,15 @@ public:
     virtual void SetState(int);
     virtual void WriteStartLog(int, wchar_t const *, void *);
     virtual void WriteStatusLog(wchar_t const *, void *);
-    virtual void Write(int, wchar_t const *, int, wchar_t const *, char *);
+    virtual void Write(Log::Type, wchar_t const *, int, wchar_t const *, char *);
     virtual bool controlHandler(unsigned long);
     virtual void setTitle(wchar_t const *);
     virtual void write(LogBuffer const *);
     WinMsgHandler * _messageHandler;
     ConsoleWindowInterface _consoleWindow;
-    alignas(8) unsigned char _reloadHandler[0x10];  // ❓ PDB type 0x33AE: ConsoleWindow::ReloadHandler
-    alignas(8) unsigned char _shutdownHandler[0x10];  // ❓ PDB type 0x33AF: ConsoleWindow::ShutdownHandler
-    alignas(8) unsigned char _endSessionHandler[0x10];  // ❓ PDB type 0x33B0: ConsoleWindow::EndSessionHandler
+    ConsoleWindow::ReloadHandler _reloadHandler;
+    ConsoleWindow::ShutdownHandler _shutdownHandler;
+    ConsoleWindow::EndSessionHandler _endSessionHandler;
 };
 static_assert(sizeof(WindowConsole) == 0x110, "sizeof WindowConsole");
 static_assert(offsetof(WindowConsole, _messageHandler) == 0xB0, "WindowConsole::_messageHandler");
@@ -3906,7 +4710,7 @@ static_assert(offsetof(WorldList, _fp) == 0x28, "WorldList::_fp");
 
 class WorldListManager {
 public:
-    alignas(8) unsigned char _srwLock[0x8];  // ❓ PDB type 0x10F6: _RTL_SRWLOCK
+    _RTL_SRWLOCK _srwLock;
     WorldList * _worldList;
 };
 static_assert(sizeof(WorldListManager) == 0x10, "sizeof WorldListManager");
@@ -4013,10 +4817,21 @@ static_assert(offsetof(XmlCfgDef2, nextSiblingIndex) == 0x34, "XmlCfgDef2::nextS
 
 struct XmlCfgDefLocal {
 public:
+    enum CFG_DEF_TYPE : int {
+        CFG_DEF_TYPE_INT = 0x0,
+        CFG_DEF_TYPE_INT64 = 0x1,
+        CFG_DEF_TYPE_FLOAT = 0x2,
+        CFG_DEF_TYPE_BOOL = 0x3,
+        CFG_DEF_TYPE_STRING = 0x4,
+        CFG_DEF_TYPE_ANSI_STRING = 0x5,
+        CFG_DEF_TYPE_IP = 0x6,
+        CFG_DEF_TYPE_DIRECTORY = 0x7,
+        CFG_DEF_TYPE_GUID = 0x8,
+    };
     unsigned long long offset;
     wchar_t const * name;
     int type;
-    int defType;
+    XmlCfgDefLocal::CFG_DEF_TYPE defType;
     void const * minValue;
     void const * maxValue;
     bool reload;
@@ -4065,6 +4880,14 @@ static_assert(offsetof(XmlConfigReaderInterface, DecodeFromConfigPacket) == 0x28
 
 class XmlDoc {
 public:
+    struct BinaryXmlHeader;
+    struct BinaryXmlHeader {
+    public:
+        long long _binaryXmlIdentifier;
+        unsigned char _binaryXmlVersion;
+        unsigned int _binarySize;
+        unsigned char _reserved[64];
+    };
     virtual bool IsValid() const = 0;  // slot 0
     virtual wchar_t const * Name() const = 0;  // slot 1
     virtual XmlElement * Root() = 0;  // slot 2
@@ -4073,6 +4896,11 @@ public:
     virtual void SerializeFrom(char *, int) = 0;  // slot 5
 };
 static_assert(sizeof(XmlDoc) == 0x8, "sizeof XmlDoc");
+static_assert(sizeof(XmlDoc::BinaryXmlHeader) == 0x50, "sizeof XmlDoc::BinaryXmlHeader");
+static_assert(offsetof(XmlDoc::BinaryXmlHeader, _binaryXmlIdentifier) == 0x0, "XmlDoc::BinaryXmlHeader::_binaryXmlIdentifier");
+static_assert(offsetof(XmlDoc::BinaryXmlHeader, _binaryXmlVersion) == 0x8, "XmlDoc::BinaryXmlHeader::_binaryXmlVersion");
+static_assert(offsetof(XmlDoc::BinaryXmlHeader, _binarySize) == 0xC, "XmlDoc::BinaryXmlHeader::_binarySize");
+static_assert(offsetof(XmlDoc::BinaryXmlHeader, _reserved) == 0x10, "XmlDoc::BinaryXmlHeader::_reserved");
 
 class XmlElement {
 public:
@@ -4094,7 +4922,12 @@ static_assert(sizeof(XmlElement) == 0x8, "sizeof XmlElement");
 
 class XmlNode {
 public:
-    virtual int Type() const = 0;  // slot 0
+    enum TYPE : int {
+        XML_NONE = 0x0,
+        XML_ELEMENT = 0x1,
+        XML_TEXT = 0x2,
+    };
+    virtual XmlNode::TYPE Type() const = 0;  // slot 0
     virtual bool IsValid() const = 0;  // slot 1
     virtual wchar_t const * Name() const = 0;  // slot 2
     virtual XmlDoc const * GetDoc() const = 0;  // slot 3
@@ -4144,11 +4977,20 @@ static_assert(sizeof(XmlReader) == 0x8, "sizeof XmlReader");
 
 class XmlReaderIO {
 public:
-    virtual int Open(wchar_t const *, wchar_t const *, bool) = 0;  // slot 0
-    virtual int Read(unsigned char *, unsigned int *) const = 0;  // slot 1
+    enum ErrCode : int {
+        ERR_NO_ERROR = 0x0,
+        ERR_UNKNOWN = 0x1,
+        ERR_SYSTEM = 0x2,
+        ERR_NO_MORE_FILE = 0x3,
+        ERR_NOT_IMPLEMENTED = 0x4,
+        ERR_INVALID_PARAM = 0x5,
+        ERR_INSUFFICIENT_BUFFER = 0x6,
+    };
+    virtual XmlReaderIO::ErrCode Open(wchar_t const *, wchar_t const *, bool) = 0;  // slot 0
+    virtual XmlReaderIO::ErrCode Read(unsigned char *, unsigned int *) const = 0;  // slot 1
     virtual unsigned int GetFileSize() const = 0;  // slot 2
     virtual wchar_t const * GetFileName() const = 0;  // slot 3
-    virtual int Next() = 0;  // slot 4
+    virtual XmlReaderIO::ErrCode Next() = 0;  // slot 4
     virtual void Close() = 0;  // slot 5
 };
 static_assert(sizeof(XmlReaderIO) == 0x8, "sizeof XmlReaderIO");
@@ -4642,6 +5484,68 @@ static_assert(sizeof(ZSTD_parameters) == 0x28, "sizeof ZSTD_parameters");
 static_assert(offsetof(ZSTD_parameters, cParams) == 0x0, "ZSTD_parameters::cParams");
 static_assert(offsetof(ZSTD_parameters, fParams) == 0x1C, "ZSTD_parameters::fParams");
 
+struct _GUID {
+public:
+    unsigned long Data1;
+    unsigned short Data2;
+    unsigned short Data3;
+    unsigned char Data4[8];
+};
+static_assert(sizeof(_GUID) == 0x10, "sizeof _GUID");
+static_assert(offsetof(_GUID, Data1) == 0x0, "_GUID::Data1");
+static_assert(offsetof(_GUID, Data2) == 0x4, "_GUID::Data2");
+static_assert(offsetof(_GUID, Data3) == 0x6, "_GUID::Data3");
+static_assert(offsetof(_GUID, Data4) == 0x8, "_GUID::Data4");
+
+union _LARGE_INTEGER {
+public:
+    struct {
+        unsigned long LowPart;
+        long HighPart;
+    };
+    struct {
+        unsigned long LowPart;
+        long HighPart;
+    } u;
+    long long QuadPart;
+};
+static_assert(sizeof(_LARGE_INTEGER) == 0x8, "sizeof _LARGE_INTEGER");
+static_assert(offsetof(_LARGE_INTEGER, LowPart) == 0x0, "_LARGE_INTEGER::LowPart");
+static_assert(offsetof(_LARGE_INTEGER, HighPart) == 0x4, "_LARGE_INTEGER::HighPart");
+static_assert(offsetof(_LARGE_INTEGER, u) == 0x0, "_LARGE_INTEGER::u");
+static_assert(offsetof(_LARGE_INTEGER, QuadPart) == 0x0, "_LARGE_INTEGER::QuadPart");
+
+union _ULARGE_INTEGER {
+public:
+    struct {
+        unsigned long LowPart;
+        unsigned long HighPart;
+    };
+    struct {
+        unsigned long LowPart;
+        unsigned long HighPart;
+    } u;
+    unsigned long long QuadPart;
+};
+static_assert(sizeof(_ULARGE_INTEGER) == 0x8, "sizeof _ULARGE_INTEGER");
+static_assert(offsetof(_ULARGE_INTEGER, LowPart) == 0x0, "_ULARGE_INTEGER::LowPart");
+static_assert(offsetof(_ULARGE_INTEGER, HighPart) == 0x4, "_ULARGE_INTEGER::HighPart");
+static_assert(offsetof(_ULARGE_INTEGER, u) == 0x0, "_ULARGE_INTEGER::u");
+static_assert(offsetof(_ULARGE_INTEGER, QuadPart) == 0x0, "_ULARGE_INTEGER::QuadPart");
+
+struct _s_ThrowInfo {
+public:
+    unsigned int attributes;
+    int pmfnUnwind;
+    int pForwardCompat;
+    int pCatchableTypeArray;
+};
+static_assert(sizeof(_s_ThrowInfo) == 0x10, "sizeof _s_ThrowInfo");
+static_assert(offsetof(_s_ThrowInfo, attributes) == 0x0, "_s_ThrowInfo::attributes");
+static_assert(offsetof(_s_ThrowInfo, pmfnUnwind) == 0x4, "_s_ThrowInfo::pmfnUnwind");
+static_assert(offsetof(_s_ThrowInfo, pForwardCompat) == 0x8, "_s_ThrowInfo::pForwardCompat");
+static_assert(offsetof(_s_ThrowInfo, pCatchableTypeArray) == 0xC, "_s_ThrowInfo::pCatchableTypeArray");
+
 struct addrinfo {
 public:
     int ai_flags;
@@ -4650,7 +5554,7 @@ public:
     int ai_protocol;
     unsigned long long ai_addrlen;
     char * ai_canonname;
-    void * ai_addr;
+    sockaddr * ai_addr;
     addrinfo * ai_next;
 };
 static_assert(sizeof(addrinfo) == 0x30, "sizeof addrinfo");
@@ -4683,13 +5587,26 @@ static_assert(sizeof(fseWkspMax_t) == 0x3804, "sizeof fseWkspMax_t");
 static_assert(offsetof(fseWkspMax_t, CTable_max) == 0x0, "fseWkspMax_t::CTable_max");
 static_assert(offsetof(fseWkspMax_t, scratchBuffer) == 0x2804, "fseWkspMax_t::scratchBuffer");
 
+struct sockaddr_storage {
+public:
+    unsigned short ss_family;
+    char __ss_pad1[6];
+    long long __ss_align;
+    char __ss_pad2[112];
+};
+static_assert(sizeof(sockaddr_storage) == 0x80, "sizeof sockaddr_storage");
+static_assert(offsetof(sockaddr_storage, ss_family) == 0x0, "sockaddr_storage::ss_family");
+static_assert(offsetof(sockaddr_storage, __ss_pad1) == 0x2, "sockaddr_storage::__ss_pad1");
+static_assert(offsetof(sockaddr_storage, __ss_align) == 0x8, "sockaddr_storage::__ss_align");
+static_assert(offsetof(sockaddr_storage, __ss_pad2) == 0x10, "sockaddr_storage::__ss_pad2");
+
 struct group_filter {
 public:
     unsigned long gf_interface;
-    alignas(8) unsigned char gf_group[0x80];  // ❓ PDB type 0x369D: sockaddr_storage
+    sockaddr_storage gf_group;
     MULTICAST_MODE_TYPE gf_fmode;
     unsigned long gf_numsrc;
-    alignas(8) unsigned char gf_slist[0x80];  // ❓ PDB type 0x36A0: leaf 0x1503
+    sockaddr_storage gf_slist[1];
 };
 static_assert(sizeof(group_filter) == 0x110, "sizeof group_filter");
 static_assert(offsetof(group_filter, gf_interface) == 0x0, "group_filter::gf_interface");
@@ -4700,11 +5617,11 @@ static_assert(offsetof(group_filter, gf_slist) == 0x90, "group_filter::gf_slist"
 
 struct ip_msfilter {
 public:
-    alignas(4) unsigned char imsf_multiaddr[0x4];  // ❓ PDB type 0x3131: in_addr
-    alignas(4) unsigned char imsf_interface[0x4];  // ❓ PDB type 0x3131: in_addr
+    in_addr imsf_multiaddr;
+    in_addr imsf_interface;
     MULTICAST_MODE_TYPE imsf_fmode;
     unsigned long imsf_numsrc;
-    alignas(4) unsigned char imsf_slist[0x4];  // ❓ PDB type 0x36BC: leaf 0x1503
+    in_addr imsf_slist[1];
 };
 static_assert(sizeof(ip_msfilter) == 0x14, "sizeof ip_msfilter");
 static_assert(offsetof(ip_msfilter, imsf_multiaddr) == 0x0, "ip_msfilter::imsf_multiaddr");
@@ -4775,8 +5692,3 @@ extern id128 ID128_GUID_ZERO;
 #pragma clang diagnostic pop
 
 // Skipped types:
-//   AsyncConnectContext: base EventContext
-//   AsyncRecvContext: base EventContext
-//   AsyncSendContext: base EventContext
-//   EventContext: base _OVERLAPPED
-//   SCOPE_ID: member Value overlaps (0x0 < 0x4)

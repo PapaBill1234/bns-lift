@@ -13,7 +13,7 @@
 namespace
 {
 wchar_t const* const MANAGEMENT_SESSION_FILE = L"ManagementSessionHandler.cpp";  // ❓ name
-wchar_t const* const MANAGEMENT_SESSION_TAG = L"management session handler";   // ❓ name
+static wchar_t const* const MODULE_NAME = L"management session handler";  // PDB MODULE_NAME
 }
 
 // ❓ no out-of-line copy found
@@ -27,7 +27,7 @@ bool ManagementSessionHandler::OnAccept(Session const* session) const
     unsigned long long const sessionId = session->_id;
     Log::Write(Log::LT_NOTICE, MANAGEMENT_SESSION_FILE, 25,
                L"[%s], %s; accepted management session, sessionId:0x%I64X, portId:%u, sessionIndex:%u",
-               MANAGEMENT_SESSION_TAG, L"ManagementSessionHandler::OnAccept", sessionId,
+               MODULE_NAME, L"ManagementSessionHandler::OnAccept", sessionId,
                static_cast<unsigned int>(sessionId >> 32), static_cast<unsigned int>(sessionId));
     return true;
 }
@@ -39,7 +39,7 @@ bool ManagementSessionHandler::OnConnect(Session const* session, bool firstConne
     Log::Write(Log::LT_ERROR, MANAGEMENT_SESSION_FILE, 31,
                L"[%s], %s; cannot use ManagementSessionHandler::OnConnect handler, sessionId:0x%I64X, portId:%u, "
                L"sessionIndex:%u",
-               MANAGEMENT_SESSION_TAG, L"ManagementSessionHandler::OnConnect", sessionId,
+               MODULE_NAME, L"ManagementSessionHandler::OnConnect", sessionId,
                static_cast<unsigned int>(sessionId >> 32), static_cast<unsigned int>(sessionId));
     return false;
 }
@@ -50,7 +50,7 @@ void ManagementSessionHandler::OnClose(Session const* session, bool tryReconnect
     unsigned long long const sessionId = session->_id;
     Log::Write(Log::LT_NOTICE, MANAGEMENT_SESSION_FILE, 37,
                L"[%s], %s; closed management session, sessionId:0x%I64X, portId:%u, sessionIndex:%u",
-               MANAGEMENT_SESSION_TAG, L"ManagementSessionHandler::OnClose", sessionId,
+               MODULE_NAME, L"ManagementSessionHandler::OnClose", sessionId,
                static_cast<unsigned int>(sessionId >> 32), static_cast<unsigned int>(sessionId));
 }
 
@@ -64,7 +64,7 @@ bool ManagementSessionHandler::PacketHandler(Session const* session, Packet cons
     {
         Log::Write(Log::LT_ERROR, MANAGEMENT_SESSION_FILE, 46,
                    L"[%s], %s; failed to decompose command, session:0x%I64X, portId:%u, sessionIndex:%u",
-                   MANAGEMENT_SESSION_TAG, L"ManagementSessionHandler::PacketHandler", session->_id,
+                   MODULE_NAME, L"ManagementSessionHandler::PacketHandler", session->_id,
                    static_cast<unsigned int>(session->_id >> 32), static_cast<unsigned int>(session->_id));
         _snwprintf_s(failReason, 0x101, _TRUNCATE, L"failed to decompose command");
     }
@@ -92,7 +92,7 @@ bool ManagementSessionHandler::PacketHandler(Session const* session, Packet cons
         Log::Write(Log::LT_ERROR, MANAGEMENT_SESSION_FILE, line,
                    L"[%s], %s; invalid packet command of management session, command:%s, session:0x%I64X, portId:%u, "
                    L"sessionIndex:%u",
-                   MANAGEMENT_SESSION_TAG, L"ManagementSessionHandler::PacketHandler", command, session->_id,
+                   MODULE_NAME, L"ManagementSessionHandler::PacketHandler", command, session->_id,
                    static_cast<unsigned int>(session->_id >> 32), static_cast<unsigned int>(session->_id));
         _snwprintf_s(failReason, 0x101, _TRUNCATE, L"invalid packet command");
     }

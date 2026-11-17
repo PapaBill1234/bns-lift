@@ -11,30 +11,27 @@ class BroadcastPacketCrypt : public PacketCrypt
 {
 public:
     explicit BroadcastPacketCrypt(Crypto* crypto)
-        : _crypto(crypto), _param(0), _keySet(false), _compressType(1), _compressFunc(nullptr), _dict(nullptr),
+        : _crypto(crypto), _param(PARAM_NONE), _keySet(false), _compressType(1), _compressFunc(nullptr), _dict(nullptr),
           _dictSize(0)
     {
     }
 
-    typedef int (*CompressFunc)(unsigned char* dest, int* destLen, unsigned char const* src, int srcLen,
-                                unsigned char const* dict, int dictSize);  // ❓ type name
-
     virtual int GetType();                                                                  // 0x4DBA0
-    virtual int SetEncryptParam(int param);                                                 // 0x4DC00
-    virtual int SetKey(unsigned char const* key, int keySize);                              // 0x4CF60
-    virtual int GenerateKey(unsigned char* key1, int* size1, unsigned char* key2, int* size2);  // 0x4DC20
-    virtual int Encrypt(unsigned char* buffer, int* bufferSize, int size, bool with3rdParty);  // 0x4DD70
-    virtual int Decrypt(unsigned char* buffer, int size, int* outSize, bool* with3rdParty);    // 0x4DF30
-    virtual int SetExternalCompressFunc(void* func, unsigned char const* data, int size);      // 0x4DF40
+    virtual ErrCode SetEncryptParam(Param param);                                              // 0x4DC00
+    virtual ErrCode SetKey(unsigned char const* key, int keySize);                              // 0x4CF60
+    virtual ErrCode GenerateKey(unsigned char* key1, int* size1, unsigned char* key2, int* size2);  // 0x4DC20
+    virtual ErrCode Encrypt(unsigned char* buffer, int* bufferSize, int size, bool with3rdParty);  // 0x4DD70
+    virtual ErrCode Decrypt(unsigned char* buffer, int size, int* outSize, bool* with3rdParty);    // 0x4DF30
+    virtual ErrCode SetExternalCompressFunc(ExternalCompressFunc func, unsigned char const* data, int size);      // 0x4DF40
     virtual ~BroadcastPacketCrypt();                                                        // 0x4DBB0
 
     Crypto* _crypto;               // ❓ +0x8
-    int _param;                         // ❓ +0x10, PacketCrypt::Param
+    Param _param;                       // ❓ +0x10
     bool _keySet;                       // ❓ +0x14
     char _compressType;                 // ❓ +0x15, 1 = compress2, 2 = _compressFunc
     unsigned char _buffer[0x2818 - 0x16];  // ❓ +0x16, compress output
     int _bufferSize;                    // ❓ +0x2818
-    CompressFunc _compressFunc;         // ❓ +0x2820
+    ExternalCompressFunc _compressFunc;  // ❓ +0x2820
     unsigned char* _dict;               // ❓ +0x2828
     int _dictSize;                      // ❓ +0x2830
 };

@@ -114,7 +114,7 @@ public:
         InLtq = false;
     }
     virtual ~LobbyGateCooldownTimer();                                          // 0x13bb0
-    virtual unsigned int TimerClass() const;                                    // ❓
+    virtual unsigned int TimerClass() const;                                    // 0x28750 (folded with TimerId)
     virtual unsigned long long TimerId() const;                                 // 0x28750
     virtual unsigned int EventId() const;                                       // 0x13ba0
     virtual bool HandleEvent(EventContext* context, unsigned long numOfBytes);  // 0x13bf0
@@ -137,8 +137,8 @@ public:
         SlotIndex = -1;
         InLtq = false;
     }
-    virtual ~LobbyGateReloadInvalidRestoreTimer();                              // ❓
-    virtual unsigned int TimerClass() const;                                    // ❓
+    virtual ~LobbyGateReloadInvalidRestoreTimer();                              // 0x13bb0
+    virtual unsigned int TimerClass() const;                                    // 0x21830 (folded with TimerId)
     virtual unsigned long long TimerId() const;                                 // 0x21830
     virtual unsigned int EventId() const;                                       // 0x12780
     virtual bool HandleEvent(EventContext* context, unsigned long numOfBytes);  // 0x12790

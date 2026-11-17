@@ -31,4 +31,4 @@
 - None. Bash denied some combined commands; single commands worked.
 
 ## Gate result
-- `tools/gate.sh`: `gate ok` (2026-11-15, after BnsCommonConfigDefinition). No new warnings in BnsCommonConfig.cpp.
+- `tools/gate.sh`: `gate ok` (2026-11-15, after BnsCommonConfigDefinition). No new warnings in BnsCommonConfigDefinition.cpp.

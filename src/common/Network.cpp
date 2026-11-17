@@ -28,12 +28,12 @@ static wchar_t const NETWORK_FILE[] = L"source\\Network.cpp";
         CrashHandler::MakeCrash("source\\Network.cpp", line, L"");                  \
     } while (0)
 
-// ❓ File static of the PacketCrypt module (0x14005A508). PacketCrypt::Setup increments it.
+// File static s_initializedCount (PDB: CryptoKey.obj, CacheGate rva 0x5A508). PacketCrypt::Setup increments it.
 // Network::Clear decrements it (an inlined PacketCrypt clean-up).
 extern long volatile s_initializedCount;
-long volatile s_initializedCount = 0;  // ❓ the PacketCrypt module is not lifted; the definition is here
+long volatile s_initializedCount = 0;  // The PacketCrypt module is not lifted. The definition is here.
 
-int PacketCrypt::_MaxSize = 0;  // ❓
+int PacketCrypt::_MaxSize = 0;
 
 // 0x327E0 (PacketCrypt module). Not in the CacheGate hr export.
 PacketCrypt::ErrCode PacketCrypt::Setup(int maxSize)

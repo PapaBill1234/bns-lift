@@ -40,7 +40,7 @@ long long Daemon::Now = 0;
 wchar_t const* Daemon::StateString[10] = {
     L"UNKNOWN", L"STOPPED", L"STOPPING", L"STARTING", L"RUNNING",
     L"INVALID", L"FLUSHING", L"COOLDOWNING", L"COOLDOWNED", L"RELOADING",
-};  // ❓ strings from the STATE enum names; check them in .rdata
+};  // 0x59180
 RUN_MODE RunMode = static_cast<RUN_MODE>(-1);  // ❓ initial data is 0xFFFFFFFF
 int const CONFIG_DIR_OPTION_LEN = 6;            // wcslen(L"--conf")
 
@@ -424,7 +424,7 @@ bool Daemon::start(int argc, wchar_t const** argv)
     }
     {
         void* memory = BaseMemoryManager::_Instance.Alloc(sizeof(DelayedRelease), DAEMON_FILE, 525);
-        GlobalDelayedRelease = memory != nullptr ? new (memory) DelayedRelease() : nullptr;
+        GlobalDelayedRelease = memory != nullptr ? new (memory) DelayedRelease(DelayedRelease::DEFAULT_INTERVAL, DelayedRelease::DEFAULT_DELAY) : nullptr;
     }
 
     network = Network::initInstance(threadManager);

@@ -8,7 +8,7 @@
 #include "PostOfficeDaemon.h"
 
 #define CHECK_POST_CAPACITY_RELAY_FILE L"CheckPostCapacityRelay.cpp"
-#define CHECK_POST_CAPACITY_RELAY_TAG L"relay context"
+static wchar_t const* const MODULE_NAME = L"relay context";  // PDB MODULE_NAME
 
 #define CHECK_POST_CAPACITY_RELAY_CRASH(line, fmt, ...)                                     \
     do                                                                                      \
@@ -35,23 +35,22 @@ bool CheckPostCapacityRelayContext::processRelayRequest(Channel* const channel) 
     if (channel == nullptr)
     {
         CHECK_POST_CAPACITY_RELAY_CRASH(30, L"== CRASH == [%s], %s; invalid parameter, channel:0x%p",
-                                        CHECK_POST_CAPACITY_RELAY_TAG, L"CheckPostCapacityRelayContext::processRelayRequest",
+                                        MODULE_NAME, L"CheckPostCapacityRelayContext::processRelayRequest",
                                         static_cast<Channel*>(nullptr));
         return false;
     }
 
     unsigned long long const relayTid = _economyHeader._relayTid;
-    // ❓ SendRelayRequest takes a non-const pointer.
-    if (!static_cast<CacheGateChannel*>(channel)->SendRelayRequest(const_cast<CheckPostCapacityRelayContext*>(this)))
+    if (!static_cast<CacheGateChannel*>(channel)->SendRelayRequest(this))
     {
         Log::Write(Log::LT_ERROR, CHECK_POST_CAPACITY_RELAY_FILE, 37,
                    L"[%s], %s; failed to send check post capacity relay request, relayTid:0x%I64X",
-                   CHECK_POST_CAPACITY_RELAY_TAG, L"CheckPostCapacityRelayContext::processRelayRequest", relayTid);
+                   MODULE_NAME, L"CheckPostCapacityRelayContext::processRelayRequest", relayTid);
         return false;
     }
 
     Log::Write(Log::LT_NOTICE, CHECK_POST_CAPACITY_RELAY_FILE, 41,
-               L"[%s], %s; sent check post capacity relay request, relayTid:0x%I64X", CHECK_POST_CAPACITY_RELAY_TAG,
+               L"[%s], %s; sent check post capacity relay request, relayTid:0x%I64X", MODULE_NAME,
                L"CheckPostCapacityRelayContext::processRelayRequest", relayTid);
     return true;
 }
@@ -65,23 +64,22 @@ bool CheckPostCapacityRelayContext::processRelayResponse() const
     {
         Log::Write(Log::LT_ERROR, CHECK_POST_CAPACITY_RELAY_FILE, 51,
                    L"[%s], %s; world is not connecting; cannot send packet, relayTid:0x%I64X",
-                   CHECK_POST_CAPACITY_RELAY_TAG, L"CheckPostCapacityRelayContext::processRelayResponse", relayTid);
+                   MODULE_NAME, L"CheckPostCapacityRelayContext::processRelayResponse", relayTid);
         return false;
     }
 
-    // ❓ SendRelayResponse takes a non-const pointer.
-    if (!worldChannel->SendRelayResponse(const_cast<CheckPostCapacityRelayContext*>(this)))
+    if (!worldChannel->SendRelayResponse(this))
     {
         Log::Write(Log::LT_ERROR, CHECK_POST_CAPACITY_RELAY_FILE, 56,
                    L"[%s], %s; failed to send check post capacity %s response ack, relayTid:0x%I64X",
-                   CHECK_POST_CAPACITY_RELAY_TAG, L"CheckPostCapacityRelayContext::processRelayResponse",
+                   MODULE_NAME, L"CheckPostCapacityRelayContext::processRelayResponse",
                    _response._resultState == RelayResponse::RESULTSTATE_SUCCESS ? L"success" : L"failure", relayTid);
         worldChannel->removeReferenceCount(CHECK_POST_CAPACITY_RELAY_FILE, 57);
         return false;
     }
 
     Log::Write(Log::LT_NOTICE, CHECK_POST_CAPACITY_RELAY_FILE, 61,
-               L"[%s], %s; sent check post capacity %s response ack, relayTid:0x%I64X", CHECK_POST_CAPACITY_RELAY_TAG,
+               L"[%s], %s; sent check post capacity %s response ack, relayTid:0x%I64X", MODULE_NAME,
                L"CheckPostCapacityRelayContext::processRelayResponse",
                _response._resultState == RelayResponse::RESULTSTATE_SUCCESS ? L"success" : L"failure", relayTid);
     worldChannel->removeReferenceCount(CHECK_POST_CAPACITY_RELAY_FILE, 62);
@@ -91,9 +89,7 @@ bool CheckPostCapacityRelayContext::processRelayResponse() const
 // 0x9400
 bool CheckPostCapacityRelayContext::processRelayTimeout()
 {
-    CheckPostCapacityRelayResponse response;
-    response._resultState = RelayResponse::RESULTSTATE_RELAY_TIMEOUT;
-    response._failReason = 19;
+    CheckPostCapacityRelayResponse response(RelayResponse::RESULTSTATE_RELAY_TIMEOUT, 19);
     initResponse(&response);
     return processRelayResponse();
 }
@@ -125,14 +121,14 @@ bool CheckPostCapacityRelayContext::ComposeRequestPacket(Packet& packet) const
     {
         Log::Write(Log::LT_ERROR, CHECK_POST_CAPACITY_RELAY_FILE, 87,
                    L"[%s], %s; failed to compose check post capacity relay request packet, fromWid:%u, toWid:%u, relayTid:0x%I64X, gameTid:0x%I64X, targetPcId:0x%I64X",
-                   CHECK_POST_CAPACITY_RELAY_TAG, L"CheckPostCapacityRelayContext::ComposeRequestPacket", fromWid, toWid,
+                   MODULE_NAME, L"CheckPostCapacityRelayContext::ComposeRequestPacket", fromWid, toWid,
                    relayTid, gameTid, targetPcId);
         return false;
     }
 
     Log::Write(Log::LT_DEBUG, CHECK_POST_CAPACITY_RELAY_FILE, 91,
                L"[%s], %s; composed check post capacity relay request packet, fromWid:%u, toWid:%u, relayTid:0x%I64X, gameTid:0x%I64X, targetPcId:0x%I64X",
-               CHECK_POST_CAPACITY_RELAY_TAG, L"CheckPostCapacityRelayContext::ComposeRequestPacket", fromWid, toWid,
+               MODULE_NAME, L"CheckPostCapacityRelayContext::ComposeRequestPacket", fromWid, toWid,
                relayTid, gameTid, targetPcId);
     return true;
 }
@@ -149,13 +145,13 @@ bool CheckPostCapacityRelayContext::ComposeResponsePacket(Packet& packet) const
         {
             Log::Write(Log::LT_ERROR, CHECK_POST_CAPACITY_RELAY_FILE, 106,
                        L"[%s], %s; failed to compose check post capacity success response packet, gameTid:0x%I64X",
-                       CHECK_POST_CAPACITY_RELAY_TAG, L"CheckPostCapacityRelayContext::ComposeResponsePacket",
+                       MODULE_NAME, L"CheckPostCapacityRelayContext::ComposeResponsePacket",
                        _request._gameTid);
             return false;
         }
         Log::Write(Log::LT_DEBUG, CHECK_POST_CAPACITY_RELAY_FILE, 109,
                    L"[%s], %s; composed check post capacity success response packet, gameTid:0x%I64X",
-                   CHECK_POST_CAPACITY_RELAY_TAG, L"CheckPostCapacityRelayContext::ComposeResponsePacket", _request._gameTid);
+                   MODULE_NAME, L"CheckPostCapacityRelayContext::ComposeResponsePacket", _request._gameTid);
         return true;
     }
 
@@ -163,36 +159,34 @@ bool CheckPostCapacityRelayContext::ComposeResponsePacket(Packet& packet) const
     {
         CHECK_POST_CAPACITY_RELAY_CRASH(127,
                                         L"== CRASH == [%s], %s; invalid response result state, relayTid:0x%I64X, resultState:%d",
-                                        CHECK_POST_CAPACITY_RELAY_TAG, L"CheckPostCapacityRelayContext::ComposeResponsePacket",
+                                        MODULE_NAME, L"CheckPostCapacityRelayContext::ComposeResponsePacket",
                                         relayTid, resultState);
         return false;
     }
 
-    int const failReason = convertFailReason(static_cast<RelayResponse::RESULTSTATE>(resultState), _response._failReason);
+    int const failReason = convertFailReason(static_cast<RelayResponse::ResultState>(resultState), _response._failReason);
     bool const composed = packet.Compose("hqE", 9, _request._gameTid, failReason) != 0;
     if (!composed)
     {
         Log::Write(Log::LT_ERROR, CHECK_POST_CAPACITY_RELAY_FILE, 120,
                    L"[%s], %s; failed to compose check post capacity failure response packet, gameTid:0x%I64X, failReason:%d",
-                   CHECK_POST_CAPACITY_RELAY_TAG, L"CheckPostCapacityRelayContext::ComposeResponsePacket", _request._gameTid,
+                   MODULE_NAME, L"CheckPostCapacityRelayContext::ComposeResponsePacket", _request._gameTid,
                    failReason);
         return false;
     }
     Log::Write(Log::LT_DEBUG, CHECK_POST_CAPACITY_RELAY_FILE, 123,
                L"[%s], %s; composed check post capacity failure response packet, gameTid:0x%I64X, failReason:%d",
-               CHECK_POST_CAPACITY_RELAY_TAG, L"CheckPostCapacityRelayContext::ComposeResponsePacket", _request._gameTid,
+               MODULE_NAME, L"CheckPostCapacityRelayContext::ComposeResponsePacket", _request._gameTid,
                failReason);
     return true;
 }
 
 // 0x9740
-// ❓ The case values 2/3/4 are the raw values in the binary. They do not match the RESULTSTATE values in RelayContext.h.
-unsigned short CheckPostCapacityRelayContext::convertFailReason(RelayResponse::RESULTSTATE const resultState,
-                                                                short const failReason)
+short const CheckPostCapacityRelayContext::convertFailReason(RelayResponse::ResultState const resultState, short const failReason) const
 {
-    switch (static_cast<int>(resultState))
+    switch (resultState)
     {
-    case 2:
+    case RelayResponse::RESULTSTATE_FAILURE:
         switch (failReason)
         {
         case 14:
@@ -205,7 +199,7 @@ unsigned short CheckPostCapacityRelayContext::convertFailReason(RelayResponse::R
             break;
         }
         break;
-    case 3:
+    case RelayResponse::RESULTSTATE_RELAY_ERROR:
         switch (failReason)
         {
         case 3:
@@ -220,7 +214,7 @@ unsigned short CheckPostCapacityRelayContext::convertFailReason(RelayResponse::R
             break;
         }
         break;
-    case 4:
+    case RelayResponse::RESULTSTATE_RELAY_TIMEOUT:
         return 19;
     default:
         break;

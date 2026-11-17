@@ -118,8 +118,11 @@ public:
     virtual bool IsBinary(wchar_t const* fileName) const = 0;                                 // slot 10
 };
 
-// ❓ The export typedef names are not in the PDB.
-typedef wchar_t const* (*GetInterfaceVersionFunc)();  // ❓
-typedef void (*SetMemAllocatorFunc)(void*, void*);     // ❓ not called
-typedef XmlReader* (*CreateXmlReaderFunc)();           // ❓
-typedef void (*DestroyXmlReaderFunc)(XmlReader* reader);  // ❓
+// Function types of the XmlReader_sv64.dll exports (PDB typedefs).
+typedef void* (*XriMallocFunc)(unsigned long long);
+typedef void* (*XriReallocFunc)(void*, unsigned long long);
+typedef void (*XriFreeFunc)(void*);
+typedef wchar_t const* (*XriGetInterfaceVersion)();
+typedef void (*XriSetMemAllocator)(XriMallocFunc, XriReallocFunc, XriFreeFunc);  // not called
+typedef XmlReader const* (*XriCreateFunc)();
+typedef void (*XriDestoryFunc)(XmlReader const*);

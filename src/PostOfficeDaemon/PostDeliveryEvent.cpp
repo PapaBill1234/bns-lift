@@ -14,7 +14,7 @@
 #include "PostOfficeDaemon.h"
 
 #define POST_DELIVERY_EVENT_FILE L"PostDeliveryEvent.cpp"
-#define POST_DELIVERY_EVENT_TAG L"post delivery event"
+static wchar_t const* const MODULE_NAME = L"post delivery event";  // PDB MODULE_NAME
 
 #define POST_DELIVERY_EVENT_CRASH(line, fmt, ...)                                      \
     do                                                                                 \
@@ -60,7 +60,7 @@ bool PostDeliveryEvent::OccurEvent(PostContext* const postContext, CacheGateChan
     if (postContext == nullptr || cachegateChannel == nullptr)
     {
         POST_DELIVERY_EVENT_CRASH(50, L"== CRASH == [%s], %s; invalid parameter, postContext:0x%p, cachegateChannel:0x%p",
-                                  POST_DELIVERY_EVENT_TAG, L"PostDeliveryEvent::OccurEvent", postContext, cachegateChannel);
+                                  MODULE_NAME, L"PostDeliveryEvent::OccurEvent", postContext, cachegateChannel);
         return false;
     }
 
@@ -68,12 +68,12 @@ bool PostDeliveryEvent::OccurEvent(PostContext* const postContext, CacheGateChan
     PostDeliveryEvent* const postDeliveryEvent =
         memory != nullptr ? ::new (memory) PostDeliveryEvent(postContext, cachegateChannel) : nullptr;
 
-    if (PostQueuedCompletionStatus(Network::iocpHandleOrNull(), 0, reinterpret_cast<ULONG_PTR>(postDeliveryEvent), nullptr))
+    if (PostQueuedCompletionStatus(Network::iocpHandle(), 0, reinterpret_cast<ULONG_PTR>(postDeliveryEvent), nullptr))
         return true;
 
     Log::Write(POST_DELIVERY_EVENT_FILE, 57, GetLastError(),
                L"[%s], %s; exception occurred; failed to occur post delivery event, postId:0x%I64X",
-               POST_DELIVERY_EVENT_TAG, L"PostDeliveryEvent::OccurEvent", postContext->_postInfo._postId);
+               MODULE_NAME, L"PostDeliveryEvent::OccurEvent", postContext->_postInfo._postId);
     // BUG: 0x105b0 postDeliveryEvent can be null here (Alloc failed); the call does not check it.
     postDeliveryEvent->removeReferenceCount(POST_DELIVERY_EVENT_FILE, 58);
     return false;
@@ -83,7 +83,7 @@ bool PostDeliveryEvent::OccurEvent(PostContext* const postContext, CacheGateChan
 bool PostDeliveryEvent::HandleEvent(EventContext* context, unsigned long param)
 {
     Log::Write(Log::LT_DEBUG, POST_DELIVERY_EVENT_FILE, 69, L"[%s], %s; <BEGIN EVENT HANDLER>",
-               POST_DELIVERY_EVENT_TAG, L"PostDeliveryEvent::HandleEvent");
+               MODULE_NAME, L"PostDeliveryEvent::HandleEvent");
 
     unsigned short const recipientWid = static_cast<unsigned short>(_postContext->_postInfo._recipientWid);
     long long const postId = _postContext->_postInfo._postId;
@@ -92,19 +92,19 @@ bool PostDeliveryEvent::HandleEvent(EventContext* context, unsigned long param)
         if (!PostOfficeDaemon::_instance->_postContextManager->RemoveContext(postId))
         {
             POST_DELIVERY_EVENT_CRASH(76, L"== CRASH == [%s], %s; exception occurred; failed to remove post context, postId:0x%I64X",
-                                      POST_DELIVERY_EVENT_TAG, L"PostDeliveryEvent::HandleEvent", postId);
+                                      MODULE_NAME, L"PostDeliveryEvent::HandleEvent", postId);
         }
         if (!PostOfficeDaemon::_instance->_unsentPostContextManager->RegisterUnsentPost(recipientWid, postId, false))
         {
             Log::Write(Log::LT_ERROR, POST_DELIVERY_EVENT_FILE, 80,
                        L"[%s], %s; exception occurred; failed to register unsent post, recipientWid:%u, postId:0x%I64X",
-                       POST_DELIVERY_EVENT_TAG, L"PostDeliveryEvent::HandleEvent", static_cast<unsigned int>(recipientWid),
+                       MODULE_NAME, L"PostDeliveryEvent::HandleEvent", static_cast<unsigned int>(recipientWid),
                        postId);
         }
     }
 
     Log::Write(Log::LT_DEBUG, POST_DELIVERY_EVENT_FILE, 84, L"[%s], %s; <END EVENT HANDLER>",
-               POST_DELIVERY_EVENT_TAG, L"PostDeliveryEvent::HandleEvent");
+               MODULE_NAME, L"PostDeliveryEvent::HandleEvent");
     removeReferenceCount(POST_DELIVERY_EVENT_FILE, 86);
     return true;
 }
@@ -118,7 +118,7 @@ bool PostDeliveryEvent::deliverPost(unsigned short recipientWid, long long postI
     if (postStatus != 1 && postStatus != 2)
     {
         Log::Write(Log::LT_ERROR, POST_DELIVERY_EVENT_FILE, 98, L"[%s], %s; invalid post status, postId:0x%I64X, postStatus:%d",
-                   POST_DELIVERY_EVENT_TAG, L"PostDeliveryEvent::deliverPost", postId, static_cast<int>(postStatus));
+                   MODULE_NAME, L"PostDeliveryEvent::deliverPost", postId, static_cast<int>(postStatus));
         return false;
     }
 
@@ -144,7 +144,7 @@ bool PostDeliveryEvent::deliverPost(unsigned short recipientWid, long long postI
     }
 
     Log::Write(Log::LT_ERROR, POST_DELIVERY_EVENT_FILE, 110, L"[%s], %s; failed to send deliver post relay request, relayTid:0x%I64X",
-               POST_DELIVERY_EVENT_TAG, L"PostDeliveryEvent::deliverPost", relayTid);
+               MODULE_NAME, L"PostDeliveryEvent::deliverPost", relayTid);
     relayContext->removeReferenceCount(POST_DELIVERY_EVENT_FILE, 111);
     return false;
 }

@@ -454,7 +454,7 @@ bool SendPublicationEvent::HandleEvent(EventContext*, unsigned long)
             void* evMem = Memory::_Manager[2]->Alloc(sizeof(SendRetryCouponPublicationFailEvent), kFile, 427);
             SendRetryCouponPublicationFailEvent* ev =
                 evMem ? new (evMem) SendRetryCouponPublicationFailEvent(_managementTid, 2) : nullptr;
-            PostQueuedCompletionStatus(Network::iocpHandleOrNull(), 0,
+            PostQueuedCompletionStatus(Network::iocpHandle(), 0,
                                        reinterpret_cast<ULONG_PTR>(static_cast<EventObject*>(ev)), nullptr);
             Log::Write(Log::LT_DEBUG, kFile, 430,
                        L"[publication-event], handle event, post retry-coupon-publication-fail-event, tid:%I64d, failReason:%d",
@@ -523,7 +523,7 @@ bool RetryCouponPublicationEvent::HandleEvent(EventContext*, unsigned long)
             ev = new (mem) SendPublicationEvent(_publicationId, _gameAccountId, _couponEventId);
             ev->_managementTid = _tid;
         }
-        PostQueuedCompletionStatus(Network::iocpHandleOrNull(), 0,
+        PostQueuedCompletionStatus(Network::iocpHandle(), 0,
                                    reinterpret_cast<ULONG_PTR>(static_cast<EventObject*>(ev)), nullptr);
         Log::Write(Log::LT_DEBUG, kFile, 459,
                    L"[retry-coupon-publication], handle event, post publication-event, publication-id:%I64d, acc:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X, coupon-event-id:%d, management-tid:%I64d",
@@ -533,7 +533,7 @@ bool RetryCouponPublicationEvent::HandleEvent(EventContext*, unsigned long)
     }
     void* mem = Memory::_Manager[2]->Alloc(sizeof(SendRetryCouponPublicationFailEvent), kFile, 465);
     SendRetryCouponPublicationFailEvent* ev = mem ? new (mem) SendRetryCouponPublicationFailEvent(_tid, failReason) : nullptr;
-    PostQueuedCompletionStatus(Network::iocpHandleOrNull(), 0, reinterpret_cast<ULONG_PTR>(static_cast<EventObject*>(ev)),
+    PostQueuedCompletionStatus(Network::iocpHandle(), 0, reinterpret_cast<ULONG_PTR>(static_cast<EventObject*>(ev)),
                                nullptr);
     Log::Write(Log::LT_DEBUG, kFile, 468,
                L"[retry-coupon-publication], handle event, post retry-coupon-publication-fail-event, tid:%I64d, failReason:%d",

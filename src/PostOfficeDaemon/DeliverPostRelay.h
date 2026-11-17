@@ -6,11 +6,12 @@
 
 class PostContext;
 
-// The PDB has the vtable type DeliverPostRelayRequest_vtbl. The class has no data. ❓ inline members
+// PDB type 0x2C88. The class has no data.
 class DeliverPostRelayRequest : public RelayRequest
 {
 public:
-    virtual ~DeliverPostRelayRequest() {}  // ❓ inline
+    DeliverPostRelayRequest() {}
+    virtual ~DeliverPostRelayRequest() {}
 };
 static_assert(sizeof(DeliverPostRelayRequest) == 0x8, "sizeof DeliverPostRelayRequest");
 
@@ -18,7 +19,9 @@ static_assert(sizeof(DeliverPostRelayRequest) == 0x8, "sizeof DeliverPostRelayRe
 class DeliverPostRelayResponse : public RelayResponse
 {
 public:
-    DeliverPostRelayResponse() { _resultState = RESULTSTATE_SUCCESS; _failReason = 0; }  // ❓ inlined
+    // PDB ctor (ResultState, short const) with default arguments. 0x65c0 stores (1, 0).
+    DeliverPostRelayResponse(ResultState resultState = RESULTSTATE_SUCCESS, short const failReason = 0)
+        : RelayResponse(resultState, failReason) {}
     virtual ~DeliverPostRelayResponse() {}  // slot 0
 };
 static_assert(sizeof(DeliverPostRelayResponse) == 0x10, "sizeof DeliverPostRelayResponse");

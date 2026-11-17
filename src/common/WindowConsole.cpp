@@ -226,7 +226,7 @@ void WindowConsole::write(LogBuffer const* logbuf)
         if (node->_flush)
             continue;
         ConsoleLog* log = (ConsoleLog*)static_cast<ConsoleLog const*>(node);
-        if (log->GetType() != L_NONE)
+        if (log->GetType() != ConsoleLog::L_NONE)
             _consoleWindow.console->WriteLog(log);
     }
 }
@@ -234,7 +234,7 @@ void WindowConsole::write(LogBuffer const* logbuf)
 // 0x174b0
 void WindowConsole::Write(Log::Type type, wchar_t const* file, int line, wchar_t const* format, char* args)
 {
-    if (CONSOLE_LOG_TYPE[type] == L_NONE)
+    if (CONSOLE_LOG_TYPE[type] == ConsoleLog::L_NONE)
         return;
     LogBuffer* logbuf = LogBufferAllocator::_Local->allocate();
     GetLocalTime(&logbuf->_logtime);

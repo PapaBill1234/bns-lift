@@ -12,22 +12,26 @@ class PagePoolMemoryManager;
 class ConsoleLog
 {
 public:
+    enum Type
+    {
+        L_NONE = 0,
+        L_INTERNAL = 1,
+        L_ERROR = 2,
+        L_DEBUG = 3,
+        L_INFO = 4,
+        L_TRACE = 5,
+        L_MAX = 6,
+    };
+
     virtual bool Acquire() = 0;                                              // slot 0
     virtual void Release() = 0;                                              // slot 1
-    virtual int GetType() const = 0;                                         // slot 2
+    virtual Type GetType() const = 0;                                        // slot 2
     virtual bool GetLog(wchar_t* buffer, unsigned long long size) const = 0;  // slot 3
 };
 static_assert(sizeof(ConsoleLog) == 0x8, "sizeof ConsoleLog");
 
-// ❓ The name of the ConsoleLog type enum is not in the PDB. L_NONE is the value
-// that WindowConsole compares with (0).
-enum ConsoleLogType  // ❓
-{
-    L_NONE = 0,  // ❓
-};
-
 // PDB global (LogBuffer.obj). Maps Log::Type to the ConsoleLog type.
-extern int const CONSOLE_LOG_TYPE[11];
+extern ConsoleLog::Type const CONSOLE_LOG_TYPE[11];
 
 class LogBuffer : public RefCntObject, public ConsoleLog
 {
@@ -43,7 +47,7 @@ public:
     }
     virtual ~LogBuffer();
     virtual void deallocate_me(void* ptr, wchar_t const* file, int line);
-    virtual int GetType() const;
+    virtual ConsoleLog::Type GetType() const;
     virtual bool Acquire();
     virtual void Release();
     virtual bool GetLog(wchar_t* buffer, unsigned long long size) const;

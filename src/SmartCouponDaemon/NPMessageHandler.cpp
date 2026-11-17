@@ -16,7 +16,7 @@ bool NPHandlerEventNoti(NPChannel* channel, _StsMsg* msg, NPTransaction* tran)
         Log::Write(Log::LT_ERROR, NPMESSAGEHANDLER_FILE, 49, L"[np], handle event-noti fail; msg is null");
         return false;
     }
-    if (msg->GetMessageType() != 2)
+    if (msg->GetMessageType() != MESSAGE_TYPE_RESPONSE)
         return false;
     _StsMsgResponseRewardBrokerEventNoti* res = static_cast<_StsMsgResponseRewardBrokerEventNoti*>(msg);
     if (tran != nullptr)

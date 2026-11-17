@@ -27,7 +27,7 @@ static wchar_t const IOWORKER_FILE[] = L"source\\IoWorkerThread.cpp";
 __declspec(thread) int IoWorker::WorkerId;
 __declspec(thread) ZSTD_CCtx_s* IoWorker::ZstdCCtx;
 
-// ❓ zstd global. All members are null (default allocator).
+// PDB ZSTD_defaultCMem (CacheGate zstd_compress.obj, 0x469c0). All members are null (default allocator).
 static ZSTD_customMem const ZSTD_defaultCMem = {nullptr, nullptr, nullptr};
 
 // 0x199E0

@@ -21,7 +21,7 @@ public:
 protected:
     virtual void write(LogBuffer const* logbuf) = 0;  // slot 5
 
-    LogMedia()  // ❓ inlined in Console::Console (0x13f50)
+    LogMedia()  // PDB constructor, inlined in Console::Console (0x13f50)
         : _bufferNodePos(-1), _head(nullptr), _tail(nullptr)
     {
         memset(_next, 0, sizeof(_next));

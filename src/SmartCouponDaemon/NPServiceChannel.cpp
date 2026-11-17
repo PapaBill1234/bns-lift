@@ -101,8 +101,8 @@ bool NPServiceChannel::SendRequestEventNoti(CouponJob* job, id128 const* gameAcc
         sprintf_s(strPublicationId, sizeof(strPublicationId), "%I64d", publicationId);
 
         _StsMsgRequestRewardRequestRewardForEvent msg;
-        msg.msgInfo.eCmd = 0xB24;
-        msg.msgInfo.msgType = 1;
+        msg.msgInfo.eCmd = COMMAND_SRV_REWARD_REQUEST_REWARD_FOR_EVENT;
+        msg.msgInfo.msgType = MESSAGE_TYPE_REQUEST;
         msg.msgInfo.nTxnId = 0;
         msg.pUserId = const_cast<id128*>(gameAccountId);
         msg.pszEventId = strEventId;
@@ -119,8 +119,8 @@ bool NPServiceChannel::SendRequestEventNoti(CouponJob* job, id128 const* gameAcc
     }
 
     _StsMsgRequestRewardBrokerEventNoti msg;
-    msg.msgInfo.eCmd = 2851;
-    msg.msgInfo.msgType = 1;
+    msg.msgInfo.eCmd = COMMAND_SRV_REWARDBROKER_EVENT_NOTI;
+    msg.msgInfo.msgType = MESSAGE_TYPE_REQUEST;
     msg.msgInfo.nTxnId = 0;
     msg.pUserId = const_cast<id128*>(gameAccountId);
     msg.nNotiType = 1;
@@ -164,7 +164,7 @@ bool NPMsgHandleEvent::HandleEvent(EventContext*, unsigned long)
 }
 
 // 0x10340
-bool NPServiceChannelManager::Initialize(unsigned long ip, unsigned short port)
+bool NPServiceChannelManager::Initialize(unsigned int portId, unsigned long ip, unsigned short portNo, long timeout)
 {
     if (_init)
     {
@@ -180,15 +180,15 @@ bool NPServiceChannelManager::Initialize(unsigned long ip, unsigned short port)
                    L"[npchmgr], initialize fail; init game-service channel fail");
         return false;
     }
-    if (!_npServChannel->Connect(0, 1, ip, port, 5, true))
+    if (!_npServChannel->Connect(0, portId, ip, portNo, timeout, true))
     {
         Log::Write(Log::LT_ERROR, NPSERVICECHANNEL_FILE, 209,
                    L"[npchmgr], initialize fail; connect game service channel fail");
         return false;
     }
     Log::Write(Log::LT_DEBUG, NPSERVICECHANNEL_FILE, 213,
-               L"[npchmgr], initialize ok, port-id:%d, ip:%s, port:%d, timeout:%d(sec)", 1,
-               Network::GetAddressStringW(ip), port, 5);
+               L"[npchmgr], initialize ok, port-id:%d, ip:%s, port:%d, timeout:%d(sec)", portId,
+               Network::GetAddressStringW(ip), portNo, timeout);
     return true;
 }
 
@@ -241,7 +241,7 @@ bool NPServiceChannelManager::HandleMessage(NPChannel* channel, _StsMsg* msg, vo
     if (channel == nullptr || msg == nullptr)
         return false;
     ECommand cmd = msg->GetCommand();
-    if (cmd < 2851 || cmd > 2852)
+    if (cmd < COMMAND_SRV_REWARDBROKER_EVENT_NOTI || cmd > COMMAND_SRV_REWARD_REQUEST_REWARD_FOR_EVENT)
     {
         Log::Write(Log::LT_ERROR, NPMESSAGEHANDLER_FILE, 36, L"[np], DispatchNPMessageHandler, invalid command, cmd:%d",
                    cmd);
@@ -253,6 +253,6 @@ bool NPServiceChannelManager::HandleMessage(NPChannel* channel, _StsMsg* msg, vo
         mem ? new (mem) NPMsgHandleEvent(channel, msg, static_cast<NPTransaction*>(context), NPHandlerEventNoti)
             : nullptr;
     channel->addReferenceCount(NPSERVICECHANNEL_FILE, 141);
-    PostQueuedCompletionStatus(Network::iocpHandleOrNull(), 0, reinterpret_cast<ULONG_PTR>(ev), nullptr);
+    PostQueuedCompletionStatus(Network::iocpHandle(), 0, reinterpret_cast<ULONG_PTR>(ev), nullptr);
     return true;
 }

@@ -39,8 +39,9 @@ static inline void destroyCrypt(PacketCrypt* crypt)
 
 // 0x22F50
 int zstdPacketCompress(unsigned char* dest, int* destLen, unsigned char const* src, int srcLen,
-                       unsigned char const* args)
+                       unsigned char const* args, int argsSize)
 {
+    (void)argsSize;
     ZSTD_CCtx_s* cctx = IoWorker::ZstdCCtx;
     if (cctx == nullptr || (args != nullptr && *reinterpret_cast<unsigned short const*>(args) > srcLen))
         return PacketCrypt::FAILED_COMP;
@@ -62,10 +63,10 @@ BroadcastCrypt::~BroadcastCrypt()
 bool BroadcastCrypt::Initialize(Type type, PacketCrypt::Algorithm algorithm, int broadcastCompressType)
 {
     clear();
-    unsigned char compressType = 1;  // ❓ local name
-    int paramSize = 1;               // ❓ local name
-    int keySize = 64;                // ❓ local name
-    unsigned char keyBuf[64];        // ❓ local name
+    char compressType = 1;
+    int paramSize = 1;
+    int keySize = 64;
+    unsigned char keyBuf[64];
 
     // Inlined allocation of a BroadcastPacketCrypt (0x2840 bytes) with its Crypto object after it.
     int cryptoSize = Crypto::InstanceSize(static_cast<Crypto::Type>(2));
@@ -81,7 +82,7 @@ bool BroadcastCrypt::Initialize(Type type, PacketCrypt::Algorithm algorithm, int
     if (crypt == nullptr)
         SECURITY_ASSERT_CRASH(96);
 
-    crypt->SetExternalCompressFunc(reinterpret_cast<void*>(&zstdPacketCompress), nullptr, 0);
+    crypt->SetExternalCompressFunc(&zstdPacketCompress, nullptr, 0);
     if (crypt->SetEncryptParam(PacketCrypt::PARAM_BROADCAST_GLOBAL) != PacketCrypt::SPCE_NO_ERROR)
     {
         // BUG: 0x23000 logs the constant 0 as the type, not the type argument.
@@ -94,7 +95,7 @@ bool BroadcastCrypt::Initialize(Type type, PacketCrypt::Algorithm algorithm, int
         crypt = nullptr;
         return false;
     }
-    if (crypt->GenerateKey(keyBuf, &keySize, &compressType, &paramSize) != PacketCrypt::SPCE_NO_ERROR)
+    if (crypt->GenerateKey(keyBuf, &keySize, reinterpret_cast<unsigned char*>(&compressType), &paramSize) != PacketCrypt::SPCE_NO_ERROR)
     {
         Log::Write(Log::LT_ERROR, SECURITY_FILE, 110,
                    L"BroadcastCrypt, initialize failed;generate broadcast key failed, type:%d", 0);
@@ -138,7 +139,7 @@ extern "C" int compress2(unsigned char* dest, int* destLen, unsigned char const*
 }
 
 // 0x4CF60
-int BroadcastPacketCrypt::SetKey(unsigned char const* key, int keySize)
+PacketCrypt::ErrCode BroadcastPacketCrypt::SetKey(unsigned char const* key, int keySize)
 {
     (void)key;
     (void)keySize;
@@ -166,7 +167,7 @@ BroadcastPacketCrypt::~BroadcastPacketCrypt()
 }
 
 // 0x4DC00
-int BroadcastPacketCrypt::SetEncryptParam(int param)
+PacketCrypt::ErrCode BroadcastPacketCrypt::SetEncryptParam(Param param)
 {
     if (param != PacketCrypt::PARAM_BROADCAST_LOCAL && param != PacketCrypt::PARAM_BROADCAST_GLOBAL &&
         param != PacketCrypt::PARAM_BROADCAST_LOCAL_COMPRESS)
@@ -176,7 +177,7 @@ int BroadcastPacketCrypt::SetEncryptParam(int param)
 }
 
 // 0x4DC20
-int BroadcastPacketCrypt::GenerateKey(unsigned char* key1, int* size1, unsigned char* key2, int* size2)
+PacketCrypt::ErrCode BroadcastPacketCrypt::GenerateKey(unsigned char* key1, int* size1, unsigned char* key2, int* size2)
 {
     if (key1 == nullptr || size1 == nullptr || *size1 < 16)
         return PacketCrypt::INVALID_PARAM;
@@ -201,7 +202,7 @@ int BroadcastPacketCrypt::GenerateKey(unsigned char* key1, int* size1, unsigned 
 }
 
 // 0x4DD70
-int BroadcastPacketCrypt::Encrypt(unsigned char* buffer, int* bufferSize, int size, bool with3rdParty)
+PacketCrypt::ErrCode BroadcastPacketCrypt::Encrypt(unsigned char* buffer, int* bufferSize, int size, bool with3rdParty)
 {
     (void)with3rdParty;
     if (_keySet == false)
@@ -214,18 +215,18 @@ int BroadcastPacketCrypt::Encrypt(unsigned char* buffer, int* bufferSize, int si
     switch (_param)
     {
     case PacketCrypt::PARAM_BROADCAST_LOCAL:
-        type = 12;
+        type = PacketCrypt::BROADCAST_LOCAL_KEY;
         break;
     case PacketCrypt::PARAM_BROADCAST_GLOBAL:
-        type = 14;
+        type = PacketCrypt::BROADCAST_GLOBAL_KEY;
         break;
     case PacketCrypt::PARAM_BROADCAST_LOCAL_COMPRESS:
     {
-        type = 13;
+        type = PacketCrypt::BROADCAST_LOCAL_KEY_COMPRESS;
         int result;
-        if (_compressType == 1)
+        if (_compressType == PacketCrypt::COMPRESS_TYPE1)
             result = compress2(_buffer, &_bufferSize, src, size);
-        else if (_compressType == 2)
+        else if (_compressType == PacketCrypt::COMPRESS_TYPE2)
             result = _compressFunc(_buffer, &_bufferSize, src, size, _dict, _dictSize);
         else
             return PacketCrypt::INVALID_PARAM;
@@ -236,7 +237,7 @@ int BroadcastPacketCrypt::Encrypt(unsigned char* buffer, int* bufferSize, int si
         }
         else
         {
-            type = 12;
+            type = PacketCrypt::BROADCAST_LOCAL_KEY;
         }
         break;
     }
@@ -257,7 +258,7 @@ int BroadcastPacketCrypt::Encrypt(unsigned char* buffer, int* bufferSize, int si
 }
 
 // 0x4DF30
-int BroadcastPacketCrypt::Decrypt(unsigned char* buffer, int size, int* outSize, bool* with3rdParty)
+PacketCrypt::ErrCode BroadcastPacketCrypt::Decrypt(unsigned char* buffer, int size, int* outSize, bool* with3rdParty)
 {
     (void)buffer;
     (void)size;
@@ -267,12 +268,12 @@ int BroadcastPacketCrypt::Decrypt(unsigned char* buffer, int size, int* outSize,
 }
 
 // 0x4DF40
-int BroadcastPacketCrypt::SetExternalCompressFunc(void* func, unsigned char const* data, int size)
+PacketCrypt::ErrCode BroadcastPacketCrypt::SetExternalCompressFunc(ExternalCompressFunc func, unsigned char const* data, int size)
 {
     size_t dataSize = size;
     if (_compressFunc != nullptr)
         return PacketCrypt::FAILED_SET_EXT_COMP_FUNC;
-    _compressFunc = reinterpret_cast<CompressFunc>(func);
+    _compressFunc = func;
     if (data != nullptr)
     {
         if (_dict != nullptr)

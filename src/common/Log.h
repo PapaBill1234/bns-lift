@@ -38,7 +38,7 @@ public:
     static wchar_t const* TypeName[LT_MAX];  // 0x83140 (SmartCouponDaemon)
 
 private:
-    Log()  // ❓ inlined in Initialize (0x9DA0)
+    Log()  // PDB constructor, inlined in Initialize (0x9DA0)
         : open(false), flush(false), mediaCount(0)
     {
         _maxFrozenSeconds = 60;

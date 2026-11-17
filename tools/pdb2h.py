@@ -12,8 +12,12 @@ Output:
   - base classes, data members, virtual methods in vtable order;
   - static_assert(sizeof) and static_assert(offsetof) for each type and member;
   - extern declarations of global data (S_GDATA32).
-Skipped: CRT and STL internals, nested types, templates that are not mapped,
-anonymous types. A member that has a type which the script cannot write becomes a
+Nested types go inside their outer class. Members of anonymous structs and unions
+(the PDB lists them flat) go back into anonymous unions and structs.
+A Windows SDK or CRT struct that a member uses by value comes from the PDB too,
+with its PDB name (_GUID, _RTL_CRITICAL_SECTION). The header includes no SDK header.
+Skipped: CRT and STL internals, templates that are not mapped.
+A member that has a type which the script cannot write becomes a
 byte array with the same offset and size (comment: original type name).
 std:: types map to include/vs2010/ (string, vector, map, set, deque, queue, pair).
 """
@@ -375,6 +379,10 @@ def parse_tmpl(s):
     return s[:i].strip(), split_args(s[i + 1:-1])
 
 
+class GenFail(Exception):
+    pass
+
+
 class Gen:
     def __init__(self, pdb_path, server):
         msf = Msf(pdb_path)
@@ -386,6 +394,12 @@ class Gen:
         self.emit = {}       # name -> ti, types that the header writes
         self.fwd_extra = set()  # class names that only get a forward declaration
         self.notes = []
+        self.children = {}   # outer class name -> nested type names
+        self.nested_ok = set()  # nested types that the header writes inside the outer class
+        self.extra = set()   # "_" names that a member uses by value
+        self.extra_failed = set()
+        self.nested_failed = {}
+        self.changed = False
         self._index()
 
     # -- index ------------------------------------------------------------
@@ -405,6 +419,20 @@ class Gen:
             r = self.tpi.get(ti)
             if self._want(n, r):
                 self.emit[n] = ti
+        for n, ti in self.defs.items():
+            if "::" not in n or n.startswith(SKIP_PREFIX) or not valid_name(n):
+                continue
+            outer = n.rsplit("::", 1)[0]
+            r = self.tpi.get(ti)
+            if outer in self.defs and self.kinds.get(outer) != LF_ENUM and (r.leaf == LF_ENUM or r.size):
+                self.children.setdefault(outer, []).append(n)
+                self.nested_ok.add(n)
+
+    def top_of(self, n):
+        """Top-level class that holds the nested type n, or None."""
+        while n in self.nested_ok:
+            n = n.rsplit("::", 1)[0]
+        return n if n in self.emit else None
 
     def _want(self, n, r):
         if n.startswith(SKIP_PREFIX) or n in SKIP_NAMES or not valid_name(n):
@@ -461,7 +489,7 @@ class Gen:
             if u is not None and u.leaf in (LF_PROCEDURE, LF_MFUNCTION):
                 t = "void *"         # function pointer: the lift writes the real type
             elif u is not None and u.leaf in UDT_LEAVES:
-                t = self.ptr_target(u.name, soft) or "void"
+                t = self.ptr_target(u.name, soft, hard) or "void"
                 t = t + (" &" if r.mode in (1, 4) else " *")
             else:
                 t = self.tname(r.utype, set(), soft) if r.utype >= 0x1000 else self.prim(r.utype)
@@ -479,17 +507,32 @@ class Gen:
             if n in self.emit:
                 hard.add(n)
                 return n
+            if n in self.nested_ok and self.top_of(n):
+                hard.add(self.top_of(n))
+                hard.add(n)
+                return n
             if n.startswith("std::"):
                 return self.std_name(n, hard, soft)
             if r.leaf == LF_ENUM:
                 return self.tname(r.utype, hard, soft)
+            if ((n.startswith("_") or n in SKIP_NAMES) and IDENT.match(n) and r.size
+                    and n in self.defs and n not in self.extra and n not in self.extra_failed):
+                self.extra.add(n)      # a Windows SDK or CRT struct by value: the next pass writes it
             return None
         return None
 
-    def ptr_target(self, n, soft):
+    def ptr_target(self, n, soft, hard=None):
         """Name of a class that is used only through a pointer."""
         if n in self.emit:
             soft.add(n)
+            return n
+        if n in self.nested_ok and self.top_of(n):
+            # a nested class has no forward declaration outside its outer class
+            if hard is not None:
+                hard.add(self.top_of(n))
+                hard.add(n)
+            else:
+                soft.add(self.top_of(n))
             return n
         if n.startswith("std::"):
             return self.std_name(n, set(), soft)
@@ -510,7 +553,7 @@ class Gen:
             if inner in NAME_PRIM:
                 t = NAME_PRIM[inner]
             elif inner.startswith("std::") or "<" not in inner:
-                t = self.ptr_target(inner, soft)
+                t = self.ptr_target(inner, soft, hard)
             else:
                 t = None
             if t is None:
@@ -526,6 +569,10 @@ class Gen:
         if s.startswith("std::"):
             return self.std_name(s, hard, soft)
         if s in self.emit:
+            hard.add(s)
+            return s
+        if s in self.nested_ok and self.top_of(s):
+            hard.add(self.top_of(s))
             hard.add(s)
             return s
         ti = self.defs.get(s)
@@ -570,10 +617,13 @@ class Gen:
             cb, ca = parse_tmpl(a[1])
             if cb != "std::vector" or not ca or ca[0] != a[0]:
                 return None
-            if a[2] not in ("std::less<%s >" % a[0], "std::less<%s>" % a[0]):
-                return None
             x = self.sname(a[0], hard, soft)
-            return None if x is None else "std::priority_queue<%s>" % x
+            if x is None:
+                return None
+            if a[2] not in ("std::less<%s >" % a[0], "std::less<%s>" % a[0]):
+                c = self.sname(a[2], hard, soft)
+                return None if c is None else "std::priority_queue<%s, std::vector<%s>, %s>" % (x, x, c)
+            return "std::priority_queue<%s>" % x
         return None
 
     # -- size and alignment -------------------------------------------------
@@ -658,17 +708,26 @@ class Gen:
             return None
         short = cls.rsplit("::", 1)[-1]
         args = []
+        sh = set()
         al = self.tpi.get(m.arglist)
         for i, a in enumerate(al.args if al and al.args else []):
             if a == 0x0003 and len(al.args) == 1:
                 break
-            t = self.tname(a, set(), soft)
+            t = self.tname(a, sh, soft)
             if t is None:
                 t = "void *"     # ❓ type not written by pdb2h
             args.append(t)
         if name.startswith("~"):
             return "~%s()" % short
-        rv = self.tname(m.rvtype, set(), soft) or "void *"
+        rv = self.tname(m.rvtype, sh, soft) or "void *"
+        # a nested type in a signature needs the full outer class; other classes need only a declaration
+        for h in sh:
+            if h in self.nested_ok:
+                hard.add(self.top_of(h))
+            elif self.kinds.get(h) == LF_ENUM:
+                hard.add(h)
+            else:
+                soft.add(h)
         if name == short:
             return None
         if not IDENT.match(name):
@@ -717,6 +776,9 @@ class Gen:
         for f in fields:
             if f.leaf == LF_BCLASS:
                 b = self.tpi.get(self.resolve(f.type))
+                if (b is not None and b.name not in self.emit and (b.name.startswith("_") or b.name in SKIP_NAMES)
+                        and IDENT.match(b.name) and b.name in self.defs and b.name not in self.extra_failed):
+                    self.extra.add(b.name)
                 if b is None or b.name not in self.emit:
                     return None, "base %s" % (b.name if b else "?")
                 hard.add(b.name)
@@ -730,6 +792,42 @@ class Gen:
                     bases.append("virtual public " + b.name)
         head = "%s %s%s {" % (kw, short, (" : " + ", ".join(bases)) if bases else "")
         out = [head, "public:"]
+        nested_asserts = []
+        kids = [c for c in sorted(self.children.get(n, ())) if c in self.nested_ok]
+        if kids:
+            kkw = {LF_CLASS: "class", LF_STRUCTURE: "struct", LF_INTERFACE: "struct", LF_UNION: "union"}
+            kb, kd = {}, {}
+            for c in kids:
+                cr = self.tpi.get(self.defs[c])
+                if cr.leaf == LF_ENUM:
+                    kb[c], kd[c] = (self.body_enum(c, cr), []), set()
+                    continue
+                ch, cs = set(), set()
+                cl, ca = self.body_udt(c, cr, ch, cs)
+                if cl is None:
+                    self.nested_ok.discard(c)
+                    self.nested_failed[c] = ca
+                    self.changed = True
+                    continue
+                kb[c], kd[c] = (cl, ca), ch
+                hard |= {h for h in ch if h != c}
+                soft |= cs
+            for c in kb:
+                if self.kinds.get(c) != LF_ENUM:
+                    out.append("    %s %s;" % (kkw[self.kinds[c]], c.rsplit("::", 1)[1]))
+            done = []
+
+            def put(c, stack):
+                if c in done or c in stack:
+                    return
+                for d in sorted(kd[c]):
+                    if d in kb and d != c:
+                        put(d, stack + [c])
+                done.append(c)
+                out.extend("    " + l for l in kb[c][0])
+                nested_asserts.extend(kb[c][1])
+            for c in sorted(kb, key=lambda c: (self.kinds.get(c) != LF_ENUM, c)):
+                put(c, [])
 
         # virtual methods, vtable order
         vt = []
@@ -767,89 +865,184 @@ class Gen:
         members = [f for f in fields if f.leaf == LF_MEMBER]
         asserts = []
         start = 0
-        if any(f.leaf == LF_VFUNCTAB for f in fields) and not bases:
-            start = 8
+        if any(f.leaf == LF_VFUNCTAB for f in fields):
+            start = 8             # this class adds the vfptr (also with a base that has no vfptr)
         for f in fields:
             if f.leaf == LF_BCLASS:
                 b = self.tpi.get(self.resolve(f.type))
-                start = max(start, f.offset + b.size)
+                if not self.is_empty(b):   # an empty base takes no space
+                    start = max(start, f.offset + b.size)
         if any(f.leaf in (LF_VBCLASS, LF_IVBCLASS) for f in fields):
             start = None          # vbptr position: no padding check
-        cur = start
-        npad = 0
-        i = 0
         is_union = r.leaf == LF_UNION
-        while i < len(members):
-            f = members[i]
-            # a run of members at the same offset becomes an anonymous union
-            run = [f]
-            if not is_union:
-                while (i + len(run) < len(members)
-                       and members[i + len(run)].offset == f.offset
-                       and not self.is_bf(members[i + len(run)].type)
-                       and not self.is_bf(f.type)):
-                    run.append(members[i + len(run)])
-            off = f.offset
-            if cur is not None and not is_union:
-                if off < cur:
-                    if not self.is_bf(f.type):
-                        return None, "member %s overlaps (0x%x < 0x%x)" % (f.name, off, cur)
-                else:
-                    _s, al = self.size_align(f.type)
-                    nat = (cur + al - 1) // al * al
-                    if nat != off:
-                        if off > cur and off % al == 0:
-                            out.append("    char _pdb_pad%d[0x%X];" % (npad, off - cur))
-                            npad += 1
-                        else:
-                            return None, "member %s needs pack (0x%x)" % (f.name, off)
-            lines, end = [], off
-            for g in run:
-                if not IDENT.match(g.name):
-                    return None, "member name %s" % g.name
-                if self.is_bf(g.type):
-                    t = self.tpi.get(g.type)
-                    bt = self.tname(t.utype, hard, soft) or "unsigned int"
-                    lines.append("%s %s : %d;" % (bt, g.name, t.length))
-                    bs, _a = self.size_align(t.utype)
-                    end = max(end, g.offset + bs)   # bitfields share one storage unit
-                    continue
-                d = self.decl(g.type, g.name, hard, soft)
-                gs, ga = self.size_align(g.type)
-                if d is None:
-                    if gs == 0:
-                        return None, "member %s has size 0" % g.name
-                    # keep the alignment of the original type (a byte array has alignment 1)
-                    d = "%sunsigned char %s[0x%X];  // ❓ PDB type 0x%X: %s" % (
-                        "alignas(%d) " % ga if ga > 1 else "",
-                        g.name, gs, g.type, self.type_label(g.type))
-                else:
-                    d += ";"
-                lines.append(d)
-                end = max(end, g.offset + gs)
-                if not is_union:
-                    asserts.append("static_assert(offsetof(%s, %s) == 0x%X, \"%s::%s\");"
-                                   % (n, g.name, g.offset, n, g.name))
-            if len(run) > 1:
-                out.append("    union {")
-                out += ["        " + l for l in lines]
-                out.append("    };")
-            else:
-                out += ["    " + l for l in lines]
-            if cur is not None:
-                cur = max(cur, end) if not is_union else cur
-            i += len(run)
+        self._npad = 0
+        try:
+            lines, cur, _top = self.render(n, self.group(members, is_union), start, is_union, hard, soft, asserts)
+        except GenFail as e:
+            return None, str(e)
+        out += ["    " + l for l in lines]
         # tail padding
         if cur is not None and not is_union:
             al = self.udt_align(self.defs[n])
             nat = (cur + al - 1) // al * al
-            if nat < r.size:
+            if self.is_empty(r):
+                pass                  # an empty class has size 1 and no member
+            elif nat < r.size:
                 out.append("    char _pdb_tail[0x%X];" % (r.size - cur))
             elif nat > r.size:
                 return None, "size 0x%x < natural 0x%x" % (r.size, nat)
         out.append("};")
         asserts.insert(0, "static_assert(sizeof(%s) == 0x%X, \"sizeof %s\");" % (n, r.size, n))
-        return out, asserts
+        return out, asserts + nested_asserts
+
+    def anon_decl(self, ti, name, hard, soft):
+        """Lines 'struct { ... } name;' for a member that has an unnamed struct or union type."""
+        r = self.tpi.get(self.resolve(ti)) if ti >= 0x1000 else None
+        if r is None or r.leaf not in UDT_LEAVES or "<unnamed" not in r.name or not r.size:
+            return None
+        self._anon = getattr(self, "_anon", 0) + 1
+        fake = "_pdb_anon%d" % self._anon
+        self.defs[fake] = self.resolve(ti)
+        npad = self._npad
+        try:
+            lines, _asserts = self.body_udt(fake, r, hard, soft)
+        finally:
+            del self.defs[fake]
+            self._npad = npad
+        if lines is None or any(l.lstrip().startswith("virtual ") for l in lines):
+            return None
+        kw = "union" if r.leaf == LF_UNION else "struct"
+        body = [l for l in lines[1:-1] if l != "public:"]
+        return [kw + " {"] + body + ["} %s;" % name]
+
+    # -- data members: the PDB lists the members of anonymous structs and unions flat -----
+    def m_end(self, f):
+        if self.is_bf(f.type):
+            return f.offset + self.size_align(self.tpi.get(f.type).utype)[0]
+        return f.offset + self.size_align(f.type)[0]
+
+    def m_align(self, f):
+        if self.is_bf(f.type):
+            return self.size_align(self.tpi.get(f.type).utype)[1]
+        return self.size_align(f.type)[1]
+
+    def group(self, members, is_union):
+        """Put flat members back into anonymous unions and structs.
+        Node: ("m", member) | ("u", [alternative, ...]); an alternative is a list of nodes."""
+        def both_bf(k):
+            return self.is_bf(members[k].type) and self.is_bf(members[k - 1].type)
+
+        def alts(i, splits, e):
+            b = [i] + splits + [e]
+            return ("u", [self.group(members[b[j]:b[j + 1]], False) for j in range(len(b) - 1)])
+
+        n = len(members)
+        if is_union:
+            if not members:
+                return []
+            base = members[0].offset
+            splits = [k for k in range(1, n) if members[k].offset == base and not both_bf(k)]
+            return [alts(0, splits, n)]
+        nodes, i = [], 0
+        while i < n:
+            base = members[i].offset
+            splits = [k for k in range(i + 1, n) if members[k].offset == base and not both_bf(k)]
+            if not splits:
+                nodes.append(("m", members[i]))
+                i += 1
+                continue
+            uend = max(self.m_end(m) for m in members[i:splits[-1] + 1])
+            e = splits[-1] + 1
+            while e < n and base < members[e].offset < uend:
+                e += 1
+            nodes.append(alts(i, splits, e))
+            i = e
+        return nodes
+
+    def node_members(self, node):
+        if node[0] == "m":
+            return [node[1]]
+        return [m for alt in node[1] for nd in alt for m in self.node_members(nd)]
+
+    def render(self, n, nodes, cur, is_union, hard, soft, asserts):
+        """Lines for the nodes. Return (lines, cur, largest end offset). cur None = no padding check."""
+        out = []
+        top = 0
+        for node in nodes:
+            ms = self.node_members(node)
+            off = min(m.offset for m in ms)
+            al = max(self.m_align(m) for m in ms)
+            if cur is not None and not is_union:
+                if off < cur:
+                    if not (node[0] == "m" and self.is_bf(node[1].type)):
+                        raise GenFail("member %s overlaps (0x%x < 0x%x)" % (ms[0].name, off, cur))
+                else:
+                    nat = (cur + al - 1) // al * al
+                    if nat != off:
+                        if off > cur and off % al == 0:
+                            out.append("char _pdb_pad%d[0x%X];" % (self._npad, off - cur))
+                            self._npad += 1
+                        else:
+                            raise GenFail("member %s needs pack (0x%x)" % (ms[0].name, off))
+            end = off
+            if node[0] == "m":
+                g = node[1]
+                if not IDENT.match(g.name):
+                    raise GenFail("member name %s" % g.name)
+                if self.is_bf(g.type):
+                    t = self.tpi.get(g.type)
+                    bt = self.tname(t.utype, hard, soft) or "unsigned int"
+                    out.append("%s %s : %d;" % (bt, g.name, t.length))
+                    end = self.m_end(g)     # bitfields share one storage unit
+                else:
+                    d = self.decl(g.type, g.name, hard, soft)
+                    gs, ga = self.size_align(g.type)
+                    anon = self.anon_decl(g.type, g.name, hard, soft) if d is None else None
+                    if anon is not None:
+                        out += anon
+                    elif d is None:
+                        if gs == 0:
+                            raise GenFail("member %s has size 0" % g.name)
+                        # keep the alignment of the original type (a byte array has alignment 1)
+                        out.append("%sunsigned char %s[0x%X];  // ❓ PDB type 0x%X: %s" % (
+                            "alignas(%d) " % ga if ga > 1 else "",
+                            g.name, gs, g.type, self.type_label(g.type)))
+                    else:
+                        out.append(d + ";")
+                    end = g.offset + gs
+                    if n is not None:
+                        asserts.append("static_assert(offsetof(%s, %s) == 0x%X, \"%s::%s\");"
+                                       % (n, g.name, g.offset, n, g.name))
+            else:
+                inner = []
+                for alt in node[1]:
+                    if len(alt) == 1 and alt[0][0] == "m":
+                        l2, _c, e2 = self.render(n, alt, None, True, hard, soft, asserts)
+                        inner += l2
+                    else:
+                        l2, _c, e2 = self.render(n, alt, off, False, hard, soft, asserts)
+                        inner += ["struct {"] + ["    " + x for x in l2] + ["};"]
+                    end = max(end, e2)
+                if is_union:
+                    out += inner            # the type itself is the union
+                else:
+                    out += ["union {"] + ["    " + x for x in inner] + ["};"]
+            top = max(top, end)
+            if cur is not None:
+                cur = max(cur, end)
+        return out, cur, top
+
+    def is_empty(self, r):
+        """True for a class that has no data member, no vfptr and only empty bases."""
+        if r is None or r.size > 1:
+            return False
+        fl = self.tpi.get(r.field)
+        for f in (fl.fields if fl and fl.fields else []):
+            if f.leaf in (LF_MEMBER, LF_VFUNCTAB, LF_VBCLASS, LF_IVBCLASS):
+                return False
+            if f.leaf == LF_BCLASS and not self.is_empty(self.tpi.get(self.resolve(f.type))):
+                return False
+        return True
 
     def methods_safe(self, fields):
         class _F:
@@ -883,10 +1076,14 @@ class Gen:
         changed = True
         while changed:
             changed = False
+            self.changed = False
             bodies.clear()
             deps.clear()
             self.enum_names = {}
             self.fwd_extra = set()
+            for n in sorted(self.extra):
+                if n not in self.emit and n not in self.extra_failed:
+                    self.emit[n] = self.defs[n]
             for n in sorted(self.emit):
                 r = self.tpi.get(self.emit[n])
                 if r.leaf == LF_ENUM:
@@ -901,8 +1098,19 @@ class Gen:
                     continue
                 bodies[n] = (lines, extra)
                 deps[n] = hard - {n}
-            for n in dropped:
-                self.emit.pop(n, None)
+            pending = [n for n in self.extra if n not in self.emit and n not in self.extra_failed]
+            for n in list(dropped):
+                if n in self.extra:
+                    self.extra_failed.add(n)
+                    self.emit.pop(n, None)
+                elif pending and dropped[n].startswith("base "):
+                    del dropped[n]            # the base comes in the next pass
+                else:
+                    self.emit.pop(n, None)
+            if self.changed or pending:
+                changed = True
+        for n, why in self.nested_failed.items():
+            dropped.setdefault(n, why)
         order = self.topo(deps)
         return order, bodies, dropped
 
@@ -944,7 +1152,7 @@ class Gen:
                 if r and r.leaf in UDT_LEAVES and r.name not in self.emit and not r.name.startswith("std::"):
                     continue
             d = self.decl(g["type"], n, hard, soft)
-            if d is None or any(h not in self.emit for h in hard):
+            if d is None or any(h not in self.emit and h not in self.nested_ok for h in hard):
                 continue
             out.append("extern %s;" % d)
         return out
@@ -1006,6 +1214,9 @@ class Gen:
         ns, _s = self.split_ns(n)
         if not ns:
             return lines
+        if ns.split("::")[0] in self.defs:
+            # a type that is local to a member function: C++ cannot name it from outside
+            ns = "pdb_local::" + ns
         return ["namespace %s {" % ns] + lines + ["}  // namespace %s" % ns]
 
 

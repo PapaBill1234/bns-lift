@@ -1,6 +1,6 @@
-// BnsCommonConfigDefinition.obj (CacheGate PDB).  // ❓ file name
+// BnsCommonConfigDefinition.obj (CacheGate PDB).
 // Source file in the binary: ..\..\Shared\BnsCommonConfigDefinition.cpp
-#include "BnsCommonConfig.h"
+#include "BnsCommonConfigDefinition.h"
 #include "AlertSender.h"
 #include "Daemon.h"
 #include "Log.h"
@@ -16,8 +16,8 @@
 namespace
 {
 wchar_t const* const FILE_NAME = L"..\\..\\Shared\\BnsCommonConfigDefinition.cpp";  // ❓ name
-wchar_t const* const CONFIG_FILE = L"bns.common.config.xml";                      // ❓ name
-wchar_t const* const CONFIG_NAME = L"bns-common-config";                          // ❓ name
+wchar_t const* const CONFIG_FILENAME = L"bns.common.config.xml";    // 0x59278
+wchar_t const* const CONFIG_MODULENAME = L"bns-common-config";  // 0x59370
 }
 
 static int const MIN_NP_PROGRAM_ID = 0;        // 0x467b4
@@ -41,45 +41,45 @@ BnsCommonConfig* BnsCommonConfig::ConfigOlds = nullptr;          // 0x5a3d8
 
 // 0x594b0
 XmlCfgDefLocal const BnsCommonConfig::_Def[5] = {
-    {offsetof(BnsCommonConfig, _pType), L"p-type", XML_CFG_TYPE_WSTRING, 4, nullptr, nullptr, false, L"live",
+    {offsetof(BnsCommonConfig, _pType), L"p-type", XmlCfgDef::CFG_STR, XmlCfgDefLocal::CFG_DEF_TYPE_STRING, nullptr, nullptr, false, L"live",
      offsetof(BnsCommonConfig, _pType)},
-    {offsetof(BnsCommonConfig, _npProgramId), L"np-program-id", XML_CFG_TYPE_INT, 0, &MIN_NP_PROGRAM_ID,
+    {offsetof(BnsCommonConfig, _npProgramId), L"np-program-id", XmlCfgDef::CFG_INT, XmlCfgDefLocal::CFG_DEF_TYPE_INT, &MIN_NP_PROGRAM_ID,
      &MAX_NP_PROGRAM_ID, false, &DEFAULT_NP_PROGRAM_ID, offsetof(BnsCommonConfig, _npProgramId)},
-    {offsetof(BnsCommonConfig, _npGameCode), L"np-game-code", XML_CFG_TYPE_WSTRING, 4, nullptr, nullptr, false,
+    {offsetof(BnsCommonConfig, _npGameCode), L"np-game-code", XmlCfgDef::CFG_STR, XmlCfgDefLocal::CFG_DEF_TYPE_STRING, nullptr, nullptr, false,
      L"bnsprog", offsetof(BnsCommonConfig, _npGameCode)},
-    {offsetof(BnsCommonConfig, _npAppIdStr), L"np-app-id", XML_CFG_TYPE_WSTRING, CFG_DEF_TYPE_GUID, nullptr,
+    {offsetof(BnsCommonConfig, _npAppIdStr), L"np-app-id", XmlCfgDef::CFG_STR, XmlCfgDefLocal::CFG_DEF_TYPE_GUID, nullptr,
      nullptr, true, NP_APP_ID_DEFAULT, offsetof(BnsCommonConfig, _npAppId)},
-    {offsetof(BnsCommonConfig, _npClientAppIdStr), L"np-client-app-id", XML_CFG_TYPE_WSTRING, CFG_DEF_TYPE_GUID,
+    {offsetof(BnsCommonConfig, _npClientAppIdStr), L"np-client-app-id", XmlCfgDef::CFG_STR, XmlCfgDefLocal::CFG_DEF_TYPE_GUID,
      nullptr, nullptr, true, NP_CLIENT_APP_ID_DEFAULT, offsetof(BnsCommonConfig, _npClientAppId)},
 };
 
 // 0x593e0
 XmlCfgDefLocal const BnsCommonConfig::_DefReload[2] = {
-    {offsetof(BnsCommonConfig, _npAppIdStr), L"np-app-id", XML_CFG_TYPE_WSTRING, CFG_DEF_TYPE_GUID, nullptr,
+    {offsetof(BnsCommonConfig, _npAppIdStr), L"np-app-id", XmlCfgDef::CFG_STR, XmlCfgDefLocal::CFG_DEF_TYPE_GUID, nullptr,
      nullptr, true, NP_APP_ID_DEFAULT, offsetof(BnsCommonConfig, _npAppId)},
-    {offsetof(BnsCommonConfig, _npClientAppIdStr), L"np-client-app-id", XML_CFG_TYPE_WSTRING, CFG_DEF_TYPE_GUID,
+    {offsetof(BnsCommonConfig, _npClientAppIdStr), L"np-client-app-id", XmlCfgDef::CFG_STR, XmlCfgDefLocal::CFG_DEF_TYPE_GUID,
      nullptr, nullptr, true, NP_CLIENT_APP_ID_DEFAULT, offsetof(BnsCommonConfig, _npClientAppId)},
 };
 
 // 0x595f0
 XmlCfgDef const BnsCommonConfigLoad::_Def[5] = {
-    {offsetof(BnsCommonConfigLoad, _pType), L"p-type", XML_CFG_TYPE_WSTRING, 1, L"live",
+    {offsetof(BnsCommonConfigLoad, _pType), L"p-type", XmlCfgDef::CFG_STR, 1, L"live",
      L"product-type. live / remaster !!IF YOU HAVE ANY QUESTION ABOUT THIS CONFIG, PLEASE ASK TO STEAKY!!"},
-    {offsetof(BnsCommonConfigLoad, _npProgramId), L"np-program-id", XML_CFG_TYPE_INT, 0, &DEFAULT_NP_PROGRAM_ID,
+    {offsetof(BnsCommonConfigLoad, _npProgramId), L"np-program-id", XmlCfgDef::CFG_INT, 0, &DEFAULT_NP_PROGRAM_ID,
      L"NP program-id. 302:live(QA), 303:program, 304:internal, 305:branch (0 ~ 10000)"},
-    {offsetof(BnsCommonConfigLoad, _npGameCode), L"np-game-code", XML_CFG_TYPE_WSTRING, 0, L"bnsprog",
+    {offsetof(BnsCommonConfigLoad, _npGameCode), L"np-game-code", XmlCfgDef::CFG_STR, 0, L"bnsprog",
      L"NP game-code. bns:live(QA), bnsprog:program, bnsintr:internal, bnsbr:branch"},
-    {offsetof(BnsCommonConfigLoad, _npAppIdStr), L"np-app-id", XML_CFG_TYPE_WSTRING, 0, NP_APP_ID_DEFAULT,
+    {offsetof(BnsCommonConfigLoad, _npAppIdStr), L"np-app-id", XmlCfgDef::CFG_STR, 0, NP_APP_ID_DEFAULT,
      NP_APP_ID_DESC},
-    {offsetof(BnsCommonConfigLoad, _npClientAppIdStr), L"np-client-app-id", XML_CFG_TYPE_WSTRING, 0,
+    {offsetof(BnsCommonConfigLoad, _npClientAppIdStr), L"np-client-app-id", XmlCfgDef::CFG_STR, 0,
      NP_CLIENT_APP_ID_DEFAULT, NP_CLIENT_APP_ID_DESC},
 };
 
 // 0x59460
 XmlCfgDef const BnsCommonConfigReload::_Def[2] = {
-    {offsetof(BnsCommonConfigReload, _npAppIdStr), L"np-app-id", XML_CFG_TYPE_WSTRING, 0, NP_APP_ID_DEFAULT,
+    {offsetof(BnsCommonConfigReload, _npAppIdStr), L"np-app-id", XmlCfgDef::CFG_STR, 0, NP_APP_ID_DEFAULT,
      NP_APP_ID_DESC},
-    {offsetof(BnsCommonConfigReload, _npClientAppIdStr), L"np-client-app-id", XML_CFG_TYPE_WSTRING, 0,
+    {offsetof(BnsCommonConfigReload, _npClientAppIdStr), L"np-client-app-id", XmlCfgDef::CFG_STR, 0,
      NP_CLIENT_APP_ID_DEFAULT, NP_CLIENT_APP_ID_DESC},
 };
 
@@ -87,18 +87,18 @@ XmlCfgDef const BnsCommonConfigReload::_Def[2] = {
 BnsCommonConfigLoad* BnsCommonConfigLoad::Load()
 {
     wchar_t configPath[MAX_PATH] = {0};
-    PathCombineW(configPath, Daemon::Instance->confDir, CONFIG_FILE);
+    PathCombineW(configPath, Daemon::Instance->confDir, CONFIG_FILENAME);
     return static_cast<BnsCommonConfigLoad*>(
-        DaemonConfig::Load(BnsCommonConfigLoad::_Def, 5, sizeof(BnsCommonConfigLoad), configPath, CONFIG_NAME, false));
+        DaemonConfig::Load(BnsCommonConfigLoad::_Def, 5, sizeof(BnsCommonConfigLoad), configPath, CONFIG_MODULENAME, false));
 }
 
 // 0x1340
 BnsCommonConfigReload* BnsCommonConfigReload::Load()
 {
     wchar_t configPath[MAX_PATH] = {0};
-    PathCombineW(configPath, Daemon::Instance->confDir, CONFIG_FILE);
+    PathCombineW(configPath, Daemon::Instance->confDir, CONFIG_FILENAME);
     return static_cast<BnsCommonConfigReload*>(DaemonConfig::Load(
-        BnsCommonConfigReload::_Def, 2, sizeof(BnsCommonConfigReload), configPath, CONFIG_NAME, true));
+        BnsCommonConfigReload::_Def, 2, sizeof(BnsCommonConfigReload), configPath, CONFIG_MODULENAME, true));
 }
 
 // 0x13e0
@@ -225,7 +225,7 @@ void BnsCommonConfig::Dump()
     if (config == nullptr)
         return;
 
-    Log::Write(Log::LT_NOTICE, FILE_NAME, 317, L"[%s], %s : %u", CONFIG_NAME, L"version", 2u);
+    Log::Write(Log::LT_NOTICE, FILE_NAME, 317, L"[%s], %s : %u", CONFIG_MODULENAME, L"version", 2u);
     char const* base = reinterpret_cast<char const*>(config);
     for (int i = 0; i < 5; ++i)
     {
@@ -233,30 +233,30 @@ void BnsCommonConfig::Dump()
         void const* field = base + def.offset;
         switch (def.type)
         {
-        case XML_CFG_TYPE_INT:
-            Log::Write(Log::LT_NOTICE, FILE_NAME, 327, L"[%s], %s : %d", CONFIG_NAME, def.name,
+        case XmlCfgDef::CFG_INT:
+            Log::Write(Log::LT_NOTICE, FILE_NAME, 327, L"[%s], %s : %d", CONFIG_MODULENAME, def.name,
                        *static_cast<int const*>(field));
             break;
-        case XML_CFG_TYPE_INT64:
-            Log::Write(Log::LT_NOTICE, FILE_NAME, 328, L"[%s], %s : %I64d", CONFIG_NAME, def.name,
+        case XmlCfgDef::CFG_INT64:
+            Log::Write(Log::LT_NOTICE, FILE_NAME, 328, L"[%s], %s : %I64d", CONFIG_MODULENAME, def.name,
                        *static_cast<long long const*>(field));
             break;
-        case XML_CFG_TYPE_FLOAT:
-            Log::Write(Log::LT_NOTICE, FILE_NAME, 329, L"[%s], %s : %f", CONFIG_NAME, def.name,
+        case XmlCfgDef::CFG_FLOAT:
+            Log::Write(Log::LT_NOTICE, FILE_NAME, 329, L"[%s], %s : %f", CONFIG_MODULENAME, def.name,
                        static_cast<double>(*static_cast<float const*>(field)));
             break;
-        case XML_CFG_TYPE_BOOL:
-            Log::Write(Log::LT_NOTICE, FILE_NAME, 330, L"[%s], %s : %s", CONFIG_NAME, def.name,
+        case XmlCfgDef::CFG_BOOL:
+            Log::Write(Log::LT_NOTICE, FILE_NAME, 330, L"[%s], %s : %s", CONFIG_MODULENAME, def.name,
                        *static_cast<bool const*>(field) ? L"yes" : L"no");
             break;
-        case XML_CFG_TYPE_ADDRESS:
-            Log::Write(Log::LT_NOTICE, FILE_NAME, 334, L"[%s], %s : %s", CONFIG_NAME, def.name,
+        case XmlCfgDef::CFG_IP:
+            Log::Write(Log::LT_NOTICE, FILE_NAME, 334, L"[%s], %s : %s", CONFIG_MODULENAME, def.name,
                        Network::GetAddressStringW(*static_cast<unsigned long const*>(field)));
             break;
-        case XML_CFG_TYPE_WSTRING:
+        case XmlCfgDef::CFG_STR:
         {
             wchar_t const* text = static_cast<wchar_t const*>(field);
-            Log::Write(Log::LT_NOTICE, FILE_NAME, 342, L"[%s], %s : %s", CONFIG_NAME, def.name,
+            Log::Write(Log::LT_NOTICE, FILE_NAME, 342, L"[%s], %s : %s", CONFIG_MODULENAME, def.name,
                        text != nullptr ? text : L"N/A");
             break;
         }
@@ -281,7 +281,7 @@ bool BnsCommonConfig::CheckMinMaxBoundary(void const* const loaded, XmlCfgDefLoc
         void const* field = base + loadDefList[i].offset;
         switch (def.type)
         {
-        case XML_CFG_TYPE_INT:
+        case XmlCfgDef::CFG_INT:
         {
             int value = *static_cast<int const*>(field);
             int minValue = *static_cast<int const*>(def.minValue);
@@ -293,7 +293,7 @@ bool BnsCommonConfig::CheckMinMaxBoundary(void const* const loaded, XmlCfgDefLoc
                        def.name, value, minValue, maxValue);
             break;
         }
-        case XML_CFG_TYPE_INT64:
+        case XmlCfgDef::CFG_INT64:
         {
             long long value = *static_cast<long long const*>(field);
             long long minValue = *static_cast<long long const*>(def.minValue);
@@ -306,7 +306,7 @@ bool BnsCommonConfig::CheckMinMaxBoundary(void const* const loaded, XmlCfgDefLoc
                 def.name, value, minValue, maxValue);
             break;
         }
-        case XML_CFG_TYPE_FLOAT:
+        case XmlCfgDef::CFG_FLOAT:
         {
             float value = *static_cast<float const*>(field);
             float minValue = *static_cast<float const*>(def.minValue);
@@ -319,9 +319,9 @@ bool BnsCommonConfig::CheckMinMaxBoundary(void const* const loaded, XmlCfgDefLoc
                        static_cast<double>(maxValue));
             break;
         }
-        case XML_CFG_TYPE_WSTRING:
+        case XmlCfgDef::CFG_STR:
         {
-            if (def.defType != CFG_DEF_TYPE_GUID)
+            if (def.defType != XmlCfgDefLocal::CFG_DEF_TYPE_GUID)
                 continue;
             wchar_t const* value = *static_cast<wchar_t const* const*>(field);
             if (String::GetId128FromGuidString(value, nullptr))
@@ -355,24 +355,24 @@ bool BnsCommonConfig::UpdateAllVariable(BnsCommonConfigLoad const* const load)
         XmlCfgDef const& loadDef = BnsCommonConfigLoad::_Def[i];
         switch (def.type)
         {
-        case XML_CFG_TYPE_INT:
-        case XML_CFG_TYPE_FLOAT:
-        case XML_CFG_TYPE_ADDRESS:
+        case XmlCfgDef::CFG_INT:
+        case XmlCfgDef::CFG_FLOAT:
+        case XmlCfgDef::CFG_IP:
             *reinterpret_cast<unsigned long*>(dst + def.offset) =
                 *reinterpret_cast<unsigned long const*>(src + loadDef.offset);
             break;
-        case XML_CFG_TYPE_INT64:
+        case XmlCfgDef::CFG_INT64:
             *reinterpret_cast<long long*>(dst + def.offset) = *reinterpret_cast<long long const*>(src + loadDef.offset);
             break;
-        case XML_CFG_TYPE_BOOL:
+        case XmlCfgDef::CFG_BOOL:
             *reinterpret_cast<bool*>(dst + def.offset) = *reinterpret_cast<bool const*>(src + loadDef.offset);
             break;
-        case XML_CFG_TYPE_WSTRING:
+        case XmlCfgDef::CFG_STR:
         {
             wchar_t* text = reinterpret_cast<wchar_t*>(dst + def.offset);
             wchar_t const* value = *reinterpret_cast<wchar_t const* const*>(src + loadDef.offset);
             wcscpy_s(text, 260, value != nullptr ? value : L"");
-            if (def.defType == CFG_DEF_TYPE_GUID)
+            if (def.defType == XmlCfgDefLocal::CFG_DEF_TYPE_GUID)
                 String::GetId128FromGuidString(text, reinterpret_cast<id128*>(dst + def.refOffset));
             break;
         }
@@ -414,8 +414,8 @@ bool BnsCommonConfig::UpdateReloadedVariable(BnsCommonConfigReload const* const 
         XmlCfgDef const& reloadDef = BnsCommonConfigReload::_Def[i];
         switch (def.type)
         {
-        case XML_CFG_TYPE_INT:
-        case XML_CFG_TYPE_ADDRESS:
+        case XmlCfgDef::CFG_INT:
+        case XmlCfgDef::CFG_IP:
         {
             unsigned long value = *reinterpret_cast<unsigned long const*>(src + reloadDef.offset);
             unsigned long* field = reinterpret_cast<unsigned long*>(dst + def.offset);
@@ -423,7 +423,7 @@ bool BnsCommonConfig::UpdateReloadedVariable(BnsCommonConfigReload const* const 
                 *field = value;
             break;
         }
-        case XML_CFG_TYPE_INT64:
+        case XmlCfgDef::CFG_INT64:
         {
             long long value = *reinterpret_cast<long long const*>(src + reloadDef.offset);
             long long* field = reinterpret_cast<long long*>(dst + def.offset);
@@ -431,7 +431,7 @@ bool BnsCommonConfig::UpdateReloadedVariable(BnsCommonConfigReload const* const 
                 *field = value;
             break;
         }
-        case XML_CFG_TYPE_FLOAT:
+        case XmlCfgDef::CFG_FLOAT:
         {
             float value = *reinterpret_cast<float const*>(src + reloadDef.offset);
             float* field = reinterpret_cast<float*>(dst + def.offset);
@@ -439,7 +439,7 @@ bool BnsCommonConfig::UpdateReloadedVariable(BnsCommonConfigReload const* const 
                 *field = value;
             break;
         }
-        case XML_CFG_TYPE_BOOL:
+        case XmlCfgDef::CFG_BOOL:
         {
             bool value = *reinterpret_cast<bool const*>(src + reloadDef.offset);
             bool* field = reinterpret_cast<bool*>(dst + def.offset);
@@ -447,7 +447,7 @@ bool BnsCommonConfig::UpdateReloadedVariable(BnsCommonConfigReload const* const 
                 *field = value;
             break;
         }
-        case XML_CFG_TYPE_WSTRING:
+        case XmlCfgDef::CFG_STR:
         {
             wchar_t* text = reinterpret_cast<wchar_t*>(dst + def.offset);
             wchar_t const* value = *reinterpret_cast<wchar_t const* const*>(src + reloadDef.offset);
@@ -455,7 +455,7 @@ bool BnsCommonConfig::UpdateReloadedVariable(BnsCommonConfigReload const* const 
                 value = L"";
             if (wcscmp(text, value) != 0)
                 wcscpy_s(text, 260, value);
-            if (def.defType == CFG_DEF_TYPE_GUID)
+            if (def.defType == XmlCfgDefLocal::CFG_DEF_TYPE_GUID)
                 String::GetId128FromGuidString(text, reinterpret_cast<id128*>(dst + def.refOffset));
             break;
         }
@@ -482,24 +482,24 @@ bool BnsCommonConfig::CompareMatch(BnsCommonConfigReload const* reload) const
         bool equal = true;
         switch (def.type)
         {
-        case XML_CFG_TYPE_INT:
-        case XML_CFG_TYPE_ADDRESS:
+        case XmlCfgDef::CFG_INT:
+        case XmlCfgDef::CFG_IP:
             equal = *reinterpret_cast<unsigned long const*>(dst + def.offset) ==
                     *reinterpret_cast<unsigned long const*>(src + reloadDef.offset);
             break;
-        case XML_CFG_TYPE_INT64:
+        case XmlCfgDef::CFG_INT64:
             equal = *reinterpret_cast<long long const*>(dst + def.offset) ==
                     *reinterpret_cast<long long const*>(src + reloadDef.offset);
             break;
-        case XML_CFG_TYPE_FLOAT:
+        case XmlCfgDef::CFG_FLOAT:
             equal = *reinterpret_cast<float const*>(dst + def.offset) ==
                     *reinterpret_cast<float const*>(src + reloadDef.offset);
             break;
-        case XML_CFG_TYPE_BOOL:
+        case XmlCfgDef::CFG_BOOL:
             equal = *reinterpret_cast<bool const*>(dst + def.offset) ==
                     *reinterpret_cast<bool const*>(src + reloadDef.offset);
             break;
-        case XML_CFG_TYPE_WSTRING:
+        case XmlCfgDef::CFG_STR:
         {
             wchar_t const* value = *reinterpret_cast<wchar_t const* const*>(src + reloadDef.offset);
             equal = wcscmp(reinterpret_cast<wchar_t const*>(dst + def.offset), value != nullptr ? value : L"") == 0;
