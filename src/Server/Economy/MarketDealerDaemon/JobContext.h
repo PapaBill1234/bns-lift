@@ -505,8 +505,11 @@ public:
         MAX_PARAM_COUNT = 0x7,
     };
     virtual ~AbandonBidJob();
-    virtual bool verifyParameter(short& result) const;
-    virtual bool handleJob(short& result);
+    virtual bool verifyParameter(short& failReason) const;              // 0x12780
+    virtual bool handleJob(short& failReason);                          // 0x12810
+    bool Initialize(Packet const*& packet);                             // 0x123e0
+    void ReplySuccess(Session const*& session) const;                   // 0x12550
+    void ReplyFailure(Session const*& session, short const& failReason) const;  // 0x12660
 
     unsigned long long _tid;
     long long _saleId;
@@ -533,8 +536,11 @@ public:
         MAX_PARAM_COUNT = 0x9,
     };
     virtual ~ReservePurchaseJob();
-    virtual bool verifyParameter(short& result) const;
-    virtual bool handleJob(short& result);
+    virtual bool verifyParameter(short& failReason) const;              // 0x136f0
+    virtual bool handleJob(short& failReason);                          // 0x138f0
+    bool Initialize(Packet const*& packet);                             // 0x131f0
+    void ReplySuccess(Session const*& session) const;                   // 0x134a0
+    void ReplyFailure(Session const*& session, short const& failReason) const;  // 0x135c0
 
     unsigned long long _tid;
     long long _saleId;
@@ -552,8 +558,11 @@ public:
         MAX_PARAM_COUNT = 0x3,
     };
     virtual ~CancelPurchaseReservationJob();
-    virtual bool verifyParameter(short& result) const;
-    virtual bool handleJob(short& result);
+    virtual bool verifyParameter(short& failReason) const;              // 0x14310
+    virtual bool handleJob(short& failReason);                          // 0x143a0
+    bool Initialize(Packet const*& packet);                             // 0x13f70
+    void ReplySuccess(Session const*& session) const;                   // 0x140e0
+    void ReplyFailure(Session const*& session, short const& failReason) const;  // 0x141f0
 
     unsigned long long _tid;
     long long _saleId;
@@ -583,8 +592,11 @@ public:
         MAX_PARAM_COUNT = 0xE,
     };
     virtual ~RegisterPurchaseJob();
-    virtual bool verifyParameter(short& result) const;
-    virtual bool handleJob(short& result);
+    virtual bool verifyParameter(short& failReason) const;              // 0x14dc0
+    virtual bool handleJob(short& failReason);                          // 0x14e60
+    bool Initialize(Packet const*& packet);                             // 0x149d0
+    void ReplySuccess(Session const*& session) const;                   // 0x14b70
+    void ReplyFailure(Session const*& session, short const& failReason) const;  // 0x14c90
 
     unsigned long long _tid;
     long long _saleId;
