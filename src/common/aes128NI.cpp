@@ -5,7 +5,7 @@
 #include "aes128.h"
 
 // _mm_aeskeygenassist_si128 needs an immediate. The original code uses a switch.
-static __m128i keyGenAssist(__m128i key, int i)
+static __m128i keyGenAssist(__m128i key, int i)  // ❓ lift helper name, not in any PDB
 {
     switch (i)
     {

@@ -29,6 +29,12 @@ public:
     void SetServiceState(ServiceState const newState);
 
     ServiceState _serviceState;
+
+private:
+    bool composeRelayHeader(Packet& packet, RelayHeader const& relayHeader);          // 0x75a0
+    bool composeRelayHeader(FragmentPacket& packet, RelayHeader const& relayHeader);  // 0x7670
+    bool combineFragmentRelayFormat(char* const relayFormat, unsigned long long const bufferSize,
+                                    char const* const economyFormat);                 // 0x7410
 };
 static_assert(sizeof(CacheGateChannel) == 0x30, "sizeof CacheGateChannel");
 static_assert(offsetof(CacheGateChannel, _serviceState) == 0x28, "CacheGateChannel::_serviceState");

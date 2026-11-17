@@ -29,7 +29,7 @@ static wchar_t const SECURITY_FILE[] = L"source\\Security.cpp";
     } while (0)
 
 // Inlined destroy of a PacketCrypt. The types 0, 2, 3 and 4 call the destructor (slot 7, flag 0).
-static inline void destroyCrypt(PacketCrypt* crypt)
+static inline void destroyCrypt(PacketCrypt* crypt)  // ❓ lift helper name, not in any PDB
 {
     int type = crypt->GetType();
     if (type == PacketCrypt::NO_CRYPT || type == PacketCrypt::HANDSHAKE_CRYPT ||

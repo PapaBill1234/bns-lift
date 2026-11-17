@@ -72,7 +72,7 @@ bool BindPostColumns(DbTransaction* tran, PostInfo& postInfo, AttachedItemInfo* 
     return true;
 }
 
-void ClearRow(PostInfo& postInfo, AttachedItemInfo* items)
+void ClearRow(PostInfo& postInfo, AttachedItemInfo* items)  // ❓ lift helper name, not in any PDB
 {
     memset(&postInfo, 0, sizeof(postInfo));
     memset(items, 0, sizeof(AttachedItemInfo) * kMaxAttachedItem);
