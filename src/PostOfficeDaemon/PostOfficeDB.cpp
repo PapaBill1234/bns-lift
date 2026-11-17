@@ -169,7 +169,7 @@ bool PostOfficeDB::LoadPostList(int* dbRetValue)
     for (;;)
     {
         ClearRow(postInfo, attachedItemInfo);
-        int const result = tran.Tran->Fetch(0);  // ❓ argument
+        int const result = tran.Tran->Fetch(0);  // LIFT: folded. edx is not set at the call. Fetch 0x2d350 does not read it.
         if (result == -1)
         {
             Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 103, FAIL_FETCH, MODULE_NAME, fn);
@@ -240,7 +240,7 @@ bool PostOfficeDB::LoadSinglePost(int* dbRetValue, long long postId)
     }
 
     ClearRow(postInfo, attachedItemInfo);
-    int const result = tran.Tran->Fetch(0);  // ❓ argument
+    int const result = tran.Tran->Fetch(0);  // LIFT: folded. edx is not set at the call. Fetch 0x2d350 does not read it.
     if (result == -1)
     {
         Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 228, FAIL_FETCH, MODULE_NAME, fn);
@@ -482,7 +482,7 @@ bool PostOfficeDB::LoadRetryReadySinglePost(int* dbRetValue, long long postId, l
     }
 
     ClearRow(postInfo, attachedItemInfo);
-    int const result = tran.Tran->Fetch(0);  // ❓ argument
+    int const result = tran.Tran->Fetch(0);  // LIFT: folded. edx is not set at the call. Fetch 0x2d350 does not read it.
     if (result == -1)
     {
         Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 576, FAIL_FETCH, MODULE_NAME, fn);
@@ -490,7 +490,7 @@ bool PostOfficeDB::LoadRetryReadySinglePost(int* dbRetValue, long long postId, l
     }
     if (result == 0)
     {
-        // ❓ The tail of the text is cut in the pseudocode. "recipientPcId:0x%I64X" is a guess.
+        // LIFT: full text in .rdata 0x7f710.
         Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 580,
                    L"[%s], %s; there is no such post, postId:0x%I64X, invoiceId:0x%I64X, recipientPcId:0x%I64X",
                    MODULE_NAME, fn, postId, invoiceId, recipientPcId);
@@ -561,7 +561,7 @@ bool PostOfficeDB::LoadRetryReadyPostList(int* dbRetValue)
     for (;;)
     {
         ClearRow(postInfo, attachedItemInfo);
-        int const result = tran.Tran->Fetch(0);  // ❓ argument
+        int const result = tran.Tran->Fetch(0);  // LIFT: folded. edx is not set at the call. Fetch 0x2d350 does not read it.
         if (result == -1)
         {
             Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 710, FAIL_FETCH, MODULE_NAME, fn);
