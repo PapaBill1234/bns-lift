@@ -42,8 +42,7 @@ class RsaPublic : public Rsa
 {
 public:
     RsaPublic() {}
-    // 0x531F0
-    virtual ~RsaPublic() {}
+    virtual ~RsaPublic();  // 0x531F0 (rsa.cpp)
 
     virtual bool Setup(unsigned char const* key, int keySize, int round);
     virtual void Cleanup(); // 0x126F0 (folded), empty

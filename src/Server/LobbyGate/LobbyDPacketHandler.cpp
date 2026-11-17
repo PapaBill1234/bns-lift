@@ -1545,17 +1545,75 @@ bool HandleLobbyLobbyGate_BypassPacket(Session const* session, Packet* packet)
     return true;
 }
 
-// 0x12650. The linker folded many `return true;` handlers to this body.
-bool HandleLobbyLobbyGate_ChangedGradeLevelNotify(Session const* session, Packet* packet)
-{
-    (void)session;
-    (void)packet;
-    return true;
-}
+// 0x12650. The linker folded 82 `return true;` handlers to this body (ICF): the 54 LobbyLobbyGate handlers below
+// and the 28 LobbyGate handlers in LobbyGatePacketHandler.cpp. The PDB gives each name the same RVA.
+// The lift keeps one function per PDB name. The handlers do nothing: LobbyGate sends these packets on to the
+// client in HandleLobbyLobbyGate_BypassPacket.
+#define LD_EMPTY_HANDLER(name)                                    \
+    bool name(Session const* session, Packet const* packet)       \
+    {                                                             \
+        (void)session;                                            \
+        (void)packet;                                             \
+        return true;                                              \
+    }
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_GetEnterWorldTokenFail)  // 0x12650, cmd 0x1A
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_StartWaitNotify)  // 0x12650, cmd 0x1B
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_GetWaitInfoOk)  // 0x12650, cmd 0x1D
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_GetWaitInfoFail)  // 0x12650, cmd 0x1E
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_GiveupWaitOk)  // 0x12650, cmd 0x20
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_GiveupWaitFail)  // 0x12650, cmd 0x21
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_EndWaitNotify)  // 0x12650, cmd 0x22
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_GetCharacterInfoListFail)  // 0x12650, cmd 0x25
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_GetCharacterInfoOk)  // 0x12650, cmd 0x27
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_GetCharacterInfoFail)  // 0x12650, cmd 0x28
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_CheckCharacterNameOk)  // 0x12650, cmd 0x2A
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_CheckCharacterNameFail)  // 0x12650, cmd 0x2B
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_CreateCharacterOk)  // 0x12650, cmd 0x2D
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_CreateCharacterFail)  // 0x12650, cmd 0x2E
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_DeleteCharacterOk)  // 0x12650, cmd 0x30
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_DeleteCharacterFail)  // 0x12650, cmd 0x31
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_EndWaitCharacterDeletionNotify)  // 0x12650, cmd 0x32
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_CancelWaitCharacterDeletionOk)  // 0x12650, cmd 0x34
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_CancelWaitCharacterDeletionFail)  // 0x12650, cmd 0x35
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_RecoverCharacterOk)  // 0x12650, cmd 0x37
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_RecoverCharacterFail)  // 0x12650, cmd 0x38
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_BindCharacterSlotOk)  // 0x12650, cmd 0x3A
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_BindCharacterSlotFail)  // 0x12650, cmd 0x3B
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_GetChargeInfoOk)  // 0x12650, cmd 0x3D
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_GetChargeInfoFail)  // 0x12650, cmd 0x3E
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_AccountInventoryNotify)  // 0x12650, cmd 0x3F
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_GetGoodsCountOk)  // 0x12650, cmd 0x41
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_GetGoodsCountFail)  // 0x12650, cmd 0x42
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_ListGoodsFail)  // 0x12650, cmd 0x45
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_TakeGoodsFail)  // 0x12650, cmd 0x48
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_ListLobbyServiceItemInfoFail)  // 0x12650, cmd 0x4B
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_GetLobbyServiceItemInfoOk)  // 0x12650, cmd 0x4D
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_GetLobbyServiceItemInfoFail)  // 0x12650, cmd 0x4E
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_GetServiceEntryListFail)  // 0x12650, cmd 0x51
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_ChangeCharacterAppearanceWithAccountInventoryItemOk)  // 0x12650, cmd 0x53
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_ChangeCharacterAppearanceWithAccountInventoryItemFail)  // 0x12650, cmd 0x54
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_ChangeCharacterSexWithAccountInventoryItemOk)  // 0x12650, cmd 0x56
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_ChangeCharacterSexWithAccountInventoryItemFail)  // 0x12650, cmd 0x57
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_ChangeCharacterRaceWithAccountInventoryItemOk)  // 0x12650, cmd 0x59
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_ChangeCharacterRaceWithAccountInventoryItemFail)  // 0x12650, cmd 0x5A
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_RenameCharacterWithAccountInventoryItemOk)  // 0x12650, cmd 0x5C
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_RenameCharacterWithAccountInventoryItemFail)  // 0x12650, cmd 0x5D
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_AddSlotWithAccountInventoryItemOk)  // 0x12650, cmd 0x5F
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_AddSlotWithAccountInventoryItemFail)  // 0x12650, cmd 0x60
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_ChangeUserNameWithAccountInventoryItemOk)  // 0x12650, cmd 0x62
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_ChangeUserNameWithAccountInventoryItemFail)  // 0x12650, cmd 0x63
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_ExtendJumpingCharacterCreationQuotaWithAccountInventoryItemOk)  // 0x12650, cmd 0x65
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_ExtendJumpingCharacterCreationQuotaWithAccountInventoryItemFail)  // 0x12650, cmd 0x66
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_CreateInitialUserNameOk)  // 0x12650, cmd 0x68
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_CreateInitialUserNameFail)  // 0x12650, cmd 0x69
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_ActivateGradeOk)  // 0x12650, cmd 0x6B
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_ActivateGradeFail)  // 0x12650, cmd 0x6C
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_ChangedGradeNotify)  // 0x12650, cmd 0x6D
+LD_EMPTY_HANDLER(HandleLobbyLobbyGate_ChangedGradeLevelNotify)  // 0x12650, cmd 0x6E
+#undef LD_EMPTY_HANDLER
 
 // Handler tables. PDB: both lists have type 0x2693, 888 bytes (111 entries).
 #define LD_H(f) reinterpret_cast<void*>(&(f))
-#define LD_NOP LD_H(HandleLobbyLobbyGate_ChangedGradeLevelNotify)
 
 void* LobbyLobbyGatePacketLobbyGateSideHandlerList[111] = {
     /*   0 */ nullptr, nullptr, LD_H(HandleLobbyLobbyGate_HelloOk), LD_H(HandleLobbyLobbyGate_HelloFail),
@@ -1569,19 +1627,19 @@ void* LobbyLobbyGatePacketLobbyGateSideHandlerList[111] = {
     /*  17 */ LD_H(HandleLobbyLobbyGate_StartSessionWithLobbyTokenFail), nullptr, nullptr,
     /*  20 */ LD_H(HandleLobbyLobbyGate_CloseAnonymousSessionNotify), LD_H(HandleLobbyLobbyGate_CloseSessionNotify),
     /*  22 */ LD_H(HandleLobbyLobbyGate_KickNotify), nullptr, nullptr,
-    /*  25 */ LD_H(HandleLobbyLobbyGate_GetEnterWorldTokenOk), LD_NOP, LD_NOP, nullptr, LD_NOP,
-    /*  30 */ LD_NOP, nullptr, LD_NOP, LD_NOP, LD_NOP, nullptr,
-    /*  36 */ LD_H(HandleLobbyLobbyGate_GetCharacterInfoListOk), LD_NOP, nullptr, LD_NOP,
-    /*  40 */ LD_NOP, nullptr, LD_NOP, LD_NOP, nullptr, LD_NOP, LD_NOP, nullptr, LD_NOP, LD_NOP,
-    /*  50 */ LD_NOP, nullptr, LD_NOP, LD_NOP, nullptr, LD_NOP, LD_NOP, nullptr, LD_NOP, LD_NOP,
-    /*  60 */ nullptr, LD_NOP, LD_NOP, LD_NOP, nullptr, LD_NOP, LD_NOP, nullptr,
-    /*  68 */ LD_H(HandleLobbyLobbyGate_ListGoodsOk), LD_NOP, nullptr, LD_H(HandleLobbyLobbyGate_TakeGoodsOk),
-    /*  72 */ LD_NOP, nullptr, LD_H(HandleLobbyLobbyGate_ListLobbyServiceItemInfoOk), LD_NOP, nullptr, LD_NOP,
-    /*  78 */ LD_NOP, nullptr, LD_H(HandleLobbyLobbyGate_GetServiceEntryListOk), LD_NOP, nullptr, LD_NOP,
-    /*  84 */ LD_NOP, nullptr, LD_NOP, LD_NOP, nullptr, LD_NOP,
-    /*  90 */ LD_NOP, nullptr, LD_NOP, LD_NOP, nullptr, LD_NOP, LD_NOP, nullptr, LD_NOP, LD_NOP,
-    /* 100 */ nullptr, LD_NOP, LD_NOP, nullptr, LD_NOP, LD_NOP, nullptr, LD_NOP, LD_NOP, LD_NOP,
-    /* 110 */ LD_NOP,
+    /*  25 */ LD_H(HandleLobbyLobbyGate_GetEnterWorldTokenOk), LD_H(HandleLobbyLobbyGate_GetEnterWorldTokenFail), LD_H(HandleLobbyLobbyGate_StartWaitNotify), nullptr, LD_H(HandleLobbyLobbyGate_GetWaitInfoOk),
+    /*  30 */ LD_H(HandleLobbyLobbyGate_GetWaitInfoFail), nullptr, LD_H(HandleLobbyLobbyGate_GiveupWaitOk), LD_H(HandleLobbyLobbyGate_GiveupWaitFail), LD_H(HandleLobbyLobbyGate_EndWaitNotify), nullptr,
+    /*  36 */ LD_H(HandleLobbyLobbyGate_GetCharacterInfoListOk), LD_H(HandleLobbyLobbyGate_GetCharacterInfoListFail), nullptr, LD_H(HandleLobbyLobbyGate_GetCharacterInfoOk),
+    /*  40 */ LD_H(HandleLobbyLobbyGate_GetCharacterInfoFail), nullptr, LD_H(HandleLobbyLobbyGate_CheckCharacterNameOk), LD_H(HandleLobbyLobbyGate_CheckCharacterNameFail), nullptr, LD_H(HandleLobbyLobbyGate_CreateCharacterOk), LD_H(HandleLobbyLobbyGate_CreateCharacterFail), nullptr, LD_H(HandleLobbyLobbyGate_DeleteCharacterOk), LD_H(HandleLobbyLobbyGate_DeleteCharacterFail),
+    /*  50 */ LD_H(HandleLobbyLobbyGate_EndWaitCharacterDeletionNotify), nullptr, LD_H(HandleLobbyLobbyGate_CancelWaitCharacterDeletionOk), LD_H(HandleLobbyLobbyGate_CancelWaitCharacterDeletionFail), nullptr, LD_H(HandleLobbyLobbyGate_RecoverCharacterOk), LD_H(HandleLobbyLobbyGate_RecoverCharacterFail), nullptr, LD_H(HandleLobbyLobbyGate_BindCharacterSlotOk), LD_H(HandleLobbyLobbyGate_BindCharacterSlotFail),
+    /*  60 */ nullptr, LD_H(HandleLobbyLobbyGate_GetChargeInfoOk), LD_H(HandleLobbyLobbyGate_GetChargeInfoFail), LD_H(HandleLobbyLobbyGate_AccountInventoryNotify), nullptr, LD_H(HandleLobbyLobbyGate_GetGoodsCountOk), LD_H(HandleLobbyLobbyGate_GetGoodsCountFail), nullptr,
+    /*  68 */ LD_H(HandleLobbyLobbyGate_ListGoodsOk), LD_H(HandleLobbyLobbyGate_ListGoodsFail), nullptr, LD_H(HandleLobbyLobbyGate_TakeGoodsOk),
+    /*  72 */ LD_H(HandleLobbyLobbyGate_TakeGoodsFail), nullptr, LD_H(HandleLobbyLobbyGate_ListLobbyServiceItemInfoOk), LD_H(HandleLobbyLobbyGate_ListLobbyServiceItemInfoFail), nullptr, LD_H(HandleLobbyLobbyGate_GetLobbyServiceItemInfoOk),
+    /*  78 */ LD_H(HandleLobbyLobbyGate_GetLobbyServiceItemInfoFail), nullptr, LD_H(HandleLobbyLobbyGate_GetServiceEntryListOk), LD_H(HandleLobbyLobbyGate_GetServiceEntryListFail), nullptr, LD_H(HandleLobbyLobbyGate_ChangeCharacterAppearanceWithAccountInventoryItemOk),
+    /*  84 */ LD_H(HandleLobbyLobbyGate_ChangeCharacterAppearanceWithAccountInventoryItemFail), nullptr, LD_H(HandleLobbyLobbyGate_ChangeCharacterSexWithAccountInventoryItemOk), LD_H(HandleLobbyLobbyGate_ChangeCharacterSexWithAccountInventoryItemFail), nullptr, LD_H(HandleLobbyLobbyGate_ChangeCharacterRaceWithAccountInventoryItemOk),
+    /*  90 */ LD_H(HandleLobbyLobbyGate_ChangeCharacterRaceWithAccountInventoryItemFail), nullptr, LD_H(HandleLobbyLobbyGate_RenameCharacterWithAccountInventoryItemOk), LD_H(HandleLobbyLobbyGate_RenameCharacterWithAccountInventoryItemFail), nullptr, LD_H(HandleLobbyLobbyGate_AddSlotWithAccountInventoryItemOk), LD_H(HandleLobbyLobbyGate_AddSlotWithAccountInventoryItemFail), nullptr, LD_H(HandleLobbyLobbyGate_ChangeUserNameWithAccountInventoryItemOk), LD_H(HandleLobbyLobbyGate_ChangeUserNameWithAccountInventoryItemFail),
+    /* 100 */ nullptr, LD_H(HandleLobbyLobbyGate_ExtendJumpingCharacterCreationQuotaWithAccountInventoryItemOk), LD_H(HandleLobbyLobbyGate_ExtendJumpingCharacterCreationQuotaWithAccountInventoryItemFail), nullptr, LD_H(HandleLobbyLobbyGate_CreateInitialUserNameOk), LD_H(HandleLobbyLobbyGate_CreateInitialUserNameFail), nullptr, LD_H(HandleLobbyLobbyGate_ActivateGradeOk), LD_H(HandleLobbyLobbyGate_ActivateGradeFail), LD_H(HandleLobbyLobbyGate_ChangedGradeNotify),
+    /* 110 */ LD_H(HandleLobbyLobbyGate_ChangedGradeLevelNotify),
 };
 
 // The fragment list has the fragment handlers only (9 entries in the binary).

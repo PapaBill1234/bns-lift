@@ -25,6 +25,11 @@ TextConsole::TextConsole()
     GetWindowTextW(GetConsoleWindow(), (LPWSTR)originalTitle, 1024);
 }
 
+// 0x13850 (CacheGate). The PDB puts this inline destructor in TextConsole.obj.
+Console::~Console()
+{
+}
+
 // 0x140a0 (scalar deleting destructor; the body is inline)
 TextConsole::~TextConsole()
 {
