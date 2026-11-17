@@ -28,7 +28,7 @@ public:
     bool SendInitSessionWithLobbyTokenReq(unsigned long long gateKey, unsigned long long cliKey,
                                           unsigned long long lobbyToken, unsigned int ipAddress); // 0xa690
     bool SendStartSessionWithLobbyTokenReq(unsigned long long cliKey);                          // 0xa920
-    bool SendLostAnonymousConnectionNotify(long long gateKey);  // 0xab20 (❓ the pseudocode type is unsigned)
+    bool SendLostAnonymousConnectionNotify(unsigned long long gateKey);  // 0xab20 (PDB: unsigned __int64)
     bool SendLostConnectionNotify(unsigned long long cliKey);   // 0xad20
 
     int _state;

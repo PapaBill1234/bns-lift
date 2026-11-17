@@ -1552,7 +1552,7 @@ bool HandleLobbyLobbyGate_ChangedGradeLevelNotify(Session const* session, Packet
     return true;
 }
 
-// Handler tables. ❓ The array sizes come from the highest command index (110).
+// Handler tables. PDB: both lists have type 0x2693, 888 bytes (111 entries).
 #define LD_H(f) reinterpret_cast<void*>(&(f))
 #define LD_NOP LD_H(HandleLobbyLobbyGate_ChangedGradeLevelNotify)
 

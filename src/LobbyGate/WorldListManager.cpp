@@ -71,8 +71,8 @@ bool WorldListManager::SetWorldList(WorldInfo const* worldList, int worldCount)
                    L"[WorldListManger], SetWorldList fail; invalid parameter, world-count:%d", worldCount);
         return false;
     }
-    // ❓ The Alloc call has no line argument in the pseudocode.
-    void* mem = Memory::_Manager[2]->Alloc(sizeof(WorldList), WORLDLIST_FILE, 0);
+    // 0x1658d: r9d = 0xD1 (line 209). 0x1659a: edx = 0x120 (size).
+    void* mem = Memory::_Manager[2]->Alloc(sizeof(WorldList), WORLDLIST_FILE, 209);
     WorldList* list = mem != nullptr ? new (mem) WorldList() : nullptr;
     // BUG: 0x16530 calls Set on a null list when Alloc fails.
     if (!list->Set(worldList, worldCount))

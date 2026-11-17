@@ -9,7 +9,7 @@
 
 namespace
 {
-// ❓ Inlined size check before each Compose: the code allocates a new fragment when the free size is too small.
+// LIFT: inlined size check before each Compose, e.g. LobbyGate 0x153f5 (4000 - CurHeader->size). The code allocates a new fragment when the free size is too small.
 inline unsigned short FreeBody(FragmentPacket* fp)
 {
     return fp->packet.CurHeader != nullptr ? static_cast<unsigned short>(4000 - fp->packet.CurHeader->size) : 0;
