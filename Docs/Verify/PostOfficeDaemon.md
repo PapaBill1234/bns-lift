@@ -2,7 +2,8 @@
 
 Status (2026-11-17, done): the lifted exe of bd20e24 crashes (`Network.cpp,175 ASSERT CRASH`). With the fix patch
 it runs and is the same as the original for ports, CacheGate peer bytes, client bytes and pkl, also with the Task 4
-input streams. The log is the same except `version:` and timing values (timer ticks, DB loading time).
+input streams. The log is the same except timing values (timer ticks, DB loading time).
+2026-11-17 (parity-runtime): `.rc` VERSIONINFO added. The compare gives 0 changed lines in all diffs, also the log.
 
 ## How to run
 | Command | Use |
@@ -45,7 +46,7 @@ Lifted A = gate build of bd20e24. Lifted B = bd20e24 + fix patch (`fixsrc`). Run
 | OpenPort args | 8 args: portId, portNo, purpose, handler, bufferHandler, maxSession, autoOpen, nagle; always `_enableRecv = true` | 9 args, ports 2/3 get enableRecv false | 0x28AB0 |
 | Log tag of CacheGateSessionHandler | `[cachegate channel]` | `[cachegate session handler]` | CacheGateChannel.cpp (OnConnect lines 242, 261) |
 | Function name in WorldConfigManager logs | `WorldConfigManager::setupWorldConfigList` (also `loadWorldConfigFile`, `addWorldConfig`) | name without class | WorldConfigManager.cpp lines 150, 283, 352 |
-| `version:` | 0.0.348.484 | empty (no VERSIONINFO, same as SmartCouponDaemon) | Daemon.cpp 496/545 |
+| `version:` | 0.0.348.484 | FIXED: `PostOfficeDaemon.rc` | Daemon.cpp 496/545 |
 | Timer tick count of RelayTimeoutChecker | n | n-1 in one run | timing only, not a code difference |
 | `database loading time` | 0sec | 1sec in one run | timing only (`loadAllUnsentPostFromDB`, PostOfficeDaemon.cpp 502) |
 | Other tags/names (static check: lifted `L"..."` names not in exe strings) | `cachegate channel` for CacheGateChannelManager too; `CacheGateChannel::composeRelayHeader`, `::combineFragmentRelayFormat`; all 12 WorldConfigManager names with `WorldConfigManager::` | short names, tags `cachegate session handler` / `cachegate channel manager` | CacheGateChannel.cpp, WorldConfigManager.cpp |

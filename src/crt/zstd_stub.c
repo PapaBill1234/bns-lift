@@ -1,5 +1,5 @@
-/* zstd entry points that CacheGate uses. vendor/zstd/src is not in the repo, so lift_zstd is not built.
-   The original exe links upstream zstd (see vendor/zstd/README.md). */
+/* zstd entry points for the exes when vendor/zstd/src is not present (CMake target lift_zstd_stub).
+   With vendor/zstd/src (upstream zstd 1.3.5, see vendor/zstd/README.md), CMake builds lift_zstd and does not use this file. */
 #include <stddef.h>
 
 /* ZSTD_customMem is three pointers (customAlloc, customFree, opaque). It is passed by pointer on x64. */

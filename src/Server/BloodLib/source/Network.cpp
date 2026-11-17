@@ -6,6 +6,7 @@
 #include <windows.h>
 #include "AlertSender.h"
 #include "CrashHandler.h"
+#include "CryptoKey.h"
 #include "Daemon.h"
 #include "IdleWatcher.h"
 #include "IoWorkerThread.h"
@@ -28,19 +29,15 @@ static wchar_t const NETWORK_FILE[] = L"source\\Network.cpp";
         CrashHandler::MakeCrash("source\\Network.cpp", line, L"");                  \
     } while (0)
 
-// File static s_initializedCount (PDB: CryptoKey.obj, CacheGate rva 0x5A508). PacketCrypt::Setup increments it.
-// Network::Clear decrements it (an inlined PacketCrypt clean-up).
-extern long volatile s_initializedCount;
-long volatile s_initializedCount = 0;  // The PacketCrypt module is not lifted. The definition is here.
-
 int PacketCrypt::_MaxSize = 0;
 
-// 0x327E0 (PacketCrypt module). Not in the CacheGate hr export.
+// 0x327E0 (PacketCrypt module). Inlined in Network::Initialize (LobbyGate 0x20192-0x201aa).
 PacketCrypt::ErrCode PacketCrypt::Setup(int maxSize)
 {
-    // TODO(lift-cg-5) the PacketCrypt module is not lifted.
+    if (_MaxSize > 0)
+        return ALREADY_INITIALIZED;
     _MaxSize = maxSize;
-    _InterlockedIncrement(&s_initializedCount);
+    CryptoKey::Initialize();  // LobbyGate 0x201a5. The original ignores the result.
     return SPCE_NO_ERROR;
 }
 
@@ -177,7 +174,7 @@ void Network::Clear()
             Instance->_port[i] = nullptr;
         }
     }
-    _InterlockedDecrement(&s_initializedCount);  // LIFT: inlined PacketCrypt clean-up
+    _InterlockedDecrement(&CryptoKey::s_initializedCount);  // LIFT: inlined PacketCrypt clean-up (LobbyGate 0x204cb, 0x94108)
     if (Instance->_iocpHandle != nullptr)
         CloseHandle(Instance->_iocpHandle);
     // BUG: 0xCFD0 Instance and EndEventObject are not released and WSACleanup is not called.
@@ -189,21 +186,23 @@ bool Network::OpenPort(unsigned int id, unsigned short portNumber, int initialMo
                        bool enableRecv, bool nagle)
 {
     // LIFT: LTCG folded the bool params (LobbyGate 0x20500, call 0x20708). All callers give constants.
-    // The binary uses enableAccept == true and enableRecv == true. Port::Initialize gets them as constants.
+    // LobbyGate and CacheGate use enableAccept == true and enableRecv == true. PostOfficeDaemon keeps enableAccept and nagle (0x28AB0).
     if (id == 0)
         NETWORK_ASSERT_CRASH(170);
-    if (initialMode != 1 && initialMode != 2)
+    // LIFT: LTCG keeps only the purposes that the callers of each exe use: CacheGate {1, 2}, LobbyGate {0, 2},
+    // PostOfficeDaemon {2, 3} (0x28AB0). s_defaultMaxSession has 4 entries, so the source range is 0..3.
+    if (initialMode < 0 || initialMode > 3)  // ❓ exact source form of the check
         NETWORK_ASSERT_CRASH(175);
     if (Instance->_port[id - 1] != nullptr)
         NETWORK_ASSERT_CRASH(177);
 
     if (maxSession == 0)
     {
-        if (initialMode == 2)
+        if (initialMode == 2 || initialMode == 3)  // PostOfficeDaemon 0x28B6D
         {
             maxSession = 2 * Instance->_workerThreadCount + 1;
-            if (maxSession < 16)
-                maxSession = 16;
+            if (s_defaultMaxSession[initialMode] > maxSession)
+                maxSession = s_defaultMaxSession[initialMode];
         }
         else
         {
@@ -221,7 +220,7 @@ bool Network::OpenPort(unsigned int id, unsigned short portNumber, int initialMo
         BaseMemoryManager::_Instance.Free(port, NETWORK_FILE, 188);
         return false;
     }
-    if (enableAccept && port->_portNumber != 0)
+    if (port->_portNumber != 0)
     {
         if (!port->StartAccept())
         {
@@ -231,8 +230,11 @@ bool Network::OpenPort(unsigned int id, unsigned short portNumber, int initialMo
             return false;
         }
     }
-    if (enableRecv)
-        port->_enableRecv = true;
+    // PostOfficeDaemon 0x28C6A: StartAccept runs for each listen port. A port with enableAccept == false
+    // gets accept later through OpenPort(id).
+    port->_enableRecv = enableRecv;
+    if (!enableAccept)
+        port->_enableAccept = false;
     Instance->_port[id - 1] = port;
     return true;
 }

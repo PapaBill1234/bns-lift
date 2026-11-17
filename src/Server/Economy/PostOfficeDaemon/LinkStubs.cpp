@@ -6,5 +6,5 @@
 bool ClientSideDaemonChannel::onAccept(Session const* session)
 {
     (void)session;
-    return true;  // LIFT: no body in PostOfficeDaemon, so no original return value.
+    return false;  // LIFT: no body in PostOfficeDaemon. CacheGate 0x40B0 bytes 32 c0 c3: xor al, al; ret
 }

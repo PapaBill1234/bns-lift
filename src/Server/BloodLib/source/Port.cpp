@@ -169,7 +169,7 @@ bool Port::Initialize(unsigned int id, unsigned short portNumber, unsigned int m
         PORT_ASSERT_CRASH(216);
     _id = id;
     _portNumber = portNumber;
-    _nagle = nagle;  // LIFT: LTCG folded nagle to false (the binary stores 0).
+    _nagle = nagle;  // LobbyGate stores 0 (folded). PostOfficeDaemon gives nagle = 1 for the management port (0x13B59).
     _maxSession = maxSession;
     _sessionHandler = sessionHandler;
     _bufferHandler = bufferHandler->Clone(nullptr);

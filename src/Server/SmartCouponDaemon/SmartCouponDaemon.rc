@@ -1,0 +1,30 @@
+// VERSIONINFO of the original SmartCouponDaemon.exe (Service_348_8349). Daemon::LoadVersion (0xbb30) reads it.
+// The values come from the original resource. Language 0x0412, code page 1200.
+1 VERSIONINFO
+ FILEVERSION 0,0,348,352
+ PRODUCTVERSION 0,0,348,352
+ FILEFLAGSMASK 0x3fL
+ FILEFLAGS 0x0L
+ FILEOS 0x40004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "041204b0"
+        BEGIN
+            VALUE "CompanyName", "NCSoft"
+            VALUE "FileDescription", "Blade & Soul SmartCoupon Daemon"
+            VALUE "FileVersion", "0, 0, 348, 352"
+            VALUE "InternalName", "SmartCouponDaemon.exe"
+            VALUE "LegalCopyright", "Copyright (C) 2007-2011, Team Bloodlust, NCSoft Corporation. All Rights Reserved."
+            VALUE "OriginalFilename", "SmartCouponDaemon.exe"
+            VALUE "ProductName", "Blade & Soul SmartCoupon Daemon"
+            VALUE "ProductVersion", "0, 0, 348, 352"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x412, 1200
+    END
+END
