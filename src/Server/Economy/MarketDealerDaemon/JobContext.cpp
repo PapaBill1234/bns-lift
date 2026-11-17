@@ -14,6 +14,7 @@
 #include "MarketDB.h"
 #include "MarketDealerDaemon.h"
 #include "SaleContext.h"
+#include "BidContext.h"
 #include "SaleTimeContext.h"
 #include "DeliveryContext.h"
 #include "Postman.h"
@@ -1633,4 +1634,837 @@ bool AbandonSaleJob::handleJob(short& failReason)
     }
     saleContext->removeReferenceCount(JOB_CONTEXT_FILE, 1399);
     return false;
+}
+
+// ---- ReserveBidJob ----
+
+// 0xecb0
+bool ReserveBidJob::Initialize(Packet const*& packet)
+{
+    wchar_t const* const fn = L"ReserveBidJob::Initialize";
+    if (packet == nullptr)
+    {
+        JOB_CONTEXT_CRASH(1420, INVALID_PACKET, MODULE_NAME, fn, packet);
+        return false;
+    }
+    short cmd = 0;
+    Participant& bidder = _bidInfo._dealingInfo._trader;
+    if (packet->Decompose("hqqhqossq", &cmd, &_tid, &_saleId, &bidder._participantWid, &bidder._participantPcId,
+                          &bidder._participantAccountId, bidder._participantWorldName, 33, bidder._participantName, 33,
+                          &_bidInfo._dealingInfo._dealingPrice) == 0)
+    {
+        Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1434, FAIL_DECOMPOSE, MODULE_NAME, fn);
+        return false;
+    }
+    Log::Write(Log::LT_DEBUG, JOB_CONTEXT_FILE, 1437,
+               L"[%s], %s; decomposed packet, tid:0x%I64X, saleId:0x%I64X, participantWid:%d, participantPcId:0x%I64X, "
+               L"participantAccountId:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X, participantWorldName:%s, "
+               L"participantName:%s, bidPrice:%I64d",
+               MODULE_NAME, fn, _tid, _saleId, static_cast<int>(bidder._participantWid), bidder._participantPcId,
+               ID128_ARGS(bidder._participantAccountId), bidder._participantWorldName, bidder._participantName,
+               _bidInfo._dealingInfo._dealingPrice);
+    return true;
+}
+
+// 0xef60
+void ReserveBidJob::ReplySuccess(Session const*& session) const
+{
+    wchar_t const* const fn = L"ReserveBidJob::ReplySuccess";
+    if (session == nullptr)
+    {
+        JOB_CONTEXT_CRASH(1445, INVALID_SESSION, MODULE_NAME, fn, session);
+        return;
+    }
+    DealingInfo const& dealing = _bidInfo._dealingInfo;
+    session->Send("hqq", MarketDealer_ReserveBidOkCmd, _tid, dealing._dealingId);
+    Log::Write(Log::LT_NOTICE, JOB_CONTEXT_FILE, 1450,
+               L"[%s], %s; sent reserve bid success ack, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, "
+               L"bidderPcId:0x%I64X, bidPrice:%I64d",
+               MODULE_NAME, fn, _tid, _saleId, dealing._dealingId, dealing._trader._participantPcId,
+               dealing._dealingPrice);
+}
+
+// 0xf080
+void ReserveBidJob::ReplyFailure(Session const*& session, short const& failReason) const
+{
+    wchar_t const* const fn = L"ReserveBidJob::ReplyFailure";
+    if (session == nullptr)
+    {
+        JOB_CONTEXT_CRASH(1456, INVALID_SESSION, MODULE_NAME, fn, session);
+        return;
+    }
+    DealingInfo const& dealing = _bidInfo._dealingInfo;
+    session->Send("hqE", MarketDealer_ReserveBidFailCmd, _tid, static_cast<int>(failReason));
+    Log::Write(Log::LT_NOTICE, JOB_CONTEXT_FILE, 1461,
+               L"[%s], %s; sent reserve bid failure ack, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, "
+               L"bidderPcId:0x%I64X, bidPrice:%I64d, failReason:%d",
+               MODULE_NAME, fn, _tid, _saleId, dealing._dealingId, dealing._trader._participantPcId,
+               dealing._dealingPrice, static_cast<int>(failReason));
+}
+
+// 0xf1b0
+bool ReserveBidJob::verifyParameter(short& failReason) const
+{
+    Participant const& bidder = _bidInfo._dealingInfo._trader;
+    if (_saleId > 0 && bidder._participantWid > 0 && bidder._participantPcId > 0 &&
+        (bidder._participantAccountId.id[0] != 0 || bidder._participantAccountId.id[1] != 0) &&
+        wcslen(bidder._participantWorldName) != 0 && wcslen(bidder._participantName) != 0 &&
+        _bidInfo._dealingInfo._dealingPrice > 0)
+    {
+        return true;
+    }
+    Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1473,
+               L"[%s], %s; invalid parameter, tid:0x%I64X, saleId:0x%I64X, participantWid:%d, participantPcId:0x%I64X, "
+               L"participantAccountId:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X, participantWorldName:%s, "
+               L"participantName:%s, bidPrice:%I64d",
+               MODULE_NAME, L"ReserveBidJob::verifyParameter", _tid, _saleId,
+               static_cast<int>(bidder._participantWid), bidder._participantPcId,
+               ID128_ARGS(bidder._participantAccountId), bidder._participantWorldName, bidder._participantName,
+               _bidInfo._dealingInfo._dealingPrice);
+    failReason = MARKETDEALER_RESERVEBIDFAIL_INVALID_PARAMETER;
+    return false;
+}
+
+// 0xf3b0
+bool ReserveBidJob::handleJob(short& failReason)
+{
+    wchar_t const* const fn = L"ReserveBidJob::handleJob";
+    DealingInfo const& dealing = _bidInfo._dealingInfo;
+    SaleContext* const saleContext = MarketDealerDaemon::_instance->_saleContextManager->GetContext(_saleId);
+    if (saleContext == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1485,
+                   L"[%s], %s; there is no such sale context, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, "
+                   L"bidderPcId:0x%I64X, bidPrice:%I64d",
+                   MODULE_NAME, fn, _tid, _saleId, dealing._dealingId, dealing._trader._participantPcId,
+                   dealing._dealingPrice);
+        failReason = MARKETDEALER_RESERVEBIDFAIL_NO_SUCH_SALE;
+        return false;
+    }
+
+    {
+        AutoCS autoLock(&saleContext->_lock);
+        SaleInfo const& saleInfo = saleContext->_saleInfo;
+        long long const bidderPcId = dealing._trader._participantPcId;
+        if (saleInfo._saleStatus != SaleInfo::SALESTATUS_SELLING)
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1495,
+                       L"[%s], %s; sale status is not selling, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, "
+                       L"bidderPcId:0x%I64X, bidPrice:%I64d, saleStatus:%d",
+                       MODULE_NAME, fn, _tid, _saleId, dealing._dealingId, bidderPcId, dealing._dealingPrice,
+                       static_cast<int>(saleInfo._saleStatus));
+            failReason = MARKETDEALER_RESERVEBIDFAIL_INVALID_SALE_STATUS;
+        }
+        else if (saleInfo._saleType != ECONOMY_SALETYPE_AUCTION)
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1500,
+                       L"[%s], %s; sale type is not auction, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, "
+                       L"bidderPcId:0x%I64X, bidPrice:%I64d, saleType:%d",
+                       MODULE_NAME, fn, _tid, _saleId, dealing._dealingId, bidderPcId, dealing._dealingPrice,
+                       static_cast<int>(saleInfo._saleType));
+            failReason = MARKETDEALER_RESERVEBIDFAIL_SALE_TYPE_IS_NOT_AUCTION;
+        }
+        else if (saleInfo._seller._participantPcId == bidderPcId)
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1505,
+                       L"[%s], %s; seller and bidder are same, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, "
+                       L"bidderPcId:0x%I64X, bidPrice:%I64d, sellerPcId:0x%I64X",
+                       MODULE_NAME, fn, _tid, _saleId, dealing._dealingId, bidderPcId, dealing._dealingPrice,
+                       saleInfo._seller._participantPcId);
+            failReason = MARKETDEALER_RESERVEBIDFAIL_SELLER_AND_BIDDER_ARE_SAME;
+        }
+        else if (saleContext->IsBidding(bidderPcId))
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1510,
+                       L"[%s], %s; already exists bid, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, "
+                       L"bidderPcId:0x%I64X, bidPrice:%I64d",
+                       MODULE_NAME, fn, _tid, _saleId, dealing._dealingId, dealing._trader._participantPcId,
+                       dealing._dealingPrice);
+            failReason = MARKETDEALER_RESERVEBIDFAIL_ALREADY_BID;
+        }
+        else if (saleInfo._topBidPrice > 0 && saleInfo._bidUnitPrice + saleInfo._topBidPrice > dealing._dealingPrice)
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1516,
+                       L"[%s], %s; insufficient bid price, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, "
+                       L"bidderPcId:0x%I64X, bidPrice:%I64d, topBidPrice:%I64d, bidUnitPrice:%I64d",
+                       MODULE_NAME, fn, _tid, _saleId, dealing._dealingId, dealing._trader._participantPcId,
+                       dealing._dealingPrice, saleInfo._topBidPrice, saleInfo._bidUnitPrice);
+            failReason = MARKETDEALER_RESERVEBIDFAIL_INSUFFICIENT_BID_PRICE;
+        }
+        else if (saleInfo._topBidPrice <= 0 && saleInfo._salePrice > dealing._dealingPrice)
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1523,
+                       L"[%s], %s; insufficient bid price, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, "
+                       L"bidderPcId:0x%I64X, bidPrice:%I64d, bidInitPrice:%I64d",
+                       MODULE_NAME, fn, _tid, _saleId, dealing._dealingId, dealing._trader._participantPcId,
+                       dealing._dealingPrice, saleInfo._salePrice);
+            failReason = MARKETDEALER_RESERVEBIDFAIL_INSUFFICIENT_BID_PRICE;
+        }
+        else
+        {
+            int dbRetValue = 0;
+            if (MarketDB::ReserveBid(dbRetValue, *this))
+            {
+                _bidInfo._bidStatus = BidInfo::BIDSTATUS_RESERVING;
+                if (!saleContext->AddBidContext(_bidInfo))
+                {
+                    JOB_CONTEXT_CRASH(1548,
+                                      L"== CRASH == [%s], %s; exception occurred; failed to add bid context, "
+                                      L"tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, bidderPcId:0x%I64X, "
+                                      L"bidPrice:%I64d",
+                                      MODULE_NAME, fn, _tid, _saleId, dealing._dealingId,
+                                      dealing._trader._participantPcId, dealing._dealingPrice);
+                }
+                autoLock.Leave();
+                Log::Write(Log::LT_DEBUG, JOB_CONTEXT_FILE, 1552,
+                           L"[%s], %s; succeeded to reserve bid, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, "
+                           L"bidderPcId:0x%I64X, bidPrice:%I64d",
+                           MODULE_NAME, fn, _tid, _saleId, dealing._dealingId, dealing._trader._participantPcId,
+                           dealing._dealingPrice);
+                saleContext->removeReferenceCount(JOB_CONTEXT_FILE, 1553);
+                return true;
+            }
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1531,
+                       L"[%s], %s; failed to reserve bid, dbRetValue:%d, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, "
+                       L"bidderPcId:0x%I64X, bidPrice:%I64d",
+                       MODULE_NAME, fn, dbRetValue, _tid, _saleId, dealing._dealingId,
+                       dealing._trader._participantPcId, dealing._dealingPrice);
+            if (dbRetValue == 2)
+                failReason = MARKETDEALER_RESERVEBIDFAIL_EXCEEDED_CONCURRENT_BID_COUNT;
+            else if (dbRetValue == 3)
+                failReason = MARKETDEALER_RESERVEBIDFAIL_ALREADY_BID;
+            else
+                failReason = MARKETDEALER_DB_ERROR;
+        }
+    }
+    saleContext->removeReferenceCount(JOB_CONTEXT_FILE, 1559);
+    return false;
+}
+
+// ---- CancelBidReservationJob ----
+
+// 0xfae0
+bool CancelBidReservationJob::Initialize(Packet const*& packet)
+{
+    wchar_t const* const fn = L"CancelBidReservationJob::Initialize";
+    if (packet == nullptr)
+    {
+        JOB_CONTEXT_CRASH(1590, INVALID_PACKET, MODULE_NAME, fn, packet);
+        return false;
+    }
+    short cmd = 0;
+    if (packet->Decompose("hqqqq", &cmd, &_tid, &_saleId, &_bidId, &_bidderPcId) == 0)
+    {
+        Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1600, FAIL_DECOMPOSE, MODULE_NAME, fn);
+        return false;
+    }
+    Log::Write(Log::LT_DEBUG, JOB_CONTEXT_FILE, 1603,
+               L"[%s], %s; decomposed packet, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, bidderPcId:0x%I64X",
+               MODULE_NAME, fn, _tid, _saleId, _bidId, _bidderPcId);
+    return true;
+}
+
+// 0xfc50
+void CancelBidReservationJob::ReplySuccess(Session const*& session) const
+{
+    wchar_t const* const fn = L"CancelBidReservationJob::ReplySuccess";
+    if (session == nullptr)
+    {
+        JOB_CONTEXT_CRASH(1611, INVALID_SESSION, MODULE_NAME, fn, session);
+        return;
+    }
+    session->Send("hq", MarketDealer_CancelBidReservationOkCmd, _tid);
+    Log::Write(Log::LT_NOTICE, JOB_CONTEXT_FILE, 1616,
+               L"[%s], %s; sent cancel bid reservation success ack, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, "
+               L"bidderPcId:0x%I64X",
+               MODULE_NAME, fn, _tid, _saleId, _bidId, _bidderPcId);
+}
+
+// 0xfd60
+void CancelBidReservationJob::ReplyFailure(Session const*& session, short const& failReason) const
+{
+    wchar_t const* const fn = L"CancelBidReservationJob::ReplyFailure";
+    if (session == nullptr)
+    {
+        JOB_CONTEXT_CRASH(1622, INVALID_SESSION, MODULE_NAME, fn, session);
+        return;
+    }
+    session->Send("hqE", MarketDealer_CancelBidReservationFailCmd, _tid, static_cast<int>(failReason));
+    Log::Write(Log::LT_NOTICE, JOB_CONTEXT_FILE, 1627,
+               L"[%s], %s; sent cancel bid reservation failure ack, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, "
+               L"bidderPcId:0x%I64X, failReason:%d",
+               MODULE_NAME, fn, _tid, _saleId, _bidId, _bidderPcId, static_cast<int>(failReason));
+}
+
+// 0xfe80
+bool CancelBidReservationJob::verifyParameter(short& failReason) const
+{
+    if (_saleId > 0 && _bidId > 0 && _bidderPcId > 0)
+        return true;
+    Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1635,
+               L"[%s], %s; invalid parameter, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, bidderPcId:0x%I64X",
+               MODULE_NAME, L"CancelBidReservationJob::verifyParameter", _tid, _saleId, _bidId, _bidderPcId);
+    failReason = MARKETDEALER_CANCELBIDRESERVATIONFAIL_INVALID_PARAMETER;
+    return false;
+}
+
+// 0xff10
+bool CancelBidReservationJob::handleJob(short& failReason)
+{
+    wchar_t const* const fn = L"CancelBidReservationJob::handleJob";
+    BidContext* bidContext = nullptr;
+    SaleContext* const saleContext = MarketDealerDaemon::_instance->_saleContextManager->GetContext(_saleId);
+    if (saleContext != nullptr)
+    {
+        AutoCS autoLock(&saleContext->_lock);
+        bidContext = saleContext->GetBidContext(_bidderPcId);
+        if (bidContext == nullptr)
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1655,
+                       L"[%s], %s; there is no such bid context, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, "
+                       L"bidderPcId:0x%I64X",
+                       MODULE_NAME, fn, _tid, _saleId, _bidId, _bidderPcId);
+            failReason = MARKETDEALER_CANCELBIDRESERVATIONFAIL_NO_SUCH_BID;
+            autoLock.Leave();
+            saleContext->removeReferenceCount(JOB_CONTEXT_FILE, 1708);
+            return false;
+        }
+
+        BidInfo& bidInfo = bidContext->_bidInfo;
+        bool failed = true;
+        int dbRetValue = 0;
+        if (bidInfo._dealingInfo._dealingId != _bidId)
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1660,
+                       L"[%s], %s; bid id is not same, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, bidderPcId:0x%I64X, "
+                       L"contextId:0x%I64X",
+                       MODULE_NAME, fn, _tid, _saleId, _bidId, _bidderPcId, bidInfo._dealingInfo._dealingId);
+            failReason = MARKETDEALER_CANCELBIDRESERVATIONFAIL_NO_SUCH_BID;
+        }
+        else if (bidInfo._dealingInfo._trader._participantPcId != _bidderPcId)
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1665,
+                       L"[%s], %s; bidder pcId is not same, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, "
+                       L"bidderPcId:0x%I64X, contextPcId:0x%I64X",
+                       MODULE_NAME, fn, _tid, _saleId, _bidId, _bidderPcId,
+                       bidInfo._dealingInfo._trader._participantPcId);
+            failReason = MARKETDEALER_CANCELBIDRESERVATIONFAIL_PCID_IS_NOT_SAME;
+        }
+        else if (bidInfo._bidStatus != BidInfo::BIDSTATUS_RESERVING)
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1670,
+                       L"[%s], %s; bid status is not reserving, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, "
+                       L"bidderPcId:0x%I64X, bidStatus:%d",
+                       MODULE_NAME, fn, _tid, _saleId, _bidId, _bidderPcId, static_cast<int>(bidInfo._bidStatus));
+            failReason = MARKETDEALER_CANCELBIDRESERVATIONFAIL_INVALID_BID_STATUS;
+        }
+        else if (!MarketDB::CancelBidReservation(dbRetValue, *this))
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1677,
+                       L"[%s], %s; failed to cancel bid reservation, dbRetValue:%d, tid:0x%I64X, saleId:0x%I64X, "
+                       L"bidId:0x%I64X, bidderPcId:0x%I64X",
+                       MODULE_NAME, fn, dbRetValue, _tid, _saleId, _bidId, _bidderPcId);
+            failReason = MARKETDEALER_DB_ERROR;
+        }
+        else
+        {
+            bidInfo._bidStatus = BidInfo::BIDSTATUS_RESERVATION_CANCELLATION;
+            if (!saleContext->RemoveBidContext(_bidderPcId))
+            {
+                JOB_CONTEXT_CRASH(1684,
+                                  L"== CRASH == [%s], %s; exception occurred; failed to remove bid context, "
+                                  L"tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, bidderPcId:0x%I64X",
+                                  MODULE_NAME, fn, _tid, _saleId, _bidId, _bidderPcId);
+            }
+            failed = false;
+        }
+        autoLock.Leave();
+        if (failed)
+        {
+            bidContext->removeReferenceCount(JOB_CONTEXT_FILE, 1706);
+            saleContext->removeReferenceCount(JOB_CONTEXT_FILE, 1708);
+            return false;
+        }
+    }
+    else
+    {
+        // The sale context is gone (the sale is closed). Only the DB row is cancelled.
+        int dbRetValue = 0;
+        if (!MarketDB::CancelBidReservation(dbRetValue, *this))
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1690,
+                       L"[%s], %s; failed to cancel bid reservation, dbRetValue:%d, tid:0x%I64X, saleId:0x%I64X, "
+                       L"bidId:0x%I64X, bidderPcId:0x%I64X",
+                       MODULE_NAME, fn, dbRetValue, _tid, _saleId, _bidId, _bidderPcId);
+            failReason = MARKETDEALER_DB_ERROR;
+            return false;
+        }
+    }
+    Log::Write(Log::LT_DEBUG, JOB_CONTEXT_FILE, 1696,
+               L"[%s], %s; succeeded to cancel bid reservation, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, "
+               L"bidderPcId:0x%I64X",
+               MODULE_NAME, fn, _tid, _saleId, _bidId, _bidderPcId);
+    if (bidContext != nullptr)
+        bidContext->removeReferenceCount(JOB_CONTEXT_FILE, 1698);
+    if (saleContext != nullptr)
+        saleContext->removeReferenceCount(JOB_CONTEXT_FILE, 1700);
+    return true;
+}
+
+// ---- RegisterBidJob ----
+
+// 0x10540
+bool RegisterBidJob::Initialize(Packet const*& packet)
+{
+    wchar_t const* const fn = L"RegisterBidJob::Initialize";
+    if (packet == nullptr)
+    {
+        JOB_CONTEXT_CRASH(1733, INVALID_PACKET, MODULE_NAME, fn, packet);
+        return false;
+    }
+    short cmd = 0;
+    if (packet->Decompose("hqqqqq", &cmd, &_tid, &_saleId, &_bidId, &_bidderPcId, &_pawnId) == 0)
+    {
+        Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1744, FAIL_DECOMPOSE, MODULE_NAME, fn);
+        return false;
+    }
+    Log::Write(Log::LT_DEBUG, JOB_CONTEXT_FILE, 1747,
+               L"[%s], %s; decomposed packet, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, bidderPcId:0x%I64X, "
+               L"pawnId:0x%I64X",
+               MODULE_NAME, fn, _tid, _saleId, _bidId, _bidderPcId, _pawnId);
+    return true;
+}
+
+// 0x106e0
+void RegisterBidJob::ReplySuccess(Session const*& session) const
+{
+    wchar_t const* const fn = L"RegisterBidJob::ReplySuccess";
+    if (session == nullptr)
+    {
+        JOB_CONTEXT_CRASH(1755, INVALID_SESSION, MODULE_NAME, fn, session);
+        return;
+    }
+    session->Send("hq", MarketDealer_RegisterBidOkCmd, _tid);
+    Log::Write(Log::LT_NOTICE, JOB_CONTEXT_FILE, 1760,
+               L"[%s], %s; sent register bid success ack, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, "
+               L"bidderPcId:0x%I64X, pawnId:0x%I64X",
+               MODULE_NAME, fn, _tid, _saleId, _bidId, _bidderPcId, _pawnId);
+}
+
+// 0x10800
+void RegisterBidJob::ReplyFailure(Session const*& session, short const& failReason) const
+{
+    wchar_t const* const fn = L"RegisterBidJob::ReplyFailure";
+    if (session == nullptr)
+    {
+        JOB_CONTEXT_CRASH(1766, INVALID_SESSION, MODULE_NAME, fn, session);
+        return;
+    }
+    session->Send("hqE", MarketDealer_RegisterBidFailCmd, _tid, static_cast<int>(failReason));
+    Log::Write(Log::LT_NOTICE, JOB_CONTEXT_FILE, 1771,
+               L"[%s], %s; sent register bid failure ack, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, "
+               L"bidderPcId:0x%I64X, pawnId:0x%I64X, failReason:%d",
+               MODULE_NAME, fn, _tid, _saleId, _bidId, _bidderPcId, _pawnId, static_cast<int>(failReason));
+}
+
+// 0x10930
+bool RegisterBidJob::verifyParameter(short& failReason) const
+{
+    if (_saleId > 0 && _bidId > 0 && _bidderPcId > 0 && _pawnId > 0)
+        return true;
+    Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1780,
+               L"[%s], %s; invalid parameter, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, bidderPcId:0x%I64X, "
+               L"pawnId:0x%I64X",
+               MODULE_NAME, L"RegisterBidJob::verifyParameter", _tid, _saleId, _bidId, _bidderPcId, _pawnId);
+    failReason = MARKETDEALER_REGISTERBIDFAIL_INVALID_PARAMETER;
+    return false;
+}
+
+// 0x109d0
+bool RegisterBidJob::handleJob(short& failReason)
+{
+    wchar_t const* const fn = L"RegisterBidJob::handleJob";
+    SaleContext* const saleContext = MarketDealerDaemon::_instance->_saleContextManager->GetContext(_saleId);
+    if (saleContext == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1795,
+                   L"[%s], %s; there is no such sale context, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, "
+                   L"bidderPcId:0x%I64X, pawnId:0x%I64X",
+                   MODULE_NAME, fn, _tid, _saleId, _bidId, _bidderPcId, _pawnId);
+        failReason = MARKETDEALER_REGISTERBIDFAIL_NO_SUCH_SALE;
+        return false;
+    }
+
+    {
+        AutoCS autoLock(&saleContext->_lock);
+        SaleInfo& saleInfo = saleContext->_saleInfo;
+        if (saleInfo._saleStatus != SaleInfo::SALESTATUS_SELLING)
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1805,
+                       L"[%s], %s; sale status is not selling, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, "
+                       L"bidderPcId:0x%I64X, pawnId:0x%I64X, saleStatus:%d",
+                       MODULE_NAME, fn, _tid, _saleId, _bidId, _bidderPcId, _pawnId,
+                       static_cast<int>(saleInfo._saleStatus));
+            failReason = MARKETDEALER_REGISTERBIDFAIL_INVALID_SALE_STATUS;
+            autoLock.Leave();
+            saleContext->removeReferenceCount(JOB_CONTEXT_FILE, 1881);
+            return false;
+        }
+        BidContext* const bidContext = saleContext->GetBidContext(_bidderPcId);
+        if (bidContext == nullptr)
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1812,
+                       L"[%s], %s; there is no such bid context, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, "
+                       L"bidderPcId:0x%I64X, pawnId:0x%I64X",
+                       MODULE_NAME, fn, _tid, _saleId, _bidId, _bidderPcId, _pawnId);
+            failReason = MARKETDEALER_REGISTERBIDFAIL_NO_SUCH_BID;
+            autoLock.Leave();
+            saleContext->removeReferenceCount(JOB_CONTEXT_FILE, 1881);
+            return false;
+        }
+
+        BidInfo& bidInfo = bidContext->_bidInfo;
+        int dbRetValue = 0;
+        bool failed = true;
+        if (bidInfo._dealingInfo._dealingId != _bidId)
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1817,
+                       L"[%s], %s; bid id is not same, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, bidderPcId:0x%I64X, "
+                       L"pawnId:0x%I64X, contextId:0x%I64X",
+                       MODULE_NAME, fn, _tid, _saleId, _bidId, _bidderPcId, _pawnId, bidInfo._dealingInfo._dealingId);
+            failReason = MARKETDEALER_REGISTERBIDFAIL_NO_SUCH_BID;
+        }
+        else if (bidInfo._dealingInfo._trader._participantPcId != _bidderPcId)
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1822,
+                       L"[%s], %s; bidder pcId is not same, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, "
+                       L"bidderPcId:0x%I64X, pawnId:0x%I64X, contextPcId:0x%I64X",
+                       MODULE_NAME, fn, _tid, _saleId, _bidId, _bidderPcId, _pawnId,
+                       bidInfo._dealingInfo._trader._participantPcId);
+            failReason = MARKETDEALER_REGISTERBIDFAIL_PCID_IS_NOT_SAME;
+        }
+        else if (bidInfo._bidStatus != BidInfo::BIDSTATUS_RESERVING)
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1827,
+                       L"[%s], %s; bid status is not reserving, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, "
+                       L"bidderPcId:0x%I64X, pawnId:0x%I64X, bidStatus:%d",
+                       MODULE_NAME, fn, _tid, _saleId, _bidId, _bidderPcId, _pawnId,
+                       static_cast<int>(bidInfo._bidStatus));
+            failReason = MARKETDEALER_REGISTERBIDFAIL_INVALID_BID_STATUS;
+        }
+        else if ((_bidPrice = bidInfo._dealingInfo._dealingPrice, saleInfo._topBidPrice > 0) &&
+                 saleInfo._bidUnitPrice + saleInfo._topBidPrice > _bidPrice)
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1835,
+                       L"[%s], %s; insufficient bid price, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, "
+                       L"bidderPcId:0x%I64X, pawnId:0x%I64X, topBidPrice:%I64d, bidUnitPrice:%I64d, bidPrice:%I64d",
+                       MODULE_NAME, fn, _tid, _saleId, _bidId, _bidderPcId, _pawnId, saleInfo._topBidPrice,
+                       saleInfo._bidUnitPrice, _bidPrice);
+            // BUG: 0x109d0 uses the reserve bid fail reason (39), not MARKETDEALER_REGISTERBIDFAIL_INSUFFICIENT_BID_PRICE.
+            failReason = MARKETDEALER_RESERVEBIDFAIL_INSUFFICIENT_BID_PRICE;
+        }
+        else if (saleInfo._topBidPrice <= 0 && saleInfo._salePrice > _bidPrice)
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1842,
+                       L"[%s], %s; insufficient bid price, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, "
+                       L"bidderPcId:0x%I64X, pawnId:0x%I64X, bidInitPrice:%I64d, bidPrice:%I64d",
+                       MODULE_NAME, fn, _tid, _saleId, _bidId, _bidderPcId, _pawnId, saleInfo._salePrice, _bidPrice);
+            // BUG: 0x109d0 uses the reserve bid fail reason (39), not MARKETDEALER_REGISTERBIDFAIL_INSUFFICIENT_BID_PRICE.
+            failReason = MARKETDEALER_RESERVEBIDFAIL_INSUFFICIENT_BID_PRICE;
+        }
+        else if (!SaleContext::DetermineUnitPrice(_bidPrice, saleContext->_saleItemInfo._itemAmount, _newUnitPrice))
+        {
+            JOB_CONTEXT_CRASH(1850,
+                              L"== CRASH == [%s], %s; failed to determine unit price, tid:0x%I64X, saleId:0x%I64X, "
+                              L"bidId:0x%I64X, bidderPcId:0x%I64X, pawnId:0x%I64X, bidPrice:%I64d, itemAmount:%d",
+                              MODULE_NAME, fn, _tid, _saleId, _bidId, _bidderPcId, _pawnId, _bidPrice,
+                              saleContext->_saleItemInfo._itemAmount);
+            failReason = MARKETDEALER_SYSTEM_ERROR;
+        }
+        else if (!MarketDB::RegisterBid(dbRetValue, *this))
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1857,
+                       L"[%s], %s; failed to register bid, dbRetValue:%d, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, "
+                       L"bidderPcId:0x%I64X, pawnId:0x%I64X",
+                       MODULE_NAME, fn, dbRetValue, _tid, _saleId, _bidId, _bidderPcId, _pawnId);
+            failReason = MARKETDEALER_DB_ERROR;
+        }
+        else
+        {
+            bidInfo._dealingInfo._pawnId = _pawnId;
+            bidInfo._bidStatus = BidInfo::BIDSTATUS_BIDDING;
+            ++saleContext->_bidCount;
+            if (!saleContext->SetTopBidInfo(bidInfo))
+            {
+                JOB_CONTEXT_CRASH(1866,
+                                  L"== CRASH == [%s], %s; exception occurred; failed to set top bid info, "
+                                  L"tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, bidderPcId:0x%I64X, pawnId:0x%I64X, "
+                                  L"bidPrice:%I64d",
+                                  MODULE_NAME, fn, _tid, _saleId, _bidId, _bidderPcId, _pawnId,
+                                  bidInfo._dealingInfo._dealingPrice);
+            }
+            saleInfo._unitPrice = _newUnitPrice;
+            failed = false;
+        }
+
+        autoLock.Leave();
+        if (failed)
+        {
+            bidContext->removeReferenceCount(JOB_CONTEXT_FILE, 1879);
+            saleContext->removeReferenceCount(JOB_CONTEXT_FILE, 1881);
+            return false;
+        }
+        Log::Write(Log::LT_DEBUG, JOB_CONTEXT_FILE, 1871,
+                   L"[%s], %s; succeeded to register bid, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, "
+                   L"bidderPcId:0x%I64X, pawnId:0x%I64X, bidPrice:%I64d",
+                   MODULE_NAME, fn, _tid, _saleId, _bidId, _bidderPcId, _pawnId, bidInfo._dealingInfo._dealingPrice);
+        bidContext->removeReferenceCount(JOB_CONTEXT_FILE, 1872);
+        saleContext->removeReferenceCount(JOB_CONTEXT_FILE, 1873);
+        return true;
+    }
+}
+
+// ---- UpdateBidPriceJob ----
+
+// 0x11360
+bool UpdateBidPriceJob::Initialize(Packet const*& packet)
+{
+    wchar_t const* const fn = L"UpdateBidPriceJob::Initialize";
+    if (packet == nullptr)
+    {
+        JOB_CONTEXT_CRASH(1907, INVALID_PACKET, MODULE_NAME, fn, packet);
+        return false;
+    }
+    short cmd = 0;
+    if (packet->Decompose("hqqqqqq", &cmd, &_tid, &_saleId, &_bidId, &_bidderPcId, &_maxDealingPrice,
+                          &_extraBidPrice) == 0)
+    {
+        Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1919, FAIL_DECOMPOSE, MODULE_NAME, fn);
+        return false;
+    }
+    Log::Write(Log::LT_DEBUG, JOB_CONTEXT_FILE, 1922,
+               L"[%s], %s; decomposed packet, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, bidderPcId:0x%I64X, "
+               L"maxDealingPrice:%I64d, extraBidPrice:%I64d",
+               MODULE_NAME, fn, _tid, _saleId, _bidId, _bidderPcId, _maxDealingPrice, _extraBidPrice);
+    return true;
+}
+
+// 0x11510
+void UpdateBidPriceJob::ReplySuccess(Session const*& session) const
+{
+    wchar_t const* const fn = L"UpdateBidPriceJob::ReplySuccess";
+    if (session == nullptr)
+    {
+        JOB_CONTEXT_CRASH(1930, INVALID_SESSION, MODULE_NAME, fn, session);
+        return;
+    }
+    session->Send("hq", MarketDealer_UpdateBidPriceOkCmd, _tid);
+    Log::Write(Log::LT_NOTICE, JOB_CONTEXT_FILE, 1935,
+               L"[%s], %s; sent update bid price success ack, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, "
+               L"bidderPcId:0x%I64X, maxDealingPrice:%I64d, extraBidPrice:%I64d",
+               MODULE_NAME, fn, _tid, _saleId, _bidId, _bidderPcId, _maxDealingPrice, _extraBidPrice);
+}
+
+// 0x11630
+void UpdateBidPriceJob::ReplyFailure(Session const*& session, short const& failReason) const
+{
+    wchar_t const* const fn = L"UpdateBidPriceJob::ReplyFailure";
+    if (session == nullptr)
+    {
+        JOB_CONTEXT_CRASH(1941, INVALID_SESSION, MODULE_NAME, fn, session);
+        return;
+    }
+    session->Send("hqE", MarketDealer_UpdateBidPriceFailCmd, _tid, static_cast<int>(failReason));
+    Log::Write(Log::LT_NOTICE, JOB_CONTEXT_FILE, 1946,
+               L"[%s], %s; sent update bid price failure ack, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, "
+               L"bidderPcId:0x%I64X, maxDealingPrice:%I64d, extraBidPrice:%I64d, failReason:%d",
+               MODULE_NAME, fn, _tid, _saleId, _bidId, _bidderPcId, _maxDealingPrice, _extraBidPrice,
+               static_cast<int>(failReason));
+}
+
+// 0x11770
+bool UpdateBidPriceJob::verifyParameter(short& failReason) const
+{
+    if (_saleId > 0 && _bidId > 0 && _bidderPcId > 0 && _maxDealingPrice > 0 && _extraBidPrice > 0)
+        return true;
+    Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1956,
+               L"[%s], %s; invalid parameter, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, bidderPcId:0x%I64X, "
+               L"maxDealingPrice:%I64d, extraBidPrice:%I64d",
+               MODULE_NAME, L"UpdateBidPriceJob::verifyParameter", _tid, _saleId, _bidId, _bidderPcId,
+               _maxDealingPrice, _extraBidPrice);
+    failReason = MARKETDEALER_UPDATEBIDPRICEFAIL_INVALID_PARAMETER;
+    return false;
+}
+
+// 0x11820
+bool UpdateBidPriceJob::handleJob(short& failReason)
+{
+    wchar_t const* const fn = L"UpdateBidPriceJob::handleJob";
+    SaleContext* const saleContext = MarketDealerDaemon::_instance->_saleContextManager->GetContext(_saleId);
+    if (saleContext == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1971,
+                   L"[%s], %s; there is no such sale context, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, "
+                   L"bidderPcId:0x%I64X, maxDealingPrice:%I64d, extraBidPrice:%I64d",
+                   MODULE_NAME, fn, _tid, _saleId, _bidId, _bidderPcId, _maxDealingPrice, _extraBidPrice);
+        failReason = MARKETDEALER_UPDATEBIDPRICEFAIL_NO_SUCH_SALE;
+        return false;
+    }
+
+    {
+        AutoCS autoLock(&saleContext->_lock);
+        SaleInfo& saleInfo = saleContext->_saleInfo;
+        if (saleInfo._saleStatus != SaleInfo::SALESTATUS_SELLING)
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1981,
+                       L"[%s], %s; sale status is not selling, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, "
+                       L"bidderPcId:0x%I64X, maxDealingPrice:%I64d, extraBidPrice:%I64d, saleStatus:%d",
+                       MODULE_NAME, fn, _tid, _saleId, _bidId, _bidderPcId, _maxDealingPrice, _extraBidPrice,
+                       static_cast<int>(saleInfo._saleStatus));
+            failReason = MARKETDEALER_UPDATEBIDPRICEFAIL_INVALID_SALE_STATUS;
+            autoLock.Leave();
+            saleContext->removeReferenceCount(JOB_CONTEXT_FILE, 2068);
+            return false;
+        }
+        BidContext* const bidContext = saleContext->GetBidContext(_bidderPcId);
+        if (bidContext == nullptr)
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1988,
+                       L"[%s], %s; there is no such bid context, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, "
+                       L"bidderPcId:0x%I64X, maxDealingPrice:%I64d, extraBidPrice:%I64d",
+                       MODULE_NAME, fn, _tid, _saleId, _bidId, _bidderPcId, _maxDealingPrice, _extraBidPrice);
+            failReason = MARKETDEALER_UPDATEBIDPRICEFAIL_NO_SUCH_BID;
+            autoLock.Leave();
+            saleContext->removeReferenceCount(JOB_CONTEXT_FILE, 2068);
+            return false;
+        }
+
+        BidInfo& bidInfo = bidContext->_bidInfo;
+        long long const currentBidPrice = bidInfo._dealingInfo._dealingPrice;
+        int dbRetValue = 0;
+        bool failed = true;
+        if (bidInfo._dealingInfo._dealingId != _bidId)
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1993,
+                       L"[%s], %s; bid id is not same, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, bidderPcId:0x%I64X, "
+                       L"maxDealingPrice:%I64d, extraBidPrice:%I64d, contextId:0x%I64X",
+                       MODULE_NAME, fn, _tid, _saleId, _bidId, _bidderPcId, _maxDealingPrice, _extraBidPrice,
+                       bidInfo._dealingInfo._dealingId);
+            failReason = MARKETDEALER_UPDATEBIDPRICEFAIL_NO_SUCH_BID;
+        }
+        else if (bidInfo._dealingInfo._trader._participantPcId != _bidderPcId)
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 1998,
+                       L"[%s], %s; bidder pcId is not same, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, "
+                       L"bidderPcId:0x%I64X, maxDealingPrice:%I64d, extraBidPrice:%I64d, contextPcId:0x%I64X",
+                       MODULE_NAME, fn, _tid, _saleId, _bidId, _bidderPcId, _maxDealingPrice, _extraBidPrice,
+                       bidInfo._dealingInfo._trader._participantPcId);
+            failReason = MARKETDEALER_UPDATEBIDPRICEFAIL_PCID_IS_NOT_SAME;
+        }
+        else if (bidInfo._bidStatus != BidInfo::BIDSTATUS_BIDDING)
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 2003,
+                       L"[%s], %s; bid status is not bidding, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, "
+                       L"bidderPcId:0x%I64X, maxDealingPrice:%I64d, extraBidPrice:%I64d, bidStatus:%d",
+                       MODULE_NAME, fn, _tid, _saleId, _bidId, _bidderPcId, _maxDealingPrice, _extraBidPrice,
+                       static_cast<int>(bidInfo._bidStatus));
+            failReason = MARKETDEALER_UPDATEBIDPRICEFAIL_INVALID_BID_STATUS;
+        }
+        else if (saleInfo._topBidder._participantPcId == _bidderPcId)
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 2008,
+                       L"[%s], %s; top bidder, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, bidderPcId:0x%I64X, "
+                       L"maxDealingPrice:%I64d, extraBidPrice:%I64d",
+                       MODULE_NAME, fn, _tid, _saleId, _bidId, _bidderPcId, _maxDealingPrice, _extraBidPrice);
+            failReason = MARKETDEALER_UPDATEBIDPRICEFAIL_TOP_BIDDER;
+        }
+        else if (saleInfo._bidUnitPrice > _extraBidPrice)
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 2013,
+                       L"[%s], %s; insufficient bid price, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, "
+                       L"bidderPcId:0x%I64X, maxDealingPrice:%I64d, extraBidPrice:%I64d, bidUnitPrice:%I64d",
+                       MODULE_NAME, fn, _tid, _saleId, _bidId, _bidderPcId, _maxDealingPrice, _extraBidPrice,
+                       saleInfo._bidUnitPrice);
+            failReason = MARKETDEALER_UPDATEBIDPRICEFAIL_INSUFFICIENT_BID_PRICE;
+        }
+        else if (saleInfo._bidUnitPrice + saleInfo._topBidPrice > _extraBidPrice + currentBidPrice)
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 2019,
+                       L"[%s], %s; insufficient bid price, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, "
+                       L"bidderPcId:0x%I64X, maxDealingPrice:%I64d, extraBidPrice:%I64d, topBidPrice:%I64d, "
+                       L"bidUnitPrice:%I64d, currentBidPrice:%I64d",
+                       MODULE_NAME, fn, _tid, _saleId, _bidId, _bidderPcId, _maxDealingPrice, _extraBidPrice,
+                       saleInfo._topBidPrice, saleInfo._bidUnitPrice, currentBidPrice);
+            failReason = MARKETDEALER_UPDATEBIDPRICEFAIL_INSUFFICIENT_BID_PRICE;
+        }
+        else if (_extraBidPrice + currentBidPrice > _maxDealingPrice)
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 2024,
+                       L"[%s], %s; max dealing price excess, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, "
+                       L"bidderPcId:0x%I64X, maxDealingPrice:%I64d, extraBidPrice:%I64d, currentBidPrice:%I64d",
+                       MODULE_NAME, fn, _tid, _saleId, _bidId, _bidderPcId, _maxDealingPrice, _extraBidPrice,
+                       currentBidPrice);
+            failReason = MARKETDEALER_UPDATEBIDPRICEFAIL_MAX_DEALING_PRICE_EXCESS;
+        }
+        else if ((_newBidPrice = _extraBidPrice + currentBidPrice,
+                  !SaleContext::DetermineUnitPrice(_newBidPrice, saleContext->_saleItemInfo._itemAmount,
+                                                   _newUnitPrice)))
+        {
+            JOB_CONTEXT_CRASH(2033,
+                              L"== CRASH == [%s], %s; failed to determine unit price, tid:0x%I64X, saleId:0x%I64X, "
+                              L"bidId:0x%I64X, bidderPcId:0x%I64X, maxDealingPrice:%I64d, extraBidPrice:%I64d, "
+                              L"bidPrice:%I64d, itemAmount:%d",
+                              MODULE_NAME, fn, _tid, _saleId, _bidId, _bidderPcId, _maxDealingPrice, _extraBidPrice,
+                              _newBidPrice, saleContext->_saleItemInfo._itemAmount);
+            failReason = MARKETDEALER_SYSTEM_ERROR;
+        }
+        else if (!MarketDB::UpdateBidPrice(dbRetValue, *this))
+        {
+            Log::Write(Log::LT_ERROR, JOB_CONTEXT_FILE, 2040,
+                       L"[%s], %s; failed to update bid price, dbRetValue:%d, tid:0x%I64X, saleId:0x%I64X, "
+                       L"bidId:0x%I64X, bidderPcId:0x%I64X, maxDealingPrice:%I64d, extraBidPrice:%I64d",
+                       MODULE_NAME, fn, dbRetValue, _tid, _saleId, _bidId, _bidderPcId, _maxDealingPrice,
+                       _extraBidPrice);
+            failReason = MARKETDEALER_DB_ERROR;
+        }
+        else
+        {
+            if (!bidContext->SetNewBidPrice(_newBidPrice))
+            {
+                JOB_CONTEXT_CRASH(2046,
+                                  L"== CRASH == [%s], %s; exception occurred; failed to set new bid price, "
+                                  L"tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, bidderPcId:0x%I64X, "
+                                  L"maxDealingPrice:%I64d, extraBidPrice:%I64d, newBidPrice:%I64d",
+                                  MODULE_NAME, fn, _tid, _saleId, _bidId, _bidderPcId, _maxDealingPrice,
+                                  _extraBidPrice, _newBidPrice);
+            }
+            if (!saleContext->SetTopBidInfo(bidInfo))
+            {
+                JOB_CONTEXT_CRASH(2053,
+                                  L"== CRASH == [%s], %s; exception occurred; failed to set top bid info, "
+                                  L"tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, bidderPcId:0x%I64X, "
+                                  L"maxDealingPrice:%I64d, extraBidPrice:%I64d, bidPrice:%I64d",
+                                  MODULE_NAME, fn, _tid, _saleId, _bidId, _bidderPcId, _maxDealingPrice,
+                                  _extraBidPrice, bidInfo._dealingInfo._dealingPrice);
+            }
+            saleInfo._unitPrice = _newUnitPrice;
+            failed = false;
+        }
+
+        autoLock.Leave();
+        if (failed)
+        {
+            bidContext->removeReferenceCount(JOB_CONTEXT_FILE, 2066);
+            saleContext->removeReferenceCount(JOB_CONTEXT_FILE, 2068);
+            return false;
+        }
+        Log::Write(Log::LT_DEBUG, JOB_CONTEXT_FILE, 2058,
+                   L"[%s], %s; succeeded to update bid price, tid:0x%I64X, saleId:0x%I64X, bidId:0x%I64X, "
+                   L"bidderPcId:0x%I64X, maxDealingPrice:%I64d, extraBidPrice:%I64d, bidPrice:%I64d",
+                   MODULE_NAME, fn, _tid, _saleId, _bidId, _bidderPcId, _maxDealingPrice, _extraBidPrice,
+                   bidInfo._dealingInfo._dealingPrice);
+        bidContext->removeReferenceCount(JOB_CONTEXT_FILE, 2059);
+        saleContext->removeReferenceCount(JOB_CONTEXT_FILE, 2060);
+        return true;
+    }
 }
