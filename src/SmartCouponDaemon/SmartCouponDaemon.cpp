@@ -201,7 +201,7 @@ void SmartCouponDaemon::FailedEventObjectHandler(EventObject* eventObject)
         AlertSender::Write(kFile, 130, L"== CRASH == [scd], invalid parameter, eventObject:0x%p", nullptr);
         return;
     }
-    eventObject->EventId();  // ❓ the switch on the id has no case
+    eventObject->EventId();  // LIFT: switch with no case; 0x14eff calls slot 4 and drops eax
     Log::Write(Log::LT_DEBUG, kFile, 143, L"[scd], unknown event object id, id: %d, object: %p", eventObject->EventId(),
                eventObject);
 }
@@ -233,7 +233,7 @@ bool SmartCouponDaemon::initLog()
     // BUG: 0x14f40 the result of Alloc is not checked.
     void* const buffer = Memory::_Manager[2]->Alloc(sizeof(LogFile), kFile, 177);
     _logFile = new (buffer) LogFile(_config->_logPath, 2, 0);  // LIFT: LTCG folded the args. initialize 0x21b45 sets _filetype = 2. logType is not read.
-    // ❓ _logFile->_enable[2] = false; the _enable member is not in LogFile.h.
+    _logFile->_enable[Log::LT_TRACE] = false;  // LIFT: mov byte ptr [rax+6Ah], 0 at 0x1505c (LogMedia::_enable 0x68 + 2)
 
     if (!Log::InitMedia(console))
     {
@@ -343,14 +343,14 @@ bool SmartCouponDaemon::initialize()
     _npChannelMgr = mem ? new (mem) NPServiceChannelManager() : nullptr;
 
     GameEventManager::Initialize(FailedEventObjectHandler, Daemon::Instance->threadManager,
-                                 _config->_gameEventWorkerThreadCount);  // ❓ handler argument
+                                 _config->_gameEventWorkerThreadCount);  // LIFT: LTCG dropped the handler; 0x155bf passes rcx = threadManager, edx = count
     return true;
 }
 
 // 0x155f0
 bool SmartCouponDaemon::initNetwork()
 {
-    if (!Network::Initialize(FailedEventObjectHandler, _config->_workerThreadCount))  // ❓ handler argument
+    if (!Network::Initialize(FailedEventObjectHandler, _config->_workerThreadCount))  // LIFT: LTCG dropped the handler; 0x15635 passes ecx = count
     {
         Log::Write(Log::LT_ERROR, kFile, 312, L"[scd], failed to initialize network");
         return false;
@@ -430,7 +430,7 @@ bool SmartCouponDaemon::onStart()
     Log::Write(Log::LT_NOTICE, kFile, 430, L"[scd], open managed port ok");
     _instance->_serviceAvailable = true;
     if (pipeConsole != nullptr)
-        pipeConsole->SetDetectFrozenThread(true, 0);  // ❓ arguments
+        pipeConsole->SetDetectFrozenThread(true, 0);  // LIFT: LTCG put the args into 0x25000 (stores 1 at +8C0h, 0 at +8C4h)
     return true;
 }
 
