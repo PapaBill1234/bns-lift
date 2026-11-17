@@ -25,11 +25,10 @@ static wchar_t const CHANNEL_H_FILE[] =
 
 static short const SMARTCOUPON_PACKET_VERSION = 1;  // LIFT: No PDB symbol. The binary uses the literal.
 
-// ❓ The guid prints as DWORD, WORD, WORD and 8 bytes.
+// LIFT: lift macro, not in any PDB. The 11 id128::guid arguments of the "%08X-%04X-%04X-..." format.
 #define GUID_ARGS(g)                                                                                               \
-    *reinterpret_cast<unsigned int const*>(&(g).guid[0]), *reinterpret_cast<unsigned short const*>(&(g).guid[4]), \
-        *reinterpret_cast<unsigned short const*>(&(g).guid[6]), (g).guid[8], (g).guid[9], (g).guid[10],            \
-        (g).guid[11], (g).guid[12], (g).guid[13], (g).guid[14], (g).guid[15]
+    (g).guid.id1, (g).guid.id2, (g).guid.id3, (g).guid.id4[0], (g).guid.id4[1], (g).guid.id4[2], (g).guid.id4[3], \
+        (g).guid.id4[4], (g).guid.id4[5], (g).guid.id4[6], (g).guid.id4[7]
 
 // 0x7d30
 unsigned long long DChannel::GetId()
@@ -53,7 +52,7 @@ bool HandleSmartCoupon_HelloReq(Session const* session, Packet const* packet)
 {
     short cmd = 0;
     short packetVersion = 0;
-    int daemonType = 0;  // ❓ PDB type SmartCouponDaemonType
+    SmartCouponDaemonType daemonType = SMARTCOUPON_DAEMONTYPE_NONE;  // PDB: S_REGREL32 type 0x2731
     short worldId = 0;
     unsigned short internalPort = 0;
 
