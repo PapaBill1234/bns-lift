@@ -42,6 +42,8 @@ static_assert(offsetof(DbTransaction, StmtHandle) == 0x10, "DbTransaction::StmtH
 static_assert(offsetof(DbTransaction, BoundParam) == 0x19, "DbTransaction::BoundParam");
 static_assert(offsetof(DbTransaction, Next) == 0x20, "DbTransaction::Next");
 
+struct tagTIMESTAMP_STRUCT;
+
 class Db
 {
 public:
@@ -55,6 +57,7 @@ public:
     static void errorLog(wchar_t const* fmt, ...);                  // 0x20C70
     static bool initEnv();                                          // 0x20CB0
     void clearList();                                               // 0x20D90
+    static long long ConvertTime(tagTIMESTAMP_STRUCT const* ts);    // 0x3c9f0 (MarketDealerDaemon)
 
     static void* EnvHandle;
     static Db* Instance[41];

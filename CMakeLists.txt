@@ -44,6 +44,7 @@ set(LIFT_SRC_INCLUDE
   ${CMAKE_SOURCE_DIR}/src/Server/BloodLib/source
   ${CMAKE_SOURCE_DIR}/src/Server/Economy/CacheGate
   ${CMAKE_SOURCE_DIR}/src/Server/Economy/PostOfficeDaemon
+  ${CMAKE_SOURCE_DIR}/src/Server/Economy/MarketDealerDaemon
   ${CMAKE_SOURCE_DIR}/src/Server/Economy/Shared
   ${CMAKE_SOURCE_DIR}/src/Server/LobbyDaemon
   ${CMAKE_SOURCE_DIR}/src/Server/LobbyGate
@@ -55,6 +56,7 @@ set(LIFT_SRC_INCLUDE
 lift_exe(lift_selftest
   SOURCES src/selftest/main.cpp src/selftest/stl_layout.cpp src/selftest/pdb_types.cpp
           src/selftest/pdb_types_LobbyGate.cpp src/selftest/pdb_types_PostOfficeDaemon.cpp
+          src/selftest/pdb_types_MarketDealerDaemon.cpp
           src/selftest/pdb_types_SmartCouponDaemon.cpp
   IMPORTS msvcr100 kernel32)
 # msvcr100 from Wine has no type_info vftable in the import lib. No RTTI for the selftest.
@@ -245,6 +247,17 @@ target_compile_options(lift_postofficedaemon PRIVATE /GR-)
 target_include_directories(lift_postofficedaemon BEFORE PRIVATE ${LIFT_STL_INCLUDE})
 target_include_directories(lift_postofficedaemon PUBLIC ${LIFT_SRC_INCLUDE})
 target_link_libraries(lift_postofficedaemon PUBLIC lift_common)
+
+# MarketDealerDaemon lifted modules (static library). Calls to code of later cards stay as declarations.
+add_library(lift_marketdealerdaemon STATIC
+  src/Server/Economy/MarketDealerDaemon/SaleContext.cpp
+  src/Server/Economy/MarketDealerDaemon/BidContext.cpp
+  src/Server/Economy/MarketDealerDaemon/PurchaseContext.cpp
+  src/Server/Economy/MarketDealerDaemon/Postman.cpp)
+target_compile_options(lift_marketdealerdaemon PRIVATE /GR-)
+target_include_directories(lift_marketdealerdaemon BEFORE PRIVATE ${LIFT_STL_INCLUDE})
+target_include_directories(lift_marketdealerdaemon PUBLIC ${LIFT_SRC_INCLUDE})
+target_link_libraries(lift_marketdealerdaemon PUBLIC lift_common)
 
 # SmartCouponDaemon server exe. LinkStubs.cpp has stub bodies for the modules in the handoff "Not done" list.
 lift_exe(SmartCouponDaemon

@@ -3,6 +3,8 @@
 #include <sql.h>
 #include <sqlext.h>
 #include <stdio.h>
+#include <string.h>
+#include <time.h>
 #include <wchar.h>
 #include <new>
 #include <locale.h>
@@ -508,4 +510,21 @@ void DbTransaction::statmentErrorLog(wchar_t const* fmt, ...)
     va_start(args, fmt);
     Db::Log(SQL_HANDLE_STMT, StmtHandle, fmt, args);
     va_end(args);
+}
+
+// 0x3c9f0 (MarketDealerDaemon)
+long long Db::ConvertTime(tagTIMESTAMP_STRUCT const* ts)
+{
+    tm time;
+    memset(&time, 0, sizeof(time));
+    time.tm_year = ts->year - 1900;
+    if (ts->month != 0)
+        time.tm_mon = ts->month - 1;
+    else
+        time.tm_mon = 0;
+    time.tm_mday = ts->day;
+    time.tm_hour = ts->hour;
+    time.tm_min = ts->minute;
+    time.tm_sec = ts->second;
+    return _mktime64(&time);
 }
