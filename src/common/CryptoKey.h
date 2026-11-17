@@ -9,7 +9,7 @@ class CryptoKey
 {
 public:
     CryptoKey() : _alloc(false) {}
-    virtual int GetType() const = 0; // ❓ slot 0
+    virtual int GetType() const = 0; // LIFT: slot 0. Dh slot 0 = xor eax,eax; ret, folded with Rsa::KeySize (LobbyGate 0x86ED8, 0x27fc0)
     virtual bool Setup(int bits) = 0;
     virtual void Cleanup() = 0;
     virtual bool Start(unsigned char const* in, int inSize, unsigned char* out, int* outSize) = 0;
@@ -24,7 +24,7 @@ protected:
     static bool generatePrimeNumber(int bits, unsigned char* out, int* size);
 
 public:
-    bool _alloc; // ❓ +8
+    bool _alloc; // LIFT: +8. Dh::Dh writes byte [rcx+8] = 0 (LobbyGate 0x554c0)
 
 private:
     static long s_initializedCount; // 0x94108
@@ -55,12 +55,12 @@ private:
     }
 
 public:
-    int _state;     // ❓ +16. 0 = new, 1 = started, -1 = done.
-    int _bits;      // ❓ +20
-    BigInteger _g;  // ❓ +24
-    BigInteger _p;  // ❓ +544
-    BigInteger _x;  // ❓ +1064, private value
-    BigInteger _y;  // ❓ +1584, peer value
+    int _state;     // LIFT: +16. 0 = new (Setup 0x55610), 1 = started (Start 0x5595e), -1 = done (Process 0x559e2). LobbyGate.
+    int _bits;      // LIFT: +20. Setup writes [rcx+14h] (LobbyGate 0x55610)
+    BigInteger _g;  // LIFT: +24. Dh::Dh header +0x18 (LobbyGate 0x554c0)
+    BigInteger _p;  // LIFT: +544. Dh::Dh header +0x220 (LobbyGate 0x554c0)
+    BigInteger _x;  // LIFT: +1064, private value. getValue sets it from generateBigNumber (LobbyGate 0x55e41)
+    BigInteger _y;  // LIFT: +1584, peer value. Process sets it from the input (LobbyGate 0x559a5)
 };
 static_assert(offsetof(Dh, _state) == 16, "Dh::_state");
 static_assert(offsetof(Dh, _g) == 24, "Dh::_g");

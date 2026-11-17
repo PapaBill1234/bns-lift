@@ -41,7 +41,7 @@ wchar_t const* Daemon::StateString[10] = {
     L"UNKNOWN", L"STOPPED", L"STOPPING", L"STARTING", L"RUNNING",
     L"INVALID", L"FLUSHING", L"COOLDOWNING", L"COOLDOWNED", L"RELOADING",
 };  // 0x59180
-RUN_MODE RunMode = static_cast<RUN_MODE>(-1);  // ❓ initial data is 0xFFFFFFFF
+RUN_MODE RunMode = static_cast<RUN_MODE>(-1);  // LIFT: .data holds 0xFFFFFFFF (LobbyGate 0x93ad8)
 int const CONFIG_DIR_OPTION_LEN = 6;            // wcslen(L"--conf")
 
 namespace
@@ -137,7 +137,7 @@ static Console* makeConsole()
 {
     if (RunMode == DAEMON_MODE)
     {
-        // ❓ source line is not in the decompiled call (119 is a guess)
+        // LIFT: DAEMON_MODE allocates 0xE0 bytes at line 119 (LobbyGate 0x1db83)
         void* memory = BaseMemoryManager::_Instance.Alloc(sizeof(WinServiceConsole), DAEMON_FILE, 119);
         return memory != nullptr ? new (memory) WinServiceConsole() : nullptr;
     }
@@ -164,7 +164,7 @@ void BloodDaemonMain(int argc, wchar_t** argv)
     SysInfo::_PageSize = systemInfo.dwPageSize;
     SysInfo::_ProcessorCount = systemInfo.dwNumberOfProcessors;
     SysInfo::_Granularity = systemInfo.dwAllocationGranularity;
-    CrashHandler::Initialize(0, false);  // ❓ LTCG removed the arguments
+    CrashHandler::Initialize(0, false);  // LIFT: LTCG folded the arguments; callee writes rcx and edx first (LobbyGate 0x1cbc8, call 0x1dc63)
     initMemorySection(1, nullptr);
     initMemorySection(2, HeapMemoryManager::LFH);
     if (Daemon::Instance == nullptr)
@@ -209,13 +209,13 @@ void BloodDaemonMain(int argc, wchar_t** argv)
             {
                 if (_wcsicmp(argv[i], L"--install") == 0 && i + 2 < argc)
                 {
-                    // ❓ LTCG removed the daemon argument (rcx = postfix).
+                    // LIFT: LTCG folded the daemon argument; callee reads Daemon::Instance, rcx = postfix (LobbyGate 0x2c4a1).
                     WinServiceConsole::InstallService(Daemon::Instance, argv[i + 1], argv[i + 2]);
                     exit(0);
                 }
                 if (_wcsicmp(argv[i], L"--uninstall") == 0)
                 {
-                    // ❓ LTCG removed the daemon argument (rcx = postfix).
+                    // LIFT: LTCG folded the daemon argument; callee reads Daemon::Instance, rcx = postfix (LobbyGate 0x2c724).
                     WinServiceConsole::UninstallService(Daemon::Instance, argv[i + 1]);
                     exit(0);
                 }
@@ -271,7 +271,7 @@ Daemon::Daemon()
     _zstdCDic = nullptr;
     _cDicBuffer = nullptr;
     _cDicBufferSize = 8000;
-    LoadVersion(&Ver, VerStr, 32);  // ❓ r8 is not set at the call; 32 is the size of VerStr
+    LoadVersion(&Ver, VerStr, 32);  // r8d = 0x20 (LobbyGate 0x1e1df)
 }
 
 // 0xacf0
@@ -379,8 +379,8 @@ bool Daemon::start(int argc, wchar_t const** argv)
     LogBufferAllocator::Initialize();
     PacketBufferAllocator::Initialize();
     EndEvent.Event = CreateEventW(nullptr, FALSE, FALSE, nullptr);
-    SysInfo::Hostname(0, hostname, 256);  // ❓ LTCG removed the address and length arguments
-    console->SetTitle(nullptr);           // ❓ LTCG removed the title argument
+    SysInfo::Hostname(0, hostname, 256);  // LIFT: LTCG folded address and length; rcx = buffer (LobbyGate 0x28b31, call 0x1e728)
+    console->SetTitle(nullptr);           // LIFT: LTCG folded the title; rdx is not set (LobbyGate call 0x1e73a)
     setState(STATE_STARTING);
 
     unsigned long long startTick = GetTickCount64();
@@ -460,9 +460,10 @@ bool Daemon::start(int argc, wchar_t const** argv)
     Log::Close();
     AlertSender::_alertSender.fini();
     pipeConsole->cleanup();
-    threadManager->StopAll(3000, false);  // ❓ LTCG removed forceTerminate
+    threadManager->StopAll(3000, false);  // LIFT: LTCG folded forceTerminate; callee does not read r8 (LobbyGate 0x27780, call 0x1edb1)
 
     // ❓ The binary calls each destructor and then BaseMemoryManager::Free (a delete macro).
+    // ❓ LobbyGate calls ~ThreadManager direct (0x1edc0), but PipeConsole through vtable slot 0 with flag 1 (0x1edfa).
     if (threadManager != nullptr)
         threadManager->~ThreadManager();
     BaseMemoryManager::_Instance.Free(threadManager, DAEMON_FILE, 570);
@@ -644,7 +645,7 @@ void Daemon::noTimerMain(Network* networkInstance)
         long long now = _time64(nullptr);
         threadManager->_now = now;
         Now = now;
-        // ❓ LTCG removed count, force and all
+        // LIFT: LTCG folded count, force and all; callee writes r8 and r9 first (LobbyGate 0x28300)
         GlobalDelayedRelease->Release(GetTickCount64() - Instance->StartSystemTick64, 0, false, false);
         if (flushTime <= now)
         {
@@ -692,7 +693,7 @@ void Daemon::timerMain(Network* networkInstance)
         long long now = _time64(nullptr);
         threadManager->_now = now;
         Now = now;
-        // ❓ LTCG removed count, force and all
+        // LIFT: LTCG folded count, force and all; callee writes r8 and r9 first (LobbyGate 0x28300)
         GlobalDelayedRelease->Release(GetTickCount64() - Instance->StartSystemTick64, 0, false, false);
         ++CurrentTick;
         GlobalTimerQueue->TimeExpired(&slot);
