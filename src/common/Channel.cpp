@@ -195,8 +195,8 @@ bool DaemonChannel::OnConnect(Session const* session, bool firstConnected) const
 // 0x10910
 void DaemonChannel::OnClose(Session const* session, bool tryReconnect) const
 {
-    bool allClosed = _InterlockedDecrement(&ConnectedSessionCount) <= 0;
-    const_cast<DaemonChannel*>(this)->onClose(session, tryReconnect, allClosed);
+    bool closeAll = _InterlockedDecrement(&ConnectedSessionCount) <= 0;
+    const_cast<DaemonChannel*>(this)->onClose(session, tryReconnect, closeAll);
 }
 
 // 0x10950
