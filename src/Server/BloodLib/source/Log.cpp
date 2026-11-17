@@ -40,7 +40,7 @@ bool Log::Initialize()
 {
     if (instance != nullptr)
         return true;
-    void* memory = BaseMemoryManager::_Instance.Alloc(sizeof(Log), LOG_FILE, 45);
+    void* memory = BASE_MEMORY_MANAGER.Alloc(sizeof(Log), LOG_FILE, 45);
     instance = memory != nullptr ? new (memory) Log() : nullptr;
     return Daemon::Instance->threadManager->StartThread(instance, nullptr);  // threadId = nullptr (LobbyGate 0x1aa43 xor r8d)
 }

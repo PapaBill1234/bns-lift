@@ -133,11 +133,7 @@ bool TimerQueue::Add(long elapse, Timer* timer)
         TIMER_ASSERT_CRASH(155);
     EnterCriticalSection(&Lock.SL);
     unsigned int slice = elapse / TimerInterval;
-    if (slice >= StqSize)
-    {
-        addLongTermQueue(slice, timer);
-    }
-    else
+    if (slice < StqSize)
     {
         long currentTick = Daemon::Instance->CurrentTick;
         Slot& slot = StqSlot[(slice + StqCurrent) % StqSize];
@@ -154,6 +150,10 @@ bool TimerQueue::Add(long elapse, Timer* timer)
         timer->StartTick = currentTick;
         timer->SlotIndex = slot.index;
         timer->addReferenceCount(TIMER_FILE, 288);
+    }
+    else
+    {
+        addLongTermQueue(slice, timer);
     }
     LeaveCriticalSection(&Lock.SL);
     return true;
@@ -181,7 +181,8 @@ bool TimerQueue::Remove(Timer* timer)
 }
 
 // 0x26480 (SmartCouponDaemon)
-void TimerQueue::removeShortTermQueue(Slot* slot, Timer* timer)
+// LIFT: noinline. The original Remove (0x26390) calls this function in all exes. VS2010 /LTCG inlines it without the attribute.
+__declspec(noinline) void TimerQueue::removeShortTermQueue(Slot* slot, Timer* timer)
 {
     if (slot->head == timer)
         slot->head = timer->next;

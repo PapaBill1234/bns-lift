@@ -29,40 +29,40 @@ void RefCntObject::operator delete(void* ptr, wchar_t const* file, int line)
 // 0x2150
 long RefCntObject::addReferenceCount(wchar_t const* file, int line)
 {
-    if (_ref > 0)
+    if (_ref <= 0)
     {
-        if (_history != nullptr)
-            _history->add(_ref, file, line, RefCntHistory::OP_ADDREF);
-        return InterlockedIncrement(&_ref);
+        Log::Write(Log::LT_ERROR, REFCNT_HEADER, 153,
+                   L"== CRASH == [ref obj], cannot add reference count, this:0x%p, ref:%d, tag:0x%08x, file:%s, line:%d",
+                   this, _ref, _tag, file, line);
+        AlertSender::Write(REFCNT_HEADER, 153,
+                           L"== CRASH == [ref obj], cannot add reference count, this:0x%p, ref:%d, tag:0x%08x, file:%s, line:%d",
+                           this, _ref, _tag, file, line);
+        return 0;
     }
-    Log::Write(Log::LT_ERROR, REFCNT_HEADER, 153,
-               L"== CRASH == [ref obj], cannot add reference count, this:0x%p, ref:%d, tag:0x%08x, file:%s, line:%d",
-               this, _ref, _tag, file, line);
-    AlertSender::Write(REFCNT_HEADER, 153,
-                       L"== CRASH == [ref obj], cannot add reference count, this:0x%p, ref:%d, tag:0x%08x, file:%s, line:%d",
-                       this, _ref, _tag, file, line);
-    return 0;
+    if (_history != nullptr)
+        _history->add(_ref, file, line, RefCntHistory::OP_ADDREF);
+    return InterlockedIncrement(&_ref);
 }
 
 // 0x2230
 long RefCntObject::removeReferenceCount(wchar_t const* file, int line)
 {
-    if (_ref > 0)
+    if (_ref <= 0)
     {
-        if (_history != nullptr)
-            _history->add(_ref, file, line, RefCntHistory::OP_DELREF);
-        long ref = InterlockedDecrement(&_ref);
-        if (ref == 0)
-            deallocate_object(file, line);
-        return ref;
+        Log::Write(Log::LT_ERROR, REFCNT_HEADER, 177,
+                   L"== CRASH == [ref obj], cannot remove reference count, this:0x%p, ref:%d, tag:0x%08x, file:%s, line:%d",
+                   this, _ref, _tag, file, line);
+        AlertSender::Write(REFCNT_HEADER, 177,
+                           L"== CRASH == [ref obj], cannot remove reference count, this:0x%p, ref:%d, tag:0x%08x, file:%s, line:%d",
+                           this, _ref, _tag, file, line);
+        return 0;
     }
-    Log::Write(Log::LT_ERROR, REFCNT_HEADER, 177,
-               L"== CRASH == [ref obj], cannot remove reference count, this:0x%p, ref:%d, tag:0x%08x, file:%s, line:%d",
-               this, _ref, _tag, file, line);
-    AlertSender::Write(REFCNT_HEADER, 177,
-                       L"== CRASH == [ref obj], cannot remove reference count, this:0x%p, ref:%d, tag:0x%08x, file:%s, line:%d",
-                       this, _ref, _tag, file, line);
-    return 0;
+    if (_history != nullptr)
+        _history->add(_ref, file, line, RefCntHistory::OP_DELREF);
+    long ref = InterlockedDecrement(&_ref);
+    if (ref == 0)
+        deallocate_object(file, line);
+    return ref;
 }
 
 // 0x2320
@@ -149,15 +149,16 @@ void RefCntHistory::dump(RefCntObject* ptr)
         swprintf(timeStr, 128, L"%04d/%02d/%02d-%02d:%02d:%02d%s%s", localTm.tm_year + 1900, localTm.tm_mon + 1,
                  localTm.tm_mday, localTm.tm_hour, localTm.tm_min, localTm.tm_sec, L"", L"");
         wchar_t const* opName = L"none";
-        if (item._op == RefCntHistory::OP_ADDREF)
+        switch (item._op)
         {
+        case RefCntHistory::OP_ADDREF:
             opName = L"addref";
             ++calcRef;
-        }
-        else if (item._op == RefCntHistory::OP_DELREF)
-        {
+            break;
+        case RefCntHistory::OP_DELREF:
             opName = L"delref";
             --calcRef;
+            break;
         }
         Log::Write(Log::LT_DEBUG, L"source\\RefCntObject.cpp", 350,
                    L"[refcnt-history], seq:%d, ptr:0x%p, tag:0x%08x, time:%s, thread-id:%d, idx:%d, op:%s, ref:%d, "
@@ -181,5 +182,5 @@ BaseRefCntObj::~BaseRefCntObj()
 void BaseRefCntObj::deallocate_me(void* ptr, wchar_t const* file, int line)
 {
     this->~BaseRefCntObj();
-    BaseMemoryManager::_Instance.Free(ptr, file, line);
+    BASE_MEMORY_MANAGER.Free(ptr, file, line);
 }

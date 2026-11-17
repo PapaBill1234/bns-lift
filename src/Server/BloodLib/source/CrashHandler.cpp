@@ -245,15 +245,7 @@ static void makeDirectory(wchar_t* directory)
     wchar_t parentPath[260];
 
     _wsplitpath_s(directory, drive, 3, dir, 260, fileName, 260, ext, 260);
-    if (wcslen(drive) == 0)
-    {
-        // BUG: 0x1BF90 the path appends CrashLogPath, not directory. The call is only for CrashLogPath.
-        GetCurrentDirectoryW(260, parentPath);
-        wcsncat(parentPath, L"\\", 260 - wcslen(parentPath));
-        wcsncat(parentPath, CrashLogPath, 260 - wcslen(parentPath));
-        makeDirectory(parentPath);
-    }
-    else
+    if (wcslen(drive) != 0)
     {
         int length = static_cast<int>(wcslen(dir));
         if (length > 1)
@@ -263,6 +255,14 @@ static void makeDirectory(wchar_t* directory)
             makeDirectory(parentPath);
             CreateDirectoryW(parentPath, nullptr);
         }
+    }
+    else
+    {
+        // BUG: 0x1BF90 the path appends CrashLogPath, not directory. The call is only for CrashLogPath.
+        GetCurrentDirectoryW(260, parentPath);
+        wcsncat(parentPath, L"\\", 260 - wcslen(parentPath));
+        wcsncat(parentPath, CrashLogPath, 260 - wcslen(parentPath));
+        makeDirectory(parentPath);
     }
 }
 
@@ -276,8 +276,7 @@ void CrashHandler::MakeCrash(char const* file, int line, wchar_t const* fmt, ...
     info->file = file;
     info->line = line;
     _vswprintf_c_l(info->log, 4096, fmt, nullptr, args);  // LobbyGate 0x1CF3C (import _vswprintf_c_l)
-    ULONG_PTR parameter = reinterpret_cast<ULONG_PTR>(info);
-    RaiseException(USER_ASSERT_FAILED, EXCEPTION_NONCONTINUABLE, 1, &parameter);
+    RaiseException(USER_ASSERT_FAILED, EXCEPTION_NONCONTINUABLE, 1, reinterpret_cast<ULONG_PTR const*>(&info));
     if (Daemon::Instance->EndEvent.Event != nullptr)
         SetEvent(Daemon::Instance->EndEvent.Event);
     Sleep(1000);

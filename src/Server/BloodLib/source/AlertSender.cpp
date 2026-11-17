@@ -1,7 +1,6 @@
 // AlertSender.obj (SmartCouponDaemon PDB).
 // Compiler-made code in AlertSender.obj (not lifted by hand):
-//   0x194A0 swprintf_s<64>, 0x19470 swprintf_s<260>: the Wine headers do not have the
-//           template, so the lift calls swprintf_s with an explicit size.
+//   0x194A0 swprintf_s<64>, 0x19470 swprintf_s<260>: template overloads from crt_cpp_overload.h.
 //   0x18AD0 scalar deleting destructor, 0x51E30 its dtor$0 (calls Thread::~Thread).
 //   0x52A50 dynamic initializer, 0x52B80 atexit destructor, 0x52A20 its dtor$0 (_alertSender).
 #include <winsock2.h>
@@ -10,6 +9,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <wchar.h>
+#if defined(__clang__)
+#include <crt_cpp_overload.h>  // The Wine headers do not have swprintf_s<N>. VS2010 has it.
+#endif
 #include "Daemon.h"
 #include "Memory.h"
 #include "MemoryManager.h"
@@ -169,7 +171,7 @@ void AlertSender::writev2(wchar_t const* file, int line, wchar_t const* format, 
         wchar_t name[264];
         wchar_t ext[264];
         _wsplitpath_s(file, nullptr, 0, nullptr, 0, name, 260, ext, 260);
-        short count = static_cast<short>(swprintf_s(fstr, 260, L"%s%s", name, ext));
+        short count = static_cast<short>(swprintf_s(fstr, L"%s%s", name, ext));
         if (count < 0)
             return;
         fileBytes = static_cast<short>(count * 2);
@@ -182,7 +184,7 @@ void AlertSender::writev2(wchar_t const* file, int line, wchar_t const* format, 
 
     // The original makes this string and does not use it.
     wchar_t lstr[64];
-    if (static_cast<short>(swprintf_s(lstr, 64, L"%d,", line)) < 0)
+    if (static_cast<short>(swprintf_s(lstr, L"%d,", line)) < 0)
         return;
 
     wchar_t log[2000];

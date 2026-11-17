@@ -71,7 +71,7 @@ bool BroadcastCrypt::Initialize(Type type, PacketCrypt::Algorithm algorithm, int
     // Inlined allocation of a BroadcastPacketCrypt (0x2840 bytes) with its Crypto object after it.
     int cryptoSize = Crypto::InstanceSize(static_cast<Crypto::Type>(2));
     int totalSize = 16 * ((cryptoSize + 15) / 16 + 0x284);
-    char* mem = static_cast<char*>(BaseMemoryManager::_Instance.Alloc(totalSize, SECURITY_FILE, 91));
+    char* mem = static_cast<char*>(BASE_MEMORY_MANAGER.Alloc(totalSize, SECURITY_FILE, 91));
     BroadcastPacketCrypt* broadcast = nullptr;
     if (mem != nullptr && totalSize > 0 && totalSize >= static_cast<int>((((cryptoSize + 15) & ~15) + 0x2847) & ~15))
     {
@@ -91,7 +91,7 @@ bool BroadcastCrypt::Initialize(Type type, PacketCrypt::Algorithm algorithm, int
                    PacketCrypt::PARAM_BROADCAST_GLOBAL);
         if (crypt != nullptr)
             destroyCrypt(crypt);
-        BaseMemoryManager::_Instance.Free(crypt, SECURITY_FILE, 104);
+        BASE_MEMORY_MANAGER.Free(crypt, SECURITY_FILE, 104);
         crypt = nullptr;
         return false;
     }
@@ -101,11 +101,11 @@ bool BroadcastCrypt::Initialize(Type type, PacketCrypt::Algorithm algorithm, int
                    L"BroadcastCrypt, initialize failed;generate broadcast key failed, type:%d", 0);
         if (crypt != nullptr)
             destroyCrypt(crypt);
-        BaseMemoryManager::_Instance.Free(crypt, SECURITY_FILE, 112);
+        BASE_MEMORY_MANAGER.Free(crypt, SECURITY_FILE, 112);
         crypt = nullptr;
         return false;
     }
-    key = static_cast<char*>(BaseMemoryManager::_Instance.Alloc(keySize, SECURITY_FILE, 116));
+    key = static_cast<char*>(BASE_MEMORY_MANAGER.Alloc(keySize, SECURITY_FILE, 116));
     memcpy(key, keyBuf, keySize);
     size = keySize;
     return true;
@@ -117,12 +117,12 @@ void BroadcastCrypt::clear()
     if (crypt != nullptr)
     {
         destroyCrypt(crypt);
-        BaseMemoryManager::_Instance.Free(crypt, SECURITY_FILE, 142);
+        BASE_MEMORY_MANAGER.Free(crypt, SECURITY_FILE, 142);
         crypt = nullptr;
     }
     if (key != nullptr)
     {
-        BaseMemoryManager::_Instance.Free(key, SECURITY_FILE, 145);
+        BASE_MEMORY_MANAGER.Free(key, SECURITY_FILE, 145);
         key = nullptr;
     }
 }

@@ -48,7 +48,7 @@ bool Db::Initialize(unsigned int dbId, wchar_t const* dsn)
     Instance[dbId] = db;
     db->TranList = nullptr;  // BUG: 0x20690 no null check after a failed Alloc.
     size_t const length = wcslen(dsn) + 1;
-    wchar_t* copy = static_cast<wchar_t*>(BaseMemoryManager::_Instance.Alloc(length * sizeof(wchar_t), kFile, 53));
+    wchar_t* copy = static_cast<wchar_t*>(BASE_MEMORY_MANAGER.Alloc(length * sizeof(wchar_t), kFile, 53));
     Instance[dbId]->Dsn = copy;
     wcsncpy(copy, dsn, wcslen(dsn) + 1);
     return true;
@@ -79,7 +79,7 @@ void Db::Clear(unsigned int dbId)
     db->clearList();
     if (db->Dsn != nullptr)
     {
-        BaseMemoryManager::_Instance.Free(db->Dsn, kFile, 36);
+        BASE_MEMORY_MANAGER.Free(db->Dsn, kFile, 36);
         db->Dsn = nullptr;
     }
     DeleteCriticalSection(&db->TranListLock.CS);

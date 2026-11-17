@@ -34,7 +34,7 @@ IdleStateTable* IdleStateTable::Create(Port* port, int size, long maxIdleTime, b
         Log::Write(Log::LT_ERROR, IDLEWATCHER_FILE, 56, L"[idlewatcher], size is too big. size:%d", size);
         return nullptr;
     }
-    void* memory = BaseMemoryManager::_Instance.Alloc(allocSize, IDLEWATCHER_FILE, 60);
+    void* memory = BASE_MEMORY_MANAGER.Alloc(allocSize, IDLEWATCHER_FILE, 60);
     IdleStateTable* table = memory != nullptr ? new (memory) IdleStateTable() : nullptr;
     // BUG: 0x24CD0 no null check after Alloc. The code writes to a null table.
     table->_port = port;

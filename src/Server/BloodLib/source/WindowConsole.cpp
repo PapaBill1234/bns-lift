@@ -18,7 +18,7 @@ WindowConsole* WinMsgHandler::_console = nullptr;
 WinMsgHandler::WinMsgHandler(WindowConsole* console)
 {
     _console = console;
-    SystemEvent* initEvent = (SystemEvent*)BaseMemoryManager::_Instance.Alloc(sizeof(SystemEvent),
+    SystemEvent* initEvent = (SystemEvent*)BASE_MEMORY_MANAGER.Alloc(sizeof(SystemEvent),
                                                                                WINDOW_CONSOLE_FILE, 44);
     if (initEvent != nullptr)
         initEvent = new (initEvent) SystemEvent();
@@ -44,7 +44,7 @@ WinMsgHandler::~WinMsgHandler()
             CloseHandle(initEvent->Event);
             initEvent->Event = nullptr;
         }
-        BaseMemoryManager::_Instance.Free(_initEvent, WINDOW_CONSOLE_FILE, 51);
+        BASE_MEMORY_MANAGER.Free(_initEvent, WINDOW_CONSOLE_FILE, 51);
         _initEvent = nullptr;
     }
 }
@@ -64,7 +64,7 @@ void WinMsgHandler::WaitInit()
         CloseHandle(initEvent->Event);
         initEvent->Event = nullptr;
     }
-    BaseMemoryManager::_Instance.Free(_initEvent, WINDOW_CONSOLE_FILE, 58);
+    BASE_MEMORY_MANAGER.Free(_initEvent, WINDOW_CONSOLE_FILE, 58);
     _initEvent = nullptr;
 }
 
@@ -140,7 +140,7 @@ WindowConsole::~WindowConsole()
     if (_messageHandler != nullptr)
     {
         _messageHandler->~WinMsgHandler();
-        BaseMemoryManager::_Instance.Free(_messageHandler, WINDOW_CONSOLE_FILE, 120);
+        BASE_MEMORY_MANAGER.Free(_messageHandler, WINDOW_CONSOLE_FILE, 120);
         _messageHandler = nullptr;
     }
 }
@@ -187,7 +187,7 @@ bool WindowConsole::Open()
                                             &_reloadHandler, &_shutdownHandler, nullptr, &_endSessionHandler))
         return false;
 
-    void* memory = BaseMemoryManager::_Instance.Alloc(sizeof(WinMsgHandler), WINDOW_CONSOLE_FILE, 157);
+    void* memory = BASE_MEMORY_MANAGER.Alloc(sizeof(WinMsgHandler), WINDOW_CONSOLE_FILE, 157);
     WinMsgHandler* handler = (memory != nullptr) ? new (memory) WinMsgHandler(this) : nullptr;
     _messageHandler = handler;
     // LIFT: LTCG folded threadId. The call (0x17325) sets no r8. StartThread (0x12E40) writes r8

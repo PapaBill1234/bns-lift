@@ -9,6 +9,9 @@
 #include <shlwapi.h>
 #include <stdio.h>
 #include <string.h>
+#if defined(__clang__)
+#include <crt_cpp_overload.h>  // The Wine headers do not have swprintf_s<N>. VS2010 has it.
+#endif
 
 namespace
 {
@@ -29,9 +32,9 @@ void* DaemonConfig::Load(XmlCfgDef const* def, int count, unsigned long long siz
     Daemon* daemon = Daemon::Instance;
     // 0xcca0 is swprintf_s<780>.
     if (PathIsFileSpecW(fileName) && daemon->confDir[0] != 0)
-        swprintf_s(fullPath, 780, L"%s\\%s", daemon->confDir, fileName);
+        swprintf_s(fullPath, L"%s\\%s", daemon->confDir, fileName);
     else
-        swprintf_s(fullPath, 780, fileName);  // BUG: 0xc600 the file name is used as a format string.
+        swprintf_s(fullPath, fileName);  // BUG: 0xc600 the file name is used as a format string.
 
     Console* console = Daemon::Instance->console;
     HMODULE module = LoadLibraryW(XML_READER_DLL);

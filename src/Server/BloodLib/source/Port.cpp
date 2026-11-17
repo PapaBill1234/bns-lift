@@ -190,12 +190,12 @@ bool Port::Initialize(unsigned int id, unsigned short portNumber, unsigned int m
         PORT_ASSERT_CRASH(239);
         break;
     }
-    void* memory = BaseMemoryManager::_Instance.Alloc(sizeof(SessionPool), PORT_FILE, 243);
+    void* memory = BASE_MEMORY_MANAGER.Alloc(sizeof(SessionPool), PORT_FILE, 243);
     _pool = memory != nullptr ? new (memory) SessionPool(_id) : nullptr;
     _pool->Initialize(_maxSession, prepareRatio, false);
     _unusedSessionIndex = 1;
     _sessionList = static_cast<Session**>(
-        BaseMemoryManager::_Instance.AllocZero(sizeof(Session*) * _maxSession, PORT_FILE, 248));
+        BASE_MEMORY_MANAGER.AllocZero(sizeof(Session*) * _maxSession, PORT_FILE, 248));
     _iocpHandle = iocpHandle;
     if (portNumber == 0)
         return true;
@@ -225,7 +225,7 @@ void Port::Clear()
             if (_sessionList[i] != nullptr)
                 RemoveSession(_sessionList[i]);
         }
-        BaseMemoryManager::_Instance.Free(_sessionList, PORT_FILE, 295);
+        BASE_MEMORY_MANAGER.Free(_sessionList, PORT_FILE, 295);
         _sessionList = nullptr;
     }
     _sessionHandler = nullptr;

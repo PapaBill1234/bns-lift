@@ -51,6 +51,11 @@ public:
 };
 static_assert(sizeof(BaseMemoryManager) == 0x10, "sizeof BaseMemoryManager");
 
+// LIFT: parity helper (no PDB name). The original calls BaseMemoryManager::_Instance through the vtable
+// (indirect call, Daemon::Start 0xad50). A call on the object binds statically and LTCG inlines HeapAlloc.
+// A call through a base reference keeps the virtual call.
+#define BASE_MEMORY_MANAGER (static_cast<MemoryManager const&>(BaseMemoryManager::_Instance))
+
 class StaticPageMemoryManager : public MemoryManager
 {
 public:

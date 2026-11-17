@@ -138,12 +138,12 @@ void SessionSendBuffer::Clear()
         {
             if (bufferList->_wsaBuffer != nullptr)
             {
-                BaseMemoryManager::_Instance.Free(bufferList->_wsaBuffer, SESSIONBUFFER_FILE, 255);
+                BASE_MEMORY_MANAGER.Free(bufferList->_wsaBuffer, SESSIONBUFFER_FILE, 255);
                 bufferList->_wsaBuffer = nullptr;
             }
             if (bufferList->_pbuffer != nullptr)
             {
-                BaseMemoryManager::_Instance.Free(bufferList->_pbuffer, SESSIONBUFFER_FILE, 260);
+                BASE_MEMORY_MANAGER.Free(bufferList->_pbuffer, SESSIONBUFFER_FILE, 260);
                 bufferList->_pbuffer = nullptr;
             }
             bufferList->_size = 0;
@@ -160,10 +160,10 @@ void SessionSendBuffer::increaseBuffer(SendBufferList* bufferList)
     if (bufferList->_external)
     {
         bufferList->_size = size * 2;
-        bufferList->_wsaBuffer = BaseMemoryManager::_Instance.ReallocZero(
+        bufferList->_wsaBuffer = BASE_MEMORY_MANAGER.ReallocZero(
             bufferList->_wsaBuffer, sizeof(WSABUF) * static_cast<unsigned long long>(bufferList->_size),
             sizeof(WSABUF) * static_cast<unsigned long long>(size), SESSIONBUFFER_FILE, 305);
-        bufferList->_pbuffer = static_cast<PacketBuffer**>(BaseMemoryManager::_Instance.ReallocZero(
+        bufferList->_pbuffer = static_cast<PacketBuffer**>(BASE_MEMORY_MANAGER.ReallocZero(
             bufferList->_pbuffer, sizeof(PacketBuffer*) * static_cast<unsigned long long>(bufferList->_size),
             sizeof(PacketBuffer*) * static_cast<unsigned long long>(size), SESSIONBUFFER_FILE, 306));
         return;
@@ -175,9 +175,9 @@ void SessionSendBuffer::increaseBuffer(SendBufferList* bufferList)
     while (bufferList->_size < size * 2)
         bufferList->_size *= 2;
     bufferList->_external = true;
-    bufferList->_wsaBuffer = BaseMemoryManager::_Instance.AllocZero(
+    bufferList->_wsaBuffer = BASE_MEMORY_MANAGER.AllocZero(
         sizeof(WSABUF) * static_cast<unsigned long long>(bufferList->_size), SESSIONBUFFER_FILE, 289);
-    bufferList->_pbuffer = static_cast<PacketBuffer**>(BaseMemoryManager::_Instance.AllocZero(
+    bufferList->_pbuffer = static_cast<PacketBuffer**>(BASE_MEMORY_MANAGER.AllocZero(
         sizeof(PacketBuffer*) * static_cast<unsigned long long>(bufferList->_size), SESSIONBUFFER_FILE, 290));
     if (wsaBuffer != nullptr)
         memcpy(bufferList->_wsaBuffer, wsaBuffer, sizeof(WSABUF) * static_cast<unsigned long long>(size));

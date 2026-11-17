@@ -76,18 +76,18 @@ void* HeapMemoryManager::AllocZero(unsigned long long size, wchar_t const* file,
 // 0x19fa0
 void* HeapMemoryManager::Realloc(void* ptr, unsigned long long size, wchar_t const* file, int line) const
 {
-    if (ptr != nullptr)
-        return HeapReAlloc(_heap, 0, ptr, size);
-    return HeapAlloc(_heap, 0, size);
+    if (ptr == nullptr)
+        return HeapAlloc(_heap, 0, size);
+    return HeapReAlloc(_heap, 0, ptr, size);
 }
 
 // 0x19fc0
 void* HeapMemoryManager::ReallocZero(void* ptr, unsigned long long size, unsigned long long oldSize,
                                      wchar_t const* file, int line) const
 {
-    if (ptr != nullptr)
-        return HeapReAlloc(_heap, HEAP_ZERO_MEMORY, ptr, size);
-    return HeapAlloc(_heap, HEAP_ZERO_MEMORY, size);
+    if (ptr == nullptr)
+        return HeapAlloc(_heap, HEAP_ZERO_MEMORY, size);
+    return HeapReAlloc(_heap, HEAP_ZERO_MEMORY, ptr, size);
 }
 
 // 0x19ff0

@@ -23,6 +23,9 @@
 #include <time.h>
 #include <wchar.h>
 #include <shlwapi.h>
+#if defined(__clang__)
+#include <crt_cpp_overload.h>  // The Wine headers do not have swprintf_s<N>. VS2010 has it.
+#endif
 
 #define DAEMON_FILE L"source\\Daemon.cpp"
 
@@ -82,40 +85,18 @@ void finiMemorySection(int section)
         manager = const_cast<MemoryManager*>(Memory::_Manager[section]);
         if (manager != nullptr)
             manager->~MemoryManager();  // LIFT: binary calls the deleting destructor with flag 1; it does not free (MemoryManager 0x268b0, LobbyGate)
-        BaseMemoryManager::_Instance.Free(manager, L"source\\Memory.cpp", 85);
+        BASE_MEMORY_MANAGER.Free(manager, L"source\\Memory.cpp", 85);
         Memory::_Manager[section] = nullptr;
     }
 }
 
-// LIFT: Inlined helper. The IPv4 text buffers are in .tls (+0x40 char[32], +0x60 wchar_t[32]).
-__declspec(thread) char addressStringA[32];
-__declspec(thread) wchar_t addressStringW[32];
-
-wchar_t const* addressToString(unsigned long address)  // LIFT: lift helper name, not in any PDB
-{
-    wchar_t* wide = addressStringW;
-    char* narrow = addressStringA;
-    wide[0] = 0;
-    narrow[0] = 0;
-    in_addr in;
-    in.s_addr = address;
-    char const* text = inet_ntoa(in);
-    if (text != nullptr)
-        strcpy_s(narrow, 32, text);
-    if (narrow != nullptr)
-    {
-        wide[31] = 0;
-        MultiByteToWideChar(CP_ACP, 0, narrow, -1, wide, 31);
-    }
-    return wide;
-}
-
 // LIFT: Inlined helper. 3 = 10/8, 2 = 172.16/12, 1 = 192.168/16, 0 = other.
+// 0xbda0: the 172 test is a range test ((x & 0xFFF00000) + 0x53F00000 <= 0xF0000).
 int privateClass(unsigned long address)
 {
     if ((htonl(address) & 0xFF000000) == 0x0A000000)
         return 3;
-    if ((htonl(address) & 0xFFF00000) == 0xAC100000)
+    if ((htonl(address) & 0xFFF00000) - 0xAC100000 <= 0xF0000)
         return 2;
     return (htonl(address) & 0xFFFF0000) == 0xC0A80000;
 }
@@ -148,17 +129,17 @@ static Console* makeConsole()
     if (RunMode == DAEMON_MODE)
     {
         // LIFT: DAEMON_MODE allocates 0xE0 bytes at line 119 (LobbyGate 0x1db83)
-        void* memory = BaseMemoryManager::_Instance.Alloc(sizeof(WinServiceConsole), DAEMON_FILE, 119);
+        void* memory = BASE_MEMORY_MANAGER.Alloc(sizeof(WinServiceConsole), DAEMON_FILE, 119);
         return memory != nullptr ? new (memory) WinServiceConsole() : nullptr;
     }
     if (RunMode == TEXT_MODE)
     {
-        void* memory = BaseMemoryManager::_Instance.Alloc(sizeof(TextConsole), DAEMON_FILE, 121);
+        void* memory = BASE_MEMORY_MANAGER.Alloc(sizeof(TextConsole), DAEMON_FILE, 121);
         return memory != nullptr ? new (memory) TextConsole() : nullptr;
     }
     if (RunMode == WINDOW_MODE)
     {
-        void* memory = BaseMemoryManager::_Instance.Alloc(sizeof(WindowConsole), DAEMON_FILE, 123);
+        void* memory = BASE_MEMORY_MANAGER.Alloc(sizeof(WindowConsole), DAEMON_FILE, 123);
         return memory != nullptr ? new (memory) WindowConsole() : nullptr;
     }
     Log::Write(Log::LT_ERROR, DAEMON_FILE, 126, L"== CRASH == [daemon], invalid run mode");
@@ -193,8 +174,8 @@ void BloodDaemonMain(int argc, wchar_t** argv)
     PathRemoveFileSpecW(path);
     PathAddBackslashW(path);
     // BUG: 0xa690 the path is used as the format string of swprintf_s.
-    // 0xc5d0 is the template swprintf_s<520>. The Wine headers do not have it, so the size is explicit.
-    swprintf_s(Daemon::Instance->confDir, 520, path);
+    // 0xc5d0 is the template swprintf_s<520>.
+    swprintf_s(Daemon::Instance->confDir, path);
 
     if (GetConsoleWindow() != nullptr)
     {
@@ -228,7 +209,7 @@ void BloodDaemonMain(int argc, wchar_t** argv)
                 if (_wcsnicmp(argv[i], L"--conf", CONFIG_DIR_OPTION_LEN) != 0)
                     printUsage(argv[0]);
                 // BUG: 0xa690 the argument is used as the format string of swprintf_s.
-                swprintf_s(Daemon::Instance->confDir, 520, &argv[i][CONFIG_DIR_OPTION_LEN + 1]);
+                swprintf_s(Daemon::Instance->confDir, &argv[i][CONFIG_DIR_OPTION_LEN + 1]);
             }
         }
     }
@@ -295,12 +276,13 @@ Daemon::~Daemon()
 // LIFT: Inlined helper. It sets the state of the pipe console and of the console.
 void Daemon::setState(int state)
 {
+    PipeConsole* pipe = pipeConsole;
     State = state;
-    if (pipeConsole != nullptr)
+    if (pipe != nullptr)
     {
-        pipeConsole->_lock.Enter();
-        pipeConsole->_state = state;
-        pipeConsole->_lock.Leave();
+        pipe->_lock.Enter();
+        pipe->_state = state;
+        pipe->_lock.Leave();
     }
     if (console != nullptr)
         console->SetState(state);
@@ -313,13 +295,13 @@ bool Daemon::Start(Console* console, bool debugMode, int argc, wchar_t const** a
     if (console == nullptr)
         DAEMON_ASSERT_CRASH(332);
 
-    void* memory = BaseMemoryManager::_Instance.Alloc(sizeof(ThreadManager), DAEMON_FILE, 336);
+    void* memory = BASE_MEMORY_MANAGER.Alloc(sizeof(ThreadManager), DAEMON_FILE, 336);
     ThreadManager* threadManager = memory != nullptr ? new (memory) ThreadManager() : nullptr;
     daemon->threadManager = threadManager;
     if (threadManager == nullptr || !threadManager->Initialize(128))
         return false;
 
-    memory = BaseMemoryManager::_Instance.Alloc(sizeof(PipeConsole), DAEMON_FILE, 341);
+    memory = BASE_MEMORY_MANAGER.Alloc(sizeof(PipeConsole), DAEMON_FILE, 341);
     PipeConsole* pipeConsole = memory != nullptr ? new (memory) PipeConsole() : nullptr;
     daemon->pipeConsole = pipeConsole;
     if (pipeConsole == nullptr || !pipeConsole->init())
@@ -423,13 +405,13 @@ bool Daemon::start(int argc, wchar_t const** argv)
     StartTime = _time64(nullptr);
     if (GetTimerInterval() != 0)
     {
-        void* memory = BaseMemoryManager::_Instance.Alloc(sizeof(TimerQueue), DAEMON_FILE, 520);
+        void* memory = BASE_MEMORY_MANAGER.Alloc(sizeof(TimerQueue), DAEMON_FILE, 520);
         GlobalTimerQueue = memory != nullptr ? new (memory) TimerQueue() : nullptr;
         int slotCount = 1000 / GetTimerInterval() * GetTimerMaxTime();
         GlobalTimerQueue->Initialize(GetTimerInterval(), slotCount + 1);
     }
     {
-        void* memory = BaseMemoryManager::_Instance.Alloc(sizeof(DelayedRelease), DAEMON_FILE, 525);
+        void* memory = BASE_MEMORY_MANAGER.Alloc(sizeof(DelayedRelease), DAEMON_FILE, 525);
         GlobalDelayedRelease = memory != nullptr ? new (memory) DelayedRelease(DelayedRelease::DEFAULT_INTERVAL, DelayedRelease::DEFAULT_DELAY) : nullptr;
     }
 
@@ -473,19 +455,19 @@ bool Daemon::start(int argc, wchar_t const** argv)
     // LIFT: explicit destructor call; the slot 0 target only runs ~PipeConsole and does not free (0x295c0).
     if (threadManager != nullptr)
         threadManager->~ThreadManager();
-    BaseMemoryManager::_Instance.Free(threadManager, DAEMON_FILE, 570);
+    BASE_MEMORY_MANAGER.Free(threadManager, DAEMON_FILE, 570);
     threadManager = nullptr;
     if (pipeConsole != nullptr)
         pipeConsole->~PipeConsole();
-    BaseMemoryManager::_Instance.Free(pipeConsole, DAEMON_FILE, 571);
+    BASE_MEMORY_MANAGER.Free(pipeConsole, DAEMON_FILE, 571);
     pipeConsole = nullptr;
     if (GlobalTimerQueue != nullptr)
         GlobalTimerQueue->~TimerQueue();
-    BaseMemoryManager::_Instance.Free(GlobalTimerQueue, DAEMON_FILE, 572);
+    BASE_MEMORY_MANAGER.Free(GlobalTimerQueue, DAEMON_FILE, 572);
     GlobalTimerQueue = nullptr;
     if (GlobalDelayedRelease != nullptr)
         GlobalDelayedRelease->~DelayedRelease();
-    BaseMemoryManager::_Instance.Free(GlobalDelayedRelease, DAEMON_FILE, 573);
+    BASE_MEMORY_MANAGER.Free(GlobalDelayedRelease, DAEMON_FILE, 573);
     GlobalDelayedRelease = nullptr;
 
     setState(STATE_STOPPED);
@@ -627,8 +609,9 @@ void Daemon::setAddress()
         internalAddress = publicAddr;
     }
     publicAddress = publicAddr;
-    wcsncpy(publicAddrString, addressToString(publicAddress), 20);
-    wcsncpy(internalAddrString, addressToString(internalAddress), 20);
+    // 0xbda0: the original inlines Network::GetAddressStringW (TLS +0x40/+0x60 of Network.obj).
+    wcsncpy(publicAddrString, Network::GetAddressStringW(publicAddress), 20);
+    wcsncpy(internalAddrString, Network::GetAddressStringW(internalAddress), 20);
     (void)type;
 }
 
@@ -687,15 +670,16 @@ void Daemon::timerMain(Network* networkInstance)
     {
         nextTick += interval;
         int wait = static_cast<int>(nextTick - GetTickCount64());
-        if (wait <= 0)
+        if (wait > 0)
+        {
+            if (EndEvent.Event != nullptr && WaitForSingleObject(EndEvent.Event, wait) == WAIT_OBJECT_0)
+                break;
+        }
+        else
         {
             Log::Write(Log::LT_DEBUG, DAEMON_FILE, 1065,
                        L"[%s], no wait; wait interval is less than threshold, wait: %d, threshold: %d", ShortName(),
                        wait, 0);
-        }
-        else if (EndEvent.Event != nullptr && WaitForSingleObject(EndEvent.Event, wait) == WAIT_OBJECT_0)
-        {
-            break;
         }
         long long now = _time64(nullptr);
         threadManager->_now = now;

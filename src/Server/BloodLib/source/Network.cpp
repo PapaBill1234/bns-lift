@@ -61,9 +61,10 @@ void DynamicEventObject::deallocate_me(void* ptr, wchar_t const* file, int line)
 // LIFT: name; CacheGate .rdata 0x4e408 = {10000, 10000, 16, 16}, indexed by initialMode at 0xd40b-0xd412.
 static unsigned int const s_defaultMaxSession[4] = {10000, 10000, 16, 16};
 
-// LIFT: names; GetAddressStringW (LobbyGate 0x20b20) uses TLS slot 0 +0x40 char[32] (strcpy_s size 0x20, 0x20b5e) and +0x60 wchar_t[32] (cch 0x1F, 0x20b7d).
-static __declspec(thread) char s_addressStringA[32];
-static __declspec(thread) wchar_t s_addressStringW[32];
+// GetAddressStringW (LobbyGate 0x20b20) uses TLS slot 0 +0x40 char[32] (strcpy_s size 0x20, 0x20b5e) and +0x60 wchar_t[32] (cch 0x1F, 0x20b7d).
+// PDB (CacheGate Network.obj): S_LTHREAD32 __ip_addr_string_w__ at .tls+0x60. The char name is not in the PDB symbols. ❓
+static __declspec(thread) char __ip_addr_string_a__[32];
+static __declspec(thread) wchar_t __ip_addr_string_w__[32];
 
 ThreadManager* Network::WorkerManager;
 EventObject* Network::EndEventObject;
@@ -139,7 +140,7 @@ void Network::Clear()
         Daemon::Instance->threadManager->StopThread(Instance->_idleWatcher->_id, 2000, true, true);
         if (Instance->_idleWatcher != nullptr)
             Instance->_idleWatcher->~IdleWatcher();
-        BaseMemoryManager::_Instance.Free(Instance->_idleWatcher, NETWORK_FILE, 117);
+        BASE_MEMORY_MANAGER.Free(Instance->_idleWatcher, NETWORK_FILE, 117);
         Instance->_idleWatcher = nullptr;
     }
     if (Instance->_iocpHandle != nullptr)
@@ -156,7 +157,7 @@ void Network::Clear()
                 WorkerManager->StopThread(Instance->_workerThreads[i]->_id, 2000, true, true);
                 if (Instance->_workerThreads[i] != nullptr)
                     Instance->_workerThreads[i]->~IoWorker();
-                BaseMemoryManager::_Instance.Free(Instance->_workerThreads[i], NETWORK_FILE, 141);
+                BASE_MEMORY_MANAGER.Free(Instance->_workerThreads[i], NETWORK_FILE, 141);
                 Instance->_workerThreads[i] = nullptr;
             }
         }
@@ -170,7 +171,7 @@ void Network::Clear()
             Instance->_port[i]->Clear();
             if (Instance->_port[i] != nullptr)
                 Instance->_port[i]->~Port();
-            BaseMemoryManager::_Instance.Free(Instance->_port[i], NETWORK_FILE, 152);
+            BASE_MEMORY_MANAGER.Free(Instance->_port[i], NETWORK_FILE, 152);
             Instance->_port[i] = nullptr;
         }
     }
@@ -210,14 +211,14 @@ bool Network::OpenPort(unsigned int id, unsigned short portNumber, int initialMo
         }
     }
 
-    void* memory = BaseMemoryManager::_Instance.Alloc(sizeof(Port), NETWORK_FILE, 184);
+    void* memory = BASE_MEMORY_MANAGER.Alloc(sizeof(Port), NETWORK_FILE, 184);
     Port* port = memory != nullptr ? new (memory) Port() : nullptr;
     if (!port->Initialize(id, portNumber, maxSession, initialMode, enableRecv, nagle, Instance->_iocpHandle,
                           sessionHandler, bufferHandler))
     {
         if (port != nullptr)
             port->~Port();
-        BaseMemoryManager::_Instance.Free(port, NETWORK_FILE, 188);
+        BASE_MEMORY_MANAGER.Free(port, NETWORK_FILE, 188);
         return false;
     }
     if (port->_portNumber != 0)
@@ -226,7 +227,7 @@ bool Network::OpenPort(unsigned int id, unsigned short portNumber, int initialMo
         {
             port->clearPool();  // LIFT: inlined StartAccept failed; only this path calls clearPool (LobbyGate 0x20753-0x207a1)
             port->~Port();
-            BaseMemoryManager::_Instance.Free(port, NETWORK_FILE, 194);
+            BASE_MEMORY_MANAGER.Free(port, NETWORK_FILE, 194);
             return false;
         }
     }
@@ -255,7 +256,7 @@ bool Network::OpenPort(unsigned int portId, unsigned short portNo, SessionHandle
             maxSession = 16;
     }
 
-    void* memory = BaseMemoryManager::_Instance.Alloc(sizeof(Port), NETWORK_FILE, 184);
+    void* memory = BASE_MEMORY_MANAGER.Alloc(sizeof(Port), NETWORK_FILE, 184);
     Port* port = memory != nullptr ? new (memory) Port() : nullptr;
     // LIFT: LTCG folded Port::Initialize (0x28E10): initialMode 2, enableRecv true, nagle false.
     if (!port->Initialize(portId, portNo, maxSession, 2, true, false, Instance->_iocpHandle, sessionHandler,
@@ -263,7 +264,7 @@ bool Network::OpenPort(unsigned int portId, unsigned short portNo, SessionHandle
     {
         if (port != nullptr)
             port->~Port();
-        BaseMemoryManager::_Instance.Free(port, NETWORK_FILE, 188);
+        BASE_MEMORY_MANAGER.Free(port, NETWORK_FILE, 188);
         return false;
     }
     if (port->_portNumber != 0)
@@ -272,7 +273,7 @@ bool Network::OpenPort(unsigned int portId, unsigned short portNo, SessionHandle
         {
             port->clearPool();
             port->~Port();
-            BaseMemoryManager::_Instance.Free(port, NETWORK_FILE, 194);
+            BASE_MEMORY_MANAGER.Free(port, NETWORK_FILE, 194);
             return false;
         }
     }
@@ -339,7 +340,7 @@ bool Network::SetMaxIdleTime(unsigned int portId, bool disconnect, long maxIdleT
         NETWORK_ASSERT_CRASH(229);
     if (Instance->_idleWatcher == nullptr)
     {
-        void* memory = BaseMemoryManager::_Instance.Alloc(sizeof(IdleWatcher), NETWORK_FILE, 233);
+        void* memory = BASE_MEMORY_MANAGER.Alloc(sizeof(IdleWatcher), NETWORK_FILE, 233);
         IdleWatcher* watcher = memory != nullptr ? new (memory) IdleWatcher() : nullptr;
         Instance->_idleWatcher = watcher;
         Daemon::Instance->threadManager->StartThread(watcher, nullptr);
@@ -367,8 +368,8 @@ void Network::CloseSession(unsigned long long sessionId, bool force)
 // 0xD6D0
 wchar_t const* Network::GetAddressStringW(unsigned long address)
 {
-    wchar_t* addressW = s_addressStringW;
-    char* addressA = s_addressStringA;
+    wchar_t* addressW = __ip_addr_string_w__;
+    char* addressA = __ip_addr_string_a__;
     addressW[0] = L'\0';
     addressA[0] = '\0';
     in_addr addr;
@@ -389,7 +390,7 @@ Network* Network::initInstance(ThreadManager* threadManager)
 {
     if (Instance != nullptr)
         NETWORK_ASSERT_CRASH(338);
-    void* memory = BaseMemoryManager::_Instance.Alloc(sizeof(Network), NETWORK_FILE, 340);
+    void* memory = BASE_MEMORY_MANAGER.Alloc(sizeof(Network), NETWORK_FILE, 340);
     Network* network = memory != nullptr ? new (memory) Network() : nullptr;
     WorkerManager = threadManager;
     if (network == nullptr)
@@ -409,10 +410,10 @@ bool Network::initWorkerThread(void (*failedEventHandler)(EventObject*), unsigne
     if (workerThreadCount == 0)
         workerThreadCount = 2 * SysInfo::ProcessorCount();
     _workerThreads = static_cast<IoWorker**>(
-        BaseMemoryManager::_Instance.AllocZero(sizeof(IoWorker*) * workerThreadCount, NETWORK_FILE, 377));
+        BASE_MEMORY_MANAGER.AllocZero(sizeof(IoWorker*) * workerThreadCount, NETWORK_FILE, 377));
     for (unsigned int i = 0; i < workerThreadCount; ++i)
     {
-        void* memory = BaseMemoryManager::_Instance.Alloc(sizeof(IoWorker), NETWORK_FILE, 380);
+        void* memory = BASE_MEMORY_MANAGER.Alloc(sizeof(IoWorker), NETWORK_FILE, 380);
         IoWorker* worker = memory != nullptr ? new (memory) IoWorker() : nullptr;
         if (worker != nullptr)
         {

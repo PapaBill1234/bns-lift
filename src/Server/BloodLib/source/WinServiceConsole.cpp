@@ -9,6 +9,9 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <wchar.h>
+#if defined(__clang__)
+#include <crt_cpp_overload.h>  // The Wine headers do not have swprintf_s<N>. VS2010 has it.
+#endif
 
 // 0x14005a378
 WinServiceConsole* _WinServiceConsole = nullptr;
@@ -116,7 +119,7 @@ void WinServiceConsole::ServiceMain(unsigned long argCount, wchar_t** argVector)
         {
             if (_wcsnicmp(argv[i], L"--conf", 6) == 0)
                 // BUG: 0x177d0 the command-line text is the format string (format-string injection).
-                swprintf_s(Daemon::Instance->confDir, _countof(Daemon::Instance->confDir), argv[i] + 7);
+                swprintf_s(Daemon::Instance->confDir, argv[i] + 7);
         }
         LocalFree(argv);
     }
@@ -137,17 +140,17 @@ void WinServiceConsole::ServiceMain(unsigned long argCount, wchar_t** argVector)
     self->Status.dwCheckPoint = self->CheckPoint++;
 
     wchar_t const* message;
-    if (SetServiceStatus(self->Handle, &self->Status))
+    if (!SetServiceStatus(self->Handle, &self->Status))
+    {
+        addLog(true, L"SetServiceStatus failed");
+        message = L"reportStatusToSCManager(SERVICE_START_PENDING) failed";
+    }
+    else
     {
         // LIFT: SmartCouponDaemon 0x27512 sets only rcx. Daemon::start (0x171e0) writes edx/r8 before it reads them. The args are not used.
         if (Daemon::Instance->start(0, nullptr))
             return;
         message = L"Daemon Start failed";
-    }
-    else
-    {
-        addLog(true, L"SetServiceStatus failed");
-        message = L"reportStatusToSCManager(SERVICE_START_PENDING) failed";
     }
     addLog(true, message);
     self->Close();
@@ -178,7 +181,8 @@ bool WinServiceConsole::controlHandler(unsigned long ctrlCode)
 }
 
 // 0x17a20
-bool WinServiceConsole::reportStatusToSCManager(unsigned long currentState, unsigned long exitCode,
+// LIFT: noinline. The original controlHandler (0x179e0) calls this function. VS2010 /LTCG inlines it without the attribute.
+__declspec(noinline) bool WinServiceConsole::reportStatusToSCManager(unsigned long currentState, unsigned long exitCode,
                                                 unsigned long waitHint)
 {
     Status.dwCurrentState = currentState;
@@ -266,24 +270,31 @@ bool WinServiceConsole::InstallService(Daemon* daemon, wchar_t const* postfix, w
     swprintf_s(&path[len + 1], 779 - len, L" \"--conf=%s\"", postfix);
 
     SC_HANDLE manager = OpenSCManagerW(nullptr, nullptr, SC_MANAGER_ALL_ACCESS);
-    if (manager == nullptr)
+    if (manager != nullptr)
+    {
+        // The dependency list is double-null terminated: the original string is 6 bytes.
+        SC_HANDLE service = CreateServiceW(manager, name, desc, SERVICE_ALL_ACCESS, SERVICE_WIN32_OWN_PROCESS,
+                                           SERVICE_DEMAND_START, SERVICE_ERROR_NORMAL, path, nullptr, nullptr,
+                                           L"\0\0", nullptr, nullptr);
+        if (service != nullptr)
+        {
+            wprintf(L"[%s] was registered.\n", desc);
+            CloseServiceHandle(service);
+            CloseServiceHandle(manager);
+            return true;
+        }
+        else
+        {
+            wprintf(L"CreateService failed - %s\n", getLastErrorText(errorString, 0));
+            CloseServiceHandle(manager);
+            return false;
+        }
+    }
+    else
     {
         wprintf(L"OpenSCManager failed - %s\n", getLastErrorText(errorString, 0));
         return false;
     }
-    SC_HANDLE service = CreateServiceW(manager, name, desc, SERVICE_ALL_ACCESS, SERVICE_WIN32_OWN_PROCESS,
-                                       SERVICE_DEMAND_START, SERVICE_ERROR_NORMAL, path, nullptr, nullptr, L"",
-                                       nullptr, nullptr);
-    if (service == nullptr)
-    {
-        wprintf(L"CreateService failed - %s\n", getLastErrorText(errorString, 0));
-        CloseServiceHandle(manager);
-        return false;
-    }
-    wprintf(L"[%s] was registered.\n", desc);
-    CloseServiceHandle(service);
-    CloseServiceHandle(manager);
-    return true;
 }
 
 // 0x17f00
@@ -308,45 +319,53 @@ bool WinServiceConsole::UninstallService(Daemon* daemon, wchar_t const* postfix)
     }
 
     SC_HANDLE manager = OpenSCManagerW(nullptr, nullptr, SC_MANAGER_ALL_ACCESS);
-    if (manager == nullptr)
+    if (manager != nullptr)
+    {
+        SC_HANDLE service = OpenServiceW(manager, name, SERVICE_ALL_ACCESS);
+        if (service != nullptr)
+        {
+            if (ControlService(service, SERVICE_CONTROL_STOP, &status))
+            {
+                wprintf(L"Stopping [%s]...", desc);
+                Sleep(1000);
+                while (QueryServiceStatus(service, &status))
+                {
+                    if (status.dwCurrentState != SERVICE_STOP_PENDING)
+                        break;
+                    wprintf(L".");
+                    Sleep(1000);
+                }
+                if (status.dwCurrentState == SERVICE_STOPPED)
+                    wprintf(L"\n[%s] was stopped.\n", desc);
+                else
+                    wprintf(L"\nFailed to stop [%s].\n", desc);
+            }
+
+            if (DeleteService(service))
+            {
+                wprintf(L"[%s] was unregistered.\n", desc);
+                CloseServiceHandle(service);
+                CloseServiceHandle(manager);
+                return true;
+            }
+            else
+            {
+                wprintf(L"DeleteService failed - %s\n", getLastErrorText(errorString, 0));
+                CloseServiceHandle(service);
+                CloseServiceHandle(manager);
+                return false;
+            }
+        }
+        else
+        {
+            wprintf(L"OpenService failed - %s\n", getLastErrorText(errorString, 0));
+            CloseServiceHandle(manager);
+            return false;
+        }
+    }
+    else
     {
         wprintf(L"OpenSCManager failed - %s\n", getLastErrorText(errorString, 0));
         return false;
     }
-    SC_HANDLE service = OpenServiceW(manager, name, SERVICE_ALL_ACCESS);
-    if (service == nullptr)
-    {
-        wprintf(L"OpenService failed - %s\n", getLastErrorText(errorString, 0));
-        CloseServiceHandle(manager);
-        return false;
-    }
-
-    if (ControlService(service, SERVICE_CONTROL_STOP, &status))
-    {
-        wprintf(L"Stopping [%s]...", desc);
-        Sleep(1000);
-        while (QueryServiceStatus(service, &status))
-        {
-            if (status.dwCurrentState != SERVICE_STOP_PENDING)
-                break;
-            wprintf(L".");
-            Sleep(1000);
-        }
-        if (status.dwCurrentState == SERVICE_STOPPED)
-            wprintf(L"\n[%s] was stopped.\n", desc);
-        else
-            wprintf(L"\nFailed to stop [%s].\n", desc);
-    }
-
-    if (DeleteService(service))
-    {
-        wprintf(L"[%s] was unregistered.\n", desc);
-        CloseServiceHandle(service);
-        CloseServiceHandle(manager);
-        return true;
-    }
-    wprintf(L"DeleteService failed - %s\n", getLastErrorText(errorString, 0));
-    CloseServiceHandle(service);
-    CloseServiceHandle(manager);
-    return false;
 }

@@ -28,12 +28,12 @@ ThreadManager::~ThreadManager()
     StopAll(2000, false);
     if (_threads != nullptr)
     {
-        BaseMemoryManager::_Instance.Free(_threads, L"source\\Thread.cpp", 44);
+        BASE_MEMORY_MANAGER.Free(_threads, L"source\\Thread.cpp", 44);
         _threads = nullptr;
     }
     if (_threadHandles != nullptr)
     {
-        BaseMemoryManager::_Instance.Free(_threadHandles, L"source\\Thread.cpp", 49);
+        BASE_MEMORY_MANAGER.Free(_threadHandles, L"source\\Thread.cpp", 49);
         _threadHandles = nullptr;
     }
 }
@@ -45,9 +45,9 @@ bool ThreadManager::Initialize(unsigned int maxThreadCount)
         return false;
     _maxThreadCount = maxThreadCount;
     _threads = static_cast<Thread**>(
-        BaseMemoryManager::_Instance.AllocZero(sizeof(Thread*) * maxThreadCount, L"source\\Thread.cpp", 59));
+        BASE_MEMORY_MANAGER.AllocZero(sizeof(Thread*) * maxThreadCount, L"source\\Thread.cpp", 59));
     _threadHandles = static_cast<void**>(
-        BaseMemoryManager::_Instance.AllocZero(sizeof(void*) * _maxThreadCount, L"source\\Thread.cpp", 60));
+        BASE_MEMORY_MANAGER.AllocZero(sizeof(void*) * _maxThreadCount, L"source\\Thread.cpp", 60));
     return true;
 }
 

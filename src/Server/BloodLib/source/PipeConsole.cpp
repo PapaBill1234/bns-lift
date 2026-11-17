@@ -11,6 +11,9 @@
 #include <stdarg.h>
 #include <string.h>
 #include <wchar.h>
+#if defined(__clang__)
+#include <crt_cpp_overload.h>  // The Wine headers do not have swprintf_s<N>. VS2010 has it.
+#endif
 
 static wchar_t const PIPE_CONSOLE_FILE[] = L"source\\PipeConsole.cpp";  // LIFT: name; LobbyGate wide string at 0x857d8 (Log::Write arg at 0x296d3).
 
@@ -298,7 +301,7 @@ void PipeConsole::checkFrozenThread()
         long long maxFrozenSeconds = thread->_maxFrozenSeconds;
         if (maxFrozenSeconds == 0)
             continue;
-        swprintf_s(buffer, 256, L"thread frozen, name:%s, id:%#I64x", thread->Name(), thread->_id);
+        swprintf_s(buffer, L"thread frozen, name:%s, id:%#I64x", thread->Name(), thread->_id);
         long long lastExecuted = thread->_lastExecuted;
         long long frozenSeconds = now - lastExecuted;
         if (lastExecuted != 0 && maxFrozenSeconds < frozenSeconds)
@@ -435,61 +438,61 @@ void PipeConsole::run()
         if (pipe.fPendingIO)
         {
             BOOL success = GetOverlappedResult(pipe.hPipeInst, &pipe.oOverlap, &bytesTransferred, FALSE);
-            switch (pipe.dwState)
+            if (pipe.dwState == 0)  // connecting
             {
-            case 0:  // connecting
                 if (!success)
                 {
                     Log::Write(Log::LT_ERROR, PIPE_CONSOLE_FILE, 538, L"[pipe-console], connect failed, error:%d",
                                GetLastError());
-                    disconnectAndReconnect(pipe);
-                    continue;
+                    goto reconnect;
                 }
                 pipe.dwState = 1;
-                break;
-            case 1:  // reading
+            }
+            else if (pipe.dwState == 1)  // reading
+            {
                 if (!success || bytesTransferred == 0)
-                {
-                    disconnectAndReconnect(pipe);
-                    continue;
-                }
+                    goto reconnect;
                 pipe.cbRead = bytesTransferred;
                 pipe.dwState = 2;
-                break;
-            case 2:  // writing
+            }
+            else if (pipe.dwState == 2)  // writing
+            {
                 if (!success || bytesTransferred != pipe.cbToWrite)
-                {
-                    disconnectAndReconnect(pipe);
-                    continue;
-                }
+                    goto reconnect;
                 pipe.dwState = 1;
-                break;
-            default:
+            }
+            else
+            {
                 Log::Write(Log::LT_ERROR, PIPE_CONSOLE_FILE, 567, L"[pipe-console], invalid pipe state, state:%d",
                            pipe.dwState);
-                break;
             }
         }
 
-        if (pipe.dwState == 1)
+        switch (pipe.dwState)
         {
-            BOOL success = ReadFile(pipe.hPipeInst, pipe.chRequest, sizeof(pipe.chRequest), &pipe.cbRead,
-                                    &pipe.oOverlap);
+        case 1:  // reading
+        {
+            BOOL success;
+            DWORD error;
+            success = ReadFile(pipe.hPipeInst, pipe.chRequest, sizeof(pipe.chRequest), &pipe.cbRead, &pipe.oOverlap);
             if (success && pipe.cbRead != 0)
             {
                 pipe.dwState = 2;
                 pipe.fPendingIO = 0;
                 continue;
             }
-            DWORD error = GetLastError();
+            error = GetLastError();
             if (!success && error == ERROR_IO_PENDING)
             {
                 pipe.fPendingIO = 1;
                 continue;
             }
+            // LIFT: one call site for all errors, as in the original 0x157b0.
+        reconnect:
             disconnectAndReconnect(pipe);
+            continue;
         }
-        else if (pipe.dwState == 2)
+        case 2:  // writing
         {
             processCommand(pipe);
             BOOL success = WriteFile(pipe.hPipeInst, pipe.chReply, pipe.cbToWrite, &bytesTransferred, &pipe.oOverlap);
@@ -505,12 +508,12 @@ void PipeConsole::run()
                 pipe.fPendingIO = 1;
                 continue;
             }
-            disconnectAndReconnect(pipe);
+            goto reconnect;
         }
-        else
-        {
+        default:
             Log::Write(Log::LT_ERROR, PIPE_CONSOLE_FILE, 639, L"[pipe-console], invalid pipe state, state:%d",
                        pipe.dwState);
+            break;
         }
     }
 }
@@ -519,7 +522,7 @@ void PipeConsole::run()
 bool PipeConsole::initPipe()
 {
     wchar_t pipeName[128];
-    swprintf_s(pipeName, 128, L"\\\\.\\pipe\\bns_daemon_%08x", GetCurrentProcessId());
+    swprintf_s(pipeName, L"\\\\.\\pipe\\bns_daemon_%08x", GetCurrentProcessId());
     for (int i = 0; i < 4; ++i)
     {
         _events[i] = CreateEventW(nullptr, TRUE, TRUE, nullptr);
@@ -547,7 +550,8 @@ bool PipeConsole::initPipe()
 }
 
 // 0x15c80
-bool PipeConsole::connectPipe(void* pipe, OVERLAPPED* overlapped)
+// LIFT: noinline. The original initPipe (0x15af0) and disconnectAndReconnect (0x15d20) call this function.
+__declspec(noinline) bool PipeConsole::connectPipe(void* pipe, OVERLAPPED* overlapped)
 {
     if (ConnectNamedPipe(pipe, overlapped))
     {
@@ -566,7 +570,8 @@ bool PipeConsole::connectPipe(void* pipe, OVERLAPPED* overlapped)
 }
 
 // 0x15d20
-void PipeConsole::disconnectAndReconnect(PipeInstance& pipe)
+// LIFT: noinline. The original run (0x157b0) calls this function.
+__declspec(noinline) void PipeConsole::disconnectAndReconnect(PipeInstance& pipe)
 {
     if (!DisconnectNamedPipe(pipe.hPipeInst))
     {
@@ -667,7 +672,8 @@ void PipeConsole::SetDetectFrozenThread(bool detect, int crashCount)
 }
 
 // 0x15ed0
-bool PipeConsole::addNode(ItemList& list, wchar_t const* keyString, wchar_t const* valueString)
+// LIFT: noinline. The original SetInvalidInfo (0x15d90) and checkFrozenThread (0x15190) call this function.
+__declspec(noinline) bool PipeConsole::addNode(ItemList& list, wchar_t const* keyString, wchar_t const* valueString)
 {
     ItemNode* node = (ItemNode*)Memory::_Manager[2]->AllocZero(sizeof(ItemNode), PIPE_CONSOLE_FILE, 842);
     if (node == nullptr)

@@ -14,7 +14,7 @@ MemoryManager const* Memory::_Manager[3] = {};
 MemoryManager const* Memory::CreateManager(MgrType type, void const* option, unsigned long long size,
                                            bool createAllocationHistory)
 {
-    void* memory = BaseMemoryManager::_Instance.Alloc(sizeof(HeapMemoryManager), L"source\\Memory.cpp", 22);
+    void* memory = BASE_MEMORY_MANAGER.Alloc(sizeof(HeapMemoryManager), L"source\\Memory.cpp", 22);
     MemoryManager* manager = memory != nullptr ? new (memory) HeapMemoryManager() : nullptr;
     manager->Initialize(option, size);
     return manager;
