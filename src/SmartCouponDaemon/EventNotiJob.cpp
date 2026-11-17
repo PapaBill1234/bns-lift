@@ -17,21 +17,6 @@ static wchar_t const* const kFile = L"EventNotiJob.cpp";
 
 namespace
 {
-// ❓ Not in the PDB. The log reads id128 as a GUID (Data1, Data2, Data3, Data4[8]).
-struct GuidParts  // LIFT: lift helper name, not in any PDB
-{
-    unsigned long id1;
-    unsigned short id2;
-    unsigned short id3;
-    unsigned char id4[8];
-};
-static_assert(sizeof(GuidParts) == 0x10, "sizeof GuidParts");
-
-inline GuidParts const& Parts(id128 const& id)  // LIFT: lift helper name, not in any PDB
-{
-    return *reinterpret_cast<GuidParts const*>(&id);
-}
-
 // 0x60828 (PDB StateDef, EventNotiJob.obj)
 JobStateDef const StateDef[] = {
     {0, L"INIT"},
@@ -40,7 +25,7 @@ JobStateDef const StateDef[] = {
 };
 }  // namespace
 
-ObjPool EventNotiJob::_pool(1, sizeof(EventNotiJob), L"EventNotiJob");  // 0x52A30 ❓ id argument
+ObjPool EventNotiJob::_pool(1, sizeof(EventNotiJob), L"EventNotiJob");  // 0x52A30 LIFT: LTCG put the args into the ctor (0x11a4: id 1, size 0x90)
 JobDef const EventNotiJob::_def = {1, StateDef, 2, L"EventNotiJob"};  // 0x83230
 
 // 0x9860
@@ -129,7 +114,7 @@ bool EventNotiJob::Initialize(id128 const* gameAccountId, int couponEventId, lon
         }
         return true;
     }
-    GuidParts const& acc = Parts(*gameAccountId);
+    auto const& acc = gameAccountId->guid;
     Log::Write(Log::LT_ERROR, kFile, 83,
                L"[job], init fail; invalid parameter, jobid:0x%I64X, type:%d, state:%dacc:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X,  coupon-event-id:%d, publicationid:%I64d, management-tid:%I64d",
                _id, GetDefinition()->type, _state, acc.id1, acc.id2, acc.id3, acc.id4[0], acc.id4[1], acc.id4[2],
@@ -198,7 +183,7 @@ bool EventNotiJob::work(int task, void* param)
 // 0x9F90
 bool EventNotiJob::init()
 {
-    GuidParts const& acc = Parts(_gameAccountId);
+    auto const& acc = _gameAccountId.guid;
     Log::Write(Log::LT_DEBUG, kFile, 161,
                L"[job], init ok, jobid:0x%I64X, type:%d, state:%d, acc:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X,  coupon-event-id:%d, publicationid:%I64d, management-tid:%I64d",
                _id, GetDefinition()->type, _state, acc.id1, acc.id2, acc.id3, acc.id4[0], acc.id4[1], acc.id4[2],
@@ -225,7 +210,7 @@ bool EventNotiJob::eventNotiReq()
     }
     else
     {
-        GuidParts const& acc = Parts(_gameAccountId);
+        auto const& acc = _gameAccountId.guid;
         Log::Write(Log::LT_ERROR, kFile, 178,
                    L"[job], event-noti req fail; unsent, jobid:0x%I64X, type:%d, state:%dacc:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X,  coupon-event-id:%d, publication-id:%I64d",
                    _id, GetDefinition()->type, _state, acc.id1, acc.id2, acc.id3, acc.id4[0], acc.id4[1], acc.id4[2],
@@ -251,7 +236,7 @@ bool EventNotiJob::eventNotiRes(void* param)
     unsigned int const status = res->msgInfo.errInfo.nStatusCode;
     wchar_t const* const reason = res->msgInfo.errInfo.pwszReason;
     int const err = res->msgInfo.errInfo.nErrorCode;
-    GuidParts const& acc = Parts(_gameAccountId);
+    auto const& acc = _gameAccountId.guid;
 
     bool success = status == 200 || (status == 400 && _wcsicmp(L"Success", reason ? reason : L"null") == 0);
     if (!success && err != 5809)
