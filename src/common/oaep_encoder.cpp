@@ -3,7 +3,7 @@
 #include <string.h>
 #include "prng.h"
 
-// 0x93F20. ❓ The name is not in the PDB symbols. Default OAEP label.
+// PDB: S_LDATA32 nullparam, oaep_encoder.obj (Mod 0076), 0003:12064 = 0x93F20. Default OAEP label.
 static unsigned char const nullparam[16] = {0};
 
 // 0x5AA00

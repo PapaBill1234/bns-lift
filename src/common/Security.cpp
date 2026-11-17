@@ -127,7 +127,8 @@ void BroadcastCrypt::clear()
     }
 }
 
-// ❓ 0x4DFE0. The exe links zlib. This copy of compress2 takes 4 arguments (the level is fixed inside).
+// LIFT: name. 0x4DFE0 is in compress.obj (BloodPacketCrypt, Mod 0098). That module has no debug info,
+// so the PDB has no name. The function takes 4 arguments (the level is fixed inside).
 // zlib is not in the tree. A non-zero result makes Encrypt send the packet without compression.
 extern "C" int compress2(unsigned char* dest, int* destLen, unsigned char const* source, int sourceLen)
 {
