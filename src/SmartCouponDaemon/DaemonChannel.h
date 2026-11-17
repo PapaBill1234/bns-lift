@@ -17,7 +17,7 @@ struct GameEventDaemonId
     unsigned char _reserved;
 
     // LIFT: inlined. The map compare uses the same key as DChannel::GetId (0x7D30), _reserved included.
-    unsigned int Key() const { return ((static_cast<unsigned int>(_type) << 16) + _wid << 8) + _reserved; }  // ❓
+    unsigned int Key() const { return ((static_cast<unsigned int>(_type) << 16) + _wid << 8) + _reserved; }  // LIFT: same math as DChannel::GetId 0x7d30
     bool operator<(GameEventDaemonId const& other) const { return Key() < other.Key(); }
 };
 static_assert(sizeof(GameEventDaemonId) == 0x6, "sizeof GameEventDaemonId");

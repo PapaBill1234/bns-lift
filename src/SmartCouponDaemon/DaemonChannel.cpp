@@ -214,7 +214,7 @@ bool DChannelMgr::SetupDaemonList(DaemonInfo** list, int count)
     if (list == nullptr)
     {
         Log::Write(Log::LT_ERROR, DCHANNEL_FILE, 192, L"[daemon-mgr], setup daemon list fail, null list");
-        return false;  // ❓ return value
+        return false;  // LIFT: xor al, al at 0xd2a6
     }
 
     for (int i = 0; i < count; ++i)
@@ -339,13 +339,13 @@ void DChannelMgr::writeFileUtf8(void* handle, wchar_t const* format, ...)
     vswprintf_s(&wide[0], length, format, args);
     va_end(args);
 
-    int size = WideCharToMultiByte(CP_UTF8, 0, &wide[0], -1, nullptr, 0, nullptr, nullptr);
-    std::vector<char> utf8(size);
-    WideCharToMultiByte(CP_UTF8, 0, &wide[0], -1, &utf8[0], size, nullptr, nullptr);
+    // LIFT: 0xd99e passes cchWideChar = length - 1, so the terminating zero is not converted or written.
+    int size = WideCharToMultiByte(CP_UTF8, 0, &wide[0], length - 1, nullptr, 0, nullptr, nullptr);
+    std::vector<char> utf8(size + 1);
+    int converted = WideCharToMultiByte(CP_UTF8, 0, &wide[0], length - 1, &utf8[0], size, nullptr, nullptr);
 
     DWORD written = 0;
-    // ❓ size - 1: the terminating zero is not written.
-    WriteFile(handle, &utf8[0], size - 1, &written, nullptr);
+    WriteFile(handle, &utf8[0], converted, &written, nullptr);  // LIFT: 0xda4c size = WideCharToMultiByte result
 }
 
 // 0xdab0
