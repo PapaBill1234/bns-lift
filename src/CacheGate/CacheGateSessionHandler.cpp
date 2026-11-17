@@ -23,7 +23,8 @@ static wchar_t const FRAGMENT_PACKET_FILE[] = L"..\\..\\Packet\\FragmentPacket.c
 // The inlined Session::GetChannel uses the Session.cpp path.
 static wchar_t const SESSION_FILE[] = L"source\\Session.cpp";
 
-// ❓ name. The body of the relay packets after the command (22 bytes, packed).
+// PDB: OuterWorldDdataHeader (CacheGate type 0x2B25, sizeof 22, same members). The body of the relay packets
+// after the command.
 #pragma pack(push, 2)
 struct OuterWorldDdataHeader
 {
@@ -360,7 +361,7 @@ bool HandleCacheGateFragmentRelay(Session const* session, Packet const* packet)
     }
 
     bool last = remain > 0 ? (static_cast<unsigned short>(packet->CurHeader->size - 2) - 6 == remain) : (remain == 0);
-    sfc->_packet.Concatenate(packet, nullptr);  // ❓ handler argument
+    sfc->_packet.Concatenate(packet, nullptr);  // LIFT: LTCG folded concatHandler. The call (0x59A6) sets no r8. 0x7300 writes r8 before it reads it.
     if (!last)
         return true;
 
