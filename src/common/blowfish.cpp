@@ -49,7 +49,7 @@ int Blowfish::BlockSize() const
     return 8;
 }
 
-// 0x35ec0 ❓ The linker folds this body with Aes128::KeySize. It returns 16.
+// 0x35ec0. PDB: same address as Aes128::KeySize (ICF). mov eax,16; ret.
 int Blowfish::KeySize() const
 {
     return 16;

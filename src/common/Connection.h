@@ -68,7 +68,7 @@ public:
     bool AsyncRecv(AsyncRecvContext* context, unsigned int* recvdSize);                                    // 0x1AF30
     bool AsyncSend(AsyncSendContext* context);                                                           // 0x1AFB0
 
-    friend class NPChannel;  // ❓ NPChannel2.cpp calls GetLocalAddress.
+    friend class NPChannel;  // LIFT: access helper. No PDB in the set has friend records. NPChannel2.cpp calls GetLocalAddress (PDB: protected).
 
 protected:
     unsigned long GetLocalAddress() const;  // 0x2AEA0 (SmartCouponDaemon). Not in the CacheGate exe.

@@ -42,7 +42,7 @@ public:
     unsigned char* _buffer;
 
     friend class RawPacketBufferHandler;  // LIFT: ToPacket (0x21860) calls the inlined grow path.
-    friend class TextStreamPacketBufferHandler;  // ❓ ToPacket (0x2C570) calls grow.
+    friend class TextStreamPacketBufferHandler;  // LIFT: access helper. No PDB in the set has friend records. ToPacket (0x2C570) calls grow (PDB: private).
 };
 static_assert(sizeof(GrowingBuffer) == 0x30, "sizeof GrowingBuffer");
 static_assert(offsetof(GrowingBuffer, _sec) == 0x8, "GrowingBuffer::_sec");

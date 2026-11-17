@@ -5,13 +5,13 @@
 // 0x5a388. Crypto::Initialize fills it.
 Aes128::Delegator Aes128::_Delegator = { 0, 0, 0 };
 
-// 0xded0 ❓ The linker folds this body with Session::EventId. It returns 3.
+// 0xded0. PDB: Aes128::GetType and Session::EventId have the same address (ICF). mov eax,3; ret.
 Crypto::Type Aes128::GetType() const
 {
     return AES128;
 }
 
-// 0x35ec0 ❓ The linker folds BlockSize into KeySize (vtable slot 3 and slot 4).
+// 0x35ec0. PDB: Aes128::BlockSize, Aes128::KeySize and Blowfish::KeySize have the same address (ICF). mov eax,16; ret.
 int Aes128::BlockSize() const
 {
     return 16;

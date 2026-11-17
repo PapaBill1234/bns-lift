@@ -28,8 +28,8 @@ public:
     virtual bool Encrypt(unsigned char const* in, int size, unsigned char* out, int* encCount) const;
     virtual bool Decrypt(unsigned char const* in, int size, unsigned char* out, int* encCount) const;
 
-    unsigned int _encKey[44]; // ❓ +16
-    unsigned int _decKey[44]; // ❓ +192
+    unsigned int _encKey[44]; // +0x10. LIFT: name (the PDB has no field list). Cleanup 0x35ee0 clears 0xB0 bytes here.
+    unsigned int _decKey[44]; // +0xC0. LIFT: name (the PDB has no field list). Cleanup 0x35efa clears 0xB0 bytes here.
 
     static Delegator _Delegator; // 0x5A388
 };
