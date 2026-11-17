@@ -11,7 +11,7 @@ public:
     virtual void SetFormat(char const* format, int start);  // slot 1
     virtual void Forward(int index);                        // slot 2
     virtual void Rewind(int index);                         // slot 3
-    virtual void Allocated(Packet*, char const*) {}         // slot 4 ❓ empty, folds with Console::Flush
+    virtual void Allocated(Packet*, char const*) {}         // slot 4 0x126F0 (empty, 3 bytes, folded with Console::Flush)
     virtual char const* CurrentFormat() const;              // slot 5
     virtual int GetIndex() const;                           // slot 6
     virtual void skipRepeatFormat();                        // slot 7

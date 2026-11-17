@@ -13,6 +13,14 @@ public:
         MMGR_MAX = 2,
     };
 
+    enum Section
+    {
+        INIT = 0,
+        STATIC = 1,
+        DYNAMIC = 2,
+        MEMSEC_MAX = 3,
+    };
+
     static MemoryManager const* CreateManager(MgrType type, void const* option, unsigned long long size,
                                               bool createAllocationHistory);
 
@@ -23,8 +31,8 @@ public:
 class GrowingBuffer
 {
 public:
-    // ❓ Inlined in RawPacketBufferHandler::Clone (0x216F0). The arguments are a guess from the stores.
-    GrowingBuffer(int sec, unsigned long long initSize)
+    // Inlined in RawPacketBufferHandler::Clone (0x216F0). PDB (PostOfficeDaemon type 0x12CA): (Memory::Section, unsigned).
+    GrowingBuffer(Memory::Section sec, unsigned initSize)
         : _sec(sec), _initSize(initSize), _size(0), _count(0), _buffer(nullptr)
     {
     }
@@ -35,7 +43,7 @@ private:
     void grow(unsigned long long size);
 
 public:
-    int _sec;
+    Memory::Section _sec;
     unsigned long long _initSize;
     unsigned long long _size;
     unsigned long long _count;
