@@ -125,7 +125,6 @@ public:
     friend class ClientManager;   // LIFT: access for the inlined send in ClientManager::broadcast (LobbyGate)
     friend class LobbyD;          // LIFT: access for the inlined send in LobbyD::Send* (LobbyGate)
     friend class NPChannel;        // LIFT: access for the inlined send in NPChannel::SendMsg (SmartCouponDaemon)
-    friend class NPSessionHandler; // ❓ access for NPSessionHandler::OnConnect/OnClose (SmartCouponDaemon)
     friend class ManagementSessionHandler; // LIFT: access for the inlined send in the management handlers (PostOfficeDaemon)
     friend class WorldChannel;             // LIFT: access for the inlined send in WorldChannel::SendRelayResponse (PostOfficeDaemon)
     // LIFT: access for the inlined send and completeHandshake in the LobbyGate packet handlers

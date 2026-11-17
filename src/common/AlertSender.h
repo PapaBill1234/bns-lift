@@ -40,7 +40,7 @@ private:
     static AlertSender _alertSender;
 
     friend class Daemon;
-    friend class LobbyGate;  // ❓ LobbyGate::initNetwork and shutdown (LobbyGate 0x13220, 0x13580) call init and fini.
+    friend class LobbyGate;  // LIFT: access helper. No PDB in the set has friend records. LobbyGate::initNetwork and shutdown (LobbyGate 0x13220, 0x13580) call init and fini (PDB: private).
 
 public:
     unsigned long long _socket;

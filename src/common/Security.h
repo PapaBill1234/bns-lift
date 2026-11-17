@@ -58,7 +58,6 @@ public:
 
 private:
     void clear();  // 0x232F0
-    friend class LobbyGate;  // ❓ access for LobbyGate::~LobbyGate (0x129c0, LobbyGate)
 };
 static_assert(sizeof(BroadcastCrypt) == 0x18, "sizeof BroadcastCrypt");
 

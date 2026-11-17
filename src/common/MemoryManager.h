@@ -76,7 +76,7 @@ private:
     unsigned char* _current;
     MemoryManager const* _additional;
 
-    friend class Session;  // ❓ access for Session::~Session (0x1BA50)
+    friend class Session;  // LIFT: access helper. No PDB in the set has friend records. Session::~Session (0x1BA50) reads _start and _end (PDB: private).
 };
 static_assert(sizeof(StaticPageMemoryManager) == 0x28, "sizeof StaticPageMemoryManager");
 
