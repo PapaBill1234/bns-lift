@@ -159,10 +159,10 @@ bool CacheGate::initLog()
     return true;
 }
 
-// ❓ Not in index.tsv. The PDB has the slot. The lift returns true.
+// 0x40B0 (size 3: returns true)
 bool CacheGate::setArgument(int argc, wchar_t const** argv)
 {
-    return true;  // ❓
+    return true;
 }
 
 // 0x4510

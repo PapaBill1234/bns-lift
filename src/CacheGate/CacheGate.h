@@ -44,7 +44,7 @@ public:
     virtual long GetTimerMaxTime();                          // 0x40A0
     virtual void PrintDependency();                          // 0x4B90
     virtual bool initLog();                                  // 0x43F0
-    virtual bool setArgument(int argc, wchar_t const** argv);  // ❓ not in index
+    virtual bool setArgument(int argc, wchar_t const** argv);  // 0x40B0
     virtual bool initialize();                               // 0x4510
     virtual bool initNetwork();                              // 0x4770
     virtual bool onStart();                                  // 0xCD80

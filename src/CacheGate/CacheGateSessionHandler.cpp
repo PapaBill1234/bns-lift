@@ -61,7 +61,7 @@ CacheGateSessionHandler::~CacheGateSessionHandler()
 {
 }
 
-// ❓ not in index
+// 0xCD80 (size 3: returns true)
 bool CacheGateSessionHandler::OnAccept(Session const* session) const
 {
     return true;
