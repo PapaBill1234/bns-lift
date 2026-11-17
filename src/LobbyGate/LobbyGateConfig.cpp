@@ -18,7 +18,8 @@ static int const DEFAULT_CLIENT_PORT = 10900;
 static int const DEFAULT_LOBBY_DAEMON_PORT = 21801;
 static int const DEFAULT_IDLE_TIME = 300;
 static int const DEFAULT_COOLDOWN_COMPLETE = 180;
-static bool const DEFAULT_TRUE = true;  // ❓ unnamed data in the binary (bytes 0xFF)
+// _Def rows 21 and 28 (0x140092d40 + 40 * row + 24) hold the literal value 1, not a pointer.
+#define DEFAULT_TRUE reinterpret_cast<void const*>(1)
 
 // 0x140092d40
 XmlCfgDef const LobbyGateConfig::_Def[29] = {
@@ -55,7 +56,7 @@ XmlCfgDef const LobbyGateConfig::_Def[29] = {
      L"lobby daemon ip address"},
     {offsetof(LobbyGateConfig, _lobbyPort), L"lobby-daemon-port", XmlCfgDef::CFG_INT, 1, &DEFAULT_LOBBY_DAEMON_PORT,
      L"lobby daemon port"},
-    {offsetof(LobbyGateConfig, _maxIdleTimeEnable), L"max-idle-time-enable", XmlCfgDef::CFG_BOOL, 1, &DEFAULT_TRUE,
+    {offsetof(LobbyGateConfig, _maxIdleTimeEnable), L"max-idle-time-enable", XmlCfgDef::CFG_BOOL, 1, DEFAULT_TRUE,
      L"max idle time enable / disable"},
     {offsetof(LobbyGateConfig, _disconnectAfterIdleTime), L"disconnect-after-idle-time", XmlCfgDef::CFG_BOOL, 0, nullptr,
      L"disconnect after idle time"},
@@ -64,13 +65,13 @@ XmlCfgDef const LobbyGateConfig::_Def[29] = {
     {offsetof(LobbyGateConfig, _useChannelDelayedRelease), L"use-channel-delayed-release", XmlCfgDef::CFG_BOOL, 0,
      nullptr, L"session-channel binding releases after some delay(10sec) default:no"},
     {offsetof(LobbyGateConfig, _alertSendAddress), L"alert-send-address", XmlCfgDef::CFG_STR, 0,
-     L"",  // ❓ IDA name "valueString", first wchar is 0
+     L"",  // 0x1400627d8: empty wide string. "valueString" is only a PDB local name (S_REGREL32).
      L"alert log send address (ip:port)"},
     {offsetof(LobbyGateConfig, _cooldownCompleteDelay), L"cooldown-complete-delay", XmlCfgDef::CFG_INT, 0,
      &DEFAULT_COOLDOWN_COMPLETE, L"cooldown"},
     {static_cast<unsigned long long>(-1), nullptr, 0, 0, nullptr, L"Configuration for logs"},
     {offsetof(LobbyGateConfig, _allowClientIPAddressInLogs), L"allow-client-ip-address-in-logs", XmlCfgDef::CFG_BOOL, 0,
-     &DEFAULT_TRUE, L"allow client ip address in logs"},
+     DEFAULT_TRUE, L"allow client ip address in logs"},
 };
 
 // 0x13e20

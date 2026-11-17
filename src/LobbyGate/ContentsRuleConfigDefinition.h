@@ -6,9 +6,10 @@
 class FragmentPacket;
 struct FragmentPacketWrap;
 
-// ❓ The binary table ContentsRuleConfig::_Def (0x140092a60) has a row size of 0x38. The common XmlCfgDefLocal
-// has a row size of 0x40 (it has refOffset). This LobbyGate build has no refOffset.
-struct ContentsRuleXmlCfgDefLocal  // ❓ name
+// PDB: ContentsRuleConfig::_Def (0x140092a60) has type 0x2E86, an array of const XmlCfgDefLocal (0x2697) of 728 bytes.
+// 728 = 13 rows of 0x38. The XmlCfgDefLocal of the common code (0x26BA) has sizeof 64 (it has refOffset).
+// LIFT: the name ContentsRuleXmlCfgDefLocal keeps the 0x38 row apart from the common XmlCfgDefLocal.
+struct ContentsRuleXmlCfgDefLocal
 {
     unsigned long long offset;
     wchar_t const* name;

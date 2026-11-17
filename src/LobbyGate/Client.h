@@ -13,7 +13,7 @@ class Packet;
 class PacketBuffer;
 struct Goods;  // LobbyGatePredefine (later card). sizeof is 0x390.
 
-// ❓ The PDB does not give a module for these structs. Client.obj uses them.
+// LIFT: PDB types (TPI) have no module. Client.obj uses these structs, so the lift puts them here.
 struct CharacterInfo
 {
     unsigned long long pcId;

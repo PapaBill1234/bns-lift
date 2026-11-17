@@ -5,8 +5,9 @@ class Session;
 class Packet;
 class Client;
 
-// ❓ The PDB type of the list entries is void*. Callers cast an entry to Daemon::PacketHandler
-// (PDB nested type 0x20EA, also LobbyGate::NotAuthedPacketHandler).
+// PDB: each list is 880 bytes (110 entries). AnyAuthed and NotAuthed use type 0x2631: pointers (0x20EA) to
+// bool(Session const*, Packet const*). Authed uses type 0x2637: pointers (0x2636) to bool(Client*, Packet const*).
+// LIFT: the lift stores the entries as void*. Callers cast an entry to the PDB pointer type.
 
 extern void* AnyAuthedLobbyGatePacketHandlerList[110];  // 0x91b00
 extern void* AuthedLobbyGatePacketHandlerList[110];     // 0x921e0
