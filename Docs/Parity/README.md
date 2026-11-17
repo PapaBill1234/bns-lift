@@ -8,6 +8,8 @@ The 4 lifted exes compile to the same code as the original 2019 + PDB exes. | Le
 | Preferred | **99 %** | Target of the 90+ rounds. |
 | Shared library | **99 %** preferred | Functions that 2 or more exes have (BloodLib, Shared, Packet, CRT). A shared function is MATCH only if it is MATCH in each exe. Measure: `tools/parity_shared.py` (`--list` gives the DIFF functions). |
 
+The parity table in the top `README.md` is written by `tools/parity_readme.py`. `tools/parity.sh --accept` runs it after each accepted card. Cards do not edit that table.
+
 Shared library cards come first in each round. One fix in shared code helps each exe and later GameDaemon. Start (after `lift-parity-s3`): 354/478 = 74.1 %.
 
 After each exe has 90 % or more, do "90+ rounds". The 90+ target is **99 % parity** for each exe. Each 90+ round fixes the DIFF functions that are left and that have a fixable cause. Its last card is a review.

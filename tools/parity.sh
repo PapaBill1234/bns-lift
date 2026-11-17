@@ -37,6 +37,7 @@ with open(f, "a") as fh:
         fh.write("date\tcard\tparity (MATCH/total per exe)\n")
     fh.write(f"{datetime.date.today()}\t{card}\t" + "; ".join(cells) + "\n")
 PY
+  python3 tools/parity_readme.py || echo "README parity table not updated"
   echo "baseline accepted"; exit 0
 fi
 UV="$(command -v uv || echo "$HOME/.local/bin/uv")"
