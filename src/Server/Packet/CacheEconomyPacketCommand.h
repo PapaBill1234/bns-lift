@@ -1,0 +1,50 @@
+// LIFT: file. The PDB has no source path for these enums. Names and values are from include/pdb/PostOfficeDaemon/types.h (PostOfficeDaemon PDB).
+// Use these names in Send and Decompose calls. Do not write bare command or reason numbers.
+#pragma once
+
+enum CacheEconomyPacketCommand : int {
+    CacheEconomy_HelloReqCmd = 0x401,
+    CacheEconomy_HelloOkCmd = 0x402,
+    CacheEconomy_HelloFailCmd = 0x403,
+    CacheEconomy_FailCmd = 0x404,
+    CacheEconomy_PingReqCmd = 0x407,
+    CacheEconomy_PingOkCmd = 0x408,
+    CacheEconomy_PingFailCmd = 0x409,
+    CacheEconomy_RemovePawnReqCmd = 0x40A,
+    CacheEconomy_RemovePawnOkCmd = 0x40B,
+    CacheEconomy_RemovePawnFailCmd = 0x40C,
+    CacheEconomy_RetrieveCharacterInfoReqCmd = 0x40D,
+    CacheEconomy_RetrieveCharacterInfoOkCmd = 0x40E,
+    CacheEconomy_RetrieveCharacterInfoFailCmd = 0x40F,
+    CacheEconomy_CheckPostCapacityReqCmd = 0x410,
+    CacheEconomy_CheckPostCapacityOkCmd = 0x411,
+    CacheEconomy_CheckPostCapacityFailCmd = 0x412,
+    CacheEconomy_DeliverPostReqCmd = 0x413,
+    CacheEconomy_DeliverPostOkCmd = 0x414,
+    CacheEconomy_DeliverPostFailCmd = 0x415,
+    CACHEECONOMY_CMD_MAX = 0x416,
+};
+
+enum CacheEconomyFailReason : int {
+    CACHEECONOMY_SUCCESS = 0x0,
+    CACHEECONOMY_UNKNOWN_ERROR = 0x1,
+    CACHEECONOMY_SYSTEM_ERROR = 0x2,
+    CACHEECONOMY_DB_ERROR = 0x3,
+    CACHEECONOMY_INVALID_DESTINATION = 0x4,
+    CACHEECONOMY_SERVICE_NOT_AVAILABLE = 0x5,
+    CACHEECONOMY_HELLOFAIL_INVALID_PACKET_VERSION = 0x6,
+    CACHEECONOMY_HELLOFAIL_INVALID_WORLD_ID = 0x7,
+    CACHEECONOMY_FAILREASON_INVALID_COMMAND = 0x8,
+    CACHEECONOMY_REMOVEPAWNFAILREASON_INVALID_WORLD_ID = 0x9,
+    CACHEECONOMY_REMOVEPAWNFAILREASON_INVALID_PARAMETER = 0xA,
+    CACHEECONOMY_REMOVEPAWNFAILREASON_ALREADY_REMOVED = 0xB,
+    CACHEECONOMY_RETRIEVECHARACTERINFOFAILREASON_INVALID_PARAMETER = 0xC,
+    CACHEECONOMY_RETRIEVECHARACTERINFOFAILREASON_NO_SUCH_PC = 0xD,
+    CACHEECONOMY_CHECKPOSTCAPACITYFAILREASON_INVALID_PARAMETER = 0xE,
+    CACHEECONOMY_CHECKPOSTCAPACITYFAILREASON_NO_SUCH_PC = 0xF,
+    CACHEECONOMY_CHECKPOSTCAPACITYFAILREASON_MAX_POST_LIMIT_EXCESS = 0x10,
+    CACHEECONOMY_DELIVERPOSTFAILREASON_INVALID_WORLD = 0x11,
+    CACHEECONOMY_DELIVERPOSTFAILREASON_DUPLICATED_POST = 0x12,
+    CACHEECONOMY_DELIVERPOSTFAILREASON_NO_SUCH_CHARACTER = 0x13,
+    CACHEECONOMY_GLOBAL_MAX = 0x14,
+};

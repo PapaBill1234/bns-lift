@@ -14,6 +14,7 @@
 #include "Packet.h"
 #include "PipeConsole.h"
 #include "Session.h"
+#include "CacheGatePacketCommand.h"
 
 static wchar_t const CACHED_CHANNEL_FILE[] = L"CacheDChannel.cpp";
 // The inlined Session::GetChannel / ReleaseChannel use the Session.cpp path.
@@ -55,7 +56,7 @@ bool CacheDChannel::onConnect(Session const* session, bool firstConnected)
     }
     else
     {
-        session->Send("hhhh", 1, 4, 10, cached->_id);
+        session->Send("hhhh", CacheGate_HelloCmd, 4, 10, cached->_id);
         Log::Write(Log::LT_DEBUG, CACHED_CHANNEL_FILE, 80, L"[cg], cached connect, hello send, wid:%d, ip:%s",
                    static_cast<int>(cached->_id), Network::GetAddressStringW(session->_connection->_ip));
     }

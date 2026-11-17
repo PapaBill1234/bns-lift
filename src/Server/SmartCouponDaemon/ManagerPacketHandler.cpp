@@ -14,6 +14,7 @@
 #include "Session.h"
 #include "SmartCouponDB.h"
 #include "SmartCouponDaemon.h"
+#include "SmartCouponManagerPacketCommand.h"
 
 static wchar_t const MANAGERPACKETHANDLER_FILE[] = L"ManagerPacketHandler.cpp";
 static wchar_t const SESSION_SOURCE_FILE[] = L"source\\Session.cpp";
@@ -84,7 +85,7 @@ bool HandleSmartCouponManager_HelloReq(Session const* session, Packet const* pac
                 managerChannel->SetSession(session);
                 SmartCouponDaemon::SetManagerChannel(managerChannel);
                 managerChannel->removeReferenceCount(MANAGERPACKETHANDLER_FILE, 75);
-                session->Send("h", 2);
+                session->Send("h", SmartCouponManager_HelloOkCmd);
                 Log::Write(Log::LT_NOTICE, MANAGERPACKETHANDLER_FILE, 78,
                            L"[mgr-ch], 0x%.16I64X, %I64d, sent hello success ack, managerWid:%u", session->_id,
                            channel != nullptr ? channel->GetId() : 0ULL, managerWid);
@@ -100,7 +101,7 @@ bool HandleSmartCouponManager_HelloReq(Session const* session, Packet const* pac
         }
     }
 
-    session->Send("hh", 3, failReason);
+    session->Send("hh", SmartCouponManager_HelloFailCmd, failReason);
     Log::Write(Log::LT_NOTICE, MANAGERPACKETHANDLER_FILE, 84,
                L"[mgr-ch], 0x%.16I64X, %I64d, sent hello failure ack, managerWid:%u, failReason:%d", session->_id,
                channel != nullptr ? channel->GetId() : 0ULL, managerWid, failReason);
@@ -159,7 +160,7 @@ bool HandleSmartCouponManager_RetryCouponPublicationReq(Session const* session, 
         failReason = 7;
     }
 
-    session->Send("hqE", 6, event->_tid, failReason);
+    session->Send("hqE", SmartCouponManager_RetryCouponPublicationFailCmd, event->_tid, failReason);
     Log::Write(Log::LT_ERROR, MANAGERPACKETHANDLER_FILE, 140,
                L"[mgr-ch], 0x%.16I64X, %I64d, retry coupon publication failure ack, cmd:%d, tid:0x%.16I64X, "
                L"account-id:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X, publication-id:0x%I64X, failReason:%d",
@@ -223,7 +224,7 @@ bool HandleSmartCouponManager_LoadRetryReadyGameEventLogListReq(Session const* s
         }
         else
         {
-            session->Send("hq", 8, tid);
+            session->Send("hq", SmartCouponManager_LoadRetryReadyGameEventLogListOkCmd, tid);
             Log::Write(Log::LT_DEBUG, MANAGERPACKETHANDLER_FILE, 201,
                        L"[mgr-ch], 0x%.16I64X, %I64d, load-retryready-game-event-log-list success ack, cmd:%d, "
                        L"tid:0x%.16I64X, count:%d",
@@ -233,7 +234,7 @@ bool HandleSmartCouponManager_LoadRetryReadyGameEventLogListReq(Session const* s
         }
     }
 
-    session->Send("hqE", 9, tid, failReason);
+    session->Send("hqE", SmartCouponManager_LoadRetryReadyGameEventLogListFailCmd, tid, failReason);
     Log::Write(Log::LT_ERROR, MANAGERPACKETHANDLER_FILE, 208,
                L"[mgr-ch], 0x%.16I64X, %I64d, load-retryready-game-event-log-list failure ack, cmd:%d, tid:0x%.16I64X, "
                L"failReason:%d",

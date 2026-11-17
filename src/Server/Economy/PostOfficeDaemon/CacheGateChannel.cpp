@@ -15,6 +15,7 @@
 #include "RelayContext.h"
 #include "Session.h"
 #include "ThreadFreePacketPump.h"
+#include "CacheGatePacketCommand.h"
 
 extern Daemon::PacketHandler CacheGatePacketClientSideHandlerList[10];
 extern Daemon::PacketHandler CacheGatePacketClientSideFragmentHandlerList[10];
@@ -272,7 +273,7 @@ bool CacheGateSessionHandler::OnConnect(Session const* session, bool firstConnec
         daemon->pipeConsole->SetInvalidInfo(DISCONNECTED_CACHEGATE, false);
 
     // 0x7a75-0x7a95: Send("hhhh" 0x74388, 1, 4, 0xA, word [daemon+0x750]).
-    session->Send("hhhh", 1, 4, 10, daemon->_serviceWid);
+    session->Send("hhhh", CacheGate_HelloCmd, 4, 10, daemon->_serviceWid);
     Log::Write(Log::LT_NOTICE, CACHEGATE_CHANNEL_FILE, 261,
                L"[%s], %s; sent hello request to cachegate, cachegate-packet-version:%d, economy-common-packet-version:%d, postofficeServiceWid:%u",
                L"cachegate session handler", L"CacheGateSessionHandler::OnConnect", 4, 10, daemon->_serviceWid);

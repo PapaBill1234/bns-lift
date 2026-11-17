@@ -13,6 +13,7 @@
 #include "Daemon.h"
 #include "PipeConsole.h"
 #include "LobbyGate.h"
+#include "LobbyLobbyGatePacketCommand.h"
 
 namespace
 {
@@ -350,7 +351,7 @@ bool LobbyD::hello()
         ResetEvent(_helloEvent.Event);
     LobbyGateConfig const* config = LobbyGate::_instance->_config;
     // BUG: 0x9d80 Send is called also when the session is null.
-    session->Send("hhhh", 1, static_cast<int>(static_cast<short>(config->_predefinedWorldId)), 58,
+    session->Send("hhhh", LobbyLobbyGate_HelloReqCmd, static_cast<int>(static_cast<short>(config->_predefinedWorldId)), 58,
                   static_cast<int>(static_cast<short>(config->_internalPort)));
     Log::Write(Log::LT_DEBUG, LOBBYD_FILE, 315,
                L"[channel], 0x%.16I64X, send, cmd:%d, gate-wid:%d, lobbylobbygatepacket-version:%d, internal-port:%d",
