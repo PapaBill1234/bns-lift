@@ -21,7 +21,7 @@ static wchar_t const NPSERVICECHANNEL_FILE[] = L"NPServiceChannel.cpp";
 static wchar_t const NPMESSAGEHANDLER_FILE[] = L"NPMessageHandler.cpp";
 
 // 0xFD80
-void NPServiceChannelCmdDispatcher(unsigned int id, ECommand* eCmd)
+void NPServiceChannelCmdDispatcher(unsigned int id, ECommand& eCmd)
 {
     NPServiceChannel* channel = SmartCouponDaemon::_instance->_npChannelMgr->_npServChannel;
     if (channel == nullptr)  // LIFT: 0xfda1 tests only the channel
@@ -41,7 +41,7 @@ void NPServiceChannelCmdDispatcher(unsigned int id, ECommand* eCmd)
     }
     NPTransactionRegistry::Item item;
     if (registry->Find(id, &item))
-        *eCmd = item.cmd;
+        eCmd = item.cmd;
     else
         Log::Write(Log::LT_ERROR, NPSERVICECHANNEL_FILE, 34,
                    L"[np], [np-gameservch-tran-reg], dispatch command fail; not found, txn-id:%u", id);
@@ -207,7 +207,7 @@ bool NPServiceChannelManager::OnClose(NPChannel* channel, bool) const
     if (channel->_tranRegistry != nullptr)
     {
         std::vector<void*, StlAllocator<void*, 2> > expired;
-        channel->_tranRegistry->ReleaseAll(&expired);
+        channel->_tranRegistry->ReleaseAll(expired);
         for (auto it = expired.begin(); it != expired.end(); ++it)
         {
             NPTransaction* tran = static_cast<NPTransaction*>(*it);
