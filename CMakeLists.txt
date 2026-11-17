@@ -31,6 +31,27 @@ add_custom_target(lift_msvcp100_implib DEPENDS ${LIFT_MSVCP100_IMPLIB})
 set(LIFT_STL_INCLUDE ${CMAKE_SOURCE_DIR}/include/vs2010)
 set(LIFT_PDB_INCLUDE ${CMAKE_SOURCE_DIR}/include)
 
+# Source tree as in the original depot (Program\\...). See Docs/layout.md.
+set(LIFT_SRC_INCLUDE
+  ${CMAKE_SOURCE_DIR}/src/Security/source/BloodCrypto/crypto
+  ${CMAKE_SOURCE_DIR}/src/Security/source/BloodCrypto/crypto/encoder
+  ${CMAKE_SOURCE_DIR}/src/Security/source/BloodCrypto/crypto/mode
+  ${CMAKE_SOURCE_DIR}/src/Security/source/BloodCrypto/hash
+  ${CMAKE_SOURCE_DIR}/src/Security/source/BloodCrypto/key
+  ${CMAKE_SOURCE_DIR}/src/Security/source/BloodCrypto/math/bignumber
+  ${CMAKE_SOURCE_DIR}/src/Security/source/BloodCrypto/math/prng
+  ${CMAKE_SOURCE_DIR}/src/Server/BloodLib/include
+  ${CMAKE_SOURCE_DIR}/src/Server/BloodLib/source
+  ${CMAKE_SOURCE_DIR}/src/Server/Economy/CacheGate
+  ${CMAKE_SOURCE_DIR}/src/Server/Economy/PostOfficeDaemon
+  ${CMAKE_SOURCE_DIR}/src/Server/Economy/Shared
+  ${CMAKE_SOURCE_DIR}/src/Server/LobbyDaemon
+  ${CMAKE_SOURCE_DIR}/src/Server/LobbyGate
+  ${CMAKE_SOURCE_DIR}/src/Server/Packet
+  ${CMAKE_SOURCE_DIR}/src/Server/Shared
+  ${CMAKE_SOURCE_DIR}/src/Server/SmartCouponDaemon
+)
+
 lift_exe(lift_selftest
   SOURCES src/selftest/main.cpp src/selftest/stl_layout.cpp src/selftest/pdb_types.cpp
           src/selftest/pdb_types_LobbyGate.cpp src/selftest/pdb_types_PostOfficeDaemon.cpp
@@ -44,72 +65,72 @@ target_link_libraries(lift_selftest PRIVATE ${LIFT_MSVCP100_IMPLIB})
 
 # Common server code (BloodLib). Static lib, shared by the server exes.
 add_library(lift_common STATIC
-  src/common/BaseMemory.cpp
-  src/common/Memory.cpp
-  src/common/MemoryManager.cpp
-  src/common/RefCntObject.cpp
-  src/common/Log.cpp
-  src/common/LogBuffer.cpp
-  src/common/LogMedia.cpp
-  src/common/StringUtil.cpp
-  src/common/SystemInformation.cpp
-  src/common/DelayedRelease.cpp
-  src/common/Timer.cpp
-  src/common/AlertSender.cpp
-  src/common/Thread.cpp
-  src/common/Console.cpp
-  src/common/TextConsole.cpp
-  src/common/PipeConsole.cpp
-  src/common/WindowConsole.cpp
-  src/common/WinServiceConsole.cpp
-  src/common/Daemon.cpp
-  src/common/DaemonConfig.cpp
-  src/common/BnsCommonConfigDefinition.cpp
-  src/common/Crypto.cpp
-  src/common/aes128.cpp
-  src/common/aes128Table.cpp
-  src/common/aes128NI.cpp
-  src/common/blowfish.cpp
-  src/common/ctr.cpp
-  src/common/prng.cpp
-  src/common/ripemd160.cpp
-  src/common/ripemd128.cpp
-  src/common/mgf.cpp
-  src/common/oaep_encoder.cpp
-  src/common/rsa.cpp
-  src/common/CryptoKey.cpp
-  src/common/BigInteger.cpp
-  src/common/biArithmetic.cpp
-  src/common/biMultiplication.cpp
-  src/common/biSqr.cpp
-  src/common/biMontgomery.cpp
-  src/common/NumberTheory.cpp
-  src/common/LogFile.cpp
-  src/common/PacketBuffer.cpp
-  src/common/Packet.cpp
-  src/common/Connection.cpp
-  src/common/SessionBuffer.cpp
-  src/common/Session.cpp
-  src/common/Listener.cpp
-  src/common/IoWorkerThread.cpp
-  src/common/Channel.cpp
-  src/common/Network.cpp
-  src/common/Port.cpp
-  src/common/PacketBufferHandler.cpp
-  src/common/IdleWatcher.cpp
-  src/common/PacketUtil.cpp
-  src/common/Security.cpp
-  src/common/CrashHandler.cpp
-  src/common/FragmentPacket.cpp
-  src/common/ThreadFreePacketPump.cpp
-  src/common/Db.cpp)
+  src/Server/BloodLib/source/BaseMemory.cpp
+  src/Server/BloodLib/source/Memory.cpp
+  src/Server/BloodLib/source/MemoryManager.cpp
+  src/Server/BloodLib/source/RefCntObject.cpp
+  src/Server/BloodLib/source/Log.cpp
+  src/Server/BloodLib/source/LogBuffer.cpp
+  src/Server/BloodLib/source/LogMedia.cpp
+  src/Server/BloodLib/source/StringUtil.cpp
+  src/Server/BloodLib/source/SystemInformation.cpp
+  src/Server/BloodLib/source/DelayedRelease.cpp
+  src/Server/BloodLib/source/Timer.cpp
+  src/Server/BloodLib/source/AlertSender.cpp
+  src/Server/BloodLib/source/Thread.cpp
+  src/Server/BloodLib/source/Console.cpp
+  src/Server/BloodLib/source/TextConsole.cpp
+  src/Server/BloodLib/source/PipeConsole.cpp
+  src/Server/BloodLib/source/WindowConsole.cpp
+  src/Server/BloodLib/source/WinServiceConsole.cpp
+  src/Server/BloodLib/source/Daemon.cpp
+  src/Server/BloodLib/source/DaemonConfig.cpp
+  src/Server/Shared/BnsCommonConfigDefinition.cpp
+  src/Security/source/BloodCrypto/crypto/Crypto.cpp
+  src/Security/source/BloodCrypto/crypto/aes128.cpp
+  src/Security/source/BloodCrypto/crypto/aes128Table.cpp
+  src/Security/source/BloodCrypto/crypto/aes128NI.cpp
+  src/Security/source/BloodCrypto/crypto/blowfish.cpp
+  src/Security/source/BloodCrypto/crypto/mode/ctr.cpp
+  src/Security/source/BloodCrypto/math/prng/prng.cpp
+  src/Security/source/BloodCrypto/hash/ripemd160.cpp
+  src/Security/source/BloodCrypto/hash/ripemd128.cpp
+  src/Security/source/BloodCrypto/crypto/encoder/mgf.cpp
+  src/Security/source/BloodCrypto/crypto/encoder/oaep_encoder.cpp
+  src/Security/source/BloodCrypto/crypto/rsa.cpp
+  src/Security/source/BloodCrypto/key/CryptoKey.cpp
+  src/Security/source/BloodCrypto/math/bignumber/BigInteger.cpp
+  src/Security/source/BloodCrypto/math/bignumber/biArithmetic.cpp
+  src/Security/source/BloodCrypto/math/bignumber/biMultiplication.cpp
+  src/Security/source/BloodCrypto/math/bignumber/biSqr.cpp
+  src/Security/source/BloodCrypto/math/bignumber/biMontgomery.cpp
+  src/Security/source/BloodCrypto/math/bignumber/NumberTheory.cpp
+  src/Server/BloodLib/source/LogFile.cpp
+  src/Server/BloodLib/source/PacketBuffer.cpp
+  src/Server/BloodLib/source/Packet.cpp
+  src/Server/BloodLib/source/Connection.cpp
+  src/Server/BloodLib/source/SessionBuffer.cpp
+  src/Server/BloodLib/source/Session.cpp
+  src/Server/BloodLib/source/Listener.cpp
+  src/Server/BloodLib/source/IoWorkerThread.cpp
+  src/Server/BloodLib/source/Channel.cpp
+  src/Server/BloodLib/source/Network.cpp
+  src/Server/BloodLib/source/Port.cpp
+  src/Server/BloodLib/source/PacketBufferHandler.cpp
+  src/Server/BloodLib/source/IdleWatcher.cpp
+  src/Server/BloodLib/source/PacketUtil.cpp
+  src/Server/BloodLib/source/Security.cpp
+  src/Server/BloodLib/source/CrashHandler.cpp
+  src/Server/Packet/FragmentPacket.cpp
+  src/Server/Economy/Shared/ThreadFreePacketPump.cpp
+  src/Server/BloodLib/source/Db.cpp)
 # clang-cl needs the AES target feature for the <wmmintrin.h> intrinsics.
-set_source_files_properties(src/common/aes128NI.cpp PROPERTIES COMPILE_OPTIONS "-maes")
+set_source_files_properties(src/Security/source/BloodCrypto/crypto/aes128NI.cpp PROPERTIES COMPILE_OPTIONS "-maes")
 target_compile_options(lift_common PRIVATE /GR-)
 # AlertSender.h includes winsock2.h after windows.h.
 target_compile_definitions(lift_common PUBLIC WIN32_LEAN_AND_MEAN)
 target_include_directories(lift_common BEFORE PRIVATE ${LIFT_STL_INCLUDE})
-target_include_directories(lift_common PUBLIC ${CMAKE_SOURCE_DIR}/src/common)
+target_include_directories(lift_common PUBLIC ${LIFT_SRC_INCLUDE})
 add_dependencies(lift_common lift_msvcp100_implib)
 # Wine import libs for the BloodLib modules (Db: odbc32, SystemInformation: ws2_32 iphlpapi, String: ole32).
 foreach(imp odbc32 ws2_32 iphlpapi ole32 advapi32 shell32 version user32 shlwapi)
@@ -131,9 +152,9 @@ endif()
 
 # CacheGate server exe. wmain_bridge.c gives the narrow main that crt0.c calls.
 lift_exe(CacheGate
-  SOURCES src/CacheGate/CacheGate.cpp src/CacheGate/CacheD.cpp src/CacheGate/CacheDChannel.cpp
-          src/CacheGate/ClientManager.cpp src/CacheGate/CacheGateSessionHandler.cpp
-          src/CacheGate/CacheGateServerSideHandlerList.cpp src/crt/wmain_bridge.c
+  SOURCES src/Server/Economy/CacheGate/CacheGate.cpp src/Server/Economy/CacheGate/CacheD.cpp src/Server/Economy/CacheGate/CacheDChannel.cpp
+          src/Server/Economy/CacheGate/ClientManager.cpp src/Server/Economy/CacheGate/CacheGateSessionHandler.cpp
+          src/Server/Economy/CacheGate/CacheGateServerSideHandlerList.cpp src/crt/wmain_bridge.c
           src/crt/tlssup.c src/crt/new_delete.c src/crt/zstd_stub.c
   IMPORTS msvcr100 kernel32)
 target_compile_options(CacheGate PRIVATE /GR-)
@@ -143,86 +164,86 @@ target_link_libraries(CacheGate PRIVATE lift_common ${LIFT_MSVCP100_IMPLIB})
 
 # SmartCouponDaemon app modules (static lib).
 add_library(lift_smartcoupondaemon STATIC
-  src/SmartCouponDaemon/CouponJob.cpp
-  src/SmartCouponDaemon/EventNotiJob.cpp
-  src/SmartCouponDaemon/GameEventWorker.cpp
-  src/SmartCouponDaemon/ObjectPool.cpp
-  src/SmartCouponDaemon/SharedChannel.cpp
-  src/SmartCouponDaemon/ManagerChannel.cpp
-  src/SmartCouponDaemon/ManagerPacketHandler.cpp
-  src/SmartCouponDaemon/SmartCouponManagerPacketSmartCouponSideHandlerList.cpp
-  src/SmartCouponDaemon/SmartCouponDB.cpp
-  src/SmartCouponDaemon/DaemonChannel.cpp
-  src/SmartCouponDaemon/DaemonPacketHandler.cpp
-  src/SmartCouponDaemon/SmartCouponPacketSmartCouponSideHandlerList.cpp
-  src/SmartCouponDaemon/CouponGameEventConfig.cpp
-  src/SmartCouponDaemon/NPChannel2.cpp
-  src/SmartCouponDaemon/NPServiceChannel.cpp
-  src/SmartCouponDaemon/NPMessageHandler.cpp
-  src/SmartCouponDaemon/SmartCouponDaemon.cpp)
+  src/Server/SmartCouponDaemon/CouponJob.cpp
+  src/Server/SmartCouponDaemon/EventNotiJob.cpp
+  src/Server/SmartCouponDaemon/GameEventWorker.cpp
+  src/Server/LobbyDaemon/ObjectPool.cpp
+  src/Server/Shared/SharedChannel.cpp
+  src/Server/SmartCouponDaemon/ManagerChannel.cpp
+  src/Server/SmartCouponDaemon/ManagerPacketHandler.cpp
+  src/Server/SmartCouponDaemon/SmartCouponManagerPacketSmartCouponSideHandlerList.cpp
+  src/Server/SmartCouponDaemon/SmartCouponDB.cpp
+  src/Server/SmartCouponDaemon/DaemonChannel.cpp
+  src/Server/SmartCouponDaemon/DaemonPacketHandler.cpp
+  src/Server/SmartCouponDaemon/SmartCouponPacketSmartCouponSideHandlerList.cpp
+  src/Server/Shared/CouponGameEventConfig.cpp
+  src/Server/Shared/NPChannel2.cpp
+  src/Server/SmartCouponDaemon/NPServiceChannel.cpp
+  src/Server/SmartCouponDaemon/NPMessageHandler.cpp
+  src/Server/SmartCouponDaemon/SmartCouponDaemon.cpp)
 target_compile_options(lift_smartcoupondaemon PRIVATE /GR-)
 target_include_directories(lift_smartcoupondaemon BEFORE PRIVATE ${LIFT_STL_INCLUDE})
-target_include_directories(lift_smartcoupondaemon PUBLIC ${CMAKE_SOURCE_DIR}/src/SmartCouponDaemon)
+target_include_directories(lift_smartcoupondaemon PUBLIC ${LIFT_SRC_INCLUDE})
 target_link_libraries(lift_smartcoupondaemon PUBLIC lift_common)
 
 # LobbyGate app modules (static lib).
 add_library(lift_lobbygate STATIC
-  src/LobbyGate/Client.cpp
-  src/LobbyGate/LobbyDChannel.cpp
-  src/LobbyGate/LobbyGatePredefine.cpp
-  src/LobbyGate/PcCafeMileageFeverTimeScheduleList.cpp
-  src/LobbyGate/WorldListManager.cpp
-  src/LobbyGate/LobbyGateConfig.cpp
-  src/LobbyGate/ContentsRuleConfigDefinition.cpp
-  src/LobbyGate/LobbyGate.cpp
-  src/LobbyGate/LobbyGatePacketHandler.cpp
-  src/LobbyGate/LobbyDPacketHandler.cpp)
+  src/Server/LobbyGate/Client.cpp
+  src/Server/LobbyGate/LobbyDChannel.cpp
+  src/Server/LobbyGate/LobbyGatePredefine.cpp
+  src/Server/LobbyGate/PcCafeMileageFeverTimeScheduleList.cpp
+  src/Server/LobbyGate/WorldListManager.cpp
+  src/Server/LobbyGate/LobbyGateConfig.cpp
+  src/Server/LobbyGate/ContentsRuleConfigDefinition.cpp
+  src/Server/LobbyGate/LobbyGate.cpp
+  src/Server/LobbyGate/LobbyGatePacketHandler.cpp
+  src/Server/LobbyGate/LobbyDPacketHandler.cpp)
 target_compile_options(lift_lobbygate PRIVATE /GR-)
 target_include_directories(lift_lobbygate BEFORE PRIVATE ${LIFT_STL_INCLUDE})
-target_include_directories(lift_lobbygate PUBLIC ${CMAKE_SOURCE_DIR}/src/LobbyGate)
+target_include_directories(lift_lobbygate PUBLIC ${LIFT_SRC_INCLUDE})
 target_link_libraries(lift_lobbygate PUBLIC lift_common)
 
 # PostOfficeDaemon lifted modules (static library). Calls to code of later cards stay as declarations.
 add_library(lift_postofficedaemon STATIC
-  src/PostOfficeDaemon/RelayContext.cpp
-  src/PostOfficeDaemon/RelayTimeContext.cpp
-  src/PostOfficeDaemon/RelayTimeoutChecker.cpp
-  src/PostOfficeDaemon/RelayTimeoutEvent.cpp
-  src/PostOfficeDaemon/PingRelay.cpp
-  src/PostOfficeDaemon/PingGenerator.cpp
-  src/PostOfficeDaemon/CachedWatchdog.cpp
-  src/PostOfficeDaemon/CacheGateChannel.cpp
-  src/PostOfficeDaemon/CacheGatePacketHandler.cpp
-  src/PostOfficeDaemon/CacheGateClientSideHandlerList.cpp
-  src/PostOfficeDaemon/AgentChannel.cpp
-  src/PostOfficeDaemon/AgentPacketHandler.cpp
-  src/PostOfficeDaemon/PostOfficePacketServerSideHandlerList.cpp
-  src/PostOfficeDaemon/ManagementSessionHandler.cpp
-  src/PostOfficeDaemon/ManagementPacketHandler.cpp
-  src/PostOfficeDaemon/PostOfficeManagementPacketHandlerList.cpp
-  src/PostOfficeDaemon/WorldChannel.cpp
-  src/PostOfficeDaemon/WorldPacketHandler.cpp
-  src/PostOfficeDaemon/PostOfficeServicePacketServerSideHandlerList.cpp
-  src/PostOfficeDaemon/PostContext.cpp
-  src/PostOfficeDaemon/PostDeliveryEvent.cpp
-  src/PostOfficeDaemon/DeliverPostRelay.cpp
-  src/PostOfficeDaemon/CheckPostCapacityRelay.cpp
-  src/PostOfficeDaemon/RetrieveCharacterInfoRelay.cpp
-  src/PostOfficeDaemon/CacheEconomyPacketHandler.cpp
-  src/PostOfficeDaemon/CacheEconomyClientSideHandlerList.cpp
-  src/PostOfficeDaemon/WorldConfigManager.cpp
-  src/PostOfficeDaemon/UnsentPostContext.cpp
-  src/PostOfficeDaemon/UnsentPostChecker.cpp
-  src/PostOfficeDaemon/PostOfficeDB.cpp
-  src/PostOfficeDaemon/PostOfficeDaemon.cpp)
+  src/Server/Economy/PostOfficeDaemon/RelayContext.cpp
+  src/Server/Economy/PostOfficeDaemon/RelayTimeContext.cpp
+  src/Server/Economy/PostOfficeDaemon/RelayTimeoutChecker.cpp
+  src/Server/Economy/PostOfficeDaemon/RelayTimeoutEvent.cpp
+  src/Server/Economy/PostOfficeDaemon/PingRelay.cpp
+  src/Server/Economy/PostOfficeDaemon/PingGenerator.cpp
+  src/Server/Economy/PostOfficeDaemon/CachedWatchdog.cpp
+  src/Server/Economy/PostOfficeDaemon/CacheGateChannel.cpp
+  src/Server/Economy/PostOfficeDaemon/CacheGatePacketHandler.cpp
+  src/Server/Economy/PostOfficeDaemon/CacheGateClientSideHandlerList.cpp
+  src/Server/Economy/PostOfficeDaemon/AgentChannel.cpp
+  src/Server/Economy/PostOfficeDaemon/AgentPacketHandler.cpp
+  src/Server/Economy/PostOfficeDaemon/PostOfficePacketServerSideHandlerList.cpp
+  src/Server/Economy/PostOfficeDaemon/ManagementSessionHandler.cpp
+  src/Server/Economy/PostOfficeDaemon/ManagementPacketHandler.cpp
+  src/Server/Economy/PostOfficeDaemon/PostOfficeManagementPacketHandlerList.cpp
+  src/Server/Economy/PostOfficeDaemon/WorldChannel.cpp
+  src/Server/Economy/PostOfficeDaemon/WorldPacketHandler.cpp
+  src/Server/Economy/PostOfficeDaemon/PostOfficeServicePacketServerSideHandlerList.cpp
+  src/Server/Economy/PostOfficeDaemon/PostContext.cpp
+  src/Server/Economy/PostOfficeDaemon/PostDeliveryEvent.cpp
+  src/Server/Economy/PostOfficeDaemon/DeliverPostRelay.cpp
+  src/Server/Economy/PostOfficeDaemon/CheckPostCapacityRelay.cpp
+  src/Server/Economy/PostOfficeDaemon/RetrieveCharacterInfoRelay.cpp
+  src/Server/Economy/PostOfficeDaemon/CacheEconomyPacketHandler.cpp
+  src/Server/Economy/PostOfficeDaemon/CacheEconomyClientSideHandlerList.cpp
+  src/Server/Economy/PostOfficeDaemon/WorldConfigManager.cpp
+  src/Server/Economy/PostOfficeDaemon/UnsentPostContext.cpp
+  src/Server/Economy/PostOfficeDaemon/UnsentPostChecker.cpp
+  src/Server/Economy/PostOfficeDaemon/PostOfficeDB.cpp
+  src/Server/Economy/PostOfficeDaemon/PostOfficeDaemon.cpp)
 target_compile_options(lift_postofficedaemon PRIVATE /GR-)
 target_include_directories(lift_postofficedaemon BEFORE PRIVATE ${LIFT_STL_INCLUDE})
-target_include_directories(lift_postofficedaemon PUBLIC ${CMAKE_SOURCE_DIR}/src/PostOfficeDaemon)
+target_include_directories(lift_postofficedaemon PUBLIC ${LIFT_SRC_INCLUDE})
 target_link_libraries(lift_postofficedaemon PUBLIC lift_common)
 
 # SmartCouponDaemon server exe. LinkStubs.cpp has stub bodies for the modules in the handoff "Not done" list.
 lift_exe(SmartCouponDaemon
-  SOURCES src/SmartCouponDaemon/LinkStubs.cpp src/crt/wmain_bridge.c
+  SOURCES src/Server/SmartCouponDaemon/LinkStubs.cpp src/crt/wmain_bridge.c
           src/crt/tlssup.c src/crt/new_delete.c src/crt/zstd_stub.c
   IMPORTS msvcr100 kernel32 odbc32 iphlpapi version shlwapi ws2_32)
 target_compile_options(SmartCouponDaemon PRIVATE /GR-)
@@ -232,7 +253,7 @@ target_link_libraries(SmartCouponDaemon PRIVATE lift_smartcoupondaemon lift_comm
 
 # LobbyGate server exe. XmlReader_sv64.dll, bsConsole_sv64.dll and dbghelp.dll load at run time (not linked).
 lift_exe(LobbyGate
-  SOURCES src/LobbyGate/LinkStubs.cpp src/crt/wmain_bridge.c src/crt/tlssup.c src/crt/new_delete.c
+  SOURCES src/Server/LobbyGate/LinkStubs.cpp src/crt/wmain_bridge.c src/crt/tlssup.c src/crt/new_delete.c
           src/crt/zstd_stub.c
   IMPORTS msvcr100 kernel32 user32 advapi32 shell32 ole32 shlwapi version ws2_32 iphlpapi)
 target_compile_options(LobbyGate PRIVATE /GR-)
@@ -242,7 +263,7 @@ target_link_libraries(LobbyGate PRIVATE lift_lobbygate lift_common ${LIFT_MSVCP1
 
 # PostOfficeDaemon server exe. XmlReader_sv64.dll, bsConsole_sv64.dll and dbghelp.dll load at run time (not linked).
 lift_exe(PostOfficeDaemon
-  SOURCES src/PostOfficeDaemon/LinkStubs.cpp src/crt/wmain_bridge.c src/crt/tlssup.c src/crt/new_delete.c
+  SOURCES src/Server/Economy/PostOfficeDaemon/LinkStubs.cpp src/crt/wmain_bridge.c src/crt/tlssup.c src/crt/new_delete.c
   IMPORTS msvcr100 kernel32 user32 advapi32 shell32 ole32 odbc32 shlwapi version ws2_32 iphlpapi)
 target_compile_options(PostOfficeDaemon PRIVATE /GR-)
 target_include_directories(PostOfficeDaemon BEFORE PRIVATE ${LIFT_STL_INCLUDE})
