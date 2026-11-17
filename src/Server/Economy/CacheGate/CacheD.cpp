@@ -253,14 +253,14 @@ bool CacheDList::LoadCachedListConfigFile(wchar_t const* fileName, bool reload)
                             else if (existing->_addr == ip && existing->_port == port)
                             {
                                 Log::Write(Log::LT_DEBUG, CACHED_FILE, 295,
-                                           L"[cached list], already exists, wid:%d, ip-address:%s, port:%d",
+                                           L"[cached list], load cached success, already exists, wid:%d, ip-address:%s, port:%d",
                                            wid, Network::GetAddressStringW(ip), port);
                                 existing->removeReferenceCount(CACHED_FILE, 296);
                             }
                             else
                             {
                                 Log::Write(Log::LT_DEBUG, CACHED_FILE, 302,
-                                           L"[cached list], update cached info OLD , wid:%d, ip-address:%s, port:%d"
+                                           L"[cached list], load cached success, update cached info OLD , wid:%d, ip-address:%s, port:%d"
                                            L"NEW , wid:%d, ip-address:%s, port:%d",
                                            existing->_id, Network::GetAddressStringW(existing->_addr), existing->_port,
                                            wid, Network::GetAddressStringW(ip), port);

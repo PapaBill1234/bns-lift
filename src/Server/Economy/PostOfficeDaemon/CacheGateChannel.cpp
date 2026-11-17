@@ -62,12 +62,12 @@ bool CacheGateChannel::composeRelayHeader(Packet& packet, RelayHeader const& rel
     if (result)
         Log::Write(Log::LT_DEBUG, CACHEGATE_CHANNEL_FILE, 115,
                    L"[%s], %s; composed relay header, fromWid:%u, toWid:%u, relayTid:0x%I64X, hint:%u, reserved:%I64u",
-                   MODULE_NAME, L"composeRelayHeader", relayHeader._fromWid, relayHeader._toWid,
+                   MODULE_NAME, L"CacheGateChannel::composeRelayHeader", relayHeader._fromWid, relayHeader._toWid,
                    relayHeader._relayTid, relayHeader._hint, relayHeader._reserved);
     else
         Log::Write(Log::LT_ERROR, CACHEGATE_CHANNEL_FILE, 112,
                    L"[%s], %s; failed to compose relay header, fromWid:%u, toWid:%u, relayTid:0x%I64X, hint:%u, reserved:%I64u",
-                   MODULE_NAME, L"composeRelayHeader", relayHeader._fromWid, relayHeader._toWid,
+                   MODULE_NAME, L"CacheGateChannel::composeRelayHeader", relayHeader._fromWid, relayHeader._toWid,
                    relayHeader._relayTid, relayHeader._hint, relayHeader._reserved);
     return result;
 }
@@ -80,12 +80,12 @@ bool CacheGateChannel::composeRelayHeader(FragmentPacket& packet, RelayHeader co
     if (result)
         Log::Write(Log::LT_DEBUG, CACHEGATE_CHANNEL_FILE, 126,
                    L"[%s], %s; composed relay header, fromWid:%u, toWid:%u, relayTid:0x%I64X, hint:%u, reserved:%I64u",
-                   MODULE_NAME, L"composeRelayHeader", relayHeader._fromWid, relayHeader._toWid,
+                   MODULE_NAME, L"CacheGateChannel::composeRelayHeader", relayHeader._fromWid, relayHeader._toWid,
                    relayHeader._relayTid, relayHeader._hint, relayHeader._reserved);
     else
         Log::Write(Log::LT_ERROR, CACHEGATE_CHANNEL_FILE, 123,
                    L"[%s], %s; failed to compose relay header, fromWid:%u, toWid:%u, relayTid:0x%I64X, hint:%u, reserved:%I64u",
-                   MODULE_NAME, L"composeRelayHeader", relayHeader._fromWid, relayHeader._toWid,
+                   MODULE_NAME, L"CacheGateChannel::composeRelayHeader", relayHeader._fromWid, relayHeader._toWid,
                    relayHeader._relayTid, relayHeader._hint, relayHeader._reserved);
     return result;
 }
@@ -98,10 +98,10 @@ bool CacheGateChannel::combineFragmentRelayFormat(char* const relayFormat, unsig
     {
         Log::Write(Log::LT_ERROR, CACHEGATE_CHANNEL_FILE, 91,
                    L"== CRASH == [%s], %s; invalid parameter, relayFormat:0x%p, bufferSize:%d, economyFormat:0x%p",
-                   MODULE_NAME, L"combineFragmentRelayFormat", relayFormat, bufferSize, economyFormat);
+                   MODULE_NAME, L"CacheGateChannel::combineFragmentRelayFormat", relayFormat, bufferSize, economyFormat);
         AlertSender::Write(CACHEGATE_CHANNEL_FILE, 91,
                            L"== CRASH == [%s], %s; invalid parameter, relayFormat:0x%p, bufferSize:%d, economyFormat:0x%p",
-                           MODULE_NAME, L"combineFragmentRelayFormat", relayFormat, bufferSize, economyFormat);
+                           MODULE_NAME, L"CacheGateChannel::combineFragmentRelayFormat", relayFormat, bufferSize, economyFormat);
         return false;
     }
 
@@ -109,14 +109,14 @@ bool CacheGateChannel::combineFragmentRelayFormat(char* const relayFormat, unsig
     if (formatLength >= bufferSize)
     {
         Log::Write(Log::LT_ERROR, CACHEGATE_CHANNEL_FILE, 97, L"[%s], %s; format length overflow, formatLength:%d",
-                   MODULE_NAME, L"combineFragmentRelayFormat", formatLength);
+                   MODULE_NAME, L"CacheGateChannel::combineFragmentRelayFormat", formatLength);
         return false;
     }
 
     if (strncat_s(relayFormat, bufferSize, economyFormat, strlen(economyFormat)) != 0)
     {
         Log::Write(Log::LT_ERROR, CACHEGATE_CHANNEL_FILE, 102, L"[%s], %s; failed to append economy packet format",
-                   MODULE_NAME, L"combineFragmentRelayFormat");
+                   MODULE_NAME, L"CacheGateChannel::combineFragmentRelayFormat");
         return false;
     }
     return true;
@@ -195,10 +195,10 @@ bool CacheGateChannelManager::initChannelManager()
         return true;
     Log::Write(Log::LT_ERROR, CACHEGATE_CHANNEL_FILE, 155,
                L"== CRASH == [%s], %s; cachegate channel manager is already initialized, cachegateChannel:0x%p",
-               L"cachegate channel manager", L"CacheGateChannelManager::initChannelManager", _cachegateChannel);
+               L"cachegate channel", L"CacheGateChannelManager::initChannelManager", _cachegateChannel);
     AlertSender::Write(CACHEGATE_CHANNEL_FILE, 155,
                        L"== CRASH == [%s], %s; cachegate channel manager is already initialized, cachegateChannel:0x%p",
-                       L"cachegate channel manager", L"CacheGateChannelManager::initChannelManager", _cachegateChannel);
+                       L"cachegate channel", L"CacheGateChannelManager::initChannelManager", _cachegateChannel);
     return false;
 }
 
@@ -208,10 +208,10 @@ bool CacheGateChannelManager::SetCacheGateChannel(CacheGateChannel* const cacheg
     if (cachegateChannel == nullptr)
     {
         Log::Write(Log::LT_ERROR, CACHEGATE_CHANNEL_FILE, 179,
-                   L"== CRASH == [%s], %s; invalid parameter, cachegateChannel:0x%p", L"cachegate channel manager",
+                   L"== CRASH == [%s], %s; invalid parameter, cachegateChannel:0x%p", L"cachegate channel",
                    L"CacheGateChannelManager::SetCacheGateChannel", static_cast<CacheGateChannel*>(nullptr));
         AlertSender::Write(CACHEGATE_CHANNEL_FILE, 179, L"== CRASH == [%s], %s; invalid parameter, cachegateChannel:0x%p",
-                           L"cachegate channel manager", L"CacheGateChannelManager::SetCacheGateChannel",
+                           L"cachegate channel", L"CacheGateChannelManager::SetCacheGateChannel",
                            static_cast<CacheGateChannel*>(nullptr));
         return false;
     }
@@ -221,7 +221,7 @@ bool CacheGateChannelManager::SetCacheGateChannel(CacheGateChannel* const cacheg
     {
         _lock.Leave();
         Log::Write(Log::LT_ERROR, CACHEGATE_CHANNEL_FILE, 186,
-                   L"[%s], %s; cachegate channel is already set, cachegateChannel:0x%p", L"cachegate channel manager",
+                   L"[%s], %s; cachegate channel is already set, cachegateChannel:0x%p", L"cachegate channel",
                    L"CacheGateChannelManager::SetCacheGateChannel", _cachegateChannel);
         return false;
     }
@@ -237,7 +237,7 @@ bool CacheGateSessionHandler::OnAccept(Session const* session) const
     unsigned long long const sessionId = session->_id;
     Log::Write(Log::LT_ERROR, CACHEGATE_CHANNEL_FILE, 235,
                L"[%s], %s; cannot use CacheGateSessionHandler::OnAccept handler, sessionId:0x%I64X, portId:%u, sessionIndex:%u",
-               L"cachegate session handler", L"CacheGateSessionHandler::OnAccept", sessionId,
+               L"cachegate channel", L"CacheGateSessionHandler::OnAccept", sessionId,
                static_cast<unsigned int>(sessionId >> 32), static_cast<unsigned int>(sessionId));
     return false;
 }
@@ -249,12 +249,12 @@ bool CacheGateSessionHandler::OnConnect(Session const* session, bool firstConnec
     if (firstConnected)
         Log::Write(Log::LT_NOTICE, CACHEGATE_CHANNEL_FILE, 242,
                    L"[%s], %s; connected to cachegate, sessionId:0x%I64X, portId:%u, sessionIndex:%u",
-                   L"cachegate session handler", L"CacheGateSessionHandler::OnConnect", sessionId,
+                   L"cachegate channel", L"CacheGateSessionHandler::OnConnect", sessionId,
                    static_cast<unsigned int>(sessionId >> 32), static_cast<unsigned int>(sessionId));
     else
         Log::Write(Log::LT_NOTICE, CACHEGATE_CHANNEL_FILE, 244,
                    L"[%s], %s; reconnected to cachegate, sessionId:0x%I64X, portId:%u, sessionIndex:%u",
-                   L"cachegate session handler", L"CacheGateSessionHandler::OnConnect", sessionId,
+                   L"cachegate channel", L"CacheGateSessionHandler::OnConnect", sessionId,
                    static_cast<unsigned int>(sessionId >> 32), static_cast<unsigned int>(sessionId));
 
     Channel* const channel = session->GetChannel();
@@ -262,7 +262,7 @@ bool CacheGateSessionHandler::OnConnect(Session const* session, bool firstConnec
     {
         Log::Write(Log::LT_ERROR, CACHEGATE_CHANNEL_FILE, 249,
                    L"[%s], %s; cachegate channel is null, cachegateChannel:0x%p, sessionId:0x%I64X, portId:%u, sessionIndex:%u",
-                   L"cachegate session handler", L"CacheGateSessionHandler::OnConnect", static_cast<Channel*>(nullptr),
+                   L"cachegate channel", L"CacheGateSessionHandler::OnConnect", static_cast<Channel*>(nullptr),
                    sessionId, static_cast<unsigned int>(sessionId >> 32), static_cast<unsigned int>(sessionId));
         return false;
     }
@@ -276,7 +276,7 @@ bool CacheGateSessionHandler::OnConnect(Session const* session, bool firstConnec
     session->Send("hhhh", CacheGate_HelloCmd, 4, 10, daemon->_serviceWid);
     Log::Write(Log::LT_NOTICE, CACHEGATE_CHANNEL_FILE, 261,
                L"[%s], %s; sent hello request to cachegate, cachegate-packet-version:%d, economy-common-packet-version:%d, postofficeServiceWid:%u",
-               L"cachegate session handler", L"CacheGateSessionHandler::OnConnect", 4, 10, daemon->_serviceWid);
+               L"cachegate channel", L"CacheGateSessionHandler::OnConnect", 4, 10, daemon->_serviceWid);
     return true;
 }
 
@@ -286,7 +286,7 @@ void CacheGateSessionHandler::OnClose(Session const* session, bool tryReconnect)
     unsigned long long const sessionId = session->_id;
     Log::Write(Log::LT_NOTICE, CACHEGATE_CHANNEL_FILE, 268,
                L"[%s], %s; closed connection with cachegate, sessionId:0x%I64X, portId:%u, sessionIndex:%u",
-               L"cachegate session handler", L"CacheGateSessionHandler::OnClose", sessionId,
+               L"cachegate channel", L"CacheGateSessionHandler::OnClose", sessionId,
                static_cast<unsigned int>(sessionId >> 32), static_cast<unsigned int>(sessionId));
 
     PostOfficeDaemon* const daemon = PostOfficeDaemon::_instance;
@@ -315,7 +315,7 @@ void CacheGateSessionHandler::OnClose(Session const* session, bool tryReconnect)
     if (tryReconnect)
         Log::Write(Log::LT_DEBUG, CACHEGATE_CHANNEL_FILE, 284,
                    L"[%s], %s; reconnecting to cachegate, sessionId:0x%I64X, portId:%u, sessionIndex:%u",
-                   L"cachegate session handler", L"CacheGateSessionHandler::OnClose", sessionId,
+                   L"cachegate channel", L"CacheGateSessionHandler::OnClose", sessionId,
                    static_cast<unsigned int>(sessionId >> 32), static_cast<unsigned int>(sessionId));
 
     // LIFT: inlined search and addNode; same logic as SetInvalidInfo(key, true).

@@ -12,7 +12,6 @@ have 0 changed lines. The log diff has 4 changed lines: `version:` is empty in `
 | --- | --- |
 | `tools/verify/run_smartcoupondaemon.sh lifted\|original [SECONDS] [--pktlog] [--peer] [--client]` | Runs one exe under wine64 in its own prefix (`build/verify/wineprefix`). Output in `build/verify/scd-<kind>/`: `log.txt`, `console.txt`, `ports.txt`, `exit.txt`, `peer-np.txt`, `peer-gamed.txt`, `client-manager.txt`, `client-daemon.txt`, `pktlog/*.pkl`. |
 | `tools/verify/compare_smartcoupondaemon.sh [SECONDS] [--pktlog]` | Runs both kinds with `--peer --client`, writes 7 diffs in `build/verify/scd-compare/`: log, ports, peer-np, peer-gamed, client-manager, client-daemon, pkl. Exit 0 = no difference, 1 = difference, 3 = no lifted exe. |
-| `tools/verify/fixsrc_smartcoupondaemon.sh` | Round 1 only (src before 8e56145). Copies the source to `build/verify/scd-fixsrc/` and applies the `src/common` part of `Docs/Verify/CacheGate-fixes.patch`. Not necessary now: 8e56145 has these fixes. |
 | `tools/verify/replay.py` | No change. Used as the NP peer (`listen`) and as the manager and daemon clients (`connect`). |
 
 Self test: `SCD_LIFTED_EXE=<original exe> tools/verify/compare_smartcoupondaemon.sh 15 --pktlog` gives

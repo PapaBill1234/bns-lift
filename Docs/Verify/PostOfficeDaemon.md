@@ -9,7 +9,6 @@ input streams. The log is the same except `version:` and timing values (timer ti
 | --- | --- |
 | `POD_CERT=sql tools/verify/run_postofficedaemon.sh lifted\|original [SECONDS] [--pktlog] [--peer] [--client]` | Runs one exe under wine64 (prefix `build/verify/wineprefix`). Output in `build/verify/pod-<kind>/`: `log.txt`, `ports.txt`, `exit.txt`, `peer-cachegate.txt`, `client-{agent,world,manage}.txt`, `pktlog/*.pkl`. |
 | `POD_LIFTED_EXE=<exe> POD_CERT=sql tools/verify/compare_postofficedaemon.sh [SECONDS] [--pktlog]` | Runs both, writes `build/verify/pod-compare/*.diff` (log sorted, ports, peer/client bytes, pkl sorted). Exit 0 = same. |
-| `tools/verify/fixsrc_postofficedaemon.sh` | Copies the source to `build/verify/pod-fixsrc/src-copy/`, applies `Docs/Verify/PostOfficeDaemon-fixes.patch`, builds `PostOfficeDaemon.exe` there. Use it with `POD_LIFTED_EXE=<that exe>`. |
 
 ## Run facts (original, version 0.0.348.484)
 - Same setup as SmartCouponDaemon: wineconsole on Xvfb `:77`, E: and D: in the run folder.
@@ -51,12 +50,13 @@ Lifted A = gate build of bd20e24. Lifted B = bd20e24 + fix patch (`fixsrc`). Run
 | `database loading time` | 0sec | 1sec in one run | timing only (`loadAllUnsentPostFromDB`, PostOfficeDaemon.cpp 502) |
 | Other tags/names (static check: lifted `L"..."` names not in exe strings) | `cachegate channel` for CacheGateChannelManager too; `CacheGateChannel::composeRelayHeader`, `::combineFragmentRelayFormat`; all 12 WorldConfigManager names with `WorldConfigManager::` | short names, tags `cachegate session handler` / `cachegate channel manager` | CacheGateChannel.cpp, WorldConfigManager.cpp |
 
-## Fix patch (`PostOfficeDaemon-fixes.patch`)
+## Fixes (in `src/`)
+- 2026-11-17: the fixes are in `src/`. The patch file and the fixsrc script are removed.
 - Adds `Network::OpenPort` 0x28AB0 (8 params) to src/common, and changes the 4 calls in `initNetwork`.
   Table 0x87D68 = {10000, 10000, 16, 16} (= `s_defaultMaxSession`). Call args from the pseudocode: port 1 (true, false),
   ports 2/3 (false, false), port 4 (true, true). `Port::Initialize` 0x361D0 is the same as the lifted one.
-- Also fixes all log text differences above (tags and class prefixes). The patch is made with `diff -u` per file
-  (5 files) and `git apply --check` accepts it. A lift card must apply it to src/ (outside this card's files).
+- The log text differences above (tags and class prefixes) are fixed in `src/`.
+- `Network::OpenPort` in `src/` now has 9 params (nagle last). This replaces the 8-param form of the old patch.
 
 ## Input facts for Task 4 (streams: `python3 -I tools/verify/pod_streams.py`, run done)
 - Packet = u16 size (includes the size field), u16 cmd, body. CacheGate ids: 1 Hello, 2 HelloOk, 3 HelloFail ("hE").
