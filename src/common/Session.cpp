@@ -43,10 +43,9 @@ Timer::~Timer()
     next = nullptr;
 }
 
-// ❓ Not in the CacheGate hr export.
+// LobbyGate ReconnectTimer vtable 0x80760 slot 8 = 0x126f0 (retn 0). The body is empty.
 void Timer::preprocessExpireEvent()
 {
-    // TODO(lift-cg-5)
 }
 
 // The PDB has the class name only. Size 0x40 (Memory::_Manager[2]->Alloc(64) in Connect).
@@ -78,10 +77,10 @@ ReconnectTimer::~ReconnectTimer()
     _sessionId = 0;
 }
 
-// ❓ Not in the hr export. The CacheGate exe has no other timer class id for it.
+// LobbyGate ReconnectTimer vtable 0x80760 slot 6 = 0x27fc0 (xor eax, eax; retn).
 unsigned int ReconnectTimer::TimerClass() const
 {
-    return 0;  // ❓
+    return 0;
 }
 
 // 0xFFD0 (folded with LogMedia::GetLastFileName)
@@ -97,7 +96,7 @@ bool ReconnectTimer::HandleEvent(EventContext* context, unsigned long numOfBytes
     return true;
 }
 
-// ❓ Not in the PDB. Packs the idle table position: WORD0 port id, WORD1 slot (id & 3), DWORD1 byte index.
+// LIFT: helper, not in the PDB. Packs the idle table position: WORD0 port id, WORD1 slot (id & 3), DWORD1 byte index.
 static inline long long makeIdleStatePos(unsigned long long id)
 {
     unsigned long long pos = static_cast<unsigned short>(id >> 32);
@@ -126,8 +125,8 @@ Session::Session(unsigned int portId, PacketBufferHandler const* bufferHandler)
     void* buffer = nullptr;
     _tag = 1802;
     clear();
-    // ❓ The size and the used part are not in the pseudocode. The send free buffer starts at this+2048
-    // and the in-page objects end at this+0x248.
+    // LTCG folded size and used into StaticPageMemoryManager::Initialize (LobbyGate 0x26c90):
+    // size 0x800 (0x26c99) and used 0x248 (crash log 0x26cbe).
     _allocator.Initialize(this, 2048, 0x248, &BaseMemoryManager::_Instance);
     if (bufferHandler != nullptr)
     {
@@ -142,7 +141,7 @@ Session::Session(unsigned int portId, PacketBufferHandler const* bufferHandler)
 // 0xE0A0
 Session::~Session()
 {
-    if (_port != nullptr && _port->_sessionHandler != nullptr)  // ❓ the checks are from the inlined calls
+    if (_port != nullptr && _port->_sessionHandler != nullptr)  // LobbyGate 0x175d1 tests _port, 0x175da tests _sessionHandler
         _port->_sessionHandler->OnDestroyed(this);
     if (_connection != nullptr)
     {
@@ -708,9 +707,9 @@ bool Session::handlePacket()
     while (_minPacketSize <= recvBuffer->_recvdSize - offset)
     {
         char const* pkt = nullptr;
-        // ❓ The size arguments are from the pseudocode register use.
+        // LobbyGate 0x18cc4: the 5th argument is 0xFA8 - _recvdSize (free space), not 0xFA8 - offset.
         int size = _bufferHandler->ToPacket(this, &recvBuffer->_buffer[offset], recvBuffer->_recvdSize - offset,
-                                            4008 - offset, &pkt);
+                                            4008 - recvBuffer->_recvdSize, &pkt);
         if (size < 0)
         {
             packet.Clear();
