@@ -332,7 +332,7 @@ void Network::ReconnectSession(unsigned long long id)
 // 0x20860 (LobbyGate)
 bool Network::SetMaxIdleTime(unsigned int portId, bool disconnect, long maxIdleTime)
 {
-    (void)portId;  // ❓ LTCG removed it. The code reads _port[0].
+    (void)portId;  // LIFT: LTCG removed it. LobbyGate 0x20860 reads _port[0].
     if (Instance->_port[0] == nullptr)
         NETWORK_ASSERT_CRASH(229);
     if (Instance->_idleWatcher == nullptr)

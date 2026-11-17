@@ -338,7 +338,7 @@ bool Client::SendGetCharacterInfoListOk(long long now, short timeZoneBias, Chara
     fp.packet.ListHead->encrypt(session->_currentCrypt, session->_security3rd);
     PacketBuffer const* list[1] = {fp.packet.ListHead};
     session->_lock.Enter();
-    session->send(list, 1);  // ❓ count is not initialized in the pseudocode
+    session->send(list, 1);  // LIFT: LTCG dropped the count. Session::send (0x19360) does not read r8.
     session->_lock.Leave();
     return okSend(this, session, fp, cmd, 464);
 }
@@ -369,7 +369,7 @@ bool Client::SendListGoodsOk(Goods const* goodsList, int goodsCount)
     fp.packet.ListHead->encrypt(session->_currentCrypt, session->_security3rd);
     PacketBuffer const* list[1] = {fp.packet.ListHead};
     session->_lock.Enter();
-    session->send(list, 1);  // ❓ count is not initialized in the pseudocode
+    session->send(list, 1);  // LIFT: LTCG dropped the count. Session::send (0x19360) does not read r8.
     session->_lock.Leave();
     return okSend(this, session, fp, cmd, 513);
 }
@@ -458,7 +458,7 @@ bool Client::SendGetServiceEntryListOk(PacketBuffer* serviceEntryList, int servi
     fp.packet.ListHead->encrypt(session->_currentCrypt, session->_security3rd);
     PacketBuffer const* list[1] = {fp.packet.ListHead};
     session->_lock.Enter();
-    session->send(list, 1);  // ❓ count is not initialized in the pseudocode
+    session->send(list, 1);  // LIFT: LTCG dropped the count. Session::send (0x19360) does not read r8.
     session->_lock.Leave();
     return okSend(this, session, fp, cmd, 655);
 }

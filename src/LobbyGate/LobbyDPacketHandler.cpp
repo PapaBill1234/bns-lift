@@ -56,11 +56,12 @@ static wchar_t const* const SESSION_FILE = L"source\\Session.cpp";
 static wchar_t const* const CHANNEL_H_FILE =
     L"E:\\DailyBuild02\\LobbyGate-Common-0.0.348\\depot\\Branch\\348NC\\Program\\Server\\BloodLib\\include\\Channel.h";
 
-#define ID128_ARGS(x)                                                                                        \
-    *reinterpret_cast<unsigned int const*>(&(x).guid[0]),                                                    \
-        static_cast<unsigned int>(*reinterpret_cast<unsigned short const*>(&(x).guid[4])),                   \
-        static_cast<unsigned int>(*reinterpret_cast<unsigned short const*>(&(x).guid[6])), (x).guid[8],      \
-        (x).guid[9], (x).guid[10], (x).guid[11], (x).guid[12], (x).guid[13], (x).guid[14], (x).guid[15]
+// LIFT: lift helper. It gives the PDB fields of id128::<unnamed-type-guid> in the order of the
+// "%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X" format.
+#define ID128_ARGS(x)                                                                                     \
+    static_cast<unsigned int>((x).guid.id1), static_cast<unsigned int>((x).guid.id2),                     \
+        static_cast<unsigned int>((x).guid.id3), (x).guid.id4[0], (x).guid.id4[1], (x).guid.id4[2],       \
+        (x).guid.id4[3], (x).guid.id4[4], (x).guid.id4[5], (x).guid.id4[6], (x).guid.id4[7]
 
 // All log texts start with this prefix. Arguments: session id, channel id (Channel::GetId).
 #define LDPFX L"[lobbyd], 0x%.16I64X, %I64d, "

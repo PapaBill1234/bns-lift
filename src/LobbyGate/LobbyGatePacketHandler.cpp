@@ -21,12 +21,12 @@ static wchar_t const* const HANDLER_FILE = L"LobbyGatePacketHandler.cpp";  // LI
 static wchar_t const* const CHANNEL_H_FILE =                                // LIFT: No PDB symbol. The binary uses the literal.
     L"E:\\DailyBuild02\\LobbyGate-Common-0.0.348\\depot\\Branch\\348NC\\Program\\Server\\BloodLib\\include\\Channel.h";
 
-// ❓ The GUID fields of an id128 in the order of the "%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X" format.
+// LIFT: lift helper. It gives the PDB fields of id128::<unnamed-type-guid> in the order of the
+// "%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X" format.
 #define ID128_ARGS(x)                                                                                     \
-    *reinterpret_cast<unsigned int const*>(&(x).guid[0]),                                                 \
-        static_cast<unsigned int>(*reinterpret_cast<unsigned short const*>(&(x).guid[4])),                \
-        static_cast<unsigned int>(*reinterpret_cast<unsigned short const*>(&(x).guid[6])), (x).guid[8],   \
-        (x).guid[9], (x).guid[10], (x).guid[11], (x).guid[12], (x).guid[13], (x).guid[14], (x).guid[15]
+    static_cast<unsigned int>((x).guid.id1), static_cast<unsigned int>((x).guid.id2),                     \
+        static_cast<unsigned int>((x).guid.id3), (x).guid.id4[0], (x).guid.id4[1], (x).guid.id4[2],       \
+        (x).guid.id4[3], (x).guid.id4[4], (x).guid.id4[5], (x).guid.id4[6], (x).guid.id4[7]
 
 // 0x91b00
 void* AnyAuthedLobbyGatePacketHandlerList[110] = {
@@ -113,7 +113,7 @@ bool HandleLobbyGate_ContentsRuleListReq(Session* session, Packet const* packet)
     }
     else
     {
-        session->Send("hE", 108, 234);  // ❓ the pseudocode shows only 108; 234 is the reason in the log
+        session->Send("hE", 108, 234);  // 0x14365: r9d = 234, r8d = r9 - 126.
         Log::Write(Log::LT_DEBUG, HANDLER_FILE, 52,
                    L"[lobbygate], sent LobbyGate_ContentsRuleListFail, SessionId:0x%I64X, reason:%d", session->_id, 234);
     }
@@ -146,7 +146,7 @@ bool HandleLobbyGate_HelloReq(Session* session, Packet* packet)
 
     Packet reply{};  // LIFT: inlined constructor
     reply.Allocate();
-    reply.Compose("hb", 2);  // ❓ no argument for "b" in the original
+    reply.Compose("hb", 2, 0);  // 0x145bc: r9d = 0. The binary also writes r12 to the 5th slot. "hb" does not read it.
     if (handshakeDataSize <= 0)
     {
         Log::Write(Log::LT_ERROR, HANDLER_FILE, 87, L"[lobbygate], Session(%I64X), helloreq, Invalid handshake data",
@@ -209,7 +209,7 @@ bool HandleLobbyGate_LoginWithNPTokenReq(Session* session, Packet* packet)
                    L"npGameToken:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X, "
                    L"portalAccountId:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
                    session->_id, 0LL, ID128_ARGS(npGameToken), ID128_ARGS(portalAccountId));
-        session->Send("hh", 5);  // ❓ the reason argument is not in the pseudocode
+        session->Send("hh", 5, 2);  // 0x14a97: r9d = 2. Both paths use this call.
         return true;
     }
     id128 npToken = npGameToken;
@@ -223,7 +223,7 @@ bool HandleLobbyGate_LoginWithNPTokenReq(Session* session, Packet* packet)
                    L"npGameToken:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X, "
                    L"portalAccountId:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
                    session->_id, 0LL, ID128_ARGS(npGameToken), ID128_ARGS(portalAccountId));
-        session->Send("hh", 5);  // ❓ the reason argument is not in the pseudocode
+        session->Send("hh", 5, 2);  // 0x14a97: r9d = 2. Both paths use this call.
         return true;
     }
     return true;
@@ -254,7 +254,7 @@ bool HandleLobbyGate_LoginWithLobbyTokenReq(Session* session, Packet* packet)
                    L"[lobbygate], 0x%.16I64X, %I64d, failed to MakeGateKey, LoginWithLobbyTokenReq, cliKey:0x%I64X, "
                    L"lobbyToken:0x%I64X",
                    session->_id, 0LL, cliKey, lobbyToken);
-        session->Send("hh", 8);  // ❓ the reason argument is not in the pseudocode
+        session->Send("hh", 8, 2);  // 0x14c5c: r9d = 2. Both paths use this call.
         return true;
     }
     if (!LobbyGate::_instance->_lobbyD->SendInitSessionWithLobbyTokenReq(
@@ -265,7 +265,7 @@ bool HandleLobbyGate_LoginWithLobbyTokenReq(Session* session, Packet* packet)
                    L"[lobbygate], 0x%.16I64X, %I64d, failed to sendInitSessionWithLobbyTokenReq, LoginWithLobbyTokenReq, "
                    L"cliKey:0x%I64X, lobbyToken:0x%I64X, gatekey:0x%I64X",
                    session->_id, 0LL, cliKey, lobbyToken, gateKey);
-        session->Send("hh", 8);  // ❓ the reason argument is not in the pseudocode
+        session->Send("hh", 8, 2);  // 0x14c5c: r9d = 2. Both paths use this call.
         return true;
     }
     return true;
@@ -350,7 +350,7 @@ bool HandleLobbyGate_GetWorldInfoListReq(Client* client, Packet const* packet)
         // BUG: 0x14fa4 the format is split into two arguments. The second part is printed as a value.
         Log::Write(Log::LT_ERROR, HANDLER_FILE, 284, L"[lobbygate], fail to get world list, invalid lobbyd channel, ",
                    L"GetWorldInfoListReq, cliKey:0x%I64X", cliKey);
-        client->Send("hh", 19);  // ❓ the reason argument is not in the pseudocode
+        client->Send("hh", 19, 7);  // 0x14fe3: r9d = 7. Both paths use this call.
         return true;
     }
     if (lobbyD->_state != 1)
@@ -358,11 +358,11 @@ bool HandleLobbyGate_GetWorldInfoListReq(Client* client, Packet const* packet)
         // BUG: 0x14fd5 the format is split into two arguments.
         Log::Write(Log::LT_ERROR, HANDLER_FILE, 291, L"[lobbygate], fail to get world list, service not avaliable, ",
                    L"GetWorldInfoListReq, cliKey:0x%I64X", cliKey);
-        client->Send("hh", 19);  // ❓ the reason argument is not in the pseudocode
+        client->Send("hh", 19, 7);  // 0x14fe3: r9d = 7. Both paths use this call.
         return true;
     }
 
-    // Inlined WorldListManager::GetWorldList ❓
+    // Inlined WorldListManager::AcquireWorldList (PDB method, 0x15031).
     WorldListManager* manager = LobbyGate::_instance->_worldListManger;
     WorldList* worldList = nullptr;
     AcquireSRWLockShared(&manager->_srwLock);
@@ -383,7 +383,7 @@ bool HandleLobbyGate_GetWorldInfoListReq(Client* client, Packet const* packet)
         // BUG: 0x15090 the format is split into two arguments.
         Log::Write(Log::LT_ERROR, HANDLER_FILE, 300, L"[lobbygate], fail to get world list, ",
                    L"GetWorldInfoListReq, cliKey:0x%I64X", cliKey);
-        client->Send("hh", 19, 2);  // BUG: 0x150b0 "hh" uses only one value after the command.
+        client->Send("hh", 19, 2);  // 0x15095: rbx = 0, thus r9d = 2.
     }
     return true;
 }
@@ -405,7 +405,7 @@ bool HandleLobbyGate_GetPcCafeMileageFeverTimeScheduleListReq(Client* client, Pa
         // BUG: 0x15154 the format is split into two arguments.
         Log::Write(Log::LT_ERROR, HANDLER_FILE, 363, L"[lobbygate], fail to get world list, invalid lobbyd channel, ",
                    L"GetPcCafeMileageFeverTimeScheduleListReq, cliKey:0x%I64X", cliKey);
-        client->Send("hh", 105);  // ❓ the reason argument is not in the pseudocode
+        client->Send("hh", 105, 7);  // 0x15193: r9d = 7. Both paths use this call.
         return true;
     }
     if (lobbyD->_state != 1)
@@ -413,11 +413,11 @@ bool HandleLobbyGate_GetPcCafeMileageFeverTimeScheduleListReq(Client* client, Pa
         // BUG: 0x15185 the format is split into two arguments.
         Log::Write(Log::LT_ERROR, HANDLER_FILE, 370, L"[lobbygate], fail to get world list, service not avaliable, ",
                    L"GetPcCafeMileageFeverTimeScheduleListReq, cliKey:0x%I64X", cliKey);
-        client->Send("hh", 105);  // ❓ the reason argument is not in the pseudocode
+        client->Send("hh", 105, 7);  // 0x15193: r9d = 7. Both paths use this call.
         return true;
     }
 
-    // Inlined PcCafeMileageFeverTimeScheduleListManager::GetScheduleList ❓
+    // Inlined PcCafeMileageFeverTimeScheduleListManager::AcquirePcCafeMileageFeverTimeScheduleList (PDB method, 0x151e1).
     PcCafeMileageFeverTimeScheduleListManager* manager = LobbyGate::_instance->_pcCafeMileageFeverTimeScheduleListManager;
     PcCafeMileageFeverTimeScheduleList* scheduleList = nullptr;
     AcquireSRWLockShared(&manager->_srwLock);
@@ -438,7 +438,7 @@ bool HandleLobbyGate_GetPcCafeMileageFeverTimeScheduleListReq(Client* client, Pa
         // BUG: 0x15240 the format is split into two arguments.
         Log::Write(Log::LT_ERROR, HANDLER_FILE, 378, L"[lobbygate], fail to get world list, ",
                    L"GetPcCafeMileageFeverTimeScheduleListReq, cliKey:0x%I64X", cliKey);
-        client->Send("hh", 105, 2);  // BUG: 0x15260 "hh" uses only one value after the command.
+        client->Send("hh", 105, 2);  // 0x15245: rbx = 0, thus r9d = 2.
     }
     return true;
 }

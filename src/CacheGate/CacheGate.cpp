@@ -153,7 +153,7 @@ bool CacheGate::initLog()
     CrashHandler::SetLogPath(_config->_logPath);
 
     void* buffer = Memory::_Manager[2]->Alloc(sizeof(LogFile), CACHEGATE_FILE, 78);
-    LogFile* logFile = buffer != nullptr ? new (buffer) LogFile(_config->_logPath, 2, 0) : nullptr;  // ❓ fileType, logType
+    LogFile* logFile = buffer != nullptr ? new (buffer) LogFile(_config->_logPath, 2, 0) : nullptr;  // LIFT: LTCG folded the args. initialize 0x10da5 sets _filetype = 2. logType is not read.
     Log::InitMedia(console);
     Log::InitMedia(logFile);
     return true;

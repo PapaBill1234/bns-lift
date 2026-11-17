@@ -177,7 +177,7 @@ public:
         TR_MAX = 4,
     };
 
-    virtual ~ClientSessionTimerJob();                                    // later card
+    virtual ~ClientSessionTimerJob();                                    // 0x13bb0 (folded with Timer)
     virtual unsigned int TimerClass() const;                             // later card
     virtual unsigned long long TimerId() const;                          // 0x27fc0 (LobbyGate.obj, later card)
     virtual bool HandleEvent(EventContext* context, unsigned long numOfBytes);  // 0x6fa0

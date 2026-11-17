@@ -18,7 +18,8 @@ public:
     virtual ~LobbyD();                  // not in index.tsv for this module
     virtual unsigned long long GetId(); // not in index.tsv for this module
 
-    bool Hello(LobbyDSessionHandler* handler, unsigned int waitAck, unsigned short portId);  // 0x9bd0 (❓ argument names)
+    bool Hello(LobbyDSessionHandler* handler, bool waitAck, unsigned int portId, unsigned long ip, unsigned short port,
+               long connectTimeout, bool reconnect);  // 0x9bd0
     bool hello();                                                                              // 0x9d80
     bool SendInitSessionWithNPTokenReq(unsigned long long gateKey, id128 const* npToken, id128 const* portalAccountId,
                                        unsigned int ipAddress);                                  // 0x9e70

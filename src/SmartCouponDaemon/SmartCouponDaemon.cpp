@@ -232,7 +232,7 @@ bool SmartCouponDaemon::initLog()
 
     // BUG: 0x14f40 the result of Alloc is not checked.
     void* const buffer = Memory::_Manager[2]->Alloc(sizeof(LogFile), kFile, 177);
-    _logFile = new (buffer) LogFile(_config->_logPath, 1, 0);  // ❓ fileType and logType
+    _logFile = new (buffer) LogFile(_config->_logPath, 2, 0);  // LIFT: LTCG folded the args. initialize 0x21b45 sets _filetype = 2. logType is not read.
     // ❓ _logFile->_enable[2] = false; the _enable member is not in LogFile.h.
 
     if (!Log::InitMedia(console))
