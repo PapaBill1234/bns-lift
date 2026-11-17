@@ -48,7 +48,7 @@ clang-cl (LLVM 21) ──► .obj ──► lld-link ──► .exe ──► wi
 | Compile flags | `/GS- /X -imsvc <wine>/msvcrt -imsvc <wine>/windows /D_WIN64 /D_MSVCR_VER=100` |
 | Link | `lld-link /nodefaultlib /entry:mainCRTStartup` + Wine `.a` import libs in `/usr/lib/x86_64-linux-gnu/wine/x86_64-windows/` |
 | C++ STL | Not in Wine. Write our own subset in `include/vs2010/` with the VS2010 object layout (from the PDB types). |
-| Do not use | mingw (other C++ ABI), xwin (needs a Microsoft licence acceptance), `-fms-compatibility-version=16` (removes `char16_t`, Wine headers fail) |
+| Do not use | mingw (other C++ ABI), xwin (not needed: we have the real SDK 7.1 compilers), `-fms-compatibility-version=16` (removes `char16_t`, Wine headers fail) |
 | Test | `hello.exe` with a virtual class: output `lift ok 2 32` under Wine. |
 
 ## Repo layout
@@ -133,6 +133,15 @@ Source: PDB S_COMPILE3, PE linker version, Rich header.
 2. Diff each function of our exe against the original 2019 exe. Use our PDB on our exe and the original PDB on the original exe.
 3. Tool candidates: reccmp (per-function accuracy score, HTML report, JSON baseline), objdiff (per-object), BinDiff, Diaphora.
 4. Fix the source until each function matches, or mark the difference with `// LIFT:`.
+
+VS2010 SP1 compiler (user approved the download and the Microsoft licence, 2026-11-17):
+
+| File | Source | Gives |
+| --- | --- | --- |
+| `GRMSDKX_EN_DVD.iso` | Windows SDK 7.1, download.microsoft.com (id 8442) | VC++ 2010 x64 cl + link + CRT |
+| `VC-Compiler-KB2519277.exe` | VC++ 2010 SP1 compiler update (id 4422) | cl 16.00.40219.1 (same as the original) |
+
+- Location: `~/toolchains/vs2010/` (outside the repo). Never commit it.
 
 Step 2 now (without VS2010): `tools/funcdiff.py <Server>`. reccmp is x86 only, so this is x64 glue.
 

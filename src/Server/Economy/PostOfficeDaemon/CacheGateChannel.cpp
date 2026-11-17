@@ -135,7 +135,7 @@ bool CacheGateChannel::SendRelayRequest(RelayContext const* const relayContext)
         return false;
     }
 
-    Packet packet{};  // LIFT: inlined constructor
+    Packet packet = {};  // LIFT: inlined constructor
     packet.Allocate();
     if (composeRelayHeader(packet, relayContext->MakeRelayHeader()) && relayContext->ComposeRequestPacket(packet))
     {

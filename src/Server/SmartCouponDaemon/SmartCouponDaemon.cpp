@@ -302,7 +302,9 @@ bool SmartCouponDaemon::initialize()
     {
         // The pool reads the vtable of a sample object. The original (0x153E9) builds it on the stack
         // and never calls its destructor. A destructor call logs "ref:1, tag:0xfa" (RefCntObject.h,129).
-        alignas(EventNotiJob) unsigned char tmpStorage[sizeof(EventNotiJob)];
+        // VS2010 has no alignas. 16 covers EventNotiJob.
+        static_assert(__alignof(EventNotiJob) <= 16, "EventNotiJob alignment");
+        __declspec(align(16)) unsigned char tmpStorage[sizeof(EventNotiJob)];
         EventNotiJob* tmp = new (tmpStorage) EventNotiJob();
         EventNotiJob::_pool.Initialize(*reinterpret_cast<void**>(tmp), _config->_initJobCount,
                                        _config->_reuseWaitTime);

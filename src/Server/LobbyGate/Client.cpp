@@ -580,7 +580,7 @@ void ClientManager::BroadcastAnnounceNotify(wchar_t const* message)
                    L"[client session handler], broadcast announce notify fail; invalid parameter");
         return;
     }
-    Packet packet{};  // LIFT: inlined constructor
+    Packet packet = {};  // LIFT: inlined constructor
     if (packet.Compose("hs", 11, message) == 0)
     {
         Log::Write(Log::LT_ERROR, CLIENT_FILE, 806,
