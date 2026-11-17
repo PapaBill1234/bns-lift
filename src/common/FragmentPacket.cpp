@@ -169,10 +169,10 @@ void FragmentPacket::IncRepeatCount()
 }
 
 // 0x38a0 (Client.obj copy)
-int FragmentPacket::FreeSize() const
+unsigned short FragmentPacket::FreeSize() const
 {
     if (packet.CurHeader != nullptr)
-        return static_cast<unsigned int>(4000 - packet.CurHeader->size);
+        return static_cast<unsigned short>(4000 - packet.CurHeader->size);
     return 0;
 }
 

@@ -25,7 +25,8 @@ wchar_t const* const SESSION_FILE = L"source\\Session.cpp";
 wchar_t const* const CHANNEL_H_FILE =
     L"E:\\DailyBuild02\\LobbyGate-Common-0.0.348\\depot\\Branch\\348NC\\Program\\Server\\BloodLib\\include\\Channel.h";
 
-typedef std::vector<Client*, StlAllocator<Client*, 2> > ClientList;  // ❓ typedef name
+// PDB S_UDT ClientList (LobbyGate type 0x2A2F, in ClientManager::DisconnectAll).
+typedef std::vector<Client*, StlAllocator<Client*, 2> > ClientList;
 
 // ❓ Inlined array new: the element count is in the first 8 bytes, then each element is constructed.
 template <class T>
@@ -792,9 +793,9 @@ bool ClientSessionHandler::PacketHandler(Session const* session, Packet const* p
 }
 
 // 0x6da0
-short ClientSessionHandler::SwitchCmdLobbyGateToLobbyDaemon(short cmd)
+short ClientSessionHandler::SwitchCmdLobbyGateToLobbyDaemon(short lobbyGateCmd)
 {
-    switch (cmd)
+    switch (lobbyGateCmd)
     {
     case 12: return 23;
     case 13: return 24;
@@ -881,9 +882,9 @@ bool ClientSessionTimerJob::HandleEvent(EventContext* context, unsigned long num
 }
 
 // 0x7180
-unsigned int ClientManager::DisconnectAll()
+int ClientManager::DisconnectAll()
 {
-    unsigned int count = 0;
+    int count = 0;
     ClientList clients;
     unsigned long long maxSize = 0;
     for (int i = 0; i < _hashCount; ++i)

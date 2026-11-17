@@ -192,7 +192,7 @@ void JobManager::Execute(CouponJob* job, int task, void* param)
 }
 
 // 0x7220
-bool JobManager::ExecuteW(unsigned long long jobid, void* param)
+bool JobManager::ExecuteW(unsigned long long jobid, int task, void* param)
 {
     CouponJob* const job = find(jobid);
     if (job == nullptr)
@@ -200,7 +200,7 @@ bool JobManager::ExecuteW(unsigned long long jobid, void* param)
         Log::Write(Log::LT_ERROR, kFile, 218, L"[job-mgr], execute fail; no such job, jobid:0x%I64X", jobid);
         return false;
     }
-    Execute(job, 2, param);
+    Execute(job, task, param);
     job->removeReferenceCount(kFile, 224);
     return true;
 }

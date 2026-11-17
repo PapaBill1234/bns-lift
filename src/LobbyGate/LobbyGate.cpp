@@ -212,7 +212,7 @@ void LobbyGate::AddJobTimer(unsigned long long gateKey, char reason)
         timer->prev = nullptr;
         timer->SlotIndex = -1;
         timer->InLtq = false;
-        timer->_timerReason = reason;
+        timer->_timerReason = static_cast<ClientSessionTimerJob::TimerReason>(reason);
         timer->_key = gateKey;
     }
     if (!GlobalTimerQueue->Add(_config->_closeTimeout, timer))
@@ -588,7 +588,7 @@ bool LobbyGateCooldownTimer::HandleEvent(EventContext* context, unsigned long nu
 {
     LobbyGate* const lobbyGate = LobbyGate::_instance;
     _elapsed += 3000;
-    int const remainClient = static_cast<int>(lobbyGate->_clientManager->DisconnectAll());
+    int const remainClient = lobbyGate->_clientManager->DisconnectAll();
     int remainTime = 0;
     if (_completeDelay - _elapsed > 0)
         remainTime = _completeDelay - _elapsed;

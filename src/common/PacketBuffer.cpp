@@ -575,7 +575,9 @@ PacketBuffer* PacketBufferAllocator::allocate(int count)
 
 // PostOfficeDaemon PDB: text packets.
 
-wchar_t const* HEX_PREFIXES[] = {L"0x", L"0X", nullptr};  // ❓ type
+// PDB S_CONSTANT HEX_PREFIX_LEN (const int, 2) and S_LDATA32 HEX_PREFIXES (const wchar_t*[3]).
+static int const HEX_PREFIX_LEN = 2;
+static wchar_t const* HEX_PREFIXES[3] = {L"0x", L"0X", nullptr};
 
 // 0x2F530 (PostOfficeDaemon)
 unsigned short PacketBuffer::ComposeText(char* buffer, unsigned int count, char const* format,
@@ -640,7 +642,7 @@ bool isHex(wchar_t const* num)
 {
     for (long long i = 0; HEX_PREFIXES[i] != nullptr; ++i)
     {
-        if (wcsncmp(num, HEX_PREFIXES[i], 2) == 0)
+        if (wcsncmp(num, HEX_PREFIXES[i], HEX_PREFIX_LEN) == 0)
             return true;
     }
     return false;

@@ -33,8 +33,8 @@ public:
 
     void StartRepeat();                                 // 0x37f0
     void IncRepeatCount();                              // 0x3840
-    int FreeSize() const;                               // 0x38a0 ❓ return type
-    unsigned short Compose(int n, ...);                 // 0x38c0 ❓ return type
+    unsigned short FreeSize() const;                    // 0x38a0
+    unsigned short Compose(int n, ...);                 // 0x38c0
 
     int count;
     Packet packet;
