@@ -1,4 +1,4 @@
-// SendPublicationEvent (SmartCouponDaemon PDB). ❓ The PDB module of this class is not known.
+// SendPublicationEvent (SmartCouponDaemon PDB). The bodies are in GameEventWorker.obj (Mod 0011). LIFT: header file.
 // Layouts from include/pdb/SmartCouponDaemon/types.h.
 #pragma once
 #include <stddef.h>

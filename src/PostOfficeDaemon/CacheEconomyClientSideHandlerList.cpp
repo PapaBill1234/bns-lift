@@ -28,5 +28,5 @@ Daemon::PacketHandler CacheEconomyPacketClientSideHandlerList[22] = {
     HandleCacheEconomyDeliverPostFail,
 };
 
-// 0x98aa0 (.bss, all entries are zero). ❓ size 22 from the distance to the next symbol (0x98b50).
+// 0x98aa0 (.bss, all entries are zero). PDB: LF_ARRAY 0x26A2, 176 bytes = 22 entries.
 Daemon::PacketHandler CacheEconomyPacketClientSideFragmentHandlerList[22] = {};

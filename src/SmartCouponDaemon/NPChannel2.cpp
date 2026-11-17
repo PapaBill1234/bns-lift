@@ -37,8 +37,9 @@ unsigned int NPPing::_class = 0;
 unsigned long long NPPing::_id = 0;
 long NPPing::_interval = 0;
 
-// ❓ Thread-local buffers of the original (TLS area).
-static __declspec(thread) unsigned char t_buildBuffer[64000];
+// PDB: NPChannel::_buffer (S_GTHREAD32, TLS +0x40, unsigned char[64000]).
+__declspec(thread) unsigned char NPChannel::_buffer[64000];
+// LIFT: name. TLS +0xFA40 (0x5C87) has no PDB symbol.
 static __declspec(thread) char t_addressBuffer[32];
 
 // LIFT: Packet has no constructor. The original sets these fields inline.
@@ -428,8 +429,8 @@ bool NPChannel::SendMsg(_StsMsg* msg, bool response, void* context)
     }
 
     _StsMsgBuffer buffer;
-    buffer.pData = t_buildBuffer;
-    buffer.nLen = sizeof(t_buildBuffer);
+    buffer.pData = NPChannel::_buffer;
+    buffer.nLen = sizeof(NPChannel::_buffer);
     EStsMsgError err = _sts->Build(msg, &buffer);
     if (err == 1)
     {

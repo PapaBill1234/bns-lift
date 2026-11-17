@@ -676,7 +676,7 @@ void PostOfficeDaemon::shutdown()
     Network::StopPort(1);
     Network::ClosePort(1);
     Network::Clear();
-    // Inlined Db cleanup. ❓ name. The Db type record has no cleanup method (only Clear(uint) and initEnv).
+    // LIFT: inlined Db cleanup, no PDB name. The Db type record has no cleanup method (only Clear(uint) and initEnv).
     if (Db::EnvHandle != nullptr)
     {
         SQLFreeHandle(SQL_HANDLE_ENV, Db::EnvHandle);

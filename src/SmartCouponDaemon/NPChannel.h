@@ -518,6 +518,7 @@ public:
     static StsMsgLib::IStsMsg* (*_stsCreate)();
     static void (*_stsCleanUp)(StsMsgLib::IStsMsg*);
     static bool _recvCompletionLog;
+    static __declspec(thread) unsigned char _buffer[64000];  // PDB S_GTHREAD32
 
     StsMsgLib::IStsMsg* _sts;
     NPMessageHandler* _handler;

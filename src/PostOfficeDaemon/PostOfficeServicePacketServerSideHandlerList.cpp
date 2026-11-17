@@ -1,4 +1,4 @@
-// Handler tables for the world sessions (PostOfficeDaemon .data). ❓ file name: the PDB has no module for the tables.
+// Handler tables for the world sessions (PostOfficeDaemon .data). LIFT: file name. The PDB has no module for the tables.
 #include "WorldPacketHandler.h"
 #include "ThreadFreePacketPump.h"
 

@@ -41,7 +41,7 @@ static_assert(sizeof(EventNotiJob) == 0x90, "sizeof EventNotiJob");
 static_assert(offsetof(EventNotiJob, _gameAccountId) == 0x50, "EventNotiJob::_gameAccountId");
 static_assert(offsetof(EventNotiJob, _managementReason) == 0x88, "EventNotiJob::_managementReason");
 
-// ❓ Header placement. The HandleEvent bodies are in GameEventWorker.obj.
+// LIFT: header placement. The HandleEvent bodies are in GameEventWorker.obj.
 class SendRetryCouponPublicationOkEvent : public DynamicEventObject
 {
 public:

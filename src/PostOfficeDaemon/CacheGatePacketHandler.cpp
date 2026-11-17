@@ -276,7 +276,7 @@ bool HandleCacheGateRelayFail(Session const* session, Packet const* packet)
 
     // The original has one case body for each hint. All case bodies are the same except the text.
     Log::Write(Log::LT_ERROR, CGPH_FILE, errorLine, errorText, MODULE_NAME, func, relayTid, static_cast<int>(relayFailReason));
-    DeliverPostRelayResponse response;  // ❓ the original uses this response class for all hints
+    DeliverPostRelayResponse response;  // All 4 hint cases store vftable 0x8CA20 (DeliverPostRelayResponse, 0x87E7).
     response._resultState = RelayResponse::RESULTSTATE_RELAY_ERROR;
     response._failReason = relayFailReason;
     if (!relayContext->ProcessRelayResponse(&response))
@@ -379,7 +379,7 @@ bool HandleCacheGateRelayInvalid(Session const* session, Packet const* packet)
 
     Log::Write(Log::LT_ERROR, CGPH_FILE, errorLine, errorText, MODULE_NAME, func, relayTid,
                static_cast<int>(relayInvalidReason));
-    DeliverPostRelayResponse response;  // ❓ the original uses this response class for all hints
+    DeliverPostRelayResponse response;  // All 4 hint cases store vftable 0x8CA20 (DeliverPostRelayResponse).
     response._resultState = RelayResponse::RESULTSTATE_RELAY_ERROR;
     response._failReason = relayInvalidReason;
     if (!relayContext->ProcessRelayResponse(&response))

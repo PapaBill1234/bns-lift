@@ -25,7 +25,7 @@ static void zeroPacket(Packet* packet)
     packet->ListTail = nullptr;
 }
 
-// ❓ Inlined connected check (Session lock, state and socket).
+// LIFT: not in the PDB. Inlined connected check (Session lock, state and socket).
 static bool isConnected(Session* session)
 {
     session->_lock.Enter();
