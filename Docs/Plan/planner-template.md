@@ -30,7 +30,7 @@ One row per line. 9 columns, separated by one TAB. No header is necessary.
 | --- | --- |
 | id | `lift-{SLUG}-N`, `lift-{SLUG}-verify` or `lift-<next slug>-plan` |
 | kind | `lift` |
-| model | `opus` |
+| model | `opus` for lift, verify and planner cards (code reversing). `sonnet:medium` for a docs-only card. See "Model per card" in `Docs/Parity/README.md`. |
 | crate | `-` |
 | paths | Comma list of the card "Files" (no spaces). Planner: `Docs/Plan/cards/,Docs/Plan/queue/` |
 | deps | Card 1: `{PREV_DEP}`. Card N: `lift-{SLUG}-<N-1>`. Verify and next planner: the last lift card. |

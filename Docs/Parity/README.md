@@ -60,6 +60,15 @@ src ──► tools/gate.sh (clang) ──► build/build.ninja ──► tools/
 - Pseudocode of the original: `~/.cache/bns-lift/hr/<EXE>/` (`index.tsv`, one `.c` per PDB module).
 - Progress: `progress.tsv` (one row per accepted card).
 
+## Model per card
+The queue column `model` takes `opus`, `sonnet:high` or `sonnet:medium`. The runner gives `--model` and `--effort` to the session. A fix round 2 or later always uses `opus`.
+
+| Model | Use it for |
+| --- | --- |
+| `opus` | Complex code reversing, IDA work, plans, specs, rules, bug and exploit judgement, parity reviews, stall checks, DIFF functions with no known cause |
+| `sonnet:high` | Apply a known fix pattern to named functions, Rust from a spec, gate and build errors, helper scripts (IDAPython, Diaphora, funcdiff), tests |
+| `sonnet:medium` | Docs and README updates, ASD-STE100 rewrites, notes tidying, card files after a review named the causes, rules-proposal text into the lift rules, log summaries |
+
 ## Rules
 | Rule | Why |
 | --- | --- |
