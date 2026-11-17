@@ -21,6 +21,8 @@ struct AlertBufferList;
 class AlertSender;
 struct AssertInfo;
 struct AsyncConnectContext;
+struct AsyncRecvContext;
+struct AsyncSendContext;
 class AtomicOperation;
 class AutoCS;
 class AutoDbTran;
@@ -170,6 +172,7 @@ class RepeatPacketDecomposer;
 class RetrieveEventLogContext;
 class RetrievePublicationContext;
 class RetryCouponPublicationEvent;
+struct SCOPE_ID;
 struct SC_HANDLE__;
 struct SERVICE_STATUS_HANDLE__;
 namespace STSMSGLIB_CHECK_DLL_VERSION::__l12 {
@@ -1536,11 +1539,24 @@ struct ZSTD_outBuffer_s;
 struct ZSTD_parameters;
 struct ZSTD_prefixDict_s;
 struct ZSTD_window_t;
+struct _FILETIME;
+struct _GUID;
+union _LARGE_INTEGER;
+struct _OVERLAPPED;
+struct _RTL_CRITICAL_SECTION;
+struct _RTL_SRWLOCK;
+struct _SERVICE_STATUS;
+struct _SYSTEMTIME;
+union _ULARGE_INTEGER;
+struct _WSABUF;
+struct _cidraddress;
+struct _s_ThrowInfo;
 struct addrinfo;
 struct cachedLiteralPrice_t;
 struct fseWkspMax_t;
 struct group_filter;
 union id128;
+struct in_addr;
 struct ip_msfilter;
 struct ldmEntry_t;
 struct ldmParams_t;
@@ -1553,6 +1569,9 @@ struct rawSeqStore_t;
 struct repcodes_s;
 struct seqDef_s;
 struct seqStore_t;
+struct sockaddr;
+struct sockaddr_in;
+struct sockaddr_storage;
 
 enum ADDRESS_MODE : int {
     AddrMode1616 = 0x0,
@@ -1801,6 +1820,246 @@ enum NPChatChannelType : int {
     NP_CHAT_CHANNEL_TYPE_COUNT = 0x13,
 };
 
+namespace StsMsgLib {
+enum ECommand : int {
+    COMMAND_INVALID = -1,
+    COMMAND_NONE = 0x0,
+    COMMAND_INITIAL_CONNECT = 0x3E9,
+    COMMAND_PING = 0x3EA,
+    COMMAND_COMMON_PRES_USER_INFO = 0x4B1,
+    COMMAND_COMMON_PRES_WHISPER = 0x4B2,
+    COMMAND_COMMON_GATE_CUSTOM_MESSAGE = 0x641,
+    COMMAND_COMMON_WORLD_LIST_WORLDS = 0x6A5,
+    COMMAND_COMMON_SECONDPWD_GET_STATUS = 0x6AF,
+    COMMAND_COMMON_GRADE_LIST_GRADES = 0x6B9,
+    COMMAND_COMMON_GRADE_GET_LEVEL = 0x6BA,
+    COMMAND_COMMON_GRADE_LIST_LEVELS = 0x6BB,
+    COMMAND_COMMON_GRADE_GET_BASE_GRADEID_ACTIVATION = 0x6BC,
+    COMMAND_COMMON_GRADE_LIST_ALL_GRADES = 0x6BD,
+    COMMAND_COMMON_SLOT_LIST_SLOTS = 0x5DD,
+    COMMAND_COMMON_SLOT_GET_SLOT = 0x5DE,
+    COMMAND_COMMON_GOODS_LIST_CATEGORY_IDS = 0x777,
+    COMMAND_COMMON_GOODS_GET_GAME_GOODS_BY_CATEGORY_ID = 0x778,
+    COMMAND_COMMON_GOODS_GET_REVISION = 0x779,
+    COMMAND_COMMON_PURCHASE_PURCHASE = 0x781,
+    COMMAND_COMMON_PROMOTIONSTAMP_LIST_CURRENT_PROMOTIONS = 0x673,
+    COMMAND_COMMON_PROMOTIONSTAMP_GET_PROMOTION_POLICY = 0x674,
+    COMMAND_COMMON_PROMOTIONSTAMP_GET_USER_PROMOTION_STATUS = 0x675,
+    COMMAND_COMMON_PROMOTIONSTAMP_ATTEND_PROMOTION = 0x676,
+    COMMAND_COMMON_PROMOTIONSTAMP_ATTEND_PROMOTION_SECURED = 0x677,
+    COMMAND_COMMON_PROMOTIONSTAMP_REQUEST_REWARD_DELIVERY = 0x678,
+    COMMAND_COMMON_PROMOTIONSTAMP_LIST_INVALID_REWARD_DELIVERIES = 0x679,
+    COMMAND_SRV_AUTH_CONSUME_GAME_TOKEN = 0x835,
+    COMMAND_SRV_AUTH_CREATE_ACCOUNT = 0x836,
+    COMMAND_SRV_AUTH_GET_GAME_ACCOUNT_ID = 0x837,
+    COMMAND_SRV_AUTH_LINK_GAME_ACCOUNT = 0x838,
+    COMMAND_SRV_AUTH_LOGIN_WEB_START = 0x839,
+    COMMAND_SRV_AUTH_IS_USER_NAME_CHANGEABLE_INCOMPLETE = 0x83A,
+    COMMAND_SRV_AUTH_GET_USER_NAME_CHANGEABLE_INCOMPLETE = 0x83B,
+    COMMAND_SRV_AUTH_CHANGE_MY_USER_NAME_INCOMPLETE = 0x83C,
+    COMMAND_SRV_AUTH_GET_USER_INFO = 0x83D,
+    COMMAND_SRV_GAMEACCOUNT_LIST_USER_LAST_PRESENCES = 0x8CB,
+    COMMAND_SRV_PROFILE_GET_USER_PROFILE = 0x8D5,
+    COMMAND_SRV_GAMETIME_GET_GAME_TIME = 0x8DF,
+    COMMAND_SRV_GROUP_SET_GROUP_DATA = 0x8FD,
+    COMMAND_SRV_GROUP_GET_GROUP_INFO = 0x8FE,
+    COMMAND_SRV_GROUP_JOIN = 0x8FF,
+    COMMAND_SRV_GROUP_INVITE = 0x900,
+    COMMAND_SRV_GROUP_SET_ROLE = 0x901,
+    COMMAND_SRV_GROUP_GROUP_INFO = 0x902,
+    COMMAND_SRV_GROUP_SET_WATCH = 0x903,
+    COMMAND_SRV_GROUP_USER_INFO = 0x904,
+    COMMAND_SRV_GAMEGROUP_REQUEST_VALIDATE_GROUP = 0x957,
+    COMMAND_SRV_GAMEGROUP_REQUEST_GET_CHANNEL_PROPERTY = 0x958,
+    COMMAND_SRV_GAMEGROUP_REQUEST_GROUP_INFO = 0x959,
+    COMMAND_SRV_CHANNEL_SET_PERMISSION_GROUP = 0x961,
+    COMMAND_SRV_CHANNEL_UNSET_PERMISSION_GROUP = 0x962,
+    COMMAND_SRV_CHANNEL_DELETE_GROUP_CHANNEL = 0x963,
+    COMMAND_SRV_CHANNEL_KICK = 0x964,
+    COMMAND_SRV_CHANNEL_SET_PERMISSION_MEMBER_CHANNELS = 0x965,
+    COMMAND_SRV_CHANNEL_UNSET_PERMISSION_MEMBER_CHANNELS = 0x966,
+    COMMAND_SRV_PRES_LOGIN = 0x899,
+    COMMAND_SRV_PRES_LOGOUT = 0x89A,
+    COMMAND_SRV_PRES_WHISPER = 0x89B,
+    COMMAND_SRV_PRES_SET_USER_DATA = 0x89C,
+    COMMAND_SRV_PRES_GET_USER_INFO = 0x89D,
+    COMMAND_SRV_PRES_SET_WATCH = 0x89E,
+    COMMAND_SRV_PRES_LOGOUT_USER = 0x89F,
+    COMMAND_SRV_PRES_SET_APP_DATA = 0x8A0,
+    COMMAND_SRV_PRES_MESSAGE = 0x8A1,
+    COMMAND_SRV_PRES_KICK = 0x8A2,
+    COMMAND_SRV_SLOT_CREATE_SLOTS = 0x9C5,
+    COMMAND_SRV_SLOT_DELETE_SLOT = 0x9C6,
+    COMMAND_SRV_SLOT_SET_DATA = 0x9C7,
+    COMMAND_SRV_SLOT_RESET_DATA = 0x9C8,
+    COMMAND_SRV_GATE_FIND = 0xA29,
+    COMMAND_SRV_GATE_REGISTER_SERVICE = 0xA2A,
+    COMMAND_SRV_GATE_UNREGISTER_SERVICE = 0xA2B,
+    COMMAND_SRV_GATE_UPDATE_WORLD_PROPERTY = 0xA2C,
+    COMMAND_SRV_GATE_GAMEACCOUNT_GET_ATTRIBUTES = 0xA2D,
+    COMMAND_SRV_GATE_REGISTER_WAREHOUSE_SERVICE = 0xA2E,
+    COMMAND_SRV_WORLD_GET_STATUS = 0xA8D,
+    COMMAND_SRV_SECONDPWD_IS_VERIFIED = 0xA97,
+    COMMAND_SRV_GRADE_ACTIVATE_GRADE = 0xAA1,
+    COMMAND_SRV_GRADE_ADD_GRADE_SCORE = 0xAA2,
+    COMMAND_SRV_GRADE_NOTIFY_GRADE_CHANGED = 0xAA3,
+    COMMAND_SRV_GRADE_NOTIFY_SCORE_CHANGED = 0xAA4,
+    COMMAND_SRV_FRIEND_SEND_MESSAGE = 0xABF,
+    COMMAND_SRV_CONTENTBAN_LIST_USER_BANS = 0xADD,
+    COMMAND_SRV_MTX_LIST_GOODS_INFOS = 0xAF1,
+    COMMAND_SRV_MTX_GET_GOODS_INFO = 0xAF2,
+    COMMAND_SRV_MTX_INVALID_GOODS_INVENTORY_INFO = 0xAF3,
+    COMMAND_SRV_MTX_ELIMINATE_GOODS_INVENTORY = 0xAF7,
+    COMMAND_SRV_GOODS_LIST_GOODS_INFOS = 0xAF8,
+    COMMAND_SRV_WAREHOUSE_REQUEST_GOODS_INFO_CHANGED = 0xAFA,
+    COMMAND_SRV_WAREHOUSE_REQUEST_GOODS_INVENTORY_CHANGED = 0xAFB,
+    COMMAND_SRV_WAREHOUSE_GET_GOODS_COUNT = 0xAFC,
+    COMMAND_SRV_WAREHOUSE_LIST = 0xAFD,
+    COMMAND_SRV_WAREHOUSE_TAKE = 0xAFE,
+    COMMAND_SRV_CHARGE_GET_INFO = 0xB55,
+    COMMAND_SRV_CHARGE_START = 0xB56,
+    COMMAND_SRV_CHARGE_STOP = 0xB57,
+    COMMAND_SRV_CHARGE_REQUEST_STOP = 0xB58,
+    COMMAND_SRV_CHARGE_ABANDON = 0xB59,
+    COMMAND_SRV_CHARGE_NOTIFY_REMAIN_TIME = 0xB5A,
+    COMMAND_SRV_CHARGE_NOTIFY_APPLY_NEW_CHARGE_ITEM = 0xB5B,
+    COMMAND_SRV_PURCHASE_GET_PURCHASE = 0xB69,
+    COMMAND_SRV_REFUND_REFUND_AGENCY_PURCHASE = 0xB4B,
+    COMMAND_SRV_REWARDBROKER_EVENT_NOTI = 0xB23,
+    COMMAND_SRV_REWARD_REQUEST_REWARD_FOR_EVENT = 0xB24,
+    COMMAND_SRV_AUCTION_ESCROW = 0xB91,
+    COMMAND_SRV_AUCTION_ROLLBACK_ESCROW = 0xB92,
+    COMMAND_SRV_AUCTION_DELIVER = 0xB93,
+    COMMAND_SRV_AUCTION_BID = 0xB94,
+    COMMAND_SRV_VIRTUALCURRENCY_DEPOSIT = 0xBA5,
+    COMMAND_SRV_RISKMGMT_INQUIRY = 0xA1F,
+    COMMAND_COMMON_FOLLOW_FOLLOWED = 0xBB9,
+    COMMAND_CLI_AUTH_LOGIN_START = 0xC1D,
+    COMMAND_CLI_AUTH_LOGIN_KEY_DATA = 0xC1E,
+    COMMAND_CLI_AUTH_LOGIN_FINISH = 0xC1F,
+    COMMAND_CLI_AUTH_LOGOUT = 0xC21,
+    COMMAND_CLI_AUTH_GAME_ACCOUNT_LIST = 0xC22,
+    COMMAND_CLI_AUTH_REQUEST_GAME_TOKEN = 0xC23,
+    COMMAND_CLI_AUTH_CHANGE_MY_PASSWORD = 0xC24,
+    COMMAND_CLI_AUTH_RESET_PASSWORD = 0xC25,
+    COMMAND_CLI_AUTH_REQUEST_TOKEN = 0xC26,
+    COMMAND_CLI_AUTH_LOGIN_TOKEN_START = 0xC27,
+    COMMAND_CLI_AUTH_TOKEN_KEY_DATA = 0xC28,
+    COMMAND_CLI_AUTH_VERIFY_MOBI_OTP = 0xC29,
+    COMMAND_CLI_AUTH_GET_MY_USER_INFO = 0xC2A,
+    COMMAND_CLI_AUTH_GET_USERS_INFO = 0xC2B,
+    COMMAND_CLI_AUTH_VERIFY_SECONDARY_AUTH = 0xC2C,
+    COMMAND_CLI_AUTH_GET_SECURITY_CARD_CODE_INDEX = 0xC2D,
+    COMMAND_CLI_AUTH_REGISTER_SECONDARY_PASSWORD = 0xC2E,
+    COMMAND_CLI_PRES_LOGOUT_USER = 0xC81,
+    COMMAND_COMMON_PRES_MESSAGE = 0xC82,
+    COMMAND_CLI_GRADE_REWARD = 0xE89,
+    COMMAND_CLI_SHOWCASE_LIST_CURRENT_GOODS_BY_CATEGORY_ID = 0xE9D,
+    COMMAND_CLI_SHOWCASE_GET_USER_SALE_PRICE_BY_GOODS_ID = 0xE9E,
+    COMMAND_CLI_SHOWCASE_LIST_GOODS_SALE_PRICE = 0xE9F,
+    COMMAND_CLI_SHOWCASE_GET_GOODS_DISPLAY_REVISION = 0xEA0,
+    COMMAND_CLI_SHOWCASE_LIST_DISPLAY_CATEGORY = 0xEA1,
+    COMMAND_CLI_FRIEND_PROPOSE = 0xEA7,
+    COMMAND_CLI_FRIEND_DENY_PROPOSAL = 0xEA8,
+    COMMAND_CLI_FRIEND_ACCEPT_PROPOSAL = 0xEA9,
+    COMMAND_CLI_FRIEND_PAGE_RECV_PROPOSALS = 0xEAA,
+    COMMAND_CLI_FRIEND_REMOVE = 0xEAB,
+    COMMAND_CLI_FRIEND_CHANGE_ALIAS = 0xEAC,
+    COMMAND_CLI_FRIEND_GET_USERINFO = 0xEAD,
+    COMMAND_CLI_FRIEND_GET_RELATIONS = 0xEAE,
+    COMMAND_CLI_FRIEND_PAGE_FRIENDS = 0xEAF,
+    COMMAND_CLI_FRIEND_PROPOSED = 0xEB0,
+    COMMAND_CLI_FRIEND_PROPOSAL_ACCEPTED = 0xEB1,
+    COMMAND_CLI_FRIEND_PROPOSAL_DENIED = 0xEB2,
+    COMMAND_CLI_FRIEND_INFO = 0xEB3,
+    COMMAND_CLI_FRIEND_MESSAGE = 0xEB4,
+    COMMAND_CLI_FRIEND_USER_NAME_CHANGED = 0xEB5,
+    COMMAND_CLI_FRIEND_REMOVED = 0xEB6,
+    COMMAND_CLI_TENCENT_PURCHASE_TOKEN = 0xEBB,
+    COMMAND_CLI_INGAMESHOP_PURCHASE = 0xF6F,
+    COMMAND_CLI_INGAMESHOP_PAGE_PURCHASE_HISTORY = 0xF70,
+    COMMAND_CLI_INGAMESHOP_GET_CATEGORIES = 0xF71,
+    COMMAND_CLI_INGAMESHOP_GET_GOODS_BY_CATEGORYID = 0xF72,
+    COMMAND_CLI_INGAMESHOP_GET_GOODS_BY_GOODSID = 0xF73,
+    COMMAND_CLI_INGAMESHOP_GET_DISPLAY_REVISION = 0xF74,
+    COMMAND_CLI_INGAMESHOP_GET_BALANCE = 0xF75,
+    COMMAND_CLI_INGAMESHOP_LIST_GOODS_LIMITS = 0xF76,
+    COMMAND_CLI_AUCTION_SELL = 0xF79,
+    COMMAND_CLI_AUCTION_CANCEL_SALE = 0xF7A,
+    COMMAND_CLI_AUCTION_BID = 0xF7B,
+    COMMAND_CLI_AUCTION_PAGE_ITEMS = 0xF7C,
+    COMMAND_CLI_AUCTION_PAGE_MY_SALES = 0xF7D,
+    COMMAND_CLI_AUCTION_PAGE_MY_SALE_HISTORY = 0xF7E,
+    COMMAND_CLI_AUCTION_PAGE_MY_BUY_HISTORY = 0xF7F,
+    COMMAND_CLI_AUCTION_LIST_POLICIES = 0xF80,
+    COMMAND_CLI_AUCTION_GET_STATISTICS = 0xF81,
+    COMMAND_CLI_AUCTION_GET_BALANCE = 0xF82,
+    COMMAND_CLI_AUCTION_NOTIFY_EVENT = 0xF83,
+    COMMAND_CLI_SECONDPASSWORD_CREATE = 0xE7F,
+    COMMAND_CLI_SECONDPASSWORD_CANCEL_DELETE = 0xE80,
+    COMMAND_CLI_SECONDPASSWORD_CHANGE_MY_PASSWORD = 0xE81,
+    COMMAND_CLI_SECONDPASSWORD_CHANGE_MY_ACTION_MASK = 0xE82,
+    COMMAND_CLI_SECONDPASSWORD_ENABLE_MY_ACTION_MASK = 0xE83,
+    COMMAND_CLI_SECONDPASSWORD_DISABLE_MY_ACTION_MASK = 0xE84,
+    COMMAND_CLI_SECONDPASSWORD_VERIFY = 0xE85,
+    COMMAND_CLI_VIRTUALCURRENCY_GET_BALANCE = 0xF8D,
+    COMMAND_CLI_VIRTUALCURRENCY_NOTIFY_BALANCE_CHANGED = 0xF8E,
+    COMMAND_CLI_INGAMESHOP_WISH_WISH = 0xF97,
+    COMMAND_CLI_INGAMESHOP_WISH_ACCEPT = 0xF98,
+    COMMAND_CLI_INGAMESHOP_WISH_REJECT = 0xF99,
+    COMMAND_CLI_INGAMESHOP_WISH_PAGE_WISHES = 0xF9A,
+    COMMAND_CLI_INGAMESHOP_WISH_PAGE_RECEIVED_WISHES = 0xF9B,
+    COMMAND_CLI_INGAMESHOP_WISH_GET_WISH_COUNT_AT_TODAY = 0xF9C,
+    COMMAND_CLI_INGAMESHOP_WISH_IS_OPTOUT_USER = 0xF9D,
+    COMMAND_CLI_INGAMESHOP_WISH_CHANGE_OPTOUT = 0xF9E,
+    COMMAND_CLI_PROMOTIONSTAMP_GOODS_CATEGORYID_LIST = 0xE49,
+    COMMAND_CLI_PROMOTIONSTAMP_GOODS_BY_CATEGORYID = 0xE4A,
+    COMMAND_CLI_PROMOTIONSTAMP_GOODS_BY_GOODSID = 0xE4B,
+    COMMAND_CLI_PROMOTIONSTAMP_GOODS_REVISION = 0xE4C,
+    COMMAND_CLI_COUPON_REGISTER_USER_COUPON = 0xF5B,
+    COMMAND_CLI_COUPON_GET_USER_COUPON_COUNT = 0xF5C,
+    COMMAND_CLI_COUPON_PAGE_USER_COUPONS = 0xF5D,
+    COMMAND_CLI_COUPON_USE_GOODS_COUPON = 0xF5E,
+    COMMAND_CLI_PG_DR_DIRECT_PURCHASE = 0xF65,
+    COMMAND_CLI_PG_CHECK_DR_BILLING_INFO = 0xF66,
+    COMMAND_CLI_PG_CHECK_CURRENCY_LOCKING = 0xF67,
+    COMMAND_CLI_PG_PAGE_PAYMENT_ORDER = 0xF68,
+    COMMAND_CLI_GOODS_PAGE_SEARCH_GOODS = 0xF47,
+    COMMAND_CLI_GOODS_LIST_GAME_GOODS = 0xF48,
+    COMMAND_CLI_GOODS_CHECK_NEW_GOODS = 0xF49,
+    COMMAND_CLI_GOODS_GET_SALE_GOODS = 0xF4A,
+    COMMAND_CLI_SLOT_SET_DATA = 0xDAD,
+    COMMAND_CLI_REPORT_ADD_REPORT = 0xF29,
+    COMMAND_CLI_CHANNEL_CREATE = 0xD49,
+    COMMAND_CLI_CHANNEL_JOIN = 0xD4A,
+    COMMAND_CLI_CHANNEL_LEAVE = 0xD4B,
+    COMMAND_CLI_CHANNEL_LOGOUT = 0xD4C,
+    COMMAND_CLI_CHANNEL_TALK = 0xD4D,
+    COMMAND_CLI_CHANNEL_NOTIFY_TALK = 0xD4E,
+    COMMAND_CLI_CHANNEL_NOTIFY_USER_INFO = 0xD4F,
+    COMMAND_CLI_CHANNEL_NOTIFY_CHANNEL_INFO = 0xD50,
+    COMMAND_CLI_CHANNEL_JOIN_GROUP_CHANNEL = 0xD51,
+    COMMAND_CLI_CHANNEL_PAGE_MEMBERS = 0xD52,
+    COMMAND_CLI_CHANNEL_SET_PERMISSION = 0xD53,
+    COMMAND_CLI_CHANNEL_UNSET_PERMISSION = 0xD54,
+    COMMAND_CLI_CHANNEL_ACTIVATE_VOICE = 0xD55,
+    COMMAND_CLI_CHANNEL_DEACTIVATE_VOICE = 0xD56,
+    COMMAND_CLI_CHANNEL_SET_USER_DATA = 0xD57,
+    COMMAND_CLI_CHANNEL_START_VOICE = 0xD58,
+    COMMAND_CLI_CHANNEL_END_VOICE = 0xD59,
+};
+}  // namespace StsMsgLib
+
+namespace StsMsgLib {
+enum EMessageType : int {
+    MESSAGE_TYPE_NONE = 0x0,
+    MESSAGE_TYPE_REQUEST = 0x1,
+    MESSAGE_TYPE_RESPONSE = 0x2,
+    MESSAGE_TYPE_NOTIFY = 0x3,
+    MESSAGES = 0x4,
+};
+}  // namespace StsMsgLib
+
 enum NpResponseErrCode : int {
     NP_RESPONSE_ERR_BAD_SERVER_DATA = 0x4,
     NP_RESPONSE_ERR_INVALID_PARAMETER = 0xA,
@@ -2046,236 +2305,6 @@ enum EChargeBaseType : int {
 }  // namespace StsMsgLib
 
 namespace StsMsgLib {
-enum ECommand : int {
-    COMMAND_INVALID = -1,
-    COMMAND_NONE = 0x0,
-    COMMAND_INITIAL_CONNECT = 0x3E9,
-    COMMAND_PING = 0x3EA,
-    COMMAND_COMMON_PRES_USER_INFO = 0x4B1,
-    COMMAND_COMMON_PRES_WHISPER = 0x4B2,
-    COMMAND_COMMON_GATE_CUSTOM_MESSAGE = 0x641,
-    COMMAND_COMMON_WORLD_LIST_WORLDS = 0x6A5,
-    COMMAND_COMMON_SECONDPWD_GET_STATUS = 0x6AF,
-    COMMAND_COMMON_GRADE_LIST_GRADES = 0x6B9,
-    COMMAND_COMMON_GRADE_GET_LEVEL = 0x6BA,
-    COMMAND_COMMON_GRADE_LIST_LEVELS = 0x6BB,
-    COMMAND_COMMON_GRADE_GET_BASE_GRADEID_ACTIVATION = 0x6BC,
-    COMMAND_COMMON_GRADE_LIST_ALL_GRADES = 0x6BD,
-    COMMAND_COMMON_SLOT_LIST_SLOTS = 0x5DD,
-    COMMAND_COMMON_SLOT_GET_SLOT = 0x5DE,
-    COMMAND_COMMON_GOODS_LIST_CATEGORY_IDS = 0x777,
-    COMMAND_COMMON_GOODS_GET_GAME_GOODS_BY_CATEGORY_ID = 0x778,
-    COMMAND_COMMON_GOODS_GET_REVISION = 0x779,
-    COMMAND_COMMON_PURCHASE_PURCHASE = 0x781,
-    COMMAND_COMMON_PROMOTIONSTAMP_LIST_CURRENT_PROMOTIONS = 0x673,
-    COMMAND_COMMON_PROMOTIONSTAMP_GET_PROMOTION_POLICY = 0x674,
-    COMMAND_COMMON_PROMOTIONSTAMP_GET_USER_PROMOTION_STATUS = 0x675,
-    COMMAND_COMMON_PROMOTIONSTAMP_ATTEND_PROMOTION = 0x676,
-    COMMAND_COMMON_PROMOTIONSTAMP_ATTEND_PROMOTION_SECURED = 0x677,
-    COMMAND_COMMON_PROMOTIONSTAMP_REQUEST_REWARD_DELIVERY = 0x678,
-    COMMAND_COMMON_PROMOTIONSTAMP_LIST_INVALID_REWARD_DELIVERIES = 0x679,
-    COMMAND_SRV_AUTH_CONSUME_GAME_TOKEN = 0x835,
-    COMMAND_SRV_AUTH_CREATE_ACCOUNT = 0x836,
-    COMMAND_SRV_AUTH_GET_GAME_ACCOUNT_ID = 0x837,
-    COMMAND_SRV_AUTH_LINK_GAME_ACCOUNT = 0x838,
-    COMMAND_SRV_AUTH_LOGIN_WEB_START = 0x839,
-    COMMAND_SRV_AUTH_IS_USER_NAME_CHANGEABLE_INCOMPLETE = 0x83A,
-    COMMAND_SRV_AUTH_GET_USER_NAME_CHANGEABLE_INCOMPLETE = 0x83B,
-    COMMAND_SRV_AUTH_CHANGE_MY_USER_NAME_INCOMPLETE = 0x83C,
-    COMMAND_SRV_AUTH_GET_USER_INFO = 0x83D,
-    COMMAND_SRV_GAMEACCOUNT_LIST_USER_LAST_PRESENCES = 0x8CB,
-    COMMAND_SRV_PROFILE_GET_USER_PROFILE = 0x8D5,
-    COMMAND_SRV_GAMETIME_GET_GAME_TIME = 0x8DF,
-    COMMAND_SRV_GROUP_SET_GROUP_DATA = 0x8FD,
-    COMMAND_SRV_GROUP_GET_GROUP_INFO = 0x8FE,
-    COMMAND_SRV_GROUP_JOIN = 0x8FF,
-    COMMAND_SRV_GROUP_INVITE = 0x900,
-    COMMAND_SRV_GROUP_SET_ROLE = 0x901,
-    COMMAND_SRV_GROUP_GROUP_INFO = 0x902,
-    COMMAND_SRV_GROUP_SET_WATCH = 0x903,
-    COMMAND_SRV_GROUP_USER_INFO = 0x904,
-    COMMAND_SRV_GAMEGROUP_REQUEST_VALIDATE_GROUP = 0x957,
-    COMMAND_SRV_GAMEGROUP_REQUEST_GET_CHANNEL_PROPERTY = 0x958,
-    COMMAND_SRV_GAMEGROUP_REQUEST_GROUP_INFO = 0x959,
-    COMMAND_SRV_CHANNEL_SET_PERMISSION_GROUP = 0x961,
-    COMMAND_SRV_CHANNEL_UNSET_PERMISSION_GROUP = 0x962,
-    COMMAND_SRV_CHANNEL_DELETE_GROUP_CHANNEL = 0x963,
-    COMMAND_SRV_CHANNEL_KICK = 0x964,
-    COMMAND_SRV_CHANNEL_SET_PERMISSION_MEMBER_CHANNELS = 0x965,
-    COMMAND_SRV_CHANNEL_UNSET_PERMISSION_MEMBER_CHANNELS = 0x966,
-    COMMAND_SRV_PRES_LOGIN = 0x899,
-    COMMAND_SRV_PRES_LOGOUT = 0x89A,
-    COMMAND_SRV_PRES_WHISPER = 0x89B,
-    COMMAND_SRV_PRES_SET_USER_DATA = 0x89C,
-    COMMAND_SRV_PRES_GET_USER_INFO = 0x89D,
-    COMMAND_SRV_PRES_SET_WATCH = 0x89E,
-    COMMAND_SRV_PRES_LOGOUT_USER = 0x89F,
-    COMMAND_SRV_PRES_SET_APP_DATA = 0x8A0,
-    COMMAND_SRV_PRES_MESSAGE = 0x8A1,
-    COMMAND_SRV_PRES_KICK = 0x8A2,
-    COMMAND_SRV_SLOT_CREATE_SLOTS = 0x9C5,
-    COMMAND_SRV_SLOT_DELETE_SLOT = 0x9C6,
-    COMMAND_SRV_SLOT_SET_DATA = 0x9C7,
-    COMMAND_SRV_SLOT_RESET_DATA = 0x9C8,
-    COMMAND_SRV_GATE_FIND = 0xA29,
-    COMMAND_SRV_GATE_REGISTER_SERVICE = 0xA2A,
-    COMMAND_SRV_GATE_UNREGISTER_SERVICE = 0xA2B,
-    COMMAND_SRV_GATE_UPDATE_WORLD_PROPERTY = 0xA2C,
-    COMMAND_SRV_GATE_GAMEACCOUNT_GET_ATTRIBUTES = 0xA2D,
-    COMMAND_SRV_GATE_REGISTER_WAREHOUSE_SERVICE = 0xA2E,
-    COMMAND_SRV_WORLD_GET_STATUS = 0xA8D,
-    COMMAND_SRV_SECONDPWD_IS_VERIFIED = 0xA97,
-    COMMAND_SRV_GRADE_ACTIVATE_GRADE = 0xAA1,
-    COMMAND_SRV_GRADE_ADD_GRADE_SCORE = 0xAA2,
-    COMMAND_SRV_GRADE_NOTIFY_GRADE_CHANGED = 0xAA3,
-    COMMAND_SRV_GRADE_NOTIFY_SCORE_CHANGED = 0xAA4,
-    COMMAND_SRV_FRIEND_SEND_MESSAGE = 0xABF,
-    COMMAND_SRV_CONTENTBAN_LIST_USER_BANS = 0xADD,
-    COMMAND_SRV_MTX_LIST_GOODS_INFOS = 0xAF1,
-    COMMAND_SRV_MTX_GET_GOODS_INFO = 0xAF2,
-    COMMAND_SRV_MTX_INVALID_GOODS_INVENTORY_INFO = 0xAF3,
-    COMMAND_SRV_MTX_ELIMINATE_GOODS_INVENTORY = 0xAF7,
-    COMMAND_SRV_GOODS_LIST_GOODS_INFOS = 0xAF8,
-    COMMAND_SRV_WAREHOUSE_REQUEST_GOODS_INFO_CHANGED = 0xAFA,
-    COMMAND_SRV_WAREHOUSE_REQUEST_GOODS_INVENTORY_CHANGED = 0xAFB,
-    COMMAND_SRV_WAREHOUSE_GET_GOODS_COUNT = 0xAFC,
-    COMMAND_SRV_WAREHOUSE_LIST = 0xAFD,
-    COMMAND_SRV_WAREHOUSE_TAKE = 0xAFE,
-    COMMAND_SRV_CHARGE_GET_INFO = 0xB55,
-    COMMAND_SRV_CHARGE_START = 0xB56,
-    COMMAND_SRV_CHARGE_STOP = 0xB57,
-    COMMAND_SRV_CHARGE_REQUEST_STOP = 0xB58,
-    COMMAND_SRV_CHARGE_ABANDON = 0xB59,
-    COMMAND_SRV_CHARGE_NOTIFY_REMAIN_TIME = 0xB5A,
-    COMMAND_SRV_CHARGE_NOTIFY_APPLY_NEW_CHARGE_ITEM = 0xB5B,
-    COMMAND_SRV_PURCHASE_GET_PURCHASE = 0xB69,
-    COMMAND_SRV_REFUND_REFUND_AGENCY_PURCHASE = 0xB4B,
-    COMMAND_SRV_REWARDBROKER_EVENT_NOTI = 0xB23,
-    COMMAND_SRV_REWARD_REQUEST_REWARD_FOR_EVENT = 0xB24,
-    COMMAND_SRV_AUCTION_ESCROW = 0xB91,
-    COMMAND_SRV_AUCTION_ROLLBACK_ESCROW = 0xB92,
-    COMMAND_SRV_AUCTION_DELIVER = 0xB93,
-    COMMAND_SRV_AUCTION_BID = 0xB94,
-    COMMAND_SRV_VIRTUALCURRENCY_DEPOSIT = 0xBA5,
-    COMMAND_SRV_RISKMGMT_INQUIRY = 0xA1F,
-    COMMAND_COMMON_FOLLOW_FOLLOWED = 0xBB9,
-    COMMAND_CLI_AUTH_LOGIN_START = 0xC1D,
-    COMMAND_CLI_AUTH_LOGIN_KEY_DATA = 0xC1E,
-    COMMAND_CLI_AUTH_LOGIN_FINISH = 0xC1F,
-    COMMAND_CLI_AUTH_LOGOUT = 0xC21,
-    COMMAND_CLI_AUTH_GAME_ACCOUNT_LIST = 0xC22,
-    COMMAND_CLI_AUTH_REQUEST_GAME_TOKEN = 0xC23,
-    COMMAND_CLI_AUTH_CHANGE_MY_PASSWORD = 0xC24,
-    COMMAND_CLI_AUTH_RESET_PASSWORD = 0xC25,
-    COMMAND_CLI_AUTH_REQUEST_TOKEN = 0xC26,
-    COMMAND_CLI_AUTH_LOGIN_TOKEN_START = 0xC27,
-    COMMAND_CLI_AUTH_TOKEN_KEY_DATA = 0xC28,
-    COMMAND_CLI_AUTH_VERIFY_MOBI_OTP = 0xC29,
-    COMMAND_CLI_AUTH_GET_MY_USER_INFO = 0xC2A,
-    COMMAND_CLI_AUTH_GET_USERS_INFO = 0xC2B,
-    COMMAND_CLI_AUTH_VERIFY_SECONDARY_AUTH = 0xC2C,
-    COMMAND_CLI_AUTH_GET_SECURITY_CARD_CODE_INDEX = 0xC2D,
-    COMMAND_CLI_AUTH_REGISTER_SECONDARY_PASSWORD = 0xC2E,
-    COMMAND_CLI_PRES_LOGOUT_USER = 0xC81,
-    COMMAND_COMMON_PRES_MESSAGE = 0xC82,
-    COMMAND_CLI_GRADE_REWARD = 0xE89,
-    COMMAND_CLI_SHOWCASE_LIST_CURRENT_GOODS_BY_CATEGORY_ID = 0xE9D,
-    COMMAND_CLI_SHOWCASE_GET_USER_SALE_PRICE_BY_GOODS_ID = 0xE9E,
-    COMMAND_CLI_SHOWCASE_LIST_GOODS_SALE_PRICE = 0xE9F,
-    COMMAND_CLI_SHOWCASE_GET_GOODS_DISPLAY_REVISION = 0xEA0,
-    COMMAND_CLI_SHOWCASE_LIST_DISPLAY_CATEGORY = 0xEA1,
-    COMMAND_CLI_FRIEND_PROPOSE = 0xEA7,
-    COMMAND_CLI_FRIEND_DENY_PROPOSAL = 0xEA8,
-    COMMAND_CLI_FRIEND_ACCEPT_PROPOSAL = 0xEA9,
-    COMMAND_CLI_FRIEND_PAGE_RECV_PROPOSALS = 0xEAA,
-    COMMAND_CLI_FRIEND_REMOVE = 0xEAB,
-    COMMAND_CLI_FRIEND_CHANGE_ALIAS = 0xEAC,
-    COMMAND_CLI_FRIEND_GET_USERINFO = 0xEAD,
-    COMMAND_CLI_FRIEND_GET_RELATIONS = 0xEAE,
-    COMMAND_CLI_FRIEND_PAGE_FRIENDS = 0xEAF,
-    COMMAND_CLI_FRIEND_PROPOSED = 0xEB0,
-    COMMAND_CLI_FRIEND_PROPOSAL_ACCEPTED = 0xEB1,
-    COMMAND_CLI_FRIEND_PROPOSAL_DENIED = 0xEB2,
-    COMMAND_CLI_FRIEND_INFO = 0xEB3,
-    COMMAND_CLI_FRIEND_MESSAGE = 0xEB4,
-    COMMAND_CLI_FRIEND_USER_NAME_CHANGED = 0xEB5,
-    COMMAND_CLI_FRIEND_REMOVED = 0xEB6,
-    COMMAND_CLI_TENCENT_PURCHASE_TOKEN = 0xEBB,
-    COMMAND_CLI_INGAMESHOP_PURCHASE = 0xF6F,
-    COMMAND_CLI_INGAMESHOP_PAGE_PURCHASE_HISTORY = 0xF70,
-    COMMAND_CLI_INGAMESHOP_GET_CATEGORIES = 0xF71,
-    COMMAND_CLI_INGAMESHOP_GET_GOODS_BY_CATEGORYID = 0xF72,
-    COMMAND_CLI_INGAMESHOP_GET_GOODS_BY_GOODSID = 0xF73,
-    COMMAND_CLI_INGAMESHOP_GET_DISPLAY_REVISION = 0xF74,
-    COMMAND_CLI_INGAMESHOP_GET_BALANCE = 0xF75,
-    COMMAND_CLI_INGAMESHOP_LIST_GOODS_LIMITS = 0xF76,
-    COMMAND_CLI_AUCTION_SELL = 0xF79,
-    COMMAND_CLI_AUCTION_CANCEL_SALE = 0xF7A,
-    COMMAND_CLI_AUCTION_BID = 0xF7B,
-    COMMAND_CLI_AUCTION_PAGE_ITEMS = 0xF7C,
-    COMMAND_CLI_AUCTION_PAGE_MY_SALES = 0xF7D,
-    COMMAND_CLI_AUCTION_PAGE_MY_SALE_HISTORY = 0xF7E,
-    COMMAND_CLI_AUCTION_PAGE_MY_BUY_HISTORY = 0xF7F,
-    COMMAND_CLI_AUCTION_LIST_POLICIES = 0xF80,
-    COMMAND_CLI_AUCTION_GET_STATISTICS = 0xF81,
-    COMMAND_CLI_AUCTION_GET_BALANCE = 0xF82,
-    COMMAND_CLI_AUCTION_NOTIFY_EVENT = 0xF83,
-    COMMAND_CLI_SECONDPASSWORD_CREATE = 0xE7F,
-    COMMAND_CLI_SECONDPASSWORD_CANCEL_DELETE = 0xE80,
-    COMMAND_CLI_SECONDPASSWORD_CHANGE_MY_PASSWORD = 0xE81,
-    COMMAND_CLI_SECONDPASSWORD_CHANGE_MY_ACTION_MASK = 0xE82,
-    COMMAND_CLI_SECONDPASSWORD_ENABLE_MY_ACTION_MASK = 0xE83,
-    COMMAND_CLI_SECONDPASSWORD_DISABLE_MY_ACTION_MASK = 0xE84,
-    COMMAND_CLI_SECONDPASSWORD_VERIFY = 0xE85,
-    COMMAND_CLI_VIRTUALCURRENCY_GET_BALANCE = 0xF8D,
-    COMMAND_CLI_VIRTUALCURRENCY_NOTIFY_BALANCE_CHANGED = 0xF8E,
-    COMMAND_CLI_INGAMESHOP_WISH_WISH = 0xF97,
-    COMMAND_CLI_INGAMESHOP_WISH_ACCEPT = 0xF98,
-    COMMAND_CLI_INGAMESHOP_WISH_REJECT = 0xF99,
-    COMMAND_CLI_INGAMESHOP_WISH_PAGE_WISHES = 0xF9A,
-    COMMAND_CLI_INGAMESHOP_WISH_PAGE_RECEIVED_WISHES = 0xF9B,
-    COMMAND_CLI_INGAMESHOP_WISH_GET_WISH_COUNT_AT_TODAY = 0xF9C,
-    COMMAND_CLI_INGAMESHOP_WISH_IS_OPTOUT_USER = 0xF9D,
-    COMMAND_CLI_INGAMESHOP_WISH_CHANGE_OPTOUT = 0xF9E,
-    COMMAND_CLI_PROMOTIONSTAMP_GOODS_CATEGORYID_LIST = 0xE49,
-    COMMAND_CLI_PROMOTIONSTAMP_GOODS_BY_CATEGORYID = 0xE4A,
-    COMMAND_CLI_PROMOTIONSTAMP_GOODS_BY_GOODSID = 0xE4B,
-    COMMAND_CLI_PROMOTIONSTAMP_GOODS_REVISION = 0xE4C,
-    COMMAND_CLI_COUPON_REGISTER_USER_COUPON = 0xF5B,
-    COMMAND_CLI_COUPON_GET_USER_COUPON_COUNT = 0xF5C,
-    COMMAND_CLI_COUPON_PAGE_USER_COUPONS = 0xF5D,
-    COMMAND_CLI_COUPON_USE_GOODS_COUPON = 0xF5E,
-    COMMAND_CLI_PG_DR_DIRECT_PURCHASE = 0xF65,
-    COMMAND_CLI_PG_CHECK_DR_BILLING_INFO = 0xF66,
-    COMMAND_CLI_PG_CHECK_CURRENCY_LOCKING = 0xF67,
-    COMMAND_CLI_PG_PAGE_PAYMENT_ORDER = 0xF68,
-    COMMAND_CLI_GOODS_PAGE_SEARCH_GOODS = 0xF47,
-    COMMAND_CLI_GOODS_LIST_GAME_GOODS = 0xF48,
-    COMMAND_CLI_GOODS_CHECK_NEW_GOODS = 0xF49,
-    COMMAND_CLI_GOODS_GET_SALE_GOODS = 0xF4A,
-    COMMAND_CLI_SLOT_SET_DATA = 0xDAD,
-    COMMAND_CLI_REPORT_ADD_REPORT = 0xF29,
-    COMMAND_CLI_CHANNEL_CREATE = 0xD49,
-    COMMAND_CLI_CHANNEL_JOIN = 0xD4A,
-    COMMAND_CLI_CHANNEL_LEAVE = 0xD4B,
-    COMMAND_CLI_CHANNEL_LOGOUT = 0xD4C,
-    COMMAND_CLI_CHANNEL_TALK = 0xD4D,
-    COMMAND_CLI_CHANNEL_NOTIFY_TALK = 0xD4E,
-    COMMAND_CLI_CHANNEL_NOTIFY_USER_INFO = 0xD4F,
-    COMMAND_CLI_CHANNEL_NOTIFY_CHANNEL_INFO = 0xD50,
-    COMMAND_CLI_CHANNEL_JOIN_GROUP_CHANNEL = 0xD51,
-    COMMAND_CLI_CHANNEL_PAGE_MEMBERS = 0xD52,
-    COMMAND_CLI_CHANNEL_SET_PERMISSION = 0xD53,
-    COMMAND_CLI_CHANNEL_UNSET_PERMISSION = 0xD54,
-    COMMAND_CLI_CHANNEL_ACTIVATE_VOICE = 0xD55,
-    COMMAND_CLI_CHANNEL_DEACTIVATE_VOICE = 0xD56,
-    COMMAND_CLI_CHANNEL_SET_USER_DATA = 0xD57,
-    COMMAND_CLI_CHANNEL_START_VOICE = 0xD58,
-    COMMAND_CLI_CHANNEL_END_VOICE = 0xD59,
-};
-}  // namespace StsMsgLib
-
-namespace StsMsgLib {
 enum ELanguageType : int {
     LANGUAGE_TYPE_INVALID = -1,
     LANGUAGE_TYPE_ENGLISH = 0x0,
@@ -2293,16 +2322,6 @@ enum ELanguageType : int {
     LANGUAGE_TYPE_CAFFEINATED = 0x10,
     LANGUAGE_TYPE_SWEDISH_CHEF = 0x11,
     LANGUAGE_TYPES = 0x12,
-};
-}  // namespace StsMsgLib
-
-namespace StsMsgLib {
-enum EMessageType : int {
-    MESSAGE_TYPE_NONE = 0x0,
-    MESSAGE_TYPE_REQUEST = 0x1,
-    MESSAGE_TYPE_RESPONSE = 0x2,
-    MESSAGE_TYPE_NOTIFY = 0x3,
-    MESSAGES = 0x4,
 };
 }  // namespace StsMsgLib
 
@@ -2615,6 +2634,32 @@ static_assert(offsetof(Thread, _maxFrozenSeconds) == 0x18, "Thread::_maxFrozenSe
 static_assert(offsetof(Thread, _threadManager) == 0x20, "Thread::_threadManager");
 static_assert(offsetof(Thread, _run) == 0x28, "Thread::_run");
 
+struct _RTL_CRITICAL_SECTION {
+public:
+    void * DebugInfo;
+    long LockCount;
+    long RecursionCount;
+    void * OwningThread;
+    void * LockSemaphore;
+    unsigned long long SpinCount;
+};
+static_assert(sizeof(_RTL_CRITICAL_SECTION) == 0x28, "sizeof _RTL_CRITICAL_SECTION");
+static_assert(offsetof(_RTL_CRITICAL_SECTION, DebugInfo) == 0x0, "_RTL_CRITICAL_SECTION::DebugInfo");
+static_assert(offsetof(_RTL_CRITICAL_SECTION, LockCount) == 0x8, "_RTL_CRITICAL_SECTION::LockCount");
+static_assert(offsetof(_RTL_CRITICAL_SECTION, RecursionCount) == 0xC, "_RTL_CRITICAL_SECTION::RecursionCount");
+static_assert(offsetof(_RTL_CRITICAL_SECTION, OwningThread) == 0x10, "_RTL_CRITICAL_SECTION::OwningThread");
+static_assert(offsetof(_RTL_CRITICAL_SECTION, LockSemaphore) == 0x18, "_RTL_CRITICAL_SECTION::LockSemaphore");
+static_assert(offsetof(_RTL_CRITICAL_SECTION, SpinCount) == 0x20, "_RTL_CRITICAL_SECTION::SpinCount");
+
+struct sockaddr {
+public:
+    unsigned short sa_family;
+    char sa_data[14];
+};
+static_assert(sizeof(sockaddr) == 0x10, "sizeof sockaddr");
+static_assert(offsetof(sockaddr, sa_family) == 0x0, "sockaddr::sa_family");
+static_assert(offsetof(sockaddr, sa_data) == 0x2, "sockaddr::sa_data");
+
 class AlertSender : public Thread {
 public:
     virtual wchar_t const * Name();
@@ -2626,13 +2671,13 @@ public:
     unsigned long long _threadId;
     int _maxLogCount;
     bool _init;
-    alignas(2) unsigned char _remoteAddr[0x10];  // ❓ PDB type 0x2227: sockaddr
+    sockaddr _remoteAddr;
     short _daemonNameBytes;
     wchar_t _daemonName[64];
     short _versionBytes;
     wchar_t _version[64];
     int _worldId;
-    alignas(8) unsigned char _cs[0x28];  // ❓ PDB type 0x1052: _RTL_CRITICAL_SECTION
+    _RTL_CRITICAL_SECTION _cs;
     AlertBufferList _bufferList;
 };
 static_assert(sizeof(AlertSender) == 0x1B0, "sizeof AlertSender");
@@ -2662,9 +2707,112 @@ static_assert(offsetof(AssertInfo, file) == 0x0, "AssertInfo::file");
 static_assert(offsetof(AssertInfo, line) == 0x8, "AssertInfo::line");
 static_assert(offsetof(AssertInfo, log) == 0xC, "AssertInfo::log");
 
+struct _OVERLAPPED {
+public:
+    unsigned long long Internal;
+    unsigned long long InternalHigh;
+    union {
+        struct {
+            unsigned long Offset;
+            unsigned long OffsetHigh;
+        };
+        void * Pointer;
+    };
+    void * hEvent;
+};
+static_assert(sizeof(_OVERLAPPED) == 0x20, "sizeof _OVERLAPPED");
+static_assert(offsetof(_OVERLAPPED, Internal) == 0x0, "_OVERLAPPED::Internal");
+static_assert(offsetof(_OVERLAPPED, InternalHigh) == 0x8, "_OVERLAPPED::InternalHigh");
+static_assert(offsetof(_OVERLAPPED, Offset) == 0x10, "_OVERLAPPED::Offset");
+static_assert(offsetof(_OVERLAPPED, OffsetHigh) == 0x14, "_OVERLAPPED::OffsetHigh");
+static_assert(offsetof(_OVERLAPPED, Pointer) == 0x10, "_OVERLAPPED::Pointer");
+static_assert(offsetof(_OVERLAPPED, hEvent) == 0x18, "_OVERLAPPED::hEvent");
+
+struct EventContext : public _OVERLAPPED {
+public:
+    int _id;
+};
+static_assert(sizeof(EventContext) == 0x28, "sizeof EventContext");
+static_assert(offsetof(EventContext, _id) == 0x20, "EventContext::_id");
+
+struct in_addr {
+public:
+    union {
+        struct {
+            unsigned char s_b1;
+            unsigned char s_b2;
+            unsigned char s_b3;
+            unsigned char s_b4;
+        } S_un_b;
+        struct {
+            unsigned short s_w1;
+            unsigned short s_w2;
+        } S_un_w;
+        unsigned long S_addr;
+    } S_un;
+};
+static_assert(sizeof(in_addr) == 0x4, "sizeof in_addr");
+static_assert(offsetof(in_addr, S_un) == 0x0, "in_addr::S_un");
+
+struct sockaddr_in {
+public:
+    unsigned short sin_family;
+    unsigned short sin_port;
+    in_addr sin_addr;
+    char sin_zero[8];
+};
+static_assert(sizeof(sockaddr_in) == 0x10, "sizeof sockaddr_in");
+static_assert(offsetof(sockaddr_in, sin_family) == 0x0, "sockaddr_in::sin_family");
+static_assert(offsetof(sockaddr_in, sin_port) == 0x2, "sockaddr_in::sin_port");
+static_assert(offsetof(sockaddr_in, sin_addr) == 0x4, "sockaddr_in::sin_addr");
+static_assert(offsetof(sockaddr_in, sin_zero) == 0x8, "sockaddr_in::sin_zero");
+
+struct AsyncConnectContext : public EventContext {
+public:
+    Session * _session;
+    unsigned long long _socket;
+    sockaddr_in _remoteAddr;
+    bool _firstConnect;
+    long long _timeout;
+    int _tryReconnectCount;
+};
+static_assert(sizeof(AsyncConnectContext) == 0x60, "sizeof AsyncConnectContext");
+static_assert(offsetof(AsyncConnectContext, _session) == 0x28, "AsyncConnectContext::_session");
+static_assert(offsetof(AsyncConnectContext, _socket) == 0x30, "AsyncConnectContext::_socket");
+static_assert(offsetof(AsyncConnectContext, _remoteAddr) == 0x38, "AsyncConnectContext::_remoteAddr");
+static_assert(offsetof(AsyncConnectContext, _firstConnect) == 0x48, "AsyncConnectContext::_firstConnect");
+static_assert(offsetof(AsyncConnectContext, _timeout) == 0x50, "AsyncConnectContext::_timeout");
+static_assert(offsetof(AsyncConnectContext, _tryReconnectCount) == 0x58, "AsyncConnectContext::_tryReconnectCount");
+
+struct _WSABUF {
+public:
+    unsigned long len;
+    char * buf;
+};
+static_assert(sizeof(_WSABUF) == 0x10, "sizeof _WSABUF");
+static_assert(offsetof(_WSABUF, len) == 0x0, "_WSABUF::len");
+static_assert(offsetof(_WSABUF, buf) == 0x8, "_WSABUF::buf");
+
+struct AsyncRecvContext : public EventContext {
+public:
+    Session * _session;
+    _WSABUF _wsaBuffer;
+};
+static_assert(sizeof(AsyncRecvContext) == 0x40, "sizeof AsyncRecvContext");
+static_assert(offsetof(AsyncRecvContext, _session) == 0x28, "AsyncRecvContext::_session");
+static_assert(offsetof(AsyncRecvContext, _wsaBuffer) == 0x30, "AsyncRecvContext::_wsaBuffer");
+
+struct AsyncSendContext : public EventContext {
+public:
+    Session * _session;
+    SendBufferList * _bufferList;
+};
+static_assert(sizeof(AsyncSendContext) == 0x38, "sizeof AsyncSendContext");
+static_assert(offsetof(AsyncSendContext, _session) == 0x28, "AsyncSendContext::_session");
+static_assert(offsetof(AsyncSendContext, _bufferList) == 0x30, "AsyncSendContext::_bufferList");
+
 class AtomicOperation {
 public:
-    char _pdb_tail[0x1];
 };
 static_assert(sizeof(AtomicOperation) == 0x1, "sizeof AtomicOperation");
 
@@ -2688,8 +2836,12 @@ static_assert(offsetof(AutoDbTran, TimeoutSec) == 0x8, "AutoDbTran::TimeoutSec")
 
 class AutoSRW {
 public:
-    void * _lock;
-    int const _mode;
+    enum Mode : int {
+        EXCLUSIVE = 0x0,
+        SHARED = 0x1,
+    };
+    _RTL_SRWLOCK const * _lock;
+    AutoSRW::Mode const _mode;
 };
 static_assert(sizeof(AutoSRW) == 0x10, "sizeof AutoSRW");
 static_assert(offsetof(AutoSRW, _lock) == 0x0, "AutoSRW::_lock");
@@ -2762,6 +2914,21 @@ static_assert(sizeof(BaseMemoryManager) == 0x10, "sizeof BaseMemoryManager");
 
 class RefCntObject {
 public:
+    enum Tag : int {
+        TAG_INIT = 0xA,
+        TAG_FINI = 0xF0,
+        TAG_TYPE_LOGBUFFER = 0x1,
+        TAG_TYPE_TIMER = 0x2,
+        TAG_TYPE_PORTLISTENER = 0x3,
+        TAG_TYPE_CHANNEL = 0x4,
+        TAG_TYPE_PACKETBUFFER = 0x5,
+        TAG_TYPE_END_NETWORK_EVENT = 0x6,
+        TAG_TYPE_SESSION = 0x7,
+        TAG_TYPE_SESSION_POOL = 0x8,
+        TAG_TYPE_USER_DEFINED = 0x14,
+        TAG_SUBTYPE_TIMER_RECONNECT = 0x1,
+        TAG_SUBTYPE_TIMER_USER_DEFINED = 0xA,
+    };
     virtual ~RefCntObject();  // slot 0
     virtual void deallocate_object(wchar_t const *, int);  // slot 1
     virtual void deallocate_me(void *, wchar_t const *, int) = 0;  // slot 2
@@ -2784,16 +2951,71 @@ static_assert(sizeof(BaseRefCntObj) == 0x18, "sizeof BaseRefCntObj");
 
 class BloodCert {
 public:
-    char _pdb_tail[0x1];
+    enum ErrCode : int {
+        SCERR_NO_ERROR = 0x0,
+        UNKOWN_ERROR = 0x1,
+        INVALID_PARAM = 0x2,
+        INVALID_CERTFILE = 0x3,
+        INVALID_CERT = 0x4,
+        INVALID_VER = 0x5,
+        INVALID_SERIAL = 0x6,
+        INVALID_DSN = 0x7,
+        INVALID_ISSUE = 0x8,
+        NOT_MATCH_SERIAL = 0x9,
+        EXPIRED = 0xA,
+    };
+    enum Flag : int {
+        TEST = 0x1,
+    };
+    enum Module : int {
+        INVALID = 0x0,
+        TOOL = 0x1,
+        ISSUE = 0x2,
+        GAMED = 0x3,
+        CACHED = 0x4,
+        UNIVD = 0x5,
+        BAZZARD = 0x6,
+        ARENAD = 0x7,
+        AUTHD = 0x8,
+        LOGD = 0x9,
+        POSTOFFICED = 0xA,
+        CRAFTD = 0xB,
+        MARKET_DEALERD = 0xC,
+        MARKET_READERD = 0xD,
+        UNIVCHARMGRD = 0xE,
+        SNS_CACHED = 0xF,
+        SNS_WRITERD = 0x10,
+        PROXYD = 0x11,
+        MANAGEMENTD = 0x12,
+        GM_AUDITLOG = 0x13,
+        PLAYJOURNALD = 0x14,
+        LOBBYD = 0x15,
+        LOBBYGATE = 0x16,
+        ACCOUNTINVENTORYD = 0x17,
+        SMARTCOUPOND = 0x18,
+        INFOGATE = 0x19,
+        ACHIEVEMENTD = 0x1A,
+        ENGINETOOL = 0x1B,
+        ARENALOBBY = 0x1C,
+        RANKINGD = 0x1D,
+        MODULE_MAX = 0x1E,
+    };
 };
 static_assert(sizeof(BloodCert) == 0x1, "sizeof BloodCert");
 
 union id128 {
 public:
-    alignas(4) unsigned char guid[0x10];  // ❓ PDB type 0x22FF: id128::<unnamed-type-guid>
+    struct {
+        unsigned int id1;
+        unsigned short id2;
+        unsigned short id3;
+        unsigned char id4[8];
+    } guid;
     unsigned long long id[2];
 };
 static_assert(sizeof(id128) == 0x10, "sizeof id128");
+static_assert(offsetof(id128, guid) == 0x0, "id128::guid");
+static_assert(offsetof(id128, id) == 0x0, "id128::id");
 
 class BnsCommonConfig {
 public:
@@ -2842,6 +3064,10 @@ static_assert(offsetof(BnsCommonConfigReload, _npClientAppIdStr) == 0x8, "BnsCom
 
 class BroadcastCrypt {
 public:
+    enum Type : int {
+        BROADCAST_DAEMON = 0x0,
+        BROADCAST_LOCAL = 0x1,
+    };
     PacketCrypt * crypt;
     char * key;
     int size;
@@ -2983,20 +3209,74 @@ static_assert(offsetof(Connection, _socket) == 0x8, "Connection::_socket");
 static_assert(offsetof(Connection, _ip) == 0x10, "Connection::_ip");
 static_assert(offsetof(Connection, _portNumber) == 0x14, "Connection::_portNumber");
 
+class SystemEvent {
+public:
+    void * Event;
+};
+static_assert(sizeof(SystemEvent) == 0x8, "sizeof SystemEvent");
+static_assert(offsetof(SystemEvent, Event) == 0x0, "SystemEvent::Event");
+
+class Log : public Thread {
+public:
+    enum Type : int {
+        LT_ERROR = 0x0,
+        LT_DEBUG = 0x1,
+        LT_TRACE = 0x2,
+        LT_NOTICE = 0x3,
+        LT_RESOURCE = 0x4,
+        LT_ARCHIVE = 0x5,
+        LT_USER_DEFINED_MIN = 0x6,
+        LT_USER_DEFINED_1 = 0x6,
+        LT_USER_DEFINED_2 = 0x7,
+        LT_USER_DEFINED_3 = 0x8,
+        LT_USER_DEFINED_4 = 0x9,
+        LT_USER_DEFINED_5 = 0xA,
+        LT_USER_DEFINED_MAX = 0xA,
+        LT_MAX = 0xB,
+    };
+    virtual ~Log();
+    virtual wchar_t const * Name();
+    virtual void run();
+    bool open;
+    bool flush;
+    SystemEvent notifyEvent;
+    LogMedia * media[8];
+    int mediaCount;
+    LogMedia * mediaList[11];
+    int mediaCountPerList[11];
+};
+static_assert(sizeof(Log) == 0x110, "sizeof Log");
+static_assert(offsetof(Log, open) == 0x30, "Log::open");
+static_assert(offsetof(Log, flush) == 0x31, "Log::flush");
+static_assert(offsetof(Log, notifyEvent) == 0x38, "Log::notifyEvent");
+static_assert(offsetof(Log, media) == 0x40, "Log::media");
+static_assert(offsetof(Log, mediaCount) == 0x80, "Log::mediaCount");
+static_assert(offsetof(Log, mediaList) == 0x88, "Log::mediaList");
+static_assert(offsetof(Log, mediaCountPerList) == 0xE0, "Log::mediaCountPerList");
+
 class SpinLock {
 public:
-    alignas(8) unsigned char SL[0x28];  // ❓ PDB type 0x1052: _RTL_CRITICAL_SECTION
+    _RTL_CRITICAL_SECTION SL;
 };
 static_assert(sizeof(SpinLock) == 0x28, "sizeof SpinLock");
 static_assert(offsetof(SpinLock, SL) == 0x0, "SpinLock::SL");
 
 class LogMedia {
 public:
+    enum Type : int {
+        LM_NULL = 0x0,
+        LM_CONSOLE = 0x1,
+        LM_FILE = 0x2,
+        LM_NETWORK = 0x3,
+        LM_DB = 0x4,
+        LM_ARCHIVE = 0x5,
+        LM_FGT_FILE = 0x6,
+    };
     virtual ~LogMedia();  // slot 0
     virtual bool Writable();  // slot 1
     virtual void Flush() = 0;  // slot 2
     virtual wchar_t * GetLastFileName();  // slot 3
-    virtual int GetType() const = 0;  // slot 4
+    virtual LogMedia::Type GetType() const = 0;  // slot 4
     virtual void write(LogBuffer const *) = 0;  // slot 5
     int _bufferNodePos;
     LogMedia * _next[11];
@@ -3020,27 +3300,63 @@ public:
     virtual void SetState(int) = 0;  // slot 8
     virtual void WriteStartLog(int, wchar_t const *, void *) = 0;  // slot 9
     virtual void WriteStatusLog(wchar_t const *, void *) = 0;  // slot 10
-    virtual void Write(int, wchar_t const *, int, wchar_t const *, char *) = 0;  // slot 11
+    virtual void Write(Log::Type, wchar_t const *, int, wchar_t const *, char *) = 0;  // slot 11
     virtual bool controlHandler(unsigned long) = 0;  // slot 12
     virtual void setTitle(wchar_t const *);  // slot 13
     virtual ~Console();
-    virtual int GetType() const;
+    virtual LogMedia::Type GetType() const;
     virtual void Flush();
 };
 static_assert(sizeof(Console) == 0xB0, "sizeof Console");
 
 class ConsoleLog {
 public:
+    enum Type : int {
+        L_NONE = 0x0,
+        L_INTERNAL = 0x1,
+        L_ERROR = 0x2,
+        L_DEBUG = 0x3,
+        L_INFO = 0x4,
+        L_TRACE = 0x5,
+        L_MAX = 0x6,
+    };
     virtual bool Acquire() = 0;  // slot 0
     virtual void Release() = 0;  // slot 1
-    virtual int GetType() const = 0;  // slot 2
+    virtual ConsoleLog::Type GetType() const = 0;  // slot 2
     virtual bool GetLog(wchar_t *, unsigned long long) const = 0;  // slot 3
 };
 static_assert(sizeof(ConsoleLog) == 0x8, "sizeof ConsoleLog");
 
 class ConsoleWindow {
 public:
-    virtual bool Initialize(HINSTANCE__ *, wchar_t const *, wchar_t const *, void *, void *, void *, void *, void *, void *) = 0;  // slot 0
+    struct EndSessionHandler;
+    struct ReloadHandler;
+    struct ShutdownHandler;
+    struct SocketHandler;
+    struct EndSessionHandler {
+    public:
+        void * logoff;
+        void * shutdown;
+    };
+    struct ReloadHandler {
+    public:
+        bool autoEnable;
+        void * reload;
+    };
+    struct ShutdownHandler {
+    public:
+        bool autoEnable;
+        void * shutdown;
+    };
+    struct SocketHandler {
+    public:
+        void * connect;
+        void * close;
+        void * send;
+        void * handle;
+        void * option;
+    };
+    virtual bool Initialize(HINSTANCE__ *, wchar_t const *, wchar_t const *, void *, void *, ConsoleWindow::ReloadHandler *, ConsoleWindow::ShutdownHandler *, ConsoleWindow::SocketHandler *, ConsoleWindow::EndSessionHandler *) = 0;  // slot 0
     virtual void Clear() = 0;  // slot 1
     virtual int Run() = 0;  // slot 2
     virtual HWND__ * GetMainWindowHandle() = 0;  // slot 3
@@ -3058,6 +3374,21 @@ public:
     virtual void WriteStatus(int, int, int, int, int, int) = 0;  // slot 15
 };
 static_assert(sizeof(ConsoleWindow) == 0x8, "sizeof ConsoleWindow");
+static_assert(sizeof(ConsoleWindow::EndSessionHandler) == 0x10, "sizeof ConsoleWindow::EndSessionHandler");
+static_assert(offsetof(ConsoleWindow::EndSessionHandler, logoff) == 0x0, "ConsoleWindow::EndSessionHandler::logoff");
+static_assert(offsetof(ConsoleWindow::EndSessionHandler, shutdown) == 0x8, "ConsoleWindow::EndSessionHandler::shutdown");
+static_assert(sizeof(ConsoleWindow::ReloadHandler) == 0x10, "sizeof ConsoleWindow::ReloadHandler");
+static_assert(offsetof(ConsoleWindow::ReloadHandler, autoEnable) == 0x0, "ConsoleWindow::ReloadHandler::autoEnable");
+static_assert(offsetof(ConsoleWindow::ReloadHandler, reload) == 0x8, "ConsoleWindow::ReloadHandler::reload");
+static_assert(sizeof(ConsoleWindow::ShutdownHandler) == 0x10, "sizeof ConsoleWindow::ShutdownHandler");
+static_assert(offsetof(ConsoleWindow::ShutdownHandler, autoEnable) == 0x0, "ConsoleWindow::ShutdownHandler::autoEnable");
+static_assert(offsetof(ConsoleWindow::ShutdownHandler, shutdown) == 0x8, "ConsoleWindow::ShutdownHandler::shutdown");
+static_assert(sizeof(ConsoleWindow::SocketHandler) == 0x28, "sizeof ConsoleWindow::SocketHandler");
+static_assert(offsetof(ConsoleWindow::SocketHandler, connect) == 0x0, "ConsoleWindow::SocketHandler::connect");
+static_assert(offsetof(ConsoleWindow::SocketHandler, close) == 0x8, "ConsoleWindow::SocketHandler::close");
+static_assert(offsetof(ConsoleWindow::SocketHandler, send) == 0x10, "ConsoleWindow::SocketHandler::send");
+static_assert(offsetof(ConsoleWindow::SocketHandler, handle) == 0x18, "ConsoleWindow::SocketHandler::handle");
+static_assert(offsetof(ConsoleWindow::SocketHandler, option) == 0x20, "ConsoleWindow::SocketHandler::option");
 
 struct ConsoleWindowInterface {
 public:
@@ -3076,7 +3407,7 @@ static_assert(offsetof(ConsoleWindowInterface, Destroy) == 0x20, "ConsoleWindowI
 
 class CriticalSection {
 public:
-    alignas(8) unsigned char CS[0x28];  // ❓ PDB type 0x1052: _RTL_CRITICAL_SECTION
+    _RTL_CRITICAL_SECTION CS;
 };
 static_assert(sizeof(CriticalSection) == 0x28, "sizeof CriticalSection");
 static_assert(offsetof(CriticalSection, CS) == 0x0, "CriticalSection::CS");
@@ -3089,6 +3420,10 @@ static_assert(sizeof(RefCntPoolObj) == 0x18, "sizeof RefCntPoolObj");
 
 class CouponJob : public RefCntPoolObj {
 public:
+    enum Result : int {
+        JOB_DONE = 0x0,
+        JOB_FIN = 0x1,
+    };
     virtual JobDef const * GetDefinition() const = 0;  // slot 4
     virtual bool dispatch_work(int, void *);  // slot 5
     virtual bool work(int, void *) = 0;  // slot 6
@@ -3170,6 +3505,19 @@ static_assert(offsetof(DChannel, _port) == 0x34, "DChannel::_port");
 
 class DChannelMgr : public SessionHandler {
 public:
+    struct DaemonInfo;
+    enum ErrCode : int {
+        ERR_SUCCESS = 0x0,
+        ERR_INVALID_PARAM = 0x1,
+        ERR_ADDWORLD_NOT_CAPABLE = 0x2,
+        ERR_ADDWORLD_ALREADY_REGISTERED = 0x3,
+    };
+    struct DaemonInfo {
+    public:
+        GameEventDaemonId daemonId;
+        unsigned long ipaddr;
+        unsigned short port;
+    };
     virtual ~DChannelMgr();
     virtual bool OnAccept(Session const *) const;
     virtual bool OnConnect(Session const *, bool) const;
@@ -3181,6 +3529,10 @@ public:
 static_assert(sizeof(DChannelMgr) == 0x50, "sizeof DChannelMgr");
 static_assert(offsetof(DChannelMgr, _lock) == 0x8, "DChannelMgr::_lock");
 static_assert(offsetof(DChannelMgr, _list) == 0x30, "DChannelMgr::_list");
+static_assert(sizeof(DChannelMgr::DaemonInfo) == 0x10, "sizeof DChannelMgr::DaemonInfo");
+static_assert(offsetof(DChannelMgr::DaemonInfo, daemonId) == 0x0, "DChannelMgr::DaemonInfo::daemonId");
+static_assert(offsetof(DChannelMgr::DaemonInfo, ipaddr) == 0x8, "DChannelMgr::DaemonInfo::ipaddr");
+static_assert(offsetof(DChannelMgr::DaemonInfo, port) == 0xC, "DChannelMgr::DaemonInfo::port");
 
 class EventObject : public RefCntObject {
 public:
@@ -3211,15 +3563,38 @@ static_assert(offsetof(DChannelPacketHandleEvent, _session) == 0x18, "DChannelPa
 static_assert(offsetof(DChannelPacketHandleEvent, _packet) == 0x20, "DChannelPacketHandleEvent::_packet");
 static_assert(offsetof(DChannelPacketHandleEvent, _handler) == 0x28, "DChannelPacketHandleEvent::_handler");
 
-class SystemEvent {
+struct _cidraddress {
 public:
-    void * Event;
+    unsigned long address;
+    unsigned long netmask;
 };
-static_assert(sizeof(SystemEvent) == 0x8, "sizeof SystemEvent");
-static_assert(offsetof(SystemEvent, Event) == 0x0, "SystemEvent::Event");
+static_assert(sizeof(_cidraddress) == 0x8, "sizeof _cidraddress");
+static_assert(offsetof(_cidraddress, address) == 0x0, "_cidraddress::address");
+static_assert(offsetof(_cidraddress, netmask) == 0x4, "_cidraddress::netmask");
 
 class Daemon {
 public:
+    struct Version;
+    enum DaemonState : int {
+        STATE_UNKNOWN = 0x0,
+        STATE_STOPPED = 0x1,
+        STATE_STOPPING = 0x2,
+        STATE_STARTING = 0x3,
+        STATE_RUNNING = 0x4,
+        STATE_INVALID = 0x5,
+        STATE_FLUSHING = 0x6,
+        STATE_COOLDOWNING = 0x7,
+        STATE_COOLDOWNED = 0x8,
+        STATE_RELOADING = 0x9,
+        STATE_MAX = 0xA,
+    };
+    struct Version {
+    public:
+        union {
+            unsigned long long version;
+            unsigned short unit[4];
+        };
+    };
     virtual ~Daemon();  // slot 0
     virtual wchar_t const * ServiceName() = 0;  // slot 1
     virtual wchar_t const * ShortName() = 0;  // slot 2
@@ -3243,13 +3618,13 @@ public:
     Console * console;
     PipeConsole * pipeConsole;
     ThreadManager * threadManager;
-    int State;
+    Daemon::DaemonState State;
     SystemEvent EndEvent;
     long StartSystemTick;
     long long StartSystemTick64;
     long CurrentTick;
     long long StartTime;
-    alignas(8) unsigned char Ver[0x8];  // ❓ PDB type 0x21B4: Daemon::Version
+    Daemon::Version Ver;
     wchar_t VerStr[32];
     wchar_t hostname[256];
     unsigned long publicAddress;
@@ -3257,8 +3632,8 @@ public:
     unsigned long internalAddress;
     wchar_t internalAddrString[20];
     wchar_t confDir[520];
-    alignas(4) unsigned char internalCIDR[0x8];  // ❓ PDB type 0x2202: _cidraddress
-    alignas(4) unsigned char publicCIDR[0x8];  // ❓ PDB type 0x2202: _cidraddress
+    _cidraddress internalCIDR;
+    _cidraddress publicCIDR;
     bool setInternalCIDR;
     bool setPublicCIDR;
     TimerQueue * GlobalTimerQueue;
@@ -3295,10 +3670,12 @@ static_assert(offsetof(Daemon, GlobalTimerQueue) == 0x730, "Daemon::GlobalTimerQ
 static_assert(offsetof(Daemon, GlobalDelayedRelease) == 0x738, "Daemon::GlobalDelayedRelease");
 static_assert(offsetof(Daemon, allowClientIPAddressInLogs) == 0x740, "Daemon::allowClientIPAddressInLogs");
 static_assert(offsetof(Daemon, allowClientSessionLifeCycleInLogs) == 0x741, "Daemon::allowClientSessionLifeCycleInLogs");
+static_assert(sizeof(Daemon::Version) == 0x8, "sizeof Daemon::Version");
+static_assert(offsetof(Daemon::Version, version) == 0x0, "Daemon::Version::version");
+static_assert(offsetof(Daemon::Version, unit) == 0x0, "Daemon::Version::unit");
 
 class DaemonConfig {
 public:
-    char _pdb_tail[0x1];
 };
 static_assert(sizeof(DaemonConfig) == 0x1, "sizeof DaemonConfig");
 
@@ -3332,9 +3709,18 @@ static_assert(offsetof(DbTransaction, Next) == 0x20, "DbTransaction::Next");
 
 class DelayedDelete {
 public:
+    struct Node;
+    struct Node {
+    public:
+        DelayedDelete::Node * _next;
+        long long _added;
+        void * _checkDelete;
+        void * _doDelete;
+        void * _ptr;
+    };
     CriticalSection _lock;
-    void * _head;
-    void * _tail;
+    DelayedDelete::Node * _head;
+    DelayedDelete::Node * _tail;
     int _count;
     long long _lastDeleted;
     long _interval;
@@ -3348,12 +3734,28 @@ static_assert(offsetof(DelayedDelete, _count) == 0x38, "DelayedDelete::_count");
 static_assert(offsetof(DelayedDelete, _lastDeleted) == 0x40, "DelayedDelete::_lastDeleted");
 static_assert(offsetof(DelayedDelete, _interval) == 0x48, "DelayedDelete::_interval");
 static_assert(offsetof(DelayedDelete, _delay) == 0x4C, "DelayedDelete::_delay");
+static_assert(sizeof(DelayedDelete::Node) == 0x28, "sizeof DelayedDelete::Node");
+static_assert(offsetof(DelayedDelete::Node, _next) == 0x0, "DelayedDelete::Node::_next");
+static_assert(offsetof(DelayedDelete::Node, _added) == 0x8, "DelayedDelete::Node::_added");
+static_assert(offsetof(DelayedDelete::Node, _checkDelete) == 0x10, "DelayedDelete::Node::_checkDelete");
+static_assert(offsetof(DelayedDelete::Node, _doDelete) == 0x18, "DelayedDelete::Node::_doDelete");
+static_assert(offsetof(DelayedDelete::Node, _ptr) == 0x20, "DelayedDelete::Node::_ptr");
 
 class DelayedRelease {
 public:
+    struct Node;
+    struct Node {
+    public:
+        DelayedRelease::Node * _next;
+        long long _added;
+        void * _callback;
+        RefCntObject * _ref1;
+        RefCntObject * _ref2;
+        RefCntObject * _ref3;
+    };
     CriticalSection _lock;
-    void * _head;
-    void * _tail;
+    DelayedRelease::Node * _head;
+    DelayedRelease::Node * _tail;
     int _count;
     long long _lastReleased;
     long _interval;
@@ -3367,25 +3769,40 @@ static_assert(offsetof(DelayedRelease, _count) == 0x38, "DelayedRelease::_count"
 static_assert(offsetof(DelayedRelease, _lastReleased) == 0x40, "DelayedRelease::_lastReleased");
 static_assert(offsetof(DelayedRelease, _interval) == 0x48, "DelayedRelease::_interval");
 static_assert(offsetof(DelayedRelease, _delay) == 0x4C, "DelayedRelease::_delay");
+static_assert(sizeof(DelayedRelease::Node) == 0x30, "sizeof DelayedRelease::Node");
+static_assert(offsetof(DelayedRelease::Node, _next) == 0x0, "DelayedRelease::Node::_next");
+static_assert(offsetof(DelayedRelease::Node, _added) == 0x8, "DelayedRelease::Node::_added");
+static_assert(offsetof(DelayedRelease::Node, _callback) == 0x10, "DelayedRelease::Node::_callback");
+static_assert(offsetof(DelayedRelease::Node, _ref1) == 0x18, "DelayedRelease::Node::_ref1");
+static_assert(offsetof(DelayedRelease::Node, _ref2) == 0x20, "DelayedRelease::Node::_ref2");
+static_assert(offsetof(DelayedRelease::Node, _ref3) == 0x28, "DelayedRelease::Node::_ref3");
 
 class DeleteEvent : public DynamicEventObject {
 public:
     virtual ~DeleteEvent();
     virtual unsigned int EventId() const;
     virtual bool HandleEvent(EventContext *, unsigned long);
-    void * _head;
+    DelayedDelete::Node * _head;
 };
 static_assert(sizeof(DeleteEvent) == 0x20, "sizeof DeleteEvent");
 static_assert(offsetof(DeleteEvent, _head) == 0x18, "DeleteEvent::_head");
 
 struct EHExceptionRecord {
 public:
+    struct EHParameters;
+    struct EHParameters {
+    public:
+        unsigned long magicNumber;
+        void * pExceptionObject;
+        _s_ThrowInfo const * pThrowInfo;
+        void * pThrowImageBase;
+    };
     unsigned long ExceptionCode;
     unsigned long ExceptionFlags;
     void * ExceptionRecord;
     void * ExceptionAddress;
     unsigned long NumberParameters;
-    alignas(8) unsigned char params[0x20];  // ❓ PDB type 0x532D: EHExceptionRecord::EHParameters
+    EHExceptionRecord::EHParameters params;
 };
 static_assert(sizeof(EHExceptionRecord) == 0x40, "sizeof EHExceptionRecord");
 static_assert(offsetof(EHExceptionRecord, ExceptionCode) == 0x0, "EHExceptionRecord::ExceptionCode");
@@ -3394,6 +3811,11 @@ static_assert(offsetof(EHExceptionRecord, ExceptionRecord) == 0x8, "EHExceptionR
 static_assert(offsetof(EHExceptionRecord, ExceptionAddress) == 0x10, "EHExceptionRecord::ExceptionAddress");
 static_assert(offsetof(EHExceptionRecord, NumberParameters) == 0x18, "EHExceptionRecord::NumberParameters");
 static_assert(offsetof(EHExceptionRecord, params) == 0x20, "EHExceptionRecord::params");
+static_assert(sizeof(EHExceptionRecord::EHParameters) == 0x20, "sizeof EHExceptionRecord::EHParameters");
+static_assert(offsetof(EHExceptionRecord::EHParameters, magicNumber) == 0x0, "EHExceptionRecord::EHParameters::magicNumber");
+static_assert(offsetof(EHExceptionRecord::EHParameters, pExceptionObject) == 0x8, "EHExceptionRecord::EHParameters::pExceptionObject");
+static_assert(offsetof(EHExceptionRecord::EHParameters, pThrowInfo) == 0x10, "EHExceptionRecord::EHParameters::pThrowInfo");
+static_assert(offsetof(EHExceptionRecord::EHParameters, pThrowImageBase) == 0x18, "EHExceptionRecord::EHParameters::pThrowImageBase");
 
 struct EventLogInfo {
 public:
@@ -3412,6 +3834,11 @@ static_assert(offsetof(EventLogInfo, gameEventId) == 0x28, "EventLogInfo::gameEv
 
 class EventNotiJob : public CouponJob {
 public:
+    enum State : int {
+        INIT = 0x0,
+        EVENT_NOTI = 0x1,
+        FIN = 0x2,
+    };
     virtual ~EventNotiJob();
     virtual JobDef const * GetDefinition() const;
     virtual void deallocate_me(void *, wchar_t const *, int);
@@ -3484,21 +3911,47 @@ static_assert(sizeof(FSE_symbolCompressionTransform) == 0x8, "sizeof FSE_symbolC
 static_assert(offsetof(FSE_symbolCompressionTransform, deltaFindState) == 0x0, "FSE_symbolCompressionTransform::deltaFindState");
 static_assert(offsetof(FSE_symbolCompressionTransform, deltaNbBits) == 0x4, "FSE_symbolCompressionTransform::deltaNbBits");
 
+struct _FILETIME {
+public:
+    unsigned long dwLowDateTime;
+    unsigned long dwHighDateTime;
+};
+static_assert(sizeof(_FILETIME) == 0x8, "sizeof _FILETIME");
+static_assert(offsetof(_FILETIME, dwLowDateTime) == 0x0, "_FILETIME::dwLowDateTime");
+static_assert(offsetof(_FILETIME, dwHighDateTime) == 0x4, "_FILETIME::dwHighDateTime");
+
 union FT {
 public:
     unsigned long long ft_scalar;
-    alignas(4) unsigned char ft_struct[0x8];  // ❓ PDB type 0x1084: _FILETIME
+    _FILETIME ft_struct;
 };
 static_assert(sizeof(FT) == 0x8, "sizeof FT");
+static_assert(offsetof(FT, ft_scalar) == 0x0, "FT::ft_scalar");
+static_assert(offsetof(FT, ft_struct) == 0x0, "FT::ft_struct");
 
 class GameEventConfig {
 public:
+    struct GameEventInfo;
+    struct GameEventInfo {
+    public:
+        int id;
+        wchar_t name[260];
+        char eventType;
+        bool enable;
+        unsigned char daemonType;
+    };
     CriticalSection _lock;
-    alignas(8) unsigned char _gameEventList[0x20];  // ❓ PDB type 0x28BF: std::map<int,GameEventConfig::GameEventInfo *,std::less<int>,StlAllocator<std::pair<int,GameEventConfig::GameEventInfo *>,2> >
+    std::map<int, GameEventConfig::GameEventInfo *> _gameEventList;
 };
 static_assert(sizeof(GameEventConfig) == 0x48, "sizeof GameEventConfig");
 static_assert(offsetof(GameEventConfig, _lock) == 0x0, "GameEventConfig::_lock");
 static_assert(offsetof(GameEventConfig, _gameEventList) == 0x28, "GameEventConfig::_gameEventList");
+static_assert(sizeof(GameEventConfig::GameEventInfo) == 0x210, "sizeof GameEventConfig::GameEventInfo");
+static_assert(offsetof(GameEventConfig::GameEventInfo, id) == 0x0, "GameEventConfig::GameEventInfo::id");
+static_assert(offsetof(GameEventConfig::GameEventInfo, name) == 0x4, "GameEventConfig::GameEventInfo::name");
+static_assert(offsetof(GameEventConfig::GameEventInfo, eventType) == 0x20C, "GameEventConfig::GameEventInfo::eventType");
+static_assert(offsetof(GameEventConfig::GameEventInfo, enable) == 0x20D, "GameEventConfig::GameEventInfo::enable");
+static_assert(offsetof(GameEventConfig::GameEventInfo, daemonType) == 0x20E, "GameEventConfig::GameEventInfo::daemonType");
 
 class GameEventEndEvent : public DynamicEventObject {
 public:
@@ -3554,10 +4007,26 @@ static_assert(offsetof(GameEventWorker, _workerId) == 0x30, "GameEventWorker::_w
 static_assert(offsetof(GameEventWorker, _mgrInstance) == 0x38, "GameEventWorker::_mgrInstance");
 static_assert(offsetof(GameEventWorker, _failedEventHandler) == 0x40, "GameEventWorker::_failedEventHandler");
 
+class Memory {
+public:
+    enum MgrType : int {
+        MMGR_DEFAULT = 0x0,
+        MMGR_DEBUG = 0x1,
+        MMGR_MAX = 0x2,
+    };
+    enum Section : int {
+        INIT = 0x0,
+        STATIC = 0x1,
+        DYNAMIC = 0x2,
+        MEMSEC_MAX = 0x3,
+    };
+};
+static_assert(sizeof(Memory) == 0x1, "sizeof Memory");
+
 class GrowingBuffer {
 public:
     virtual ~GrowingBuffer();  // slot 0
-    int _sec;
+    Memory::Section _sec;
     unsigned long long _initSize;
     unsigned long long _size;
     unsigned long long _count;
@@ -3619,7 +4088,7 @@ static_assert(offsetof(HWND__, unused) == 0x0, "HWND__::unused");
 
 struct IUnknown {
 public:
-    virtual long QueryInterface(void *, void * *) = 0;  // slot 0
+    virtual long QueryInterface(_GUID const &, void * *) = 0;  // slot 0
     virtual unsigned long AddRef() = 0;  // slot 1
     virtual unsigned long Release() = 0;  // slot 2
 };
@@ -3629,8 +4098,8 @@ struct IDispatch : public IUnknown {
 public:
     virtual long GetTypeInfoCount(unsigned int *) = 0;  // slot 3
     virtual long GetTypeInfo(unsigned int, unsigned long, ITypeInfo * *) = 0;  // slot 4
-    virtual long GetIDsOfNames(void *, wchar_t * *, unsigned int, unsigned long, long *) = 0;  // slot 5
-    virtual long Invoke(long, void *, unsigned long, unsigned short, void *, void *, void *, unsigned int *) = 0;  // slot 6
+    virtual long GetIDsOfNames(_GUID const &, wchar_t * *, unsigned int, unsigned long, long *) = 0;  // slot 5
+    virtual long Invoke(long, _GUID const &, unsigned long, unsigned short, void *, void *, void *, unsigned int *) = 0;  // slot 6
 };
 static_assert(sizeof(IDispatch) == 0x8, "sizeof IDispatch");
 
@@ -3648,7 +4117,7 @@ public:
     virtual long RecordInit(void *) = 0;  // slot 3
     virtual long RecordClear(void *) = 0;  // slot 4
     virtual long RecordCopy(void *, void *) = 0;  // slot 5
-    virtual long GetGuid(void *) = 0;  // slot 6
+    virtual long GetGuid(_GUID *) = 0;  // slot 6
     virtual long GetName(wchar_t * *) = 0;  // slot 7
     virtual long GetSize(unsigned long *) = 0;  // slot 8
     virtual long GetTypeInfo(ITypeInfo * *) = 0;  // slot 9
@@ -3677,15 +4146,15 @@ public:
     virtual long OpenStream(wchar_t const *, void *, unsigned long, unsigned long, IStream * *) = 0;  // slot 4
     virtual long CreateStorage(wchar_t const *, unsigned long, unsigned long, unsigned long, IStorage * *) = 0;  // slot 5
     virtual long OpenStorage(wchar_t const *, IStorage *, unsigned long, wchar_t * *, unsigned long, IStorage * *) = 0;  // slot 6
-    virtual long CopyTo(unsigned long, void *, wchar_t * *, IStorage *) = 0;  // slot 7
+    virtual long CopyTo(unsigned long, _GUID const *, wchar_t * *, IStorage *) = 0;  // slot 7
     virtual long MoveElementTo(wchar_t const *, IStorage *, wchar_t const *, unsigned long) = 0;  // slot 8
     virtual long Commit(unsigned long) = 0;  // slot 9
     virtual long Revert() = 0;  // slot 10
     virtual long EnumElements(unsigned long, void *, unsigned long, IEnumSTATSTG * *) = 0;  // slot 11
     virtual long DestroyElement(wchar_t const *) = 0;  // slot 12
     virtual long RenameElement(wchar_t const *, wchar_t const *) = 0;  // slot 13
-    virtual long SetElementTimes(wchar_t const *, void *, void *, void *) = 0;  // slot 14
-    virtual long SetClass(void *) = 0;  // slot 15
+    virtual long SetElementTimes(wchar_t const *, _FILETIME const *, _FILETIME const *, _FILETIME const *) = 0;  // slot 14
+    virtual long SetClass(_GUID const &) = 0;  // slot 15
     virtual long SetStateBits(unsigned long, unsigned long) = 0;  // slot 16
     virtual long Stat(void *, unsigned long) = 0;  // slot 17
 };
@@ -3693,13 +4162,13 @@ static_assert(sizeof(IStorage) == 0x8, "sizeof IStorage");
 
 struct IStream : public ISequentialStream {
 public:
-    virtual long Seek(void *, unsigned long, void *) = 0;  // slot 5
-    virtual long SetSize(void *) = 0;  // slot 6
-    virtual long CopyTo(IStream *, void *, void *, void *) = 0;  // slot 7
+    virtual long Seek(_LARGE_INTEGER, unsigned long, _ULARGE_INTEGER *) = 0;  // slot 5
+    virtual long SetSize(_ULARGE_INTEGER) = 0;  // slot 6
+    virtual long CopyTo(IStream *, _ULARGE_INTEGER, _ULARGE_INTEGER *, _ULARGE_INTEGER *) = 0;  // slot 7
     virtual long Commit(unsigned long) = 0;  // slot 8
     virtual long Revert() = 0;  // slot 9
-    virtual long LockRegion(void *, void *, unsigned long) = 0;  // slot 10
-    virtual long UnlockRegion(void *, void *, unsigned long) = 0;  // slot 11
+    virtual long LockRegion(_ULARGE_INTEGER, _ULARGE_INTEGER, unsigned long) = 0;  // slot 10
+    virtual long UnlockRegion(_ULARGE_INTEGER, _ULARGE_INTEGER, unsigned long) = 0;  // slot 11
     virtual long Stat(void *, unsigned long) = 0;  // slot 12
     virtual long Clone(IStream * *) = 0;  // slot 13
 };
@@ -3727,7 +4196,7 @@ public:
     virtual long GetDllEntry(long, int, wchar_t * *, wchar_t * *, unsigned short *) = 0;  // slot 13
     virtual long GetRefTypeInfo(unsigned long, ITypeInfo * *) = 0;  // slot 14
     virtual long AddressOfMember(long, int, void * *) = 0;  // slot 15
-    virtual long CreateInstance(IUnknown *, void *, void * *) = 0;  // slot 16
+    virtual long CreateInstance(IUnknown *, _GUID const &, void * *) = 0;  // slot 16
     virtual long GetMops(long, wchar_t * *) = 0;  // slot 17
     virtual long GetContainingTypeLib(ITypeLib * *, unsigned int *) = 0;  // slot 18
     virtual void ReleaseTypeAttr(void *) = 0;  // slot 19
@@ -3741,7 +4210,7 @@ public:
     virtual unsigned int GetTypeInfoCount() = 0;  // slot 3
     virtual long GetTypeInfo(unsigned int, ITypeInfo * *) = 0;  // slot 4
     virtual long GetTypeInfoType(unsigned int, int *) = 0;  // slot 5
-    virtual long GetTypeInfoOfGuid(void *, ITypeInfo * *) = 0;  // slot 6
+    virtual long GetTypeInfoOfGuid(_GUID const &, ITypeInfo * *) = 0;  // slot 6
     virtual long GetLibAttr(void * *) = 0;  // slot 7
     virtual long GetTypeComp(ITypeComp * *) = 0;  // slot 8
     virtual long GetDocumentation(int, wchar_t * *, wchar_t * *, unsigned long *, wchar_t * *) = 0;  // slot 9
@@ -3753,6 +4222,16 @@ static_assert(sizeof(ITypeLib) == 0x8, "sizeof ITypeLib");
 
 class IdleStateTable {
 public:
+    union Pos;
+    union Pos {
+    public:
+        long long pos;
+        struct {
+            short port;
+            short bit;
+            int index;
+        };
+    };
     Port * _port;
     long _maxIdleTime;
     bool _disconnect;
@@ -3765,6 +4244,11 @@ static_assert(offsetof(IdleStateTable, _maxIdleTime) == 0x8, "IdleStateTable::_m
 static_assert(offsetof(IdleStateTable, _disconnect) == 0xC, "IdleStateTable::_disconnect");
 static_assert(offsetof(IdleStateTable, _size) == 0x10, "IdleStateTable::_size");
 static_assert(offsetof(IdleStateTable, _table) == 0x18, "IdleStateTable::_table");
+static_assert(sizeof(IdleStateTable::Pos) == 0x8, "sizeof IdleStateTable::Pos");
+static_assert(offsetof(IdleStateTable::Pos, pos) == 0x0, "IdleStateTable::Pos::pos");
+static_assert(offsetof(IdleStateTable::Pos, port) == 0x0, "IdleStateTable::Pos::port");
+static_assert(offsetof(IdleStateTable::Pos, bit) == 0x2, "IdleStateTable::Pos::bit");
+static_assert(offsetof(IdleStateTable::Pos, index) == 0x4, "IdleStateTable::Pos::index");
 
 class IdleWatcher : public Thread {
 public:
@@ -3841,12 +4325,25 @@ static_assert(offsetof(JobTaskEvent, _job) == 0x18, "JobTaskEvent::_job");
 static_assert(offsetof(JobTaskEvent, _task) == 0x20, "JobTaskEvent::_task");
 static_assert(offsetof(JobTaskEvent, _param) == 0x28, "JobTaskEvent::_param");
 
+struct _GUID {
+public:
+    unsigned long Data1;
+    unsigned short Data2;
+    unsigned short Data3;
+    unsigned char Data4[8];
+};
+static_assert(sizeof(_GUID) == 0x10, "sizeof _GUID");
+static_assert(offsetof(_GUID, Data1) == 0x0, "_GUID::Data1");
+static_assert(offsetof(_GUID, Data2) == 0x4, "_GUID::Data2");
+static_assert(offsetof(_GUID, Data3) == 0x6, "_GUID::Data3");
+static_assert(offsetof(_GUID, Data4) == 0x8, "_GUID::Data4");
+
 struct KNOWNFOLDER_DEFINITION {
 public:
     KF_CATEGORY category;
     wchar_t * pszName;
     wchar_t * pszDescription;
-    alignas(4) unsigned char fidParent[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID fidParent;
     wchar_t * pszRelativePath;
     wchar_t * pszParsingName;
     wchar_t * pszTooltip;
@@ -3855,7 +4352,7 @@ public:
     wchar_t * pszSecurity;
     unsigned long dwAttributes;
     unsigned long kfdFlags;
-    alignas(4) unsigned char ftidType[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID ftidType;
 };
 static_assert(sizeof(KNOWNFOLDER_DEFINITION) == 0x70, "sizeof KNOWNFOLDER_DEFINITION");
 static_assert(offsetof(KNOWNFOLDER_DEFINITION, category) == 0x0, "KNOWNFOLDER_DEFINITION::category");
@@ -3890,39 +4387,44 @@ static_assert(sizeof(LIST_ENTRY64) == 0x10, "sizeof LIST_ENTRY64");
 static_assert(offsetof(LIST_ENTRY64, Flink) == 0x0, "LIST_ENTRY64::Flink");
 static_assert(offsetof(LIST_ENTRY64, Blink) == 0x8, "LIST_ENTRY64::Blink");
 
-class Log : public Thread {
+struct _SYSTEMTIME {
 public:
-    virtual ~Log();
-    virtual wchar_t const * Name();
-    virtual void run();
-    bool open;
-    bool flush;
-    SystemEvent notifyEvent;
-    LogMedia * media[8];
-    int mediaCount;
-    LogMedia * mediaList[11];
-    int mediaCountPerList[11];
+    unsigned short wYear;
+    unsigned short wMonth;
+    unsigned short wDayOfWeek;
+    unsigned short wDay;
+    unsigned short wHour;
+    unsigned short wMinute;
+    unsigned short wSecond;
+    unsigned short wMilliseconds;
 };
-static_assert(sizeof(Log) == 0x110, "sizeof Log");
-static_assert(offsetof(Log, open) == 0x30, "Log::open");
-static_assert(offsetof(Log, flush) == 0x31, "Log::flush");
-static_assert(offsetof(Log, notifyEvent) == 0x38, "Log::notifyEvent");
-static_assert(offsetof(Log, media) == 0x40, "Log::media");
-static_assert(offsetof(Log, mediaCount) == 0x80, "Log::mediaCount");
-static_assert(offsetof(Log, mediaList) == 0x88, "Log::mediaList");
-static_assert(offsetof(Log, mediaCountPerList) == 0xE0, "Log::mediaCountPerList");
+static_assert(sizeof(_SYSTEMTIME) == 0x10, "sizeof _SYSTEMTIME");
+static_assert(offsetof(_SYSTEMTIME, wYear) == 0x0, "_SYSTEMTIME::wYear");
+static_assert(offsetof(_SYSTEMTIME, wMonth) == 0x2, "_SYSTEMTIME::wMonth");
+static_assert(offsetof(_SYSTEMTIME, wDayOfWeek) == 0x4, "_SYSTEMTIME::wDayOfWeek");
+static_assert(offsetof(_SYSTEMTIME, wDay) == 0x6, "_SYSTEMTIME::wDay");
+static_assert(offsetof(_SYSTEMTIME, wHour) == 0x8, "_SYSTEMTIME::wHour");
+static_assert(offsetof(_SYSTEMTIME, wMinute) == 0xA, "_SYSTEMTIME::wMinute");
+static_assert(offsetof(_SYSTEMTIME, wSecond) == 0xC, "_SYSTEMTIME::wSecond");
+static_assert(offsetof(_SYSTEMTIME, wMilliseconds) == 0xE, "_SYSTEMTIME::wMilliseconds");
 
 class LogBuffer : public RefCntObject, public ConsoleLog {
 public:
+    class Iterator;
+    class Iterator {
+    public:
+        LogMedia const * _media;
+        LogBuffer const * _logbuf;
+    };
     virtual ~LogBuffer();
     virtual void deallocate_me(void *, wchar_t const *, int);
-    virtual int GetType() const;
+    virtual ConsoleLog::Type GetType() const;
     virtual bool Acquire();
     virtual void Release();
     virtual bool GetLog(wchar_t *, unsigned long long) const;
     LogBuffer * _next[8];
-    alignas(2) unsigned char _logtime[0x10];  // ❓ PDB type 0x237A: _SYSTEMTIME
-    int _type;
+    _SYSTEMTIME _logtime;
+    Log::Type _type;
     wchar_t const * _file;
     int _line;
     bool _flush;
@@ -3936,10 +4438,12 @@ static_assert(offsetof(LogBuffer, _file) == 0x78, "LogBuffer::_file");
 static_assert(offsetof(LogBuffer, _line) == 0x80, "LogBuffer::_line");
 static_assert(offsetof(LogBuffer, _flush) == 0x84, "LogBuffer::_flush");
 static_assert(offsetof(LogBuffer, _log) == 0x86, "LogBuffer::_log");
+static_assert(sizeof(LogBuffer::Iterator) == 0x10, "sizeof LogBuffer::Iterator");
+static_assert(offsetof(LogBuffer::Iterator, _media) == 0x0, "LogBuffer::Iterator::_media");
+static_assert(offsetof(LogBuffer::Iterator, _logbuf) == 0x8, "LogBuffer::Iterator::_logbuf");
 
 class LogBufferAllocator {
 public:
-    char _pdb_tail[0x1];
 };
 static_assert(sizeof(LogBufferAllocator) == 0x1, "sizeof LogBufferAllocator");
 
@@ -3955,7 +4459,7 @@ static_assert(offsetof(LogBufferPool, _pool) == 0x8, "LogBufferPool::_pool");
 class LogFile : public LogMedia {
 public:
     virtual ~LogFile();
-    virtual int GetType() const;
+    virtual LogMedia::Type GetType() const;
     virtual void Flush();
     virtual wchar_t * GetLastFileName();
     virtual void write(LogBuffer const *);
@@ -3988,7 +4492,7 @@ static_assert(offsetof(LogFile, _lastFileName) == 0x2F8, "LogFile::_lastFileName
 
 class LogFgtFile : public LogFile {
 public:
-    virtual int GetType() const;
+    virtual LogMedia::Type GetType() const;
     virtual ~LogFgtFile();
 };
 static_assert(sizeof(LogFgtFile) == 0x500, "sizeof LogFgtFile");
@@ -4012,12 +4516,6 @@ public:
 };
 static_assert(sizeof(ManagerSessionHandler) == 0x8, "sizeof ManagerSessionHandler");
 
-class Memory {
-public:
-    char _pdb_tail[0x1];
-};
-static_assert(sizeof(Memory) == 0x1, "sizeof Memory");
-
 struct ModuleInfo {
 public:
     char name[260];
@@ -4031,12 +4529,19 @@ static_assert(offsetof(ModuleInfo, offset) == 0x108, "ModuleInfo::offset");
 
 class NPBase64 {
 public:
-    char _pdb_tail[0x1];
 };
 static_assert(sizeof(NPBase64) == 0x1, "sizeof NPBase64");
 
 class SharedChannel : public DynamicRefCntObj {
 public:
+    class RawChannel;
+    class RawChannel : public Channel {
+    public:
+        virtual ~RawChannel();
+        virtual unsigned long long GetId();
+        unsigned long long _id;
+        SharedChannel * _owner;
+    };
     virtual bool Connect(unsigned long long, unsigned int, unsigned long, unsigned short, long, bool);  // slot 4
     virtual bool Accept(unsigned long long, Session const *);  // slot 5
     virtual void Close();  // slot 6
@@ -4046,6 +4551,9 @@ public:
 };
 static_assert(sizeof(SharedChannel) == 0x20, "sizeof SharedChannel");
 static_assert(offsetof(SharedChannel, _rawChannel) == 0x18, "SharedChannel::_rawChannel");
+static_assert(sizeof(SharedChannel::RawChannel) == 0x38, "sizeof SharedChannel::RawChannel");
+static_assert(offsetof(SharedChannel::RawChannel, _id) == 0x28, "SharedChannel::RawChannel::_id");
+static_assert(offsetof(SharedChannel::RawChannel, _owner) == 0x30, "SharedChannel::RawChannel::_owner");
 
 class NPChannel : public SharedChannel {
 public:
@@ -4064,6 +4572,11 @@ static_assert(offsetof(NPChannel, _ping) == 0x38, "NPChannel::_ping");
 
 class NPTransaction {
 public:
+    enum Kind : int {
+        KIND_INVALID = 0x0,
+        KIND_TRANJOB = 0x1,
+        KIND_MAX = 0x2,
+    };
     virtual ~NPTransaction();  // slot 0
     virtual int GetKind() const = 0;  // slot 1
     virtual void Expire() = 0;  // slot 2
@@ -4094,7 +4607,6 @@ static_assert(sizeof(NPMessageHandler) == 0x8, "sizeof NPMessageHandler");
 
 class NPMsgDecomposer {
 public:
-    char _pdb_tail[0x1];
 };
 static_assert(sizeof(NPMsgDecomposer) == 0x1, "sizeof NPMsgDecomposer");
 
@@ -4116,7 +4628,6 @@ static_assert(offsetof(NPMsgHandleEvent, _handler) == 0x30, "NPMsgHandleEvent::_
 
 class NPMsgHelper {
 public:
-    char _pdb_tail[0x1];
 };
 static_assert(sizeof(NPMsgHelper) == 0x1, "sizeof NPMsgHelper");
 
@@ -4185,9 +4696,15 @@ static_assert(offsetof(NPSessionHandler, _connlock) == 0x8, "NPSessionHandler::_
 
 class NPTransactionRegistry {
 public:
+    struct Item;
+    struct Item {
+    public:
+        StsMsgLib::ECommand cmd;
+        void * context;
+    };
     void * _cmdDispatcher;
     unsigned int _seed;
-    alignas(8) unsigned char _dict[0x20];  // ❓ PDB type 0x2C94: std::map<unsigned int,NPTransactionRegistry::Item *,std::less<unsigned int>,StlAllocator<std::pair<unsigned int,NPTransactionRegistry::Item *>,2> >
+    std::map<unsigned int, NPTransactionRegistry::Item *> _dict;
     CriticalSection _lock;
 };
 static_assert(sizeof(NPTransactionRegistry) == 0x58, "sizeof NPTransactionRegistry");
@@ -4195,9 +4712,28 @@ static_assert(offsetof(NPTransactionRegistry, _cmdDispatcher) == 0x0, "NPTransac
 static_assert(offsetof(NPTransactionRegistry, _seed) == 0x8, "NPTransactionRegistry::_seed");
 static_assert(offsetof(NPTransactionRegistry, _dict) == 0x10, "NPTransactionRegistry::_dict");
 static_assert(offsetof(NPTransactionRegistry, _lock) == 0x30, "NPTransactionRegistry::_lock");
+static_assert(sizeof(NPTransactionRegistry::Item) == 0x10, "sizeof NPTransactionRegistry::Item");
+static_assert(offsetof(NPTransactionRegistry::Item, cmd) == 0x0, "NPTransactionRegistry::Item::cmd");
+static_assert(offsetof(NPTransactionRegistry::Item, context) == 0x8, "NPTransactionRegistry::Item::context");
 
 class Network {
 public:
+    enum Const : int {
+        INVALID_PORT_ID = 0x0,
+        CLIENT_PORT_ID = 0x1,
+        MAX_PORT_ID = 0x18,
+        MAX_SESSION = 0x8000,
+        DEFAULT_INTERNAL_MAX_SESSION = 0x10,
+        DEFAULT_PUBLIC_MAX_SESSION = 0x2710,
+        USE_DEFAULT_MAX_SESSION = 0x0,
+        LOOPBACK_ADDRESS = 0x100007F,
+    };
+    enum Ports : int {
+        PUBLIC_CRYPT_PORT = 0x0,
+        PUBLIC_NOCRYPT_PORT = 0x1,
+        INTERNAL_PORT = 0x2,
+        MANAGE_PORT = 0x3,
+    };
     unsigned int _workerThreadCount;
     IoWorker * * _workerThreads;
     Port * _port[24];
@@ -4219,6 +4755,141 @@ public:
 };
 static_assert(sizeof(NetworkEndEvent) == 0x18, "sizeof NetworkEndEvent");
 
+namespace StsMsgLib {
+struct _StsMsg {
+public:
+    virtual StsMsgLib::ECommand GetCommand() = 0;  // slot 0
+    virtual unsigned int GetTransactionId() = 0;  // slot 1
+    virtual StsMsgLib::EMessageType GetMessageType() = 0;  // slot 2
+};
+}  // namespace StsMsgLib
+static_assert(sizeof(StsMsgLib::_StsMsg) == 0x8, "sizeof StsMsgLib::_StsMsg");
+
+namespace StsMsgLib {
+struct _StsMsgInfo {
+public:
+    StsMsgLib::ECommand eCmd;
+    StsMsgLib::EMessageType msgType;
+};
+}  // namespace StsMsgLib
+static_assert(sizeof(StsMsgLib::_StsMsgInfo) == 0x8, "sizeof StsMsgLib::_StsMsgInfo");
+static_assert(offsetof(StsMsgLib::_StsMsgInfo, eCmd) == 0x0, "StsMsgLib::_StsMsgInfo::eCmd");
+static_assert(offsetof(StsMsgLib::_StsMsgInfo, msgType) == 0x4, "StsMsgLib::_StsMsgInfo::msgType");
+
+namespace StsMsgLib {
+struct _StsMsgInfoResponse : public StsMsgLib::_StsMsgInfo {
+public:
+    struct _StsMsgBanInfo;
+    struct _StsMsgErrInfo;
+    struct _StsMsgBanInfo {
+    public:
+        unsigned int nBanId;
+        long long tEffectiveFrom;
+        long long tEffectiveTo;
+        long long tUserUnbanFrom;
+        int nBanReasonCode;
+    };
+    struct _StsMsgErrInfo {
+    public:
+        char const * pszErr;
+        unsigned int nStatusCode;
+        wchar_t const * pwszReason;
+        int nErrorCode;
+        StsMsgLib::_StsMsgInfoResponse::_StsMsgBanInfo banInfo;
+    };
+    unsigned int nTxnId;
+    bool bComplete;
+    StsMsgLib::_StsMsgInfoResponse::_StsMsgErrInfo errInfo;
+};
+}  // namespace StsMsgLib
+static_assert(sizeof(StsMsgLib::_StsMsgInfoResponse) == 0x58, "sizeof StsMsgLib::_StsMsgInfoResponse");
+static_assert(offsetof(StsMsgLib::_StsMsgInfoResponse, nTxnId) == 0x8, "StsMsgLib::_StsMsgInfoResponse::nTxnId");
+static_assert(offsetof(StsMsgLib::_StsMsgInfoResponse, bComplete) == 0xC, "StsMsgLib::_StsMsgInfoResponse::bComplete");
+static_assert(offsetof(StsMsgLib::_StsMsgInfoResponse, errInfo) == 0x10, "StsMsgLib::_StsMsgInfoResponse::errInfo");
+static_assert(sizeof(StsMsgLib::_StsMsgInfoResponse::_StsMsgBanInfo) == 0x28, "sizeof StsMsgLib::_StsMsgInfoResponse::_StsMsgBanInfo");
+static_assert(offsetof(StsMsgLib::_StsMsgInfoResponse::_StsMsgBanInfo, nBanId) == 0x0, "StsMsgLib::_StsMsgInfoResponse::_StsMsgBanInfo::nBanId");
+static_assert(offsetof(StsMsgLib::_StsMsgInfoResponse::_StsMsgBanInfo, tEffectiveFrom) == 0x8, "StsMsgLib::_StsMsgInfoResponse::_StsMsgBanInfo::tEffectiveFrom");
+static_assert(offsetof(StsMsgLib::_StsMsgInfoResponse::_StsMsgBanInfo, tEffectiveTo) == 0x10, "StsMsgLib::_StsMsgInfoResponse::_StsMsgBanInfo::tEffectiveTo");
+static_assert(offsetof(StsMsgLib::_StsMsgInfoResponse::_StsMsgBanInfo, tUserUnbanFrom) == 0x18, "StsMsgLib::_StsMsgInfoResponse::_StsMsgBanInfo::tUserUnbanFrom");
+static_assert(offsetof(StsMsgLib::_StsMsgInfoResponse::_StsMsgBanInfo, nBanReasonCode) == 0x20, "StsMsgLib::_StsMsgInfoResponse::_StsMsgBanInfo::nBanReasonCode");
+static_assert(sizeof(StsMsgLib::_StsMsgInfoResponse::_StsMsgErrInfo) == 0x48, "sizeof StsMsgLib::_StsMsgInfoResponse::_StsMsgErrInfo");
+static_assert(offsetof(StsMsgLib::_StsMsgInfoResponse::_StsMsgErrInfo, pszErr) == 0x0, "StsMsgLib::_StsMsgInfoResponse::_StsMsgErrInfo::pszErr");
+static_assert(offsetof(StsMsgLib::_StsMsgInfoResponse::_StsMsgErrInfo, nStatusCode) == 0x8, "StsMsgLib::_StsMsgInfoResponse::_StsMsgErrInfo::nStatusCode");
+static_assert(offsetof(StsMsgLib::_StsMsgInfoResponse::_StsMsgErrInfo, pwszReason) == 0x10, "StsMsgLib::_StsMsgInfoResponse::_StsMsgErrInfo::pwszReason");
+static_assert(offsetof(StsMsgLib::_StsMsgInfoResponse::_StsMsgErrInfo, nErrorCode) == 0x18, "StsMsgLib::_StsMsgInfoResponse::_StsMsgErrInfo::nErrorCode");
+static_assert(offsetof(StsMsgLib::_StsMsgInfoResponse::_StsMsgErrInfo, banInfo) == 0x20, "StsMsgLib::_StsMsgInfoResponse::_StsMsgErrInfo::banInfo");
+
+namespace StsMsgLib {
+struct _StsMsgResponse : public StsMsgLib::_StsMsg {
+public:
+    virtual StsMsgLib::ECommand GetCommand();
+    virtual unsigned int GetTransactionId();
+    virtual StsMsgLib::EMessageType GetMessageType();
+    StsMsgLib::_StsMsgInfoResponse msgInfo;
+};
+}  // namespace StsMsgLib
+static_assert(sizeof(StsMsgLib::_StsMsgResponse) == 0x60, "sizeof StsMsgLib::_StsMsgResponse");
+static_assert(offsetof(StsMsgLib::_StsMsgResponse, msgInfo) == 0x8, "StsMsgLib::_StsMsgResponse::msgInfo");
+
+namespace StsMsgLib {
+struct _StsMsgResponseGameGroupGetChannelProperty : public StsMsgLib::_StsMsgResponse {
+public:
+    enum EDefaultVoiceStatus : int {
+        DEFAULTVOICESTATUS_INVALID = 0x0,
+        DEFAULTVOICESTATUS_TALK = 0x1,
+        DEFAULTVOICESTATUS_MUTE = 0x2,
+    };
+    enum ETransportType : int {
+        TRANSPORTTYPE_INVALID = 0x0,
+        TRANSPORTTYPE_P2P = 0x1,
+        TRANSPORTTYPE_RELAY = 0x2,
+        TRANSPORTTYPE_MIX = 0x3,
+        TRANSPORTTYPE_MIXSTREAM = 0x4,
+    };
+    wchar_t * pwszChannelAlias;
+    wchar_t * pwszNotice;
+    unsigned int nAdminExist;
+    unsigned int nAllowVoice;
+    unsigned int nAllowEmpty;
+    unsigned int nSaveMsg;
+    unsigned int nProfanity;
+    unsigned int nNotifyChannelInfo;
+    unsigned int nNotifyUserInfo;
+    unsigned int nNotifyTalk;
+    unsigned int nNotifyGroup;
+    unsigned int nMaxTalkCountPerSec;
+    unsigned int nCheckPeriodSec;
+    unsigned int nMaxTalkCount;
+    unsigned int nBlockPeriodSec;
+    unsigned int nAdditionalPenalty;
+    unsigned int nMaxMemberCount;
+    StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty::ETransportType eTransportType;
+    StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty::EDefaultVoiceStatus eDefaultVoiceStatus;
+    unsigned int nVoiceMaxTalkCount;
+};
+}  // namespace StsMsgLib
+static_assert(sizeof(StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty) == 0xB8, "sizeof StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty, pwszChannelAlias) == 0x60, "StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty::pwszChannelAlias");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty, pwszNotice) == 0x68, "StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty::pwszNotice");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty, nAdminExist) == 0x70, "StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty::nAdminExist");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty, nAllowVoice) == 0x74, "StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty::nAllowVoice");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty, nAllowEmpty) == 0x78, "StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty::nAllowEmpty");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty, nSaveMsg) == 0x7C, "StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty::nSaveMsg");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty, nProfanity) == 0x80, "StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty::nProfanity");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty, nNotifyChannelInfo) == 0x84, "StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty::nNotifyChannelInfo");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty, nNotifyUserInfo) == 0x88, "StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty::nNotifyUserInfo");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty, nNotifyTalk) == 0x8C, "StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty::nNotifyTalk");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty, nNotifyGroup) == 0x90, "StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty::nNotifyGroup");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty, nMaxTalkCountPerSec) == 0x94, "StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty::nMaxTalkCountPerSec");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty, nCheckPeriodSec) == 0x98, "StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty::nCheckPeriodSec");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty, nMaxTalkCount) == 0x9C, "StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty::nMaxTalkCount");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty, nBlockPeriodSec) == 0xA0, "StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty::nBlockPeriodSec");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty, nAdditionalPenalty) == 0xA4, "StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty::nAdditionalPenalty");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty, nMaxMemberCount) == 0xA8, "StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty::nMaxMemberCount");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty, eTransportType) == 0xAC, "StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty::eTransportType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty, eDefaultVoiceStatus) == 0xB0, "StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty::eDefaultVoiceStatus");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty, nVoiceMaxTalkCount) == 0xB4, "StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty::nVoiceMaxTalkCount");
+
 struct NpChatChannelProperty {
 public:
     int maxMemberCount;
@@ -4230,7 +4901,7 @@ public:
     int notifyChannelInfo;
     int notifyUserInfo;
     int maxTalkCount;
-    int transportType;
+    StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty::ETransportType transportType;
 };
 static_assert(sizeof(NpChatChannelProperty) == 0x28, "sizeof NpChatChannelProperty");
 static_assert(offsetof(NpChatChannelProperty, maxMemberCount) == 0x0, "NpChatChannelProperty::maxMemberCount");
@@ -4246,6 +4917,32 @@ static_assert(offsetof(NpChatChannelProperty, transportType) == 0x24, "NpChatCha
 
 class ObjPool {
 public:
+    struct Node;
+    class Queue;
+    class Stack;
+    struct Tail;
+    struct Node {
+    public:
+        ObjPool::Node * next;
+        wchar_t const * file;
+        int line;
+        long long when;
+    };
+    class Queue {
+    public:
+        ObjPool::Node * _head;
+        ObjPool::Node * _tail;
+        int _size;
+    };
+    class Stack {
+    public:
+        ObjPool::Node * _head;
+        int _size;
+    };
+    struct Tail {
+    public:
+        void * tombstone;
+    };
     virtual ~ObjPool();  // slot 0
     unsigned long long _id;
     int _objsize;
@@ -4254,9 +4951,9 @@ public:
     void * _vtbl;
     long _timeToWait;
     int _total;
-    alignas(8) unsigned char _pool[0x10];  // ❓ PDB type 0x1ED7: ObjPool::Stack
+    ObjPool::Stack _pool;
     CriticalSection _lock;
-    alignas(8) unsigned char _wait[0x18];  // ❓ PDB type 0x1ED8: ObjPool::Queue
+    ObjPool::Queue _wait;
     CriticalSection _waitlock;
 };
 static_assert(sizeof(ObjPool) == 0xB0, "sizeof ObjPool");
@@ -4271,6 +4968,20 @@ static_assert(offsetof(ObjPool, _pool) == 0x38, "ObjPool::_pool");
 static_assert(offsetof(ObjPool, _lock) == 0x48, "ObjPool::_lock");
 static_assert(offsetof(ObjPool, _wait) == 0x70, "ObjPool::_wait");
 static_assert(offsetof(ObjPool, _waitlock) == 0x88, "ObjPool::_waitlock");
+static_assert(sizeof(ObjPool::Node) == 0x20, "sizeof ObjPool::Node");
+static_assert(offsetof(ObjPool::Node, next) == 0x0, "ObjPool::Node::next");
+static_assert(offsetof(ObjPool::Node, file) == 0x8, "ObjPool::Node::file");
+static_assert(offsetof(ObjPool::Node, line) == 0x10, "ObjPool::Node::line");
+static_assert(offsetof(ObjPool::Node, when) == 0x18, "ObjPool::Node::when");
+static_assert(sizeof(ObjPool::Queue) == 0x18, "sizeof ObjPool::Queue");
+static_assert(offsetof(ObjPool::Queue, _head) == 0x0, "ObjPool::Queue::_head");
+static_assert(offsetof(ObjPool::Queue, _tail) == 0x8, "ObjPool::Queue::_tail");
+static_assert(offsetof(ObjPool::Queue, _size) == 0x10, "ObjPool::Queue::_size");
+static_assert(sizeof(ObjPool::Stack) == 0x10, "sizeof ObjPool::Stack");
+static_assert(offsetof(ObjPool::Stack, _head) == 0x0, "ObjPool::Stack::_head");
+static_assert(offsetof(ObjPool::Stack, _size) == 0x8, "ObjPool::Stack::_size");
+static_assert(sizeof(ObjPool::Tail) == 0x8, "sizeof ObjPool::Tail");
+static_assert(offsetof(ObjPool::Tail, tombstone) == 0x0, "ObjPool::Tail::tombstone");
 
 class ObjPoolMemoryAllocator {
 public:
@@ -4296,10 +5007,27 @@ static_assert(offsetof(ObjPoolTimer, _resolution) == 0x60, "ObjPoolTimer::_resol
 
 class Packet {
 public:
+    struct Header;
+    struct VarData;
+    struct VarStr;
+    struct Header {
+    public:
+        short size;
+    };
+    struct VarData {
+    public:
+        short * size;
+        char * buffer;
+    };
+    struct VarStr {
+    public:
+        short * len;
+        wchar_t * str;
+    };
     PacketSplitter * Splitter;
     bool IsFragmentPacket;
     int FragmentPacketCmd;
-    void * CurHeader;
+    Packet::Header * CurHeader;
     PacketBuffer * ListHead;
     PacketBuffer * ListTail;
 };
@@ -4310,6 +5038,14 @@ static_assert(offsetof(Packet, FragmentPacketCmd) == 0xC, "Packet::FragmentPacke
 static_assert(offsetof(Packet, CurHeader) == 0x10, "Packet::CurHeader");
 static_assert(offsetof(Packet, ListHead) == 0x18, "Packet::ListHead");
 static_assert(offsetof(Packet, ListTail) == 0x20, "Packet::ListTail");
+static_assert(sizeof(Packet::Header) == 0x2, "sizeof Packet::Header");
+static_assert(offsetof(Packet::Header, size) == 0x0, "Packet::Header::size");
+static_assert(sizeof(Packet::VarData) == 0x10, "sizeof Packet::VarData");
+static_assert(offsetof(Packet::VarData, size) == 0x0, "Packet::VarData::size");
+static_assert(offsetof(Packet::VarData, buffer) == 0x8, "Packet::VarData::buffer");
+static_assert(sizeof(Packet::VarStr) == 0x10, "sizeof Packet::VarStr");
+static_assert(offsetof(Packet::VarStr, len) == 0x0, "Packet::VarStr::len");
+static_assert(offsetof(Packet::VarStr, str) == 0x8, "Packet::VarStr::str");
 
 class PacketBuffer : public RefCntObject {
 public:
@@ -4328,7 +5064,6 @@ static_assert(offsetof(PacketBuffer, Next) == 0xFD0, "PacketBuffer::Next");
 
 class PacketBufferAllocator {
 public:
-    char _pdb_tail[0x1];
 };
 static_assert(sizeof(PacketBufferAllocator) == 0x1, "sizeof PacketBufferAllocator");
 
@@ -4396,6 +5131,18 @@ static_assert(offsetof(RepeatPacketDecomposer, top) == 0x34, "RepeatPacketDecomp
 
 class PacketConcatenateBuffer : public PacketConcatenater {
 public:
+    struct VarData;
+    struct VarStr;
+    struct VarData {
+    public:
+        short * size;
+        char * buffer;
+    };
+    struct VarStr {
+    public:
+        short * len;
+        wchar_t * str;
+    };
     virtual ~PacketConcatenateBuffer();  // slot 4
     virtual short check(char const *, short) = 0;  // slot 5
     virtual bool copy(PacketConcatenateBuffer *);  // slot 6
@@ -4412,6 +5159,12 @@ static_assert(offsetof(PacketConcatenateBuffer, size) == 0x10, "PacketConcatenat
 static_assert(offsetof(PacketConcatenateBuffer, gbuffer) == 0x18, "PacketConcatenateBuffer::gbuffer");
 static_assert(offsetof(PacketConcatenateBuffer, gbufsize) == 0x20, "PacketConcatenateBuffer::gbufsize");
 static_assert(offsetof(PacketConcatenateBuffer, decomposer) == 0x28, "PacketConcatenateBuffer::decomposer");
+static_assert(sizeof(PacketConcatenateBuffer::VarData) == 0x10, "sizeof PacketConcatenateBuffer::VarData");
+static_assert(offsetof(PacketConcatenateBuffer::VarData, size) == 0x0, "PacketConcatenateBuffer::VarData::size");
+static_assert(offsetof(PacketConcatenateBuffer::VarData, buffer) == 0x8, "PacketConcatenateBuffer::VarData::buffer");
+static_assert(sizeof(PacketConcatenateBuffer::VarStr) == 0x10, "sizeof PacketConcatenateBuffer::VarStr");
+static_assert(offsetof(PacketConcatenateBuffer::VarStr, len) == 0x0, "PacketConcatenateBuffer::VarStr::len");
+static_assert(offsetof(PacketConcatenateBuffer::VarStr, str) == 0x8, "PacketConcatenateBuffer::VarStr::str");
 
 class PacketConcatenateHandler {
 public:
@@ -4421,15 +5174,87 @@ static_assert(sizeof(PacketConcatenateHandler) == 0x8, "sizeof PacketConcatenate
 
 class PacketCrypt {
 public:
+    union Header;
+    enum Algorithm : int {
+        ALGORITHM_DEFAULT = 0x0,
+        ALGORITHM_TYPE1 = 0x1,
+        ALGORITHM_TYPE2 = 0x2,
+        ALGORITHM_TYPE3 = 0x3,
+        ALGORITHM_TYPE4 = 0x4,
+    };
+    enum Code : int {
+        NONE = 0x0,
+        INITIAL_KEY = 0x4,
+        CLI_HANDSHAKE_KEY = 0x5,
+        SESSION_KEY_1 = 0x8,
+        SESSION_KEY_2 = 0x9,
+        SESSION_KEY_1_AND_3RD_PARTY = 0xA,
+        SESSION_KEY_2_AND_3RD_PARTY = 0xB,
+        BROADCAST_LOCAL_KEY = 0xC,
+        BROADCAST_LOCAL_KEY_COMPRESS = 0xD,
+        BROADCAST_GLOBAL_KEY = 0xE,
+    };
+    enum CompressType : int {
+        COMPRESS_NONE = 0x0,
+        COMPRESS_TYPE1 = 0x1,
+        COMPRESS_TYPE2 = 0x2,
+    };
+    enum ErrCode : int {
+        SPCE_NO_ERROR = 0x0,
+        UNKOWN_ERROR = 0x1,
+        NO_RESULT = 0x2,
+        NOT_INITIALIZED = 0x3,
+        ALREADY_INITIALIZED = 0x4,
+        INVALID_PARAM = 0x5,
+        FAILED_SETUP_CRYPTO = 0x6,
+        FAILED_INVALID_CODE = 0x7,
+        FAILED_TOO_LARGE_PACKET = 0x8,
+        FAILED_INSUFFIENT_BUFFER = 0x9,
+        FAILED_NOT_COMPLETE_PACKET = 0xA,
+        FAILED_KEYGEN = 0xB,
+        FAILED_ENCRYPT = 0xC,
+        FAILED_DECRYPT = 0xD,
+        ALREADY_CHANGE_KEY = 0xE,
+        FAILED_SET_EXT_COMP_FUNC = 0xF,
+        FAILED_COMP = 0x10,
+    };
+    enum Param : int {
+        PARAM_NONE = 0x0,
+        PARAM_HANDSHAKE_FAIL = 0x1,
+        PARAM_BROADCAST_LOCAL = 0x2,
+        PARAM_BROADCAST_GLOBAL = 0x3,
+        PARAM_BROADCAST_LOCAL_COMPRESS = 0x4,
+    };
+    enum Type : int {
+        NO_CRYPT = 0x0,
+        NO_HANDSHAKE_CRYPT = 0x1,
+        HANDSHAKE_CRYPT = 0x2,
+        SESSION_CRYPT = 0x3,
+        BROADCAST_CRYPT = 0x4,
+    };
+    union Header {
+    public:
+        struct {
+            unsigned short size : 12;
+            unsigned short code : 4;
+        } enc;
+        struct {
+            unsigned short size : 14;
+            unsigned short code : 2;
+        } plain;
+    };
     virtual int GetType() = 0;  // slot 0
-    virtual int SetEncryptParam(int) = 0;  // slot 1
-    virtual int SetKey(unsigned char const *, int) = 0;  // slot 2
-    virtual int GenerateKey(unsigned char *, int *, unsigned char *, int *) = 0;  // slot 3
-    virtual int Encrypt(unsigned char *, int *, int, bool) = 0;  // slot 4
-    virtual int Decrypt(unsigned char *, int, int *, bool *) = 0;  // slot 5
-    virtual int SetExternalCompressFunc(void *, unsigned char const *, int) = 0;  // slot 6
+    virtual PacketCrypt::ErrCode SetEncryptParam(PacketCrypt::Param) = 0;  // slot 1
+    virtual PacketCrypt::ErrCode SetKey(unsigned char const *, int) = 0;  // slot 2
+    virtual PacketCrypt::ErrCode GenerateKey(unsigned char *, int *, unsigned char *, int *) = 0;  // slot 3
+    virtual PacketCrypt::ErrCode Encrypt(unsigned char *, int *, int, bool) = 0;  // slot 4
+    virtual PacketCrypt::ErrCode Decrypt(unsigned char *, int, int *, bool *) = 0;  // slot 5
+    virtual PacketCrypt::ErrCode SetExternalCompressFunc(void *, unsigned char const *, int) = 0;  // slot 6
 };
 static_assert(sizeof(PacketCrypt) == 0x8, "sizeof PacketCrypt");
+static_assert(sizeof(PacketCrypt::Header) == 0x2, "sizeof PacketCrypt::Header");
+static_assert(offsetof(PacketCrypt::Header, enc) == 0x0, "PacketCrypt::Header::enc");
+static_assert(offsetof(PacketCrypt::Header, plain) == 0x0, "PacketCrypt::Header::plain");
 
 class PacketList {
 public:
@@ -4444,8 +5269,8 @@ static_assert(offsetof(PacketList, Buffers) == 0x8, "PacketList::Buffers");
 
 class PacketSplitter {
 public:
-    virtual bool AddBuffer(void *, void *) = 0;  // slot 0
-    virtual bool Finalize(void *) = 0;  // slot 1
+    virtual bool AddBuffer(Packet::Header const *, Packet::Header *) = 0;  // slot 0
+    virtual bool Finalize(Packet::Header const *) = 0;  // slot 1
     virtual void Clear() = 0;  // slot 2
 };
 static_assert(sizeof(PacketSplitter) == 0x8, "sizeof PacketSplitter");
@@ -4482,23 +5307,45 @@ static_assert(offsetof(PagedMemoryPool, _lock) == 0x48, "PagedMemoryPool::_lock"
 
 class PipeCommandProcess : public Thread {
 public:
+    struct Command;
+    struct CommandList;
+    struct Command {
+    public:
+        PipeCommandProcess::Command * _next;
+        PipeCommandProcess::Command * _prev;
+        wchar_t * * _argv;
+        int _argc;
+    };
+    struct CommandList {
+    public:
+        PipeCommandProcess::Command _head;
+        PipeCommandProcess::Command _tail;
+    };
     virtual ~PipeCommandProcess();
     virtual wchar_t const * Name();
     virtual void run();
     SystemEvent _notifyEvent;
     CriticalSection _lock;
-    alignas(8) unsigned char _remote[0x40];  // ❓ PDB type 0x4CFE: PipeCommandProcess::CommandList
-    alignas(8) unsigned char _local[0x40];  // ❓ PDB type 0x4CFE: PipeCommandProcess::CommandList
+    PipeCommandProcess::CommandList _remote;
+    PipeCommandProcess::CommandList _local;
 };
 static_assert(sizeof(PipeCommandProcess) == 0xE0, "sizeof PipeCommandProcess");
 static_assert(offsetof(PipeCommandProcess, _notifyEvent) == 0x30, "PipeCommandProcess::_notifyEvent");
 static_assert(offsetof(PipeCommandProcess, _lock) == 0x38, "PipeCommandProcess::_lock");
 static_assert(offsetof(PipeCommandProcess, _remote) == 0x60, "PipeCommandProcess::_remote");
 static_assert(offsetof(PipeCommandProcess, _local) == 0xA0, "PipeCommandProcess::_local");
+static_assert(sizeof(PipeCommandProcess::Command) == 0x20, "sizeof PipeCommandProcess::Command");
+static_assert(offsetof(PipeCommandProcess::Command, _next) == 0x0, "PipeCommandProcess::Command::_next");
+static_assert(offsetof(PipeCommandProcess::Command, _prev) == 0x8, "PipeCommandProcess::Command::_prev");
+static_assert(offsetof(PipeCommandProcess::Command, _argv) == 0x10, "PipeCommandProcess::Command::_argv");
+static_assert(offsetof(PipeCommandProcess::Command, _argc) == 0x18, "PipeCommandProcess::Command::_argc");
+static_assert(sizeof(PipeCommandProcess::CommandList) == 0x40, "sizeof PipeCommandProcess::CommandList");
+static_assert(offsetof(PipeCommandProcess::CommandList, _head) == 0x0, "PipeCommandProcess::CommandList::_head");
+static_assert(offsetof(PipeCommandProcess::CommandList, _tail) == 0x20, "PipeCommandProcess::CommandList::_tail");
 
 struct PipeInstance {
 public:
-    alignas(8) unsigned char oOverlap[0x20];  // ❓ PDB type 0x10E2: _OVERLAPPED
+    _OVERLAPPED oOverlap;
     void * hPipeInst;
     unsigned long cbRead;
     unsigned long cbToWrite;
@@ -4519,13 +5366,32 @@ static_assert(offsetof(PipeInstance, chReply) == 0x2038, "PipeInstance::chReply"
 
 class PipeConsole : public Thread {
 public:
+    struct ItemList;
+    struct ItemNode;
+    enum PipeState : int {
+        STATE_CONNECTING = 0x0,
+        STATE_READING = 0x1,
+        STATE_WRITING = 0x2,
+    };
+    struct ItemNode {
+    public:
+        PipeConsole::ItemNode * _next;
+        PipeConsole::ItemNode * _prev;
+        wchar_t _key[129];
+        wchar_t _value[129];
+    };
+    struct ItemList {
+    public:
+        PipeConsole::ItemNode _head;
+        PipeConsole::ItemNode _tail;
+    };
     virtual ~PipeConsole();
     virtual wchar_t const * Name();
     virtual void run();
     CriticalSection _lock;
     int _state;
-    alignas(8) unsigned char _invalid[0x430];  // ❓ PDB type 0x4C98: PipeConsole::ItemList
-    alignas(8) unsigned char _running[0x430];  // ❓ PDB type 0x4C98: PipeConsole::ItemList
+    PipeConsole::ItemList _invalid;
+    PipeConsole::ItemList _running;
     bool _detectFrozenThread;
     int _crashIfExistFrozenThreadCount;
     PipeCommandProcess _commandProcess;
@@ -4542,6 +5408,14 @@ static_assert(offsetof(PipeConsole, _crashIfExistFrozenThreadCount) == 0x8C4, "P
 static_assert(offsetof(PipeConsole, _commandProcess) == 0x8C8, "PipeConsole::_commandProcess");
 static_assert(offsetof(PipeConsole, _pipe) == 0x9A8, "PipeConsole::_pipe");
 static_assert(offsetof(PipeConsole, _events) == 0x10A88, "PipeConsole::_events");
+static_assert(sizeof(PipeConsole::ItemNode) == 0x218, "sizeof PipeConsole::ItemNode");
+static_assert(offsetof(PipeConsole::ItemNode, _next) == 0x0, "PipeConsole::ItemNode::_next");
+static_assert(offsetof(PipeConsole::ItemNode, _prev) == 0x8, "PipeConsole::ItemNode::_prev");
+static_assert(offsetof(PipeConsole::ItemNode, _key) == 0x10, "PipeConsole::ItemNode::_key");
+static_assert(offsetof(PipeConsole::ItemNode, _value) == 0x112, "PipeConsole::ItemNode::_value");
+static_assert(sizeof(PipeConsole::ItemList) == 0x430, "sizeof PipeConsole::ItemList");
+static_assert(offsetof(PipeConsole::ItemList, _head) == 0x0, "PipeConsole::ItemList::_head");
+static_assert(offsetof(PipeConsole::ItemList, _tail) == 0x218, "PipeConsole::ItemList::_tail");
 
 class Port {
 public:
@@ -4584,17 +5458,38 @@ static_assert(offsetof(Port, _bufferHandler) == 0x78, "Port::_bufferHandler");
 
 class PortListener : public DynamicEventObject {
 public:
+    struct AcceptContext;
+    enum Const : int {
+        CONTEXT_COUNT = 0x80,
+        CONTEXT_BUFFER = 0x80,
+    };
+    struct AcceptContext : public EventContext {
+    public:
+        unsigned int _index;
+        unsigned long long _socket;
+        unsigned char _buffer[128];
+        unsigned long _recvdSize;
+        unsigned long _localAddrSize;
+        unsigned long _remoteAddrSize;
+    };
     virtual ~PortListener();
     virtual unsigned int EventId() const;
     virtual bool HandleEvent(EventContext *, unsigned long);
     Port * _portInstance;
     unsigned long long _socket;
-    alignas(8) unsigned char _context[0x6400];  // ❓ PDB type 0x52C6: leaf 0x1503
+    PortListener::AcceptContext _context[128];
 };
 static_assert(sizeof(PortListener) == 0x6428, "sizeof PortListener");
 static_assert(offsetof(PortListener, _portInstance) == 0x18, "PortListener::_portInstance");
 static_assert(offsetof(PortListener, _socket) == 0x20, "PortListener::_socket");
 static_assert(offsetof(PortListener, _context) == 0x28, "PortListener::_context");
+static_assert(sizeof(PortListener::AcceptContext) == 0xC8, "sizeof PortListener::AcceptContext");
+static_assert(offsetof(PortListener::AcceptContext, _index) == 0x28, "PortListener::AcceptContext::_index");
+static_assert(offsetof(PortListener::AcceptContext, _socket) == 0x30, "PortListener::AcceptContext::_socket");
+static_assert(offsetof(PortListener::AcceptContext, _buffer) == 0x38, "PortListener::AcceptContext::_buffer");
+static_assert(offsetof(PortListener::AcceptContext, _recvdSize) == 0xB8, "PortListener::AcceptContext::_recvdSize");
+static_assert(offsetof(PortListener::AcceptContext, _localAddrSize) == 0xBC, "PortListener::AcceptContext::_localAddrSize");
+static_assert(offsetof(PortListener::AcceptContext, _remoteAddrSize) == 0xC0, "PortListener::AcceptContext::_remoteAddrSize");
 
 struct PublicationInfo {
 public:
@@ -4634,6 +5529,11 @@ static_assert(offsetof(ReconnectTimer, _sessionId) == 0x38, "ReconnectTimer::_se
 
 class RefCntHistory {
 public:
+    enum Operation : int {
+        OP_NONE = 0x0,
+        OP_ADDREF = 0x1,
+        OP_DELREF = 0x2,
+    };
     long volatile _dumped;
     long volatile _historyPos;
     long _historyMax;
@@ -4666,29 +5566,57 @@ static_assert(offsetof(RefCntHistoryItem, _op) == 0x1E, "RefCntHistoryItem::_op"
 
 class RelationalRefCntObject : public RefCntObject {
 public:
+    struct ChildRole;
+    struct ParentRole;
+    struct ChildRole {
+    public:
+        RelationalRefCntObject * _prev;
+        RelationalRefCntObject * _next;
+        RelationalRefCntObject * _parent;
+    };
+    struct ParentRole {
+    public:
+        CriticalSection _lock;
+        RelationalRefCntObject * _objects;
+    };
     virtual MemoryManager * parentRoleAllocator();  // slot 4
     virtual MemoryManager * childRoleAllocator();  // slot 5
     virtual ~RelationalRefCntObject();
     virtual void deallocate_object(wchar_t const *, int);
-    void * _parentRole;
-    void * _childRole;
+    RelationalRefCntObject::ParentRole * _parentRole;
+    RelationalRefCntObject::ChildRole * _childRole;
 };
 static_assert(sizeof(RelationalRefCntObject) == 0x28, "sizeof RelationalRefCntObject");
 static_assert(offsetof(RelationalRefCntObject, _parentRole) == 0x18, "RelationalRefCntObject::_parentRole");
 static_assert(offsetof(RelationalRefCntObject, _childRole) == 0x20, "RelationalRefCntObject::_childRole");
+static_assert(sizeof(RelationalRefCntObject::ChildRole) == 0x18, "sizeof RelationalRefCntObject::ChildRole");
+static_assert(offsetof(RelationalRefCntObject::ChildRole, _prev) == 0x0, "RelationalRefCntObject::ChildRole::_prev");
+static_assert(offsetof(RelationalRefCntObject::ChildRole, _next) == 0x8, "RelationalRefCntObject::ChildRole::_next");
+static_assert(offsetof(RelationalRefCntObject::ChildRole, _parent) == 0x10, "RelationalRefCntObject::ChildRole::_parent");
+static_assert(sizeof(RelationalRefCntObject::ParentRole) == 0x30, "sizeof RelationalRefCntObject::ParentRole");
+static_assert(offsetof(RelationalRefCntObject::ParentRole, _lock) == 0x0, "RelationalRefCntObject::ParentRole::_lock");
+static_assert(offsetof(RelationalRefCntObject::ParentRole, _objects) == 0x28, "RelationalRefCntObject::ParentRole::_objects");
 
 class ReleaseEvent : public DynamicEventObject {
 public:
     virtual ~ReleaseEvent();
     virtual unsigned int EventId() const;
     virtual bool HandleEvent(EventContext *, unsigned long);
-    void * _head;
+    DelayedRelease::Node * _head;
 };
 static_assert(sizeof(ReleaseEvent) == 0x20, "sizeof ReleaseEvent");
 static_assert(offsetof(ReleaseEvent, _head) == 0x18, "ReleaseEvent::_head");
 
 class RepeatPacketComposer : public PacketComposer {
 public:
+    struct SubPacketInfo;
+    struct SubPacketInfo {
+    public:
+        unsigned char * size;
+        char const * startPos;
+        char const * format;
+        int index;
+    };
     virtual void Reset();
     virtual void Forward(int);
     virtual void Rewind(int);
@@ -4698,7 +5626,7 @@ public:
     short * counts[3];
     int start[3];
     int top;
-    alignas(8) unsigned char sub[0x60];  // ❓ PDB type 0x248A: leaf 0x1503
+    RepeatPacketComposer::SubPacketInfo sub[3];
     int subTop;
 };
 static_assert(sizeof(RepeatPacketComposer) == 0xA8, "sizeof RepeatPacketComposer");
@@ -4707,6 +5635,11 @@ static_assert(offsetof(RepeatPacketComposer, start) == 0x30, "RepeatPacketCompos
 static_assert(offsetof(RepeatPacketComposer, top) == 0x3C, "RepeatPacketComposer::top");
 static_assert(offsetof(RepeatPacketComposer, sub) == 0x40, "RepeatPacketComposer::sub");
 static_assert(offsetof(RepeatPacketComposer, subTop) == 0xA0, "RepeatPacketComposer::subTop");
+static_assert(sizeof(RepeatPacketComposer::SubPacketInfo) == 0x20, "sizeof RepeatPacketComposer::SubPacketInfo");
+static_assert(offsetof(RepeatPacketComposer::SubPacketInfo, size) == 0x0, "RepeatPacketComposer::SubPacketInfo::size");
+static_assert(offsetof(RepeatPacketComposer::SubPacketInfo, startPos) == 0x8, "RepeatPacketComposer::SubPacketInfo::startPos");
+static_assert(offsetof(RepeatPacketComposer::SubPacketInfo, format) == 0x10, "RepeatPacketComposer::SubPacketInfo::format");
+static_assert(offsetof(RepeatPacketComposer::SubPacketInfo, index) == 0x18, "RepeatPacketComposer::SubPacketInfo::index");
 
 class RetrieveEventLogContext {
 public:
@@ -4746,6 +5679,19 @@ static_assert(offsetof(RetryCouponPublicationEvent, _gameAccountId) == 0x20, "Re
 static_assert(offsetof(RetryCouponPublicationEvent, _publicationId) == 0x30, "RetryCouponPublicationEvent::_publicationId");
 static_assert(offsetof(RetryCouponPublicationEvent, _couponEventId) == 0x38, "RetryCouponPublicationEvent::_couponEventId");
 
+struct SCOPE_ID {
+public:
+    union {
+        struct {
+            unsigned long Zone : 28;
+            unsigned long Level : 4;
+        };
+        unsigned long Value;
+    };
+};
+static_assert(sizeof(SCOPE_ID) == 0x4, "sizeof SCOPE_ID");
+static_assert(offsetof(SCOPE_ID, Value) == 0x0, "SCOPE_ID::Value");
+
 struct SC_HANDLE__ {
 public:
     int unused;
@@ -4775,9 +5721,15 @@ static_assert(offsetof(STSMSGLIB_CHECK_DLL_VERSION::__l12::Version, unit) == 0x0
 
 class Security3rdParty {
 public:
+    enum ErrCode : int {
+        S3ERR_SUCCESS = 0x0,
+        S3ERR_FAILED = 0x1,
+        S3ERR_NO_NEED_ENCRYPT = 0x2,
+        S3ERR_INSUFFICIENT_BUFFER = 0x3,
+    };
     virtual ~Security3rdParty();  // slot 0
-    virtual int Encrypt(unsigned char *, int *, bool *) = 0;  // slot 1
-    virtual int Decrypt(unsigned char *, int *, bool) = 0;  // slot 2
+    virtual Security3rdParty::ErrCode Encrypt(unsigned char *, int *, bool *) = 0;  // slot 1
+    virtual Security3rdParty::ErrCode Decrypt(unsigned char *, int *, bool) = 0;  // slot 2
 };
 static_assert(sizeof(Security3rdParty) == 0x8, "sizeof Security3rdParty");
 
@@ -4786,7 +5738,7 @@ public:
     bool _external;
     unsigned int _size;
     unsigned int _count;
-    void * _wsaBuffer;
+    _WSABUF * _wsaBuffer;
     PacketBuffer * * _pbuffer;
     SendBufferList * _next;
 };
@@ -4890,6 +5842,27 @@ static_assert(offsetof(StaticPageMemoryManager, _additional) == 0x20, "StaticPag
 
 class Session : public EventObject {
 public:
+    enum Encryption : int {
+        ENC_INVALID = 0x0,
+        ENC_NONE = 0x1,
+        ENC_HS = 0x2,
+        ENC_HS_ACK = 0x3,
+        ENC_HS_FAIL = 0x4,
+        ENC_SESSION = 0x5,
+    };
+    enum Option : int {
+        ACCEPT = 0x0,
+        CONNECT = 0x1,
+        RECONNECT = 0x2,
+    };
+    enum State : int {
+        CLOSED = 0x0,
+        CLOSING = 0x1,
+        FORCE_CLOSING = 0x2,
+        CONNECTING = 0x3,
+        POSTPONE_CONNECTING = 0x4,
+        CONNECTED = 0x5,
+    };
     virtual ~Session();
     virtual unsigned int EventId() const;
     virtual bool HandleEvent(EventContext *, unsigned long);
@@ -4897,7 +5870,7 @@ public:
     CriticalSection _lock;
     Connection * _connection;
     SessionSendBuffer * _sendBuffer;
-    int _state;
+    Session::State _state;
     int _option;
     bool _recvPending;
     bool _sendPending;
@@ -4981,8 +5954,11 @@ static_assert(offsetof(SessionPool, _sessionQueue) == 0xA0, "SessionPool::_sessi
 
 class SessionRecvBuffer {
 public:
+    enum Const : int {
+        MAX_SIZE = 0xFA8,
+    };
     virtual ~SessionRecvBuffer();  // slot 0
-    alignas(8) unsigned char _context[0x40];  // ❓ PDB type 0x4F75: AsyncRecvContext
+    AsyncRecvContext _context;
     unsigned int _recvdSize;
     char _buffer[4008];
 };
@@ -4993,8 +5969,12 @@ static_assert(offsetof(SessionRecvBuffer, _buffer) == 0x4C, "SessionRecvBuffer::
 
 class SessionSendBuffer {
 public:
+    enum Const : int {
+        SIZE_NOCHECK = -1,
+        DEFAULT_BUFFER_SIZE = 0x20,
+    };
     virtual ~SessionSendBuffer();  // slot 0
-    alignas(8) unsigned char _context[0x38];  // ❓ PDB type 0x4F52: AsyncSendContext
+    AsyncSendContext _context;
     PacketBufferHandler * _bufferHandler;
     SendBufferList _bufferList[2];
     SendBufferList * _curSendingList;
@@ -5022,6 +6002,12 @@ static_assert(offsetof(SharedChannelList, _size) == 0x14, "SharedChannelList::_s
 
 class SmartCouponConfig {
 public:
+    enum DumpType : int {
+        DUMP_NONE = 0x0,
+        DUMP_MINIMAL = 0x1,
+        DUMP_FULL = 0x2,
+        DUMP_MAX = 0x3,
+    };
     wchar_t * _rootPath;
     char * _certFile;
     wchar_t * _logPath;
@@ -5063,12 +6049,49 @@ static_assert(offsetof(SmartCouponConfig, _npRewardChangeoverEnable) == 0x54, "S
 
 class SmartCouponDB {
 public:
-    char _pdb_tail[0x1];
+    enum CouponPublicationColumn : int {
+        COUPONPUBLICATIONCOLUMN_ID = 0x0,
+        COUPONPUBLICATIONCOLUMN_GAME_ACCOUNT_ID = 0x1,
+        COUPONPUBLICATIONCOLUMN_WORLD_ID = 0x2,
+        COUPONPUBLICATIONCOLUMN_PC_ID = 0x3,
+        COUPONPUBLICATIONCOLUMN_COUPON_EVENT_ID = 0x4,
+        COUPONPUBLICATIONCOLUMN_STATUS = 0x5,
+        COUPONPUBLICATIONCOLUMN_REGISTRATION_TIME = 0x6,
+        COUPONPUBLICATIONCOLUMN_LAST_STATUS_UPDATE_TIME = 0x7,
+        COUPONPUBLICATIONCOLUMN_RECEIPT_ID = 0x8,
+        COUPONPUBLICATIONCOLUMN_MAX = 0x9,
+    };
+    enum DBFailReason : int {
+        DB_NO_ERROR = 0x0,
+        DB_SYSTEM_ERROR = 0x1,
+        DB_INVALID_PARAMETER = 0x2,
+        DB_CHECKUSABLEITEM_NO_SUCH_ITEM = 0x3,
+        DB_CHECKUSABLEITEM_UNUSABLE = 0x4,
+        DB_UNKNOWN_ERROR = 0x5,
+        DB_SQL_ERROR = 0x6,
+    };
+    enum GameEventLogColumn : int {
+        GAMEEVENTLOGCOLUMN_ID = 0x0,
+        GAMEEVENTLOGCOLUMN_GAME_ACCOUNT_ID = 0x1,
+        GAMEEVENTLOGCOLUMN_WORLD_ID = 0x2,
+        GAMEEVENTLOGCOLUMN_PC_ID = 0x3,
+        GAMEEVENTLOGCOLUMN_GAME_EVENT_ID = 0x4,
+        GAMEEVENTLOGCOLUMN_STATUS = 0x5,
+        GAMEEVENTLOGCOLUMN_MAX = 0x6,
+    };
 };
 static_assert(sizeof(SmartCouponDB) == 0x1, "sizeof SmartCouponDB");
 
 class SmartCouponDaemon : public Daemon {
 public:
+    enum DB : int {
+        SMARTCOUPON_DB_ID = 0x1,
+    };
+    enum Port : int {
+        NP_PORT_ID = 0x1,
+        DAEMON_PORT_ID = 0x2,
+        MANAGEMENT_PORT_ID = 0x3,
+    };
     virtual ~SmartCouponDaemon();
     virtual void PrintDependency();
     virtual wchar_t const * ShortName();
@@ -5131,7 +6154,6 @@ static_assert(offsetof(SmartCouponObjPoolMemoryAllocator, _end) == 0x48, "SmartC
 
 class String {
 public:
-    char _pdb_tail[0x1];
 };
 static_assert(sizeof(String) == 0x1, "sizeof String");
 
@@ -5151,6 +6173,32 @@ static_assert(offsetof(StsMsgLib::CliGate::Channel::_Adress, pwszIsp) == 0x10, "
 namespace StsMsgLib::CliGate::Channel {
 struct _ChannelProperty {
 public:
+    struct FloodingRule;
+    struct _SendNotify;
+    struct FloodingRule {
+    public:
+        struct _Global;
+        struct _User;
+        struct _Global {
+        public:
+            unsigned int maxTalkCountPerSec;
+        };
+        struct _User {
+        public:
+            unsigned int checkPeriodSec;
+            unsigned int blockPeriodSec;
+            unsigned int maxTalkCount;
+            unsigned int additionalPenalty;
+        };
+        StsMsgLib::CliGate::Channel::_ChannelProperty::FloodingRule::_Global global;
+        StsMsgLib::CliGate::Channel::_ChannelProperty::FloodingRule::_User user;
+    };
+    struct _SendNotify {
+    public:
+        unsigned int notifyChannelInfo;
+        unsigned int notifyUserInfo;
+        unsigned int notifyTalk;
+    };
     unsigned int adminExist;
     unsigned int allowVoice;
     unsigned int allowEmpty;
@@ -5158,8 +6206,8 @@ public:
     unsigned int saveMsg;
     unsigned int maxMemberCount;
     unsigned int currentMemberCount;
-    alignas(4) unsigned char sendNotify[0xC];  // ❓ PDB type 0x3B98: StsMsgLib::CliGate::Channel::_ChannelProperty::_SendNotify
-    alignas(4) unsigned char floodingRule[0x14];  // ❓ PDB type 0x3B99: StsMsgLib::CliGate::Channel::_ChannelProperty::FloodingRule
+    StsMsgLib::CliGate::Channel::_ChannelProperty::_SendNotify sendNotify;
+    StsMsgLib::CliGate::Channel::_ChannelProperty::FloodingRule floodingRule;
     unsigned int msgSeq;
 };
 }  // namespace StsMsgLib::CliGate::Channel
@@ -5174,39 +6222,95 @@ static_assert(offsetof(StsMsgLib::CliGate::Channel::_ChannelProperty, currentMem
 static_assert(offsetof(StsMsgLib::CliGate::Channel::_ChannelProperty, sendNotify) == 0x1C, "StsMsgLib::CliGate::Channel::_ChannelProperty::sendNotify");
 static_assert(offsetof(StsMsgLib::CliGate::Channel::_ChannelProperty, floodingRule) == 0x28, "StsMsgLib::CliGate::Channel::_ChannelProperty::floodingRule");
 static_assert(offsetof(StsMsgLib::CliGate::Channel::_ChannelProperty, msgSeq) == 0x3C, "StsMsgLib::CliGate::Channel::_ChannelProperty::msgSeq");
+static_assert(sizeof(StsMsgLib::CliGate::Channel::_ChannelProperty::FloodingRule) == 0x14, "sizeof StsMsgLib::CliGate::Channel::_ChannelProperty::FloodingRule");
+static_assert(offsetof(StsMsgLib::CliGate::Channel::_ChannelProperty::FloodingRule, global) == 0x0, "StsMsgLib::CliGate::Channel::_ChannelProperty::FloodingRule::global");
+static_assert(offsetof(StsMsgLib::CliGate::Channel::_ChannelProperty::FloodingRule, user) == 0x4, "StsMsgLib::CliGate::Channel::_ChannelProperty::FloodingRule::user");
+static_assert(sizeof(StsMsgLib::CliGate::Channel::_ChannelProperty::FloodingRule::_Global) == 0x4, "sizeof StsMsgLib::CliGate::Channel::_ChannelProperty::FloodingRule::_Global");
+static_assert(offsetof(StsMsgLib::CliGate::Channel::_ChannelProperty::FloodingRule::_Global, maxTalkCountPerSec) == 0x0, "StsMsgLib::CliGate::Channel::_ChannelProperty::FloodingRule::_Global::maxTalkCountPerSec");
+static_assert(sizeof(StsMsgLib::CliGate::Channel::_ChannelProperty::FloodingRule::_User) == 0x10, "sizeof StsMsgLib::CliGate::Channel::_ChannelProperty::FloodingRule::_User");
+static_assert(offsetof(StsMsgLib::CliGate::Channel::_ChannelProperty::FloodingRule::_User, checkPeriodSec) == 0x0, "StsMsgLib::CliGate::Channel::_ChannelProperty::FloodingRule::_User::checkPeriodSec");
+static_assert(offsetof(StsMsgLib::CliGate::Channel::_ChannelProperty::FloodingRule::_User, blockPeriodSec) == 0x4, "StsMsgLib::CliGate::Channel::_ChannelProperty::FloodingRule::_User::blockPeriodSec");
+static_assert(offsetof(StsMsgLib::CliGate::Channel::_ChannelProperty::FloodingRule::_User, maxTalkCount) == 0x8, "StsMsgLib::CliGate::Channel::_ChannelProperty::FloodingRule::_User::maxTalkCount");
+static_assert(offsetof(StsMsgLib::CliGate::Channel::_ChannelProperty::FloodingRule::_User, additionalPenalty) == 0xC, "StsMsgLib::CliGate::Channel::_ChannelProperty::FloodingRule::_User::additionalPenalty");
+static_assert(sizeof(StsMsgLib::CliGate::Channel::_ChannelProperty::_SendNotify) == 0xC, "sizeof StsMsgLib::CliGate::Channel::_ChannelProperty::_SendNotify");
+static_assert(offsetof(StsMsgLib::CliGate::Channel::_ChannelProperty::_SendNotify, notifyChannelInfo) == 0x0, "StsMsgLib::CliGate::Channel::_ChannelProperty::_SendNotify::notifyChannelInfo");
+static_assert(offsetof(StsMsgLib::CliGate::Channel::_ChannelProperty::_SendNotify, notifyUserInfo) == 0x4, "StsMsgLib::CliGate::Channel::_ChannelProperty::_SendNotify::notifyUserInfo");
+static_assert(offsetof(StsMsgLib::CliGate::Channel::_ChannelProperty::_SendNotify, notifyTalk) == 0x8, "StsMsgLib::CliGate::Channel::_ChannelProperty::_SendNotify::notifyTalk");
 
 namespace StsMsgLib::CliGate::Channel {
 struct _MediaExtensions {
 public:
-    void * pMediaExtensionArray;
+    struct _MediaExtension;
+    struct _MediaExtension {
+    public:
+        wchar_t const * type;
+        wchar_t const * pwszValue;
+        wchar_t const * pwszTumbnailUrl;
+        wchar_t const * pwszDownloadUrl;
+        wchar_t const * pwszExpireAt;
+        wchar_t const * pwszExtension;
+        bool bMeta;
+        int width;
+        int height;
+    };
+    StsMsgLib::CliGate::Channel::_MediaExtensions::_MediaExtension * pMediaExtensionArray;
     int nMediaExtensionArrayCount;
 };
 }  // namespace StsMsgLib::CliGate::Channel
 static_assert(sizeof(StsMsgLib::CliGate::Channel::_MediaExtensions) == 0x10, "sizeof StsMsgLib::CliGate::Channel::_MediaExtensions");
 static_assert(offsetof(StsMsgLib::CliGate::Channel::_MediaExtensions, pMediaExtensionArray) == 0x0, "StsMsgLib::CliGate::Channel::_MediaExtensions::pMediaExtensionArray");
 static_assert(offsetof(StsMsgLib::CliGate::Channel::_MediaExtensions, nMediaExtensionArrayCount) == 0x8, "StsMsgLib::CliGate::Channel::_MediaExtensions::nMediaExtensionArrayCount");
+static_assert(sizeof(StsMsgLib::CliGate::Channel::_MediaExtensions::_MediaExtension) == 0x40, "sizeof StsMsgLib::CliGate::Channel::_MediaExtensions::_MediaExtension");
+static_assert(offsetof(StsMsgLib::CliGate::Channel::_MediaExtensions::_MediaExtension, type) == 0x0, "StsMsgLib::CliGate::Channel::_MediaExtensions::_MediaExtension::type");
+static_assert(offsetof(StsMsgLib::CliGate::Channel::_MediaExtensions::_MediaExtension, pwszValue) == 0x8, "StsMsgLib::CliGate::Channel::_MediaExtensions::_MediaExtension::pwszValue");
+static_assert(offsetof(StsMsgLib::CliGate::Channel::_MediaExtensions::_MediaExtension, pwszTumbnailUrl) == 0x10, "StsMsgLib::CliGate::Channel::_MediaExtensions::_MediaExtension::pwszTumbnailUrl");
+static_assert(offsetof(StsMsgLib::CliGate::Channel::_MediaExtensions::_MediaExtension, pwszDownloadUrl) == 0x18, "StsMsgLib::CliGate::Channel::_MediaExtensions::_MediaExtension::pwszDownloadUrl");
+static_assert(offsetof(StsMsgLib::CliGate::Channel::_MediaExtensions::_MediaExtension, pwszExpireAt) == 0x20, "StsMsgLib::CliGate::Channel::_MediaExtensions::_MediaExtension::pwszExpireAt");
+static_assert(offsetof(StsMsgLib::CliGate::Channel::_MediaExtensions::_MediaExtension, pwszExtension) == 0x28, "StsMsgLib::CliGate::Channel::_MediaExtensions::_MediaExtension::pwszExtension");
+static_assert(offsetof(StsMsgLib::CliGate::Channel::_MediaExtensions::_MediaExtension, bMeta) == 0x30, "StsMsgLib::CliGate::Channel::_MediaExtensions::_MediaExtension::bMeta");
+static_assert(offsetof(StsMsgLib::CliGate::Channel::_MediaExtensions::_MediaExtension, width) == 0x34, "StsMsgLib::CliGate::Channel::_MediaExtensions::_MediaExtension::width");
+static_assert(offsetof(StsMsgLib::CliGate::Channel::_MediaExtensions::_MediaExtension, height) == 0x38, "StsMsgLib::CliGate::Channel::_MediaExtensions::_MediaExtension::height");
 
 namespace StsMsgLib::CliGate::Channel {
 struct _Permissions {
 public:
-    void * pPermissionArray;
+    struct _Permission;
+    struct _Permission {
+    public:
+        wchar_t const * type;
+    };
+    StsMsgLib::CliGate::Channel::_Permissions::_Permission * pPermissionArray;
     int permissionCount;
 };
 }  // namespace StsMsgLib::CliGate::Channel
 static_assert(sizeof(StsMsgLib::CliGate::Channel::_Permissions) == 0x10, "sizeof StsMsgLib::CliGate::Channel::_Permissions");
 static_assert(offsetof(StsMsgLib::CliGate::Channel::_Permissions, pPermissionArray) == 0x0, "StsMsgLib::CliGate::Channel::_Permissions::pPermissionArray");
 static_assert(offsetof(StsMsgLib::CliGate::Channel::_Permissions, permissionCount) == 0x8, "StsMsgLib::CliGate::Channel::_Permissions::permissionCount");
+static_assert(sizeof(StsMsgLib::CliGate::Channel::_Permissions::_Permission) == 0x8, "sizeof StsMsgLib::CliGate::Channel::_Permissions::_Permission");
+static_assert(offsetof(StsMsgLib::CliGate::Channel::_Permissions::_Permission, type) == 0x0, "StsMsgLib::CliGate::Channel::_Permissions::_Permission::type");
 
 namespace StsMsgLib::CliGate::Channel {
 struct _Member {
 public:
+    struct _Joins;
+    struct _Joins {
+    public:
+        struct _Join;
+        struct _Join {
+        public:
+            unsigned int userCenter;
+            _GUID appId;
+        };
+        StsMsgLib::CliGate::Channel::_Member::_Joins::_Join * pJoinArray;
+        int joinArrayCount;
+    };
     wchar_t const * pwszMemberKey;
     wchar_t const * pwszMemberType;
     wchar_t const * pwszMemberOwner;
     wchar_t const * pwszUserAlias;
-    alignas(4) unsigned char memberValidateAppId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID memberValidateAppId;
     StsMsgLib::CliGate::Channel::_Permissions permissions;
-    alignas(8) unsigned char joins[0x10];  // ❓ PDB type 0x3BB0: StsMsgLib::CliGate::Channel::_Member::_Joins
+    StsMsgLib::CliGate::Channel::_Member::_Joins joins;
     unsigned int nMic;
     unsigned int nSpeaker;
     unsigned int nRelayUserId;
@@ -5223,6 +6327,12 @@ static_assert(offsetof(StsMsgLib::CliGate::Channel::_Member, joins) == 0x40, "St
 static_assert(offsetof(StsMsgLib::CliGate::Channel::_Member, nMic) == 0x50, "StsMsgLib::CliGate::Channel::_Member::nMic");
 static_assert(offsetof(StsMsgLib::CliGate::Channel::_Member, nSpeaker) == 0x54, "StsMsgLib::CliGate::Channel::_Member::nSpeaker");
 static_assert(offsetof(StsMsgLib::CliGate::Channel::_Member, nRelayUserId) == 0x58, "StsMsgLib::CliGate::Channel::_Member::nRelayUserId");
+static_assert(sizeof(StsMsgLib::CliGate::Channel::_Member::_Joins) == 0x10, "sizeof StsMsgLib::CliGate::Channel::_Member::_Joins");
+static_assert(offsetof(StsMsgLib::CliGate::Channel::_Member::_Joins, pJoinArray) == 0x0, "StsMsgLib::CliGate::Channel::_Member::_Joins::pJoinArray");
+static_assert(offsetof(StsMsgLib::CliGate::Channel::_Member::_Joins, joinArrayCount) == 0x8, "StsMsgLib::CliGate::Channel::_Member::_Joins::joinArrayCount");
+static_assert(sizeof(StsMsgLib::CliGate::Channel::_Member::_Joins::_Join) == 0x14, "sizeof StsMsgLib::CliGate::Channel::_Member::_Joins::_Join");
+static_assert(offsetof(StsMsgLib::CliGate::Channel::_Member::_Joins::_Join, userCenter) == 0x0, "StsMsgLib::CliGate::Channel::_Member::_Joins::_Join::userCenter");
+static_assert(offsetof(StsMsgLib::CliGate::Channel::_Member::_Joins::_Join, appId) == 0x4, "StsMsgLib::CliGate::Channel::_Member::_Joins::_Join::appId");
 
 namespace StsMsgLib::CliGate::Channel {
 struct _RelayServer {
@@ -5261,8 +6371,8 @@ static_assert(offsetof(StsMsgLib::CliGate::Channel::_RendezvousSever, nPort) == 
 namespace StsMsgLib::CliGate::Channel {
 struct _Scope {
 public:
-    alignas(4) unsigned char appId[0x10];  // ❓ PDB type 0x1056: _GUID
-    void * appIds;
+    _GUID appId;
+    _GUID * appIds;
     int nAppIdsCount;
     unsigned int all;
 };
@@ -5278,7 +6388,7 @@ struct _Target {
 public:
     wchar_t const * pwszMemberType;
     wchar_t const * pwszMemberKey;
-    void * memberValidateAppId;
+    _GUID * memberValidateAppId;
     wchar_t const * pwszMemberOwner;
 };
 }  // namespace StsMsgLib::CliGate::Channel
@@ -5306,11 +6416,23 @@ static_assert(offsetof(StsMsgLib::CliGate::Channel::_Voice, nCurrentTalkCount) =
 namespace StsMsgLib {
 struct Grade {
 public:
+    struct DailyReward;
+    struct DailyReward {
+    public:
+        enum TargetType : int {
+            TARGETTYPE_INVALID = 0x0,
+            TARGETTYPE_VIRTUALCURRENCY = 0x1,
+        };
+        StsMsgLib::Grade::DailyReward::TargetType eTargetType;
+        int nTargetKey;
+        int nRewards;
+        long long tCompiled;
+    };
     int nGradeId;
     long long tEffectiveFrom;
     long long tEffectiveTo;
     long long tRegistered;
-    alignas(8) unsigned char dailyReward[0x18];  // ❓ PDB type 0x341F: StsMsgLib::Grade::DailyReward
+    StsMsgLib::Grade::DailyReward dailyReward;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::Grade) == 0x38, "sizeof StsMsgLib::Grade");
@@ -5319,6 +6441,11 @@ static_assert(offsetof(StsMsgLib::Grade, tEffectiveFrom) == 0x8, "StsMsgLib::Gra
 static_assert(offsetof(StsMsgLib::Grade, tEffectiveTo) == 0x10, "StsMsgLib::Grade::tEffectiveTo");
 static_assert(offsetof(StsMsgLib::Grade, tRegistered) == 0x18, "StsMsgLib::Grade::tRegistered");
 static_assert(offsetof(StsMsgLib::Grade, dailyReward) == 0x20, "StsMsgLib::Grade::dailyReward");
+static_assert(sizeof(StsMsgLib::Grade::DailyReward) == 0x18, "sizeof StsMsgLib::Grade::DailyReward");
+static_assert(offsetof(StsMsgLib::Grade::DailyReward, eTargetType) == 0x0, "StsMsgLib::Grade::DailyReward::eTargetType");
+static_assert(offsetof(StsMsgLib::Grade::DailyReward, nTargetKey) == 0x4, "StsMsgLib::Grade::DailyReward::nTargetKey");
+static_assert(offsetof(StsMsgLib::Grade::DailyReward, nRewards) == 0x8, "StsMsgLib::Grade::DailyReward::nRewards");
+static_assert(offsetof(StsMsgLib::Grade::DailyReward, tCompiled) == 0x10, "StsMsgLib::Grade::DailyReward::tCompiled");
 
 namespace StsMsgLib {
 struct IStsMsg {
@@ -5364,17 +6491,42 @@ static_assert(offsetof(StsMsgLib::UserBan, tEffectiveUntil) == 0x20, "StsMsgLib:
 namespace StsMsgLib {
 struct _CliFriendInfo {
 public:
-    alignas(4) unsigned char friendId[0x10];  // ❓ PDB type 0x1056: _GUID
+    struct _AppData;
+    struct _CharFriendInfo;
+    struct _GroupInfo;
+    struct _Location;
+    struct _AppData {
+    public:
+        _GUID appId;
+        unsigned int nCustomListCount;
+        wchar_t * * pwszCustomKeyList;
+        wchar_t * * pwszCustomValueList;
+    };
+    struct _CharFriendInfo {
+    public:
+        int nFriendAppGroupId;
+        wchar_t * pwszFriendCharKey;
+        long long tRegistered;
+    };
+    struct _GroupInfo {
+    public:
+        _GUID groupId;
+    };
+    struct _Location {
+    public:
+        _GUID appId;
+    };
+    _GUID friendId;
     wchar_t * pwszFriendAlias;
     wchar_t * pwszRelation;
     long long tRegistered;
-    void * pGroupInfoList;
+    StsMsgLib::_CliFriendInfo::_GroupInfo * pGroupInfoList;
     unsigned int nGroupInfoListCount;
-    void * pAppDataList;
+    StsMsgLib::_CliFriendInfo::_AppData * pAppDataList;
     unsigned int nAppDataListCount;
-    void * pCharFriendInfoList;
+    StsMsgLib::_CliFriendInfo::_CharFriendInfo * pCharFriendInfoList;
     unsigned int nCharFriendInfoListCount;
-    void * pLocationList;
+    StsMsgLib::_CliFriendInfo::_Location * pLocationList;
     unsigned int nLocationListCount;
 };
 }  // namespace StsMsgLib
@@ -5391,6 +6543,19 @@ static_assert(offsetof(StsMsgLib::_CliFriendInfo, pCharFriendInfoList) == 0x48, 
 static_assert(offsetof(StsMsgLib::_CliFriendInfo, nCharFriendInfoListCount) == 0x50, "StsMsgLib::_CliFriendInfo::nCharFriendInfoListCount");
 static_assert(offsetof(StsMsgLib::_CliFriendInfo, pLocationList) == 0x58, "StsMsgLib::_CliFriendInfo::pLocationList");
 static_assert(offsetof(StsMsgLib::_CliFriendInfo, nLocationListCount) == 0x60, "StsMsgLib::_CliFriendInfo::nLocationListCount");
+static_assert(sizeof(StsMsgLib::_CliFriendInfo::_AppData) == 0x28, "sizeof StsMsgLib::_CliFriendInfo::_AppData");
+static_assert(offsetof(StsMsgLib::_CliFriendInfo::_AppData, appId) == 0x0, "StsMsgLib::_CliFriendInfo::_AppData::appId");
+static_assert(offsetof(StsMsgLib::_CliFriendInfo::_AppData, nCustomListCount) == 0x10, "StsMsgLib::_CliFriendInfo::_AppData::nCustomListCount");
+static_assert(offsetof(StsMsgLib::_CliFriendInfo::_AppData, pwszCustomKeyList) == 0x18, "StsMsgLib::_CliFriendInfo::_AppData::pwszCustomKeyList");
+static_assert(offsetof(StsMsgLib::_CliFriendInfo::_AppData, pwszCustomValueList) == 0x20, "StsMsgLib::_CliFriendInfo::_AppData::pwszCustomValueList");
+static_assert(sizeof(StsMsgLib::_CliFriendInfo::_CharFriendInfo) == 0x18, "sizeof StsMsgLib::_CliFriendInfo::_CharFriendInfo");
+static_assert(offsetof(StsMsgLib::_CliFriendInfo::_CharFriendInfo, nFriendAppGroupId) == 0x0, "StsMsgLib::_CliFriendInfo::_CharFriendInfo::nFriendAppGroupId");
+static_assert(offsetof(StsMsgLib::_CliFriendInfo::_CharFriendInfo, pwszFriendCharKey) == 0x8, "StsMsgLib::_CliFriendInfo::_CharFriendInfo::pwszFriendCharKey");
+static_assert(offsetof(StsMsgLib::_CliFriendInfo::_CharFriendInfo, tRegistered) == 0x10, "StsMsgLib::_CliFriendInfo::_CharFriendInfo::tRegistered");
+static_assert(sizeof(StsMsgLib::_CliFriendInfo::_GroupInfo) == 0x10, "sizeof StsMsgLib::_CliFriendInfo::_GroupInfo");
+static_assert(offsetof(StsMsgLib::_CliFriendInfo::_GroupInfo, groupId) == 0x0, "StsMsgLib::_CliFriendInfo::_GroupInfo::groupId");
+static_assert(sizeof(StsMsgLib::_CliFriendInfo::_Location) == 0x10, "sizeof StsMsgLib::_CliFriendInfo::_Location");
+static_assert(offsetof(StsMsgLib::_CliFriendInfo::_Location, appId) == 0x0, "StsMsgLib::_CliFriendInfo::_Location::appId");
 
 namespace StsMsgLib {
 struct _ExternalAccount {
@@ -5412,7 +6577,7 @@ static_assert(offsetof(StsMsgLib::_ExternalAccount, ExternalUserAppKey) == 0x20,
 namespace StsMsgLib {
 struct _PresenceAppData {
 public:
-    alignas(4) unsigned char appId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID appId;
     unsigned int nCustomListCount;
     wchar_t * * pwszCustomKeyList;
     wchar_t * * pwszCustomValueList;
@@ -5427,23 +6592,13 @@ static_assert(offsetof(StsMsgLib::_PresenceAppData, pwszCustomValueList) == 0x20
 namespace StsMsgLib {
 struct _PresenceLocation {
 public:
-    alignas(4) unsigned char locationId[0x10];  // ❓ PDB type 0x1056: _GUID
-    alignas(4) unsigned char appId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID locationId;
+    _GUID appId;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_PresenceLocation) == 0x20, "sizeof StsMsgLib::_PresenceLocation");
 static_assert(offsetof(StsMsgLib::_PresenceLocation, locationId) == 0x0, "StsMsgLib::_PresenceLocation::locationId");
 static_assert(offsetof(StsMsgLib::_PresenceLocation, appId) == 0x10, "StsMsgLib::_PresenceLocation::appId");
-
-namespace StsMsgLib {
-struct _StsMsg {
-public:
-    virtual StsMsgLib::ECommand GetCommand() = 0;  // slot 0
-    virtual unsigned int GetTransactionId() = 0;  // slot 1
-    virtual StsMsgLib::EMessageType GetMessageType() = 0;  // slot 2
-};
-}  // namespace StsMsgLib
-static_assert(sizeof(StsMsgLib::_StsMsg) == 0x8, "sizeof StsMsgLib::_StsMsg");
 
 namespace StsMsgLib {
 struct _StsMsgBuffer {
@@ -5455,17 +6610,6 @@ public:
 static_assert(sizeof(StsMsgLib::_StsMsgBuffer) == 0x10, "sizeof StsMsgLib::_StsMsgBuffer");
 static_assert(offsetof(StsMsgLib::_StsMsgBuffer, pData) == 0x0, "StsMsgLib::_StsMsgBuffer::pData");
 static_assert(offsetof(StsMsgLib::_StsMsgBuffer, nLen) == 0x8, "StsMsgLib::_StsMsgBuffer::nLen");
-
-namespace StsMsgLib {
-struct _StsMsgInfo {
-public:
-    StsMsgLib::ECommand eCmd;
-    StsMsgLib::EMessageType msgType;
-};
-}  // namespace StsMsgLib
-static_assert(sizeof(StsMsgLib::_StsMsgInfo) == 0x8, "sizeof StsMsgLib::_StsMsgInfo");
-static_assert(offsetof(StsMsgLib::_StsMsgInfo, eCmd) == 0x0, "StsMsgLib::_StsMsgInfo::eCmd");
-static_assert(offsetof(StsMsgLib::_StsMsgInfo, msgType) == 0x4, "StsMsgLib::_StsMsgInfo::msgType");
 
 namespace StsMsgLib {
 struct _StsMsgInfoRequest : public StsMsgLib::_StsMsgInfo {
@@ -5539,23 +6683,10 @@ public:
 static_assert(sizeof(StsMsgLib::_StsMsgInfoNotify) == 0x8, "sizeof StsMsgLib::_StsMsgInfoNotify");
 
 namespace StsMsgLib {
-struct _StsMsgInfoResponse : public StsMsgLib::_StsMsgInfo {
-public:
-    unsigned int nTxnId;
-    bool bComplete;
-    alignas(8) unsigned char errInfo[0x48];  // ❓ PDB type 0x2FB2: StsMsgLib::_StsMsgInfoResponse::_StsMsgErrInfo
-};
-}  // namespace StsMsgLib
-static_assert(sizeof(StsMsgLib::_StsMsgInfoResponse) == 0x58, "sizeof StsMsgLib::_StsMsgInfoResponse");
-static_assert(offsetof(StsMsgLib::_StsMsgInfoResponse, nTxnId) == 0x8, "StsMsgLib::_StsMsgInfoResponse::nTxnId");
-static_assert(offsetof(StsMsgLib::_StsMsgInfoResponse, bComplete) == 0xC, "StsMsgLib::_StsMsgInfoResponse::bComplete");
-static_assert(offsetof(StsMsgLib::_StsMsgInfoResponse, errInfo) == 0x10, "StsMsgLib::_StsMsgInfoResponse::errInfo");
-
-namespace StsMsgLib {
 struct _StsMsgLinkGameAccount : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pPortalAccountId;
-    void * pGameAccountId;
+    _GUID * pPortalAccountId;
+    _GUID * pGameAccountId;
     wchar_t * pwszAlias;
     long long tCreation;
 };
@@ -5569,7 +6700,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgLinkGameAccount, tCreation) == 0x30, "S
 namespace StsMsgLib {
 struct _StsMsgLoginWebStart : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pPortalAccountId;
+    _GUID * pPortalAccountId;
     char * pszLoginName;
     char * pszPassWord;
 };
@@ -5597,7 +6728,7 @@ public:
     wchar_t * pwszGameCode;
     int nAuctionType;
     int nAuctionUserType;
-    alignas(4) unsigned char auctionId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID auctionId;
     wchar_t * pwszGameItemKey;
     long long nQuantity;
     long long nSalePrice;
@@ -5619,7 +6750,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgNotifyAuctionNotifyEvent, tRegistered) 
 namespace StsMsgLib {
 struct _StsMsgNotifyChargeNotifyApplyNewItem : public StsMsgLib::_StsMsgNotify {
 public:
-    alignas(4) unsigned char UserId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID UserId;
     unsigned int nRemainPlayTime;
     unsigned int nReservations;
     unsigned int nItemId;
@@ -5638,7 +6769,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgNotifyChargeNotifyApplyNewItem, ChargeK
 namespace StsMsgLib {
 struct _StsMsgNotifyChargeNotifyRemainTime : public StsMsgLib::_StsMsgNotify {
 public:
-    alignas(4) unsigned char UserId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID UserId;
     unsigned int nRemainPlayTime;
     unsigned int nReservations;
     unsigned int nItemId;
@@ -5657,7 +6788,7 @@ struct _StsMsgNotifyCustomMessage : public StsMsgLib::_StsMsgNotify {
 public:
     char * pszProtocol;
     char * pszCommand;
-    alignas(4) unsigned char guidPortalAccountId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID guidPortalAccountId;
     wchar_t * pwszAlias;
     unsigned int nTxnId;
     char * pszXmlMessageBody;
@@ -5681,13 +6812,13 @@ static_assert(sizeof(StsMsgLib::_StsMsgNotifyFollowFollowed) == 0x10, "sizeof St
 namespace StsMsgLib {
 struct _StsMsgNotifyFriendInfo : public StsMsgLib::_StsMsgNotify {
 public:
-    alignas(4) unsigned char friendId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID friendId;
     wchar_t * pwszPrivacyRelationship;
     bool bAppDataChagned;
-    void * pAppDataList;
+    StsMsgLib::_CliFriendInfo::_AppData * pAppDataList;
     unsigned int nAppDataListCount;
     bool bLocationChanged;
-    void * pLocationList;
+    StsMsgLib::_CliFriendInfo::_Location * pLocationList;
     unsigned int nLocationListCount;
 };
 }  // namespace StsMsgLib
@@ -5704,7 +6835,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgNotifyFriendInfo, nLocationListCount) =
 namespace StsMsgLib {
 struct _StsMsgNotifyFriendMessage : public StsMsgLib::_StsMsgNotify {
 public:
-    alignas(4) unsigned char friendId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID friendId;
     unsigned int nContentListCount;
     wchar_t * * pwszContentKeyList;
     wchar_t * * pwszContentValueList;
@@ -5719,11 +6850,11 @@ static_assert(offsetof(StsMsgLib::_StsMsgNotifyFriendMessage, pwszContentValueLi
 namespace StsMsgLib {
 struct _StsMsgNotifyFriendProposalAccepted : public StsMsgLib::_StsMsgNotify {
 public:
-    alignas(4) unsigned char proposalId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID proposalId;
     wchar_t * pwszUserAlias;
     wchar_t * pwszUserCharKey;
     int nUserAppGroupId;
-    alignas(4) unsigned char friendId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID friendId;
     wchar_t * pwszFriendAlias;
     wchar_t * pwszFriendCharKey;
     int nFriendAppGroupId;
@@ -5742,11 +6873,11 @@ static_assert(offsetof(StsMsgLib::_StsMsgNotifyFriendProposalAccepted, nFriendAp
 namespace StsMsgLib {
 struct _StsMsgNotifyFriendProposalDenied : public StsMsgLib::_StsMsgNotify {
 public:
-    alignas(4) unsigned char proposalId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID proposalId;
     wchar_t * pwszUserAlias;
     wchar_t * pwszUserCharKey;
     int nUserAppGroupId;
-    alignas(4) unsigned char friendId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID friendId;
     wchar_t * pwszFriendAlias;
     wchar_t * pwszFriendCharKey;
     int nFriendAppGroupId;
@@ -5765,11 +6896,11 @@ static_assert(offsetof(StsMsgLib::_StsMsgNotifyFriendProposalDenied, nFriendAppG
 namespace StsMsgLib {
 struct _StsMsgNotifyFriendProposed : public StsMsgLib::_StsMsgNotify {
 public:
-    alignas(4) unsigned char proposalId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID proposalId;
     wchar_t * pwszUserAlias;
     wchar_t * pwszUserCharKey;
     int nUserAppGroupId;
-    alignas(4) unsigned char friendId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID friendId;
     wchar_t * pwszFriendAlias;
     wchar_t * pwszFriendCharKey;
     int nFriendAppGroupId;
@@ -5788,7 +6919,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgNotifyFriendProposed, nFriendAppGroupId
 namespace StsMsgLib {
 struct _StsMsgNotifyFriendRemoved : public StsMsgLib::_StsMsgNotify {
 public:
-    alignas(4) unsigned char friendId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID friendId;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgNotifyFriendRemoved) == 0x20, "sizeof StsMsgLib::_StsMsgNotifyFriendRemoved");
@@ -5797,7 +6928,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgNotifyFriendRemoved, friendId) == 0x10,
 namespace StsMsgLib {
 struct _StsMsgNotifyFriendUserNameChanged : public StsMsgLib::_StsMsgNotify {
 public:
-    alignas(4) unsigned char friendId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID friendId;
     wchar_t * pwszChangedUserName;
 };
 }  // namespace StsMsgLib
@@ -5808,7 +6939,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgNotifyFriendUserNameChanged, pwszChange
 namespace StsMsgLib {
 struct _StsMsgNotifyGradeNotifyGradeChanged : public StsMsgLib::_StsMsgNotify {
 public:
-    alignas(4) unsigned char UserId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID UserId;
     int nGradeId;
     wchar_t AppGroupCode[9];
     wchar_t GameGradeKey[51];
@@ -5835,9 +6966,16 @@ static_assert(offsetof(StsMsgLib::_StsMsgNotifyGradeNotifyGradeChanged, pwszReas
 namespace StsMsgLib {
 struct _StsMsgNotifyGradeNotifyScoreChanged : public StsMsgLib::_StsMsgNotify {
 public:
-    alignas(4) unsigned char UserId[0x10];  // ❓ PDB type 0x1056: _GUID
+    struct _Grade;
+    struct _Grade {
+    public:
+        int nGradeId;
+        wchar_t AppGroupCode[9];
+        wchar_t GameGradeKey[51];
+    };
+    _GUID UserId;
     int nRelatedGradesCount;
-    void * pRelatedGrades;
+    StsMsgLib::_StsMsgNotifyGradeNotifyScoreChanged::_Grade * pRelatedGrades;
     bool bLevelChanged;
     int nLevelId;
     int nAccumulateGradeScore;
@@ -5856,11 +6994,15 @@ static_assert(offsetof(StsMsgLib::_StsMsgNotifyGradeNotifyScoreChanged, nAccumul
 static_assert(offsetof(StsMsgLib::_StsMsgNotifyGradeNotifyScoreChanged, nMinimumLevelScore) == 0x3C, "StsMsgLib::_StsMsgNotifyGradeNotifyScoreChanged::nMinimumLevelScore");
 static_assert(offsetof(StsMsgLib::_StsMsgNotifyGradeNotifyScoreChanged, nMaximumLevelScore) == 0x40, "StsMsgLib::_StsMsgNotifyGradeNotifyScoreChanged::nMaximumLevelScore");
 static_assert(offsetof(StsMsgLib::_StsMsgNotifyGradeNotifyScoreChanged, nMaximumGradeScore) == 0x44, "StsMsgLib::_StsMsgNotifyGradeNotifyScoreChanged::nMaximumGradeScore");
+static_assert(sizeof(StsMsgLib::_StsMsgNotifyGradeNotifyScoreChanged::_Grade) == 0x7C, "sizeof StsMsgLib::_StsMsgNotifyGradeNotifyScoreChanged::_Grade");
+static_assert(offsetof(StsMsgLib::_StsMsgNotifyGradeNotifyScoreChanged::_Grade, nGradeId) == 0x0, "StsMsgLib::_StsMsgNotifyGradeNotifyScoreChanged::_Grade::nGradeId");
+static_assert(offsetof(StsMsgLib::_StsMsgNotifyGradeNotifyScoreChanged::_Grade, AppGroupCode) == 0x4, "StsMsgLib::_StsMsgNotifyGradeNotifyScoreChanged::_Grade::AppGroupCode");
+static_assert(offsetof(StsMsgLib::_StsMsgNotifyGradeNotifyScoreChanged::_Grade, GameGradeKey) == 0x16, "StsMsgLib::_StsMsgNotifyGradeNotifyScoreChanged::_Grade::GameGradeKey");
 
 namespace StsMsgLib {
 struct _StsMsgNotifyIngameChannelChannelInfo : public StsMsgLib::_StsMsgNotify {
 public:
-    alignas(4) unsigned char channelId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID channelId;
     unsigned int channelCenter;
     wchar_t const * pwszChannelKey;
     wchar_t const * pwszChannelAlias;
@@ -5885,9 +7027,9 @@ static_assert(offsetof(StsMsgLib::_StsMsgNotifyIngameChannelChannelInfo, voice) 
 namespace StsMsgLib {
 struct _StsMsgNotifyIngameChannelTalk : public StsMsgLib::_StsMsgNotify {
 public:
-    alignas(4) unsigned char channelId[0x10];  // ❓ PDB type 0x1056: _GUID
-    alignas(4) unsigned char userId[0x10];  // ❓ PDB type 0x1056: _GUID
-    alignas(4) unsigned char pwszUserId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID channelId;
+    _GUID userId;
+    _GUID pwszUserId;
     unsigned int channelCenter;
     wchar_t const * pwszChannelKey;
     wchar_t const * pwszText;
@@ -5908,7 +7050,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgNotifyIngameChannelTalk, mediaExtension
 namespace StsMsgLib {
 struct _StsMsgNotifyIngameChannelUserInfo : public StsMsgLib::_StsMsgNotify {
 public:
-    alignas(4) unsigned char channelId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID channelId;
     unsigned int channelCenter;
     wchar_t const * pwszChannelKey;
     wchar_t const * pwszReason;
@@ -5925,8 +7067,8 @@ static_assert(offsetof(StsMsgLib::_StsMsgNotifyIngameChannelUserInfo, member) ==
 namespace StsMsgLib {
 struct _StsMsgNotifyPresenceMessage : public StsMsgLib::_StsMsgNotify {
 public:
-    alignas(4) unsigned char guidAppId[0x10];  // ❓ PDB type 0x1056: _GUID
-    alignas(4) unsigned char guidUserId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID guidAppId;
+    _GUID guidUserId;
     wchar_t * pwszMessageName;
     wchar_t * pwszContent;
 };
@@ -5940,7 +7082,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgNotifyPresenceMessage, pwszContent) == 
 namespace StsMsgLib {
 struct _StsMsgNotifyPresenceUserInfo : public StsMsgLib::_StsMsgNotify {
 public:
-    alignas(4) unsigned char guidPortalAccountId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID guidPortalAccountId;
     unsigned int nDataCenter;
     wchar_t * pwszUserName;
     StsMsgLib::EUserStatus userStatus;
@@ -5970,9 +7112,13 @@ static_assert(offsetof(StsMsgLib::_StsMsgNotifyPresenceWhisper, szWhispserMessag
 namespace StsMsgLib {
 struct _StsMsgNotifyVirtualCurrencyNotifyBalanceChanged : public StsMsgLib::_StsMsgNotify {
 public:
-    alignas(4) unsigned char userId[0x10];  // ❓ PDB type 0x1056: _GUID
+    enum DepositReasonCode : int {
+        DEPOSITREASON_UNKNOWN = 0x0,
+        DEPOSITREASON_DAILYREWARD = 0xD,
+    };
+    _GUID userId;
     int nCurrencyGroupId;
-    int eDepositReasonCode;
+    StsMsgLib::_StsMsgNotifyVirtualCurrencyNotifyBalanceChanged::DepositReasonCode eDepositReasonCode;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgNotifyVirtualCurrencyNotifyBalanceChanged) == 0x28, "sizeof StsMsgLib::_StsMsgNotifyVirtualCurrencyNotifyBalanceChanged");
@@ -6027,7 +7173,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgReqWarehouseListGoodsInfos, nPageSize) 
 namespace StsMsgLib {
 struct _StsMsgRequestAuctionBid : public StsMsgLib::_StsMsgRequest {
 public:
-    alignas(4) unsigned char auctionId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID auctionId;
     int nGameServerId;
     long long nCharacterId;
     int nBidCurrencyGroupId;
@@ -6044,8 +7190,8 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestAuctionBid, nBidPrice) == 0x40, 
 namespace StsMsgLib {
 struct _StsMsgRequestAuctionBid_Srv : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pAuctionId;
-    void * pUserId;
+    _GUID * pAuctionId;
+    _GUID * pUserId;
     int nGameServerId;
     long long nCharacterId;
     int nBidCurrencyGroupId;
@@ -6063,7 +7209,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestAuctionBid_Srv, nBidPrice) == 0x
 namespace StsMsgLib {
 struct _StsMsgRequestAuctionCancelSale : public StsMsgLib::_StsMsgRequest {
 public:
-    alignas(4) unsigned char auctionId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID auctionId;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgRequestAuctionCancelSale) == 0x28, "sizeof StsMsgLib::_StsMsgRequestAuctionCancelSale");
@@ -6072,7 +7218,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestAuctionCancelSale, auctionId) ==
 namespace StsMsgLib {
 struct _StsMsgRequestAuctionGetBalance : public StsMsgLib::_StsMsgRequest {
 public:
-    alignas(4) unsigned char userId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID userId;
     int nCurrencyGroupId;
     int nCurrencyId;
     char const * pszClientNetAddress;
@@ -6184,7 +7330,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestAuctionSell, nDurationHr) == 0x4
 namespace StsMsgLib {
 struct _StsMsgRequestAuthChangeMyUserNameIncomplete : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
+    _GUID * pUserId;
     wchar_t * pwszUserNameOld;
     wchar_t * pwszUserNameNew;
     bool bSkipCheckPassword;
@@ -6201,7 +7347,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestAuthChangeMyUserNameIncomplete, 
 namespace StsMsgLib {
 struct _StsMsgRequestAuthGetUserInfo : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
+    _GUID * pUserId;
     bool bExternalAccount;
     bool bServiceTimeSchedule;
 };
@@ -6214,7 +7360,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestAuthGetUserInfo, bServiceTimeSch
 namespace StsMsgLib {
 struct _StsMsgRequestAuthGetUserNameChangeableIncomplete : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
+    _GUID * pUserId;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgRequestAuthGetUserNameChangeableIncomplete) == 0x20, "sizeof StsMsgLib::_StsMsgRequestAuthGetUserNameChangeableIncomplete");
@@ -6223,7 +7369,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestAuthGetUserNameChangeableIncompl
 namespace StsMsgLib {
 struct _StsMsgRequestAuthGetUsersInfo : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserIdList;
+    _GUID * pUserIdList;
     int nUserIdListCount;
 };
 }  // namespace StsMsgLib
@@ -6234,7 +7380,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestAuthGetUsersInfo, nUserIdListCou
 namespace StsMsgLib {
 struct _StsMsgRequestAuthIsUserNameChangeableIncomplete : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
+    _GUID * pUserId;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgRequestAuthIsUserNameChangeableIncomplete) == 0x20, "sizeof StsMsgLib::_StsMsgRequestAuthIsUserNameChangeableIncomplete");
@@ -6244,7 +7390,7 @@ namespace StsMsgLib {
 struct _StsMsgRequestChannelDeleteGroupChannel : public StsMsgLib::_StsMsgRequest {
 public:
     char * pszGroupName;
-    void * pGroupValidateAppId;
+    _GUID * pGroupValidateAppId;
     int nGroupOwner;
 };
 }  // namespace StsMsgLib
@@ -6257,7 +7403,7 @@ namespace StsMsgLib {
 struct _StsMsgRequestChannelKick : public StsMsgLib::_StsMsgRequest {
 public:
     char * pszGroupName;
-    void * pValidateAppId;
+    _GUID * pValidateAppId;
     unsigned long long nTargetMemberKey;
     int nTargetMemberOwner;
 };
@@ -6272,7 +7418,7 @@ namespace StsMsgLib {
 struct _StsMsgRequestChannelSetPermissionGroup : public StsMsgLib::_StsMsgRequest {
 public:
     char const * pszGroupName;
-    void * pValidateAppId;
+    _GUID const * pValidateAppId;
     char const * pszTargetMemberType;
     unsigned long long nTargetMemberKey;
     int nTargetMemberOwner;
@@ -6292,7 +7438,7 @@ struct _StsMsgRequestChannelSetPermissionMemberChannels : public StsMsgLib::_Sts
 public:
     char const * pszMemberType;
     unsigned long long nMemberKey;
-    void * pMemberValidateAppId;
+    _GUID const * pMemberValidateAppId;
     int nMemberOwner;
     char const * pszPermission;
 };
@@ -6308,7 +7454,7 @@ namespace StsMsgLib {
 struct _StsMsgRequestChannelUnsetPermissionGroup : public StsMsgLib::_StsMsgRequest {
 public:
     char const * pszGroupName;
-    void * pValidateAppId;
+    _GUID const * pValidateAppId;
     char const * pszTargetMemberType;
     unsigned long long nTargetMemberKey;
     int nTargetMemberOwner;
@@ -6328,7 +7474,7 @@ struct _StsMsgRequestChannelUnsetPermissionMemberChannels : public StsMsgLib::_S
 public:
     char const * pszMemberType;
     unsigned long long nMemberKey;
-    void * pMemberValidateAppId;
+    _GUID const * pMemberValidateAppId;
     int nMemberOwner;
     char const * pszPermission;
 };
@@ -6343,7 +7489,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestChannelUnsetPermissionMemberChan
 namespace StsMsgLib {
 struct _StsMsgRequestChargeAbandon : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
+    _GUID * pUserId;
     wchar_t ChargeKey[65];
 };
 }  // namespace StsMsgLib
@@ -6354,7 +7500,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestChargeAbandon, ChargeKey) == 0x2
 namespace StsMsgLib {
 struct _StsMsgRequestChargeGetInfo : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
+    _GUID * pUserId;
     char * pszClientNetAddress;
 };
 }  // namespace StsMsgLib
@@ -6365,7 +7511,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestChargeGetInfo, pszClientNetAddre
 namespace StsMsgLib {
 struct _StsMsgRequestChargeRequestStop : public StsMsgLib::_StsMsgRequest {
 public:
-    alignas(4) unsigned char UserId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID UserId;
     wchar_t * pwszReason;
 };
 }  // namespace StsMsgLib
@@ -6376,7 +7522,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestChargeRequestStop, pwszReason) =
 namespace StsMsgLib {
 struct _StsMsgRequestChargeStart : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
+    _GUID * pUserId;
     char * pszClientNetAddress;
     unsigned int nWorldCode;
     unsigned int nClientInstanceCount;
@@ -6391,7 +7537,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestChargeStart, nClientInstanceCoun
 namespace StsMsgLib {
 struct _StsMsgRequestChargeStop : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
+    _GUID * pUserId;
     char * pszClientNetAddress;
     wchar_t ChargeKey[65];
 };
@@ -6415,8 +7561,8 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestCliLogOut, eAccsError) == 0x1C, 
 namespace StsMsgLib {
 struct _StsMsgRequestConsumeGameToken : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
-    void * pGameToken;
+    _GUID * pUserId;
+    _GUID * pGameToken;
     char const * pszClientNetAddress;
 };
 }  // namespace StsMsgLib
@@ -6428,7 +7574,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestConsumeGameToken, pszClientNetAd
 namespace StsMsgLib {
 struct _StsMsgRequestCouponGetUserCouponCount : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
+    _GUID * pUserId;
     int nUserCouponStatus;
 };
 }  // namespace StsMsgLib
@@ -6439,7 +7585,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestCouponGetUserCouponCount, nUserC
 namespace StsMsgLib {
 struct _StsMsgRequestCouponPageUserCoupons : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
+    _GUID * pUserId;
     int nUserCouponStatus;
     int nPageIndex;
     int nPageSize;
@@ -6457,7 +7603,7 @@ namespace StsMsgLib {
 struct _StsMsgRequestCouponRegisterUserCoupon : public StsMsgLib::_StsMsgRequest {
 public:
     wchar_t const * pwszCouponKey;
-    void * pUserId;
+    _GUID * pUserId;
     bool bUseGoodsCoupon;
     int nAccountNo;
     int nAccountServiceCode;
@@ -6479,10 +7625,15 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestCouponRegisterUserCoupon, pwszCh
 namespace StsMsgLib {
 struct _StsMsgRequestCouponUseGoodsCoupon : public StsMsgLib::_StsMsgRequest {
 public:
+    struct _CouponGoods;
+    struct _CouponGoods {
+    public:
+        int nGoodsId;
+    };
     long long nUserCouponId;
-    void * pUserId;
+    _GUID * pUserId;
     int nCouponGoodsCount;
-    void * pCouponGoodsList;
+    StsMsgLib::_StsMsgRequestCouponUseGoodsCoupon::_CouponGoods * pCouponGoodsList;
     int nAccountNo;
     int nAccountServiceCode;
     int nServerId;
@@ -6500,6 +7651,8 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestCouponUseGoodsCoupon, nAccountSe
 static_assert(offsetof(StsMsgLib::_StsMsgRequestCouponUseGoodsCoupon, nServerId) == 0x40, "StsMsgLib::_StsMsgRequestCouponUseGoodsCoupon::nServerId");
 static_assert(offsetof(StsMsgLib::_StsMsgRequestCouponUseGoodsCoupon, nCharId) == 0x44, "StsMsgLib::_StsMsgRequestCouponUseGoodsCoupon::nCharId");
 static_assert(offsetof(StsMsgLib::_StsMsgRequestCouponUseGoodsCoupon, pwszCharName) == 0x48, "StsMsgLib::_StsMsgRequestCouponUseGoodsCoupon::pwszCharName");
+static_assert(sizeof(StsMsgLib::_StsMsgRequestCouponUseGoodsCoupon::_CouponGoods) == 0x4, "sizeof StsMsgLib::_StsMsgRequestCouponUseGoodsCoupon::_CouponGoods");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestCouponUseGoodsCoupon::_CouponGoods, nGoodsId) == 0x0, "StsMsgLib::_StsMsgRequestCouponUseGoodsCoupon::_CouponGoods::nGoodsId");
 
 namespace StsMsgLib {
 struct _StsMsgRequestCustomMessage : public StsMsgLib::_StsMsgRequest {
@@ -6526,8 +7679,8 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestCustomMessageResponse, pszXmlMes
 namespace StsMsgLib {
 struct _StsMsgRequestFriendAcceptProposal : public StsMsgLib::_StsMsgRequest {
 public:
-    alignas(4) unsigned char friendId[0x10];  // ❓ PDB type 0x1056: _GUID
-    alignas(4) unsigned char proposalId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID friendId;
+    _GUID proposalId;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgRequestFriendAcceptProposal) == 0x38, "sizeof StsMsgLib::_StsMsgRequestFriendAcceptProposal");
@@ -6537,7 +7690,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestFriendAcceptProposal, proposalId
 namespace StsMsgLib {
 struct _StsMsgRequestFriendChangeAlias : public StsMsgLib::_StsMsgRequest {
 public:
-    alignas(4) unsigned char friendId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID friendId;
     wchar_t const * pwszFriendAlias;
 };
 }  // namespace StsMsgLib
@@ -6548,8 +7701,8 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestFriendChangeAlias, pwszFriendAli
 namespace StsMsgLib {
 struct _StsMsgRequestFriendDenyProposal : public StsMsgLib::_StsMsgRequest {
 public:
-    alignas(4) unsigned char friendId[0x10];  // ❓ PDB type 0x1056: _GUID
-    alignas(4) unsigned char proposalId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID friendId;
+    _GUID proposalId;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgRequestFriendDenyProposal) == 0x38, "sizeof StsMsgLib::_StsMsgRequestFriendDenyProposal");
@@ -6559,7 +7712,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestFriendDenyProposal, proposalId) 
 namespace StsMsgLib {
 struct _StsMsgRequestFriendGetRelations : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pFriendIdList;
+    _GUID * pFriendIdList;
     int nFriendListCount;
     int nIsReqGroupInfo;
     int nIsReqAppDataInfo;
@@ -6618,7 +7771,7 @@ public:
     wchar_t const * pwszUserAlias;
     wchar_t const * pwszUserCharKey;
     int nUserAppGroupId;
-    alignas(4) unsigned char friendId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID friendId;
     wchar_t const * pwszFriendAlias;
     wchar_t const * pwszFriendCharKey;
     int nFriendAppGroupId;
@@ -6636,7 +7789,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestFriendPropose, nFriendAppGroupId
 namespace StsMsgLib {
 struct _StsMsgRequestFriendRemove : public StsMsgLib::_StsMsgRequest {
 public:
-    alignas(4) unsigned char friendId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID friendId;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgRequestFriendRemove) == 0x28, "sizeof StsMsgLib::_StsMsgRequestFriendRemove");
@@ -6645,13 +7798,25 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestFriendRemove, friendId) == 0x18,
 namespace StsMsgLib {
 struct _StsMsgRequestFriendSendMessage : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
-    void * pAppIds;
+    struct Contents;
+    struct Contents {
+    public:
+        struct Field;
+        struct Field {
+        public:
+            char * pszKey;
+            wchar_t * pwszValue;
+        };
+        StsMsgLib::_StsMsgRequestFriendSendMessage::Contents::Field * pFields;
+        int nFieldCount;
+    };
+    _GUID * pUserId;
+    _GUID * pAppIds;
     int nAppIdCount;
     wchar_t * pwszScope;
-    void * pScopeId;
+    _GUID * pScopeId;
     wchar_t * pwszMessageName;
-    alignas(8) unsigned char contents[0x10];  // ❓ PDB type 0x3E88: StsMsgLib::_StsMsgRequestFriendSendMessage::Contents
+    StsMsgLib::_StsMsgRequestFriendSendMessage::Contents contents;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgRequestFriendSendMessage) == 0x58, "sizeof StsMsgLib::_StsMsgRequestFriendSendMessage");
@@ -6662,6 +7827,12 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestFriendSendMessage, pwszScope) ==
 static_assert(offsetof(StsMsgLib::_StsMsgRequestFriendSendMessage, pScopeId) == 0x38, "StsMsgLib::_StsMsgRequestFriendSendMessage::pScopeId");
 static_assert(offsetof(StsMsgLib::_StsMsgRequestFriendSendMessage, pwszMessageName) == 0x40, "StsMsgLib::_StsMsgRequestFriendSendMessage::pwszMessageName");
 static_assert(offsetof(StsMsgLib::_StsMsgRequestFriendSendMessage, contents) == 0x48, "StsMsgLib::_StsMsgRequestFriendSendMessage::contents");
+static_assert(sizeof(StsMsgLib::_StsMsgRequestFriendSendMessage::Contents) == 0x10, "sizeof StsMsgLib::_StsMsgRequestFriendSendMessage::Contents");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestFriendSendMessage::Contents, pFields) == 0x0, "StsMsgLib::_StsMsgRequestFriendSendMessage::Contents::pFields");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestFriendSendMessage::Contents, nFieldCount) == 0x8, "StsMsgLib::_StsMsgRequestFriendSendMessage::Contents::nFieldCount");
+static_assert(sizeof(StsMsgLib::_StsMsgRequestFriendSendMessage::Contents::Field) == 0x10, "sizeof StsMsgLib::_StsMsgRequestFriendSendMessage::Contents::Field");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestFriendSendMessage::Contents::Field, pszKey) == 0x0, "StsMsgLib::_StsMsgRequestFriendSendMessage::Contents::Field::pszKey");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestFriendSendMessage::Contents::Field, pwszValue) == 0x8, "StsMsgLib::_StsMsgRequestFriendSendMessage::Contents::Field::pwszValue");
 
 namespace StsMsgLib {
 struct _StsMsgRequestGameAccountList : public StsMsgLib::_StsMsgRequest {
@@ -6673,7 +7844,7 @@ static_assert(sizeof(StsMsgLib::_StsMsgRequestGameAccountList) == 0x18, "sizeof 
 namespace StsMsgLib {
 struct _StsMsgRequestGameAccountListUserLastPresences : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
+    _GUID * pUserId;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgRequestGameAccountListUserLastPresences) == 0x20, "sizeof StsMsgLib::_StsMsgRequestGameAccountListUserLastPresences");
@@ -6682,12 +7853,46 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestGameAccountListUserLastPresences
 namespace StsMsgLib {
 struct _StsMsgRequestGameAuctionDeliver : public StsMsgLib::_StsMsgRequest {
 public:
+    struct _AuctionMessage;
+    struct _DeliveryItem;
+    enum AuctionEventType : int {
+        AUCTIONEVENTTYPE_INVALID = 0x0,
+        AUCTIONEVENTTYPE_SUCCESS = 0x1,
+        AUCTIONEVENTTYPE_EXPIRED = 0x2,
+        AUCTIONEVENTTYPE_CANCELED = 0x3,
+        AUCTIONEVENTTYPE_BIDFAIL = 0x4,
+        AUCTIONEVENTTYPE_MAX = 0x5,
+    };
+    enum AuctionUserType : int {
+        AUCTIONUSERTYPE_INVALID = 0x0,
+        AUCTIONUSERTYPE_SELLER = 0x1,
+        AUCTIONUSERTYPE_BUYER = 0x2,
+        AUCTIONUSERTYPE_MAX = 0x3,
+    };
+    struct _AuctionMessage {
+    public:
+        StsMsgLib::_StsMsgRequestGameAuctionDeliver::AuctionEventType eAuctionEventType;
+        StsMsgLib::_StsMsgRequestGameAuctionDeliver::AuctionUserType eAuctionUserType;
+        _GUID AuctionId;
+        wchar_t GameItemKey[51];
+        long long nQuantity;
+        long long nSalePrice;
+        long long nBidPrice;
+        long long nCurrencyFee;
+        long long nGameItemFee;
+        long long tRegistered;
+    };
+    struct _DeliveryItem {
+    public:
+        wchar_t GameItemKey[51];
+        long long nQuantity;
+    };
     wchar_t RequestId[51];
-    alignas(4) unsigned char UserId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID UserId;
     short nWorldCode;
     long long nCharacterId;
-    alignas(8) unsigned char AuctionMessage[0xB0];  // ❓ PDB type 0x3C45: StsMsgLib::_StsMsgRequestGameAuctionDeliver::_AuctionMessage
-    void * pDeliveryItem;
+    StsMsgLib::_StsMsgRequestGameAuctionDeliver::_AuctionMessage AuctionMessage;
+    StsMsgLib::_StsMsgRequestGameAuctionDeliver::_DeliveryItem * pDeliveryItem;
     int nDeliveryItemCount;
 };
 }  // namespace StsMsgLib
@@ -6699,12 +7904,26 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestGameAuctionDeliver, nCharacterId
 static_assert(offsetof(StsMsgLib::_StsMsgRequestGameAuctionDeliver, AuctionMessage) == 0xA0, "StsMsgLib::_StsMsgRequestGameAuctionDeliver::AuctionMessage");
 static_assert(offsetof(StsMsgLib::_StsMsgRequestGameAuctionDeliver, pDeliveryItem) == 0x150, "StsMsgLib::_StsMsgRequestGameAuctionDeliver::pDeliveryItem");
 static_assert(offsetof(StsMsgLib::_StsMsgRequestGameAuctionDeliver, nDeliveryItemCount) == 0x158, "StsMsgLib::_StsMsgRequestGameAuctionDeliver::nDeliveryItemCount");
+static_assert(sizeof(StsMsgLib::_StsMsgRequestGameAuctionDeliver::_AuctionMessage) == 0xB0, "sizeof StsMsgLib::_StsMsgRequestGameAuctionDeliver::_AuctionMessage");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestGameAuctionDeliver::_AuctionMessage, eAuctionEventType) == 0x0, "StsMsgLib::_StsMsgRequestGameAuctionDeliver::_AuctionMessage::eAuctionEventType");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestGameAuctionDeliver::_AuctionMessage, eAuctionUserType) == 0x4, "StsMsgLib::_StsMsgRequestGameAuctionDeliver::_AuctionMessage::eAuctionUserType");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestGameAuctionDeliver::_AuctionMessage, AuctionId) == 0x8, "StsMsgLib::_StsMsgRequestGameAuctionDeliver::_AuctionMessage::AuctionId");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestGameAuctionDeliver::_AuctionMessage, GameItemKey) == 0x18, "StsMsgLib::_StsMsgRequestGameAuctionDeliver::_AuctionMessage::GameItemKey");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestGameAuctionDeliver::_AuctionMessage, nQuantity) == 0x80, "StsMsgLib::_StsMsgRequestGameAuctionDeliver::_AuctionMessage::nQuantity");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestGameAuctionDeliver::_AuctionMessage, nSalePrice) == 0x88, "StsMsgLib::_StsMsgRequestGameAuctionDeliver::_AuctionMessage::nSalePrice");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestGameAuctionDeliver::_AuctionMessage, nBidPrice) == 0x90, "StsMsgLib::_StsMsgRequestGameAuctionDeliver::_AuctionMessage::nBidPrice");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestGameAuctionDeliver::_AuctionMessage, nCurrencyFee) == 0x98, "StsMsgLib::_StsMsgRequestGameAuctionDeliver::_AuctionMessage::nCurrencyFee");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestGameAuctionDeliver::_AuctionMessage, nGameItemFee) == 0xA0, "StsMsgLib::_StsMsgRequestGameAuctionDeliver::_AuctionMessage::nGameItemFee");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestGameAuctionDeliver::_AuctionMessage, tRegistered) == 0xA8, "StsMsgLib::_StsMsgRequestGameAuctionDeliver::_AuctionMessage::tRegistered");
+static_assert(sizeof(StsMsgLib::_StsMsgRequestGameAuctionDeliver::_DeliveryItem) == 0x70, "sizeof StsMsgLib::_StsMsgRequestGameAuctionDeliver::_DeliveryItem");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestGameAuctionDeliver::_DeliveryItem, GameItemKey) == 0x0, "StsMsgLib::_StsMsgRequestGameAuctionDeliver::_DeliveryItem::GameItemKey");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestGameAuctionDeliver::_DeliveryItem, nQuantity) == 0x68, "StsMsgLib::_StsMsgRequestGameAuctionDeliver::_DeliveryItem::nQuantity");
 
 namespace StsMsgLib {
 struct _StsMsgRequestGameAuctionEscrow : public StsMsgLib::_StsMsgRequest {
 public:
-    alignas(4) unsigned char RequestId[0x10];  // ❓ PDB type 0x1056: _GUID
-    alignas(4) unsigned char UserId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID RequestId;
+    _GUID UserId;
     short nWorldCode;
     long long nCharacterId;
     wchar_t GameItemKey[51];
@@ -6723,7 +7942,7 @@ namespace StsMsgLib {
 struct _StsMsgRequestGameAuctionRollbackEscrow : public StsMsgLib::_StsMsgRequest {
 public:
     short nWorldCode;
-    alignas(4) unsigned char RequestId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID RequestId;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgRequestGameAuctionRollbackEscrow) == 0x30, "sizeof StsMsgLib::_StsMsgRequestGameAuctionRollbackEscrow");
@@ -6744,14 +7963,14 @@ struct _StsMsgRequestGameGroupGroupInfo : public StsMsgLib::_StsMsgRequest {
 public:
     wchar_t * pwszGroupName;
     unsigned int nChannelCenter;
-    alignas(4) unsigned char ChannelId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID ChannelId;
     wchar_t * pwszReason;
     unsigned int nCurrentMemberCount;
-    alignas(4) unsigned char UserId[0x10];  // ❓ PDB type 0x1056: _GUID
-    alignas(4) unsigned char GameAccountId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID UserId;
+    _GUID GameAccountId;
     wchar_t * pwszMemberType;
     wchar_t * pwszMemberKey;
-    alignas(4) unsigned char LocationId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID LocationId;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgRequestGameGroupGroupInfo) == 0x88, "sizeof StsMsgLib::_StsMsgRequestGameGroupGroupInfo");
@@ -6771,11 +7990,11 @@ struct _StsMsgRequestGameGroupValidateGroup : public StsMsgLib::_StsMsgRequest {
 public:
     wchar_t * pwszGroupToken;
     unsigned int nUserCenter;
-    alignas(4) unsigned char UserId[0x10];  // ❓ PDB type 0x1056: _GUID
-    alignas(4) unsigned char GameAccountId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID UserId;
+    _GUID GameAccountId;
     wchar_t * pwszMemberType;
     wchar_t * pwszMemberKey;
-    alignas(4) unsigned char AppId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID AppId;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgRequestGameGroupValidateGroup) == 0x68, "sizeof StsMsgLib::_StsMsgRequestGameGroupValidateGroup");
@@ -6790,7 +8009,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestGameGroupValidateGroup, AppId) =
 namespace StsMsgLib {
 struct _StsMsgRequestGameTimeGetGameTime : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pGameAccountId;
+    _GUID * pGameAccountId;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgRequestGameTimeGetGameTime) == 0x20, "sizeof StsMsgLib::_StsMsgRequestGameTimeGetGameTime");
@@ -6808,7 +8027,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestGameToken, pwszGameAlias) == 0x1
 namespace StsMsgLib {
 struct _StsMsgRequestGetAttributes : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
+    _GUID * pUserId;
     char * pszWorldCode;
 };
 }  // namespace StsMsgLib
@@ -6888,7 +8107,17 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestGoodsGetSaleGoods, languageCode)
 namespace StsMsgLib {
 struct _StsMsgRequestGoodsListCategoryIds : public StsMsgLib::_StsMsgRequest {
 public:
-    int eCategoryType;
+    enum CategoryType : int {
+        CATEGORYTYPE_INVALID = 0x0,
+        CATEGORYTYPE_NORMAL = 0x1,
+        CATEGORYTYPE_INSTANT_PURCHASE = 0x2,
+        CATEGORYTYPE_PROMOTION = 0x3,
+        CATEGORYTYPE_CHARGE = 0x4,
+        CATEGORYTYPE_TODAY = 0x5,
+        CATEGORYTYPE_VIP = 0x6,
+        CATEGORYTYPE_SHOWCASE = 0x7,
+    };
+    StsMsgLib::_StsMsgRequestGoodsListCategoryIds::CategoryType eCategoryType;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgRequestGoodsListCategoryIds) == 0x20, "sizeof StsMsgLib::_StsMsgRequestGoodsListCategoryIds");
@@ -6927,7 +8156,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestGoodsPageSearchGoods, nPageSize)
 namespace StsMsgLib {
 struct _StsMsgRequestGradeActivateGrade : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
+    _GUID * pUserId;
     int nGradeId;
     int nGameGradeKey;
     wchar_t AppGroupCode[9];
@@ -6942,9 +8171,16 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestGradeActivateGrade, AppGroupCode
 namespace StsMsgLib {
 struct _StsMsgRequestGradeAddGradeScore : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
+    enum EReasonCode : int {
+        REASONCODE_NULL = 0x0,
+        REASONCODE_PURCHASE = 0x1,
+        REASONCODE_WITHDRAW_PURCHASE = 0x2,
+        REASONCODE_EVENT = 0x3,
+        REASONCODES = 0x4,
+    };
+    _GUID * pUserId;
     int nLevelGroupId;
-    int nGradeScoreChangeReasonCode;
+    StsMsgLib::_StsMsgRequestGradeAddGradeScore::EReasonCode nGradeScoreChangeReasonCode;
     int nGradeScore;
     int nRequestFromCode;
     unsigned long long nRequestKey;
@@ -6961,7 +8197,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestGradeAddGradeScore, nRequestKey)
 namespace StsMsgLib {
 struct _StsMsgRequestGradeGetBaseGradeIdActivation : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
+    _GUID * pUserId;
     int nGradeId;
 };
 }  // namespace StsMsgLib
@@ -6972,7 +8208,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestGradeGetBaseGradeIdActivation, n
 namespace StsMsgLib {
 struct _StsMsgRequestGradeGetLevel : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
+    _GUID * pUserId;
     int nLevelGroupId;
     int nGradeId;
     int nGameGradeKey;
@@ -6987,7 +8223,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestGradeGetLevel, nGameGradeKey) ==
 namespace StsMsgLib {
 struct _StsMsgRequestGradeListAllGrades : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
+    _GUID * pUserId;
     int nDailyRewardInfo;
     wchar_t AppGroupCode[9];
 };
@@ -7000,7 +8236,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestGradeListAllGrades, AppGroupCode
 namespace StsMsgLib {
 struct _StsMsgRequestGradeListGrades : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
+    _GUID * pUserId;
     int nGradeId;
     int nDailyRewardInfo;
     wchar_t AppGroupCode[9];
@@ -7015,7 +8251,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestGradeListGrades, AppGroupCode) =
 namespace StsMsgLib {
 struct _StsMsgRequestGradeListLevels : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
+    _GUID * pUserId;
     int nLevelGroupId;
     int nGradeId;
 };
@@ -7028,7 +8264,11 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestGradeListLevels, nGradeId) == 0x
 namespace StsMsgLib {
 struct _StsMsgRequestGradeReward : public StsMsgLib::_StsMsgRequest {
 public:
-    int eRewardType;
+    enum ERewardType : int {
+        REWARD_INVALID = 0x0,
+        REWARD_VIRTUALCURRENCY = 0x1,
+    };
+    StsMsgLib::_StsMsgRequestGradeReward::ERewardType eRewardType;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgRequestGradeReward) == 0x20, "sizeof StsMsgLib::_StsMsgRequestGradeReward");
@@ -7037,13 +8277,13 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestGradeReward, eRewardType) == 0x1
 namespace StsMsgLib {
 struct _StsMsgRequestIngameChannelActivateVoice : public StsMsgLib::_StsMsgRequest {
 public:
-    alignas(4) unsigned char channelId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID channelId;
     unsigned int channelCenter;
     wchar_t const * pwszChannelKey;
     wchar_t const * pwszTransportType;
     wchar_t const * pwszDefaultVoiceStatus;
     wchar_t const * pwszMemberType;
-    void * memberValidateAppId;
+    _GUID const * memberValidateAppId;
     wchar_t const * pwszMemberOwner;
     wchar_t const * pwszMemberKey;
     unsigned int nMaxTalkCount;
@@ -7068,7 +8308,7 @@ public:
     StsMsgLib::CliGate::Channel::_ChannelProperty channelProperty;
     wchar_t const * pwszMemberType;
     wchar_t const * pwszMemberKey;
-    alignas(4) unsigned char memberValidateAppId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID memberValidateAppId;
     wchar_t const * pwszUserAlias;
     wchar_t const * pwszChannelAlias;
     wchar_t const * pwszPassword;
@@ -7095,7 +8335,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameChannelCreate, allowEmpty)
 namespace StsMsgLib {
 struct _StsMsgRequestIngameChannelDeactivateVoice : public StsMsgLib::_StsMsgRequest {
 public:
-    alignas(4) unsigned char channelId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID channelId;
     unsigned int channelCenter;
     wchar_t const * pwszChannelKey;
     wchar_t const * pwszMemberType;
@@ -7110,7 +8350,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameChannelDeactivateVoice, pw
 namespace StsMsgLib {
 struct _StsMsgRequestIngameChannelEndVoice : public StsMsgLib::_StsMsgRequest {
 public:
-    alignas(4) unsigned char channelId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID channelId;
     unsigned int channelCenter;
     wchar_t const * pwszChannelKey;
     wchar_t const * pwszMemberType;
@@ -7125,11 +8365,11 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameChannelEndVoice, pwszMembe
 namespace StsMsgLib {
 struct _StsMsgRequestIngameChannelJoin : public StsMsgLib::_StsMsgRequest {
 public:
-    alignas(4) unsigned char channelId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID channelId;
     unsigned int channelCenter;
     wchar_t const * pwszUserAlias;
     wchar_t const * pwszPassword;
-    alignas(4) unsigned char channelToken[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID channelToken;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgRequestIngameChannelJoin) == 0x50, "sizeof StsMsgLib::_StsMsgRequestIngameChannelJoin");
@@ -7143,7 +8383,7 @@ namespace StsMsgLib {
 struct _StsMsgRequestIngameChannelJoinGroupChannel : public StsMsgLib::_StsMsgRequest {
 public:
     wchar_t const * pwszGroupToken;
-    void * pGroupValidateAppId;
+    _GUID const * pGroupValidateAppId;
     wchar_t const * pwszGroupOwner;
     wchar_t const * pwszMemberType;
     wchar_t const * pwszMemberKey;
@@ -7165,7 +8405,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameChannelJoinGroupChannel, p
 namespace StsMsgLib {
 struct _StsMsgRequestIngameChannelLeave : public StsMsgLib::_StsMsgRequest {
 public:
-    alignas(4) unsigned char channelId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID channelId;
     unsigned int channelCenter;
     wchar_t const * pwszChannelKey;
 };
@@ -7178,7 +8418,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameChannelLeave, pwszChannelK
 namespace StsMsgLib {
 struct _StsMsgRequestIngameChannelLogout : public StsMsgLib::_StsMsgRequest {
 public:
-    alignas(4) unsigned char channelId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID channelId;
     unsigned int channelCenter;
     wchar_t const * pwszChannelKey;
 };
@@ -7191,7 +8431,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameChannelLogout, pwszChannel
 namespace StsMsgLib {
 struct _StsMsgRequestIngameChannelPageMembers : public StsMsgLib::_StsMsgRequest {
 public:
-    void * channelId;
+    _GUID * channelId;
     unsigned int channelCenter;
     wchar_t const * pwszChannelKey;
     unsigned int pageSize;
@@ -7210,7 +8450,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameChannelPageMembers, permis
 namespace StsMsgLib {
 struct _StsMsgRequestIngameChannelSetPermission : public StsMsgLib::_StsMsgRequest {
 public:
-    void * channelId;
+    _GUID const * channelId;
     unsigned int channelCenter;
     wchar_t const * pwszChannelKey;
     StsMsgLib::CliGate::Channel::_Target target;
@@ -7227,7 +8467,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameChannelSetPermission, pwsz
 namespace StsMsgLib {
 struct _StsMsgRequestIngameChannelSetUserData : public StsMsgLib::_StsMsgRequest {
 public:
-    alignas(4) unsigned char channelId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID channelId;
     unsigned int channelCenter;
     wchar_t const * pwszChannelKey;
     wchar_t const * pwszMemberType;
@@ -7246,7 +8486,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameChannelSetUserData, nSpeak
 namespace StsMsgLib {
 struct _StsMsgRequestIngameChannelStartVoice : public StsMsgLib::_StsMsgRequest {
 public:
-    alignas(4) unsigned char channelId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID channelId;
     unsigned int channelCenter;
     wchar_t const * pwszChannelKey;
     wchar_t const * pwszMemberType;
@@ -7255,7 +8495,7 @@ public:
     unsigned int nMic;
     unsigned int nSpeaker;
     unsigned int nMaxTalkCount;
-    void * memberValidateAppId;
+    _GUID const * memberValidateAppId;
     wchar_t const * pwszMemberOwner;
     wchar_t const * pwszMemberKey;
 };
@@ -7277,11 +8517,11 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameChannelStartVoice, pwszMem
 namespace StsMsgLib {
 struct _StsMsgRequestIngameChannelTalk : public StsMsgLib::_StsMsgRequest {
 public:
-    alignas(4) unsigned char channelId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID channelId;
     unsigned int channelCenter;
     wchar_t const * pwszChannelKey;
     wchar_t const * pwszText;
-    void * memberValidateAppId;
+    _GUID const * memberValidateAppId;
     bool bUsePush;
     wchar_t const * pwszAps;
     wchar_t const * pwszGcm;
@@ -7300,7 +8540,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameChannelTalk, pwszGcm) == 0
 namespace StsMsgLib {
 struct _StsMsgRequestIngameChannelUnsetPermission : public StsMsgLib::_StsMsgRequest {
 public:
-    void * channelId;
+    _GUID const * channelId;
     unsigned int channelCenter;
     wchar_t const * pwszChannelKey;
     StsMsgLib::CliGate::Channel::_Target target;
@@ -7317,7 +8557,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameChannelUnsetPermission, pw
 namespace StsMsgLib {
 struct _StsMsgRequestIngameShopGetBalance : public StsMsgLib::_StsMsgRequest {
 public:
-    alignas(4) unsigned char userId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID userId;
     int nCurrencyGroupId;
     int nCurrencyId;
     int * pCurrencyGroupIdList;
@@ -7391,7 +8631,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopListGoodsLimits, nGood
 namespace StsMsgLib {
 struct _StsMsgRequestIngameShopPagePurchaseHistory : public StsMsgLib::_StsMsgRequest {
 public:
-    alignas(4) unsigned char userId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID userId;
     long long dateFromUnixTime;
     long long dateToUnixTime;
     int nPageIndex;
@@ -7410,13 +8650,42 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopPagePurchaseHistory, n
 namespace StsMsgLib {
 struct _StsMsgRequestIngameShopPurchase : public StsMsgLib::_StsMsgRequest {
 public:
-    alignas(4) unsigned char userId[0x10];  // ❓ PDB type 0x1056: _GUID
+    struct _GiftDesc;
+    struct _PurchaseGoodsInfo;
+    struct _UserInfo;
+    struct _GiftDesc {
+    public:
+        wchar_t const * pwszSenderDescription;
+        wchar_t const * pwszReceiverDescription;
+        wchar_t const * pwszGiftMessage;
+    };
+    struct _UserInfo {
+    public:
+        _GUID userId;
+        int nAccountNo;
+        int nServiceCode;
+        int nServerId;
+        long long nCharacterId;
+        wchar_t const * pwszCharacterName;
+    };
+    struct _PurchaseGoodsInfo {
+    public:
+        int nGoodsId;
+        int nPurchaseQuantity;
+        double dPurchaseAmount;
+        int nCategoryId;
+        StsMsgLib::_StsMsgRequestIngameShopPurchase::_UserInfo sender;
+        StsMsgLib::_StsMsgRequestIngameShopPurchase::_UserInfo receiver;
+        int nIsGift;
+        StsMsgLib::_StsMsgRequestIngameShopPurchase::_GiftDesc giftDesc;
+    };
+    _GUID userId;
     wchar_t const * pwszPurchaseDescription;
     char const * pszClientNetAddress;
     double dPaymentAmount;
     int nCurrencyGroupId;
     wchar_t const * pwszPaymentMethodDescription;
-    void * pPurchaseGoodsInfoList;
+    StsMsgLib::_StsMsgRequestIngameShopPurchase::_PurchaseGoodsInfo * pPurchaseGoodsInfoList;
     int nPurchaseGoodsInfoCount;
 };
 }  // namespace StsMsgLib
@@ -7429,15 +8698,43 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopPurchase, nCurrencyGro
 static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopPurchase, pwszPaymentMethodDescription) == 0x48, "StsMsgLib::_StsMsgRequestIngameShopPurchase::pwszPaymentMethodDescription");
 static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopPurchase, pPurchaseGoodsInfoList) == 0x50, "StsMsgLib::_StsMsgRequestIngameShopPurchase::pPurchaseGoodsInfoList");
 static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopPurchase, nPurchaseGoodsInfoCount) == 0x58, "StsMsgLib::_StsMsgRequestIngameShopPurchase::nPurchaseGoodsInfoCount");
+static_assert(sizeof(StsMsgLib::_StsMsgRequestIngameShopPurchase::_GiftDesc) == 0x18, "sizeof StsMsgLib::_StsMsgRequestIngameShopPurchase::_GiftDesc");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopPurchase::_GiftDesc, pwszSenderDescription) == 0x0, "StsMsgLib::_StsMsgRequestIngameShopPurchase::_GiftDesc::pwszSenderDescription");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopPurchase::_GiftDesc, pwszReceiverDescription) == 0x8, "StsMsgLib::_StsMsgRequestIngameShopPurchase::_GiftDesc::pwszReceiverDescription");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopPurchase::_GiftDesc, pwszGiftMessage) == 0x10, "StsMsgLib::_StsMsgRequestIngameShopPurchase::_GiftDesc::pwszGiftMessage");
+static_assert(sizeof(StsMsgLib::_StsMsgRequestIngameShopPurchase::_UserInfo) == 0x30, "sizeof StsMsgLib::_StsMsgRequestIngameShopPurchase::_UserInfo");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopPurchase::_UserInfo, userId) == 0x0, "StsMsgLib::_StsMsgRequestIngameShopPurchase::_UserInfo::userId");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopPurchase::_UserInfo, nAccountNo) == 0x10, "StsMsgLib::_StsMsgRequestIngameShopPurchase::_UserInfo::nAccountNo");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopPurchase::_UserInfo, nServiceCode) == 0x14, "StsMsgLib::_StsMsgRequestIngameShopPurchase::_UserInfo::nServiceCode");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopPurchase::_UserInfo, nServerId) == 0x18, "StsMsgLib::_StsMsgRequestIngameShopPurchase::_UserInfo::nServerId");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopPurchase::_UserInfo, nCharacterId) == 0x20, "StsMsgLib::_StsMsgRequestIngameShopPurchase::_UserInfo::nCharacterId");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopPurchase::_UserInfo, pwszCharacterName) == 0x28, "StsMsgLib::_StsMsgRequestIngameShopPurchase::_UserInfo::pwszCharacterName");
+static_assert(sizeof(StsMsgLib::_StsMsgRequestIngameShopPurchase::_PurchaseGoodsInfo) == 0x98, "sizeof StsMsgLib::_StsMsgRequestIngameShopPurchase::_PurchaseGoodsInfo");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopPurchase::_PurchaseGoodsInfo, nGoodsId) == 0x0, "StsMsgLib::_StsMsgRequestIngameShopPurchase::_PurchaseGoodsInfo::nGoodsId");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopPurchase::_PurchaseGoodsInfo, nPurchaseQuantity) == 0x4, "StsMsgLib::_StsMsgRequestIngameShopPurchase::_PurchaseGoodsInfo::nPurchaseQuantity");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopPurchase::_PurchaseGoodsInfo, dPurchaseAmount) == 0x8, "StsMsgLib::_StsMsgRequestIngameShopPurchase::_PurchaseGoodsInfo::dPurchaseAmount");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopPurchase::_PurchaseGoodsInfo, nCategoryId) == 0x10, "StsMsgLib::_StsMsgRequestIngameShopPurchase::_PurchaseGoodsInfo::nCategoryId");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopPurchase::_PurchaseGoodsInfo, sender) == 0x18, "StsMsgLib::_StsMsgRequestIngameShopPurchase::_PurchaseGoodsInfo::sender");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopPurchase::_PurchaseGoodsInfo, receiver) == 0x48, "StsMsgLib::_StsMsgRequestIngameShopPurchase::_PurchaseGoodsInfo::receiver");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopPurchase::_PurchaseGoodsInfo, nIsGift) == 0x78, "StsMsgLib::_StsMsgRequestIngameShopPurchase::_PurchaseGoodsInfo::nIsGift");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopPurchase::_PurchaseGoodsInfo, giftDesc) == 0x80, "StsMsgLib::_StsMsgRequestIngameShopPurchase::_PurchaseGoodsInfo::giftDesc");
 
 namespace StsMsgLib {
 struct _StsMsgRequestIngameShopWishAccept : public StsMsgLib::_StsMsgRequest {
 public:
+    struct _GoodsInfo;
+    struct _GoodsInfo {
+    public:
+        long long nWishGoodsId;
+        int nGoodsId;
+        double dPurchaseAmount;
+        int nGoodsCategoryId;
+    };
     long long nWishId;
-    void * pUserId;
-    void * pGoodsInfoList;
+    _GUID * pUserId;
+    StsMsgLib::_StsMsgRequestIngameShopWishAccept::_GoodsInfo * pGoodsInfoList;
     int nGoodsInfoCount;
-    void * pPurchaserUserId;
+    _GUID * pPurchaserUserId;
     double dAmount;
     wchar_t const * pwszPurchaseDescription;
     int nCurrencyGroupId;
@@ -7464,11 +8761,16 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopWishAccept, pwszReceiv
 static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopWishAccept, pwszGiftMessage) == 0x70, "StsMsgLib::_StsMsgRequestIngameShopWishAccept::pwszGiftMessage");
 static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopWishAccept, nDiscountUserCouponId) == 0x78, "StsMsgLib::_StsMsgRequestIngameShopWishAccept::nDiscountUserCouponId");
 static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopWishAccept, pszClientNetAddress) == 0x80, "StsMsgLib::_StsMsgRequestIngameShopWishAccept::pszClientNetAddress");
+static_assert(sizeof(StsMsgLib::_StsMsgRequestIngameShopWishAccept::_GoodsInfo) == 0x20, "sizeof StsMsgLib::_StsMsgRequestIngameShopWishAccept::_GoodsInfo");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopWishAccept::_GoodsInfo, nWishGoodsId) == 0x0, "StsMsgLib::_StsMsgRequestIngameShopWishAccept::_GoodsInfo::nWishGoodsId");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopWishAccept::_GoodsInfo, nGoodsId) == 0x8, "StsMsgLib::_StsMsgRequestIngameShopWishAccept::_GoodsInfo::nGoodsId");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopWishAccept::_GoodsInfo, dPurchaseAmount) == 0x10, "StsMsgLib::_StsMsgRequestIngameShopWishAccept::_GoodsInfo::dPurchaseAmount");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopWishAccept::_GoodsInfo, nGoodsCategoryId) == 0x18, "StsMsgLib::_StsMsgRequestIngameShopWishAccept::_GoodsInfo::nGoodsCategoryId");
 
 namespace StsMsgLib {
 struct _StsMsgRequestIngameShopWishChangeOptout : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
+    _GUID * pUserId;
     int nIsOptoutUser;
 };
 }  // namespace StsMsgLib
@@ -7479,7 +8781,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopWishChangeOptout, nIsO
 namespace StsMsgLib {
 struct _StsMsgRequestIngameShopWishGetWishCountAtToday : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
+    _GUID * pUserId;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgRequestIngameShopWishGetWishCountAtToday) == 0x20, "sizeof StsMsgLib::_StsMsgRequestIngameShopWishGetWishCountAtToday");
@@ -7488,7 +8790,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopWishGetWishCountAtToda
 namespace StsMsgLib {
 struct _StsMsgRequestIngameShopWishIsOptoutUser : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
+    _GUID * pUserId;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgRequestIngameShopWishIsOptoutUser) == 0x20, "sizeof StsMsgLib::_StsMsgRequestIngameShopWishIsOptoutUser");
@@ -7497,7 +8799,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopWishIsOptoutUser, pUse
 namespace StsMsgLib {
 struct _StsMsgRequestIngameShopWishPageReceivedWishes : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
+    _GUID * pUserId;
     int nWishRequestStatus;
     int nPageSize;
     int nPageIndex;
@@ -7516,7 +8818,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopWishPageReceivedWishes
 namespace StsMsgLib {
 struct _StsMsgRequestIngameShopWishPageWishes : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
+    _GUID * pUserId;
     int nWishRequestStatus;
     int nPageSize;
     int nPageIndex;
@@ -7535,7 +8837,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopWishPageWishes, tRegis
 namespace StsMsgLib {
 struct _StsMsgRequestIngameShopWishReject : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
+    _GUID * pUserId;
     long long nWishId;
 };
 }  // namespace StsMsgLib
@@ -7546,10 +8848,17 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopWishReject, nWishId) =
 namespace StsMsgLib {
 struct _StsMsgRequestIngameShopWishWish : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
-    void * pReceiverInfoList;
+    struct _GoodsInfo;
+    struct _GoodsInfo {
+    public:
+        int nGoodsId;
+        int nGoodsCategoryId;
+        wchar_t const * pwszGoodsData;
+    };
+    _GUID * pUserId;
+    _GUID * pReceiverInfoList;
     int nReceiverInfoCount;
-    void * pGoodsInfoList;
+    StsMsgLib::_StsMsgRequestIngameShopWishWish::_GoodsInfo * pGoodsInfoList;
     int nGoodsInfoCount;
     wchar_t const * pwszWishMessage;
     wchar_t const * pwszWishDescription;
@@ -7563,6 +8872,10 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopWishWish, pGoodsInfoLi
 static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopWishWish, nGoodsInfoCount) == 0x38, "StsMsgLib::_StsMsgRequestIngameShopWishWish::nGoodsInfoCount");
 static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopWishWish, pwszWishMessage) == 0x40, "StsMsgLib::_StsMsgRequestIngameShopWishWish::pwszWishMessage");
 static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopWishWish, pwszWishDescription) == 0x48, "StsMsgLib::_StsMsgRequestIngameShopWishWish::pwszWishDescription");
+static_assert(sizeof(StsMsgLib::_StsMsgRequestIngameShopWishWish::_GoodsInfo) == 0x10, "sizeof StsMsgLib::_StsMsgRequestIngameShopWishWish::_GoodsInfo");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopWishWish::_GoodsInfo, nGoodsId) == 0x0, "StsMsgLib::_StsMsgRequestIngameShopWishWish::_GoodsInfo::nGoodsId");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopWishWish::_GoodsInfo, nGoodsCategoryId) == 0x4, "StsMsgLib::_StsMsgRequestIngameShopWishWish::_GoodsInfo::nGoodsCategoryId");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestIngameShopWishWish::_GoodsInfo, pwszGoodsData) == 0x8, "StsMsgLib::_StsMsgRequestIngameShopWishWish::_GoodsInfo::pwszGoodsData");
 
 namespace StsMsgLib {
 struct _StsMsgRequestInitialConnect : public StsMsgLib::_StsMsgRequest {
@@ -7576,7 +8889,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestInitialConnect, pszIpAddress) ==
 namespace StsMsgLib {
 struct _StsMsgRequestListUserBans : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
+    _GUID * pUserId;
     wchar_t AppGroupCode[9];
 };
 }  // namespace StsMsgLib
@@ -7594,8 +8907,8 @@ static_assert(sizeof(StsMsgLib::_StsMsgRequestLogOut) == 0x18, "sizeof StsMsgLib
 namespace StsMsgLib {
 struct _StsMsgRequestLogOutUser : public StsMsgLib::_StsMsgRequest {
 public:
-    alignas(4) unsigned char guidUserId[0x10];  // ❓ PDB type 0x1056: _GUID
-    alignas(4) unsigned char guidGameAccountId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID guidUserId;
+    _GUID guidGameAccountId;
     unsigned int nError;
 };
 }  // namespace StsMsgLib
@@ -7641,7 +8954,7 @@ static_assert(sizeof(StsMsgLib::_StsMsgRequestLoginTokenStart) == 0x18, "sizeof 
 namespace StsMsgLib {
 struct _StsMsgRequestPgCheckCurrencyLocking : public StsMsgLib::_StsMsgRequest {
 public:
-    alignas(4) unsigned char userId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID userId;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgRequestPgCheckCurrencyLocking) == 0x28, "sizeof StsMsgLib::_StsMsgRequestPgCheckCurrencyLocking");
@@ -7652,7 +8965,7 @@ struct _StsMsgRequestPgCheckDrBillingInfo : public StsMsgLib::_StsMsgRequest {
 public:
     wchar_t const * pwszPgName;
     int nPaymentType;
-    alignas(4) unsigned char userId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID userId;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgRequestPgCheckDrBillingInfo) == 0x38, "sizeof StsMsgLib::_StsMsgRequestPgCheckDrBillingInfo");
@@ -7663,19 +8976,28 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestPgCheckDrBillingInfo, userId) ==
 namespace StsMsgLib {
 struct _StsMsgRequestPgDrDirectPurchase : public StsMsgLib::_StsMsgRequest {
 public:
+    struct _Item;
+    struct _Item {
+    public:
+        int nNo;
+        wchar_t const * pwszName;
+        double dPrice;
+        int nQuantity;
+        int nCategoryId;
+    };
     wchar_t const * pwszPgName;
     int nPaymentType;
     wchar_t const * pwszPaymentOrderDescription;
-    alignas(4) unsigned char userId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID userId;
     wchar_t const * pwszUserName;
     wchar_t const * pwszUserEmail;
-    alignas(4) unsigned char receiverUserId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID receiverUserId;
     wchar_t const * pwszReceiverUserName;
     wchar_t const * pwszLocale;
     char const * pszIpAddress;
     double dTotal;
     wchar_t const * pwszCurrency;
-    void * pItemList;
+    StsMsgLib::_StsMsgRequestPgDrDirectPurchase::_Item * pItemList;
     int nItemListCount;
 };
 }  // namespace StsMsgLib
@@ -7694,11 +9016,17 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestPgDrDirectPurchase, dTotal) == 0
 static_assert(offsetof(StsMsgLib::_StsMsgRequestPgDrDirectPurchase, pwszCurrency) == 0x80, "StsMsgLib::_StsMsgRequestPgDrDirectPurchase::pwszCurrency");
 static_assert(offsetof(StsMsgLib::_StsMsgRequestPgDrDirectPurchase, pItemList) == 0x88, "StsMsgLib::_StsMsgRequestPgDrDirectPurchase::pItemList");
 static_assert(offsetof(StsMsgLib::_StsMsgRequestPgDrDirectPurchase, nItemListCount) == 0x90, "StsMsgLib::_StsMsgRequestPgDrDirectPurchase::nItemListCount");
+static_assert(sizeof(StsMsgLib::_StsMsgRequestPgDrDirectPurchase::_Item) == 0x20, "sizeof StsMsgLib::_StsMsgRequestPgDrDirectPurchase::_Item");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestPgDrDirectPurchase::_Item, nNo) == 0x0, "StsMsgLib::_StsMsgRequestPgDrDirectPurchase::_Item::nNo");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestPgDrDirectPurchase::_Item, pwszName) == 0x8, "StsMsgLib::_StsMsgRequestPgDrDirectPurchase::_Item::pwszName");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestPgDrDirectPurchase::_Item, dPrice) == 0x10, "StsMsgLib::_StsMsgRequestPgDrDirectPurchase::_Item::dPrice");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestPgDrDirectPurchase::_Item, nQuantity) == 0x18, "StsMsgLib::_StsMsgRequestPgDrDirectPurchase::_Item::nQuantity");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestPgDrDirectPurchase::_Item, nCategoryId) == 0x1C, "StsMsgLib::_StsMsgRequestPgDrDirectPurchase::_Item::nCategoryId");
 
 namespace StsMsgLib {
 struct _StsMsgRequestPgPagePaymentOrder : public StsMsgLib::_StsMsgRequest {
 public:
-    alignas(4) unsigned char userId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID userId;
     int nUserRegionCode;
     wchar_t const * pwszPaymentGoodsAppGroupCode;
     int nPaymentType;
@@ -7730,7 +9058,7 @@ static_assert(sizeof(StsMsgLib::_StsMsgRequestPing) == 0x18, "sizeof StsMsgLib::
 namespace StsMsgLib {
 struct _StsMsgRequestPresenceGetUserInfo : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pPortalAccountId;
+    _GUID * pPortalAccountId;
     bool bStatus;
     bool bAppDataSet;
     bool bAliases;
@@ -7749,8 +9077,8 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestPresenceGetUserInfo, nWatchFlags
 namespace StsMsgLib {
 struct _StsMsgRequestPresenceKick : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
-    void * pAppId;
+    _GUID * pUserId;
+    _GUID * pAppId;
     bool bForce;
 };
 }  // namespace StsMsgLib
@@ -7764,7 +9092,7 @@ struct _StsMsgRequestPresenceLogIn : public StsMsgLib::_StsMsgRequest {
 public:
     char * pszLoginName;
     wchar_t * pwszUserName;
-    void * pGameAccountId;
+    _GUID * pGameAccountId;
     wchar_t * pwszAlias;
     char * pszClientNetAddress;
 };
@@ -7779,7 +9107,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestPresenceLogIn, pszClientNetAddre
 namespace StsMsgLib {
 struct _StsMsgRequestPresenceLogOut : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
+    _GUID * pUserId;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgRequestPresenceLogOut) == 0x20, "sizeof StsMsgLib::_StsMsgRequestPresenceLogOut");
@@ -7788,8 +9116,8 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestPresenceLogOut, pUserId) == 0x18
 namespace StsMsgLib {
 struct _StsMsgRequestPresenceMessage : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
-    void * pAppId;
+    _GUID * pUserId;
+    _GUID * pAppId;
     wchar_t const * pwszMessageName;
     wchar_t const * pwszContent;
 };
@@ -7803,15 +9131,33 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestPresenceMessage, pwszContent) ==
 namespace StsMsgLib {
 struct _StsMsgRequestPresenceSetAppData : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
-    void * pAppId;
-    alignas(8) unsigned char appData[0x10];  // ❓ PDB type 0x2E71: StsMsgLib::_StsMsgRequestPresenceSetAppData::AppData
+    struct AppData;
+    struct AppData {
+    public:
+        struct Field;
+        struct Field {
+        public:
+            char * pszKey;
+            wchar_t * pwszValue;
+        };
+        StsMsgLib::_StsMsgRequestPresenceSetAppData::AppData::Field * pFields;
+        int nFieldCount;
+    };
+    _GUID * pUserId;
+    _GUID * pAppId;
+    StsMsgLib::_StsMsgRequestPresenceSetAppData::AppData appData;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgRequestPresenceSetAppData) == 0x38, "sizeof StsMsgLib::_StsMsgRequestPresenceSetAppData");
 static_assert(offsetof(StsMsgLib::_StsMsgRequestPresenceSetAppData, pUserId) == 0x18, "StsMsgLib::_StsMsgRequestPresenceSetAppData::pUserId");
 static_assert(offsetof(StsMsgLib::_StsMsgRequestPresenceSetAppData, pAppId) == 0x20, "StsMsgLib::_StsMsgRequestPresenceSetAppData::pAppId");
 static_assert(offsetof(StsMsgLib::_StsMsgRequestPresenceSetAppData, appData) == 0x28, "StsMsgLib::_StsMsgRequestPresenceSetAppData::appData");
+static_assert(sizeof(StsMsgLib::_StsMsgRequestPresenceSetAppData::AppData) == 0x10, "sizeof StsMsgLib::_StsMsgRequestPresenceSetAppData::AppData");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestPresenceSetAppData::AppData, pFields) == 0x0, "StsMsgLib::_StsMsgRequestPresenceSetAppData::AppData::pFields");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestPresenceSetAppData::AppData, nFieldCount) == 0x8, "StsMsgLib::_StsMsgRequestPresenceSetAppData::AppData::nFieldCount");
+static_assert(sizeof(StsMsgLib::_StsMsgRequestPresenceSetAppData::AppData::Field) == 0x10, "sizeof StsMsgLib::_StsMsgRequestPresenceSetAppData::AppData::Field");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestPresenceSetAppData::AppData::Field, pszKey) == 0x0, "StsMsgLib::_StsMsgRequestPresenceSetAppData::AppData::Field::pszKey");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestPresenceSetAppData::AppData::Field, pwszValue) == 0x8, "StsMsgLib::_StsMsgRequestPresenceSetAppData::AppData::Field::pwszValue");
 
 namespace StsMsgLib {
 struct _StsMsgRequestPresenceWhisper : public StsMsgLib::_StsMsgRequest {
@@ -7833,7 +9179,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestPresenceWhisper, pszWhisperMessa
 namespace StsMsgLib {
 struct _StsMsgRequestProfileGetUserProfile : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
+    _GUID * pUserId;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgRequestProfileGetUserProfile) == 0x20, "sizeof StsMsgLib::_StsMsgRequestProfileGetUserProfile");
@@ -7892,7 +9238,7 @@ struct _StsMsgRequestPromotionStampAttendPromotion : public StsMsgLib::_StsMsgRe
 public:
     int nPromotionId;
     short nBoardType;
-    void * pUserId;
+    _GUID * pUserId;
     char const * pszAppGroupCode;
 };
 }  // namespace StsMsgLib
@@ -7907,7 +9253,7 @@ struct _StsMsgRequestPromotionStampAttendPromotionSecured : public StsMsgLib::_S
 public:
     int nPromotionId;
     short nBoardType;
-    void * pUserId;
+    _GUID * pUserId;
     char const * pszAppGroupCode;
     int nAccumulatedPoint;
     long long tAttended;
@@ -7939,7 +9285,7 @@ struct _StsMsgRequestPromotionStampGetUserPromotionStatus : public StsMsgLib::_S
 public:
     int nPromotionId;
     short nBoardType;
-    void * pUserId;
+    _GUID * pUserId;
     char const * pszAppGroupCode;
 };
 }  // namespace StsMsgLib
@@ -7964,7 +9310,7 @@ namespace StsMsgLib {
 struct _StsMsgRequestPromotionStampListInvalidRewardDeliveries : public StsMsgLib::_StsMsgRequest {
 public:
     int nPromotionId;
-    void * pUserId;
+    _GUID * pUserId;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgRequestPromotionStampListInvalidRewardDeliveries) == 0x28, "sizeof StsMsgLib::_StsMsgRequestPromotionStampListInvalidRewardDeliveries");
@@ -7976,7 +9322,7 @@ struct _StsMsgRequestPromotionStampRequestRewardDelivery : public StsMsgLib::_St
 public:
     int nPromotionId;
     long long nUserPromotionRewardId;
-    void * pUserId;
+    _GUID * pUserId;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgRequestPromotionStampRequestRewardDelivery) == 0x30, "sizeof StsMsgLib::_StsMsgRequestPromotionStampRequestRewardDelivery");
@@ -8000,7 +9346,36 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestPurchaseGetPurchase, pwszResultS
 namespace StsMsgLib {
 struct _StsMsgRequestPurchasePurchase : public StsMsgLib::_StsMsgRequest {
 public:
-    alignas(4) unsigned char userId[0x10];  // ❓ PDB type 0x1056: _GUID
+    struct _GiftDesc;
+    struct _PurchaseGoodsInfo;
+    struct _UserInfo;
+    struct _GiftDesc {
+    public:
+        wchar_t const * pwszSenderDescription;
+        wchar_t const * pwszReceiverDescription;
+        wchar_t const * pwszGiftMessage;
+    };
+    struct _UserInfo {
+    public:
+        _GUID userId;
+        int nAccountNo;
+        int nServiceCode;
+        int nServerId;
+        long long nCharacterId;
+        wchar_t const * pwszCharacterName;
+    };
+    struct _PurchaseGoodsInfo {
+    public:
+        int nGoodsId;
+        int nPurchaseQuantity;
+        double dPurchaseAmount;
+        int nCategoryId;
+        StsMsgLib::_StsMsgRequestPurchasePurchase::_UserInfo sender;
+        StsMsgLib::_StsMsgRequestPurchasePurchase::_UserInfo receiver;
+        int nIsGift;
+        StsMsgLib::_StsMsgRequestPurchasePurchase::_GiftDesc giftDesc;
+    };
+    _GUID userId;
     short nRequestFromCode;
     wchar_t const * pwszRequestKey;
     wchar_t const * pwszPurchaseDescription;
@@ -8008,7 +9383,7 @@ public:
     double dPaymentAmount;
     int nCurrencyGroupId;
     wchar_t const * pwszPaymentMethodDescription;
-    void * pPurchaseGoodsInfoList;
+    StsMsgLib::_StsMsgRequestPurchasePurchase::_PurchaseGoodsInfo * pPurchaseGoodsInfoList;
     int nPurchaseGoodsInfoCount;
 };
 }  // namespace StsMsgLib
@@ -8023,12 +9398,32 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestPurchasePurchase, nCurrencyGroup
 static_assert(offsetof(StsMsgLib::_StsMsgRequestPurchasePurchase, pwszPaymentMethodDescription) == 0x58, "StsMsgLib::_StsMsgRequestPurchasePurchase::pwszPaymentMethodDescription");
 static_assert(offsetof(StsMsgLib::_StsMsgRequestPurchasePurchase, pPurchaseGoodsInfoList) == 0x60, "StsMsgLib::_StsMsgRequestPurchasePurchase::pPurchaseGoodsInfoList");
 static_assert(offsetof(StsMsgLib::_StsMsgRequestPurchasePurchase, nPurchaseGoodsInfoCount) == 0x68, "StsMsgLib::_StsMsgRequestPurchasePurchase::nPurchaseGoodsInfoCount");
+static_assert(sizeof(StsMsgLib::_StsMsgRequestPurchasePurchase::_GiftDesc) == 0x18, "sizeof StsMsgLib::_StsMsgRequestPurchasePurchase::_GiftDesc");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestPurchasePurchase::_GiftDesc, pwszSenderDescription) == 0x0, "StsMsgLib::_StsMsgRequestPurchasePurchase::_GiftDesc::pwszSenderDescription");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestPurchasePurchase::_GiftDesc, pwszReceiverDescription) == 0x8, "StsMsgLib::_StsMsgRequestPurchasePurchase::_GiftDesc::pwszReceiverDescription");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestPurchasePurchase::_GiftDesc, pwszGiftMessage) == 0x10, "StsMsgLib::_StsMsgRequestPurchasePurchase::_GiftDesc::pwszGiftMessage");
+static_assert(sizeof(StsMsgLib::_StsMsgRequestPurchasePurchase::_UserInfo) == 0x30, "sizeof StsMsgLib::_StsMsgRequestPurchasePurchase::_UserInfo");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestPurchasePurchase::_UserInfo, userId) == 0x0, "StsMsgLib::_StsMsgRequestPurchasePurchase::_UserInfo::userId");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestPurchasePurchase::_UserInfo, nAccountNo) == 0x10, "StsMsgLib::_StsMsgRequestPurchasePurchase::_UserInfo::nAccountNo");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestPurchasePurchase::_UserInfo, nServiceCode) == 0x14, "StsMsgLib::_StsMsgRequestPurchasePurchase::_UserInfo::nServiceCode");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestPurchasePurchase::_UserInfo, nServerId) == 0x18, "StsMsgLib::_StsMsgRequestPurchasePurchase::_UserInfo::nServerId");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestPurchasePurchase::_UserInfo, nCharacterId) == 0x20, "StsMsgLib::_StsMsgRequestPurchasePurchase::_UserInfo::nCharacterId");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestPurchasePurchase::_UserInfo, pwszCharacterName) == 0x28, "StsMsgLib::_StsMsgRequestPurchasePurchase::_UserInfo::pwszCharacterName");
+static_assert(sizeof(StsMsgLib::_StsMsgRequestPurchasePurchase::_PurchaseGoodsInfo) == 0x98, "sizeof StsMsgLib::_StsMsgRequestPurchasePurchase::_PurchaseGoodsInfo");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestPurchasePurchase::_PurchaseGoodsInfo, nGoodsId) == 0x0, "StsMsgLib::_StsMsgRequestPurchasePurchase::_PurchaseGoodsInfo::nGoodsId");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestPurchasePurchase::_PurchaseGoodsInfo, nPurchaseQuantity) == 0x4, "StsMsgLib::_StsMsgRequestPurchasePurchase::_PurchaseGoodsInfo::nPurchaseQuantity");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestPurchasePurchase::_PurchaseGoodsInfo, dPurchaseAmount) == 0x8, "StsMsgLib::_StsMsgRequestPurchasePurchase::_PurchaseGoodsInfo::dPurchaseAmount");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestPurchasePurchase::_PurchaseGoodsInfo, nCategoryId) == 0x10, "StsMsgLib::_StsMsgRequestPurchasePurchase::_PurchaseGoodsInfo::nCategoryId");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestPurchasePurchase::_PurchaseGoodsInfo, sender) == 0x18, "StsMsgLib::_StsMsgRequestPurchasePurchase::_PurchaseGoodsInfo::sender");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestPurchasePurchase::_PurchaseGoodsInfo, receiver) == 0x48, "StsMsgLib::_StsMsgRequestPurchasePurchase::_PurchaseGoodsInfo::receiver");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestPurchasePurchase::_PurchaseGoodsInfo, nIsGift) == 0x78, "StsMsgLib::_StsMsgRequestPurchasePurchase::_PurchaseGoodsInfo::nIsGift");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestPurchasePurchase::_PurchaseGoodsInfo, giftDesc) == 0x80, "StsMsgLib::_StsMsgRequestPurchasePurchase::_PurchaseGoodsInfo::giftDesc");
 
 namespace StsMsgLib {
 struct _StsMsgRequestRefundRefundAgencyPurchase : public StsMsgLib::_StsMsgRequest {
 public:
-    void * userId;
-    void * receiverUserId;
+    _GUID * userId;
+    _GUID * receiverUserId;
     long long nPurchaseId;
 };
 }  // namespace StsMsgLib
@@ -8076,12 +9471,12 @@ public:
     int nChannelId;
     wchar_t const * pwszAppGroupCode;
     short nGameServerId;
-    void * pReporterUserId;
+    _GUID * pReporterUserId;
     wchar_t const * pwszReporterGameAccountId;
     wchar_t const * pwszReporterCharKey;
     wchar_t const * pwszReporterCharName;
     char const * pszReporterNetAddress;
-    void * pAbuserUserId;
+    _GUID * pAbuserUserId;
     wchar_t const * pwszAbuserGameAccountId;
     wchar_t const * pwszAbuserCharKey;
     wchar_t const * pwszAbuserCharName;
@@ -8110,7 +9505,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestReportAddReport, pwszReportData)
 namespace StsMsgLib {
 struct _StsMsgRequestRewardBrokerEventNoti : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
+    _GUID * pUserId;
     int nNotiType;
     int nEventId;
     long long nRequestKey;
@@ -8127,7 +9522,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestRewardBrokerEventNoti, pwszReque
 namespace StsMsgLib {
 struct _StsMsgRequestRewardRequestRewardForEvent : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
+    _GUID * pUserId;
     char * pszEventId;
     short nRequestFromCode;
     char * pszRequestKey;
@@ -8142,7 +9537,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestRewardRequestRewardForEvent, psz
 namespace StsMsgLib {
 struct _StsMsgRequestRiskMgmtInquiry : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
+    _GUID * pUserId;
     char * pszEvent;
     char * pszLocation;
 };
@@ -8155,7 +9550,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestRiskMgmtInquiry, pszLocation) ==
 namespace StsMsgLib {
 struct _StsMsgRequestSecondPasswordCancelDelete : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
+    _GUID * pUserId;
     int nType;
 };
 }  // namespace StsMsgLib
@@ -8166,7 +9561,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestSecondPasswordCancelDelete, nTyp
 namespace StsMsgLib {
 struct _StsMsgRequestSecondPasswordChangeMyActionMask : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
+    _GUID * pUserId;
     int nType;
     char szPasswordHash[45];
     unsigned long long nActionMask;
@@ -8181,7 +9576,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestSecondPasswordChangeMyActionMask
 namespace StsMsgLib {
 struct _StsMsgRequestSecondPasswordChangeMyPassword : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
+    _GUID * pUserId;
     int nType;
     char szOldPasswordHash[45];
     char szNewPasswordHash[45];
@@ -8196,7 +9591,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestSecondPasswordChangeMyPassword, 
 namespace StsMsgLib {
 struct _StsMsgRequestSecondPasswordCreate : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
+    _GUID * pUserId;
     int nType;
     char szPasswordHash[45];
     unsigned long long nActionMask;
@@ -8211,7 +9606,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestSecondPasswordCreate, nActionMas
 namespace StsMsgLib {
 struct _StsMsgRequestSecondPasswordDisableMyActionMask : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
+    _GUID * pUserId;
     int nType;
     char szPasswordHash[45];
     int nActionIndex;
@@ -8226,7 +9621,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestSecondPasswordDisableMyActionMas
 namespace StsMsgLib {
 struct _StsMsgRequestSecondPasswordEnableMyActionMask : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
+    _GUID * pUserId;
     int nType;
     char szPasswordHash[45];
     int nActionIndex;
@@ -8241,7 +9636,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestSecondPasswordEnableMyActionMask
 namespace StsMsgLib {
 struct _StsMsgRequestSecondPasswordGetStatus : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
+    _GUID * pUserId;
     int nType;
 };
 }  // namespace StsMsgLib
@@ -8252,7 +9647,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestSecondPasswordGetStatus, nType) 
 namespace StsMsgLib {
 struct _StsMsgRequestSecondPasswordIsVerified : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
+    _GUID * pUserId;
     int nType;
     unsigned int nActionIndex;
 };
@@ -8265,7 +9660,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestSecondPasswordIsVerified, nActio
 namespace StsMsgLib {
 struct _StsMsgRequestSecondPasswordVerify : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
+    _GUID * pUserId;
     int nType;
     char szPasswordHash[45];
     int nActionIndex;
@@ -8280,20 +9675,29 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestSecondPasswordVerify, nActionInd
 namespace StsMsgLib {
 struct _StsMsgRequestSetUserData : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pPortalAccountId;
+    struct _AppData;
+    struct _AppData {
+    public:
+        char * pszName;
+        char * pszValue;
+    };
+    _GUID * pPortalAccountId;
     unsigned int nAppDataCount;
-    void * pAppData;
+    StsMsgLib::_StsMsgRequestSetUserData::_AppData * pAppData;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgRequestSetUserData) == 0x30, "sizeof StsMsgLib::_StsMsgRequestSetUserData");
 static_assert(offsetof(StsMsgLib::_StsMsgRequestSetUserData, pPortalAccountId) == 0x18, "StsMsgLib::_StsMsgRequestSetUserData::pPortalAccountId");
 static_assert(offsetof(StsMsgLib::_StsMsgRequestSetUserData, nAppDataCount) == 0x20, "StsMsgLib::_StsMsgRequestSetUserData::nAppDataCount");
 static_assert(offsetof(StsMsgLib::_StsMsgRequestSetUserData, pAppData) == 0x28, "StsMsgLib::_StsMsgRequestSetUserData::pAppData");
+static_assert(sizeof(StsMsgLib::_StsMsgRequestSetUserData::_AppData) == 0x10, "sizeof StsMsgLib::_StsMsgRequestSetUserData::_AppData");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestSetUserData::_AppData, pszName) == 0x0, "StsMsgLib::_StsMsgRequestSetUserData::_AppData::pszName");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestSetUserData::_AppData, pszValue) == 0x8, "StsMsgLib::_StsMsgRequestSetUserData::_AppData::pszValue");
 
 namespace StsMsgLib {
 struct _StsMsgRequestSetWatch : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pPortalAccountId;
+    _GUID * pPortalAccountId;
     unsigned int nWatchFlags;
 };
 }  // namespace StsMsgLib
@@ -8357,9 +9761,14 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestShowcaseListGoodsSalePrice, quan
 namespace StsMsgLib {
 struct _StsMsgRequestSlotCreateSlots : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
+    struct _SlotData;
+    struct _SlotData {
+    public:
+        long long serviceId;
+    };
+    _GUID * pUserId;
     wchar_t * pwszSlotType;
-    alignas(8) unsigned char slotData[0x8];  // ❓ PDB type 0x3440: StsMsgLib::_StsMsgRequestSlotCreateSlots::_SlotData
+    StsMsgLib::_StsMsgRequestSlotCreateSlots::_SlotData slotData;
     wchar_t * pwszSlotData;
     unsigned int nCount;
     wchar_t * pwszTransactionKey;
@@ -8372,12 +9781,14 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestSlotCreateSlots, slotData) == 0x
 static_assert(offsetof(StsMsgLib::_StsMsgRequestSlotCreateSlots, pwszSlotData) == 0x30, "StsMsgLib::_StsMsgRequestSlotCreateSlots::pwszSlotData");
 static_assert(offsetof(StsMsgLib::_StsMsgRequestSlotCreateSlots, nCount) == 0x38, "StsMsgLib::_StsMsgRequestSlotCreateSlots::nCount");
 static_assert(offsetof(StsMsgLib::_StsMsgRequestSlotCreateSlots, pwszTransactionKey) == 0x40, "StsMsgLib::_StsMsgRequestSlotCreateSlots::pwszTransactionKey");
+static_assert(sizeof(StsMsgLib::_StsMsgRequestSlotCreateSlots::_SlotData) == 0x8, "sizeof StsMsgLib::_StsMsgRequestSlotCreateSlots::_SlotData");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestSlotCreateSlots::_SlotData, serviceId) == 0x0, "StsMsgLib::_StsMsgRequestSlotCreateSlots::_SlotData::serviceId");
 
 namespace StsMsgLib {
 struct _StsMsgRequestSlotDeleteSlot : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
-    void * pSlotId;
+    _GUID * pUserId;
+    _GUID * pSlotId;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgRequestSlotDeleteSlot) == 0x28, "sizeof StsMsgLib::_StsMsgRequestSlotDeleteSlot");
@@ -8387,8 +9798,8 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestSlotDeleteSlot, pSlotId) == 0x20
 namespace StsMsgLib {
 struct _StsMsgRequestSlotGetSlot : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
-    void * pSlotId;
+    _GUID * pUserId;
+    _GUID * pSlotId;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgRequestSlotGetSlot) == 0x28, "sizeof StsMsgLib::_StsMsgRequestSlotGetSlot");
@@ -8398,7 +9809,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestSlotGetSlot, pSlotId) == 0x20, "
 namespace StsMsgLib {
 struct _StsMsgRequestSlotListSlots : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
+    _GUID * pUserId;
     wchar_t * pwszSlotType;
 };
 }  // namespace StsMsgLib
@@ -8409,8 +9820,8 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestSlotListSlots, pwszSlotType) == 
 namespace StsMsgLib {
 struct _StsMsgRequestSlotResetData : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
-    void * pSlotId;
+    _GUID * pUserId;
+    _GUID * pSlotId;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgRequestSlotResetData) == 0x28, "sizeof StsMsgLib::_StsMsgRequestSlotResetData");
@@ -8420,10 +9831,15 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestSlotResetData, pSlotId) == 0x20,
 namespace StsMsgLib {
 struct _StsMsgRequestSlotSetClientData : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
-    void * pAppId;
-    void * pSlotId;
-    alignas(8) unsigned char slotData[0x8];  // ❓ PDB type 0x3EC4: StsMsgLib::_StsMsgRequestSlotSetClientData::_SlotData
+    struct _SlotData;
+    struct _SlotData {
+    public:
+        char * customizeData;
+    };
+    _GUID * pUserId;
+    _GUID * pAppId;
+    _GUID * pSlotId;
+    StsMsgLib::_StsMsgRequestSlotSetClientData::_SlotData slotData;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgRequestSlotSetClientData) == 0x38, "sizeof StsMsgLib::_StsMsgRequestSlotSetClientData");
@@ -8431,13 +9847,20 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestSlotSetClientData, pUserId) == 0
 static_assert(offsetof(StsMsgLib::_StsMsgRequestSlotSetClientData, pAppId) == 0x20, "StsMsgLib::_StsMsgRequestSlotSetClientData::pAppId");
 static_assert(offsetof(StsMsgLib::_StsMsgRequestSlotSetClientData, pSlotId) == 0x28, "StsMsgLib::_StsMsgRequestSlotSetClientData::pSlotId");
 static_assert(offsetof(StsMsgLib::_StsMsgRequestSlotSetClientData, slotData) == 0x30, "StsMsgLib::_StsMsgRequestSlotSetClientData::slotData");
+static_assert(sizeof(StsMsgLib::_StsMsgRequestSlotSetClientData::_SlotData) == 0x8, "sizeof StsMsgLib::_StsMsgRequestSlotSetClientData::_SlotData");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestSlotSetClientData::_SlotData, customizeData) == 0x0, "StsMsgLib::_StsMsgRequestSlotSetClientData::_SlotData::customizeData");
 
 namespace StsMsgLib {
 struct _StsMsgRequestSlotSetData : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
-    void * pSlotId;
-    alignas(8) unsigned char slotData[0x8];  // ❓ PDB type 0x41B0: StsMsgLib::_StsMsgRequestSlotSetData::_SlotData
+    struct _SlotData;
+    struct _SlotData {
+    public:
+        long long serviceId;
+    };
+    _GUID * pUserId;
+    _GUID * pSlotId;
+    StsMsgLib::_StsMsgRequestSlotSetData::_SlotData slotData;
     wchar_t * pwszSlotData;
 };
 }  // namespace StsMsgLib
@@ -8446,6 +9869,8 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestSlotSetData, pUserId) == 0x18, "
 static_assert(offsetof(StsMsgLib::_StsMsgRequestSlotSetData, pSlotId) == 0x20, "StsMsgLib::_StsMsgRequestSlotSetData::pSlotId");
 static_assert(offsetof(StsMsgLib::_StsMsgRequestSlotSetData, slotData) == 0x28, "StsMsgLib::_StsMsgRequestSlotSetData::slotData");
 static_assert(offsetof(StsMsgLib::_StsMsgRequestSlotSetData, pwszSlotData) == 0x30, "StsMsgLib::_StsMsgRequestSlotSetData::pwszSlotData");
+static_assert(sizeof(StsMsgLib::_StsMsgRequestSlotSetData::_SlotData) == 0x8, "sizeof StsMsgLib::_StsMsgRequestSlotSetData::_SlotData");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestSlotSetData::_SlotData, serviceId) == 0x0, "StsMsgLib::_StsMsgRequestSlotSetData::_SlotData::serviceId");
 
 namespace StsMsgLib {
 struct _StsMsgRequestTencentPurchaseToken : public StsMsgLib::_StsMsgRequest {
@@ -8577,7 +10002,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestVerifySecondaryAuth, pwszValue) 
 namespace StsMsgLib {
 struct _StsMsgRequestVirtualCurrencyDeposit : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pUserId;
+    _GUID * pUserId;
     int nCurrencyId;
     long long nAmount;
     char * pszRequestId;
@@ -8606,7 +10031,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestVirtualCurrencyDeposit, pwszAddi
 namespace StsMsgLib {
 struct _StsMsgRequestVirtualCurrencyGetBalance : public StsMsgLib::_StsMsgRequest {
 public:
-    alignas(4) unsigned char userId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID userId;
     int nCurrencyGroupId;
     int nCurrencyId;
     int * pCurrencyGroupIdList;
@@ -8625,7 +10050,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestVirtualCurrencyGetBalance, pszCl
 namespace StsMsgLib {
 struct _StsMsgRequestWarehouseGetGoodsCount : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pGameAccountId;
+    _GUID * pGameAccountId;
     int nFilterGoodsId;
     int nFilterGameServerId;
     long long nFilterCharacterId;
@@ -8644,6 +10069,13 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestWarehouseGetGoodsCount, bFilterI
 namespace StsMsgLib {
 struct _StsMsgResWarehouseGoodsInfo {
 public:
+    struct _StsMsgResGoodsDisplay;
+    struct _StsMsgResGoodsDisplay {
+    public:
+        int nLanguageCode;
+        wchar_t * pwszGoodsDisplayName;
+        wchar_t * pwszGoodsDisplayDesc;
+    };
     int nGoodsNumber;
     int nGoodsIconId;
     wchar_t * pwszGoodsName;
@@ -8663,7 +10095,7 @@ public:
     char * pszCustomizedItemAttribute2;
     unsigned int pszCustomizedItemAttribute2Len;
     unsigned int nGoodsDisplayCount;
-    void * pGoodsDisplayList;
+    StsMsgLib::_StsMsgResWarehouseGoodsInfo::_StsMsgResGoodsDisplay * pGoodsDisplayList;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgResWarehouseGoodsInfo) == 0x88, "sizeof StsMsgLib::_StsMsgResWarehouseGoodsInfo");
@@ -8687,6 +10119,10 @@ static_assert(offsetof(StsMsgLib::_StsMsgResWarehouseGoodsInfo, pszCustomizedIte
 static_assert(offsetof(StsMsgLib::_StsMsgResWarehouseGoodsInfo, pszCustomizedItemAttribute2Len) == 0x78, "StsMsgLib::_StsMsgResWarehouseGoodsInfo::pszCustomizedItemAttribute2Len");
 static_assert(offsetof(StsMsgLib::_StsMsgResWarehouseGoodsInfo, nGoodsDisplayCount) == 0x7C, "StsMsgLib::_StsMsgResWarehouseGoodsInfo::nGoodsDisplayCount");
 static_assert(offsetof(StsMsgLib::_StsMsgResWarehouseGoodsInfo, pGoodsDisplayList) == 0x80, "StsMsgLib::_StsMsgResWarehouseGoodsInfo::pGoodsDisplayList");
+static_assert(sizeof(StsMsgLib::_StsMsgResWarehouseGoodsInfo::_StsMsgResGoodsDisplay) == 0x18, "sizeof StsMsgLib::_StsMsgResWarehouseGoodsInfo::_StsMsgResGoodsDisplay");
+static_assert(offsetof(StsMsgLib::_StsMsgResWarehouseGoodsInfo::_StsMsgResGoodsDisplay, nLanguageCode) == 0x0, "StsMsgLib::_StsMsgResWarehouseGoodsInfo::_StsMsgResGoodsDisplay::nLanguageCode");
+static_assert(offsetof(StsMsgLib::_StsMsgResWarehouseGoodsInfo::_StsMsgResGoodsDisplay, pwszGoodsDisplayName) == 0x8, "StsMsgLib::_StsMsgResWarehouseGoodsInfo::_StsMsgResGoodsDisplay::pwszGoodsDisplayName");
+static_assert(offsetof(StsMsgLib::_StsMsgResWarehouseGoodsInfo::_StsMsgResGoodsDisplay, pwszGoodsDisplayDesc) == 0x10, "StsMsgLib::_StsMsgResWarehouseGoodsInfo::_StsMsgResGoodsDisplay::pwszGoodsDisplayDesc");
 
 namespace StsMsgLib {
 struct _StsMsgRequestWarehouseGoodsInfoChanged : public StsMsgLib::_StsMsgRequest {
@@ -8700,12 +10136,107 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestWarehouseGoodsInfoChanged, szWor
 static_assert(offsetof(StsMsgLib::_StsMsgRequestWarehouseGoodsInfoChanged, goodsInfo) == 0x28, "StsMsgLib::_StsMsgRequestWarehouseGoodsInfoChanged::goodsInfo");
 
 namespace StsMsgLib {
+struct _StsMsgResponseWarehouseList : public StsMsgLib::_StsMsgResponse {
+public:
+    struct _WarehouseGoods;
+    struct _WarehouseGoodsItem;
+    struct _WarehouseGoodsItem {
+    public:
+        int nItemId;
+        int nItemQuantity;
+        long long nGameItemKey;
+        char * pszGameItemId;
+        unsigned int nGameItemIdLen;
+        char * pszGameItemData;
+        unsigned int nGameItemDataLen;
+        char * pszCustomizedGoodsData;
+    };
+    struct _WarehouseGoods {
+    public:
+        long long nEnumeratedGoodsWarehouseId;
+        int nGoodsId;
+        int nIsRefundable;
+        int nIsRefundExpirationDate;
+        wchar_t * pwszRefundEffectiveUntil;
+        wchar_t * pwszDeliveryDate;
+        bool bIsGifted;
+        wchar_t * pwszSenderDescription;
+        wchar_t * pwszGiftMessage;
+        int nGameServerId;
+        long long nCharacterId;
+        int nFirstRequestFromCode;
+        unsigned long long nFileTimeRefundEffectiveUntil;
+        unsigned long long nFileTimeDeliveryDate;
+        unsigned int nItemCount;
+        unsigned int nItemListCount;
+        StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoodsItem * pItemList;
+    };
+    int nPageIndex;
+    int nTotalPageCount;
+    int nTotalGoodsCount;
+    int nGoodsCount;
+    int nIsLastPage;
+    unsigned int nGoodsListCount;
+    StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoods * pGoodsList;
+};
+}  // namespace StsMsgLib
+static_assert(sizeof(StsMsgLib::_StsMsgResponseWarehouseList) == 0x80, "sizeof StsMsgLib::_StsMsgResponseWarehouseList");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseList, nPageIndex) == 0x60, "StsMsgLib::_StsMsgResponseWarehouseList::nPageIndex");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseList, nTotalPageCount) == 0x64, "StsMsgLib::_StsMsgResponseWarehouseList::nTotalPageCount");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseList, nTotalGoodsCount) == 0x68, "StsMsgLib::_StsMsgResponseWarehouseList::nTotalGoodsCount");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseList, nGoodsCount) == 0x6C, "StsMsgLib::_StsMsgResponseWarehouseList::nGoodsCount");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseList, nIsLastPage) == 0x70, "StsMsgLib::_StsMsgResponseWarehouseList::nIsLastPage");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseList, nGoodsListCount) == 0x74, "StsMsgLib::_StsMsgResponseWarehouseList::nGoodsListCount");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseList, pGoodsList) == 0x78, "StsMsgLib::_StsMsgResponseWarehouseList::pGoodsList");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoodsItem) == 0x38, "sizeof StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoodsItem");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoodsItem, nItemId) == 0x0, "StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoodsItem::nItemId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoodsItem, nItemQuantity) == 0x4, "StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoodsItem::nItemQuantity");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoodsItem, nGameItemKey) == 0x8, "StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoodsItem::nGameItemKey");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoodsItem, pszGameItemId) == 0x10, "StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoodsItem::pszGameItemId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoodsItem, nGameItemIdLen) == 0x18, "StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoodsItem::nGameItemIdLen");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoodsItem, pszGameItemData) == 0x20, "StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoodsItem::pszGameItemData");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoodsItem, nGameItemDataLen) == 0x28, "StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoodsItem::nGameItemDataLen");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoodsItem, pszCustomizedGoodsData) == 0x30, "StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoodsItem::pszCustomizedGoodsData");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoods) == 0x78, "sizeof StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoods");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoods, nEnumeratedGoodsWarehouseId) == 0x0, "StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoods::nEnumeratedGoodsWarehouseId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoods, nGoodsId) == 0x8, "StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoods::nGoodsId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoods, nIsRefundable) == 0xC, "StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoods::nIsRefundable");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoods, nIsRefundExpirationDate) == 0x10, "StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoods::nIsRefundExpirationDate");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoods, pwszRefundEffectiveUntil) == 0x18, "StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoods::pwszRefundEffectiveUntil");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoods, pwszDeliveryDate) == 0x20, "StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoods::pwszDeliveryDate");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoods, bIsGifted) == 0x28, "StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoods::bIsGifted");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoods, pwszSenderDescription) == 0x30, "StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoods::pwszSenderDescription");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoods, pwszGiftMessage) == 0x38, "StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoods::pwszGiftMessage");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoods, nGameServerId) == 0x40, "StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoods::nGameServerId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoods, nCharacterId) == 0x48, "StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoods::nCharacterId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoods, nFirstRequestFromCode) == 0x50, "StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoods::nFirstRequestFromCode");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoods, nFileTimeRefundEffectiveUntil) == 0x58, "StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoods::nFileTimeRefundEffectiveUntil");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoods, nFileTimeDeliveryDate) == 0x60, "StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoods::nFileTimeDeliveryDate");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoods, nItemCount) == 0x68, "StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoods::nItemCount");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoods, nItemListCount) == 0x6C, "StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoods::nItemListCount");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoods, pItemList) == 0x70, "StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoods::pItemList");
+
+namespace StsMsgLib {
 struct _StsMsgRequestWarehouseGoodsInventoryChanged : public StsMsgLib::_StsMsgRequest {
 public:
+    struct _NotifyInfo;
+    enum ActionType : int {
+        ACTIONTYPE_NONE = 0x0,
+        ACTIONTYPE_ADD = 0x1,
+        ACTIONTYPE_DEL = 0x2,
+    };
+    struct _NotifyInfo {
+    public:
+        int nActionType;
+        _GUID gameAccountId;
+        int nWorldCode;
+        unsigned int nGoodsListCount;
+        StsMsgLib::_StsMsgResponseWarehouseList::_WarehouseGoods * pGoodsList;
+    };
     int nNotifyCount;
     char szWorldCode[14];
     int nInfoCount;
-    void * pNotifyInfos;
+    StsMsgLib::_StsMsgRequestWarehouseGoodsInventoryChanged::_NotifyInfo * pNotifyInfos;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgRequestWarehouseGoodsInventoryChanged) == 0x38, "sizeof StsMsgLib::_StsMsgRequestWarehouseGoodsInventoryChanged");
@@ -8713,11 +10244,17 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestWarehouseGoodsInventoryChanged, 
 static_assert(offsetof(StsMsgLib::_StsMsgRequestWarehouseGoodsInventoryChanged, szWorldCode) == 0x1C, "StsMsgLib::_StsMsgRequestWarehouseGoodsInventoryChanged::szWorldCode");
 static_assert(offsetof(StsMsgLib::_StsMsgRequestWarehouseGoodsInventoryChanged, nInfoCount) == 0x2C, "StsMsgLib::_StsMsgRequestWarehouseGoodsInventoryChanged::nInfoCount");
 static_assert(offsetof(StsMsgLib::_StsMsgRequestWarehouseGoodsInventoryChanged, pNotifyInfos) == 0x30, "StsMsgLib::_StsMsgRequestWarehouseGoodsInventoryChanged::pNotifyInfos");
+static_assert(sizeof(StsMsgLib::_StsMsgRequestWarehouseGoodsInventoryChanged::_NotifyInfo) == 0x28, "sizeof StsMsgLib::_StsMsgRequestWarehouseGoodsInventoryChanged::_NotifyInfo");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestWarehouseGoodsInventoryChanged::_NotifyInfo, nActionType) == 0x0, "StsMsgLib::_StsMsgRequestWarehouseGoodsInventoryChanged::_NotifyInfo::nActionType");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestWarehouseGoodsInventoryChanged::_NotifyInfo, gameAccountId) == 0x4, "StsMsgLib::_StsMsgRequestWarehouseGoodsInventoryChanged::_NotifyInfo::gameAccountId");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestWarehouseGoodsInventoryChanged::_NotifyInfo, nWorldCode) == 0x14, "StsMsgLib::_StsMsgRequestWarehouseGoodsInventoryChanged::_NotifyInfo::nWorldCode");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestWarehouseGoodsInventoryChanged::_NotifyInfo, nGoodsListCount) == 0x18, "StsMsgLib::_StsMsgRequestWarehouseGoodsInventoryChanged::_NotifyInfo::nGoodsListCount");
+static_assert(offsetof(StsMsgLib::_StsMsgRequestWarehouseGoodsInventoryChanged::_NotifyInfo, pGoodsList) == 0x20, "StsMsgLib::_StsMsgRequestWarehouseGoodsInventoryChanged::_NotifyInfo::pGoodsList");
 
 namespace StsMsgLib {
 struct _StsMsgRequestWarehouseList : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pGameAccountId;
+    _GUID * pGameAccountId;
     unsigned int nMaxGoodsCount;
     int nFilterGoodsId;
     int nFilterGameServerId;
@@ -8738,7 +10275,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgRequestWarehouseList, bFilterIncludeEmp
 namespace StsMsgLib {
 struct _StsMsgRequestWarehouseTake : public StsMsgLib::_StsMsgRequest {
 public:
-    void * pGameAccountId;
+    _GUID * pGameAccountId;
     int nGameServerId;
     long long nCharacterId;
     wchar_t * pwszCharacterName;
@@ -8760,18 +10297,6 @@ public:
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgRequestWorldListWorlds) == 0x18, "sizeof StsMsgLib::_StsMsgRequestWorldListWorlds");
-
-namespace StsMsgLib {
-struct _StsMsgResponse : public StsMsgLib::_StsMsg {
-public:
-    virtual StsMsgLib::ECommand GetCommand();
-    virtual unsigned int GetTransactionId();
-    virtual StsMsgLib::EMessageType GetMessageType();
-    StsMsgLib::_StsMsgInfoResponse msgInfo;
-};
-}  // namespace StsMsgLib
-static_assert(sizeof(StsMsgLib::_StsMsgResponse) == 0x60, "sizeof StsMsgLib::_StsMsgResponse");
-static_assert(offsetof(StsMsgLib::_StsMsgResponse, msgInfo) == 0x8, "StsMsgLib::_StsMsgResponse::msgInfo");
 
 namespace StsMsgLib {
 struct _StsMsgResWarehouseGetGoodsInfo : public StsMsgLib::_StsMsgResponse {
@@ -8813,13 +10338,24 @@ static_assert(offsetof(StsMsgLib::_StsMsgReseponseShowcaseGetGoodsDisplayRevisio
 namespace StsMsgLib {
 struct _StsMsgReseponseShowcaseListDisplayCategory : public StsMsgLib::_StsMsgResponse {
 public:
-    void * pCategoryList;
+    struct _Category;
+    struct _Category {
+    public:
+        int nCategoryId;
+        int nCurrencyGroupId;
+        wchar_t * pwszCategoryData;
+    };
+    StsMsgLib::_StsMsgReseponseShowcaseListDisplayCategory::_Category * pCategoryList;
     unsigned int nCategoryCount;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgReseponseShowcaseListDisplayCategory) == 0x70, "sizeof StsMsgLib::_StsMsgReseponseShowcaseListDisplayCategory");
 static_assert(offsetof(StsMsgLib::_StsMsgReseponseShowcaseListDisplayCategory, pCategoryList) == 0x60, "StsMsgLib::_StsMsgReseponseShowcaseListDisplayCategory::pCategoryList");
 static_assert(offsetof(StsMsgLib::_StsMsgReseponseShowcaseListDisplayCategory, nCategoryCount) == 0x68, "StsMsgLib::_StsMsgReseponseShowcaseListDisplayCategory::nCategoryCount");
+static_assert(sizeof(StsMsgLib::_StsMsgReseponseShowcaseListDisplayCategory::_Category) == 0x10, "sizeof StsMsgLib::_StsMsgReseponseShowcaseListDisplayCategory::_Category");
+static_assert(offsetof(StsMsgLib::_StsMsgReseponseShowcaseListDisplayCategory::_Category, nCategoryId) == 0x0, "StsMsgLib::_StsMsgReseponseShowcaseListDisplayCategory::_Category::nCategoryId");
+static_assert(offsetof(StsMsgLib::_StsMsgReseponseShowcaseListDisplayCategory::_Category, nCurrencyGroupId) == 0x4, "StsMsgLib::_StsMsgReseponseShowcaseListDisplayCategory::_Category::nCurrencyGroupId");
+static_assert(offsetof(StsMsgLib::_StsMsgReseponseShowcaseListDisplayCategory::_Category, pwszCategoryData) == 0x8, "StsMsgLib::_StsMsgReseponseShowcaseListDisplayCategory::_Category::pwszCategoryData");
 
 namespace StsMsgLib {
 struct _StsMsgReseponseTencentPurchaseToken : public StsMsgLib::_StsMsgResponse {
@@ -8854,7 +10390,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgResetPassWord, pwszBodyEnd) == 0x30, "S
 namespace StsMsgLib {
 struct _StsMsgResponseAuctionBid : public StsMsgLib::_StsMsgResponse {
 public:
-    alignas(4) unsigned char auctionId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID auctionId;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgResponseAuctionBid) == 0x70, "sizeof StsMsgLib::_StsMsgResponseAuctionBid");
@@ -8863,7 +10399,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionBid, auctionId) == 0x60,
 namespace StsMsgLib {
 struct _StsMsgResponseAuctionBid_Srv : public StsMsgLib::_StsMsgResponse {
 public:
-    alignas(4) unsigned char auctionId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID auctionId;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgResponseAuctionBid_Srv) == 0x70, "sizeof StsMsgLib::_StsMsgResponseAuctionBid_Srv");
@@ -8872,7 +10408,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionBid_Srv, auctionId) == 0
 namespace StsMsgLib {
 struct _StsMsgResponseAuctionCancelSale : public StsMsgLib::_StsMsgResponse {
 public:
-    alignas(4) unsigned char auctionId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID auctionId;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgResponseAuctionCancelSale) == 0x70, "sizeof StsMsgLib::_StsMsgResponseAuctionCancelSale");
@@ -8881,13 +10417,26 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionCancelSale, auctionId) =
 namespace StsMsgLib {
 struct _StsMsgResponseAuctionGetBalance : public StsMsgLib::_StsMsgResponse {
 public:
+    struct _BalanceInfo;
+    struct _BalanceInfo {
+    public:
+        int nCurrencyGroupId;
+        int nCurrencyId;
+        long long nBalance;
+        long long tExpired;
+    };
     int nBalanceInfoListCount;
-    void * pBalanceInfoList;
+    StsMsgLib::_StsMsgResponseAuctionGetBalance::_BalanceInfo * pBalanceInfoList;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgResponseAuctionGetBalance) == 0x70, "sizeof StsMsgLib::_StsMsgResponseAuctionGetBalance");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionGetBalance, nBalanceInfoListCount) == 0x60, "StsMsgLib::_StsMsgResponseAuctionGetBalance::nBalanceInfoListCount");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionGetBalance, pBalanceInfoList) == 0x68, "StsMsgLib::_StsMsgResponseAuctionGetBalance::pBalanceInfoList");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseAuctionGetBalance::_BalanceInfo) == 0x18, "sizeof StsMsgLib::_StsMsgResponseAuctionGetBalance::_BalanceInfo");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionGetBalance::_BalanceInfo, nCurrencyGroupId) == 0x0, "StsMsgLib::_StsMsgResponseAuctionGetBalance::_BalanceInfo::nCurrencyGroupId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionGetBalance::_BalanceInfo, nCurrencyId) == 0x4, "StsMsgLib::_StsMsgResponseAuctionGetBalance::_BalanceInfo::nCurrencyId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionGetBalance::_BalanceInfo, nBalance) == 0x8, "StsMsgLib::_StsMsgResponseAuctionGetBalance::_BalanceInfo::nBalance");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionGetBalance::_BalanceInfo, tExpired) == 0x10, "StsMsgLib::_StsMsgResponseAuctionGetBalance::_BalanceInfo::tExpired");
 
 namespace StsMsgLib {
 struct _StsMsgResponseAuctionGetStatistics : public StsMsgLib::_StsMsgResponse {
@@ -8905,11 +10454,34 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionGetStatistics, dAverageU
 namespace StsMsgLib {
 struct _StsMsgResponseAuctionListPolicies : public StsMsgLib::_StsMsgResponse {
 public:
-    void * pFeePolicyList;
+    struct _FeePolicy;
+    struct _PriceLimitPolicy;
+    struct _UnitPricePolicy;
+    struct _FeePolicy {
+    public:
+        int nFeeType;
+        int nPayerType;
+        int nPaymentType;
+        wchar_t * pwszPaymentCurrencyKey;
+        int nFeePercentage;
+    };
+    struct _PriceLimitPolicy {
+    public:
+        wchar_t * pwszGameItemKey;
+        int nMinBuyItnowPricePercentage;
+        int nMaxBuyItnowPricePercentage;
+    };
+    struct _UnitPricePolicy {
+    public:
+        wchar_t * pwszGameItemKey;
+        int nCurrencyGroupId;
+        double dUnitPrice;
+    };
+    StsMsgLib::_StsMsgResponseAuctionListPolicies::_FeePolicy * pFeePolicyList;
     unsigned int nFeePolicyCount;
-    void * pPriceLimitPolicyList;
+    StsMsgLib::_StsMsgResponseAuctionListPolicies::_PriceLimitPolicy * pPriceLimitPolicyList;
     unsigned int nPriceLimitPolicyCount;
-    void * pUnitPricePolicyList;
+    StsMsgLib::_StsMsgResponseAuctionListPolicies::_UnitPricePolicy * pUnitPricePolicyList;
     unsigned int nUnitPricePolicyCount;
 };
 }  // namespace StsMsgLib
@@ -8920,11 +10492,37 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionListPolicies, pPriceLimi
 static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionListPolicies, nPriceLimitPolicyCount) == 0x78, "StsMsgLib::_StsMsgResponseAuctionListPolicies::nPriceLimitPolicyCount");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionListPolicies, pUnitPricePolicyList) == 0x80, "StsMsgLib::_StsMsgResponseAuctionListPolicies::pUnitPricePolicyList");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionListPolicies, nUnitPricePolicyCount) == 0x88, "StsMsgLib::_StsMsgResponseAuctionListPolicies::nUnitPricePolicyCount");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseAuctionListPolicies::_FeePolicy) == 0x20, "sizeof StsMsgLib::_StsMsgResponseAuctionListPolicies::_FeePolicy");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionListPolicies::_FeePolicy, nFeeType) == 0x0, "StsMsgLib::_StsMsgResponseAuctionListPolicies::_FeePolicy::nFeeType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionListPolicies::_FeePolicy, nPayerType) == 0x4, "StsMsgLib::_StsMsgResponseAuctionListPolicies::_FeePolicy::nPayerType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionListPolicies::_FeePolicy, nPaymentType) == 0x8, "StsMsgLib::_StsMsgResponseAuctionListPolicies::_FeePolicy::nPaymentType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionListPolicies::_FeePolicy, pwszPaymentCurrencyKey) == 0x10, "StsMsgLib::_StsMsgResponseAuctionListPolicies::_FeePolicy::pwszPaymentCurrencyKey");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionListPolicies::_FeePolicy, nFeePercentage) == 0x18, "StsMsgLib::_StsMsgResponseAuctionListPolicies::_FeePolicy::nFeePercentage");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseAuctionListPolicies::_PriceLimitPolicy) == 0x10, "sizeof StsMsgLib::_StsMsgResponseAuctionListPolicies::_PriceLimitPolicy");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionListPolicies::_PriceLimitPolicy, pwszGameItemKey) == 0x0, "StsMsgLib::_StsMsgResponseAuctionListPolicies::_PriceLimitPolicy::pwszGameItemKey");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionListPolicies::_PriceLimitPolicy, nMinBuyItnowPricePercentage) == 0x8, "StsMsgLib::_StsMsgResponseAuctionListPolicies::_PriceLimitPolicy::nMinBuyItnowPricePercentage");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionListPolicies::_PriceLimitPolicy, nMaxBuyItnowPricePercentage) == 0xC, "StsMsgLib::_StsMsgResponseAuctionListPolicies::_PriceLimitPolicy::nMaxBuyItnowPricePercentage");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseAuctionListPolicies::_UnitPricePolicy) == 0x18, "sizeof StsMsgLib::_StsMsgResponseAuctionListPolicies::_UnitPricePolicy");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionListPolicies::_UnitPricePolicy, pwszGameItemKey) == 0x0, "StsMsgLib::_StsMsgResponseAuctionListPolicies::_UnitPricePolicy::pwszGameItemKey");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionListPolicies::_UnitPricePolicy, nCurrencyGroupId) == 0x8, "StsMsgLib::_StsMsgResponseAuctionListPolicies::_UnitPricePolicy::nCurrencyGroupId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionListPolicies::_UnitPricePolicy, dUnitPrice) == 0x10, "StsMsgLib::_StsMsgResponseAuctionListPolicies::_UnitPricePolicy::dUnitPrice");
 
 namespace StsMsgLib {
 struct _StsMsgResponseAuctionPageItems : public StsMsgLib::_StsMsgResponse {
 public:
-    void * pSaleItemList;
+    struct _SaleItem;
+    struct _SaleItem {
+    public:
+        _GUID auctionId;
+        wchar_t * pwszGameItemKey;
+        long long nQuantity;
+        double dUnitPrice;
+        int nBidCurrencyGroupId;
+        long long nBuyItNowPrice;
+        long long nBestBidPrice;
+        long long tBidUntil;
+    };
+    StsMsgLib::_StsMsgResponseAuctionPageItems::_SaleItem * pSaleItemList;
     unsigned int nSaleItemCount;
     bool bIsLastPage;
 };
@@ -8933,11 +10531,33 @@ static_assert(sizeof(StsMsgLib::_StsMsgResponseAuctionPageItems) == 0x70, "sizeo
 static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageItems, pSaleItemList) == 0x60, "StsMsgLib::_StsMsgResponseAuctionPageItems::pSaleItemList");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageItems, nSaleItemCount) == 0x68, "StsMsgLib::_StsMsgResponseAuctionPageItems::nSaleItemCount");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageItems, bIsLastPage) == 0x6C, "StsMsgLib::_StsMsgResponseAuctionPageItems::bIsLastPage");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseAuctionPageItems::_SaleItem) == 0x48, "sizeof StsMsgLib::_StsMsgResponseAuctionPageItems::_SaleItem");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageItems::_SaleItem, auctionId) == 0x0, "StsMsgLib::_StsMsgResponseAuctionPageItems::_SaleItem::auctionId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageItems::_SaleItem, pwszGameItemKey) == 0x10, "StsMsgLib::_StsMsgResponseAuctionPageItems::_SaleItem::pwszGameItemKey");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageItems::_SaleItem, nQuantity) == 0x18, "StsMsgLib::_StsMsgResponseAuctionPageItems::_SaleItem::nQuantity");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageItems::_SaleItem, dUnitPrice) == 0x20, "StsMsgLib::_StsMsgResponseAuctionPageItems::_SaleItem::dUnitPrice");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageItems::_SaleItem, nBidCurrencyGroupId) == 0x28, "StsMsgLib::_StsMsgResponseAuctionPageItems::_SaleItem::nBidCurrencyGroupId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageItems::_SaleItem, nBuyItNowPrice) == 0x30, "StsMsgLib::_StsMsgResponseAuctionPageItems::_SaleItem::nBuyItNowPrice");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageItems::_SaleItem, nBestBidPrice) == 0x38, "StsMsgLib::_StsMsgResponseAuctionPageItems::_SaleItem::nBestBidPrice");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageItems::_SaleItem, tBidUntil) == 0x40, "StsMsgLib::_StsMsgResponseAuctionPageItems::_SaleItem::tBidUntil");
 
 namespace StsMsgLib {
 struct _StsMsgResponseAuctionPageMyBuyHistory : public StsMsgLib::_StsMsgResponse {
 public:
-    void * pMyBuyItemHistoryList;
+    struct _MyBuyItemHistory;
+    struct _MyBuyItemHistory {
+    public:
+        _GUID auctionId;
+        int nGameServerId;
+        long long nCharacterId;
+        wchar_t * pwszGameItemKey;
+        long long nQuantity;
+        int nBidCurrencyGroupId;
+        long long nBidPrice;
+        long long nWithdrawAmount;
+        long long tTraded;
+    };
+    StsMsgLib::_StsMsgResponseAuctionPageMyBuyHistory::_MyBuyItemHistory * pMyBuyItemHistoryList;
     unsigned int nMyBuyItemHistoryCount;
     bool bIsLastPage;
 };
@@ -8946,11 +10566,34 @@ static_assert(sizeof(StsMsgLib::_StsMsgResponseAuctionPageMyBuyHistory) == 0x70,
 static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageMyBuyHistory, pMyBuyItemHistoryList) == 0x60, "StsMsgLib::_StsMsgResponseAuctionPageMyBuyHistory::pMyBuyItemHistoryList");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageMyBuyHistory, nMyBuyItemHistoryCount) == 0x68, "StsMsgLib::_StsMsgResponseAuctionPageMyBuyHistory::nMyBuyItemHistoryCount");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageMyBuyHistory, bIsLastPage) == 0x6C, "StsMsgLib::_StsMsgResponseAuctionPageMyBuyHistory::bIsLastPage");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseAuctionPageMyBuyHistory::_MyBuyItemHistory) == 0x50, "sizeof StsMsgLib::_StsMsgResponseAuctionPageMyBuyHistory::_MyBuyItemHistory");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageMyBuyHistory::_MyBuyItemHistory, auctionId) == 0x0, "StsMsgLib::_StsMsgResponseAuctionPageMyBuyHistory::_MyBuyItemHistory::auctionId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageMyBuyHistory::_MyBuyItemHistory, nGameServerId) == 0x10, "StsMsgLib::_StsMsgResponseAuctionPageMyBuyHistory::_MyBuyItemHistory::nGameServerId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageMyBuyHistory::_MyBuyItemHistory, nCharacterId) == 0x18, "StsMsgLib::_StsMsgResponseAuctionPageMyBuyHistory::_MyBuyItemHistory::nCharacterId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageMyBuyHistory::_MyBuyItemHistory, pwszGameItemKey) == 0x20, "StsMsgLib::_StsMsgResponseAuctionPageMyBuyHistory::_MyBuyItemHistory::pwszGameItemKey");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageMyBuyHistory::_MyBuyItemHistory, nQuantity) == 0x28, "StsMsgLib::_StsMsgResponseAuctionPageMyBuyHistory::_MyBuyItemHistory::nQuantity");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageMyBuyHistory::_MyBuyItemHistory, nBidCurrencyGroupId) == 0x30, "StsMsgLib::_StsMsgResponseAuctionPageMyBuyHistory::_MyBuyItemHistory::nBidCurrencyGroupId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageMyBuyHistory::_MyBuyItemHistory, nBidPrice) == 0x38, "StsMsgLib::_StsMsgResponseAuctionPageMyBuyHistory::_MyBuyItemHistory::nBidPrice");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageMyBuyHistory::_MyBuyItemHistory, nWithdrawAmount) == 0x40, "StsMsgLib::_StsMsgResponseAuctionPageMyBuyHistory::_MyBuyItemHistory::nWithdrawAmount");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageMyBuyHistory::_MyBuyItemHistory, tTraded) == 0x48, "StsMsgLib::_StsMsgResponseAuctionPageMyBuyHistory::_MyBuyItemHistory::tTraded");
 
 namespace StsMsgLib {
 struct _StsMsgResponseAuctionPageMySaleHistory : public StsMsgLib::_StsMsgResponse {
 public:
-    void * pMySaleItemHistoryList;
+    struct _MySaleItemHistory;
+    struct _MySaleItemHistory {
+    public:
+        _GUID auctionId;
+        int nGameServerId;
+        long long nCharacterId;
+        wchar_t * pwszGameItemKey;
+        long long nQuantity;
+        int nDepositCurrencyId;
+        long long nSalePrice;
+        long long nDepositAmount;
+        long long tTraded;
+    };
+    StsMsgLib::_StsMsgResponseAuctionPageMySaleHistory::_MySaleItemHistory * pMySaleItemHistoryList;
     unsigned int nMySaleItemHistoryCount;
     bool bIsLastPage;
 };
@@ -8959,11 +10602,34 @@ static_assert(sizeof(StsMsgLib::_StsMsgResponseAuctionPageMySaleHistory) == 0x70
 static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageMySaleHistory, pMySaleItemHistoryList) == 0x60, "StsMsgLib::_StsMsgResponseAuctionPageMySaleHistory::pMySaleItemHistoryList");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageMySaleHistory, nMySaleItemHistoryCount) == 0x68, "StsMsgLib::_StsMsgResponseAuctionPageMySaleHistory::nMySaleItemHistoryCount");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageMySaleHistory, bIsLastPage) == 0x6C, "StsMsgLib::_StsMsgResponseAuctionPageMySaleHistory::bIsLastPage");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseAuctionPageMySaleHistory::_MySaleItemHistory) == 0x50, "sizeof StsMsgLib::_StsMsgResponseAuctionPageMySaleHistory::_MySaleItemHistory");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageMySaleHistory::_MySaleItemHistory, auctionId) == 0x0, "StsMsgLib::_StsMsgResponseAuctionPageMySaleHistory::_MySaleItemHistory::auctionId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageMySaleHistory::_MySaleItemHistory, nGameServerId) == 0x10, "StsMsgLib::_StsMsgResponseAuctionPageMySaleHistory::_MySaleItemHistory::nGameServerId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageMySaleHistory::_MySaleItemHistory, nCharacterId) == 0x18, "StsMsgLib::_StsMsgResponseAuctionPageMySaleHistory::_MySaleItemHistory::nCharacterId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageMySaleHistory::_MySaleItemHistory, pwszGameItemKey) == 0x20, "StsMsgLib::_StsMsgResponseAuctionPageMySaleHistory::_MySaleItemHistory::pwszGameItemKey");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageMySaleHistory::_MySaleItemHistory, nQuantity) == 0x28, "StsMsgLib::_StsMsgResponseAuctionPageMySaleHistory::_MySaleItemHistory::nQuantity");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageMySaleHistory::_MySaleItemHistory, nDepositCurrencyId) == 0x30, "StsMsgLib::_StsMsgResponseAuctionPageMySaleHistory::_MySaleItemHistory::nDepositCurrencyId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageMySaleHistory::_MySaleItemHistory, nSalePrice) == 0x38, "StsMsgLib::_StsMsgResponseAuctionPageMySaleHistory::_MySaleItemHistory::nSalePrice");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageMySaleHistory::_MySaleItemHistory, nDepositAmount) == 0x40, "StsMsgLib::_StsMsgResponseAuctionPageMySaleHistory::_MySaleItemHistory::nDepositAmount");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageMySaleHistory::_MySaleItemHistory, tTraded) == 0x48, "StsMsgLib::_StsMsgResponseAuctionPageMySaleHistory::_MySaleItemHistory::tTraded");
 
 namespace StsMsgLib {
 struct _StsMsgResponseAuctionPageMySales : public StsMsgLib::_StsMsgResponse {
 public:
-    void * pMySaleItemList;
+    struct _MySaleItem;
+    struct _MySaleItem {
+    public:
+        _GUID auctionId;
+        int nGameServerId;
+        wchar_t * pwszGameItemKey;
+        long long nQuantity;
+        long long nStartingPrice;
+        long long nBuyItNowPrice;
+        long long nBestBidPrice;
+        long long tBidUntil;
+        long long tRegistered;
+    };
+    StsMsgLib::_StsMsgResponseAuctionPageMySales::_MySaleItem * pMySaleItemList;
     unsigned int nMySaleItemCount;
     bool bIsLastPage;
 };
@@ -8972,11 +10638,21 @@ static_assert(sizeof(StsMsgLib::_StsMsgResponseAuctionPageMySales) == 0x70, "siz
 static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageMySales, pMySaleItemList) == 0x60, "StsMsgLib::_StsMsgResponseAuctionPageMySales::pMySaleItemList");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageMySales, nMySaleItemCount) == 0x68, "StsMsgLib::_StsMsgResponseAuctionPageMySales::nMySaleItemCount");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageMySales, bIsLastPage) == 0x6C, "StsMsgLib::_StsMsgResponseAuctionPageMySales::bIsLastPage");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseAuctionPageMySales::_MySaleItem) == 0x50, "sizeof StsMsgLib::_StsMsgResponseAuctionPageMySales::_MySaleItem");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageMySales::_MySaleItem, auctionId) == 0x0, "StsMsgLib::_StsMsgResponseAuctionPageMySales::_MySaleItem::auctionId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageMySales::_MySaleItem, nGameServerId) == 0x10, "StsMsgLib::_StsMsgResponseAuctionPageMySales::_MySaleItem::nGameServerId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageMySales::_MySaleItem, pwszGameItemKey) == 0x18, "StsMsgLib::_StsMsgResponseAuctionPageMySales::_MySaleItem::pwszGameItemKey");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageMySales::_MySaleItem, nQuantity) == 0x20, "StsMsgLib::_StsMsgResponseAuctionPageMySales::_MySaleItem::nQuantity");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageMySales::_MySaleItem, nStartingPrice) == 0x28, "StsMsgLib::_StsMsgResponseAuctionPageMySales::_MySaleItem::nStartingPrice");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageMySales::_MySaleItem, nBuyItNowPrice) == 0x30, "StsMsgLib::_StsMsgResponseAuctionPageMySales::_MySaleItem::nBuyItNowPrice");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageMySales::_MySaleItem, nBestBidPrice) == 0x38, "StsMsgLib::_StsMsgResponseAuctionPageMySales::_MySaleItem::nBestBidPrice");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageMySales::_MySaleItem, tBidUntil) == 0x40, "StsMsgLib::_StsMsgResponseAuctionPageMySales::_MySaleItem::tBidUntil");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuctionPageMySales::_MySaleItem, tRegistered) == 0x48, "StsMsgLib::_StsMsgResponseAuctionPageMySales::_MySaleItem::tRegistered");
 
 namespace StsMsgLib {
 struct _StsMsgResponseAuctionSell : public StsMsgLib::_StsMsgResponse {
 public:
-    alignas(4) unsigned char auctionId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID auctionId;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgResponseAuctionSell) == 0x70, "sizeof StsMsgLib::_StsMsgResponseAuctionSell");
@@ -8992,7 +10668,7 @@ static_assert(sizeof(StsMsgLib::_StsMsgResponseAuthChangeMyUserNameIncomplete) =
 namespace StsMsgLib {
 struct _StsMsgResponseAuthGetUserInfo : public StsMsgLib::_StsMsgResponse {
 public:
-    alignas(4) unsigned char UserId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID UserId;
     unsigned int nDataCenter;
     wchar_t * pwszUserName;
     wchar_t * pwszLoginName;
@@ -9028,13 +10704,28 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseAuthGetUserNameChangeableIncomp
 namespace StsMsgLib {
 struct _StsMsgResponseAuthGetUsersInfo : public StsMsgLib::_StsMsgResponse {
 public:
-    void * pUserInfoList;
+    struct _UserInfo;
+    struct _UserInfo {
+    public:
+        _GUID userId;
+        int nUserCenter;
+        wchar_t * pwszUserName;
+        wchar_t * pwszLoginName;
+        int nUserStatus;
+    };
+    StsMsgLib::_StsMsgResponseAuthGetUsersInfo::_UserInfo * pUserInfoList;
     int nUserInfoListCount;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgResponseAuthGetUsersInfo) == 0x70, "sizeof StsMsgLib::_StsMsgResponseAuthGetUsersInfo");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseAuthGetUsersInfo, pUserInfoList) == 0x60, "StsMsgLib::_StsMsgResponseAuthGetUsersInfo::pUserInfoList");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseAuthGetUsersInfo, nUserInfoListCount) == 0x68, "StsMsgLib::_StsMsgResponseAuthGetUsersInfo::nUserInfoListCount");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseAuthGetUsersInfo::_UserInfo) == 0x30, "sizeof StsMsgLib::_StsMsgResponseAuthGetUsersInfo::_UserInfo");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuthGetUsersInfo::_UserInfo, userId) == 0x0, "StsMsgLib::_StsMsgResponseAuthGetUsersInfo::_UserInfo::userId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuthGetUsersInfo::_UserInfo, nUserCenter) == 0x10, "StsMsgLib::_StsMsgResponseAuthGetUsersInfo::_UserInfo::nUserCenter");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuthGetUsersInfo::_UserInfo, pwszUserName) == 0x18, "StsMsgLib::_StsMsgResponseAuthGetUsersInfo::_UserInfo::pwszUserName");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuthGetUsersInfo::_UserInfo, pwszLoginName) == 0x20, "StsMsgLib::_StsMsgResponseAuthGetUsersInfo::_UserInfo::pwszLoginName");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseAuthGetUsersInfo::_UserInfo, nUserStatus) == 0x28, "StsMsgLib::_StsMsgResponseAuthGetUsersInfo::_UserInfo::nUserStatus");
 
 namespace StsMsgLib {
 struct _StsMsgResponseAuthIsUserNameChangeableIncomplete : public StsMsgLib::_StsMsgResponse {
@@ -9102,10 +10793,25 @@ static_assert(sizeof(StsMsgLib::_StsMsgResponseChargeAbandon) == 0x60, "sizeof S
 namespace StsMsgLib {
 struct _StsMsgResponseChargeGetInfo : public StsMsgLib::_StsMsgResponse {
 public:
-    alignas(4) unsigned char UserId[0x10];  // ❓ PDB type 0x1056: _GUID
+    struct PcCafeInfo;
+    struct PersonalInfo;
+    struct PcCafeInfo {
+    public:
+        unsigned int IPKind;
+    };
+    struct PersonalInfo {
+    public:
+        unsigned int RemainPlayTime;
+        unsigned int Reservations;
+        unsigned int ValueType;
+        unsigned int ItemId;
+        _GUID ValueId;
+        unsigned int ComputationBasis;
+    };
+    _GUID UserId;
     StsMsgLib::EChargeBaseType eChargeBaseType;
-    void * pPersonalInfo;
-    void * pPcCafeInfo;
+    StsMsgLib::_StsMsgResponseChargeGetInfo::PersonalInfo * pPersonalInfo;
+    StsMsgLib::_StsMsgResponseChargeGetInfo::PcCafeInfo * pPcCafeInfo;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgResponseChargeGetInfo) == 0x88, "sizeof StsMsgLib::_StsMsgResponseChargeGetInfo");
@@ -9113,6 +10819,15 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseChargeGetInfo, UserId) == 0x60,
 static_assert(offsetof(StsMsgLib::_StsMsgResponseChargeGetInfo, eChargeBaseType) == 0x70, "StsMsgLib::_StsMsgResponseChargeGetInfo::eChargeBaseType");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseChargeGetInfo, pPersonalInfo) == 0x78, "StsMsgLib::_StsMsgResponseChargeGetInfo::pPersonalInfo");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseChargeGetInfo, pPcCafeInfo) == 0x80, "StsMsgLib::_StsMsgResponseChargeGetInfo::pPcCafeInfo");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseChargeGetInfo::PcCafeInfo) == 0x4, "sizeof StsMsgLib::_StsMsgResponseChargeGetInfo::PcCafeInfo");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseChargeGetInfo::PcCafeInfo, IPKind) == 0x0, "StsMsgLib::_StsMsgResponseChargeGetInfo::PcCafeInfo::IPKind");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseChargeGetInfo::PersonalInfo) == 0x24, "sizeof StsMsgLib::_StsMsgResponseChargeGetInfo::PersonalInfo");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseChargeGetInfo::PersonalInfo, RemainPlayTime) == 0x0, "StsMsgLib::_StsMsgResponseChargeGetInfo::PersonalInfo::RemainPlayTime");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseChargeGetInfo::PersonalInfo, Reservations) == 0x4, "StsMsgLib::_StsMsgResponseChargeGetInfo::PersonalInfo::Reservations");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseChargeGetInfo::PersonalInfo, ValueType) == 0x8, "StsMsgLib::_StsMsgResponseChargeGetInfo::PersonalInfo::ValueType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseChargeGetInfo::PersonalInfo, ItemId) == 0xC, "StsMsgLib::_StsMsgResponseChargeGetInfo::PersonalInfo::ItemId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseChargeGetInfo::PersonalInfo, ValueId) == 0x10, "StsMsgLib::_StsMsgResponseChargeGetInfo::PersonalInfo::ValueId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseChargeGetInfo::PersonalInfo, ComputationBasis) == 0x20, "StsMsgLib::_StsMsgResponseChargeGetInfo::PersonalInfo::ComputationBasis");
 
 namespace StsMsgLib {
 struct _StsMsgResponseChargeRequestStop : public StsMsgLib::_StsMsgResponse {
@@ -9124,7 +10839,7 @@ static_assert(sizeof(StsMsgLib::_StsMsgResponseChargeRequestStop) == 0x60, "size
 namespace StsMsgLib {
 struct _StsMsgResponseChargeStart : public StsMsgLib::_StsMsgResponse {
 public:
-    alignas(4) unsigned char UserId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID UserId;
     char * pszClientNetAddress;
     wchar_t ChargeKey[65];
     unsigned int nRemainPlayTime;
@@ -9152,7 +10867,11 @@ static_assert(sizeof(StsMsgLib::_StsMsgResponseChargeStop) == 0x60, "sizeof StsM
 namespace StsMsgLib {
 struct _StsMsgResponseCliLogOut : public StsMsgLib::_StsMsgResponse {
 public:
-    int eError;
+    enum EError : int {
+        ERR_SUCCESS = 0x0,
+        ERR_BAD_SERVER_DATA = 0x1,
+    };
+    StsMsgLib::_StsMsgResponseCliLogOut::EError eError;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgResponseCliLogOut) == 0x68, "sizeof StsMsgLib::_StsMsgResponseCliLogOut");
@@ -9161,9 +10880,9 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseCliLogOut, eError) == 0x60, "St
 namespace StsMsgLib {
 struct _StsMsgResponseConsumeGameToken : public StsMsgLib::_StsMsgResponse {
 public:
-    alignas(4) unsigned char guidGameAccount[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID guidGameAccount;
     char * pszLoginName;
-    alignas(4) unsigned char guidUserId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID guidUserId;
     char * pszUserName;
     char * pszUserCenter;
     unsigned int * pRoleIds;
@@ -9191,15 +10910,74 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseCouponGetUserCouponCount, nTota
 namespace StsMsgLib {
 struct _StsMsgResponseCouponPageUserCoupons : public StsMsgLib::_StsMsgResponse {
 public:
+    struct _CouponGoods;
+    struct _CouponUseCurrencyPolicy;
+    struct _UserCoupon;
+    struct _CouponGoods {
+    public:
+        int nGoodsId;
+    };
+    struct _CouponUseCurrencyPolicy {
+    public:
+        int nCurrencyGroupId;
+        double dMinimumAmount;
+        double dMaximumAmount;
+    };
+    struct _UserCoupon {
+    public:
+        long long nUserCouponId;
+        int nIssueId;
+        wchar_t * pwszCouponKey;
+        long long tRegistered;
+        long long tCouponStatusChanged;
+        long long tEffectiveFrom;
+        long long tEffectiveTo;
+        _GUID prevUserId;
+        _GUID nextUserId;
+        wchar_t * pwszCouponIssueName;
+        int nCouponType;
+        int nCouponGoodsCount;
+        StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_CouponGoods * pCouponGoodsList;
+        int nSelectableGoodsQuantity;
+        int nDiscountValueType;
+        double dDiscountValue;
+        int nCouponUseCurrencyPolicyCount;
+        StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_CouponUseCurrencyPolicy * pCouponUseCurrencyPolicyList;
+    };
     int nTotalCount;
     int nUserCounponCount;
-    void * pUserCounponList;
+    StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_UserCoupon * pUserCounponList;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgResponseCouponPageUserCoupons) == 0x70, "sizeof StsMsgLib::_StsMsgResponseCouponPageUserCoupons");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseCouponPageUserCoupons, nTotalCount) == 0x60, "StsMsgLib::_StsMsgResponseCouponPageUserCoupons::nTotalCount");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseCouponPageUserCoupons, nUserCounponCount) == 0x64, "StsMsgLib::_StsMsgResponseCouponPageUserCoupons::nUserCounponCount");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseCouponPageUserCoupons, pUserCounponList) == 0x68, "StsMsgLib::_StsMsgResponseCouponPageUserCoupons::pUserCounponList");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_CouponGoods) == 0x4, "sizeof StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_CouponGoods");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_CouponGoods, nGoodsId) == 0x0, "StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_CouponGoods::nGoodsId");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_CouponUseCurrencyPolicy) == 0x18, "sizeof StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_CouponUseCurrencyPolicy");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_CouponUseCurrencyPolicy, nCurrencyGroupId) == 0x0, "StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_CouponUseCurrencyPolicy::nCurrencyGroupId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_CouponUseCurrencyPolicy, dMinimumAmount) == 0x8, "StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_CouponUseCurrencyPolicy::dMinimumAmount");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_CouponUseCurrencyPolicy, dMaximumAmount) == 0x10, "StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_CouponUseCurrencyPolicy::dMaximumAmount");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_UserCoupon) == 0x90, "sizeof StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_UserCoupon");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_UserCoupon, nUserCouponId) == 0x0, "StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_UserCoupon::nUserCouponId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_UserCoupon, nIssueId) == 0x8, "StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_UserCoupon::nIssueId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_UserCoupon, pwszCouponKey) == 0x10, "StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_UserCoupon::pwszCouponKey");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_UserCoupon, tRegistered) == 0x18, "StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_UserCoupon::tRegistered");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_UserCoupon, tCouponStatusChanged) == 0x20, "StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_UserCoupon::tCouponStatusChanged");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_UserCoupon, tEffectiveFrom) == 0x28, "StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_UserCoupon::tEffectiveFrom");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_UserCoupon, tEffectiveTo) == 0x30, "StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_UserCoupon::tEffectiveTo");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_UserCoupon, prevUserId) == 0x38, "StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_UserCoupon::prevUserId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_UserCoupon, nextUserId) == 0x48, "StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_UserCoupon::nextUserId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_UserCoupon, pwszCouponIssueName) == 0x58, "StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_UserCoupon::pwszCouponIssueName");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_UserCoupon, nCouponType) == 0x60, "StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_UserCoupon::nCouponType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_UserCoupon, nCouponGoodsCount) == 0x64, "StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_UserCoupon::nCouponGoodsCount");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_UserCoupon, pCouponGoodsList) == 0x68, "StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_UserCoupon::pCouponGoodsList");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_UserCoupon, nSelectableGoodsQuantity) == 0x70, "StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_UserCoupon::nSelectableGoodsQuantity");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_UserCoupon, nDiscountValueType) == 0x74, "StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_UserCoupon::nDiscountValueType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_UserCoupon, dDiscountValue) == 0x78, "StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_UserCoupon::dDiscountValue");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_UserCoupon, nCouponUseCurrencyPolicyCount) == 0x80, "StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_UserCoupon::nCouponUseCurrencyPolicyCount");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_UserCoupon, pCouponUseCurrencyPolicyList) == 0x88, "StsMsgLib::_StsMsgResponseCouponPageUserCoupons::_UserCoupon::pCouponUseCurrencyPolicyList");
 
 namespace StsMsgLib {
 struct _StsMsgResponseCouponRegisterUserCoupon : public StsMsgLib::_StsMsgResponse {
@@ -9222,7 +11000,7 @@ static_assert(sizeof(StsMsgLib::_StsMsgResponseCouponUseGoodsCoupon) == 0x60, "s
 namespace StsMsgLib {
 struct _StsMsgResponseCreateAccount : public StsMsgLib::_StsMsgResponse {
 public:
-    alignas(4) unsigned char guidPortalAccountId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID guidPortalAccountId;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgResponseCreateAccount) == 0x70, "sizeof StsMsgLib::_StsMsgResponseCreateAccount");
@@ -9240,7 +11018,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseCustomMessage, pszXmlMessageBod
 namespace StsMsgLib {
 struct _StsMsgResponseFriendAcceptProposal : public StsMsgLib::_StsMsgResponse {
 public:
-    alignas(4) unsigned char proposalId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID proposalId;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgResponseFriendAcceptProposal) == 0x70, "sizeof StsMsgLib::_StsMsgResponseFriendAcceptProposal");
@@ -9249,7 +11027,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseFriendAcceptProposal, proposalI
 namespace StsMsgLib {
 struct _StsMsgResponseFriendChangeAlias : public StsMsgLib::_StsMsgResponse {
 public:
-    alignas(4) unsigned char friendId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID friendId;
     wchar_t * pwszFriendAlias;
 };
 }  // namespace StsMsgLib
@@ -9260,7 +11038,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseFriendChangeAlias, pwszFriendAl
 namespace StsMsgLib {
 struct _StsMsgResponseFriendDenyProposal : public StsMsgLib::_StsMsgResponse {
 public:
-    alignas(4) unsigned char proposalId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID proposalId;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgResponseFriendDenyProposal) == 0x70, "sizeof StsMsgLib::_StsMsgResponseFriendDenyProposal");
@@ -9310,8 +11088,21 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseFriendPageFriend, nFriendInfoLi
 namespace StsMsgLib {
 struct _StsMsgResponseFriendPageRecvProposals : public StsMsgLib::_StsMsgResponse {
 public:
+    struct _Proposal;
+    struct _Proposal {
+    public:
+        _GUID proposalId;
+        wchar_t * pwszUserAlias;
+        wchar_t * pwszUserCharKey;
+        int nUserAppGroupId;
+        _GUID friendId;
+        wchar_t * pwszFriendAlias;
+        wchar_t * pwszFriendCharKey;
+        int nFriendAppGroupId;
+        long long tRegistered;
+    };
     int nProposalTotalCount;
-    void * pProposalList;
+    StsMsgLib::_StsMsgResponseFriendPageRecvProposals::_Proposal * pProposalList;
     int nProposalListCount;
 };
 }  // namespace StsMsgLib
@@ -9319,12 +11110,22 @@ static_assert(sizeof(StsMsgLib::_StsMsgResponseFriendPageRecvProposals) == 0x78,
 static_assert(offsetof(StsMsgLib::_StsMsgResponseFriendPageRecvProposals, nProposalTotalCount) == 0x60, "StsMsgLib::_StsMsgResponseFriendPageRecvProposals::nProposalTotalCount");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseFriendPageRecvProposals, pProposalList) == 0x68, "StsMsgLib::_StsMsgResponseFriendPageRecvProposals::pProposalList");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseFriendPageRecvProposals, nProposalListCount) == 0x70, "StsMsgLib::_StsMsgResponseFriendPageRecvProposals::nProposalListCount");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseFriendPageRecvProposals::_Proposal) == 0x58, "sizeof StsMsgLib::_StsMsgResponseFriendPageRecvProposals::_Proposal");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseFriendPageRecvProposals::_Proposal, proposalId) == 0x0, "StsMsgLib::_StsMsgResponseFriendPageRecvProposals::_Proposal::proposalId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseFriendPageRecvProposals::_Proposal, pwszUserAlias) == 0x10, "StsMsgLib::_StsMsgResponseFriendPageRecvProposals::_Proposal::pwszUserAlias");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseFriendPageRecvProposals::_Proposal, pwszUserCharKey) == 0x18, "StsMsgLib::_StsMsgResponseFriendPageRecvProposals::_Proposal::pwszUserCharKey");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseFriendPageRecvProposals::_Proposal, nUserAppGroupId) == 0x20, "StsMsgLib::_StsMsgResponseFriendPageRecvProposals::_Proposal::nUserAppGroupId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseFriendPageRecvProposals::_Proposal, friendId) == 0x24, "StsMsgLib::_StsMsgResponseFriendPageRecvProposals::_Proposal::friendId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseFriendPageRecvProposals::_Proposal, pwszFriendAlias) == 0x38, "StsMsgLib::_StsMsgResponseFriendPageRecvProposals::_Proposal::pwszFriendAlias");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseFriendPageRecvProposals::_Proposal, pwszFriendCharKey) == 0x40, "StsMsgLib::_StsMsgResponseFriendPageRecvProposals::_Proposal::pwszFriendCharKey");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseFriendPageRecvProposals::_Proposal, nFriendAppGroupId) == 0x48, "StsMsgLib::_StsMsgResponseFriendPageRecvProposals::_Proposal::nFriendAppGroupId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseFriendPageRecvProposals::_Proposal, tRegistered) == 0x50, "StsMsgLib::_StsMsgResponseFriendPageRecvProposals::_Proposal::tRegistered");
 
 namespace StsMsgLib {
 struct _StsMsgResponseFriendPropose : public StsMsgLib::_StsMsgResponse {
 public:
-    alignas(4) unsigned char friendId[0x10];  // ❓ PDB type 0x1056: _GUID
-    alignas(4) unsigned char proposalId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID friendId;
+    _GUID proposalId;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgResponseFriendPropose) == 0x80, "sizeof StsMsgLib::_StsMsgResponseFriendPropose");
@@ -9334,7 +11135,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseFriendPropose, proposalId) == 0
 namespace StsMsgLib {
 struct _StsMsgResponseFriendRemove : public StsMsgLib::_StsMsgResponse {
 public:
-    alignas(4) unsigned char friendId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID friendId;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgResponseFriendRemove) == 0x70, "sizeof StsMsgLib::_StsMsgResponseFriendRemove");
@@ -9350,24 +11151,49 @@ static_assert(sizeof(StsMsgLib::_StsMsgResponseFriendSendMessage) == 0x60, "size
 namespace StsMsgLib {
 struct _StsMsgResponseGameAccountList : public StsMsgLib::_StsMsgResponse {
 public:
+    struct _GameAccount;
+    struct _GameAccount {
+    public:
+        wchar_t * pwszGameAlias;
+    };
     unsigned int nGameAccountCount;
-    void * pGameAccount;
+    StsMsgLib::_StsMsgResponseGameAccountList::_GameAccount * pGameAccount;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgResponseGameAccountList) == 0x70, "sizeof StsMsgLib::_StsMsgResponseGameAccountList");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseGameAccountList, nGameAccountCount) == 0x60, "StsMsgLib::_StsMsgResponseGameAccountList::nGameAccountCount");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseGameAccountList, pGameAccount) == 0x68, "StsMsgLib::_StsMsgResponseGameAccountList::pGameAccount");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseGameAccountList::_GameAccount) == 0x8, "sizeof StsMsgLib::_StsMsgResponseGameAccountList::_GameAccount");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGameAccountList::_GameAccount, pwszGameAlias) == 0x0, "StsMsgLib::_StsMsgResponseGameAccountList::_GameAccount::pwszGameAlias");
 
 namespace StsMsgLib {
 struct _StsMsgResponseGameAccountListUserLastPresences : public StsMsgLib::_StsMsgResponse {
 public:
-    void * pUserLastPresenceArray;
+    struct UserLastPresence;
+    enum PresenceType : int {
+        PRESENCE_TYPE_INVALID = 0x0,
+        PRESENCE_TYPE_SERVER_LOGIN = 0x1,
+        PRESENCE_TYPE_SERVER_LOGOUT = 0x2,
+        PRESENCE_TYPE_CLIENT_LOGIN = 0x3,
+        PRESENCE_TYPE_CLIENT_LOGOUT = 0x4,
+    };
+    struct UserLastPresence {
+    public:
+        wchar_t pwszGameCode[9];
+        int nPresenceType;
+        long long tChanged;
+    };
+    StsMsgLib::_StsMsgResponseGameAccountListUserLastPresences::UserLastPresence * pUserLastPresenceArray;
     int nUserLastPresenceCount;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgResponseGameAccountListUserLastPresences) == 0x70, "sizeof StsMsgLib::_StsMsgResponseGameAccountListUserLastPresences");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseGameAccountListUserLastPresences, pUserLastPresenceArray) == 0x60, "StsMsgLib::_StsMsgResponseGameAccountListUserLastPresences::pUserLastPresenceArray");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseGameAccountListUserLastPresences, nUserLastPresenceCount) == 0x68, "StsMsgLib::_StsMsgResponseGameAccountListUserLastPresences::nUserLastPresenceCount");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseGameAccountListUserLastPresences::UserLastPresence) == 0x20, "sizeof StsMsgLib::_StsMsgResponseGameAccountListUserLastPresences::UserLastPresence");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGameAccountListUserLastPresences::UserLastPresence, pwszGameCode) == 0x0, "StsMsgLib::_StsMsgResponseGameAccountListUserLastPresences::UserLastPresence::pwszGameCode");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGameAccountListUserLastPresences::UserLastPresence, nPresenceType) == 0x14, "StsMsgLib::_StsMsgResponseGameAccountListUserLastPresences::UserLastPresence::nPresenceType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGameAccountListUserLastPresences::UserLastPresence, tChanged) == 0x18, "StsMsgLib::_StsMsgResponseGameAccountListUserLastPresences::UserLastPresence::tChanged");
 
 namespace StsMsgLib {
 struct _StsMsgResponseGameAuctionDeliver : public StsMsgLib::_StsMsgResponse {
@@ -9393,53 +11219,6 @@ public:
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgResponseGameAuctionRollbackEscrow) == 0x60, "sizeof StsMsgLib::_StsMsgResponseGameAuctionRollbackEscrow");
-
-namespace StsMsgLib {
-struct _StsMsgResponseGameGroupGetChannelProperty : public StsMsgLib::_StsMsgResponse {
-public:
-    wchar_t * pwszChannelAlias;
-    wchar_t * pwszNotice;
-    unsigned int nAdminExist;
-    unsigned int nAllowVoice;
-    unsigned int nAllowEmpty;
-    unsigned int nSaveMsg;
-    unsigned int nProfanity;
-    unsigned int nNotifyChannelInfo;
-    unsigned int nNotifyUserInfo;
-    unsigned int nNotifyTalk;
-    unsigned int nNotifyGroup;
-    unsigned int nMaxTalkCountPerSec;
-    unsigned int nCheckPeriodSec;
-    unsigned int nMaxTalkCount;
-    unsigned int nBlockPeriodSec;
-    unsigned int nAdditionalPenalty;
-    unsigned int nMaxMemberCount;
-    int eTransportType;
-    int eDefaultVoiceStatus;
-    unsigned int nVoiceMaxTalkCount;
-};
-}  // namespace StsMsgLib
-static_assert(sizeof(StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty) == 0xB8, "sizeof StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty");
-static_assert(offsetof(StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty, pwszChannelAlias) == 0x60, "StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty::pwszChannelAlias");
-static_assert(offsetof(StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty, pwszNotice) == 0x68, "StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty::pwszNotice");
-static_assert(offsetof(StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty, nAdminExist) == 0x70, "StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty::nAdminExist");
-static_assert(offsetof(StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty, nAllowVoice) == 0x74, "StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty::nAllowVoice");
-static_assert(offsetof(StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty, nAllowEmpty) == 0x78, "StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty::nAllowEmpty");
-static_assert(offsetof(StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty, nSaveMsg) == 0x7C, "StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty::nSaveMsg");
-static_assert(offsetof(StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty, nProfanity) == 0x80, "StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty::nProfanity");
-static_assert(offsetof(StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty, nNotifyChannelInfo) == 0x84, "StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty::nNotifyChannelInfo");
-static_assert(offsetof(StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty, nNotifyUserInfo) == 0x88, "StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty::nNotifyUserInfo");
-static_assert(offsetof(StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty, nNotifyTalk) == 0x8C, "StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty::nNotifyTalk");
-static_assert(offsetof(StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty, nNotifyGroup) == 0x90, "StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty::nNotifyGroup");
-static_assert(offsetof(StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty, nMaxTalkCountPerSec) == 0x94, "StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty::nMaxTalkCountPerSec");
-static_assert(offsetof(StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty, nCheckPeriodSec) == 0x98, "StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty::nCheckPeriodSec");
-static_assert(offsetof(StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty, nMaxTalkCount) == 0x9C, "StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty::nMaxTalkCount");
-static_assert(offsetof(StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty, nBlockPeriodSec) == 0xA0, "StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty::nBlockPeriodSec");
-static_assert(offsetof(StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty, nAdditionalPenalty) == 0xA4, "StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty::nAdditionalPenalty");
-static_assert(offsetof(StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty, nMaxMemberCount) == 0xA8, "StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty::nMaxMemberCount");
-static_assert(offsetof(StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty, eTransportType) == 0xAC, "StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty::eTransportType");
-static_assert(offsetof(StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty, eDefaultVoiceStatus) == 0xB0, "StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty::eDefaultVoiceStatus");
-static_assert(offsetof(StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty, nVoiceMaxTalkCount) == 0xB4, "StsMsgLib::_StsMsgResponseGameGroupGetChannelProperty::nVoiceMaxTalkCount");
 
 namespace StsMsgLib {
 struct _StsMsgResponseGameGroupGroupInfo : public StsMsgLib::_StsMsgResponse {
@@ -9474,7 +11253,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseGameGroupValidateGroup, bListen
 namespace StsMsgLib {
 struct _StsMsgResponseGameTimeGetGameTime : public StsMsgLib::_StsMsgResponse {
 public:
-    alignas(4) unsigned char UserId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID UserId;
     unsigned int nAppGroupId;
     char * pszScheduleData;
     unsigned int nIsSelfScheduled;
@@ -9500,7 +11279,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseGetAttributes, pszPassCode) == 
 namespace StsMsgLib {
 struct _StsMsgResponseGetMyUserInfo : public StsMsgLib::_StsMsgResponse {
 public:
-    alignas(4) unsigned char guidUserId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID guidUserId;
     unsigned int nDataCenter;
     wchar_t * pwszUserName;
     wchar_t * pwszLoginName;
@@ -9526,10 +11305,13 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseGetSecurityCardCodeIndex, nCode
 namespace StsMsgLib {
 struct _StsMsgResponseGetStatus : public StsMsgLib::_StsMsgResponse {
 public:
+    enum EError : int {
+        ERR_SUCCESS = 0x0,
+    };
     int nPlayingUsers;
     int nWaitingUsers;
     int nMaxUsers;
-    int eError;
+    StsMsgLib::_StsMsgResponseGetStatus::EError eError;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgResponseGetStatus) == 0x70, "sizeof StsMsgLib::_StsMsgResponseGetStatus");
@@ -9550,9 +11332,65 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsCheckNewGoods, nIsNewGoods
 namespace StsMsgLib {
 struct _StsMsgResponseGoodsGetGameGoodsByCategoryId : public StsMsgLib::_StsMsgResponse {
 public:
+    struct _Goods;
+    struct _GoodsItem;
+    struct _GoodsSalePricePolicy;
+    struct _GoodsItem {
+    public:
+        unsigned int nGameItemKey;
+        int nGradeItemKey;
+        int nItemQuantity;
+        int nItemExpirationDuration;
+        int nGradeScore;
+        int nItemExpirationType;
+        long long tItemExpireAt;
+        int nItemType;
+        int nCurrencyId;
+        char * pItemData;
+        int nItemDataLen;
+    };
+    struct _GoodsSalePricePolicy {
+    public:
+        int nPricePolicyType;
+        long long tEffectiveFrom;
+        long long tEffectiveTo;
+        double dGoodsSalePrice;
+        int nGoodsDiscountValueType;
+        double dGoodsDiscountValue;
+        wchar_t * pwszGoodsDiscountKey;
+        int nRewardTargetKey;
+        int nRewardTargetKeyType;
+        int nMileageValueType;
+        double dMileageValue;
+    };
+    struct _Goods {
+    public:
+        int nGoodsId;
+        int nRelationGoodsId;
+        int nGoodsType;
+        char * pGoodsData;
+        int nGoodsDataSize;
+        int nGoodsIconId;
+        int nGoodsIconType;
+        int nGoodsPurchaseCheckMask;
+        int nOneTimePurchaseLimit;
+        int nCheckGradeId;
+        long long tEffectiveFrom;
+        long long tEffectiveTo;
+        int nParentGoodsId;
+        wchar_t * pwszGoodsName;
+        wchar_t * pwszGoodsDescription;
+        double dGoodsBasicSalePrice;
+        unsigned int nGoodsItemCount;
+        StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsItem * pGoodsItemList;
+        unsigned int nGoodsSalePricePolicyCount;
+        StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsSalePricePolicy * pGoodsSalePricePolicyList;
+        unsigned int nCategoryCount;
+        int * pCategoryList;
+    };
     int nCategoryId;
     unsigned long long nRevision;
-    void * pGoodsList;
+    StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods * pGoodsList;
     unsigned int nGoodsCount;
 };
 }  // namespace StsMsgLib
@@ -9561,6 +11399,53 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId, 
 static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId, nRevision) == 0x68, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::nRevision");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId, pGoodsList) == 0x70, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::pGoodsList");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId, nGoodsCount) == 0x78, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::nGoodsCount");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsItem) == 0x38, "sizeof StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsItem");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsItem, nGameItemKey) == 0x0, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsItem::nGameItemKey");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsItem, nGradeItemKey) == 0x4, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsItem::nGradeItemKey");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsItem, nItemQuantity) == 0x8, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsItem::nItemQuantity");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsItem, nItemExpirationDuration) == 0xC, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsItem::nItemExpirationDuration");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsItem, nGradeScore) == 0x10, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsItem::nGradeScore");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsItem, nItemExpirationType) == 0x14, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsItem::nItemExpirationType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsItem, tItemExpireAt) == 0x18, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsItem::tItemExpireAt");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsItem, nItemType) == 0x20, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsItem::nItemType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsItem, nCurrencyId) == 0x24, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsItem::nCurrencyId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsItem, pItemData) == 0x28, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsItem::pItemData");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsItem, nItemDataLen) == 0x30, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsItem::nItemDataLen");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsSalePricePolicy) == 0x50, "sizeof StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsSalePricePolicy");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsSalePricePolicy, nPricePolicyType) == 0x0, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsSalePricePolicy::nPricePolicyType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsSalePricePolicy, tEffectiveFrom) == 0x8, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsSalePricePolicy::tEffectiveFrom");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsSalePricePolicy, tEffectiveTo) == 0x10, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsSalePricePolicy::tEffectiveTo");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsSalePricePolicy, dGoodsSalePrice) == 0x18, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsSalePricePolicy::dGoodsSalePrice");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsSalePricePolicy, nGoodsDiscountValueType) == 0x20, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsSalePricePolicy::nGoodsDiscountValueType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsSalePricePolicy, dGoodsDiscountValue) == 0x28, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsSalePricePolicy::dGoodsDiscountValue");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsSalePricePolicy, pwszGoodsDiscountKey) == 0x30, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsSalePricePolicy::pwszGoodsDiscountKey");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsSalePricePolicy, nRewardTargetKey) == 0x38, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsSalePricePolicy::nRewardTargetKey");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsSalePricePolicy, nRewardTargetKeyType) == 0x3C, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsSalePricePolicy::nRewardTargetKeyType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsSalePricePolicy, nMileageValueType) == 0x40, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsSalePricePolicy::nMileageValueType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsSalePricePolicy, dMileageValue) == 0x48, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsSalePricePolicy::dMileageValue");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods) == 0x90, "sizeof StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods, nGoodsId) == 0x0, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods::nGoodsId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods, nRelationGoodsId) == 0x4, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods::nRelationGoodsId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods, nGoodsType) == 0x8, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods::nGoodsType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods, pGoodsData) == 0x10, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods::pGoodsData");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods, nGoodsDataSize) == 0x18, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods::nGoodsDataSize");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods, nGoodsIconId) == 0x1C, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods::nGoodsIconId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods, nGoodsIconType) == 0x20, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods::nGoodsIconType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods, nGoodsPurchaseCheckMask) == 0x24, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods::nGoodsPurchaseCheckMask");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods, nOneTimePurchaseLimit) == 0x28, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods::nOneTimePurchaseLimit");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods, nCheckGradeId) == 0x2C, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods::nCheckGradeId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods, tEffectiveFrom) == 0x30, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods::tEffectiveFrom");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods, tEffectiveTo) == 0x38, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods::tEffectiveTo");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods, nParentGoodsId) == 0x40, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods::nParentGoodsId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods, pwszGoodsName) == 0x48, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods::pwszGoodsName");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods, pwszGoodsDescription) == 0x50, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods::pwszGoodsDescription");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods, dGoodsBasicSalePrice) == 0x58, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods::dGoodsBasicSalePrice");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods, nGoodsItemCount) == 0x60, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods::nGoodsItemCount");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods, pGoodsItemList) == 0x68, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods::pGoodsItemList");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods, nGoodsSalePricePolicyCount) == 0x70, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods::nGoodsSalePricePolicyCount");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods, pGoodsSalePricePolicyList) == 0x78, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods::pGoodsSalePricePolicyList");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods, nCategoryCount) == 0x80, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods::nCategoryCount");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods, pCategoryList) == 0x88, "StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods::pCategoryList");
 
 namespace StsMsgLib {
 struct _StsMsgResponseGoodsGetRevision : public StsMsgLib::_StsMsgResponse {
@@ -9578,8 +11463,63 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetRevision, bIsCategoryRe
 namespace StsMsgLib {
 struct _StsMsgResponseGoodsGetSaleGoods : public StsMsgLib::_StsMsgResponse {
 public:
+    struct _Category;
+    struct _Goods;
+    struct _GoodsItem;
+    struct _GoodsSalePricePolicy;
+    struct _Category {
+    public:
+        int categoryId;
+        int displayOrder;
+    };
+    struct _GoodsItem {
+    public:
+        int itemType;
+        int currencyId;
+        int itemQuantity;
+        long long gameItemKey;
+        int gameGradeKey;
+        char * customizedItemAttribute1;
+        int customizedItemAttribute1Len;
+        char * customizedItemAttribute2;
+        int customizedItemAttribute2Len;
+    };
+    struct _GoodsSalePricePolicy {
+    public:
+        int currencyGroupId;
+        int pricePolicyType;
+        long long effectiveFrom;
+        long long effectiveTo;
+        double salePrice;
+        int discountValueType;
+        double discountValue;
+        wchar_t * discountKey;
+        int rewardTargetKeyType;
+        int rewardTargetKey;
+        int rewardValueType;
+        double rewardValue;
+    };
+    struct _Goods {
+    public:
+        int goodsId;
+        int parentGoodsId;
+        long long effectiveFrom;
+        long long effectiveTo;
+        int goodsIconId;
+        int goodsIconType;
+        int goodsPurchaseCheckMask;
+        wchar_t * goodsDisplayName;
+        char * goodsData;
+        int goodsDataLen;
+        unsigned int categoryCount;
+        StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_Category * categoryList;
+        unsigned int goodsSalePricePolicyCount;
+        StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsSalePricePolicy * goodsSalePricePolicyList;
+        unsigned int goodsItemCount;
+        StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsItem * goodsItemList;
+    };
     unsigned long long revision;
-    void * goodsList;
+    StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_Goods * goodsList;
     unsigned int goodsCount;
 };
 }  // namespace StsMsgLib
@@ -9587,6 +11527,49 @@ static_assert(sizeof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods) == 0x78, "size
 static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods, revision) == 0x60, "StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::revision");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods, goodsList) == 0x68, "StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::goodsList");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods, goodsCount) == 0x70, "StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::goodsCount");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_Category) == 0x8, "sizeof StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_Category");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_Category, categoryId) == 0x0, "StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_Category::categoryId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_Category, displayOrder) == 0x4, "StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_Category::displayOrder");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsItem) == 0x40, "sizeof StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsItem");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsItem, itemType) == 0x0, "StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsItem::itemType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsItem, currencyId) == 0x4, "StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsItem::currencyId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsItem, itemQuantity) == 0x8, "StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsItem::itemQuantity");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsItem, gameItemKey) == 0x10, "StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsItem::gameItemKey");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsItem, gameGradeKey) == 0x18, "StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsItem::gameGradeKey");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsItem, customizedItemAttribute1) == 0x20, "StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsItem::customizedItemAttribute1");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsItem, customizedItemAttribute1Len) == 0x28, "StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsItem::customizedItemAttribute1Len");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsItem, customizedItemAttribute2) == 0x30, "StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsItem::customizedItemAttribute2");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsItem, customizedItemAttribute2Len) == 0x38, "StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsItem::customizedItemAttribute2Len");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsSalePricePolicy) == 0x50, "sizeof StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsSalePricePolicy");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsSalePricePolicy, currencyGroupId) == 0x0, "StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsSalePricePolicy::currencyGroupId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsSalePricePolicy, pricePolicyType) == 0x4, "StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsSalePricePolicy::pricePolicyType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsSalePricePolicy, effectiveFrom) == 0x8, "StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsSalePricePolicy::effectiveFrom");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsSalePricePolicy, effectiveTo) == 0x10, "StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsSalePricePolicy::effectiveTo");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsSalePricePolicy, salePrice) == 0x18, "StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsSalePricePolicy::salePrice");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsSalePricePolicy, discountValueType) == 0x20, "StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsSalePricePolicy::discountValueType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsSalePricePolicy, discountValue) == 0x28, "StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsSalePricePolicy::discountValue");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsSalePricePolicy, discountKey) == 0x30, "StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsSalePricePolicy::discountKey");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsSalePricePolicy, rewardTargetKeyType) == 0x38, "StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsSalePricePolicy::rewardTargetKeyType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsSalePricePolicy, rewardTargetKey) == 0x3C, "StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsSalePricePolicy::rewardTargetKey");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsSalePricePolicy, rewardValueType) == 0x40, "StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsSalePricePolicy::rewardValueType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsSalePricePolicy, rewardValue) == 0x48, "StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_GoodsSalePricePolicy::rewardValue");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_Goods) == 0x68, "sizeof StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_Goods");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_Goods, goodsId) == 0x0, "StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_Goods::goodsId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_Goods, parentGoodsId) == 0x4, "StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_Goods::parentGoodsId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_Goods, effectiveFrom) == 0x8, "StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_Goods::effectiveFrom");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_Goods, effectiveTo) == 0x10, "StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_Goods::effectiveTo");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_Goods, goodsIconId) == 0x18, "StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_Goods::goodsIconId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_Goods, goodsIconType) == 0x1C, "StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_Goods::goodsIconType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_Goods, goodsPurchaseCheckMask) == 0x20, "StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_Goods::goodsPurchaseCheckMask");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_Goods, goodsDisplayName) == 0x28, "StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_Goods::goodsDisplayName");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_Goods, goodsData) == 0x30, "StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_Goods::goodsData");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_Goods, goodsDataLen) == 0x38, "StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_Goods::goodsDataLen");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_Goods, categoryCount) == 0x3C, "StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_Goods::categoryCount");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_Goods, categoryList) == 0x40, "StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_Goods::categoryList");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_Goods, goodsSalePricePolicyCount) == 0x48, "StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_Goods::goodsSalePricePolicyCount");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_Goods, goodsSalePricePolicyList) == 0x50, "StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_Goods::goodsSalePricePolicyList");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_Goods, goodsItemCount) == 0x58, "StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_Goods::goodsItemCount");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_Goods, goodsItemList) == 0x60, "StsMsgLib::_StsMsgResponseGoodsGetSaleGoods::_Goods::goodsItemList");
 
 namespace StsMsgLib {
 struct _StsMsgResponseGoodsListCategoryIds : public StsMsgLib::_StsMsgResponse {
@@ -9602,7 +11585,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsListCategoryIds, nCategory
 namespace StsMsgLib {
 struct _StsMsgResponseGoodsListGameGoods : public StsMsgLib::_StsMsgResponse {
 public:
-    void * pGoodsList;
+    StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods * pGoodsList;
     unsigned int nGoodsCount;
 };
 }  // namespace StsMsgLib
@@ -9613,20 +11596,49 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsListGameGoods, nGoodsCount
 namespace StsMsgLib {
 struct _StsMsgResponseGoodsPageSearchGoods : public StsMsgLib::_StsMsgResponse {
 public:
+    struct _Goods;
+    struct _Goods {
+    public:
+        int nGoodsId;
+        int nGoodsType;
+        int nGoodsIconId;
+        int nGoodsIconType;
+        double dGoodsBasicSalePrice;
+        long long tChanged;
+        wchar_t * pwszGoodsDisplayName;
+        wchar_t * pwszGoodsDisplayDescription;
+        unsigned int nGoodsSalePricePolicyCount;
+        StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsSalePricePolicy * pGoodsSalePricePolicyList;
+        unsigned int nGoodsItemCount;
+        StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_GoodsItem * pGoodsItemList;
+    };
     int nTotalCount;
     unsigned int nGoodsCount;
-    void * pGoodsList;
+    StsMsgLib::_StsMsgResponseGoodsPageSearchGoods::_Goods * pGoodsList;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgResponseGoodsPageSearchGoods) == 0x70, "sizeof StsMsgLib::_StsMsgResponseGoodsPageSearchGoods");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsPageSearchGoods, nTotalCount) == 0x60, "StsMsgLib::_StsMsgResponseGoodsPageSearchGoods::nTotalCount");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsPageSearchGoods, nGoodsCount) == 0x64, "StsMsgLib::_StsMsgResponseGoodsPageSearchGoods::nGoodsCount");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsPageSearchGoods, pGoodsList) == 0x68, "StsMsgLib::_StsMsgResponseGoodsPageSearchGoods::pGoodsList");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseGoodsPageSearchGoods::_Goods) == 0x50, "sizeof StsMsgLib::_StsMsgResponseGoodsPageSearchGoods::_Goods");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsPageSearchGoods::_Goods, nGoodsId) == 0x0, "StsMsgLib::_StsMsgResponseGoodsPageSearchGoods::_Goods::nGoodsId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsPageSearchGoods::_Goods, nGoodsType) == 0x4, "StsMsgLib::_StsMsgResponseGoodsPageSearchGoods::_Goods::nGoodsType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsPageSearchGoods::_Goods, nGoodsIconId) == 0x8, "StsMsgLib::_StsMsgResponseGoodsPageSearchGoods::_Goods::nGoodsIconId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsPageSearchGoods::_Goods, nGoodsIconType) == 0xC, "StsMsgLib::_StsMsgResponseGoodsPageSearchGoods::_Goods::nGoodsIconType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsPageSearchGoods::_Goods, dGoodsBasicSalePrice) == 0x10, "StsMsgLib::_StsMsgResponseGoodsPageSearchGoods::_Goods::dGoodsBasicSalePrice");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsPageSearchGoods::_Goods, tChanged) == 0x18, "StsMsgLib::_StsMsgResponseGoodsPageSearchGoods::_Goods::tChanged");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsPageSearchGoods::_Goods, pwszGoodsDisplayName) == 0x20, "StsMsgLib::_StsMsgResponseGoodsPageSearchGoods::_Goods::pwszGoodsDisplayName");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsPageSearchGoods::_Goods, pwszGoodsDisplayDescription) == 0x28, "StsMsgLib::_StsMsgResponseGoodsPageSearchGoods::_Goods::pwszGoodsDisplayDescription");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsPageSearchGoods::_Goods, nGoodsSalePricePolicyCount) == 0x30, "StsMsgLib::_StsMsgResponseGoodsPageSearchGoods::_Goods::nGoodsSalePricePolicyCount");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsPageSearchGoods::_Goods, pGoodsSalePricePolicyList) == 0x38, "StsMsgLib::_StsMsgResponseGoodsPageSearchGoods::_Goods::pGoodsSalePricePolicyList");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsPageSearchGoods::_Goods, nGoodsItemCount) == 0x40, "StsMsgLib::_StsMsgResponseGoodsPageSearchGoods::_Goods::nGoodsItemCount");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGoodsPageSearchGoods::_Goods, pGoodsItemList) == 0x48, "StsMsgLib::_StsMsgResponseGoodsPageSearchGoods::_Goods::pGoodsItemList");
 
 namespace StsMsgLib {
 struct _StsMsgResponseGradeActivateGrade : public StsMsgLib::_StsMsgResponse {
 public:
-    alignas(4) unsigned char UserId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID UserId;
     int nGradeId;
     wchar_t AppGroupCode[9];
     wchar_t GameGradeKey[51];
@@ -9647,7 +11659,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseGradeActivateGrade, nRemainingG
 namespace StsMsgLib {
 struct _StsMsgResponseGradeAddGradeScore : public StsMsgLib::_StsMsgResponse {
 public:
-    alignas(4) unsigned char UserId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID UserId;
     wchar_t AppGroupCode[9];
     int nUserGradeScoreId;
     int nLevelId;
@@ -9670,7 +11682,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseGradeAddGradeScore, nMaximumGra
 namespace StsMsgLib {
 struct _StsMsgResponseGradeGetBaseGradeIdActivation : public StsMsgLib::_StsMsgResponse {
 public:
-    alignas(4) unsigned char UserId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID UserId;
     wchar_t AppGroupCode[9];
     int nBaseGradeIdActivation;
 };
@@ -9683,7 +11695,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseGradeGetBaseGradeIdActivation, 
 namespace StsMsgLib {
 struct _StsMsgResponseGradeGetLevel : public StsMsgLib::_StsMsgResponse {
 public:
-    alignas(4) unsigned char UserId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID UserId;
     wchar_t AppGroupCode[9];
     int nLevelId;
     int nAccumulateGradeScore;
@@ -9704,18 +11716,39 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseGradeGetLevel, nMaximumGradeSco
 namespace StsMsgLib {
 struct _StsMsgResponseGradeListAllGrades : public StsMsgLib::_StsMsgResponse {
 public:
+    struct _GradeListItem;
+    struct _GradeListItem {
+    public:
+        int nGradeId;
+        wchar_t GameGradeKey[51];
+        bool bActivation;
+        int nGradeCount;
+        long long tTotalEffectiveFrom;
+        long long tTotalEffectiveTo;
+        int nRemainingGradeTimePerSecond;
+        StsMsgLib::Grade::DailyReward dailyReward;
+    };
     int nGradeListCount;
-    void * pGradeList;
+    StsMsgLib::_StsMsgResponseGradeListAllGrades::_GradeListItem * pGradeList;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgResponseGradeListAllGrades) == 0x70, "sizeof StsMsgLib::_StsMsgResponseGradeListAllGrades");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseGradeListAllGrades, nGradeListCount) == 0x60, "StsMsgLib::_StsMsgResponseGradeListAllGrades::nGradeListCount");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseGradeListAllGrades, pGradeList) == 0x68, "StsMsgLib::_StsMsgResponseGradeListAllGrades::pGradeList");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseGradeListAllGrades::_GradeListItem) == 0xA0, "sizeof StsMsgLib::_StsMsgResponseGradeListAllGrades::_GradeListItem");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGradeListAllGrades::_GradeListItem, nGradeId) == 0x0, "StsMsgLib::_StsMsgResponseGradeListAllGrades::_GradeListItem::nGradeId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGradeListAllGrades::_GradeListItem, GameGradeKey) == 0x4, "StsMsgLib::_StsMsgResponseGradeListAllGrades::_GradeListItem::GameGradeKey");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGradeListAllGrades::_GradeListItem, bActivation) == 0x6A, "StsMsgLib::_StsMsgResponseGradeListAllGrades::_GradeListItem::bActivation");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGradeListAllGrades::_GradeListItem, nGradeCount) == 0x6C, "StsMsgLib::_StsMsgResponseGradeListAllGrades::_GradeListItem::nGradeCount");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGradeListAllGrades::_GradeListItem, tTotalEffectiveFrom) == 0x70, "StsMsgLib::_StsMsgResponseGradeListAllGrades::_GradeListItem::tTotalEffectiveFrom");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGradeListAllGrades::_GradeListItem, tTotalEffectiveTo) == 0x78, "StsMsgLib::_StsMsgResponseGradeListAllGrades::_GradeListItem::tTotalEffectiveTo");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGradeListAllGrades::_GradeListItem, nRemainingGradeTimePerSecond) == 0x80, "StsMsgLib::_StsMsgResponseGradeListAllGrades::_GradeListItem::nRemainingGradeTimePerSecond");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseGradeListAllGrades::_GradeListItem, dailyReward) == 0x88, "StsMsgLib::_StsMsgResponseGradeListAllGrades::_GradeListItem::dailyReward");
 
 namespace StsMsgLib {
 struct _StsMsgResponseGradeListGrades : public StsMsgLib::_StsMsgResponse {
 public:
-    alignas(4) unsigned char UserId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID UserId;
     wchar_t AppGroupCode[9];
     long long tTotalEffectiveFrom;
     long long tTotalEffectiveTo;
@@ -9736,7 +11769,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseGradeListGrades, bActivation) =
 namespace StsMsgLib {
 struct _StsMsgResponseGradeListLevels : public StsMsgLib::_StsMsgResponse {
 public:
-    alignas(4) unsigned char UserId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID UserId;
     wchar_t AppGroupCode[9];
     int nLevelListCount;
     StsMsgLib::Level * pLevelList;
@@ -9758,7 +11791,7 @@ static_assert(sizeof(StsMsgLib::_StsMsgResponseIngameChannelActivateVoice) == 0x
 namespace StsMsgLib {
 struct _StsMsgResponseIngameChannelCreate : public StsMsgLib::_StsMsgResponse {
 public:
-    alignas(4) unsigned char channelId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID channelId;
     unsigned int channelCenter;
     wchar_t const * pwszChannelKey;
     wchar_t const * pwszChannelAlias;
@@ -9768,7 +11801,7 @@ public:
     StsMsgLib::CliGate::Channel::_Member member;
     unsigned int maxMemberCount;
     unsigned int currentMemberCount;
-    alignas(4) unsigned char locationId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID locationId;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgResponseIngameChannelCreate) == 0x168, "sizeof StsMsgLib::_StsMsgResponseIngameChannelCreate");
@@ -9801,7 +11834,7 @@ static_assert(sizeof(StsMsgLib::_StsMsgResponseIngameChannelEndVoice) == 0x60, "
 namespace StsMsgLib {
 struct _StsMsgResponseIngameChannelGroupChannelJoin : public StsMsgLib::_StsMsgResponse {
 public:
-    alignas(4) unsigned char channelId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID channelId;
     unsigned int channelCenter;
     wchar_t const * pwszChannelKey;
     wchar_t const * pwszChannelAlias;
@@ -9811,7 +11844,7 @@ public:
     StsMsgLib::CliGate::Channel::_Member member;
     unsigned int maxMemberCount;
     unsigned int currentMemberCount;
-    alignas(4) unsigned char locationId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID locationId;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgResponseIngameChannelGroupChannelJoin) == 0x168, "sizeof StsMsgLib::_StsMsgResponseIngameChannelGroupChannelJoin");
@@ -9830,7 +11863,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameChannelGroupChannelJoin, 
 namespace StsMsgLib {
 struct _StsMsgResponseIngameChannelJoin : public StsMsgLib::_StsMsgResponse {
 public:
-    alignas(4) unsigned char channelId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID channelId;
     unsigned int channelCenter;
     wchar_t const * pwszChannelKey;
     wchar_t * pwszChannelAlias;
@@ -9839,7 +11872,7 @@ public:
     StsMsgLib::CliGate::Channel::_Scope scope;
     unsigned int maxMemberCount;
     unsigned int currentMemberCount;
-    alignas(4) unsigned char locationId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID locationId;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgResponseIngameChannelJoin) == 0x108, "sizeof StsMsgLib::_StsMsgResponseIngameChannelJoin");
@@ -9935,20 +11968,42 @@ static_assert(sizeof(StsMsgLib::_StsMsgResponseIngameChannelUnsetPermission) == 
 namespace StsMsgLib {
 struct _StsMsgResponseIngameShopGetBalance : public StsMsgLib::_StsMsgResponse {
 public:
+    struct _BalanceInfo;
+    struct _BalanceInfo {
+    public:
+        int nCurrencyGroupId;
+        int nCurrencyId;
+        long long nBalance;
+        long long tExpired;
+    };
     int nBalanceInfoListCount;
-    void * pBalanceInfoList;
+    StsMsgLib::_StsMsgResponseIngameShopGetBalance::_BalanceInfo * pBalanceInfoList;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgResponseIngameShopGetBalance) == 0x70, "sizeof StsMsgLib::_StsMsgResponseIngameShopGetBalance");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetBalance, nBalanceInfoListCount) == 0x60, "StsMsgLib::_StsMsgResponseIngameShopGetBalance::nBalanceInfoListCount");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetBalance, pBalanceInfoList) == 0x68, "StsMsgLib::_StsMsgResponseIngameShopGetBalance::pBalanceInfoList");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseIngameShopGetBalance::_BalanceInfo) == 0x18, "sizeof StsMsgLib::_StsMsgResponseIngameShopGetBalance::_BalanceInfo");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetBalance::_BalanceInfo, nCurrencyGroupId) == 0x0, "StsMsgLib::_StsMsgResponseIngameShopGetBalance::_BalanceInfo::nCurrencyGroupId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetBalance::_BalanceInfo, nCurrencyId) == 0x4, "StsMsgLib::_StsMsgResponseIngameShopGetBalance::_BalanceInfo::nCurrencyId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetBalance::_BalanceInfo, nBalance) == 0x8, "StsMsgLib::_StsMsgResponseIngameShopGetBalance::_BalanceInfo::nBalance");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetBalance::_BalanceInfo, tExpired) == 0x10, "StsMsgLib::_StsMsgResponseIngameShopGetBalance::_BalanceInfo::tExpired");
 
 namespace StsMsgLib {
 struct _StsMsgResponseIngameShopGetCategories : public StsMsgLib::_StsMsgResponse {
 public:
+    struct _IngameShopCategory;
+    struct _IngameShopCategory {
+    public:
+        int nCategoryId;
+        wchar_t * pwszCateogryName;
+        int nCurrencyGroupId;
+        int nParentCategoryId;
+        wchar_t * pwszCategoryData;
+    };
     int nReqCategoryId;
     unsigned long long nCategoryRevision;
-    void * pIngameShopCategoryList;
+    StsMsgLib::_StsMsgResponseIngameShopGetCategories::_IngameShopCategory * pIngameShopCategoryList;
     unsigned int nIngameShopCategoryCount;
 };
 }  // namespace StsMsgLib
@@ -9957,6 +12012,12 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetCategories, nReqCa
 static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetCategories, nCategoryRevision) == 0x68, "StsMsgLib::_StsMsgResponseIngameShopGetCategories::nCategoryRevision");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetCategories, pIngameShopCategoryList) == 0x70, "StsMsgLib::_StsMsgResponseIngameShopGetCategories::pIngameShopCategoryList");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetCategories, nIngameShopCategoryCount) == 0x78, "StsMsgLib::_StsMsgResponseIngameShopGetCategories::nIngameShopCategoryCount");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseIngameShopGetCategories::_IngameShopCategory) == 0x20, "sizeof StsMsgLib::_StsMsgResponseIngameShopGetCategories::_IngameShopCategory");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetCategories::_IngameShopCategory, nCategoryId) == 0x0, "StsMsgLib::_StsMsgResponseIngameShopGetCategories::_IngameShopCategory::nCategoryId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetCategories::_IngameShopCategory, pwszCateogryName) == 0x8, "StsMsgLib::_StsMsgResponseIngameShopGetCategories::_IngameShopCategory::pwszCateogryName");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetCategories::_IngameShopCategory, nCurrencyGroupId) == 0x10, "StsMsgLib::_StsMsgResponseIngameShopGetCategories::_IngameShopCategory::nCurrencyGroupId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetCategories::_IngameShopCategory, nParentCategoryId) == 0x14, "StsMsgLib::_StsMsgResponseIngameShopGetCategories::_IngameShopCategory::nParentCategoryId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetCategories::_IngameShopCategory, pwszCategoryData) == 0x18, "StsMsgLib::_StsMsgResponseIngameShopGetCategories::_IngameShopCategory::pwszCategoryData");
 
 namespace StsMsgLib {
 struct _StsMsgResponseIngameShopGetDisplayRevision : public StsMsgLib::_StsMsgResponse {
@@ -9974,9 +12035,58 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetDisplayRevision, n
 namespace StsMsgLib {
 struct _StsMsgResponseIngameShopGetGoodsByCategoryId : public StsMsgLib::_StsMsgResponse {
 public:
+    struct _IngameShopGoods;
+    struct _IngameShopGoodsItem;
+    struct _IngameShopGoodsSalePricePolicy;
+    struct _IngameShopGoodsItem {
+    public:
+        long long nGameItemKey;
+        int nGradeItemKey;
+        int nItemQuantity;
+        int nItemExpirationDuration;
+        int nGradeScore;
+        int nItemExpirationType;
+        long long tItemExpireAt;
+        int nItemType;
+        int nCurrencyId;
+    };
+    struct _IngameShopGoodsSalePricePolicy {
+    public:
+        int nPricePolicyType;
+        long long tEffectiveFrom;
+        long long tEffectiveTo;
+        double dGoodsSalePrice;
+        int nGoodsDiscountValueType;
+        double dGoodsDiscountValue;
+        int nGoodsDiscountKey;
+        int nRewardTargetKey;
+        int nRewardTargetKeyType;
+        int nMileageValueType;
+        double dMileageValue;
+    };
+    struct _IngameShopGoods {
+    public:
+        int nGoodsId;
+        int nGoodsType;
+        char * pszGoodsData;
+        int nGoodsIconId;
+        int nGoodsIconType;
+        int nGoodsPurchaseCheckMask;
+        int nOneTimePurchaseLimit;
+        long long tEffectiveFrom;
+        long long tEffectiveTo;
+        int nParentGoodsId;
+        wchar_t * pwszGoodsName;
+        wchar_t * pwszGoodsDescription;
+        double dGoodsBasicSalePrice;
+        unsigned int nGoodsItemCount;
+        StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsItem * pGoodsItemList;
+        unsigned int nGoodsSalePricePolicyCount;
+        StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsSalePricePolicy * pGoodsSalePricePolicyList;
+    };
     int nReqCategoryId;
     unsigned long long nCategoryGoodsRevision;
-    void * pIngameShopGoodsList;
+    StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoods * pIngameShopGoodsList;
     unsigned int nIngameshopGoodsCount;
 };
 }  // namespace StsMsgLib
@@ -9985,11 +12095,51 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId,
 static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId, nCategoryGoodsRevision) == 0x68, "StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::nCategoryGoodsRevision");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId, pIngameShopGoodsList) == 0x70, "StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::pIngameShopGoodsList");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId, nIngameshopGoodsCount) == 0x78, "StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::nIngameshopGoodsCount");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsItem) == 0x30, "sizeof StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsItem");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsItem, nGameItemKey) == 0x0, "StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsItem::nGameItemKey");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsItem, nGradeItemKey) == 0x8, "StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsItem::nGradeItemKey");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsItem, nItemQuantity) == 0xC, "StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsItem::nItemQuantity");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsItem, nItemExpirationDuration) == 0x10, "StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsItem::nItemExpirationDuration");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsItem, nGradeScore) == 0x14, "StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsItem::nGradeScore");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsItem, nItemExpirationType) == 0x18, "StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsItem::nItemExpirationType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsItem, tItemExpireAt) == 0x20, "StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsItem::tItemExpireAt");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsItem, nItemType) == 0x28, "StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsItem::nItemType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsItem, nCurrencyId) == 0x2C, "StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsItem::nCurrencyId");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsSalePricePolicy) == 0x48, "sizeof StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsSalePricePolicy");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsSalePricePolicy, nPricePolicyType) == 0x0, "StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsSalePricePolicy::nPricePolicyType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsSalePricePolicy, tEffectiveFrom) == 0x8, "StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsSalePricePolicy::tEffectiveFrom");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsSalePricePolicy, tEffectiveTo) == 0x10, "StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsSalePricePolicy::tEffectiveTo");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsSalePricePolicy, dGoodsSalePrice) == 0x18, "StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsSalePricePolicy::dGoodsSalePrice");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsSalePricePolicy, nGoodsDiscountValueType) == 0x20, "StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsSalePricePolicy::nGoodsDiscountValueType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsSalePricePolicy, dGoodsDiscountValue) == 0x28, "StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsSalePricePolicy::dGoodsDiscountValue");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsSalePricePolicy, nGoodsDiscountKey) == 0x30, "StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsSalePricePolicy::nGoodsDiscountKey");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsSalePricePolicy, nRewardTargetKey) == 0x34, "StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsSalePricePolicy::nRewardTargetKey");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsSalePricePolicy, nRewardTargetKeyType) == 0x38, "StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsSalePricePolicy::nRewardTargetKeyType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsSalePricePolicy, nMileageValueType) == 0x3C, "StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsSalePricePolicy::nMileageValueType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsSalePricePolicy, dMileageValue) == 0x40, "StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoodsSalePricePolicy::dMileageValue");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoods) == 0x70, "sizeof StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoods");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoods, nGoodsId) == 0x0, "StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoods::nGoodsId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoods, nGoodsType) == 0x4, "StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoods::nGoodsType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoods, pszGoodsData) == 0x8, "StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoods::pszGoodsData");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoods, nGoodsIconId) == 0x10, "StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoods::nGoodsIconId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoods, nGoodsIconType) == 0x14, "StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoods::nGoodsIconType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoods, nGoodsPurchaseCheckMask) == 0x18, "StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoods::nGoodsPurchaseCheckMask");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoods, nOneTimePurchaseLimit) == 0x1C, "StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoods::nOneTimePurchaseLimit");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoods, tEffectiveFrom) == 0x20, "StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoods::tEffectiveFrom");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoods, tEffectiveTo) == 0x28, "StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoods::tEffectiveTo");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoods, nParentGoodsId) == 0x30, "StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoods::nParentGoodsId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoods, pwszGoodsName) == 0x38, "StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoods::pwszGoodsName");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoods, pwszGoodsDescription) == 0x40, "StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoods::pwszGoodsDescription");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoods, dGoodsBasicSalePrice) == 0x48, "StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoods::dGoodsBasicSalePrice");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoods, nGoodsItemCount) == 0x50, "StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoods::nGoodsItemCount");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoods, pGoodsItemList) == 0x58, "StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoods::pGoodsItemList");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoods, nGoodsSalePricePolicyCount) == 0x60, "StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoods::nGoodsSalePricePolicyCount");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoods, pGoodsSalePricePolicyList) == 0x68, "StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoods::pGoodsSalePricePolicyList");
 
 namespace StsMsgLib {
 struct _StsMsgResponseIngameShopGetGoodsByGoodsId : public StsMsgLib::_StsMsgResponse {
 public:
-    alignas(8) unsigned char ingameShopGoods[0x70];  // ❓ PDB type 0x3061: StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoods
+    StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoods ingameShopGoods;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByGoodsId) == 0xD0, "sizeof StsMsgLib::_StsMsgResponseIngameShopGetGoodsByGoodsId");
@@ -9998,26 +12148,82 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopGetGoodsByGoodsId, in
 namespace StsMsgLib {
 struct _StsMsgResponseIngameShopListGoodsLimits : public StsMsgLib::_StsMsgResponse {
 public:
+    struct _Limit;
+    struct _Limit {
+    public:
+        int nGoodsId;
+        int nLimitId;
+        int nLimitType;
+        int nLimitActionType;
+        double dLimitAmount;
+        int nLimitQuantity;
+        int nLimitDurationUnitType;
+        int nLimitDuration;
+        int nPaymentCurrencyGroupId;
+        int nAccumulatedPurchaseQuantity;
+    };
     int nLimitListCount;
-    void * pLimitList;
+    StsMsgLib::_StsMsgResponseIngameShopListGoodsLimits::_Limit * pLimitList;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgResponseIngameShopListGoodsLimits) == 0x70, "sizeof StsMsgLib::_StsMsgResponseIngameShopListGoodsLimits");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopListGoodsLimits, nLimitListCount) == 0x60, "StsMsgLib::_StsMsgResponseIngameShopListGoodsLimits::nLimitListCount");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopListGoodsLimits, pLimitList) == 0x68, "StsMsgLib::_StsMsgResponseIngameShopListGoodsLimits::pLimitList");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseIngameShopListGoodsLimits::_Limit) == 0x30, "sizeof StsMsgLib::_StsMsgResponseIngameShopListGoodsLimits::_Limit");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopListGoodsLimits::_Limit, nGoodsId) == 0x0, "StsMsgLib::_StsMsgResponseIngameShopListGoodsLimits::_Limit::nGoodsId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopListGoodsLimits::_Limit, nLimitId) == 0x4, "StsMsgLib::_StsMsgResponseIngameShopListGoodsLimits::_Limit::nLimitId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopListGoodsLimits::_Limit, nLimitType) == 0x8, "StsMsgLib::_StsMsgResponseIngameShopListGoodsLimits::_Limit::nLimitType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopListGoodsLimits::_Limit, nLimitActionType) == 0xC, "StsMsgLib::_StsMsgResponseIngameShopListGoodsLimits::_Limit::nLimitActionType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopListGoodsLimits::_Limit, dLimitAmount) == 0x10, "StsMsgLib::_StsMsgResponseIngameShopListGoodsLimits::_Limit::dLimitAmount");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopListGoodsLimits::_Limit, nLimitQuantity) == 0x18, "StsMsgLib::_StsMsgResponseIngameShopListGoodsLimits::_Limit::nLimitQuantity");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopListGoodsLimits::_Limit, nLimitDurationUnitType) == 0x1C, "StsMsgLib::_StsMsgResponseIngameShopListGoodsLimits::_Limit::nLimitDurationUnitType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopListGoodsLimits::_Limit, nLimitDuration) == 0x20, "StsMsgLib::_StsMsgResponseIngameShopListGoodsLimits::_Limit::nLimitDuration");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopListGoodsLimits::_Limit, nPaymentCurrencyGroupId) == 0x24, "StsMsgLib::_StsMsgResponseIngameShopListGoodsLimits::_Limit::nPaymentCurrencyGroupId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopListGoodsLimits::_Limit, nAccumulatedPurchaseQuantity) == 0x28, "StsMsgLib::_StsMsgResponseIngameShopListGoodsLimits::_Limit::nAccumulatedPurchaseQuantity");
 
 namespace StsMsgLib {
 struct _StsMsgResponseIngameShopPagePurchaseHistory : public StsMsgLib::_StsMsgResponse {
 public:
+    struct _PurchaseInfo;
+    struct _PurchaseInfo {
+    public:
+        long long nPurchaseId;
+        int nPurchaseType;
+        wchar_t * pwszPurchaseDescription;
+        long long tRegistered;
+        double dPaymentAmount;
+        int nCurrencyGroupId;
+        wchar_t * pwszPaymentMethodDescription;
+        int nGoodsId;
+        int nGoodsCategoryId;
+        int nGoodsType;
+        int nGoodsServiceCode;
+        double dPaymentAmountPerGoods;
+        int nPurchaseQuantityPerGoods;
+    };
     int nPurchaseHistoryTotalCount;
     int nPurchaseInfoCount;
-    void * pPurchaseInfoList;
+    StsMsgLib::_StsMsgResponseIngameShopPagePurchaseHistory::_PurchaseInfo * pPurchaseInfoList;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgResponseIngameShopPagePurchaseHistory) == 0x70, "sizeof StsMsgLib::_StsMsgResponseIngameShopPagePurchaseHistory");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopPagePurchaseHistory, nPurchaseHistoryTotalCount) == 0x60, "StsMsgLib::_StsMsgResponseIngameShopPagePurchaseHistory::nPurchaseHistoryTotalCount");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopPagePurchaseHistory, nPurchaseInfoCount) == 0x64, "StsMsgLib::_StsMsgResponseIngameShopPagePurchaseHistory::nPurchaseInfoCount");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopPagePurchaseHistory, pPurchaseInfoList) == 0x68, "StsMsgLib::_StsMsgResponseIngameShopPagePurchaseHistory::pPurchaseInfoList");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseIngameShopPagePurchaseHistory::_PurchaseInfo) == 0x58, "sizeof StsMsgLib::_StsMsgResponseIngameShopPagePurchaseHistory::_PurchaseInfo");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopPagePurchaseHistory::_PurchaseInfo, nPurchaseId) == 0x0, "StsMsgLib::_StsMsgResponseIngameShopPagePurchaseHistory::_PurchaseInfo::nPurchaseId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopPagePurchaseHistory::_PurchaseInfo, nPurchaseType) == 0x8, "StsMsgLib::_StsMsgResponseIngameShopPagePurchaseHistory::_PurchaseInfo::nPurchaseType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopPagePurchaseHistory::_PurchaseInfo, pwszPurchaseDescription) == 0x10, "StsMsgLib::_StsMsgResponseIngameShopPagePurchaseHistory::_PurchaseInfo::pwszPurchaseDescription");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopPagePurchaseHistory::_PurchaseInfo, tRegistered) == 0x18, "StsMsgLib::_StsMsgResponseIngameShopPagePurchaseHistory::_PurchaseInfo::tRegistered");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopPagePurchaseHistory::_PurchaseInfo, dPaymentAmount) == 0x20, "StsMsgLib::_StsMsgResponseIngameShopPagePurchaseHistory::_PurchaseInfo::dPaymentAmount");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopPagePurchaseHistory::_PurchaseInfo, nCurrencyGroupId) == 0x28, "StsMsgLib::_StsMsgResponseIngameShopPagePurchaseHistory::_PurchaseInfo::nCurrencyGroupId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopPagePurchaseHistory::_PurchaseInfo, pwszPaymentMethodDescription) == 0x30, "StsMsgLib::_StsMsgResponseIngameShopPagePurchaseHistory::_PurchaseInfo::pwszPaymentMethodDescription");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopPagePurchaseHistory::_PurchaseInfo, nGoodsId) == 0x38, "StsMsgLib::_StsMsgResponseIngameShopPagePurchaseHistory::_PurchaseInfo::nGoodsId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopPagePurchaseHistory::_PurchaseInfo, nGoodsCategoryId) == 0x3C, "StsMsgLib::_StsMsgResponseIngameShopPagePurchaseHistory::_PurchaseInfo::nGoodsCategoryId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopPagePurchaseHistory::_PurchaseInfo, nGoodsType) == 0x40, "StsMsgLib::_StsMsgResponseIngameShopPagePurchaseHistory::_PurchaseInfo::nGoodsType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopPagePurchaseHistory::_PurchaseInfo, nGoodsServiceCode) == 0x44, "StsMsgLib::_StsMsgResponseIngameShopPagePurchaseHistory::_PurchaseInfo::nGoodsServiceCode");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopPagePurchaseHistory::_PurchaseInfo, dPaymentAmountPerGoods) == 0x48, "StsMsgLib::_StsMsgResponseIngameShopPagePurchaseHistory::_PurchaseInfo::dPaymentAmountPerGoods");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopPagePurchaseHistory::_PurchaseInfo, nPurchaseQuantityPerGoods) == 0x50, "StsMsgLib::_StsMsgResponseIngameShopPagePurchaseHistory::_PurchaseInfo::nPurchaseQuantityPerGoods");
 
 namespace StsMsgLib {
 struct _StsMsgResponseIngameShopPurchase : public StsMsgLib::_StsMsgResponse {
@@ -10067,28 +12273,102 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopWishIsOptoutUser, nIs
 namespace StsMsgLib {
 struct _StsMsgResponseIngameShopWishPageReceivedWishes : public StsMsgLib::_StsMsgResponse {
 public:
+    struct _Wish;
+    struct _Wish {
+    public:
+        long long nWishId;
+        _GUID userId;
+        int nWishRequestStatus;
+        long long tEffectiveFrom;
+        long long tEffectiveTo;
+        long long tRegistered;
+        wchar_t * pwszWishMessage;
+        wchar_t * pwszWishDescription;
+        _GUID receiverUserId;
+        long long nWishGoodsId;
+        int nGoodsId;
+        int nGoodsCategoryId;
+        int nWishGoodsStatus;
+        long long nCompletedPurchaseKey;
+        long long tPurchaseCompleted;
+        wchar_t * pwszGoodsData;
+    };
     int nTotalCount;
     int nWishCount;
-    void * pWishList;
+    StsMsgLib::_StsMsgResponseIngameShopWishPageReceivedWishes::_Wish * pWishList;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgResponseIngameShopWishPageReceivedWishes) == 0x70, "sizeof StsMsgLib::_StsMsgResponseIngameShopWishPageReceivedWishes");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopWishPageReceivedWishes, nTotalCount) == 0x60, "StsMsgLib::_StsMsgResponseIngameShopWishPageReceivedWishes::nTotalCount");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopWishPageReceivedWishes, nWishCount) == 0x64, "StsMsgLib::_StsMsgResponseIngameShopWishPageReceivedWishes::nWishCount");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopWishPageReceivedWishes, pWishList) == 0x68, "StsMsgLib::_StsMsgResponseIngameShopWishPageReceivedWishes::pWishList");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseIngameShopWishPageReceivedWishes::_Wish) == 0x88, "sizeof StsMsgLib::_StsMsgResponseIngameShopWishPageReceivedWishes::_Wish");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopWishPageReceivedWishes::_Wish, nWishId) == 0x0, "StsMsgLib::_StsMsgResponseIngameShopWishPageReceivedWishes::_Wish::nWishId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopWishPageReceivedWishes::_Wish, userId) == 0x8, "StsMsgLib::_StsMsgResponseIngameShopWishPageReceivedWishes::_Wish::userId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopWishPageReceivedWishes::_Wish, nWishRequestStatus) == 0x18, "StsMsgLib::_StsMsgResponseIngameShopWishPageReceivedWishes::_Wish::nWishRequestStatus");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopWishPageReceivedWishes::_Wish, tEffectiveFrom) == 0x20, "StsMsgLib::_StsMsgResponseIngameShopWishPageReceivedWishes::_Wish::tEffectiveFrom");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopWishPageReceivedWishes::_Wish, tEffectiveTo) == 0x28, "StsMsgLib::_StsMsgResponseIngameShopWishPageReceivedWishes::_Wish::tEffectiveTo");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopWishPageReceivedWishes::_Wish, tRegistered) == 0x30, "StsMsgLib::_StsMsgResponseIngameShopWishPageReceivedWishes::_Wish::tRegistered");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopWishPageReceivedWishes::_Wish, pwszWishMessage) == 0x38, "StsMsgLib::_StsMsgResponseIngameShopWishPageReceivedWishes::_Wish::pwszWishMessage");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopWishPageReceivedWishes::_Wish, pwszWishDescription) == 0x40, "StsMsgLib::_StsMsgResponseIngameShopWishPageReceivedWishes::_Wish::pwszWishDescription");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopWishPageReceivedWishes::_Wish, receiverUserId) == 0x48, "StsMsgLib::_StsMsgResponseIngameShopWishPageReceivedWishes::_Wish::receiverUserId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopWishPageReceivedWishes::_Wish, nWishGoodsId) == 0x58, "StsMsgLib::_StsMsgResponseIngameShopWishPageReceivedWishes::_Wish::nWishGoodsId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopWishPageReceivedWishes::_Wish, nGoodsId) == 0x60, "StsMsgLib::_StsMsgResponseIngameShopWishPageReceivedWishes::_Wish::nGoodsId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopWishPageReceivedWishes::_Wish, nGoodsCategoryId) == 0x64, "StsMsgLib::_StsMsgResponseIngameShopWishPageReceivedWishes::_Wish::nGoodsCategoryId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopWishPageReceivedWishes::_Wish, nWishGoodsStatus) == 0x68, "StsMsgLib::_StsMsgResponseIngameShopWishPageReceivedWishes::_Wish::nWishGoodsStatus");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopWishPageReceivedWishes::_Wish, nCompletedPurchaseKey) == 0x70, "StsMsgLib::_StsMsgResponseIngameShopWishPageReceivedWishes::_Wish::nCompletedPurchaseKey");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopWishPageReceivedWishes::_Wish, tPurchaseCompleted) == 0x78, "StsMsgLib::_StsMsgResponseIngameShopWishPageReceivedWishes::_Wish::tPurchaseCompleted");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopWishPageReceivedWishes::_Wish, pwszGoodsData) == 0x80, "StsMsgLib::_StsMsgResponseIngameShopWishPageReceivedWishes::_Wish::pwszGoodsData");
 
 namespace StsMsgLib {
 struct _StsMsgResponseIngameShopWishPageWishes : public StsMsgLib::_StsMsgResponse {
 public:
+    struct _Wish;
+    struct _Wish {
+    public:
+        long long nWishId;
+        _GUID userId;
+        int nWishRequestStatus;
+        long long tEffectiveFrom;
+        long long tEffectiveTo;
+        long long tRegistered;
+        wchar_t * pwszWishMessage;
+        wchar_t * pwszWishDescription;
+        _GUID receiverUserId;
+        long long nWishGoodsId;
+        int nGoodsId;
+        int nGoodsCategoryId;
+        int nWishGoodsStatus;
+        long long nCompletedPurchaseKey;
+        long long tPurchaseCompleted;
+        wchar_t * pwszGoodsData;
+    };
     int nTotalCount;
     int nWishCount;
-    void * pWishList;
+    StsMsgLib::_StsMsgResponseIngameShopWishPageWishes::_Wish * pWishList;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgResponseIngameShopWishPageWishes) == 0x70, "sizeof StsMsgLib::_StsMsgResponseIngameShopWishPageWishes");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopWishPageWishes, nTotalCount) == 0x60, "StsMsgLib::_StsMsgResponseIngameShopWishPageWishes::nTotalCount");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopWishPageWishes, nWishCount) == 0x64, "StsMsgLib::_StsMsgResponseIngameShopWishPageWishes::nWishCount");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopWishPageWishes, pWishList) == 0x68, "StsMsgLib::_StsMsgResponseIngameShopWishPageWishes::pWishList");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseIngameShopWishPageWishes::_Wish) == 0x88, "sizeof StsMsgLib::_StsMsgResponseIngameShopWishPageWishes::_Wish");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopWishPageWishes::_Wish, nWishId) == 0x0, "StsMsgLib::_StsMsgResponseIngameShopWishPageWishes::_Wish::nWishId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopWishPageWishes::_Wish, userId) == 0x8, "StsMsgLib::_StsMsgResponseIngameShopWishPageWishes::_Wish::userId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopWishPageWishes::_Wish, nWishRequestStatus) == 0x18, "StsMsgLib::_StsMsgResponseIngameShopWishPageWishes::_Wish::nWishRequestStatus");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopWishPageWishes::_Wish, tEffectiveFrom) == 0x20, "StsMsgLib::_StsMsgResponseIngameShopWishPageWishes::_Wish::tEffectiveFrom");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopWishPageWishes::_Wish, tEffectiveTo) == 0x28, "StsMsgLib::_StsMsgResponseIngameShopWishPageWishes::_Wish::tEffectiveTo");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopWishPageWishes::_Wish, tRegistered) == 0x30, "StsMsgLib::_StsMsgResponseIngameShopWishPageWishes::_Wish::tRegistered");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopWishPageWishes::_Wish, pwszWishMessage) == 0x38, "StsMsgLib::_StsMsgResponseIngameShopWishPageWishes::_Wish::pwszWishMessage");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopWishPageWishes::_Wish, pwszWishDescription) == 0x40, "StsMsgLib::_StsMsgResponseIngameShopWishPageWishes::_Wish::pwszWishDescription");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopWishPageWishes::_Wish, receiverUserId) == 0x48, "StsMsgLib::_StsMsgResponseIngameShopWishPageWishes::_Wish::receiverUserId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopWishPageWishes::_Wish, nWishGoodsId) == 0x58, "StsMsgLib::_StsMsgResponseIngameShopWishPageWishes::_Wish::nWishGoodsId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopWishPageWishes::_Wish, nGoodsId) == 0x60, "StsMsgLib::_StsMsgResponseIngameShopWishPageWishes::_Wish::nGoodsId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopWishPageWishes::_Wish, nGoodsCategoryId) == 0x64, "StsMsgLib::_StsMsgResponseIngameShopWishPageWishes::_Wish::nGoodsCategoryId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopWishPageWishes::_Wish, nWishGoodsStatus) == 0x68, "StsMsgLib::_StsMsgResponseIngameShopWishPageWishes::_Wish::nWishGoodsStatus");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopWishPageWishes::_Wish, nCompletedPurchaseKey) == 0x70, "StsMsgLib::_StsMsgResponseIngameShopWishPageWishes::_Wish::nCompletedPurchaseKey");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopWishPageWishes::_Wish, tPurchaseCompleted) == 0x78, "StsMsgLib::_StsMsgResponseIngameShopWishPageWishes::_Wish::tPurchaseCompleted");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseIngameShopWishPageWishes::_Wish, pwszGoodsData) == 0x80, "StsMsgLib::_StsMsgResponseIngameShopWishPageWishes::_Wish::pwszGoodsData");
 
 namespace StsMsgLib {
 struct _StsMsgResponseIngameShopWishReject : public StsMsgLib::_StsMsgResponse {
@@ -10127,7 +12407,12 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseListUserBans, pUserBanList) == 
 namespace StsMsgLib {
 struct _StsMsgResponseLogOutUser : public StsMsgLib::_StsMsgResponse {
 public:
-    int eError;
+    enum EError : int {
+        ERR_SUCCESS = 0x0,
+        ERR_USER_NOT_ONLINE = 0x1,
+        ERR_BAD_SERVER_DATA = 0x2,
+    };
+    StsMsgLib::_StsMsgResponseLogOutUser::EError eError;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgResponseLogOutUser) == 0x68, "sizeof StsMsgLib::_StsMsgResponseLogOutUser");
@@ -10136,7 +12421,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseLogOutUser, eError) == 0x60, "S
 namespace StsMsgLib {
 struct _StsMsgResponseLoginFinish : public StsMsgLib::_StsMsgResponse {
 public:
-    alignas(4) unsigned char guidUserId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID guidUserId;
     unsigned int nRoleCount;
     unsigned int nAuthType;
     unsigned int nStatus;
@@ -10182,7 +12467,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseLoginTokenStart, serverSignatur
 namespace StsMsgLib {
 struct _StsMsgResponseLoginWebStart : public StsMsgLib::_StsMsgResponse {
 public:
-    alignas(4) unsigned char guidPortalAccountId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID guidPortalAccountId;
     char * pszUserName;
     unsigned int nUserCenter;
     unsigned int nAuthType;
@@ -10259,20 +12544,43 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponsePgDrDirectPurchase, pwszDetails
 namespace StsMsgLib {
 struct _StsMsgResponsePgPagePaymentOrder : public StsMsgLib::_StsMsgResponse {
 public:
+    struct _PaymentInfo;
+    struct _PaymentInfo {
+    public:
+        int nPaymentId;
+        double dTotalPaymentAmount;
+        int nPaymentCurrencyGroupId;
+        int nPaymentGoodsId;
+        wchar_t * pwszPaymentGoodsName;
+        int nPaymentGoodsQuantity;
+        double dPaymentGoodsSalePrice;
+        long long tRegistered;
+        int nPaymentGoodsCategoryId;
+    };
     int nTotalCount;
     int nPaymentInfoCount;
-    void * pPaymentInfoList;
+    StsMsgLib::_StsMsgResponsePgPagePaymentOrder::_PaymentInfo * pPaymentInfoList;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgResponsePgPagePaymentOrder) == 0x70, "sizeof StsMsgLib::_StsMsgResponsePgPagePaymentOrder");
 static_assert(offsetof(StsMsgLib::_StsMsgResponsePgPagePaymentOrder, nTotalCount) == 0x60, "StsMsgLib::_StsMsgResponsePgPagePaymentOrder::nTotalCount");
 static_assert(offsetof(StsMsgLib::_StsMsgResponsePgPagePaymentOrder, nPaymentInfoCount) == 0x64, "StsMsgLib::_StsMsgResponsePgPagePaymentOrder::nPaymentInfoCount");
 static_assert(offsetof(StsMsgLib::_StsMsgResponsePgPagePaymentOrder, pPaymentInfoList) == 0x68, "StsMsgLib::_StsMsgResponsePgPagePaymentOrder::pPaymentInfoList");
+static_assert(sizeof(StsMsgLib::_StsMsgResponsePgPagePaymentOrder::_PaymentInfo) == 0x40, "sizeof StsMsgLib::_StsMsgResponsePgPagePaymentOrder::_PaymentInfo");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePgPagePaymentOrder::_PaymentInfo, nPaymentId) == 0x0, "StsMsgLib::_StsMsgResponsePgPagePaymentOrder::_PaymentInfo::nPaymentId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePgPagePaymentOrder::_PaymentInfo, dTotalPaymentAmount) == 0x8, "StsMsgLib::_StsMsgResponsePgPagePaymentOrder::_PaymentInfo::dTotalPaymentAmount");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePgPagePaymentOrder::_PaymentInfo, nPaymentCurrencyGroupId) == 0x10, "StsMsgLib::_StsMsgResponsePgPagePaymentOrder::_PaymentInfo::nPaymentCurrencyGroupId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePgPagePaymentOrder::_PaymentInfo, nPaymentGoodsId) == 0x14, "StsMsgLib::_StsMsgResponsePgPagePaymentOrder::_PaymentInfo::nPaymentGoodsId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePgPagePaymentOrder::_PaymentInfo, pwszPaymentGoodsName) == 0x18, "StsMsgLib::_StsMsgResponsePgPagePaymentOrder::_PaymentInfo::pwszPaymentGoodsName");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePgPagePaymentOrder::_PaymentInfo, nPaymentGoodsQuantity) == 0x20, "StsMsgLib::_StsMsgResponsePgPagePaymentOrder::_PaymentInfo::nPaymentGoodsQuantity");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePgPagePaymentOrder::_PaymentInfo, dPaymentGoodsSalePrice) == 0x28, "StsMsgLib::_StsMsgResponsePgPagePaymentOrder::_PaymentInfo::dPaymentGoodsSalePrice");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePgPagePaymentOrder::_PaymentInfo, tRegistered) == 0x30, "StsMsgLib::_StsMsgResponsePgPagePaymentOrder::_PaymentInfo::tRegistered");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePgPagePaymentOrder::_PaymentInfo, nPaymentGoodsCategoryId) == 0x38, "StsMsgLib::_StsMsgResponsePgPagePaymentOrder::_PaymentInfo::nPaymentGoodsCategoryId");
 
 namespace StsMsgLib {
 struct _StsMsgResponsePresenceGetUserInfo : public StsMsgLib::_StsMsgResponse {
 public:
-    alignas(4) unsigned char userId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID userId;
     unsigned int nUserCenter;
     wchar_t * pwszUserName;
     char * pszStatus;
@@ -10306,10 +12614,15 @@ static_assert(sizeof(StsMsgLib::_StsMsgResponsePresenceKick) == 0x60, "sizeof St
 namespace StsMsgLib {
 struct _StsMsgResponsePresenceLogin : public StsMsgLib::_StsMsgResponse {
 public:
-    alignas(4) unsigned char guidPortalAccountId[0x10];  // ❓ PDB type 0x1056: _GUID
+    struct _PcCafeInfo;
+    struct _PcCafeInfo {
+    public:
+        wchar_t * pwszPcCafeCode;
+    };
+    _GUID guidPortalAccountId;
     unsigned int nDataCenter;
     StsMsgLib::_ExternalAccount * externalAccount;
-    alignas(8) unsigned char pcCafeInfo[0x8];  // ❓ PDB type 0x2EEA: StsMsgLib::_StsMsgResponsePresenceLogin::_PcCafeInfo
+    StsMsgLib::_StsMsgResponsePresenceLogin::_PcCafeInfo pcCafeInfo;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgResponsePresenceLogin) == 0x88, "sizeof StsMsgLib::_StsMsgResponsePresenceLogin");
@@ -10317,11 +12630,13 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponsePresenceLogin, guidPortalAccoun
 static_assert(offsetof(StsMsgLib::_StsMsgResponsePresenceLogin, nDataCenter) == 0x70, "StsMsgLib::_StsMsgResponsePresenceLogin::nDataCenter");
 static_assert(offsetof(StsMsgLib::_StsMsgResponsePresenceLogin, externalAccount) == 0x78, "StsMsgLib::_StsMsgResponsePresenceLogin::externalAccount");
 static_assert(offsetof(StsMsgLib::_StsMsgResponsePresenceLogin, pcCafeInfo) == 0x80, "StsMsgLib::_StsMsgResponsePresenceLogin::pcCafeInfo");
+static_assert(sizeof(StsMsgLib::_StsMsgResponsePresenceLogin::_PcCafeInfo) == 0x8, "sizeof StsMsgLib::_StsMsgResponsePresenceLogin::_PcCafeInfo");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePresenceLogin::_PcCafeInfo, pwszPcCafeCode) == 0x0, "StsMsgLib::_StsMsgResponsePresenceLogin::_PcCafeInfo::pwszPcCafeCode");
 
 namespace StsMsgLib {
 struct _StsMsgResponsePresenceLogout : public StsMsgLib::_StsMsgResponse {
 public:
-    alignas(4) unsigned char guidGameAccount[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID guidGameAccount;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgResponsePresenceLogout) == 0x70, "sizeof StsMsgLib::_StsMsgResponsePresenceLogout");
@@ -10353,7 +12668,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponsePresenceWhisper, szChannelName)
 namespace StsMsgLib {
 struct _StsMsgResponseProfileGetUserProfile : public StsMsgLib::_StsMsgResponse {
 public:
-    alignas(4) unsigned char UserId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID UserId;
     unsigned int uGenderCode;
     long long tLegalBirthday;
     unsigned int uAge;
@@ -10370,7 +12685,7 @@ struct _StsMsgResponsePromotionGoodsByCategoryId : public StsMsgLib::_StsMsgResp
 public:
     int nReqCategoryId;
     unsigned long long nCategoryGoodsRevision;
-    void * pGoodsList;
+    StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoods * pGoodsList;
     unsigned int nGoodsCount;
 };
 }  // namespace StsMsgLib
@@ -10383,7 +12698,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionGoodsByCategoryId, nGo
 namespace StsMsgLib {
 struct _StsMsgResponsePromotionGoodsByGoodsId : public StsMsgLib::_StsMsgResponse {
 public:
-    alignas(8) unsigned char goods[0x70];  // ❓ PDB type 0x3061: StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoods
+    StsMsgLib::_StsMsgResponseIngameShopGetGoodsByCategoryId::_IngameShopGoods goods;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgResponsePromotionGoodsByGoodsId) == 0xD0, "sizeof StsMsgLib::_StsMsgResponsePromotionGoodsByGoodsId");
@@ -10416,6 +12731,15 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionGoodsRevision, nRevisi
 namespace StsMsgLib {
 struct _StsMsgResponsePromotionStampAttendPromotion : public StsMsgLib::_StsMsgResponse {
 public:
+    struct _UserPromotionRewardInfo;
+    struct _UserPromotionRewardInfo {
+    public:
+        long long nUserPromotionRewardId;
+        int nRewardPolicyId;
+        int nPlayedRound;
+        int nDeliveryStatus;
+        long long tRegistered;
+    };
     int nPromotionId;
     int nLastPlayedRound;
     wchar_t * pwszAttendedMask;
@@ -10425,7 +12749,7 @@ public:
     int nRemainedCount;
     int nMaxPlayableCount;
     int nChanceType;
-    void * pUserPromotionRewardList;
+    StsMsgLib::_StsMsgResponsePromotionStampAttendPromotion::_UserPromotionRewardInfo * pUserPromotionRewardList;
     int nUserPromotionRewardListCount;
 };
 }  // namespace StsMsgLib
@@ -10441,10 +12765,25 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampAttendPromotion, 
 static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampAttendPromotion, nChanceType) == 0x88, "StsMsgLib::_StsMsgResponsePromotionStampAttendPromotion::nChanceType");
 static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampAttendPromotion, pUserPromotionRewardList) == 0x90, "StsMsgLib::_StsMsgResponsePromotionStampAttendPromotion::pUserPromotionRewardList");
 static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampAttendPromotion, nUserPromotionRewardListCount) == 0x98, "StsMsgLib::_StsMsgResponsePromotionStampAttendPromotion::nUserPromotionRewardListCount");
+static_assert(sizeof(StsMsgLib::_StsMsgResponsePromotionStampAttendPromotion::_UserPromotionRewardInfo) == 0x20, "sizeof StsMsgLib::_StsMsgResponsePromotionStampAttendPromotion::_UserPromotionRewardInfo");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampAttendPromotion::_UserPromotionRewardInfo, nUserPromotionRewardId) == 0x0, "StsMsgLib::_StsMsgResponsePromotionStampAttendPromotion::_UserPromotionRewardInfo::nUserPromotionRewardId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampAttendPromotion::_UserPromotionRewardInfo, nRewardPolicyId) == 0x8, "StsMsgLib::_StsMsgResponsePromotionStampAttendPromotion::_UserPromotionRewardInfo::nRewardPolicyId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampAttendPromotion::_UserPromotionRewardInfo, nPlayedRound) == 0xC, "StsMsgLib::_StsMsgResponsePromotionStampAttendPromotion::_UserPromotionRewardInfo::nPlayedRound");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampAttendPromotion::_UserPromotionRewardInfo, nDeliveryStatus) == 0x10, "StsMsgLib::_StsMsgResponsePromotionStampAttendPromotion::_UserPromotionRewardInfo::nDeliveryStatus");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampAttendPromotion::_UserPromotionRewardInfo, tRegistered) == 0x18, "StsMsgLib::_StsMsgResponsePromotionStampAttendPromotion::_UserPromotionRewardInfo::tRegistered");
 
 namespace StsMsgLib {
 struct _StsMsgResponsePromotionStampAttendPromotionSecured : public StsMsgLib::_StsMsgResponse {
 public:
+    struct _UserPromotionRewardInfo;
+    struct _UserPromotionRewardInfo {
+    public:
+        long long nUserPromotionRewardId;
+        int nRewardPolicyId;
+        int nPlayedRound;
+        int nDeliveryStatus;
+        long long tRegistered;
+    };
     int nPromotionId;
     int nLastPlayedRound;
     wchar_t * pwszAttendedMask;
@@ -10454,7 +12793,7 @@ public:
     int nRemainedCount;
     int nMaxPlayableCount;
     int nChanceType;
-    void * pUserPromotionRewardList;
+    StsMsgLib::_StsMsgResponsePromotionStampAttendPromotionSecured::_UserPromotionRewardInfo * pUserPromotionRewardList;
     int nUserPromotionRewardListCount;
 };
 }  // namespace StsMsgLib
@@ -10470,10 +12809,57 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampAttendPromotionSe
 static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampAttendPromotionSecured, nChanceType) == 0x88, "StsMsgLib::_StsMsgResponsePromotionStampAttendPromotionSecured::nChanceType");
 static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampAttendPromotionSecured, pUserPromotionRewardList) == 0x90, "StsMsgLib::_StsMsgResponsePromotionStampAttendPromotionSecured::pUserPromotionRewardList");
 static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampAttendPromotionSecured, nUserPromotionRewardListCount) == 0x98, "StsMsgLib::_StsMsgResponsePromotionStampAttendPromotionSecured::nUserPromotionRewardListCount");
+static_assert(sizeof(StsMsgLib::_StsMsgResponsePromotionStampAttendPromotionSecured::_UserPromotionRewardInfo) == 0x20, "sizeof StsMsgLib::_StsMsgResponsePromotionStampAttendPromotionSecured::_UserPromotionRewardInfo");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampAttendPromotionSecured::_UserPromotionRewardInfo, nUserPromotionRewardId) == 0x0, "StsMsgLib::_StsMsgResponsePromotionStampAttendPromotionSecured::_UserPromotionRewardInfo::nUserPromotionRewardId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampAttendPromotionSecured::_UserPromotionRewardInfo, nRewardPolicyId) == 0x8, "StsMsgLib::_StsMsgResponsePromotionStampAttendPromotionSecured::_UserPromotionRewardInfo::nRewardPolicyId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampAttendPromotionSecured::_UserPromotionRewardInfo, nPlayedRound) == 0xC, "StsMsgLib::_StsMsgResponsePromotionStampAttendPromotionSecured::_UserPromotionRewardInfo::nPlayedRound");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampAttendPromotionSecured::_UserPromotionRewardInfo, nDeliveryStatus) == 0x10, "StsMsgLib::_StsMsgResponsePromotionStampAttendPromotionSecured::_UserPromotionRewardInfo::nDeliveryStatus");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampAttendPromotionSecured::_UserPromotionRewardInfo, tRegistered) == 0x18, "StsMsgLib::_StsMsgResponsePromotionStampAttendPromotionSecured::_UserPromotionRewardInfo::tRegistered");
 
 namespace StsMsgLib {
 struct _StsMsgResponsePromotionStampGetPromotionPolicy : public StsMsgLib::_StsMsgResponse {
 public:
+    struct _ExtraPlayableCountData;
+    struct _ExtraRewardData;
+    struct _GainablePermission;
+    struct _RewardPolicyInfo;
+    struct _ExtraPlayableCountData {
+    public:
+        int nDataType;
+        int nId;
+        int nId2;
+        int nPlayableCount;
+    };
+    struct _GainablePermission {
+    public:
+        bool bGrade;
+        int nGradeId;
+        wchar_t * GameGradeKey;
+        bool bChance;
+        int nChanceType;
+        bool bUserAttend;
+        int nUserAttendType;
+    };
+    struct _ExtraRewardData {
+    public:
+        StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_GainablePermission * pGainablePermission;
+    };
+    struct _RewardPolicyInfo {
+    public:
+        int nRewardPolicyId;
+        int nRewardTargetKeyType;
+        int nRewardTargetKey;
+        int nRewardQuantity;
+        int nRewardAtType;
+        int nBoardConditionType;
+        int nBoardConditionValue;
+        long long tBoardConditionDate;
+        int nRewardableCountPerRewardReceiver;
+        wchar_t * pwszRewardEffectData;
+        long long tEffectiveFrom;
+        long long tEffectiveTo;
+        StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_ExtraRewardData * pExtraRewardData;
+    };
     int nPromotionId;
     wchar_t * pwszPromotionName;
     wchar_t * pwszPromotionDescription;
@@ -10482,7 +12868,7 @@ public:
     int nBoardSpotCount;
     int nUserAttendType;
     int nPlaybleCount;
-    void * pExtraPlayableCountDataList;
+    StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_ExtraPlayableCountData * pExtraPlayableCountDataList;
     int nExtraPlayableCountDataListCount;
     int nReplayDurationUnitType;
     int nReplayDuration;
@@ -10494,7 +12880,7 @@ public:
     int nGainedPointMin;
     int nGainedPointMax;
     int nIsCheckingChargeTime;
-    void * pRewardPolicyList;
+    StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_RewardPolicyInfo * pRewardPolicyList;
     int nRewardPolicyListCount;
     int * pChanceSpotList;
     int nChanceSpotListCount;
@@ -10535,23 +12921,73 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolic
 static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy, pChanceGradeList) == 0x108, "StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::pChanceGradeList");
 static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy, pChanceGradeKeyList) == 0x110, "StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::pChanceGradeKeyList");
 static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy, nChanceGradeListCount) == 0x118, "StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::nChanceGradeListCount");
+static_assert(sizeof(StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_ExtraPlayableCountData) == 0x10, "sizeof StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_ExtraPlayableCountData");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_ExtraPlayableCountData, nDataType) == 0x0, "StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_ExtraPlayableCountData::nDataType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_ExtraPlayableCountData, nId) == 0x4, "StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_ExtraPlayableCountData::nId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_ExtraPlayableCountData, nId2) == 0x8, "StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_ExtraPlayableCountData::nId2");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_ExtraPlayableCountData, nPlayableCount) == 0xC, "StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_ExtraPlayableCountData::nPlayableCount");
+static_assert(sizeof(StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_GainablePermission) == 0x20, "sizeof StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_GainablePermission");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_GainablePermission, bGrade) == 0x0, "StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_GainablePermission::bGrade");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_GainablePermission, nGradeId) == 0x4, "StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_GainablePermission::nGradeId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_GainablePermission, GameGradeKey) == 0x8, "StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_GainablePermission::GameGradeKey");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_GainablePermission, bChance) == 0x10, "StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_GainablePermission::bChance");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_GainablePermission, nChanceType) == 0x14, "StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_GainablePermission::nChanceType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_GainablePermission, bUserAttend) == 0x18, "StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_GainablePermission::bUserAttend");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_GainablePermission, nUserAttendType) == 0x1C, "StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_GainablePermission::nUserAttendType");
+static_assert(sizeof(StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_ExtraRewardData) == 0x8, "sizeof StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_ExtraRewardData");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_ExtraRewardData, pGainablePermission) == 0x0, "StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_ExtraRewardData::pGainablePermission");
+static_assert(sizeof(StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_RewardPolicyInfo) == 0x50, "sizeof StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_RewardPolicyInfo");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_RewardPolicyInfo, nRewardPolicyId) == 0x0, "StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_RewardPolicyInfo::nRewardPolicyId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_RewardPolicyInfo, nRewardTargetKeyType) == 0x4, "StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_RewardPolicyInfo::nRewardTargetKeyType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_RewardPolicyInfo, nRewardTargetKey) == 0x8, "StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_RewardPolicyInfo::nRewardTargetKey");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_RewardPolicyInfo, nRewardQuantity) == 0xC, "StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_RewardPolicyInfo::nRewardQuantity");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_RewardPolicyInfo, nRewardAtType) == 0x10, "StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_RewardPolicyInfo::nRewardAtType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_RewardPolicyInfo, nBoardConditionType) == 0x14, "StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_RewardPolicyInfo::nBoardConditionType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_RewardPolicyInfo, nBoardConditionValue) == 0x18, "StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_RewardPolicyInfo::nBoardConditionValue");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_RewardPolicyInfo, tBoardConditionDate) == 0x20, "StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_RewardPolicyInfo::tBoardConditionDate");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_RewardPolicyInfo, nRewardableCountPerRewardReceiver) == 0x28, "StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_RewardPolicyInfo::nRewardableCountPerRewardReceiver");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_RewardPolicyInfo, pwszRewardEffectData) == 0x30, "StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_RewardPolicyInfo::pwszRewardEffectData");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_RewardPolicyInfo, tEffectiveFrom) == 0x38, "StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_RewardPolicyInfo::tEffectiveFrom");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_RewardPolicyInfo, tEffectiveTo) == 0x40, "StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_RewardPolicyInfo::tEffectiveTo");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_RewardPolicyInfo, pExtraRewardData) == 0x48, "StsMsgLib::_StsMsgResponsePromotionStampGetPromotionPolicy::_RewardPolicyInfo::pExtraRewardData");
 
 namespace StsMsgLib {
 struct _StsMsgResponsePromotionStampListCurrentPromotions : public StsMsgLib::_StsMsgResponse {
 public:
+    struct _PromotionInfo;
+    struct _PromotionInfo {
+    public:
+        int nPromotionId;
+        int nBoardType;
+        wchar_t * pwszBoardTemplateKey;
+        int nUserAttendType;
+    };
     int nPromotionListCount;
-    void * pPromotionList;
+    StsMsgLib::_StsMsgResponsePromotionStampListCurrentPromotions::_PromotionInfo * pPromotionList;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgResponsePromotionStampListCurrentPromotions) == 0x70, "sizeof StsMsgLib::_StsMsgResponsePromotionStampListCurrentPromotions");
 static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampListCurrentPromotions, nPromotionListCount) == 0x60, "StsMsgLib::_StsMsgResponsePromotionStampListCurrentPromotions::nPromotionListCount");
 static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampListCurrentPromotions, pPromotionList) == 0x68, "StsMsgLib::_StsMsgResponsePromotionStampListCurrentPromotions::pPromotionList");
+static_assert(sizeof(StsMsgLib::_StsMsgResponsePromotionStampListCurrentPromotions::_PromotionInfo) == 0x18, "sizeof StsMsgLib::_StsMsgResponsePromotionStampListCurrentPromotions::_PromotionInfo");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampListCurrentPromotions::_PromotionInfo, nPromotionId) == 0x0, "StsMsgLib::_StsMsgResponsePromotionStampListCurrentPromotions::_PromotionInfo::nPromotionId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampListCurrentPromotions::_PromotionInfo, nBoardType) == 0x4, "StsMsgLib::_StsMsgResponsePromotionStampListCurrentPromotions::_PromotionInfo::nBoardType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampListCurrentPromotions::_PromotionInfo, pwszBoardTemplateKey) == 0x8, "StsMsgLib::_StsMsgResponsePromotionStampListCurrentPromotions::_PromotionInfo::pwszBoardTemplateKey");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampListCurrentPromotions::_PromotionInfo, nUserAttendType) == 0x10, "StsMsgLib::_StsMsgResponsePromotionStampListCurrentPromotions::_PromotionInfo::nUserAttendType");
 
 namespace StsMsgLib {
 struct _StsMsgResponsePromotionStampListInvalidRewardDeliveries : public StsMsgLib::_StsMsgResponse {
 public:
+    struct _InvalidRewardDelivery;
+    struct _InvalidRewardDelivery {
+    public:
+        long long nUserPromotionRewardId;
+        int nRewardPolicyId;
+        int nPlayedRound;
+        int nDeliveryStatus;
+    };
     int nPromotionId;
-    void * pInvalidRewardDeliveryList;
+    StsMsgLib::_StsMsgResponsePromotionStampListInvalidRewardDeliveries::_InvalidRewardDelivery * pInvalidRewardDeliveryList;
     int nInvalidRewardDeliveryCount;
 };
 }  // namespace StsMsgLib
@@ -10559,6 +12995,11 @@ static_assert(sizeof(StsMsgLib::_StsMsgResponsePromotionStampListInvalidRewardDe
 static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampListInvalidRewardDeliveries, nPromotionId) == 0x60, "StsMsgLib::_StsMsgResponsePromotionStampListInvalidRewardDeliveries::nPromotionId");
 static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampListInvalidRewardDeliveries, pInvalidRewardDeliveryList) == 0x68, "StsMsgLib::_StsMsgResponsePromotionStampListInvalidRewardDeliveries::pInvalidRewardDeliveryList");
 static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampListInvalidRewardDeliveries, nInvalidRewardDeliveryCount) == 0x70, "StsMsgLib::_StsMsgResponsePromotionStampListInvalidRewardDeliveries::nInvalidRewardDeliveryCount");
+static_assert(sizeof(StsMsgLib::_StsMsgResponsePromotionStampListInvalidRewardDeliveries::_InvalidRewardDelivery) == 0x18, "sizeof StsMsgLib::_StsMsgResponsePromotionStampListInvalidRewardDeliveries::_InvalidRewardDelivery");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampListInvalidRewardDeliveries::_InvalidRewardDelivery, nUserPromotionRewardId) == 0x0, "StsMsgLib::_StsMsgResponsePromotionStampListInvalidRewardDeliveries::_InvalidRewardDelivery::nUserPromotionRewardId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampListInvalidRewardDeliveries::_InvalidRewardDelivery, nRewardPolicyId) == 0x8, "StsMsgLib::_StsMsgResponsePromotionStampListInvalidRewardDeliveries::_InvalidRewardDelivery::nRewardPolicyId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampListInvalidRewardDeliveries::_InvalidRewardDelivery, nPlayedRound) == 0xC, "StsMsgLib::_StsMsgResponsePromotionStampListInvalidRewardDeliveries::_InvalidRewardDelivery::nPlayedRound");
+static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampListInvalidRewardDeliveries::_InvalidRewardDelivery, nDeliveryStatus) == 0x10, "StsMsgLib::_StsMsgResponsePromotionStampListInvalidRewardDeliveries::_InvalidRewardDelivery::nDeliveryStatus");
 
 namespace StsMsgLib {
 struct _StsMsgResponsePromotionStampRequestRewardDelivery : public StsMsgLib::_StsMsgResponse {
@@ -10574,6 +13015,13 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponsePromotionStampRequestRewardDeli
 namespace StsMsgLib {
 struct _StsMsgResponsePurchaseGetPurchase : public StsMsgLib::_StsMsgResponse {
 public:
+    enum PurchaseStatus : int {
+        PURCHASESTATUS_INVALID = 0x0,
+        PURCHASESTATUS_TRY_PURCHASE = 0x1,
+        PURCHASESTATUS_IN_PURCHASE = 0x2,
+        PURCHASESTATUS_FAIL = 0x3,
+        PURCHASESTATUS_SUCCESS = 0x4,
+    };
     long long nPurchaseId;
     short nPurchaseStatus;
 };
@@ -10585,6 +13033,13 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponsePurchaseGetPurchase, nPurchaseS
 namespace StsMsgLib {
 struct _StsMsgResponsePurchasePurchase : public StsMsgLib::_StsMsgResponse {
 public:
+    enum PurchaseStatus : int {
+        PURCHASESTATUS_INVALID = 0x0,
+        PURCHASESTATUS_TRY_PURCHASE = 0x1,
+        PURCHASESTATUS_IN_PURCHASE = 0x2,
+        PURCHASESTATUS_FAIL = 0x3,
+        PURCHASESTATUS_SUCCESS = 0x4,
+    };
     long long nPurchaseId;
     short nPurchaseStatus;
 };
@@ -10635,7 +13090,7 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseReportAddReport, nReportId) == 
 namespace StsMsgLib {
 struct _StsMsgResponseRequestGameToken : public StsMsgLib::_StsMsgResponse {
 public:
-    alignas(4) unsigned char guidGameToken[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID guidGameToken;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgResponseRequestGameToken) == 0x70, "sizeof StsMsgLib::_StsMsgResponseRequestGameToken");
@@ -10722,7 +13177,11 @@ static_assert(sizeof(StsMsgLib::_StsMsgResponseSecondPasswordEnableMyActionMask)
 namespace StsMsgLib {
 struct _StsMsgResponseSecondPasswordGetStatus : public StsMsgLib::_StsMsgResponse {
 public:
-    int eBlockStatus;
+    enum EBlockStatus : int {
+        EBLOCKSTATUS_NOT_BLOCKED = 0x0,
+        EBLOCKSTATUS_BLOCKED = 0x1,
+    };
+    StsMsgLib::_StsMsgResponseSecondPasswordGetStatus::EBlockStatus eBlockStatus;
     unsigned int nAuthFailLimitCount;
     unsigned int nAuthFailCount;
     long long tBlockedUntil;
@@ -10762,7 +13221,7 @@ static_assert(sizeof(StsMsgLib::_StsMsgResponseSetUserData) == 0x60, "sizeof Sts
 namespace StsMsgLib {
 struct _StsMsgResponseSetWatch : public StsMsgLib::_StsMsgResponse {
 public:
-    alignas(4) unsigned char guidPortalAccountId[0x10];  // ❓ PDB type 0x1056: _GUID
+    _GUID guidPortalAccountId;
     unsigned int nUserCenter;
     wchar_t * pwszUserName;
     wchar_t * pwszAppData;
@@ -10801,7 +13260,7 @@ public:
     int categoryId;
     unsigned long long revision;
     long long effectiveTo;
-    void * goodsList;
+    StsMsgLib::_StsMsgResponseGoodsGetGameGoodsByCategoryId::_Goods * goodsList;
     unsigned int goodsCount;
 };
 }  // namespace StsMsgLib
@@ -10815,10 +13274,16 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseShowcaseListCurrentGoodsByCateg
 namespace StsMsgLib {
 struct _StsMsgResponseShowcaseListGoodsSalePrice : public StsMsgLib::_StsMsgResponse {
 public:
+    struct _PriceInfo;
+    struct _PriceInfo {
+    public:
+        int quantity;
+        double price;
+    };
     int goodsId;
     int maxQuantity;
     double priceOverMaxQuantity;
-    void * priceList;
+    StsMsgLib::_StsMsgResponseShowcaseListGoodsSalePrice::_PriceInfo * priceList;
     unsigned int priceCount;
 };
 }  // namespace StsMsgLib
@@ -10828,11 +13293,14 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseShowcaseListGoodsSalePrice, max
 static_assert(offsetof(StsMsgLib::_StsMsgResponseShowcaseListGoodsSalePrice, priceOverMaxQuantity) == 0x68, "StsMsgLib::_StsMsgResponseShowcaseListGoodsSalePrice::priceOverMaxQuantity");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseShowcaseListGoodsSalePrice, priceList) == 0x70, "StsMsgLib::_StsMsgResponseShowcaseListGoodsSalePrice::priceList");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseShowcaseListGoodsSalePrice, priceCount) == 0x78, "StsMsgLib::_StsMsgResponseShowcaseListGoodsSalePrice::priceCount");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseShowcaseListGoodsSalePrice::_PriceInfo) == 0x10, "sizeof StsMsgLib::_StsMsgResponseShowcaseListGoodsSalePrice::_PriceInfo");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseShowcaseListGoodsSalePrice::_PriceInfo, quantity) == 0x0, "StsMsgLib::_StsMsgResponseShowcaseListGoodsSalePrice::_PriceInfo::quantity");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseShowcaseListGoodsSalePrice::_PriceInfo, price) == 0x8, "StsMsgLib::_StsMsgResponseShowcaseListGoodsSalePrice::_PriceInfo::price");
 
 namespace StsMsgLib {
 struct _StsMsgResponseSlotCreateSlots : public StsMsgLib::_StsMsgResponse {
 public:
-    void * pSlotId;
+    _GUID * pSlotId;
     unsigned int nCount;
 };
 }  // namespace StsMsgLib
@@ -10850,10 +13318,15 @@ static_assert(sizeof(StsMsgLib::_StsMsgResponseSlotDeleteSlot) == 0x60, "sizeof 
 namespace StsMsgLib {
 struct _StsMsgResponseSlotGetSlot : public StsMsgLib::_StsMsgResponse {
 public:
-    alignas(4) unsigned char guidSlotId[0x10];  // ❓ PDB type 0x1056: _GUID
+    struct _SlotData;
+    struct _SlotData {
+    public:
+        long long serviceId;
+    };
+    _GUID guidSlotId;
     wchar_t * pwszSlotType;
     bool bSystemSlot;
-    alignas(8) unsigned char slotData[0x8];  // ❓ PDB type 0x3CF0: StsMsgLib::_StsMsgResponseSlotGetSlot::_SlotData
+    StsMsgLib::_StsMsgResponseSlotGetSlot::_SlotData slotData;
     wchar_t * pwszSlotData;
     long long tChanged;
     long long tRegistered;
@@ -10867,17 +13340,47 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseSlotGetSlot, slotData) == 0x80,
 static_assert(offsetof(StsMsgLib::_StsMsgResponseSlotGetSlot, pwszSlotData) == 0x88, "StsMsgLib::_StsMsgResponseSlotGetSlot::pwszSlotData");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseSlotGetSlot, tChanged) == 0x90, "StsMsgLib::_StsMsgResponseSlotGetSlot::tChanged");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseSlotGetSlot, tRegistered) == 0x98, "StsMsgLib::_StsMsgResponseSlotGetSlot::tRegistered");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseSlotGetSlot::_SlotData) == 0x8, "sizeof StsMsgLib::_StsMsgResponseSlotGetSlot::_SlotData");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseSlotGetSlot::_SlotData, serviceId) == 0x0, "StsMsgLib::_StsMsgResponseSlotGetSlot::_SlotData::serviceId");
 
 namespace StsMsgLib {
 struct _StsMsgResponseSlotListSlots : public StsMsgLib::_StsMsgResponse {
 public:
+    struct _Slot;
+    struct _SlotData;
+    struct _SlotData {
+    public:
+        long long serviceId;
+        char * customizeData;
+    };
+    struct _Slot {
+    public:
+        _GUID guidSlotId;
+        wchar_t * pwszSlotType;
+        bool bSystemSlot;
+        StsMsgLib::_StsMsgResponseSlotListSlots::_SlotData slotData;
+        wchar_t * pwszSlotData;
+        long long tChanged;
+        long long tRegistered;
+    };
     unsigned int nCount;
-    void * pSlot;
+    StsMsgLib::_StsMsgResponseSlotListSlots::_Slot * pSlot;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgResponseSlotListSlots) == 0x70, "sizeof StsMsgLib::_StsMsgResponseSlotListSlots");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseSlotListSlots, nCount) == 0x60, "StsMsgLib::_StsMsgResponseSlotListSlots::nCount");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseSlotListSlots, pSlot) == 0x68, "StsMsgLib::_StsMsgResponseSlotListSlots::pSlot");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseSlotListSlots::_SlotData) == 0x10, "sizeof StsMsgLib::_StsMsgResponseSlotListSlots::_SlotData");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseSlotListSlots::_SlotData, serviceId) == 0x0, "StsMsgLib::_StsMsgResponseSlotListSlots::_SlotData::serviceId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseSlotListSlots::_SlotData, customizeData) == 0x8, "StsMsgLib::_StsMsgResponseSlotListSlots::_SlotData::customizeData");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseSlotListSlots::_Slot) == 0x48, "sizeof StsMsgLib::_StsMsgResponseSlotListSlots::_Slot");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseSlotListSlots::_Slot, guidSlotId) == 0x0, "StsMsgLib::_StsMsgResponseSlotListSlots::_Slot::guidSlotId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseSlotListSlots::_Slot, pwszSlotType) == 0x10, "StsMsgLib::_StsMsgResponseSlotListSlots::_Slot::pwszSlotType");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseSlotListSlots::_Slot, bSystemSlot) == 0x18, "StsMsgLib::_StsMsgResponseSlotListSlots::_Slot::bSystemSlot");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseSlotListSlots::_Slot, slotData) == 0x20, "StsMsgLib::_StsMsgResponseSlotListSlots::_Slot::slotData");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseSlotListSlots::_Slot, pwszSlotData) == 0x30, "StsMsgLib::_StsMsgResponseSlotListSlots::_Slot::pwszSlotData");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseSlotListSlots::_Slot, tChanged) == 0x38, "StsMsgLib::_StsMsgResponseSlotListSlots::_Slot::tChanged");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseSlotListSlots::_Slot, tRegistered) == 0x40, "StsMsgLib::_StsMsgResponseSlotListSlots::_Slot::tRegistered");
 
 namespace StsMsgLib {
 struct _StsMsgResponseSlotResetData : public StsMsgLib::_StsMsgResponse {
@@ -10924,6 +13427,15 @@ static_assert(sizeof(StsMsgLib::_StsMsgResponseUpdateWorldProperty) == 0x60, "si
 namespace StsMsgLib {
 struct _StsMsgResponseUserPromotionStatus : public StsMsgLib::_StsMsgResponse {
 public:
+    struct _UserPromotionRewardInfo;
+    struct _UserPromotionRewardInfo {
+    public:
+        long long nUserPromotionRewardId;
+        int nRewardPolicyId;
+        int nPlayedRound;
+        int nDeliveryStatus;
+        long long tRegistered;
+    };
     int nPromotionId;
     int nLastPlayedRound;
     wchar_t * pwszAttendedMask;
@@ -10931,7 +13443,7 @@ public:
     int nAccumulatedPoint;
     int nRemainedCount;
     int nMaxPlayableCount;
-    void * pUserPromotionRewardList;
+    StsMsgLib::_StsMsgResponseUserPromotionStatus::_UserPromotionRewardInfo * pUserPromotionRewardList;
     int nUserPromotionRewardListCount;
 };
 }  // namespace StsMsgLib
@@ -10945,6 +13457,12 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseUserPromotionStatus, nRemainedC
 static_assert(offsetof(StsMsgLib::_StsMsgResponseUserPromotionStatus, nMaxPlayableCount) == 0x80, "StsMsgLib::_StsMsgResponseUserPromotionStatus::nMaxPlayableCount");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseUserPromotionStatus, pUserPromotionRewardList) == 0x88, "StsMsgLib::_StsMsgResponseUserPromotionStatus::pUserPromotionRewardList");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseUserPromotionStatus, nUserPromotionRewardListCount) == 0x90, "StsMsgLib::_StsMsgResponseUserPromotionStatus::nUserPromotionRewardListCount");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseUserPromotionStatus::_UserPromotionRewardInfo) == 0x20, "sizeof StsMsgLib::_StsMsgResponseUserPromotionStatus::_UserPromotionRewardInfo");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseUserPromotionStatus::_UserPromotionRewardInfo, nUserPromotionRewardId) == 0x0, "StsMsgLib::_StsMsgResponseUserPromotionStatus::_UserPromotionRewardInfo::nUserPromotionRewardId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseUserPromotionStatus::_UserPromotionRewardInfo, nRewardPolicyId) == 0x8, "StsMsgLib::_StsMsgResponseUserPromotionStatus::_UserPromotionRewardInfo::nRewardPolicyId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseUserPromotionStatus::_UserPromotionRewardInfo, nPlayedRound) == 0xC, "StsMsgLib::_StsMsgResponseUserPromotionStatus::_UserPromotionRewardInfo::nPlayedRound");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseUserPromotionStatus::_UserPromotionRewardInfo, nDeliveryStatus) == 0x10, "StsMsgLib::_StsMsgResponseUserPromotionStatus::_UserPromotionRewardInfo::nDeliveryStatus");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseUserPromotionStatus::_UserPromotionRewardInfo, tRegistered) == 0x18, "StsMsgLib::_StsMsgResponseUserPromotionStatus::_UserPromotionRewardInfo::tRegistered");
 
 namespace StsMsgLib {
 struct _StsMsgResponseVerifyMobiOtp : public StsMsgLib::_StsMsgResponse {
@@ -10974,13 +13492,26 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseVirtualCurrencyDeposit, nBalanc
 namespace StsMsgLib {
 struct _StsMsgResponseVirtualCurrencyGetBalance : public StsMsgLib::_StsMsgResponse {
 public:
+    struct _BalanceInfo;
+    struct _BalanceInfo {
+    public:
+        int nCurrencyGroupId;
+        int nCurrencyId;
+        long long nBalance;
+        long long tExpired;
+    };
     int nBalanceInfoListCount;
-    void * pBalanceInfoList;
+    StsMsgLib::_StsMsgResponseVirtualCurrencyGetBalance::_BalanceInfo * pBalanceInfoList;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgResponseVirtualCurrencyGetBalance) == 0x70, "sizeof StsMsgLib::_StsMsgResponseVirtualCurrencyGetBalance");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseVirtualCurrencyGetBalance, nBalanceInfoListCount) == 0x60, "StsMsgLib::_StsMsgResponseVirtualCurrencyGetBalance::nBalanceInfoListCount");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseVirtualCurrencyGetBalance, pBalanceInfoList) == 0x68, "StsMsgLib::_StsMsgResponseVirtualCurrencyGetBalance::pBalanceInfoList");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseVirtualCurrencyGetBalance::_BalanceInfo) == 0x18, "sizeof StsMsgLib::_StsMsgResponseVirtualCurrencyGetBalance::_BalanceInfo");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseVirtualCurrencyGetBalance::_BalanceInfo, nCurrencyGroupId) == 0x0, "StsMsgLib::_StsMsgResponseVirtualCurrencyGetBalance::_BalanceInfo::nCurrencyGroupId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseVirtualCurrencyGetBalance::_BalanceInfo, nCurrencyId) == 0x4, "StsMsgLib::_StsMsgResponseVirtualCurrencyGetBalance::_BalanceInfo::nCurrencyId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseVirtualCurrencyGetBalance::_BalanceInfo, nBalance) == 0x8, "StsMsgLib::_StsMsgResponseVirtualCurrencyGetBalance::_BalanceInfo::nBalance");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseVirtualCurrencyGetBalance::_BalanceInfo, tExpired) == 0x10, "StsMsgLib::_StsMsgResponseVirtualCurrencyGetBalance::_BalanceInfo::tExpired");
 
 namespace StsMsgLib {
 struct _StsMsgResponseWarehouseGetGoodsCount : public StsMsgLib::_StsMsgResponse {
@@ -10994,7 +13525,10 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseGetGoodsCount, nGoodsC
 namespace StsMsgLib {
 struct _StsMsgResponseWarehouseGoodsInfoChanged : public StsMsgLib::_StsMsgResponse {
 public:
-    int eError;
+    enum EError : int {
+        ERR_SUCCESS = 0x0,
+    };
+    StsMsgLib::_StsMsgResponseWarehouseGoodsInfoChanged::EError eError;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgResponseWarehouseGoodsInfoChanged) == 0x68, "sizeof StsMsgLib::_StsMsgResponseWarehouseGoodsInfoChanged");
@@ -11003,54 +13537,72 @@ static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseGoodsInfoChanged, eErr
 namespace StsMsgLib {
 struct _StsMsgResponseWarehouseGoodsInventoryChanged : public StsMsgLib::_StsMsgResponse {
 public:
-    int eError;
+    enum EError : int {
+        ERR_SUCCESS = 0x0,
+    };
+    StsMsgLib::_StsMsgResponseWarehouseGoodsInventoryChanged::EError eError;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgResponseWarehouseGoodsInventoryChanged) == 0x68, "sizeof StsMsgLib::_StsMsgResponseWarehouseGoodsInventoryChanged");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseGoodsInventoryChanged, eError) == 0x60, "StsMsgLib::_StsMsgResponseWarehouseGoodsInventoryChanged::eError");
 
 namespace StsMsgLib {
-struct _StsMsgResponseWarehouseList : public StsMsgLib::_StsMsgResponse {
-public:
-    int nPageIndex;
-    int nTotalPageCount;
-    int nTotalGoodsCount;
-    int nGoodsCount;
-    int nIsLastPage;
-    unsigned int nGoodsListCount;
-    void * pGoodsList;
-};
-}  // namespace StsMsgLib
-static_assert(sizeof(StsMsgLib::_StsMsgResponseWarehouseList) == 0x80, "sizeof StsMsgLib::_StsMsgResponseWarehouseList");
-static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseList, nPageIndex) == 0x60, "StsMsgLib::_StsMsgResponseWarehouseList::nPageIndex");
-static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseList, nTotalPageCount) == 0x64, "StsMsgLib::_StsMsgResponseWarehouseList::nTotalPageCount");
-static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseList, nTotalGoodsCount) == 0x68, "StsMsgLib::_StsMsgResponseWarehouseList::nTotalGoodsCount");
-static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseList, nGoodsCount) == 0x6C, "StsMsgLib::_StsMsgResponseWarehouseList::nGoodsCount");
-static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseList, nIsLastPage) == 0x70, "StsMsgLib::_StsMsgResponseWarehouseList::nIsLastPage");
-static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseList, nGoodsListCount) == 0x74, "StsMsgLib::_StsMsgResponseWarehouseList::nGoodsListCount");
-static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseList, pGoodsList) == 0x78, "StsMsgLib::_StsMsgResponseWarehouseList::pGoodsList");
-
-namespace StsMsgLib {
 struct _StsMsgResponseWarehouseTake : public StsMsgLib::_StsMsgResponse {
 public:
+    struct _TakeResult;
+    struct _TakeResult {
+    public:
+        long long nWarehouseId;
+        int nResultCode;
+        int nGameServerId;
+        long long nCharacterId;
+        wchar_t * pwszCharacterName;
+    };
     unsigned int nResultListCount;
-    void * pResultList;
+    StsMsgLib::_StsMsgResponseWarehouseTake::_TakeResult * pResultList;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgResponseWarehouseTake) == 0x70, "sizeof StsMsgLib::_StsMsgResponseWarehouseTake");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseTake, nResultListCount) == 0x60, "StsMsgLib::_StsMsgResponseWarehouseTake::nResultListCount");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseTake, pResultList) == 0x68, "StsMsgLib::_StsMsgResponseWarehouseTake::pResultList");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseWarehouseTake::_TakeResult) == 0x20, "sizeof StsMsgLib::_StsMsgResponseWarehouseTake::_TakeResult");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseTake::_TakeResult, nWarehouseId) == 0x0, "StsMsgLib::_StsMsgResponseWarehouseTake::_TakeResult::nWarehouseId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseTake::_TakeResult, nResultCode) == 0x8, "StsMsgLib::_StsMsgResponseWarehouseTake::_TakeResult::nResultCode");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseTake::_TakeResult, nGameServerId) == 0xC, "StsMsgLib::_StsMsgResponseWarehouseTake::_TakeResult::nGameServerId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseTake::_TakeResult, nCharacterId) == 0x10, "StsMsgLib::_StsMsgResponseWarehouseTake::_TakeResult::nCharacterId");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWarehouseTake::_TakeResult, pwszCharacterName) == 0x18, "StsMsgLib::_StsMsgResponseWarehouseTake::_TakeResult::pwszCharacterName");
 
 namespace StsMsgLib {
 struct _StsMsgResponseWorldListWorlds : public StsMsgLib::_StsMsgResponse {
 public:
-    void * pWorld;
+    struct _World;
+    struct _World {
+    public:
+        char * pszWorldCode;
+        char * pszPublicNetAddress;
+        wchar_t * pwszWorldName;
+        char * pszEnableCharacterCreate;
+        char * pszWorldScore;
+        char * pszPlayingUsers;
+        char * pszWaitingUsers;
+        char * pszMaxUsers;
+    };
+    StsMsgLib::_StsMsgResponseWorldListWorlds::_World * pWorld;
     unsigned int nCount;
 };
 }  // namespace StsMsgLib
 static_assert(sizeof(StsMsgLib::_StsMsgResponseWorldListWorlds) == 0x70, "sizeof StsMsgLib::_StsMsgResponseWorldListWorlds");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseWorldListWorlds, pWorld) == 0x60, "StsMsgLib::_StsMsgResponseWorldListWorlds::pWorld");
 static_assert(offsetof(StsMsgLib::_StsMsgResponseWorldListWorlds, nCount) == 0x68, "StsMsgLib::_StsMsgResponseWorldListWorlds::nCount");
+static_assert(sizeof(StsMsgLib::_StsMsgResponseWorldListWorlds::_World) == 0x40, "sizeof StsMsgLib::_StsMsgResponseWorldListWorlds::_World");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWorldListWorlds::_World, pszWorldCode) == 0x0, "StsMsgLib::_StsMsgResponseWorldListWorlds::_World::pszWorldCode");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWorldListWorlds::_World, pszPublicNetAddress) == 0x8, "StsMsgLib::_StsMsgResponseWorldListWorlds::_World::pszPublicNetAddress");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWorldListWorlds::_World, pwszWorldName) == 0x10, "StsMsgLib::_StsMsgResponseWorldListWorlds::_World::pwszWorldName");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWorldListWorlds::_World, pszEnableCharacterCreate) == 0x18, "StsMsgLib::_StsMsgResponseWorldListWorlds::_World::pszEnableCharacterCreate");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWorldListWorlds::_World, pszWorldScore) == 0x20, "StsMsgLib::_StsMsgResponseWorldListWorlds::_World::pszWorldScore");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWorldListWorlds::_World, pszPlayingUsers) == 0x28, "StsMsgLib::_StsMsgResponseWorldListWorlds::_World::pszPlayingUsers");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWorldListWorlds::_World, pszWaitingUsers) == 0x30, "StsMsgLib::_StsMsgResponseWorldListWorlds::_World::pszWaitingUsers");
+static_assert(offsetof(StsMsgLib::_StsMsgResponseWorldListWorlds::_World, pszMaxUsers) == 0x38, "StsMsgLib::_StsMsgResponseWorldListWorlds::_World::pszMaxUsers");
 
 struct SymbolFunctions {
 public:
@@ -11083,7 +13635,6 @@ static_assert(offsetof(SymbolFunctions, symMiniDumpWriteDump) == 0x58, "SymbolFu
 
 class SysInfo {
 public:
-    char _pdb_tail[0x1];
 };
 static_assert(sizeof(SysInfo) == 0x1, "sizeof SysInfo");
 
@@ -11110,7 +13661,7 @@ public:
     virtual bool controlHandler(unsigned long);
     virtual void setTitle(wchar_t const *);
     virtual void WriteStatusLog(wchar_t const *, void *);
-    virtual void Write(int, wchar_t const *, int, wchar_t const *, char *);
+    virtual void Write(Log::Type, wchar_t const *, int, wchar_t const *, char *);
     virtual void write(LogBuffer const *);
     void * stdoutHandle;
     unsigned short originalAttr;
@@ -11154,13 +13705,24 @@ static_assert(offsetof(ThreadManager, _now) == 0x18, "ThreadManager::_now");
 
 class TimerQueue {
 public:
+    struct GreaterBySlotIndex;
+    struct Slot;
+    struct GreaterBySlotIndex {
+    public:
+    };
+    struct Slot {
+    public:
+        int index;
+        Timer * head;
+        Timer * tail;
+    };
     virtual ~TimerQueue();  // slot 0
     long TimerInterval;
     SpinLock Lock;
     unsigned int StqSize;
-    void * StqSlot;
+    TimerQueue::Slot * StqSlot;
     unsigned int StqCurrent;
-    alignas(8) unsigned char LtQueue[0x28];  // ❓ PDB type 0x134C: std::priority_queue<Timer *,std::vector<Timer *,StlAllocator<Timer *,2> >,TimerQueue::GreaterBySlotIndex>
+    std::priority_queue<Timer *, std::vector<Timer *>, TimerQueue::GreaterBySlotIndex> LtQueue;
 };
 static_assert(sizeof(TimerQueue) == 0x78, "sizeof TimerQueue");
 static_assert(offsetof(TimerQueue, TimerInterval) == 0x8, "TimerQueue::TimerInterval");
@@ -11169,6 +13731,11 @@ static_assert(offsetof(TimerQueue, StqSize) == 0x38, "TimerQueue::StqSize");
 static_assert(offsetof(TimerQueue, StqSlot) == 0x40, "TimerQueue::StqSlot");
 static_assert(offsetof(TimerQueue, StqCurrent) == 0x48, "TimerQueue::StqCurrent");
 static_assert(offsetof(TimerQueue, LtQueue) == 0x50, "TimerQueue::LtQueue");
+static_assert(sizeof(TimerQueue::GreaterBySlotIndex) == 0x1, "sizeof TimerQueue::GreaterBySlotIndex");
+static_assert(sizeof(TimerQueue::Slot) == 0x18, "sizeof TimerQueue::Slot");
+static_assert(offsetof(TimerQueue::Slot, index) == 0x0, "TimerQueue::Slot::index");
+static_assert(offsetof(TimerQueue::Slot, head) == 0x8, "TimerQueue::Slot::head");
+static_assert(offsetof(TimerQueue::Slot, tail) == 0x10, "TimerQueue::Slot::tail");
 
 class TrustedPacketBufferHandler : public PacketBufferHandler {
 public:
@@ -11192,6 +13759,25 @@ public:
 static_assert(sizeof(WinMsgHandler) == 0x38, "sizeof WinMsgHandler");
 static_assert(offsetof(WinMsgHandler, _initEvent) == 0x30, "WinMsgHandler::_initEvent");
 
+struct _SERVICE_STATUS {
+public:
+    unsigned long dwServiceType;
+    unsigned long dwCurrentState;
+    unsigned long dwControlsAccepted;
+    unsigned long dwWin32ExitCode;
+    unsigned long dwServiceSpecificExitCode;
+    unsigned long dwCheckPoint;
+    unsigned long dwWaitHint;
+};
+static_assert(sizeof(_SERVICE_STATUS) == 0x1C, "sizeof _SERVICE_STATUS");
+static_assert(offsetof(_SERVICE_STATUS, dwServiceType) == 0x0, "_SERVICE_STATUS::dwServiceType");
+static_assert(offsetof(_SERVICE_STATUS, dwCurrentState) == 0x4, "_SERVICE_STATUS::dwCurrentState");
+static_assert(offsetof(_SERVICE_STATUS, dwControlsAccepted) == 0x8, "_SERVICE_STATUS::dwControlsAccepted");
+static_assert(offsetof(_SERVICE_STATUS, dwWin32ExitCode) == 0xC, "_SERVICE_STATUS::dwWin32ExitCode");
+static_assert(offsetof(_SERVICE_STATUS, dwServiceSpecificExitCode) == 0x10, "_SERVICE_STATUS::dwServiceSpecificExitCode");
+static_assert(offsetof(_SERVICE_STATUS, dwCheckPoint) == 0x14, "_SERVICE_STATUS::dwCheckPoint");
+static_assert(offsetof(_SERVICE_STATUS, dwWaitHint) == 0x18, "_SERVICE_STATUS::dwWaitHint");
+
 class WinServiceConsole : public Console {
 public:
     virtual ~WinServiceConsole();
@@ -11200,13 +13786,13 @@ public:
     virtual void SetState(int);
     virtual bool Writable();
     virtual void write(LogBuffer const *);
-    virtual void Write(int, wchar_t const *, int, wchar_t const *, char *);
+    virtual void Write(Log::Type, wchar_t const *, int, wchar_t const *, char *);
     virtual void WriteStartLog(int, wchar_t const *, void *);
     virtual bool controlHandler(unsigned long);
     virtual void WriteStatusLog(wchar_t const *, void *);
     unsigned long ErrorCode;
     unsigned long CheckPoint;
-    alignas(4) unsigned char Status[0x1C];  // ❓ PDB type 0x4D5A: _SERVICE_STATUS
+    _SERVICE_STATUS Status;
     SERVICE_STATUS_HANDLE__ * Handle;
 };
 static_assert(sizeof(WinServiceConsole) == 0xE0, "sizeof WinServiceConsole");
@@ -11223,15 +13809,15 @@ public:
     virtual void SetState(int);
     virtual void WriteStartLog(int, wchar_t const *, void *);
     virtual void WriteStatusLog(wchar_t const *, void *);
-    virtual void Write(int, wchar_t const *, int, wchar_t const *, char *);
+    virtual void Write(Log::Type, wchar_t const *, int, wchar_t const *, char *);
     virtual bool controlHandler(unsigned long);
     virtual void setTitle(wchar_t const *);
     virtual void write(LogBuffer const *);
     WinMsgHandler * _messageHandler;
     ConsoleWindowInterface _consoleWindow;
-    alignas(8) unsigned char _reloadHandler[0x10];  // ❓ PDB type 0x4CF3: ConsoleWindow::ReloadHandler
-    alignas(8) unsigned char _shutdownHandler[0x10];  // ❓ PDB type 0x4CF4: ConsoleWindow::ShutdownHandler
-    alignas(8) unsigned char _endSessionHandler[0x10];  // ❓ PDB type 0x4CF5: ConsoleWindow::EndSessionHandler
+    ConsoleWindow::ReloadHandler _reloadHandler;
+    ConsoleWindow::ShutdownHandler _shutdownHandler;
+    ConsoleWindow::EndSessionHandler _endSessionHandler;
 };
 static_assert(sizeof(WindowConsole) == 0x110, "sizeof WindowConsole");
 static_assert(offsetof(WindowConsole, _messageHandler) == 0xB0, "WindowConsole::_messageHandler");
@@ -11340,10 +13926,21 @@ static_assert(offsetof(XmlCfgDef2, nextSiblingIndex) == 0x34, "XmlCfgDef2::nextS
 
 struct XmlCfgDefLocal {
 public:
+    enum CFG_DEF_TYPE : int {
+        CFG_DEF_TYPE_INT = 0x0,
+        CFG_DEF_TYPE_INT64 = 0x1,
+        CFG_DEF_TYPE_FLOAT = 0x2,
+        CFG_DEF_TYPE_BOOL = 0x3,
+        CFG_DEF_TYPE_STRING = 0x4,
+        CFG_DEF_TYPE_ANSI_STRING = 0x5,
+        CFG_DEF_TYPE_IP = 0x6,
+        CFG_DEF_TYPE_DIRECTORY = 0x7,
+        CFG_DEF_TYPE_GUID = 0x8,
+    };
     unsigned long long offset;
     wchar_t const * name;
     int type;
-    int defType;
+    XmlCfgDefLocal::CFG_DEF_TYPE defType;
     void const * minValue;
     void const * maxValue;
     bool reload;
@@ -11392,6 +13989,14 @@ static_assert(offsetof(XmlConfigReaderInterface, DecodeFromConfigPacket) == 0x28
 
 class XmlDoc {
 public:
+    struct BinaryXmlHeader;
+    struct BinaryXmlHeader {
+    public:
+        long long _binaryXmlIdentifier;
+        unsigned char _binaryXmlVersion;
+        unsigned int _binarySize;
+        unsigned char _reserved[64];
+    };
     virtual bool IsValid() const = 0;  // slot 0
     virtual wchar_t const * Name() const = 0;  // slot 1
     virtual XmlElement * Root() = 0;  // slot 2
@@ -11400,6 +14005,11 @@ public:
     virtual void SerializeFrom(char *, int) = 0;  // slot 5
 };
 static_assert(sizeof(XmlDoc) == 0x8, "sizeof XmlDoc");
+static_assert(sizeof(XmlDoc::BinaryXmlHeader) == 0x50, "sizeof XmlDoc::BinaryXmlHeader");
+static_assert(offsetof(XmlDoc::BinaryXmlHeader, _binaryXmlIdentifier) == 0x0, "XmlDoc::BinaryXmlHeader::_binaryXmlIdentifier");
+static_assert(offsetof(XmlDoc::BinaryXmlHeader, _binaryXmlVersion) == 0x8, "XmlDoc::BinaryXmlHeader::_binaryXmlVersion");
+static_assert(offsetof(XmlDoc::BinaryXmlHeader, _binarySize) == 0xC, "XmlDoc::BinaryXmlHeader::_binarySize");
+static_assert(offsetof(XmlDoc::BinaryXmlHeader, _reserved) == 0x10, "XmlDoc::BinaryXmlHeader::_reserved");
 
 class XmlElement {
 public:
@@ -11421,7 +14031,12 @@ static_assert(sizeof(XmlElement) == 0x8, "sizeof XmlElement");
 
 class XmlNode {
 public:
-    virtual int Type() const = 0;  // slot 0
+    enum TYPE : int {
+        XML_NONE = 0x0,
+        XML_ELEMENT = 0x1,
+        XML_TEXT = 0x2,
+    };
+    virtual XmlNode::TYPE Type() const = 0;  // slot 0
     virtual bool IsValid() const = 0;  // slot 1
     virtual wchar_t const * Name() const = 0;  // slot 2
     virtual XmlDoc const * GetDoc() const = 0;  // slot 3
@@ -11471,11 +14086,20 @@ static_assert(sizeof(XmlReader) == 0x8, "sizeof XmlReader");
 
 class XmlReaderIO {
 public:
-    virtual int Open(wchar_t const *, wchar_t const *, bool) = 0;  // slot 0
-    virtual int Read(unsigned char *, unsigned int *) const = 0;  // slot 1
+    enum ErrCode : int {
+        ERR_NO_ERROR = 0x0,
+        ERR_UNKNOWN = 0x1,
+        ERR_SYSTEM = 0x2,
+        ERR_NO_MORE_FILE = 0x3,
+        ERR_NOT_IMPLEMENTED = 0x4,
+        ERR_INVALID_PARAM = 0x5,
+        ERR_INSUFFICIENT_BUFFER = 0x6,
+    };
+    virtual XmlReaderIO::ErrCode Open(wchar_t const *, wchar_t const *, bool) = 0;  // slot 0
+    virtual XmlReaderIO::ErrCode Read(unsigned char *, unsigned int *) const = 0;  // slot 1
     virtual unsigned int GetFileSize() const = 0;  // slot 2
     virtual wchar_t const * GetFileName() const = 0;  // slot 3
-    virtual int Next() = 0;  // slot 4
+    virtual XmlReaderIO::ErrCode Next() = 0;  // slot 4
     virtual void Close() = 0;  // slot 5
 };
 static_assert(sizeof(XmlReaderIO) == 0x8, "sizeof XmlReaderIO");
@@ -11969,6 +14593,62 @@ static_assert(sizeof(ZSTD_parameters) == 0x28, "sizeof ZSTD_parameters");
 static_assert(offsetof(ZSTD_parameters, cParams) == 0x0, "ZSTD_parameters::cParams");
 static_assert(offsetof(ZSTD_parameters, fParams) == 0x1C, "ZSTD_parameters::fParams");
 
+union _LARGE_INTEGER {
+public:
+    struct {
+        unsigned long LowPart;
+        long HighPart;
+    };
+    struct {
+        unsigned long LowPart;
+        long HighPart;
+    } u;
+    long long QuadPart;
+};
+static_assert(sizeof(_LARGE_INTEGER) == 0x8, "sizeof _LARGE_INTEGER");
+static_assert(offsetof(_LARGE_INTEGER, LowPart) == 0x0, "_LARGE_INTEGER::LowPart");
+static_assert(offsetof(_LARGE_INTEGER, HighPart) == 0x4, "_LARGE_INTEGER::HighPart");
+static_assert(offsetof(_LARGE_INTEGER, u) == 0x0, "_LARGE_INTEGER::u");
+static_assert(offsetof(_LARGE_INTEGER, QuadPart) == 0x0, "_LARGE_INTEGER::QuadPart");
+
+struct _RTL_SRWLOCK {
+public:
+    void * Ptr;
+};
+static_assert(sizeof(_RTL_SRWLOCK) == 0x8, "sizeof _RTL_SRWLOCK");
+static_assert(offsetof(_RTL_SRWLOCK, Ptr) == 0x0, "_RTL_SRWLOCK::Ptr");
+
+union _ULARGE_INTEGER {
+public:
+    struct {
+        unsigned long LowPart;
+        unsigned long HighPart;
+    };
+    struct {
+        unsigned long LowPart;
+        unsigned long HighPart;
+    } u;
+    unsigned long long QuadPart;
+};
+static_assert(sizeof(_ULARGE_INTEGER) == 0x8, "sizeof _ULARGE_INTEGER");
+static_assert(offsetof(_ULARGE_INTEGER, LowPart) == 0x0, "_ULARGE_INTEGER::LowPart");
+static_assert(offsetof(_ULARGE_INTEGER, HighPart) == 0x4, "_ULARGE_INTEGER::HighPart");
+static_assert(offsetof(_ULARGE_INTEGER, u) == 0x0, "_ULARGE_INTEGER::u");
+static_assert(offsetof(_ULARGE_INTEGER, QuadPart) == 0x0, "_ULARGE_INTEGER::QuadPart");
+
+struct _s_ThrowInfo {
+public:
+    unsigned int attributes;
+    int pmfnUnwind;
+    int pForwardCompat;
+    int pCatchableTypeArray;
+};
+static_assert(sizeof(_s_ThrowInfo) == 0x10, "sizeof _s_ThrowInfo");
+static_assert(offsetof(_s_ThrowInfo, attributes) == 0x0, "_s_ThrowInfo::attributes");
+static_assert(offsetof(_s_ThrowInfo, pmfnUnwind) == 0x4, "_s_ThrowInfo::pmfnUnwind");
+static_assert(offsetof(_s_ThrowInfo, pForwardCompat) == 0x8, "_s_ThrowInfo::pForwardCompat");
+static_assert(offsetof(_s_ThrowInfo, pCatchableTypeArray) == 0xC, "_s_ThrowInfo::pCatchableTypeArray");
+
 struct addrinfo {
 public:
     int ai_flags;
@@ -11977,7 +14657,7 @@ public:
     int ai_protocol;
     unsigned long long ai_addrlen;
     char * ai_canonname;
-    void * ai_addr;
+    sockaddr * ai_addr;
     addrinfo * ai_next;
 };
 static_assert(sizeof(addrinfo) == 0x30, "sizeof addrinfo");
@@ -12010,13 +14690,26 @@ static_assert(sizeof(fseWkspMax_t) == 0x3804, "sizeof fseWkspMax_t");
 static_assert(offsetof(fseWkspMax_t, CTable_max) == 0x0, "fseWkspMax_t::CTable_max");
 static_assert(offsetof(fseWkspMax_t, scratchBuffer) == 0x2804, "fseWkspMax_t::scratchBuffer");
 
+struct sockaddr_storage {
+public:
+    unsigned short ss_family;
+    char __ss_pad1[6];
+    long long __ss_align;
+    char __ss_pad2[112];
+};
+static_assert(sizeof(sockaddr_storage) == 0x80, "sizeof sockaddr_storage");
+static_assert(offsetof(sockaddr_storage, ss_family) == 0x0, "sockaddr_storage::ss_family");
+static_assert(offsetof(sockaddr_storage, __ss_pad1) == 0x2, "sockaddr_storage::__ss_pad1");
+static_assert(offsetof(sockaddr_storage, __ss_align) == 0x8, "sockaddr_storage::__ss_align");
+static_assert(offsetof(sockaddr_storage, __ss_pad2) == 0x10, "sockaddr_storage::__ss_pad2");
+
 struct group_filter {
 public:
     unsigned long gf_interface;
-    alignas(8) unsigned char gf_group[0x80];  // ❓ PDB type 0x5080: sockaddr_storage
+    sockaddr_storage gf_group;
     MULTICAST_MODE_TYPE gf_fmode;
     unsigned long gf_numsrc;
-    alignas(8) unsigned char gf_slist[0x80];  // ❓ PDB type 0x5083: leaf 0x1503
+    sockaddr_storage gf_slist[1];
 };
 static_assert(sizeof(group_filter) == 0x110, "sizeof group_filter");
 static_assert(offsetof(group_filter, gf_interface) == 0x0, "group_filter::gf_interface");
@@ -12027,11 +14720,11 @@ static_assert(offsetof(group_filter, gf_slist) == 0x90, "group_filter::gf_slist"
 
 struct ip_msfilter {
 public:
-    alignas(4) unsigned char imsf_multiaddr[0x4];  // ❓ PDB type 0x4F62: in_addr
-    alignas(4) unsigned char imsf_interface[0x4];  // ❓ PDB type 0x4F62: in_addr
+    in_addr imsf_multiaddr;
+    in_addr imsf_interface;
     MULTICAST_MODE_TYPE imsf_fmode;
     unsigned long imsf_numsrc;
-    alignas(4) unsigned char imsf_slist[0x4];  // ❓ PDB type 0x50A1: leaf 0x1503
+    in_addr imsf_slist[1];
 };
 static_assert(sizeof(ip_msfilter) == 0x14, "sizeof ip_msfilter");
 static_assert(offsetof(ip_msfilter, imsf_multiaddr) == 0x0, "ip_msfilter::imsf_multiaddr");
@@ -12102,8 +14795,3 @@ extern id128 ID128_GUID_ZERO;
 #pragma clang diagnostic pop
 
 // Skipped types:
-//   AsyncConnectContext: base EventContext
-//   AsyncRecvContext: base EventContext
-//   AsyncSendContext: base EventContext
-//   EventContext: base _OVERLAPPED
-//   SCOPE_ID: member Value overlaps (0x0 < 0x4)

@@ -33,6 +33,8 @@ set(LIFT_PDB_INCLUDE ${CMAKE_SOURCE_DIR}/include)
 
 lift_exe(lift_selftest
   SOURCES src/selftest/main.cpp src/selftest/stl_layout.cpp src/selftest/pdb_types.cpp
+          src/selftest/pdb_types_LobbyGate.cpp src/selftest/pdb_types_PostOfficeDaemon.cpp
+          src/selftest/pdb_types_SmartCouponDaemon.cpp
   IMPORTS msvcr100 kernel32)
 # msvcr100 from Wine has no type_info vftable in the import lib. No RTTI for the selftest.
 target_compile_options(lift_selftest PRIVATE /GR-)
