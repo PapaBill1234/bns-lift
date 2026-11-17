@@ -111,7 +111,7 @@ ThreadFreeFragmentPacketPump::~ThreadFreeFragmentPacketPump()
 {
     if (_fpc != nullptr)
     {
-        // ❓ The binary calls the scalar deleting destructor with flag 1, then Free.
+        // LIFT: LobbyGate 0x1791 calls vtable slot 4 (0x24f0) with flag 1. 0x24f0 runs the dtor only and does not free.
         _fpc->~FragmentPacketConcatenater();
         Memory::_Manager[2]->Free(_fpc, TFPP_FILE, 114);
     }
@@ -165,9 +165,8 @@ bool __pump_packet(unsigned int eventId, void* iocp, Session const* session, Pac
     copy->Allocate();
     copy->Add(reinterpret_cast<char const*>(packet->CurHeader) + 2, packet->CurHeader->size - 2);
 
-    // ❓ Line 174: the line of this Alloc is not visible in the pseudocode.
-    ThreadFreePacketPump* pump =
-        ::new (Memory::_Manager[2]->Alloc(sizeof(ThreadFreePacketPump), TFPP_FILE, 174)) ThreadFreePacketPump(
+        ThreadFreePacketPump* pump =
+        ::new (Memory::_Manager[2]->Alloc(sizeof(ThreadFreePacketPump), TFPP_FILE, 176)) ThreadFreePacketPump(  // line 0xB0 at LobbyGate 0x1a0f
             eventId, _InterlockedIncrement64(reinterpret_cast<long long volatile*>(&GPacketPumpEventKey)));
     if (!pump->Initialize(session, copy, handler))
     {
@@ -208,7 +207,7 @@ bool __pump_fragment_packet(unsigned int eventId, void* iocp, Session const* ses
 
     wchar_t const* format;
     int line;
-    if (!concatenater->Add(packet, &completed, cmd != 0))  // ❓ arg 3 is (bool)cmd; Add does not use it
+    if (!concatenater->Add(packet, &completed, cmd != 0))  // LIFT: 0x1cea does not set r9b. Add (0x25d0) writes r9 at 0x25ef before it reads it.
     {
         format = L"[packet-pump], concatenate fragment packet fail, event-id:%u, iocp:%I64u, session:0x%016I64X, cmd:%d";
         line = 217;
@@ -218,7 +217,7 @@ bool __pump_fragment_packet(unsigned int eventId, void* iocp, Session const* ses
         return true;
 
     {
-        // ❓ Line 224: the line of this Alloc is not visible in the pseudocode.
+        // LobbyGate 0x1d4c gives line 0xE0 (224).
         FragmentPacketConcatenater* fpc =
             ::new (Memory::_Manager[2]->Alloc(sizeof(FragmentPacketConcatenater), TFPP_FILE, 224)) FragmentPacketConcatenater;
         if (!fpc->Copy(concatenater))
@@ -241,7 +240,7 @@ bool __pump_fragment_packet(unsigned int eventId, void* iocp, Session const* ses
                        eventId, iocp, session->_id, cmd);
             if (fpc != nullptr)
             {
-                // ❓ The binary calls the scalar deleting destructor with flag 1, then Free.
+                // LIFT: LobbyGate 0x1791 calls vtable slot 4 (0x24f0) with flag 1. 0x24f0 runs the dtor only and does not free.
                 fpc->~FragmentPacketConcatenater();
                 Memory::_Manager[2]->Free(fpc, TFPP_FILE, 238);
             }
