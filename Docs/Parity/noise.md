@@ -1,6 +1,6 @@
 # funcdiff noise (lift-parity-0)
 
-Status: 4 fixes are in `tools/funcdiff.py`. More candidates are open (see the end).
+Status: 8 fixes are in `tools/funcdiff.py` (fixes 5 to 8 from lift-parity-tool-2). More candidates are open (see the end).
 
 ## Method
 - `tools/funcdiff.py <EXE> --build build-vs2010 --show .` for all 4 exes.
@@ -43,12 +43,63 @@ Status: 4 fixes are in `tools/funcdiff.py`. More candidates are open (see the en
   `CrashHandler::handleCrash` orig 0x8853 `mov eax, 0x12e0`; ours 0xc23b `mov eax, 0x1318`.
 - Fix: when a call to `__chkstk` or `_alloca_probe` comes right after `mov eax, imm`, remove that constant.
 
+## Fixes of lift-parity-tool-2
+
+Counts: `tools/parity.sh` on the same VS2010 objects, before the fixes and after them. No exe loses a MATCH function.
+
+| Exe | MATCH before | After fix 5 to 8 | Change | MATCH lost |
+| --- | ---: | ---: | ---: | ---: |
+| CacheGate | 387 | 405 | +18 | 0 |
+| LobbyGate | 487 | 506 | +19 | 0 |
+| SmartCouponDaemon | 461 | 484 | +23 | 0 |
+| PostOfficeDaemon | 509 | 529 | +20 | 0 |
+| Shared library | 369/489 | 397/489 | +28 | 0 |
+
+Review 1 measured +63 (fix 5 and 6 only). The result is +80. The test copy of review 1 named a TLS offset only after
+a `gs:` load. The final fix 6 also finds the offset before the load (see fix 6).
+
+## Fix 5: vtable symbol read as a string (PROVEN, FIXED)
+- `Image.string_at()` ran before `target_name()`. Slot 0 of a vtable holds a code address (`0x1400074xx`). Its bytes can
+  look like a 2-byte text.
+- Proof: SmartCouponDaemon `Console::Console` (orig 0x23170, ours 0x6170). Both have 2 `lea rax, [rip+x]`.
+  Orig: `??_7LogMedia@@6B@` (0x78a20) then `??_7Console@@6B@` (0x77060). Ours: the same 2 symbols (0x58700, 0x58730).
+  Before: refs orig `??_7Console@@6B@`, `??_7LogMedia@@6B@`; ours `"0a"`, `"0a"` (score 66.7, DIFF).
+  After: both sides name the symbol. Score 100, MATCH. The code is equal: same calls, same 2 vtable stores, same size (113 bytes).
+- Fix: when a `??_7` symbol is at the exact RVA of the data ref, use that symbol first.
+- Effect: all 47 lines of `allow-worse.txt` were for this noise. They are removed (each function is MATCH now).
+
+## Fix 6: `.tls` offsets (PROVEN, FIXED)
+- Code: `mov rax, gs:[0x58]; mov rcx, [rax]; mov edx, <off>; mov [rdx+rcx], x`. `<off>` is the offset of a
+  `__declspec(thread)` variable in the `.tls` block. The linker puts the variables in another order in each exe.
+- Proof: SmartCouponDaemon `LogBuffer::deallocate_me` (orig 0x200b0, ours 0xcac0, 30 bytes each).
+  Orig `mov r8d, 0x18`, ours `mov r8d, 0x60`. The PDB (`S_LTHREAD32`) names both: `LogBufferAllocator::_Local`
+  (orig .tls offset 0x18, ours 0x60). Same variable, other offset. Before: consts 0x18 against 0x60 (DIFF).
+  After: both are the ref `tls:LogBufferAllocator::_Local`. MATCH. `Log::WriteV` (orig 0x19870, ours 0xc600) is the same case.
+- Fix: `mov reg, imm` where `imm` is the `.tls` offset of a PDB `S_LTHREAD32` or `S_GTHREAD32` symbol is a ref
+  `tls:<name>`, not a constant.
+- Guard (`is_tls_index()`): the register must be used as `[reg + reg]` (scale 1) in the next 6 instructions, and there
+  must be a `gs:` operand in 6 instructions before or after. The original often puts the `mov` before the `gs:` load
+  (`ThreadManager::entry` orig 0x1314e `mov edx, 0x28` then `mov rax, gs:[0x58]`). A version that needed a
+  `gs:` load before the `mov` missed these cases. A version with no `[reg+reg]` test named sizes like `mov r8d, 0x40`
+  by chance (`Daemon::setAddress`: score 99.3 -> 88.1, `ThreadManager::entry` 66.7 -> 33.3). The final test gives
+  no score loss except `IoWorker::run` (85.1 -> 84.9, 0 MATCH lost).
+
+## Fix 7: `<K const ,V>` against `<K const,V>` (PROVEN, FIXED)
+- Proof: CacheGate `CacheDList::add` 0x3490. Orig call `..._Buynode<std::pair<unsigned short const ,CacheD * __ptr64> >`,
+  ours `..._Buynode<std::pair<unsigned short const,CacheD * __ptr64> >`. Same template, same instance. Only the PDB writer
+  differs in the space. Before: calls 83, DIFF 94.4. After: MATCH 100. LobbyGate `ClientManager::AddSession` is the same case.
+- Fix: `name_form()` removes the space before a comma in each PDB name (both exes).
+
+## Fix 8: function name not demangled in the original PDB (PROVEN, FIXED)
+- Proof: CacheGate `Network::Initialize`. Orig call `?Setup@PacketCrypt@@SA?AW4ErrCode@1@H@Z`, ours `PacketCrypt::Setup`.
+  The original PDB has only the public (mangled) name at this address. The mangled name is the name of
+  `PacketCrypt::Setup` (class `PacketCrypt`, function `Setup`, static, returns `ErrCode`). Before: calls 91, DIFF 97.0.
+  After: MATCH 100.
+- Fix: `simple_demangle()` gives `Scope::name` for a plain mangled name (`?name@Scope@@...`). It does not change
+  operators, ctors or templates (`??`, `?$`). Used for the names of functions and for a call target that has only a public name.
+
 ## Open candidates
-- A. TLS offsets (PROVEN noise, NOT FIXED): `mov rax, gs:[0x58]; mov rcx, [rax]; mov edx, 0xfb00; mov rcx, [rdx+rcx]`.
-  The immediate is the section-relative offset of a `__declspec(thread)` variable. Seen: SmartCouponDaemon ours
-  `Log::WriteV` 0xc838 (0xfb00, 0xfb08); orig `Network::GetAddressStringW` 0x1ad3a/0x1ad42 (0xfa60, 0xfa40).
-  Many functions show +0xfb00/+0xfb08 against -0xfa40/-0xfa60. Fix idea: name the value from the PDB
-  `S_LTHREAD32`/`S_GTHREAD32` records, or drop an immediate that is used with the TLS array from `gs:[0x58]`.
+- A. TLS offsets: FIXED in lift-parity-tool-2 (fix 6).
 - B. `??_C@_11LOCGONAA@` (empty wide string, 29/29): same name on both sides. Count per function differs. Real, not noise.
 - C. `<data>` refs (141 orig / 244 ours): most are fields of named globals in `.data` (for example
   `AlertSender::_alertSender+0x54`, `Memory::_Manager+0x10`), and the image base (`lea r, [rip-x]` → 0x0).

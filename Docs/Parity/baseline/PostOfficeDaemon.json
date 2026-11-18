@@ -379,9 +379,9 @@
 },
 "CacheGateChannel::SendRelayRequest": {
 "calls": 82,
-"consts": 80,
+"consts": 100,
 "refs": 100,
-"score": 87.5,
+"score": 94.1,
 "status": "DIFF"
 },
 "CacheGateChannel::combineFragmentRelayFormat": {
@@ -562,9 +562,9 @@
 "Channel::~Channel": {
 "calls": 100,
 "consts": 100,
-"refs": 50,
-"score": 83.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "CheckPostCapacityRelayContext::ComposeRequestPacket [?ComposeRequestPacket@CheckPostCapacityRelayContext@@UEBA_NAEAVFragmentPacket@@@Z]": {
 "calls": 100,
@@ -757,9 +757,9 @@
 },
 "CrashHandler::handleCrash": {
 "calls": 96,
-"consts": 98,
+"consts": 100,
 "refs": 93,
-"score": 95.6,
+"score": 96.4,
 "status": "DIFF"
 },
 "CriticalSection::CriticalSection": {
@@ -1122,9 +1122,9 @@
 "DeliverPostRelayContext::~DeliverPostRelayContext": {
 "calls": 100,
 "consts": 100,
-"refs": 83,
-"score": 94.4,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "DumpRegister": {
 "calls": 100,
@@ -1157,9 +1157,9 @@
 "DynamicRefCntObj::~DynamicRefCntObj": {
 "calls": 100,
 "consts": 100,
-"refs": 0,
-"score": 66.7,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "ExceptionCodeString": {
 "calls": 100,
@@ -1436,43 +1436,43 @@
 },
 "HandlePostOfficeManagementHelloReq": {
 "calls": 91,
-"consts": 83,
+"consts": 100,
 "refs": 100,
-"score": 91.4,
+"score": 97.0,
 "status": "DIFF"
 },
 "HandlePostOfficeManagementLoadRetryReadyPostListReq": {
 "calls": 84,
-"consts": 88,
+"consts": 93,
 "refs": 100,
-"score": 90.6,
+"score": 92.5,
 "status": "DIFF"
 },
 "HandlePostOfficeManagementLoadRetryReadySinglePostReq": {
 "calls": 84,
-"consts": 89,
+"consts": 94,
 "refs": 100,
-"score": 91.0,
+"score": 92.7,
 "status": "DIFF"
 },
 "HandlePostOfficeManagementResetAllPostStatusReq": {
 "calls": 84,
-"consts": 88,
+"consts": 93,
 "refs": 100,
-"score": 90.6,
+"score": 92.5,
 "status": "DIFF"
 },
 "HandlePostOfficeManagementResetPostStatusReq": {
 "calls": 84,
-"consts": 81,
+"consts": 87,
 "refs": 100,
-"score": 88.4,
+"score": 90.2,
 "status": "DIFF"
 },
 "HandlePostOfficeRegisterPostReq": {
 "calls": 98,
-"consts": 98,
-"refs": 98,
+"consts": 99,
+"refs": 97,
 "score": 98.0,
 "status": "DIFF"
 },
@@ -1492,9 +1492,9 @@
 },
 "HandlePostOfficeServiceRegisterPostReq": {
 "calls": 97,
-"consts": 98,
-"refs": 92,
-"score": 95.7,
+"consts": 99,
+"refs": 91,
+"score": 95.6,
 "status": "DIFF"
 },
 "HandlePostOfficeServiceRetrieveCharacterInfoReq": {
@@ -1569,9 +1569,9 @@
 },
 "IoWorker::run": {
 "calls": 69,
-"consts": 89,
+"consts": 88,
 "refs": 97,
-"score": 85.1,
+"score": 84.9,
 "status": "DIFF"
 },
 "IoWorker::stop": {
@@ -1625,17 +1625,17 @@
 },
 "Log::Write [?Write@Log@@SAXW4Type@1@PEB_WH1ZZ]": {
 "calls": 100,
-"consts": 67,
+"consts": 100,
 "refs": 100,
-"score": 88.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Log::WriteV": {
 "calls": 100,
-"consts": 86,
+"consts": 100,
 "refs": 100,
-"score": 95.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Log::run": {
 "calls": 100,
@@ -1681,17 +1681,17 @@
 },
 "LogBuffer::deallocate_me": {
 "calls": 100,
-"consts": 0,
+"consts": 100,
 "refs": 100,
-"score": 66.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "LogBufferAllocator::Initialize": {
 "calls": 100,
-"consts": 67,
+"consts": 100,
 "refs": 100,
-"score": 88.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "LogBufferAllocator::allocate": {
 "calls": 100,
@@ -1842,17 +1842,17 @@
 },
 "ManagementSessionHandler::PacketHandler": {
 "calls": 88,
-"consts": 90,
+"consts": 100,
 "refs": 100,
-"score": 92.5,
+"score": 95.8,
 "status": "DIFF"
 },
 "Memory::CreateManager": {
 "calls": 100,
 "consts": 100,
-"refs": 75,
-"score": 91.7,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Network::Clear": {
 "calls": 100,
@@ -1885,8 +1885,8 @@
 "Network::Network": {
 "calls": 100,
 "consts": 100,
-"refs": 89,
-"score": 96.3,
+"refs": 96,
+"score": 98.8,
 "status": "DIFF"
 },
 "Network::OpenPort [?OpenPort@Network@@SA_NI@Z]": {
@@ -1961,10 +1961,10 @@
 },
 "Packet::Allocate [?Allocate@Packet@@QEAAPEBDXZ]": {
 "calls": 100,
-"consts": 67,
+"consts": 100,
 "refs": 100,
-"score": 88.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Packet::Clear": {
 "calls": 100,
@@ -2059,10 +2059,10 @@
 },
 "PacketBuffer::deallocate_me": {
 "calls": 100,
-"consts": 0,
+"consts": 100,
 "refs": 100,
-"score": 66.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "PacketBuffer::encrypt": {
 "calls": 100,
@@ -2073,10 +2073,10 @@
 },
 "PacketBufferAllocator::Initialize": {
 "calls": 100,
-"consts": 67,
+"consts": 100,
 "refs": 100,
-"score": 88.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "PacketBufferAllocator::allocate": {
 "calls": 100,
@@ -2214,8 +2214,8 @@
 "PingGenerator::sendPing": {
 "calls": 100,
 "consts": 93,
-"refs": 93,
-"score": 95.3,
+"refs": 98,
+"score": 97.0,
 "status": "DIFF"
 },
 "PingRelayContext::ComposeRequestPacket": {
@@ -2556,9 +2556,9 @@
 },
 "PostContext::~PostContext": {
 "calls": 100,
-"consts": 80,
-"refs": 75,
-"score": 85.0,
+"consts": 100,
+"refs": 89,
+"score": 96.3,
 "status": "DIFF"
 },
 "PostContextManager::AddContext": {
@@ -2864,10 +2864,10 @@
 },
 "Prng::Initialize": {
 "calls": 100,
-"consts": 67,
-"refs": 50,
-"score": 72.2,
-"status": "DIFF"
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Prng::setSeed": {
 "calls": 67,
@@ -2928,9 +2928,9 @@
 "RefCntObject::~RefCntObject": {
 "calls": 100,
 "consts": 100,
-"refs": 80,
-"score": 93.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "RelayContext::ProcessRelayRequest": {
 "calls": 94,
@@ -2956,9 +2956,9 @@
 "RelayContext::~RelayContext": {
 "calls": 100,
 "consts": 100,
-"refs": 50,
-"score": 83.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "RelayContextManager::AddContext": {
 "calls": 69,
@@ -3249,10 +3249,10 @@
 },
 "Session::SendV": {
 "calls": 100,
-"consts": 88,
+"consts": 100,
 "refs": 100,
-"score": 95.8,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Session::Session [??0Session@@IEAA@IPEBVPacketBufferHandler@@@Z]": {
 "calls": 100,
@@ -3705,9 +3705,9 @@
 "ThreadFreeFragmentPacketPump::~ThreadFreeFragmentPacketPump": {
 "calls": 100,
 "consts": 100,
-"refs": 80,
-"score": 93.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "ThreadFreePacketPump::HandleEvent": {
 "calls": 100,
@@ -3726,9 +3726,9 @@
 "ThreadFreePacketPump::~ThreadFreePacketPump": {
 "calls": 100,
 "consts": 100,
-"refs": 80,
-"score": 93.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "ThreadFreePacketPumpEvent::EventId": {
 "calls": 100,
@@ -3747,9 +3747,9 @@
 "ThreadFreePacketPumpEvent::~ThreadFreePacketPumpEvent": {
 "calls": 100,
 "consts": 100,
-"refs": 50,
-"score": 83.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "ThreadManager::Initialize": {
 "calls": 100,
@@ -3781,10 +3781,10 @@
 },
 "ThreadManager::entry": {
 "calls": 100,
-"consts": 0,
+"consts": 100,
 "refs": 100,
-"score": 66.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "ThreadManager::stopThread": {
 "calls": 100,
@@ -4110,10 +4110,10 @@
 },
 "WindowConsole::Write": {
 "calls": 100,
-"consts": 50,
+"consts": 100,
 "refs": 100,
-"score": 83.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "WindowConsole::WriteStartLog": {
 "calls": 100,
@@ -4173,9 +4173,9 @@
 },
 "WorldChannel::SendRelayResponse": {
 "calls": 93,
-"consts": 80,
+"consts": 100,
 "refs": 100,
-"score": 91.0,
+"score": 97.6,
 "status": "DIFF"
 },
 "WorldChannelManager::AddWorldChannel": {

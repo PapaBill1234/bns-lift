@@ -338,9 +338,9 @@
 "Channel::~Channel": {
 "calls": 100,
 "consts": 100,
-"refs": 50,
-"score": 83.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Connection::Accept": {
 "calls": 100,
@@ -394,9 +394,9 @@
 "Console::Console": {
 "calls": 100,
 "consts": 100,
-"refs": 0,
-"score": 66.7,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Console::GetType": {
 "calls": 100,
@@ -415,9 +415,9 @@
 "Console::~Console": {
 "calls": 100,
 "consts": 100,
-"refs": 0,
-"score": 66.7,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "CouponJob::dispatch_work": {
 "calls": 100,
@@ -498,9 +498,9 @@
 },
 "CrashHandler::handleCrash": {
 "calls": 96,
-"consts": 98,
+"consts": 100,
 "refs": 93,
-"score": 95.6,
+"score": 96.4,
 "status": "DIFF"
 },
 "CriticalSection::~CriticalSection": {
@@ -625,8 +625,8 @@
 "DChannelMgr::SetupDaemonList": {
 "calls": 64,
 "consts": 91,
-"refs": 87,
-"score": 80.6,
+"refs": 93,
+"score": 82.8,
 "status": "DIFF"
 },
 "DChannelMgr::SetupDaemonListFromXml": {
@@ -646,8 +646,8 @@
 "DChannelMgr::~DChannelMgr": {
 "calls": 86,
 "consts": 100,
-"refs": 75,
-"score": 86.9,
+"refs": 100,
+"score": 95.2,
 "status": "DIFF"
 },
 "Daemon::Cooldown": {
@@ -940,9 +940,9 @@
 "DynamicRefCntObj::~DynamicRefCntObj": {
 "calls": 100,
 "consts": 100,
-"refs": 0,
-"score": 66.7,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "EventNotiJob::EventNotiJob": {
 "calls": 100,
@@ -1213,8 +1213,8 @@
 "HandleSmartCoupon_HelloReq": {
 "calls": 97,
 "consts": 93,
-"refs": 95,
-"score": 95.3,
+"refs": 98,
+"score": 96.1,
 "status": "DIFF"
 },
 "HeapMemoryManager::Alloc": {
@@ -1282,9 +1282,9 @@
 },
 "IoWorker::run": {
 "calls": 69,
-"consts": 89,
+"consts": 88,
 "refs": 97,
-"score": 85.1,
+"score": 84.9,
 "status": "DIFF"
 },
 "IoWorker::stop": {
@@ -1408,17 +1408,17 @@
 },
 "Log::Write [?Write@Log@@SAXW4Type@1@PEB_WH1ZZ]": {
 "calls": 100,
-"consts": 67,
+"consts": 100,
 "refs": 100,
-"score": 88.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Log::WriteV": {
 "calls": 100,
-"consts": 86,
+"consts": 100,
 "refs": 100,
-"score": 95.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Log::run": {
 "calls": 100,
@@ -1464,17 +1464,17 @@
 },
 "LogBuffer::deallocate_me": {
 "calls": 100,
-"consts": 0,
+"consts": 100,
 "refs": 100,
-"score": 66.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "LogBufferAllocator::Initialize": {
 "calls": 100,
-"consts": 67,
+"consts": 100,
 "refs": 100,
-"score": 88.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "LogBufferAllocator::allocate": {
 "calls": 100,
@@ -1528,9 +1528,9 @@
 "LogFile::LogFile": {
 "calls": 100,
 "consts": 100,
-"refs": 50,
-"score": 83.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "LogFile::MakeFilename": {
 "calls": 100,
@@ -1584,9 +1584,9 @@
 "LogFile::~LogFile": {
 "calls": 100,
 "consts": 100,
-"refs": 83,
-"score": 94.4,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "LogMedia::Add": {
 "calls": 100,
@@ -1696,8 +1696,8 @@
 "NPChannel::Setup": {
 "calls": 100,
 "consts": 100,
-"refs": 95,
-"score": 98.2,
+"refs": 98,
+"score": 99.4,
 "status": "DIFF"
 },
 "NPChannel::checkLibError": {
@@ -1724,16 +1724,16 @@
 "NPChannel::sendInitialConnectMessage": {
 "calls": 100,
 "consts": 80,
-"refs": 67,
-"score": 82.2,
+"refs": 100,
+"score": 93.3,
 "status": "DIFF"
 },
 "NPChannel::~NPChannel": {
 "calls": 100,
 "consts": 100,
-"refs": 89,
-"score": 96.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "NPHandlerEventNoti": {
 "calls": 100,
@@ -1766,9 +1766,9 @@
 "NPPing::HandleEvent": {
 "calls": 100,
 "consts": 100,
-"refs": 67,
-"score": 88.9,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "NPPing::TimerClass": {
 "calls": 100,
@@ -1787,8 +1787,8 @@
 "NPServiceChannel::SendRequestEventNoti": {
 "calls": 86,
 "consts": 100,
-"refs": 87,
-"score": 90.8,
+"refs": 100,
+"score": 95.2,
 "status": "DIFF"
 },
 "NPServiceChannelCmdDispatcher": {
@@ -2045,10 +2045,10 @@
 },
 "Packet::Allocate": {
 "calls": 100,
-"consts": 67,
+"consts": 100,
 "refs": 100,
-"score": 88.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Packet::Clear": {
 "calls": 100,
@@ -2094,10 +2094,10 @@
 },
 "PacketBuffer::deallocate_me": {
 "calls": 100,
-"consts": 0,
+"consts": 100,
 "refs": 100,
-"score": 66.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "PacketBuffer::encrypt": {
 "calls": 100,
@@ -2108,10 +2108,10 @@
 },
 "PacketBufferAllocator::Initialize": {
 "calls": 100,
-"consts": 67,
+"consts": 100,
 "refs": 100,
-"score": 88.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "PacketBufferAllocator::allocate": {
 "calls": 100,
@@ -2444,10 +2444,10 @@
 },
 "Prng::Initialize": {
 "calls": 100,
-"consts": 67,
-"refs": 50,
-"score": 72.2,
-"status": "DIFF"
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Prng::setSeed": {
 "calls": 67,
@@ -2717,10 +2717,10 @@
 },
 "Session::SendV": {
 "calls": 100,
-"consts": 86,
+"consts": 100,
 "refs": 100,
-"score": 95.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Session::Session [??0Session@@IEAA@IPEBVPacketBufferHandler@@@Z]": {
 "calls": 100,
@@ -2823,9 +2823,9 @@
 "SessionHandler::~SessionHandler": {
 "calls": 100,
 "consts": 100,
-"refs": 0,
-"score": 66.7,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "SessionPool::Initialize": {
 "calls": 100,
@@ -2956,9 +2956,9 @@
 "SharedChannel::~SharedChannel": {
 "calls": 100,
 "consts": 100,
-"refs": 67,
-"score": 88.9,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "SmartCouponDB::LoadCouponPublicationList": {
 "calls": 78,
@@ -3103,9 +3103,9 @@
 "SmartCouponDaemon::initNetwork": {
 "calls": 100,
 "consts": 100,
-"refs": 96,
-"score": 98.8,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "SmartCouponDaemon::initialize": {
 "calls": 92,
@@ -3417,10 +3417,10 @@
 },
 "ThreadManager::entry": {
 "calls": 100,
-"consts": 0,
+"consts": 100,
 "refs": 100,
-"score": 66.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "ThreadManager::stopThread": {
 "calls": 100,
@@ -3683,10 +3683,10 @@
 },
 "WindowConsole::Write": {
 "calls": 100,
-"consts": 50,
+"consts": 100,
 "refs": 100,
-"score": 83.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "WindowConsole::WriteStartLog": {
 "calls": 100,
@@ -3712,9 +3712,9 @@
 "WindowConsole::~WindowConsole": {
 "calls": 100,
 "consts": 100,
-"refs": 80,
-"score": 93.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "WindowConsoleOnClose": {
 "calls": 100,
@@ -4160,8 +4160,8 @@
 "makeConsole": {
 "calls": 50,
 "consts": 60,
-"refs": 93,
-"score": 67.8,
+"refs": 100,
+"score": 70.0,
 "status": "DIFF"
 },
 "makeDirectory": {

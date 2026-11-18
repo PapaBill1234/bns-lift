@@ -133,26 +133,36 @@ Each new card adds its patterns at the end of section A or B. The next review so
 - Read `_connectContext` in `Session::HandleEvent` (worse).
 
 ## C. Tool and build facts
-### C1. funcdiff reads a vtable ref as a string (OPEN, fix in lift-parity-tool-2)
-- `Image.string_at()` runs before `target_name()`. A vtable whose slot 0 holds `0x1400074xx` reads as `" t"`, `"PI"`, `"@c"`.
-- Each code size change moves 2 to 8 MATCH (ctors and dtors of Console, LogFile, Thread, PipeConsole, WinMsgHandler,
+### C1. funcdiff reads a vtable ref as a string (FIXED in lift-parity-tool-2)
+- `Image.string_at()` ran before `target_name()`. A vtable whose slot 0 holds `0x1400074xx` read as `" t"`, `"PI"`, `"@c"`.
+  Each code size change moved 2 to 8 MATCH (ctors and dtors of Console, LogFile, Thread, PipeConsole, WinMsgHandler,
   AlertSender, CrashHandler, Channel). It made 2 good changes look bad.
-- Measured fix (review-1): use the `??_7` symbol at the exact RVA first: CG +4, LG +7, SCD +12, POD +9, 0 lost.
+- Fix: the `??_7` symbol at the exact RVA is used first (`noise.md`, fix 5). The 47 lines of `allow-worse.txt` are removed.
+- Patterns 47 (POD map keys) and 49 (POD `UpdatePostStatus`) were undone only for this noise. Try them again (card pod-2).
 
-### C2. `.tls` variable order (OPEN, fix in lift-parity-tool-2)
+### C2. `.tls` variable order (FIXED in lift-parity-tool-2)
 - The immediate after `mov rax, gs:[0x58]` is the `.tls` offset of a thread variable. Ours groups the variables by object.
   Signals: const 0x18/0x20 against 0x88/0x90 in `Log::Write`, `Log::WriteV`, `LogBuffer::deallocate_me`,
   `Packet::Allocate`, `PacketBuffer::deallocate_me`, `Session::SendV`, `ThreadManager::entry`, `Daemon::setAddress`.
-- No source fix. Measured tool fix (review-1, name the offset from PDB `S_*THREAD32`): +10, +7, +7, +7 more after C1.
+- No source fix. Tool fix: the offset is named from PDB `S_LTHREAD32`/`S_GTHREAD32` and counted as a ref `tls:<name>`
+  (`noise.md`, fix 6). The guard needs `[reg + reg]` use next to a `gs:` operand. A rule with only "the function reads `gs:`"
+  named plain sizes (0x40) by chance and lowered scores.
+- Result of fixes 5 to 8 together: CG +18, LG +19, SCD +23, POD +20, shared 369 -> 397 of 489. 0 MATCH lost.
+- A new `tls:` DIFF is real: the original and ours use other variables (for example a thread variable that we add or do not have).
 
-### C3. Name forms in the PDB
+### C3. Name forms in the PDB (FIXED in lift-parity-tool-2)
 - `_Buynode<std::pair<K const ,V>>` (original) against `<K const,V>` (ours): `CacheDList::add` 0x3490, `ClientManager::AddSession` 0x6120.
+  `name_form()` in funcdiff removes the space before a comma (`noise.md`, fix 7).
 - The original PDB has `?Setup@PacketCrypt@@SA?AW4ErrCode@1@H@Z` not demangled (`Network::Initialize`).
-- ICF folds give other names (`Packet::~Packet` shows as `Packet::Clear`; `PingRelayContext::GetRequestWid`).
+  `simple_demangle()` gives `PacketCrypt::Setup` (`noise.md`, fix 8).
+- ICF folds give other names (`Packet::~Packet` shows as `Packet::Clear`; `PingRelayContext::GetRequestWid`). Open, not tool noise.
 
 ### C4. Build facts
-- `tools/vs2010/build.sh` rebuilds an object only when the `.cpp` is newer than the `.obj`. After a header change,
-  `touch` each `.cpp` that includes it, or `rm -rf build-vs2010/obj`. (Found again in 5 cards.)
+- `tools/vs2010/build.sh` tracks headers (lift-parity-tool-2). `cl /showIncludes` writes the repo headers of each object to
+  `build-vs2010/obj/<src>.dep`. An object is built again when the `.cpp` or one of these headers is newer, or when the
+  `.dep` file is missing. Test: no change = 0 objects built; `touch Log.h` = 31 CacheGate objects built (all includers).
+  No `touch` of the `.cpp` files is necessary. A new `build-vs2010/obj` from an older build has no `.dep`: it builds all once.
+  (5 cards found the old stale-object problem.)
 - Include `crt_cpp_overload.h` only under `#if defined(__clang__)`.
 - The link sorts the objects of each target. A new object in a target moves the data layout (and C1 noise).
 - Helper tools: `.scratch/dis2.py <EXE> '<regex>'` (orig and ours disassembly), `.scratch/strxref.py <EXE> '<text>'`.

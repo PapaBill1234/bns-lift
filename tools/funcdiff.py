@@ -63,6 +63,25 @@ def pdb_dump(pdb, flag):
         return f.read().split("\n")
 
 
+def name_form(name):
+    """Noise fix 7: the original PDB writes `pair<K const ,V>`, our PDB writes `pair<K const,V>`."""
+    return name.replace(" ,", ",")
+
+
+MANGLED_PLAIN = re.compile(r"^\?(\w+)((?:@\w+)*)@@")
+
+
+def simple_demangle(name):
+    """Noise fix 8: a few functions are not demangled in the original PDB
+    (`?Setup@PacketCrypt@@SA?AW4ErrCode@1@H@Z`). Give `PacketCrypt::Setup` as our PDB does.
+    Only plain names (no operator, ctor or template) are changed."""
+    m = MANGLED_PLAIN.match(name)
+    if not m:
+        return name
+    scopes = [s for s in m.group(2).split("@") if s]
+    return "::".join(scopes[::-1] + [m.group(1)])
+
+
 class Image:
     def __init__(self, exe, pdb):
         self.pe = pefile.PE(exe, fast_load=True)
@@ -78,6 +97,7 @@ class Image:
                 self.imports[i.address - self.base] = name
         self.funcs = {}            # rva -> (name, size)
         self.names = collections.defaultdict(set)   # rva -> names (functions and data)
+        self.tls = {}                                # .tls section offset -> thread variable name (noise fix 6)
         for flag in ("-symbols", "-globals", "-publics"):
             lines = pdb_dump(pdb, flag)
             for n, l in enumerate(lines):
@@ -85,14 +105,17 @@ class Image:
                 if not m or n + 1 >= len(lines):
                     continue
                 kind, name = m.groups()
+                name = name_form(name)
                 a = ADDR.search(lines[n + 1])
                 if not a or not 0 < int(a.group(1)) < len(self.secs):
                     continue
                 rva = self.secs[int(a.group(1))] + int(a.group(2))
                 if kind in ("S_GPROC32", "S_LPROC32"):
-                    self.funcs.setdefault(rva, (name, int(a.group(3) or 0)))
+                    self.funcs.setdefault(rva, (simple_demangle(name), int(a.group(3) or 0)))
                 if kind in ("S_GPROC32", "S_LPROC32", "S_GDATA32", "S_LDATA32", "S_PUB32"):
                     self.names[rva].add(name)
+                if kind in ("S_LTHREAD32", "S_GTHREAD32"):
+                    self.tls.setdefault(int(a.group(2)), name)
         # Mangled public name of each function: it tells overloads and destructor kinds apart.
         self.mangled = {}
         for rva in self.funcs:
@@ -154,6 +177,29 @@ MD.detail = True
 X86 = capstone.x86
 
 
+def _reg64(r):
+    n = MD.reg_name(r)
+    return "r" + n[1:] if n.startswith("e") else (n[:-1] if n.startswith("r") and n.endswith("d") else n)
+
+
+def is_tls_index(insns, idx):
+    """Noise fix 6: `mov reg, <.tls offset>` is the index into the thread block of the function:
+    `mov rax, gs:[0x58]; mov rcx, [rax]; mov edx, off; mov [rdx + rcx], x`. The order of these
+    instructions differs, so look at 6 instructions before and after. A size or a count that has the
+    same value as a .tls offset is not used as `[reg + reg]` next to a `gs:` load."""
+    ins = insns[idx]
+    win = insns[max(0, idx - 6):idx + 7]
+    if not any("gs:" in w.op_str for w in win):
+        return False
+    r = _reg64(ins.operands[0].reg)
+    for w in insns[idx + 1:idx + 7]:
+        for op in w.operands:
+            if op.type == X86.X86_OP_MEM and op.mem.base and op.mem.index and op.mem.scale == 1 \
+                    and r in (_reg64(op.mem.base), _reg64(op.mem.index)):
+                return True
+    return False
+
+
 def signals(img, rva, size, alias):
     calls, refs, consts = [], [], []
     end = rva + size
@@ -165,7 +211,7 @@ def signals(img, rva, size, alias):
             n = img.funcs[t][0]
             return alias.get(n, n)
         ns = sorted(img.names.get(t, ()), key=lambda n: (n.startswith("?"), n))
-        return alias.get(ns[0], ns[0]) if ns else None
+        return simple_demangle(alias.get(ns[0], ns[0])) if ns else None
 
     def field_name(t):
         """A slot inside a named global (for example Aes128::_Delegator+0x10). Noise fix 3."""
@@ -192,7 +238,8 @@ def signals(img, rva, size, alias):
     size = end - rva
 
     chk = None                                     # const of the last instruction if it is mov eax, imm
-    for ins in MD.disasm(img.code(rva, size), rva):
+    insns = list(MD.disasm(img.code(rva, size), rva))
+    for idx, ins in enumerate(insns):
         op0 = ins.operands[0] if ins.operands else None
         chk, prev = None, chk
         if ins.group(X86.X86_GRP_JUMP) and ins.mnemonic != "jmp" or ins.mnemonic.startswith("loop"):
@@ -227,7 +274,9 @@ def signals(img, rva, size, alias):
         for op in ins.operands:
             if op.type == X86.X86_OP_MEM and op.mem.base == X86.X86_REG_RIP:
                 t = ins.address + ins.size + op.mem.disp
-                n = img.string_at(t) or target_name(t) or "<data>"
+                # Noise fix 5: a vtable symbol at the exact RVA wins. Slot 0 can look like a 2-byte string.
+                vt = target_name(t) if any(x.startswith("??_7") for x in img.names.get(t, ())) else None
+                n = vt or img.string_at(t) or target_name(t) or "<data>"
                 if n not in NOISE:
                     refs.append(n)
             elif op.type == X86.X86_OP_IMM:
@@ -239,6 +288,9 @@ def signals(img, rva, size, alias):
                     continue                       # flags and shifts: compiler noise
                 if 0x10000 <= v < img.size:
                     continue                       # an RVA (try tables, image-base addressing)
+                if ins.mnemonic == "mov" and v in img.tls and is_tls_index(insns, idx):
+                    refs.append("tls:" + img.tls[v])      # noise fix 6: .tls offset of a thread variable
+                    continue
                 consts.append(v)
                 if ins.mnemonic == "mov" and ins.operands[0].type == X86.X86_OP_REG \
                         and ins.operands[0].reg == X86.X86_REG_EAX:

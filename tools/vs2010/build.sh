@@ -8,6 +8,7 @@
 # Usage: tools/vs2010/build.sh [EXE...]   (default: CacheGate LobbyGate SmartCouponDaemon PostOfficeDaemon)
 # Env: LIFT_BUILD_DIR (clang build dir), VS2010_OUT (default: build-vs2010), JOBS (default: nproc)
 # Output: $VS2010_OUT/<EXE>.exe and <EXE>.pdb.
+# Header changes: the .dep file of each object lists its repo headers. A newer header rebuilds the object.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 R="$PWD"
@@ -48,17 +49,27 @@ for d in include $(sed -n '/set(LIFT_SRC_INCLUDE/,/^)/p' CMakeLists.txt | grep -
 done
 export INC R O
 
-# Compile one source to $O/obj/<path>.obj. Skip it when the object is newer than the source.
+# Compile one source to $O/obj/<path>.obj. Skip it when the object is newer than the source
+# and newer than each repo header that it included. /showIncludes gives the headers: they are
+# written to $O/obj/<path>.dep (one Linux path per line). An object with no .dep file is stale.
 compile_one() {
-  local src="$1" obj="$O/obj/$1.obj" log="$O/obj/$1.log" lang=""
+  local src="$1" obj="$O/obj/$1.obj" log="$O/obj/$1.log" dep="$O/obj/$1.dep" lang="" h stale=0
   mkdir -p "$(dirname "$obj")"
-  [ "$obj" -nt "$src" ] && return 0
+  if [ -f "$obj" ] && [ -f "$dep" ] && [ "$obj" -nt "$src" ]; then
+    while IFS= read -r h; do
+      if [ ! -e "$h" ] || [ "$h" -nt "$obj" ]; then stale=1; break; fi
+    done < "$dep"
+    [ "$stale" = 0 ] && return 0
+  fi
   case "$src" in *.c) lang="/TC";; esac
   # /Z7: /Zi starts mspdbsrv.exe, which hangs under Wine. /FIwinsock2.h: the headers include windows.h first.
   if ! wine "$VS2010_BIN/cl.exe" /nologo /c /O2 /GL /EHsc /MD /Z7 /GR- /W3 /D_WIN64 /DNDEBUG /DWIN32_LEAN_AND_MEAN \
-        /FIwinsock2.h $lang $INC /Fo"$(winepath -w "$R/$obj")" "$(winepath -w "$R/$src")" > "$log" 2>&1; then
-    echo "FAIL $src (see $log)"; rm -f "$obj"; return 1
+        /showIncludes /FIwinsock2.h $lang $INC /Fo"$(winepath -w "$R/$obj")" "$(winepath -w "$R/$src")" > "$log" 2>&1; then
+    echo "FAIL $src (see $log)"; rm -f "$obj" "$dep"; return 1
   fi
+  # "Note: including file:   Z:\home\...\X.h" -> "/home/.../X.h". Keep only the files of the repo.
+  tr -d '\r' < "$log" | sed -n 's/^Note: including file: *//p' | sed -E 's#^[Zz]:##; s#\\#/#g' |
+    grep -F "$R/" | sort -u > "$dep" || true
 }
 export -f compile_one
 

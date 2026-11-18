@@ -93,9 +93,9 @@
 "AlertSender::AlertSender": {
 "calls": 100,
 "consts": 100,
-"refs": 96,
-"score": 98.6,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "AlertSender::Name": {
 "calls": 100,
@@ -366,9 +366,9 @@
 "Channel::~Channel": {
 "calls": 100,
 "consts": 100,
-"refs": 75,
-"score": 91.7,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Client::GetId": {
 "calls": 100,
@@ -380,36 +380,36 @@
 "Client::SendGetCharacterInfoListOk": {
 "calls": 96,
 "consts": 91,
-"refs": 70,
-"score": 85.4,
+"refs": 78,
+"score": 88.3,
 "status": "DIFF"
 },
 "Client::SendGetServiceEntryListOk": {
 "calls": 97,
 "consts": 90,
-"refs": 70,
-"score": 85.3,
+"refs": 78,
+"score": 88.2,
 "status": "DIFF"
 },
 "Client::SendListGoodsOk": {
 "calls": 96,
 "consts": 87,
-"refs": 70,
-"score": 84.3,
+"refs": 78,
+"score": 87.2,
 "status": "DIFF"
 },
 "Client::SendListLobbyServiceItemInfoOk": {
 "calls": 85,
 "consts": 90,
-"refs": 76,
-"score": 83.5,
+"refs": 83,
+"score": 85.8,
 "status": "DIFF"
 },
 "Client::SendTakeGoodsOk": {
 "calls": 85,
 "consts": 93,
-"refs": 76,
-"score": 84.5,
+"refs": 83,
+"score": 86.8,
 "status": "DIFF"
 },
 "ClientManager::AcquireClient": {
@@ -428,9 +428,9 @@
 },
 "ClientManager::BroadcastAnnounceNotify": {
 "calls": 88,
-"consts": 89,
+"consts": 100,
 "refs": 100,
-"score": 92.1,
+"score": 95.8,
 "status": "DIFF"
 },
 "ClientManager::DisconnectAll": {
@@ -708,9 +708,9 @@
 },
 "CrashHandler::handleCrash": {
 "calls": 96,
-"consts": 95,
+"consts": 100,
 "refs": 93,
-"score": 94.8,
+"score": 96.4,
 "status": "DIFF"
 },
 "CriticalSection::~CriticalSection": {
@@ -989,9 +989,9 @@
 "FragmentPacket::FragmentPacket": {
 "calls": 100,
 "consts": 100,
-"refs": 50,
-"score": 83.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "FragmentPacket::IncRepeatCount": {
 "calls": 100,
@@ -1534,9 +1534,9 @@
 },
 "IoWorker::run": {
 "calls": 69,
-"consts": 81,
+"consts": 88,
 "refs": 97,
-"score": 82.7,
+"score": 84.9,
 "status": "DIFF"
 },
 "IoWorker::stop": {
@@ -1856,17 +1856,17 @@
 },
 "Log::Write [?Write@Log@@SAXW4Type@1@PEB_WH1ZZ]": {
 "calls": 100,
-"consts": 67,
+"consts": 100,
 "refs": 100,
-"score": 88.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Log::WriteV": {
 "calls": 100,
-"consts": 86,
+"consts": 100,
 "refs": 100,
-"score": 95.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Log::run": {
 "calls": 100,
@@ -1912,17 +1912,17 @@
 },
 "LogBuffer::deallocate_me": {
 "calls": 100,
-"consts": 0,
+"consts": 100,
 "refs": 100,
-"score": 66.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "LogBufferAllocator::Initialize": {
 "calls": 100,
-"consts": 67,
+"consts": 100,
 "refs": 100,
-"score": 88.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "LogBufferAllocator::allocate": {
 "calls": 100,
@@ -2109,8 +2109,8 @@
 "Network::SetMaxIdleTime": {
 "calls": 100,
 "consts": 100,
-"refs": 90,
-"score": 96.8,
+"refs": 97,
+"score": 98.9,
 "status": "DIFF"
 },
 "Network::initInstance": {
@@ -2123,8 +2123,8 @@
 "Network::initWorkerThread": {
 "calls": 100,
 "consts": 86,
-"refs": 90,
-"score": 91.9,
+"refs": 100,
+"score": 95.2,
 "status": "DIFF"
 },
 "Network::initializeSocketInterface": {
@@ -2157,10 +2157,10 @@
 },
 "Packet::Allocate [?Allocate@Packet@@QEAAPEBDXZ]": {
 "calls": 100,
-"consts": 67,
+"consts": 100,
 "refs": 100,
-"score": 88.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Packet::Clear": {
 "calls": 100,
@@ -2185,9 +2185,9 @@
 },
 "Packet::Copy": {
 "calls": 96,
-"consts": 75,
+"consts": 100,
 "refs": 100,
-"score": 90.2,
+"score": 98.6,
 "status": "DIFF"
 },
 "Packet::Decompose": {
@@ -2248,10 +2248,10 @@
 },
 "PacketBuffer::deallocate_me": {
 "calls": 100,
-"consts": 0,
+"consts": 100,
 "refs": 100,
-"score": 66.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "PacketBuffer::encrypt": {
 "calls": 100,
@@ -2262,10 +2262,10 @@
 },
 "PacketBufferAllocator::Initialize": {
 "calls": 100,
-"consts": 67,
+"consts": 100,
 "refs": 100,
-"score": 88.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "PacketBufferAllocator::allocate": {
 "calls": 100,
@@ -2452,9 +2452,9 @@
 "PipeCommandProcess::~PipeCommandProcess": {
 "calls": 100,
 "consts": 100,
-"refs": 50,
-"score": 83.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "PipeConsole::Name": {
 "calls": 100,
@@ -2578,9 +2578,9 @@
 "PipeConsole::~PipeConsole": {
 "calls": 100,
 "consts": 100,
-"refs": 67,
-"score": 88.9,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Port::Clear": {
 "calls": 100,
@@ -2696,10 +2696,10 @@
 },
 "Prng::Initialize": {
 "calls": 100,
-"consts": 67,
-"refs": 50,
-"score": 72.2,
-"status": "DIFF"
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Prng::setSeed": {
 "calls": 67,
@@ -2920,10 +2920,10 @@
 },
 "Session::SendV": {
 "calls": 100,
-"consts": 88,
+"consts": 100,
 "refs": 100,
-"score": 95.8,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Session::Session [??0Session@@IEAA@IPEBVPacketBufferHandler@@@Z]": {
 "calls": 100,
@@ -2948,9 +2948,9 @@
 },
 "Session::SetHandshakeParameter": {
 "calls": 50,
-"consts": 78,
-"refs": 90,
-"score": 72.6,
+"consts": 88,
+"refs": 91,
+"score": 76.1,
 "status": "DIFF"
 },
 "Session::SetPacketConcatenater": {
@@ -3320,9 +3320,9 @@
 "Thread::~Thread": {
 "calls": 100,
 "consts": 100,
-"refs": 0,
-"score": 66.7,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "ThreadFreeFragmentPacketPump::HandleEvent": {
 "calls": 100,
@@ -3417,10 +3417,10 @@
 },
 "ThreadManager::entry": {
 "calls": 100,
-"consts": 0,
+"consts": 100,
 "refs": 100,
-"score": 66.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "ThreadManager::stopThread": {
 "calls": 100,
@@ -3558,9 +3558,9 @@
 "WinMsgHandler::~WinMsgHandler": {
 "calls": 100,
 "consts": 100,
-"refs": 80,
-"score": 93.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "WinServiceConsole::Close": {
 "calls": 100,
@@ -3676,10 +3676,10 @@
 },
 "WindowConsole::Write": {
 "calls": 100,
-"consts": 50,
+"consts": 100,
 "refs": 100,
-"score": 83.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "WindowConsole::WriteStartLog": {
 "calls": 100,
@@ -4537,9 +4537,9 @@
 },
 "zstdPacketCompress": {
 "calls": 100,
-"consts": 75,
+"consts": 100,
 "refs": 100,
-"score": 91.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 }
 }
