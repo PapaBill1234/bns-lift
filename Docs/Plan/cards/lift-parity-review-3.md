@@ -1,6 +1,6 @@
 # lift-parity-review-3: parity review: measure, write the lessons, plan the next round
 
-Repo: bns-lift (PRIVATE). IDA only when the pseudocode and funcdiff are not enough (`/home/ubuntu/Documents/Codex/private-project/ida/lift/CacheGate/CacheGate.exe`).
+Repo: bns-lift (PUBLIC). Never commit binaries, PDBs, IDA databases or abuse notes. IDA only when the pseudocode and funcdiff are not enough (`/home/ubuntu/Documents/Codex/private-project/ida/lift/CacheGate/CacheGate.exe`).
 
 ## Goal
 We know what worked in round 3. The next round of parity cards is queued if an exe is below 90 %, or a 90+ round is queued,
@@ -14,6 +14,11 @@ or the handoff gives the reason for the stop.
 - Pseudocode of the original exes: `~/.cache/bns-lift/hr/<EXE>/` for CacheGate, LobbyGate, SmartCouponDaemon and PostOfficeDaemon.
 - `Docs/Parity/progress.tsv` has one row per accepted card.
 - Parity at review 2: CG 420/491 (85.5 %), LG 530/739 (71.7 %), SCD 510/669 (76.2 %), POD 588/759 (77.5 %), shared 421/499 (84.4 %).
+- Manual work (astra + opus 6.2, card `manual-parity` in progress.tsv) came after round 3: CG 91.2 % (448), LG 84.8 % (627), SCD 87.0 % (582), POD 87.6 % (665), shared 89.3 % (490/549).
+  Count it as its own row in review-3. Its methods are in `Docs/Parity/lessons.md`, sections from "AlertSender socket event loop" to the end.
+- Use these manual methods first in the round-4 cards: PDB facts before source changes, inline control (`#pragma inline_depth(0)`, out-of-line calls),
+  `::new` with global placement delete, statement order, and the tool fixes (funcdiff fix 9 TLS, fix 10 folded vtables). Also read the failed tests there.
+  Give each round-4 card the lessons section names that apply to it.
 - Estimate in review-2 section 6: CG about 440, LG about 625, SCD about 585, POD about 670.
 - The runner adds the rows of `Docs/Plan/queue/lift-parity-review-3.tsv` to the queue after this card. The columns are: id, kind, model,
   crate, paths, deps, turns, status, title. Use kind `lift`, crate `-`, turns `150`, status `ready`. Each id must start with `lift-parity-`.
