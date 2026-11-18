@@ -571,17 +571,14 @@ void BigInteger::Divide(BigInteger const* a, unsigned int b, BigInteger* quot, u
     else
     {
         // BUG: 0x59AF0 reads up to 128 entries of digit_bit_r, but the table has 32.
-        unsigned int k = 0;
-        unsigned int const* table = digit_bit_r;
-        while (b != *table)
+        for (unsigned int k = 0; k < 0x80; ++k)
         {
-            ++k;
-            ++table;
-            if (k >= 0x80)
-                goto found;
+            if (b == digit_bit_r[k])
+            {
+                w = 31 - k;
+                break;
+            }
         }
-        w = 31 - k;
-    found:
         *rem = a->digits[0] & digit_mask[static_cast<int>(w)];
     }
 }
