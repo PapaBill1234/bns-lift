@@ -952,6 +952,8 @@ __declspec(thread) PacketCrypt::ErrCode Thread_LastCryptError;
 
 // 0x19460 (LobbyGate)
 // LIFT: noinline. The orig calls it out of line at all call sites (LG 0x19460: not inlined).
+// LIFT: inline_depth(0). LG 0x19460 calls PacketCrypt::InstanceSize (0x4cc60) out of line (lessons A20).
+#pragma inline_depth(0)
 __declspec(noinline) void* Session::allocateCrypt(PacketCrypt::Type type, PacketCrypt::Algorithm algorithm) const
 {
     // LIFT: LTCG removed the algorithm param from InstanceSize and Create. Create gets (type, buffer, size)
@@ -963,6 +965,7 @@ __declspec(noinline) void* Session::allocateCrypt(PacketCrypt::Type type, Packet
     unsigned char* buffer = static_cast<unsigned char*>(self->_allocator.Alloc(size, SESSION_FILE, 1320));
     return PacketCrypt::Create(type, algorithm, buffer, size);
 }
+#pragma inline_depth()
 
 // 0x194C0 (LobbyGate). The CacheGate ~Session (0xE0A0) inlines it.
 // LIFT: per-exe form, only LG 0x194c0 has the function (noinline). CG, SCD and POD inline it in ~Session.
@@ -1064,7 +1067,17 @@ void Session::completeHandshake()
     _cryptMode = 5;
     if (handshakeCrypt != nullptr)
     {
+#if defined(LIFT_EXE_LG)
+        // LIFT: LG 0x197e0 has the body of deallocateCrypt (0x194c0) in place, with no null test.
+        int type = handshakeCrypt->GetType();
+        int rest1;
+        int rest2;
+        if (type == 0 || ((rest1 = type - 1) != 0 && ((rest2 = rest1 - 1) == 0 || static_cast<unsigned int>(rest2 - 1) <= 1)))
+            handshakeCrypt->~PacketCrypt();
+        _allocator.Free(handshakeCrypt, SESSION_FILE, 1331);
+#else
         deallocateCrypt(handshakeCrypt);
+#endif
         _handshakeCrypt = nullptr;
     }
     _currentCrypt = _sessionCrypt;

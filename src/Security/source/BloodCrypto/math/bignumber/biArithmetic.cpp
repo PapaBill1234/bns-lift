@@ -269,7 +269,12 @@ void BigInteger::Mul(BigInteger const* a, BigInteger const* b)
             r = &tmp;
         else
             setZero();
-        mul(a, b, r);
+        // LIFT: 0x58fbd computes the rounded bit count and compares it with 0x1000. Both paths call mul,
+        // and the compiler merged them. The source name of the second path is not known. // ❓
+        if (((a->bits + b->bits + 31) & ~31) < 0x1000)
+            mul(a, b, r);
+        else
+            mul(a, b, r);
         r->sign = a->sign * b->sign;
         if (r != this)
             Set(r, 1);
