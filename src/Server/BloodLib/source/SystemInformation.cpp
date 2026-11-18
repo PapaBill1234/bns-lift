@@ -37,53 +37,59 @@ static void addUniqueAddress(unsigned long* address, int capacity, int* found, u
 // LTCG folded address to 0 (the only caller is Daemon: Hostname(0, hostname, 256)).
 int SysInfo::Hostname(unsigned long address, wchar_t* hostname, int length)
 {
-    sockaddr_in sockaddr = {};
-    sockaddr.sin_family = AF_INET;
-    sockaddr.sin_port = htons(0);
-    sockaddr.sin_addr.S_un.S_addr = address;
-    if (hostname == nullptr)
-        return 3;
-    WSADATA data;
-    if (WSAStartup(MAKEWORD(2, 2), &data) != 0)
-        return 4;
-    int result;
-    char name[1025];
-    if (address == 0)
+    sockaddr addr;
+    memset(&addr, 0, sizeof(addr));
+    sockaddr_in* in = reinterpret_cast<sockaddr_in*>(&addr);
+    in->sin_family = AF_INET;
+    in->sin_port = htons(0);
+    in->sin_addr.S_un.S_addr = address;
+    if (hostname != nullptr)
     {
-        if (gethostname(name, 1025) != 0)
+        WSADATA data;
+        if (WSAStartup(MAKEWORD(2, 2), &data) != 0)
+            return 4;
+        int result;
+        char name[1025];
+        if (address == 0)
         {
-            result = 5;
+            if (gethostname(name, 1025) != 0)
+            {
+                result = 5;
+            }
+            else
+            {
+                hostname[length - 1] = L'\0';
+                MultiByteToWideChar(CP_ACP, 0, name, -1, hostname, length - 1);
+                result = 0;
+            }
         }
         else
         {
-            hostname[length - 1] = L'\0';
-            MultiByteToWideChar(CP_ACP, 0, name, -1, hostname, length - 1);
-            result = 0;
+            // LIFT: the binary has no code for address != 0. The only call (0x17240) passes only rcx = hostname,
+            // and 0x1FBB7 stores 0 in sin_addr. The lift returns 5 here. This branch never runs.
+            result = 5;
         }
-    }
-    else
-    {
-        // LIFT: the binary has no code for address != 0. The only call (0x17240) passes only rcx = hostname,
-        // and 0x1FBB7 stores 0 in sin_addr. The lift returns 5 here. This branch never runs.
-        result = 5;
-    }
-    WSACleanup();
-    if (result != 0)
-    {
-        char* text = inet_ntoa(sockaddr.sin_addr);
-        hostname[length - 1] = L'\0';
-        MultiByteToWideChar(CP_ACP, 0, text, -1, hostname, length - 1);
+        WSACleanup();
+        if (result == 0)
+        {
+            for (wchar_t* p = hostname; *p != L'\0'; ++p)
+            {
+                if (*p == L'.')
+                {
+                    *p = L'\0';
+                    break;
+                }
+            }
+        }
+        else
+        {
+            char* text = inet_ntoa(in->sin_addr);
+            hostname[length - 1] = L'\0';
+            MultiByteToWideChar(CP_ACP, 0, text, -1, hostname, length - 1);
+        }
         return result;
     }
-    for (wchar_t* p = hostname; *p != L'\0'; ++p)
-    {
-        if (*p == L'.')
-        {
-            *p = L'\0';
-            break;
-        }
-    }
-    return 0;
+    return 3;
 }
 
 // 0x1FCE0 (SmartCouponDaemon)
@@ -100,18 +106,21 @@ int SysInfo::IpAddress(wchar_t const* hostname, int* count, unsigned long* addre
     if (WSAStartup(MAKEWORD(2, 2), &data) != 0)
         return 4;
     char name[1025];
-    if (hostname != nullptr)
+    if (hostname == nullptr)
+    {
+        // BUG: 0x1FCE0 (SmartCouponDaemon) gethostname returns 0 on success, but 0 is used as the failure.
+        if (gethostname(name, 1025) == 0)
+        {
+            WSACleanup();
+            *count = 0;
+            return 5;
+        }
+    }
+    else
     {
         name[1023] = '\0';
         name[1024] = '\0';
         WideCharToMultiByte(CP_ACP, 0, hostname, -1, name, 1024, nullptr, nullptr);
-    }
-    // BUG: 0x1FCE0 (SmartCouponDaemon) gethostname returns 0 on success, but 0 is used as the failure.
-    else if (gethostname(name, 1025) == 0)
-    {
-        WSACleanup();
-        *count = 0;
-        return 5;
     }
 
     addrinfo hint;
@@ -141,18 +150,20 @@ int SysInfo::IpAddress(wchar_t const* hostname, int* count, unsigned long* addre
 
     ULONG outBufLen = 15360;
     IP_ADAPTER_ADDRESSES* adapters = nullptr;
-    for (unsigned int retry = 0;;)
+    unsigned int retry = 0;
+    ULONG result = 0;
+    do
     {
         adapters = static_cast<IP_ADAPTER_ADDRESSES*>(malloc(outBufLen));
         if (adapters == nullptr)
             break;
-        if (GetAdaptersAddresses(AF_INET, GAA_FLAG_INCLUDE_PREFIX, nullptr, adapters, &outBufLen) != ERROR_BUFFER_OVERFLOW)
+        result = GetAdaptersAddresses(AF_INET, GAA_FLAG_INCLUDE_PREFIX, nullptr, adapters, &outBufLen);
+        if (result != ERROR_BUFFER_OVERFLOW)
             break;
         free(adapters);
         adapters = nullptr;
-        if (++retry >= 3)
-            break;
-    }
+        ++retry;
+    } while (result == ERROR_BUFFER_OVERFLOW && retry < 3);
     if (adapters != nullptr)
     {
         for (IP_ADAPTER_ADDRESSES* adapter = adapters; adapter != nullptr; adapter = adapter->Next)

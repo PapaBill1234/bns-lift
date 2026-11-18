@@ -1584,9 +1584,9 @@
 "PacketBufferAllocator::initAllocator": {
 "calls": 100,
 "consts": 100,
-"refs": 92,
-"score": 97.4,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "PacketBufferPool::allocate": {
 "calls": 100,
@@ -2087,10 +2087,10 @@
 },
 "Session::Accept": {
 "calls": 100,
-"consts": 92,
+"consts": 100,
 "refs": 100,
-"score": 97.4,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Session::Close": {
 "calls": 100,
@@ -2227,10 +2227,10 @@
 },
 "Session::recv": {
 "calls": 100,
-"consts": 91,
+"consts": 100,
 "refs": 100,
-"score": 97.0,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Session::send": {
 "calls": 100,
@@ -2423,17 +2423,17 @@
 },
 "SysInfo::Hostname": {
 "calls": 100,
-"consts": 88,
+"consts": 100,
 "refs": 100,
-"score": 95.8,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "SysInfo::IpAddress": {
-"calls": 80,
-"consts": 95,
+"calls": 100,
+"consts": 100,
 "refs": 100,
-"score": 91.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "SystemEvent::~SystemEvent": {
 "calls": 100,
@@ -2675,10 +2675,10 @@
 },
 "TrustedPacketBufferHandler::ToPacket": {
 "calls": 100,
-"consts": 75,
+"consts": 100,
 "refs": 100,
-"score": 91.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "WinMsgHandler::Name": {
 "calls": 100,

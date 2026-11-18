@@ -54,18 +54,19 @@ int TrustedPacketBufferHandler::ToPacket(Session const* session, char const* buf
 {
     if (bufferSize < 2)
         return 0;
-    short size = *reinterpret_cast<short const*>(buffer);
-    if (size < 2 || size > 4000)
+    // The PDB has no local here (CG 0x11e90): read the header in place each time.
+    short const* size = reinterpret_cast<short const*>(buffer);
+    if (*size < 2 || *size > 4000)
     {
         Log::Write(Log::LT_ERROR, PBH_FILE, 63,
                    L"== CRASH == [session], TrustedPacketBufferHandler; invalid packet size, id:%I64X, header->size:%d",
-                   session->_id, static_cast<int>(size));
+                   session->_id, static_cast<int>(*size));
         AlertSender::Write(PBH_FILE, 63,
                            L"== CRASH == [session], TrustedPacketBufferHandler; invalid packet size, id:%I64X, header->size:%d",
                            session->_id, static_cast<int>(*reinterpret_cast<short const*>(buffer)));
         return -1;
     }
-    if (bufferSize < size)
+    if (bufferSize < *size)
         return 0;
     if (packet != nullptr)
         *packet = buffer;

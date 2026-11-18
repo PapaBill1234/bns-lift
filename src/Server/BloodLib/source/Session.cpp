@@ -96,15 +96,6 @@ bool ReconnectTimer::HandleEvent(EventContext* context, unsigned long numOfBytes
     return true;
 }
 
-// LIFT: helper, not in the PDB. Packs the idle table position: WORD0 port id, WORD1 slot (id & 3), DWORD1 byte index.
-static inline long long makeIdleStatePos(unsigned long long id)
-{
-    unsigned long long pos = static_cast<unsigned short>(id >> 32);
-    pos |= static_cast<unsigned long long>(static_cast<unsigned short>(id & 3)) << 16;
-    pos |= static_cast<unsigned long long>(static_cast<unsigned int>(id) >> 2) << 32;
-    return static_cast<long long>(pos);
-}
-
 // 0xDED0
 unsigned int Session::EventId() const
 {
@@ -353,11 +344,11 @@ bool Session::Accept(Port* port, unsigned long long id, unsigned long long* sock
 {
     if (!initialize(port, id, option))
         return false;
-    port->_sessionHandler->OnCreated(this);
+    _port->_sessionHandler->OnCreated(this);  // orig reads the member (CG 0xe7c0)
     if (!_connection->Accept(this, *socket, ip, portNumber))
     {
         Log::Write(Log::LT_ERROR, SESSION_FILE, 448, L"[session], Connection::Accept failed, id:%I64x, this:%p, error:%d",
-                   id, this, WSAGetLastError());
+                   _id, this, WSAGetLastError());
         return false;
     }
     *socket = INVALID_SOCKET;
@@ -370,24 +361,20 @@ bool Session::Accept(Port* port, unsigned long long id, unsigned long long* sock
             _connection->_socket = INVALID_SOCKET;
         }
         _state = CLOSED;
-        Log::Write(Log::LT_ERROR, SESSION_FILE, 460, L"[session], OnAccept failed, id:%I64x, this:%p", id, this);
+        Log::Write(Log::LT_ERROR, SESSION_FILE, 460, L"[session], OnAccept failed, id:%I64x, this:%p", _id, this);
         return false;
     }
     if (port->_idleStateTable != nullptr)
     {
         _lastRecvTime = GetTickCount64() - Daemon::Instance->StartSystemTick64;
-        IdleStateTable* table = port->_idleStateTable;
-        unsigned int index = static_cast<unsigned int>(id) >> 2;
-        table->_table[index] &= ~IdleStateTable::STATE_MASK[id & 3];
-        table->_table[index] |= 1 << (2 * (3 - (id & 3)));
-        _idleStatePos = makeIdleStatePos(id);
+        _idleStatePos = port->_idleStateTable->SetBusyWithPos(id).pos;  // inlined (CG 0xe7c0)
     }
     if (!Daemon::Instance->allowClientIPAddressInLogs && port->_id == 1)
         ip = 0;
     if (Daemon::Instance->allowClientSessionLifeCycleInLogs || port->_id != 1)
         Log::Write(Log::LT_DEBUG, SESSION_FILE, 480,
                    L"[session], accepted from, port id: %u, session id:%I64x, this:%p, ip:%s, port:%d, socket:%p",
-                   port->_id, id, this, Network::GetAddressStringW(ip), portNumber,
+                   port->_id, _id, this, Network::GetAddressStringW(ip), portNumber,
                    reinterpret_cast<void*>(_connection->_socket));  // LobbyGate 0x17ee8: _connection(+0x40)->_socket(+8)
     return true;
 }
@@ -563,19 +550,21 @@ bool Session::recv()
                    _id, this, _state);
         return false;
     }
-    SessionRecvBuffer* recvBuffer = _recvBuffer;
-    recvBuffer->_context._wsaBuffer.len = 4008 - recvBuffer->_recvdSize;
-    recvBuffer->_context._wsaBuffer.buf = &recvBuffer->_buffer[recvBuffer->_recvdSize];
+    // CG 0xf0d0: the context pointer first; the store through it makes the compiler read _recvBuffer again.
+    AsyncRecvContext* context = &_recvBuffer->_context;
+    context->_wsaBuffer.len = 4008 - _recvBuffer->_recvdSize;
+    context->_wsaBuffer.buf = &_recvBuffer->_buffer[_recvBuffer->_recvdSize];
     // LIFT: AsyncRecv does not read the second argument; it sets r8 to 0 (LobbyGate 0x27264). r8 holds the recv buffer.
-    if (_connection->AsyncRecv(&recvBuffer->_context, reinterpret_cast<unsigned int*>(recvBuffer)))
+    // CG 0xf0d0 puts the failure block first.
+    if (!_connection->AsyncRecv(context, reinterpret_cast<unsigned int*>(_recvBuffer)))
     {
-        _recvPending = true;
-        return true;
+        Log::Write(Log::LT_ERROR, SESSION_FILE, 743,
+                   L"[session], recv error; Connection::AsyncRecv failed, id:%I64x, this:%p, error:%d", _id, this,
+                   WSAGetLastError());
+        return false;
     }
-    Log::Write(Log::LT_ERROR, SESSION_FILE, 743,
-               L"[session], recv error; Connection::AsyncRecv failed, id:%I64x, this:%p, error:%d", _id, this,
-               WSAGetLastError());
-    return false;
+    _recvPending = true;
+    return true;
 }
 
 // 0xF1C0
@@ -703,8 +692,7 @@ void Session::HandleFailedEvent(EventContext* context, unsigned long numOfBytes)
         IdleStateTable* table = _port->_idleStateTable;
         if (table != nullptr)
         {
-            unsigned int id = static_cast<unsigned int>(_id);
-            table->_table[id >> 2] &= ~IdleStateTable::STATE_MASK[static_cast<short>(id & 3)];
+            table->SetNotAvailable(_id);  // inlined (CG 0xf5d0)
         }
         _port->_sessionHandler->OnClose(this, _option == 2);
         EnterCriticalSection(&_lock.CS);

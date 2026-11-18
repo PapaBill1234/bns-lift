@@ -15,6 +15,56 @@ public:
 
     static IdleStateTable* Create(Port* port, int size, long maxIdleTime, bool disconnect);  // 0x24CD0
 
+    enum
+    {
+        NOT_AVAILABLE = 0,
+        BUSY = 1,
+        IDLE = 2,
+        CLOSE_CANDIDATE = 3,
+    };
+
+    // PDB union IdleStateTable::Pos (size 8): port +0, bit +2, index +4.
+    union Pos
+    {
+        __int64 pos;
+        struct
+        {
+            short port;
+            short bit;
+            int index;
+        };
+    };
+
+    // Inlined in each caller (CG Session::Accept 0xe7c0, Session::HandleFailedEvent 0xf5d0). The PDB has no
+    // signature for these methods. ❓ parameter types
+    static Pos GetPos(unsigned __int64 id)
+    {
+        Pos p;
+        p.port = static_cast<short>(id >> 32);
+        p.bit = static_cast<short>(id & 3);
+        p.index = static_cast<int>(static_cast<unsigned int>(id) >> 2);
+        return p;
+    }
+    // CG 0xf5d0 does not compute the port part: no Pos here.
+    void SetNotAvailable(unsigned __int64 id)
+    {
+        setState(static_cast<unsigned int>(id) >> 2, static_cast<short>(id & 3), NOT_AVAILABLE);
+    }
+    Pos SetBusyWithPos(unsigned __int64 id)
+    {
+        Pos p = GetPos(id);
+        setState(static_cast<unsigned int>(p.index), p.bit, BUSY);
+        return p;
+    }
+
+private:
+    // LIFT: no PDB name. Common body of the Set* methods. CG 0xf5d0 keeps "or (0 << shift)" for NOT_AVAILABLE.
+    void setState(unsigned int index, short bit, unsigned char state)
+    {
+        _table[index] &= ~STATE_MASK[bit];
+        _table[index] |= static_cast<unsigned char>(state << ((3 - bit) * 2));
+    }
+
 protected:
     void scan();  // 0x24DF0
 

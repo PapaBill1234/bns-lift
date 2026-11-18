@@ -88,8 +88,14 @@ static_assert(sizeof(StaticPageMemoryManager) == 0x28, "sizeof StaticPageMemoryM
 class PagePoolMemoryManager
 {
 public:
-    PagePoolMemoryManager(unsigned long long granularity)  // LIFT: inlined constructor (0x135D0)
-        : _allocSize(0), _granularity(granularity), _block(nullptr), _blockEnd(nullptr) {}
+    // LIFT: inlined constructor (0x135D0). CG 0x12b10 calls InitializeCriticalSection (_lock) before the stores: body stores.
+    PagePoolMemoryManager(unsigned long long granularity)
+    {
+        _allocSize = 0;
+        _granularity = granularity;
+        _block = nullptr;
+        _blockEnd = nullptr;
+    }
     ~PagePoolMemoryManager();
     bool Initialize(unsigned long long size);
     void* Alloc();

@@ -381,3 +381,32 @@ Not done:
 ## lift-parity-order-3, stage 6 (final)
 - Full run after all edits: CG 430, LG 588, SCD 550, POD 631 (baseline 424 / 583 / 543 / 626). MATCH lost: 0. Gate ok, parity ok.
 - Did not work: POD `UnsentPostContextManager::initContextManager` 0xc6d0, `for (;; ++it) { if (it == end) goto success; ... } success: Leave; return true;`. The compiler gives the same block order (success tail after the loop exit). Undone. The note about this try also holds for `updateWorldList` 0xcae0 (same shape, not tried).
+
+## lift-parity-consts-3, stage 1
+- Quick CG measure (`.scratch/q.sh CacheGate`): 430 -> 434. New MATCH: `PacketBufferAllocator::initAllocator` 0x12b10, `Session::Accept` 0xe7c0, `Session::recv` 0xf0d0, `TrustedPacketBufferHandler::ToPacket` 0x11e90. LG, SCD and POD are not measured yet.
+- Worked, `initAllocator`: `x = mem ? new (mem) T(...) : nullptr` with an init-list ctor moves or duplicates the stores. Use plain placement new and a ctor that assigns in the body, so that `InitializeCriticalSection` (member ctor) comes before the stores.
+- Did not work, `Network::Network` 0xcdb0: the same placement-new change for `EndEventObject` gives no change (still 2 stores, orig has 1 merged store).
+- Worked, `Session::Accept`: the orig reads the members (`_port->_sessionHandler`, `_id`), not the params. The idle block is one `SetBusyWithPos(id).pos` call (union `IdleStateTable::Pos` from the PDB).
+- Worked, `Session::recv`: take a pointer-to-context local before the stores. Put the failure block (`!AsyncRecv` -> log, return false) first.
+- Worked, `ToPacket`: no short local for the header size. Read `*size` through a `short const*` two times. A short local gives a range check with const 0xf9e.
+- Build fact: the `.dep` files of `tools/vs2010/build.sh` list only headers in `BloodLib/include/`. An edit of a header in `BloodLib/source/` (for example `IdleWatcher.h`) does not rebuild. Touch the `.cpp` files.
+- Not fixable here (stop list): TLS offsets in `Daemon::setAddress`, `Network::GetAddressStringW`, `Network::initWorkerThread`; const 0x80 in `Daemon::Start` (`ThreadManager::Initialize(128)` is constant-propagated); ICF vtable name in `Session::initialize` (`SessionRecvBuffer` vs `CrashHandler`); ICF name in `WindowConsole::Open`.
+- `Session::HandleFailedEvent` 0xf5d0 is still DIFF. Cause: ours keeps `&_lock.CS` in rsi; orig computes `+0x18` again at each use and keeps `removed` in esi. Also ours reads the id with a 64-bit `mov rax`; orig uses `mov r8`, then `r9d = r8d >> 2`.
+
+## lift-parity-consts-3, stage 2
+- Measured with `.scratch/q.sh` on all 4 exes: CG 430 -> 434, LG 589 -> 593, SCD 550 -> 554, POD 631 -> 635. The same 4 functions are MATCH in each exe. No exe lost a MATCH.
+- `Network::Network` placement-new edit reverted. `makeIdleStatePos` in Session.cpp removed (no caller).
+- Did not work, `Session::HandleFailedEvent`: `_lock.Enter()` / `_lock.Leave()` in place of `EnterCriticalSection(&_lock.CS)` gives the same code. `static_cast<short>(id) & 3` in place of `static_cast<short>(id & 3)` in `SetNotAvailable` gives the same code. Both reverted.
+- Cause found, not fixed: `Session::Session(unsigned, PacketBufferHandler const*)` and `StaticPageMemoryManager::Initialize(page,size,allocated,additional)` (CG 0x1a1a0). The only caller is the Session ctor. Orig LTCG folds `size` 2048 and `allocated` 584 into the callee, but still passes `&BaseMemoryManager::_Instance` in r8. Ours folds the address too. No source change is known that stops the address fold.
+- `SysInfo::Hostname` CG 0x14390: orig keeps a 16-byte `sockaddr_in` on the stack (frame 0x600, ours 0x5f0). Stores: 0 (2 qwords), sin_addr, sin_family 2, then sin_port = htons(0). `memset` + this store order alone does not keep the struct (frame still 0x5f0). Orig puts the '.' loop on the fall-through path after `test edi,edi; jne`.
+- `SysInfo::IpAddress` CG 0x144f0: orig tests `address == nullptr` before it reads `*count`; ours reads `*count` first (movsxd before the test). Orig uses r11 frame (`mov r11, rsp`). Call order differs: orig calls gethostname and WSACleanup before malloc.
+
+## lift-parity-consts-3, stage 3
+- Worked, `SysInfo::IpAddress` CG 0x144f0 (91.7 -> MATCH): (1) the adapter retry loop in the MS sample form `do { malloc; if null break; result = GetAdaptersAddresses(...); if (result != ERROR_BUFFER_OVERFLOW) break; free; p = nullptr; ++retry; } while (result == ERROR_BUFFER_OVERFLOW && retry < 3);`. The `for (;;)` form rotates the loop and calls `malloc` two times. (2) `if (hostname == nullptr) { if (gethostname(...) == 0) {...return 5;} } else { WideCharToMultiByte }`. The `if (hostname != nullptr) ... else if (gethostname...)` form moves the gethostname block to the end.
+- Worked, `SysInfo::Hostname` CG 0x14390 (95.8 -> MATCH): `sockaddr addr; memset; sockaddr_in* in = reinterpret_cast<sockaddr_in*>(&addr);` stores through `in` keep the struct on the stack (frame 0x600). Body in `if (hostname != nullptr) { ... return result; } return 3;`. Tail: `if (result == 0) { '.' loop } else { inet_ntoa ... }`. The consts 0x3/0x4 came from the block order (`lea eax,[rsi+3]` against `[rsi+4]`).
+- Cause found, `Port::Initialize` EH state -2: orig has `RefCntObject::operator delete(void*, wchar_t const*, int)` (CG 0x20f0, crash log line 0x8b). So orig creates `SessionPool` (derives `BaseRefCntObj`) with a class `operator new(size_t, wchar_t const*, int)` and the matching delete gives the EH region. Ours uses `Alloc` + plain placement new. Not yet tried.
+
+## lift-parity-consts-3, stage 4
+- Measured `SysInfo::Hostname` and `SysInfo::IpAddress` on LG, SCD, POD: both MATCH in each exe. Total for the card: LG 589 -> 595, SCD 550 -> 556, POD 631 -> 637, CG 430 -> 436. No exe lost a MATCH.
+- Correction to stage 3, `Port::Initialize` EH state -2: the PDB has no `RefCntObject::operator new`. The real cause is the global placement delete. Orig `bloodlib\include\Memory.h:173` defines `operator delete(void* obj, void* buf)` with a crash body ("== CRASH == [memory], DO NOT USE THIS DEL OPERATOR", CG 0x1000). The body is not empty, so VS2010 keeps an unwind state (frame marker -2) for each `new (memory) T(...)` where the ctor of T is a call. Our `include/vs2010/new` (and the VS2010 `<new>`) has an empty inline body, so cl removes the state.
+- Fix not applied: the fix is global (Memory.h must define `__PLACEMENT_NEW_INLINE` and the crash-body placement new/delete before `<new>`). It changes each placement-new site in all exes. Do it in a separate card and measure all 4 exes.
