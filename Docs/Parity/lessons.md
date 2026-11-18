@@ -446,3 +446,63 @@
   known zero). Write the alloc path in `if (buffer == nullptr) {...}`. MATCH (also `TrustedPacketBufferHandler::Clone`).
 - `FragmentPacket::~FragmentPacket` 0x24e0: orig is `add rcx,8; jmp Packet::Clear`. The body must be empty: the
   member `~Packet` does the Clear. An explicit `packet.Clear()` gives two calls and an EH frame. MATCH.
+
+## Pattern 40 (worked, lift-parity-scd-1): SmartCouponDB compare with ID128_GUID_ZERO, split return tail, literal L""
+- Orig SCD 0x10b46 compares `id[0]`/`id[1]` with `ID128_GUID_ZERO` (2 `cmp qword` with memory). Source:
+  `id->id[0] == ID128_GUID_ZERO.id[0] && id->id[1] == ID128_GUID_ZERO.id[1]`, not `== 0`.
+- Success tail: `if (*dbRetValue != 0) return false; return true;` (orig has 2 `ReleaseTransaction` calls).
+- Pass the literal `L""` (`??_C@_11LOCGONAA@`), not a named `wchar_t const[]`.
+- Result: SCD 437 -> 440. RegisterGameEventLog 0x10b00, UpdateStatusToProcessFailure 0x11130,
+  UpdateStatusToPublicationFailure MATCH.
+- Did not change the code: `goto _BIND_ERROR` per bind call (HR label `$_BIND_ERROR_1`) in
+  ProcessCharacterGameEventLog 0x117c0. Same diff: orig inlines only the first BindCol, ours all 3; ours has
+  one extra Fetch and one extra Log::Write. Cause not known.
+- SCD StlMemory.h path: lower case `e:\dailybuild02\smartcoupondaemon-common-0.0.348\...\StlMemory.h` in CouponJob,
+  DaemonChannel, NPChannel2, NPServiceChannel, ObjectPool, Port, Timer; upper case
+  `E:\DailyBuild02\SmartCouponDaemon-Common-0.0.348\...` only in CouponGameEventConfig. Ours uses the CG path
+  (StlMemory.h:8). Example: NPServiceChannelManager::OnClose 96.3 (only this ref differs).
+
+## Pattern 41 (worked, lift-parity-scd-1): per-exe StlMemory.h path
+- `LIFT_STLMEMORY_FILE` in `StlMemory.h` is now `#ifndef`. An exe-only `.cpp` defines it before the first include.
+- SCD: lower case path in CouponJob, DaemonChannel, NPServiceChannel, NPChannel2 (only SCD builds it); upper
+  case in CouponGameEventConfig. Port and Timer are shared: not changed.
+- Result: SCD 440 -> 444 (NPServiceChannelManager::OnClose, DChannelMgr::DChannelMgr, GameEventConfig ctor,
+  NPTransactionRegistry ctor). Touch the `.cpp` files after the header change.
+
+## Pattern 42 (worked, lift-parity-scd-1): compiler-generated EventObject dtor
+- Cause: in all 4 exes `EventObject::~EventObject` / `DynamicEventObject::~DynamicEventObject` is a thunk to
+  `RefCntObject::~RefCntObject` with no vtable store. A user-declared dtor (even an empty one) stores
+  `??_7EventObject`, also when it is inlined into a derived dtor.
+- Source change: remove the user-declared dtors from `TimerQueue.h` and `Network.cpp`.
+- Result: CG +1, LG +1, POD +5, SCD Timer::~Timer and NPMsgHandleEvent::~NPMsgHandleEvent MATCH.
+- Some other dtors/ctors flip MATCH <-> DIFF in the same run (Console, LogFile, Thread, Channel). funcdiff
+  `string_at` reads their vtable as a string ("0a", "PI"). This is noise of the tool, not a code change.
+
+## Pattern 43 (worked, lift-parity-scd-1): small SCD diffs
+- Hex dump loop (NPChannel::handlePacket 0x57d0, extra const 0x6): walk a byte pointer to the end,
+  `temp[k++]` three times. An index loop with `k += 3` gives a 6-byte stride.
+- `x = mem ? new (mem) T() : nullptr` into a static gives 2 stores. Use a local and one store
+  (GameEventManager::GameEventManager 0xaae0).
+- LTCG drops an unused function-pointer argument. A null test of that argument stays as
+  `lea fn; test` in our build. The original tests the next argument (GameEventManager::Initialize 0xac90:
+  test of `threadManager`).
+- Log the `GetLastError()` value, not the API result, when the HR shows a second GetLastError call
+  (DChannelMgr::CreateDaemonListXml 0xd5c0).
+- Result: SCD 444 -> 448.
+
+## Pattern 44 (worked, lift-parity-scd-1, stage 4): Pattern 38 on the SCD maps
+- Cause: the SCD PDB map allocators have a non-const key (`StlAllocator<std::pair<unsigned __int64,CouponJob *>,2>`).
+- Source change: non-const key in `JobManager::JobMap`, `DChannelMgr::_list`, `GameEventConfig::_gameEventList`,
+  `NPTransactionRegistry::_dict`. Insert with the explicit non-const `std::pair<K, V>(k, v)`.
+- Result: SCD MATCH 448 -> 459. CG, LG, POD did not lose a MATCH. Example: `JobManager::Clear` 0x6ff0 MATCH.
+
+## Pattern 45 (worked, lift-parity-scd-1, stage 5): assert path strings and init lists
+- Cause 1: the assert file path in inline RefCntObject code is a per-exe string. SCD has the upper case path
+  `E:\DailyBuild02\SmartCouponDaemon-Common-...\RefCntObject.h`. Source change: macro `REFCNT_HEADER_ALT`
+  (default = `REFCNT_HEADER`). `RefCntObjectSmartCouponDaemon.cpp` sets it. Example: `RefCntObject::addReferenceCount` 0x6890 MATCH.
+- Cause 2: member stores in the ctor body versus in the init list. Source change: put the stores in the init list
+  (`CouponJob() : _id(0), _state(0), _lastState(0) {}`, `EventNotiJob` ctor 0x99f0 `_gameAccountId(ID128_GUID_ZERO)`).
+- Cause 3: log arguments with null tests (`job ? job->_id : 0`) in `EventNotiJob::init` 0x9f90 MATCH.
+- Result: SCD MATCH 459 -> 461. CG, LG, POD did not lose a MATCH.
+- Did not work / stopped: constant CSE of -1 and 1 (`EventNotiJob::finalize` 0x9cc0) and LTCG constant propagation
+  (`JobManager::Execute` 0x71a0, `ExecuteW` 0x7220). The source cannot control them.

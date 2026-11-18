@@ -1,4 +1,7 @@
 // CouponJob.obj (SmartCouponDaemon PDB). Source file name from log strings: "CouponJob.cpp".
+// LIFT: SCD build path of StlMemory.h (lower case form, from the HR strings).
+#define LIFT_STLMEMORY_FILE \
+    L"e:\\dailybuild02\\smartcoupondaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\bloodlib\\include\\StlMemory.h"
 #include <windows.h>
 #include <new>
 #include "CouponJob.h"
@@ -230,7 +233,7 @@ bool JobManager::add(CouponJob* job)
         return false;
     int const slot = static_cast<int>(job->_id % _hashCount);
     EnterCriticalSection(&_lock[slot].CS);
-    bool const inserted = _jobs[slot].insert(JobMap::value_type(job->_id, job)).second;
+    bool const inserted = _jobs[slot].insert(std::pair<unsigned long long, CouponJob*>(job->_id, job)).second;
     if (inserted)
         job->addReferenceCount(kFile, 281);
     LeaveCriticalSection(&_lock[slot].CS);

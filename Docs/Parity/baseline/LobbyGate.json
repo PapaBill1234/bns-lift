@@ -366,9 +366,9 @@
 "Channel::~Channel": {
 "calls": 100,
 "consts": 100,
-"refs": 100,
-"score": 100.0,
-"status": "MATCH"
+"refs": 75,
+"score": 91.7,
+"status": "DIFF"
 },
 "Client::GetId": {
 "calls": 100,
@@ -667,9 +667,9 @@
 "CrashHandler::CrashHandler": {
 "calls": 100,
 "consts": 100,
-"refs": 89,
-"score": 96.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "CrashHandler::Handle": {
 "calls": 100,
@@ -905,9 +905,9 @@
 "DynamicEventObject::~DynamicEventObject": {
 "calls": 100,
 "consts": 100,
-"refs": 0,
-"score": 66.7,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "DynamicRefCntObj::~DynamicRefCntObj": {
 "calls": 100,
@@ -2046,9 +2046,9 @@
 "Memory::CreateManager": {
 "calls": 100,
 "consts": 100,
-"refs": 75,
-"score": 91.7,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Network::Clear": {
 "calls": 100,
@@ -2109,8 +2109,8 @@
 "Network::SetMaxIdleTime": {
 "calls": 100,
 "consts": 100,
-"refs": 97,
-"score": 98.9,
+"refs": 90,
+"score": 96.8,
 "status": "DIFF"
 },
 "Network::initInstance": {
@@ -2123,8 +2123,8 @@
 "Network::initWorkerThread": {
 "calls": 100,
 "consts": 86,
-"refs": 100,
-"score": 95.2,
+"refs": 90,
+"score": 91.9,
 "status": "DIFF"
 },
 "Network::initializeSocketInterface": {
@@ -2452,9 +2452,9 @@
 "PipeCommandProcess::~PipeCommandProcess": {
 "calls": 100,
 "consts": 100,
-"refs": 100,
-"score": 100.0,
-"status": "MATCH"
+"refs": 50,
+"score": 83.3,
+"status": "DIFF"
 },
 "PipeConsole::Name": {
 "calls": 100,
@@ -2578,9 +2578,9 @@
 "PipeConsole::~PipeConsole": {
 "calls": 100,
 "consts": 100,
-"refs": 100,
-"score": 100.0,
-"status": "MATCH"
+"refs": 67,
+"score": 88.9,
+"status": "DIFF"
 },
 "Port::Clear": {
 "calls": 100,
@@ -2697,8 +2697,8 @@
 "Prng::Initialize": {
 "calls": 100,
 "consts": 67,
-"refs": 100,
-"score": 88.9,
+"refs": 50,
+"score": 72.2,
 "status": "DIFF"
 },
 "Prng::setSeed": {
@@ -2998,8 +2998,8 @@
 "Session::initialize": {
 "calls": 100,
 "consts": 100,
-"refs": 50,
-"score": 83.3,
+"refs": 75,
+"score": 91.7,
 "status": "DIFF"
 },
 "Session::reconnect": {
@@ -3040,8 +3040,8 @@
 "Session::~Session": {
 "calls": 100,
 "consts": 77,
-"refs": 92,
-"score": 89.7,
+"refs": 100,
+"score": 92.3,
 "status": "DIFF"
 },
 "SessionPool::Initialize": {
@@ -3320,9 +3320,9 @@
 "Thread::~Thread": {
 "calls": 100,
 "consts": 100,
-"refs": 100,
-"score": 100.0,
-"status": "MATCH"
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
 },
 "ThreadFreeFragmentPacketPump::HandleEvent": {
 "calls": 100,
@@ -3341,9 +3341,9 @@
 "ThreadFreeFragmentPacketPump::~ThreadFreeFragmentPacketPump": {
 "calls": 100,
 "consts": 100,
-"refs": 91,
-"score": 97.0,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "ThreadFreePacketPump::HandleEvent": {
 "calls": 100,
@@ -3362,9 +3362,9 @@
 "ThreadFreePacketPump::~ThreadFreePacketPump": {
 "calls": 100,
 "consts": 100,
-"refs": 91,
-"score": 97.0,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "ThreadFreePacketPumpEvent::EventId": {
 "calls": 100,
@@ -3383,9 +3383,9 @@
 "ThreadFreePacketPumpEvent::~ThreadFreePacketPumpEvent": {
 "calls": 100,
 "consts": 100,
-"refs": 80,
-"score": 93.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "ThreadManager::Initialize": {
 "calls": 100,
@@ -3558,9 +3558,9 @@
 "WinMsgHandler::~WinMsgHandler": {
 "calls": 100,
 "consts": 100,
-"refs": 100,
-"score": 100.0,
-"status": "MATCH"
+"refs": 80,
+"score": 93.3,
+"status": "DIFF"
 },
 "WinServiceConsole::Close": {
 "calls": 100,

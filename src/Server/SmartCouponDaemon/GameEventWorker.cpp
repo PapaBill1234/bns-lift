@@ -79,7 +79,12 @@ GameEventManager::GameEventManager()
     Instance = this;
     WorkerManager = nullptr;
     void* mem = Memory::_Manager[2]->Alloc(sizeof(GameEventEndEvent), kFile, 46);
-    EndEventObject = mem ? new (mem) GameEventEndEvent() : nullptr;
+    EventObject* endEvent;
+    if (mem != nullptr)
+        endEvent = new (mem) GameEventEndEvent();
+    else
+        endEvent = nullptr;
+    EndEventObject = endEvent;
     _threadCount = 0;
     _threads = nullptr;
     _gameEventHandle = nullptr;
@@ -107,7 +112,9 @@ GameEventManager::~GameEventManager()
 bool GameEventManager::Initialize(void (*failedEventHandler)(EventObject*), ThreadManager* threadManager,
                                   unsigned int threadCount)
 {
-    if (Instance != nullptr || failedEventHandler == nullptr)
+    // ❓ 0xac90 tests rcx (= threadManager after LTCG drops the handler) and has no ref to the handler.
+    // A test of failedEventHandler gives "lea FailedEventObjectHandler; test" in our build.
+    if (Instance != nullptr || threadManager == nullptr)
         assertCrash(75);
     void* mem = Memory::_Manager[1]->Alloc(sizeof(GameEventManager), kFile, 77);
     GameEventManager* mgr = mem ? new (mem) GameEventManager() : nullptr;

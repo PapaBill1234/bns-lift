@@ -1,4 +1,7 @@
 // NPServiceChannel.obj of the SmartCouponDaemon PDB.
+// LIFT: SCD build path of StlMemory.h (lower case form, from the HR strings).
+#define LIFT_STLMEMORY_FILE \
+    L"e:\\dailybuild02\\smartcoupondaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\bloodlib\\include\\StlMemory.h"
 #include <winsock2.h>
 #include <windows.h>
 #include <stdio.h>

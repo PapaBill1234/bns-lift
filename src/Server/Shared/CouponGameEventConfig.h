@@ -33,7 +33,7 @@ private:
 
 public:
     CriticalSection _lock;
-    std::map<int, GameEventInfo*, std::less<int>, StlAllocator<std::pair<int const, GameEventInfo*>, 2> > _gameEventList;
+    std::map<int, GameEventInfo*, std::less<int>, StlAllocator<std::pair<int, GameEventInfo*>, 2> > _gameEventList;
 };
 static_assert(sizeof(GameEventConfig::GameEventInfo) == 528, "sizeof GameEventConfig::GameEventInfo");
 static_assert(sizeof(GameEventConfig) == 0x48, "sizeof GameEventConfig");

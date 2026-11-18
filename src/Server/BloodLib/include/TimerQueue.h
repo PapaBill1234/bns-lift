@@ -13,14 +13,14 @@ class EventObject : public RefCntObject
 public:
     virtual unsigned int EventId() const = 0;                     // slot 4
     virtual bool HandleEvent(EventContext* ctx, unsigned long) = 0;  // slot 5
-    virtual ~EventObject();
+    // LIFT: no user-declared dtor. The PDB dtor (CG 0xCD60, SCD 0x1170) is a thunk to
+    // RefCntObject::~RefCntObject with no vtable store: a compiler-generated dtor.
 };
 static_assert(sizeof(EventObject) == 0x18, "sizeof EventObject");
 
 class DynamicEventObject : public EventObject
 {
-public:
-    virtual ~DynamicEventObject();
+    // LIFT: compiler-generated dtor (see EventObject).
 private:
     virtual void deallocate_me(void* ptr, wchar_t const* file, int line);
 };

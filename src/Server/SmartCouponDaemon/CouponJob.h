@@ -32,6 +32,9 @@ static_assert(sizeof(JobDef) == 0x20, "sizeof JobDef");
 class CouponJob : public RefCntPoolObj
 {
 public:
+    // LIFT: inlined in EventNotiJob::EventNotiJob (0x99F0): the base stores _id, _state and _lastState before
+    // InitializeCriticalSection of _lock.
+    CouponJob() : _id(0), _state(0), _lastState(0) {}
     virtual JobDef const* GetDefinition() const = 0;  // slot 4
     virtual bool dispatch_work(int, void*);           // slot 5
     virtual bool work(int, void*) = 0;                // slot 6
@@ -61,7 +64,7 @@ public:
     ~JobManager();  // 0x6CE0
 
     typedef std::map<unsigned long long, CouponJob*, std::less<unsigned long long>,
-                     StlAllocator<std::pair<const unsigned long long, CouponJob*>, 2> > JobMap;  // PDB JobManager::JobMap
+                     StlAllocator<std::pair<unsigned long long, CouponJob*>, 2> > JobMap;  // PDB JobManager::JobMap
 
     bool Initialize(int hashCount);                                   // 0x6E10
     bool Register(CouponJob* job);                                    // 0x6F60

@@ -653,9 +653,9 @@
 "Console::Console": {
 "calls": 100,
 "consts": 100,
-"refs": 0,
-"score": 66.7,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Console::GetType": {
 "calls": 100,
@@ -674,9 +674,9 @@
 "Console::~Console": {
 "calls": 100,
 "consts": 100,
-"refs": 0,
-"score": 66.7,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "CrashHandler::CrashHandler": {
 "calls": 100,
@@ -1108,9 +1108,9 @@
 "DynamicEventObject::~DynamicEventObject": {
 "calls": 100,
 "consts": 100,
-"refs": 0,
-"score": 66.7,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "DynamicRefCntObj::~DynamicRefCntObj": {
 "calls": 100,
@@ -1675,9 +1675,9 @@
 "LogFile::LogFile": {
 "calls": 100,
 "consts": 100,
-"refs": 50,
-"score": 83.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "LogFile::MakeFilename": {
 "calls": 100,
@@ -1731,9 +1731,9 @@
 "LogFile::~LogFile": {
 "calls": 100,
 "consts": 100,
-"refs": 83,
-"score": 94.4,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "LogMedia::Add": {
 "calls": 100,
@@ -2550,9 +2550,9 @@
 "PostDeliveryEvent::~PostDeliveryEvent": {
 "calls": 100,
 "consts": 100,
-"refs": 86,
-"score": 95.2,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "PostInfo::CheckValidityPostData": {
 "calls": 100,
@@ -3131,16 +3131,16 @@
 "Session::Session [??0Session@@IEAA@IPEBVPacketBufferHandler@@@Z]": {
 "calls": 100,
 "consts": 100,
-"refs": 86,
-"score": 95.2,
+"refs": 57,
+"score": 85.7,
 "status": "DIFF"
 },
 "Session::Session [??0Session@@IEAA@XZ]": {
 "calls": 100,
 "consts": 100,
-"refs": 100,
-"score": 100.0,
-"status": "MATCH"
+"refs": 50,
+"score": 83.3,
+"status": "DIFF"
 },
 "Session::SetChannel": {
 "calls": 100,
@@ -3229,8 +3229,8 @@
 "Session::~Session": {
 "calls": 100,
 "consts": 77,
-"refs": 92,
-"score": 89.7,
+"refs": 83,
+"score": 86.8,
 "status": "DIFF"
 },
 "SessionPool::Initialize": {
@@ -3383,9 +3383,9 @@
 "StaticPageMemoryManager::~StaticPageMemoryManager": {
 "calls": 100,
 "consts": 100,
-"refs": 100,
-"score": 100.0,
-"status": "MATCH"
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
 },
 "String::GetId128FromGuidString": {
 "calls": 86,
@@ -3579,8 +3579,8 @@
 "ThreadFreeFragmentPacketPump::~ThreadFreeFragmentPacketPump": {
 "calls": 100,
 "consts": 100,
-"refs": 73,
-"score": 90.9,
+"refs": 80,
+"score": 93.3,
 "status": "DIFF"
 },
 "ThreadFreePacketPump::HandleEvent": {
@@ -3600,8 +3600,8 @@
 "ThreadFreePacketPump::~ThreadFreePacketPump": {
 "calls": 100,
 "consts": 100,
-"refs": 73,
-"score": 90.9,
+"refs": 80,
+"score": 93.3,
 "status": "DIFF"
 },
 "ThreadFreePacketPumpEvent::EventId": {
@@ -3621,8 +3621,8 @@
 "ThreadFreePacketPumpEvent::~ThreadFreePacketPumpEvent": {
 "calls": 100,
 "consts": 100,
-"refs": 40,
-"score": 80.0,
+"refs": 50,
+"score": 83.3,
 "status": "DIFF"
 },
 "ThreadManager::Initialize": {
@@ -4013,9 +4013,9 @@
 "WindowConsole::~WindowConsole": {
 "calls": 100,
 "consts": 100,
-"refs": 80,
-"score": 93.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "WindowConsoleOnClose": {
 "calls": 100,
@@ -4629,8 +4629,8 @@
 "makeConsole": {
 "calls": 50,
 "consts": 60,
-"refs": 93,
-"score": 67.8,
+"refs": 100,
+"score": 70.0,
 "status": "DIFF"
 },
 "makeDirectory": {

@@ -5,8 +5,11 @@
 #include <memory>
 #include "Memory.h"
 
+// LIFT: each exe has its own build path. A .cpp file can define LIFT_STLMEMORY_FILE before the first include.
+#ifndef LIFT_STLMEMORY_FILE
 #define LIFT_STLMEMORY_FILE \
     L"e:\\dailybuild02\\cachegate-common-0.0.348\\depot\\branch\\348nc\\program\\server\\bloodlib\\include\\StlMemory.h"
+#endif
 
 template<class T, int N>
 class StlAllocator : public std::_Allocator_base<T>

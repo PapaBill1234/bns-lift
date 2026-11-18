@@ -18,12 +18,13 @@ static wchar_t const* const MODULE_NAME = L"db";  // PDB MODULE_NAME
 
 namespace
 {
-// PDB: ??_C@_11LOCGONAA@ (rva 0x544f4)
-wchar_t const kEmpty[] = L"";
+// PDB: ??_C@_11LOCGONAA@ (rva 0x544f4). The orig refs the literal itself.
+#define kEmpty L""
 
 unsigned long long const kNullData = static_cast<unsigned long long>(-1);  // SQL_NULL_DATA
 
-bool IsZeroGuid(id128 const* id) { return id->id[0] == 0 && id->id[1] == 0; }
+// LIFT: inline compare with ID128_GUID_ZERO (orig 0x10b46: cmp qword [ID128_GUID_ZERO], [+8]).
+bool IsZeroGuid(id128 const* id) { return id->id[0] == ID128_GUID_ZERO.id[0] && id->id[1] == ID128_GUID_ZERO.id[1]; }
 
 unsigned long long* LenPtr(long long* len) { return reinterpret_cast<unsigned long long*>(len); }
 }  // namespace
@@ -139,7 +140,9 @@ bool SmartCouponDB::RegisterGameEventLog(int* dbRetValue, id128* gameAccountId, 
                        MODULE_NAME, GUID_ARGS(*gameAccountId), worldId, pcdbid, gameEventId, query);
             return false;
         }
-        return *dbRetValue == 0;
+        if (*dbRetValue != 0)
+            return false;
+        return true;
     }
     Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 175,
                L"[%s], failed to bind parameter, reg-game-event-log, account-id:" GUID_FMT
@@ -202,7 +205,9 @@ bool SmartCouponDB::UpdateStatusToProcessFailure(int* dbRetValue, long long game
                        MODULE_NAME, gameEventLogId, GUID_ARGS(*gameAccountId), worldId, pcdbid, gameEventId, query);
             return false;
         }
-        return *dbRetValue == 0;
+        if (*dbRetValue != 0)
+            return false;
+        return true;
     }
     Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 233,
                L"[%s], failed to bind parameter,update-process-fail, logid:%I64d, account-id:" GUID_FMT
@@ -251,50 +256,61 @@ bool SmartCouponDB::ProcessCharacterGameEventLog(int* dbRetValue, long long game
     unsigned long long gameEventIdLen = 0;
     PublicationInfo publicationInfo;
     long long publicationLen[9] = {0};
-    if (tran.Tran->BindParam(1, SQL_PARAM_OUTPUT, dbRetValue, SQL_INTEGER, SQL_C_SLONG, &retLen) &&
-        tran.Tran->BindParam(2, SQL_PARAM_INPUT, &gameEventLogId, SQL_BIGINT, SQL_C_SBIGINT, &logIdLen) &&
-        tran.Tran->BindParam(3, SQL_PARAM_INPUT, gameAccountId, SQL_GUID, SQL_C_GUID, &gameAccountIdLen) &&
-        tran.Tran->BindParam(4, SQL_PARAM_INPUT, &worldId, SQL_SMALLINT, SQL_C_SSHORT, &widLen) &&
-        tran.Tran->BindParam(5, SQL_PARAM_INPUT, &pcdbid, SQL_BIGINT, SQL_C_SBIGINT, &pcdbidLen) &&
-        tran.Tran->BindParam(6, SQL_PARAM_INPUT, &gameEventId, SQL_INTEGER, SQL_C_SLONG, &gameEventIdLen) &&
-        tran.Tran->BindCol(1, &publicationInfo.publicationId, SQL_C_SBIGINT, &publicationLen[0]) &&
-        tran.Tran->BindCol(2, &publicationInfo.gameAccountId, SQL_C_GUID, &publicationLen[1]) &&
-        tran.Tran->BindCol(3, &publicationInfo.couponEventId, SQL_C_SLONG, &publicationLen[4]))
+    if (!tran.Tran->BindParam(1, SQL_PARAM_OUTPUT, dbRetValue, SQL_INTEGER, SQL_C_SLONG, &retLen))
+        goto _BIND_ERROR;
+    if (!tran.Tran->BindParam(2, SQL_PARAM_INPUT, &gameEventLogId, SQL_BIGINT, SQL_C_SBIGINT, &logIdLen))
+        goto _BIND_ERROR;
+    if (!tran.Tran->BindParam(3, SQL_PARAM_INPUT, gameAccountId, SQL_GUID, SQL_C_GUID, &gameAccountIdLen))
+        goto _BIND_ERROR;
+    if (!tran.Tran->BindParam(4, SQL_PARAM_INPUT, &worldId, SQL_SMALLINT, SQL_C_SSHORT, &widLen))
+        goto _BIND_ERROR;
+    if (!tran.Tran->BindParam(5, SQL_PARAM_INPUT, &pcdbid, SQL_BIGINT, SQL_C_SBIGINT, &pcdbidLen))
+        goto _BIND_ERROR;
+    if (!tran.Tran->BindParam(6, SQL_PARAM_INPUT, &gameEventId, SQL_INTEGER, SQL_C_SLONG, &gameEventIdLen))
+        goto _BIND_ERROR;
+    if (!tran.Tran->BindCol(1, &publicationInfo.publicationId, SQL_C_SBIGINT, &publicationLen[0]))
+        goto _BIND_ERROR;
+    if (!tran.Tran->BindCol(2, &publicationInfo.gameAccountId, SQL_C_GUID, &publicationLen[1]))
+        goto _BIND_ERROR;
+    if (!tran.Tran->BindCol(3, &publicationInfo.couponEventId, SQL_C_SLONG, &publicationLen[4]))
+        goto _BIND_ERROR;
+    if (!tran.Tran->Execute())
     {
-        if (!tran.Tran->Execute())
+        Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 290,
+                   L"[%s], failed to execute sql,process-char, logid:%I64d, account-id:" GUID_FMT
+                   L", wid:%d, pcdbid:0x%I64X, game-event-id:%d, query:%s",
+                   MODULE_NAME, gameEventLogId, GUID_ARGS(*gameAccountId), worldId, pcdbid, gameEventId, query);
+        return false;
+    }
+    for (;;)
+    {
+        memset(&publicationInfo, 0, sizeof(publicationInfo));
+        int const result = tran.Tran->Fetch(0);  // LIFT: Fetch (0x21180) never reads edx; no call site sets it
+        if (result == -1)
         {
-            Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 290,
-                       L"[%s], failed to execute sql,process-char, logid:%I64d, account-id:" GUID_FMT
-                       L", wid:%d, pcdbid:0x%I64X, game-event-id:%d, query:%s",
-                       MODULE_NAME, gameEventLogId, GUID_ARGS(*gameAccountId), worldId, pcdbid, gameEventId, query);
+            Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 302,
+                       L"[%s], failed to fetch,process-char, logid:%I64d, account-id:" GUID_FMT
+                       L", wid:%d, pcdbid:0x%I64X, game-event-id:%d",
+                       MODULE_NAME, gameEventLogId, GUID_ARGS(*gameAccountId), worldId, pcdbid, gameEventId);
             return false;
         }
-        for (;;)
-        {
-            memset(&publicationInfo, 0, sizeof(publicationInfo));
-            int const result = tran.Tran->Fetch(0);  // LIFT: Fetch (0x21180) never reads edx; no call site sets it
-            if (result == -1)
-            {
-                Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 302,
-                           L"[%s], failed to fetch,process-char, logid:%I64d, account-id:" GUID_FMT
-                           L", wid:%d, pcdbid:0x%I64X, game-event-id:%d",
-                           MODULE_NAME, gameEventLogId, GUID_ARGS(*gameAccountId), worldId, pcdbid, gameEventId);
-                return false;
-            }
-            if (result == 0)
-                break;
-            if (publicationLen[0] == -1 || publicationLen[1] == -1 || publicationLen[4] == -1)
-                Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 314,
-                           L"[%s], invalid db data,process-char, logid:%I64d, account-id:" GUID_FMT
-                           L", wid:%d, pcdbid:0x%I64X, game-event-id:%d, publicationdLen:0x%I64X, "
-                           L"gameAccountIdLen:0x%I64X, couponEventIdLen:0x%I64X",
-                           MODULE_NAME, gameEventLogId, GUID_ARGS(*gameAccountId), worldId, pcdbid, gameEventId,
-                           publicationLen[0], publicationLen[1], publicationLen[4]);
-            else
-                outPublicationContext->AddPublicationInfo(&publicationInfo);
-        }
-        return *dbRetValue == 0;
+        if (result == 0)
+            break;
+        if (publicationLen[0] == -1 || publicationLen[1] == -1 || publicationLen[4] == -1)
+            Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 314,
+                       L"[%s], invalid db data,process-char, logid:%I64d, account-id:" GUID_FMT
+                       L", wid:%d, pcdbid:0x%I64X, game-event-id:%d, publicationdLen:0x%I64X, "
+                       L"gameAccountIdLen:0x%I64X, couponEventIdLen:0x%I64X",
+                       MODULE_NAME, gameEventLogId, GUID_ARGS(*gameAccountId), worldId, pcdbid, gameEventId,
+                       publicationLen[0], publicationLen[1], publicationLen[4]);
+        else
+            outPublicationContext->AddPublicationInfo(&publicationInfo);
     }
+    if (*dbRetValue != 0)
+        return false;
+    return true;
+
+_BIND_ERROR:
     Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 329,
                L"[%s], failed to bind parameter,process-char, logid:%I64d, account-id:" GUID_FMT
                L", wid:%d, pcdbid:0x%I64X, game-event-id:%d",
@@ -378,7 +394,9 @@ bool SmartCouponDB::ProcessAccountGameEventLog(int* dbRetValue, long long gameEv
             else
                 outPublicationContext->AddPublicationInfo(&publicationInfo);
         }
-        return *dbRetValue == 0;
+        if (*dbRetValue != 0)
+            return false;
+        return true;
     }
     Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 421,
                L"[%s], failed to bind parameter,process-acc, logid:%I64d, account-id:" GUID_FMT L", game-event-id:%d",
@@ -441,7 +459,9 @@ bool SmartCouponDB::UpdateStatusToPublicationSuccess(int* dbRetValue, long long 
                        MODULE_NAME, publicationId, GUID_ARGS(*gameAccountId), couponEventId, receiptId, receiptNull, query);
             return false;
         }
-        return *dbRetValue == 0;
+        if (*dbRetValue != 0)
+            return false;
+        return true;
     }
     Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 479,
                L"[%s], failed to bind parameter, update-publication-succ, publication-id:%I64d, account-id:" GUID_FMT
@@ -499,7 +519,9 @@ bool SmartCouponDB::UpdateStatusToPublicationFailure(int* dbRetValue, long long 
                        MODULE_NAME, publicationId, GUID_ARGS(*gameAccountId), couponEventId, query);
             return false;
         }
-        return *dbRetValue == 0;
+        if (*dbRetValue != 0)
+            return false;
+        return true;
     }
     Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 532,
                L"[%s], failed to bind parameter, update-publication-fail, publication-id:%I64d, account-id:" GUID_FMT
@@ -563,7 +585,9 @@ bool SmartCouponDB::LoadGameEventLogList(int* dbRetValue, RetrieveEventLogContex
             else
                 outEventLogContext->AddEventLogInfo(&eventLogInfo);
         }
-        return *dbRetValue == 0;
+        if (*dbRetValue != 0)
+            return false;
+        return true;
     }
     Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 670, L"[%s], failed to bind parameter, load-game-event-log %s", MODULE_NAME,
                kEmpty);
@@ -622,7 +646,9 @@ bool SmartCouponDB::LoadCouponPublicationList(int* dbRetValue, RetrievePublicati
             else
                 outPublicationContext->AddPublicationInfo(&publicationInfo);
         }
-        return *dbRetValue == 0;
+        if (*dbRetValue != 0)
+            return false;
+        return true;
     }
     Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 750, L"[%s], failed to bind parameter, load-coupon-publication %s",
                MODULE_NAME, kEmpty);
@@ -705,7 +731,9 @@ bool SmartCouponDB::LoadSingleCouponPublication(int* dbRetValue, long long publi
                            MODULE_NAME, GUID_ARGS(*gameAccountId), publicationId, publicationInfo.publicationId,
                            GUID_ARGS(publicationInfo.gameAccountId), publicationInfo.couponEventId);
         }
-        return *dbRetValue == 0;
+        if (*dbRetValue != 0)
+            return false;
+        return true;
     }
     Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 845,
                L"[%s], failed to bind parameter,load single coupon publication, acc:" GUID_FMT
@@ -769,7 +797,9 @@ bool SmartCouponDB::LoadRetryReadyGameEventLogList(int* dbRetValue, RetrieveEven
             else
                 outEventLogContext->AddEventLogInfo(&eventLogInfo);
         }
-        return *dbRetValue == 0;
+        if (*dbRetValue != 0)
+            return false;
+        return true;
     }
     Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 930, L"[%s], failed to bind parameter, load-retryready-game-event-log %s", MODULE_NAME,
                kEmpty);

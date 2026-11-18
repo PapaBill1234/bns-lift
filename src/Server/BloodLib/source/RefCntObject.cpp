@@ -15,6 +15,11 @@
 #define REFCNT_HEADER \
     L"e:\\dailybuild02\\cachegate-common-0.0.348\\depot\\branch\\348nc\\program\\server\\bloodlib\\include\\RefCntObject.h"
 #endif
+// LIFT: the SCD orig (0x6890 addReferenceCount, 0x1020 ~RefCntObject) has the upper case path in these 2 functions.
+// They come from other .obj files (CouponJob, ObjectPool) with a different case of the include path.
+#ifndef REFCNT_HEADER_ALT
+#define REFCNT_HEADER_ALT REFCNT_HEADER
+#endif
 
 // 0x20f0
 // BUG: 0x20f0 the format gets ptr for %s and the low 32 bits of file for %d (0x20FA, 0x2103).
@@ -34,10 +39,10 @@ long RefCntObject::addReferenceCount(wchar_t const* file, int line)
 {
     if (_ref <= 0)
     {
-        Log::Write(Log::LT_ERROR, REFCNT_HEADER, 153,
+        Log::Write(Log::LT_ERROR, REFCNT_HEADER_ALT, 153,
                    L"== CRASH == [ref obj], cannot add reference count, this:0x%p, ref:%d, tag:0x%08x, file:%s, line:%d",
                    this, _ref, _tag, file, line);
-        AlertSender::Write(REFCNT_HEADER, 153,
+        AlertSender::Write(REFCNT_HEADER_ALT, 153,
                            L"== CRASH == [ref obj], cannot add reference count, this:0x%p, ref:%d, tag:0x%08x, file:%s, line:%d",
                            this, _ref, _tag, file, line);
         return 0;
@@ -94,10 +99,10 @@ RefCntObject::~RefCntObject()
     _tag |= 0xF0;
     if (_ref != 0)
     {
-        Log::Write(Log::LT_ERROR, REFCNT_HEADER, 129,
+        Log::Write(Log::LT_ERROR, REFCNT_HEADER_ALT, 129,
                    L"== CRASH == [ref obj], destructring with not zero reference count, this:0x%p, ref:%d, tag:0x%08x",
                    this, _ref, _tag);
-        AlertSender::Write(REFCNT_HEADER, 129,
+        AlertSender::Write(REFCNT_HEADER_ALT, 129,
                            L"== CRASH == [ref obj], destructring with not zero reference count, this:0x%p, ref:%d, tag:0x%08x",
                            this, _ref, _tag);
     }

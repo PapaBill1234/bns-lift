@@ -41,15 +41,8 @@ PacketCrypt::ErrCode PacketCrypt::Setup(int maxSize)
     return SPCE_NO_ERROR;
 }
 
-// 0xCD60 (folded with DynamicEventObject::~DynamicEventObject)
-EventObject::~EventObject()
-{
-}
-
-// 0xCD60 (folded with EventObject::~EventObject)
-DynamicEventObject::~DynamicEventObject()
-{
-}
+// 0xCD60 EventObject::~EventObject / DynamicEventObject::~DynamicEventObject (folded):
+// compiler-generated. See TimerQueue.h.
 
 // 0x2350 (CacheGate PDB; folded with DynamicRefCntObj::deallocate_me). LobbyGate 0x1330.
 void DynamicEventObject::deallocate_me(void* ptr, wchar_t const* file, int line)

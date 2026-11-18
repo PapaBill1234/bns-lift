@@ -1,4 +1,7 @@
 // DaemonChannel.obj (SmartCouponDaemon PDB). Source: .scratch/hr/DaemonChannel.c
+// LIFT: SCD build path of StlMemory.h (lower case form, from the HR strings).
+#define LIFT_STLMEMORY_FILE \
+    L"e:\\dailybuild02\\smartcoupondaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\bloodlib\\include\\StlMemory.h"
 #include <winsock2.h>
 #include <windows.h>
 #include <shlobj.h>
@@ -44,7 +47,7 @@ DChannelMgr::~DChannelMgr()
 void DChannelMgr::Finalize()
 {
     for (std::map<GameEventDaemonId, DChannel*, std::less<GameEventDaemonId>,
-                  StlAllocator<std::pair<GameEventDaemonId const, DChannel*>, 2> >::iterator it = _list.begin();
+                  StlAllocator<std::pair<GameEventDaemonId, DChannel*>, 2> >::iterator it = _list.begin();
          it != _list.end(); ++it)
     {
         if (it->second != nullptr)
@@ -304,10 +307,11 @@ bool DChannelMgr::CreateDaemonListXml(wchar_t const* xml)
             return false;
         }
 
-        int error = SHCreateDirectoryExW(nullptr, path, nullptr);
-        if (error != 0)
+        // 0xd5c0: the original logs GetLastError(), not the SHCreateDirectoryExW result.
+        if (SHCreateDirectoryExW(nullptr, path, nullptr) != 0)
         {
-            Log::Write(DCHANNEL_FILE, 263, error, L"[daemon-mgr], create daemon list xml fail, make directory fail");
+            Log::Write(DCHANNEL_FILE, 263, GetLastError(),
+                       L"[daemon-mgr], create daemon list xml fail, make directory fail");
             return false;
         }
 
@@ -358,7 +362,7 @@ DChannelMgr::ErrCode DChannelMgr::AddDaemon(DChannel* channel)
     }
 
     _lock.Enter();
-    bool inserted = _list.insert(std::pair<GameEventDaemonId const, DChannel*>(channel->_daemonId, channel)).second;
+    bool inserted = _list.insert(std::pair<GameEventDaemonId, DChannel*>(channel->_daemonId, channel)).second;
     if (inserted)
         channel->addReferenceCount(DCHANNEL_FILE, 327);
     _lock.Leave();
@@ -386,7 +390,7 @@ DChannel* DChannelMgr::FindDaemon(GameEventDaemonId const* daemonId)
     DChannel* second = nullptr;
     _lock.Enter();
     std::map<GameEventDaemonId, DChannel*, std::less<GameEventDaemonId>,
-             StlAllocator<std::pair<GameEventDaemonId const, DChannel*>, 2> >::iterator it = _list.find(*daemonId);
+             StlAllocator<std::pair<GameEventDaemonId, DChannel*>, 2> >::iterator it = _list.find(*daemonId);
     if (it != _list.end())
     {
         second = it->second;
@@ -408,7 +412,7 @@ bool DChannelMgr::ReplaceDaemon(DChannel* newDaemon)
     DChannel* second = nullptr;
     _lock.Enter();
     std::map<GameEventDaemonId, DChannel*, std::less<GameEventDaemonId>,
-             StlAllocator<std::pair<GameEventDaemonId const, DChannel*>, 2> >::iterator it =
+             StlAllocator<std::pair<GameEventDaemonId, DChannel*>, 2> >::iterator it =
         _list.find(newDaemon->_daemonId);
     if (it != _list.end())
     {
@@ -416,7 +420,7 @@ bool DChannelMgr::ReplaceDaemon(DChannel* newDaemon)
         _list.erase(it);
     }
     bool inserted =
-        _list.insert(std::pair<GameEventDaemonId const, DChannel*>(newDaemon->_daemonId, newDaemon)).second;
+        _list.insert(std::pair<GameEventDaemonId, DChannel*>(newDaemon->_daemonId, newDaemon)).second;
     if (inserted)
         newDaemon->addReferenceCount(DCHANNEL_FILE, 409);
     _lock.Leave();

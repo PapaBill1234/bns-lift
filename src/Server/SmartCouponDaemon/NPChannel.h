@@ -466,7 +466,7 @@ public:
 
     CmdDispatcher _cmdDispatcher;
     unsigned int volatile _seed;
-    std::map<unsigned int, Item*, std::less<unsigned int>, StlAllocator<std::pair<unsigned int const, Item*>, 2> > _dict;
+    std::map<unsigned int, Item*, std::less<unsigned int>, StlAllocator<std::pair<unsigned int, Item*>, 2> > _dict;
     CriticalSection _lock;
 };
 static_assert(sizeof(NPTransactionRegistry) == 0x58, "sizeof NPTransactionRegistry");

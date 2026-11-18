@@ -77,7 +77,7 @@ private:
 public:
     CriticalSection _lock;
     std::map<GameEventDaemonId, DChannel*, std::less<GameEventDaemonId>,
-             StlAllocator<std::pair<GameEventDaemonId const, DChannel*>, 2> > _list;
+             StlAllocator<std::pair<GameEventDaemonId, DChannel*>, 2> > _list;
 };
 static_assert(sizeof(DChannelMgr::DaemonInfo) == 0x10, "sizeof DChannelMgr::DaemonInfo");
 static_assert(sizeof(DChannelMgr) == 0x50, "sizeof DChannelMgr");

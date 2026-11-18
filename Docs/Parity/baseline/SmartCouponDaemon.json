@@ -93,9 +93,9 @@
 "AlertSender::AlertSender": {
 "calls": 100,
 "consts": 100,
-"refs": 96,
-"score": 98.6,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "AlertSender::Name": {
 "calls": 100,
@@ -394,9 +394,9 @@
 "Console::Console": {
 "calls": 100,
 "consts": 100,
-"refs": 100,
-"score": 100.0,
-"status": "MATCH"
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
 },
 "Console::GetType": {
 "calls": 100,
@@ -415,9 +415,9 @@
 "Console::~Console": {
 "calls": 100,
 "consts": 100,
-"refs": 100,
-"score": 100.0,
-"status": "MATCH"
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
 },
 "CouponJob::dispatch_work": {
 "calls": 100,
@@ -457,9 +457,9 @@
 "CrashHandler::CrashHandler": {
 "calls": 100,
 "consts": 100,
-"refs": 89,
-"score": 96.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "CrashHandler::Handle": {
 "calls": 100,
@@ -553,25 +553,25 @@
 "status": "MATCH"
 },
 "DChannelMgr::AddDaemon": {
-"calls": 78,
+"calls": 96,
 "consts": 100,
 "refs": 100,
-"score": 92.8,
+"score": 98.6,
 "status": "DIFF"
 },
 "DChannelMgr::CreateDaemonListXml": {
-"calls": 97,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 99.1,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "DChannelMgr::DChannelMgr": {
 "calls": 100,
 "consts": 100,
-"refs": 67,
-"score": 88.9,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "DChannelMgr::Finalize": {
 "calls": 100,
@@ -581,11 +581,11 @@
 "status": "MATCH"
 },
 "DChannelMgr::FindDaemon": {
-"calls": 86,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 95.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "DChannelMgr::OnAccept": {
 "calls": 100,
@@ -616,11 +616,11 @@
 "status": "DIFF"
 },
 "DChannelMgr::ReplaceDaemon": {
-"calls": 59,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 86.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "DChannelMgr::SetupDaemonList": {
 "calls": 64,
@@ -632,8 +632,8 @@
 "DChannelMgr::SetupDaemonListFromXml": {
 "calls": 87,
 "consts": 90,
-"refs": 94,
-"score": 90.7,
+"refs": 96,
+"score": 91.4,
 "status": "DIFF"
 },
 "DChannelMgr::writeFileUtf8": {
@@ -644,10 +644,10 @@
 "status": "DIFF"
 },
 "DChannelMgr::~DChannelMgr": {
-"calls": 57,
+"calls": 86,
 "consts": 100,
-"refs": 50,
-"score": 69.0,
+"refs": 75,
+"score": 86.9,
 "status": "DIFF"
 },
 "Daemon::Cooldown": {
@@ -716,8 +716,8 @@
 "Daemon::start": {
 "calls": 96,
 "consts": 98,
-"refs": 86,
-"score": 93.4,
+"refs": 88,
+"score": 94.0,
 "status": "DIFF"
 },
 "Daemon::startDaemon": {
@@ -933,9 +933,9 @@
 "DynamicEventObject::~DynamicEventObject": {
 "calls": 100,
 "consts": 100,
-"refs": 0,
-"score": 66.7,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "DynamicRefCntObj::~DynamicRefCntObj": {
 "calls": 100,
@@ -947,9 +947,9 @@
 "EventNotiJob::EventNotiJob": {
 "calls": 100,
 "consts": 100,
-"refs": 67,
-"score": 88.9,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "EventNotiJob::GetDefinition": {
 "calls": 100,
@@ -995,10 +995,10 @@
 },
 "EventNotiJob::init": {
 "calls": 100,
-"consts": 67,
+"consts": 100,
 "refs": 100,
-"score": 88.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "EventNotiJob::work": {
 "calls": 60,
@@ -1038,9 +1038,9 @@
 "GameEventConfig::GameEventConfig": {
 "calls": 100,
 "consts": 100,
-"refs": 50,
-"score": 83.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "GameEventConfig::Load": {
 "calls": 88,
@@ -1057,18 +1057,18 @@
 "status": "DIFF"
 },
 "GameEventConfig::addGameEventInfo": {
-"calls": 80,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 93.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "GameEventConfig::~GameEventConfig": {
-"calls": 67,
+"calls": 100,
 "consts": 100,
-"refs": 67,
-"score": 77.8,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "GameEventLogEvent::EventId": {
 "calls": 100,
@@ -1094,16 +1094,16 @@
 "GameEventManager::GameEventManager": {
 "calls": 100,
 "consts": 100,
-"refs": 96,
-"score": 98.8,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "GameEventManager::Initialize": {
 "calls": 100,
 "consts": 100,
-"refs": 98,
-"score": 99.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "GameEventManager::PostGameEventLogList": {
 "calls": 83,
@@ -1302,11 +1302,11 @@
 "status": "MATCH"
 },
 "JobManager::Clear": {
-"calls": 80,
+"calls": 100,
 "consts": 100,
-"refs": 67,
-"score": 82.2,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "JobManager::Execute": {
 "calls": 100,
@@ -1344,11 +1344,11 @@
 "status": "MATCH"
 },
 "JobManager::add": {
-"calls": 60,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 86.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "JobManager::find": {
 "calls": 100,
@@ -1358,11 +1358,11 @@
 "status": "MATCH"
 },
 "JobManager::remove": {
-"calls": 75,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 91.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "JobManager::~JobManager": {
 "calls": 55,
@@ -1528,9 +1528,9 @@
 "LogFile::LogFile": {
 "calls": 100,
 "consts": 100,
-"refs": 100,
-"score": 100.0,
-"status": "MATCH"
+"refs": 50,
+"score": 83.3,
+"status": "DIFF"
 },
 "LogFile::MakeFilename": {
 "calls": 100,
@@ -1584,9 +1584,9 @@
 "LogFile::~LogFile": {
 "calls": 100,
 "consts": 100,
-"refs": 100,
-"score": 100.0,
-"status": "MATCH"
+"refs": 83,
+"score": 94.4,
+"status": "DIFF"
 },
 "LogMedia::Add": {
 "calls": 100,
@@ -1709,10 +1709,10 @@
 },
 "NPChannel::handlePacket": {
 "calls": 100,
-"consts": 95,
+"consts": 100,
 "refs": 100,
-"score": 98.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "NPChannel::onConnect": {
 "calls": 100,
@@ -1729,10 +1729,10 @@
 "status": "DIFF"
 },
 "NPChannel::~NPChannel": {
-"calls": 89,
+"calls": 100,
 "consts": 100,
-"refs": 78,
-"score": 88.9,
+"refs": 89,
+"score": 96.3,
 "status": "DIFF"
 },
 "NPHandlerEventNoti": {
@@ -1759,9 +1759,9 @@
 "NPMsgHandleEvent::~NPMsgHandleEvent": {
 "calls": 100,
 "consts": 100,
-"refs": 89,
-"score": 96.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "NPPing::HandleEvent": {
 "calls": 100,
@@ -1815,9 +1815,9 @@
 "NPServiceChannelManager::OnClose": {
 "calls": 100,
 "consts": 100,
-"refs": 89,
-"score": 96.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "NPServiceChannelManager::OnConnect": {
 "calls": 100,
@@ -1864,30 +1864,30 @@
 "NPTransactionRegistry::NPTransactionRegistry": {
 "calls": 100,
 "consts": 100,
-"refs": 67,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"NPTransactionRegistry::Register": {
+"calls": 100,
+"consts": 67,
+"refs": 100,
 "score": 88.9,
 "status": "DIFF"
 },
-"NPTransactionRegistry::Register": {
-"calls": 75,
-"consts": 67,
-"refs": 100,
-"score": 80.6,
-"status": "DIFF"
-},
 "NPTransactionRegistry::Release": {
-"calls": 75,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 91.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "NPTransactionRegistry::ReleaseAll": {
-"calls": 86,
+"calls": 100,
 "consts": 100,
-"refs": 75,
-"score": 86.9,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Network::Clear": {
 "calls": 100,
@@ -1920,8 +1920,8 @@
 "Network::Network": {
 "calls": 100,
 "consts": 100,
-"refs": 96,
-"score": 98.8,
+"refs": 89,
+"score": 96.3,
 "status": "DIFF"
 },
 "Network::OpenPort [?OpenPort@Network@@SA_NI@Z]": {
@@ -2032,8 +2032,8 @@
 "ObjPoolTimer::~ObjPoolTimer": {
 "calls": 100,
 "consts": 100,
-"refs": 75,
-"score": 91.7,
+"refs": 88,
+"score": 95.8,
 "status": "DIFF"
 },
 "Packet::AddSize": {
@@ -2445,8 +2445,8 @@
 "Prng::Initialize": {
 "calls": 100,
 "consts": 67,
-"refs": 100,
-"score": 88.9,
+"refs": 50,
+"score": 72.2,
 "status": "DIFF"
 },
 "Prng::setSeed": {
@@ -2529,9 +2529,9 @@
 "RefCntObject::addReferenceCount": {
 "calls": 100,
 "consts": 100,
-"refs": 50,
-"score": 83.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "RefCntObject::deallocate_object": {
 "calls": 100,
@@ -2550,9 +2550,9 @@
 "RefCntObject::~RefCntObject": {
 "calls": 100,
 "consts": 100,
-"refs": 60,
-"score": 86.7,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "ReleaseEvent::EventId": {
 "calls": 100,
@@ -2816,8 +2816,8 @@
 "Session::~Session": {
 "calls": 100,
 "consts": 77,
-"refs": 92,
-"score": 89.7,
+"refs": 100,
+"score": 92.3,
 "status": "DIFF"
 },
 "SessionHandler::~SessionHandler": {
@@ -2963,22 +2963,22 @@
 "SmartCouponDB::LoadCouponPublicationList": {
 "calls": 78,
 "consts": 94,
-"refs": 77,
-"score": 82.9,
+"refs": 92,
+"score": 88.0,
 "status": "DIFF"
 },
 "SmartCouponDB::LoadGameEventLogList": {
 "calls": 68,
 "consts": 91,
-"refs": 74,
-"score": 77.9,
+"refs": 89,
+"score": 82.8,
 "status": "DIFF"
 },
 "SmartCouponDB::LoadRetryReadyGameEventLogList": {
 "calls": 68,
 "consts": 91,
-"refs": 74,
-"score": 77.9,
+"refs": 89,
+"score": 82.8,
 "status": "DIFF"
 },
 "SmartCouponDB::LoadSingleCouponPublication": {
@@ -2989,45 +2989,45 @@
 "status": "DIFF"
 },
 "SmartCouponDB::ProcessAccountGameEventLog": {
-"calls": 82,
+"calls": 84,
 "consts": 94,
-"refs": 93,
-"score": 89.9,
+"refs": 97,
+"score": 91.8,
 "status": "DIFF"
 },
 "SmartCouponDB::ProcessCharacterGameEventLog": {
-"calls": 83,
+"calls": 85,
 "consts": 95,
-"refs": 93,
-"score": 90.5,
+"refs": 97,
+"score": 92.3,
 "status": "DIFF"
 },
 "SmartCouponDB::RegisterGameEventLog": {
-"calls": 97,
+"calls": 100,
 "consts": 100,
-"refs": 95,
-"score": 97.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "SmartCouponDB::UpdateStatusToProcessFailure": {
-"calls": 97,
+"calls": 100,
 "consts": 100,
-"refs": 95,
-"score": 97.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "SmartCouponDB::UpdateStatusToPublicationFailure": {
-"calls": 97,
+"calls": 100,
 "consts": 100,
-"refs": 94,
-"score": 97.0,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "SmartCouponDB::UpdateStatusToPublicationSuccess": {
-"calls": 97,
+"calls": 100,
 "consts": 97,
-"refs": 80,
-"score": 91.3,
+"refs": 85,
+"score": 93.8,
 "status": "DIFF"
 },
 "SmartCouponDaemon::Descriptions": {
@@ -3446,9 +3446,9 @@
 "Timer::~Timer": {
 "calls": 100,
 "consts": 100,
-"refs": 0,
-"score": 66.7,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "TimerQueue::Add": {
 "calls": 100,
@@ -3509,8 +3509,8 @@
 "TimerQueue::~TimerQueue": {
 "calls": 100,
 "consts": 100,
-"refs": 67,
-"score": 88.9,
+"refs": 83,
+"score": 94.4,
 "status": "DIFF"
 },
 "TrustedPacketBufferHandler::Clone": {
@@ -3712,9 +3712,9 @@
 "WindowConsole::~WindowConsole": {
 "calls": 100,
 "consts": 100,
-"refs": 100,
-"score": 100.0,
-"status": "MATCH"
+"refs": 80,
+"score": 93.3,
+"status": "DIFF"
 },
 "WindowConsoleOnClose": {
 "calls": 100,
@@ -4160,8 +4160,8 @@
 "makeConsole": {
 "calls": 50,
 "consts": 60,
-"refs": 100,
-"score": 70.0,
+"refs": 93,
+"score": 67.8,
 "status": "DIFF"
 },
 "makeDirectory": {

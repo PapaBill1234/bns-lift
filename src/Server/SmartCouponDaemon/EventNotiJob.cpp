@@ -82,14 +82,9 @@ SendRetryCouponPublicationFailEvent::~SendRetryCouponPublicationFailEvent()
 
 // 0x99F0
 EventNotiJob::EventNotiJob()
-    : _couponEventId(0), _publicationId(0), _acceptTid(0), _fromManagementDaemon(false), _managementTid(0),
-      _managementReason(-1)
+    : _gameAccountId(ID128_GUID_ZERO), _couponEventId(0), _publicationId(0), _acceptTid(0),
+      _fromManagementDaemon(false), _managementTid(0), _managementReason(-1)
 {
-    _id = 0;
-    _state = 0;
-    _lastState = 0;
-    _gameAccountId.id[0] = 0;
-    _gameAccountId.id[1] = 0;
 }
 
 // 0x9A80
@@ -184,9 +179,11 @@ bool EventNotiJob::work(int task, void* param)
 bool EventNotiJob::init()
 {
     auto const& acc = _gameAccountId.guid;
+    // LIFT: orig 0x9FB2 tests the job pointer for the id/type/state args (-1 when null), like a log macro.
+    CouponJob const* const job = this;
     Log::Write(Log::LT_DEBUG, kFile, 161,
                L"[job], init ok, jobid:0x%I64X, type:%d, state:%d, acc:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X,  coupon-event-id:%d, publicationid:%I64d, management-tid:%I64d",
-               _id, GetDefinition()->type, _state, acc.id1, acc.id2, acc.id3, acc.id4[0], acc.id4[1], acc.id4[2],
+               job ? job->_id : 0, job ? job->GetDefinition()->type : -1, job ? job->_state : -1, acc.id1, acc.id2, acc.id3, acc.id4[0], acc.id4[1], acc.id4[2],
                acc.id4[3], acc.id4[4], acc.id4[5], acc.id4[6], acc.id4[7], _couponEventId, _publicationId,
                _managementTid);
     transit(1);

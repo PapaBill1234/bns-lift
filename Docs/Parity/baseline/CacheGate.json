@@ -667,8 +667,8 @@
 "ClientSideDaemonChannel::~ClientSideDaemonChannel": {
 "calls": 80,
 "consts": 92,
-"refs": 82,
-"score": 84.9,
+"refs": 71,
+"score": 81.0,
 "status": "DIFF"
 },
 "Connection::Accept": {
@@ -1010,9 +1010,9 @@
 "DynamicEventObject::~DynamicEventObject": {
 "calls": 100,
 "consts": 100,
-"refs": 0,
-"score": 66.7,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "DynamicRefCntObj::~DynamicRefCntObj": {
 "calls": 100,
@@ -1038,8 +1038,8 @@
 "HandleCacheGateFragmentRelay": {
 "calls": 82,
 "consts": 98,
-"refs": 71,
-"score": 83.4,
+"refs": 74,
+"score": 84.3,
 "status": "DIFF"
 },
 "HandleCacheGateHello": {
@@ -2228,8 +2228,8 @@
 "Session::~Session": {
 "calls": 100,
 "consts": 77,
-"refs": 92,
-"score": 89.7,
+"refs": 100,
+"score": 92.3,
 "status": "DIFF"
 },
 "SessionPool::Initialize": {

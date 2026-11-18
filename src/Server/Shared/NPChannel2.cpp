@@ -1,4 +1,7 @@
 // NPChannel.obj (..\Shared\NPChannel2.cpp) of the SmartCouponDaemon PDB.
+// LIFT: SCD build path of StlMemory.h (lower case form, from the HR strings). Only SCD builds this file.
+#define LIFT_STLMEMORY_FILE \
+    L"e:\\dailybuild02\\smartcoupondaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\bloodlib\\include\\StlMemory.h"
 #include <winsock2.h>
 #include <windows.h>
 #include <stdlib.h>
@@ -159,7 +162,7 @@ bool NPTransactionRegistry::Register(ECommand cmd, void* context, unsigned int* 
     item->context = context;
 
     _lock.Enter();
-    bool inserted = _dict.insert(std::make_pair(txnId, item)).second;
+    bool inserted = _dict.insert(std::pair<unsigned int, Item*>(txnId, item)).second;
     _lock.Leave();
 
     if (inserted)
@@ -507,11 +510,11 @@ bool NPChannel::handlePacket(Packet const* packet)
         static wchar_t const hex[] = L"0123456789ABCDEF";
         wchar_t temp[304];
         int k = 0;
-        for (unsigned int i = 0; i < bodySize && k < 300; ++i, k += 3)
+        for (unsigned char const* p = body; p != body + bodySize && k < 300; ++p)
         {
-            temp[k] = hex[body[i] >> 4];
-            temp[k + 1] = hex[body[i] & 0xF];
-            temp[k + 2] = L' ';
+            temp[k++] = hex[*p >> 4];
+            temp[k++] = hex[*p & 0xF];
+            temp[k++] = L' ';
         }
         temp[k] = 0;
         Log::Write(Log::LT_DEBUG, NPCHANNEL_FILE, 516, L"[np], recvd, size:%d, body:%s", bodySize, temp);

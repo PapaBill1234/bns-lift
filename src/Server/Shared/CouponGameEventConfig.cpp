@@ -1,4 +1,7 @@
 // CouponGameEventConfig.obj (SmartCouponDaemon PDB). Source: .scratch/hr/CouponGameEventConfig.c
+// LIFT: SCD build path of StlMemory.h. This module uses the upper case form (HR strings).
+#define LIFT_STLMEMORY_FILE \
+    L"E:\\DailyBuild02\\SmartCouponDaemon-Common-0.0.348\\depot\\Branch\\348NC\\Program\\Server\\BloodLib\\include\\StlMemory.h"
 #include <winsock2.h>
 #include <windows.h>
 #include <stdlib.h>
@@ -205,7 +208,7 @@ bool GameEventConfig::addGameEventInfo(GameEventInfo* gameEventInfo)
     }
 
     _lock.Enter();
-    bool inserted = _gameEventList.insert(std::make_pair(gameEventInfo->id, gameEventInfo)).second;
+    bool inserted = _gameEventList.insert(std::pair<int, GameEventInfo*>(gameEventInfo->id, gameEventInfo)).second;
     _lock.Leave();
 
     if (!inserted)
