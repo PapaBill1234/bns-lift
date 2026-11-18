@@ -48,6 +48,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Aes128::~Aes128": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Aes128NI_Decrypt": {
 "calls": 100,
 "consts": 100,
@@ -161,6 +168,216 @@
 "status": "MATCH"
 },
 "BaseRefCntObj::~BaseRefCntObj": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BigInteger::Add": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BigInteger::BigInteger": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BigInteger::Divide [?Divide@BigInteger@@SAXPEBV1@0PEAV1@1@Z]": {
+"calls": 83,
+"consts": 89,
+"refs": 67,
+"score": 79.4,
+"status": "DIFF"
+},
+"BigInteger::Divide [?Divide@BigInteger@@SAXPEBV1@IPEAV1@PEAI@Z]": {
+"calls": 100,
+"consts": 89,
+"refs": 100,
+"score": 96.3,
+"status": "DIFF"
+},
+"BigInteger::ExpMod": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BigInteger::InvMod": {
+"calls": 65,
+"consts": 89,
+"refs": 100,
+"score": 84.7,
+"status": "DIFF"
+},
+"BigInteger::IsPrime": {
+"calls": 100,
+"consts": 67,
+"refs": 80,
+"score": 82.2,
+"status": "DIFF"
+},
+"BigInteger::LeftShift": {
+"calls": 67,
+"consts": 88,
+"refs": 0,
+"score": 51.4,
+"status": "DIFF"
+},
+"BigInteger::Mul": {
+"calls": 100,
+"consts": 50,
+"refs": 100,
+"score": 83.3,
+"status": "DIFF"
+},
+"BigInteger::Pow2": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BigInteger::RightShift": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BigInteger::Set [?Set@BigInteger@@QEAAXPEBV1@H@Z]": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BigInteger::Set [?Set@BigInteger@@QEAAX_J@Z]": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BigInteger::Set [?Set@BigInteger@@QEAA_NHPEBEH@Z]": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BigInteger::Sqr": {
+"calls": 89,
+"consts": 75,
+"refs": 100,
+"score": 88.0,
+"status": "DIFF"
+},
+"BigInteger::Sub": {
+"calls": 77,
+"consts": 100,
+"refs": 100,
+"score": 92.3,
+"status": "DIFF"
+},
+"BigInteger::absCompare": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BigInteger::add": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BigInteger::expMod": {
+"calls": 95,
+"consts": 100,
+"refs": 100,
+"score": 98.2,
+"status": "DIFF"
+},
+"BigInteger::invMod": {
+"calls": 41,
+"consts": 90,
+"refs": 100,
+"score": 77.1,
+"status": "DIFF"
+},
+"BigInteger::isPrimeMR": {
+"calls": 81,
+"consts": 84,
+"refs": 100,
+"score": 88.4,
+"status": "DIFF"
+},
+"BigInteger::leftShiftDigit": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BigInteger::montgomeryNormalize": {
+"calls": 73,
+"consts": 95,
+"refs": 100,
+"score": 89.2,
+"status": "DIFF"
+},
+"BigInteger::montgomeryReduce": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BigInteger::mul [?mul@BigInteger@@AEAAXI@Z]": {
+"calls": 100,
+"consts": 89,
+"refs": 100,
+"score": 96.3,
+"status": "DIFF"
+},
+"BigInteger::mul [?mul@BigInteger@@CAXPEBV1@0PEAV1@@Z]": {
+"calls": 100,
+"consts": 73,
+"refs": 100,
+"score": 90.9,
+"status": "DIFF"
+},
+"BigInteger::setBit": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BigInteger::sqr": {
+"calls": 100,
+"consts": 94,
+"refs": 100,
+"score": 98.0,
+"status": "DIFF"
+},
+"BigInteger::sub": {
+"calls": 100,
+"consts": 86,
+"refs": 100,
+"score": 95.2,
+"status": "DIFF"
+},
+"BigInteger::~BigInteger": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -294,10 +511,10 @@
 "status": "MATCH"
 },
 "BroadcastCrypt::Initialize": {
-"calls": 92,
-"consts": 71,
-"refs": 98,
-"score": 87.0,
+"calls": 100,
+"consts": 87,
+"refs": 100,
+"score": 95.6,
 "status": "DIFF"
 },
 "BroadcastCrypt::clear": {
@@ -497,10 +714,10 @@
 "status": "MATCH"
 },
 "ClientPacketBufferHandler::ToPacket": {
-"calls": 78,
+"calls": 58,
 "consts": 97,
 "refs": 100,
-"score": 91.9,
+"score": 85.2,
 "status": "DIFF"
 },
 "ClientSessionHandler::OnAccept": {
@@ -734,6 +951,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Crypto::Create": {
+"calls": 29,
+"consts": 33,
+"refs": 40,
+"score": 34.0,
+"status": "DIFF"
+},
 "Crypto::Destroy": {
 "calls": 100,
 "consts": 100,
@@ -742,6 +966,34 @@
 "status": "MATCH"
 },
 "Crypto::Initialize": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Crypto::InstanceSize": {
+"calls": 100,
+"consts": 33,
+"refs": 0,
+"score": 44.4,
+"status": "DIFF"
+},
+"CryptoKey::Initialize": {
+"calls": 100,
+"consts": 100,
+"refs": 50,
+"score": 83.3,
+"status": "DIFF"
+},
+"CryptoKey::generateBigNumber": {
+"calls": 100,
+"consts": 86,
+"refs": 100,
+"score": 95.2,
+"status": "DIFF"
+},
+"CryptoKey::generatePrimeNumber": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -901,6 +1153,76 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"Dh::Cleanup": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Dh::Dh": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Dh::GetKey": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Dh::Process": {
+"calls": 67,
+"consts": 67,
+"refs": 100,
+"score": 77.8,
+"status": "DIFF"
+},
+"Dh::Setup": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Dh::Start": {
+"calls": 100,
+"consts": 86,
+"refs": 100,
+"score": 95.2,
+"status": "DIFF"
+},
+"Dh::clear": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Dh::getValue": {
+"calls": 67,
+"consts": 82,
+"refs": 0,
+"score": 49.5,
+"status": "DIFF"
+},
+"Dh::setupFactors": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Dh::~Dh": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
 },
 "DumpRegister": {
 "calls": 100,
@@ -1288,10 +1610,10 @@
 "status": "DIFF"
 },
 "HandleLobbyGate_HelloReq": {
-"calls": 86,
-"consts": 84,
+"calls": 91,
+"consts": 89,
 "refs": 100,
-"score": 90.2,
+"score": 93.3,
 "status": "DIFF"
 },
 "HandleLobbyGate_LoginWithLobbyTokenReq": {
@@ -2092,6 +2414,13 @@
 "score": 46.8,
 "status": "DIFF"
 },
+"MaskGenerator::generate": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Memory::CreateManager": {
 "calls": 100,
 "consts": 100,
@@ -2128,11 +2457,11 @@
 "status": "DIFF"
 },
 "Network::Initialize": {
-"calls": 91,
-"consts": 83,
-"refs": 94,
-"score": 89.3,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Network::Network": {
 "calls": 100,
@@ -2182,6 +2511,41 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"OaepEncoder::Decode": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"OaepEncoder::Encode": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"OaepEncoder::Setup": {
+"calls": 80,
+"consts": 91,
+"refs": 100,
+"score": 90.3,
+"status": "DIFF"
+},
+"OaepEncoder::decode": {
+"calls": 62,
+"consts": 100,
+"refs": 100,
+"score": 87.5,
+"status": "DIFF"
+},
+"OaepEncoder::encode": {
+"calls": 88,
+"consts": 100,
+"refs": 100,
+"score": 96.0,
+"status": "DIFF"
 },
 "Packet::Add": {
 "calls": 100,
@@ -2743,6 +3107,20 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Prng::Generate": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Prng::GeneratePrime": {
+"calls": 100,
+"consts": 92,
+"refs": 100,
+"score": 97.4,
+"status": "DIFF"
+},
 "Prng::Initialize": {
 "calls": 100,
 "consts": 100,
@@ -2911,12 +3289,124 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Ripemd128::Digest": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Ripemd160::Digest": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"Ripemd160::~Ripemd160": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Rsa::Rsa": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Rsa::decrypt": {
+"calls": 95,
+"consts": 100,
+"refs": 80,
+"score": 91.7,
+"status": "DIFF"
+},
+"Rsa::encrypt": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RsaPrivate::Decrypt": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RsaPrivate::Encrypt": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RsaPrivate::GetType": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RsaPrivate::RsaPrivate": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RsaPrivate::Setup": {
+"calls": 100,
+"consts": 67,
+"refs": 100,
+"score": 88.9,
+"status": "DIFF"
+},
+"RsaPrivate::~RsaPrivate": {
+"calls": 100,
+"consts": 100,
+"refs": 40,
+"score": 80.0,
+"status": "DIFF"
+},
+"RsaPublic::Decrypt": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RsaPublic::Encrypt": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RsaPublic::GetType": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RsaPublic::Setup": {
+"calls": 100,
+"consts": 71,
+"refs": 100,
+"score": 90.2,
+"status": "DIFF"
+},
+"RsaPublic::~RsaPublic": {
+"calls": 100,
+"consts": 100,
+"refs": 40,
+"score": 80.0,
+"status": "DIFF"
 },
 "Session::Accept": {
 "calls": 100,
@@ -3010,11 +3500,11 @@
 "status": "MATCH"
 },
 "Session::SetHandshakeParameter": {
-"calls": 95,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 98.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Session::SetPacketConcatenater": {
 "calls": 100,
@@ -3022,6 +3512,13 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"Session::allocateCrypt": {
+"calls": 80,
+"consts": 22,
+"refs": 100,
+"score": 67.4,
+"status": "DIFF"
 },
 "Session::clear": {
 "calls": 100,
@@ -3036,6 +3533,13 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"Session::completeHandshake": {
+"calls": 100,
+"consts": 67,
+"refs": 0,
+"score": 55.6,
+"status": "DIFF"
 },
 "Session::deallocateCrypt": {
 "calls": 100,
@@ -4493,6 +4997,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"i2os": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "makeConsole": {
 "calls": 50,
 "consts": 60,
@@ -4513,6 +5024,13 @@
 "refs": 0,
 "score": 0.0,
 "status": "DIFF"
+},
+"os2i": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "pre_c_init": {
 "calls": 100,

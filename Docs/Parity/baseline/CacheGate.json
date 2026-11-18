@@ -3264,8 +3264,8 @@
 "aes128TableSetupEncKey": {
 "calls": 100,
 "consts": 67,
-"refs": 67,
-"score": 77.8,
+"refs": 100,
+"score": 88.9,
 "status": "DIFF"
 },
 "atexit": {

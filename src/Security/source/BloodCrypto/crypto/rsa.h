@@ -56,6 +56,10 @@ static_assert(sizeof(RsaPublic) == 1432, "sizeof RsaPublic");
 class RsaPrivate : public Rsa
 {
 public:
+    // 0x53430 (LobbyGate). LIFT: noinline only in LG: the LG original keeps a call.
+#if defined(LIFT_EXE_LG)
+    __declspec(noinline)
+#endif
     RsaPrivate() {}
     // 0x534A0
     virtual ~RsaPrivate() {}

@@ -59,7 +59,10 @@ void Crypto::Destroy(Crypto* crypto)
         free(crypto);
 }
 
-// 0x55150 (LobbyGate)
+// 0x55150 (LobbyGate). LIFT: noinline only in LG: the LG original keeps a call.
+#if defined(LIFT_EXE_LG)
+__declspec(noinline)
+#endif
 int Crypto::InstanceSize(Type type)
 {
     switch (static_cast<int>(type))

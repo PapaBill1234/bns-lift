@@ -25,8 +25,8 @@ public:
 
     void Set(BigInteger const* src, int sign);
     void Set(long long value);
-    // LIFT: PDB name Set(int,uchar const*,int). LobbyGate 0x560a0 reads rdx as data and r8d as size only.
-    bool Set(unsigned char const* data, int size);
+    // PDB: Set(int,uchar const*,int). All callers give sign 1; LTCG removes the param (LobbyGate 0x560a0).
+    bool Set(int sign, unsigned char const* data, int size); // ❓ name of param 1
     bool InvMod(BigInteger const* a, BigInteger const* b);
     void Sqr(BigInteger const* a);
     void RightShift(BigInteger const* a, int n);

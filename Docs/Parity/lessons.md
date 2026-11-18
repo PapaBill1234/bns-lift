@@ -281,3 +281,13 @@ A12->A14, A13->A15, A14->A16, A15->A10, A16+A17->A17, new A12 (crypto source for
   `DaemonConfig::Dump`) differ in the count of global data refs (`Network::EndEventObject`, `_Allocator`, `BaseMemoryManager::_Instance`), not in a path. They need a data-layout or init-order cause.
 - Not a per-exe cause: scalar placement `operator delete(void*, void*)` (Memory.h:173) is DIFF score 0 in CG, SCD, POD (card arraynew-3). IDA did not open CG in this card; `Session::SendV` CG 0xfaa0 not fixed.
   The orig `Compose` call there has the const 0xf9e twice; our source has it once (`Compose(..., 0xF9E, format, -1, args)`).
+
+## lift-parity-cryptolib-3 (closed crypto libraries)
+- Worked: lift the callers in the closed libraries from disasm (`PacketCrypt` LG 0x4cc60-0x4da60, `BloodCert`/`CertDec`/`SSN`/`NIC` LG 0x4bf70-0x4ca10). LG +36: the callees in BloodCrypto get a caller and pair.
+- Worked: `#pragma comment(linker, "/INCLUDE:<IsValid>")` under `LIFT_EXE_LG/SCD/POD` keeps an uncalled closed-lib object, as the original does (the lib object is linked whole). SCD +26, POD +26, LG +2. CG has no such object.
+- Fact: the original BloodCert functions have no PDB symbol. Ours are ONLY-OURS. This does not change the MATCH count.
+- Worked: PDB signature `BigInteger::Set(int,uchar const*,int)` with param 1 = sign and all callers give 1. LTCG removes the param as in the original. MATCH in LG, SCD, POD (+1 each).
+  Read a removed param in the PDB mangled name before you write `LIFT:` for it.
+- Worked: `noinline` on `CryptoKey::Initialize` under `LIFT_EXE_LG/SCD/POD` (+1 each). Did not work without the guard: CG loses `Network::Initialize` (CG original inlines it).
+- Worked: `noinline` under `LIFT_EXE_LG` on `Crypto::InstanceSize`, `RsaPrivate::RsaPrivate`, `BigInteger::IsPrime`, `Session::completeHandshake`: 4 orig-only go to paired, LG +1 MATCH (IsPrime DIFF 82, completeHandshake DIFF 56).
+- Final measure (gate ok, parity ok): CG 421, LG 574, SCD 540, POD 620. Crypto orig-only: 0 in each exe.

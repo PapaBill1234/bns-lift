@@ -433,7 +433,10 @@ bool BigInteger::isPrimeMR(BigInteger const* n, unsigned long long b)
     return isEqual(y, n1, absCompare);
 }
 
-// 0x561a0
+// 0x561a0. LIFT: noinline only in LG: the LG original keeps a call.
+#if defined(LIFT_EXE_LG)
+__declspec(noinline)
+#endif
 bool BigInteger::IsPrime() const
 {
     unsigned int r;

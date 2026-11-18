@@ -44,6 +44,8 @@ set(LIFT_SRC_INCLUDE
   ${CMAKE_SOURCE_DIR}/src/Security/source/BloodCrypto/key
   ${CMAKE_SOURCE_DIR}/src/Security/source/BloodCrypto/math/bignumber
   ${CMAKE_SOURCE_DIR}/src/Security/source/BloodCrypto/math/prng
+  ${CMAKE_SOURCE_DIR}/src/Security/source/BloodPacketCrypt
+  ${CMAKE_SOURCE_DIR}/src/Security/source/BloodCert
   ${CMAKE_SOURCE_DIR}/src/Server/BloodLib/include
   ${CMAKE_SOURCE_DIR}/src/Server/BloodLib/source
   ${CMAKE_SOURCE_DIR}/src/Server/Economy/CacheGate
@@ -126,6 +128,8 @@ set(LIFT_COMMON_SOURCES
   src/Server/BloodLib/source/IdleWatcher.cpp
   src/Server/BloodLib/source/PacketUtil.cpp
   src/Server/BloodLib/source/Security.cpp
+  src/Security/source/BloodCert/BloodCert.cpp
+  src/Security/source/BloodPacketCrypt/PacketCrypt.cpp
   src/Server/BloodLib/source/CrashHandler.cpp
   src/Server/Packet/FragmentPacket.cpp
   src/Server/BloodLib/source/Db.cpp)

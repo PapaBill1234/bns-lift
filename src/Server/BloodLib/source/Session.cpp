@@ -959,23 +959,7 @@ bool Session::send(PacketBuffer const** const pbufferList, int count) const
 // PDB Thread_LastCryptError (LobbyGate Session.obj, TLS 0x9a010).
 __declspec(thread) PacketCrypt::ErrCode Thread_LastCryptError;
 
-// 0x4CC60 (LobbyGate, PacketCrypt module). Not in this card.
-int PacketCrypt::InstanceSize(Type type, Algorithm algorithm)
-{
-    (void)type;
-    (void)algorithm;
-    return 0;  // TODO(lift-lobbygate-4)
-}
-
-// 0x4CCE0 (LobbyGate, PacketCrypt module). Not in this card.
-PacketCrypt* PacketCrypt::Create(Type type, Algorithm algorithm, unsigned char* buffer, int size)
-{
-    (void)type;
-    (void)algorithm;
-    (void)buffer;
-    (void)size;
-    return nullptr;  // TODO(lift-lobbygate-4)
-}
+// PacketCrypt::InstanceSize (0x4CC60) and PacketCrypt::Create (0x4CCE0): src/Security/source/BloodPacketCrypt/PacketCrypt.cpp.
 
 // 0x19460 (LobbyGate)
 // LIFT: noinline. The orig calls it out of line at all call sites (LG 0x19460: not inlined).
@@ -1081,6 +1065,10 @@ bool Session::FailHandshake() const
 }
 
 // 0x197E0 (LobbyGate). deallocateCrypt is inlined.
+// LIFT: noinline only in LG: the LG original keeps a call.
+#if defined(LIFT_EXE_LG)
+__declspec(noinline)
+#endif
 void Session::completeHandshake()
 {
     PacketCrypt* handshakeCrypt = _handshakeCrypt;

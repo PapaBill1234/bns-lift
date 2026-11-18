@@ -10,7 +10,10 @@
 // 0x94108
 long CryptoKey::s_initializedCount = 0;
 
-// 0x526e0
+// 0x526e0. LIFT: noinline only in LG/SCD/POD: these originals keep a call. CacheGate inlines it.
+#if defined(LIFT_EXE_LG) || defined(LIFT_EXE_SCD) || defined(LIFT_EXE_POD)
+__declspec(noinline)
+#endif
 bool CryptoKey::Initialize()
 {
     if (_InterlockedIncrement(&s_initializedCount) > 1)
@@ -119,9 +122,9 @@ bool Dh::Start(unsigned char const* in, int inSize, unsigned char* out, int* out
         if (avail <= inSize)
             return false;
         memcpy(out, in, inSize);
-        bool ok = _g.Set(out + 4, *len1);
+        bool ok = _g.Set(1, out + 4, *len1);
         unsigned char* q = out + *len1 + 4;
-        if (!ok || !_p.Set(q + 4, *(int*)q))
+        if (!ok || !_p.Set(1, q + 4, *(int*)q))
         {
             memset(out, 0, *outSize);
             return false;
@@ -140,7 +143,7 @@ bool Dh::Start(unsigned char const* in, int inSize, unsigned char* out, int* out
             memset(out, 0, *outSize);
             return false;
         }
-        if (!_g.Set(out + 4, *len1) || !_p.Set(q + 4, *(int*)q))
+        if (!_g.Set(1, out + 4, *len1) || !_p.Set(1, q + 4, *(int*)q))
         {
             memset(out, 0, *outSize);
             return false;
@@ -177,7 +180,7 @@ bool Dh::Process(unsigned char const* in, int inSize, unsigned char* out, int* o
         if (!setupFactors(in, inSize) || !getValue(out, outSize))
             return false;
     }
-    else if (_state != 1 || in == 0 || inSize <= 0 || !_y.Set(in, inSize))
+    else if (_state != 1 || in == 0 || inSize <= 0 || !_y.Set(1, in, inSize))
     {
         return false;
     }
@@ -226,7 +229,7 @@ bool Dh::setupFactors(unsigned char const* data, int size)
     int len3 = *(int const*)yStart;
     if (end < yStart + len3 + 4 || len3 <= 0 || size < len1 + len2 + len3 + 12)
         return false;
-    if (!_g.Set(data + 4, len1) || !_p.Set(pStart + 4, len2) || !_y.Set(yStart + 4, len3))
+    if (!_g.Set(1, data + 4, len1) || !_p.Set(1, pStart + 4, len2) || !_y.Set(1, yStart + 4, len3))
         return false;
     if (pNotAboveG())
     {
@@ -249,7 +252,7 @@ bool Dh::getValue(unsigned char* out, int* size)
     int count = 128;
     if (half > 1024 || !CryptoKey::generateBigNumber(half, buffer, &count))
         return false;
-    _x.Set(buffer, count);
+    _x.Set(1, buffer, count);
     memset(buffer, 0, sizeof(buffer));
     BigInteger value;
     if (((_p.bits + 31) & ~31) <= 2048)

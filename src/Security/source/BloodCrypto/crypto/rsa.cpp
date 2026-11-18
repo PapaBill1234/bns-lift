@@ -52,7 +52,7 @@ bool Rsa::encrypt(BigInteger const* key, unsigned char const* in, int size, unsi
         int count = 128;
         // The result of Encode is not examined.
         _encoder.Encode(src, len, buf, &count, 0, 0);
-        m.Set(buf, count);
+        m.Set(1, buf, count);
         if (((_n.bits + 31) & ~31) <= 2048)
             r.ExpMod(&m, key, &_n);
         int c = (r.bits + 7) >> 3;
@@ -87,7 +87,7 @@ bool Rsa::decrypt(BigInteger const* key, unsigned char const* in, int size, unsi
     *outSize = 0;
     while (in < end)
     {
-        m.Set(in, _encoder._blockSize);
+        m.Set(1, in, _encoder._blockSize);
         if (((_n.bits + 31) & ~31) <= 2048)
             r.ExpMod(&m, key, &_n);
         unsigned char buf[128];
@@ -134,7 +134,7 @@ bool RsaPublic::Setup(unsigned char const* key, int keySize, int round)
         _error = 6;
         return false;
     }
-    if (!_n.Set(key + 4, *reinterpret_cast<int const*>(key)))
+    if (!_n.Set(1, key + 4, *reinterpret_cast<int const*>(key)))
     {
         _error = 5;
         return false;
@@ -205,7 +205,7 @@ bool RsaPrivate::Setup(unsigned char const* key, int keySize, int round)
     }
     int len = *reinterpret_cast<int const*>(key);
     unsigned char const* nx = key + 4 + len;
-    if (!_n.Set(key + 4, len) || !_d.Set(nx + 4, *reinterpret_cast<int const*>(nx)))
+    if (!_n.Set(1, key + 4, len) || !_d.Set(1, nx + 4, *reinterpret_cast<int const*>(nx)))
     {
         _error = 5;
         return false;

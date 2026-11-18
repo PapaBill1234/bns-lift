@@ -98,12 +98,12 @@ void BigInteger::Set(long long value)
 }
 
 // 0x48e10
-bool BigInteger::Set(unsigned char const* data, int size)
+bool BigInteger::Set(int sign, unsigned char const* data, int size)
 {
     if (data == 0 || static_cast<unsigned int>(size) > 0x200)
         return false;
     memset(digits, 0, sizeof(digits));
-    sign = 1;
+    this->sign = sign;
     bits = 1;
     memcpy(digits, data, size);
     setBit((8 * size + 24) >> 5);

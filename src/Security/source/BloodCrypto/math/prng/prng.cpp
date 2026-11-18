@@ -85,7 +85,7 @@ bool Prng::GeneratePrime(int bits, BigInteger* out)
         buffer[bytes - 1] = top | (mask & buffer[bytes - 1]);
         buffer[0] |= 1;
         if (bytes <= 0x200)
-            out->Set(buffer, bytes);
+            out->Set(1, buffer, bytes);
         if (out->IsPrime())
             return true;
     }
