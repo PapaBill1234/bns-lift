@@ -8,7 +8,7 @@
 #include "prng.h"
 
 // 0x94108
-long CryptoKey::s_initializedCount = 0;
+long s_initializedCount = 0;
 
 // 0x526e0. LIFT: noinline only in LG/SCD/POD: these originals keep a call. CacheGate inlines it.
 #if defined(LIFT_EXE_LG) || defined(LIFT_EXE_SCD) || defined(LIFT_EXE_POD)
@@ -24,7 +24,8 @@ bool CryptoKey::Initialize()
 }
 
 // 0x52750
-bool CryptoKey::generateBigNumber(int bits, unsigned char* out, int* size)
+// LIFT: Both Dh callers call this function in LobbyGate (0x52750).
+__declspec(noinline) bool CryptoKey::generateBigNumber(int bits, unsigned char* out, int* size)
 {
     if ((unsigned int)(bits - 8) > 0xFF8)
         return false;

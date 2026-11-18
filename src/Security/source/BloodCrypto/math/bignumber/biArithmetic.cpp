@@ -300,19 +300,27 @@ void BigInteger::Sub(BigInteger const* a, BigInteger const* b)
     {
         Set(b, -1);
     }
-    else if (a->sign == b->sign)
+    else if (a->sign != b->sign)
     {
-        int cmp = absCompare(a, b);
-        if (cmp == 0)
-            setZero();
-        else if (cmp > 0)
-            sub(a, b, a->sign);
-        else
-            sub(b, a, -b->sign);
+        add(a, b, a->sign);
     }
     else
     {
-        add(a, b, a->sign);
+        int cmp = absCompare(a, b);
+        if (cmp == 0)
+        {
+            setZero();
+            return;
+        }
+        int resultSign = a->sign;
+        if (cmp < 0)
+        {
+            resultSign = -b->sign;
+            BigInteger const* larger = b;
+            b = a;
+            a = larger;
+        }
+        sub(a, b, resultSign);
     }
 }
 

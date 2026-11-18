@@ -348,6 +348,6 @@ bool CacheGateSessionHandler::PacketHandler(Session const* session, Packet const
 
     // LIFT: LTCG folded the event id and the offset. The values come from the LobbyGate call.
     iocpHandle = Network::iocpHandle();
-    return TFPP_PumpPacket(128, iocpHandle, session, packet, *pCmd, 0,
+    return TFPP_PumpPacket(PostOfficeDaemon::POSTEVENT_PACKET_PUMP_EVENT, iocpHandle, session, packet, *pCmd, 0,
                            CacheGatePacketClientSideHandlerList, CacheGatePacketClientSideFragmentHandlerList);
 }

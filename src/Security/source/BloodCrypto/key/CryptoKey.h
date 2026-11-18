@@ -26,9 +26,9 @@ protected:
 public:
     bool _alloc; // LIFT: +8. Dh::Dh writes byte [rcx+8] = 0 (LobbyGate 0x554c0)
 
-    // LIFT: public. Network::Clear decrements it inline (LobbyGate 0x204cb).
-    static long s_initializedCount; // 0x94108
 };
+
+extern long s_initializedCount; // LobbyGate 0x94108
 
 // Diffie-Hellman key exchange. vtable 0x86ED8.
 class Dh : public CryptoKey
