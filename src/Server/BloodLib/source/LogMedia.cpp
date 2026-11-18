@@ -39,6 +39,9 @@ __declspec(noinline) int LogMedia::Add(LogBuffer* logbuffer)
 }
 
 // 0x28650 (SmartCouponDaemon)
+#if defined(_MSC_VER) && !defined(__clang__)
+#pragma inline_depth(0)
+#endif
 void LogMedia::Write()
 {
     _lock.Enter();
@@ -66,3 +69,6 @@ void LogMedia::Write()
         head = next;
     } while (head != nullptr);
 }
+#if defined(_MSC_VER) && !defined(__clang__)
+#pragma inline_depth()
+#endif

@@ -460,16 +460,15 @@ bool SendPublicationEvent::HandleEvent(EventContext*, unsigned long)
     JobManager* jobMgr = SmartCouponDaemon::_instance->_jobMgr;
     if (jobMgr->Register(job))
     {
-        if (job != nullptr)
-        {
-            if (job->execute(1, nullptr))
-                jobMgr->remove(job->_id);
-        }
-        else
+        if (job == nullptr)
         {
             // Inlined JobManager execute check (CouponJob.cpp).
             Log::Write(Log::LT_ERROR, L"CouponJob.cpp", 206, L"== CRASH == [job-mgr], execute fail; null job");
             AlertSender::Write(L"CouponJob.cpp", 206, L"== CRASH == [job-mgr], execute fail; null job");
+        }
+        else if (job->execute(1, nullptr))
+        {
+            jobMgr->remove(job->_id);
         }
         Log::Write(Log::LT_DEBUG, kFile, 415,
                    L"[publication-event], handle event end, acc:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X, publication-id:%I64d, coupon-event-id:%d",

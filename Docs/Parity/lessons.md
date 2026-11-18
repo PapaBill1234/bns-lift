@@ -594,3 +594,45 @@ Open facts:
 - A pointer loop in `BigInteger::mul(unsigned int)` did not add a match.
   Explicit initial allocation in `Client::SendTakeGoodsOk` and
   `Client::SendListLobbyServiceItemInfoOk` inlined the allocator.
+
+## Manual parity for logging, timers, and job dispatch
+
+- This pass added two matches in CacheGate, two in LobbyGate, four in
+  SmartCouponDaemon, and two in PostOfficeDaemon. It added three
+  shared matches. All previous matches held.
+- In the four-argument `DbTransaction::BindCol` (SmartCouponDaemon
+  0x20e40), check the null statement handle first and return after the
+  log call. Then bind the column and return on error. This gives the
+  original order of the log and ODBC calls.
+- In `SendPublicationEvent::HandleEvent` (SmartCouponDaemon 0xbe30),
+  put the null job log before the call to `CouponJob::execute`.
+- Use `#pragma inline_depth(0)` on the caller when the original calls
+  `RefCntObject::removeReferenceCount` out of line. Set the default
+  depth again after the caller. This lets other callers still inline
+  the release. See `LogMedia::Write` (CacheGate 0x13910) and
+  `TimerQueue::clearShortTermQueueSlot` (CacheGate 0x16900). These two
+  functions match in all four binaries.
+- VS2010 can give a lowercase path in `/showIncludes`. The case-sensitive
+  filter dropped that path. For example, it dropped `Timer.cpp` from
+  the dependencies of `TimerLobbyGate.cpp`. Match the Windows path
+  without a case check. Use `winepath -u` to get the path on disk.
+- The following tests did not add a match. Selecting the message before
+  calling `wprintf` in `WinServiceConsole::UninstallService` did not
+  restore the calls to close the service handles. Loading each GUID
+  word separately did not change the BnsCommonConfig scores. Putting
+  the failure branch first in `PingRelayContext::processRelayResponse`
+  lowered its score from 97.6 to 95.1.
+- An inline depth of 1 had no effect on
+  `SessionSendBuffer::clearPacketBufferList`. A countdown and a cached
+  completion port handle had no effect on `Network::Clear`. A loop to
+  compare the XML element name and a common release call in
+  `CacheDList::LoadCachedListConfigFile` lowered its score to 96.3.
+- In `ClientManager::BroadcastAnnounceNotify` (LobbyGate 0x62c0),
+  let the packet destructor call `Clear`. This removes the extra
+  call and raises the score from 95.8 to 97.8. The remaining
+  difference is one merged log call.
+- In CacheGate `Network::initWorkerThread`, the original sets
+  `r14d` to the TLS offset at 0xd94f, before the loop. It uses the
+  register at 0xd9c9 to clear `IoWorker::ZstdCCtx`. The original and
+  build PDBs give offsets 0x30 and 0x18 for that variable. The current
+  six-instruction check misses the address use.

@@ -259,20 +259,20 @@ void Db::clearList()
 // LIFT: noinline. The orig calls it out of line (SCD 0x20e40).
 __declspec(noinline) bool DbTransaction::BindCol(unsigned int index, void* buffer, unsigned int varType, long long* result)
 {
-    if (StmtHandle != nullptr)
+    if (StmtHandle == nullptr)
     {
-        *result = SQL_NTS;
-        if (sqlSucceeded(SQLBindCol(StmtHandle, static_cast<SQLUSMALLINT>(index), static_cast<SQLSMALLINT>(varType),
-                                    buffer, 0, reinterpret_cast<SQLLEN*>(result))))
-        {
-            BoundCol = true;
-            return true;
-        }
+        ::Log::Write(::Log::LT_ERROR, kFile, 286, L"DbTransaction::BindCol(), Not initialized");
+        return false;
+    }
+    *result = SQL_NTS;
+    if (!sqlSucceeded(SQLBindCol(StmtHandle, static_cast<SQLUSMALLINT>(index), static_cast<SQLSMALLINT>(varType),
+                                 buffer, 0, reinterpret_cast<SQLLEN*>(result))))
+    {
         statmentErrorLog(L"SQLBindCol(%d, %d, %d, %p, %p)", index, varType, buffer, 0, result);
         return false;
     }
-    ::Log::Write(::Log::LT_ERROR, kFile, 286, L"DbTransaction::BindCol(), Not initialized");
-    return false;
+    BoundCol = true;
+    return true;
 }
 
 // 0x20F20

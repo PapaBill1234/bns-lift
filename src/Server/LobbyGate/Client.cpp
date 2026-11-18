@@ -624,7 +624,6 @@ __declspec(noinline) void ClientManager::BroadcastAnnounceNotify(wchar_t const* 
         Log::Write(Log::LT_ERROR, CLIENT_FILE, 812,
                    L"[client session handler], broadcast announce notify fail; broadcast fail, message:%s", message);
     }
-    packet.Clear();
 }
 
 // 0x6410

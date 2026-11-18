@@ -199,6 +199,9 @@ __declspec(noinline) void TimerQueue::removeShortTermQueue(Slot* slot, Timer* ti
 }
 
 // 0x264F0 (SmartCouponDaemon)
+#if defined(_MSC_VER) && !defined(__clang__)
+#pragma inline_depth(0)
+#endif
 void TimerQueue::clearShortTermQueueSlot(Slot* slot)
 {
     Timer* timer;
@@ -214,6 +217,9 @@ void TimerQueue::clearShortTermQueueSlot(Slot* slot)
         timer->removeReferenceCount(TIMER_FILE, 312);
     }
 }
+#if defined(_MSC_VER) && !defined(__clang__)
+#pragma inline_depth()
+#endif
 
 // 0x26560 (SmartCouponDaemon)
 void TimerQueue::addLongTermQueue(unsigned int slice, Timer* timer)

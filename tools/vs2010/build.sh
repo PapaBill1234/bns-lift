@@ -20,6 +20,7 @@ EXES=("$@"); [ ${#EXES[@]} -gt 0 ] || EXES=(CacheGate LobbyGate SmartCouponDaemo
 source "$HOME/toolchains/vs2010/bin/vs2010-env.sh"
 [ -f "$B/build.ninja" ] || { echo "no $B/build.ninja: run tools/gate.sh first" >&2; exit 2; }
 mkdir -p "$O/obj"
+WINE_REPO_PATH=$(winepath -w "$R")
 
 # The clang build gives these with crt0 and the Wine import libs. The VS2010 build uses the real CRT (msvcrt.lib, /MD).
 skip_src() { case "$1" in src/crt/*) return 0;; esac; return 1; }
@@ -47,7 +48,7 @@ for d in include $(sed -n '/set(LIFT_SRC_INCLUDE/,/^)/p' CMakeLists.txt | grep -
          vendor/zstd/src/lib vendor/zstd/src/lib/common; do
   [ -d "$d" ] && INC="$INC /I$(winepath -w "$R/$d")"
 done
-export INC R O
+export INC R O WINE_REPO_PATH
 
 # Compile one source to $O/obj/<path>.obj. Skip it when the object is newer than the source
 # and newer than each repo header that it included. /showIncludes gives the headers: they are
@@ -58,7 +59,7 @@ compile_one() {
   [ -n "$tag" ] && { pre="$O/obj/$tag"; d="/DLIFT_EXE_$tag"; }
   local obj="$pre/$1.obj" log="$pre/$1.log" dep="$pre/$1.dep"
   mkdir -p "$(dirname "$obj")"
-  if [ -f "$obj" ] && [ -f "$dep" ] && [ "$obj" -nt "$src" ]; then
+  if [ -f "$obj" ] && [ "$dep" -nt tools/vs2010/build.sh ] && [ "$obj" -nt "$src" ]; then
     if [[ "$src" == *.cpp && "$R/src/Server/BloodLib/include/PlacementNew.h" -nt "$obj" ]]; then
       stale=1
     fi
@@ -73,9 +74,17 @@ compile_one() {
         /showIncludes /FIwinsock2.h $d $lang $INC /Fo"$(winepath -w "$R/$obj")" "$(winepath -w "$R/$src")" > "$log" 2>&1; then
     echo "FAIL $src (see $log)"; rm -f "$obj" "$dep"; return 1
   fi
-  # "Note: including file:   Z:\home\...\X.h" -> "/home/.../X.h". Keep only the files of the repo.
-  tr -d '\r' < "$log" | sed -n 's/^Note: including file: *//p' | sed -E 's#^[Zz]:##; s#\\#/#g' |
-    grep -F "$R/" | sort -u > "$dep" || true
+  # VS2010 can report the same include path with different case. Wine gives the case on disk.
+  local -a includes=()
+  mapfile -t includes < <(tr -d '\r' < "$log" | sed -n 's/^Note: including file: *//p' |
+    grep -Fi -- "$WINE_REPO_PATH\\" | sort -u)
+  if [ "${#includes[@]}" -eq 0 ]; then
+    : > "$dep"
+  elif ! winepath -u "${includes[@]}" > "$dep"; then
+    echo "FAIL $src (cannot read include paths)"
+    rm -f "$obj" "$dep"
+    return 1
+  fi
 }
 export -f compile_one
 
