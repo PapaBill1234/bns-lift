@@ -21,6 +21,22 @@
 
 static wchar_t const DAEMONPACKETHANDLER_FILE[] = L"DaemonPacketHandler.cpp";
 static wchar_t const SESSION_SOURCE_FILE[] = L"source\\Session.cpp";
+
+// LIFT: Session::Send(Packet const*) (0xFA40 in CG) is inlined at each call site in SCD (0x8360, 0x8E80).
+// The BloodLib copy is noinline for CG and LG, so this file has its own inline copy.
+struct DaemonPacketHandlerSend
+{
+    static __forceinline void Send(Session const* session, Packet const* packet)
+    {
+        PacketBuffer* buffer = packet->ListHead;
+        buffer->encrypt(session->_currentCrypt, session->_security3rd);
+        PacketBuffer const* list[1];
+        list[0] = buffer;
+        EnterCriticalSection(&const_cast<Session*>(session)->_lock.CS);
+        session->send(list, 1);
+        LeaveCriticalSection(&const_cast<Session*>(session)->_lock.CS);
+    }
+};
 static wchar_t const CHANNEL_H_FILE[] =
     L"E:\\DailyBuild02\\SmartCouponDaemon-Common-0.0.348\\depot\\Branch\\348NC\\Program\\Server\\BloodLib\\include\\Channel.h";
 
@@ -193,7 +209,8 @@ bool HandleSmartCoupon_GameEventByCharacterReq(Session const* session, Packet co
                    session->_id, channel->GetId());
         failReason = 2;
     }
-    else if ((event->_gameAccountId.id[0] == 0 && event->_gameAccountId.id[1] == 0) || event->_wid <= 0 ||
+    else if ((event->_gameAccountId.id[0] == ID128_GUID_ZERO.id[0] && event->_gameAccountId.id[1] == ID128_GUID_ZERO.id[1]) ||
+             event->_wid <= 0 ||
              event->_wid != static_cast<short>(channel->_daemonId._wid) || event->_pcdbid <= 0 ||
              event->_gameEventId <= 0)
     {
@@ -249,18 +266,19 @@ bool HandleSmartCoupon_GameEventByCharacterReq(Session const* session, Packet co
             }
             else
             {
-                Packet p;
-                p.Allocate();
-                p.Compose("hqq", 5, tid, event->_gameEventLogId);
-                session->Send(&p);  // inlined encrypt and send (0xFA40)
-                Log::Write(Log::LT_DEBUG, DAEMONPACKETHANDLER_FILE, 202,
-                           L"[packet], 0x%.16I64X, %I64d, register game event log, success, cmd:%d, wid:%d, "
-                           L"channel-tid:0x%.16I64X, account-id:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X, "
-                           L"pcdbid:0x%I64X, game-event-id:%d, log-id:%I64d",
-                           session->_id, channel->GetId(), cmd, channel->_daemonId._wid, tid,
-                           GUID_ARGS(event->_gameAccountId), event->_pcdbid, event->_gameEventId,
-                           event->_gameEventLogId);
-                p.Clear();
+                {
+                    Packet p;
+                    p.Allocate();
+                    p.Compose("hqq", 5, tid, event->_gameEventLogId);
+                    DaemonPacketHandlerSend::Send(session, &p);
+                    Log::Write(Log::LT_DEBUG, DAEMONPACKETHANDLER_FILE, 202,
+                               L"[packet], 0x%.16I64X, %I64d, register game event log, success, cmd:%d, wid:%d, "
+                               L"channel-tid:0x%.16I64X, account-id:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X, "
+                               L"pcdbid:0x%I64X, game-event-id:%d, log-id:%I64d",
+                               session->_id, channel->GetId(), cmd, channel->_daemonId._wid, tid,
+                               GUID_ARGS(event->_gameAccountId), event->_pcdbid, event->_gameEventId,
+                               event->_gameEventLogId);
+                }  // LIFT: the Packet dtor is the one Packet::Clear call (0x8360).
                 if (GameEventManager::Instance != nullptr && GameEventManager::Instance->_gameEventHandle != nullptr)
                 {
                     PostQueuedCompletionStatus(GameEventManager::Instance->_gameEventHandle, 0,
@@ -318,7 +336,8 @@ bool HandleSmartCoupon_GameEventByAccountReq(Session const* session, Packet cons
                    session->_id, channel->GetId());
         failReason = 2;
     }
-    else if ((event->_gameAccountId.id[0] == 0 && event->_gameAccountId.id[1] == 0) || event->_gameEventId <= 0)
+    else if ((event->_gameAccountId.id[0] == ID128_GUID_ZERO.id[0] && event->_gameAccountId.id[1] == ID128_GUID_ZERO.id[1]) ||
+             event->_gameEventId <= 0)
     {
         Log::Write(Log::LT_ERROR, DAEMONPACKETHANDLER_FILE, 262,
                    L"[packet], 0x%.16I64X, %I64d, invalid parameter, cmd:%d, wid:%d, channel-tid:0x%.16I64X, "
@@ -372,17 +391,18 @@ bool HandleSmartCoupon_GameEventByAccountReq(Session const* session, Packet cons
             }
             else
             {
-                Packet p;
-                p.Allocate();
-                p.Compose("hqq", 8, tid, event->_gameEventLogId);
-                session->Send(&p);  // inlined encrypt and send (0xFA40)
-                Log::Write(Log::LT_DEBUG, DAEMONPACKETHANDLER_FILE, 308,
-                           L"[packet], 0x%.16I64X, %I64d, register game event log, success, cmd:%d, wid:%d, "
-                           L"channel-tid:0x%.16I64X, account-id:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X, "
-                           L"game-event-id:%d, log-id:%I64d",
-                           session->_id, channel->GetId(), cmd, channel->_daemonId._wid, tid,
-                           GUID_ARGS(event->_gameAccountId), event->_gameEventId, event->_gameEventLogId);
-                p.Clear();
+                {
+                    Packet p;
+                    p.Allocate();
+                    p.Compose("hqq", 8, tid, event->_gameEventLogId);
+                    DaemonPacketHandlerSend::Send(session, &p);
+                    Log::Write(Log::LT_DEBUG, DAEMONPACKETHANDLER_FILE, 308,
+                               L"[packet], 0x%.16I64X, %I64d, register game event log, success, cmd:%d, wid:%d, "
+                               L"channel-tid:0x%.16I64X, account-id:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X, "
+                               L"game-event-id:%d, log-id:%I64d",
+                               session->_id, channel->GetId(), cmd, channel->_daemonId._wid, tid,
+                               GUID_ARGS(event->_gameAccountId), event->_gameEventId, event->_gameEventLogId);
+                }  // LIFT: the Packet dtor is the one Packet::Clear call (0x8E80).
                 if (GameEventManager::Instance != nullptr && GameEventManager::Instance->_gameEventHandle != nullptr)
                 {
                     PostQueuedCompletionStatus(GameEventManager::Instance->_gameEventHandle, 0,

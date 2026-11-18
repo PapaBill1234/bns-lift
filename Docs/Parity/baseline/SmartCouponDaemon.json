@@ -441,10 +441,10 @@
 "status": "MATCH"
 },
 "CouponJob::transit": {
-"calls": 86,
+"calls": 88,
 "consts": 100,
-"refs": 87,
-"score": 90.9,
+"refs": 96,
+"score": 94.8,
 "status": "DIFF"
 },
 "CouponJob::~CouponJob": {
@@ -502,6 +502,13 @@
 "refs": 94,
 "score": 97.3,
 "status": "DIFF"
+},
+"CriticalSection::CriticalSection": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "CriticalSection::~CriticalSection": {
 "calls": 100,
@@ -1218,17 +1225,17 @@
 "status": "DIFF"
 },
 "HandleSmartCoupon_GameEventByAccountReq": {
-"calls": 71,
+"calls": 82,
 "consts": 100,
-"refs": 91,
-"score": 87.1,
+"refs": 94,
+"score": 91.9,
 "status": "DIFF"
 },
 "HandleSmartCoupon_GameEventByCharacterReq": {
-"calls": 89,
+"calls": 100,
 "consts": 97,
-"refs": 94,
-"score": 93.4,
+"refs": 97,
+"score": 98.1,
 "status": "DIFF"
 },
 "HandleSmartCoupon_HelloReq": {
@@ -1344,11 +1351,11 @@
 "status": "DIFF"
 },
 "JobManager::Initialize": {
-"calls": 67,
-"consts": 88,
-"refs": 73,
-"score": 75.6,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "JobManager::Register": {
 "calls": 100,
@@ -1386,10 +1393,10 @@
 "status": "MATCH"
 },
 "JobManager::~JobManager": {
-"calls": 55,
-"consts": 67,
-"refs": 67,
-"score": 62.6,
+"calls": 100,
+"consts": 89,
+"refs": 100,
+"score": 96.3,
 "status": "DIFF"
 },
 "Log::Add": {
@@ -1758,9 +1765,9 @@
 },
 "NPChannel::sendInitialConnectMessage": {
 "calls": 100,
-"consts": 80,
+"consts": 89,
 "refs": 100,
-"score": 93.3,
+"score": 96.3,
 "status": "DIFF"
 },
 "NPChannel::~NPChannel": {
@@ -2696,10 +2703,10 @@
 },
 "SendRetryCouponPublicationFailEvent::HandleEvent": {
 "calls": 100,
-"consts": 89,
-"refs": 86,
-"score": 91.5,
-"status": "DIFF"
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "SendRetryCouponPublicationOkEvent::EventId": {
 "calls": 100,
@@ -2710,10 +2717,10 @@
 },
 "SendRetryCouponPublicationOkEvent::HandleEvent": {
 "calls": 100,
-"consts": 89,
-"refs": 86,
-"score": 91.5,
-"status": "DIFF"
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Session::Accept": {
 "calls": 100,
@@ -3074,10 +3081,10 @@
 },
 "SmartCouponDB::UpdateStatusToPublicationSuccess": {
 "calls": 100,
-"consts": 97,
-"refs": 85,
-"score": 93.8,
-"status": "DIFF"
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "SmartCouponDaemon::Descriptions": {
 "calls": 100,
@@ -4233,6 +4240,13 @@
 "refs": 0,
 "score": 0.0,
 "status": "DIFF"
+},
+"operator delete[]": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "pre_c_init": {
 "calls": 100,

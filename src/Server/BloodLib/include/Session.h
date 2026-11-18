@@ -120,6 +120,7 @@ public:
     friend class ReconnectTimer;
     friend class PortListener;
     friend class ClientPacketBufferHandler;
+    friend struct DaemonPacketHandlerSend;  // LIFT: access for the inlined Session::Send in SCD DaemonPacketHandler.cpp
     friend class ManagerChannel;  // LIFT: access for the inlined send in ManagerChannel::SendRetryCouponPublication* (SmartCouponDaemon)
     friend class DChannel;        // LIFT: access for the inlined send in DChannel (SmartCouponDaemon)
     friend class Client;          // LIFT: access for the inlined send in Client::Send* (LobbyGate)

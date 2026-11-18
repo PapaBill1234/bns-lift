@@ -2,12 +2,39 @@
 // LIFT: SCD build path of StlMemory.h (lower case form, from the HR strings).
 #define LIFT_STLMEMORY_FILE \
     L"e:\\dailybuild02\\smartcoupondaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\bloodlib\\include\\StlMemory.h"
+// LIFT: the original Memory.h (line 181) gives its own placement array new and delete. This stops <new> from giving them.
+#define __PLACEMENT_VEC_NEW_INLINE
 #include <windows.h>
 #include <new>
 #include "CouponJob.h"
 #include "Log.h"
 #include "AlertSender.h"
 #include "Memory.h"
+
+// PDB S_GTHREAD32 (void*, .tls +0x20). The original operator delete[] only keeps the pointer here. ❓ module of the definition.
+__declspec(thread) void* __delv_buf__;
+
+// LIFT: inlined in JobManager::~JobManager 0x6CE0. No exe imports ??_V@YAXPEAX@Z.
+inline void __cdecl operator delete[](void* p)
+{
+    __delv_buf__ = p;
+}
+
+inline void* __cdecl operator new[](size_t, void* buf) throw()
+{
+    return buf;
+}
+
+// 0x6850
+inline void __cdecl operator delete[](void*, void*)
+{
+    Log::Write(Log::LT_ERROR,
+               L"E:\\DailyBuild02\\SmartCouponDaemon-Common-0.0.348\\depot\\Branch\\348NC\\Program\\Server\\BloodLib\\include\\Memory.h",
+               181, L"== CRASH == [memory], DO NOT USE THIS DEL OPERATOR");
+    AlertSender::Write(
+        L"E:\\DailyBuild02\\SmartCouponDaemon-Common-0.0.348\\depot\\Branch\\348NC\\Program\\Server\\BloodLib\\include\\Memory.h",
+        181, L"== CRASH == [memory], DO NOT USE THIS DEL OPERATOR");
+}
 
 static wchar_t const* const kFile = L"CouponJob.cpp";
 
@@ -21,28 +48,30 @@ bool CouponJob::transit(int state)
         AlertSender::Write(kFile, 17, L"== CRASH == [job], transit fail; no definition, id:0x%I64X", _id);
         return false;
     }
-    wchar_t const* format;
-    int line;
     if (state <= 0 || state > def->fin)
     {
-        format = L"== CRASH == [job], transit fail; state out of range, to:%d, jobid:0x%I64X, type:%d, state:%d";
-        line = 22;
+        Log::Write(Log::LT_ERROR, kFile, 22,
+                   L"== CRASH == [job], transit fail; state out of range, to:%d, jobid:0x%I64X, type:%d, state:%d",
+                   state, _id, GetDefinition()->type, _state);
+        AlertSender::Write(kFile, 22,
+                           L"== CRASH == [job], transit fail; state out of range, to:%d, jobid:0x%I64X, type:%d, state:%d",
+                           state, _id, GetDefinition()->type, _state);
+        return false;
     }
-    else
+    if (state >= _state)
     {
-        if (state >= _state)
-        {
-            _lastState = _state;
-            _state = state;
-            Log::Write(Log::LT_DEBUG, kFile, 35, L"[job], transit ok, from:%d, jobid:0x%I64X, type:%d, state:%d",
-                       _lastState, _id, GetDefinition()->type, state);
-            return true;
-        }
-        format = L"== CRASH == [job], transit fail; roll back not allowed, to:%d, jobid:0x%I64X, type:%d, state:%d";
-        line = 28;
+        _lastState = _state;
+        _state = state;
+        Log::Write(Log::LT_DEBUG, kFile, 35, L"[job], transit ok, from:%d, jobid:0x%I64X, type:%d, state:%d",
+                   _lastState, _id, GetDefinition()->type, state);
+        return true;
     }
-    Log::Write(Log::LT_ERROR, kFile, line, format, state, _id, GetDefinition()->type, _state);
-    AlertSender::Write(kFile, line, format, state, _id, GetDefinition()->type, _state);
+    Log::Write(Log::LT_ERROR, kFile, 28,
+               L"== CRASH == [job], transit fail; roll back not allowed, to:%d, jobid:0x%I64X, type:%d, state:%d",
+               state, _id, GetDefinition()->type, _state);
+    AlertSender::Write(kFile, 28,
+                       L"== CRASH == [job], transit fail; roll back not allowed, to:%d, jobid:0x%I64X, type:%d, state:%d",
+                       state, _id, GetDefinition()->type, _state);
     return false;
 }
 
@@ -86,21 +115,14 @@ JobManager::~JobManager()
     Clear();
     if (_jobs != nullptr)
     {
-        // eh vector destructor iterator: the count is in the 8 bytes in front of the array.
-        long long* const base = reinterpret_cast<long long*>(_jobs) - 1;
-        int const count = static_cast<int>(*base);
-        for (int i = count - 1; i >= 0; --i)
-            _jobs[i].~JobMap();
-        Memory::_Manager[2]->Free(base, kFile, 116);
+        delete[] _jobs;
+        Memory::_Manager[2]->Free(__delv_buf__, kFile, 116);
         _jobs = nullptr;
     }
     if (_lock != nullptr)
     {
-        long long* const base = reinterpret_cast<long long*>(_lock) - 1;
-        int const count = static_cast<int>(*base);
-        for (int i = count - 1; i >= 0; --i)
-            _lock[i].~CriticalSection();
-        Memory::_Manager[2]->Free(base, kFile, 118);
+        delete[] _lock;
+        Memory::_Manager[2]->Free(__delv_buf__, kFile, 118);
         _lock = nullptr;
     }
 }
@@ -115,30 +137,10 @@ bool JobManager::Initialize(int hashCount)
     }
     _hashCount = hashCount;
 
-    // new JobMap[hashCount] with the count in front of the array.
-    long long* mem = static_cast<long long*>(
-        Memory::_Manager[2]->Alloc(sizeof(JobMap) * hashCount + 8, kFile, 129));
-    JobMap* jobs = nullptr;
-    if (mem != nullptr)
-    {
-        *reinterpret_cast<int*>(mem) = hashCount;
-        jobs = reinterpret_cast<JobMap*>(mem + 1);
-        for (int i = 0; i < hashCount; ++i)
-            new (&jobs[i]) JobMap();
-    }
-    _jobs = jobs;
-
-    int const count = _hashCount;
-    mem = static_cast<long long*>(Memory::_Manager[2]->Alloc(sizeof(CriticalSection) * count + 8, kFile, 130));
-    CriticalSection* locks = nullptr;
-    if (mem != nullptr)
-    {
-        *reinterpret_cast<int*>(mem) = count;
-        locks = reinterpret_cast<CriticalSection*>(mem + 1);
-        for (int i = 0; i < count; ++i)
-            new (&locks[i]) CriticalSection();
-    }
-    _lock = locks;
+    // The count is in the 8 bytes in front of the array.
+    _jobs = new (Memory::_Manager[2]->Alloc(sizeof(JobMap) * hashCount + 8, kFile, 129)) JobMap[hashCount];
+    _lock = new (Memory::_Manager[2]->Alloc(sizeof(CriticalSection) * _hashCount + 8, kFile, 130))
+        CriticalSection[_hashCount];
     // BUG: 0x6E10 the result of both Alloc calls is not checked.
     Log::Write(Log::LT_NOTICE, kFile, 132, L"[job-mgr], initialize ok, hash-count:%d", _hashCount);
     return true;

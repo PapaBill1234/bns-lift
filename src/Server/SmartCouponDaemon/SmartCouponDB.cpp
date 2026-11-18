@@ -410,8 +410,9 @@ bool SmartCouponDB::UpdateStatusToPublicationSuccess(int* dbRetValue, long long 
                                                      long long const* acceptTid)
 {
     *dbRetValue = 0;
-    long long const receiptId = (acceptTid != nullptr) ? *acceptTid : 0;
-    wchar_t const* const receiptNull = (acceptTid != nullptr) ? L"" : L"(NULL)";
+// LIFT: the original writes the two `?:` at each use (0x129C0 refs L"" and L"(NULL)" 5 times).
+#define receiptId ((acceptTid != nullptr) ? *acceptTid : 0)
+#define receiptNull ((acceptTid != nullptr) ? L"" : L"(NULL)")
     if (publicationId == 0 || IsZeroGuid(gameAccountId) || couponEventId == 0)
     {
         Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 434,
@@ -442,7 +443,10 @@ bool SmartCouponDB::UpdateStatusToPublicationSuccess(int* dbRetValue, long long 
     unsigned long long publicationIdLen = 0;
     unsigned long long gameAccountIdLen = 0;
     unsigned long long couponEventIdLen = 0;
-    unsigned long long receiptIdLen = (acceptTid != nullptr) ? 0 : kNullData;
+    long long receiptLenValue = 0;
+    if (acceptTid == nullptr)
+        receiptLenValue = -1;
+    unsigned long long receiptIdLen = receiptLenValue;
     if (tran.Tran->BindParam(1, SQL_PARAM_OUTPUT, dbRetValue, SQL_INTEGER, SQL_C_SLONG, &retLen) &&
         tran.Tran->BindParam(2, SQL_PARAM_INPUT, &publicationId, SQL_BIGINT, SQL_C_SBIGINT, &publicationIdLen) &&
         tran.Tran->BindParam(3, SQL_PARAM_INPUT, const_cast<id128*>(gameAccountId), SQL_GUID, SQL_C_GUID,
@@ -468,6 +472,8 @@ bool SmartCouponDB::UpdateStatusToPublicationSuccess(int* dbRetValue, long long 
                L", coupon-event-id:%d, receipt-id:%I64d%s",
                MODULE_NAME, publicationId, GUID_ARGS(*gameAccountId), couponEventId, receiptId, receiptNull);
     return false;
+#undef receiptId
+#undef receiptNull
 }
 
 // 0x13060

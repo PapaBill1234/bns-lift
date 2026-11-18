@@ -537,12 +537,12 @@ bool RetryCouponPublicationEvent::HandleEvent(EventContext*, unsigned long)
 // 0xc6e0
 bool SendRetryCouponPublicationOkEvent::HandleEvent(EventContext*, unsigned long)
 {
-    SmartCouponDaemon* daemon = SmartCouponDaemon::_instance;
-    EnterCriticalSection(&daemon->_managerChannelLock.CS);
-    ManagerChannel* channel = daemon->_managerChannel;
+    // LIFT: inlined manager channel get (SmartCouponDaemon.cpp line 88). It reads _instance again after each call.
+    EnterCriticalSection(&SmartCouponDaemon::_instance->_managerChannelLock.CS);
+    ManagerChannel* channel = SmartCouponDaemon::_instance->_managerChannel;
     if (channel != nullptr)
         channel->addReferenceCount(L"SmartCouponDaemon.cpp", 88);
-    LeaveCriticalSection(&daemon->_managerChannelLock.CS);
+    LeaveCriticalSection(&SmartCouponDaemon::_instance->_managerChannelLock.CS);
     if (channel != nullptr)
     {
         channel->SendRetryCouponPublicationOk(const_cast<Session*>(channel->GetSession()), _tid, _acceptTid);
@@ -561,12 +561,12 @@ bool SendRetryCouponPublicationOkEvent::HandleEvent(EventContext*, unsigned long
 // 0xc7d0
 bool SendRetryCouponPublicationFailEvent::HandleEvent(EventContext*, unsigned long)
 {
-    SmartCouponDaemon* daemon = SmartCouponDaemon::_instance;
-    EnterCriticalSection(&daemon->_managerChannelLock.CS);
-    ManagerChannel* channel = daemon->_managerChannel;
+    // LIFT: inlined manager channel get (SmartCouponDaemon.cpp line 88). It reads _instance again after each call.
+    EnterCriticalSection(&SmartCouponDaemon::_instance->_managerChannelLock.CS);
+    ManagerChannel* channel = SmartCouponDaemon::_instance->_managerChannel;
     if (channel != nullptr)
         channel->addReferenceCount(L"SmartCouponDaemon.cpp", 88);
-    LeaveCriticalSection(&daemon->_managerChannelLock.CS);
+    LeaveCriticalSection(&SmartCouponDaemon::_instance->_managerChannelLock.CS);
     if (channel != nullptr)
     {
         channel->SendRetryCouponPublicationFail(const_cast<Session*>(channel->GetSession()), _tid, _reason);

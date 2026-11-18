@@ -332,6 +332,41 @@ Each new card adds its patterns at the end of section A or B. The next review so
   the whole fail block moves to the end. The original has `Allocate` before the first `Compose`, and the fail block (`Log::Write`,
   `removeReferenceCount`, `Packet::Clear`) directly after it. The negative form stays. Reverted.
 
+## scd-2, stage 1 (2026-11-18): facts, no source change yet (SCD 504/669 at start)
+- `__delv_buf__` is a PDB `S_GTHREAD32` (`void*`, `.tls` +0x20). No exe (CG, LG, SCD, POD) imports `??_V@YAXPEAX@Z` or `??3@YAXPEAX@Z`.
+  So the original replaces the global `operator delete[](void*)`: it only stores the pointer in `__delv_buf__`. The caller then calls
+  `Memory::_Manager[2]->Free(base, file, line)`. SCD `JobManager::~JobManager` 0x6ce0: `eh vector destructor iterator` (map dtor, `CriticalSection::~CriticalSection`),
+  `__delv_buf__ = base`, `Free(base, L"CouponJob.cpp", 116/118)`, member = nullptr.
+- SCD `JobManager::Initialize` 0x6e10: placement array new with `eh vector constructor iterator` (map ctor/dtor, `CriticalSection::CriticalSection`/dtor).
+  This explains the orig-only `CriticalSection::CriticalSection` and `operator delete[]` 0x6850. 0x6850 is the placement
+  `operator delete[](void* obj, void* buf)` from `Memory.h` line 181 (Log + Alert "== CRASH == [memory], DO NOT USE THIS DEL OPERATOR",
+  upper-case `E:\DailyBuild02\SmartCouponDaemon-Common-...\Memory.h` path). It is emitted because the EH unwind of `new (buf) T[n]` refs it.
+  Source form to try: `#define __PLACEMENT_VEC_NEW_INLINE` before all includes, own placement `new[]`/`delete[]`, `delete[] p` in the dtor.
+  No `src/` file uses `delete[]` now, so a global `delete[]` replacement changes only JobManager.
+
+## scd-2, stage 2 (2026-11-18): SCD 504 -> 509 (0 lost, `tools/parity.sh SmartCouponDaemon` ok)
+- Works: `JobManager::Initialize` 0x6e10 MATCH, `operator delete[]` 0x6850 MATCH. Form in `CouponJob.cpp`:
+  `#define __PLACEMENT_VEC_NEW_INLINE` before all includes, own `operator new[](size_t, void*) throw()` (the `throw()` gives the null check),
+  own `operator delete[](void*, void*)` with the Memory.h:181 crash Log + Alert, `inline operator delete[](void* p) { __delv_buf__ = p; }`,
+  `_jobs = new (Alloc(sizeof(JobMap) * n + 8, ...)) JobMap[n]`, dtor `delete[] _jobs; Free(__delv_buf__, ...)`. Builds with VS2010 cl and clang-cl.
+- `~JobManager` 0x6ce0 is 96.3: only the TLS offset of `__delv_buf__` differs (orig .tls +0x20, ours +0x10). The full TLS layout differs (shared, all exes):
+  orig `_Instance` 0x8, `IoWorker::WorkerId` 0x10, `LogBufferAllocator::_Local` 0x18, `__delv_buf__` 0x20, `PacketBufferAllocator::_Local` 0x28,
+  `Thread::Current` 0x30, `IoWorker::ZstdCCtx` 0x38, `NPChannel::_buffer` 0x40. Ours also has `t_addressBuffer`, `__ip_addr_string_a__/_w__` before `_buffer`. Not fixed.
+- `CouponJob::transit` 0x6990: full Log + Alert in each fail branch (order: range fail, ok, roll back) gives 90.9 -> 94.8 (DIFF). Orig tail-merges the 2 Alert calls.
+- Works: `SendRetryCouponPublication{Ok,Fail}Event::HandleEvent` MATCH: write `SmartCouponDaemon::_instance->` at each use (Enter, read, Leave), no local copy.
+- `UpdateStatusToPublicationSuccess` 0x129c0: write the `?:` for receipt-id and `L""`/`L"(NULL)"` at each use (local macros) -> 98.9.
+  Left: orig const -1 for the receipt length (`v = 0; if (acceptTid == nullptr) v = -1;`); ours uses `kNullData` in a `?:`.
+- Orig-only scalar placement `operator delete(void*, void*)` 0x1b90 (BnsCommonConfigDefinition, Memory.h:173). Shared code. Not done.
+
+## scd-2, stage 3 (2026-11-18): SCD 509 -> 510
+- Works (+1 MATCH): `UpdateStatusToPublicationSuccess` 0x129c0 receipt length as `long long v = 0; if (acceptTid == nullptr) v = -1;`.
+- Works (no MATCH yet): `HandleSmartCoupon_GameEventByCharacterReq` 0x8360 93.4 -> 98.1, `...ByAccountReq` 0x8e80 87.1 -> 91.9.
+  Form: (1) inline `Session::Send(Packet const*)` as a `static __forceinline` member of `struct DaemonPacketHandlerSend`
+  (friend in `Session.h`, because `Session::send` is private); (2) zero check vs `ID128_GUID_ZERO.id[0]/[1]`; (3) `Packet p` in its own
+  `{}` block that ends after the Log 202/308, no explicit `p.Clear()` (orig has 1 `Packet::Clear`).
+- Left in 0x8360: orig has 2 `ID128_GUID_ZERO` refs and 1 more `<data>` ref, ours 1; ours has an extra const 0x7b (the not-authed Log line 123).
+- Left in 0x8e80: block order. Orig puts all fail paths (Session::Send fail ack, Log, removeRef) at the end; ours puts the fail tail before Allocate.
+
 ## pod-2, stage 1 (2026-11-18): Pattern 47 applied (POD 570 -> 574, 0 lost, `tools/parity.sh PostOfficeDaemon` ok)
 - Pattern 47 (A9) works now that C1 is fixed. POD map typedefs use `StlAllocator<std::pair<K, V>, 2>` (key not const):
   `PostContext.h`, `RelayContext.h`, `RelayTimeContext.h` (K = CompoundKey), `WorldChannel.h`, `WorldConfig.h`.
@@ -427,3 +462,8 @@ Find the order with `dis2.py` (look at the first `jne`/`je` after the `find` cod
   `RetrieveCharacterInfoRelayContext::ComposeResponsePacket` 0x1e230. Write the failure branch first: `if (resultState != SUCCESS) {crash block;
   convertFailReason; failure Compose + 2 Log} else {success Compose + 2 Log} return true;`. The call order then equals the original.
   The consts stay different (line numbers and cmd ids in the unwind and `Log::Write` setup). No more source change is known.
+
+## scd-2, stage 4 (2026-11-18): SCD 510/669 = 76.2 %, full `tools/parity.sh` ok (CG 420, LG 530, POD 588, 0 lost)
+- `HandleSmartCoupon_GameEventByAccountReq` 0x8e80 (91.9): the source already has the fail tail (`Send "hqE"`, Log, `removeReferenceCount`)
+  as the last block. Our build still puts it after the db-fail Log. The original also moves the invalid-parameter Log to the end, and loads
+  `ID128_GUID_ZERO` two times (ours one time). The cause is block layout, not the source order. Not tried again; a next try: `goto` labels.
