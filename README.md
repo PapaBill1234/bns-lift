@@ -11,7 +11,7 @@ Do not push this code to a public repo. Do not commit binaries or keys.
 ## Parity
 
 <!-- parity:start -->
-Last update: card `lift-parity-pod-1` (2026-11-18). Tool: `tools/parity.sh` (VS2010 /GL /LTCG build vs original, funcdiff).
+Last update: card `lift-parity-review-1` (2026-11-18). Tool: `tools/parity.sh` (VS2010 /GL /LTCG build vs original, funcdiff).
 
 | Exe | Parity | MATCH | DIFF | Only in original | Total | Mean score | Start | Change | Level |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
@@ -38,4 +38,5 @@ Goal: 95 % per exe, 99 % preferred. Shared library: 99 % preferred. Rules: [Docs
 | `lift-parity-lg-1` | 78.6 % | 65.8 % | 65.3 % | 63.1 % |
 | `lift-parity-scd-1` | 78.8 % | 65.9 % | 68.9 % | 63.8 % |
 | `lift-parity-pod-1` | 78.8 % | 65.9 % | 68.9 % | 67.1 % |
+| `lift-parity-review-1` | 78.8 % | 65.9 % | 68.9 % | 67.1 % |
 <!-- parity:end -->

@@ -1,0 +1,9 @@
+lift-parity-tool-2	lift	sonnet:high	-	tools/funcdiff.py,tools/vs2010/build.sh,Docs/Parity/	lift-parity-review-1	150	ready	Parity tool: funcdiff vtable refs and .tls offsets, build header deps
+lift-parity-paths-2	lift	sonnet:high	-	src/Server/,src/Security/,include/,CMakeLists.txt,Docs/Parity/	lift-parity-tool-2	150	ready	Parity shared: per-exe path literals in all 4 exes
+lift-parity-crypto-2	lift	opus	-	src/Security/,tools/vs2010/build.sh,include/,CMakeLists.txt,Docs/Parity/	lift-parity-paths-2	150	ready	Parity shared: BloodCrypto compile flags, crypto misses and consts
+lift-parity-bloodlib-2	lift	opus	-	src/Server/BloodLib/,src/Server/Shared/,src/Server/Packet/,include/,CMakeLists.txt,Docs/Parity/	lift-parity-crypto-2	150	ready	Parity shared: BloodLib DIFF functions that are left
+lift-parity-noinline-2	lift	sonnet:high	-	src/Server/,src/Security/,include/,CMakeLists.txt,Docs/Parity/	lift-parity-bloodlib-2	150	ready	Parity shared: noinline on the misses in all 4 exes
+lift-parity-helpers-2	lift	sonnet:high	-	src/Server/LobbyGate/,src/Server/Economy/,src/Server/BloodLib/,src/Server/Shared/,include/,CMakeLists.txt,Docs/Parity/	lift-parity-noinline-2	150	ready	Parity LG and POD: lift helpers and handler form
+lift-parity-pod-2	lift	sonnet:high	-	src/Server/Economy/,src/Server/BloodLib/,src/Server/Shared/,src/Server/Packet/,include/,CMakeLists.txt,Docs/Parity/	lift-parity-helpers-2	150	ready	Parity POD: patterns 47 and 49 again, block order
+lift-parity-scd-2	lift	opus	-	src/Server/SmartCouponDaemon/,src/Server/BloodLib/,src/Server/Shared/,src/Server/Packet/,include/,CMakeLists.txt,Docs/Parity/	lift-parity-pod-2	150	ready	Parity SCD: handler inline depth and SmartCouponDB
+lift-parity-review-2	lift	opus	-	Docs/Parity/,Docs/Plan/queue/,Docs/Plan/cards/	lift-parity-scd-2	150	ready	Parity review 2: measure, lessons, plan the next round
