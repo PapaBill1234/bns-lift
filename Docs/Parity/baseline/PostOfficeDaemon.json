@@ -3311,11 +3311,11 @@
 "status": "MATCH"
 },
 "Session::handlePacket": {
-"calls": 83,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 94.4,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Session::initialize": {
 "calls": 100,
@@ -3409,11 +3409,11 @@
 "status": "MATCH"
 },
 "SessionSendBuffer::Add": {
-"calls": 60,
-"consts": 80,
+"calls": 100,
+"consts": 100,
 "refs": 100,
-"score": 80.0,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "SessionSendBuffer::Clear": {
 "calls": 100,
@@ -3424,17 +3424,17 @@
 },
 "SessionSendBuffer::Initialize": {
 "calls": 100,
-"consts": 92,
-"refs": 100,
-"score": 97.4,
-"status": "DIFF"
-},
-"SessionSendBuffer::RemoveSentBuffer": {
-"calls": 67,
 "consts": 100,
 "refs": 100,
-"score": 88.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
+},
+"SessionSendBuffer::RemoveSentBuffer": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "SessionSendBuffer::clearPacketBufferList": {
 "calls": 75,
@@ -3444,11 +3444,11 @@
 "status": "DIFF"
 },
 "SessionSendBuffer::increaseBuffer": {
-"calls": 67,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 88.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "StaticPageMemoryManager::Alloc": {
 "calls": 100,

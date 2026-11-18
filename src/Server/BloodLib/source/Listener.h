@@ -1,6 +1,7 @@
 // Listener.obj (CacheGate PDB). Layout from include/pdb/CacheGate/types.h and IDA.
 #pragma once
 #include <stddef.h>
+#include <string.h>
 #include "Connection.h"
 #include "TimerQueue.h"
 
@@ -19,7 +20,12 @@ public:
         unsigned int _remoteAddrSize;
     };
 
-    PortListener() : _portInstance(nullptr), _socket(~0ULL) {}  // LIFT: inlined in Port::Initialize
+    // LIFT: inlined in Port::Initialize (0x18b70): _tag = 778 (0x30a), memset of _context (0x6400 bytes).
+    PortListener() : _portInstance(nullptr), _socket(~0ULL)
+    {
+        _tag = 778;
+        memset(_context, 0, sizeof(_context));
+    }
     virtual ~PortListener();                                                     // 0x31F60
     virtual unsigned int EventId() const;                                        // 0x11E80
     virtual bool HandleEvent(EventContext* context, unsigned long bytes);        // 0x322B0

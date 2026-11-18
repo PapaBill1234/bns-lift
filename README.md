@@ -11,19 +11,19 @@ Do not push this code to a public repo. Do not commit binaries or keys.
 ## Parity
 
 <!-- parity:start -->
-Last update: card `lift-parity-crypto-2` (2026-11-18). Tool: `tools/parity.sh` (VS2010 /GL /LTCG build vs original, funcdiff).
+Last update: card `lift-parity-bloodlib-2` (2026-11-18). Tool: `tools/parity.sh` (VS2010 /GL /LTCG build vs original, funcdiff).
 
 | Exe | Parity | MATCH | DIFF | Only in original | Total | Mean score | Start | Change | Level |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| CacheGate | **83.7 %** | 411 | 73 | 7 | 491 | 98.3 | 44.0 % | +39.7 | below 90 % |
-| LobbyGate | **70.0 %** | 517 | 133 | 89 | 739 | 98.0 | 37.9 % | +32.1 | below 90 % |
-| SmartCouponDaemon | **73.7 %** | 493 | 117 | 59 | 669 | 97.9 | 33.6 % | +40.1 | below 90 % |
-| PostOfficeDaemon | **71.1 %** | 540 | 157 | 62 | 759 | 97.1 | 34.5 % | +36.6 | below 90 % |
-| **All 4** | **73.8 %** | 1961 | | | 2658 | | 37.0 % | +36.8 | below 90 % |
+| CacheGate | **85.1 %** | 418 | 66 | 7 | 491 | 98.5 | 44.0 % | +41.1 | below 90 % |
+| LobbyGate | **70.6 %** | 522 | 128 | 89 | 739 | 98.1 | 37.9 % | +32.7 | below 90 % |
+| SmartCouponDaemon | **74.4 %** | 498 | 112 | 59 | 669 | 98.0 | 33.6 % | +40.8 | below 90 % |
+| PostOfficeDaemon | **71.8 %** | 545 | 152 | 62 | 759 | 97.2 | 34.5 % | +37.3 | below 90 % |
+| **All 4** | **74.6 %** | 1983 | | | 2658 | | 37.0 % | +37.6 | below 90 % |
 
 | Shared library (functions in 2+ exes) | Parity | MATCH in each exe | DIFF in 1+ exe | Total | Goal |
 | --- | ---: | ---: | ---: | ---: | --- |
-| BloodLib, Shared, Packet, CRT | **83.5 %** | 409 | 81 | 490 | 99 % |
+| BloodLib, Shared, Packet, CRT | **84.5 %** | 414 | 76 | 490 | 99 % |
 
 Goal: 95 % per exe, 99 % preferred. Shared library: 99 % preferred. Rules: [Docs/Parity/README.md](Docs/Parity/README.md). History: [Docs/Parity/progress.tsv](Docs/Parity/progress.tsv).
 
@@ -42,4 +42,5 @@ Goal: 95 % per exe, 99 % preferred. Shared library: 99 % preferred. Rules: [Docs
 | `lift-parity-tool-2` | 82.5 % | 68.5 % | 72.3 % | 69.7 % |
 | `lift-parity-paths-2` | 82.7 % | 69.3 % | 72.9 % | 70.5 % |
 | `lift-parity-crypto-2` | 83.7 % | 70.0 % | 73.7 % | 71.1 % |
+| `lift-parity-bloodlib-2` | 85.1 % | 70.6 % | 74.4 % | 71.8 % |
 <!-- parity:end -->

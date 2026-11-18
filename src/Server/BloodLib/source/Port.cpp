@@ -212,9 +212,19 @@ bool Port::Initialize(unsigned int id, unsigned short portNumber, unsigned int m
 void Port::Clear()
 {
     _enableAccept = false;
-    if (_listener != nullptr)
+    PortListener* listener = _listener;
+    if (listener != nullptr)
     {
-        _listener->Clear();
+        // LIFT: 0x18df0 the original inlines PortListener::Clear here. Ours is noinline (PortListener::Initialize
+        // calls it), so this is a copy of its body.
+        SOCKET listenSocket = static_cast<SOCKET>(_InterlockedExchange64(
+            reinterpret_cast<volatile long long*>(&listener->_socket), static_cast<long long>(INVALID_SOCKET)));
+        if (listenSocket != INVALID_SOCKET)
+        {
+            closesocket(listenSocket);
+            listener->_portInstance = nullptr;
+            listener->removeReferenceCount(L"source\\Listener.cpp", 113);
+        }
         _listener->removeReferenceCount(PORT_FILE, 280);
         _listener = nullptr;
     }
@@ -244,11 +254,12 @@ void Port::Clear()
     _maxSession = 0;
     _unusedSessionIndex = 0;
     _sessionCount = 0;
-    if (_pool != nullptr)
+    SessionPool* pool = _pool;  // 0x18df0: the original reads _pool one time for the lock.
+    if (pool != nullptr)
     {
-        _pool->_lock.Enter();
-        _pool->_valid = false;
-        _pool->_lock.Leave();
+        pool->_lock.Enter();
+        pool->_valid = false;
+        pool->_lock.Leave();
         _pool->removeReferenceCount(PORT_FILE, 319);
         _pool = nullptr;
     }
@@ -458,11 +469,12 @@ Session* Port::makeSession(unsigned long long& id)
 // 0x195A0
 void Port::clearPool()
 {
-    if (_pool != nullptr)
+    SessionPool* pool = _pool;  // 0x195a0: the original reads _pool one time for the lock.
+    if (pool != nullptr)
     {
-        _pool->_lock.Enter();
-        _pool->_valid = false;
-        _pool->_lock.Leave();
+        pool->_lock.Enter();
+        pool->_valid = false;
+        pool->_lock.Leave();
         _pool->removeReferenceCount(PORT_FILE, 672);
         _pool = nullptr;
     }

@@ -135,6 +135,17 @@ Each new card adds its patterns at the end of section A or B. The next review so
 - SQLRETURN compare with the constant first: `0 == r || 1 == r` (P21).
 - Inline ctor copies `ID128_GUID_ZERO` (P27, score only).
 
+### A17. BloodLib block order and register locals (lift-parity-bloodlib-2): +5 each exe
+- Block order: write the good path first and the error `Log` block last, as the pseudocode shows. Example:
+  `SessionBuffer.cpp` (`Add`, `RemoveSentBuffer`, `increaseBuffer`, `Initialize`: +4), `Session::handlePacket` 0xf750
+  (error Log 998 last, local `recvdSize`: +1).
+- Read a member pointer one time into a local when the original keeps it in a register (`Port::clearPool`: `pool`
+  for lock and `_valid`).
+- Copy the body of an inlined `noinline` function into the caller, with a `// LIFT:` mark (`Port::Clear` gets the
+  `PortListener::Clear` body: MATCH in CG).
+- Inlined ctor with a folded tag: set `_tag = 778` and `memset` the context in the ctor body
+  (`PortListener` ctor; `Port::Initialize` score +2.6, no MATCH: only the EH state const -2 is missing).
+
 ## B. Patterns that did not work (do not try again without a new idea)
 - `!wcscmp(...)` or `int r = wcscmp(...)` to keep the -1/0/1 value (`PipeCommandProcess::processCommand`).
 - Body of `removeReferenceCount` in the header, or `inline` (LTCG inline choice does not change).
@@ -148,6 +159,9 @@ Each new card adds its patterns at the end of section A or B. The next review so
 - Positive conditions first in LG handlers (the original puts error blocks first).
 - Remove the `UpdatePostStatus` helper (P49) and POD map keys (P47): MATCH +2 and more, but undone for tool noise only (C1).
 - Read `_connectContext` in `Session::HandleEvent` (worse).
+- Source `goto` to merge the 780/838 `LT_ERROR` tails in `Session::HandleEvent` (score 98.5 -> 97.1). cl does the
+  tail merge itself; a goto changes the block order.
+- A global `noinline` on `RefCntHistory::add` is wrong (found by analysis, not built): only `SessionSendBuffer::clearPacketBufferList` calls it out of line.
 
 ## C. Tool and build facts
 ### C1. funcdiff reads a vtable ref as a string (FIXED in lift-parity-tool-2)

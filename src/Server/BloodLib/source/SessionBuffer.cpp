@@ -25,80 +25,83 @@ SessionSendBuffer::~SessionSendBuffer()
 AsyncSendContext* SessionSendBuffer::Add(PacketBuffer const** const pbufferList, int count)
 {
     AsyncSendContext* context = nullptr;
-    if (pbufferList == nullptr)
+    // LIFT: good path first, error block last, as in the original block order (0x1a350).
+    if (pbufferList != nullptr)
     {
-        // LIFT: LTCG put constants in the log: count = 1 (0x1A4AD, 0x1A4BA), pbufferList = 0 (ebp, 0x1A35A).
-        Log::Write(Log::LT_ERROR, SESSIONBUFFER_FILE, 94,
-                   L"== CRASH == [session], send parameter is invalid, count %d, pbufferList: %p", count, pbufferList);
-        AlertSender::Write(SESSIONBUFFER_FILE, 94,
-                           L"== CRASH == [session], send parameter is invalid, count %d, pbufferList: %p", count,
-                           pbufferList);
-        return nullptr;
+        char* buf = nullptr;
+        SendBufferList* next = _curSendingList != nullptr ? _curSendingList->_next : &_bufferList[0];
+        for (PacketBuffer* i = const_cast<PacketBuffer*>(pbufferList[0]); i != nullptr; i = i->Next)
+        {
+            if (next->_size <= next->_count + 1)
+                increaseBuffer(next);
+            i->addReferenceCount(SESSIONBUFFER_FILE, 116);
+            char const* sendBuffer = i->sendBuffer != nullptr ? i->sendBuffer : &i->Buffer[8];
+            WSABUF* wsaBuffer = static_cast<WSABUF*>(next->_wsaBuffer);
+            wsaBuffer[next->_count].len =
+                _bufferHandler->ToBuffer(nullptr, i->Buffer, 4008, sendBuffer, const_cast<char const**>(&buf));
+            wsaBuffer[next->_count].buf = buf;
+            next->_pbuffer[next->_count++] = i;
+        }
+        if (_curSendingList == nullptr && next->_count != 0)
+        {
+            _curSendingList = next;
+            _context._bufferList = next;
+            context = &_context;
+        }
+        long long total =
+            static_cast<long long>(_bufferList[0]._count + static_cast<unsigned long long>(_bufferList[1]._count));
+        if (_maxBufferCount < total)
+            _maxBufferCount = total;
+        return context;
     }
 
-    char* buf = nullptr;
-    SendBufferList* next = _curSendingList != nullptr ? _curSendingList->_next : &_bufferList[0];
-    for (PacketBuffer* i = const_cast<PacketBuffer*>(pbufferList[0]); i != nullptr; i = i->Next)
-    {
-        if (next->_size <= next->_count + 1)
-            increaseBuffer(next);
-        i->addReferenceCount(SESSIONBUFFER_FILE, 116);
-        char const* sendBuffer = i->sendBuffer != nullptr ? i->sendBuffer : &i->Buffer[8];
-        WSABUF* wsaBuffer = static_cast<WSABUF*>(next->_wsaBuffer);
-        wsaBuffer[next->_count].len =
-            _bufferHandler->ToBuffer(nullptr, i->Buffer, 4008, sendBuffer, const_cast<char const**>(&buf));
-        wsaBuffer[next->_count].buf = buf;
-        next->_pbuffer[next->_count++] = i;
-    }
-    if (_curSendingList == nullptr && next->_count != 0)
-    {
-        _curSendingList = next;
-        _context._bufferList = next;
-        context = &_context;
-    }
-    long long total = static_cast<long long>(_bufferList[0]._count + static_cast<unsigned long long>(_bufferList[1]._count));
-    if (_maxBufferCount < total)
-        _maxBufferCount = total;
-    return context;
+    // LIFT: LTCG put constants in the log: count = 1 (0x1A4AD, 0x1A4BA), pbufferList = 0 (ebp, 0x1A35A).
+    Log::Write(Log::LT_ERROR, SESSIONBUFFER_FILE, 94,
+               L"== CRASH == [session], send parameter is invalid, count %d, pbufferList: %p", count, pbufferList);
+    AlertSender::Write(SESSIONBUFFER_FILE, 94,
+                       L"== CRASH == [session], send parameter is invalid, count %d, pbufferList: %p", count,
+                       pbufferList);
+    return nullptr;
 }
 
 // 0x1A4F0
 AsyncSendContext* SessionSendBuffer::RemoveSentBuffer(unsigned long sentSize)
 {
-    if (_curSendingList != nullptr)
+    // LIFT: error block first, as in the original block order (0x1a4f0: Log::Write before removeReferenceCount).
+    if (_curSendingList == nullptr)
     {
-        for (unsigned int i = 0; i < _curSendingList->_count; ++i)
-        {
-            if (_curSendingList->_pbuffer[i] != nullptr)
-                _curSendingList->_pbuffer[i]->removeReferenceCount(SESSIONBUFFER_FILE, 175);
-            _curSendingList->_pbuffer[i] = nullptr;
-            WSABUF* wsaBuffer = static_cast<WSABUF*>(_curSendingList->_wsaBuffer);
-            wsaBuffer[i].buf = nullptr;
-            wsaBuffer[i].len = 0;
-        }
-        _curSendingList->_count = 0;
-        SendBufferList* next = _curSendingList->_next;
-        if (next->_count != 0)
-        {
-            _curSendingList = next;
-            _context._bufferList = next;
-            return &_context;
-        }
-        _curSendingList = nullptr;
-        _context._bufferList = nullptr;
+        Log::Write(Log::LT_ERROR, SESSIONBUFFER_FILE, 163,
+                   L"== CRASH == [session], cannot remove send buffer; curSendingList is NULL, session-id:%I64X, "
+                   L"sent-size:%u, context-buffer:0x%p, context-buffer-count:%d",
+                   _context._session->_id, sentSize, _context._bufferList,
+                   _context._bufferList != nullptr ? _context._bufferList->_count : 0);
+        AlertSender::Write(SESSIONBUFFER_FILE, 163,
+                           L"== CRASH == [session], cannot remove send buffer; curSendingList is NULL, session-id:%I64X, "
+                           L"sent-size:%u, context-buffer:0x%p, context-buffer-count:%d",
+                           _context._session->_id, sentSize, _context._bufferList,
+                           _context._bufferList != nullptr ? _context._bufferList->_count : 0);
         return nullptr;
     }
 
-    Log::Write(Log::LT_ERROR, SESSIONBUFFER_FILE, 163,
-               L"== CRASH == [session], cannot remove send buffer; curSendingList is NULL, session-id:%I64X, "
-               L"sent-size:%u, context-buffer:0x%p, context-buffer-count:%d",
-               _context._session->_id, sentSize, _context._bufferList,
-               _context._bufferList != nullptr ? _context._bufferList->_count : 0);
-    AlertSender::Write(SESSIONBUFFER_FILE, 163,
-                       L"== CRASH == [session], cannot remove send buffer; curSendingList is NULL, session-id:%I64X, "
-                       L"sent-size:%u, context-buffer:0x%p, context-buffer-count:%d",
-                       _context._session->_id, sentSize, _context._bufferList,
-                       _context._bufferList != nullptr ? _context._bufferList->_count : 0);
+    for (unsigned int i = 0; i < _curSendingList->_count; ++i)
+    {
+        if (_curSendingList->_pbuffer[i] != nullptr)
+            _curSendingList->_pbuffer[i]->removeReferenceCount(SESSIONBUFFER_FILE, 175);
+        _curSendingList->_pbuffer[i] = nullptr;
+        WSABUF* wsaBuffer = static_cast<WSABUF*>(_curSendingList->_wsaBuffer);
+        wsaBuffer[i].buf = nullptr;
+        wsaBuffer[i].len = 0;
+    }
+    _curSendingList->_count = 0;
+    SendBufferList* next = _curSendingList->_next;
+    if (next->_count != 0)
+    {
+        _curSendingList = next;
+        _context._bufferList = next;
+        return &_context;
+    }
+    _curSendingList = nullptr;
+    _context._bufferList = nullptr;
     return nullptr;
 }
 
@@ -106,7 +109,8 @@ AsyncSendContext* SessionSendBuffer::RemoveSentBuffer(unsigned long sentSize)
 bool SessionSendBuffer::Initialize(unsigned char* freeBuffer, unsigned long long freeSize)
 {
     (void)freeSize;  // The original code does not use it.
-    for (int i = 0; i < 2; ++i)
+    // LIFT: unsigned index (0x1a6b0 computes (i - 1) & 1 with no 0xffffffff constant).
+    for (unsigned int i = 0; i < 2; ++i)
     {
         if (_bufferList[i]._size != 0)
         {
@@ -157,7 +161,25 @@ void SessionSendBuffer::Clear()
 void SessionSendBuffer::increaseBuffer(SendBufferList* bufferList)
 {
     unsigned int size = bufferList->_size;
-    if (bufferList->_external)
+    // LIFT: the not-external path first, as in the original block order (0x1a810: AllocZero before ReallocZero).
+    if (bufferList->_external == false)
+    {
+        void* wsaBuffer = bufferList->_wsaBuffer;
+        PacketBuffer** pbuffer = bufferList->_pbuffer;
+        bufferList->_size = 2;
+        while (bufferList->_size < size * 2)
+            bufferList->_size *= 2;
+        bufferList->_external = true;
+        bufferList->_wsaBuffer = BASE_MEMORY_MANAGER.AllocZero(
+            sizeof(WSABUF) * static_cast<unsigned long long>(bufferList->_size), SESSIONBUFFER_FILE, 289);
+        bufferList->_pbuffer = static_cast<PacketBuffer**>(BASE_MEMORY_MANAGER.AllocZero(
+            sizeof(PacketBuffer*) * static_cast<unsigned long long>(bufferList->_size), SESSIONBUFFER_FILE, 290));
+        if (wsaBuffer != nullptr)
+            memcpy(bufferList->_wsaBuffer, wsaBuffer, sizeof(WSABUF) * static_cast<unsigned long long>(size));
+        if (pbuffer != nullptr)
+            memcpy(bufferList->_pbuffer, pbuffer, sizeof(PacketBuffer*) * static_cast<unsigned long long>(size));
+    }
+    else
     {
         bufferList->_size = size * 2;
         bufferList->_wsaBuffer = BASE_MEMORY_MANAGER.ReallocZero(
@@ -166,23 +188,7 @@ void SessionSendBuffer::increaseBuffer(SendBufferList* bufferList)
         bufferList->_pbuffer = static_cast<PacketBuffer**>(BASE_MEMORY_MANAGER.ReallocZero(
             bufferList->_pbuffer, sizeof(PacketBuffer*) * static_cast<unsigned long long>(bufferList->_size),
             sizeof(PacketBuffer*) * static_cast<unsigned long long>(size), SESSIONBUFFER_FILE, 306));
-        return;
     }
-
-    void* wsaBuffer = bufferList->_wsaBuffer;
-    PacketBuffer** pbuffer = bufferList->_pbuffer;
-    bufferList->_size = 2;
-    while (bufferList->_size < size * 2)
-        bufferList->_size *= 2;
-    bufferList->_external = true;
-    bufferList->_wsaBuffer = BASE_MEMORY_MANAGER.AllocZero(
-        sizeof(WSABUF) * static_cast<unsigned long long>(bufferList->_size), SESSIONBUFFER_FILE, 289);
-    bufferList->_pbuffer = static_cast<PacketBuffer**>(BASE_MEMORY_MANAGER.AllocZero(
-        sizeof(PacketBuffer*) * static_cast<unsigned long long>(bufferList->_size), SESSIONBUFFER_FILE, 290));
-    if (wsaBuffer != nullptr)
-        memcpy(bufferList->_wsaBuffer, wsaBuffer, sizeof(WSABUF) * static_cast<unsigned long long>(size));
-    if (pbuffer != nullptr)
-        memcpy(bufferList->_pbuffer, pbuffer, sizeof(PacketBuffer*) * static_cast<unsigned long long>(size));
 }
 
 // 0x1A980

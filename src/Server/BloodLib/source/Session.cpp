@@ -562,6 +562,10 @@ bool Session::recv()
 // 0xF1C0
 bool Session::HandleEvent(EventContext* context, unsigned long numOfBytes)
 {
+    unsigned __int64 id;    // LIFT: 0xf1c0 shared Log::Write tail arguments
+    int error;
+    wchar_t const* format;
+    int line;
     switch (context->_id)
     {
     case EVID_IO_CONNECT:
@@ -622,9 +626,12 @@ bool Session::HandleEvent(EventContext* context, unsigned long numOfBytes)
         }
         if (!Recv())
         {
-            Log::Write(Log::LT_DEBUG, SESSION_FILE, 796, L"[session], next recv error, id:%I64x, this:%p, error:%d",
-                       _id, this, WSAGetLastError());
-            return false;
+            // LIFT: 0xf1c0 the original shares one Log::Write tail for lines 796 and 814 (merged tail).
+            id = _id;
+            error = WSAGetLastError();
+            format = L"[session], next recv error, id:%I64x, this:%p, error:%d";
+            line = 796;
+            goto logDebugError;
         }
         if (_port->_idleStateTable != nullptr)
         {
@@ -643,13 +650,13 @@ bool Session::HandleEvent(EventContext* context, unsigned long numOfBytes)
         EnterCriticalSection(&_lock.CS);
         bool result = sendNext(numOfBytes);
         LeaveCriticalSection(&_lock.CS);
-        if (!result)
-        {
-            Log::Write(Log::LT_DEBUG, SESSION_FILE, 814, L"[session], next send error, id:%I64x, this:%p, error:%d",
-                       _id, this, WSAGetLastError());
-            return false;
-        }
-        return true;
+        if (result)
+            return true;
+        id = _id;
+        error = WSAGetLastError();
+        format = L"[session], next send error, id:%I64x, this:%p, error:%d";
+        line = 814;
+        goto logDebugError;
     }
     default:
         Log::Write(Log::LT_ERROR, SESSION_FILE, 862, L"== CRASH == [session], invalid event, id:%I64x, this:%p, context:%d",
@@ -658,6 +665,9 @@ bool Session::HandleEvent(EventContext* context, unsigned long numOfBytes)
                            _id, this, context->_id);
         return true;
     }
+logDebugError:
+    Log::Write(Log::LT_DEBUG, SESSION_FILE, line, format, id, this, error);
+    return false;
 }
 
 // 0xF5D0
@@ -731,16 +741,17 @@ bool Session::handlePacket()
         offset += size;
     }
     SessionRecvBuffer* recvBuffer = _recvBuffer;
-    if (offset > recvBuffer->_recvdSize)
+    unsigned int recvdSize = recvBuffer->_recvdSize;
+    // 0xF750: the original puts the good path first and the error block last.
+    if (offset <= recvdSize)
     {
-        Log::Write(Log::LT_ERROR, SESSION_FILE, 998, L"[session], clear recv buffer error, id:%I64x, this:%p", _id,
-                   this);
-        return false;
+        if (offset < recvdSize)
+            memmove(recvBuffer->_buffer, &recvBuffer->_buffer[offset], recvdSize - offset);
+        recvBuffer->_recvdSize -= offset;
+        return true;
     }
-    if (offset < recvBuffer->_recvdSize)
-        memmove(recvBuffer->_buffer, &recvBuffer->_buffer[offset], recvBuffer->_recvdSize - offset);
-    recvBuffer->_recvdSize -= offset;
-    return true;
+    Log::Write(Log::LT_ERROR, SESSION_FILE, 998, L"[session], clear recv buffer error, id:%I64x, this:%p", _id, this);
+    return false;
 }
 
 // 0xF960
