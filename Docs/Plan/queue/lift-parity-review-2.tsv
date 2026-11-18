@@ -1,0 +1,9 @@
+lift-parity-perexe-3	lift	sonnet:high	-	tools/vs2010/build.sh,src/Server/,include/,CMakeLists.txt,Docs/Parity/	lift-parity-review-2	150	ready	Parity shared: per-exe build define and per-exe inline choice
+lift-parity-cryptolib-3	lift	opus	-	src/Security/,src/Server/BloodLib/,tools/vs2010/build.sh,include/,CMakeLists.txt,Docs/Parity/	lift-parity-perexe-3	150	ready	Parity LG SCD POD: lift the callers in the closed crypto libraries
+lift-parity-inline-3	lift	sonnet:high	-	src/Server/,src/Security/,include/,CMakeLists.txt,Docs/Parity/	lift-parity-cryptolib-3	150	ready	Parity shared: orig calls more, ours calls more
+lift-parity-order-3	lift	sonnet:high	-	src/Server/,include/,Docs/Parity/	lift-parity-inline-3	150	ready	Parity shared: block order and call order
+lift-parity-consts-3	lift	opus	-	src/Server/BloodLib/,src/Server/Shared/,src/Server/Packet/,include/,CMakeLists.txt,tools/vs2010/build.sh,Docs/Parity/	lift-parity-order-3	150	ready	Parity shared: constants and refs with no known cause
+lift-parity-arraynew-3	lift	sonnet:high	-	src/Server/LobbyGate/,src/Server/Economy/,src/Server/BloodLib/,src/Server/Shared/,include/,CMakeLists.txt,Docs/Parity/	lift-parity-consts-3	150	ready	Parity all: placement array new and eh vector constructor iterator
+lift-parity-handlers-3	lift	sonnet:high	-	src/Server/,include/,Docs/Parity/	lift-parity-arraynew-3	150	ready	Parity all: packet handler form
+lift-parity-dbbind-3	lift	opus	-	src/Server/SmartCouponDaemon/,src/Server/Economy/,src/Server/BloodLib/,include/,Docs/Parity/	lift-parity-handlers-3	150	ready	Parity SCD POD: DB loaders with inlined SQLBindCol
+lift-parity-review-3	lift	opus:high	-	Docs/Parity/,Docs/Plan/queue/,Docs/Plan/cards/	lift-parity-dbbind-3	150	ready	Parity review 3: measure, lessons, plan the next round
