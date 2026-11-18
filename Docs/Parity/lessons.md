@@ -408,8 +408,10 @@ Not done:
 
 ## lift-parity-consts-3, stage 4
 - Measured `SysInfo::Hostname` and `SysInfo::IpAddress` on LG, SCD, POD: both MATCH in each exe. Total for the card: LG 589 -> 595, SCD 550 -> 556, POD 631 -> 637, CG 430 -> 436. No exe lost a MATCH.
-- Correction to stage 3, `Port::Initialize` EH state -2: the PDB has no `RefCntObject::operator new`. The real cause is the global placement delete. Orig `bloodlib\include\Memory.h:173` defines `operator delete(void* obj, void* buf)` with a crash body ("== CRASH == [memory], DO NOT USE THIS DEL OPERATOR", CG 0x1000). The body is not empty, so VS2010 keeps an unwind state (frame marker -2) for each `new (memory) T(...)` where the ctor of T is a call. Our `include/vs2010/new` (and the VS2010 `<new>`) has an empty inline body, so cl removes the state.
-- Fix not applied: the fix is global (Memory.h must define `__PLACEMENT_NEW_INLINE` and the crash-body placement new/delete before `<new>`). It changes each placement-new site in all exes. Do it in a separate card and measure all 4 exes.
+- The original `Port::Initialize` uses the global placement delete during
+  unwinding. At this stage, the lift used the empty CRT form. See
+  [Placement delete and shared functions](#placement-delete-and-shared-functions)
+  for the measured fix.
 
 ## lift-parity-arraynew-3, stage 1 (2026-11-18)
 - Start measure (this worktree, same as baseline): CG 436, LG 595, SCD 556, POD 637, shared 465/546.
@@ -432,7 +434,11 @@ Not done:
 - Did not work, LG `ClientManager::BroadcastAnnounceNotify` 0x62c0 (95.8): swapping the `Compose` branches (success first, as in the HR) gave no change. Diff: orig `Log::Write` before `ClientManager::broadcast` in address order, ours has 2 `Packet::Clear` (tail duplicate). It is block layout. Source reverted.
 - Stop list, `GateKeyManager::Finalize` 0x3b10 (97.0) and `ClientManager::Finalize` 0x5cf0 (95.2): const 0x18 against 0x10 = `.tls` offset of `__delv_buf__`. Orig `.tls` raw data 0xa1 bytes, ours 0xb1 bytes: other TLS variables sit before it in orig (link order). Not fixable in source.
 - `GateKeyManager::MakeGateKey` 0x? (94.3): orig calls `GateKeyEntry::scalar deleting destructor` where ours calls `RefCntObject::removeReferenceCount`, and the order of `LeaveCriticalSection` differs. Not tried.
-- Facts for the scalar placement `operator delete(void*, void*)` (all 4 exes, score 0): LG orig 0x1000 (first function in the exe, PDB module ThreadFreePacketPump), crash body at `Memory.h:173`, Log::Write + AlertSender::Write, path lower case in LG (`e:\dailybuild02\lobbygate-common-0.0.348\depot\branch\348nc\program\server\bloodlib\include\memory.h`), mixed case in SCD (`E:\DailyBuild02\SmartCouponDaemon-Common-0.0.348\depot\Branch\348NC\Program\Server\BloodLib\include\Memory.h`). `include/vs2010/new` has an empty inline placement delete. Plan: declare it non-inline in `include/vs2010/new`, define the crash body once per exe (per-exe path with `LIFT_EXE_*`) in `BloodLib/source/Memory.cpp`. Not tried: it is global. The `bloodlib-2` card lists `operator delete` on its stop list.
+- The scalar placement `operator delete(void*, void*)` scored 0 in this
+  round. The LobbyGate PDB gives address 0x1000 and module
+  `ThreadFreePacketPump`. The function logs at `Memory.h:173`.
+  See [Placement delete and shared functions](#placement-delete-and-shared-functions)
+  for the fix and the source of the path literals.
 
 ## lift-parity-handlers-3, stage 2 (2026-11-18, PacketHandler form)
 - WORKED: POD `WorldSessionHandler::PacketHandler` 0x1f270 is MATCH (POD 637 -> 638). Form, all parts needed:
@@ -483,6 +489,7 @@ Open facts:
 
 ## AlertSender socket event loop
 
+- Commit `27d5420` added one match in each of the four executables.
 - `AlertSender::run` (CacheGate 0x98f0): Initialize each socket event field
   with a separate store. Aggregate initialization emitted a `memset` call.
   Branch directly to the reconnect and stop blocks. This keeps the separate
@@ -490,31 +497,50 @@ Open facts:
 
 ## Manual server parity checks
 
+- Commit `46fe9c1` added six matches in LobbyGate, two in
+  SmartCouponDaemon, and three in PostOfficeDaemon.
 - The original `CryptoKey::Initialize` uses the PDB global
   `s_initializedCount`. A class member gave a different data reference.
+  Use the same global for the decrement in `Network::Clear`.
 - Both LobbyGate callers call `CryptoKey::generateBigNumber` out of line.
-  Keeping that call also restores the range check in the callee.
+  Keeping that call restores the range check and matches both
+  `CryptoKey::generateBigNumber` and `Dh::Start`.
 - LobbyGate reads the idle watcher before `IdleStateTable::Create`.
   Keep that pointer for the later table write.
 - The PostOfficeDaemon PDB gives `POSTEVENT_PACKET_PUMP_EVENT` the value
-  `0x82`. Use it at each call to `TFPP_PumpPacket`.
+  `0x82`. Use this enum value at the Agent, CacheGate, and World
+  session handler calls. This matches `TFPP_PumpPacket`.
 - In `BigInteger::Sub`, handle different signs with `add` first.
   For equal signs, select the operands and sign before one call to `sub`.
+- In LobbyGate `ContentsRuleConfig::ConvPacketElement` (0x8ce0), the
+  `FormatMessageW` flags are `0x3100`. Use `FORMAT_MESSAGE_ALLOCATE_BUFFER`,
+  `FORMAT_MESSAGE_FROM_SYSTEM`, and `FORMAT_MESSAGE_ARGUMENT_ARRAY`.
+- Testing the last `InitSymbol` lookup separately and jumping to a
+  common unload block gave no new match. A common log block in
+  `Session::HandleEvent` also gave no new match.
 
 ## Placement delete and shared functions
 
-- The original placement delete at CacheGate 0x1000 writes two messages.
-  Include its declaration before the CRT headers. Use the original
-  `Memory.h` path for each executable.
+- Commit `beb4669` added five matches in CacheGate, five in LobbyGate,
+  six in SmartCouponDaemon, and six in PostOfficeDaemon. All previous
+  matches held.
+- The original placement delete at CacheGate 0x1000 calls `Log::Write`
+  and `AlertSender::Write`. Include `PlacementNew.h` before the CRT
+  headers. Use the path in each original binary, with the last component
+  spelled `Memory.h`. All four placement delete functions match.
 - In `Port::Initialize`, use `::new` for the session pool and the listener.
   VS2010 then uses the global placement delete if a constructor throws.
-  This gives the unwind state in the original.
+  This gives the `-2` unwind state in all four executables. The declaration
+  and body of the global placement delete alone did not give that state.
 - In `Network::Network`, construct the end event before the assignment
   to `EndEventObject`. Use the allocation pointer for that assignment.
-  This gives one store to the global pointer.
+  This gives one store to the global pointer. The function matches in
+  CacheGate, LobbyGate, and PostOfficeDaemon. SmartCouponDaemon still
+  has a different vtable name after the linker folds identical code.
 - In `Blowfish::Setup`, the inlined round code advances the index after
   the first P-box read. Read the second entry at the new index minus one.
-- In `BigInteger::sqr`, shift the bit count by four and clear the low bit.
+- In `BigInteger::sqr`, add 31 to the bit count. Shift the result right
+  by four and clear the low bit.
   This gives twice the digit count in the same form as the original.
 - In `SmartCouponDaemon::reload`, log `GetLastError()` when
   `_wmakepath_s` fails. Put the configuration reload failure and
@@ -522,3 +548,11 @@ Open facts:
 - In `UnsentPostContextManager::addUnsentPostContextList`, allocate the
   header node in the list constructor. This gives the original unwind
   state for the critical section.
+- The new placement delete also let `Console::Flush` match in CacheGate
+  and SmartCouponDaemon. The empty functions previously shared a
+  linker address.
+- These tests gave no new match. The AES table key setup tests used
+  groups of five encryption key steps and a pointer to the middle of
+  the last decryption key. The `CacheD::Verify` test put the mismatch
+  branch first. The `loadUnhandledGameEventLog` test put the
+  successful load branch first.
