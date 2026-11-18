@@ -12,7 +12,8 @@ class Rsa : public Crypto
 {
 public:
     Rsa() { _e.Set(65537LL); }
-    virtual ~Rsa() {}
+    // No user dtor. Vtable 0x86D78 has 8 slots and no dtor slot. Orig ~RsaPublic (0x531F0)
+    // stores no ??_7Rsa. A user dtor stores the vptr; a compiler-generated dtor does not.
 
     virtual bool Setup(unsigned char const* key, int keySize, int round) = 0;
     virtual void Cleanup() = 0;
