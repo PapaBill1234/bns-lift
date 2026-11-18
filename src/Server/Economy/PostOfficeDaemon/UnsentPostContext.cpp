@@ -199,6 +199,18 @@ bool UnsentPostContextManager::updateWorldList(WorldConfigList const* worldConfi
     return true;
 }
 
+// LIFT: The original inlines this constructor at 0xce80.
+UnsentPostContextList::UnsentPostContextList(unsigned short wid)
+    : _wid(wid), _lock(4000), _header(nullptr), _contextCount(0)
+{
+    void* const memory = Memory::_Manager[2]->Alloc(sizeof(UnsentPostContext), UNSENT_POST_CONTEXT_FILE, 30);
+    // BUG: 0xce80 does not stop when Alloc of the header node fails.
+    UnsentPostContext* const header = memory != nullptr ? new (memory) UnsentPostContext(0, false) : nullptr;
+    header->_prev = header;
+    header->_next = header;
+    _header = header;
+}
+
 // 0xce80
 bool UnsentPostContextManager::addUnsentPostContextList(unsigned short wid, int bucketIndex, int worldIndex)
 {
@@ -211,18 +223,7 @@ bool UnsentPostContextManager::addUnsentPostContextList(unsigned short wid, int 
     }
 
     void* const memory = Memory::_Manager[2]->Alloc(sizeof(UnsentPostContextList), UNSENT_POST_CONTEXT_FILE, 227);
-    UnsentPostContextList* unsentPostContextList = nullptr;
-    if (memory != nullptr)
-    {
-        unsentPostContextList = new (memory) UnsentPostContextList(wid);
-
-        void* const headerMemory = Memory::_Manager[2]->Alloc(sizeof(UnsentPostContext), UNSENT_POST_CONTEXT_FILE, 30);
-        // BUG: 0xce80 does not stop when Alloc of the header node fails.
-        UnsentPostContext* const header = headerMemory != nullptr ? new (headerMemory) UnsentPostContext(0, false) : nullptr;
-        header->_prev = header;
-        header->_next = header;
-        unsentPostContextList->_header = header;
-    }
+    UnsentPostContextList* unsentPostContextList = memory != nullptr ? new (memory) UnsentPostContextList(wid) : nullptr;
 
     // BUG: 0xce80 stores a null list when Alloc fails and returns true.
     _containerList[bucketIndex][worldIndex] = unsentPostContextList;

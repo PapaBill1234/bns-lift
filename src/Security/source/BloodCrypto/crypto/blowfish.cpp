@@ -12,10 +12,11 @@ static void encrypt(int round, unsigned int const* pbox, unsigned int const* sbo
 {
     unsigned int l = *xl;
     unsigned int r = *xr;
-    for (long long k = 0; k < round; k += 2)
+    for (long long k = 0; k < round;)
     {
         unsigned int t = pbox[k] ^ l;
-        r ^= pbox[k + 1] ^ BF_F(sbox, t);
+        k += 2;
+        r ^= pbox[k - 1] ^ BF_F(sbox, t);
         l = BF_F(sbox, r) ^ t;
     }
     *xr = l ^ pbox[16];

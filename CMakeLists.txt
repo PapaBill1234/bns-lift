@@ -71,6 +71,9 @@ target_include_directories(lift_selftest BEFORE PRIVATE ${LIFT_STL_INCLUDE} ${LI
 add_dependencies(lift_selftest lift_msvcp100_implib)
 target_link_libraries(lift_selftest PRIVATE ${LIFT_MSVCP100_IMPLIB})
 
+# Load the BloodLib placement operators before the STL headers.
+add_compile_options($<$<COMPILE_LANGUAGE:CXX>:/FIPlacementNew.h>)
+
 # Common server code (BloodLib). Static lib, shared by the server exes.
 # lift_common has no MemoryManager.cpp and RefCntObject.cpp: LG, SCD and POD link a per-exe copy (lessons.md
 # pattern 35). lift_common_cg is the full list for CacheGate. tools/vs2010/build.sh sorts the objects of a lib by

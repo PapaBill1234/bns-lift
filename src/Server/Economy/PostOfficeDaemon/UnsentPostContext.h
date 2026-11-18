@@ -28,7 +28,7 @@ class UnsentPostContextList
 {
 public:
     // PDB constructor, inlined at 0xce80. The lock uses InitializeCriticalSectionAndSpinCount(4000).
-    explicit UnsentPostContextList(unsigned short const wid) : _wid(wid), _lock(4000), _header(nullptr), _contextCount(0) {}
+    explicit UnsentPostContextList(unsigned short wid);
 
     bool pushUnsentPostContext(long long const postId, bool const hasPostContext);  // 0xc3b0
     UnsentPostContext* popUnsentPostContext();                                       // 0xc5a0

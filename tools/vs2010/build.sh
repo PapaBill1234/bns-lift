@@ -59,12 +59,15 @@ compile_one() {
   local obj="$pre/$1.obj" log="$pre/$1.log" dep="$pre/$1.dep"
   mkdir -p "$(dirname "$obj")"
   if [ -f "$obj" ] && [ -f "$dep" ] && [ "$obj" -nt "$src" ]; then
+    if [[ "$src" == *.cpp && "$R/src/Server/BloodLib/include/PlacementNew.h" -nt "$obj" ]]; then
+      stale=1
+    fi
     while IFS= read -r h; do
       if [ ! -e "$h" ] || [ "$h" -nt "$obj" ]; then stale=1; break; fi
     done < "$dep"
     [ "$stale" = 0 ] && return 0
   fi
-  case "$src" in *.c) lang="/TC";; esac
+  case "$src" in *.c) lang="/TC";; *) lang="/FIPlacementNew.h";; esac
   # /Z7: /Zi starts mspdbsrv.exe, which hangs under Wine. /FIwinsock2.h: the headers include windows.h first.
   if ! wine "$VS2010_BIN/cl.exe" /nologo /c /O2 /GL /EHsc /MD /Z7 /GR- /W3 /D_WIN64 /DNDEBUG /DWIN32_LEAN_AND_MEAN \
         /showIncludes /FIwinsock2.h $d $lang $INC /Fo"$(winepath -w "$R/$obj")" "$(winepath -w "$R/$src")" > "$log" 2>&1; then

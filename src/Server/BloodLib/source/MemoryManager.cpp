@@ -10,6 +10,20 @@
 #endif
 #define LIFT_DO_NOT_USE L"== CRASH == [memory], do not use this function"
 
+#ifndef LIFT_MEMORY_H_FILE
+#define LIFT_MEMORY_H_FILE \
+    L"e:\\dailybuild02\\cachegate-common-0.0.348\\depot\\branch\\348nc\\program\\server\\bloodlib\\include\\Memory.h"
+#endif
+
+// Memory.h:173 (CacheGate 0x1000). The caller owns the placement buffer.
+void __cdecl operator delete(void*, void*) throw()
+{
+    Log::Write(Log::LT_ERROR, LIFT_MEMORY_H_FILE, 173,
+               L"== CRASH == [memory], DO NOT USE THIS DEL OPERATOR");
+    AlertSender::Write(LIFT_MEMORY_H_FILE, 173,
+                       L"== CRASH == [memory], DO NOT USE THIS DEL OPERATOR");
+}
+
 // 0x590a0 (.rdata). HeapMemoryManager::Initialize compares the option with 2.
 void const* const HeapMemoryManager::LFH = reinterpret_cast<void const*>(2);
 
