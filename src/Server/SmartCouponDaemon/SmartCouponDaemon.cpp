@@ -512,13 +512,13 @@ bool SmartCouponDaemon::reload(wchar_t** argv, int argc)
     if (argc == 1)
     {
         wchar_t name[260] = {0};
-        errno_t const errcode =
-            _wmakepath_s(name, 260, nullptr, _config->_configPath, L"gamed-list.config.xml", nullptr);
-        if (errcode != 0)
+        if (_wmakepath_s(name, 260, nullptr, _config->_configPath, L"gamed-list.config.xml", nullptr) != 0)
         {
-            Log::Write(kFile, 512, errcode,
+            wchar_t const* configPath = _config->_configPath;
+            DWORD const error = GetLastError();
+            Log::Write(kFile, 512, error,
                        L"failed to make gamed config file path, configPath:%s, configFileName:%s",
-                       _config->_configPath, L"gamed-list.config.xml");
+                       configPath, L"gamed-list.config.xml");
             return true;
         }
         if (!_daemonChannelMgr->SetupDaemonListFromXml(name))
@@ -532,21 +532,18 @@ bool SmartCouponDaemon::reload(wchar_t** argv, int argc)
 
     bool changed = false;
     Log::Write(Log::LT_NOTICE, kFile, 529, L"[scd], bns common config reloading...");
-    if (BnsCommonConfig::ReloadBnsCommonConfig(changed))
+    if (!BnsCommonConfig::ReloadBnsCommonConfig(changed))
     {
-        if (changed)
-        {
-            BnsCommonConfig::Dump();
-            Log::Write(Log::LT_NOTICE, kFile, 543, L"[scd], bns common config reload complete, done");
-        }
-        else
-        {
-            Log::Write(Log::LT_NOTICE, kFile, 538, L"[scd], bns common config reload complete, not changed");
-        }
+        Log::Write(Log::LT_ERROR, kFile, 532, L"[scd], bns common config reload fail");
+    }
+    else if (!changed)
+    {
+        Log::Write(Log::LT_NOTICE, kFile, 538, L"[scd], bns common config reload complete, not changed");
     }
     else
     {
-        Log::Write(Log::LT_ERROR, kFile, 532, L"[scd], bns common config reload fail");
+        BnsCommonConfig::Dump();
+        Log::Write(Log::LT_NOTICE, kFile, 543, L"[scd], bns common config reload complete, done");
     }
     Log::Write(Log::LT_DEBUG, kFile, 547, L"reload(%s) success", argv[0]);
     return true;

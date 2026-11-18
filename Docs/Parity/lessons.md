@@ -500,3 +500,25 @@ Open facts:
   `0x82`. Use it at each call to `TFPP_PumpPacket`.
 - In `BigInteger::Sub`, handle different signs with `add` first.
   For equal signs, select the operands and sign before one call to `sub`.
+
+## Placement delete and shared functions
+
+- The original placement delete at CacheGate 0x1000 writes two messages.
+  Include its declaration before the CRT headers. Use the original
+  `Memory.h` path for each executable.
+- In `Port::Initialize`, use `::new` for the session pool and the listener.
+  VS2010 then uses the global placement delete if a constructor throws.
+  This gives the unwind state in the original.
+- In `Network::Network`, construct the end event before the assignment
+  to `EndEventObject`. Use the allocation pointer for that assignment.
+  This gives one store to the global pointer.
+- In `Blowfish::Setup`, the inlined round code advances the index after
+  the first P-box read. Read the second entry at the new index minus one.
+- In `BigInteger::sqr`, shift the bit count by four and clear the low bit.
+  This gives twice the digit count in the same form as the original.
+- In `SmartCouponDaemon::reload`, log `GetLastError()` when
+  `_wmakepath_s` fails. Put the configuration reload failure and
+  the unchanged case before the case that calls `Dump`.
+- In `UnsentPostContextManager::addUnsentPostContextList`, allocate the
+  header node in the list constructor. This gives the original unwind
+  state for the critical section.

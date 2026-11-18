@@ -191,7 +191,7 @@ bool Port::Initialize(unsigned int id, unsigned short portNumber, unsigned int m
         break;
     }
     void* memory = BASE_MEMORY_MANAGER.Alloc(sizeof(SessionPool), PORT_FILE, 243);
-    _pool = memory != nullptr ? new (memory) SessionPool(_id) : nullptr;
+    _pool = memory != nullptr ? ::new (memory) SessionPool(_id) : nullptr;
     _pool->Initialize(_maxSession, prepareRatio, false);
     _unusedSessionIndex = 1;
     _sessionList = static_cast<Session**>(
@@ -200,7 +200,7 @@ bool Port::Initialize(unsigned int id, unsigned short portNumber, unsigned int m
     if (portNumber == 0)
         return true;
     void* listenerMemory = Memory::_Manager[2]->Alloc(sizeof(PortListener), PORT_FILE, 255);
-    _listener = listenerMemory != nullptr ? new (listenerMemory) PortListener() : nullptr;
+    _listener = listenerMemory != nullptr ? ::new (listenerMemory) PortListener() : nullptr;
     if (_listener->Initialize(this, iocpHandle, portNumber))
         return true;
     Clear();

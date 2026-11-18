@@ -88,7 +88,9 @@ Network::Network()
     Instance = this;
     WorkerManager = nullptr;
     void* memory = Memory::_Manager[2]->Alloc(sizeof(NetworkEndEvent), NETWORK_FILE, 56);
-    EndEventObject = memory != nullptr ? new (memory) NetworkEndEvent() : nullptr;
+    if (memory != nullptr)
+        new (memory) NetworkEndEvent();
+    EndEventObject = static_cast<NetworkEndEvent*>(memory);
     _workerThreadCount = 0;
     _workerThreads = nullptr;
     _iocpHandle = nullptr;

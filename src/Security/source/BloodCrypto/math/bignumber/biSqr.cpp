@@ -6,7 +6,7 @@ void BigInteger::sqr(BigInteger const* a, BigInteger* r)
 {
     BigInteger tmp;
     BigInteger* out = r;
-    int pa = 2 * a->digitCount();
+    int pa = ((a->bits + 31) >> 4) & ~1;
     if (pa >= MAX_DIGITS)
         pa = MAX_DIGITS - 1;
     if (r == 0 || a == r)
