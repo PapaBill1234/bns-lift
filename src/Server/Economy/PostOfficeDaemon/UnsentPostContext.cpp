@@ -373,18 +373,18 @@ bool UnsentPostContextManager::deliverUnsentPost(UnsentPostContext* const unsent
         return false;
     }
 
-    if (PostDeliveryEvent::OccurEvent(postContext, cachegateChannel))
+    if (!PostDeliveryEvent::OccurEvent(postContext, cachegateChannel))
     {
-        postContext->removeReferenceCount(UNSENT_POST_CONTEXT_FILE, 371);
-        return true;
+        Log::Write(Log::LT_ERROR, UNSENT_POST_CONTEXT_FILE, 361,
+                   L"[%s], %s; exception occurred; failed to occur post delivery event, postId:0x%I64X",
+                   MODULE_NAME, L"UnsentPostContextManager::deliverUnsentPost", postId);
+        if (!PostOfficeDaemon::_instance->_postContextManager->RemoveContext(postId))
+            UNSENT_POST_CONTEXT_CRASH(364, L"== CRASH == [%s], %s; exception occurred; failed to remove post context, postId:0x%I64X",
+                                  MODULE_NAME, L"UnsentPostContextManager::deliverUnsentPost", postId);
+        postContext->removeReferenceCount(UNSENT_POST_CONTEXT_FILE, 367);
+        return false;
     }
 
-    Log::Write(Log::LT_ERROR, UNSENT_POST_CONTEXT_FILE, 361,
-               L"[%s], %s; exception occurred; failed to occur post delivery event, postId:0x%I64X",
-               MODULE_NAME, L"UnsentPostContextManager::deliverUnsentPost", postId);
-    if (!PostOfficeDaemon::_instance->_postContextManager->RemoveContext(postId))
-        UNSENT_POST_CONTEXT_CRASH(364, L"== CRASH == [%s], %s; exception occurred; failed to remove post context, postId:0x%I64X",
-                                  MODULE_NAME, L"UnsentPostContextManager::deliverUnsentPost", postId);
-    postContext->removeReferenceCount(UNSENT_POST_CONTEXT_FILE, 367);
-    return false;
+    postContext->removeReferenceCount(UNSENT_POST_CONTEXT_FILE, 371);
+    return true;
 }

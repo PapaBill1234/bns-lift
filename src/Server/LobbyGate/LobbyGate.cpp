@@ -410,7 +410,7 @@ bool LobbyGate::initNetwork()
         return false;
     }
 
-    AlertSender::_alertSender.init(_config->_alertSendAddress, ShortName(), 0, 1000);  // LIFT: LTCG folded the args. 0x19e5b: _worldId = 0. 0x19e61: _maxLogCount = 1000.
+    AlertSender::_alertSender.init(_config->_alertSendAddress, L"LOBBYGATE", 0, 1000);  // LIFT: LTCG folded the args. 0x19e5b: _worldId = 0. 0x19e61: _maxLogCount = 1000.
 
     // LIFT: LTCG removed portId. 0x20860 reads _port[0], thus port id 1.
     // BUG: 0x134d9 and 0x13500 read _maxIdleTime (int) as a word. Values above 65535 wrap.

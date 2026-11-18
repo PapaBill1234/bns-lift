@@ -317,8 +317,9 @@ bool EventNotiJob::eventNotiRes(void* param)
 // LIFT: noinline. The orig calls it out of line (SCD 0xa9d0).
 __declspec(noinline) bool EventNotiJob::eventNotiExpire()
 {
-    Log::Write(Log::LT_ERROR, kFile, 313, L"[job], event-noti expire, jobid:0x%I64X, type:%d, state:%d", _id,
-               GetDefinition()->type, _state);
+    CouponJob const* const job = this;
+    Log::Write(Log::LT_ERROR, kFile, 313, L"[job], event-noti expire, jobid:0x%I64X, type:%d, state:%d",
+               job ? job->_id : 0, job ? job->GetDefinition()->type : -1, job ? job->_state : -1);
     if (_fromManagementDaemon)
         _managementReason = 3;
     transit(2);

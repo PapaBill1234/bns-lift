@@ -543,7 +543,7 @@ void Daemon::LoadVersion(Version* ver, wchar_t* verStr, unsigned long long strLe
         ver->unit[1] = LOWORD(ffi->dwFileVersionMS);
         ver->unit[2] = HIWORD(ffi->dwFileVersionLS);
         ver->unit[3] = LOWORD(ffi->dwFileVersionLS);
-        swprintf_s(verStr, 32, L"%d.%d.%d.%d", ver->unit[0], ver->unit[1], ver->unit[2], ver->unit[3]);
+        swprintf_s(verStr, strLength, L"%d.%d.%d.%d", ver->unit[0], ver->unit[1], ver->unit[2], ver->unit[3]);
     }
 }
 

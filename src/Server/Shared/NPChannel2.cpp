@@ -308,7 +308,9 @@ bool NPChannel::Setup(int programId, wchar_t const* gameCode)
         return false;
     }
     void* mem = Memory::_Manager[2]->Alloc(sizeof(NPSessionHandler), NPCHANNEL_FILE, 330);
-    _sessionHandler = mem ? new (mem) NPSessionHandler() : nullptr;
+    if (mem != nullptr)
+        new (mem) NPSessionHandler();
+    _sessionHandler = static_cast<NPSessionHandler*>(mem);
     NPPing::_class = 1;
     NPPing::_id = 1;
     NPPing::_interval = 30000;

@@ -37,8 +37,8 @@ bool GoodsItem::Setup(FragmentPacketConcatenater* fpc)
 
     if (fpc == nullptr || !fpc->Decompose(3, &itemNumber, &itemAmount, &itemDataId))
         return false;
-    if (static_cast<unsigned short>(fpc->Decompose(&varCustomizedItemAttribute_1)) == 0 ||
-        static_cast<unsigned short>(fpc->Decompose(&varCustomizedItemAttribute_2)) == 0)
+    if (fpc->Decompose(&varCustomizedItemAttribute_1) == 0 ||
+        fpc->Decompose(&varCustomizedItemAttribute_2) == 0)
         return false;
 
     if (*varCustomizedItemAttribute_1.size > 0)
@@ -91,8 +91,8 @@ bool Goods::Setup(FragmentPacketConcatenater* fpc)
                         &deliveryDate, senderDesc, 51, senderMessage, 81, &goodsIconId, goodsName, 81, goodsDesc, 201))
         return false;
     int i = 0;
-    if (static_cast<unsigned short>(fpc->Decompose(&varGoodsRestrictionCondition)) == 0 ||
-        static_cast<unsigned short>(fpc->Decompose(&varCustomizedGoodsAttribute)) == 0)
+    if (fpc->Decompose(&varGoodsRestrictionCondition) == 0 ||
+        fpc->Decompose(&varCustomizedGoodsAttribute) == 0)
         return false;
 
     if (*varGoodsRestrictionCondition.size > 0)

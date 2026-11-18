@@ -247,16 +247,17 @@ bool WorldConfigManager::loadWorldConfigFile(WorldConfigList* worldConfigList)
         reinterpret_cast<XriDestoryFunc>(GetProcAddress(library, "DestroyXmlReader"));
     XmlReader const* reader = createXmlReader();
     XmlDoc* doc = nullptr;
+    wchar_t const* version = reader != nullptr ? getInterfaceVersion() : nullptr;
     if (reader == nullptr)
     {
         Log::Write(Log::LT_ERROR, WORLD_CONFIG_FILE, 257, L"[%s], %s; failed to create xml reader", MODULE_NAME,
                    L"WorldConfigManager::loadWorldConfigFile");
     }
-    else if (wcscmp(getInterfaceVersion(), XML_READER_VERSION) != 0)
+    else if (_wcsicmp(version, XML_READER_VERSION) != 0)
     {
         Log::Write(Log::LT_ERROR, WORLD_CONFIG_FILE, 263,
                    L"[%s], %s; xml interface version mismatch, current-version:%s, load-version:%s", MODULE_NAME,
-                   L"WorldConfigManager::loadWorldConfigFile", XML_READER_VERSION, getInterfaceVersion());  // 0xE6D6: +0x30 version constant, +0x38 getInterfaceVersion()
+                   L"WorldConfigManager::loadWorldConfigFile", XML_READER_VERSION, version);
     }
     else if (!reader->Initialize(nullptr, nullptr, false))
     {

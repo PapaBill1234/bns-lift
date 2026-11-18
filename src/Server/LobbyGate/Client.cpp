@@ -66,7 +66,9 @@ typedef std::vector<Client*, StlAllocator<Client*, 2> > ClientList;
 // LIFT: inlined FragmentPacket free-size check, e.g. LobbyGate 0x482b-0x485c (4000 - CurHeader->size < need, then Packet::Allocate).
 static __forceinline void reserveFragment(FragmentPacket& fp, int need)
 {
-    if (fp.FreeSize() < need)
+    Packet::Header const* header = fp.packet.CurHeader;
+    unsigned short freeSize = header != nullptr ? static_cast<unsigned short>(4000 - header->size) : 0;
+    if (freeSize < need)
         fp.packet.Allocate(&fp.composer);
 }
 

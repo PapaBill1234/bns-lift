@@ -387,7 +387,7 @@ bool PacketConcatenateBuffer::Decompose(int n, ...)
 }
 
 // 0x1BCE0
-int PacketConcatenateBuffer::Decompose(VarData* data)
+unsigned short PacketConcatenateBuffer::Decompose(VarData* data)
 {
     if (buffer == nullptr || data == nullptr)
         PACKETUTIL_ASSERT_CRASH(411);
@@ -406,7 +406,7 @@ int PacketConcatenateBuffer::Decompose(VarData* data)
     data->size = reinterpret_cast<short*>(p);
     data->buffer = p + 2;
     decomposer.offset += len + 2;
-    return len + 2;
+    return static_cast<unsigned short>(len + 2);
 }
 
 // 0x1BE20
