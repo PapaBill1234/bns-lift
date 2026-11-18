@@ -97,11 +97,16 @@ bool ManagementSessionHandler::PacketHandler(Session const* session, Packet cons
         _snwprintf_s(failReason, 0x101, _TRUNCATE, L"invalid packet command");
     }
 
+    // LIFT: Packet constructor, inlined (0x10d00): the fields are set one by one.
     Packet reply;
-    memset(static_cast<void*>(&reply), 0, sizeof(reply));
+    reply.CurHeader = nullptr;
+    reply.Splitter = nullptr;
+    reply.ListHead = nullptr;
+    reply.ListTail = nullptr;
+    reply.IsFragmentPacket = false;
+    reply.FragmentPacketCmd = 0;
     reply.Allocate();
     SendTextReply(session, &reply, command, failReason);
-    reply.Clear();
     return false;
 }
 

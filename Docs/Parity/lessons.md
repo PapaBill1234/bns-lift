@@ -433,3 +433,50 @@ Not done:
 - Stop list, `GateKeyManager::Finalize` 0x3b10 (97.0) and `ClientManager::Finalize` 0x5cf0 (95.2): const 0x18 against 0x10 = `.tls` offset of `__delv_buf__`. Orig `.tls` raw data 0xa1 bytes, ours 0xb1 bytes: other TLS variables sit before it in orig (link order). Not fixable in source.
 - `GateKeyManager::MakeGateKey` 0x? (94.3): orig calls `GateKeyEntry::scalar deleting destructor` where ours calls `RefCntObject::removeReferenceCount`, and the order of `LeaveCriticalSection` differs. Not tried.
 - Facts for the scalar placement `operator delete(void*, void*)` (all 4 exes, score 0): LG orig 0x1000 (first function in the exe, PDB module ThreadFreePacketPump), crash body at `Memory.h:173`, Log::Write + AlertSender::Write, path lower case in LG (`e:\dailybuild02\lobbygate-common-0.0.348\depot\branch\348nc\program\server\bloodlib\include\memory.h`), mixed case in SCD (`E:\DailyBuild02\SmartCouponDaemon-Common-0.0.348\depot\Branch\348NC\Program\Server\BloodLib\include\Memory.h`). `include/vs2010/new` has an empty inline placement delete. Plan: declare it non-inline in `include/vs2010/new`, define the crash body once per exe (per-exe path with `LIFT_EXE_*`) in `BloodLib/source/Memory.cpp`. Not tried: it is global. The `bloodlib-2` card lists `operator delete` on its stop list.
+
+## lift-parity-handlers-3, stage 2 (2026-11-18, PacketHandler form)
+- WORKED: POD `WorldSessionHandler::PacketHandler` 0x1f270 is MATCH (POD 637 -> 638). Form, all parts needed:
+  1. `void* iocpHandle = nullptr;` at the top, then `iocpHandle = Network::iocpHandle();` inside the pump branch (a zero register that stays alive: the range test stays 2 signed compares, const 0xd).
+  2. `short const* const pCmd = &packet->CurHeader[1].size; if (pCmd == nullptr)` (orig `add rsi, 2` + ZF; the `CurHeader == nullptr` form and the `== -2` form are wrong). Read `*pCmd` at each use (orig reloads it after each call). Use `session->_id` at each use, no `sessionId` local (orig loads `[rdx+0x68]` in each block).
+  3. Inline `Session::GetChannel` by hand: `T* channel = nullptr; if (session->_channel != nullptr && !session->_waitForRelease) { session->_channel->addReferenceCount(SESSION_FILE, 1051); channel = static_cast<T*>(session->_channel); }`.
+  4. `bool result = false;` AFTER the GetChannel block, then `if (channel == nullptr) { if (*pCmd == 1 && list[1] != nullptr) result = list[1](session, packet); else Log; } else { if (range ok) result = TFPP_PumpPacket(...); else Log; channel->removeReferenceCount(...); } return result;` (one return, no early return after the CurHeader test).
+  The `GetChannel()` call and the positive-first `if (channel != nullptr)` did not change the block order alone. Build time for one exe: about 30 s (`.scratch/try.sh <EXE> <regex> <file>`).
+- Same signal (consts orig 0x2 + 0x7/0xa, ours 0x5/0x8; calls orig `<indirect>, Log::Write` after addRef) in POD `AgentSessionHandler` (list size 7), POD `CacheGateSessionHandler` (no channel; consts 0x2, 0xa), SCD `ManagerSessionHandler`. The CG/SCD form has no GetChannel: only fix 1 and 2 apply there.
+- POD `ManagementSessionHandler::PacketHandler`: calls only. Ours has 2 extra `<indirect>` (before `Log::Write`, before `Packet::ComposeText`) and `Packet::Clear` where orig has `<indirect>`. Not worked on.
+
+## lift-parity-handlers-3, stage 3 (session handlers)
+- Worked (MATCH): the PacketHandler form of stage 2 for POD `AgentSessionHandler::PacketHandler` 0x3a00 (needs `SESSION_FILE`), POD `CacheGateSessionHandler::PacketHandler` 0x7d90, SCD `ManagerSessionHandler::PacketHandler` 0xe980, LG `ClientSessionHandler::PacketHandler` 0x6b70.
+  The form: `short const* const pCmd = &packet->CurHeader[1].size;`, test `pCmd == nullptr`, read `*pCmd` each time, no `sessionId` local. Use `session->_id` in each Log::Write.
+- SCD 0xe980: `Session::GetChannel` is a real call (not inline). One `bool result = false;` and one `return result;`. `channel == nullptr` first (cmd 1 then list[1]), else the list call and `removeReferenceCount(..., 101)`.
+- LG 0x6b70: the list tests are signed: `*pCmd >= 0 && *pCmd < 0x6E` (Any list), `*pCmd >= 0 && *pCmd <= 0x6E` (Authed, NotAuthed). Do not use `unsigned short`. Inline GetChannel add-ref, then `Client* client = session->_channel` and `client->_state == 1` inside the same `if`. The NotAuthed code follows after it.
+- Worked (partly): POD `ManagementSessionHandler::PacketHandler` 0x10d00: set the Packet fields one by one (`CurHeader`, `Splitter`, `ListHead`, `ListTail`, `IsFragmentPacket`, `FragmentPacketCmd`) instead of `memset`, and drop the explicit `reply.Clear()`. This removes the extra `Packet::Clear` and one `<indirect>` (Splitter test). Score 97.8.
+- Did NOT work (POD 0x10d00): `int line = 61; if (index != 16) line = 68;` (adds const 0x3d). A `goto done` with `result = handler(...)` (no change). Open: orig puts the handler call (`call r8`) at the END of the function, after `Packet::Clear`. Ours puts it before the first `Log::Write`.
+- Open: POD pool index in the inlined `Packet::Allocate` is 0x28 in orig and 0x90 in ours (`mov edx, ...` before `PacketBufferPool::allocate`). Not checked if it is the same in the MATCH functions.
+
+## Handlers stage 4 (lift-parity-handlers-3)
+
+Measured with `.scratch/try.sh PostOfficeDaemon <regex> <file>`. Result: POD 645 (was 640).
+
+Worked:
+- Local `Packet reply` with the packet init written field by field (CurHeader, Splitter, ListHead, ListTail,
+  IsFragmentPacket, FragmentPacketCmd) and then `Allocate()`. Do not use `memset`. A `memset` adds an
+  `<indirect>` call in the call list. File: `ManagementPacketHandler.cpp` `initReply`.
+- Do not write `reply.Clear()` by hand. The destructor does it. A hand `Clear()` before a `return`
+  gives a second `Packet::Clear` call. (HelloReq 97.0 -> MATCH.)
+- Branch order in the management handlers: the failure branch comes first, the success branch last.
+  Write `if (DecomposeText(...) == 0) { fail } else { ... if (!DbCall(...)) { fail } else { success; return true; } }`
+  and then the common failure tail. Do not write `if (call) { success; return } fail`.
+  (ResetAll 96.3 -> MATCH, LoadRetryReadyPostList, ResetPostStatus, LoadRetryReadySinglePost: all MATCH.)
+
+Did not work:
+- `goto done` with `bool result` instead of `return handler(...)` in
+  `ManagementSessionHandler::PacketHandler` (0x10d00). No gain. Reverted.
+- `HandleCacheGateRelay` (0x8070): `if (Decompose != 0)` first with `serviceWid == toWid` first gave 89.1
+  (worse than 92.8). `== 0` first with `!=` first and explicit `endLine = 109` per branch gave 93.3.
+  The orig has the Write(86) decompose failure block AFTER the success block (const order 73, 89, ..., 86).
+  The version `!= 0` first with `serviceWid != toWid` first is written in the file and NOT measured.
+
+Open facts:
+- `HandleCacheGateRelayFail`/`RelayInvalid` (POD): the orig has three `RelayContext::ProcessRelayResponse`
+  calls (one per relay request type, 3 vtable refs of CheckPostCapacityRelayRequest). Our code has one.
+  Needs a switch with three inlined branches. Not tried.

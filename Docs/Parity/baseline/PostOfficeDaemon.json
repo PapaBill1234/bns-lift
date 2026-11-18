@@ -133,11 +133,11 @@
 "status": "MATCH"
 },
 "AgentSessionHandler::PacketHandler": {
-"calls": 71,
-"consts": 77,
+"calls": 100,
+"consts": 100,
 "refs": 100,
-"score": 82.8,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "AlertSender::AlertSender": {
 "calls": 100,
@@ -631,10 +631,10 @@
 },
 "CacheGateSessionHandler::PacketHandler": {
 "calls": 100,
-"consts": 57,
+"consts": 100,
 "refs": 100,
-"score": 85.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "CachedWatchdog::CachedWatchdog": {
 "calls": 100,
@@ -1659,39 +1659,39 @@
 "status": "DIFF"
 },
 "HandlePostOfficeManagementHelloReq": {
-"calls": 91,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 97.0,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "HandlePostOfficeManagementLoadRetryReadyPostListReq": {
-"calls": 84,
-"consts": 93,
+"calls": 100,
+"consts": 100,
 "refs": 100,
-"score": 92.5,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "HandlePostOfficeManagementLoadRetryReadySinglePostReq": {
-"calls": 84,
-"consts": 94,
+"calls": 100,
+"consts": 100,
 "refs": 100,
-"score": 92.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "HandlePostOfficeManagementResetAllPostStatusReq": {
-"calls": 84,
-"consts": 93,
+"calls": 100,
+"consts": 100,
 "refs": 100,
-"score": 92.5,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "HandlePostOfficeManagementResetPostStatusReq": {
-"calls": 84,
-"consts": 87,
+"calls": 100,
+"consts": 100,
 "refs": 100,
-"score": 90.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "HandlePostOfficeRegisterPostReq": {
 "calls": 98,
@@ -2079,10 +2079,10 @@
 "status": "MATCH"
 },
 "ManagementSessionHandler::PacketHandler": {
-"calls": 88,
+"calls": 93,
 "consts": 100,
 "refs": 100,
-"score": 95.8,
+"score": 97.8,
 "status": "DIFF"
 },
 "MaskGenerator::generate": {
@@ -4697,11 +4697,11 @@
 "status": "MATCH"
 },
 "WorldSessionHandler::PacketHandler": {
-"calls": 71,
-"consts": 77,
+"calls": 100,
+"consts": 100,
 "refs": 100,
-"score": 82.8,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "ZSTD_BtFindBestMatch": {
 "calls": 100,

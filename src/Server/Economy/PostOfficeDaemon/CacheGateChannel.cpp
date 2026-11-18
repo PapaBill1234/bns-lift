@@ -326,27 +326,28 @@ void CacheGateSessionHandler::OnClose(Session const* session, bool tryReconnect)
 // 0x7d90
 bool CacheGateSessionHandler::PacketHandler(Session const* session, Packet const* packet) const
 {
-    unsigned long long const sessionId = session->_id;
-    if (packet->CurHeader == nullptr)
+    void* iocpHandle = nullptr;
+    short const* const pCmd = &packet->CurHeader[1].size;
+    if (pCmd == nullptr)
     {
         Log::Write(Log::LT_ERROR, CACHEGATE_CHANNEL_FILE, 295,
                    L"[%s], %s; invalid packet; command is null, cmd:0x%p, sessionId:0x%I64X, portId:%u, sessionIndex:%u",
-                   MODULE_NAME, L"CacheGateSessionHandler::PacketHandler", static_cast<void*>(nullptr),
-                   sessionId, static_cast<unsigned int>(sessionId >> 32), static_cast<unsigned int>(sessionId));
+                   MODULE_NAME, L"CacheGateSessionHandler::PacketHandler", static_cast<void*>(nullptr), session->_id,
+                   static_cast<unsigned int>(session->_id >> 32), static_cast<unsigned int>(session->_id));
         return false;
     }
 
-    short const cmd = reinterpret_cast<Packet::Header const*>(packet->CurHeader)[1].size;
-    if (cmd <= 0 || cmd >= 10 || CacheGatePacketClientSideHandlerList[cmd] == nullptr)
+    if (*pCmd <= 0 || *pCmd >= 10 || CacheGatePacketClientSideHandlerList[*pCmd] == nullptr)
     {
         Log::Write(Log::LT_ERROR, CACHEGATE_CHANNEL_FILE, 305,
                    L"[%s], %s; invalid cachegate packet command, command:%d, sessionId:0x%I64X, portId:%u, sessionIndex:%u",
-                   MODULE_NAME, L"CacheGateSessionHandler::PacketHandler", static_cast<int>(cmd), sessionId,
-                   static_cast<unsigned int>(sessionId >> 32), static_cast<unsigned int>(sessionId));
+                   MODULE_NAME, L"CacheGateSessionHandler::PacketHandler", static_cast<int>(*pCmd), session->_id,
+                   static_cast<unsigned int>(session->_id >> 32), static_cast<unsigned int>(session->_id));
         return false;
     }
 
     // LIFT: LTCG folded the event id and the offset. The values come from the LobbyGate call.
-    return TFPP_PumpPacket(128, Network::iocpHandle(), session, packet, cmd, 0,
+    iocpHandle = Network::iocpHandle();
+    return TFPP_PumpPacket(128, iocpHandle, session, packet, *pCmd, 0,
                            CacheGatePacketClientSideHandlerList, CacheGatePacketClientSideFragmentHandlerList);
 }

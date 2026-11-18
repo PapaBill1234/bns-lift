@@ -743,10 +743,10 @@
 },
 "ClientSessionHandler::PacketHandler": {
 "calls": 100,
-"consts": 95,
+"consts": 100,
 "refs": 100,
-"score": 98.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "ClientSessionHandler::SwitchCmdLobbyGateToLobbyDaemon": {
 "calls": 100,

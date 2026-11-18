@@ -11,15 +11,15 @@ Do not push this code to a public repo. Do not commit binaries or keys.
 ## Parity
 
 <!-- parity:start -->
-Last update: card `lift-parity-arraynew-3` (2026-11-18). Tool: `tools/parity.sh` (VS2010 /GL /LTCG build vs original, funcdiff).
+Last update: card `lift-parity-handlers-3` (2026-11-18). Tool: `tools/parity.sh` (VS2010 /GL /LTCG build vs original, funcdiff).
 
 | Exe | Parity | MATCH | DIFF | Only in original | Total | Mean score | Start | Change | Level |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
 | CacheGate | **88.8 %** | 436 | 51 | 4 | 491 | 98.8 | 44.0 % | +44.8 | below 90 % |
-| LobbyGate | **81.2 %** | 600 | 134 | 5 | 739 | 97.9 | 37.9 % | +43.3 | below 90 % |
-| SmartCouponDaemon | **83.1 %** | 556 | 110 | 3 | 669 | 98.3 | 33.6 % | +49.5 | below 90 % |
-| PostOfficeDaemon | **83.9 %** | 637 | 116 | 6 | 759 | 98.3 | 34.5 % | +49.4 | below 90 % |
-| **All 4** | **83.9 %** | 2229 | | | 2658 | | 37.0 % | +46.9 | below 90 % |
+| LobbyGate | **81.3 %** | 601 | 133 | 5 | 739 | 97.9 | 37.9 % | +43.4 | below 90 % |
+| SmartCouponDaemon | **83.3 %** | 557 | 109 | 3 | 669 | 98.3 | 33.6 % | +49.6 | below 90 % |
+| PostOfficeDaemon | **85.0 %** | 645 | 108 | 6 | 759 | 98.4 | 34.5 % | +50.5 | below 90 % |
+| **All 4** | **84.2 %** | 2239 | | | 2658 | | 37.0 % | +47.3 | below 90 % |
 
 | Shared library (functions in 2+ exes) | Parity | MATCH in each exe | DIFF in 1+ exe | Total | Goal |
 | --- | ---: | ---: | ---: | ---: | --- |
@@ -54,4 +54,5 @@ Goal: 95 % per exe, 99 % preferred. Shared library: 99 % preferred. Rules: [Docs
 | `lift-parity-order-3` | 87.6 % | 79.6 % | 82.2 % | 83.1 % |
 | `lift-parity-consts-3` | 88.8 % | 80.5 % | 83.1 % | 83.9 % |
 | `lift-parity-arraynew-3` | 88.8 % | 81.2 % | 83.1 % | 83.9 % |
+| `lift-parity-handlers-3` | 88.8 % | 81.3 % | 83.3 % | 85.0 % |
 <!-- parity:end -->

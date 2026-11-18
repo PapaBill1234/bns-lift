@@ -762,63 +762,61 @@ void ClientSessionHandler::OnClose(Session const* session, bool tryReconnect) co
 bool ClientSessionHandler::PacketHandler(Session const* session, Packet const* packet) const
 {
     // The command is the short after the packet header.
-    short cmd = packet->CurHeader[1].size;
-    if (static_cast<unsigned short>(cmd) <= 0x6D)
+    short const* const pCmd = &packet->CurHeader[1].size;
+    if (*pCmd >= 0 && *pCmd < 0x6E)
     {
         Daemon::PacketHandler handler =
-            reinterpret_cast<Daemon::PacketHandler>(AnyAuthedLobbyGatePacketHandlerList[cmd]);
+            reinterpret_cast<Daemon::PacketHandler>(AnyAuthedLobbyGatePacketHandlerList[*pCmd]);
         if (handler != nullptr)
             return handler(session, packet);
     }
 
-    Channel* channel = nullptr;
+    // LIFT: Inlined Session::GetChannel with the add-ref (Session.cpp line 1051).
     if (session->_channel != nullptr && !session->_waitForRelease)
     {
         session->_channel->addReferenceCount(SESSION_FILE, 1051);
-        channel = session->_channel;
-    }
-    // BUG: 0x6b70 no release of the channel reference when Client::_state is not 1.
-    if (channel == nullptr || static_cast<Client*>(channel)->_state != 1)
-    {
-        // BUG: 0x6b70 index 0x6E is out of bounds for the 110 entries of NotAuthedLobbyGatePacketHandlerList.
-        if (static_cast<unsigned short>(cmd) <= 0x6E)
+        Client* client = static_cast<Client*>(session->_channel);
+        // BUG: 0x6b70 no release of the channel reference when Client::_state is not 1.
+        if (client != nullptr && client->_state == 1)
         {
-            Daemon::PacketHandler handler =
-                reinterpret_cast<Daemon::PacketHandler>(NotAuthedLobbyGatePacketHandlerList[cmd]);
-            if (handler != nullptr)
-                return handler(session, packet);
+            if (*pCmd == 9)
+            {
+                Log::Write(Log::LT_DEBUG, L"LobbyGatePacketHandler.cpp", 31,
+                           L"[lobbygate], ping recv ok, SessionId:0x%I64X", session->_id);
+                client->removeReferenceCount(SESSION_FILE, 1059);
+                return true;
+            }
+            // BUG: 0x6b70 index 0x6E is out of bounds for the 110 entries of AuthedLobbyGatePacketHandlerList.
+            if (*pCmd >= 0 && *pCmd <= 0x6E && AuthedLobbyGatePacketHandlerList[*pCmd] != nullptr)
+            {
+                bool result;
+                if (*pCmd == 24)
+                    result = HandleLobbyGate_GetWorldInfoListReq(client, packet);
+                else if (*pCmd == 103)
+                    result = HandleLobbyGate_GetPcCafeMileageFeverTimeScheduleListReq(client, packet);
+                else
+                    result = HandleLobbyGate_BypassPacket(client, packet);
+                client->removeReferenceCount(SESSION_FILE, 1059);
+                return result;
+            }
+            Log::Write(Log::LT_ERROR, CLIENT_FILE, 1034, L"%I64X[%I64X], Unknown packet command %d", session->_id,
+                       client->GetId(), static_cast<int>(*pCmd));
+            client->removeReferenceCount(SESSION_FILE, 1059);
+            return false;
         }
-        Log::Write(Log::LT_ERROR, CLIENT_FILE, 1066, L"%I64X[N/A], Unknown packet command %d", session->_id,
-                   static_cast<int>(cmd));
-        return false;
     }
 
-    if (cmd == 9)
+    // BUG: 0x6b70 index 0x6E is out of bounds for the 110 entries of NotAuthedLobbyGatePacketHandlerList.
+    if (*pCmd >= 0 && *pCmd <= 0x6E)
     {
-        Log::Write(Log::LT_DEBUG, L"LobbyGatePacketHandler.cpp", 31, L"[lobbygate], ping recv ok, SessionId:0x%I64X",
-                   session->_id);
-        channel->removeReferenceCount(SESSION_FILE, 1059);
-        return true;
+        Daemon::PacketHandler handler =
+            reinterpret_cast<Daemon::PacketHandler>(NotAuthedLobbyGatePacketHandlerList[*pCmd]);
+        if (handler != nullptr)
+            return handler(session, packet);
     }
-    // BUG: 0x6b70 index 0x6E is out of bounds for the 110 entries of AuthedLobbyGatePacketHandlerList.
-    if (static_cast<unsigned short>(cmd) > 0x6E || AuthedLobbyGatePacketHandlerList[cmd] == nullptr)
-    {
-        Log::Write(Log::LT_ERROR, CLIENT_FILE, 1034, L"%I64X[%I64X], Unknown packet command %d", session->_id,
-                   channel->GetId(), static_cast<int>(cmd));
-        channel->removeReferenceCount(SESSION_FILE, 1059);
-        return false;
-    }
-
-    Client* client = static_cast<Client*>(session->_channel);
-    bool result;
-    if (cmd == 24)
-        result = HandleLobbyGate_GetWorldInfoListReq(client, packet);
-    else if (cmd == 103)
-        result = HandleLobbyGate_GetPcCafeMileageFeverTimeScheduleListReq(client, packet);
-    else
-        result = HandleLobbyGate_BypassPacket(client, packet);
-    channel->removeReferenceCount(SESSION_FILE, 1059);
-    return result;
+    Log::Write(Log::LT_ERROR, CLIENT_FILE, 1066, L"%I64X[N/A], Unknown packet command %d", session->_id,
+               static_cast<int>(*pCmd));
+    return false;
 }
 
 // 0x6da0

@@ -22,7 +22,12 @@ static wchar_t const* const MODULE_NAME = L"management packet handler";  // PDB 
 // LIFT: Inlined in each handler: zero the packet and allocate the first buffer.
 void initReply(Packet* reply)
 {
-    memset(static_cast<void*>(reply), 0, sizeof(*reply));
+    reply->CurHeader = nullptr;
+    reply->Splitter = nullptr;
+    reply->ListHead = nullptr;
+    reply->ListTail = nullptr;
+    reply->IsFragmentPacket = false;
+    reply->FragmentPacketCmd = 0;
     reply->Allocate();
 }
 
@@ -45,7 +50,6 @@ bool HandlePostOfficeManagementHelloReq(Session const* session, Packet const* pa
                L"HandlePostOfficeManagementHelloReq");
     Log::Write(Log::LT_DEBUG, MANAGEMENT_PACKET_FILE, 35, L"[%s], %s; <END PACKET HANDLER>", MODULE_NAME,
                L"HandlePostOfficeManagementHelloReq");
-    reply.Clear();
     return true;
 }
 
@@ -64,7 +68,13 @@ bool HandlePostOfficeManagementResetPostStatusReq(Session const* session, Packet
     long long recipientPcId = 0;
     PostContext* postContext = nullptr;
 
-    if (packet->DecomposeText("sqqq", command, 65, &postId, &invoiceId, &recipientPcId) != 0)
+    if (packet->DecomposeText("sqqq", command, 65, &postId, &invoiceId, &recipientPcId) == 0)
+    {
+        Log::Write(Log::LT_ERROR, MANAGEMENT_PACKET_FILE, 59, L"[%s], %s; failed to decompose packet",
+                   MODULE_NAME, FUNC);
+        _snwprintf_s(failReason, 0x101, _TRUNCATE, L"failed to decompose packet");
+    }
+    else
     {
         Log::Write(Log::LT_DEBUG, MANAGEMENT_PACKET_FILE, 63,
                    L"[%s], %s; decomposed packet, postId:0x%I64X, invoiceId:0x%I64X, recipientPcId:0x%I64X",
@@ -92,7 +102,18 @@ bool HandlePostOfficeManagementResetPostStatusReq(Session const* session, Packet
             else
             {
                 int dbRetValue = 0;
-                if (PostOfficeDB::UpdateStatusToRetryReady(&dbRetValue, postId, invoiceId, recipientPcId))
+                if (!PostOfficeDB::UpdateStatusToRetryReady(&dbRetValue, postId, invoiceId, recipientPcId))
+                {
+                Log::Write(Log::LT_ERROR, MANAGEMENT_PACKET_FILE, 81,
+                           L"[%s], %s; failed to update post status [retry ready status], dbRetValue:%d, "
+                           L"postId:0x%I64X, invoiceId:0x%I64X, recipientPcId:0x%I64X",
+                           MODULE_NAME, FUNC, dbRetValue, postId, invoiceId, recipientPcId);
+                _snwprintf_s(failReason, 0x101, _TRUNCATE,
+                             L"failed to update post status [retry ready status], dbRetValue:%d, postId:0x%I64X, "
+                             L"invoiceId:0x%I64X, recipientPcId:0x%I64X",
+                             dbRetValue, postId, invoiceId, recipientPcId);
+                }
+                else
                 {
                     _snwprintf_s(failReason, 0x101, _TRUNCATE,
                                  L"succeeded to update post status [retry ready status], postId:0x%I64X", postId);
@@ -102,25 +123,10 @@ bool HandlePostOfficeManagementResetPostStatusReq(Session const* session, Packet
                                MODULE_NAME, FUNC);
                     Log::Write(Log::LT_DEBUG, MANAGEMENT_PACKET_FILE, 93, L"[%s], %s; <END PACKET HANDLER>",
                                MODULE_NAME, FUNC);
-                    reply.Clear();
                     return true;
                 }
-                Log::Write(Log::LT_ERROR, MANAGEMENT_PACKET_FILE, 81,
-                           L"[%s], %s; failed to update post status [retry ready status], dbRetValue:%d, "
-                           L"postId:0x%I64X, invoiceId:0x%I64X, recipientPcId:0x%I64X",
-                           MODULE_NAME, FUNC, dbRetValue, postId, invoiceId, recipientPcId);
-                _snwprintf_s(failReason, 0x101, _TRUNCATE,
-                             L"failed to update post status [retry ready status], dbRetValue:%d, postId:0x%I64X, "
-                             L"invoiceId:0x%I64X, recipientPcId:0x%I64X",
-                             dbRetValue, postId, invoiceId, recipientPcId);
             }
         }
-    }
-    else
-    {
-        Log::Write(Log::LT_ERROR, MANAGEMENT_PACKET_FILE, 59, L"[%s], %s; failed to decompose packet",
-                   MODULE_NAME, FUNC);
-        _snwprintf_s(failReason, 0x101, _TRUNCATE, L"failed to decompose packet");
     }
 
     sendTextReply(session, &reply, command, failReason);
@@ -130,7 +136,6 @@ bool HandlePostOfficeManagementResetPostStatusReq(Session const* session, Packet
         postContext->removeReferenceCount(MANAGEMENT_PACKET_FILE, 102);
     Log::Write(Log::LT_DEBUG, MANAGEMENT_PACKET_FILE, 104, L"[%s], %s; <END PACKET HANDLER>", MODULE_NAME,
                FUNC);
-    reply.Clear();
     return true;
 }
 
@@ -149,7 +154,13 @@ bool HandlePostOfficeManagementLoadRetryReadySinglePostReq(Session const* sessio
     long long recipientPcId = 0;
     PostContext* postContext = nullptr;
 
-    if (packet->DecomposeText("sqqq", command, 65, &postId, &invoiceId, &recipientPcId) != 0)
+    if (packet->DecomposeText("sqqq", command, 65, &postId, &invoiceId, &recipientPcId) == 0)
+    {
+        Log::Write(Log::LT_ERROR, MANAGEMENT_PACKET_FILE, 127, L"[%s], %s; failed to decompose packet",
+                   MODULE_NAME, FUNC);
+        _snwprintf_s(failReason, 0x101, _TRUNCATE, L"failed to decompose packet");
+    }
+    else
     {
         Log::Write(Log::LT_DEBUG, MANAGEMENT_PACKET_FILE, 131,
                    L"[%s], %s; decomposed packet, postId:0x%I64X, invoiceId:0x%I64X, recipientPcId:0x%I64X",
@@ -177,7 +188,18 @@ bool HandlePostOfficeManagementLoadRetryReadySinglePostReq(Session const* sessio
             else
             {
                 int dbRetValue = 0;
-                if (PostOfficeDB::LoadRetryReadySinglePost(&dbRetValue, postId, invoiceId, recipientPcId))
+                if (!PostOfficeDB::LoadRetryReadySinglePost(&dbRetValue, postId, invoiceId, recipientPcId))
+                {
+                Log::Write(Log::LT_ERROR, MANAGEMENT_PACKET_FILE, 149,
+                           L"[%s], %s; failed to load retry ready single post, dbRetValue:%d, postId:0x%I64X, "
+                           L"invoiceId:0x%I64X, recipientPcId:0x%I64X",
+                           MODULE_NAME, FUNC, dbRetValue, postId, invoiceId, recipientPcId);
+                _snwprintf_s(failReason, 0x101, _TRUNCATE,
+                             L"failed to load retry ready single post, dbRetValue:%d, postId:0x%I64X, "
+                             L"invoiceId:0x%I64X, recipientPcId:0x%I64X",
+                             dbRetValue, postId, invoiceId, recipientPcId);
+                }
+                else
                 {
                     _snwprintf_s(failReason, 0x101, _TRUNCATE,
                                  L"succeeded to load retry ready single post, postId:0x%I64X", postId);
@@ -187,25 +209,10 @@ bool HandlePostOfficeManagementLoadRetryReadySinglePostReq(Session const* sessio
                                FUNC);
                     Log::Write(Log::LT_DEBUG, MANAGEMENT_PACKET_FILE, 161, L"[%s], %s; <END PACKET HANDLER>",
                                MODULE_NAME, FUNC);
-                    reply.Clear();
                     return true;
                 }
-                Log::Write(Log::LT_ERROR, MANAGEMENT_PACKET_FILE, 149,
-                           L"[%s], %s; failed to load retry ready single post, dbRetValue:%d, postId:0x%I64X, "
-                           L"invoiceId:0x%I64X, recipientPcId:0x%I64X",
-                           MODULE_NAME, FUNC, dbRetValue, postId, invoiceId, recipientPcId);
-                _snwprintf_s(failReason, 0x101, _TRUNCATE,
-                             L"failed to load retry ready single post, dbRetValue:%d, postId:0x%I64X, "
-                             L"invoiceId:0x%I64X, recipientPcId:0x%I64X",
-                             dbRetValue, postId, invoiceId, recipientPcId);
             }
         }
-    }
-    else
-    {
-        Log::Write(Log::LT_ERROR, MANAGEMENT_PACKET_FILE, 127, L"[%s], %s; failed to decompose packet",
-                   MODULE_NAME, FUNC);
-        _snwprintf_s(failReason, 0x101, _TRUNCATE, L"failed to decompose packet");
     }
 
     sendTextReply(session, &reply, command, failReason);
@@ -215,7 +222,6 @@ bool HandlePostOfficeManagementLoadRetryReadySinglePostReq(Session const* sessio
         postContext->removeReferenceCount(MANAGEMENT_PACKET_FILE, 170);
     Log::Write(Log::LT_DEBUG, MANAGEMENT_PACKET_FILE, 172, L"[%s], %s; <END PACKET HANDLER>", MODULE_NAME,
                FUNC);
-    reply.Clear();
     return true;
 }
 
@@ -230,12 +236,27 @@ bool HandlePostOfficeManagementResetAllPostStatusReq(Session const* session, Pac
     wchar_t command[65] = {0};
     wchar_t failReason[257] = {0};
 
-    if (packet->DecomposeText("s", command, 65) != 0)
+    if (packet->DecomposeText("s", command, 65) == 0)
+    {
+        Log::Write(Log::LT_ERROR, MANAGEMENT_PACKET_FILE, 187, L"[%s], %s; failed to decompose packet",
+                   MODULE_NAME, FUNC);
+        _snwprintf_s(failReason, 0x101, _TRUNCATE, L"failed to decompose packet");
+    }
+    else
     {
         Log::Write(Log::LT_DEBUG, MANAGEMENT_PACKET_FILE, 191, L"[%s], %s; decomposed packet", MODULE_NAME,
                    FUNC);
         int dbRetValue = 0;
-        if (PostOfficeDB::ResetAllDeliveryFailurePost(&dbRetValue))
+        if (!PostOfficeDB::ResetAllDeliveryFailurePost(&dbRetValue))
+        {
+            Log::Write(Log::LT_ERROR, MANAGEMENT_PACKET_FILE, 195,
+                       L"[%s], %s; failed to reset all delivery failure post [retry ready status], dbRetValue:%d",
+                       MODULE_NAME, FUNC, dbRetValue);
+            _snwprintf_s(failReason, 0x101, _TRUNCATE,
+                         L"failed to reset all delivery failure post [retry ready status], dbRetValue:%d",
+                         dbRetValue);
+        }
+        else
         {
             _snwprintf_s(failReason, 0x101, _TRUNCATE,
                          L"succeeded to reset all delivery failure post [retry ready status]");
@@ -245,20 +266,8 @@ bool HandlePostOfficeManagementResetAllPostStatusReq(Session const* session, Pac
                        MODULE_NAME, FUNC);
             Log::Write(Log::LT_DEBUG, MANAGEMENT_PACKET_FILE, 207, L"[%s], %s; <END PACKET HANDLER>",
                        MODULE_NAME, FUNC);
-            reply.Clear();
             return true;
         }
-        Log::Write(Log::LT_ERROR, MANAGEMENT_PACKET_FILE, 195,
-                   L"[%s], %s; failed to reset all delivery failure post [retry ready status], dbRetValue:%d",
-                   MODULE_NAME, FUNC, dbRetValue);
-        _snwprintf_s(failReason, 0x101, _TRUNCATE,
-                     L"failed to reset all delivery failure post [retry ready status], dbRetValue:%d", dbRetValue);
-    }
-    else
-    {
-        Log::Write(Log::LT_ERROR, MANAGEMENT_PACKET_FILE, 187, L"[%s], %s; failed to decompose packet",
-                   MODULE_NAME, FUNC);
-        _snwprintf_s(failReason, 0x101, _TRUNCATE, L"failed to decompose packet");
     }
 
     sendTextReply(session, &reply, command, failReason);
@@ -267,7 +276,6 @@ bool HandlePostOfficeManagementResetAllPostStatusReq(Session const* session, Pac
                MODULE_NAME, FUNC);
     Log::Write(Log::LT_DEBUG, MANAGEMENT_PACKET_FILE, 215, L"[%s], %s; <END PACKET HANDLER>", MODULE_NAME,
                FUNC);
-    reply.Clear();
     return true;
 }
 
@@ -282,12 +290,26 @@ bool HandlePostOfficeManagementLoadRetryReadyPostListReq(Session const* session,
     wchar_t command[65] = {0};
     wchar_t failReason[257] = {0};
 
-    if (packet->DecomposeText("s", command, 65) != 0)
+    if (packet->DecomposeText("s", command, 65) == 0)
+    {
+        Log::Write(Log::LT_ERROR, MANAGEMENT_PACKET_FILE, 230, L"[%s], %s; failed to decompose packet",
+                   MODULE_NAME, FUNC);
+        _snwprintf_s(failReason, 0x101, _TRUNCATE, L"failed to decompose packet");
+    }
+    else
     {
         Log::Write(Log::LT_DEBUG, MANAGEMENT_PACKET_FILE, 234, L"[%s], %s; decomposed packet", MODULE_NAME,
                    FUNC);
         int dbRetValue = 0;
-        if (PostOfficeDB::LoadRetryReadyPostList(&dbRetValue))
+        if (!PostOfficeDB::LoadRetryReadyPostList(&dbRetValue))
+        {
+            Log::Write(Log::LT_ERROR, MANAGEMENT_PACKET_FILE, 238,
+                       L"[%s], %s; failed to load retry ready post list, dbRetValue:%d", MODULE_NAME, FUNC,
+                       dbRetValue);
+            _snwprintf_s(failReason, 0x101, _TRUNCATE, L"failed to load retry ready post list, dbRetValue:%d",
+                         dbRetValue);
+        }
+        else
         {
             _snwprintf_s(failReason, 0x101, _TRUNCATE, L"succeeded to load retry ready post list");
             sendTextReply(session, &reply, command, failReason);
@@ -295,20 +317,8 @@ bool HandlePostOfficeManagementLoadRetryReadyPostListReq(Session const* session,
                        L"[%s], %s; sent retry ready post list load success ack", MODULE_NAME, FUNC);
             Log::Write(Log::LT_DEBUG, MANAGEMENT_PACKET_FILE, 250, L"[%s], %s; <END PACKET HANDLER>",
                        MODULE_NAME, FUNC);
-            reply.Clear();
             return true;
         }
-        Log::Write(Log::LT_ERROR, MANAGEMENT_PACKET_FILE, 238,
-                   L"[%s], %s; failed to load retry ready post list, dbRetValue:%d", MODULE_NAME, FUNC,
-                   dbRetValue);
-        _snwprintf_s(failReason, 0x101, _TRUNCATE, L"failed to load retry ready post list, dbRetValue:%d",
-                     dbRetValue);
-    }
-    else
-    {
-        Log::Write(Log::LT_ERROR, MANAGEMENT_PACKET_FILE, 230, L"[%s], %s; failed to decompose packet",
-                   MODULE_NAME, FUNC);
-        _snwprintf_s(failReason, 0x101, _TRUNCATE, L"failed to decompose packet");
     }
 
     sendTextReply(session, &reply, command, failReason);
@@ -316,6 +326,5 @@ bool HandlePostOfficeManagementLoadRetryReadyPostListReq(Session const* session,
                MODULE_NAME, FUNC);
     Log::Write(Log::LT_DEBUG, MANAGEMENT_PACKET_FILE, 258, L"[%s], %s; <END PACKET HANDLER>", MODULE_NAME,
                FUNC);
-    reply.Clear();
     return true;
 }

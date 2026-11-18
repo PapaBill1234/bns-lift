@@ -1890,11 +1890,11 @@
 "status": "MATCH"
 },
 "ManagerSessionHandler::PacketHandler": {
-"calls": 80,
-"consts": 67,
+"calls": 100,
+"consts": 100,
 "refs": 100,
-"score": 82.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "MaskGenerator::generate": {
 "calls": 100,

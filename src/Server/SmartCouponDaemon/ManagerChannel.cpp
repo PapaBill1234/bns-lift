@@ -94,45 +94,51 @@ bool ManagerSessionHandler::PacketHandler(Session const* session, Packet const* 
         return false;
     }
 
-    unsigned long long id = session->_id;
-    if (packet->CurHeader == reinterpret_cast<Packet::Header*>(-2))
+    short const* const pCmd = &packet->CurHeader[1].size;
+    if (pCmd == nullptr)
     {
         Log::Write(Log::LT_ERROR, MANAGERCHANNEL_FILE, 69,
                    L"[ManagerSessionHandler], invalid packet; command is null, cmd:0x%p, sessionId:0x%I64X, portId:%u, "
                    L"sessionIndex:%u",
-                   static_cast<void*>(nullptr), id, static_cast<unsigned int>(id >> 32), static_cast<unsigned int>(id));
+                   static_cast<void*>(nullptr), session->_id, static_cast<unsigned int>(session->_id >> 32),
+                   static_cast<unsigned int>(session->_id));
         return false;
     }
-    short cmd = (packet->CurHeader + 1)->size;
 
     Channel* channel = session->GetChannel();
-    if (channel != nullptr)
+    bool result = false;
+    if (channel == nullptr)
     {
-        bool result = false;
-        if (cmd >= 1 && cmd < 10 && SmartCouponManagerPacketSmartCouponSideHandlerList[cmd] != nullptr)
+        if (*pCmd == 1 && SmartCouponManagerPacketSmartCouponSideHandlerList[1] != nullptr)
         {
-            result = SmartCouponManagerPacketSmartCouponSideHandlerList[cmd](session, packet);
+            result = SmartCouponManagerPacketSmartCouponSideHandlerList[1](session, packet);
+        }
+        else
+        {
+            Log::Write(Log::LT_ERROR, MANAGERCHANNEL_FILE, 84,
+                       L"[ManagerSessionHandler], invalid packet command of not authorized session, command:%d, "
+                       L"sessionId:0x%I64X, portId:%u, sessionIndex:%u",
+                       static_cast<int>(*pCmd), session->_id, static_cast<unsigned int>(session->_id >> 32),
+                       static_cast<unsigned int>(session->_id));
+        }
+    }
+    else
+    {
+        if (*pCmd >= 1 && *pCmd < 10 && SmartCouponManagerPacketSmartCouponSideHandlerList[*pCmd] != nullptr)
+        {
+            result = SmartCouponManagerPacketSmartCouponSideHandlerList[*pCmd](session, packet);
         }
         else
         {
             Log::Write(Log::LT_ERROR, MANAGERCHANNEL_FILE, 96,
                        L"[ManagerSessionHandler], invalid manager packet command, command:%d, managerWid:%u, "
                        L"sessionId:0x%I64X, portId:%u, sessionIndex:%u",
-                       cmd, static_cast<unsigned int>(channel->GetId()), id, static_cast<unsigned int>(id >> 32),
-                       static_cast<unsigned int>(id));
+                       static_cast<int>(*pCmd), static_cast<unsigned int>(channel->GetId()), session->_id,
+                       static_cast<unsigned int>(session->_id >> 32), static_cast<unsigned int>(session->_id));
         }
         channel->removeReferenceCount(MANAGERCHANNEL_FILE, 101);
-        return result;
     }
-
-    if (cmd == 1 && SmartCouponManagerPacketSmartCouponSideHandlerList[1] != nullptr)
-        return SmartCouponManagerPacketSmartCouponSideHandlerList[1](session, packet);
-
-    Log::Write(Log::LT_ERROR, MANAGERCHANNEL_FILE, 84,
-               L"[ManagerSessionHandler], invalid packet command of not authorized session, command:%d, "
-               L"sessionId:0x%I64X, portId:%u, sessionIndex:%u",
-               cmd, id, static_cast<unsigned int>(id >> 32), static_cast<unsigned int>(id));
-    return false;
+    return result;
 }
 
 // 0xeb80

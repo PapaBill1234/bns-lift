@@ -18,6 +18,7 @@ extern Daemon::PacketHandler PostOfficePacketServerSideFragmentHandlerList[7];
 namespace
 {
 wchar_t const* const AGENT_CHANNEL_FILE = L"AgentChannel.cpp";  // LIFT: No PDB symbol. The binary uses the literal.
+wchar_t const* const SESSION_FILE = L"source\\Session.cpp";
 static wchar_t const* const MODULE_NAME = L"agent channel";  // PDB MODULE_NAME
 }
 
@@ -119,45 +120,58 @@ void AgentSessionHandler::OnClose(Session const* session, bool tryReconnect) con
 // 0x3a00
 bool AgentSessionHandler::PacketHandler(Session const* session, Packet const* packet) const
 {
-    unsigned long long const sessionId = session->_id;
-    if (packet->CurHeader == nullptr)
+    void* iocpHandle = nullptr;
+    short const* const pCmd = &packet->CurHeader[1].size;
+    if (pCmd == nullptr)
     {
         Log::Write(Log::LT_ERROR, AGENT_CHANNEL_FILE, 151,
                    L"[%s], %s; invalid packet; command is null, cmd:0x%p, sessionId:0x%I64X, portId:%u, sessionIndex:%u",
-                   MODULE_NAME, L"AgentSessionHandler::PacketHandler", static_cast<void*>(nullptr), sessionId,
-                   static_cast<unsigned int>(sessionId >> 32), static_cast<unsigned int>(sessionId));
+                   MODULE_NAME, L"AgentSessionHandler::PacketHandler", static_cast<void*>(nullptr), session->_id,
+                   static_cast<unsigned int>(session->_id >> 32), static_cast<unsigned int>(session->_id));
         return false;
     }
 
-    short const cmd = reinterpret_cast<Packet::Header const*>(packet->CurHeader)[1].size;
-    AgentChannel* const channel = static_cast<AgentChannel*>(session->GetChannel());
+    // LIFT: Inlined Session::GetChannel with the add-ref (Session.cpp line 1051).
+    AgentChannel* channel = nullptr;
+    if (session->_channel != nullptr && !session->_waitForRelease)
+    {
+        session->_channel->addReferenceCount(SESSION_FILE, 1051);
+        channel = static_cast<AgentChannel*>(session->_channel);
+    }
+    bool result = false;
     if (channel == nullptr)
     {
         // Only the hello request is allowed before the session has a channel.
-        if (cmd == 1 && PostOfficePacketServerSideHandlerList[1] != nullptr)
-            return PostOfficePacketServerSideHandlerList[1](session, packet);
-        Log::Write(Log::LT_ERROR, AGENT_CHANNEL_FILE, 168,
-                   L"[%s], %s; invalid packet command of not authorized session, command:%d, sessionId:0x%I64X, portId:%u, sessionIndex:%u",
-                   MODULE_NAME, L"AgentSessionHandler::PacketHandler", static_cast<int>(cmd), sessionId,
-                   static_cast<unsigned int>(sessionId >> 32), static_cast<unsigned int>(sessionId));
-        return false;
-    }
-
-    bool result = false;
-    if (cmd > 0 && cmd < 7 && PostOfficePacketServerSideHandlerList[cmd] != nullptr)
-    {
-        // LIFT: LTCG folded the event id and the offset. The values come from the LobbyGate call.
-        result = TFPP_PumpPacket(128, Network::iocpHandle(), session, packet, cmd, 0,
-                                 PostOfficePacketServerSideHandlerList, PostOfficePacketServerSideFragmentHandlerList);
+        if (*pCmd == 1 && PostOfficePacketServerSideHandlerList[1] != nullptr)
+        {
+            result = PostOfficePacketServerSideHandlerList[1](session, packet);
+        }
+        else
+        {
+            Log::Write(Log::LT_ERROR, AGENT_CHANNEL_FILE, 168,
+                       L"[%s], %s; invalid packet command of not authorized session, command:%d, sessionId:0x%I64X, portId:%u, sessionIndex:%u",
+                       MODULE_NAME, L"AgentSessionHandler::PacketHandler", static_cast<int>(*pCmd), session->_id,
+                       static_cast<unsigned int>(session->_id >> 32), static_cast<unsigned int>(session->_id));
+        }
     }
     else
     {
-        Log::Write(Log::LT_ERROR, AGENT_CHANNEL_FILE, 181,
-                   L"[%s], %s; invalid clientagent packet command, command:%d, agentWid:%u, connectionType:%d, sessionId:0x%I64X, portId:%u, sessionIndex:%u",
-                   MODULE_NAME, L"AgentSessionHandler::PacketHandler", static_cast<int>(cmd),
-                   static_cast<unsigned int>(channel->_agentWid), static_cast<int>(channel->_connectionType), sessionId,
-                   static_cast<unsigned int>(sessionId >> 32), static_cast<unsigned int>(sessionId));
+        if (*pCmd > 0 && *pCmd < 7 && PostOfficePacketServerSideHandlerList[*pCmd] != nullptr)
+        {
+            // LIFT: LTCG folded the event id and the offset. The values come from the LobbyGate call.
+            iocpHandle = Network::iocpHandle();
+            result = TFPP_PumpPacket(128, iocpHandle, session, packet, *pCmd, 0,
+                                     PostOfficePacketServerSideHandlerList, PostOfficePacketServerSideFragmentHandlerList);
+        }
+        else
+        {
+            Log::Write(Log::LT_ERROR, AGENT_CHANNEL_FILE, 181,
+                       L"[%s], %s; invalid clientagent packet command, command:%d, agentWid:%u, connectionType:%d, sessionId:0x%I64X, portId:%u, sessionIndex:%u",
+                       MODULE_NAME, L"AgentSessionHandler::PacketHandler", static_cast<int>(*pCmd),
+                       static_cast<unsigned int>(channel->_agentWid), static_cast<int>(channel->_connectionType), session->_id,
+                       static_cast<unsigned int>(session->_id >> 32), static_cast<unsigned int>(session->_id));
+        }
+        channel->removeReferenceCount(AGENT_CHANNEL_FILE, 184);
     }
-    channel->removeReferenceCount(AGENT_CHANNEL_FILE, 184);
     return result;
 }

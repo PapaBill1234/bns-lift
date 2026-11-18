@@ -55,7 +55,13 @@ unsigned short WorldChannel::GetWid(Session const* session)
         return 0;
     }
     unsigned short wid = 0;
-    WorldChannel* const channel = static_cast<WorldChannel*>(session->GetChannel());
+    // LIFT: Inlined Session::GetChannel with the add-ref (Session.cpp line 1051).
+    WorldChannel* channel = nullptr;
+    if (session->_channel != nullptr && !session->_waitForRelease)
+    {
+        session->_channel->addReferenceCount(SESSION_FILE, 1051);
+        channel = static_cast<WorldChannel*>(session->_channel);
+    }
     if (channel != nullptr)
     {
         wid = channel->_wid;
@@ -284,46 +290,59 @@ void WorldSessionHandler::OnClose(Session const* session, bool tryReconnect) con
 // 0x1f270
 bool WorldSessionHandler::PacketHandler(Session const* session, Packet const* packet) const
 {
-    unsigned long long const sessionId = session->_id;
-    if (packet->CurHeader == nullptr)
+    void* iocpHandle = nullptr;
+    short const* const pCmd = &packet->CurHeader[1].size;
+    if (pCmd == nullptr)
     {
         Log::Write(Log::LT_ERROR, WORLD_CHANNEL_FILE, 255,
                    L"[%s], %s; invalid packet; command is null, cmd:0x%p, sessionId:0x%I64X, portId:%u, sessionIndex:%u",
-                   MODULE_NAME, L"WorldSessionHandler::PacketHandler", static_cast<void*>(nullptr), sessionId,
-                   static_cast<unsigned int>(sessionId >> 32), static_cast<unsigned int>(sessionId));
+                   MODULE_NAME, L"WorldSessionHandler::PacketHandler", static_cast<void*>(nullptr), session->_id,
+                   static_cast<unsigned int>(session->_id >> 32), static_cast<unsigned int>(session->_id));
         return false;
     }
 
-    short const cmd = reinterpret_cast<Packet::Header const*>(packet->CurHeader)[1].size;
-    WorldChannel* const channel = static_cast<WorldChannel*>(session->GetChannel());
+    // LIFT: Inlined Session::GetChannel with the add-ref (Session.cpp line 1051).
+    WorldChannel* channel = nullptr;
+    if (session->_channel != nullptr && !session->_waitForRelease)
+    {
+        session->_channel->addReferenceCount(SESSION_FILE, 1051);
+        channel = static_cast<WorldChannel*>(session->_channel);
+    }
+    bool result = false;
     if (channel == nullptr)
     {
         // Only the hello request is allowed before the session has a channel.
-        if (cmd == 1 && PostOfficeServicePacketServerSideHandlerList[1] != nullptr)
-            return PostOfficeServicePacketServerSideHandlerList[1](session, packet);
-        Log::Write(Log::LT_ERROR, WORLD_CHANNEL_FILE, 272,
-                   L"[%s], %s; invalid packet command of not authorized world session, command:%d, sessionId:0x%I64X, portId:%u, sessionIndex:%u",
-                   MODULE_NAME, L"WorldSessionHandler::PacketHandler", static_cast<int>(cmd), sessionId,
-                   static_cast<unsigned int>(sessionId >> 32), static_cast<unsigned int>(sessionId));
-        return false;
-    }
-
-    bool result = false;
-    if (cmd > 0 && cmd < 13 && PostOfficeServicePacketServerSideHandlerList[cmd] != nullptr)
-    {
-        // LIFT: LTCG folded the event id and the offset. The values come from the LobbyGate call.
-        result = TFPP_PumpPacket(128, Network::iocpHandle(), session, packet, cmd, 0,
-                                 PostOfficeServicePacketServerSideHandlerList,
-                                 PostOfficeServicePacketServerSideFragmentHandlerList);
+        if (*pCmd == 1 && PostOfficeServicePacketServerSideHandlerList[1] != nullptr)
+        {
+            result = PostOfficeServicePacketServerSideHandlerList[1](session, packet);
+        }
+        else
+        {
+            Log::Write(Log::LT_ERROR, WORLD_CHANNEL_FILE, 272,
+                       L"[%s], %s; invalid packet command of not authorized world session, command:%d, sessionId:0x%I64X, portId:%u, sessionIndex:%u",
+                       MODULE_NAME, L"WorldSessionHandler::PacketHandler", static_cast<int>(*pCmd), session->_id,
+                       static_cast<unsigned int>(session->_id >> 32), static_cast<unsigned int>(session->_id));
+        }
     }
     else
     {
-        Log::Write(Log::LT_ERROR, WORLD_CHANNEL_FILE, 284,
-                   L"[%s], %s; invalid packet command of world session, command:%d, wid:%u, sessionId:0x%I64X, portId:%u, sessionIndex:%u",
-                   MODULE_NAME, L"WorldSessionHandler::PacketHandler", static_cast<int>(cmd),
-                   static_cast<unsigned int>(channel->_wid), sessionId, static_cast<unsigned int>(sessionId >> 32),
-                   static_cast<unsigned int>(sessionId));
+        if (*pCmd > 0 && *pCmd < 13 && PostOfficeServicePacketServerSideHandlerList[*pCmd] != nullptr)
+        {
+            // LIFT: LTCG folded the event id and the offset. The values come from the LobbyGate call.
+            iocpHandle = Network::iocpHandle();
+            result = TFPP_PumpPacket(128, iocpHandle, session, packet, *pCmd, 0,
+                                     PostOfficeServicePacketServerSideHandlerList,
+                                     PostOfficeServicePacketServerSideFragmentHandlerList);
+        }
+        else
+        {
+            Log::Write(Log::LT_ERROR, WORLD_CHANNEL_FILE, 284,
+                       L"[%s], %s; invalid packet command of world session, command:%d, wid:%u, sessionId:0x%I64X, portId:%u, sessionIndex:%u",
+                       MODULE_NAME, L"WorldSessionHandler::PacketHandler", static_cast<int>(*pCmd),
+                       static_cast<unsigned int>(channel->_wid), session->_id, static_cast<unsigned int>(session->_id >> 32),
+                       static_cast<unsigned int>(session->_id));
+        }
+        channel->removeReferenceCount(WORLD_CHANNEL_FILE, 287);
     }
-    channel->removeReferenceCount(WORLD_CHANNEL_FILE, 287);
     return result;
 }
