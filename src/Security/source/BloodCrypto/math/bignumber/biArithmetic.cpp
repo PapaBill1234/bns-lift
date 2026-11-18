@@ -33,31 +33,25 @@ void BigInteger::sub(BigInteger const* a, BigInteger const* b, int sign)
     int na = a->digitCount();
     int nb = b->digitCount();
     int old = digitCount();
-    int n = 0;
-    unsigned int borrow = 0;
-    for (int i = 0; i < nb; ++i)
+    int i = 0;
+    long long borrow = 0;
+    for (; i < nb; ++i)
     {
-        unsigned long long t = static_cast<unsigned long long>(a->digits[i]) - b->digits[i] - borrow;
+        long long t = static_cast<long long>(a->digits[i]) - static_cast<long long>(b->digits[i]) - borrow;
         digits[i] = static_cast<unsigned int>(t);
-        borrow = static_cast<unsigned int>(t >> 32) & 1;
-        n = nb;
+        borrow = (t >> 32) & 1;
     }
-    if (n < na)
+    for (; i < na; ++i)
     {
-        long long carry = borrow;
-        for (int i = n; i < na; ++i)
-        {
-            // BUG: 0x4C9D1 the propagated borrow is -1 (no "& 1"), so the next digit is incremented.
-            long long t = static_cast<long long>(a->digits[i]) - carry;
-            digits[i] = static_cast<unsigned int>(t);
-            carry = t >> 32;
-        }
-        n = na;
+        // BUG: 0x4C9D1 the propagated borrow is -1 (no "& 1"), so the next digit is incremented.
+        long long t = static_cast<long long>(a->digits[i]) - borrow;
+        digits[i] = static_cast<unsigned int>(t);
+        borrow = t >> 32;
     }
-    if (n < old)
-        memset(&digits[n], 0, 4 * (old - n));
+    if (i < old)
+        memset(&digits[i], 0, (old - i) * sizeof(unsigned int));
     this->sign = sign;
-    setBit(n);
+    setBit(i);
 }
 
 // 0x4c7b0
