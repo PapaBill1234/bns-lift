@@ -918,7 +918,8 @@ bool Session::sendNext(unsigned long sentSize)
 }
 
 // 0xFE90
-bool Session::send(PacketBuffer const** const pbufferList, int count) const
+// LIFT: noinline. LG 0x19360 calls it out of line in ClientManager::broadcast. VS2010 /LTCG inlined it there. CG, SCD, POD: no change.
+__declspec(noinline) bool Session::send(PacketBuffer const** const pbufferList, int count) const
 {
     Session* self = const_cast<Session*>(this);
     if (_state != CONNECTED || _connection->_socket == INVALID_SOCKET)

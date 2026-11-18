@@ -658,18 +658,18 @@
 "status": "MATCH"
 },
 "ClientManager::Finalize": {
-"calls": 76,
-"consts": 83,
-"refs": 71,
-"score": 77.0,
+"calls": 100,
+"consts": 86,
+"refs": 100,
+"score": 95.2,
 "status": "DIFF"
 },
 "ClientManager::Initialize": {
-"calls": 57,
-"consts": 33,
-"refs": 0,
-"score": 30.2,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "ClientManager::RemoveClient": {
 "calls": 100,
@@ -679,11 +679,11 @@
 "status": "MATCH"
 },
 "ClientManager::broadcast": {
-"calls": 81,
-"consts": 77,
-"refs": 73,
-"score": 76.9,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "ClientPacketBufferHandler::Clone": {
 "calls": 100,
@@ -944,6 +944,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"CriticalSection::CriticalSection": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "CriticalSection::~CriticalSection": {
 "calls": 100,
 "consts": 100,
@@ -1072,9 +1079,9 @@
 },
 "Daemon::setAddress": {
 "calls": 100,
-"consts": 98,
+"consts": 92,
 "refs": 100,
-"score": 99.3,
+"score": 97.2,
 "status": "DIFF"
 },
 "Daemon::setCurrentDirectory": {
@@ -1205,9 +1212,9 @@
 },
 "Dh::getValue": {
 "calls": 67,
-"consts": 82,
+"consts": 78,
 "refs": 0,
-"score": 49.5,
+"score": 48.3,
 "status": "DIFF"
 },
 "Dh::setupFactors": {
@@ -1435,10 +1442,10 @@
 "status": "MATCH"
 },
 "GateKeyManager::Finalize": {
-"calls": 67,
-"consts": 84,
-"refs": 73,
-"score": 74.7,
+"calls": 100,
+"consts": 91,
+"refs": 100,
+"score": 97.0,
 "status": "DIFF"
 },
 "GateKeyManager::GetGKEntry": {
@@ -1456,11 +1463,11 @@
 "status": "MATCH"
 },
 "GateKeyManager::Initialize": {
-"calls": 53,
-"consts": 44,
-"refs": 0,
-"score": 32.6,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "GateKeyManager::MakeGateKey": {
 "calls": 89,
@@ -2451,9 +2458,9 @@
 },
 "Network::GetAddressStringW": {
 "calls": 100,
-"consts": 75,
+"consts": 50,
 "refs": 100,
-"score": 91.7,
+"score": 83.3,
 "status": "DIFF"
 },
 "Network::Initialize": {
@@ -5024,6 +5031,13 @@
 "refs": 0,
 "score": 0.0,
 "status": "DIFF"
+},
+"operator delete[]": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "os2i": {
 "calls": 100,

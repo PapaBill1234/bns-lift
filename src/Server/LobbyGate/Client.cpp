@@ -2,6 +2,8 @@
 // LIFT: LobbyGate, upper case form build path of StlMemory.h (from the HR strings).
 #define LIFT_STLMEMORY_FILE \
     L"E:\\DailyBuild02\\LobbyGate-Common-0.0.348\\depot\\Branch\\348NC\\Program\\Server\\BloodLib\\include\\StlMemory.h"
+// LIFT: the original Memory.h (line 181) gives its own placement array new and delete. This stops <new> from giving them.
+#define __PLACEMENT_VEC_NEW_INLINE
 #include "Daemon.h"
 #include "Network.h"
 #include <new>
@@ -22,6 +24,35 @@
 #include "LobbyGatePacketHandler.h"
 #include "LobbyGatePredefine.h"
 
+// PDB S_GTHREAD32 (void*, .tls +0x20). The original operator delete[] only keeps the pointer here. ❓ module of the definition.
+__declspec(thread) void* __delv_buf__;
+
+// LIFT: inlined in GateKeyManager::Finalize 0x3b10 and ClientManager::Finalize 0x5cf0. No exe imports ??_V@YAXPEAX@Z.
+inline void __cdecl operator delete[](void* p)
+{
+    __delv_buf__ = p;
+}
+
+inline void* __cdecl operator new[](size_t, void* buf) throw()
+{
+    return buf;
+}
+
+// 0x37a0
+inline void __cdecl operator delete[](void*, void*)
+{
+    Log::Write(Log::LT_ERROR,
+               L"e:\\dailybuild02\\lobbygate-common-0.0.348\\depot\\branch\\348nc\\program\\server\\bloodlib\\include\\Memory.h",
+               181, L"== CRASH == [memory], DO NOT USE THIS DEL OPERATOR");
+    AlertSender::Write(
+        L"e:\\dailybuild02\\lobbygate-common-0.0.348\\depot\\branch\\348nc\\program\\server\\bloodlib\\include\\Memory.h",
+        181, L"== CRASH == [memory], DO NOT USE THIS DEL OPERATOR");
+}
+
+// LIFT: placement array new on Memory::_Manager[1] (GateKeyManager::Initialize 0x3910, ClientManager::Initialize 0x5b90).
+#define liftArrayNew1(T, count, line) \
+    (new (Memory::_Manager[1]->Alloc(sizeof(T) * static_cast<long long>(count) + 8, L"Client.cpp", line)) T[count])
+
 namespace
 {
 wchar_t const* const CLIENT_FILE = L"Client.cpp";
@@ -31,33 +62,6 @@ wchar_t const* const CHANNEL_H_FILE =
 
 // PDB S_UDT ClientList (LobbyGate type 0x2A2F, in ClientManager::DisconnectAll).
 typedef std::vector<Client*, StlAllocator<Client*, 2> > ClientList;
-
-// LIFT: Inlined array new: the element count is in the first 8 bytes, then each element is constructed.
-template <class T>
-T* newArray(int count, int line)
-{
-    void* mem = Memory::_Manager[1]->Alloc(count * sizeof(T) + 8, CLIENT_FILE, line);
-    if (mem == nullptr)
-        return nullptr;
-    *static_cast<unsigned long long*>(mem) = static_cast<unsigned long long>(count);
-    T* list = reinterpret_cast<T*>(static_cast<char*>(mem) + 8);
-    for (int i = 0; i < count; ++i)
-        new (&list[i]) T();
-    return list;
-}
-
-// LIFT: Inlined array delete: destroy each element, then free the block.
-template <class T>
-void deleteArray(T* list, int line)
-{
-    if (list == nullptr)
-        return;
-    char* base = reinterpret_cast<char*>(list) - 8;
-    unsigned long long count = *reinterpret_cast<unsigned long long*>(base);
-    for (unsigned long long i = count; i > 0; --i)
-        list[i - 1].~T();
-    Memory::_Manager[1]->Free(base, CLIENT_FILE, line);
-}
 
 // LIFT: inlined FragmentPacket free-size check, e.g. LobbyGate 0x482b-0x485c (4000 - CurHeader->size < need, then Packet::Allocate).
 static __forceinline void reserveFragment(FragmentPacket& fp, int need)
@@ -153,10 +157,10 @@ __declspec(noinline) bool GateKeyManager::Initialize(int hashCount)
 {
     if (hashCount < 1)
         return false;
-    _gkMap = newArray<GateKeyManager::GKEMapType>(hashCount, 86);
-    _gkLock = newArray<CriticalSection>(hashCount, 87);
-    _sgkMap = newArray<GateKeyManager::SessionGateKeyMapType>(hashCount, 89);
-    _sgkLock = newArray<CriticalSection>(hashCount, 90);
+    _gkMap = liftArrayNew1(GateKeyManager::GKEMapType, hashCount, 86);
+    _gkLock = liftArrayNew1(CriticalSection, hashCount, 87);
+    _sgkMap = liftArrayNew1(GateKeyManager::SessionGateKeyMapType, hashCount, 89);
+    _sgkLock = liftArrayNew1(CriticalSection, hashCount, 90);
     _hashCount = hashCount;
     _tidSeed = 0;
     return true;
@@ -169,12 +173,14 @@ void GateKeyManager::Finalize()
     {
         for (int i = 0; i < _hashCount; ++i)
             _sgkMap[i].clear();
-        deleteArray(_sgkMap, 107);
+        delete[] _sgkMap;
+        Memory::_Manager[1]->Free(__delv_buf__, L"Client.cpp", 107);
         _sgkMap = nullptr;
     }
     if (_sgkLock != nullptr)
     {
-        deleteArray(_sgkLock, 111);
+        delete[] _sgkLock;
+        Memory::_Manager[1]->Free(__delv_buf__, L"Client.cpp", 111);
         _sgkLock = nullptr;
     }
     if (_gkMap != nullptr)
@@ -191,12 +197,14 @@ void GateKeyManager::Finalize()
             }
             _gkMap[i].clear();
         }
-        deleteArray(_gkMap, 125);
+        delete[] _gkMap;
+        Memory::_Manager[1]->Free(__delv_buf__, L"Client.cpp", 125);
         _gkMap = nullptr;
     }
     if (_gkLock != nullptr)
     {
-        deleteArray(_gkLock, 129);
+        delete[] _gkLock;
+        Memory::_Manager[1]->Free(__delv_buf__, L"Client.cpp", 129);
         _gkLock = nullptr;
     }
     _hashCount = 0;
@@ -479,8 +487,8 @@ __declspec(noinline) bool ClientManager::Initialize(int hashCount)
 {
     if (hashCount < 1)
         return false;
-    _cliMap = newArray<ClientManager::CliMapType>(hashCount, 679);
-    _cliLock = newArray<CriticalSection>(hashCount, 680);
+    _cliMap = liftArrayNew1(ClientManager::CliMapType, hashCount, 679);
+    _cliLock = liftArrayNew1(CriticalSection, hashCount, 680);
     _hashCount = hashCount;
     return true;
 }
@@ -505,12 +513,14 @@ void ClientManager::Finalize()
             _cliMap[i].clear();
             _cliLock[i].Leave();
         }
-        deleteArray(_cliMap, 709);
+        delete[] _cliMap;
+        Memory::_Manager[1]->Free(__delv_buf__, L"Client.cpp", 709);
         _cliMap = nullptr;
     }
     if (_cliLock != nullptr)
     {
-        deleteArray(_cliLock, 713);
+        delete[] _cliLock;
+        Memory::_Manager[1]->Free(__delv_buf__, L"Client.cpp", 713);
         _cliLock = nullptr;
     }
     _hashCount = 0;
