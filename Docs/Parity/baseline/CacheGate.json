@@ -126,11 +126,11 @@
 "status": "MATCH"
 },
 "AlertSender::run": {
-"calls": 93,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 97.8,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "AlertSender::sendRemain": {
 "calls": 100,
@@ -211,10 +211,10 @@
 },
 "Blowfish::Setup": {
 "calls": 100,
-"consts": 95,
+"consts": 100,
 "refs": 100,
-"score": 98.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "BnsCommonConfig::CheckMinMaxBoundary": {
 "calls": 100,
@@ -720,6 +720,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Console::Flush": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Console::GetType": {
 "calls": 100,
 "consts": 100,
@@ -876,10 +883,10 @@
 },
 "Daemon::setAddress": {
 "calls": 100,
-"consts": 98,
+"consts": 100,
 "refs": 100,
-"score": 99.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Daemon::setCurrentDirectory": {
 "calls": 100,
@@ -1414,11 +1421,11 @@
 "status": "MATCH"
 },
 "LogMedia::Write": {
-"calls": 55,
-"consts": 57,
-"refs": 29,
-"score": 46.8,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Memory::CreateManager": {
 "calls": 100,
@@ -1430,8 +1437,8 @@
 "Network::Clear": {
 "calls": 100,
 "consts": 93,
-"refs": 95,
-"score": 96.0,
+"refs": 98,
+"score": 97.2,
 "status": "DIFF"
 },
 "Network::ClosePort": {
@@ -1443,10 +1450,10 @@
 },
 "Network::GetAddressStringW": {
 "calls": 100,
-"consts": 75,
+"consts": 100,
 "refs": 100,
-"score": 91.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Network::Initialize": {
 "calls": 100,
@@ -1458,9 +1465,9 @@
 "Network::Network": {
 "calls": 100,
 "consts": 100,
-"refs": 96,
-"score": 98.8,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Network::OpenPort": {
 "calls": 92,
@@ -1485,10 +1492,10 @@
 },
 "Network::initWorkerThread": {
 "calls": 100,
-"consts": 86,
+"consts": 100,
 "refs": 100,
-"score": 95.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Network::initializeSocketInterface": {
 "calls": 100,
@@ -1856,10 +1863,10 @@
 },
 "Port::Initialize": {
 "calls": 100,
-"consts": 96,
+"consts": 100,
 "refs": 100,
-"score": 98.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Port::MakeNewSession [?MakeNewSession@Port@@IEAAPEAVSession@@PEA_KKGH@Z]": {
 "calls": 100,
@@ -2214,9 +2221,9 @@
 "Session::initialize": {
 "calls": 100,
 "consts": 100,
-"refs": 75,
-"score": 91.7,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Session::reconnect": {
 "calls": 100,
@@ -2632,11 +2639,11 @@
 "status": "MATCH"
 },
 "TimerQueue::clearShortTermQueueSlot": {
-"calls": 36,
-"consts": 67,
-"refs": 29,
-"score": 43.9,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "TimerQueue::removeShortTermQueue": {
 "calls": 100,
@@ -2802,8 +2809,8 @@
 "WindowConsole::Open": {
 "calls": 100,
 "consts": 86,
-"refs": 92,
-"score": 92.5,
+"refs": 100,
+"score": 95.2,
 "status": "DIFF"
 },
 "WindowConsole::SetState": {
@@ -3311,11 +3318,11 @@
 "status": "MATCH"
 },
 "operator delete": {
-"calls": 0,
-"consts": 0,
-"refs": 0,
-"score": 0.0,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "pre_c_init": {
 "calls": 100,

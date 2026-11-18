@@ -133,11 +133,11 @@
 "status": "MATCH"
 },
 "AlertSender::run": {
-"calls": 93,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 97.8,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "AlertSender::sendRemain": {
 "calls": 100,
@@ -189,25 +189,25 @@
 "status": "MATCH"
 },
 "BigInteger::Divide": {
-"calls": 83,
+"calls": 75,
 "consts": 89,
 "refs": 67,
-"score": 79.4,
+"score": 76.7,
 "status": "DIFF"
 },
 "BigInteger::InvMod": {
-"calls": 65,
-"consts": 89,
+"calls": 85,
+"consts": 84,
 "refs": 100,
-"score": 84.7,
+"score": 89.7,
 "status": "DIFF"
 },
 "BigInteger::LeftShift": {
-"calls": 67,
-"consts": 88,
-"refs": 0,
-"score": 51.4,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "BigInteger::Mul": {
 "calls": 100,
@@ -259,11 +259,11 @@
 "status": "DIFF"
 },
 "BigInteger::Sub": {
-"calls": 77,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 92.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "BigInteger::absCompare": {
 "calls": 100,
@@ -287,10 +287,10 @@
 "status": "DIFF"
 },
 "BigInteger::invMod": {
-"calls": 41,
+"calls": 59,
 "consts": 90,
 "refs": 100,
-"score": 77.1,
+"score": 83.1,
 "status": "DIFF"
 },
 "BigInteger::leftShiftDigit": {
@@ -301,11 +301,11 @@
 "status": "MATCH"
 },
 "BigInteger::montgomeryNormalize": {
-"calls": 73,
-"consts": 95,
+"calls": 100,
+"consts": 100,
 "refs": 100,
-"score": 89.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "BigInteger::montgomeryReduce": {
 "calls": 100,
@@ -337,10 +337,10 @@
 },
 "BigInteger::sqr": {
 "calls": 100,
-"consts": 94,
+"consts": 100,
 "refs": 100,
-"score": 98.0,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "BigInteger::sub": {
 "calls": 100,
@@ -407,10 +407,10 @@
 },
 "Blowfish::Setup": {
 "calls": 100,
-"consts": 95,
+"consts": 100,
 "refs": 100,
-"score": 98.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "BnsCommonConfig::CheckMinMaxBoundary": {
 "calls": 100,
@@ -497,11 +497,11 @@
 "status": "MATCH"
 },
 "Channel::MakeSession": {
-"calls": 86,
-"consts": 67,
+"calls": 100,
+"consts": 100,
 "refs": 100,
-"score": 84.1,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Channel::RemoveSession": {
 "calls": 100,
@@ -581,6 +581,13 @@
 "status": "MATCH"
 },
 "Console::Console": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Console::Flush": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -723,9 +730,9 @@
 "CryptoKey::Initialize": {
 "calls": 100,
 "consts": 100,
-"refs": 50,
-"score": 83.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Ctr::Decrypt": {
 "calls": 100,
@@ -904,10 +911,10 @@
 },
 "Daemon::setAddress": {
 "calls": 100,
-"consts": 92,
+"consts": 100,
 "refs": 100,
-"score": 97.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Daemon::setCurrentDirectory": {
 "calls": 100,
@@ -1022,11 +1029,11 @@
 "status": "MATCH"
 },
 "DbTransaction::BindCol": {
-"calls": 67,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 88.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "DbTransaction::BindParam": {
 "calls": 100,
@@ -1191,10 +1198,10 @@
 },
 "EventNotiJob::eventNotiExpire": {
 "calls": 100,
-"consts": 86,
+"consts": 100,
 "refs": 100,
-"score": 95.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "EventNotiJob::eventNotiReq": {
 "calls": 88,
@@ -1590,10 +1597,10 @@
 },
 "JobManager::~JobManager": {
 "calls": 100,
-"consts": 89,
+"consts": 100,
 "refs": 100,
-"score": 96.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Log::Add": {
 "calls": 100,
@@ -1841,11 +1848,11 @@
 "status": "MATCH"
 },
 "LogMedia::Write": {
-"calls": 55,
-"consts": 57,
-"refs": 29,
-"score": 46.8,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "ManagerChannel::GetId": {
 "calls": 100,
@@ -1933,17 +1940,17 @@
 },
 "NPChannel::SendMsg": {
 "calls": 94,
-"consts": 84,
-"refs": 86,
-"score": 87.9,
+"consts": 90,
+"refs": 87,
+"score": 90.1,
 "status": "DIFF"
 },
 "NPChannel::Setup": {
 "calls": 100,
 "consts": 100,
-"refs": 98,
-"score": 99.4,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "NPChannel::checkLibError": {
 "calls": 100,
@@ -1968,10 +1975,10 @@
 },
 "NPChannel::sendInitialConnectMessage": {
 "calls": 100,
-"consts": 89,
+"consts": 100,
 "refs": 100,
-"score": 96.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "NPChannel::~NPChannel": {
 "calls": 100,
@@ -2137,8 +2144,8 @@
 "Network::Clear": {
 "calls": 100,
 "consts": 93,
-"refs": 95,
-"score": 96.0,
+"refs": 98,
+"score": 97.2,
 "status": "DIFF"
 },
 "Network::ClosePort": {
@@ -2150,10 +2157,10 @@
 },
 "Network::GetAddressStringW": {
 "calls": 100,
-"consts": 50,
+"consts": 100,
 "refs": 100,
-"score": 83.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Network::Initialize": {
 "calls": 100,
@@ -2165,9 +2172,9 @@
 "Network::Network": {
 "calls": 100,
 "consts": 100,
-"refs": 89,
-"score": 96.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Network::OpenPort [?OpenPort@Network@@SA_NI@Z]": {
 "calls": 100,
@@ -2199,10 +2206,10 @@
 },
 "Network::initWorkerThread": {
 "calls": 100,
-"consts": 86,
+"consts": 100,
 "refs": 100,
-"score": 95.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Network::initializeSocketInterface": {
 "calls": 100,
@@ -2640,10 +2647,10 @@
 },
 "Port::Initialize": {
 "calls": 100,
-"consts": 94,
+"consts": 100,
 "refs": 100,
-"score": 98.0,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Port::MakeNewSession [?MakeNewSession@Port@@IEAAPEAVSession@@PEA_KKGH@Z]": {
 "calls": 100,
@@ -3003,11 +3010,11 @@
 "status": "MATCH"
 },
 "SendPublicationEvent::HandleEvent": {
-"calls": 89,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 96.5,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "SendRetryCouponPublicationFailEvent::EventId": {
 "calls": 100,
@@ -3145,9 +3152,9 @@
 "Session::initialize": {
 "calls": 100,
 "consts": 100,
-"refs": 75,
-"score": 91.7,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Session::reconnect": {
 "calls": 100,
@@ -3514,11 +3521,11 @@
 "status": "MATCH"
 },
 "SmartCouponDaemon::reload": {
-"calls": 90,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 96.6,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "SmartCouponDaemon::setArgument": {
 "calls": 100,
@@ -3871,11 +3878,11 @@
 "status": "MATCH"
 },
 "TimerQueue::clearShortTermQueueSlot": {
-"calls": 36,
-"consts": 67,
-"refs": 29,
-"score": 43.9,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "TimerQueue::removeShortTermQueue": {
 "calls": 100,
@@ -4041,8 +4048,8 @@
 "WindowConsole::Open": {
 "calls": 100,
 "consts": 86,
-"refs": 92,
-"score": 92.5,
+"refs": 100,
+"score": 95.2,
 "status": "DIFF"
 },
 "WindowConsole::SetState": {
@@ -4557,11 +4564,11 @@
 "status": "MATCH"
 },
 "operator delete": {
-"calls": 0,
-"consts": 0,
-"refs": 0,
-"score": 0.0,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "operator delete[]": {
 "calls": 100,

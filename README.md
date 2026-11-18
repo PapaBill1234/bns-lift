@@ -1,29 +1,29 @@
 # bns-lift
 
-PRIVATE. C++ lift of the 2019 + PDB BnS server executables.
+C++ lift of the 2019 + PDB BnS server executables.
 
 - Plan: [Docs/Plan/plan.md](Docs/Plan/plan.md)
 - Build: clang-cl + lld-link with Wine headers. Run with wine64.
 - Gate: `tools/gate.sh`
 
-Do not push this code to a public repo. Do not commit binaries or keys.
+This repo is public. Do not commit binaries, keys, PDBs or IDA databases.
 
 ## Parity
 
 <!-- parity:start -->
-Last update: card `lift-parity-handlers-3` (2026-11-18). Tool: `tools/parity.sh` (VS2010 /GL /LTCG build vs original, funcdiff).
+Last update: card `manual-parity (astra + opus 6.2)` (2026-11-18). Tool: `tools/parity.sh` (VS2010 /GL /LTCG build vs original, funcdiff).
 
 | Exe | Parity | MATCH | DIFF | Only in original | Total | Mean score | Start | Change | Level |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| CacheGate | **88.8 %** | 436 | 51 | 4 | 491 | 98.8 | 44.0 % | +44.8 | below 90 % |
-| LobbyGate | **81.3 %** | 601 | 133 | 5 | 739 | 97.9 | 37.9 % | +43.4 | below 90 % |
-| SmartCouponDaemon | **83.3 %** | 557 | 109 | 3 | 669 | 98.3 | 33.6 % | +49.6 | below 90 % |
-| PostOfficeDaemon | **85.0 %** | 645 | 108 | 6 | 759 | 98.4 | 34.5 % | +50.5 | below 90 % |
-| **All 4** | **84.2 %** | 2239 | | | 2658 | | 37.0 % | +47.3 | below 90 % |
+| CacheGate | **91.2 %** | 448 | 40 | 3 | 491 | 99.3 | 44.0 % | +47.3 | 90 % ✅ |
+| LobbyGate | **84.8 %** | 627 | 109 | 3 | 739 | 98.5 | 37.9 % | +47.0 | below 90 % |
+| SmartCouponDaemon | **87.0 %** | 582 | 85 | 2 | 669 | 98.9 | 33.6 % | +53.4 | below 90 % |
+| PostOfficeDaemon | **87.6 %** | 665 | 89 | 5 | 759 | 98.7 | 34.5 % | +53.1 | below 90 % |
+| **All 4** | **87.4 %** | 2322 | | | 2658 | | 37.0 % | +50.4 | below 90 % |
 
 | Shared library (functions in 2+ exes) | Parity | MATCH in each exe | DIFF in 1+ exe | Total | Goal |
 | --- | ---: | ---: | ---: | ---: | --- |
-| BloodLib, Shared, Packet, CRT | **85.4 %** | 467 | 80 | 547 | 99 % |
+| BloodLib, Shared, Packet, CRT | **89.3 %** | 490 | 59 | 549 | 99 % |
 
 Goal: 95 % per exe, 99 % preferred. Shared library: 99 % preferred. Rules: [Docs/Parity/README.md](Docs/Parity/README.md). History: [Docs/Parity/progress.tsv](Docs/Parity/progress.tsv).
 
@@ -55,4 +55,5 @@ Goal: 95 % per exe, 99 % preferred. Shared library: 99 % preferred. Rules: [Docs
 | `lift-parity-consts-3` | 88.8 % | 80.5 % | 83.1 % | 83.9 % |
 | `lift-parity-arraynew-3` | 88.8 % | 81.2 % | 83.1 % | 83.9 % |
 | `lift-parity-handlers-3` | 88.8 % | 81.3 % | 83.3 % | 85.0 % |
+| `manual-parity (astra + opus 6.2)` | 91.2 % | 84.8 % | 87.0 % | 87.6 % |
 <!-- parity:end -->
