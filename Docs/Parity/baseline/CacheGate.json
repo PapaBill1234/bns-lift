@@ -784,11 +784,11 @@
 "status": "MATCH"
 },
 "CrashHandler::handleCrash": {
-"calls": 97,
+"calls": 100,
 "consts": 100,
-"refs": 94,
-"score": 97.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "CriticalSection::~CriticalSection": {
 "calls": 100,
@@ -1127,10 +1127,10 @@
 "status": "MATCH"
 },
 "InitSymbol": {
-"calls": 91,
+"calls": 94,
 "consts": 100,
-"refs": 95,
-"score": 95.4,
+"refs": 100,
+"score": 98.0,
 "status": "DIFF"
 },
 "IoWorker::Initialize": {
@@ -1197,11 +1197,11 @@
 "status": "MATCH"
 },
 "Log::Initialize": {
-"calls": 80,
-"consts": 80,
-"refs": 92,
-"score": 84.1,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Log::Name": {
 "calls": 100,
@@ -2415,11 +2415,11 @@
 "status": "MATCH"
 },
 "String::GetId128FromGuidString": {
-"calls": 86,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 95.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "SysInfo::Hostname": {
 "calls": 100,

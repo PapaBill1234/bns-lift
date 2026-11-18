@@ -291,3 +291,47 @@ A12->A14, A13->A15, A14->A16, A15->A10, A16+A17->A17, new A12 (crypto source for
 - Worked: `noinline` on `CryptoKey::Initialize` under `LIFT_EXE_LG/SCD/POD` (+1 each). Did not work without the guard: CG loses `Network::Initialize` (CG original inlines it).
 - Worked: `noinline` under `LIFT_EXE_LG` on `Crypto::InstanceSize`, `RsaPrivate::RsaPrivate`, `BigInteger::IsPrime`, `Session::completeHandshake`: 4 orig-only go to paired, LG +1 MATCH (IsPrime DIFF 82, completeHandshake DIFF 56).
 - Final measure (gate ok, parity ok): CG 421, LG 574, SCD 540, POD 620. Crypto orig-only: 0 in each exe.
+
+## inline-3 notes (stage 1, 2026-11-18, not yet sorted by the review)
+- Worktree setup: copy `vendor/zstd/src` from the main checkout, then `git fetch --shallow-since=2018-05-01 origin dev; git checkout bb6eaf64`
+  inside it. Set `LIFT_IDA_DIR`. Baseline before inline-3: CG 421/491, LG 574/739, SCD 540/669, POD 620/759 (gate ok, parity ok).
+- Quick loop for one exe (about 45 s): `tools/vs2010/build.sh <EXE>`, then `funcdiff.py <EXE> --build build-vs2010 --json x.json`, then compare with the
+  `build-vs2010/<EXE>.funcdiff.json` of the last parity run (copy it first: parity.sh overwrites it).
+- Disassemble one function of the original or ours with capstone: import `funcdiff.Image` (never name the script `dis.py`: it shadows the stdlib `dis`).
+- `Log::Initialize` (CG 0x9da0): our `Log::Log` was a call (`private` in-class ctor not inlined). `__forceinline` on it gives the inline stores.
+  The original has `memset(mediaList, 0, 88)` as a call and 44 bytes of `mediaCountPerList` as inline stores. Source: two `memset` calls
+  in the ctor, not a `for` loop (our loop became a rolled loop). Score 84.1 -> 93.0 in CG, still DIFF (see progress note).
+- Worked (stage 2): `Log::Log` counts as 11 explicit stores `mediaCountPerList[0..10] = 0;` plus one `memset(mediaList, 0, 88)`. A second `memset` gave an extra call; a `for` loop gave a rolled loop.
+  `Log::Initialize` MATCH in CG, LG, SCD, POD (+1 each, no loss). Together with `__forceinline` on `Log()`.
+- Worked: `wchar_t buffer[40] = L"{";` in `String::GetId128FromGuidString` (CG 0xdd90). The compiler emits the `memset` call for the rest of the array, as the original does. MATCH in CG (+1). LG, SCD, POD not measured yet.
+- Worked: `__declspec(noinline)` on `InitSymbol` (CrashHandler.cpp, orig 0x7de0). Without it, VS2010 LTCG hoists `LoadLibraryW(L"dbghelp.dll")` out of `InitSymbol` into the 4 call sites in `CrashHandler::handleCrash`. MATCH in CG (+1). Other exes not measured yet.
+- Did not work: `WinServiceConsole::UninstallService` (CG 0x17f00, orig has 5 `CloseServiceHandle` calls, ours 4). VS2010 tail-merges the OpenService-fail path (`Close(manager); return false`) into the DeleteService-fail pair.
+  Swapping the `if (DeleteService)` branches made it worse (score 95.1). Source is back to the original form. Cause class: compiler tail merge (cross-jump). Not fixed.
+- Did not work: `PipeConsole::SetInvalidInfo` (CG 0x15d90, orig 2 `addNode` call sites, ours 1). Orig has the search loop twice (one per `isInvalid` branch) and `addNode` at two places
+  (list end, and `node == nullptr` after a match). Three source forms tried: loop split per branch; `node == &tail || node == nullptr`; `goto` form like the pseudocode. VS2010 merges the calls each time. Source is back to the original form.
+- Fact: `Network::OpenPort` (CG 0xd2c0): orig CG has 3 separate crash sequences (lines 170, 175, 177) inline. Ours has fewer `Log::Write`/`AlertSender::Write`/`MakeCrash` calls.
+  Orig test for line 175 in CG is `purpose != 1 && purpose != 2`. Ours uses `initialMode < 0 || initialMode > 3` (❓ in the source). The macro is `NETWORK_ASSERT_CRASH` in `Network.cpp`. Not changed yet.
+- Fact: `PacketBuffer::Compose` (CG): orig has 2 more `memcpy` calls than ours. `Session::HandleEvent` (CG): ours has one extra `Log::Write` and one extra `L"source\Session.cpp"` ref. Not looked at in the source yet.
+
+### inline-3 stage 3 notes (2026-11-18)
+- Worked (LG +6 MATCH, `LobbyD::Send*` x6): remove each explicit `packet.Clear()` (dtor clears; A14) and write the Packet ctor inline:
+  `Packet packet; packet.Splitter = nullptr; packet.IsFragmentPacket = false; memset(&packet.FragmentPacketCmd, 0, 28);`.
+  `Packet packet = {};` gives a `memset` call over the whole struct that the original does not have. `failCompose` has no `Clear` now.
+- Worked: stage 2 changes (Log, StringUtil, CrashHandler) lose no MATCH in the 4 exes (CG 424, LG 577 before the Send* fix, SCD 543, POD 623).
+- Did not work: `Network::OpenPort` CG form `initialMode != 1 && initialMode != 2` under `LIFT_EXE_CG`: score stays 90.8. The compiler drops the
+  `id == 0` check (callers pass the constants 1 and 2); the original keeps it (orig line 170). Cause: constant propagation. Reverted.
+- Did not work: `PacketBuffer::Compose` case `P` with `p` updated before the `memcpy`: memcpy calls 2 (orig 3) but the crash tails split (score 96.3 -> 93.0). Reverted.
+  Cause: VS2010 merges the identical `memcpy` tails of cases K, P, s.
+- `Session::HandleEvent` 0xf1c0: still one extra `Log::Write` (98.5). Not touched in stage 3.
+- Worked (score only, no new MATCH): LG `findDisconnectedNode` and `clearDisconnectedInfo` (`LobbyDChannel.cpp`) as `__forceinline` with an inline 20-character compare loop (orig: `repe cmpsw`, 0x9310, 0x94c0).
+  `LobbyDSessionHandler::OnConnect` 82.7 -> 94.4 (calls and refs 100); `OnClose` calls 100. Left: consts `0x2` (loop step) and `0x278` in ours only; the `L""` ref (`??_C@_11LOCGONAA`) is not in ours. `LobbyD::Hello` 92.1 -> 91.5 (still DIFF).
+- Did not work: POD `TextStreamPacketBufferHandler::Destroy` (0x2c4a0): `Buffer.GrowingBuffer::~GrowingBuffer()` for `this->~TextStream...()`. Still one extra `<indirect>` (score 93.3). Not understood.
+- Fact: POD `RelayContext::Process*` (0x1bb30, 0x1c090, ...): ours calls `AutoCS::Leave` and the Lock.h assert tail (`Log::Write`, `AlertSender::Write`, `MakeCrash`) more often than the original. The original inlines `AutoCS::Leave` with fewer assert copies. Not changed.
+
+### inline-3 stage 5 notes (2026-11-18)
+- Worked (POD +3 MATCH: `RelayContext::ProcessRelayRequest/Response/Timeout`): the original has the `AutoCS` dtor inline at scope end (one Lock.h line-122 assert tail per exit).
+  Write the `AutoCS` in a `{ }` scope block and remove each explicit `lock.Leave()`. An explicit `Leave()` plus the dtor gives two assert tails per exit (A14 form for `AutoCS`).
+  For the failure path that works after the lock: set a flag in the scope, `return true` inside the scope, and run the failure code after the scope.
+- Worked: read `PostOfficeDaemon::_instance->` at each use. A cached local `daemon` merged the global loads; the original reloads it (2 more refs). Request went 99.5 -> MATCH.
+- Did not work, reverted: POD `TextStreamPacketBufferHandler::Destroy` with `Buffer.GrowingBuffer::~GrowingBuffer()`. No score change.
+- Not fixed: `Network::OpenPort` (CG, 2 overloads): per-exe purpose test and constant propagation; belongs to perexe-3.

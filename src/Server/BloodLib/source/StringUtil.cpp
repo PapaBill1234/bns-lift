@@ -14,9 +14,7 @@ bool String::GetId128FromGuidString(wchar_t const* guidString, id128* id)
         return false;
     if (wcslen(guidString) != 36)
         return false;
-    wchar_t buffer[40];
-    buffer[0] = L'{';
-    buffer[1] = L'\0';
+    wchar_t buffer[40] = L"{";  // LIFT: orig 0xdd90 calls memset for the rest of the array
     wcscat_s(buffer, 39, guidString);
     wcscat_s(buffer, 39, L"}");
     GUID guid;

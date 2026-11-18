@@ -38,17 +38,16 @@ public:
     static wchar_t const* TypeName[LT_MAX];  // 0x83140 (SmartCouponDaemon)
 
 private:
-    Log()  // PDB constructor, inlined in Initialize (0x9DA0)
+    __forceinline Log()  // PDB constructor, inlined in Initialize (0x9DA0)
         : open(false), flush(false), mediaCount(0)
     {
         _maxFrozenSeconds = 60;
         for (int i = 0; i < 8; ++i)
             media[i] = nullptr;
-        for (int i = 0; i < LT_MAX; ++i)
-        {
-            mediaList[i] = nullptr;
-            mediaCountPerList[i] = 0;
-        }
+        memset(mediaList, 0, sizeof(mediaList));  // LIFT: orig 0x9DA0 calls memset (88 bytes), then stores 44 bytes of counts
+        mediaCountPerList[0] = 0; mediaCountPerList[1] = 0; mediaCountPerList[2] = 0; mediaCountPerList[3] = 0;
+        mediaCountPerList[4] = 0; mediaCountPerList[5] = 0; mediaCountPerList[6] = 0; mediaCountPerList[7] = 0;
+        mediaCountPerList[8] = 0; mediaCountPerList[9] = 0; mediaCountPerList[10] = 0;
     }
     virtual ~Log();
     virtual wchar_t const* Name();

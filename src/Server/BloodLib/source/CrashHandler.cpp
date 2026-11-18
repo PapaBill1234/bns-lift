@@ -127,7 +127,7 @@ void DumpStack(void* fileHandle, SymbolFunctions* sym, _EXCEPTION_POINTERS* exce
 }
 
 // 0x1C530
-bool InitSymbol(SymbolFunctions* sym, wchar_t const* symbolPath)
+__declspec(noinline) bool InitSymbol(SymbolFunctions* sym, wchar_t const* symbolPath)
 {
     sym->moduleHandle = LoadLibraryW(L"dbghelp.dll");
     if (sym->moduleHandle == nullptr)

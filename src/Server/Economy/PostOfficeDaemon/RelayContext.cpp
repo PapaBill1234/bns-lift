@@ -36,6 +36,7 @@ bool RelayContext::ProcessRelayRequest(Channel* const channel)
     }
 
     unsigned long long const relayTid = _economyHeader._relayTid;
+    {  // LIFT: scope form, the AutoCS dtor leaves the lock (0x1bb30)
     AutoCS lock(&_lock);
 
     if (_relayStatus != RELAYSTATUS_INIT)
@@ -45,8 +46,7 @@ bool RelayContext::ProcessRelayRequest(Channel* const channel)
         return false;
     }
 
-    PostOfficeDaemon* const daemon = PostOfficeDaemon::_instance;
-    if (!daemon->_relayContextManager->AddContext(this))
+    if (!PostOfficeDaemon::_instance->_relayContextManager->AddContext(this))
     {
         RELAY_CONTEXT_CRASH(41, L"== CRASH == [%s], %s; exception occurred; faile to add relay context, relayTid:0x%I64X",
                             MODULE_NAME, L"RelayContext::ProcessRelayRequest", relayTid);
@@ -54,10 +54,10 @@ bool RelayContext::ProcessRelayRequest(Channel* const channel)
     }
 
     bool failed = false;
-    if (daemon->_config->_relayTimeoutInterval > 0)
+    if (PostOfficeDaemon::_instance->_config->_relayTimeoutInterval > 0)
     {
-        long long const relayLimitTime = _time64(nullptr) + daemon->_config->_relayTimeoutInterval;
-        if (!daemon->_relayTimeContextManager->AddContext(relayTid, relayLimitTime, this))
+        long long const relayLimitTime = _time64(nullptr) + PostOfficeDaemon::_instance->_config->_relayTimeoutInterval;
+        if (!PostOfficeDaemon::_instance->_relayTimeContextManager->AddContext(relayTid, relayLimitTime, this))
         {
             RELAY_CONTEXT_CRASH(49,
                                 L"== CRASH == [%s], %s; exception occurred; failed to add relaytime context, relayTid:0x%I64X, relayLimitTime:%I64d",
@@ -77,9 +77,14 @@ bool RelayContext::ProcessRelayRequest(Channel* const channel)
         failed = true;
     }
 
-    if (failed)
+    if (!failed)
     {
-        lock.Leave();
+        _relayStatus = RELAYSTATUS_WAITING;
+        return true;
+    }
+    }
+
+    {
         if (!PostOfficeDaemon::_instance->_relayContextManager->RemoveContext(relayTid))
         {
             RELAY_CONTEXT_CRASH(69, L"== CRASH == [%s], %s; exception occurred; faile to remove relay context, relayTid:0x%I64X",
@@ -94,10 +99,6 @@ bool RelayContext::ProcessRelayRequest(Channel* const channel)
         }
         return false;
     }
-
-    _relayStatus = RELAYSTATUS_WAITING;
-    lock.Leave();
-    return true;
 }
 
 // 0x1c090
@@ -120,12 +121,12 @@ bool RelayContext::ProcessRelayResponse(RelayResponse* const response)
         return false;
     }
 
+    {  // LIFT: scope form, the AutoCS dtor leaves the lock (0x1c090)
     AutoCS lock(&_lock);
     if (_relayStatus != RELAYSTATUS_WAITING)
     {
         Log::Write(Log::LT_ERROR, RELAY_CONTEXT_FILE, 99, L"[%s], %s; relay status is not waiting, relayTid:0x%I64X, relayStatus:%d",
                    MODULE_NAME, L"RelayContext::ProcessRelayResponse", relayTid, _relayStatus);
-        lock.Leave();
         return false;
     }
 
@@ -136,7 +137,7 @@ bool RelayContext::ProcessRelayResponse(RelayResponse* const response)
                    MODULE_NAME, L"RelayContext::ProcessRelayResponse", relayTid);
     }
     _relayStatus = RELAYSTATUS_FINISH;
-    lock.Leave();
+    }
 
     PostOfficeDaemon* const daemon = PostOfficeDaemon::_instance;
     if (daemon->_config->_relayTimeoutInterval > 0 &&
@@ -158,12 +159,12 @@ bool RelayContext::ProcessRelayResponse(RelayResponse* const response)
 bool RelayContext::ProcessRelayTimeout()
 {
     unsigned long long const relayTid = _economyHeader._relayTid;
+    {  // LIFT: scope form, the AutoCS dtor leaves the lock (0x1c480)
     AutoCS lock(&_lock);
     if (_relayStatus != RELAYSTATUS_WAITING)
     {
         Log::Write(Log::LT_ERROR, RELAY_CONTEXT_FILE, 137, L"[%s], %s; relay status is not waiting, relayTid:0x%I64X, relayStatus:%d",
                    MODULE_NAME, L"RelayContext::ProcessRelayTimeout", relayTid, _relayStatus);
-        lock.Leave();
         return false;
     }
 
@@ -178,7 +179,7 @@ bool RelayContext::ProcessRelayTimeout()
                    MODULE_NAME, L"RelayContext::ProcessRelayTimeout", relayTid);
     }
     _relayStatus = RELAYSTATUS_TIMEOUT;
-    lock.Leave();
+    }
 
     PostOfficeDaemon* const daemon = PostOfficeDaemon::_instance;
     if (daemon->_config->_relayTimeoutInterval > 0 &&

@@ -11,19 +11,19 @@ Do not push this code to a public repo. Do not commit binaries or keys.
 ## Parity
 
 <!-- parity:start -->
-Last update: card `lift-parity-cryptolib-3` (2026-11-18). Tool: `tools/parity.sh` (VS2010 /GL /LTCG build vs original, funcdiff).
+Last update: card `lift-parity-inline-3` (2026-11-18). Tool: `tools/parity.sh` (VS2010 /GL /LTCG build vs original, funcdiff).
 
 | Exe | Parity | MATCH | DIFF | Only in original | Total | Mean score | Start | Change | Level |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| CacheGate | **85.7 %** | 421 | 66 | 4 | 491 | 98.5 | 44.0 % | +41.8 | below 90 % |
-| LobbyGate | **77.7 %** | 574 | 158 | 7 | 739 | 97.5 | 37.9 % | +39.8 | below 90 % |
-| SmartCouponDaemon | **80.7 %** | 540 | 126 | 3 | 669 | 98.0 | 33.6 % | +47.1 | below 90 % |
-| PostOfficeDaemon | **81.7 %** | 620 | 133 | 6 | 759 | 98.1 | 34.5 % | +47.2 | below 90 % |
-| **All 4** | **81.1 %** | 2155 | | | 2658 | | 37.0 % | +44.1 | below 90 % |
+| CacheGate | **86.4 %** | 424 | 63 | 4 | 491 | 98.6 | 44.0 % | +42.4 | below 90 % |
+| LobbyGate | **78.9 %** | 583 | 149 | 7 | 739 | 97.5 | 37.9 % | +41.0 | below 90 % |
+| SmartCouponDaemon | **81.2 %** | 543 | 123 | 3 | 669 | 98.1 | 33.6 % | +47.5 | below 90 % |
+| PostOfficeDaemon | **82.5 %** | 626 | 127 | 6 | 759 | 98.2 | 34.5 % | +48.0 | below 90 % |
+| **All 4** | **81.9 %** | 2176 | | | 2658 | | 37.0 % | +44.9 | below 90 % |
 
 | Shared library (functions in 2+ exes) | Parity | MATCH in each exe | DIFF in 1+ exe | Total | Goal |
 | --- | ---: | ---: | ---: | ---: | --- |
-| BloodLib, Shared, Packet, CRT | **82.6 %** | 451 | 95 | 546 | 99 % |
+| BloodLib, Shared, Packet, CRT | **83.2 %** | 454 | 92 | 546 | 99 % |
 
 Goal: 95 % per exe, 99 % preferred. Shared library: 99 % preferred. Rules: [Docs/Parity/README.md](Docs/Parity/README.md). History: [Docs/Parity/progress.tsv](Docs/Parity/progress.tsv).
 
@@ -50,4 +50,5 @@ Goal: 95 % per exe, 99 % preferred. Shared library: 99 % preferred. Rules: [Docs
 | `lift-parity-review-2` | 85.5 % | 71.7 % | 76.2 % | 77.5 % |
 | `lift-parity-perexe-3` | 85.7 % | 72.1 % | 76.5 % | 78.0 % |
 | `lift-parity-cryptolib-3` | 85.7 % | 77.7 % | 80.7 % | 81.7 % |
+| `lift-parity-inline-3` | 86.4 % | 78.9 % | 81.2 % | 82.5 % |
 <!-- parity:end -->

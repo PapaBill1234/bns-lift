@@ -24,13 +24,25 @@ wchar_t const* const CHANNEL_H_FILE =
     L"E:\\DailyBuild02\\LobbyGate-Common-0.0.348\\depot\\Branch\\348NC\\Program\\Server\\BloodLib\\include\\Channel.h";
 wchar_t const* const DISCONNECTED_LOBBYD = L"disconnected lobbyd";
 
-// LIFT: Inlined search in PipeConsole::_invalid (wcsncmp with 20 characters).
-PipeConsole::ItemNode* findDisconnectedNode(PipeConsole* console)
+// LIFT: Inlined search in PipeConsole::_invalid. The original compares 20 characters with an inline loop
+// (repe cmpsw, 0x9310, 0x94c0). __forceinline because the build uses /Ob0.
+__forceinline PipeConsole::ItemNode* findDisconnectedNode(PipeConsole* console)
 {
     PipeConsole::ItemNode* node = console->_invalid._head._next;
     while (node != &console->_invalid._tail)
     {
-        if (wcsncmp(node->_key, DISCONNECTED_LOBBYD, 20) == 0)
+        wchar_t const* key = node->_key;
+        wchar_t const* text = DISCONNECTED_LOBBYD;
+        long count = 20;
+        bool equal;
+        do
+        {
+            if (count == 0)
+                break;
+            equal = *key++ == *text++;
+            --count;
+        } while (equal);
+        if (equal)
             return node;
         node = node->_next;
     }
@@ -53,7 +65,7 @@ PipeConsole::ItemNode* findDisconnectedNode(PipeConsole* console)
     } while (0)
 
 // LIFT: Inlined PipeConsole::SetInvalidInfo(L"disconnected lobbyd", false).
-void clearDisconnectedInfo()
+__forceinline void clearDisconnectedInfo()
 {
     if (Daemon::Instance == nullptr || Daemon::Instance->pipeConsole == nullptr)
         return;
@@ -106,7 +118,6 @@ bool failCompose(Session* session, Packet& packet, short cmd, int line)
     Log::Write(Log::LT_ERROR, LOBBYD_FILE, line, L"[channel], 0x%.16I64X, send fail, compose fail, cmd:%d",
                session->_id, static_cast<int>(cmd));
     session->removeReferenceCount(CHANNEL_H_FILE, 52);
-    packet.Clear();
     return false;
 }
 
@@ -371,7 +382,10 @@ bool LobbyD::SendInitSessionWithNPTokenReq(unsigned long long gateKey, id128 con
     if (session == nullptr || !isConnected(session))
         return failNotConnected(session, cmd, 328);
 
-    Packet packet = {};  // LIFT: inlined constructor
+    Packet packet;  // LIFT: inlined constructor (0xad20): two stores and a 28-byte memset
+    packet.Splitter = nullptr;
+    packet.IsFragmentPacket = false;
+    memset(&packet.FragmentPacketCmd, 0, 28);
     packet.Allocate();
     id128 portalCopy = *portalAccountId;
     id128 npCopy = *npToken;
@@ -396,7 +410,6 @@ bool LobbyD::SendInitSessionWithNPTokenReq(unsigned long long gateKey, id128 con
                np.id4[3], np.id4[4], np.id4[5], np.id4[6], np.id4[7], pa.id1, pa.id2, pa.id3, pa.id4[0], pa.id4[1],
                pa.id4[2], pa.id4[3], pa.id4[4], pa.id4[5], pa.id4[6], pa.id4[7], ipStr);
     session->removeReferenceCount(CHANNEL_H_FILE, 52);
-    packet.Clear();
     return true;
 }
 
@@ -409,7 +422,10 @@ bool LobbyD::SendStartSessionWithNPTokenReq(unsigned long long cliKey, id128 con
     if (session == nullptr || !isConnected(session))
         return failNotConnected(session, cmd, 360);
 
-    Packet packet = {};  // LIFT: inlined constructor
+    Packet packet;  // LIFT: inlined constructor (0xad20): two stores and a 28-byte memset
+    packet.Splitter = nullptr;
+    packet.IsFragmentPacket = false;
+    memset(&packet.FragmentPacketCmd, 0, 28);
     packet.Allocate();
     id128 portalCopy = *portalAccountId;
     id128 npCopy = *npToken;
@@ -435,7 +451,6 @@ bool LobbyD::SendStartSessionWithNPTokenReq(unsigned long long cliKey, id128 con
                np.id4[3], np.id4[4], np.id4[5], np.id4[6], np.id4[7], pa.id1, pa.id2, pa.id3, pa.id4[0], pa.id4[1],
                pa.id4[2], pa.id4[3], pa.id4[4], pa.id4[5], pa.id4[6], pa.id4[7], ipStr);
     session->removeReferenceCount(CHANNEL_H_FILE, 52);
-    packet.Clear();
     return true;
 }
 
@@ -448,7 +463,10 @@ bool LobbyD::SendInitSessionWithLobbyTokenReq(unsigned long long gateKey, unsign
     if (session == nullptr || !isConnected(session))
         return failNotConnected(session, cmd, 392);
 
-    Packet packet = {};  // LIFT: inlined constructor
+    Packet packet;  // LIFT: inlined constructor (0xad20): two stores and a 28-byte memset
+    packet.Splitter = nullptr;
+    packet.IsFragmentPacket = false;
+    memset(&packet.FragmentPacketCmd, 0, 28);
     packet.Allocate();
     if (packet.Compose("hqqqi", static_cast<int>(cmd), gateKey, cliKey, lobbyToken, ipAddress) == 0)
         return failCompose(session, packet, cmd, 402);
@@ -466,7 +484,6 @@ bool LobbyD::SendInitSessionWithLobbyTokenReq(unsigned long long gateKey, unsign
                L"ipAddress:%s",
                session->_id, static_cast<int>(cmd), gateKey, cliKey, lobbyToken, ipStr);
     session->removeReferenceCount(CHANNEL_H_FILE, 52);
-    packet.Clear();
     return true;
 }
 
@@ -478,7 +495,10 @@ bool LobbyD::SendStartSessionWithLobbyTokenReq(unsigned long long cliKey)
     if (session == nullptr || !isConnected(session))
         return failNotConnected(session, cmd, 424);
 
-    Packet packet = {};  // LIFT: inlined constructor
+    Packet packet;  // LIFT: inlined constructor (0xad20): two stores and a 28-byte memset
+    packet.Splitter = nullptr;
+    packet.IsFragmentPacket = false;
+    memset(&packet.FragmentPacketCmd, 0, 28);
     packet.Allocate();
     if (packet.Compose("hq", static_cast<int>(cmd), cliKey) == 0)
         return failCompose(session, packet, cmd, 434);
@@ -492,7 +512,6 @@ bool LobbyD::SendStartSessionWithLobbyTokenReq(unsigned long long cliKey)
     Log::Write(Log::LT_DEBUG, LOBBYD_FILE, 440, L"[channel], 0x%.16I64X, send, cmd:%d, cliKey:0x%I64X", session->_id,
                static_cast<int>(cmd), cliKey);
     session->removeReferenceCount(CHANNEL_H_FILE, 52);
-    packet.Clear();
     return true;
 }
 
@@ -504,7 +523,10 @@ bool LobbyD::SendLostAnonymousConnectionNotify(unsigned long long gateKey)
     if (session == nullptr || !isConnected(session))
         return failNotConnected(session, cmd, 453);
 
-    Packet packet = {};  // LIFT: inlined constructor
+    Packet packet;  // LIFT: inlined constructor (0xad20): two stores and a 28-byte memset
+    packet.Splitter = nullptr;
+    packet.IsFragmentPacket = false;
+    memset(&packet.FragmentPacketCmd, 0, 28);
     packet.Allocate();
     if (packet.Compose("hq", static_cast<int>(cmd), gateKey) == 0)
         return failCompose(session, packet, cmd, 463);
@@ -518,7 +540,6 @@ bool LobbyD::SendLostAnonymousConnectionNotify(unsigned long long gateKey)
     Log::Write(Log::LT_DEBUG, LOBBYD_FILE, 469, L"[channel], 0x%.16I64X, send, cmd:%d, gateKey:0x%I64X", session->_id,
                static_cast<int>(cmd), gateKey);
     session->removeReferenceCount(CHANNEL_H_FILE, 52);
-    packet.Clear();
     return true;
 }
 
@@ -530,7 +551,10 @@ bool LobbyD::SendLostConnectionNotify(unsigned long long cliKey)
     if (session == nullptr || !isConnected(session))
         return failNotConnected(session, cmd, 482);
 
-    Packet packet = {};  // LIFT: inlined constructor
+    Packet packet;  // LIFT: inlined constructor (0xad20): two stores and a 28-byte memset
+    packet.Splitter = nullptr;
+    packet.IsFragmentPacket = false;
+    memset(&packet.FragmentPacketCmd, 0, 28);
     packet.Allocate();
     if (packet.Compose("hq", static_cast<int>(cmd), cliKey) == 0)
         return failCompose(session, packet, cmd, 492);
@@ -544,6 +568,5 @@ bool LobbyD::SendLostConnectionNotify(unsigned long long cliKey)
     Log::Write(Log::LT_DEBUG, LOBBYD_FILE, 498, L"[channel], 0x%.16I64X, send, cmd:%d, cliKey:0x%I64X", session->_id,
                static_cast<int>(cmd), cliKey);
     session->removeReferenceCount(CHANNEL_H_FILE, 52);
-    packet.Clear();
     return true;
 }

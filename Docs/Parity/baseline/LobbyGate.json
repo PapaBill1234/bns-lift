@@ -938,11 +938,11 @@
 "status": "MATCH"
 },
 "CrashHandler::handleCrash": {
-"calls": 97,
+"calls": 100,
 "consts": 100,
-"refs": 94,
-"score": 97.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "CriticalSection::~CriticalSection": {
 "calls": 100,
@@ -1862,10 +1862,10 @@
 "status": "DIFF"
 },
 "InitSymbol": {
-"calls": 91,
+"calls": 94,
 "consts": 100,
-"refs": 95,
-"score": 95.4,
+"refs": 100,
+"score": 98.0,
 "status": "DIFF"
 },
 "IoWorker::Initialize": {
@@ -1911,53 +1911,53 @@
 "status": "MATCH"
 },
 "LobbyD::Hello": {
-"calls": 90,
-"consts": 92,
+"calls": 95,
+"consts": 86,
 "refs": 94,
-"score": 92.1,
+"score": 91.5,
 "status": "DIFF"
 },
 "LobbyD::SendInitSessionWithLobbyTokenReq": {
-"calls": 93,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 97.6,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "LobbyD::SendInitSessionWithNPTokenReq": {
-"calls": 93,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 97.6,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "LobbyD::SendLostAnonymousConnectionNotify": {
-"calls": 92,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 97.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "LobbyD::SendLostConnectionNotify": {
-"calls": 92,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 97.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "LobbyD::SendStartSessionWithLobbyTokenReq": {
-"calls": 92,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 97.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "LobbyD::SendStartSessionWithNPTokenReq": {
-"calls": 93,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 97.6,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "LobbyD::hello": {
 "calls": 100,
@@ -1974,17 +1974,17 @@
 "status": "MATCH"
 },
 "LobbyDSessionHandler::OnClose": {
-"calls": 94,
-"consts": 92,
+"calls": 100,
+"consts": 86,
 "refs": 96,
-"score": 94.0,
+"score": 93.8,
 "status": "DIFF"
 },
 "LobbyDSessionHandler::OnConnect": {
-"calls": 95,
-"consts": 75,
-"refs": 78,
-"score": 82.7,
+"calls": 100,
+"consts": 83,
+"refs": 100,
+"score": 94.4,
 "status": "DIFF"
 },
 "LobbyDSessionHandler::PacketHandler": {
@@ -2205,11 +2205,11 @@
 "status": "MATCH"
 },
 "Log::Initialize": {
-"calls": 80,
-"consts": 80,
-"refs": 92,
-"score": 84.1,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Log::Name": {
 "calls": 100,
@@ -3766,11 +3766,11 @@
 "status": "MATCH"
 },
 "String::GetId128FromGuidString": {
-"calls": 86,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 95.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "SysInfo::Hostname": {
 "calls": 100,
