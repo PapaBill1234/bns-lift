@@ -52,8 +52,11 @@ export INC R O
 # Compile one source to $O/obj/<path>.obj. Skip it when the object is newer than the source
 # and newer than each repo header that it included. /showIncludes gives the headers: they are
 # written to $O/obj/<path>.dep (one Linux path per line). An object with no .dep file is stale.
+# $2 = exe define tag (CG, LG, SCD, POD) for a source with a per-exe form: object in $O/obj/<tag>/<src>.obj, /DLIFT_EXE_<tag>.
 compile_one() {
-  local src="$1" obj="$O/obj/$1.obj" log="$O/obj/$1.log" dep="$O/obj/$1.dep" lang="" h stale=0
+  local src="$1" tag="${2:-}" d="" lang="" h stale=0 pre="$O/obj"
+  [ -n "$tag" ] && { pre="$O/obj/$tag"; d="/DLIFT_EXE_$tag"; }
+  local obj="$pre/$1.obj" log="$pre/$1.log" dep="$pre/$1.dep"
   mkdir -p "$(dirname "$obj")"
   if [ -f "$obj" ] && [ -f "$dep" ] && [ "$obj" -nt "$src" ]; then
     while IFS= read -r h; do
@@ -64,7 +67,7 @@ compile_one() {
   case "$src" in *.c) lang="/TC";; esac
   # /Z7: /Zi starts mspdbsrv.exe, which hangs under Wine. /FIwinsock2.h: the headers include windows.h first.
   if ! wine "$VS2010_BIN/cl.exe" /nologo /c /O2 /GL /EHsc /MD /Z7 /GR- /W3 /D_WIN64 /DNDEBUG /DWIN32_LEAN_AND_MEAN \
-        /showIncludes /FIwinsock2.h $lang $INC /Fo"$(winepath -w "$R/$obj")" "$(winepath -w "$R/$src")" > "$log" 2>&1; then
+        /showIncludes /FIwinsock2.h $d $lang $INC /Fo"$(winepath -w "$R/$obj")" "$(winepath -w "$R/$src")" > "$log" 2>&1; then
     echo "FAIL $src (see $log)"; rm -f "$obj" "$dep"; return 1
   fi
   # "Note: including file:   Z:\home\...\X.h" -> "/home/.../X.h". Keep only the files of the repo.
@@ -74,6 +77,54 @@ compile_one() {
 export -f compile_one
 
 RC=0
+# LIFT: python filter, in this file so that the script has no extra file. stdin = sources; prints those that use the token LIFT_EXE_.
+PEREXE_PY=$(cat <<'PYEOF'
+"""Print the sources (stdin, one per line) that include a repo header or file with the token LIFT_EXE_.
+These sources get one object per exe in tools/vs2010/build.sh (define -DLIFT_EXE_<X>)."""
+import os, re, sys
+
+ROOT = os.getcwd()
+INC = ["include"] + sys.argv[1:]
+INC_RE = re.compile(r'^\s*#\s*include\s+"([^"]+)"', re.M)
+cache = {}
+
+
+def resolve(name, cur):
+    for d in [os.path.dirname(cur)] + INC:
+        p = os.path.normpath(os.path.join(d, name))
+        if os.path.isfile(p):
+            return p
+    return None
+
+
+def uses(path, seen):
+    if path in cache:
+        return cache[path]
+    if path in seen:
+        return False
+    seen.add(path)
+    try:
+        txt = open(path, encoding="utf-8", errors="replace").read()
+    except OSError:
+        return False
+    r = "LIFT_EXE_" in txt
+    if not r:
+        for m in INC_RE.finditer(txt):
+            p = resolve(m.group(1), path)
+            if p and uses(p, seen):
+                r = True
+                break
+    cache[path] = r
+    return r
+
+
+for line in sys.stdin:
+    s = line.strip()
+    if s and uses(os.path.normpath(s), set()):
+        print(s)
+PYEOF
+)
+
 for exe in "${EXES[@]}"; do
   SEEN=()
   mapfile -t items < <(collect "$exe.exe")
@@ -87,10 +138,19 @@ for exe in "${EXES[@]}"; do
     [ -f "$s" ] || { echo "$exe: no source for $it" >&2; RC=1; continue; }
     srcs+=("$s")
   done
-  echo "$exe: ${#srcs[@]} sources"
-  printf '%s\n' "${srcs[@]}" | xargs -P "$JOBS" -I{} bash -c 'compile_one "$@"' _ {} || { RC=1; continue; }
+  # LIFT: a source that has the token LIFT_EXE_ (itself or in a repo header) gets one object per exe.
+  case "$exe" in CacheGate) tag=CG;; LobbyGate) tag=LG;; SmartCouponDaemon) tag=SCD;; PostOfficeDaemon) tag=POD;; *) tag="";; esac
+  declare -A PE=()
+  if [ -n "$tag" ]; then
+    while IFS= read -r s; do PE[$s]=1; done < <(printf '%s\n' "${srcs[@]}" | python3 -c "$PEREXE_PY" $(sed -n '/set(LIFT_SRC_INCLUDE/,/^)/p' CMakeLists.txt | grep -o 'src/[^ )]*'))
+  fi
+  echo "$exe: ${#srcs[@]} sources, ${#PE[@]} per-exe"
+  for s in "${srcs[@]}"; do echo "$s${PE[$s]:+ $tag}"; done |
+    xargs -P "$JOBS" -L1 bash -c 'compile_one "$@"' _ || { RC=1; continue; }
 
-  w=(); for s in "${srcs[@]}"; do w+=("$(winepath -w "$R/$O/obj/$s.obj")"); done
+  w=(); for s in "${srcs[@]}"; do
+    if [ -n "${PE[$s]:-}" ]; then w+=("$(winepath -w "$R/$O/obj/$tag/$s.obj")"); else w+=("$(winepath -w "$R/$O/obj/$s.obj")"); fi
+  done
   for r in "${res[@]}"; do w+=("$(winepath -w "$R/$r")"); done
   rsp="$O/$exe.rsp"
   printf '"%s"\n' "${w[@]}" > "$rsp"

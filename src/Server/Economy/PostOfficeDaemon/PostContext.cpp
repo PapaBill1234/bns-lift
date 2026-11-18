@@ -1,6 +1,9 @@
 // PostContext.obj (PostOfficeDaemon PDB).
 // No code: FragmentPacket::FreeSize 0x10fa0 (COMDAT, in common), std::map code 0x11cc0, 0x12650, 0x126b0,
 // 0x12a80, 0x1d0c0..0x1d680 (STL).
+// LIFT: PostOfficeDaemon build path of StlMemory.h, mixed case in this module (HR strings). Keeps the _Erase copies apart from the lower-case ones (no ICF fold).
+#define LIFT_STLMEMORY_FILE \
+    L"E:\\DailyBuild02\\PostOfficeDaemon-Common-0.0.348\\depot\\Branch\\348NC\\Program\\Server\\BloodLib\\include\\StlMemory.h"
 #include "PostContext.h"
 #include <string.h>
 #include <wchar.h>

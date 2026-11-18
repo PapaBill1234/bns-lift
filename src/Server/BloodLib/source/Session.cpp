@@ -183,6 +183,24 @@ Session::~Session()
         _reconnectTimer = nullptr;
     }
     _currentCrypt = nullptr;
+#if defined(LIFT_EXE_LG)
+    // LIFT: per-exe form, LG 0x175a0 has the body of deallocateCrypt (0x194c0) in place, twice (compare chain).
+#define LIFT_DEALLOC_CRYPT(member)                                                                                   \
+    if (member != nullptr)                                                                                           \
+    {                                                                                                                \
+        PacketCrypt* crypt = member;                                                                                 \
+        int type = crypt->GetType();                                                                                 \
+        int rest1;                                                                                                   \
+        int rest2;                                                                                                   \
+        if (type == 0 || ((rest1 = type - 1) != 0 && ((rest2 = rest1 - 1) == 0 || static_cast<unsigned int>(rest2 - 1) <= 1))) \
+            crypt->~PacketCrypt();                                                                                   \
+        _allocator.Free(crypt, SESSION_FILE, 1331);                                                                  \
+        member = nullptr;                                                                                            \
+    }
+    LIFT_DEALLOC_CRYPT(_handshakeCrypt)
+    LIFT_DEALLOC_CRYPT(_sessionCrypt)
+#undef LIFT_DEALLOC_CRYPT
+#else
     if (_handshakeCrypt != nullptr)
     {
         deallocateCrypt(_handshakeCrypt);
@@ -193,6 +211,7 @@ Session::~Session()
         deallocateCrypt(_sessionCrypt);
         _sessionCrypt = nullptr;
     }
+#endif
     _security3rd = nullptr;
     _id = 0;
     _port = nullptr;
@@ -797,8 +816,11 @@ void Session::Send(char const* format, ...) const
 }
 
 // 0xFA40
-// LIFT: noinline. The orig calls it out of line at all call sites (LG 0x18f00: not inlined).
-__declspec(noinline) void Session::Send(Packet const* packet) const
+// LIFT: per-exe form, CG 0xfa40 and LG 0x18f00 call it out of line (noinline). SCD and POD inline it (no function).
+#if defined(LIFT_EXE_CG) || defined(LIFT_EXE_LG)
+__declspec(noinline)
+#endif
+void Session::Send(Packet const* packet) const
 {
     Session* self = const_cast<Session*>(this);
     packet->ListHead->encrypt(_currentCrypt, _security3rd);
@@ -970,14 +992,21 @@ __declspec(noinline) void* Session::allocateCrypt(PacketCrypt::Type type, Packet
 }
 
 // 0x194C0 (LobbyGate). The CacheGate ~Session (0xE0A0) inlines it.
-// LIFT: noinline. The orig calls it out of line at all call sites (LG 0x194c0: CG ~Session inlines it).
-__declspec(noinline) void Session::deallocateCrypt(void* crypt) const
+// LIFT: per-exe form, only LG 0x194c0 has the function (noinline). CG, SCD and POD inline it in ~Session.
+#if defined(LIFT_EXE_LG)
+__declspec(noinline)
+#endif
+void Session::deallocateCrypt(void* crypt) const
 {
     Session* self = const_cast<Session*>(this);
     PacketCrypt* packetCrypt = static_cast<PacketCrypt*>(crypt);
+    if (crypt == nullptr)  // LobbyGate 0x194c0 tests crypt in the function
+        return;
+    // LIFT: the orig test is a compare chain (LobbyGate 0x194c0: v == 0, v - 1, v - 2, v - 3 <= 1; no constants 2, 3, 4).
     int type = packetCrypt->GetType();
-    if (type == PacketCrypt::NO_CRYPT || type == PacketCrypt::HANDSHAKE_CRYPT || type == PacketCrypt::SESSION_CRYPT
-        || type == PacketCrypt::BROADCAST_CRYPT)
+    int rest1;
+    int rest2;
+    if (type == 0 || ((rest1 = type - 1) != 0 && ((rest2 = rest1 - 1) == 0 || static_cast<unsigned int>(rest2 - 1) <= 1)))
         packetCrypt->~PacketCrypt();  // vtable slot 7 (deleting destructor) with flag 0 = no free (LobbyGate 0x194f9)
     self->_allocator.Free(crypt, SESSION_FILE, 1331);
 }

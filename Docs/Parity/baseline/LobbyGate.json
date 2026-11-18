@@ -3038,11 +3038,11 @@
 "status": "MATCH"
 },
 "Session::deallocateCrypt": {
-"calls": 80,
-"consts": 40,
+"calls": 100,
+"consts": 100,
 "refs": 100,
-"score": 73.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Session::deallocate_me": {
 "calls": 100,
@@ -3101,11 +3101,11 @@
 "status": "MATCH"
 },
 "Session::~Session": {
-"calls": 93,
-"consts": 89,
-"refs": 80,
-"score": 87.2,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "SessionPool::Initialize": {
 "calls": 100,
@@ -3565,9 +3565,9 @@
 "TimerQueue::~TimerQueue": {
 "calls": 100,
 "consts": 100,
-"refs": 83,
-"score": 94.4,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "TrustedPacketBufferHandler::Clone": {
 "calls": 100,

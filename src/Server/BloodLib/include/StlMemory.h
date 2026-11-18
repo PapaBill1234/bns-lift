@@ -6,9 +6,19 @@
 #include "Memory.h"
 
 // LIFT: each exe has its own build path. A .cpp file can define LIFT_STLMEMORY_FILE before the first include.
+// LIFT: per-exe form, all exes (inlined COMDAT copy of the first object keeps the path of its exe, TimerQueue::~TimerQueue).
 #ifndef LIFT_STLMEMORY_FILE
+#if defined(LIFT_EXE_LG)
+#define LIFT_STLMEMORY_EXE L"lobbygate"
+#elif defined(LIFT_EXE_SCD)
+#define LIFT_STLMEMORY_EXE L"smartcoupondaemon"
+#elif defined(LIFT_EXE_POD)
+#define LIFT_STLMEMORY_EXE L"postofficedaemon"
+#else
+#define LIFT_STLMEMORY_EXE L"cachegate"
+#endif
 #define LIFT_STLMEMORY_FILE \
-    L"e:\\dailybuild02\\cachegate-common-0.0.348\\depot\\branch\\348nc\\program\\server\\bloodlib\\include\\StlMemory.h"
+    L"e:\\dailybuild02\\" LIFT_STLMEMORY_EXE L"-common-0.0.348\\depot\\branch\\348nc\\program\\server\\bloodlib\\include\\StlMemory.h"
 #endif
 
 template<class T, int N>

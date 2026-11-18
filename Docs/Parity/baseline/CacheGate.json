@@ -2254,11 +2254,11 @@
 "status": "MATCH"
 },
 "Session::~Session": {
-"calls": 93,
-"consts": 89,
-"refs": 80,
-"score": 87.2,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "SessionPool::Initialize": {
 "calls": 100,

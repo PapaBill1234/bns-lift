@@ -3416,11 +3416,11 @@
 "status": "MATCH"
 },
 "Session::~Session": {
-"calls": 93,
-"consts": 89,
-"refs": 80,
-"score": 87.2,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "SessionPool::Initialize": {
 "calls": 100,
@@ -3929,9 +3929,9 @@
 "TimerQueue::~TimerQueue": {
 "calls": 100,
 "consts": 100,
-"refs": 83,
-"score": 94.4,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "TrustedPacketBufferHandler::Clone": {
 "calls": 100,
@@ -4256,18 +4256,18 @@
 "status": "MATCH"
 },
 "WorldChannelManager::RemoveWorldChannel": {
-"calls": 92,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 97.4,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "WorldChannelManager::initChannelManager": {
 "calls": 100,
 "consts": 100,
-"refs": 86,
-"score": 95.2,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "WorldConfigList::~WorldConfigList": {
 "calls": 100,

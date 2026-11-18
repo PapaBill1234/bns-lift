@@ -224,7 +224,7 @@ A12->A14, A13->A15, A14->A16, A15->A10, A16+A17->A17, new A12 (crypto source for
 ### C4. Build facts
 - `tools/vs2010/build.sh` tracks headers (tool-2): `cl /showIncludes` writes `build-vs2010/obj/<src>.dep`. No `touch` is necessary.
   A new `build-vs2010/obj` builds all objects once (about 5 minutes in a new worktree).
-- `tools/vs2010/build.sh` compiles one object per source path with fixed flags. It has no per-exe define (card perexe-3).
+- `tools/vs2010/build.sh` compiles one object per source path with fixed flags. The per-exe define exists now (section E).
 - Gate link has no `_Init_thread_*`: `add_compile_options(/Zc:threadSafeInit-)` in `CMakeLists.txt` (not the toolchain file; an
   old `CMakeCache.txt` keeps old flags). VS2010 has no thread-safe statics, so parity does not change.
 - Include `crt_cpp_overload.h` only under `#if defined(__clang__)`.
@@ -257,3 +257,27 @@ A12->A14, A13->A15, A14->A16, A15->A10, A16+A17->A17, new A12 (crypto source for
   POD `PostInfo::CheckValidityPostData` (switch lowering 0x2/0x7 vs 0x5), POD `ComposeResponsePacket` x2 (line numbers, unwind),
   `Blowfish::Setup` (register allocation), `aes128TableSetupEncKey` (orig unrolls 5 times), `aes128TableSetupDecKey` (not tried).
 - Scalar placement `operator delete(void*, void*)` (Memory.h:173 crash Log): DIFF score 0 in CG, SCD, POD, orig-only in LG. Card arraynew-3.
+
+## E. perexe-3 (2026-11-18, final)
+- Per-exe objects: `tools/vs2010/build.sh` gives `-DLIFT_EXE_<CG|LG|SCD|POD>` to each source that has the token `LIFT_EXE_` (itself or in
+  a repo header, found by the python filter in `tools/vs2010/build.sh`). Object: `build-vs2010/obj/<TAG>/<src>.obj`. Other sources keep one shared object.
+  `xargs -L1` joins a line that ends with a blank with the next line: write `"$s${tag:+ $tag}"`, no trailing blank.
+- `StlMemory.h`: `LIFT_STLMEMORY_FILE` default depends on `LIFT_EXE_*`. `TimerQueue::~TimerQueue` MATCH in LG, SCD, POD (the inlined COMDAT copy had the CG path).
+- `Session::Send(Packet const*)`: `noinline` only for CG, LG. `Session::deallocateCrypt`: `noinline` only for LG (0x194c0). The ONLY-OURS entries are gone in CG, SCD, POD.
+- Measure after stage 1 (last run, parity ok): CG 421 (+1), LG 532 (+2), SCD 512 (+2), POD 592 (+4). Gate ok.
+- Worked: ICF fold name. Orig POD has 2 case forms of the StlMemory.h path: `E:\DailyBuild02\PostOfficeDaemon-Common-...\Program\Server\...` (modules PostContext, RelayContext, RelayTimeContext)
+  and lower case (others). With one lower-case path in all POD objects, ours folds `_Tree<ushort,WorldChannel*>::_Erase` into the `<__int64,PostContext*>` copy and
+  `WorldConfigList::~WorldConfigList` loses MATCH. Fix: the 3 modules define `LIFT_STLMEMORY_FILE` in mixed case (POD +3 with the Session fixes).
+  Count of path forms per exe: `grep -o 'L"[Ee]:[^"]*StlMemory.h"' ~/.cache/bns-lift/hr/<EXE>/*.c`. Mixed case: LG Client; SCD CouponGameEventConfig; POD 3 modules above; CG none.
+- Worked: type test of `deallocateCrypt` as the compare chain `type == 0 || ((r1 = type - 1) != 0 && ((r2 = r1 - 1) == 0 || (unsigned)(r2 - 1) <= 1))`.
+  A `switch` on 0, 2, 3, 4 keeps the constant 0x2. The chain removes consts 0x2,0x3,0x4: `Session::~Session` MATCH in CG, SCD, POD (+1 each).
+- Worked: `if (crypt == nullptr) return;` inside `deallocateCrypt` (orig LG 0x194c0 has it): removes the tail-jump to `Free`, LG `deallocateCrypt` MATCH.
+- Worked: LG `Session::~Session` 0x175a0 inlines `deallocateCrypt` twice by hand under `#if LIFT_EXE_LG`. A local macro with the chain test (not `switch`) gives MATCH (LG +1).
+- Final measure (gate ok, parity ok): CG 421, LG 533, SCD 512, POD 592 (baseline 420/530/510/588). Shared 421/499 (no change: the shared count needs MATCH in all 4 exes).
+- Fact: `tools/parity_shared.py --list` still says DIFF for `Session::~Session` (all 4 exes) and `TimerQueue::~TimerQueue` (LG, SCD, POD) after the full parity run,
+  but `build-vs2010/<EXE>.funcdiff.json` says MATCH for each. The shared count stays 421/499. Cause not found (❓): `parity_shared.py` may compare the shared build, not `obj/<TAG>/`. Read it before the next card.
+- Fact: IDA did not open `CacheGate.exe.i64` in this card (status 4). `Session::SendV` CG 0xfaa0 was not checked in disasm.
+- Not a path literal: the remaining refs-only DIFFs (`Network::Network`, `PacketBufferAllocator::initAllocator`, `Session::Session`, `StaticPageMemoryManager::Initialize`,
+  `DaemonConfig::Dump`) differ in the count of global data refs (`Network::EndEventObject`, `_Allocator`, `BaseMemoryManager::_Instance`), not in a path. They need a data-layout or init-order cause.
+- Not a per-exe cause: scalar placement `operator delete(void*, void*)` (Memory.h:173) is DIFF score 0 in CG, SCD, POD (card arraynew-3). IDA did not open CG in this card; `Session::SendV` CG 0xfaa0 not fixed.
+  The orig `Compose` call there has the const 0xf9e twice; our source has it once (`Compose(..., 0xF9E, format, -1, args)`).
