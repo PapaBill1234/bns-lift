@@ -296,9 +296,9 @@
 "Channel::Close": {
 "calls": 100,
 "consts": 100,
-"refs": 0,
-"score": 66.7,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Channel::GetSession": {
 "calls": 100,
@@ -2032,9 +2032,9 @@
 "ObjPoolTimer::~ObjPoolTimer": {
 "calls": 100,
 "consts": 100,
-"refs": 88,
-"score": 95.8,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Packet::AddSize": {
 "calls": 100,
@@ -2851,9 +2851,9 @@
 "SessionPool::SessionPool": {
 "calls": 100,
 "consts": 100,
-"refs": 75,
-"score": 91.7,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "SessionPool::addToPool": {
 "calls": 100,
@@ -2865,9 +2865,9 @@
 "SessionPool::~SessionPool": {
 "calls": 100,
 "consts": 100,
-"refs": 88,
-"score": 95.8,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "SessionSendBuffer::Add": {
 "calls": 60,

@@ -1619,9 +1619,9 @@
 "PacketFormatIterator::SetFormat": {
 "calls": 100,
 "consts": 100,
-"refs": 50,
-"score": 83.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "PacketFormatIterator::skipRepeatFormat": {
 "calls": 100,

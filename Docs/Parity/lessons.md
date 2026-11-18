@@ -45,7 +45,24 @@ Each new card adds its patterns at the end of section A or B. The next review so
   necessary. Keep the object order of CG (`LIFT_COMMON_SOURCES`, `lift_common_cg`), else the data layout moves.
 - Examples: LG `BnsCommonConfig::Dump`, POD `ThreadFreePacketPump::Initialize`, SCD `RefCntObject::addReferenceCount` 0x6890,
   SCD `NPServiceChannelManager::OnClose`. Gains: s3 +14, lg-1 +26, scd-1 +5.
-- Open: `PacketUtil.h` (CG, POD), `StlMemory.h` in shared objects, `FragmentPacket.cpp` (LG) (see `review-1.md`).
+- paths-2 (worked, CG +1, LG +6, SCD +4, POD +6, no MATCH lost): macros `LIFT_PACKETUTIL_H_PATH` (narrow, CG default),
+  `LIFT_CHANNEL_H_FILE` (wide, CG default), `LIFT_FRAGMENTPACKET_PATH` (narrow, `..\..\Packet\` default). Wrappers
+  `{Port,Timer,Channel}<Exe>.cpp`, `PacketUtil{LobbyGate,PostOfficeDaemon}.cpp`, `FragmentPacketLobbyGate.cpp`.
+  CMake: `LIFT_COMMON_PATH_SOURCES` leave `lift_common`; `lift_common_{lg,scd,pod}` take the wrapper if it exists, else the plain file.
+  `LIFT_STLMEMORY_FILE` added to LG `Client.cpp` (upper case), POD `PostOfficeDaemon.cpp`, `WorldConfigManager.cpp`, `LobbyDaemon/ObjectPool.cpp` (SCD).
+- VS2010 `cl` gives C2308 for `L"" MACRO`. For a narrow macro that needs a wide twin, use `LIFT_WIDEN(x)` = `L##x` with a 2-step macro.
+- Did not work: `__declspec(noinline)` on `RefCntObject::removeReferenceCount` (all 4 exes lose MATCH: CG -2, LG -2, POD -1)
+  and on `AutoCS::~AutoCS`/`Leave` (POD loses `CachedWatchdogManager::initWatchdogManager`). The LTCG inline choice moves. Undone.
+- Cause of `TimerQueue::~TimerQueue` (DIFF in LG, SCD, POD): the wrapper `Timer<Exe>.obj` has only the exe path. The dtor inlines
+  `StlAllocator<Timer*,2>::deallocate` (COMDAT). The /LTCG linker keeps the first copy. Objects of `lift_<exe>` and of `lift_common`
+  that come first in the link order have the CG path (their `.obj` has the CG literal). So the CG copy wins.
+  Fix (not done): the VS2010 build must give each exe-library source a `-DLIFT_EXE_<X>` and `StlMemory.h` must choose the literal from it.
+  `tools/vs2010/build.sh` compiles one object per source path with fixed flags, and `tools/` is outside the files of paths-2.
+  A CMake `target_compile_definitions` only changes the clang build, so it has no effect on parity. Tried and undone.
+  Shared objects (`Daemon`, `Connection`, `Network`, ...) would also need a wrapper per exe. Expected gain: +3 (one per exe) and some `StlMemory.h` refs.
+- Not path causes (inline choice, `noinline` fails): `Lock.h` refs in POD (7 functions), `RefCntObject.h` refs in `LogMedia::Write` and
+  `TimerQueue::clearShortTermQueueSlot`, `source\Memory.cpp` refs in `BloodDaemonMain` and `Daemon::start` (the original inlines the
+  Memory init and calls `printUsage` before `makeConsole`).
 
 ### A6. Branch order follows the original address order (P3, P7, P10, P20, P25, P33, P39): 30
 - VS2010 lays out the `if` body first. Write first the branch that is first in the original code.

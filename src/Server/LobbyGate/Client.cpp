@@ -1,4 +1,7 @@
 // Client.obj (LobbyGate PDB). Source: .scratch/hr/Client.c
+// LIFT: LobbyGate, upper case form build path of StlMemory.h (from the HR strings).
+#define LIFT_STLMEMORY_FILE \
+    L"E:\\DailyBuild02\\LobbyGate-Common-0.0.348\\depot\\Branch\\348NC\\Program\\Server\\BloodLib\\include\\StlMemory.h"
 #include "Daemon.h"
 #include "Network.h"
 #include <new>

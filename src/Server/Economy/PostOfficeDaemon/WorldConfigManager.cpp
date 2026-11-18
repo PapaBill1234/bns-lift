@@ -1,6 +1,9 @@
 // WorldConfigManager.obj (PostOfficeDaemon PDB). Source: .scratch/hr/WorldConfigManager.c
 // The std::map functions of WorldConfigList (0xd8c0, 0xf210, 0xf2a0, 0xf310, 0xf3f0, 0xf760, 0xf890,
 // 0x12a20, 0x1f520, 0x1f580, 0x1f5a0) come from include/vs2010.
+// LIFT: PostOfficeDaemon build path of StlMemory.h (from the HR strings).
+#define LIFT_STLMEMORY_FILE \
+    L"e:\\dailybuild02\\postofficedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\bloodlib\\include\\StlMemory.h"
 #include <winsock2.h>
 #include <windows.h>
 #include <io.h>

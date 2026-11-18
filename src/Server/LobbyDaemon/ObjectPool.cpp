@@ -1,5 +1,8 @@
 // ObjectPool.obj (SmartCouponDaemon PDB). Source file: "..\LobbyDaemon\ObjectPool.cpp".
 // LTCG put the one pool (EventNotiJob::_pool) into each body. This lift uses `this`.
+// LIFT: SmartCouponDaemon build path of StlMemory.h (from the HR strings).
+#define LIFT_STLMEMORY_FILE \
+    L"e:\\dailybuild02\\smartcoupondaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\bloodlib\\include\\StlMemory.h"
 #include "ObjectPool.h"
 
 #include <windows.h>

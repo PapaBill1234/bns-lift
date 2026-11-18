@@ -11,8 +11,15 @@
 #include "PacketBuffer.h"
 
 static wchar_t const PACKETUTIL_FILE[] = L"source\\PacketUtil.cpp";
-static wchar_t const PACKETUTIL_H_FILE[] =
-    L"e:\\dailybuild02\\lobbygate-common-0.0.348\\depot\\branch\\348nc\\program\\server\\bloodlib\\include\\PacketUtil.h";
+// LIFT: each exe has its own build path for include\PacketUtil.h. A wrapper .cpp (PacketUtilLobbyGate.cpp,
+// PacketUtilPostOfficeDaemon.cpp) can define LIFT_PACKETUTIL_H_PATH before it includes this file. The default is CacheGate.
+#ifndef LIFT_PACKETUTIL_H_PATH
+#define LIFT_PACKETUTIL_H_PATH \
+    "e:\\dailybuild02\\cachegate-common-0.0.348\\depot\\branch\\348nc\\program\\server\\bloodlib\\include\\PacketUtil.h"
+#endif
+#define LIFT_WIDEN2(x) L##x
+#define LIFT_WIDEN(x) LIFT_WIDEN2(x)
+static wchar_t const PACKETUTIL_H_FILE[] = LIFT_WIDEN(LIFT_PACKETUTIL_H_PATH);
 
 // Inlined crash macro.
 #define PACKETUTIL_ASSERT_CRASH(line)                                                  \
@@ -28,8 +35,7 @@ static wchar_t const PACKETUTIL_H_FILE[] =
     {                                                                                    \
         Log::Write(Log::LT_ERROR, PACKETUTIL_H_FILE, line, L"== CRASH == ASSERT CRASH"); \
         AlertSender::Write(PACKETUTIL_H_FILE, line, L"== CRASH == ASSERT CRASH");       \
-        CrashHandler::MakeCrash("e:\\dailybuild02\\lobbygate-common-0.0.348\\depot\\branch\\348nc\\program\\server\\bloodlib\\include\\PacketUtil.h", \
-                                line, L"");                                              \
+        CrashHandler::MakeCrash(LIFT_PACKETUTIL_H_PATH, line, L"");                                              \
     } while (0)
 
 // ---- PacketFormatIterator (PacketUtil.h inline bodies) ----

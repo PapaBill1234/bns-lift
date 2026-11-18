@@ -11,19 +11,19 @@ Do not push this code to a public repo. Do not commit binaries or keys.
 ## Parity
 
 <!-- parity:start -->
-Last update: card `lift-parity-tool-2` (2026-11-18). Tool: `tools/parity.sh` (VS2010 /GL /LTCG build vs original, funcdiff).
+Last update: card `lift-parity-paths-2` (2026-11-18). Tool: `tools/parity.sh` (VS2010 /GL /LTCG build vs original, funcdiff).
 
 | Exe | Parity | MATCH | DIFF | Only in original | Total | Mean score | Start | Change | Level |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| CacheGate | **82.5 %** | 405 | 78 | 8 | 491 | 98.1 | 44.0 % | +38.5 | below 90 % |
-| LobbyGate | **68.5 %** | 506 | 143 | 90 | 739 | 97.7 | 37.9 % | +30.6 | below 90 % |
-| SmartCouponDaemon | **72.3 %** | 484 | 125 | 60 | 669 | 97.6 | 33.6 % | +38.7 | below 90 % |
-| PostOfficeDaemon | **69.7 %** | 529 | 167 | 63 | 759 | 96.9 | 34.5 % | +35.2 | below 90 % |
-| **All 4** | **72.4 %** | 1924 | | | 2658 | | 37.0 % | +35.4 | below 90 % |
+| CacheGate | **82.7 %** | 406 | 77 | 8 | 491 | 98.1 | 44.0 % | +38.7 | below 90 % |
+| LobbyGate | **69.3 %** | 512 | 137 | 90 | 739 | 97.8 | 37.9 % | +31.4 | below 90 % |
+| SmartCouponDaemon | **72.9 %** | 488 | 121 | 60 | 669 | 97.7 | 33.6 % | +39.3 | below 90 % |
+| PostOfficeDaemon | **70.5 %** | 535 | 161 | 63 | 759 | 97.0 | 34.5 % | +36.0 | below 90 % |
+| **All 4** | **73.0 %** | 1941 | | | 2658 | | 37.0 % | +36.0 | below 90 % |
 
 | Shared library (functions in 2+ exes) | Parity | MATCH in each exe | DIFF in 1+ exe | Total | Goal |
 | --- | ---: | ---: | ---: | ---: | --- |
-| BloodLib, Shared, Packet, CRT | **81.2 %** | 397 | 92 | 489 | 99 % |
+| BloodLib, Shared, Packet, CRT | **82.6 %** | 404 | 85 | 489 | 99 % |
 
 Goal: 95 % per exe, 99 % preferred. Shared library: 99 % preferred. Rules: [Docs/Parity/README.md](Docs/Parity/README.md). History: [Docs/Parity/progress.tsv](Docs/Parity/progress.tsv).
 
@@ -40,4 +40,5 @@ Goal: 95 % per exe, 99 % preferred. Shared library: 99 % preferred. Rules: [Docs
 | `lift-parity-pod-1` | 78.8 % | 65.9 % | 68.9 % | 67.1 % |
 | `lift-parity-review-1` | 78.8 % | 65.9 % | 68.9 % | 67.1 % |
 | `lift-parity-tool-2` | 82.5 % | 68.5 % | 72.3 % | 69.7 % |
+| `lift-parity-paths-2` | 82.7 % | 69.3 % | 72.9 % | 70.5 % |
 <!-- parity:end -->

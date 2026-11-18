@@ -520,9 +520,9 @@
 "Channel::Close": {
 "calls": 100,
 "consts": 100,
-"refs": 0,
-"score": 66.7,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Channel::GetSession": {
 "calls": 100,
@@ -2172,9 +2172,9 @@
 "PacketFormatIterator::SetFormat": {
 "calls": 100,
 "consts": 100,
-"refs": 50,
-"score": 83.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "PacketFormatIterator::skipRepeatFormat": {
 "calls": 100,
@@ -2795,9 +2795,9 @@
 "PostOfficeDaemon::initWorldConfigDependencyManager": {
 "calls": 100,
 "consts": 100,
-"refs": 96,
-"score": 98.8,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "PostOfficeDaemon::initialize": {
 "calls": 48,
@@ -2830,9 +2830,9 @@
 "PostOfficeDaemon::reload": {
 "calls": 100,
 "consts": 100,
-"refs": 95,
-"score": 98.5,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "PostOfficeDaemon::setArgument": {
 "calls": 100,
@@ -3383,9 +3383,9 @@
 "SessionPool::SessionPool": {
 "calls": 100,
 "consts": 100,
-"refs": 75,
-"score": 91.7,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "SessionPool::addToPool": {
 "calls": 100,
@@ -3397,9 +3397,9 @@
 "SessionPool::~SessionPool": {
 "calls": 100,
 "consts": 100,
-"refs": 88,
-"score": 95.8,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "SessionSendBuffer::Add": {
 "calls": 60,
@@ -4209,8 +4209,8 @@
 "WorldConfigList::~WorldConfigList": {
 "calls": 50,
 "consts": 100,
-"refs": 67,
-"score": 72.2,
+"refs": 100,
+"score": 83.3,
 "status": "DIFF"
 },
 "WorldConfigManager::CheckWorldConfig": {

@@ -17,11 +17,14 @@
 
 static wchar_t const CHANNEL_FILE[] = L"source\\Channel.cpp";
 // The file name of the inlined helper from BloodLib/include/Channel.h.
-static wchar_t const CHANNEL_HEADER_FILE[] =
-    L"E:\\DailyBuild02\\CacheGate-Common-0.0.348\\depot\\Branch\\348NC\\Program\\Server\\BloodLib\\include\\Channel.h";
-// The same helper file name in the LobbyGate build.
-static wchar_t const LOBBYGATE_CHANNEL_HEADER_FILE[] =
-    L"E:\\DailyBuild02\\LobbyGate-Common-0.0.348\\depot\\Branch\\348NC\\Program\\Server\\BloodLib\\include\\Channel.h";
+// LIFT: each exe has its own build path. A wrapper .cpp (ChannelLobbyGate.cpp, ...) defines LIFT_CHANNEL_H_FILE
+// before it includes this file. The default is CacheGate.
+#ifndef LIFT_CHANNEL_H_FILE
+#define LIFT_CHANNEL_H_FILE \
+    L"E:\\DailyBuild02\\CacheGate-Common-0.0.348\\depot\\Branch\\348NC\\Program\\Server\\BloodLib\\include\\Channel.h"
+#endif
+static wchar_t const CHANNEL_HEADER_FILE[] = LIFT_CHANNEL_H_FILE;
+static wchar_t const LOBBYGATE_CHANNEL_HEADER_FILE[] = LIFT_CHANNEL_H_FILE;
 
 // Inlined crash macro.
 #define CHANNEL_ASSERT_CRASH(line)                                                  \

@@ -125,7 +125,17 @@ set(LIFT_COMMON_SOURCES
   src/Server/BloodLib/source/CrashHandler.cpp
   src/Server/Packet/FragmentPacket.cpp
   src/Server/BloodLib/source/Db.cpp)
-add_library(lift_common STATIC ${LIFT_COMMON_SOURCES})
+# LIFT: these modules have a per-exe path literal (lessons.md pattern A5). LG, SCD and POD link a per-exe
+# wrapper (or the plain file) in lift_common_{lg,scd,pod}. CacheGate keeps the plain file and its default macro.
+set(LIFT_COMMON_PATH_SOURCES
+  src/Server/BloodLib/source/Timer.cpp
+  src/Server/BloodLib/source/Channel.cpp
+  src/Server/BloodLib/source/Port.cpp
+  src/Server/BloodLib/source/PacketUtil.cpp
+  src/Server/Packet/FragmentPacket.cpp)
+set(LIFT_COMMON_SHARED_SOURCES ${LIFT_COMMON_SOURCES})
+list(REMOVE_ITEM LIFT_COMMON_SHARED_SOURCES ${LIFT_COMMON_PATH_SOURCES})
+add_library(lift_common STATIC ${LIFT_COMMON_SHARED_SOURCES})
 add_library(lift_common_cg STATIC ${LIFT_COMMON_SOURCES}
   src/Server/BloodLib/source/MemoryManager.cpp
   src/Server/BloodLib/source/RefCntObject.cpp)
@@ -178,9 +188,19 @@ foreach(lift_e IN ITEMS LobbyGate:lg SmartCouponDaemon:scd PostOfficeDaemon:pod)
   string(REPLACE ":" ";" lift_p "${lift_e}")
   list(GET lift_p 0 lift_x)
   list(GET lift_p 1 lift_s)
-  add_library(lift_common_${lift_s} STATIC
+  set(lift_w
     src/Server/BloodLib/source/MemoryManager${lift_x}.cpp
     src/Server/BloodLib/source/RefCntObject${lift_x}.cpp)
+  foreach(lift_f IN LISTS LIFT_COMMON_PATH_SOURCES)
+    get_filename_component(lift_d ${lift_f} DIRECTORY)
+    get_filename_component(lift_n ${lift_f} NAME_WE)
+    if(EXISTS ${CMAKE_SOURCE_DIR}/${lift_d}/${lift_n}${lift_x}.cpp)
+      list(APPEND lift_w ${lift_d}/${lift_n}${lift_x}.cpp)
+    else()
+      list(APPEND lift_w ${lift_f})
+    endif()
+  endforeach()
+  add_library(lift_common_${lift_s} STATIC ${lift_w})
 endforeach()
 foreach(lift_s IN ITEMS lg scd pod)
   target_compile_options(lift_common_${lift_s} PRIVATE /GR-)
