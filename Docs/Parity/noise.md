@@ -1,6 +1,6 @@
 # funcdiff noise (lift-parity-0)
 
-Fixes 1 to 9 are in `tools/funcdiff.py`. See the open candidates below.
+Fixes 1 to 10 are in `tools/funcdiff.py`. See the open candidates below.
 
 ## Method
 - `tools/funcdiff.py <EXE> --build build-vs2010 --show .` for all 4 exes.
@@ -127,6 +127,32 @@ a `gs:` load. The final fix 6 also finds the offset before the load (see fix 6).
   five in LobbyGate, four in SmartCouponDaemon, and three in
   PostOfficeDaemon. Shared matches increase from 483 to 486 of 549.
   Every previous match holds.
+
+## Fix 10. Public names of folded virtual tables
+
+- In CacheGate `Session::initialize`, the instruction at 0xe343
+  loads the table at 0x52780. The original PDB names this table
+  `SessionRecvBuffer`. In the build, the instruction at 0x19fc0
+  loads the table at 0x4c228. The build PDB gives two public names
+  at section 2 offset 70184. They are `SessionRecvBuffer` and
+  `CrashHandler`. The old comparison selected `CrashHandler`.
+- In SmartCouponDaemon `Network::Network`, the original PDB gives
+  the `NetworkEndEvent` and `GameEventEndEvent` tables the same
+  address, section 2 offset 90096. The reference in the build has
+  the `NetworkEndEvent` name.
+- In PostOfficeDaemon `CrashHandler::CrashHandler`, the build PDB
+  gives the `CrashHandler`, `SessionRecvBuffer`, and
+  `CheckPostCapacityRelayRequest` tables the same address,
+  section 2 offset 167328. The original PDB gives the reference
+  the `CrashHandler` name.
+- Use every public table name at the referenced address. Pair
+  references when they share a name. Count each reference once.
+  These checks preserve differences in table names and counts.
+- The same binaries gained five matches. CacheGate, LobbyGate, and
+  SmartCouponDaemon gain `Session::initialize`. SmartCouponDaemon
+  also gains `Network::Network`. PostOfficeDaemon gains
+  `CrashHandler::CrashHandler`. Shared matches increase from 487
+  to 490 of 549. All previous matches hold.
 
 ## Open candidates
 - A. TLS offsets: see fixes 6 and 9.

@@ -291,7 +291,7 @@ def signals(img, rva, size, alias):
             if op.type == X86.X86_OP_MEM and op.mem.base == X86.X86_REG_RIP:
                 t = ins.address + ins.size + op.mem.disp
                 # Noise fix 5: a vtable symbol at the exact RVA wins. Slot 0 can look like a 2-byte string.
-                vt = target_name(t) if any(x.startswith("??_7") for x in img.names.get(t, ())) else None
+                vt = frozenset(name for name in img.names.get(t, ()) if name.startswith("??_7"))
                 n = vt or img.string_at(t) or target_name(t) or "<data>"
                 if n not in NOISE:
                     refs.append(n)
@@ -315,6 +315,46 @@ def signals(img, rva, size, alias):
                         and ins.operands[0].reg == X86.X86_REG_EAX:
                     chk = v
     return calls, refs, sorted(set(consts))
+
+
+def align_vtable_refs(original, built):
+    """Give each pair of vtable references a common PDB name."""
+    def split(refs):
+        names, tables = [], []
+        for ref in refs:
+            if isinstance(ref, frozenset):
+                tables.append(ref)
+            else:
+                names.append(ref)
+        return names, tables
+
+    original_names, original_tables = split(original)
+    built_names, built_tables = split(built)
+    candidates = [[j for j, right in enumerate(built_tables) if left & right]
+                  for left in original_tables]
+    matched = {}
+
+    # Reassign an earlier pair if its other candidate frees this reference.
+    def assign(i, visited):
+        for j in candidates[i]:
+            if j in visited:
+                continue
+            visited.add(j)
+            if j not in matched or assign(matched[j], visited):
+                matched[j] = i
+                return True
+        return False
+
+    for i in range(len(original_tables)):
+        assign(i, set())
+    matched_original = set(matched.values())
+    for j, i in matched.items():
+        name = min(original_tables[i] & built_tables[j])
+        original_names.append(name)
+        built_names.append(name)
+    original_names.extend(min(names) for i, names in enumerate(original_tables) if i not in matched_original)
+    built_names.extend(min(names) for j, names in enumerate(built_tables) if j not in matched)
+    return original_names, built_names
 
 
 def expand(orig, calls, table, rounds=3):
@@ -399,6 +439,7 @@ def main():
         oc, orf, ok = to[ko][1]
         lc, lrf, lk = tl[pairs[ko]][1]
         lc = expand(oc, lc, ours_calls)
+        orf, lrf = align_vtable_refs(orf, lrf)
         s = (sim(oc, lc), sim(sorted(orf), sorted(lrf)), sim(ok, lk))
         status = "MATCH" if s == (1.0, 1.0, 1.0) else "DIFF"
         res[k] = {"status": status, "score": round(100 * sum(s) / 3, 1),
