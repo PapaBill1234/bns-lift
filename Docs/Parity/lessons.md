@@ -659,3 +659,10 @@ Open facts:
   other original builds use a fixed port ID. Applying the same
   source form across all four builds changed the log order in those
   three builds and lost their matches.
+
+## Public names of folded virtual tables
+
+- Check all public names at the address before changing the source.
+  The CacheGate build gives the `SessionRecvBuffer` table in
+  `Session::initialize` a second name, `CrashHandler`. Use the
+  name that the two PDBs share. See fix 10 in [noise.md](noise.md).
