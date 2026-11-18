@@ -102,6 +102,18 @@ int privateClass(unsigned long address)
 }
 }  // namespace
 
+// LIFT: Log::Flush is noinline (the orig calls it from CrashHandler only). The orig inlines it in
+// Daemon::start and Daemon::Run (CG, LG, SCD, POD). This helper has the same body as Log::Flush.
+__forceinline void Log::FlushInline()
+{
+    if (instance != nullptr && instance->open)
+    {
+        instance->flush = true;
+        if (Log::instance->notifyEvent.Event != nullptr)
+            SetEvent(Log::instance->notifyEvent.Event);
+    }
+}
+
 // 0xa430
 static void printUsage(wchar_t const* argv0)
 {
@@ -479,7 +491,7 @@ fail:
     // LIFT: Inlined Log code: flush and close the log.
     if (Log::instance != nullptr)
     {
-        Log::Flush();
+        Log::FlushInline();
         Log::instance->open = false;
     }
     return false;
@@ -641,7 +653,7 @@ void Daemon::noTimerMain(Network* networkInstance)
         {
             if (--flushCount == 0)
             {
-                Log::Flush();  // LIFT: inlined
+                Log::FlushInline();  // LIFT: inlined
                 flushCount = 1;
             }
             flushTime += 600;
@@ -705,7 +717,7 @@ void Daemon::timerMain(Network* networkInstance)
         {
             if (--flushCount == 0)
             {
-                Log::Flush();  // LIFT: inlined
+                Log::FlushInline();  // LIFT: inlined
                 flushCount = 1;
             }
             flushTime += 600;

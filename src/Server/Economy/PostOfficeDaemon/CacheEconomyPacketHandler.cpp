@@ -1,7 +1,6 @@
 // CacheEconomyPacketHandler.obj (PostOfficeDaemon PDB). Source: .scratch/hr/CacheEconomyPacketHandler.c
 // Each handler inlines the static guard init of RelayHeader::GetMemberOffset. The lift skips it (no effect here).
-// Each Decompose call in the original is Packet::Decompose(packet, 0x18, 6, fmt, ...). LIFT: Packet.h has no overload
-// with these two arguments. The lift calls Decompose(fmt, ...).
+// Each Decompose call in the original is Packet::Decompose(packet, 0x18, 6, fmt, ...) (0x220d0).
 #include <winsock2.h>
 #include <windows.h>
 #include "CacheEconomyPacketHandler.h"
@@ -114,7 +113,7 @@ bool HandleCacheEconomyPingOk(Session const* session, Packet const* packet)
     response._failReason = 0;
     response._pingSeq = 0;
 
-    if (packet->Decompose("hhhqq", &cmd, &economyHeader._fromWid, &economyHeader._toWid, &economyHeader._relayTid,
+    if (packet->Decompose(0x18, 6, "hhhqq", &cmd, &economyHeader._fromWid, &economyHeader._toWid, &economyHeader._relayTid,
                           &response._pingSeq) == 0)
     {
         Log::Write(Log::LT_ERROR, CEPH_FILE, 46, L"[%s], %s; failed to decompose packet", MODULE_NAME, funcName);
@@ -152,7 +151,7 @@ bool HandleCacheEconomyPingFail(Session const* session, Packet const* packet)
     response._failReason = 0;
     response._pingSeq = 0;
 
-    if (packet->Decompose("hhhqqE", &cmd, &economyHeader._fromWid, &economyHeader._toWid, &economyHeader._relayTid,
+    if (packet->Decompose(0x18, 6, "hhhqqE", &cmd, &economyHeader._fromWid, &economyHeader._toWid, &economyHeader._relayTid,
                           &response._pingSeq, &response._failReason) == 0)
     {
         Log::Write(Log::LT_ERROR, CEPH_FILE, 105, L"[%s], %s; failed to decompose packet", MODULE_NAME, funcName);
@@ -193,7 +192,7 @@ bool HandleCacheEconomyRetrieveCharacterInfoOk(Session const* session, Packet co
     response._failReason = 0;
     response._resultPcId = 0;
 
-    if (packet->Decompose("hhhqqq", &cmd, &economyHeader._fromWid, &economyHeader._toWid, &economyHeader._relayTid,
+    if (packet->Decompose(0x18, 6, "hhhqqq", &cmd, &economyHeader._fromWid, &economyHeader._toWid, &economyHeader._relayTid,
                           &gameTid, &response._resultPcId) == 0)
     {
         Log::Write(Log::LT_ERROR, CEPH_FILE, 165, L"[%s], %s; failed to decompose packet", MODULE_NAME, funcName);
@@ -234,7 +233,7 @@ bool HandleCacheEconomyRetrieveCharacterInfoFail(Session const* session, Packet 
     response._failReason = 0;
     response._resultPcId = 0;
 
-    if (packet->Decompose("hhhqqE", &cmd, &economyHeader._fromWid, &economyHeader._toWid, &economyHeader._relayTid,
+    if (packet->Decompose(0x18, 6, "hhhqqE", &cmd, &economyHeader._fromWid, &economyHeader._toWid, &economyHeader._relayTid,
                           &gameTid, &response._failReason) == 0)
     {
         Log::Write(Log::LT_ERROR, CEPH_FILE, 225, L"[%s], %s; failed to decompose packet", MODULE_NAME, funcName);
@@ -274,7 +273,7 @@ bool HandleCacheEconomyCheckPostCapacityOk(Session const* session, Packet const*
     response._resultState = RelayResponse::RESULTSTATE_SUCCESS;
     response._failReason = 0;
 
-    if (packet->Decompose("hhhqq", &cmd, &economyHeader._fromWid, &economyHeader._toWid, &economyHeader._relayTid,
+    if (packet->Decompose(0x18, 6, "hhhqq", &cmd, &economyHeader._fromWid, &economyHeader._toWid, &economyHeader._relayTid,
                           &gameTid) == 0)
     {
         Log::Write(Log::LT_ERROR, CEPH_FILE, 284, L"[%s], %s; failed to decompose packet", MODULE_NAME, funcName);
@@ -313,7 +312,7 @@ bool HandleCacheEconomyCheckPostCapacityFail(Session const* session, Packet cons
     response._resultState = RelayResponse::RESULTSTATE_FAILURE;
     response._failReason = 0;
 
-    if (packet->Decompose("hhhqqE", &cmd, &economyHeader._fromWid, &economyHeader._toWid, &economyHeader._relayTid,
+    if (packet->Decompose(0x18, 6, "hhhqqE", &cmd, &economyHeader._fromWid, &economyHeader._toWid, &economyHeader._relayTid,
                           &gameTid, &response._failReason) == 0)
     {
         Log::Write(Log::LT_ERROR, CEPH_FILE, 344, L"[%s], %s; failed to decompose packet", MODULE_NAME, funcName);
@@ -352,7 +351,7 @@ bool HandleCacheEconomyDeliverPostOk(Session const* session, Packet const* packe
     response._resultState = RelayResponse::RESULTSTATE_SUCCESS;
     response._failReason = 0;
 
-    if (packet->Decompose("hhhq", &cmd, &economyHeader._fromWid, &economyHeader._toWid, &economyHeader._relayTid) == 0)
+    if (packet->Decompose(0x18, 6, "hhhq", &cmd, &economyHeader._fromWid, &economyHeader._toWid, &economyHeader._relayTid) == 0)
     {
         Log::Write(Log::LT_ERROR, CEPH_FILE, 401, L"[%s], %s; failed to decompose packet", MODULE_NAME, funcName);
         logEnd(funcName, 440);
@@ -388,7 +387,7 @@ bool HandleCacheEconomyDeliverPostFail(Session const* session, Packet const* pac
     response._resultState = RelayResponse::RESULTSTATE_FAILURE;
     response._failReason = 0;
 
-    if (packet->Decompose("hhhqE", &cmd, &economyHeader._fromWid, &economyHeader._toWid, &economyHeader._relayTid,
+    if (packet->Decompose(0x18, 6, "hhhqE", &cmd, &economyHeader._fromWid, &economyHeader._toWid, &economyHeader._relayTid,
                           &response._failReason) == 0)
     {
         Log::Write(Log::LT_ERROR, CEPH_FILE, 459, L"[%s], %s; failed to decompose packet", MODULE_NAME, funcName);

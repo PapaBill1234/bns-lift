@@ -27,6 +27,20 @@ Each new card adds its patterns at the end of section A or B. The next review so
 - Side effect: a caller can change its inline choice. Example: SCD `NPServiceChannelManager::OnConnect` inlined
   `SetInvalidInfo` after `addNode` became noinline. Check the callers of the changed function.
 - Opposite form (P32): `__forceinline` on an in-class ctor that the original never emits (`CacheD::CacheD`).
+- (noinline-2) A noinline function that no source code calls is removed by the linker. It stays orig-only.
+  Check the orig xrefs in IDA when Hex-Rays shows no caller: Hex-Rays can drop calls.
+  LG `LobbyGate::initialize` 0x12e70 calls `LobbyGateConfig::Dump` 0x13086, `BnsCommonConfig::Dump` 0x1308b and
+  `ContentsRuleConfig::Dump` 0x13090 after `fclose`. The pseudocode has none of them. Three calls added: LG 528 MATCH (+6).
+  `LobbyGateConfig::Dump` must be `const` (mangled `QEBAXXZ`).
+- (noinline-2) funcdiff pairs by mangled name. A name pairs by PDB name only when it is unique on both sides.
+  An overload with another signature does not pair. Open cases: SCD `Network::OpenPort` 0x1a8b0 (orig has the 9-arg overload,
+  ours calls the 5-arg one); POD `Packet::Decompose` 0x220d0 (orig `QEBAGIHPEBDZZ` = offset, n, format, ...; ours only
+  `Decompose(char const*, ...)`, and the 8 `CacheEconomyPacketHandler` handlers call the orig overload with 0x18, 6).
+- (noinline-2) `Log::FlushInline` pattern: the orig inlines `Log::Flush` in Daemon and calls it only from CrashHandler.
+- (noinline-2) CG, SCD and POD inline `Session::deallocateCrypt` in `~Session`. Our standalone copy (94 B) is ONLY-OURS there.
+- (noinline-2) POD `PostOfficeDaemon::initialize` 0x132b0: the block 0x1344a-0x134eb (`wcsncpy` of the Daemon version string,
+  `DaemonConfig::Dump` 0x13498, `LoadBnsCommonConfig`, `BnsCommonConfig::Dump`) is dead in the control flow of the orig
+  (no path reaches `esi == 0` there). The pseudocode drops it, so `DaemonConfig::Dump` stays orig-only in POD. Not lifted.
 
 ### A4. Virtual call on a global object through a base reference (P1): 49
 - Cause: `BaseMemoryManager::_Instance.Alloc(...)` binds statically and LTCG inlines `HeapMemoryManager::Alloc`.
@@ -163,6 +177,10 @@ Each new card adds its patterns at the end of section A or B. The next review so
   tail merge itself; a goto changes the block order.
 - A global `noinline` on `RefCntHistory::add` is wrong (found by analysis, not built): only `SessionSendBuffer::clearPacketBufferList` calls it out of line.
 
+- (noinline-2) `noinline` on `TimerQueue::Remove` / `removeShortTermQueue` (POD): no gain.
+- (noinline-2) LG `Session::allocateCrypt` 0x19460: `__declspec(noinline)` is set (`Session.cpp:960`) but ours has no symbol.
+  Not solved (callers `SetHandshakeParameter` 0x14f10, `ToPacket` 0x107b0 show no call).
+
 ## C. Tool and build facts
 ### C1. funcdiff reads a vtable ref as a string (FIXED in lift-parity-tool-2)
 - `Image.string_at()` ran before `target_name()`. A vtable whose slot 0 holds `0x1400074xx` read as `" t"`, `"PI"`, `"@c"`.
@@ -235,3 +253,18 @@ Each new card adds its patterns at the end of section A or B. The next review so
 - Did not work: aes128Table fst form (no MATCH gain; reverted).
 - `aes128TableSetupEncKey` 0x38370: orig unrolls the 10-pass loop 5 times (size 589, `add rbp,0x28` on Rcon,
   `add rsi,0x50` on rk, end `cmp rbp,r13`). Ours (both the for form and the fst form) is not unrolled (size 293).
+
+## noinline-2, stage 5 (verified 2026-11-18)
+
+- POD `Packet::Decompose` 0x220d0 is `Decompose(int offset, int n, char const* format, ...)` (`?Decompose@Packet@@QEBAGIHPEBDZZ`).
+  Added as `__declspec(noinline)` in `Packet.cpp` (assert line 472). The 8 calls in `CacheEconomyPacketHandler.cpp` use `(0x18, 6, fmt, ...)`.
+  Result: POD MATCH 553 (no change), 1 ONLY-ORIG less. `Channel::Send` 0x2c160 is also paired now (it was a call-target effect).
+- SCD `Network::OpenPort` 0x1a8b0 is the 9-arg overload (`?OpenPort@Network@@SA_NIGHPEBVSessionHandler@@PEBVPacketBufferHandler@@I_N22@Z`)
+  with LTCG-folded constants (initialMode 2, enableAccept false, enableRecv true, nagle false). A separate 5-arg overload never pairs.
+  Fix: SCD calls the 9-arg overload with `2, handler, pbh, max, false, true, false`; the 5-arg overload is removed. Result: SCD MATCH 504 (no change),
+  ONLY-ORIG and ONLY-OURS for OpenPort gone (-2 ONLY entries).
+- `Session::Send(Packet const*)`: the orig calls it out of line only in CG (0xfa40) and LG (0x18f00). SCD and POD inline it at every call site.
+  Our noinline in `Session.cpp:801` makes it ONLY-OURS in SCD (0x13fa0) and POD (0x150a0). `tools/vs2010/build.sh` has no per-target define,
+  so a per-exe split needs a wrapper `.cpp` per exe (pattern A5). Not done. Same for `Session::deallocateCrypt` (ONLY-OURS in SCD/POD; orig has it only in LG 0x194c0).
+- `CriticalSection::CriticalSection` (orig 24 B, `ObjectPool.obj`): no caller names it in any orig pseudocode. Dead or folded in the orig. Not fixable by noinline.
+- `operator delete[]` (`??_V@YAXPEAX0@Z`, orig `CouponJob.c` 0x6850, 59 B): orig has it in LG/SCD/POD. Not tested.

@@ -314,7 +314,8 @@ bool EventNotiJob::eventNotiRes(void* param)
 }
 
 // 0xA9D0
-bool EventNotiJob::eventNotiExpire()
+// LIFT: noinline. The orig calls it out of line (SCD 0xa9d0).
+__declspec(noinline) bool EventNotiJob::eventNotiExpire()
 {
     Log::Write(Log::LT_ERROR, kFile, 313, L"[job], event-noti expire, jobid:0x%I64X, type:%d, state:%d", _id,
                GetDefinition()->type, _state);

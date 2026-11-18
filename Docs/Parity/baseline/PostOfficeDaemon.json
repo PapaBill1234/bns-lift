@@ -371,10 +371,10 @@
 "status": "MATCH"
 },
 "CacheGateChannel::SendFragmentRelayRequest": {
-"calls": 46,
-"consts": 91,
-"refs": 89,
-"score": 75.2,
+"calls": 67,
+"consts": 100,
+"refs": 94,
+"score": 86.9,
 "status": "DIFF"
 },
 "CacheGateChannel::SendRelayRequest": {
@@ -544,6 +544,13 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"Channel::Send": {
+"calls": 91,
+"consts": 100,
+"refs": 100,
+"score": 97.0,
+"status": "DIFF"
 },
 "Channel::SetSession": {
 "calls": 100,
@@ -756,10 +763,10 @@
 "status": "MATCH"
 },
 "CrashHandler::handleCrash": {
-"calls": 96,
+"calls": 97,
 "consts": 100,
-"refs": 93,
-"score": 96.4,
+"refs": 94,
+"score": 97.3,
 "status": "DIFF"
 },
 "CriticalSection::CriticalSection": {
@@ -868,10 +875,10 @@
 "status": "MATCH"
 },
 "Daemon::start": {
-"calls": 96,
+"calls": 99,
 "consts": 98,
-"refs": 88,
-"score": 94.0,
+"refs": 93,
+"score": 96.8,
 "status": "DIFF"
 },
 "Daemon::startDaemon": {
@@ -1049,6 +1056,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"DelayedRelease::Cleanup": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "DelayedRelease::Release": {
 "calls": 100,
 "consts": 100,
@@ -1106,10 +1120,10 @@
 "status": "MATCH"
 },
 "DeliverPostRelayContext::processRelayResponse": {
-"calls": 86,
-"consts": 78,
-"refs": 89,
-"score": 84.1,
+"calls": 95,
+"consts": 100,
+"refs": 94,
+"score": 96.5,
 "status": "DIFF"
 },
 "DeliverPostRelayContext::processRelayTimeout": {
@@ -1267,6 +1281,20 @@
 "status": "MATCH"
 },
 "FragmentPacketSplitter::Finalize": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GrowingBuffer::Add": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GrowingBuffer::grow": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -1602,12 +1630,26 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Log::Flush": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Log::InitMedia": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"Log::Initialize": {
+"calls": 80,
+"consts": 80,
+"refs": 92,
+"score": 84.1,
+"status": "DIFF"
 },
 "Log::Name": {
 "calls": 100,
@@ -2051,10 +2093,10 @@
 "status": "DIFF"
 },
 "PacketBuffer::DecomposeText": {
-"calls": 93,
-"consts": 90,
+"calls": 97,
+"consts": 100,
 "refs": 82,
-"score": 88.7,
+"score": 93.0,
 "status": "DIFF"
 },
 "PacketBuffer::deallocate_me": {
@@ -2437,16 +2479,16 @@
 },
 "Port::Clear": {
 "calls": 100,
-"consts": 80,
-"refs": 91,
-"score": 90.3,
-"status": "DIFF"
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Port::Initialize": {
-"calls": 97,
-"consts": 83,
+"calls": 100,
+"consts": 96,
 "refs": 100,
-"score": 93.4,
+"score": 98.7,
 "status": "DIFF"
 },
 "Port::MakeNewSession [?MakeNewSession@Port@@IEAAPEAVSession@@PEA_KKGH@Z]": {
@@ -2479,10 +2521,10 @@
 },
 "Port::clearPool": {
 "calls": 100,
-"consts": 67,
+"consts": 100,
 "refs": 100,
-"score": 88.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Port::makeSession": {
 "calls": 100,
@@ -2685,6 +2727,20 @@
 "consts": 100,
 "refs": 100,
 "score": 98.7,
+"status": "DIFF"
+},
+"PostOfficeDB::UpdateStatusToDeliveryFailure": {
+"calls": 100,
+"consts": 57,
+"refs": 21,
+"score": 59.4,
+"status": "DIFF"
+},
+"PostOfficeDB::UpdateStatusToDeliverySuccess": {
+"calls": 100,
+"consts": 57,
+"refs": 21,
+"score": 59.4,
 "status": "DIFF"
 },
 "PostOfficeDB::UpdateStatusToRetryReady": {
@@ -3360,10 +3416,10 @@
 "status": "MATCH"
 },
 "Session::~Session": {
-"calls": 100,
-"consts": 77,
-"refs": 100,
-"score": 92.3,
+"calls": 93,
+"consts": 89,
+"refs": 80,
+"score": 87.2,
 "status": "DIFF"
 },
 "SessionPool::Initialize": {
@@ -3661,11 +3717,11 @@
 "status": "DIFF"
 },
 "TextStreamPacketBufferHandler::ToPacket": {
-"calls": 29,
-"consts": 80,
-"refs": 0,
-"score": 36.2,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "TextStreamPacketBufferHandler::~TextStreamPacketBufferHandler": {
 "calls": 100,
@@ -4793,6 +4849,13 @@
 "refs": 100,
 "score": 97.4,
 "status": "DIFF"
+},
+"parseString": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "pre_c_init": {
 "calls": 100,

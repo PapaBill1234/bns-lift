@@ -156,7 +156,8 @@ void DaemonConfig::FreeConfig(void* config)
 // 0xca10
 // LIFT: LTCG made this function specific to CacheGate. 0xCA3E loads CacheGateConfig::_Def + 8 (PDB 0003:1728)
 // and 0xCA45 loads L"cachegate config". The only call (0x4535) passes only rcx = config. The lift uses the parameters.
-void DaemonConfig::Dump(wchar_t const* name, void const* config, XmlCfgDef const* defs, int count)
+// LIFT: noinline. The orig calls it out of line (POD 0x282d0).
+__declspec(noinline) void DaemonConfig::Dump(wchar_t const* name, void const* config, XmlCfgDef const* defs, int count)
 {
     wchar_t const* const file = L"source\\DaemonConfig.cpp";
     char const* base = static_cast<char const*>(config);

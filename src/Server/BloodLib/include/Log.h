@@ -55,6 +55,7 @@ private:
     virtual void run();
     static void Add(LogBuffer* buf);  // SmartCouponDaemon 0x19B50: static, uses instance
 
+    static void FlushInline();  // LIFT: lift helper, same body as Flush, defined in Daemon.cpp (inlined there in the orig)
     static Log* instance;
 
     friend class Daemon;

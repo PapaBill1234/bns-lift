@@ -709,7 +709,8 @@ int parseDecInt(wchar_t const* str, wchar_t const* end, long long& value)
 
 // 0x2FA20 (PostOfficeDaemon)
 // The code never returns -2.
-int parseString(wchar_t const* str, wchar_t const* end, wchar_t* buffer, short count)
+// LIFT: noinline. The orig calls it out of line (POD 0x2fa20).
+__declspec(noinline) int parseString(wchar_t const* str, wchar_t const* end, wchar_t* buffer, short count)
 {
     bool quoted = false;
     wchar_t const* p = str;

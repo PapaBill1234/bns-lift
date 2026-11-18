@@ -36,7 +36,8 @@ Log::~Log()
 }
 
 // 0x19630 (SmartCouponDaemon)
-bool Log::Initialize()
+// LIFT: noinline. The orig calls it from Daemon::start only (CG 0x9DA0, LG 0x1A960, POD 0x25660).
+__declspec(noinline) bool Log::Initialize()
 {
     if (instance != nullptr)
         return true;
@@ -92,7 +93,8 @@ void Log::Close()
 }
 
 // 0x19840 (SmartCouponDaemon)
-void Log::Flush()
+// LIFT: noinline. The orig calls it from CrashHandler only (CG 0x9FB0, LG 0x1AB80); it inlines it in Daemon.cpp.
+__declspec(noinline) void Log::Flush()
 {
     if (instance != nullptr && instance->open)
     {

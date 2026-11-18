@@ -797,7 +797,8 @@ void Session::Send(char const* format, ...) const
 }
 
 // 0xFA40
-void Session::Send(Packet const* packet) const
+// LIFT: noinline. The orig calls it out of line at all call sites (LG 0x18f00: not inlined).
+__declspec(noinline) void Session::Send(Packet const* packet) const
 {
     Session* self = const_cast<Session*>(this);
     packet->ListHead->encrypt(_currentCrypt, _security3rd);
@@ -955,7 +956,8 @@ PacketCrypt* PacketCrypt::Create(Type type, Algorithm algorithm, unsigned char* 
 }
 
 // 0x19460 (LobbyGate)
-void* Session::allocateCrypt(PacketCrypt::Type type, PacketCrypt::Algorithm algorithm) const
+// LIFT: noinline. The orig calls it out of line at all call sites (LG 0x19460: not inlined).
+__declspec(noinline) void* Session::allocateCrypt(PacketCrypt::Type type, PacketCrypt::Algorithm algorithm) const
 {
     // LIFT: LTCG removed the algorithm param from InstanceSize and Create. Create gets (type, buffer, size)
     // (LobbyGate 0x1946d, tail jump 0x194ac).
@@ -968,7 +970,8 @@ void* Session::allocateCrypt(PacketCrypt::Type type, PacketCrypt::Algorithm algo
 }
 
 // 0x194C0 (LobbyGate). The CacheGate ~Session (0xE0A0) inlines it.
-void Session::deallocateCrypt(void* crypt) const
+// LIFT: noinline. The orig calls it out of line at all call sites (LG 0x194c0: CG ~Session inlines it).
+__declspec(noinline) void Session::deallocateCrypt(void* crypt) const
 {
     Session* self = const_cast<Session*>(this);
     PacketCrypt* packetCrypt = static_cast<PacketCrypt*>(crypt);

@@ -18,7 +18,7 @@ class LogFile;
 class LobbyGateConfig
 {
 public:
-    void Dump();  // 0x13e20
+    void Dump() const;  // 0x13e20
 
     wchar_t* _rootPath;
     wchar_t* _logPath;

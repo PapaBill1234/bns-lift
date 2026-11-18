@@ -497,10 +497,10 @@
 "status": "MATCH"
 },
 "CrashHandler::handleCrash": {
-"calls": 96,
+"calls": 97,
 "consts": 100,
-"refs": 93,
-"score": 96.4,
+"refs": 94,
+"score": 97.3,
 "status": "DIFF"
 },
 "CriticalSection::~CriticalSection": {
@@ -714,10 +714,10 @@
 "status": "MATCH"
 },
 "Daemon::start": {
-"calls": 96,
+"calls": 99,
 "consts": 98,
-"refs": 88,
-"score": 94.0,
+"refs": 93,
+"score": 96.8,
 "status": "DIFF"
 },
 "Daemon::startDaemon": {
@@ -818,6 +818,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"DbTransaction::BindCol": {
+"calls": 67,
+"consts": 100,
+"refs": 100,
+"score": 88.9,
+"status": "DIFF"
+},
 "DbTransaction::BindParam": {
 "calls": 100,
 "consts": 100,
@@ -889,6 +896,13 @@
 "status": "MATCH"
 },
 "DelayedRelease::Add": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DelayedRelease::Cleanup": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -972,6 +986,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"EventNotiJob::eventNotiExpire": {
+"calls": 100,
+"consts": 86,
+"refs": 100,
+"score": 95.2,
+"status": "DIFF"
+},
 "EventNotiJob::eventNotiReq": {
 "calls": 88,
 "consts": 91,
@@ -1001,11 +1022,11 @@
 "status": "MATCH"
 },
 "EventNotiJob::work": {
-"calls": 60,
-"consts": 80,
-"refs": 0,
-"score": 46.7,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "ExceptionCodeString": {
 "calls": 100,
@@ -1176,10 +1197,10 @@
 "status": "MATCH"
 },
 "HandleSmartCouponManager_HelloReq": {
-"calls": 69,
-"consts": 87,
-"refs": 96,
-"score": 84.1,
+"calls": 75,
+"consts": 90,
+"refs": 100,
+"score": 88.2,
 "status": "DIFF"
 },
 "HandleSmartCouponManager_LoadRetryReadyGameEventLogListReq": {
@@ -1197,17 +1218,17 @@
 "status": "DIFF"
 },
 "HandleSmartCoupon_GameEventByAccountReq": {
-"calls": 79,
+"calls": 71,
 "consts": 100,
 "refs": 91,
-"score": 90.0,
+"score": 87.1,
 "status": "DIFF"
 },
 "HandleSmartCoupon_GameEventByCharacterReq": {
-"calls": 97,
+"calls": 89,
 "consts": 97,
 "refs": 94,
-"score": 96.0,
+"score": 93.4,
 "status": "DIFF"
 },
 "HandleSmartCoupon_HelloReq": {
@@ -1385,12 +1406,26 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Log::Flush": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Log::InitMedia": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"Log::Initialize": {
+"calls": 80,
+"consts": 80,
+"refs": 92,
+"score": 84.1,
+"status": "DIFF"
 },
 "Log::Name": {
 "calls": 100,
@@ -1931,6 +1966,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Network::OpenPort [?OpenPort@Network@@SA_NIGHPEBVSessionHandler@@PEBVPacketBufferHandler@@I_N22@Z]": {
+"calls": 90,
+"consts": 94,
+"refs": 86,
+"score": 90.1,
+"status": "DIFF"
+},
 "Network::ReconnectSession": {
 "calls": 100,
 "consts": 100,
@@ -2346,16 +2388,16 @@
 },
 "Port::Clear": {
 "calls": 100,
-"consts": 80,
-"refs": 91,
-"score": 90.3,
-"status": "DIFF"
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Port::Initialize": {
-"calls": 96,
-"consts": 75,
+"calls": 100,
+"consts": 94,
 "refs": 100,
-"score": 90.3,
+"score": 98.0,
 "status": "DIFF"
 },
 "Port::MakeNewSession [?MakeNewSession@Port@@IEAAPEAVSession@@PEA_KKGH@Z]": {
@@ -2388,10 +2430,10 @@
 },
 "Port::clearPool": {
 "calls": 100,
-"consts": 67,
+"consts": 100,
 "refs": 100,
-"score": 88.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Port::makeSession": {
 "calls": 100,
@@ -2821,10 +2863,10 @@
 "status": "MATCH"
 },
 "Session::~Session": {
-"calls": 100,
-"consts": 77,
-"refs": 100,
-"score": 92.3,
+"calls": 93,
+"consts": 89,
+"refs": 80,
+"score": 87.2,
 "status": "DIFF"
 },
 "SessionHandler::~SessionHandler": {
@@ -2968,45 +3010,45 @@
 "status": "MATCH"
 },
 "SmartCouponDB::LoadCouponPublicationList": {
-"calls": 78,
-"consts": 94,
-"refs": 92,
-"score": 88.0,
+"calls": 86,
+"consts": 87,
+"refs": 89,
+"score": 87.5,
 "status": "DIFF"
 },
 "SmartCouponDB::LoadGameEventLogList": {
-"calls": 68,
-"consts": 91,
+"calls": 88,
+"consts": 85,
 "refs": 89,
-"score": 82.8,
+"score": 87.3,
 "status": "DIFF"
 },
 "SmartCouponDB::LoadRetryReadyGameEventLogList": {
-"calls": 68,
-"consts": 91,
+"calls": 88,
+"consts": 85,
 "refs": 89,
-"score": 82.8,
+"score": 87.3,
 "status": "DIFF"
 },
 "SmartCouponDB::LoadSingleCouponPublication": {
-"calls": 80,
-"consts": 94,
-"refs": 94,
-"score": 89.6,
+"calls": 88,
+"consts": 88,
+"refs": 92,
+"score": 89.2,
 "status": "DIFF"
 },
 "SmartCouponDB::ProcessAccountGameEventLog": {
-"calls": 84,
-"consts": 94,
-"refs": 97,
-"score": 91.8,
+"calls": 91,
+"consts": 88,
+"refs": 91,
+"score": 89.8,
 "status": "DIFF"
 },
 "SmartCouponDB::ProcessCharacterGameEventLog": {
-"calls": 85,
-"consts": 95,
-"refs": 97,
-"score": 92.3,
+"calls": 91,
+"consts": 87,
+"refs": 95,
+"score": 91.0,
 "status": "DIFF"
 },
 "SmartCouponDB::RegisterGameEventLog": {
@@ -3080,6 +3122,13 @@
 "status": "MATCH"
 },
 "SmartCouponDaemon::ServiceName": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"SmartCouponDaemon::SetManagerChannel": {
 "calls": 100,
 "consts": 100,
 "refs": 100,

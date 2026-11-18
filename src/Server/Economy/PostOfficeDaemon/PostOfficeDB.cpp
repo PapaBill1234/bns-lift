@@ -427,14 +427,16 @@ bool UpdatePostStatus(int* dbRetValue, long long postId, wchar_t const* fn, wcha
 }  // namespace
 
 // 0x17bf0
-bool PostOfficeDB::UpdateStatusToDeliverySuccess(int* dbRetValue, long long postId)
+// LIFT: noinline. The orig calls it out of line (POD 0x17bf0).
+__declspec(noinline) bool PostOfficeDB::UpdateStatusToDeliverySuccess(int* dbRetValue, long long postId)
 {
     return UpdatePostStatus(dbRetValue, postId, L"PostOfficeDB::UpdateStatusToDeliverySuccess",
                             L"{?=CALL dbo.usp_UpdateStatusToDeliverySuccess(?)}", 412, 418, 447, 437);
 }
 
 // 0x17e00
-bool PostOfficeDB::UpdateStatusToDeliveryFailure(int* dbRetValue, long long postId)
+// LIFT: noinline. The orig calls it out of line (POD 0x17e00).
+__declspec(noinline) bool PostOfficeDB::UpdateStatusToDeliveryFailure(int* dbRetValue, long long postId)
 {
     return UpdatePostStatus(dbRetValue, postId, L"PostOfficeDB::UpdateStatusToDeliveryFailure",
                             L"{?=CALL dbo.usp_UpdateStatusToDeliveryFailure(?)}", 455, 461, 490, 480);

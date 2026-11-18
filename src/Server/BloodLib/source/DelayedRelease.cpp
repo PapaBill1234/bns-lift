@@ -141,7 +141,8 @@ void DelayedRelease::Release(long long current, int maxRelease, bool forceNow, b
 }
 
 // 0x22F00 (SmartCouponDaemon)
-void DelayedRelease::Cleanup()
+// LIFT: noinline. The orig calls it from Daemon::stop only (CG 0x13CE0, LG 0x28460, SCD 0x22F00, POD 0x31300).
+__declspec(noinline) void DelayedRelease::Cleanup()
 {
     _lock.Enter();
     Node* head = _head;

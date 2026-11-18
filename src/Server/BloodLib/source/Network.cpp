@@ -175,6 +175,8 @@ void Network::Clear()
 }
 
 // 0xD2C0
+// LIFT: SmartCouponDaemon 0x1A8B0 is this overload with LTCG-folded constants (initialMode 2, enableAccept false,
+// enableRecv true, nagle false). The SCD callers pass these values. A separate 5-arg overload did not pair with the orig.
 bool Network::OpenPort(unsigned int id, unsigned short portNumber, int initialMode, SessionHandler const* sessionHandler,
                        PacketBufferHandler const* bufferHandler, unsigned int maxSession, bool enableAccept,
                        bool enableRecv, bool nagle)
@@ -230,50 +232,6 @@ bool Network::OpenPort(unsigned int id, unsigned short portNumber, int initialMo
     if (!enableAccept)
         port->_enableAccept = false;
     Instance->_port[id - 1] = port;
-    return true;
-}
-
-// 0x1A8B0 (SmartCouponDaemon)
-bool Network::OpenPort(unsigned int portId, unsigned short portNo, SessionHandler const* sessionHandler,
-                       PacketBufferHandler const* bufferHandler, unsigned int maxSession)
-{
-    if (portId == 0)
-        NETWORK_ASSERT_CRASH(170);
-    if (Instance->_port[portId - 1] != nullptr)
-        NETWORK_ASSERT_CRASH(177);
-
-    if (maxSession == 0)
-    {
-        maxSession = 2 * Instance->_workerThreadCount + 1;
-        if (maxSession < 16)
-            maxSession = 16;
-    }
-
-    void* memory = BASE_MEMORY_MANAGER.Alloc(sizeof(Port), NETWORK_FILE, 184);
-    Port* port = memory != nullptr ? new (memory) Port() : nullptr;
-    // LIFT: LTCG folded Port::Initialize (0x28E10): initialMode 2, enableRecv true, nagle false.
-    if (!port->Initialize(portId, portNo, maxSession, 2, true, false, Instance->_iocpHandle, sessionHandler,
-                          bufferHandler))
-    {
-        if (port != nullptr)
-            port->~Port();
-        BASE_MEMORY_MANAGER.Free(port, NETWORK_FILE, 188);
-        return false;
-    }
-    if (port->_portNumber != 0)
-    {
-        if (!port->StartAccept())
-        {
-            port->clearPool();
-            port->~Port();
-            BASE_MEMORY_MANAGER.Free(port, NETWORK_FILE, 194);
-            return false;
-        }
-    }
-    // 0x1AAE7: one word store. Accept stays off (OpenPort(id) 0x1AB20 sets it later), recv is on.
-    port->_enableAccept = false;
-    port->_enableRecv = true;
-    Instance->_port[portId - 1] = port;
     return true;
 }
 

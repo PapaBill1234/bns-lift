@@ -174,7 +174,8 @@ SmartCouponDaemon::~SmartCouponDaemon()
 }
 
 // 0x14df0
-void SmartCouponDaemon::SetManagerChannel(ManagerChannel* managerChannel)
+// LIFT: noinline. The orig calls it out of line (SCD 0x14df0).
+__declspec(noinline) void SmartCouponDaemon::SetManagerChannel(ManagerChannel* managerChannel)
 {
     _instance->_managerChannelLock.Enter();
     _instance->_managerChannel = managerChannel;
@@ -361,7 +362,7 @@ bool SmartCouponDaemon::initNetwork()
     if (_config->_npEnabled)
     {
         RawPacketBufferHandler raw;
-        if (!Network::OpenPort(1, 0, NPChannel::_sessionHandler, &raw, 0))
+        if (!Network::OpenPort(1, 0, 2, NPChannel::_sessionHandler, &raw, 0, false, true, false))
         {
             Log::Write(Log::LT_ERROR, kFile, 333, L"[scd], setup np port fail");
             return false;
@@ -389,8 +390,8 @@ bool SmartCouponDaemon::initNetwork()
     }
 
     unsigned int const maxSession = _config->_maxDaemonSessionCount ? _config->_maxDaemonSessionCount + 1 : 0;
-    if (!Network::OpenPort(2, static_cast<unsigned short>(_config->_daemonListenPort), _daemonChannelMgr, &pbh,
-                           maxSession))
+    if (!Network::OpenPort(2, static_cast<unsigned short>(_config->_daemonListenPort), 2, _daemonChannelMgr,
+                           &pbh, maxSession, false, true, false))
     {
         Log::Write(Log::LT_ERROR, kFile, 373, L"[scd], failed to open gamed listen port, portId:%u, portNumber:%u", 2,
                    _config->_daemonListenPort);
@@ -399,8 +400,8 @@ bool SmartCouponDaemon::initNetwork()
 
     mem = Memory::_Manager[1]->Alloc(sizeof(ManagerSessionHandler), kFile, 377);
     _managerSessionHandler = mem ? new (mem) ManagerSessionHandler() : nullptr;
-    if (!Network::OpenPort(3, static_cast<unsigned short>(_config->_manageListenPort), _managerSessionHandler, &pbh,
-                           0))
+    if (!Network::OpenPort(3, static_cast<unsigned short>(_config->_manageListenPort), 2, _managerSessionHandler,
+                           &pbh, 0, false, true, false))
     {
         Log::Write(Log::LT_ERROR, kFile, 388, L"[craftd], open manager port fail");
         return false;

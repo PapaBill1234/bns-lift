@@ -233,7 +233,8 @@ void ContentsRuleConfig::DestroyContentsRuleConfig()
 }
 
 // 0x8600
-void ContentsRuleConfig::Dump()
+// LIFT: noinline. The orig calls it out of line at all call sites (LG 0x8600: not inlined).
+__declspec(noinline) void ContentsRuleConfig::Dump()
 {
     ContentsRuleConfig* config = Config;
     if (config == nullptr)

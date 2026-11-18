@@ -784,10 +784,10 @@
 "status": "MATCH"
 },
 "CrashHandler::handleCrash": {
-"calls": 96,
+"calls": 97,
 "consts": 100,
-"refs": 93,
-"score": 96.4,
+"refs": 94,
+"score": 97.3,
 "status": "DIFF"
 },
 "CriticalSection::~CriticalSection": {
@@ -889,10 +889,10 @@
 "status": "MATCH"
 },
 "Daemon::start": {
-"calls": 96,
+"calls": 99,
 "consts": 98,
-"refs": 88,
-"score": 94.0,
+"refs": 93,
+"score": 96.8,
 "status": "DIFF"
 },
 "Daemon::startDaemon": {
@@ -972,6 +972,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"DelayedRelease::Cleanup": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "DelayedRelease::Release": {
 "calls": 100,
 "consts": 100,
@@ -1036,10 +1043,10 @@
 "status": "MATCH"
 },
 "HandleCacheGateFragmentRelay": {
-"calls": 82,
+"calls": 73,
 "consts": 98,
 "refs": 74,
-"score": 84.3,
+"score": 81.4,
 "status": "DIFF"
 },
 "HandleCacheGateHello": {
@@ -1065,9 +1072,9 @@
 },
 "HandleCacheGateRelay": {
 "calls": 100,
-"consts": 98,
+"consts": 95,
 "refs": 100,
-"score": 99.2,
+"score": 98.4,
 "status": "DIFF"
 },
 "HandleCacheGateRelayFail": {
@@ -1175,12 +1182,26 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Log::Flush": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Log::InitMedia": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"Log::Initialize": {
+"calls": 80,
+"consts": 80,
+"refs": 92,
+"score": 84.1,
+"status": "DIFF"
 },
 "Log::Name": {
 "calls": 100,
@@ -2233,10 +2254,10 @@
 "status": "MATCH"
 },
 "Session::~Session": {
-"calls": 100,
-"consts": 77,
-"refs": 100,
-"score": 92.3,
+"calls": 93,
+"consts": 89,
+"refs": 80,
+"score": 87.2,
 "status": "DIFF"
 },
 "SessionPool::Initialize": {

@@ -75,7 +75,8 @@ XmlCfgDef const LobbyGateConfig::_Def[29] = {
 };
 
 // 0x13e20
-void LobbyGateConfig::Dump()
+// LIFT: noinline. The orig calls it out of line at all call sites (LG 0x13e20: not inlined).
+__declspec(noinline) void LobbyGateConfig::Dump() const
 {
     wchar_t lobbydAddr[20];
 

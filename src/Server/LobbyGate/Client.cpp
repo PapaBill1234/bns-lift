@@ -150,7 +150,8 @@ GateKeyEntry::~GateKeyEntry()
 }
 
 // 0x3910
-bool GateKeyManager::Initialize(int hashCount)
+// LIFT: noinline. The orig calls it out of line at all call sites (LG 0x3910: one call in LobbyGate.c).
+__declspec(noinline) bool GateKeyManager::Initialize(int hashCount)
 {
     if (hashCount < 1)
         return false;
@@ -475,7 +476,8 @@ bool Client::SendGetServiceEntryListOk(PacketBuffer* serviceEntryList, int servi
 }
 
 // 0x5b90
-bool ClientManager::Initialize(int hashCount)
+// LIFT: noinline. The orig calls it out of line at all call sites (LG 0x5b90: one call in LobbyGate.c).
+__declspec(noinline) bool ClientManager::Initialize(int hashCount)
 {
     if (hashCount < 1)
         return false;

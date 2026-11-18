@@ -112,7 +112,8 @@ void Packet::AddSize(short size)
 }
 
 // 0x1B7F0 (SmartCouponDaemon)
-unsigned short Packet::Decompose(char const* format, ...) const
+// LIFT: noinline. The orig calls it out of line (POD 0x220d0).
+__declspec(noinline) unsigned short Packet::Decompose(char const* format, ...) const
 {
     va_list args;
     va_start(args, format);
@@ -121,6 +122,21 @@ unsigned short Packet::Decompose(char const* format, ...) const
     unsigned short size = PacketBuffer::Decompose(reinterpret_cast<char const*>(CurHeader + 1),
                                                   CurHeader->size - 2, format,
                                                   static_cast<unsigned long long>(-1), args);
+    va_end(args);
+    return size;
+}
+
+// 0x220D0 (PostOfficeDaemon)
+// LIFT: noinline. The orig calls it out of line from the CacheEconomyPacketHandler handlers.
+__declspec(noinline) unsigned short Packet::Decompose(int offset, int n, char const* format, ...) const
+{
+    va_list args;
+    va_start(args, format);
+    if (format == nullptr || CurHeader == nullptr || offset >= CurHeader->size - 2)
+        PACKET_ASSERT_CRASH(472);
+    unsigned short size = PacketBuffer::Decompose(reinterpret_cast<char const*>(CurHeader + 1) + offset,
+                                                  CurHeader->size - offset - 2, format,
+                                                  static_cast<unsigned long long>(n), args);
     va_end(args);
     return size;
 }

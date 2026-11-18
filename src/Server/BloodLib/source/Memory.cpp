@@ -31,7 +31,8 @@ GrowingBuffer::~GrowingBuffer()
 }
 
 // 0x29750 (PostOfficeDaemon)
-void GrowingBuffer::Add(unsigned long long size)
+// LIFT: noinline. The orig calls it out of line (POD 0x29750).
+__declspec(noinline) void GrowingBuffer::Add(unsigned long long size)
 {
     if (_size - _count < size)
     {
@@ -43,7 +44,8 @@ void GrowingBuffer::Add(unsigned long long size)
 }
 
 // 0x195A0 (SmartCouponDaemon)
-void GrowingBuffer::grow(unsigned long long size)
+// LIFT: noinline. The orig calls it out of line (POD 0x297e0).
+__declspec(noinline) void GrowingBuffer::grow(unsigned long long size)
 {
     _size *= 2;
     if (_size == 0)

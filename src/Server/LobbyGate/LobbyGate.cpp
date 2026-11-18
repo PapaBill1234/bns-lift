@@ -313,6 +313,12 @@ bool LobbyGate::initialize()
     }
     fclose(fp);
 
+    // LIFT: 0x13028-0x13090 the orig copies a Daemon version string when a local flag is set (flag is always 0), and clears
+    // Daemon+0x740 when config+0x6c is 0. Not lifted (dead flag). The three Dump calls follow at 0x13086.
+    _config->Dump();
+    BnsCommonConfig::Dump();
+    ContentsRuleConfig::Dump();
+
     void* mem = Memory::_Manager[2]->Alloc(sizeof(GateKeyManager), kFile, 308);
     if (mem != nullptr)
         memset(mem, 0, sizeof(GateKeyManager));

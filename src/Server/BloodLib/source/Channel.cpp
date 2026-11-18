@@ -266,7 +266,8 @@ bool Channel::Send(char const* format, ...)
 }
 
 // 0x21720 (LobbyGate)
-bool Channel::Send(Packet const* packet)
+// LIFT: noinline. The orig calls it out of line (POD 0x2c160).
+__declspec(noinline) bool Channel::Send(Packet const* packet)
 {
     Session* session = const_cast<Session*>(GetSession());
     if (session == nullptr)
