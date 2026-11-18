@@ -66,26 +66,26 @@ static wchar_t const* const CHANNEL_H_FILE =
 
 // All log texts start with this prefix. Arguments: session id, channel id (Channel::GetId).
 #define LDPFX L"[lobbyd], 0x%.16I64X, %I64d, "
+// The original reads the channel id at each log call (Channel::GetId after the decompose calls).
 #define LD_ERR(line, fmt, ...) \
-    Log::Write(Log::LT_ERROR, HANDLER_FILE, line, LDPFX fmt, session->_id, chId, ##__VA_ARGS__)
+    Log::Write(Log::LT_ERROR, HANDLER_FILE, line, LDPFX fmt, session->_id, ch->GetId(), ##__VA_ARGS__)
 #define LD_DBG(line, fmt, ...) \
-    Log::Write(Log::LT_DEBUG, HANDLER_FILE, line, LDPFX fmt, session->_id, chId, ##__VA_ARGS__)
+    Log::Write(Log::LT_DEBUG, HANDLER_FILE, line, LDPFX fmt, session->_id, ch->GetId(), ##__VA_ARGS__)
 #define LD_ALLOC(size, line) Memory::_Manager[2]->Alloc((size), HANDLER_FILE, (line))
 #define LD_ALLOCZERO(size, line) Memory::_Manager[2]->AllocZero((size), HANDLER_FILE, (line))
 #define LD_FREE(ptr, line) Memory::_Manager[2]->Free((ptr), HANDLER_FILE, (line))
 
 // The inlined prologue of each handler: Session::GetChannel and the crash log. LIFT: helper name.
-static Channel* LobbyDHandlerChannel(Session const* session, int line)
+static __forceinline Channel* LobbyDHandlerChannel(Session const* session, int line)
 {
     Channel* ch = session->GetChannel();
-    if (ch == nullptr)
-    {
-        Log::Write(Log::LT_ERROR, HANDLER_FILE, line, L"== CRASH == [lobbyd], 0x%.16I64X, %I64d, not authed session",
-                   session->_id, 0LL);
-        AlertSender::Write(HANDLER_FILE, line, L"== CRASH == [lobbyd], 0x%.16I64X, %I64d, not authed session",
-                           session->_id, 0LL);
-    }
-    return ch;
+    if (ch != nullptr)
+        return ch;
+    Log::Write(Log::LT_ERROR, HANDLER_FILE, line, L"== CRASH == [lobbyd], 0x%.16I64X, %I64d, not authed session",
+               session->_id, 0LL);
+    AlertSender::Write(HANDLER_FILE, line, L"== CRASH == [lobbyd], 0x%.16I64X, %I64d, not authed session",
+                       session->_id, 0LL);
+    return nullptr;
 }
 
 static void LobbyDHandlerRelease(Channel* ch)  // LIFT: lift helper name, not in any PDB
@@ -119,7 +119,6 @@ bool HandleLobbyLobbyGate_HelloOk(Session const* session, Packet* packet)
     Channel* ch = LobbyDHandlerChannel(session, 32);
     if (ch == nullptr)
         return false;
-    long long chId = static_cast<long long>(ch->GetId());
 
     LobbyGate* gate = LobbyGate::_instance;
     gate->_lobbyD->_state = 1;
@@ -217,11 +216,13 @@ bool HandleLobbyLobbyGate_HelloFail(Session const* session, Packet* packet)
     Channel* ch = LobbyDHandlerChannel(session, 196);
     if (ch == nullptr)
         return false;
-    long long chId = static_cast<long long>(ch->GetId());
     short cmd = 0;
     short reason = 0;
     packet->Decompose("hh", &cmd, &reason);
     LD_ERR(203, L"hello fail, reason:%d", reason);
+    LobbyD* lobbyD = static_cast<LobbyD*>(ch);
+    if (lobbyD->_helloEvent.Event != nullptr)
+        SetEvent(lobbyD->_helloEvent.Event);
     LobbyDHandlerRelease(ch);
     return true;
 }
@@ -233,7 +234,6 @@ bool HandleLobbyLobbyGate_UpdateWorldInfoListNotify(Session const* session, Pack
     Channel* ch = LobbyDHandlerChannel(session, 217);
     if (ch == nullptr)
         return false;
-    long long chId = static_cast<long long>(ch->GetId());
 
     pcb->decomposer.SetFormat("hiChhsQQiihhiQQQQQQQ;", 2);
     int worldCount = pcb->decomposer.PushRepeatCount(&pcb->buffer[pcb->decomposer.offset], pcb->size - pcb->decomposer.offset);
@@ -274,7 +274,6 @@ bool HandleLobbyLobbyGate_AnnounceNotify(Session const* session, Packet* packet)
     Channel* ch = LobbyDHandlerChannel(session, 326);
     if (ch == nullptr)
         return false;
-    long long chId = static_cast<long long>(ch->GetId());
     short cmd = 0;
     wchar_t message[1025];
     message[0] = L'\0';
@@ -304,7 +303,6 @@ bool HandleLobbyLobbyGate_InitSessionWithNPTokenOk(Session const* session, Packe
     Channel* ch = LobbyDHandlerChannel(session, 357);
     if (ch == nullptr)
         return false;
-    long long chId = static_cast<long long>(ch->GetId());
     short cmd = 0;
     long long gateKey = 0;
     long long cliKey = 0;
@@ -353,7 +351,6 @@ bool HandleLobbyLobbyGate_InitSessionWithNPTokenFail(Session const* session, Pac
     Channel* ch = LobbyDHandlerChannel(session, 427);
     if (ch == nullptr)
         return false;
-    long long chId = static_cast<long long>(ch->GetId());
     short cmd = 0;
     long long gateKey = 0;
     short failReason = 0;  // PDB local type: short
@@ -402,7 +399,6 @@ bool HandleLobbyLobbyGate_StartSessionWithNPTokenOk(Session const* session, Pack
     Channel* ch = LobbyDHandlerChannel(session, 478);
     if (ch == nullptr)
         return false;
-    long long chId = static_cast<long long>(ch->GetId());
 
     long long cliKey = 0;
     char createInitialUserName = 0;  // PDB local type: char
@@ -599,7 +595,6 @@ bool HandleLobbyLobbyGate_StartSessionWithNPTokenFail(Session const* session, Pa
     Channel* ch = LobbyDHandlerChannel(session, 778);
     if (ch == nullptr)
         return false;
-    long long chId = static_cast<long long>(ch->GetId());
     short cmd = 0;
     long long cliKey = 0;
     int failReason = 0;
@@ -654,7 +649,6 @@ bool HandleLobbyLobbyGate_InitSessionWithLobbyTokenOk(Session const* session, Pa
     Channel* ch = LobbyDHandlerChannel(session, 856);
     if (ch == nullptr)
         return false;
-    long long chId = static_cast<long long>(ch->GetId());
     short cmd = 0;
     long long gateKey = 0;
     long long cliKey = 0;
@@ -706,7 +700,6 @@ bool HandleLobbyLobbyGate_InitSessionWithLobbyTokenFail(Session const* session, 
     Channel* ch = LobbyDHandlerChannel(session, 930);
     if (ch == nullptr)
         return false;
-    long long chId = static_cast<long long>(ch->GetId());
     short cmd = 0;
     long long gateKey = 0;
     int failReason = 0;
@@ -756,7 +749,6 @@ bool HandleLobbyLobbyGate_StartSessionWithLobbyTokenOk(Session const* session, P
     Channel* ch = LobbyDHandlerChannel(session, 998);
     if (ch == nullptr)
         return false;
-    long long chId = static_cast<long long>(ch->GetId());
 
     long long cliKey = 0;
     int gradeLevelCount = 0;
@@ -980,7 +972,6 @@ bool HandleLobbyLobbyGate_StartSessionWithLobbyTokenFail(Session const* session,
     Channel* ch = LobbyDHandlerChannel(session, 1289);
     if (ch == nullptr)
         return false;
-    long long chId = static_cast<long long>(ch->GetId());
     short cmd = 0;
     long long cliKey = 0;
     int failReason = 0;
@@ -1025,7 +1016,6 @@ bool HandleLobbyLobbyGate_CloseAnonymousSessionNotify(Session const* session, Pa
     Channel* ch = LobbyDHandlerChannel(session, 1351);
     if (ch == nullptr)
         return false;
-    long long chId = static_cast<long long>(ch->GetId());
     short cmd = 0;
     long long gateKey = 0;
     if (!packet->Decompose("hq", &cmd, &gateKey))
@@ -1045,7 +1035,6 @@ bool HandleLobbyLobbyGate_CloseSessionNotify(Session const* session, Packet* pac
     Channel* ch = LobbyDHandlerChannel(session, 1383);
     if (ch == nullptr)
         return false;
-    long long chId = static_cast<long long>(ch->GetId());
     short cmd = 0;
     long long cliKey = 0;
     if (!packet->Decompose("hq", &cmd, &cliKey))
@@ -1056,16 +1045,16 @@ bool HandleLobbyLobbyGate_CloseSessionNotify(Session const* session, Packet* pac
     }
     LD_DBG(1402, L"recv ok, CloseSessionNotify, cliKey:0x%I64X", cliKey);
     Client* client = LobbyGate::_instance->_clientManager->AcquireClient(cliKey);
-    if (client != nullptr)
+    if (client == nullptr)
+    {
+        LD_ERR(1407, L"failed to find cliKey, CloseSessionNotify, cliKey:0x%I64X", cliKey);
+        ch->removeReferenceCount(HANDLER_FILE, 1408);
+    }
+    else
     {
         LobbyGate::_instance->AddJobTimer(client->_gateKey, 3);
         client->removeReferenceCount(HANDLER_FILE, 1416);
         ch->removeReferenceCount(HANDLER_FILE, 1417);
-    }
-    else
-    {
-        LD_ERR(1407, L"failed to find cliKey, CloseSessionNotify, cliKey:0x%I64X", cliKey);
-        ch->removeReferenceCount(HANDLER_FILE, 1408);
     }
     return true;
 }
@@ -1076,7 +1065,6 @@ bool HandleLobbyLobbyGate_KickNotify(Session const* session, Packet* packet)
     Channel* ch = LobbyDHandlerChannel(session, 1428);
     if (ch == nullptr)
         return false;
-    long long chId = static_cast<long long>(ch->GetId());
     short cmd = 0;
     long long cliKey = 0;
     char reason = 0;
@@ -1110,17 +1098,14 @@ bool HandleLobbyLobbyGate_KickNotify(Session const* session, Packet* packet)
         const_cast<Session*>(clientSession)->removeReferenceCount(CHANNEL_H_FILE, 52);
         client->removeReferenceCount(HANDLER_FILE, 1475);
         ch->removeReferenceCount(HANDLER_FILE, 1476);
+        return true;
     }
-    else
-    {
-        clientSession->Send(&p);
-        LD_DBG(1482, L"send ok, kicknotify, sessionId:0x%I64X, reason:%d", clientSession->_id, reason);
-        LobbyGate::_instance->AddJobTimer(client->_gateKey, 1);
-        const_cast<Session*>(clientSession)->removeReferenceCount(CHANNEL_H_FILE, 52);
-        client->removeReferenceCount(HANDLER_FILE, 1489);
-        ch->removeReferenceCount(HANDLER_FILE, 1490);
-    }
-    p.Clear();
+    clientSession->Send(&p);
+    LD_DBG(1482, L"send ok, kicknotify, sessionId:0x%I64X, reason:%d", clientSession->_id, reason);
+    LobbyGate::_instance->AddJobTimer(client->_gateKey, 1);
+    const_cast<Session*>(clientSession)->removeReferenceCount(CHANNEL_H_FILE, 52);
+    client->removeReferenceCount(HANDLER_FILE, 1489);
+    ch->removeReferenceCount(HANDLER_FILE, 1490);
     return true;
 }
 
@@ -1131,7 +1116,6 @@ bool HandleLobbyLobbyGate_GetCharacterInfoListOk(Session const* session, Packet*
     Channel* ch = LobbyDHandlerChannel(session, 1503);
     if (ch == nullptr)
         return false;
-    long long chId = static_cast<long long>(ch->GetId());
 
     long long cliKey = 0;
     long long now = 0;
@@ -1226,7 +1210,6 @@ bool HandleLobbyLobbyGate_ListGoodsOk(Session const* session, Packet* packet)
     Channel* ch = LobbyDHandlerChannel(session, 1645);
     if (ch == nullptr)
         return false;
-    long long chId = static_cast<long long>(ch->GetId());
 
     long long cliKey = 0;
     int goodsCount = 0;
@@ -1282,7 +1265,6 @@ bool HandleLobbyLobbyGate_TakeGoodsOk(Session const* session, Packet* packet)
     Channel* ch = LobbyDHandlerChannel(session, 1756);
     if (ch == nullptr)
         return false;
-    long long chId = static_cast<long long>(ch->GetId());
 
     long long cliKey = 0;
     unsigned long long goodsId = 0;
@@ -1295,9 +1277,7 @@ bool HandleLobbyLobbyGate_TakeGoodsOk(Session const* session, Packet* packet)
     {
         LD_ERR(1804, L"decompose packet fail, TakeGoodsOk, cliKey:0x%I64X, goodsId:0x%I64X, itemCount:%d", cliKey,
                goodsId, itemCount);
-        pcb->Clear();
-        LobbyDHandlerRelease(ch);
-        return true;
+        goto cleanup; // one shared Clear/release tail, as in the original (lessons.md pattern 36)
     }
     itemCount = pcb->decomposer.PushRepeatCount(&pcb->buffer[pcb->decomposer.offset], pcb->size - pcb->decomposer.offset);
     if (itemCount > 0)
@@ -1342,7 +1322,6 @@ bool HandleLobbyLobbyGate_ListLobbyServiceItemInfoOk(Session const* session, Pac
     Channel* ch = LobbyDHandlerChannel(session, 1865);
     if (ch == nullptr)
         return false;
-    long long chId = static_cast<long long>(ch->GetId());
 
     long long cliKey = 0;
     char searchType = 0;
@@ -1355,34 +1334,40 @@ bool HandleLobbyLobbyGate_ListLobbyServiceItemInfoOk(Session const* session, Pac
     if (!pcb->Decompose(3, &cliKey, &searchType, &searchCount))
     {
         LD_ERR(1914, L"decompose packet fail, " LSII_SUFFIX, cliKey, searchType, searchCount, itemCount);
-        pcb->Clear();
-        LobbyDHandlerRelease(ch);
-        return true;
     }
-    itemCount = pcb->decomposer.PushRepeatCount(&pcb->buffer[pcb->decomposer.offset], pcb->size - pcb->decomposer.offset);
-    if (itemCount > 0)
-        itemList = static_cast<LobbyServiceItem*>(LD_ALLOCZERO(sizeof(LobbyServiceItem) * itemCount, 1921));
-    for (int i = 0; i < itemCount; ++i)
+    else
     {
-        LobbyServiceItem& it = itemList[i];
-        if (!pcb->Decompose(5, &it.ownerPcId, &it.instanceId, &it.labelId, &it.dataId, &it.state))
+        // The original has __try/__finally here: HR shows $__FINALLY_1 and reloads itemList in the item loop.
+        __try
         {
-            LD_ERR(1928, L"decompose item-info fail, " LSII_SUFFIX, cliKey, searchType, searchCount, itemCount);
-            goto cleanup;
+            itemCount = pcb->decomposer.PushRepeatCount(&pcb->buffer[pcb->decomposer.offset],
+                                                        pcb->size - pcb->decomposer.offset);
+            if (itemCount > 0)
+                itemList = static_cast<LobbyServiceItem*>(LD_ALLOCZERO(sizeof(LobbyServiceItem) * itemCount, 1921));
+            for (int i = 0; i < itemCount; ++i)
+            {
+                LobbyServiceItem& it = itemList[i];
+                if (!pcb->Decompose(5, &it.ownerPcId, &it.instanceId, &it.labelId, &it.dataId, &it.state))
+                {
+                    LD_ERR(1928, L"decompose item-info fail, " LSII_SUFFIX, cliKey, searchType, searchCount, itemCount);
+                    __leave;
+                }
+                LobbyDRepeatNext(pcb);
+            }
+            pcb->decomposer.PopRepeatCount();
+            LD_DBG(1937, L"recv ok, " LSII_SUFFIX, cliKey, searchType, searchCount, itemCount);
+            client = LobbyGate::_instance->_clientManager->AcquireClient(cliKey);
+            if (client == nullptr)
+                LD_ERR(1942, L"failed to acquire client, " LSII_SUFFIX, cliKey, searchType, searchCount, itemCount);
+            else if (!client->SendListLobbyServiceItemInfoOk(searchType, searchCount, itemList, itemCount))
+                LD_ERR(1948, L"ack fail, " LSII_SUFFIX, cliKey, searchType, searchCount, itemCount);
         }
-        LobbyDRepeatNext(pcb);
+        __finally
+        {
+            if (itemList != nullptr)
+                LD_FREE(itemList, 1960);
+        }
     }
-    pcb->decomposer.PopRepeatCount();
-    LD_DBG(1937, L"recv ok, " LSII_SUFFIX, cliKey, searchType, searchCount, itemCount);
-    client = LobbyGate::_instance->_clientManager->AcquireClient(cliKey);
-    if (client == nullptr)
-        LD_ERR(1942, L"failed to acquire client, " LSII_SUFFIX, cliKey, searchType, searchCount, itemCount);
-    else if (!client->SendListLobbyServiceItemInfoOk(searchType, searchCount, itemList, itemCount))
-        LD_ERR(1948, L"ack fail, " LSII_SUFFIX, cliKey, searchType, searchCount, itemCount);
-
-cleanup:
-    if (itemList != nullptr)
-        LD_FREE(itemList, 1960);
     pcb->Clear();
     if (client != nullptr)
         client->removeReferenceCount(HANDLER_FILE, 1965);
@@ -1399,7 +1384,6 @@ bool HandleLobbyLobbyGate_GetServiceEntryListOk(Session const* session, Packet* 
     Channel* ch = LobbyDHandlerChannel(session, 1975);
     if (ch == nullptr)
         return false;
-    long long chId = static_cast<long long>(ch->GetId());
 
     long long cliKey = 0;
     int serviceEntryCount = 0;
@@ -1410,9 +1394,7 @@ bool HandleLobbyLobbyGate_GetServiceEntryListOk(Session const* session, Packet* 
     if (!pcb->Decompose(1, &cliKey))
     {
         LD_ERR(2022, L"decompose packet fail, " GSEL_SUFFIX, cliKey, serviceEntryCount);
-        pcb->Clear();
-        LobbyDHandlerRelease(ch);
-        return true;
+        goto cleanup; // one shared Clear/release tail, as in the original (lessons.md pattern 36)
     }
     serviceEntryCount = pcb->decomposer.PushRepeatCount(&pcb->buffer[pcb->decomposer.offset], pcb->size - pcb->decomposer.offset);
     if (serviceEntryCount > 0)
@@ -1454,7 +1436,6 @@ bool HandleLobbyLobbyGate_GetEnterWorldTokenOk(Session const* session, Packet* p
     Channel* ch = LobbyDHandlerChannel(session, 2083);
     if (ch == nullptr)
         return false;
-    long long chId = static_cast<long long>(ch->GetId());
     short cmd = 0;
     long long cliKey = 0;
     long long lobbyToken = 0;
@@ -1473,13 +1454,10 @@ bool HandleLobbyLobbyGate_GetEnterWorldTokenOk(Session const* session, Packet* p
         ch->removeReferenceCount(HANDLER_FILE, 2110);
         return true;
     }
-    else
-    {
-        client->Send("hq", LobbyGate_GetEnterWorldTokenOkCmd, lobbyToken);
-        LD_DBG(2115, L"send to client ok, " GEWT_SUFFIX, cliKey, lobbyToken, worldId);
-        client->removeReferenceCount(HANDLER_FILE, 2117);
-        ch->removeReferenceCount(HANDLER_FILE, 2118);
-    }
+    client->Send("hq", LobbyGate_GetEnterWorldTokenOkCmd, lobbyToken);
+    LD_DBG(2115, L"send to client ok, " GEWT_SUFFIX, cliKey, lobbyToken, worldId);
+    client->removeReferenceCount(HANDLER_FILE, 2117);
+    ch->removeReferenceCount(HANDLER_FILE, 2118);
     return true;
 }
 
@@ -1489,7 +1467,6 @@ bool HandleLobbyLobbyGate_BypassPacket(Session const* session, Packet* packet)
     Channel* ch = LobbyDHandlerChannel(session, 2144);
     if (ch == nullptr)
         return false;
-    long long chId = static_cast<long long>(ch->GetId());
     short cmd = 0;
     long long cliKey = 0;
     if (!packet->Decompose("hq", &cmd, &cliKey))
@@ -1504,46 +1481,49 @@ bool HandleLobbyLobbyGate_BypassPacket(Session const* session, Packet* packet)
     {
         LD_ERR(2168, L"failed to find cliKey, cmd:%d, cliKey:0x%I64X", cmd, cliKey);
         ch->removeReferenceCount(HANDLER_FILE, 2169);
-        return true;
     }
-    Session const* clientSession = client->GetSession();
-    if (clientSession == nullptr)
+    else
     {
-        // The original passes an extra 0 argument after the format arguments. The format does not use it.
-        LD_ERR(2176, L"failed to get client session, cmd:%d, cliKey:0x%I64X", cmd, cliKey, 0);
-        client->removeReferenceCount(HANDLER_FILE, 2177);
-        ch->removeReferenceCount(HANDLER_FILE, 2178);
-        return true;
-    }
-    Packet::Header* hdr = packet->CurHeader;
-    Packet p;
-    p.Allocate();
-    short clientCmd = LobbyDSessionHandler::SwitchCmdLobbyDaemonToLobbyGate(static_cast<char>(hdr[1].size));
-    if (!p.Compose("h", clientCmd))
-    {
-        LD_ERR(2189, L"failed to compose packet cmd, cmd:%d, cliKey:0x%I64X", cmd, cliKey);
-        const_cast<Session*>(clientSession)->removeReferenceCount(CHANNEL_H_FILE, 52);
-        client->removeReferenceCount(HANDLER_FILE, 2191);
-        ch->removeReferenceCount(HANDLER_FILE, 2192);
-        p.Clear();
-        return true;
-    }
-    int bodySize = static_cast<unsigned short>(hdr->size - 2) - 10;
-    if (bodySize > 0)
-    {
-        unsigned short room = 0;
-        if (p.CurHeader != nullptr)
-            room = static_cast<unsigned short>(4000 - p.CurHeader->size);
-        if (room <= bodySize)
+        Session const* clientSession = client->GetSession();
+        if (clientSession == nullptr)
+        {
+            // The original passes an extra 0 argument after the format arguments. The format does not use it.
+            LD_ERR(2176, L"failed to get client session, cmd:%d, cliKey:0x%I64X", cmd, cliKey, 0);
+            client->removeReferenceCount(HANDLER_FILE, 2177);
+            ch->removeReferenceCount(HANDLER_FILE, 2178);
+        }
+        else
+        {
+            Packet::Header* hdr = packet->CurHeader;
+            Packet p;
             p.Allocate();
-        p.Add(reinterpret_cast<char const*>(hdr) + 12, static_cast<short>(bodySize));
+            short clientCmd = LobbyDSessionHandler::SwitchCmdLobbyDaemonToLobbyGate(static_cast<char>(hdr[1].size));
+            if (!p.Compose("h", clientCmd))
+            {
+                LD_ERR(2189, L"failed to compose packet cmd, cmd:%d, cliKey:0x%I64X", cmd, cliKey);
+                const_cast<Session*>(clientSession)->removeReferenceCount(CHANNEL_H_FILE, 52);
+                client->removeReferenceCount(HANDLER_FILE, 2191);
+                ch->removeReferenceCount(HANDLER_FILE, 2192);
+                return true;
+            }
+            int bodySize = static_cast<unsigned short>(hdr->size - 2) - 10;
+            if (bodySize > 0)
+            {
+                unsigned short room = 0;
+                if (p.CurHeader != nullptr)
+                    room = static_cast<unsigned short>(4000 - p.CurHeader->size);
+                if (room <= bodySize)
+                    p.Allocate();
+                p.Add(reinterpret_cast<char const*>(hdr) + 12, static_cast<short>(bodySize));
+            }
+            clientSession->Send(&p);
+            LD_DBG(2209, L"send to client ok, sessionId:0x%I64X, cmd:%d", clientSession->_id, clientCmd);
+            const_cast<Session*>(clientSession)->removeReferenceCount(CHANNEL_H_FILE, 52);
+            client->removeReferenceCount(HANDLER_FILE, 2212);
+            ch->removeReferenceCount(HANDLER_FILE, 2213);
+            return true;
+        }
     }
-    clientSession->Send(&p);
-    LD_DBG(2209, L"send to client ok, sessionId:0x%I64X, cmd:%d", clientSession->_id, clientCmd);
-    const_cast<Session*>(clientSession)->removeReferenceCount(CHANNEL_H_FILE, 52);
-    client->removeReferenceCount(HANDLER_FILE, 2212);
-    ch->removeReferenceCount(HANDLER_FILE, 2213);
-    p.Clear();
     return true;
 }
 

@@ -10,8 +10,11 @@
 #include "MemoryManager.h"
 #include "Daemon.h"
 
+// The path is per exe project. RefCntObject<Exe>.cpp wrappers set it (lesson 30).
+#ifndef REFCNT_HEADER
 #define REFCNT_HEADER \
     L"e:\\dailybuild02\\cachegate-common-0.0.348\\depot\\branch\\348nc\\program\\server\\bloodlib\\include\\RefCntObject.h"
+#endif
 
 // 0x20f0
 // BUG: 0x20f0 the format gets ptr for %s and the low 32 bits of file for %d (0x20FA, 0x2103).

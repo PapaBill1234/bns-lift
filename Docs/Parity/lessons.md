@@ -347,3 +347,102 @@
 - `__declspec(noinline)` on `_Tree::clear`: no gain (CacheDList::clear, RemoveSessionAll still call `_Erase`).
 - Tool fact: tools/vs2010/build.sh rebuilds an object only when the .cpp is newer than the obj. It does not
   track headers. After a header edit, run `rm -rf build-vs2010/obj`.
+
+## Pattern 34 (worked, lift-parity-lg-1): force-inline the handler prologue, crash block last, GetId at the log call
+- Cause: the LobbyD handlers call `LobbyDHandlerChannel` (lift helper, Session::GetChannel + crash log). VS2010 did
+  not inline it (it is called 22 times). The orig inlines it, puts the crash log at the end of the function, and calls
+  `Channel::GetId` inside each `Log::Write` argument list (after `Packet::Decompose`), not one time at the start.
+- Source change (LobbyDPacketHandler.cpp): `static __forceinline` on the helper; helper form
+  `if (ch != nullptr) return ch; Log; Alert; return nullptr;`; the `LD_ERR`/`LD_DBG` macros pass `ch->GetId()`; no `chId` local.
+- Also a lift error: `HandleLobbyLobbyGate_HelloFail` 0xb750 did not call `SetEvent(LobbyD::_helloEvent)`. Added.
+- Result: HelloFail, UpdateWorldInfoListNotify, CloseAnonymousSessionNotify, GetCharacterInfoListOk, ListGoodsOk MATCH;
+  the other 17 LobbyD handlers +5..+30 score. Use the same form for the Client.cpp and LobbyGatePacketHandler.cpp helpers.
+
+## Noise fact (lift-parity-lg-1): each layout move changes about 8 string_at MATCH in LG
+- Any code size change moves vtable slot 0 addresses. LG then loses or gains vtable-only functions (Console, LogFile,
+  Thread, PipeConsole, WinMsgHandler, WindowConsole, AlertSender ctor). A funcdiff tooling card (lesson 2) is needed to
+  measure exe-only progress without this noise.
+- Cause in tools/funcdiff.py line 230: `img.string_at(t)` is tried before `target_name(t)`. A fix is to prefer a
+  `??_7` vtable name over string_at. tools/ is not in the files of this card (not changed).
+- The parity gate fails when the MATCH count goes down (`m < bm`), also when allow-worse.txt has each lost name.
+
+## Facts (lift-parity-lg-1, stage 2, not yet tried)
+- `Packet::~Packet` is `{ Clear(); }` (Packet.cpp). ICF folds it with `Packet::Clear`, so funcdiff shows a dtor as
+  `Packet::Clear`. The orig LobbyD handlers have one Clear per path: no explicit `p.Clear()`, a `return` in each
+  branch (dtor). Ours has `p.Clear()` + dtor (BypassPacket 0x121d0: 2 extra Clear) or one merged dtor (KickNotify 0x10660).
+- Orig tails merge `ch->removeReferenceCount(HANDLER_FILE, line)` with the line in a register (KickNotify 1454/1463,
+  CloseSessionNotify 1408/1417, GetEnterWorldTokenOk 2110/2118, BypassPacket 2169/2178). Source form: if/else with
+  one shared `return true`, no early return. The decompose-fail path keeps its own remove + return.
+- HandleLobbyLobbyGate_TakeGoodsOk 0x113e0 has `$__FINALLY_0` in the HR: the source uses `__try { ... __leave; }
+  __finally { if (itemList) Free 1850; pcb->Clear(); if (client) remove 1855; ch release }`. The decompose-ok path is
+  first in the orig. Probably the same for GetServiceEntryListOk 0x11b60 and ListLobbyServiceItemInfoOk 0x117a0.
+
+## Results (lift-parity-lg-1, stage 3)
+- Worked: BypassPacket 0x121d0 -> MATCH. Source: no `p.Clear()`; `if (client == nullptr) {2168/2169} else {
+  if (session == nullptr) {2176-2178} else { Packet p; ... each compose branch `return true;` } } return true;`.
+- Worked: KickNotify 0x10660 84.2 -> 99.4. Source: early `return true` after each error block (null client, null
+  session, compose fail), no `p.Clear()`. VS2010 cross-jumps the 1454/1463 removes by itself.
+  Left: one `LobbyGate::_instance` ref (see below).
+- Did not work: positive conditions first (`if (client != nullptr)`, `if (Compose)`). The orig puts the error
+  blocks first in address order. KickNotify fell to 88.3, GetEnterWorldTokenOk to 94.0.
+- GetEnterWorldTokenOk 0x11ee0: early-return form and if/else form both 98.1. Ours merges the decompose-fail
+  remove (2101) into the shared remove tail. The orig keeps a separate remove for 2101 (HR line 5417). Cause unknown.
+- CloseSessionNotify 0x10440: `client == nullptr` block first = 96.8 (better than 94.5). Left: one `_instance` ref.
+- `_instance` reload: the orig reads `LobbyGate::_instance` again for AddJobTimer after AcquireClient. Ours (built
+  with /GL /LTCG, tools/vs2010/build.sh) keeps it in a register. ClientManager::AcquireClient is MATCH. The orig
+  writes `_instance` only in wmain 0x128b0, the same as ours. No `&LobbyGate::_instance` in the orig HR. Cause unknown.
+- Shared: `RefCntObject::addReferenceCount` is DIFF 83.3 in LG only because `REFCNT_HEADER`
+  (src/Server/BloodLib/source/RefCntObject.cpp:13) is the CacheGate path. The LG orig uses
+  `lobbygate-common-0.0.348`. Same kind: StlMemory.h:9, MemoryManager.cpp:7, Channel.cpp:21 (CacheGate paths).
+  A per-exe path macro (as `LOBBYGATE_CHANNEL_HEADER_FILE` in Channel.cpp:23) can fix this. Check all 4 exes.
+
+## Pattern 35 (lift-parity-lg-1, stage 4): per-exe RefCntObject.h and MemoryManager.h paths
+- Original paths: RefCntObject.h lower case `<exe>-common-0.0.348\...`; MemoryManager.h `<Exe>-Common-0.0.348\...`
+  (CG, LG, SCD; POD pseudocode has no MemoryManager.h path).
+- Source: `#ifndef` default (CG path) in RefCntObject.cpp and MemoryManager.cpp. Wrappers
+  `RefCntObject<Exe>.cpp`, `MemoryManager<Exe>.cpp` (LG, SCD, POD). The 2 files leave lift_common.
+- First try (files in CG SOURCES and in each exe lib): LG 462 -> 477, SCD +7, POD +4, but CG -1
+  (Crypto::Destroy string_at noise) and SCD AlertSender::AlertSender, POD AlertSender, PipeCommandProcess,
+  PipeConsole, Thread, WinMsgHandler destructors MATCH -> DIFF (string_at noise, refs only).
+- Cause of the noise: tools/vs2010/build.sh sorts the objects of each target. Objects in CG SOURCES link before
+  the Security objects, so the Blowfish vtable moves.
+- Second try: libs `lift_common_cg/lg/scd/pod` whose names sort after lift_common. The libs need `/GR-` (else
+  lld-link: undefined `type_info::vftable` from the RTTI of RefCntObject). CG was still -1: the 2 objects left
+  their sorted place inside lift_common.
+- Third try (worked): `LIFT_COMMON_SOURCES` list. `lift_common` = list without the 2 files (LG, SCD, POD + per-exe
+  libs `lift_common_lg/scd/pod`). `lift_common_cg` = full list with the 2 files, so CG keeps its old object order.
+  Result: CG 385 (+0), LG +15, SCD +7, POD +4. The SCD/POD MATCH -> DIFF losses are string_at noise (refs only);
+  they are in allow-worse.txt.
+
+## Pattern 36 (worked, lift-parity-lg-1): one shared cleanup tail and `__try/__finally`
+- Cause: the original handler has one tail (`pcb->Clear()`, release). Our "decompose packet fail" branch had its
+  own copy of `Clear()` + release + `return`: one extra `<indirect>` call.
+- Source change: `goto cleanup;` in that branch. TakeGoodsOk 0x113e0, GetServiceEntryListOk 0x11b60: MATCH.
+- When HR shows `$__FINALLY_n` and reloads the list pointer in the item loop, use `__try { ... __leave; }
+  __finally { free }` inside an `else` of the decompose-fail `if`. ListLobbyServiceItemInfoOk 0x117a0: MATCH.
+- Only these 4 LG functions have `$__FINALLY` in the HR (all MATCH now).
+
+## Pattern 37 (worked, lift-parity-lg-1, stage 6): inlined Packet constructor with one pool buffer
+- Orig `ClientManager::BroadcastAnnounceNotify` 0x62c0 sets `Splitter`, `IsFragmentPacket`, a 28-byte zero fill, then
+  `ListTail = PacketBufferPool::allocate(TLS)`, `ListHead = ListTail`, `CurHeader = &Buffer[8]`, `size = 2`.
+- Source: `Packet packet = {nullptr, false};` then the 4 stores with `PacketBufferAllocator::_Local->allocate()`.
+  Also `__declspec(noinline)` on the function (our build inlined its first part into the caller).
+- Gain: caller `HandleLobbyLobbyGate_AnnounceNotify` 0xbce0 MATCH (LG 480 -> 481). Callee 69.8 -> 92.1.
+- Still DIFF in the callee: orig merges the two LT_ERROR `Log::Write` calls and has one `Packet::Clear`; ours has two.
+
+## Tool fact (lift-parity-lg-1, stage 7): `tools/vs2010/build.sh` does not track headers
+- It rebuilds an object only when the `.cpp` is newer than the `.obj`. After a header change, `touch` each `.cpp`
+  that includes the header. Else parity measures the old code.
+
+## Pattern 38 (worked, lift-parity-lg-1, stage 7): STL map allocator with a non-const pair key
+- Cause: the orig PDB names are `StlAllocator<std::pair<__int64,X>,2>` (key not const). Ours had `pair<__int64 const,X>`.
+  With ICF, the orig folds the `_Buynode`/`_Linsert`/`erase` of all 3 LG maps to the `Client *` names.
+- Source change: `Client.h` typedefs use `StlAllocator<std::pair<long long, X>, 2>`. Insert with
+  `std::pair<long long, X>(k, v)` (orig `_Buynode<std::pair<__int64,Client *>>`), not `value_type(k, v)`.
+- Example: `ClientManager::RemoveClient` 0x60c0 MATCH.
+
+## Pattern 39 (worked, lift-parity-lg-1, stage 7): branch order of `Clone` and an empty member destructor
+- `ClientPacketBufferHandler::Clone` 0x21920: orig tests `buffer == nullptr` first (`lea r9d,[rdx+0x62]` uses the
+  known zero). Write the alloc path in `if (buffer == nullptr) {...}`. MATCH (also `TrustedPacketBufferHandler::Clone`).
+- `FragmentPacket::~FragmentPacket` 0x24e0: orig is `add rcx,8; jmp Packet::Clear`. The body must be empty: the
+  member `~Packet` does the Clear. An explicit `packet.Clear()` gives two calls and an EH frame. MATCH.

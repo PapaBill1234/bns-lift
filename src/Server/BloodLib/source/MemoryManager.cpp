@@ -3,8 +3,11 @@
 #include "Log.h"
 #include "AlertSender.h"
 
+// The path is per exe project. MemoryManager<Exe>.cpp wrappers set it (lesson 30).
+#ifndef LIFT_MEMORYMANAGER_H_FILE
 #define LIFT_MEMORYMANAGER_H_FILE \
     L"E:\\DailyBuild02\\CacheGate-Common-0.0.348\\depot\\Branch\\348NC\\Program\\Server\\BloodLib\\include\\MemoryManager.h"
+#endif
 #define LIFT_DO_NOT_USE L"== CRASH == [memory], do not use this function"
 
 // 0x590a0 (.rdata). HeapMemoryManager::Initialize compares the option with 2.

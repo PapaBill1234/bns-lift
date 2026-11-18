@@ -66,11 +66,12 @@ add_dependencies(lift_selftest lift_msvcp100_implib)
 target_link_libraries(lift_selftest PRIVATE ${LIFT_MSVCP100_IMPLIB})
 
 # Common server code (BloodLib). Static lib, shared by the server exes.
-add_library(lift_common STATIC
+# lift_common has no MemoryManager.cpp and RefCntObject.cpp: LG, SCD and POD link a per-exe copy (lessons.md
+# pattern 35). lift_common_cg is the full list for CacheGate. tools/vs2010/build.sh sorts the objects of a lib by
+# path, so the full list keeps the old CacheGate object order.
+set(LIFT_COMMON_SOURCES
   src/Server/BloodLib/source/BaseMemory.cpp
   src/Server/BloodLib/source/Memory.cpp
-  src/Server/BloodLib/source/MemoryManager.cpp
-  src/Server/BloodLib/source/RefCntObject.cpp
   src/Server/BloodLib/source/Log.cpp
   src/Server/BloodLib/source/LogBuffer.cpp
   src/Server/BloodLib/source/LogMedia.cpp
@@ -124,17 +125,23 @@ add_library(lift_common STATIC
   src/Server/BloodLib/source/CrashHandler.cpp
   src/Server/Packet/FragmentPacket.cpp
   src/Server/BloodLib/source/Db.cpp)
+add_library(lift_common STATIC ${LIFT_COMMON_SOURCES})
+add_library(lift_common_cg STATIC ${LIFT_COMMON_SOURCES}
+  src/Server/BloodLib/source/MemoryManager.cpp
+  src/Server/BloodLib/source/RefCntObject.cpp)
 # clang-cl needs the AES target feature for the <wmmintrin.h> intrinsics.
 set_source_files_properties(src/Security/source/BloodCrypto/crypto/aes128NI.cpp PROPERTIES COMPILE_OPTIONS "-maes")
-target_compile_options(lift_common PRIVATE /GR-)
-# AlertSender.h includes winsock2.h after windows.h.
-target_compile_definitions(lift_common PUBLIC WIN32_LEAN_AND_MEAN)
-target_include_directories(lift_common BEFORE PRIVATE ${LIFT_STL_INCLUDE})
-target_include_directories(lift_common PUBLIC ${LIFT_SRC_INCLUDE})
-add_dependencies(lift_common lift_msvcp100_implib)
-# Wine import libs for the BloodLib modules (Db: odbc32, SystemInformation: ws2_32 iphlpapi, String: ole32).
-foreach(imp odbc32 ws2_32 iphlpapi ole32 advapi32 shell32 version user32 shlwapi)
-  target_link_libraries(lift_common INTERFACE "${WINE_LIBDIR}/lib${imp}.a")
+foreach(lift_l IN ITEMS lift_common lift_common_cg)
+  target_compile_options(${lift_l} PRIVATE /GR-)
+  # AlertSender.h includes winsock2.h after windows.h.
+  target_compile_definitions(${lift_l} PUBLIC WIN32_LEAN_AND_MEAN)
+  target_include_directories(${lift_l} BEFORE PRIVATE ${LIFT_STL_INCLUDE})
+  target_include_directories(${lift_l} PUBLIC ${LIFT_SRC_INCLUDE})
+  add_dependencies(${lift_l} lift_msvcp100_implib)
+  # Wine import libs for the BloodLib modules (Db: odbc32, SystemInformation: ws2_32 iphlpapi, String: ole32).
+  foreach(imp odbc32 ws2_32 iphlpapi ole32 advapi32 shell32 version user32 shlwapi)
+    target_link_libraries(${lift_l} INTERFACE "${WINE_LIBDIR}/lib${imp}.a")
+  endforeach()
 endforeach()
 
 # Upstream zstd (see vendor/zstd/README.md). Build it only if the source is present.
@@ -154,6 +161,7 @@ else()
   add_library(lift_zstd_stub STATIC src/crt/zstd_stub.c)
 endif()
 target_link_libraries(lift_common PUBLIC ${LIFT_ZSTD_LINK})
+target_link_libraries(lift_common_cg PUBLIC ${LIFT_ZSTD_LINK})
 
 # CacheGate server exe. wmain_bridge.c gives the narrow main that crt0.c calls.
 lift_exe(CacheGate
@@ -165,7 +173,22 @@ lift_exe(CacheGate
 target_compile_options(CacheGate PRIVATE /GR-)
 target_include_directories(CacheGate BEFORE PRIVATE ${LIFT_STL_INCLUDE})
 add_dependencies(CacheGate lift_msvcp100_implib)
-target_link_libraries(CacheGate PRIVATE lift_common ${LIFT_MSVCP100_IMPLIB})
+# BloodLib sources with a per-exe __FILE__ path (lessons.md pattern 35).
+foreach(lift_e IN ITEMS LobbyGate:lg SmartCouponDaemon:scd PostOfficeDaemon:pod)
+  string(REPLACE ":" ";" lift_p "${lift_e}")
+  list(GET lift_p 0 lift_x)
+  list(GET lift_p 1 lift_s)
+  add_library(lift_common_${lift_s} STATIC
+    src/Server/BloodLib/source/MemoryManager${lift_x}.cpp
+    src/Server/BloodLib/source/RefCntObject${lift_x}.cpp)
+endforeach()
+foreach(lift_s IN ITEMS lg scd pod)
+  target_compile_options(lift_common_${lift_s} PRIVATE /GR-)
+  target_include_directories(lift_common_${lift_s} BEFORE PRIVATE ${LIFT_STL_INCLUDE})
+  add_dependencies(lift_common_${lift_s} lift_msvcp100_implib)
+  target_link_libraries(lift_common_${lift_s} PUBLIC lift_common)
+endforeach()
+target_link_libraries(CacheGate PRIVATE lift_common_cg ${LIFT_MSVCP100_IMPLIB})
 
 # SmartCouponDaemon app modules (static lib).
 add_library(lift_smartcoupondaemon STATIC
@@ -253,6 +276,8 @@ target_link_libraries(lift_postofficedaemon PUBLIC lift_common)
 
 # MarketDealerDaemon lifted modules (static library). Calls to code of later cards stay as declarations.
 add_library(lift_marketdealerdaemon STATIC
+  src/Server/BloodLib/source/MemoryManager.cpp
+  src/Server/BloodLib/source/RefCntObject.cpp
   src/Server/Economy/Shared/ThreadFreePacketPumpShortPath.cpp
   src/Server/Shared/BnsCommonConfigDefinition.cpp
   src/Server/Economy/MarketDealerDaemon/SaleContext.cpp
@@ -285,7 +310,7 @@ lift_exe(SmartCouponDaemon
 target_compile_options(SmartCouponDaemon PRIVATE /GR-)
 target_include_directories(SmartCouponDaemon BEFORE PRIVATE ${LIFT_STL_INCLUDE})
 add_dependencies(SmartCouponDaemon lift_msvcp100_implib)
-target_link_libraries(SmartCouponDaemon PRIVATE lift_smartcoupondaemon lift_common ${LIFT_MSVCP100_IMPLIB})
+target_link_libraries(SmartCouponDaemon PRIVATE lift_smartcoupondaemon lift_common lift_common_scd ${LIFT_MSVCP100_IMPLIB})
 
 # LobbyGate server exe. XmlReader_sv64.dll, bsConsole_sv64.dll and dbghelp.dll load at run time (not linked).
 lift_exe(LobbyGate
@@ -294,7 +319,7 @@ lift_exe(LobbyGate
 target_compile_options(LobbyGate PRIVATE /GR-)
 target_include_directories(LobbyGate BEFORE PRIVATE ${LIFT_STL_INCLUDE})
 add_dependencies(LobbyGate lift_msvcp100_implib)
-target_link_libraries(LobbyGate PRIVATE lift_lobbygate lift_common ${LIFT_MSVCP100_IMPLIB})
+target_link_libraries(LobbyGate PRIVATE lift_lobbygate lift_common lift_common_lg ${LIFT_MSVCP100_IMPLIB})
 
 # PostOfficeDaemon server exe. XmlReader_sv64.dll, bsConsole_sv64.dll and dbghelp.dll load at run time (not linked).
 lift_exe(PostOfficeDaemon
@@ -303,4 +328,4 @@ lift_exe(PostOfficeDaemon
 target_compile_options(PostOfficeDaemon PRIVATE /GR-)
 target_include_directories(PostOfficeDaemon BEFORE PRIVATE ${LIFT_STL_INCLUDE})
 add_dependencies(PostOfficeDaemon lift_msvcp100_implib)
-target_link_libraries(PostOfficeDaemon PRIVATE lift_postofficedaemon lift_common ${LIFT_MSVCP100_IMPLIB})
+target_link_libraries(PostOfficeDaemon PRIVATE lift_postofficedaemon lift_common lift_common_pod ${LIFT_MSVCP100_IMPLIB})

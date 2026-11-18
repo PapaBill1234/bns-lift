@@ -99,9 +99,9 @@ class GateKeyManager
 {
 public:
     typedef std::map<long long, GateKeyEntry*, std::less<long long>,
-                     StlAllocator<std::pair<long long const, GateKeyEntry*>, 2> > GKEMapType;  // PDB nested type (0x29AA)
+                     StlAllocator<std::pair<long long, GateKeyEntry*>, 2> > GKEMapType;  // PDB nested type (0x29AA); orig allocator pair key is not const
     typedef std::map<long long, long long, std::less<long long>,
-                     StlAllocator<std::pair<long long const, long long>, 2> > SessionGateKeyMapType;  // PDB nested type (0x2A7D)
+                     StlAllocator<std::pair<long long, long long>, 2> > SessionGateKeyMapType;  // PDB nested type (0x2A7D)
 
     bool Initialize(int hashCount);                            // 0x3910
     void Finalize();                                           // 0x3b10
@@ -125,7 +125,7 @@ class ClientManager
 {
 public:
     typedef std::map<long long, Client*, std::less<long long>,
-                     StlAllocator<std::pair<long long const, Client*>, 2> > CliMapType;  // PDB nested type (0x2C49)
+                     StlAllocator<std::pair<long long, Client*>, 2> > CliMapType;  // PDB nested type (0x2C49)
 
     bool Initialize(int hashCount);                                          // 0x5b90
     void Finalize();                                                         // 0x5cf0

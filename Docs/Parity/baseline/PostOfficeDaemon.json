@@ -135,9 +135,9 @@
 "AlertSender::AlertSender": {
 "calls": 100,
 "consts": 100,
-"refs": 100,
-"score": 100.0,
-"status": "MATCH"
+"refs": 96,
+"score": 98.6,
+"status": "DIFF"
 },
 "AlertSender::Name": {
 "calls": 100,
@@ -1017,9 +1017,9 @@
 "DelayedRelease::releaseNode": {
 "calls": 100,
 "consts": 100,
-"refs": 71,
-"score": 90.5,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "DeliverPostRelayContext::ComposeRequestPacket": {
 "calls": 100,
@@ -1857,8 +1857,8 @@
 "Network::initWorkerThread": {
 "calls": 100,
 "consts": 86,
-"refs": 100,
-"score": 95.2,
+"refs": 90,
+"score": 91.9,
 "status": "DIFF"
 },
 "Network::initializeSocketInterface": {
@@ -1899,9 +1899,9 @@
 "Packet::Clear": {
 "calls": 100,
 "consts": 100,
-"refs": 67,
-"score": 88.9,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Packet::Compose": {
 "calls": 100,
@@ -2228,9 +2228,9 @@
 "PipeCommandProcess::~PipeCommandProcess": {
 "calls": 100,
 "consts": 100,
-"refs": 100,
-"score": 100.0,
-"status": "MATCH"
+"refs": 50,
+"score": 83.3,
+"status": "DIFF"
 },
 "PipeConsole::Name": {
 "calls": 100,
@@ -2354,9 +2354,9 @@
 "PipeConsole::~PipeConsole": {
 "calls": 100,
 "consts": 100,
-"refs": 100,
-"score": 100.0,
-"status": "MATCH"
+"refs": 67,
+"score": 88.9,
+"status": "DIFF"
 },
 "Port::Clear": {
 "calls": 100,
@@ -2788,8 +2788,8 @@
 "Prng::Initialize": {
 "calls": 100,
 "consts": 67,
-"refs": 50,
-"score": 72.2,
+"refs": 100,
+"score": 88.9,
 "status": "DIFF"
 },
 "Prng::setSeed": {
@@ -2830,9 +2830,9 @@
 "RefCntObject::addReferenceCount": {
 "calls": 100,
 "consts": 100,
-"refs": 50,
-"score": 83.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "RefCntObject::deallocate_object": {
 "calls": 100,
@@ -2844,15 +2844,15 @@
 "RefCntObject::removeReferenceCount": {
 "calls": 100,
 "consts": 100,
-"refs": 50,
-"score": 83.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "RefCntObject::~RefCntObject": {
 "calls": 100,
 "consts": 100,
-"refs": 40,
-"score": 80.0,
+"refs": 80,
+"score": 93.3,
 "status": "DIFF"
 },
 "RelayContext::ProcessRelayRequest": {
@@ -3306,8 +3306,8 @@
 "SessionSendBuffer::clearPacketBufferList": {
 "calls": 75,
 "consts": 89,
-"refs": 55,
-"score": 72.8,
+"refs": 91,
+"score": 84.9,
 "status": "DIFF"
 },
 "SessionSendBuffer::increaseBuffer": {
@@ -3327,16 +3327,16 @@
 "StaticPageMemoryManager::AllocZero": {
 "calls": 100,
 "consts": 100,
-"refs": 50,
-"score": 83.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "StaticPageMemoryManager::Clear": {
 "calls": 100,
 "consts": 100,
-"refs": 50,
-"score": 83.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "StaticPageMemoryManager::Free": {
 "calls": 100,
@@ -3355,23 +3355,23 @@
 "StaticPageMemoryManager::Initialize [?Initialize@StaticPageMemoryManager@@UEAA_NPEBX_K@Z]": {
 "calls": 100,
 "consts": 100,
-"refs": 50,
-"score": 83.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "StaticPageMemoryManager::Realloc": {
 "calls": 100,
 "consts": 100,
-"refs": 50,
-"score": 83.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "StaticPageMemoryManager::ReallocZero": {
 "calls": 100,
 "consts": 100,
-"refs": 50,
-"score": 83.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "StaticPageMemoryManager::allocate": {
 "calls": 100,
@@ -3558,9 +3558,9 @@
 "Thread::~Thread": {
 "calls": 100,
 "consts": 100,
-"refs": 100,
-"score": 100.0,
-"status": "MATCH"
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
 },
 "ThreadFreeFragmentPacketPump::HandleEvent": {
 "calls": 100,
@@ -3746,10 +3746,10 @@
 },
 "TrustedPacketBufferHandler::Clone": {
 "calls": 100,
-"consts": 0,
+"consts": 100,
 "refs": 100,
-"score": 66.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "TrustedPacketBufferHandler::Destroy": {
 "calls": 100,
@@ -3866,9 +3866,9 @@
 "WinMsgHandler::~WinMsgHandler": {
 "calls": 100,
 "consts": 100,
-"refs": 100,
-"score": 100.0,
-"status": "MATCH"
+"refs": 80,
+"score": 93.3,
+"status": "DIFF"
 },
 "WinServiceConsole::Close": {
 "calls": 100,

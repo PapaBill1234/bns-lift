@@ -147,7 +147,7 @@ FragmentPacket::FragmentPacket(short command, char const* format)
 // 0x24e0
 FragmentPacket::~FragmentPacket()
 {
-    packet.Clear();
+    // Orig 0x24e0 is only `add rcx,8; jmp Packet::Clear`: the member ~Packet does the Clear.
 }
 
 // 0x37f0 (Client.obj copy)

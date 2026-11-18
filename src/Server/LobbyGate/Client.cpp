@@ -214,8 +214,9 @@ long long GateKeyManager::MakeGateKey(Session* session)
         return 0;
     GateKeyEntry* entry = new (mem) GateKeyEntry(session);
 
+    // Orig inserts non-const std::pair values; the sgk lock stays held in the fail path (HR 0x3ec0).
     _gkLock[index].Enter();
-    bool inserted = _gkMap[index].insert(GateKeyManager::GKEMapType::value_type(gateKey, entry)).second;
+    bool inserted = _gkMap[index].insert(std::pair<long long, GateKeyEntry*>(gateKey, entry)).second;
     _gkLock[index].Leave();
     if (!inserted)
     {
@@ -225,18 +226,22 @@ long long GateKeyManager::MakeGateKey(Session* session)
     }
 
     _sgkLock[sessionIndex].Enter();
-    inserted = _sgkMap[sessionIndex]
-                   .insert(GateKeyManager::SessionGateKeyMapType::value_type(static_cast<long long>(session->_id), gateKey))
-                   .second;
-    _sgkLock[sessionIndex].Leave();
-    if (inserted)
+    if (_sgkMap[sessionIndex]
+            .insert(std::pair<long long, long long>(static_cast<long long>(session->_id), gateKey))
+            .second)
+    {
+        _sgkLock[sessionIndex].Leave();
         return gateKey;
+    }
 
     _gkLock[index].Enter();
-    _gkMap[index].erase(gateKey);
+    GateKeyManager::GKEMapType::iterator it = _gkMap[index].find(gateKey);
+    if (it != _gkMap[index].end())
+        _gkMap[index].erase(it);
     _gkLock[index].Leave();
     entry->~GateKeyEntry();
     Memory::_Manager[2]->Free(entry, CLIENT_FILE, 180);
+    _sgkLock[sessionIndex].Leave();
     return 0;
 }
 
@@ -249,21 +254,23 @@ GateKeyEntry* GateKeyManager::RemoveGateKey(long long gateKey)
     GateKeyEntry* entry = nullptr;
     _gkLock[index].Enter();
     GateKeyManager::GKEMapType::iterator it = _gkMap[index].find(gateKey);
+    // Orig keeps the gk lock while it erases the sgk entry, with find + erase(it) (HR 0x4170).
     if (it != _gkMap[index].end())
     {
         entry = it->second;
         _gkMap[index].erase(it);
+        if (entry != nullptr && entry->_session != nullptr)
+        {
+            long long sessionId = static_cast<long long>(entry->_session->_id);
+            int sessionIndex = static_cast<int>(static_cast<unsigned long long>(sessionId) % static_cast<unsigned long long>(_hashCount));
+            _sgkLock[sessionIndex].Enter();
+            GateKeyManager::SessionGateKeyMapType::iterator sit = _sgkMap[sessionIndex].find(sessionId);
+            if (sit != _sgkMap[sessionIndex].end())
+                _sgkMap[sessionIndex].erase(sit);
+            _sgkLock[sessionIndex].Leave();
+        }
     }
     _gkLock[index].Leave();
-
-    if (entry != nullptr && entry->_session != nullptr)
-    {
-        unsigned long long sessionId = entry->_session->_id;
-        int sessionIndex = static_cast<int>(sessionId % static_cast<unsigned long long>(_hashCount));
-        _sgkLock[sessionIndex].Enter();
-        _sgkMap[sessionIndex].erase(static_cast<long long>(sessionId));
-        _sgkLock[sessionIndex].Leave();
-    }
     return entry;
 }
 
@@ -521,15 +528,16 @@ bool ClientManager::AddClient(Session* session, long long gateKey, long long cli
 
     int index = static_cast<int>(cliKey % _hashCount);
     _cliLock[index].Enter();
-    if (_cliMap[index].insert(ClientManager::CliMapType::value_type(cliKey, client)).second)
+    // Orig inserts a non-const std::pair (`_Buynode<std::pair<__int64,Client *>>`); fail block first.
+    if (!_cliMap[index].insert(std::pair<long long, Client*>(cliKey, client)).second)
     {
-        client->SetSession(session);
         _cliLock[index].Leave();
-        return true;
+        client->removeReferenceCount(CLIENT_FILE, 734);
+        return false;
     }
+    client->SetSession(session);
     _cliLock[index].Leave();
-    client->removeReferenceCount(CLIENT_FILE, 734);
-    return false;
+    return true;
 }
 
 // 0x60c0
@@ -572,7 +580,7 @@ Client* ClientManager::AcquireClient(long long cliKey)
 }
 
 // 0x62c0
-void ClientManager::BroadcastAnnounceNotify(wchar_t const* message)
+__declspec(noinline) void ClientManager::BroadcastAnnounceNotify(wchar_t const* message)
 {
     if (wcslen(message) == 0)
     {
@@ -580,7 +588,12 @@ void ClientManager::BroadcastAnnounceNotify(wchar_t const* message)
                    L"[client session handler], broadcast announce notify fail; invalid parameter");
         return;
     }
-    Packet packet = {};  // LIFT: inlined constructor
+    // LIFT: inlined Packet constructor (0x62c0): zero fill, then one buffer from the thread pool.
+    Packet packet = {nullptr, false};
+    packet.ListTail = PacketBufferAllocator::_Local->allocate();
+    packet.ListHead = packet.ListTail;
+    packet.CurHeader = reinterpret_cast<Packet::Header*>(&packet.ListTail->Buffer[8]);
+    packet.CurHeader->size = 2;
     if (packet.Compose("hs", 11, message) == 0)
     {
         Log::Write(Log::LT_ERROR, CLIENT_FILE, 806,

@@ -19,12 +19,15 @@ unsigned long long TrustedPacketBufferHandler::AllocSize() const
 // 0x21580 (SmartCouponDaemon)
 PacketBufferHandler* TrustedPacketBufferHandler::Clone(void* buffer) const
 {
-    if (buffer != nullptr)
-        return new (buffer) TrustedPacketBufferHandler();
-    void* mem = Memory::_Manager[2]->Alloc(8, PBH_FILE, 41);
-    if (mem == nullptr)
-        return nullptr;
-    return new (mem) TrustedPacketBufferHandler();
+    // Orig tests buffer == nullptr first (alloc path falls through).
+    if (buffer == nullptr)
+    {
+        void* mem = Memory::_Manager[2]->Alloc(8, PBH_FILE, 41);
+        if (mem == nullptr)
+            return nullptr;
+        return new (mem) TrustedPacketBufferHandler();
+    }
+    return new (buffer) TrustedPacketBufferHandler();
 }
 
 // 0x215D0 (SmartCouponDaemon)
@@ -164,12 +167,15 @@ unsigned long long ClientPacketBufferHandler::AllocSize() const
 // 0x21920 (LobbyGate)
 PacketBufferHandler* ClientPacketBufferHandler::Clone(void* buffer) const
 {
-    if (buffer != nullptr)
-        return new (buffer) ClientPacketBufferHandler();
-    void* mem = Memory::_Manager[2]->Alloc(8, PBH_FILE, 98);
-    if (mem == nullptr)
-        return nullptr;
-    return new (mem) ClientPacketBufferHandler();
+    // Orig tests buffer == nullptr first (alloc path falls through, `lea r9d,[rdx+0x62]`).
+    if (buffer == nullptr)
+    {
+        void* mem = Memory::_Manager[2]->Alloc(8, PBH_FILE, 98);
+        if (mem == nullptr)
+            return nullptr;
+        return new (mem) ClientPacketBufferHandler();
+    }
+    return new (buffer) ClientPacketBufferHandler();
 }
 
 // 0x21970 (LobbyGate)
