@@ -59,19 +59,33 @@ bool Channel::MakeSession(unsigned int portId, unsigned long ip, unsigned short 
     if (_session != nullptr)
         CHANNEL_ASSERT_CRASH(30);
 
+#if defined(LIFT_CHANNEL_CHECK_PORT_INDEX)
+    // SmartCouponDaemon (0x1f2b0) keeps the port ID argument.
+    unsigned int index = portId - 1;
+    Port* port;
+    if (index <= ARRAYSIZE(Network::Instance->_port) - 1 && (port = Network::Instance->_port[index]) != nullptr)
+#else
     Port* port = Network::Instance->_port[portId - 1];
     if (port == nullptr)
     {
         Log::Write(Log::LT_ERROR, CHANNEL_FILE, 36, L"[channel], cannot find port, port:%d", portId);
         return false;
     }
+#endif
+    {
+        // LIFT: LTCG folded the nagle argument. Session::Connect (0xE570) reads port->_nagle.
+        if (port->MakeNewSession(ip, portNo, this, timeout, port->_nagle, reconnect, &_session))
+            return true;
 
-    // LIFT: LTCG folded the nagle argument. Session::Connect (0xE570) reads port->_nagle.
-    if (port->MakeNewSession(ip, portNo, this, timeout, port->_nagle, reconnect, &_session))
-        return true;
-
-    Log::Write(Log::LT_ERROR, CHANNEL_FILE, 44, L"[channel], cannot make session, port:%d, ip:%s, portno:%d", portId,
-               Network::GetAddressStringW(ip), static_cast<int>(portNo));
+        Log::Write(Log::LT_ERROR, CHANNEL_FILE, 44, L"[channel], cannot make session, port:%d, ip:%s, portno:%d",
+                   portId, Network::GetAddressStringW(ip), static_cast<int>(portNo));
+    }
+#if defined(LIFT_CHANNEL_CHECK_PORT_INDEX)
+    else
+    {
+        Log::Write(Log::LT_ERROR, CHANNEL_FILE, 36, L"[channel], cannot find port, port:%d", portId);
+    }
+#endif
     return false;
 }
 

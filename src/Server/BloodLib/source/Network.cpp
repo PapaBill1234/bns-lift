@@ -56,7 +56,7 @@ static unsigned int const s_defaultMaxSession[4] = {10000, 10000, 16, 16};
 
 // GetAddressStringW (LobbyGate 0x20b20) uses TLS slot 0 +0x40 char[32] (strcpy_s size 0x20, 0x20b5e) and +0x60 wchar_t[32] (cch 0x1F, 0x20b7d).
 // PDB (CacheGate Network.obj): S_LTHREAD32 __ip_addr_string_w__ at .tls+0x60. The char name is not in the PDB symbols. ❓
-static __declspec(thread) char __ip_addr_string_a__[32];
+__declspec(thread) char __ip_addr_string_a__[32];
 static __declspec(thread) wchar_t __ip_addr_string_w__[32];
 
 ThreadManager* Network::WorkerManager;

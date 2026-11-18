@@ -42,8 +42,8 @@ long NPPing::_interval = 0;
 
 // PDB: NPChannel::_buffer (S_GTHREAD32, TLS +0x40, unsigned char[64000]).
 __declspec(thread) unsigned char NPChannel::_buffer[64000];
-// LIFT: name. TLS +0xFA40 (0x5C87) has no PDB symbol.
-static __declspec(thread) char t_addressBuffer[32];
+// LIFT: Name of the narrow buffer used in Network.cpp (0x5c87).
+extern __declspec(thread) char __ip_addr_string_a__[32];
 
 // LIFT: Packet has no constructor. The original sets these fields inline.
 static void zeroPacket(Packet* packet)
@@ -608,13 +608,14 @@ bool NPChannel::onConnect(Session const* session, bool firstConnected)
 bool NPChannel::sendInitialConnectMessage(Session const* session)
 {
     char localIP[17] = {0};
-    t_addressBuffer[0] = 0;
     in_addr addr;
     addr.s_addr = session->_connection->GetLocalAddress();
+    char* addressBuffer = __ip_addr_string_a__;
+    addressBuffer[0] = 0;
     char const* text = inet_ntoa(addr);
     if (text != nullptr)
-        strcpy_s(t_addressBuffer, sizeof(t_addressBuffer), text);
-    strcpy_s(localIP, sizeof(localIP), t_addressBuffer);
+        strcpy_s(addressBuffer, sizeof(__ip_addr_string_a__), text);
+    strcpy_s(localIP, sizeof(localIP), addressBuffer);
 
     _StsMsgRequestInitialConnect msg;
     msg.msgInfo.eCmd = COMMAND_INITIAL_CONNECT;
