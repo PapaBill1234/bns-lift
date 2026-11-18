@@ -1302,95 +1302,95 @@
 "status": "MATCH"
 },
 "HandleCacheEconomyCheckPostCapacityFail": {
-"calls": 83,
-"consts": 96,
-"refs": 74,
-"score": 84.3,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "HandleCacheEconomyCheckPostCapacityOk": {
-"calls": 83,
-"consts": 96,
-"refs": 74,
-"score": 84.2,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "HandleCacheEconomyDeliverPostFail": {
-"calls": 87,
-"consts": 96,
-"refs": 72,
-"score": 85.1,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "HandleCacheEconomyDeliverPostOk": {
-"calls": 87,
-"consts": 96,
-"refs": 72,
-"score": 85.0,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "HandleCacheEconomyFail": {
 "calls": 100,
-"consts": 50,
-"refs": 22,
-"score": 57.4,
-"status": "DIFF"
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "HandleCacheEconomyHelloFail": {
 "calls": 100,
-"consts": 50,
-"refs": 22,
-"score": 57.4,
-"status": "DIFF"
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "HandleCacheEconomyHelloOk": {
 "calls": 100,
-"consts": 50,
-"refs": 22,
-"score": 57.4,
-"status": "DIFF"
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "HandleCacheEconomyPingFail": {
-"calls": 87,
-"consts": 83,
-"refs": 72,
-"score": 80.8,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "HandleCacheEconomyPingOk": {
-"calls": 87,
-"consts": 82,
-"refs": 72,
-"score": 80.3,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "HandleCacheEconomyRemovePawnFail": {
 "calls": 100,
-"consts": 50,
-"refs": 22,
-"score": 57.4,
-"status": "DIFF"
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "HandleCacheEconomyRemovePawnOk": {
 "calls": 100,
-"consts": 50,
-"refs": 22,
-"score": 57.4,
-"status": "DIFF"
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "HandleCacheEconomyRetrieveCharacterInfoFail": {
-"calls": 83,
-"consts": 96,
-"refs": 74,
-"score": 84.3,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "HandleCacheEconomyRetrieveCharacterInfoOk": {
-"calls": 87,
-"consts": 96,
-"refs": 72,
-"score": 85.0,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "HandleCacheGateFragmentRelay": {
 "calls": 91,
@@ -2723,32 +2723,32 @@
 "status": "DIFF"
 },
 "PostOfficeDB::ResetAllDeliveryFailurePost": {
-"calls": 96,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 98.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "PostOfficeDB::UpdateStatusToDeliveryFailure": {
 "calls": 100,
-"consts": 57,
-"refs": 21,
-"score": 59.4,
-"status": "DIFF"
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "PostOfficeDB::UpdateStatusToDeliverySuccess": {
 "calls": 100,
-"consts": 57,
-"refs": 21,
-"score": 59.4,
-"status": "DIFF"
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "PostOfficeDB::UpdateStatusToRetryReady": {
 "calls": 100,
-"consts": 92,
+"consts": 100,
 "refs": 100,
-"score": 97.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "PostOfficeDaemon::Descriptions": {
 "calls": 100,

@@ -45,6 +45,13 @@ static_assert(sizeof(EconomyHeader) == 0x10, "sizeof EconomyHeader");
 class RelayHeader
 {
 public:
+    RelayHeader() : _fromWid(0), _toWid(0), _relayTid(0), _hint(0), _reserved(0) {}  // ❓ PDB has a ctor (0x2B5A); zero fill seen in the static init of GetMemberOffset (0x5120)
+    // The original inlines this in each cache economy handler (static `header` + guard). Returns 0x18.
+    static int const GetMemberOffset()
+    {
+        static RelayHeader header;
+        return static_cast<int>(reinterpret_cast<char const*>(&header._reserved) - reinterpret_cast<char const*>(&header));
+    }
     unsigned short _fromWid;
     unsigned short _toWid;
     unsigned long long _relayTid;

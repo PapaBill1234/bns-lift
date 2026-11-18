@@ -14,7 +14,7 @@
 #include "UnsentPostContext.h"
 
 #define POSTOFFICEDB_FILE L"PostOfficeDB.cpp"
-static wchar_t const* const MODULE_NAME = L"postoffice db";  // PDB MODULE_NAME
+#define MODULE_NAME L"postoffice db"  // PDB MODULE_NAME; literal as in CacheEconomyPacketHandler.cpp
 
 #define FAIL_ACQUIRE L"[%s], %s; failed to acquire transaction, dbId:%d"
 #define FAIL_PREPARE L"[%s], %s; failed to prepare sql, query:%s"
@@ -396,10 +396,10 @@ bool PostOfficeDB::RegisterPost(int* dbRetValue, PostInfo* postInfo, AttachedIte
 namespace
 {
 // LIFT: Not a PDB function. The two UpdateStatusToDelivery* functions have the same body (inlined twice).
-bool UpdatePostStatus(int* dbRetValue, long long postId, wchar_t const* fn, wchar_t const* query, int acquireLine,
-                      int prepareLine, int bindLine, int executeLine)
+__forceinline bool UpdatePostStatus(int* dbRetValue, long long postId, wchar_t const* fn, wchar_t const* query,
+                                    int acquireLine, int prepareLine, int bindLine, int executeLine)
 {
-    unsigned long long paramLen[2] = {0, 0};
+    unsigned long long paramLen[2];
     AutoDbTran tran(kDbId);
     if (tran.Tran == nullptr)
     {
@@ -411,6 +411,8 @@ bool UpdatePostStatus(int* dbRetValue, long long postId, wchar_t const* fn, wcha
         Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, prepareLine, FAIL_PREPARE, MODULE_NAME, fn, query);
         return false;
     }
+    paramLen[0] = 0;
+    paramLen[1] = 0;
     if (!tran.Tran->BindParam(1, SQL_PARAM_OUTPUT, dbRetValue, 0, 0, SQL_INTEGER, SQL_C_SLONG, &paramLen[0]) ||
         !tran.Tran->BindParam(2, SQL_PARAM_INPUT, &postId, 0, 0, SQL_BIGINT, SQL_C_SBIGINT, &paramLen[1]))
     {
@@ -601,7 +603,7 @@ bool PostOfficeDB::UpdateStatusToRetryReady(int* dbRetValue, long long postId, l
                                             long long recipientPcId)
 {
     wchar_t const* const fn = L"PostOfficeDB::UpdateStatusToRetryReady";
-    unsigned long long paramLen[4] = {0, 0, 0, 0};
+    unsigned long long paramLen[4];
     AutoDbTran tran(kDbId);
     if (tran.Tran == nullptr)
     {
@@ -614,8 +616,13 @@ bool PostOfficeDB::UpdateStatusToRetryReady(int* dbRetValue, long long postId, l
         Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 771, FAIL_PREPARE, MODULE_NAME, fn, query);
         return false;
     }
+    long long nullInd = 0;  // LIFT: orig keeps the indicator in a register (0x1a220)
+    paramLen[0] = 0;
+    paramLen[1] = 0;
+    paramLen[3] = 0;
     if (invoiceId == 0)
-        paramLen[2] = kNullData;
+        nullInd = -1;
+    paramLen[2] = static_cast<unsigned long long>(nullInd);
     if (!tran.Tran->BindParam(1, SQL_PARAM_OUTPUT, dbRetValue, 0, 0, SQL_INTEGER, SQL_C_SLONG, &paramLen[0]) ||
         !tran.Tran->BindParam(2, SQL_PARAM_INPUT, &postId, 0, 0, SQL_BIGINT, SQL_C_SBIGINT, &paramLen[1]) ||
         !tran.Tran->BindParam(3, SQL_PARAM_INPUT, &invoiceId, 0, 0, SQL_BIGINT, SQL_C_SBIGINT, &paramLen[2]) ||
@@ -659,5 +666,8 @@ bool PostOfficeDB::ResetAllDeliveryFailurePost(int* dbRetValue)
         Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 839, FAIL_EXECUTE, MODULE_NAME, fn, *dbRetValue);
         return false;
     }
-    return *dbRetValue == 0;
+    // LIFT: the original keeps both returns apart (0x1a500): one Db::ReleaseTransaction per branch.
+    if (*dbRetValue != 0)
+        return false;
+    return true;
 }

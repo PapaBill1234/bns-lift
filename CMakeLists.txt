@@ -7,6 +7,10 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 include(cmake/lift.cmake)
 
+# No _Init_thread_header/_footer/_epoch in the /nodefaultlib link. VS2010 has no thread-safe statics either.
+# Here (not in the toolchain file) so that an old CMakeCache keeps working.
+add_compile_options($<$<COMPILE_LANGUAGE:CXX>:/Zc:threadSafeInit->)
+
 # msvcp100.dll import lib. Wine has no libmsvcp100.a, so make one from a .def file.
 # include/vs2010 calls only these msvcp100 exports.
 set(LIFT_MSVCP100_DEF ${CMAKE_BINARY_DIR}/msvcp100.def)

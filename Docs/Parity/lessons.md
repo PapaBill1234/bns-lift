@@ -267,4 +267,67 @@ Each new card adds its patterns at the end of section A or B. The next review so
   Our noinline in `Session.cpp:801` makes it ONLY-OURS in SCD (0x13fa0) and POD (0x150a0). `tools/vs2010/build.sh` has no per-target define,
   so a per-exe split needs a wrapper `.cpp` per exe (pattern A5). Not done. Same for `Session::deallocateCrypt` (ONLY-OURS in SCD/POD; orig has it only in LG 0x194c0).
 - `CriticalSection::CriticalSection` (orig 24 B, `ObjectPool.obj`): no caller names it in any orig pseudocode. Dead or folded in the orig. Not fixable by noinline.
+
+## helpers-2, stage 1 (2026-11-18, in progress)
+
+- A15 extension: a lift helper in an anonymous namespace or a plain `static` function is NOT inlined by VS2010 LTCG.
+  Ours then has the log strings only in the helper, so each caller has fewer refs (`L"Client.cpp"`, `Channel.h`, "invalid session"
+  text). Fix: `static __forceinline` on each helper. LG `Client.cpp` (`acquireSendSession`, `failSend`, `okSend`,
+  `finalizeFragment`, `reserveFragment`): refs of `Client::Send*Ok` 78 -> 100.
+- Same step for `LobbyDPacketHandler.cpp` helpers (`LobbyDHandlerRelease`, `LobbyDRepeatNext`, `LobbyDFpReserve`,
+  `LobbyDBroadcastReload`): no measured change yet (the handlers still DIFF for other causes).
+- A12 extension: no explicit `fp.packet.Clear()` before `return` in `failSend` / `okSend`. The `FragmentPacket` dtor clears.
+  An explicit Clear gives 2 `Packet::Clear` calls where the original has 1. Result: LG MATCH 528 -> 530
+  (`Client::SendListGoodsOk` 0x4b20, `Client::SendGetServiceEntryListOk`), 0 lost.
+- Open (Client.cpp): `Client::SendTakeGoodsOk` 0x4ed0, `SendListLobbyServiceItemInfoOk` 0x5320: orig call order is
+  `SetFormat, Allocate, Compose ...`; ours is `SetFormat, Compose, Clear, Allocate, Allocate`. The original HR has the
+  positive form `if (Compose(goodsId) != 0) { reserve; loop...; send; ok } else { error 538 block }` (error block last).
+  Ours has `if (Compose == 0) return failSend(...)` first. Not tried yet: write the positive form.
+  `SendGetCharacterInfoListOk` (const 0x18 and Compose before Allocate order) not analysed.
+- Tool facts: LG-only parity run `tools/parity.sh LobbyGate` takes about 32 s; the full run about 3.3 min.
+  `.scratch/dl.py <EXE> '<regex>'` lists DIFF functions with scores (made in this card, not in git).
 - `operator delete[]` (`??_V@YAXPEAX0@Z`, orig `CouponJob.c` 0x6850, 59 B): orig has it in LG/SCD/POD. Not tested.
+
+## helpers-2, stage 2 (2026-11-18): POD `CacheEconomyPacketHandler.cpp`, all 13 handlers MATCH (POD 553 -> 566, 0 lost)
+- Literal as a pointer variable: `static wchar_t const* const X = L"..."` at namespace scope makes VS2010 load the pointer.
+  The literal then has no ref in the caller (refs r22 in the `Hello*`/`Fail`/`RemovePawn*` handlers). Fix: `#define X L"..."`.
+  With the 4 helpers `static __forceinline`, 5 handlers MATCH (553 -> 558).
+- A12 extension (shared END tail): the original has one `<END PACKET HANDLER>` log at the end of the handler. All failure paths
+  go there. Only the success path has its own END log. Ours had one END log per failure path (extra `Log::Write` calls).
+  Fix: failure paths `goto done;`, the helper does not log END on failure, the handler has `done: logEnd(...); return false;`.
+  Put `ResponseLines` in an inner block (a `goto` must not jump past an initialised local). Score 85 -> 92.
+- Branch order in the helper decides the block layout: `else if (!ProcessRelayResponse()) { Log fail } else { removeReferenceCount;
+  logEnd; return true; }` gives the original call order (fail Log before `removeReferenceCount`). The positive form gave the other order.
+- Inlined static local of a static member function: the original handlers inline `RelayHeader::GetMemberOffset()`
+  (PDB: `static int const`, no standalone function). It has `static RelayHeader header;` + guard, zero-fill init, and it is the
+  first argument of `Packet::Decompose` (value 0x18 = offset of `_reserved`). Fix: `RelayHeader()` zero ctor and an inline
+  `GetMemberOffset()` in `RelayContext.h`; use it in each `Decompose` call. Gave +8 MATCH (558 -> 566). No other POD function lost a MATCH
+  from the new ctor. Header edit: touch the .cpp files before `tools/parity.sh` (see vs2010-build-header-deps).
+- Not done: `PostOfficeDB::UpdateStatusTo*` refs r21: the same literal pointer variable (`static wchar_t const* const MODULE_NAME`,
+  `POSTOFFICEDB_FILE`, `FAIL_*` in `PostOfficeDB.cpp` line 17 ff.) is likely the cause. Try `#define` first.
+- `PostOfficeDB::Load*Post*`: ours has `memset`/`PostInfo::PostInfo` before `Db::AllocTransaction`, the original after the acquire log.
+  Orig inlines 17 ODBC `SQLBindCol` calls (import ODBC32 #4), ours calls `DbTransaction::BindCol`. Not analysed further.
+
+## helpers-2, stage 3 (2026-11-18): POD `PostOfficeDB.cpp` (POD 566 -> 570, 0 lost; `tools/parity.sh PostOfficeDaemon` ok)
+- `MODULE_NAME` as `#define` literal alone gave no change. The `UpdateStatusToDelivery*` MATCH needed the helper form:
+  `UpdatePostStatus` (shared by the two functions, `__declspec(noinline)` wrappers) as `static __forceinline` so that the literals
+  (`fn`, `query`, line numbers) become constants in each wrapper. The original has 4 error blocks inline in each. +2 MATCH.
+- `paramLen` zero-init after `Prepare` (not at declaration): `unsigned long long paramLen[2];` then `paramLen[0] = 0; ...` after the
+  prepare check. The original zero-fills only on the success path of `Prepare`.
+- `ResetAllDeliveryFailurePost`: the original has one `Db::ReleaseTransaction` per return. `return *dbRetValue == 0;` merges the tails.
+  Write `if (*dbRetValue != 0) return false; return true;`. +1 MATCH.
+- `UpdateStatusToRetryReady` (const `0xffffffffffffffff` ref): `if (invoiceId == 0) nullInd = -1;` with `long long nullInd = 0`
+  then `paramLen[2] = nullInd` matches. The `? kNullData : 0` form gave const `kNullData` in a different place (score 98.4). +1 MATCH.
+- Did not work: `DbTransaction::BindCol` (6-argument, `Db.cpp` 0x2d010) in the positive form (`if (StmtHandle != nullptr) {...}`)
+  loses the BindCol MATCH (calls 67 %) and does not inline into `LoadSinglePost`. Reverted. The original BindCol MATCH needs the
+  `Log::Write` "Not initialized" block first. The original inlines BindCol 17 times in `Load*` with one shared "Not initialized" tail.
+- Not done: `LoadPostList` 0x14e50, `LoadRetryReadyPostList`, `LoadRetryReadySinglePost`, `LoadSinglePost` 0x15fa0 (orig order: `memset`
+  and `PostInfo::PostInfo` after the first acquire `Log::Write`; ours before `Db::AllocTransaction`), `RegisterPost` (84).
+
+## helpers-2, stage 4 (2026-11-18): gate link fix and a try that did not work
+- Gate link fail: the inline `static RelayHeader header;` in `RelayHeader::GetMemberOffset()` makes clang-cl emit `_Init_thread_header/_footer/_epoch`.
+  The gate link is `/nodefaultlib` and has no such symbols. Fix in `CMakeLists.txt`: `add_compile_options(/Zc:threadSafeInit-)` for C++
+  (VS2010 has no thread-safe statics, so the parity build is the same). Put it in `CMakeLists.txt` and not in the toolchain file, because an old `CMakeCache.txt` keeps the old `_INIT` flags.
+- Did not work: `Client::SendTakeGoodsOk` in the positive form (`if (Compose != 0) { ... } else { failSend }`). Score 98.9 -> 93.8, calls 97 -> 81:
+  the whole fail block moves to the end. The original has `Allocate` before the first `Compose`, and the fail block (`Log::Write`,
+  `removeReferenceCount`, `Packet::Clear`) directly after it. The negative form stays. Reverted.

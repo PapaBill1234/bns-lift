@@ -60,14 +60,14 @@ void deleteArray(T* list, int line)
 }
 
 // LIFT: inlined FragmentPacket free-size check, e.g. LobbyGate 0x482b-0x485c (4000 - CurHeader->size < need, then Packet::Allocate).
-inline void reserveFragment(FragmentPacket& fp, int need)
+static __forceinline void reserveFragment(FragmentPacket& fp, int need)
 {
     if (fp.FreeSize() < need)
         fp.packet.Allocate(&fp.composer);
 }
 
 // LIFT: Inlined send preamble of the Client::Send* functions.
-Session* acquireSendSession(Client* client, short cmd, int invalidLine, int notConnectedLine)
+static __forceinline Session* acquireSendSession(Client* client, short cmd, int invalidLine, int notConnectedLine)
 {
     Session* session = const_cast<Session*>(client->GetSession());
     if (session == nullptr)
@@ -92,16 +92,15 @@ Session* acquireSendSession(Client* client, short cmd, int invalidLine, int notC
 }
 
 // LIFT: Inlined fail path of the Client::Send* functions.
-bool failSend(Client* client, Session* session, FragmentPacket& fp, short cmd, int line, wchar_t const* format)
+static __forceinline bool failSend(Client* client, Session* session, FragmentPacket& fp, short cmd, int line, wchar_t const* format)
 {
     Log::Write(Log::LT_ERROR, CLIENT_FILE, line, format, session->_id, client->GetId(), static_cast<int>(cmd));
     session->removeReferenceCount(CHANNEL_H_FILE, 52);
-    fp.packet.Clear();
-    return false;
+    return false;  // LIFT: the FragmentPacket dtor clears the packet (0x4b20)
 }
 
 // LIFT: Inlined end of the Client::Send* functions before the send.
-void finalizeFragment(FragmentPacket& fp)
+static __forceinline void finalizeFragment(FragmentPacket& fp)
 {
     fp.composer.PopRepeatCount();
     if (fp.packet.Splitter != nullptr)
@@ -109,13 +108,12 @@ void finalizeFragment(FragmentPacket& fp)
 }
 
 // LIFT: Inlined ok path of the Client::Send* functions.
-bool okSend(Client* client, Session* session, FragmentPacket& fp, short cmd, int line)
+static __forceinline bool okSend(Client* client, Session* session, FragmentPacket& fp, short cmd, int line)
 {
     Log::Write(Log::LT_DEBUG, CLIENT_FILE, line, L"[channel], 0x%.16I64X, %I64d, send, cmd:%d", session->_id,
                client->GetId(), static_cast<int>(cmd));
     session->removeReferenceCount(CHANNEL_H_FILE, 52);
-    fp.packet.Clear();
-    return true;
+    return true;  // LIFT: the FragmentPacket dtor clears the packet (0x4b20)
 }
 }  // namespace
 

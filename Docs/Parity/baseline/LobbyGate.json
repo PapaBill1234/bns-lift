@@ -378,38 +378,38 @@
 "status": "MATCH"
 },
 "Client::SendGetCharacterInfoListOk": {
-"calls": 96,
-"consts": 91,
-"refs": 78,
-"score": 88.3,
+"calls": 98,
+"consts": 97,
+"refs": 100,
+"score": 98.3,
 "status": "DIFF"
 },
 "Client::SendGetServiceEntryListOk": {
-"calls": 97,
-"consts": 90,
-"refs": 78,
-"score": 88.2,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Client::SendListGoodsOk": {
-"calls": 96,
-"consts": 87,
-"refs": 78,
-"score": 87.2,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Client::SendListLobbyServiceItemInfoOk": {
-"calls": 92,
-"consts": 90,
-"refs": 83,
-"score": 88.2,
+"calls": 97,
+"consts": 100,
+"refs": 100,
+"score": 98.9,
 "status": "DIFF"
 },
 "Client::SendTakeGoodsOk": {
-"calls": 92,
-"consts": 93,
-"refs": 83,
-"score": 89.2,
+"calls": 97,
+"consts": 100,
+"refs": 100,
+"score": 98.9,
 "status": "DIFF"
 },
 "ClientManager::AcquireClient": {
