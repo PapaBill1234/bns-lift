@@ -634,3 +634,23 @@ The manual work of round 3 (commits 27d5420, 46fe9c1, beb4669 and later). The pa
 - Failed: VS2010 changes a zero-fill byte loop into `memset`. No source form kept the byte loop.
 - Failed: `noinline` on one helper changes the inline choice in other callers. Check all callers after each change.
 - Open: big `BigInteger::Divide` (76.7), `invMod` (83.1), `InvMod` (89.7), `IsPrime`, `isPrimeMR`, `Crypto::Create`, DH and `BroadcastCrypt`. See the crypto-4 handoff.
+
+## net-4
+
+### A. Worked (+15 MATCH, 0 lost)
+
+| Function | Form | Gain |
+| --- | --- | --- |
+| `SessionSendBuffer::clearPacketBufferList` | `inline_depth(0)` and the `removeReferenceCount` body by hand (A20) | +4 |
+| `Session::HandleFailedEvent` | Close and `Leave` in each case, not one shared tail | +4 |
+| `Network::Clear` | Cache `Port*` only for the null test; read `_port[i]` again for each use | +4 |
+| `Session::Connect` (LG) | Member reads and `memset` in source order | +1 |
+| `Session::SendV` (CG) | Give `Compose` the fields of the header | +1 |
+| `Network::OpenPort` (SCD) | `id < 1 \|\| id > 24`; `initialMode` list 0..3 | +1 |
+
+### B. Failed (2)
+
+- Local non-static `const` array for the max-session table: the compiler copies it to the stack. Keep it `static`.
+- `Port` ctor with body assignments: the store order is correct, but no MATCH. `OpenPort` refs still differ, because the original table has no PDB name.
+- Open: SCD `Session::Connect` keeps a `reconnect` test in the original. Our LTCG propagates the constant. Look at the callers, not the body.
+

@@ -160,9 +160,10 @@ void Network::Clear()
     // BUG: 0xCFD0 the _workerThreads array (AllocZero line 377) is never freed.
     for (unsigned int i = 0; i < 24; ++i)
     {
-        if (Instance->_port[i] != nullptr)
+        Port* port = Instance->_port[i];
+        if (port != nullptr)
         {
-            Instance->_port[i]->_enableAccept = false;
+            port->_enableAccept = false;
             Instance->_port[i]->Clear();
             if (Instance->_port[i] != nullptr)
                 Instance->_port[i]->~Port();
