@@ -89,6 +89,8 @@ void BigInteger::add(BigInteger const* a, BigInteger const* b, int sign)
 }
 
 // 0x4c650
+// LIFT: 0x5a0ad calls Set out of line. inline_depth(0) keeps Set out of line (lessons A20).
+#pragma inline_depth(0)
 void BigInteger::Sqr(BigInteger const* a)
 {
     if (a->bits == 0)
@@ -119,11 +121,16 @@ void BigInteger::Sqr(BigInteger const* a)
         r = &tmp;
     else
         setZero();
-    sqr(a, r);
+    // LIFT: 0x5a08b computes the rounded bit count before the call, as in Mul. Both paths call sqr. // ❓
+    if (((a->bits + 31) & ~31) < 0x1000)
+        sqr(a, r);
+    else
+        sqr(a, r);
     r->sign = 1;
     if (r != this)
         Set(r, 1);
 }
+#pragma inline_depth()
 
 // 0x4c3e0
 // LIFT: LeftShift jumps to this function in LobbyGate (0x59bca).

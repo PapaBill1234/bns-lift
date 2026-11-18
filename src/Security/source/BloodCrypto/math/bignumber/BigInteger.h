@@ -14,14 +14,15 @@ public:
     enum { MAX_DIGITS = 128 }; // LobbyGate Set 0x55fe6 clears 0x200 bytes
 
     // 0x46580
-    BigInteger()
+    // LIFT: __forceinline keeps the inline helpers inline under inline_depth(0) (Sqr 0x59f80).
+    __forceinline BigInteger()
     {
         sign = 1;
         bits = 1;
         memset(digits, 0, sizeof(digits));
     }
     // 0x465B0
-    ~BigInteger() { memset(digits, 0, sizeof(digits)); }
+    __forceinline ~BigInteger() { memset(digits, 0, sizeof(digits)); }
 
     void Set(BigInteger const* src, int sign);
     void Set(long long value);
@@ -43,8 +44,8 @@ public:
 
     // LIFT: Inline helpers. The compiler put this code inline. No PDB symbol.
     int digitCount() const { return (bits + 31) >> 5; }
-    bool isZero() const { return sign == 1 && bits == 1 && digits[0] == 0; }
-    void setZero()
+    __forceinline bool isZero() const { return sign == 1 && bits == 1 && digits[0] == 0; }
+    __forceinline void setZero()
     {
         sign = 1;
         bits = 1;
