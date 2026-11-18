@@ -11,14 +11,14 @@ This repo is public. Do not commit binaries, keys, PDBs or IDA databases.
 ## Parity
 
 <!-- parity:start -->
-Last update: card `manual-parity (astra + opus 6.2)` (2026-11-18). Tool: `tools/parity.sh` (VS2010 /GL /LTCG build vs original, funcdiff).
+Last update: card `lift-parity-dbbind-3` (2026-11-18). Tool: `tools/parity.sh` (VS2010 /GL /LTCG build vs original, funcdiff).
 
 | Exe | Parity | MATCH | DIFF | Only in original | Total | Mean score | Start | Change | Level |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
 | CacheGate | **91.2 %** | 448 | 40 | 3 | 491 | 99.3 | 44.0 % | +47.3 | 90 % ✅ |
 | LobbyGate | **84.8 %** | 627 | 109 | 3 | 739 | 98.5 | 37.9 % | +47.0 | below 90 % |
-| SmartCouponDaemon | **87.0 %** | 582 | 85 | 2 | 669 | 98.9 | 33.6 % | +53.4 | below 90 % |
-| PostOfficeDaemon | **87.6 %** | 665 | 89 | 5 | 759 | 98.7 | 34.5 % | +53.1 | below 90 % |
+| SmartCouponDaemon | **87.0 %** | 582 | 85 | 2 | 669 | 99.0 | 33.6 % | +53.4 | below 90 % |
+| PostOfficeDaemon | **87.6 %** | 665 | 89 | 5 | 759 | 98.9 | 34.5 % | +53.1 | below 90 % |
 | **All 4** | **87.4 %** | 2322 | | | 2658 | | 37.0 % | +50.4 | below 90 % |
 
 | Shared library (functions in 2+ exes) | Parity | MATCH in each exe | DIFF in 1+ exe | Total | Goal |
@@ -56,4 +56,5 @@ Goal: 95 % per exe, 99 % preferred. Shared library: 99 % preferred. Rules: [Docs
 | `lift-parity-arraynew-3` | 88.8 % | 81.2 % | 83.1 % | 83.9 % |
 | `lift-parity-handlers-3` | 88.8 % | 81.3 % | 83.3 % | 85.0 % |
 | `manual-parity (astra + opus 6.2)` | 91.2 % | 84.8 % | 87.0 % | 87.6 % |
+| `lift-parity-dbbind-3` | 91.2 % | 84.8 % | 87.0 % | 87.6 % |
 <!-- parity:end -->

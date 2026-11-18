@@ -666,3 +666,12 @@ Open facts:
   The CacheGate build gives the `SessionRecvBuffer` table in
   `Session::initialize` a second name, `CrashHandler`. Use the
   name that the two PDBs share. See fix 10 in [noise.md](noise.md).
+
+## dbbind-3 (2026-11-18, stage 1)
+- Worked, SCD `DbTransaction::BindCol` 0x20e40 (88.9 -> MATCH): null check first (`if (StmtHandle == nullptr) { Log::Write; return false; }`), as the POD form 0x2d010. Keep `noinline`.
+- Worked (score up, not yet MATCH): bind macro `DB_BIND_COL` (`Db.h`, `// LIFT:`) for the column that the original inlines. SCD loaders: only column 1 is inline, columns 2..n stay `BindCol` calls. Source form: `if (!BindParam...) goto _BIND_ERROR; DB_BIND_COL(..., _BIND_ERROR); if (BindCol(2) && ...) {...} _BIND_ERROR: Log::Write`.
+  SCD 0x13620 87.3 -> 95.0, 0x13a30 87.5 -> 95.7, 0x13dd0 89.2 -> 96.7, 0x145f0 87.3 -> 95.0, 0x12170 89.8 -> 97.5, 0x117c0 91.0 -> 97.8. SCD only build: 557 -> 558.
+- Open in these 6: ours has one more `DbTransaction::Fetch` call, consts 0x2/0x3(/0x5) (column index of the `BindCol` calls), and one more `L"db"`/`L""` ref.
+- Worked (stage 2, not yet MATCH): POD loaders in the orig form. `DB_BIND_COL_NI` (`Db.h`): null StmtHandle goes to a `NOT_INIT` label with one "Not initialized" log, then falls into `BIND_ERROR`. Length arrays zeroed after Prepare, `postLen[15,14,13,10,9] = SQL_NTS`, `PostInfo` ctor, inline item zero loop (`ZeroItem`, memset 0x802), 17 post columns inline, 70 item columns via `BindCol(++column, ...)` with `itemLen[i][6] = SQL_NTS` before the XML bind.
+  POD 0x14e50 60.6 -> 98.3, 0x190f0 60.8 -> 98.6, 0x15fa0 69.5 -> 88.4, 0x18010 72.1 -> 88.8. POD MATCH count unchanged (645).
+- Open: 0x15fa0/0x18010 (single-post loaders): orig merges all 17 `statmentErrorLog` calls into one site; ours has one per column, and orig has the "Not initialized" log before the binds. 0x14e50/0x190f0: ours has one more `memset, memset, Fetch` (loop rotation) and the acquire log before SQLSetStmtAttrW; const 0x23 missing.

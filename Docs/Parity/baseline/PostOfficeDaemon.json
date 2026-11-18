@@ -2926,31 +2926,31 @@
 "status": "DIFF"
 },
 "PostOfficeDB::LoadPostList": {
-"calls": 55,
-"consts": 55,
-"refs": 72,
-"score": 60.6,
+"calls": 97,
+"consts": 99,
+"refs": 99,
+"score": 98.3,
 "status": "DIFF"
 },
 "PostOfficeDB::LoadRetryReadyPostList": {
-"calls": 54,
-"consts": 58,
-"refs": 71,
-"score": 60.8,
+"calls": 97,
+"consts": 100,
+"refs": 99,
+"score": 98.6,
 "status": "DIFF"
 },
 "PostOfficeDB::LoadRetryReadySinglePost": {
-"calls": 61,
-"consts": 65,
-"refs": 91,
-"score": 72.1,
+"calls": 83,
+"consts": 99,
+"refs": 84,
+"score": 88.8,
 "status": "DIFF"
 },
 "PostOfficeDB::LoadSinglePost": {
-"calls": 58,
-"consts": 60,
-"refs": 90,
-"score": 69.5,
+"calls": 83,
+"consts": 99,
+"refs": 83,
+"score": 88.4,
 "status": "DIFF"
 },
 "PostOfficeDB::RegisterPost": {

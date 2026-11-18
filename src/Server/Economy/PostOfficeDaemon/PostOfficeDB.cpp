@@ -36,56 +36,38 @@ int const kItemColumnCount = 7;
 
 wchar_t* Query(wchar_t const* text) { return const_cast<wchar_t*>(text); }
 
-// LIFT: Not a PDB function. The 87 column binds are inlined in each loader. This keeps the order and types.
-bool BindPostColumns(DbTransaction* tran, PostInfo& postInfo, AttachedItemInfo* items, unsigned long long* postLen,
-                     unsigned long long (*itemLen)[kItemColumnCount])
+// LIFT: lift helper, no PDB name. Inlined zero ctor of AttachedItemInfo / AttachedItemContext (0x14e50 loop: fields
+// to 0, memset 0x802 of the XML text).
+template <typename Item>
+__forceinline void ZeroItem(Item& item)
 {
-    if (!tran->BindCol(1, &postInfo._postId, 0, SQL_C_SBIGINT, &postLen[0])) return false;
-    if (!tran->BindCol(2, &postInfo._invoiceId, 0, SQL_C_SBIGINT, &postLen[1])) return false;
-    if (!tran->BindCol(3, &postInfo._postType, 0, SQL_C_STINYINT, &postLen[2])) return false;
-    if (!tran->BindCol(4, &postInfo._deliveryReason, 0, SQL_C_STINYINT, &postLen[3])) return false;
-    if (!tran->BindCol(5, &postInfo._postHint, 0, SQL_C_SBIGINT, &postLen[4])) return false;
-    if (!tran->BindCol(6, &postInfo._senderServiceType, 0, SQL_C_STINYINT, &postLen[5])) return false;
-    if (!tran->BindCol(7, &postInfo._senderWid, 0, SQL_C_SSHORT, &postLen[6])) return false;
-    if (!tran->BindCol(8, &postInfo._senderPcId, 0, SQL_C_SBIGINT, &postLen[7])) return false;
-    if (!tran->BindCol(9, &postInfo._senderAccountId, 0, SQL_C_GUID, &postLen[8])) return false;
-    if (!tran->BindCol(10, postInfo._senderWorldName, 66, SQL_C_WCHAR, &postLen[9])) return false;
-    if (!tran->BindCol(11, postInfo._senderName, 66, SQL_C_WCHAR, &postLen[10])) return false;
-    if (!tran->BindCol(12, &postInfo._recipientWid, 0, SQL_C_SSHORT, &postLen[11])) return false;
-    if (!tran->BindCol(13, &postInfo._recipientPcId, 0, SQL_C_SBIGINT, &postLen[12])) return false;
-    if (!tran->BindCol(14, postInfo._recipientName, 66, SQL_C_WCHAR, &postLen[13])) return false;
-    if (!tran->BindCol(15, postInfo._postTitle, 130, SQL_C_WCHAR, &postLen[14])) return false;
-    if (!tran->BindCol(16, postInfo._postMessage, 2050, SQL_C_WCHAR, &postLen[15])) return false;
-    if (!tran->BindCol(17, &postInfo._postStatus, 0, SQL_C_STINYINT, &postLen[16])) return false;
-    for (int i = 0; i < kMaxAttachedItem; ++i)
-    {
-        unsigned int const column = 18 + kItemColumnCount * i;
-        AttachedItemInfo& item = items[i];
-        if (!tran->BindCol(column + 0, &item._itemType, 0, SQL_C_STINYINT, &itemLen[i][0])) return false;
-        if (!tran->BindCol(column + 1, &item._itemCategory, 0, SQL_C_STINYINT, &itemLen[i][1])) return false;
-        if (!tran->BindCol(column + 2, &item._itemInstanceId, 0, SQL_C_SBIGINT, &itemLen[i][2])) return false;
-        if (!tran->BindCol(column + 3, &item._itemDataId, 0, SQL_C_SLONG, &itemLen[i][3])) return false;
-        if (!tran->BindCol(column + 4, &item._itemLevel, 0, SQL_C_SSHORT, &itemLen[i][4])) return false;
-        if (!tran->BindCol(column + 5, &item._itemAmount, 0, SQL_C_SBIGINT, &itemLen[i][5])) return false;
-        if (!tran->BindCol(column + 6, item._itemXmlData, 0x802, SQL_C_WCHAR, &itemLen[i][6])) return false;
-    }
-    return true;
+    item._itemNo = 0;
+    item._itemType = 0;
+    item._itemCategory = 0;
+    item._itemInstanceId = 0;
+    item._itemDataId = 0;
+    item._itemLevel = 0;
+    item._itemAmount = 0;
+    memset(item._itemXmlData, 0, sizeof(item._itemXmlData));
 }
 
-void ClearRow(PostInfo& postInfo, AttachedItemInfo* items)  // LIFT: lift helper name, not in any PDB
+__forceinline void ClearRow(PostInfo& postInfo, AttachedItemInfo* items)  // LIFT: lift helper name, not in any PDB
 {
     memset(&postInfo, 0, sizeof(postInfo));
     memset(items, 0, sizeof(AttachedItemInfo) * kMaxAttachedItem);
 }
 
 // LIFT: Not a PDB function. Inlined in each loader: allocate the PostContext and copy the fetched row.
-PostContext* MakePostContext(PostInfo const& postInfo, AttachedItemInfo* items,
-                             unsigned long long (*itemLen)[kItemColumnCount], int contextLine, int itemLine)
+__forceinline PostContext* MakePostContext(PostInfo const& postInfo, AttachedItemInfo* items,
+                                           unsigned long long (*itemLen)[kItemColumnCount], int contextLine,
+                                           int itemLine)
 {
-    PostContext* postContext = nullptr;
+    PostContext* postContext;
     void* const memory = Memory::_Manager[2]->Alloc(sizeof(PostContext), POSTOFFICEDB_FILE, contextLine);
     if (memory != nullptr)
         postContext = ::new (memory) PostContext();
+    else
+        postContext = nullptr;
     // BUG: 0x14e50 no null check after the PostContext Alloc (same in all loaders).
     memcpy(&postContext->_postInfo, &postInfo, sizeof(PostInfo));
     for (int i = 0; i < kMaxAttachedItem; ++i)
@@ -104,16 +86,81 @@ PostContext* MakePostContext(PostInfo const& postInfo, AttachedItemInfo* items,
         if (list != nullptr)
         {
             for (int i = 0; i < count; ++i)
-                memset(&list[i], 0, sizeof(AttachedItemContext));
+                ZeroItem(list[i]);
         }
         postContext->_attachedItemList = list;
         // BUG: 0x14e50 no null check after the item list Alloc.
-        for (int i = 0; i < count; ++i)
+        for (int i = 0; i < postContext->_attachedItemCount; ++i)
             postContext->_attachedItemList[i] = items[i];
     }
     return postContext;
 }
 }  // namespace
+
+// LIFT: bind macros, no PDB name. The loaders zero the length arrays after Prepare, set SQL_NTS for the text columns,
+// and bind the 17 post columns inline (DB_BIND_COL_NI). The 70 item columns use DbTransaction::BindCol (0x14e50).
+#define POST_ZERO_ROW()                                                  \
+    postLen[0] = 0;                                                      \
+    memset(&postLen[1], 0, sizeof(postLen) - sizeof(postLen[0]));        \
+    itemLen[0][0] = 0;                                                   \
+    memset(&itemLen[0][1], 0, sizeof(itemLen) - sizeof(itemLen[0][0])); \
+    postLen[15] = kNts;                                                  \
+    postLen[14] = kNts;                                                  \
+    postLen[13] = kNts;                                                  \
+    postLen[10] = kNts;                                                  \
+    postLen[9] = kNts
+
+#define POST_ZERO_ITEMS()                      \
+    for (int i = 0; i < kMaxAttachedItem; ++i) \
+    ZeroItem(attachedItemInfo[i])
+
+#define POST_BIND(index, buffer, bufferSize, varType) \
+    DB_BIND_COL_NI(t, index, buffer, bufferSize, varType, &postLen[(index) - 1], NOT_INIT, BIND_ERROR)
+
+#define POST_BIND_COLUMNS()                                                                                \
+    POST_BIND(1, &postInfo._postId, 0, SQL_C_SBIGINT);                                                     \
+    POST_BIND(2, &postInfo._invoiceId, 0, SQL_C_SBIGINT);                                                  \
+    POST_BIND(3, &postInfo._postType, 0, SQL_C_STINYINT);                                                  \
+    POST_BIND(4, &postInfo._deliveryReason, 0, SQL_C_STINYINT);                                            \
+    POST_BIND(5, &postInfo._postHint, 0, SQL_C_SBIGINT);                                                   \
+    POST_BIND(6, &postInfo._senderServiceType, 0, SQL_C_STINYINT);                                         \
+    POST_BIND(7, &postInfo._senderWid, 0, SQL_C_SSHORT);                                                   \
+    POST_BIND(8, &postInfo._senderPcId, 0, SQL_C_SBIGINT);                                                 \
+    POST_BIND(9, &postInfo._senderAccountId, 0, SQL_C_GUID);                                               \
+    POST_BIND(10, postInfo._senderWorldName, 66, SQL_C_WCHAR);                                             \
+    POST_BIND(11, postInfo._senderName, 66, SQL_C_WCHAR);                                                  \
+    POST_BIND(12, &postInfo._recipientWid, 0, SQL_C_SSHORT);                                               \
+    POST_BIND(13, &postInfo._recipientPcId, 0, SQL_C_SBIGINT);                                             \
+    POST_BIND(14, postInfo._recipientName, 66, SQL_C_WCHAR);                                               \
+    POST_BIND(15, postInfo._postTitle, 130, SQL_C_WCHAR);                                                  \
+    POST_BIND(16, postInfo._postMessage, 2050, SQL_C_WCHAR);                                               \
+    POST_BIND(17, &postInfo._postStatus, 0, SQL_C_STINYINT);                                               \
+    column = 17;                                                                                           \
+    for (int i = 0; i < kMaxAttachedItem; ++i)                                                             \
+    {                                                                                                      \
+        if (!t->BindCol(++column, &attachedItemInfo[i]._itemType, 0, SQL_C_STINYINT, &itemLen[i][0]))      \
+            goto BIND_ERROR;                                                                               \
+        if (!t->BindCol(++column, &attachedItemInfo[i]._itemCategory, 0, SQL_C_STINYINT, &itemLen[i][1]))  \
+            goto BIND_ERROR;                                                                               \
+        if (!t->BindCol(++column, &attachedItemInfo[i]._itemInstanceId, 0, SQL_C_SBIGINT, &itemLen[i][2])) \
+            goto BIND_ERROR;                                                                               \
+        if (!t->BindCol(++column, &attachedItemInfo[i]._itemDataId, 0, SQL_C_SLONG, &itemLen[i][3]))       \
+            goto BIND_ERROR;                                                                               \
+        if (!t->BindCol(++column, &attachedItemInfo[i]._itemLevel, 0, SQL_C_SSHORT, &itemLen[i][4]))       \
+            goto BIND_ERROR;                                                                               \
+        if (!t->BindCol(++column, &attachedItemInfo[i]._itemAmount, 0, SQL_C_SBIGINT, &itemLen[i][5]))     \
+            goto BIND_ERROR;                                                                               \
+        itemLen[i][6] = kNts;                                                                              \
+        if (!t->BindCol(++column, attachedItemInfo[i]._itemXmlData, 0x802, SQL_C_WCHAR, &itemLen[i][6]))   \
+            goto BIND_ERROR;                                                                               \
+    }
+
+#define POST_BIND_TAIL(bindLine)                                                                       \
+NOT_INIT:                                                                                              \
+    Log::Write(Log::LT_ERROR, L"source\\Db.cpp", 286, L"DbTransaction::BindCol(), Not initialized"); \
+BIND_ERROR:                                                                                            \
+    Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, bindLine, FAIL_BIND, MODULE_NAME, fn);                \
+    return false
 
 // 0x14e00
 AutoDbTran::~AutoDbTran()
@@ -132,13 +179,6 @@ AutoDbTran::~AutoDbTran()
 bool PostOfficeDB::LoadPostList(int* dbRetValue)
 {
     wchar_t const* const fn = L"PostOfficeDB::LoadPostList";
-    unsigned long long paramLen[1] = {0};
-    unsigned long long postLen[17] = {0};
-    unsigned long long itemLen[kMaxAttachedItem][kItemColumnCount] = {{0}};
-    PostInfo postInfo;
-    AttachedItemInfo attachedItemInfo[kMaxAttachedItem];
-    memset(attachedItemInfo, 0, sizeof(attachedItemInfo));
-
     AutoDbTran tran(kDbId);
     if (tran.Tran == nullptr)
     {
@@ -149,71 +189,74 @@ bool PostOfficeDB::LoadPostList(int* dbRetValue)
     SQLSetStmtAttrW(tran.Tran->StmtHandle, SQL_QUERY_TIMEOUT, nullptr, 0);
 
     wchar_t const* const query = L"{?=CALL dbo.usp_LoadPostList}";
-    if (!tran.Tran->Prepare(Query(query)))
+    DbTransaction* const t = tran.Tran;
+    if (!t->Prepare(Query(query)))
     {
         Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 35, FAIL_PREPARE, MODULE_NAME, fn, query);
         return false;
     }
-    if (!tran.Tran->BindParam(1, SQL_PARAM_OUTPUT, dbRetValue, 0, 0, SQL_INTEGER, SQL_C_SLONG, &paramLen[0]) ||
-        !BindPostColumns(tran.Tran, postInfo, attachedItemInfo, postLen, itemLen))
-    {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 150, FAIL_BIND, MODULE_NAME, fn);
-        return false;
-    }
-    if (!tran.Tran->Execute())
+    unsigned long long paramLen[1] = {0};
+    unsigned long long postLen[17];
+    unsigned long long itemLen[kMaxAttachedItem][kItemColumnCount];
+    unsigned int column;
+    POST_ZERO_ROW();
+    PostInfo postInfo;
+    AttachedItemInfo attachedItemInfo[kMaxAttachedItem];
+    POST_ZERO_ITEMS();
+    if (!t->BindParam(1, SQL_PARAM_OUTPUT, dbRetValue, 0, 0, SQL_INTEGER, SQL_C_SLONG, &paramLen[0]))
+        goto BIND_ERROR;
+    POST_BIND_COLUMNS();
+    if (!t->Execute())
     {
         Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 88, FAIL_EXECUTE, MODULE_NAME, fn, *dbRetValue);
         return false;
     }
-
-    for (;;)
     {
-        ClearRow(postInfo, attachedItemInfo);
-        int const result = tran.Tran->Fetch(0);  // LIFT: folded. edx is not set at the call. Fetch 0x2d350 does not read it.
-        if (result == -1)
+        PostContextManager* const postContextManager = PostOfficeDaemon::_instance->_postContextManager;
+        for (;;)
         {
-            Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 103, FAIL_FETCH, MODULE_NAME, fn);
-            return false;
-        }
-        if (result == 0)
-            break;
-
-        PostContext* const postContext = MakePostContext(postInfo, attachedItemInfo, itemLen, 109, 121);
-        PostOfficeDaemon* const daemon = PostOfficeDaemon::_instance;
-        if (!daemon->_postContextManager->AddContext(postContext))
-        {
-            Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 127, FAIL_ADD_CRASH, MODULE_NAME, fn, postInfo._postId);
-            AlertSender::Write(POSTOFFICEDB_FILE, 127, FAIL_ADD_CRASH, MODULE_NAME, fn, postInfo._postId);
-            postContext->removeReferenceCount(POSTOFFICEDB_FILE, 128);
-            continue;
-        }
-        postContext->removeReferenceCount(POSTOFFICEDB_FILE, 132);
-        if (!daemon->_unsentPostContextManager->RegisterUnsentPost(postInfo._recipientWid, postInfo._postId, true))
-        {
-            Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 135, FAIL_REGISTER_UNSENT, MODULE_NAME, fn,
-                       static_cast<unsigned int>(postInfo._recipientWid), postInfo._postId);
-            if (!daemon->_postContextManager->RemoveContext(postInfo._postId))
+            ClearRow(postInfo, attachedItemInfo);
+            int const result = t->Fetch(0);  // LIFT: folded. edx is not set at the call. Fetch 0x2d350 does not read it.
+            if (result == -1)
             {
-                Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 138, FAIL_REMOVE_CRASH, MODULE_NAME, fn,
-                           postInfo._postId);
-                AlertSender::Write(POSTOFFICEDB_FILE, 138, FAIL_REMOVE_CRASH, MODULE_NAME, fn, postInfo._postId);
+                Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 103, FAIL_FETCH, MODULE_NAME, fn);
+                return false;
+            }
+            if (result == 0)
+                break;
+
+            PostContext* const postContext = MakePostContext(postInfo, attachedItemInfo, itemLen, 109, 121);
+            if (!postContextManager->AddContext(postContext))
+            {
+                Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 127, FAIL_ADD_CRASH, MODULE_NAME, fn, postInfo._postId);
+                AlertSender::Write(POSTOFFICEDB_FILE, 127, FAIL_ADD_CRASH, MODULE_NAME, fn, postInfo._postId);
+                postContext->removeReferenceCount(POSTOFFICEDB_FILE, 128);
+                continue;
+            }
+            postContext->removeReferenceCount(POSTOFFICEDB_FILE, 132);
+            if (!PostOfficeDaemon::_instance->_unsentPostContextManager->RegisterUnsentPost(postInfo._recipientWid,
+                                                                                          postInfo._postId, true))
+            {
+                Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 135, FAIL_REGISTER_UNSENT, MODULE_NAME, fn,
+                           static_cast<unsigned int>(postInfo._recipientWid), postInfo._postId);
+                if (!postContextManager->RemoveContext(postInfo._postId))
+                {
+                    Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 138, FAIL_REMOVE_CRASH, MODULE_NAME, fn,
+                               postInfo._postId);
+                    AlertSender::Write(POSTOFFICEDB_FILE, 138, FAIL_REMOVE_CRASH, MODULE_NAME, fn, postInfo._postId);
+                }
             }
         }
     }
     return *dbRetValue == 0;
+
+    POST_BIND_TAIL(150);
 }
 
 // 0x15fa0
 bool PostOfficeDB::LoadSinglePost(int* dbRetValue, long long postId)
 {
     wchar_t const* const fn = L"PostOfficeDB::LoadSinglePost";
-    unsigned long long paramLen[2] = {0, 0};
-    unsigned long long postLen[17] = {0};
-    unsigned long long itemLen[kMaxAttachedItem][kItemColumnCount] = {{0}};
-    PostInfo postInfo;
-    AttachedItemInfo attachedItemInfo[kMaxAttachedItem];
-    memset(attachedItemInfo, 0, sizeof(attachedItemInfo));
-
     AutoDbTran tran(kDbId);
     if (tran.Tran == nullptr)
     {
@@ -221,50 +264,59 @@ bool PostOfficeDB::LoadSinglePost(int* dbRetValue, long long postId)
         return false;
     }
     wchar_t const* const query = L"{?=CALL dbo.usp_LoadSinglePost(?)}";
-    if (!tran.Tran->Prepare(Query(query)))
+    DbTransaction* const t = tran.Tran;
+    if (!t->Prepare(Query(query)))
     {
         Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 164, FAIL_PREPARE, MODULE_NAME, fn, query);
         return false;
     }
-    if (!tran.Tran->BindParam(1, SQL_PARAM_OUTPUT, dbRetValue, 0, 0, SQL_INTEGER, SQL_C_SLONG, &paramLen[0]) ||
-        !tran.Tran->BindParam(2, SQL_PARAM_INPUT, &postId, 0, 0, SQL_BIGINT, SQL_C_SBIGINT, &paramLen[1]) ||
-        !BindPostColumns(tran.Tran, postInfo, attachedItemInfo, postLen, itemLen))
-    {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 271, FAIL_BIND, MODULE_NAME, fn);
-        return false;
-    }
-    if (!tran.Tran->Execute())
+    unsigned long long paramLen[2] = {0, 0};
+    unsigned long long postLen[17];
+    unsigned long long itemLen[kMaxAttachedItem][kItemColumnCount];
+    unsigned int column;
+    POST_ZERO_ROW();
+    PostInfo postInfo;
+    AttachedItemInfo attachedItemInfo[kMaxAttachedItem];
+    POST_ZERO_ITEMS();
+    if (!t->BindParam(1, SQL_PARAM_OUTPUT, dbRetValue, 0, 0, SQL_INTEGER, SQL_C_SLONG, &paramLen[0]) ||
+        !t->BindParam(2, SQL_PARAM_INPUT, &postId, 0, 0, SQL_BIGINT, SQL_C_SBIGINT, &paramLen[1]))
+        goto BIND_ERROR;
+    POST_BIND_COLUMNS();
+    if (!t->Execute())
     {
         Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 219, FAIL_EXECUTE, MODULE_NAME, fn, *dbRetValue);
         return false;
     }
+    {
+        ClearRow(postInfo, attachedItemInfo);
+        int const result = t->Fetch(0);  // LIFT: folded. edx is not set at the call. Fetch 0x2d350 does not read it.
+        if (result == -1)
+        {
+            Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 228, FAIL_FETCH, MODULE_NAME, fn);
+            return false;
+        }
+        if (result == 0)
+        {
+            Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 232, L"[%s], %s; there is no such post, postId:0x%I64X",
+                       MODULE_NAME, fn, postId);
+            return false;
+        }
+        if (*dbRetValue != 0)
+            return false;
 
-    ClearRow(postInfo, attachedItemInfo);
-    int const result = tran.Tran->Fetch(0);  // LIFT: folded. edx is not set at the call. Fetch 0x2d350 does not read it.
-    if (result == -1)
-    {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 228, FAIL_FETCH, MODULE_NAME, fn);
-        return false;
+        PostContext* const postContext = MakePostContext(postInfo, attachedItemInfo, itemLen, 242, 254);
+        if (!PostOfficeDaemon::_instance->_postContextManager->AddContext(postContext))
+        {
+            Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 260, FAIL_ADD_CRASH, MODULE_NAME, fn, postInfo._postId);
+            AlertSender::Write(POSTOFFICEDB_FILE, 260, FAIL_ADD_CRASH, MODULE_NAME, fn, postInfo._postId);
+            postContext->removeReferenceCount(POSTOFFICEDB_FILE, 261);
+            return false;
+        }
+        postContext->removeReferenceCount(POSTOFFICEDB_FILE, 265);
+        return true;
     }
-    if (result == 0)
-    {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 232, L"[%s], %s; there is no such post, postId:0x%I64X",
-                   MODULE_NAME, fn, postId);
-        return false;
-    }
-    if (*dbRetValue != 0)
-        return false;
 
-    PostContext* const postContext = MakePostContext(postInfo, attachedItemInfo, itemLen, 242, 254);
-    if (!PostOfficeDaemon::_instance->_postContextManager->AddContext(postContext))
-    {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 260, FAIL_ADD_CRASH, MODULE_NAME, fn, postInfo._postId);
-        AlertSender::Write(POSTOFFICEDB_FILE, 260, FAIL_ADD_CRASH, MODULE_NAME, fn, postInfo._postId);
-        postContext->removeReferenceCount(POSTOFFICEDB_FILE, 261);
-        return false;
-    }
-    postContext->removeReferenceCount(POSTOFFICEDB_FILE, 265);
-    return true;
+    POST_BIND_TAIL(271);
 }
 
 #define Q10 L"?,?,?,?,?,?,?,?,?,?,"
@@ -449,13 +501,6 @@ bool PostOfficeDB::LoadRetryReadySinglePost(int* dbRetValue, long long postId, l
                                             long long recipientPcId)
 {
     wchar_t const* const fn = L"PostOfficeDB::LoadRetryReadySinglePost";
-    unsigned long long paramLen[4] = {0, 0, 0, 0};
-    unsigned long long postLen[17] = {0};
-    unsigned long long itemLen[kMaxAttachedItem][kItemColumnCount] = {{0}};
-    PostInfo postInfo;
-    AttachedItemInfo attachedItemInfo[kMaxAttachedItem];
-    memset(attachedItemInfo, 0, sizeof(attachedItemInfo));
-
     AutoDbTran tran(kDbId);
     if (tran.Tran == nullptr)
     {
@@ -463,78 +508,85 @@ bool PostOfficeDB::LoadRetryReadySinglePost(int* dbRetValue, long long postId, l
         return false;
     }
     wchar_t const* const query = L"{?=CALL dbo.usp_LoadRetryReadySinglePost(?,?,?)}";
-    if (!tran.Tran->Prepare(Query(query)))
+    DbTransaction* const t = tran.Tran;
+    if (!t->Prepare(Query(query)))
     {
         Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 504, FAIL_PREPARE, MODULE_NAME, fn, query);
         return false;
     }
+    unsigned long long paramLen[4];
+    unsigned long long postLen[17];
+    unsigned long long itemLen[kMaxAttachedItem][kItemColumnCount];
+    unsigned int column;
+    long long nullInd = 0;  // LIFT: orig keeps the indicator in a register (0x18010)
+    paramLen[0] = 0;
+    paramLen[1] = 0;
+    paramLen[3] = 0;
+    POST_ZERO_ROW();
+    PostInfo postInfo;
+    AttachedItemInfo attachedItemInfo[kMaxAttachedItem];
+    POST_ZERO_ITEMS();
     if (invoiceId == 0)
-        paramLen[2] = kNullData;
-    if (!tran.Tran->BindParam(1, SQL_PARAM_OUTPUT, dbRetValue, 0, 0, SQL_INTEGER, SQL_C_SLONG, &paramLen[0]) ||
-        !tran.Tran->BindParam(2, SQL_PARAM_INPUT, &postId, 0, 0, SQL_BIGINT, SQL_C_SBIGINT, &paramLen[1]) ||
-        !tran.Tran->BindParam(3, SQL_PARAM_INPUT, &invoiceId, 0, 0, SQL_BIGINT, SQL_C_SBIGINT, &paramLen[2]) ||
-        !tran.Tran->BindParam(4, SQL_PARAM_INPUT, &recipientPcId, 0, 0, SQL_BIGINT, SQL_C_SBIGINT, &paramLen[3]) ||
-        !BindPostColumns(tran.Tran, postInfo, attachedItemInfo, postLen, itemLen))
-    {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 628, FAIL_BIND, MODULE_NAME, fn);
-        return false;
-    }
-    if (!tran.Tran->Execute())
+        nullInd = -1;
+    paramLen[2] = static_cast<unsigned long long>(nullInd);
+    if (!t->BindParam(1, SQL_PARAM_OUTPUT, dbRetValue, 0, 0, SQL_INTEGER, SQL_C_SLONG, &paramLen[0]) ||
+        !t->BindParam(2, SQL_PARAM_INPUT, &postId, 0, 0, SQL_BIGINT, SQL_C_SBIGINT, &paramLen[1]) ||
+        !t->BindParam(3, SQL_PARAM_INPUT, &invoiceId, 0, 0, SQL_BIGINT, SQL_C_SBIGINT, &paramLen[2]) ||
+        !t->BindParam(4, SQL_PARAM_INPUT, &recipientPcId, 0, 0, SQL_BIGINT, SQL_C_SBIGINT, &paramLen[3]))
+        goto BIND_ERROR;
+    POST_BIND_COLUMNS();
+    if (!t->Execute())
     {
         Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 567, FAIL_EXECUTE, MODULE_NAME, fn, *dbRetValue);
         return false;
     }
+    {
+        ClearRow(postInfo, attachedItemInfo);
+        int const result = t->Fetch(0);  // LIFT: folded. edx is not set at the call. Fetch 0x2d350 does not read it.
+        if (result == -1)
+        {
+            Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 576, FAIL_FETCH, MODULE_NAME, fn);
+            return false;
+        }
+        if (result == 0)
+        {
+            // LIFT: full text in .rdata 0x7f710.
+            Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 580,
+                       L"[%s], %s; there is no such post, postId:0x%I64X, invoiceId:0x%I64X, recipientPcId:0x%I64X",
+                       MODULE_NAME, fn, postId, invoiceId, recipientPcId);
+            return false;
+        }
+        if (*dbRetValue != 0)
+            return false;
 
-    ClearRow(postInfo, attachedItemInfo);
-    int const result = tran.Tran->Fetch(0);  // LIFT: folded. edx is not set at the call. Fetch 0x2d350 does not read it.
-    if (result == -1)
-    {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 576, FAIL_FETCH, MODULE_NAME, fn);
+        PostContext* const postContext = MakePostContext(postInfo, attachedItemInfo, itemLen, 590, 602);
+        PostOfficeDaemon* const daemon = PostOfficeDaemon::_instance;
+        if (!daemon->_postContextManager->AddContext(postContext))
+        {
+            Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 608, FAIL_ADD_EXISTS, MODULE_NAME, fn, postInfo._postId);
+            postContext->removeReferenceCount(POSTOFFICEDB_FILE, 609);
+            return false;
+        }
+        postContext->removeReferenceCount(POSTOFFICEDB_FILE, 613);
+        if (daemon->_unsentPostContextManager->RegisterUnsentPost(postInfo._recipientWid, postInfo._postId, true))
+            return true;
+        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 616, FAIL_REGISTER_UNSENT, MODULE_NAME, fn,
+                   static_cast<unsigned int>(postInfo._recipientWid), postInfo._postId);
+        if (!daemon->_postContextManager->RemoveContext(postInfo._postId))
+        {
+            Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 619, FAIL_REMOVE_CRASH, MODULE_NAME, fn, postInfo._postId);
+            AlertSender::Write(POSTOFFICEDB_FILE, 619, FAIL_REMOVE_CRASH, MODULE_NAME, fn, postInfo._postId);
+        }
         return false;
     }
-    if (result == 0)
-    {
-        // LIFT: full text in .rdata 0x7f710.
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 580,
-                   L"[%s], %s; there is no such post, postId:0x%I64X, invoiceId:0x%I64X, recipientPcId:0x%I64X",
-                   MODULE_NAME, fn, postId, invoiceId, recipientPcId);
-        return false;
-    }
-    if (*dbRetValue != 0)
-        return false;
 
-    PostContext* const postContext = MakePostContext(postInfo, attachedItemInfo, itemLen, 590, 602);
-    PostOfficeDaemon* const daemon = PostOfficeDaemon::_instance;
-    if (!daemon->_postContextManager->AddContext(postContext))
-    {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 608, FAIL_ADD_EXISTS, MODULE_NAME, fn, postInfo._postId);
-        postContext->removeReferenceCount(POSTOFFICEDB_FILE, 609);
-        return false;
-    }
-    postContext->removeReferenceCount(POSTOFFICEDB_FILE, 613);
-    if (daemon->_unsentPostContextManager->RegisterUnsentPost(postInfo._recipientWid, postInfo._postId, true))
-        return true;
-    Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 616, FAIL_REGISTER_UNSENT, MODULE_NAME, fn,
-               static_cast<unsigned int>(postInfo._recipientWid), postInfo._postId);
-    if (!daemon->_postContextManager->RemoveContext(postInfo._postId))
-    {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 619, FAIL_REMOVE_CRASH, MODULE_NAME, fn, postInfo._postId);
-        AlertSender::Write(POSTOFFICEDB_FILE, 619, FAIL_REMOVE_CRASH, MODULE_NAME, fn, postInfo._postId);
-    }
-    return false;
+    POST_BIND_TAIL(628);
 }
 
 // 0x190f0
 bool PostOfficeDB::LoadRetryReadyPostList(int* dbRetValue)
 {
     wchar_t const* const fn = L"PostOfficeDB::LoadRetryReadyPostList";
-    unsigned long long paramLen[1] = {0};
-    unsigned long long postLen[17] = {0};
-    unsigned long long itemLen[kMaxAttachedItem][kItemColumnCount] = {{0}};
-    PostInfo postInfo;
-    AttachedItemInfo attachedItemInfo[kMaxAttachedItem];
-    memset(attachedItemInfo, 0, sizeof(attachedItemInfo));
-
     AutoDbTran tran(kDbId);
     if (tran.Tran == nullptr)
     {
@@ -545,57 +597,67 @@ bool PostOfficeDB::LoadRetryReadyPostList(int* dbRetValue)
     SQLSetStmtAttrW(tran.Tran->StmtHandle, SQL_QUERY_TIMEOUT, nullptr, 0);
 
     wchar_t const* const query = L"{?=CALL dbo.usp_LoadRetryReadyPostList}";
-    if (!tran.Tran->Prepare(Query(query)))
+    DbTransaction* const t = tran.Tran;
+    if (!t->Prepare(Query(query)))
     {
         Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 642, FAIL_PREPARE, MODULE_NAME, fn, query);
         return false;
     }
-    if (!tran.Tran->BindParam(1, SQL_PARAM_OUTPUT, dbRetValue, 0, 0, SQL_INTEGER, SQL_C_SLONG, &paramLen[0]) ||
-        !BindPostColumns(tran.Tran, postInfo, attachedItemInfo, postLen, itemLen))
-    {
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 757, FAIL_BIND, MODULE_NAME, fn);
-        return false;
-    }
-    if (!tran.Tran->Execute())
+    unsigned long long paramLen[1] = {0};
+    unsigned long long postLen[17];
+    unsigned long long itemLen[kMaxAttachedItem][kItemColumnCount];
+    unsigned int column;
+    POST_ZERO_ROW();
+    PostInfo postInfo;
+    AttachedItemInfo attachedItemInfo[kMaxAttachedItem];
+    POST_ZERO_ITEMS();
+    if (!t->BindParam(1, SQL_PARAM_OUTPUT, dbRetValue, 0, 0, SQL_INTEGER, SQL_C_SLONG, &paramLen[0]))
+        goto BIND_ERROR;
+    POST_BIND_COLUMNS();
+    if (!t->Execute())
     {
         Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 695, FAIL_EXECUTE, MODULE_NAME, fn, *dbRetValue);
         return false;
     }
-
-    for (;;)
     {
-        ClearRow(postInfo, attachedItemInfo);
-        int const result = tran.Tran->Fetch(0);  // LIFT: folded. edx is not set at the call. Fetch 0x2d350 does not read it.
-        if (result == -1)
+        PostContextManager* const postContextManager = PostOfficeDaemon::_instance->_postContextManager;
+        for (;;)
         {
-            Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 710, FAIL_FETCH, MODULE_NAME, fn);
-            return false;
-        }
-        if (result == 0)
-            break;
-
-        PostContext* const postContext = MakePostContext(postInfo, attachedItemInfo, itemLen, 716, 728);
-        PostOfficeDaemon* const daemon = PostOfficeDaemon::_instance;
-        if (!daemon->_postContextManager->AddContext(postContext))
-        {
-            Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 734, FAIL_ADD_EXISTS, MODULE_NAME, fn, postInfo._postId);
-            postContext->removeReferenceCount(POSTOFFICEDB_FILE, 735);
-            continue;
-        }
-        postContext->removeReferenceCount(POSTOFFICEDB_FILE, 739);
-        if (!daemon->_unsentPostContextManager->RegisterUnsentPost(postInfo._recipientWid, postInfo._postId, true))
-        {
-            Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 742, FAIL_REGISTER_UNSENT, MODULE_NAME, fn,
-                       static_cast<unsigned int>(postInfo._recipientWid), postInfo._postId);
-            if (!daemon->_postContextManager->RemoveContext(postInfo._postId))
+            ClearRow(postInfo, attachedItemInfo);
+            int const result = t->Fetch(0);  // LIFT: folded. edx is not set at the call. Fetch 0x2d350 does not read it.
+            if (result == -1)
             {
-                Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 745, FAIL_REMOVE_CRASH, MODULE_NAME, fn,
-                           postInfo._postId);
-                AlertSender::Write(POSTOFFICEDB_FILE, 745, FAIL_REMOVE_CRASH, MODULE_NAME, fn, postInfo._postId);
+                Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 710, FAIL_FETCH, MODULE_NAME, fn);
+                return false;
+            }
+            if (result == 0)
+                break;
+
+            PostContext* const postContext = MakePostContext(postInfo, attachedItemInfo, itemLen, 716, 728);
+            if (!postContextManager->AddContext(postContext))
+            {
+                Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 734, FAIL_ADD_EXISTS, MODULE_NAME, fn, postInfo._postId);
+                postContext->removeReferenceCount(POSTOFFICEDB_FILE, 735);
+                continue;
+            }
+            postContext->removeReferenceCount(POSTOFFICEDB_FILE, 739);
+            if (!PostOfficeDaemon::_instance->_unsentPostContextManager->RegisterUnsentPost(postInfo._recipientWid,
+                                                                                          postInfo._postId, true))
+            {
+                Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 742, FAIL_REGISTER_UNSENT, MODULE_NAME, fn,
+                           static_cast<unsigned int>(postInfo._recipientWid), postInfo._postId);
+                if (!postContextManager->RemoveContext(postInfo._postId))
+                {
+                    Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 745, FAIL_REMOVE_CRASH, MODULE_NAME, fn,
+                               postInfo._postId);
+                    AlertSender::Write(POSTOFFICEDB_FILE, 745, FAIL_REMOVE_CRASH, MODULE_NAME, fn, postInfo._postId);
+                }
             }
         }
     }
     return *dbRetValue == 0;
+
+    POST_BIND_TAIL(757);
 }
 
 // 0x1a220

@@ -268,8 +268,7 @@ bool SmartCouponDB::ProcessCharacterGameEventLog(int* dbRetValue, long long game
         goto _BIND_ERROR;
     if (!tran.Tran->BindParam(6, SQL_PARAM_INPUT, &gameEventId, SQL_INTEGER, SQL_C_SLONG, &gameEventIdLen))
         goto _BIND_ERROR;
-    if (!tran.Tran->BindCol(1, &publicationInfo.publicationId, SQL_C_SBIGINT, &publicationLen[0]))
-        goto _BIND_ERROR;
+    DB_BIND_COL(tran.Tran, 1, &publicationInfo.publicationId, 0, SQL_C_SBIGINT, &publicationLen[0], _BIND_ERROR);
     if (!tran.Tran->BindCol(2, &publicationInfo.gameAccountId, SQL_C_GUID, &publicationLen[1]))
         goto _BIND_ERROR;
     if (!tran.Tran->BindCol(3, &publicationInfo.couponEventId, SQL_C_SLONG, &publicationLen[4]))
@@ -354,12 +353,13 @@ bool SmartCouponDB::ProcessAccountGameEventLog(int* dbRetValue, long long gameEv
     unsigned long long gameEventIdLen = 0;
     PublicationInfo publicationInfo;
     long long publicationLen[9] = {0};
-    if (tran.Tran->BindParam(1, SQL_PARAM_OUTPUT, dbRetValue, SQL_INTEGER, SQL_C_SLONG, &retLen) &&
-        tran.Tran->BindParam(2, SQL_PARAM_INPUT, &gameEventLogId, SQL_BIGINT, SQL_C_SBIGINT, &logIdLen) &&
-        tran.Tran->BindParam(3, SQL_PARAM_INPUT, gameAccountId, SQL_GUID, SQL_C_GUID, &gameAccountIdLen) &&
-        tran.Tran->BindParam(4, SQL_PARAM_INPUT, &gameEventId, SQL_INTEGER, SQL_C_SLONG, &gameEventIdLen) &&
-        tran.Tran->BindCol(1, &publicationInfo.publicationId, SQL_C_SBIGINT, &publicationLen[0]) &&
-        tran.Tran->BindCol(2, &publicationInfo.gameAccountId, SQL_C_GUID, &publicationLen[1]) &&
+    if (!(tran.Tran->BindParam(1, SQL_PARAM_OUTPUT, dbRetValue, SQL_INTEGER, SQL_C_SLONG, &retLen) &&
+          tran.Tran->BindParam(2, SQL_PARAM_INPUT, &gameEventLogId, SQL_BIGINT, SQL_C_SBIGINT, &logIdLen) &&
+          tran.Tran->BindParam(3, SQL_PARAM_INPUT, gameAccountId, SQL_GUID, SQL_C_GUID, &gameAccountIdLen) &&
+          tran.Tran->BindParam(4, SQL_PARAM_INPUT, &gameEventId, SQL_INTEGER, SQL_C_SLONG, &gameEventIdLen)))
+        goto _BIND_ERROR;
+    DB_BIND_COL(tran.Tran, 1, &publicationInfo.publicationId, 0, SQL_C_SBIGINT, &publicationLen[0], _BIND_ERROR);
+    if (tran.Tran->BindCol(2, &publicationInfo.gameAccountId, SQL_C_GUID, &publicationLen[1]) &&
         tran.Tran->BindCol(3, &publicationInfo.couponEventId, SQL_C_SLONG, &publicationLen[4]))
     {
         if (!tran.Tran->Execute())
@@ -398,6 +398,7 @@ bool SmartCouponDB::ProcessAccountGameEventLog(int* dbRetValue, long long gameEv
             return false;
         return true;
     }
+_BIND_ERROR:
     Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 421,
                L"[%s], failed to bind parameter,process-acc, logid:%I64d, account-id:" GUID_FMT L", game-event-id:%d",
                MODULE_NAME, gameEventLogId, GUID_ARGS(*gameAccountId), gameEventId);
@@ -557,9 +558,10 @@ bool SmartCouponDB::LoadGameEventLogList(int* dbRetValue, RetrieveEventLogContex
     unsigned long long retLen = 0;
     EventLogInfo eventLogInfo;
     long long eventLogLen[5] = {0};
-    if (tran.Tran->BindParam(1, SQL_PARAM_OUTPUT, dbRetValue, SQL_INTEGER, SQL_C_SLONG, &retLen) &&
-        tran.Tran->BindCol(1, &eventLogInfo.logId, SQL_C_SBIGINT, &eventLogLen[0]) &&
-        tran.Tran->BindCol(2, &eventLogInfo.gameAccountId, SQL_C_GUID, &eventLogLen[1]) &&
+    if (!tran.Tran->BindParam(1, SQL_PARAM_OUTPUT, dbRetValue, SQL_INTEGER, SQL_C_SLONG, &retLen))
+        goto _BIND_ERROR;
+    DB_BIND_COL(tran.Tran, 1, &eventLogInfo.logId, 0, SQL_C_SBIGINT, &eventLogLen[0], _BIND_ERROR);
+    if (tran.Tran->BindCol(2, &eventLogInfo.gameAccountId, SQL_C_GUID, &eventLogLen[1]) &&
         tran.Tran->BindCol(3, &eventLogInfo.wid, SQL_C_SSHORT, &eventLogLen[2]) &&
         tran.Tran->BindCol(4, &eventLogInfo.pcdbid, SQL_C_SBIGINT, &eventLogLen[3]) &&
         tran.Tran->BindCol(5, &eventLogInfo.gameEventId, SQL_C_SLONG, &eventLogLen[4]))
@@ -595,6 +597,7 @@ bool SmartCouponDB::LoadGameEventLogList(int* dbRetValue, RetrieveEventLogContex
             return false;
         return true;
     }
+_BIND_ERROR:
     Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 670, L"[%s], failed to bind parameter, load-game-event-log %s", MODULE_NAME,
                kEmpty);
     return false;
@@ -621,9 +624,10 @@ bool SmartCouponDB::LoadCouponPublicationList(int* dbRetValue, RetrievePublicati
     unsigned long long retLen = 0;
     PublicationInfo publicationInfo;
     long long publicationLen[5] = {0};
-    if (tran.Tran->BindParam(1, SQL_PARAM_OUTPUT, dbRetValue, SQL_INTEGER, SQL_C_SLONG, &retLen) &&
-        tran.Tran->BindCol(1, &publicationInfo.publicationId, SQL_C_SBIGINT, &publicationLen[0]) &&
-        tran.Tran->BindCol(2, &publicationInfo.gameAccountId, SQL_C_GUID, &publicationLen[1]) &&
+    if (!tran.Tran->BindParam(1, SQL_PARAM_OUTPUT, dbRetValue, SQL_INTEGER, SQL_C_SLONG, &retLen))
+        goto _BIND_ERROR;
+    DB_BIND_COL(tran.Tran, 1, &publicationInfo.publicationId, 0, SQL_C_SBIGINT, &publicationLen[0], _BIND_ERROR);
+    if (tran.Tran->BindCol(2, &publicationInfo.gameAccountId, SQL_C_GUID, &publicationLen[1]) &&
         tran.Tran->BindCol(3, &publicationInfo.couponEventId, SQL_C_SLONG, &publicationLen[4]))
     {
         if (!tran.Tran->Execute())
@@ -656,6 +660,7 @@ bool SmartCouponDB::LoadCouponPublicationList(int* dbRetValue, RetrievePublicati
             return false;
         return true;
     }
+_BIND_ERROR:
     Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 750, L"[%s], failed to bind parameter, load-coupon-publication %s",
                MODULE_NAME, kEmpty);
     return false;
@@ -690,11 +695,12 @@ bool SmartCouponDB::LoadSingleCouponPublication(int* dbRetValue, long long publi
     unsigned long long gameAccountIdLen = 0;
     PublicationInfo publicationInfo;
     long long publicationLen[5] = {0};
-    if (tran.Tran->BindParam(1, SQL_PARAM_OUTPUT, dbRetValue, SQL_INTEGER, SQL_C_SLONG, &retLen) &&
-        tran.Tran->BindParam(2, SQL_PARAM_INPUT, &publicationId, SQL_BIGINT, SQL_C_SBIGINT, &publicationIdLen) &&
-        tran.Tran->BindParam(3, SQL_PARAM_INPUT, gameAccountId, SQL_GUID, SQL_C_GUID, &gameAccountIdLen) &&
-        tran.Tran->BindCol(1, &publicationInfo.publicationId, SQL_C_SBIGINT, &publicationLen[0]) &&
-        tran.Tran->BindCol(2, &publicationInfo.gameAccountId, SQL_C_GUID, &publicationLen[1]) &&
+    if (!(tran.Tran->BindParam(1, SQL_PARAM_OUTPUT, dbRetValue, SQL_INTEGER, SQL_C_SLONG, &retLen) &&
+          tran.Tran->BindParam(2, SQL_PARAM_INPUT, &publicationId, SQL_BIGINT, SQL_C_SBIGINT, &publicationIdLen) &&
+          tran.Tran->BindParam(3, SQL_PARAM_INPUT, gameAccountId, SQL_GUID, SQL_C_GUID, &gameAccountIdLen)))
+        goto _BIND_ERROR;
+    DB_BIND_COL(tran.Tran, 1, &publicationInfo.publicationId, 0, SQL_C_SBIGINT, &publicationLen[0], _BIND_ERROR);
+    if (tran.Tran->BindCol(2, &publicationInfo.gameAccountId, SQL_C_GUID, &publicationLen[1]) &&
         tran.Tran->BindCol(3, &publicationInfo.couponEventId, SQL_C_SLONG, &publicationLen[4]))
     {
         if (!tran.Tran->Execute())
@@ -741,6 +747,7 @@ bool SmartCouponDB::LoadSingleCouponPublication(int* dbRetValue, long long publi
             return false;
         return true;
     }
+_BIND_ERROR:
     Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 845,
                L"[%s], failed to bind parameter,load single coupon publication, acc:" GUID_FMT
                L", publication-id:%I64d",
@@ -769,9 +776,10 @@ bool SmartCouponDB::LoadRetryReadyGameEventLogList(int* dbRetValue, RetrieveEven
     unsigned long long retLen = 0;
     EventLogInfo eventLogInfo;
     long long eventLogLen[5] = {0};
-    if (tran.Tran->BindParam(1, SQL_PARAM_OUTPUT, dbRetValue, SQL_INTEGER, SQL_C_SLONG, &retLen) &&
-        tran.Tran->BindCol(1, &eventLogInfo.logId, SQL_C_SBIGINT, &eventLogLen[0]) &&
-        tran.Tran->BindCol(2, &eventLogInfo.gameAccountId, SQL_C_GUID, &eventLogLen[1]) &&
+    if (!tran.Tran->BindParam(1, SQL_PARAM_OUTPUT, dbRetValue, SQL_INTEGER, SQL_C_SLONG, &retLen))
+        goto _BIND_ERROR;
+    DB_BIND_COL(tran.Tran, 1, &eventLogInfo.logId, 0, SQL_C_SBIGINT, &eventLogLen[0], _BIND_ERROR);
+    if (tran.Tran->BindCol(2, &eventLogInfo.gameAccountId, SQL_C_GUID, &eventLogLen[1]) &&
         tran.Tran->BindCol(3, &eventLogInfo.wid, SQL_C_SSHORT, &eventLogLen[2]) &&
         tran.Tran->BindCol(4, &eventLogInfo.pcdbid, SQL_C_SBIGINT, &eventLogLen[3]) &&
         tran.Tran->BindCol(5, &eventLogInfo.gameEventId, SQL_C_SLONG, &eventLogLen[4]))
@@ -807,6 +815,7 @@ bool SmartCouponDB::LoadRetryReadyGameEventLogList(int* dbRetValue, RetrieveEven
             return false;
         return true;
     }
+_BIND_ERROR:
     Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 930, L"[%s], failed to bind parameter, load-retryready-game-event-log %s", MODULE_NAME,
                kEmpty);
     return false;

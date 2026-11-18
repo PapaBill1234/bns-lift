@@ -42,6 +42,50 @@ static_assert(offsetof(DbTransaction, StmtHandle) == 0x10, "DbTransaction::StmtH
 static_assert(offsetof(DbTransaction, BoundParam) == 0x19, "DbTransaction::BoundParam");
 static_assert(offsetof(DbTransaction, Next) == 0x20, "DbTransaction::Next");
 
+// LIFT: bind macro, no PDB name. The original has the DbTransaction::BindCol body (Db.cpp:286) inline at some call sites:
+// SmartCouponDaemon loaders (first column only, 0x13620) and PostOfficeDaemon loaders (17 post columns, 0x14e50).
+// VS2010 /LTCG does not give that choice from the source, thus the body is in the caller. The caller includes <sql.h> and Log.h.
+#define DB_BIND_COL(tran, index, buffer, bufferSize, varType, result, errorLabel)                                     \
+    do                                                                                                               \
+    {                                                                                                                \
+        if ((tran)->StmtHandle == nullptr)                                                                           \
+        {                                                                                                            \
+            ::Log::Write(::Log::LT_ERROR, L"source\\Db.cpp", 286, L"DbTransaction::BindCol(), Not initialized");     \
+            goto errorLabel;                                                                                         \
+        }                                                                                                            \
+        *(result) = SQL_NTS;                                                                                         \
+        SQLRETURN const bindRet_ = SQLBindCol((tran)->StmtHandle, static_cast<SQLUSMALLINT>(index),                  \
+                                              static_cast<SQLSMALLINT>(varType), (buffer), (bufferSize),             \
+                                              reinterpret_cast<SQLLEN*>(result));                                    \
+        if (!(SQL_SUCCESS == bindRet_ || SQL_SUCCESS_WITH_INFO == bindRet_))                                         \
+        {                                                                                                            \
+            (tran)->statmentErrorLog(L"SQLBindCol(%d, %d, %d, %p, %p)", (index), static_cast<unsigned int>(varType), \
+                                     (buffer), (bufferSize), (result));                                              \
+            goto errorLabel;                                                                                         \
+        }                                                                                                            \
+        (tran)->BoundCol = true;                                                                                     \
+    } while (0)
+
+// LIFT: bind macro, no PDB name. Same as DB_BIND_COL, but a null StmtHandle goes to notInitLabel. The caller writes the
+// "Not initialized" log one time at that label (PostOfficeDaemon 0x14e50: one log site for 17 columns).
+#define DB_BIND_COL_NI(tran, index, buffer, bufferSize, varType, result, notInitLabel, errorLabel)                    \
+    do                                                                                                               \
+    {                                                                                                                \
+        if ((tran)->StmtHandle == nullptr)                                                                           \
+            goto notInitLabel;                                                                                       \
+        *(result) = SQL_NTS;                                                                                         \
+        SQLRETURN const bindRet_ = SQLBindCol((tran)->StmtHandle, static_cast<SQLUSMALLINT>(index),                  \
+                                              static_cast<SQLSMALLINT>(varType), (buffer), (bufferSize),             \
+                                              reinterpret_cast<SQLLEN*>(result));                                    \
+        if (!(SQL_SUCCESS == bindRet_ || SQL_SUCCESS_WITH_INFO == bindRet_))                                         \
+        {                                                                                                            \
+            (tran)->statmentErrorLog(L"SQLBindCol(%d, %d, %d, %p, %p)", (index), static_cast<unsigned int>(varType), \
+                                     (buffer), (bufferSize), (result));                                              \
+            goto errorLabel;                                                                                         \
+        }                                                                                                            \
+        (tran)->BoundCol = true;                                                                                     \
+    } while (0)
+
 struct tagTIMESTAMP_STRUCT;
 
 class Db

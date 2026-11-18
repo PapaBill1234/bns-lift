@@ -3339,45 +3339,45 @@
 "status": "MATCH"
 },
 "SmartCouponDB::LoadCouponPublicationList": {
-"calls": 86,
-"consts": 87,
-"refs": 89,
-"score": 87.5,
+"calls": 97,
+"consts": 94,
+"refs": 96,
+"score": 95.7,
 "status": "DIFF"
 },
 "SmartCouponDB::LoadGameEventLogList": {
-"calls": 88,
-"consts": 85,
-"refs": 89,
-"score": 87.3,
+"calls": 98,
+"consts": 91,
+"refs": 96,
+"score": 95.0,
 "status": "DIFF"
 },
 "SmartCouponDB::LoadRetryReadyGameEventLogList": {
-"calls": 88,
-"consts": 85,
-"refs": 89,
-"score": 87.3,
+"calls": 98,
+"consts": 91,
+"refs": 96,
+"score": 95.0,
 "status": "DIFF"
 },
 "SmartCouponDB::LoadSingleCouponPublication": {
-"calls": 88,
-"consts": 88,
-"refs": 92,
-"score": 89.2,
+"calls": 98,
+"consts": 94,
+"refs": 98,
+"score": 96.7,
 "status": "DIFF"
 },
 "SmartCouponDB::ProcessAccountGameEventLog": {
-"calls": 91,
-"consts": 88,
-"refs": 91,
-"score": 89.8,
+"calls": 98,
+"consts": 94,
+"refs": 100,
+"score": 97.5,
 "status": "DIFF"
 },
 "SmartCouponDB::ProcessCharacterGameEventLog": {
-"calls": 91,
-"consts": 87,
-"refs": 95,
-"score": 91.0,
+"calls": 98,
+"consts": 95,
+"refs": 100,
+"score": 97.8,
 "status": "DIFF"
 },
 "SmartCouponDB::RegisterGameEventLog": {
