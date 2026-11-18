@@ -227,36 +227,46 @@ bool DChannelMgr::SetupDaemonList(DaemonInfo** list, int count)
             continue;
 
         DChannel* second = FindDaemon(&info->daemonId);
-        if (second == nullptr)
-        {
-            void* mem = Memory::_Manager[2]->Alloc(sizeof(DChannel), DCHANNEL_FILE, 213);
-            second = mem != nullptr ? new (mem) DChannel(info->daemonId, info->ipaddr, info->port) : nullptr;
-            AddDaemon(second);
-            Log::Write(Log::LT_NOTICE, DCHANNEL_FILE, 215, L"[daemon-mgr], daemon #%d added, ip:%s, port:%d",
-                       info->daemonId._wid, Network::GetAddressStringW(info->ipaddr), info->port);
-        }
-        else
+        // LIFT: goto form gives the original block order (0xd270): error, changed, then add, shared notice log
+        wchar_t const* fmt;
+        int line;
+        int wid;
+        int port;
+        wchar_t const* address;
+        if (second != nullptr)
         {
             Session const* session = second->GetSession();
-            if (session == nullptr)
-            {
-                second->_addr = info->ipaddr;
-                second->_port = info->port;
-                Log::Write(Log::LT_NOTICE, DCHANNEL_FILE, 207,
-                           L"[daemon-mgr], daemon #%d's ip/port changed, ip:%s, port:%d",
-                           info->daemonId._wid, Network::GetAddressStringW(info->ipaddr), info->port);
-            }
-            else
+            if (session != nullptr)
             {
                 Log::Write(Log::LT_ERROR, DCHANNEL_FILE, 203,
                            L"[daemon-mgr], setup daemon list exception, change daemon #%d's ip/port fail, already bound "
                            L"with session, session:0x%016I64X",
-                           info->daemonId._wid, session->_id);
+                           second->_daemonId._wid, session->_id);
                 const_cast<Session*>(session)->removeReferenceCount(CHANNEL_HEADER_FILE, 52);
+                goto release;
             }
+            wid = second->_daemonId._wid;
+            second->_addr = info->ipaddr;
+            second->_port = info->port;
+            port = info->port;
+            address = Network::GetAddressStringW(info->ipaddr);
+            fmt = L"[daemon-mgr], daemon #%d's ip/port changed, ip:%s, port:%d";
+            line = 207;
         }
-        if (second != nullptr)
-            second->removeReferenceCount(DCHANNEL_FILE, 217);
+        else
+        {
+            void* mem = Memory::_Manager[2]->Alloc(sizeof(DChannel), DCHANNEL_FILE, 213);
+            second = mem != nullptr ? new (mem) DChannel(info->daemonId, info->ipaddr, info->port) : nullptr;
+            AddDaemon(second);
+            wid = second->_daemonId._wid;
+            port = second->_port;
+            address = Network::GetAddressStringW(second->_addr);
+            fmt = L"[daemon-mgr], daemon #%d added, ip:%s, port:%d";
+            line = 215;
+        }
+        Log::Write(Log::LT_NOTICE, DCHANNEL_FILE, line, fmt, wid, address, port);
+    release:
+        second->removeReferenceCount(DCHANNEL_FILE, 217);
     }
 
     Log::Write(Log::LT_NOTICE, DCHANNEL_FILE, 221, L"[daemon-mgr], setup daemon list complete, daemon-count:%d", count);

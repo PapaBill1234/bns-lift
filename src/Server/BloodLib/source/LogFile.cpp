@@ -239,20 +239,26 @@ void LogFile::writeFile()
     MakeFilename(&wtm, filename, MAX_PATH);  // LIFT: LTCG folded count; MakeFilename writes r9d before it reads it (LobbyGate 0x22256)
 
     // CacheGate 0x11600: up to 100 CreateFileW calls with Sleep(100) between them.
-    HANDLE file;
-    int tries = 0;
-    while ((file = CreateFileW(filename, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
-                               OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr)) == INVALID_HANDLE_VALUE
-           && ++tries < 100)
-        Sleep(100);
+    HANDLE file = CreateFileW(filename, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
+                              OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
     if (file == INVALID_HANDLE_VALUE)
     {
+        int tries = 1;
+        do
+        {
+            Sleep(100);
+            file = CreateFileW(filename, GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr,
+                               OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+            if (file != INVALID_HANDLE_VALUE)
+                goto opened;
+        } while (++tries < 100);
         ++_trycount;
         AlertSender::Write(LOGFILE_FILE, 301,
                            L"[log], file create error, fname:%s, error:%d, trycount:%d",
                            filename, GetLastError(), _trycount);
         return;
     }
+opened:
 
     wcsncpy(_lastFileName, filename, MAX_PATH);
     long highPos = 0;

@@ -38,16 +38,8 @@ void* DaemonConfig::Load(XmlCfgDef const* def, int count, unsigned long long siz
 
     Console* console = Daemon::Instance->console;
     HMODULE module = LoadLibraryW(XML_READER_DLL);
-    if (module == nullptr)
-    {
-        if (console != nullptr)
-        {
-            console->WriteStartLog(0, L"[config], cannot load xml reader library, file: %s", XML_READER_DLL);
-            Sleep(5000);
-        }
-        return nullptr;
-    }
-
+    if (module != nullptr)
+    {  // LIFT: 0xc600 the binary puts the failure block of LoadLibraryW last; the body is not indented.
     XriGetInterfaceVersion getInterfaceVersion =
         reinterpret_cast<XriGetInterfaceVersion>(GetProcAddress(module, "GetInterfaceVersion"));
     GetProcAddress(module, "SetMemAllocator");
@@ -139,6 +131,16 @@ void* DaemonConfig::Load(XmlCfgDef const* def, int count, unsigned long long siz
     destroyXmlReader(reader);
     FreeLibrary(module);
     return result;
+    }
+    else
+    {
+        if (console != nullptr)
+        {
+            console->WriteStartLog(0, L"[config], cannot load xml reader library, file: %s", XML_READER_DLL);
+            Sleep(5000);
+        }
+        return nullptr;
+    }
 }
 
 // 0xc9f0

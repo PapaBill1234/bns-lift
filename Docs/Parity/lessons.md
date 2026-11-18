@@ -335,3 +335,49 @@ A12->A14, A13->A15, A14->A16, A15->A10, A16+A17->A17, new A12 (crypto source for
 - Worked: read `PostOfficeDaemon::_instance->` at each use. A cached local `daemon` merged the global loads; the original reloads it (2 more refs). Request went 99.5 -> MATCH.
 - Did not work, reverted: POD `TextStreamPacketBufferHandler::Destroy` with `Buffer.GrowingBuffer::~GrowingBuffer()`. No score change.
 - Not fixed: `Network::OpenPort` (CG, 2 overloads): per-exe purpose test and constant propagation; belongs to perexe-3.
+
+## lift-parity-order-3 (stage 1, in progress)
+- Fact: a lift helper in an anonymous namespace that the orig inlines shows as ONLY-OURS and its refs/consts are missing in the caller (`initMemorySection` in `BloodDaemonMain`, 133 bytes in all 4 exes). Fix form: `__forceinline` (A10).
+- Warning: `__forceinline` on that helper also inlines the callee (`Memory::CreateManager` became `HeapCreate`): CG -1 MATCH. Add `noinline` on the callee when the orig calls it out of line. Check all 4 exes.
+- Fact: `int const CONFIG_DIR_OPTION_LEN` folds into the code. The orig reads it from memory (2 refs). Use a non-const `int` and `extern int` in `Daemon.h`.
+- Tool note: `funcdiff.py --show` prints 1 line of context. For the whole call list use a copy of the script with a larger `n` in `difflib.unified_diff` (do not edit `tools/funcdiff.py` outside a tooling card).
+
+## lift-parity-order-3 (CacheGate only measured, 424 -> 427)
+
+Worked:
+- `__forceinline` on a helper that the orig inlines (`initMemorySection`) also inlines its callees. Add `__declspec(noinline)` on the callee the orig calls out of line (`Memory::CreateManager`). Without it CG lost 1 MATCH.
+- WPO folds a global with a constant initializer, even when it is not `const`. The orig reads `CONFIG_DIR_OPTION_LEN` from memory. `volatile int` keeps the read (2 refs). Plain non-const `int` did not.
+- `BloodDaemonMain`: `if (GetConsoleWindow() == nullptr) { RunMode = DAEMON_MODE; } else { ...loop... }` and one shared tail `makeConsole` + `Daemon::Start`. This puts the DAEMON path first, as in the orig. A duplicate tail (early `return` in the DAEMON branch) gave an extra `makeConsole`/`Start` call: do not use it.
+- `makeConsole`: `switch (RunMode)` with `case DAEMON_MODE`, `TEXT_MODE`, `WINDOW_MODE`, `default` (error). The `if` chains in two orders did not match. The switch gives the orig block order.
+- `LogFile::writeFile`: first `CreateFileW` before the retry; retry as `do { Sleep; CreateFileW; if ok goto opened; } while (++tries < 100);` then the error code, then `return`; label `opened:` after. A `while (true)` loop with the error inside was worse (the compiler unrolled one more `Sleep`/`CreateFileW`).
+
+Not worked / open:
+- `PipeConsole::run` 0x157b0 (score 96.3): `switch (pipe.dwState)` for the `GetOverlappedResult` result, and `reconnect:` label moved after case 2, did not change the call order. Orig order: Log(567), GetLastError, Log(538), Log(500), ..., `disconnectAndReconnect` after the `ReadFile` `GetLastError`, then Log(639). Ours has an extra Log before `GetLastError` and `disconnectAndReconnect` too early. Not solved.
+- Not read yet: `Daemon::start` (orig calls `noTimerMain` before `timerMain`; one `Memory::_Manager` ref less in ours), `DaemonConfig::Load` (orig calls the `<indirect>` + `Sleep` after `FreeLibrary`), `BnsCommonConfig::LoadBnsCommonConfig` (orig `Log::Write` before `CheckMinMaxBoundary`; ours reads `BnsCommonConfig::Config` one more time).
+
+## lift-parity-order-3 (stage 3, CacheGate measured 424 -> 430, all 4 exes +3 before these edits)
+Worked:
+- `Daemon::start` 0xb140: swap `if (GetTimerInterval() != 0) timerMain else noTimerMain` to `== 0` first. Call order then matches.
+- `finiMemorySection` (inlined in `Daemon::start`): read `Memory::_Manager[section]` again after the destructor call (volatile global, the binary reads it again for `Free`). This removes the missing `Memory::_Manager` ref.
+- `DaemonConfig::Load` 0xc600: the binary puts the `LoadLibraryW` failure block last. Use `if (module != nullptr) { body } else { fail }`. A `goto` over initialised locals is not legal C++.
+- `BnsCommonConfig::LoadBnsCommonConfig` 0x13e0: write each error exit with its own `Config = nullptr; Log::Write(...)`. The compiler merges the tail and places it after the first error block. A hand-written `goto failed` tail (before or after the blocks) did NOT match. Also keep the allocated object in a local (`config`) and test the local: it removes one `BnsCommonConfig::Config` read.
+Not done:
+- `PipeConsole::run` 0x157b0: 3 tries used, no gain. Stop.
+- SCD `DChannelMgr::SetupDaemonList` (82.8: AddDaemon / GetAddressStringW order, `DaemonChannel.cpp` string ref, consts 0x38 0x178), `Channel::MakeSession` (Log::Write order, consts 0x17 0x24), `GameEventManager::PostGameEventLogList` (Log::Write order, orig refs ID128_GUID_ZERO, ours `GameEventManager::Instance`): diffs seen only, no edit tried.
+
+## lift-parity-order-3, stage 4 (SCD exe-only call order)
+
+- Worked (partial): `DChannelMgr::SetupDaemonList` 0xd270. Source order must follow the original block order:
+  `if (second != nullptr)` first (GetSession, error log, `goto release`, then the "changed" path), `else` alloc path last,
+  one shared `Log::Write(LT_NOTICE, ..., line, fmt, wid, address, port)` after both. Calls now match (score 82.8 -> 96.3).
+  Left: ref order (vtable before file string) and const 0x178 (line number of the inlined FindDaemon addReferenceCount). Not MATCH.
+- Did not work: `Channel::MakeSession` 0x10450, port-first order (`if (port != nullptr) { ... } ` then the "cannot find port" log last). Measured with the wrapper objects rebuilt: CG, LG and POD lose MATCH (score 90.5 / 90.5 / 88.6) and SCD stays DIFF. Undone. The shared form (early `return false` for `port == nullptr`) stays.
+- `touch` rule: the parity build tracks `.cpp` files only (see vs2010-build-header-deps). An `#include "X.cpp"` wrapper needs its own touch.
+- Worked: SCD `GameEventManager::PostGameEventLogList` 0xb140 (MATCH). (1) Read `Instance->_gameEventHandle` one time into a local `gameEventHandle`, test the local; the "handle is null" `Log::Write` is then the last block. (2) Hex-Rays folds reads of zero-initialised data (`ID128_GUID_ZERO`) to `0`: when funcdiff shows an orig ref to a global that the pseudocode shows as constant zero, write the global in the inlined constructor (`_gameAccountId(ID128_GUID_ZERO)` in `GameEventLogEvent::GameEventLogEvent`).
+- POD `UnsentPostContextManager::initContextManager` 0xc6d0 / `updateWorldList` 0xcae0 (seen only, no edit): in the binary the "return true" Leave tail (assert 122 + Leave) is the LAST call block; ours has it right after the `addUnsentPostContextList` call (loop-exit position). The RAII form `AutoCS` does not help: the original has no `~AutoCS` call (comment in `UnsentPostContext.cpp`). Next try: put the success tail after the error blocks (`goto`, or a `for` with the exit moved).
+- POD `UnsentPostContextManager::addUnsentPostContextList` 0xce80: only const `-2` (EH state) differs: toolchain cause, see the `Port::Initialize` line above. `deliverUnsentPost` 0xd510: `removeReferenceCount` order differs, not looked at.
+- Did not work: `Channel::MakeSession` port-first order (see stage 4 note above): measured and undone.
+
+## lift-parity-order-3, stage 6 (final)
+- Full run after all edits: CG 430, LG 588, SCD 550, POD 631 (baseline 424 / 583 / 543 / 626). MATCH lost: 0. Gate ok, parity ok.
+- Did not work: POD `UnsentPostContextManager::initContextManager` 0xc6d0, `for (;; ++it) { if (it == end) goto success; ... } success: Leave; return true;`. The compiler gives the same block order (success tail after the loop exit). Undone. The note about this try also holds for `updateWorldList` 0xcae0 (same shape, not tried).

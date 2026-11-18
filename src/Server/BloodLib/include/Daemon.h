@@ -30,7 +30,7 @@ enum RUN_MODE  // LIFT: The PDB enum has no name (0x304D).
     WINDOW_MODE = 2,
 };
 extern RUN_MODE RunMode;                       // 0x5a148
-extern int const CONFIG_DIR_OPTION_LEN;        // 0x593c0 (value 6)
+extern volatile int CONFIG_DIR_OPTION_LEN;  // 0x593c0 (value 6)
 
 void BloodDaemonMain(int argc, wchar_t** argv);  // 0xa690
 

@@ -223,7 +223,9 @@ void GameEventManager::Clear()
 // 0xb140
 bool GameEventManager::PostGameEventLogList(RetrieveEventLogContext* context)
 {
-    if (Instance == nullptr || Instance->_gameEventHandle == nullptr)
+    // LIFT: 0xb140 the "handle is null" log is the last block of the binary. The code reads the handle one time.
+    HANDLE gameEventHandle = (Instance != nullptr) ? Instance->_gameEventHandle : nullptr;
+    if (gameEventHandle == nullptr)
     {
         Log::Write(Log::LT_ERROR, kFile, 173, L"post game-event-log-list, game event handle is null");
         return false;
@@ -265,7 +267,7 @@ bool GameEventManager::PostGameEventLogList(RetrieveEventLogContext* context)
             else
                 ev->_eventTargetType = 0;
         }
-        PostQueuedCompletionStatus(Instance->_gameEventHandle, 0, reinterpret_cast<ULONG_PTR>(static_cast<EventObject*>(ev)),
+        PostQueuedCompletionStatus(gameEventHandle, 0, reinterpret_cast<ULONG_PTR>(static_cast<EventObject*>(ev)),
                                    nullptr);
         Log::Write(Log::LT_DEBUG, kFile, 201, L"post game-event-log-list, post, event-log-id:%I64d, index:%d, count:%d",
                    info->logId, i, context->_count);

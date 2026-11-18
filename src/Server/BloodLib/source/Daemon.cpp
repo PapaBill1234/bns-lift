@@ -55,12 +55,12 @@ wchar_t const* Daemon::StateString[10] = {
     L"INVALID", L"FLUSHING", L"COOLDOWNING", L"COOLDOWNED", L"RELOADING",
 };  // 0x59180
 RUN_MODE RunMode = static_cast<RUN_MODE>(-1);  // LIFT: .data holds 0xFFFFFFFF (LobbyGate 0x93ad8)
-int const CONFIG_DIR_OPTION_LEN = 6;            // wcslen(L"--conf")
+volatile int CONFIG_DIR_OPTION_LEN = 6;  // wcslen(L"--conf"); LIFT: volatile, WPO folds it otherwise; the orig reads it from memory (CacheGate 0xa690)
 
 namespace
 {
 // LIFT: Inlined helper of Memory.cpp (source line 57). It creates the manager of one section.
-void initMemorySection(int section, void const* option)
+__forceinline void initMemorySection(int section, void const* option)
 {
     if (Memory::_Manager[section] != nullptr)
     {
@@ -84,7 +84,10 @@ void finiMemorySection(int section)
         manager->Clear();
         manager = const_cast<MemoryManager*>(Memory::_Manager[section]);
         if (manager != nullptr)
+        {
             manager->~MemoryManager();  // LIFT: binary calls the deleting destructor with flag 1; it does not free (MemoryManager 0x268b0, LobbyGate)
+            manager = const_cast<MemoryManager*>(Memory::_Manager[section]);  // LIFT: binary reads the global again after the destructor (Daemon::start 0xb140)
+        }
         BASE_MEMORY_MANAGER.Free(manager, L"source\\Memory.cpp", 85);
         Memory::_Manager[section] = nullptr;
     }
@@ -138,25 +141,29 @@ static void printUsage(wchar_t const* argv0)
 // 0xa540
 static Console* makeConsole()
 {
-    if (RunMode == DAEMON_MODE)
+    switch (RunMode)
+    {
+    case DAEMON_MODE:
     {
         // LIFT: DAEMON_MODE allocates 0xE0 bytes at line 119 (LobbyGate 0x1db83)
         void* memory = BASE_MEMORY_MANAGER.Alloc(sizeof(WinServiceConsole), DAEMON_FILE, 119);
         return memory != nullptr ? new (memory) WinServiceConsole() : nullptr;
     }
-    if (RunMode == TEXT_MODE)
+    case TEXT_MODE:
     {
         void* memory = BASE_MEMORY_MANAGER.Alloc(sizeof(TextConsole), DAEMON_FILE, 121);
         return memory != nullptr ? new (memory) TextConsole() : nullptr;
     }
-    if (RunMode == WINDOW_MODE)
+    case WINDOW_MODE:
     {
         void* memory = BASE_MEMORY_MANAGER.Alloc(sizeof(WindowConsole), DAEMON_FILE, 123);
         return memory != nullptr ? new (memory) WindowConsole() : nullptr;
     }
-    Log::Write(Log::LT_ERROR, DAEMON_FILE, 126, L"== CRASH == [daemon], invalid run mode");
-    AlertSender::Write(DAEMON_FILE, 126, L"== CRASH == [daemon], invalid run mode");
-    return nullptr;
+    default:
+        Log::Write(Log::LT_ERROR, DAEMON_FILE, 126, L"== CRASH == [daemon], invalid run mode");
+        AlertSender::Write(DAEMON_FILE, 126, L"== CRASH == [daemon], invalid run mode");
+        return nullptr;
+    }
 }
 
 // 0xa690
@@ -189,7 +196,11 @@ void BloodDaemonMain(int argc, wchar_t** argv)
     // 0xc5d0 is the template swprintf_s<520>.
     swprintf_s(Daemon::Instance->confDir, path);
 
-    if (GetConsoleWindow() != nullptr)
+    if (GetConsoleWindow() == nullptr)
+    {
+        RunMode = DAEMON_MODE;
+    }
+    else
     {
         RunMode = WINDOW_MODE;
         for (int i = 1; i < argc; ++i)
@@ -224,10 +235,6 @@ void BloodDaemonMain(int argc, wchar_t** argv)
                 swprintf_s(Daemon::Instance->confDir, &argv[i][CONFIG_DIR_OPTION_LEN + 1]);
             }
         }
-    }
-    else
-    {
-        RunMode = DAEMON_MODE;
     }
 
     Console* console = makeConsole();
@@ -446,10 +453,10 @@ bool Daemon::start(int argc, wchar_t const** argv)
     Log::Write(Log::LT_DEBUG, DAEMON_FILE, 545, L"[%s], start, daemon: %s, version: %s, loading time: %I64d",
                ShortName(), Descriptions(), VerStr, GetTickCount64() - startTick);
     console->WriteStartLog(1, L"[%s], start, daemon: %s, version: %s", ShortName(), Descriptions(), VerStr);
-    if (GetTimerInterval() != 0)
-        timerMain(network);
-    else
+    if (GetTimerInterval() == 0)
         noTimerMain(network);
+    else
+        timerMain(network);
 
     Log::Write(Log::LT_DEBUG, DAEMON_FILE, 553, L"[%s], stop, daemon: %s, version: %s", ShortName(), Descriptions(),
                VerStr);

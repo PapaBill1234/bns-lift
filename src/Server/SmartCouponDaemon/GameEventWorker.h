@@ -73,10 +73,8 @@ class GameEventLogEvent : public DynamicEventObject
 public:
     // LIFT: Inlined in GameEventManager::PostGameEventLogList (0xB140).
     GameEventLogEvent()
-        : _gameEventLogId(0), _wid(0), _pcdbid(0), _gameEventId(0), _eventTargetType(0)
+        : _gameEventLogId(0), _gameAccountId(ID128_GUID_ZERO), _wid(0), _pcdbid(0), _gameEventId(0), _eventTargetType(0)
     {
-        _gameAccountId.id[0] = 0;
-        _gameAccountId.id[1] = 0;
     }
     virtual ~GameEventLogEvent() {}                             // 0x7D90
     virtual unsigned int EventId() const;                       // 0x7D80

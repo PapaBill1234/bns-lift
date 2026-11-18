@@ -357,11 +357,11 @@
 "status": "MATCH"
 },
 "BloodDaemonMain": {
-"calls": 89,
-"consts": 73,
-"refs": 82,
-"score": 81.3,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Blowfish::BlockSize": {
 "calls": 100,
@@ -826,10 +826,10 @@
 "status": "MATCH"
 },
 "DChannelMgr::SetupDaemonList": {
-"calls": 64,
-"consts": 91,
+"calls": 100,
+"consts": 96,
 "refs": 93,
-"score": 82.8,
+"score": 96.3,
 "status": "DIFF"
 },
 "DChannelMgr::SetupDaemonListFromXml": {
@@ -917,11 +917,11 @@
 "status": "MATCH"
 },
 "Daemon::start": {
-"calls": 99,
-"consts": 98,
-"refs": 93,
-"score": 96.8,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Daemon::startDaemon": {
 "calls": 100,
@@ -959,11 +959,11 @@
 "status": "DIFF"
 },
 "DaemonConfig::Load": {
-"calls": 96,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 98.6,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Db::AllocTransaction": {
 "calls": 100,
@@ -1330,11 +1330,11 @@
 "status": "MATCH"
 },
 "GameEventManager::PostGameEventLogList": {
-"calls": 83,
+"calls": 100,
 "consts": 100,
-"refs": 89,
-"score": 90.7,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "GameEventManager::initWorkerThread": {
 "calls": 100,
@@ -1407,11 +1407,11 @@
 "status": "DIFF"
 },
 "HandleSmartCouponManager_LoadRetryReadyGameEventLogListReq": {
-"calls": 98,
-"consts": 97,
-"refs": 95,
-"score": 96.8,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "HandleSmartCouponManager_RetryCouponPublicationReq": {
 "calls": 100,
@@ -1423,15 +1423,15 @@
 "HandleSmartCoupon_GameEventByAccountReq": {
 "calls": 82,
 "consts": 100,
-"refs": 94,
-"score": 91.9,
+"refs": 97,
+"score": 93.0,
 "status": "DIFF"
 },
 "HandleSmartCoupon_GameEventByCharacterReq": {
 "calls": 100,
 "consts": 97,
-"refs": 97,
-"score": 98.1,
+"refs": 100,
+"score": 99.1,
 "status": "DIFF"
 },
 "HandleSmartCoupon_HelloReq": {
@@ -1799,11 +1799,11 @@
 "status": "MATCH"
 },
 "LogFile::writeFile": {
-"calls": 82,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 93.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "LogFile::writeToBuffer [?writeToBuffer@LogFile@@AEAAXPEB_WH0H0H0H0H@Z]": {
 "calls": 100,
@@ -3500,10 +3500,10 @@
 "status": "MATCH"
 },
 "SmartCouponDaemon::loadUnhandledGameEventLog": {
-"calls": 84,
-"consts": 93,
-"refs": 90,
-"score": 89.1,
+"calls": 89,
+"consts": 100,
+"refs": 100,
+"score": 96.3,
 "status": "DIFF"
 },
 "SmartCouponDaemon::onStart": {
@@ -4543,11 +4543,11 @@
 "status": "MATCH"
 },
 "makeConsole": {
-"calls": 50,
-"consts": 60,
+"calls": 100,
+"consts": 100,
 "refs": 100,
-"score": 70.0,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "makeDirectory": {
 "calls": 100,

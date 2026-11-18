@@ -11,7 +11,8 @@ MemoryManager const* Memory::_Manager[3] = {};
 // LTCG removed type, size and createAllocationHistory. The binary gets only the
 // option in rcx and gives size 0. The PDB signature is kept here.
 // BUG: 0xdd10 the result of Alloc is not checked for null before the Initialize call.
-MemoryManager const* Memory::CreateManager(MgrType type, void const* option, unsigned long long size,
+// LIFT: noinline. initMemorySection is forceinline and the orig calls CreateManager out of line (CacheGate 0xdd10).
+__declspec(noinline) MemoryManager const* Memory::CreateManager(MgrType type, void const* option, unsigned long long size,
                                            bool createAllocationHistory)
 {
     void* memory = BASE_MEMORY_MANAGER.Alloc(sizeof(HeapMemoryManager), L"source\\Memory.cpp", 22);

@@ -438,8 +438,9 @@ void PipeConsole::run()
         if (pipe.fPendingIO)
         {
             BOOL success = GetOverlappedResult(pipe.hPipeInst, &pipe.oOverlap, &bytesTransferred, FALSE);
-            if (pipe.dwState == 0)  // connecting
+            switch (pipe.dwState)
             {
+            case 0:  // connecting
                 if (!success)
                 {
                     Log::Write(Log::LT_ERROR, PIPE_CONSOLE_FILE, 538, L"[pipe-console], connect failed, error:%d",
@@ -447,24 +448,22 @@ void PipeConsole::run()
                     goto reconnect;
                 }
                 pipe.dwState = 1;
-            }
-            else if (pipe.dwState == 1)  // reading
-            {
+                break;
+            case 1:  // reading
                 if (!success || bytesTransferred == 0)
                     goto reconnect;
                 pipe.cbRead = bytesTransferred;
                 pipe.dwState = 2;
-            }
-            else if (pipe.dwState == 2)  // writing
-            {
+                break;
+            case 2:  // writing
                 if (!success || bytesTransferred != pipe.cbToWrite)
                     goto reconnect;
                 pipe.dwState = 1;
-            }
-            else
-            {
+                break;
+            default:
                 Log::Write(Log::LT_ERROR, PIPE_CONSOLE_FILE, 567, L"[pipe-console], invalid pipe state, state:%d",
                            pipe.dwState);
+                break;
             }
         }
 
@@ -487,10 +486,7 @@ void PipeConsole::run()
                 pipe.fPendingIO = 1;
                 continue;
             }
-            // LIFT: one call site for all errors, as in the original 0x157b0.
-        reconnect:
-            disconnectAndReconnect(pipe);
-            continue;
+            goto reconnect;
         }
         case 2:  // writing
         {
@@ -510,6 +506,10 @@ void PipeConsole::run()
             }
             goto reconnect;
         }
+        // LIFT: one call site for all errors, as in the original 0x157b0.
+    reconnect:
+        disconnectAndReconnect(pipe);
+        continue;
         default:
             Log::Write(Log::LT_ERROR, PIPE_CONSOLE_FILE, 639, L"[pipe-console], invalid pipe state, state:%d",
                        pipe.dwState);

@@ -120,21 +120,20 @@ bool BnsCommonConfig::LoadBnsCommonConfig()
     }
 
     void* memory = Memory::_Manager[2]->Alloc(sizeof(BnsCommonConfig), FILE_NAME, 190);
-    Config = memory != nullptr ? new (memory) BnsCommonConfig() : nullptr;
-    if (Config == nullptr)
+    BnsCommonConfig* config = memory != nullptr ? new (memory) BnsCommonConfig() : nullptr;
+    Config = config;
+    if (config == nullptr)
         return false;
 
-    // LIFT: one error tail (errorLine, errorText). The original merges the three error exits at one
-    // `Config = nullptr; Log::Write` (CacheGate 0x13e0, r8d/r9 set before the jump).
-    int errorLine;
-    wchar_t const* errorText;
+    // LIFT: the original merges the three error exits at one `Config = nullptr; Log::Write`
+    // (CacheGate 0x13e0, r8d/r9 set before the jump). The compiler merges the same code.
     ConfigNoReload = BnsCommonConfigLoad::Load();
     if (ConfigNoReload == nullptr)
     {
         Memory::_Manager[2]->Free(Config, FILE_NAME, 197);
-        errorText = L"[BnsCommonConfig::LoadBnsCommonConfig], config file load failed";
-        errorLine = 199;
-        goto failed;
+        Config = nullptr;
+        Log::Write(Log::LT_ERROR, FILE_NAME, 199, L"[BnsCommonConfig::LoadBnsCommonConfig], config file load failed");
+        return false;
     }
 
     if (!CheckMinMaxBoundary(ConfigNoReload, _Def, BnsCommonConfigLoad::_Def, 5))
@@ -142,9 +141,9 @@ bool BnsCommonConfig::LoadBnsCommonConfig()
         DaemonConfig::FreeConfig(ConfigNoReload);
         ConfigNoReload = nullptr;
         Memory::_Manager[2]->Free(Config, FILE_NAME, 207);
-        errorText = L"[BnsCommonConfig::LoadBnsCommonConfig], boundary check failed";
-        errorLine = 209;
-        goto failed;
+        Config = nullptr;
+        Log::Write(Log::LT_ERROR, FILE_NAME, 209, L"[BnsCommonConfig::LoadBnsCommonConfig], boundary check failed");
+        return false;
     }
 
     if (!Config->UpdateAllVariable(ConfigNoReload))
@@ -152,17 +151,12 @@ bool BnsCommonConfig::LoadBnsCommonConfig()
         DaemonConfig::FreeConfig(ConfigNoReload);
         ConfigNoReload = nullptr;
         Memory::_Manager[2]->Free(Config, FILE_NAME, 217);
-        errorText = L"[BnsCommonConfig::LoadBnsCommonConfig], variable update failed";
-        errorLine = 219;
-        goto failed;
+        Config = nullptr;
+        Log::Write(Log::LT_ERROR, FILE_NAME, 219, L"[BnsCommonConfig::LoadBnsCommonConfig], variable update failed");
+        return false;
     }
 
     return true;
-
-failed:
-    Config = nullptr;
-    Log::Write(Log::LT_ERROR, FILE_NAME, errorLine, errorText);
-    return false;
 }
 
 // 0x1600

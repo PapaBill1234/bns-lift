@@ -385,11 +385,11 @@
 "status": "MATCH"
 },
 "BloodDaemonMain": {
-"calls": 89,
-"consts": 73,
-"refs": 82,
-"score": 81.3,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Blowfish::BlockSize": {
 "calls": 100,
@@ -1085,11 +1085,11 @@
 "status": "MATCH"
 },
 "Daemon::start": {
-"calls": 99,
-"consts": 98,
-"refs": 93,
-"score": 96.8,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Daemon::startDaemon": {
 "calls": 100,
@@ -1120,11 +1120,11 @@
 "status": "MATCH"
 },
 "DaemonConfig::Load": {
-"calls": 96,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 98.6,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "DelayedRelease::Add": {
 "calls": 100,
@@ -2373,11 +2373,11 @@
 "status": "MATCH"
 },
 "LogFile::writeFile": {
-"calls": 82,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 93.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "LogFile::writeToBuffer [?writeToBuffer@LogFile@@AEAAXPEB_WH0H0H0H0H@Z]": {
 "calls": 100,
@@ -5005,11 +5005,11 @@
 "status": "MATCH"
 },
 "makeConsole": {
-"calls": 50,
-"consts": 60,
+"calls": 100,
+"consts": 100,
 "refs": 100,
-"score": 70.0,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "makeDirectory": {
 "calls": 100,
