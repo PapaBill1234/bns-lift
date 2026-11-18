@@ -226,24 +226,23 @@ RelayContext* RelayContextManager::GetContext(unsigned long long relayTid)
     }
 
     int const index = static_cast<int>(relayTid % _bucketCount);
+    RelayContext* relayContext = nullptr;
     _lockList[index].Enter();
     Container::iterator it = _containerList[index].find(relayTid);
-    if (it == _containerList[index].end())
+    if (it != _containerList[index].end())
     {
-        _lockList[index].Leave();
-        return nullptr;
-    }
-    RelayContext* const relayContext = it->second;
-    if (relayContext != nullptr)
-    {
+        relayContext = it->second;
+        if (relayContext == nullptr)
+        {
+            _lockList[index].Leave();
+            RELAY_CONTEXT_CRASH(242, L"== CRASH == [%s], %s; relay context is null, relayTid:0x%I64X, relayContext:0x%p",
+                                MODULE_NAME, L"RelayContextManager::GetContext", relayTid, nullptr);
+            return nullptr;
+        }
         relayContext->addReferenceCount(RELAY_CONTEXT_FILE, 245);
-        _lockList[index].Leave();
-        return relayContext;
     }
     _lockList[index].Leave();
-    RELAY_CONTEXT_CRASH(242, L"== CRASH == [%s], %s; relay context is null, relayTid:0x%I64X, relayContext:0x%p",
-                        MODULE_NAME, L"RelayContextManager::GetContext", relayTid, nullptr);
-    return nullptr;
+    return relayContext;
 }
 
 // 0x1cb80
@@ -271,17 +270,17 @@ bool RelayContextManager::AddContext(RelayContext* const relayContext)
 
     int const index = static_cast<int>(relayTid % _bucketCount);
     _lockList[index].Enter();
-    if (_containerList[index].insert(Container::value_type(relayTid, relayContext)).second)
+    if (!_containerList[index].insert(std::pair<unsigned long long, RelayContext*>(relayTid, relayContext)).second)
     {
-        relayContext->addReferenceCount(RELAY_CONTEXT_FILE, 280);
-        InterlockedIncrement(&_contextCount);
         _lockList[index].Leave();
-        return true;
+        Log::Write(Log::LT_ERROR, RELAY_CONTEXT_FILE, 276, L"[%s], %s; failed to add relay context, relayTid:0x%I64X",
+                   MODULE_NAME, L"RelayContextManager::AddContext", relayTid);
+        return false;
     }
+    relayContext->addReferenceCount(RELAY_CONTEXT_FILE, 280);
+    InterlockedIncrement(&_contextCount);
     _lockList[index].Leave();
-    Log::Write(Log::LT_ERROR, RELAY_CONTEXT_FILE, 276, L"[%s], %s; failed to add relay context, relayTid:0x%I64X",
-               MODULE_NAME, L"RelayContextManager::AddContext", relayTid);
-    return false;
+    return true;
 }
 
 // 0x1ce10
@@ -311,16 +310,16 @@ bool RelayContextManager::RemoveContext(unsigned long long relayTid)
         return false;
     }
     RelayContext* const relayContext = it->second;
-    if (relayContext != nullptr)
+    if (relayContext == nullptr)
     {
-        _containerList[index].erase(it);
-        relayContext->removeReferenceCount(RELAY_CONTEXT_FILE, 318);
-        InterlockedDecrement(&_contextCount);
         _lockList[index].Leave();
-        return true;
+        RELAY_CONTEXT_CRASH(313, L"== CRASH == [%s], %s; relay context is null, relayTid:0x%I64X, relayContext:0x%p",
+                            MODULE_NAME, L"RelayContextManager::RemoveContext", relayTid, nullptr);
+        return false;
     }
+    _containerList[index].erase(it);
+    relayContext->removeReferenceCount(RELAY_CONTEXT_FILE, 318);
+    InterlockedDecrement(&_contextCount);
     _lockList[index].Leave();
-    RELAY_CONTEXT_CRASH(313, L"== CRASH == [%s], %s; relay context is null, relayTid:0x%I64X, relayContext:0x%p",
-                        MODULE_NAME, L"RelayContextManager::RemoveContext", relayTid, nullptr);
-    return false;
+    return true;
 }

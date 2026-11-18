@@ -79,13 +79,11 @@ PostInfo::PostInfo()
     _postType = 0;
     _deliveryReason = 0;
     _postHint = 0;
-    _reservedHint.id[0] = 0;
-    _reservedHint.id[1] = 0;
+    _reservedHint = ID128_GUID_ZERO;
     _senderServiceType = 0;
     _senderWid = 0;
     _senderPcId = 0;
-    _senderAccountId.id[0] = 0;
-    _senderAccountId.id[1] = 0;
+    _senderAccountId = ID128_GUID_ZERO;
     memset(_senderWorldName, 0, sizeof(_senderWorldName));
     memset(_senderName, 0, sizeof(_senderName));
     _recipientWid = 0;
@@ -110,7 +108,7 @@ bool PostInfo::CheckValidityPostData()
     {
         if (_invoiceId != 0 || _senderPcId == 0)
             return false;
-        if (_senderAccountId.id[0] == 0 && _senderAccountId.id[1] == 0)
+        if (_senderAccountId.id[0] == ID128_GUID_ZERO.id[0] && _senderAccountId.id[1] == ID128_GUID_ZERO.id[1])
             return false;
         if (wcslen(_senderWorldName) == 0)
             return false;
@@ -120,26 +118,27 @@ bool PostInfo::CheckValidityPostData()
     if (_invoiceId == 0)
         return false;
 
-    bool const hasAccountId = _senderAccountId.id[0] != 0 || _senderAccountId.id[1] != 0;
+#define POST_HAS_ACCOUNT_ID (_senderAccountId.id[0] != ID128_GUID_ZERO.id[0] || _senderAccountId.id[1] != ID128_GUID_ZERO.id[1])
     switch (_senderServiceType)
     {
     case 1:
-        if (_deliveryReason >= 3 || _postHint == 0 || _senderPcId != 0 || hasAccountId || wcslen(_senderWorldName) != 0)
+        if (_deliveryReason >= 3 || _postHint == 0 || _senderPcId != 0 || POST_HAS_ACCOUNT_ID || wcslen(_senderWorldName) != 0)
             return false;
         return wcslen(_senderName) == 0;
     case 2:
-        if (_deliveryReason >= 8 || _postHint == 0 || _senderPcId != 0 || hasAccountId || wcslen(_senderWorldName) != 0 ||
+        if (_deliveryReason >= 8 || _postHint == 0 || _senderPcId != 0 || POST_HAS_ACCOUNT_ID || wcslen(_senderWorldName) != 0 ||
             wcslen(_senderName) != 0 || wcslen(_postTitle) == 0)
             return false;
         return wcslen(_postMessage) != 0;
     case 7:
-        if (_deliveryReason >= 6 || _senderPcId != 0 || hasAccountId || wcslen(_senderWorldName) != 0 ||
+        if (_deliveryReason >= 6 || _senderPcId != 0 || POST_HAS_ACCOUNT_ID || wcslen(_senderWorldName) != 0 ||
             wcslen(_senderName) != 0)
             return false;
         return wcslen(_postMessage) != 0;
     default:
         return true;
     }
+#undef POST_HAS_ACCOUNT_ID
 }
 
 // ---- PostContext ----
@@ -270,24 +269,23 @@ PostContext* PostContextManager::GetContext(long long postId)
     }
 
     int const index = static_cast<int>(postId % _bucketCount);
+    PostContext* postContext = nullptr;
     _lockList[index].Enter();
     Container::iterator it = _containerList[index].find(postId);
-    if (it == _containerList[index].end())
+    if (it != _containerList[index].end())
     {
-        _lockList[index].Leave();
-        return nullptr;
-    }
-    PostContext* const postContext = it->second;
-    if (postContext != nullptr)
-    {
+        postContext = it->second;
+        if (postContext == nullptr)
+        {
+            _lockList[index].Leave();
+            POST_CONTEXT_CRASH(372, L"== CRASH == [%s], %s; post context is null, postId:0x%I64X, postContext:0x%p",
+                               MODULE_NAME, L"PostContextManager::GetContext", postId, nullptr);
+            return nullptr;
+        }
         postContext->addReferenceCount(POST_CONTEXT_FILE, 375);
-        _lockList[index].Leave();
-        return postContext;
     }
     _lockList[index].Leave();
-    POST_CONTEXT_CRASH(372, L"== CRASH == [%s], %s; post context is null, postId:0x%I64X, postContext:0x%p",
-                       MODULE_NAME, L"PostContextManager::GetContext", postId, nullptr);
-    return nullptr;
+    return postContext;
 }
 
 // 0x12110
@@ -315,17 +313,17 @@ bool PostContextManager::AddContext(PostContext* postContext)
 
     int const index = static_cast<int>(postId % _bucketCount);
     _lockList[index].Enter();
-    if (_containerList[index].insert(Container::value_type(postId, postContext)).second)
+    if (!_containerList[index].insert(std::pair<long long, PostContext*>(postId, postContext)).second)
     {
-        postContext->addReferenceCount(POST_CONTEXT_FILE, 410);
-        InterlockedIncrement(&_contextCount);
         _lockList[index].Leave();
-        return true;
+        Log::Write(Log::LT_ERROR, POST_CONTEXT_FILE, 406, L"[%s], %s; failed to add post context, postId:0x%I64X",
+                   MODULE_NAME, L"PostContextManager::AddContext", postId);
+        return false;
     }
+    postContext->addReferenceCount(POST_CONTEXT_FILE, 410);
+    InterlockedIncrement(&_contextCount);
     _lockList[index].Leave();
-    Log::Write(Log::LT_ERROR, POST_CONTEXT_FILE, 406, L"[%s], %s; failed to add post context, postId:0x%I64X",
-               MODULE_NAME, L"PostContextManager::AddContext", postId);
-    return false;
+    return true;
 }
 
 // 0x123a0
@@ -355,16 +353,16 @@ bool PostContextManager::RemoveContext(long long postId)
         return false;
     }
     PostContext* const postContext = it->second;
-    if (postContext != nullptr)
+    if (postContext == nullptr)
     {
-        _containerList[index].erase(it);
-        postContext->removeReferenceCount(POST_CONTEXT_FILE, 448);
-        InterlockedDecrement(&_contextCount);
         _lockList[index].Leave();
-        return true;
+        POST_CONTEXT_CRASH(443, L"== CRASH == [%s], %s; post context is null, postId:0x%I64X, postContext:0x%p",
+                           MODULE_NAME, L"PostContextManager::RemoveContext", postId, nullptr);
+        return false;
     }
+    _containerList[index].erase(it);
+    postContext->removeReferenceCount(POST_CONTEXT_FILE, 448);
+    InterlockedDecrement(&_contextCount);
     _lockList[index].Leave();
-    POST_CONTEXT_CRASH(443, L"== CRASH == [%s], %s; post context is null, postId:0x%I64X, postContext:0x%p",
-                       MODULE_NAME, L"PostContextManager::RemoveContext", postId, nullptr);
-    return false;
+    return true;
 }

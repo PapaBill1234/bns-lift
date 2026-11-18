@@ -49,8 +49,9 @@ RetrieveCharacterInfoRelayContext::RetrieveCharacterInfoRelayContext(EconomyHead
 // 0x1f770
 void RetrieveCharacterInfoRelayContext::initResponse(RelayResponse* const response)
 {
-    static_cast<RelayResponse&>(_response) = *response;
-    _response._resultPcId = static_cast<RetrieveCharacterInfoRelayResponse*>(response)->_resultPcId;
+    RetrieveCharacterInfoRelayResponse* const retrieveResponse = static_cast<RetrieveCharacterInfoRelayResponse*>(response);
+    static_cast<RelayResponse&>(_response) = *retrieveResponse;
+    _response._resultPcId = retrieveResponse->_resultPcId;
 }
 
 // 0x1f800

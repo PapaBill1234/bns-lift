@@ -79,7 +79,6 @@ bool WorldChannel::SendRelayResponse(RelayContext const* const relayContext)
     packet.Allocate();
     if (!relayContext->ComposeResponsePacket(packet))
     {
-        packet.Clear();
         return false;
     }
 
@@ -93,7 +92,6 @@ bool WorldChannel::SendRelayResponse(RelayContext const* const relayContext)
         session->_lock.Leave();
         session->removeReferenceCount(CHANNEL_H_FILE, 52);
     }
-    packet.Clear();
     return true;
 }
 
@@ -130,25 +128,24 @@ WorldChannel* WorldChannelManager::GetWorldChannel(unsigned short wid)
     }
 
     int const index = wid % _bucketCount;
+    WorldChannel* worldChannel = nullptr;
     _lockList[index].Enter();
     Container::iterator it = _containerList[index].find(wid);
-    if (it == _containerList[index].end())
+    if (it != _containerList[index].end())
     {
-        _lockList[index].Leave();
-        return nullptr;
-    }
-    WorldChannel* const worldChannel = it->second;
-    if (worldChannel != nullptr)
-    {
+        worldChannel = it->second;
+        if (worldChannel == nullptr)
+        {
+            _lockList[index].Leave();
+            WORLD_CHANNEL_CRASH(131, L"== CRASH == [%s], %s; world channel is null, wid:%u, worldChannel:0x%p",
+                                MODULE_NAME, L"WorldChannelManager::GetWorldChannel", static_cast<unsigned int>(wid),
+                                static_cast<void*>(nullptr));
+            return nullptr;
+        }
         worldChannel->addReferenceCount(WORLD_CHANNEL_FILE, 134);
-        _lockList[index].Leave();
-        return worldChannel;
     }
     _lockList[index].Leave();
-    WORLD_CHANNEL_CRASH(131, L"== CRASH == [%s], %s; world channel is null, wid:%u, worldChannel:0x%p",
-                        MODULE_NAME, L"WorldChannelManager::GetWorldChannel", static_cast<unsigned int>(wid),
-                        static_cast<void*>(nullptr));
-    return nullptr;
+    return worldChannel;
 }
 
 // 0x1eb20
@@ -177,17 +174,17 @@ bool WorldChannelManager::AddWorldChannel(WorldChannel* const worldChannel)
 
     int const index = wid % _bucketCount;
     _lockList[index].Enter();
-    if (_containerList[index].insert(Container::value_type(wid, worldChannel)).second)
+    if (!_containerList[index].insert(std::pair<unsigned short, WorldChannel*>(wid, worldChannel)).second)
     {
-        worldChannel->addReferenceCount(WORLD_CHANNEL_FILE, 169);
-        InterlockedIncrement(&_worldCount);
         _lockList[index].Leave();
-        return true;
+        Log::Write(Log::LT_ERROR, WORLD_CHANNEL_FILE, 165, L"[%s], %s; failed to add world channel, wid:%u",
+                   MODULE_NAME, L"WorldChannelManager::AddWorldChannel", static_cast<unsigned int>(wid));
+        return false;
     }
+    worldChannel->addReferenceCount(WORLD_CHANNEL_FILE, 169);
+    InterlockedIncrement(&_worldCount);
     _lockList[index].Leave();
-    Log::Write(Log::LT_ERROR, WORLD_CHANNEL_FILE, 165, L"[%s], %s; failed to add world channel, wid:%u",
-               MODULE_NAME, L"WorldChannelManager::AddWorldChannel", static_cast<unsigned int>(wid));
-    return false;
+    return true;
 }
 
 // 0x1ed90
@@ -218,19 +215,19 @@ bool WorldChannelManager::RemoveWorldChannel(unsigned short wid)
         return false;
     }
     WorldChannel* const worldChannel = it->second;
-    if (worldChannel != nullptr)
+    if (worldChannel == nullptr)
     {
-        _containerList[index].erase(it);
-        worldChannel->removeReferenceCount(WORLD_CHANNEL_FILE, 207);
-        InterlockedDecrement(&_worldCount);
         _lockList[index].Leave();
-        return true;
+        WORLD_CHANNEL_CRASH(202, L"== CRASH == [%s], %s; world channel is null, wid:%u, worldChannel:0x%p",
+                            MODULE_NAME, L"WorldChannelManager::RemoveWorldChannel", static_cast<unsigned int>(wid),
+                            static_cast<void*>(nullptr));
+        return false;
     }
+    _containerList[index].erase(it);
+    worldChannel->removeReferenceCount(WORLD_CHANNEL_FILE, 207);
+    InterlockedDecrement(&_worldCount);
     _lockList[index].Leave();
-    WORLD_CHANNEL_CRASH(202, L"== CRASH == [%s], %s; world channel is null, wid:%u, worldChannel:0x%p",
-                        MODULE_NAME, L"WorldChannelManager::RemoveWorldChannel", static_cast<unsigned int>(wid),
-                        static_cast<void*>(nullptr));
-    return false;
+    return true;
 }
 
 // LIFT: no out-of-line copy found

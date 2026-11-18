@@ -23,7 +23,7 @@ class WorldConfigList
 {
 public:
     typedef std::map<unsigned short, WorldConfig*, std::less<unsigned short>,
-                     StlAllocator<std::pair<unsigned short const, WorldConfig*>, 2> > Container;
+                     StlAllocator<std::pair<unsigned short, WorldConfig*>, 2> > Container;
 
     ~WorldConfigList();  // 0xd910
 

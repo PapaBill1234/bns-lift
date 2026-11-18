@@ -361,7 +361,7 @@ bool WorldConfigManager::setupWorldConfigList(XmlDoc* xmlDoc, WorldConfigList* w
             Memory::_Manager[2]->Free(worldConfig, WORLD_CONFIG_FILE, 341);
             return false;
         }
-        if (!worldConfigList->_configList.insert(std::make_pair(worldConfig->_wid, worldConfig)).second)
+        if (!worldConfigList->_configList.insert(std::pair<unsigned short, WorldConfig*>(worldConfig->_wid, worldConfig)).second)
         {
             Log::Write(Log::LT_ERROR, WORLD_CONFIG_FILE, 348, L"[%s], %s; failed to add world config, wid:%u",
                        MODULE_NAME, L"WorldConfigManager::setupWorldConfigList", worldConfig->_wid);

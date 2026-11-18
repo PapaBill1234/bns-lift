@@ -2,6 +2,7 @@
 // The context functions that are not in WorldPacketHandler.obj are in RetrieveCharacterInfoRelay.cpp
 // (0x1de30..0x1e410) and CheckPostCapacityRelay.cpp (0x9180..0x9740).
 #pragma once
+#include <string.h>
 #include <stddef.h>
 #include "RelayContext.h"
 #include "PingRelay.h"
@@ -15,8 +16,7 @@ class RetrieveCharacterInfoRelayRequest : public RelayRequest
 public:
     RetrieveCharacterInfoRelayRequest() : _gameTid(0), _requestWid(0), _targetWid(0)  // inlined at 0x1fe48-0x1fe64: vtable, 0, 0, memset 0x42
     {
-        for (int i = 0; i < 33; ++i)
-            _targetCharacterName[i] = 0;
+        memset(_targetCharacterName, 0, sizeof(_targetCharacterName));
     }
     virtual ~RetrieveCharacterInfoRelayRequest() {}  // vtable folded, pipe.chRequest+3860
 

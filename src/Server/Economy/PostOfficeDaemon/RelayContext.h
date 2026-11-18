@@ -112,7 +112,7 @@ class RelayContextManager
 {
 public:
     typedef std::map<unsigned long long, RelayContext*, std::less<unsigned long long>,
-                     StlAllocator<std::pair<unsigned long long const, RelayContext*>, 2> > Container;
+                     StlAllocator<std::pair<unsigned long long, RelayContext*>, 2> > Container;
 
     bool initContextManager();                            // 0x1c780
     RelayContext* GetContext(unsigned long long relayTid);  // 0x1c910

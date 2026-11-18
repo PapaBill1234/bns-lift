@@ -43,7 +43,7 @@ class RelayTimeContextManager
 {
 public:
     typedef std::map<CompoundKey, RelayTimeContext*, std::less<CompoundKey>,
-                     StlAllocator<std::pair<CompoundKey const, RelayTimeContext*>, 2> > Container;
+                     StlAllocator<std::pair<CompoundKey, RelayTimeContext*>, 2> > Container;
 
     bool initContextManager();  // 0xb110
     bool AddContext(unsigned long long relayTid, long long relayLimitTime, RelayContext* const relayContext);  // 0xb2a0

@@ -331,3 +331,99 @@ Each new card adds its patterns at the end of section A or B. The next review so
 - Did not work: `Client::SendTakeGoodsOk` in the positive form (`if (Compose != 0) { ... } else { failSend }`). Score 98.9 -> 93.8, calls 97 -> 81:
   the whole fail block moves to the end. The original has `Allocate` before the first `Compose`, and the fail block (`Log::Write`,
   `removeReferenceCount`, `Packet::Clear`) directly after it. The negative form stays. Reverted.
+
+## pod-2, stage 1 (2026-11-18): Pattern 47 applied (POD 570 -> 574, 0 lost, `tools/parity.sh PostOfficeDaemon` ok)
+- Pattern 47 (A9) works now that C1 is fixed. POD map typedefs use `StlAllocator<std::pair<K, V>, 2>` (key not const):
+  `PostContext.h`, `RelayContext.h`, `RelayTimeContext.h` (K = CompoundKey), `WorldChannel.h`, `WorldConfig.h`.
+  Insert calls use `std::pair<K, V>(k, v)` (`PostContext.cpp:318`, `RelayContext.cpp:274`, `RelayTimeContext.cpp:74`,
+  `WorldChannel.cpp:180`, `WorldConfigManager.cpp:364` was `std::make_pair`). The PDB names confirm the non-const key for all 5 maps.
+  Effect: `AddContext`, `RemoveContext` of the context managers rise (for example `RelayContextManager::AddContext` 89.7 -> 94.9).
+- Pattern 49 (`UpdatePostStatus`) is already done by helpers-2 stage 3 (`static __forceinline` helper). `UpdateStatusToDelivery*` are MATCH. Nothing to do.
+- Worktree setup: `vendor/zstd/src` is not in a new worktree. Copy it from `private-project/bns-lift/vendor/zstd/src`, then
+  `git fetch --shallow-since=2018-05-01 origin dev; git checkout bb6eaf64` inside it. Set `LIFT_IDA_DIR=.../private-project/ida/lift`.
+- Baseline at the start of pod-2 (after helpers-2): CG 420, LG 530, SCD 504, POD 570/759.
+- (Fixed in stage 2, see "Block order" below) Get/Add/Remove block order (A6): `RelayContextManager::GetContext` 0x1c910 (85.8, calls 60). Orig call order (address order):
+  `Log Alert | Enter Leave | Log Alert | addRef Leave | Log Alert` (3 crash pairs, the found path does `addRef` then jumps back to the shared `Leave`;
+  second `L"RelayContext.cpp"` ref). Ours: `Log Alert | Enter Leave addRef Leave Leave Log | Log Alert`. Same shape in
+  `PostContextManager::GetContext` and `WorldChannelManager::GetWorldChannel`. `AddContext`: orig puts `addRef` after the `_Linsert` and
+  `Leave` of the error path after it (`_Linsert, Leave, Log, addRef, Leave, Log`); ours puts `addRef, Leave` first. Not fixed yet.
+- Tool: `.scratch/fdfull.py` (copy of funcdiff with full diff context, `n=200`) works. `.scratch/dis2.py` fails at
+  `from capstone.x86 import X86` (use the import form that `tools/funcdiff.py` uses). Both files are not in git.
+  Fix: `from capstone import x86_const as X86`. Run with
+  `uv run -q --no-project --with capstone --with pefile python .scratch/dis2.py <Exe> '<name regex>'` (needs `LIFT_IDA_DIR`).
+  `tools/funcdiff.py <Exe> --build build-vs2010 --show '<regex>'` also needs `uv run ... --with capstone --with pefile`.
+
+### Block order (A6) of the context managers: fixed, POD 574 -> 584 (0 lost, `tools/parity.sh PostOfficeDaemon` ok)
+Rule: VS2010 puts the `if` body inline and the code after it behind a jump. So write the source in the order of the original blocks.
+Find the order with `dis2.py` (look at the first `jne`/`je` after the `find` code and at the `ret` positions).
+- `Get*` (`RelayContextManager::GetContext`, `PostContextManager::GetContext`, `WorldChannelManager::GetWorldChannel`): the original has one
+  shared `Leave` for the found and not-found paths. Source form: `T* p = nullptr; Enter; it = find(k); if (it != end) { p = it->second;
+  if (p == nullptr) { Leave; crash; return nullptr; } p->addReferenceCount(...); } Leave; return p;`. +1 MATCH each (3 functions).
+- `Add*` (Relay, Post, WorldChannel, RelayTime `AddContext`/`AddWorldChannel`): error path first. Form: `if (!insert(...).second)
+  { Leave; Log::Write(...); [free]; return false; } addReferenceCount; Increment; Leave; return true;`. +1 MATCH each (4 functions).
+- `Remove*` (Relay, Post, RelayTime `RemoveContext`, `WorldChannel::RemoveWorldChannel`): null path first. Form: `if (p == nullptr)
+  { Leave; crash; return false; } erase(it); removeReferenceCount; Decrement; Leave; return true;`. +1 MATCH each (3 functions).
+- Not fixed: `WorldChannelManager::RemoveWorldChannel` 0x? (97.4): the original calls its own `_Tree<unsigned short,WorldChannel*>::erase`;
+  our link folds it (ICF) into `_Tree<__int64,PostContext*>::erase`. Cause is the linker, not the source. Do not try to fix it in source.
+- `initContextManager` x4 (refs 86 to 88): ours has 4 extra `Lock.h` assert crash blocks (`Log Alert MakeCrash`, line 113 and 122).
+  The original has the `this == nullptr` assert before the first `Enter` (line 113) and one at each `Leave` (line 122): 2 at the end
+  (`LABEL_29` and the "already exists" path) and not at every exit. Ours inlines the assert at every `Leave`. Not fixed.
+- `DeliverPostRelayContext::initResponse`, `RetrieveCharacterInfoRelayContext::initResponse`: consts 0. Ours has an extra
+  `0xfffffffffffffff8` (`-8`) that the original lacks. Not fixed.
+
+## pod-2, stage 2
+- `UnsentPostContextManager::initContextManager` 0xc6d0 and `updateWorldList` 0xcae0: the original has 1 assert at Lock.h line 113 (Enter)
+  and 1 at line 122 on each exit, and no call to `AutoCS::~AutoCS`. A local `AutoCS` object gives one extra dtor call (assert + Leave)
+  per exit. Form that works: no `AutoCS`; `CriticalSection* lock = &_reloadLock;` with local macros `UNSENT_LOCK_ENTER` and
+  `UNSENT_LOCK_LEAVE_RETURN` (assert, `LeaveCriticalSection`, return). Scores: initContextManager 92.7 -> 92.9, updateWorldList 90.5. No new MATCH.
+  Still open: block order (the original puts the out-of-range exit after the loop) and the const `-2` (unwind state) that the original has.
+- `RetrieveCharacterInfoRelayRequest()` (WorldPacketHandler.h): the loop `for (i < 33) _targetCharacterName[i] = 0` gives no `memset` call.
+  `memset(_targetCharacterName, 0, sizeof(...))` gives the `memset` call of the original. `HandlePostOfficeServiceRetrieveCharacterInfoReq`
+  is MATCH now (POD 584 -> 585). Rule: an inline ctor that the original compiles to `memset` must call `memset`, not a loop.
+- Tool noise, not fixable in source (do not try): string-literal ref duplicates (`L"world packet handler"` and similar x2 or x3),
+  `PostOfficeDaemon::_instance` ref count, `tls:__delv_buf__` refs. Example: `CacheGateSessionHandler::OnConnect`, `AgentSessionHandler::OnClose`.
+- `PingRelayContext::processRelayResponse` 0xabd0 (97.6): source has the same crash blocks as the original (64, 86, 92). One
+  `AlertSender::Write` is missing in our call order. Cause not found (clang block layout). Not fixed.
+
+## pod-2, stage 3
+- `PostInfo::PostInfo` 0x11140: the original copies `ID128_GUID_ZERO` into `_reservedHint` and `_senderAccountId` (4 qword loads from data).
+  Source `_reservedHint = ID128_GUID_ZERO; _senderAccountId = ID128_GUID_ZERO;` gives the refs: score 66.7 -> 88.9. Not MATCH:
+  the original loads the constant twice, in the middle of the other stores. Ours loads it once and hoists it (refs 67). Not fixed.
+- `PostInfo::CheckValidityPostData` 0x11290: the original compares `_senderAccountId` with `ID128_GUID_ZERO` (4 uses, one per case).
+  Source with `.id[0] != ID128_GUID_ZERO.id[0] || .id[1] != ...` (macro `POST_HAS_ACCOUNT_ID`) fixes the refs: 57.6 -> 90.9.
+  Open: consts. The original has 0x2 and 0x7, ours has 0x5 (switch lowering of cases 1, 2, 7). No new MATCH from both edits (POD stays 585).
+- `PostOfficeDB::LoadSinglePost` 0x15fa0 (same cause in `LoadPostList` 0x14e50, `LoadRetryReadySinglePost` 0x18010,
+  `LoadRetryReadyPostList` 0x190f0). Facts from the pseudocode (not yet applied, patch in `.scratch/postofficedb-bindcol-macros.patch`):
+  1. The original has no helper function for the column binds. It inlines `DbTransaction::BindCol` (6-arg, 0x2d010) for the 17 post columns
+     (each with `StmtHandle` check, `*len = -3`, `SQLBindCol`, `BoundCol = true`). The item loop (7 columns x 10) calls `BindCol` out of line.
+     Our lift helper `BindPostColumns` gives 18 out-of-line `BindCol` calls. Try: macros that expand the `&&` chain in each loader.
+  2. The original declares `paramLen`, `postLen`, `itemLen`, `PostInfo`, `attachedItemInfo` after the `Prepare` check, so `memset`/`PostInfo::PostInfo`
+     come after the first `Log::Write`. Ours declares them first. Move the declarations.
+  3. The original initialises the 10 `AttachedItemInfo` with an inline loop (fields = 0, then `memset(_itemXmlData, 0, 0x802)` each).
+     Ours has one `memset` of the whole array. Needs an inline ctor `AttachedItemInfo()`. Check `AgentPacketHandler.cpp:126` and
+     `WorldPacketHandler.cpp:443` (they declare `AttachedItemInfo`) for MATCH loss.
+- Tool note: `.scratch/dis2.py` works after `from capstone import x86_const as X86`.
+
+## pod-2, stage 4 (2026-11-18): POD 585 -> 588 (0 lost; `tools/parity.sh PostOfficeDaemon` ok)
+- `WorldChannel::SendRelayResponse` 0x1e570 (97.6 -> MATCH): remove the explicit `packet.Clear()` before each `return`. The `Packet` dtor
+  clears. The original has 2 `Packet::Clear` calls, ours had 4. Same rule as A12 (no explicit `p.Clear()`).
+- `initResponse` of Deliver 0xfb50 and Retrieve 0x1f770 (66.7 -> MATCH, +2). The response classes have a vptr at 0 and `RelayResponse` at +8.
+  Deliver: `static_cast<RelayResponse&>(_response) = *response;` (same body as `CheckPostCapacityRelayContext::initResponse`, which was MATCH).
+  Do not read fields through `static_cast<DeliverPostRelayResponse*>(response)` (this gave an extra const `-8`).
+  Retrieve: keep a local `RetrieveCharacterInfoRelayResponse* r = static_cast<...>(response);`, copy the base with `= *r`, then `_resultPcId = r->_resultPcId`.
+  The one downcast gives the `-8` const that the original has.
+- Did not work: `HandlePostOfficeRegisterPostReq` 0x1aaa0 (98.0): the `attachedItemCount > 10` error block (Log line 208) moved to after the
+  success `return true` with a `goto` label. The compiler keeps the block early. Score unchanged. Reverted.
+- Did not work (score unchanged, 77.8 and 75.2): `CheckPostCapacityRelayContext::ComposeResponsePacket` 0x9570 and
+  `RetrieveCharacterInfoRelayContext::ComposeResponsePacket` 0x1e230 as `if (==SUCCESS) {...} else {...} return true;` with `<= RESULTSTATE_SUCCESS`
+  for the range test. The original puts the failure `Compose` + 2 `Log::Write` at the END of the function (after the crash block), and has consts
+  4/8 (Check) and 4/5 (Retrieve) where ours has 2 and the cmd 0x78/0x79. The if/else form stays in source (compiles, no loss). A next try:
+  failure branch as the fall-through, success `Compose` after the crash block.
+- Not done: `PostOfficeDB` loaders (`LoadPostList` 0x14e50, `LoadSinglePost` 0x15fa0, `LoadRetryReadySinglePost` 0x18010,
+  `LoadRetryReadyPostList` 0x190f0; scores 60 to 72). The original inlines 17+70 `BindCol` calls per loader. A MATCH is not likely; low value.
+- `CachedWatchdogManager::updateWorldList` (95.5) and `UnsentPostContextManager::updateWorldList` (90.5): the original has the assert-crash
+  block (`Log::Write`, `AlertSender::Write`, `CrashHandler::MakeCrash`) after the loop; ours has it before. Not tried.
+- Worked (score 77.8 to 90.5, calls now equal, no MATCH change): `CheckPostCapacityRelayContext::ComposeResponsePacket` 0x9570 and
+  `RetrieveCharacterInfoRelayContext::ComposeResponsePacket` 0x1e230. Write the failure branch first: `if (resultState != SUCCESS) {crash block;
+  convertFailReason; failure Compose + 2 Log} else {success Compose + 2 Log} return true;`. The call order then equals the original.
+  The consts stay different (line numbers and cmd ids in the unwind and `Log::Write` setup). No more source change is known.

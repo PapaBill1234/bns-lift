@@ -71,19 +71,19 @@ bool RelayTimeContextManager::AddContext(unsigned long long relayTid, long long 
 
     int const index = static_cast<int>(relayTid % _bucketCount);
     _lockList[index].Enter();
-    if (_containerList[index].insert(Container::value_type(CompoundKey(relayTid, relayLimitTime), relayTimeContext)).second)
+    if (!_containerList[index].insert(std::pair<CompoundKey, RelayTimeContext*>(CompoundKey(relayTid, relayLimitTime), relayTimeContext)).second)
     {
-        InterlockedIncrement(&_contextCount);
         _lockList[index].Leave();
-        return true;
+        Log::Write(Log::LT_ERROR, RELAY_TIME_CONTEXT_FILE, 105, L"[%s], %s; failed to add relaytime context, relayTid:0x%I64X, relayLimitTime:%I64d",
+                   MODULE_NAME, L"RelayTimeContextManager::AddContext", relayTid, relayLimitTime);
+        if (relayTimeContext != nullptr)
+            relayTimeContext->~RelayTimeContext();
+        Memory::_Manager[2]->Free(relayTimeContext, RELAY_TIME_CONTEXT_FILE, 106);
+        return false;
     }
+    InterlockedIncrement(&_contextCount);
     _lockList[index].Leave();
-    Log::Write(Log::LT_ERROR, RELAY_TIME_CONTEXT_FILE, 105, L"[%s], %s; failed to add relaytime context, relayTid:0x%I64X, relayLimitTime:%I64d",
-               MODULE_NAME, L"RelayTimeContextManager::AddContext", relayTid, relayLimitTime);
-    if (relayTimeContext != nullptr)
-        relayTimeContext->~RelayTimeContext();
-    Memory::_Manager[2]->Free(relayTimeContext, RELAY_TIME_CONTEXT_FILE, 106);
-    return false;
+    return true;
 }
 
 // 0xb550
@@ -113,18 +113,18 @@ bool RelayTimeContextManager::RemoveContext(unsigned long long relayTid, long lo
         return false;
     }
     RelayTimeContext* const relayTimeContext = it->second;
-    if (relayTimeContext != nullptr)
+    if (relayTimeContext == nullptr)
     {
-        _containerList[index].erase(it);
-        relayTimeContext->~RelayTimeContext();
-        Memory::_Manager[2]->Free(relayTimeContext, RELAY_TIME_CONTEXT_FILE, 147);
-        InterlockedDecrement(&_contextCount);
         _lockList[index].Leave();
-        return true;
+        RELAY_TIME_CONTEXT_CRASH(142,
+                                 L"== CRASH == [%s], %s; relaytime context is null, relayTid:0x%I64X, relayLimitTime:%I64d, relaytimeContext:0x%p",
+                                 MODULE_NAME, L"RelayTimeContextManager::RemoveContext", relayTid, relayLimitTime, nullptr);
+        return false;
     }
+    _containerList[index].erase(it);
+    relayTimeContext->~RelayTimeContext();
+    Memory::_Manager[2]->Free(relayTimeContext, RELAY_TIME_CONTEXT_FILE, 147);
+    InterlockedDecrement(&_contextCount);
     _lockList[index].Leave();
-    RELAY_TIME_CONTEXT_CRASH(142,
-                             L"== CRASH == [%s], %s; relaytime context is null, relayTid:0x%I64X, relayLimitTime:%I64d, relaytimeContext:0x%p",
-                             MODULE_NAME, L"RelayTimeContextManager::RemoveContext", relayTid, relayLimitTime, nullptr);
-    return false;
+    return true;
 }

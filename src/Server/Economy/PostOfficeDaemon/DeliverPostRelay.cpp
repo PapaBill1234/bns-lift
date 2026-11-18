@@ -22,10 +22,8 @@ static wchar_t const* const MODULE_NAME = L"relay context";  // PDB MODULE_NAME
 // 0xfb50
 void DeliverPostRelayContext::initResponse(RelayResponse* const response)
 {
-    DeliverPostRelayResponse* const deliverPostResponse = static_cast<DeliverPostRelayResponse*>(response);
-    // BUG: 0xfb50 a null response is read through a null pointer; the code does not check it.
-    _response._resultState = deliverPostResponse->_resultState;
-    _response._failReason = deliverPostResponse->_failReason;
+    // LIFT: 0xfb50 same body as CheckPostCapacityRelayContext::initResponse (copy of the RelayResponse base).
+    static_cast<RelayResponse&>(_response) = *response;
 }
 
 // 0xfb80

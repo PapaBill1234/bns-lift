@@ -139,7 +139,34 @@ bool RetrieveCharacterInfoRelayContext::ComposeResponsePacket(Packet& packet) co
 {
     int const resultState = _response._resultState;
     unsigned long long const relayTid = _economyHeader._relayTid;
-    if (resultState == RelayResponse::RESULTSTATE_SUCCESS)
+    if (resultState != RelayResponse::RESULTSTATE_SUCCESS)
+    {
+        if (resultState <= RelayResponse::RESULTSTATE_SUCCESS || resultState > RelayResponse::RESULTSTATE_RELAY_TIMEOUT)
+        {
+            RETRIEVE_CHARACTER_INFO_RELAY_CRASH(128,
+                                                L"== CRASH == [%s], %s; invalid response result state, relayTid:0x%I64X, resultState:%d",
+                                                MODULE_NAME,
+                                                L"RetrieveCharacterInfoRelayContext::ComposeResponsePacket", relayTid,
+                                                resultState);
+            return false;
+        }
+
+        int const failReason = convertFailReason(static_cast<RelayResponse::ResultState>(resultState), _response._failReason);
+        bool const composed = packet.Compose("hqE", 6, _request._gameTid, failReason) != 0;
+        if (!composed)
+        {
+            Log::Write(Log::LT_ERROR, RETRIEVE_CHARACTER_INFO_RELAY_FILE, 121,
+                       L"[%s], %s; failed to compose retrieve character info failure response packet, gameTid:0x%I64X, failReason:%d",
+                       MODULE_NAME, L"RetrieveCharacterInfoRelayContext::ComposeResponsePacket",
+                       _request._gameTid, failReason);
+            return false;
+        }
+        Log::Write(Log::LT_DEBUG, RETRIEVE_CHARACTER_INFO_RELAY_FILE, 124,
+                   L"[%s], %s; composed retrieve character info failure response packet, gameTid:0x%I64X, failReason:%d",
+                   MODULE_NAME, L"RetrieveCharacterInfoRelayContext::ComposeResponsePacket",
+                   _request._gameTid, failReason);
+    }
+    else
     {
         bool const composed = packet.Compose("hqq", 5, _request._gameTid, _response._resultPcId) != 0;
         long long const resultPcId = _response._resultPcId;
@@ -156,33 +183,7 @@ bool RetrieveCharacterInfoRelayContext::ComposeResponsePacket(Packet& packet) co
                    L"[%s], %s; composed retrieve character info success response packet, gameTid:0x%I64X, resultPcId:0x%I64X",
                    MODULE_NAME, L"RetrieveCharacterInfoRelayContext::ComposeResponsePacket", gameTid,
                    resultPcId);
-        return true;
     }
-
-    if (resultState < RelayResponse::RESULTSTATE_FAILURE || resultState > RelayResponse::RESULTSTATE_RELAY_TIMEOUT)
-    {
-        RETRIEVE_CHARACTER_INFO_RELAY_CRASH(128,
-                                            L"== CRASH == [%s], %s; invalid response result state, relayTid:0x%I64X, resultState:%d",
-                                            MODULE_NAME,
-                                            L"RetrieveCharacterInfoRelayContext::ComposeResponsePacket", relayTid,
-                                            resultState);
-        return false;
-    }
-
-    int const failReason = convertFailReason(static_cast<RelayResponse::ResultState>(resultState), _response._failReason);
-    bool const composed = packet.Compose("hqE", 6, _request._gameTid, failReason) != 0;
-    if (!composed)
-    {
-        Log::Write(Log::LT_ERROR, RETRIEVE_CHARACTER_INFO_RELAY_FILE, 121,
-                   L"[%s], %s; failed to compose retrieve character info failure response packet, gameTid:0x%I64X, failReason:%d",
-                   MODULE_NAME, L"RetrieveCharacterInfoRelayContext::ComposeResponsePacket",
-                   _request._gameTid, failReason);
-        return false;
-    }
-    Log::Write(Log::LT_DEBUG, RETRIEVE_CHARACTER_INFO_RELAY_FILE, 124,
-               L"[%s], %s; composed retrieve character info failure response packet, gameTid:0x%I64X, failReason:%d",
-               MODULE_NAME, L"RetrieveCharacterInfoRelayContext::ComposeResponsePacket",
-               _request._gameTid, failReason);
     return true;
 }
 

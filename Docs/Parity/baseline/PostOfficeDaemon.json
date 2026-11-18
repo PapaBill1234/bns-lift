@@ -588,10 +588,10 @@
 "status": "MATCH"
 },
 "CheckPostCapacityRelayContext::ComposeResponsePacket": {
-"calls": 67,
-"consts": 67,
+"calls": 100,
+"consts": 71,
 "refs": 100,
-"score": 77.8,
+"score": 90.5,
 "status": "DIFF"
 },
 "CheckPostCapacityRelayContext::GetRequestWid": {
@@ -1107,10 +1107,10 @@
 },
 "DeliverPostRelayContext::initResponse": {
 "calls": 100,
-"consts": 0,
+"consts": 100,
 "refs": 100,
-"score": 66.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "DeliverPostRelayContext::processRelayRequest": {
 "calls": 100,
@@ -1526,11 +1526,11 @@
 "status": "DIFF"
 },
 "HandlePostOfficeServiceRetrieveCharacterInfoReq": {
-"calls": 98,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 99.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "HeapMemoryManager::Alloc": {
 "calls": 100,
@@ -2604,32 +2604,32 @@
 "status": "DIFF"
 },
 "PostContextManager::AddContext": {
-"calls": 69,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 89.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "PostContextManager::GetContext": {
-"calls": 60,
-"consts": 100,
-"refs": 97,
-"score": 85.8,
-"status": "DIFF"
-},
-"PostContextManager::RemoveContext": {
-"calls": 75,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 91.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
+},
+"PostContextManager::RemoveContext": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "PostContextManager::initContextManager": {
 "calls": 100,
 "consts": 100,
-"refs": 86,
-"score": 95.2,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "PostDeliveryEvent::EventId": {
 "calls": 100,
@@ -2676,15 +2676,15 @@
 "PostInfo::CheckValidityPostData": {
 "calls": 100,
 "consts": 73,
-"refs": 0,
-"score": 57.6,
+"refs": 100,
+"score": 90.9,
 "status": "DIFF"
 },
 "PostInfo::PostInfo": {
 "calls": 100,
 "consts": 100,
-"refs": 0,
-"score": 66.7,
+"refs": 67,
+"score": 88.9,
 "status": "DIFF"
 },
 "PostOfficeDB::LoadPostList": {
@@ -3024,53 +3024,53 @@
 "status": "MATCH"
 },
 "RelayContextManager::AddContext": {
-"calls": 69,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 89.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "RelayContextManager::GetContext": {
-"calls": 60,
-"consts": 100,
-"refs": 97,
-"score": 85.8,
-"status": "DIFF"
-},
-"RelayContextManager::RemoveContext": {
-"calls": 75,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 91.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
+},
+"RelayContextManager::RemoveContext": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "RelayContextManager::initContextManager": {
 "calls": 100,
 "consts": 100,
-"refs": 86,
-"score": 95.2,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "RelayTimeContextManager::AddContext": {
-"calls": 79,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 92.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "RelayTimeContextManager::RemoveContext": {
-"calls": 69,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 89.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "RelayTimeContextManager::initContextManager": {
 "calls": 100,
 "consts": 100,
-"refs": 86,
-"score": 95.2,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "RelayTimeoutChecker::HandleEvent": {
 "calls": 100,
@@ -3206,10 +3206,10 @@
 "status": "MATCH"
 },
 "RetrieveCharacterInfoRelayContext::ComposeResponsePacket": {
-"calls": 59,
-"consts": 67,
+"calls": 100,
+"consts": 71,
 "refs": 100,
-"score": 75.2,
+"score": 90.5,
 "status": "DIFF"
 },
 "RetrieveCharacterInfoRelayContext::MakeRelayHeader": {
@@ -3235,10 +3235,10 @@
 },
 "RetrieveCharacterInfoRelayContext::initResponse": {
 "calls": 100,
-"consts": 0,
+"consts": 100,
 "refs": 100,
-"score": 66.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "RetrieveCharacterInfoRelayContext::processRelayRequest": {
 "calls": 100,
@@ -4018,17 +4018,17 @@
 "status": "MATCH"
 },
 "UnsentPostContextManager::initContextManager": {
-"calls": 90,
-"consts": 100,
-"refs": 88,
-"score": 92.7,
+"calls": 85,
+"consts": 94,
+"refs": 100,
+"score": 92.9,
 "status": "DIFF"
 },
 "UnsentPostContextManager::updateWorldList": {
-"calls": 88,
-"consts": 100,
-"refs": 87,
-"score": 91.7,
+"calls": 77,
+"consts": 94,
+"refs": 100,
+"score": 90.5,
 "status": "DIFF"
 },
 "WinMsgHandler::Name": {
@@ -4235,31 +4235,31 @@
 "status": "MATCH"
 },
 "WorldChannel::SendRelayResponse": {
-"calls": 93,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 97.6,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "WorldChannelManager::AddWorldChannel": {
-"calls": 67,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 88.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "WorldChannelManager::GetWorldChannel": {
-"calls": 76,
-"consts": 86,
-"refs": 100,
-"score": 87.3,
-"status": "DIFF"
-},
-"WorldChannelManager::RemoveWorldChannel": {
-"calls": 77,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 92.3,
+"score": 100.0,
+"status": "MATCH"
+},
+"WorldChannelManager::RemoveWorldChannel": {
+"calls": 92,
+"consts": 100,
+"refs": 100,
+"score": 97.4,
 "status": "DIFF"
 },
 "WorldChannelManager::initChannelManager": {
@@ -4270,11 +4270,11 @@
 "status": "DIFF"
 },
 "WorldConfigList::~WorldConfigList": {
-"calls": 50,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 83.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "WorldConfigManager::CheckWorldConfig": {
 "calls": 100,
@@ -4326,10 +4326,10 @@
 "status": "MATCH"
 },
 "WorldConfigManager::setupWorldConfigList": {
-"calls": 94,
+"calls": 100,
 "consts": 100,
 "refs": 96,
-"score": 96.7,
+"score": 98.6,
 "status": "DIFF"
 },
 "WorldConfigManager::updateWorldConfig": {
