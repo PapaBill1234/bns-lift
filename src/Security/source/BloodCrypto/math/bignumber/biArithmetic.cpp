@@ -126,7 +126,8 @@ void BigInteger::Sqr(BigInteger const* a)
 }
 
 // 0x4c3e0
-void BigInteger::RightShift(BigInteger const* a, int n)
+// LIFT: LeftShift jumps to this function in LobbyGate (0x59bca).
+__declspec(noinline) void BigInteger::RightShift(BigInteger const* a, int n)
 {
     if (n == 0)
         return;

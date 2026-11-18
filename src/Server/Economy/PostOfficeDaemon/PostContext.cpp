@@ -16,6 +16,7 @@
 
 #define POST_CONTEXT_FILE L"PostContext.cpp"
 static wchar_t const* const MODULE_NAME = L"post context";  // PDB MODULE_NAME
+__declspec(thread) void* __delv_buf__;  // PDB thread variable written by the destructor at 0x11590.
 
 #define POST_CONTEXT_CRASH(line, fmt, ...)                                       \
     do                                                                           \
@@ -156,7 +157,8 @@ PostContext::~PostContext()
 {
     if (_attachedItemList != nullptr)
     {
-        Memory::_Manager[2]->Free(_attachedItemList, POST_CONTEXT_FILE, 233);
+        __delv_buf__ = _attachedItemList;
+        Memory::_Manager[2]->Free(__delv_buf__, POST_CONTEXT_FILE, 233);
         _attachedItemList = nullptr;
     }
 }

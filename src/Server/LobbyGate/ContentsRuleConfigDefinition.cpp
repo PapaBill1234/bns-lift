@@ -282,12 +282,24 @@ __declspec(noinline) void ContentsRuleConfig::Dump()
 }
 
 // Adds one UTF-8 string element to the packet. This is the inlined code that repeats in MakeListPacket.
-static void addElement(FragmentPacket* fp, char* elementStr, wchar_t const* elementWStr, int length)  // LIFT: inlined in MakeListPacket 0x8965, 0x8af5, 0x8bdd. No PDB name.
+// LIFT: The original calls FreeSize in the option loop at 0x8b1a.
+static __forceinline void addElement(FragmentPacket* fp, char* elementStr, wchar_t const* elementWStr, int length,
+                                     bool option)
 {
     unsigned long long size = static_cast<unsigned long long>(
         WideCharToMultiByte(CP_UTF8, 0, elementWStr, length, elementStr, 260, nullptr, nullptr));
     elementStr[size] = 0;
-    if (static_cast<unsigned long long>(static_cast<unsigned int>(fp->FreeSize())) < size + 2)
+    unsigned short freeSize;
+    if (option)
+    {
+        freeSize = fp->FreeSize();
+    }
+    else
+    {
+        Packet::Header const* header = fp->packet.CurHeader;
+        freeSize = header != nullptr ? static_cast<unsigned short>(4000 - header->size) : 0;
+    }
+    if (freeSize < size + 2)
         fp->packet.Allocate(&fp->composer);
     fp->Compose(1, elementStr, static_cast<unsigned int>(size));
     RepeatPacketComposer& composer = fp->composer;
@@ -324,7 +336,7 @@ FragmentPacket* ContentsRuleConfig::MakeListPacket(ContentsRuleConfig* config)
                             L"<?xml version=\"1.0\" encoding=\"utf-8\"?><config major-version=\"%d\" minor-version=\"%d\" "
                             L"module=\"contents-rule-config\" release-module=\"LocalizationData\" release-side=\"client\">",
                             65, 0);
-    addElement(fp, elementStr, elementWStr, length);
+    addElement(fp, elementStr, elementWStr, length, false);
 
     char const* base = reinterpret_cast<char const*>(current);
     for (int i = 0; i < ROW_COUNT; ++i)
@@ -360,11 +372,11 @@ FragmentPacket* ContentsRuleConfig::MakeListPacket(ContentsRuleConfig* config)
         default:
             continue;
         }
-        addElement(fp, elementStr, elementWStr, length);
+        addElement(fp, elementStr, elementWStr, length, true);
     }
 
     length = swprintf_s(elementWStr, 260, L"</config>");
-    addElement(fp, elementStr, elementWStr, length);
+    addElement(fp, elementStr, elementWStr, length, false);
 
     fp->composer.PopRepeatCount();
     if (fp->packet.Splitter != nullptr)

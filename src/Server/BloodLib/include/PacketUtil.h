@@ -147,7 +147,7 @@ public:
 
     bool Add(char const* buffer, short size);
     bool Decompose(int n, ...);
-    int Decompose(VarData* data);
+    unsigned short Decompose(VarData* data);
 
     char const* buffer;
     int size;

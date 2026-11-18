@@ -556,3 +556,41 @@ Open facts:
   the last decryption key. The `CacheD::Verify` test put the mismatch
   branch first. The `loadUnhandledGameEventLog` test put the
   successful load branch first.
+
+## Manual parity for arithmetic, startup, and cleanup
+
+- The full build added six matches in LobbyGate, four in SmartCouponDaemon,
+  and four in PostOfficeDaemon. All previous matches held.
+- LobbyGate `BigInteger::LeftShift` jumps to `RightShift` at 0x59bca.
+  Keep `RightShift` out of line so VS2010 emits that jump.
+- In `BigInteger::montgomeryNormalize`, call `Pow2` first in source
+  order. Use one `Set(1LL)` on the other branch. `Set` clears the digits.
+- LobbyGate `Daemon::LoadVersion` passes its length argument to
+  `swprintf_s` at 0x1f21c. Use that argument so the daemon and alert
+  sender can pass their own buffer lengths.
+- Pass `L"LOBBYGATE"` to the alert sender in `LobbyGate::initNetwork`.
+  The original folds the service name into `AlertSender::init`.
+- In `NPChannel::Setup`, construct the handler before the assignment
+  to `_sessionHandler`. Assign the allocation pointer once.
+- In `EventNotiJob::eventNotiExpire`, use the same log arguments as
+  `EventNotiJob::init`. The original uses ID 0 and type and state -1
+  for a null log argument.
+- In `PostContext::~PostContext`, write the allocation pointer to
+  the PDB thread variable `__delv_buf__` before calling `Free`.
+- In `UnsentPostContextManager::deliverUnsentPost`, put the failure
+  path for `OccurEvent` before the success path. Keep each release
+  with its original line number.
+- LobbyGate `ContentsRuleConfig::MakeListPacket` calls
+  `FragmentPacket::FreeSize` in the option loop at 0x8b1a.
+  The opening and closing elements use the inlined check.
+- The LobbyGate PDB gives `PacketConcatenateBuffer::Decompose(VarData*)`
+  at 0x1bce0 an `unsigned short` return type. The previous `int` type
+  gave a different symbol for this overload. The result now pairs at
+  95.2. A separate pointer increment did not change the score.
+- In PostOfficeDaemon `WorldConfigManager::loadWorldConfigFile`, read
+  the XML reader version once. The original uses `_wcsicmp` and logs
+  the same value on a mismatch. The call order still differs. The
+  test that put all successful branches first gave a lower score.
+- A pointer loop in `BigInteger::mul(unsigned int)` did not add a match.
+  Explicit initial allocation in `Client::SendTakeGoodsOk` and
+  `Client::SendListLobbyServiceItemInfoOk` inlined the allocator.

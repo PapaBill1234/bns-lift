@@ -175,6 +175,10 @@ void FragmentPacket::IncRepeatCount()
 }
 
 // 0x38a0 (Client.obj copy)
+#if defined(LIFT_EXE_LG)
+// LIFT: ContentsRuleConfig::MakeListPacket calls this function at 0x8b1a.
+__declspec(noinline)
+#endif
 unsigned short FragmentPacket::FreeSize() const
 {
     if (packet.CurHeader != nullptr)

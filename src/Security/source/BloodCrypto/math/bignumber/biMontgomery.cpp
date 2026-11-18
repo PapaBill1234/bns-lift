@@ -46,15 +46,14 @@ void BigInteger::montgomeryNormalize(BigInteger const* b)
     int topBits = b->bits % 32;
     if (topBits == 0)
         topBits = 32;
-    if (((b->bits + 31) & ~31) <= 32)
+    if (((b->bits + 31) & ~31) > 32)
     {
-        setZero();
-        Set(1LL);
-        topBits = 1;
+        Pow2(b->bits - 1);
     }
     else
     {
-        Pow2(b->bits - 1);
+        Set(1LL);
+        topBits = 1;
     }
     for (int x = topBits - 1; x < 32; ++x)
     {
