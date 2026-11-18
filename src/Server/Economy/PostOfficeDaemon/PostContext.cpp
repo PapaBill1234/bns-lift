@@ -56,7 +56,7 @@ AttachedItemInfo::CheckResult const AttachedItemInfo::CheckValidityItemData() co
 // ---- AttachedItemContext ----
 
 // 0x110e0
-AttachedItemContext& AttachedItemContext::operator=(AttachedItemInfo const& rhs)
+__declspec(noinline) AttachedItemContext& AttachedItemContext::operator=(AttachedItemInfo const& rhs)
 {
     _itemNo = rhs._itemNo;
     _itemType = rhs._itemType;
@@ -248,8 +248,8 @@ bool PostContextManager::initContextManager()
                            MODULE_NAME, L"PostContextManager::initContextManager", _lockList, _containerList);
         return false;
     }
-    _lockList = liftArrayNew<CriticalSection>(_bucketCount, POST_CONTEXT_FILE, 346);
-    _containerList = liftArrayNew<Container>(_bucketCount, POST_CONTEXT_FILE, 347);
+    _lockList = liftArrayNew(CriticalSection, _bucketCount, POST_CONTEXT_FILE, 346);
+    _containerList = liftArrayNew(Container, _bucketCount, POST_CONTEXT_FILE, 347);
     return true;
 }
 

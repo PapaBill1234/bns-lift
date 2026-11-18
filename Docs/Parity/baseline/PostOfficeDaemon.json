@@ -135,9 +135,9 @@
 "AlertSender::AlertSender": {
 "calls": 100,
 "consts": 100,
-"refs": 96,
-"score": 98.6,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "AlertSender::Name": {
 "calls": 100,
@@ -182,6 +182,13 @@
 "status": "MATCH"
 },
 "AlertSender::writev2": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"AttachedItemContext::operator=": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -364,10 +371,10 @@
 "status": "MATCH"
 },
 "CacheGateChannel::SendFragmentRelayRequest": {
-"calls": 20,
-"consts": 50,
-"refs": 57,
-"score": 42.4,
+"calls": 46,
+"consts": 91,
+"refs": 89,
+"score": 75.2,
 "status": "DIFF"
 },
 "CacheGateChannel::SendRelayRequest": {
@@ -376,6 +383,20 @@
 "refs": 100,
 "score": 87.5,
 "status": "DIFF"
+},
+"CacheGateChannel::combineFragmentRelayFormat": {
+"calls": 57,
+"consts": 50,
+"refs": 55,
+"score": 53.9,
+"status": "DIFF"
+},
+"CacheGateChannel::composeRelayHeader [?composeRelayHeader@CacheGateChannel@@AEAA_NAEAVFragmentPacket@@AEBVRelayHeader@@@Z]": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "CacheGateChannel::composeRelayHeader [?composeRelayHeader@CacheGateChannel@@AEAA_NAEAVPacket@@AEBVRelayHeader@@@Z]": {
 "calls": 100,
@@ -426,6 +447,13 @@
 "score": 85.7,
 "status": "DIFF"
 },
+"CachedWatchdog::CachedWatchdog": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "CachedWatchdog::addTimer": {
 "calls": 100,
 "consts": 100,
@@ -462,11 +490,11 @@
 "status": "MATCH"
 },
 "CachedWatchdogManager::addCachedWatchdog": {
-"calls": 88,
-"consts": 90,
-"refs": 88,
-"score": 88.6,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "CachedWatchdogManager::getCachedWatchdog": {
 "calls": 100,
@@ -534,8 +562,8 @@
 "Channel::~Channel": {
 "calls": 100,
 "consts": 100,
-"refs": 75,
-"score": 91.7,
+"refs": 50,
+"score": 83.3,
 "status": "DIFF"
 },
 "CheckPostCapacityRelayContext::ComposeRequestPacket [?ComposeRequestPacket@CheckPostCapacityRelayContext@@UEBA_NAEAVFragmentPacket@@@Z]": {
@@ -553,10 +581,10 @@
 "status": "MATCH"
 },
 "CheckPostCapacityRelayContext::ComposeResponsePacket": {
-"calls": 59,
-"consts": 57,
+"calls": 67,
+"consts": 67,
 "refs": 100,
-"score": 72.0,
+"score": 77.8,
 "status": "DIFF"
 },
 "CheckPostCapacityRelayContext::GetRequestWid": {
@@ -567,6 +595,13 @@
 "status": "MATCH"
 },
 "CheckPostCapacityRelayContext::MakeRelayHeader": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CheckPostCapacityRelayContext::convertFailReason": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -726,6 +761,13 @@
 "refs": 93,
 "score": 95.6,
 "status": "DIFF"
+},
+"CriticalSection::CriticalSection": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "CriticalSection::~CriticalSection": {
 "calls": 100,
@@ -1147,6 +1189,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"FragmentPacket::~FragmentPacket": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "FragmentPacketConcatenater::Add": {
 "calls": 73,
 "consts": 95,
@@ -1197,6 +1246,27 @@
 "status": "MATCH"
 },
 "FragmentPacketConcatenater::~FragmentPacketConcatenater": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"FragmentPacketSplitter::AddBuffer": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"FragmentPacketSplitter::Clear": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"FragmentPacketSplitter::Finalize": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -1421,10 +1491,10 @@
 "status": "MATCH"
 },
 "HandlePostOfficeServiceRegisterPostReq": {
-"calls": 98,
-"consts": 96,
-"refs": 90,
-"score": 94.9,
+"calls": 97,
+"consts": 98,
+"refs": 92,
+"score": 95.7,
 "status": "DIFF"
 },
 "HandlePostOfficeServiceRetrieveCharacterInfoReq": {
@@ -1857,8 +1927,8 @@
 "Network::initWorkerThread": {
 "calls": 100,
 "consts": 86,
-"refs": 90,
-"score": 91.9,
+"refs": 100,
+"score": 95.2,
 "status": "DIFF"
 },
 "Network::initializeSocketInterface": {
@@ -1932,6 +2002,13 @@
 "status": "MATCH"
 },
 "Packet::DecomposeText": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Packet::GetFreeBody": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -2228,9 +2305,9 @@
 "PipeCommandProcess::~PipeCommandProcess": {
 "calls": 100,
 "consts": 100,
-"refs": 50,
-"score": 83.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "PipeConsole::Name": {
 "calls": 100,
@@ -2354,9 +2431,9 @@
 "PipeConsole::~PipeConsole": {
 "calls": 100,
 "consts": 100,
-"refs": 67,
-"score": 88.9,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Port::Clear": {
 "calls": 100,
@@ -2506,10 +2583,10 @@
 "status": "DIFF"
 },
 "PostContextManager::initContextManager": {
-"calls": 67,
-"consts": 44,
-"refs": 73,
-"score": 61.3,
+"calls": 100,
+"consts": 100,
+"refs": 86,
+"score": 95.2,
 "status": "DIFF"
 },
 "PostDeliveryEvent::EventId": {
@@ -2569,31 +2646,31 @@
 "status": "DIFF"
 },
 "PostOfficeDB::LoadPostList": {
-"calls": 53,
+"calls": 55,
 "consts": 55,
 "refs": 72,
-"score": 60.1,
+"score": 60.6,
 "status": "DIFF"
 },
 "PostOfficeDB::LoadRetryReadyPostList": {
-"calls": 52,
+"calls": 54,
 "consts": 58,
 "refs": 71,
-"score": 60.3,
+"score": 60.8,
 "status": "DIFF"
 },
 "PostOfficeDB::LoadRetryReadySinglePost": {
-"calls": 59,
+"calls": 61,
 "consts": 65,
 "refs": 91,
-"score": 71.5,
+"score": 72.1,
 "status": "DIFF"
 },
 "PostOfficeDB::LoadSinglePost": {
-"calls": 56,
+"calls": 58,
 "consts": 60,
 "refs": 90,
-"score": 68.9,
+"score": 69.5,
 "status": "DIFF"
 },
 "PostOfficeDB::RegisterPost": {
@@ -2788,8 +2865,8 @@
 "Prng::Initialize": {
 "calls": 100,
 "consts": 67,
-"refs": 100,
-"score": 88.9,
+"refs": 50,
+"score": 72.2,
 "status": "DIFF"
 },
 "Prng::setSeed": {
@@ -2905,10 +2982,10 @@
 "status": "DIFF"
 },
 "RelayContextManager::initContextManager": {
-"calls": 67,
-"consts": 44,
-"refs": 73,
-"score": 61.3,
+"calls": 100,
+"consts": 100,
+"refs": 86,
+"score": 95.2,
 "status": "DIFF"
 },
 "RelayTimeContextManager::AddContext": {
@@ -2926,10 +3003,10 @@
 "status": "DIFF"
 },
 "RelayTimeContextManager::initContextManager": {
-"calls": 67,
-"consts": 44,
-"refs": 73,
-"score": 61.3,
+"calls": 100,
+"consts": 100,
+"refs": 86,
+"score": 95.2,
 "status": "DIFF"
 },
 "RelayTimeoutChecker::HandleEvent": {
@@ -2981,6 +3058,27 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"RepeatPacketComposer::Allocated": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RepeatPacketComposer::CurrentFormat": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RepeatPacketComposer::Forward": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "RepeatPacketComposer::PopRepeatCount": {
 "calls": 100,
 "consts": 100,
@@ -2994,6 +3092,27 @@
 "refs": 100,
 "score": 98.7,
 "status": "DIFF"
+},
+"RepeatPacketComposer::Reset": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RepeatPacketComposer::Rewind": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RepeatPacketComposer::skipRepeatFormat": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "RepeatPacketDecomposer::PopRepeatCount": {
 "calls": 100,
@@ -3024,10 +3143,10 @@
 "status": "MATCH"
 },
 "RetrieveCharacterInfoRelayContext::ComposeResponsePacket": {
-"calls": 75,
-"consts": 48,
+"calls": 59,
+"consts": 67,
 "refs": 100,
-"score": 74.2,
+"score": 75.2,
 "status": "DIFF"
 },
 "RetrieveCharacterInfoRelayContext::MakeRelayHeader": {
@@ -3038,6 +3157,13 @@
 "status": "MATCH"
 },
 "RetrieveCharacterInfoRelayContext::RetrieveCharacterInfoRelayContext": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RetrieveCharacterInfoRelayContext::convertFailReason": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -3131,16 +3257,16 @@
 "Session::Session [??0Session@@IEAA@IPEBVPacketBufferHandler@@@Z]": {
 "calls": 100,
 "consts": 100,
-"refs": 57,
-"score": 85.7,
+"refs": 86,
+"score": 95.2,
 "status": "DIFF"
 },
 "Session::Session [??0Session@@IEAA@XZ]": {
 "calls": 100,
 "consts": 100,
-"refs": 50,
-"score": 83.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Session::SetChannel": {
 "calls": 100,
@@ -3229,8 +3355,8 @@
 "Session::~Session": {
 "calls": 100,
 "consts": 77,
-"refs": 83,
-"score": 86.8,
+"refs": 100,
+"score": 92.3,
 "status": "DIFF"
 },
 "SessionPool::Initialize": {
@@ -3383,9 +3509,9 @@
 "StaticPageMemoryManager::~StaticPageMemoryManager": {
 "calls": 100,
 "consts": 100,
-"refs": 0,
-"score": 66.7,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "String::GetId128FromGuidString": {
 "calls": 86,
@@ -3558,9 +3684,9 @@
 "Thread::~Thread": {
 "calls": 100,
 "consts": 100,
-"refs": 0,
-"score": 66.7,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "ThreadFreeFragmentPacketPump::HandleEvent": {
 "calls": 100,
@@ -3866,9 +3992,9 @@
 "WinMsgHandler::~WinMsgHandler": {
 "calls": 100,
 "consts": 100,
-"refs": 80,
-"score": 93.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "WinServiceConsole::Close": {
 "calls": 100,
@@ -4074,10 +4200,10 @@
 "status": "DIFF"
 },
 "WorldChannelManager::initChannelManager": {
-"calls": 67,
-"consts": 44,
-"refs": 73,
-"score": 61.3,
+"calls": 100,
+"consts": 100,
+"refs": 86,
+"score": 95.2,
 "status": "DIFF"
 },
 "WorldConfigList::~WorldConfigList": {

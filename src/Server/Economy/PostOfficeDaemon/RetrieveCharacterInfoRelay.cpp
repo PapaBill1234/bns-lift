@@ -187,7 +187,7 @@ bool RetrieveCharacterInfoRelayContext::ComposeResponsePacket(Packet& packet) co
 }
 
 // 0x1e410
-short const RetrieveCharacterInfoRelayContext::convertFailReason(RelayResponse::ResultState const resultState, short const failReason) const
+__declspec(noinline) short const RetrieveCharacterInfoRelayContext::convertFailReason(RelayResponse::ResultState const resultState, short const failReason) const
 {
     switch (resultState)
     {

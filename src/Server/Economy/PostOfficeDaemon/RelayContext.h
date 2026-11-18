@@ -95,20 +95,11 @@ static_assert(offsetof(RelayContext, _economyHeader) == 0x40, "RelayContext::_ec
 static_assert(offsetof(RelayContext, _relayStatus) == 0x50, "RelayContext::_relayStatus");
 static_assert(offsetof(RelayContext, _relayLimitTime) == 0x58, "RelayContext::_relayLimitTime");
 
-// LIFT: Not in the PDB. The original inlines an array new (`eh vector constructor iterator') with
-// Memory::_Manager[2]->Alloc: the count is at the first int, the objects start at +8.
-template<class T>
-inline T* liftArrayNew(int count, wchar_t const* file, int line)
-{
-    int* raw = static_cast<int*>(Memory::_Manager[2]->Alloc(sizeof(T) * static_cast<long long>(count) + 8, file, line));
-    if (raw == nullptr)
-        return nullptr;
-    *raw = count;
-    T* items = reinterpret_cast<T*>(raw + 2);
-    for (int i = 0; i < count; ++i)
-        ::new (static_cast<void*>(&items[i])) T();
-    return items;
-}
+// LIFT: macro name not in the PDB. The original uses a placement array new on
+// Memory::_Manager[2]->Alloc(sizeof(T) * count + 8) (`eh vector constructor iterator', 0x11d10).
+// The compiler puts the count cookie at +0 only when T has a destructor (AttachedItemContext: no cookie).
+#define liftArrayNew(T, count, file, line) \
+    (new (Memory::_Manager[2]->Alloc(sizeof(T) * static_cast<long long>(count) + 8, file, line)) T[count])
 
 class RelayContextManager
 {

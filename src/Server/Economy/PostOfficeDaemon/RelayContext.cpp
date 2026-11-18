@@ -204,8 +204,8 @@ bool RelayContextManager::initContextManager()
                             MODULE_NAME, L"RelayContextManager::initContextManager", _lockList, _containerList);
         return false;
     }
-    _lockList = liftArrayNew<CriticalSection>(_bucketCount, RELAY_CONTEXT_FILE, 216);
-    _containerList = liftArrayNew<Container>(_bucketCount, RELAY_CONTEXT_FILE, 217);
+    _lockList = liftArrayNew(CriticalSection, _bucketCount, RELAY_CONTEXT_FILE, 216);
+    _containerList = liftArrayNew(Container, _bucketCount, RELAY_CONTEXT_FILE, 217);
     return true;
 }
 

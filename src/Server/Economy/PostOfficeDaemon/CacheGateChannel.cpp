@@ -73,7 +73,7 @@ bool CacheGateChannel::composeRelayHeader(Packet& packet, RelayHeader const& rel
 }
 
 // 0x7670
-bool CacheGateChannel::composeRelayHeader(FragmentPacket& packet, RelayHeader const& relayHeader)
+__declspec(noinline) bool CacheGateChannel::composeRelayHeader(FragmentPacket& packet, RelayHeader const& relayHeader)
 {
     bool const result = packet.Compose(5, relayHeader._fromWid, relayHeader._toWid, relayHeader._relayTid,
                                        relayHeader._hint, relayHeader._reserved) != 0;
@@ -91,7 +91,7 @@ bool CacheGateChannel::composeRelayHeader(FragmentPacket& packet, RelayHeader co
 }
 
 // 0x7410
-bool CacheGateChannel::combineFragmentRelayFormat(char* const relayFormat, unsigned long long const bufferSize,
+__declspec(noinline) bool CacheGateChannel::combineFragmentRelayFormat(char* const relayFormat, unsigned long long const bufferSize,
                                                    char const* const economyFormat)
 {
     if (relayFormat == nullptr || economyFormat == nullptr)  // LIFT: 0x7422 tests only relayFormat; LTCG made economyFormat the constant 0x14007acd0

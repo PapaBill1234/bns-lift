@@ -182,7 +182,7 @@ bool CheckPostCapacityRelayContext::ComposeResponsePacket(Packet& packet) const
 }
 
 // 0x9740
-short const CheckPostCapacityRelayContext::convertFailReason(RelayResponse::ResultState const resultState, short const failReason) const
+__declspec(noinline) short const CheckPostCapacityRelayContext::convertFailReason(RelayResponse::ResultState const resultState, short const failReason) const
 {
     switch (resultState)
     {

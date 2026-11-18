@@ -77,7 +77,7 @@ unsigned long long PingGenerator::TimerId() const
 }
 
 // 0x3d20
-CachedWatchdog::CachedWatchdog(unsigned short wid)
+__declspec(noinline) CachedWatchdog::CachedWatchdog(unsigned short wid)
     : _wid(wid), _serviceState(SERVICE_STATE_UNAVAILABLE), _pingGenerator(nullptr)
 {
     void* const memory = Memory::_Manager[2]->Alloc(sizeof(PingGenerator), CACHED_WATCHDOG_FILE, 26);

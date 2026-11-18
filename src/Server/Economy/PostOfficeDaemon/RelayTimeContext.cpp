@@ -43,8 +43,8 @@ bool RelayTimeContextManager::initContextManager()
                                  MODULE_NAME, L"RelayTimeContextManager::initContextManager", _lockList, _containerList);
         return false;
     }
-    _lockList = liftArrayNew<CriticalSection>(_bucketCount, RELAY_TIME_CONTEXT_FILE, 78);
-    _containerList = liftArrayNew<Container>(_bucketCount, RELAY_TIME_CONTEXT_FILE, 79);
+    _lockList = liftArrayNew(CriticalSection, _bucketCount, RELAY_TIME_CONTEXT_FILE, 78);
+    _containerList = liftArrayNew(Container, _bucketCount, RELAY_TIME_CONTEXT_FILE, 79);
     return true;
 }
 

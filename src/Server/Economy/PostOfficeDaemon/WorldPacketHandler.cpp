@@ -477,7 +477,7 @@ bool HandlePostOfficeServiceRegisterPostReq(Session const* session, Packet const
         goto $_ERROR;
     }
     if (attachedItemCount > 0)
-        attachedItemList = liftArrayNew<AttachedItemContext>(attachedItemCount, WORLD_PACKET_HANDLER_FILE, 361);
+        attachedItemList = liftArrayNew(AttachedItemContext, attachedItemCount, WORLD_PACKET_HANDLER_FILE, 361);
 
     for (int i = 0; i < attachedItemCount; ++i)
     {

@@ -506,3 +506,36 @@
 - Result: SCD MATCH 459 -> 461. CG, LG, POD did not lose a MATCH.
 - Did not work / stopped: constant CSE of -1 and 1 (`EventNotiJob::finalize` 0x9cc0) and LTCG constant propagation
   (`JobManager::Execute` 0x71a0, `ExecuteW` 0x7220). The source cannot control them.
+
+## Pattern 46 (worked, lift-parity-pod-1): placement array new on Memory::_Manager[2]->Alloc
+- Cause: the orig `initContextManager` uses `new (Alloc(sizeof(T)*n+8, file, line)) T[n]` (`eh vector constructor
+  iterator`, cookie only when T has a dtor). Ours had a template helper with a hand loop.
+- Source change: macro `liftArrayNew(T, n, file, line)` in `RelayContext.h`. Use it at all call sites.
+- Result: POD MATCH 484 -> 492 (`CriticalSection::CriticalSection` 0x3c60 found, 3 `initContextManager` MATCH,
+  for example `PostContextManager::initContextManager` 0x11d10). CG, LG, SCD did not lose a MATCH.
+
+## Pattern 47 (did not work, lift-parity-pod-1): Pattern 38 on the POD maps
+- The POD PDB map allocators have non-const keys (`_Buynode<std::pair<__int64,PostContext *>>` 0x1d680).
+- Change: non-const key in the 5 Container typedefs and `std::pair<K, V>(k, v)` inserts. Result: POD 492 -> 488.
+  Gain: Add/RemoveContext scores up, but 6 shared MATCH are lost (`Thread::~Thread`, `PipeConsole::~PipeConsole`,
+  `PipeCommandProcess::~PipeCommandProcess`, `Memory::CreateManager`, `Session::Session()`,
+  `StaticPageMemoryManager::~StaticPageMemoryManager`). Their vtable refs resolve to strings ("PI", "PT", " T")
+  in ours: the data layout moved. ❓ funcdiff ref resolution or a real .rdata change. Change undone.
+
+## Pattern 48 (worked, lift-parity-pod-1): Pattern 11 on POD exe-only misses
+- Cause: the orig calls a small function from its only caller. Our LTCG build inlined it, so the function was a miss
+  and the caller was a DIFF ("inlined but should not be").
+- Source change: `__declspec(noinline)` on `CheckPostCapacityRelayContext::convertFailReason` 0x9740,
+  `RetrieveCharacterInfoRelayContext::convertFailReason` 0x1e410, `CachedWatchdog::CachedWatchdog` 0x3d20,
+  `AttachedItemContext::operator=` 0x110e0, `CacheGateChannel::composeRelayHeader(FragmentPacket&)` 0x7670,
+  `CacheGateChannel::combineFragmentRelayFormat` 0x7410.
+- Result: POD MATCH 492 -> 509. The callers also match (for example `CachedWatchdogManager::addCachedWatchdog`),
+  and the shared FragmentPacketSplitter and RepeatPacketComposer functions match (layout). CG, LG, SCD did not lose a MATCH.
+
+## Pattern 49 (did not work, lift-parity-pod-1): inline the UpdatePostStatus helper
+- Change: remove the `UpdatePostStatus` lift helper. Write its body in `UpdateStatusToDeliverySuccess` 0x17bf0 and
+  `UpdateStatusToDeliveryFailure` 0x17e00 (`paramLen` init after Prepare, `noinline`).
+- Result: both functions MATCH (+2), but the same 5 layout-noise MATCH of Pattern 47 are lost (`Thread::~Thread`,
+  `PipeConsole::~PipeConsole`, `PipeCommandProcess::~PipeCommandProcess`, `Memory::CreateManager`,
+  `WinMsgHandler::~WinMsgHandler`). POD 509 -> 506. Change undone. A funcdiff fix for vtable refs read as strings
+  (see 2) would let Patterns 47 and 49 count.

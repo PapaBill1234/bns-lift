@@ -107,8 +107,8 @@ bool WorldChannelManager::initChannelManager()
                             MODULE_NAME, L"WorldChannelManager::initChannelManager", _lockList, _containerList);
         return false;
     }
-    _lockList = liftArrayNew<CriticalSection>(_bucketCount, WORLD_CHANNEL_FILE, 105);
-    _containerList = liftArrayNew<Container>(_bucketCount, WORLD_CHANNEL_FILE, 106);
+    _lockList = liftArrayNew(CriticalSection, _bucketCount, WORLD_CHANNEL_FILE, 105);
+    _containerList = liftArrayNew(Container, _bucketCount, WORLD_CHANNEL_FILE, 106);
     return true;
 }
 
