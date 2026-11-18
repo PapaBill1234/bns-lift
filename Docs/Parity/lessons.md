@@ -634,5 +634,16 @@ Open facts:
 - In CacheGate `Network::initWorkerThread`, the original sets
   `r14d` to the TLS offset at 0xd94f, before the loop. It uses the
   register at 0xd9c9 to clear `IoWorker::ZstdCCtx`. The original and
-  build PDBs give offsets 0x30 and 0x18 for that variable. The current
-  six-instruction check misses the address use.
+  build PDBs give offsets 0x30 and 0x18 for that variable. The
+  six-instruction check missed the address use. See fix 9 in
+  [noise.md](noise.md).
+
+## TLS addresses that the compiler forms in separate blocks
+
+- Use the TLS block load and the offset definition to check each
+  address. The offset can occur before a loop. The address can use an
+  ADD instruction. See fix 9 in [noise.md](noise.md).
+- After the tool fix, SmartCouponDaemon
+  `NPChannel::sendInitialConnectMessage` shows a different TLS variable.
+  The original uses the shared narrow IP address buffer, at 0xfa40.
+  The lift uses `t_addressBuffer` from `NPChannel2.cpp`.
