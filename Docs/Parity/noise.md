@@ -1,6 +1,6 @@
 # funcdiff noise (lift-parity-0)
 
-Status: 8 fixes are in `tools/funcdiff.py` (fixes 5 to 8 from lift-parity-tool-2). More candidates are open (see the end).
+Fixes 1 to 9 are in `tools/funcdiff.py`. See the open candidates below.
 
 ## Method
 - `tools/funcdiff.py <EXE> --build build-vs2010 --show .` for all 4 exes.
@@ -98,8 +98,38 @@ a `gs:` load. The final fix 6 also finds the offset before the load (see fix 6).
 - Fix: `simple_demangle()` gives `Scope::name` for a plain mangled name (`?name@Scope@@...`). It does not change
   operators, ctors or templates (`??`, `?$`). Used for the names of functions and for a call target that has only a public name.
 
+## Fix 9. TLS offset definitions outside the local instruction window
+
+- In CacheGate `Network::initWorkerThread`, the original puts 0x30 in
+  `r14d` at 0xd94f. At 0xd9c9 it stores zero to `[r14+rcx]`.
+  The instruction at 0xd9c1 loads the TLS block pointer into `rcx`.
+  The build uses 0x18. Both PDBs identify the variable as
+  `IoWorker::ZstdCCtx`. The earlier instruction window missed both
+  definitions. The comparison now uses `tls:IoWorker::ZstdCCtx`.
+- CacheGate `Network::GetAddressStringW` at 0xd6d0 forms two addresses
+  by adding 0x40 and 0x60 to the TLS block pointer. It writes a byte
+  to the first address and a wide character to the second. It passes
+  the first address to `strcpy_s` with size 32. The PDB gives the
+  second address the name `__ip_addr_string_w__`. The build uses
+  offsets 0x20 and 0x40 for these buffers and names both in its PDB.
+  LobbyGate and PostOfficeDaemon use the same original offsets as
+  CacheGate. SmartCouponDaemon uses 0xfa40 and 0xfa60.
+- Recover the narrow buffer name only when the function has two
+  verified TLS offsets 32 bytes apart and the PDB names the higher
+  offset as the wide buffer. Keep any existing PDB name for the
+  lower offset. This also corrects the inlined references in
+  `Daemon::setAddress`.
+- In the additional check, follow each path to the definition.
+  Check that the register is used only to form the TLS address.
+  Keep an immediate value as a constant if the code also reads it
+  as data or passes it to a function.
+- In the same VS2010 binaries, this adds three matches in CacheGate,
+  five in LobbyGate, four in SmartCouponDaemon, and three in
+  PostOfficeDaemon. Shared matches increase from 483 to 486 of 549.
+  Every previous match holds.
+
 ## Open candidates
-- A. TLS offsets: FIXED in lift-parity-tool-2 (fix 6).
+- A. TLS offsets: see fixes 6 and 9.
 - B. `??_C@_11LOCGONAA@` (empty wide string, 29/29): same name on both sides. Count per function differs. Real, not noise.
 - C. `<data>` refs (141 orig / 244 ours): most are fields of named globals in `.data` (for example
   `AlertSender::_alertSender+0x54`, `Memory::_Manager+0x10`), and the image base (`lea r, [rip-x]` → 0x0).

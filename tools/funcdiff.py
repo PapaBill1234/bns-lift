@@ -42,6 +42,7 @@ if not os.environ.get("LIFT_IDA_DIR") and os.path.isdir(_PP_IDA) \
         and not os.path.isdir(os.path.join(os.path.dirname(os.path.dirname(HERE)), "ida", "lift")):
     os.environ["LIFT_IDA_DIR"] = _PP_IDA
 import pdbq  # noqa: E402
+from funcdiff_tls import exact_tls_offsets  # noqa: E402
 
 CACHE = os.path.expanduser("~/.cache/bns-lift/funcdiff")
 REC = re.compile(r"^\s*\d+ \| (S_\w+) \[size = \d+\] `(.*)`\s*$")
@@ -116,12 +117,26 @@ class Image:
                     self.names[rva].add(name)
                 if kind in ("S_LTHREAD32", "S_GTHREAD32"):
                     self.tls.setdefault(int(a.group(2)), name)
+        self.recover_address_buffer_name()
         # Mangled public name of each function: it tells overloads and destructor kinds apart.
         self.mangled = {}
         for rva in self.funcs:
             ms = sorted(n for n in self.names[rva] if n.startswith("?") and not n.startswith("??_C"))
             if ms:
                 self.mangled[rva] = ms[0]
+
+    def recover_address_buffer_name(self):
+        """The original PDB names the wide address buffer. See Docs/Parity/noise.md."""
+        for rva, (name, size) in self.funcs.items():
+            if name != "Network::GetAddressStringW":
+                continue
+            code = list(MD.disasm(self.code(rva, size), rva))
+            offsets = exact_tls_offsets(code)
+            if len(offsets) != 2:
+                continue
+            narrow, wide = sorted(code[i].operands[1].imm for i in offsets)
+            if wide - narrow == 32 and self.tls.get(wide) == "__ip_addr_string_w__":
+                self.tls.setdefault(narrow, "__ip_addr_string_a__")
 
     def data_below(self, t, span=0x40):
         """The nearest named symbol below t in a writable section, at most span bytes away."""
@@ -239,6 +254,7 @@ def signals(img, rva, size, alias):
 
     chk = None                                     # const of the last instruction if it is mov eax, imm
     insns = list(MD.disasm(img.code(rva, size), rva))
+    tls_offsets = exact_tls_offsets(insns)
     for idx, ins in enumerate(insns):
         op0 = ins.operands[0] if ins.operands else None
         chk, prev = None, chk
@@ -286,6 +302,9 @@ def signals(img, rva, size, alias):
                 v = op.imm & 0xFFFFFFFFFFFFFFFF
                 if v in (0, 1) or ins.mnemonic.startswith(("sh", "sa", "ro")):
                     continue                       # flags and shifts: compiler noise
+                if idx in tls_offsets and v in img.tls:
+                    refs.append("tls:" + img.tls[v])
+                    continue
                 if 0x10000 <= v < img.size:
                     continue                       # an RVA (try tables, image-base addressing)
                 if ins.mnemonic == "mov" and v in img.tls and is_tls_index(insns, idx):
