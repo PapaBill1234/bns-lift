@@ -1,23 +1,76 @@
 # Parity lessons
 
-Cleaned in lift-parity-review-2 (2026-11-18). The stage notes of round 2 are merged into the patterns. The list is sorted by
+Cleaned in lift-parity-review-3 (2026-11-18). The stage notes of round 3 are merged into the patterns. The list is sorted by
 the number of functions fixed (sum over the 4 exes; a shared function counts once per exe). Old numbers are in brackets:
-(r1 A3) = A3 of review 1, (P11) = old Pattern 11. Each new card adds its patterns at the end of section A or B. The next review sorts them again.
+(r2 A5) = A5 of review 2, (P11) = old Pattern 11. Each new card adds its patterns at the end of section A or B. The next review sorts them again.
 
 Mapping review 1 -> review 2: A1=A1, A2->A3, A3->A2, A4->A6, A5->A4, A6->A5, A7->A8, A8->A9, A9->A11, A10->A13, A11->A7,
 A12->A14, A13->A15, A14->A16, A15->A10, A16+A17->A17, new A12 (crypto source forms).
 
+Mapping review 2 -> review 3: A1=A1, A2->A4, A3->A5, A4->A6, A5->A2, A6->A7, A7->A8, A8->A12, A9->A13, A10=A10, A11->A15,
+A12->A9, A13->A11, A14->A17, A15->A18, A16=A16, A17->A24. New: A3 (closed-lib callers), A14 (global placement delete, `::new`),
+A19 (separate stores), A20 (`inline_depth(0)`), A21 (PDB facts first), A22 (per-exe source form), A23 (PacketHandler form).
+Section E (perexe-3) and the round-3 stage notes are merged into A to D. Section F keeps the manual notes of round 3.
+
 ## A. Patterns that worked
 
-### A1. Funcdiff noise fixes (tool cards): 476
+### A1. Funcdiff noise fixes (tool cards; r2 A1): 496
 - lift-parity-0 (396): branch targets counted as constants, jump tables read as code, calls through a slot with no symbol,
   `__chkstk` frame size. CG +77, LG +97, SCD +109, POD +113.
 - lift-parity-tool-2 (80): vtable symbol before `string_at` (fix 5), `.tls` offset as ref `tls:<name>` (fix 6),
   `<K const ,V>` name form (fix 7), `?Setup@PacketCrypt@@...` demangle (fix 8). CG +18, LG +19, SCD +23, POD +20. Details: C1 to C3.
 - Proof of each fix in `noise.md`.
 - Rule: fix a tool error before a source change. A tool error hides real progress and makes good changes look bad (C1).
+- Round 3 (manual): fix 9 (a TLS address that the compiler forms in separate blocks: the offset load can be before a loop, the address can use `add`;
+  15: CG 3, LG 5, SCD 4, POD 3) and fix 10 (all public names at a folded vtable address; 5). Details in F and `noise.md`.
+- Rule (round 3): before a source change on a `tls:` or vtable-name DIFF, check the tool. Fix 9 and fix 10 gave 20 MATCH with no source change.
 
-### A2. `__declspec(noinline)` on a function that the original calls out of line (r1 A3; P11, P19, P24, P48): 75
+### A2. Block order and statement order follow the original (r2 A5; P3, P7, P10, P20, P25, P33, P39; order-3, consts-3, handlers-3, manual): about 97
+- VS2010 puts the `if` body inline and the code after it behind a jump. Write the source in the order of the original blocks.
+  Find the order with `dis2.py` (the first `jne`/`je` after the test, and the `ret` positions). There is no fixed direction.
+- The HR condition can be the inverse of the source condition (P33, `CacheDChannel::onConnect` 0x3c80).
+- Error path first with an early return when the original has `jg` to the good path (P7, `RefCntObject::addReferenceCount`).
+- Good path first, `Log::Write` at the end (P20: `Db::AllocTransaction`, `initEnv`, `Execute`; SCD +6, POD +7;
+  bloodlib-2: `SessionBuffer.cpp` `Add`, `RemoveSentBuffer`, `increaseBuffer`, `Initialize` and `Session::handlePacket` 0xf750, +5 each exe).
+- Nested success-first `if` for handle chains (P10, `WinServiceConsole::InstallService` 0x17c80); `buffer == nullptr` first (P39).
+- POD context managers (pod-2, +10):
+  `Get*`: one shared `Leave`: `T* p = nullptr; Enter; it = find(k); if (it != end) { p = it->second; if (p == nullptr) { Leave; crash;
+  return nullptr; } p->addReferenceCount(...); } Leave; return p;`.
+  `Add*`: error path first: `if (!insert(...).second) { Leave; Log::Write(...); [free]; return false; } addReferenceCount; Increment; Leave; return true;`.
+  `Remove*`: null path first: `if (p == nullptr) { Leave; crash; return false; } erase(it); removeReferenceCount; Decrement; Leave; return true;`.
+- Failure branch first gives the original call order (score only, no MATCH): POD `ComposeResponsePacket` 0x9570, 0x1e230 (77.8 -> 90.5).
+- Branch order in a helper decides the layout: `else if (!ProcessRelayResponse()) { Log fail } else { removeReferenceCount; logEnd; return true; }`.
+- Register locals: read a member pointer one time into a local when the original keeps it in a register (`Port::clearPool`: `pool`).
+  Copy the body of an inlined `noinline` function into the caller with `// LIFT:` (`Port::Clear` gets the `PortListener::Clear` body: CG +2).
+- order-3 (+23, CG 6, LG 5, SCD 7, POD 5): `Daemon::start` 0xb140 tests `GetTimerInterval() == 0` first. `DaemonConfig::Load` 0xc600:
+  `if (module != nullptr) { body } else { fail }` (the `LoadLibraryW` failure block is last). `BloodDaemonMain`: `if (GetConsoleWindow() == nullptr)
+  { RunMode = DAEMON_MODE; } else { loop }` and one shared tail `makeConsole` + `Daemon::Start` (an early return duplicates the tail).
+  `makeConsole`: `switch (RunMode)` with a `default` error case (the `if` chains did not match).
+- `LogFile::writeFile`: first `CreateFileW` before the retry; `do { Sleep; CreateFileW; if ok goto opened; } while (++tries < 100);`, error code, `return`, `opened:`.
+  A `while (true)` with the error inside unrolled one more `Sleep`/`CreateFileW`.
+- `BnsCommonConfig::LoadBnsCommonConfig` 0x13e0: write each error exit in full (`Config = nullptr; Log::Write(...)`). The compiler merges the tails itself.
+  A hand-written `goto failed` tail did not match. Keep the new object in a local and test the local (one `Config` read less).
+- SCD `GameEventManager::PostGameEventLogList` 0xb140: read `Instance->_gameEventHandle` once into a local, test the local. The null log is then the last block.
+- `Session::recv`: take the context pointer local before the stores; the `!AsyncRecv` failure block first (consts-3, +4).
+- POD management handlers (handlers-3, +5): failure branch first, success last:
+  `if (DecomposeText(...) == 0) { fail } else { if (!DbCall(...)) { fail } else { success; return true; } }`, then the common failure tail.
+- Manual: SCD `DbTransaction::BindCol` 0x20e40 null statement handle first, return after the log (as POD 0x2d010). SCD `SendPublicationEvent::HandleEvent`
+  0xbe30 null job log before `CouponJob::execute`. POD `UnsentPostContextManager::deliverUnsentPost` `OccurEvent` failure first, each release with its line.
+  SCD `SmartCouponDaemon::reload`: reload failure and the unchanged case before the `Dump` case; log `GetLastError()` when `_wmakepath_s` fails.
+- The direction is per function. Success-first lowered `WorldConfigManager::loadWorldConfigFile`; failure-first lowered `PingRelayContext::processRelayResponse`
+  (97.6 -> 95.1). Measure each change.
+- SCD `DChannelMgr::SetupDaemonList` 0xd270 (82.8 -> 96.3): `if (second != nullptr)` first, the alloc path last, one shared `Log::Write` after both.
+
+### A3. Lift the callers in a closed library from the disassembly (cryptolib-3): 90
+- Cause: the original links `BloodPacketCrypt64.lib` and `BloodCert64.lib` (no debug info). Their objects call `Crypto::Create`, `Rsa::Rsa`, `Dh::Dh`.
+  Our stubs called nothing, so the BloodCrypto functions were misses (LG 72, SCD 47, POD 47).
+- Lift `PacketCrypt` (LG 0x4cc60-0x4da60) and `BloodCert`/`CertDec`/`SSN`/`NIC` (LG 0x4bf70-0x4ca10) from the disassembly with `// LIFT:` names. LG +36.
+- The original links each lib object whole. Keep an uncalled object with `#pragma comment(linker, "/INCLUDE:<IsValid>")` under `LIFT_EXE_LG/SCD/POD`:
+  SCD +26, POD +26, LG +2. CG has no such object.
+- The original BloodCert functions have no PDB symbol. Ours are ONLY-OURS. This does not change the MATCH count.
+- Result: crypto orig-only 0 in each exe. The crypto functions now pair; 14 shared names are still DIFF (review-3 section 5).
+
+### A4. `__declspec(noinline)` on a function that the original calls out of line (r2 A2; P11, P19, P24, P48; round 3): about 88
 - Cause: our LTCG build inlines a small function. The function is a miss and its caller is a DIFF.
 - Use it only when the original never inlines the function (check all callers in all exes). Mark it `// LIFT:`.
 - Examples: `WinServiceConsole::reportStatusToSCManager` 0x17a20; `Session::Recv`, `SessionSendBuffer::clearPacketBufferList`,
@@ -41,12 +94,19 @@ A12->A14, A13->A15, A14->A16, A15->A10, A16+A17->A17, new A12 (crypto source for
 - Per-exe inline choice: the original inlines `Log::Flush` in Daemon and calls it only from CrashHandler (`Log::FlushInline`).
   CG and LG call `Session::Send(Packet const*)` and `Session::deallocateCrypt` out of line; SCD and POD inline them. One source
   cannot match all 4 exes without a per-exe define (card perexe-3).
+- Round 3: `InitSymbol` (CrashHandler.cpp, CG 0x7de0; else LTCG hoists `LoadLibraryW(L"dbghelp.dll")` into the 4 call sites, +4).
+  `CryptoKey::Initialize` under `LIFT_EXE_LG/SCD/POD` (+3; without the guard CG loses `Network::Initialize`). LG `Session::send` 0xfe90
+  (`ClientManager::broadcast` 76.9 -> MATCH). LG `Crypto::InstanceSize`, `RsaPrivate::RsaPrivate`, `BigInteger::IsPrime`, `Session::completeHandshake`
+  (4 orig-only now pair). Manual: LG `BigInteger::RightShift` out of line (`LeftShift` tail-jumps to it at 0x59bca);
+  `CryptoKey::generateBigNumber` out of line (both LG callers; `Dh::Start` MATCH).
+- `__forceinline` on a helper also inlines its callees. Add `noinline` on the callee that the original calls (`initMemorySection` ->
+  `Memory::CreateManager`; without it CG lost 1 MATCH).
 
-### A3. Third-party code: vendor the exact upstream commit (r1 A2; P18): 73
+### A5. Third-party code: vendor the exact upstream commit (r2 A3; P18): 73
 - zstd: upstream `dev` commit bb6eaf64 (2018-05), not v1.3.5. See `vendor/zstd/README.md`. CG +16, LG +25, SCD +12, POD +20.
 - Method: count the calls of one function on both sides (for example `ZSTD_litLengthContribution`) and bisect the commits.
 
-### A4. Per-exe path literal of a shared file (r1 A5; P30, P35, P41, P45): 62
+### A6. Per-exe path literal of a shared file (r2 A4; P30, P35, P41, P45; perexe-3): 68
 - Cause: the original builds each shared `.cpp` in each exe project. `__FILE__`-style literals are relative to the
   project (`..\Shared\` in LG/SCD, `..\..\Shared\` in CG/POD) and header paths contain the exe name, with a per-exe
   case (`e:\dailybuild02\<exe>-common-0.0.348\...` or `E:\DailyBuild02\<Exe>-Common-...`).
@@ -63,32 +123,18 @@ A12->A14, A13->A15, A14->A16, A15->A10, A16+A17->A17, new A12 (crypto source for
   Gains: s3 +14, lg-1 +26, scd-1 +5, paths-2 +17.
 - Limit: an inlined COMDAT (for example `StlAllocator<Timer*,2>::deallocate` in `TimerQueue::~TimerQueue`) keeps the copy of the first
   object in the link order. That copy has the CG path. Fix needs a per-exe define in `tools/vs2010/build.sh` (card perexe-3).
+- perexe-3 (+6): `LIFT_STLMEMORY_FILE` default depends on `LIFT_EXE_*` (`TimerQueue::~TimerQueue` MATCH in LG, SCD, POD).
+  Orig POD has 2 case forms of the `StlMemory.h` path: mixed case in `PostContext`, `RelayContext`, `RelayTimeContext`, lower case in the others.
+  One lower-case path made our link fold `_Tree<ushort,WorldChannel*>::_Erase` into the `<__int64,PostContext*>` copy. Define the mixed case in the 3 modules.
+  Count the forms: `grep -o 'L"[Ee]:[^"]*StlMemory.h"' ~/.cache/bns-lift/hr/<EXE>/*.c`. Mixed case: LG Client; SCD CouponGameEventConfig; POD the 3 modules; CG none.
 
-### A5. Block order follows the original address order (r1 A6; P3, P7, P10, P20, P25, P33, P39, r1 A17): 60
-- VS2010 puts the `if` body inline and the code after it behind a jump. Write the source in the order of the original blocks.
-  Find the order with `dis2.py` (the first `jne`/`je` after the test, and the `ret` positions). There is no fixed direction.
-- The HR condition can be the inverse of the source condition (P33, `CacheDChannel::onConnect` 0x3c80).
-- Error path first with an early return when the original has `jg` to the good path (P7, `RefCntObject::addReferenceCount`).
-- Good path first, `Log::Write` at the end (P20: `Db::AllocTransaction`, `initEnv`, `Execute`; SCD +6, POD +7;
-  bloodlib-2: `SessionBuffer.cpp` `Add`, `RemoveSentBuffer`, `increaseBuffer`, `Initialize` and `Session::handlePacket` 0xf750, +5 each exe).
-- Nested success-first `if` for handle chains (P10, `WinServiceConsole::InstallService` 0x17c80); `buffer == nullptr` first (P39).
-- POD context managers (pod-2, +10):
-  `Get*`: one shared `Leave`: `T* p = nullptr; Enter; it = find(k); if (it != end) { p = it->second; if (p == nullptr) { Leave; crash;
-  return nullptr; } p->addReferenceCount(...); } Leave; return p;`.
-  `Add*`: error path first: `if (!insert(...).second) { Leave; Log::Write(...); [free]; return false; } addReferenceCount; Increment; Leave; return true;`.
-  `Remove*`: null path first: `if (p == nullptr) { Leave; crash; return false; } erase(it); removeReferenceCount; Decrement; Leave; return true;`.
-- Failure branch first gives the original call order (score only, no MATCH): POD `ComposeResponsePacket` 0x9570, 0x1e230 (77.8 -> 90.5).
-- Branch order in a helper decides the layout: `else if (!ProcessRelayResponse()) { Log fail } else { removeReferenceCount; logEnd; return true; }`.
-- Register locals: read a member pointer one time into a local when the original keeps it in a register (`Port::clearPool`: `pool`).
-  Copy the body of an inlined `noinline` function into the caller with `// LIFT:` (`Port::Clear` gets the `PortListener::Clear` body: CG +2).
-
-### A6. Virtual call on a global object through a base reference (r1 A4; P1): 49
+### A7. Virtual call on a global object through a base reference (r2 A6; P1): 49
 - Cause: `BaseMemoryManager::_Instance.Alloc(...)` binds statically and LTCG inlines `HeapMemoryManager::Alloc`.
   The original calls through the vtable (`<indirect>`).
 - Source: macro `BASE_MEMORY_MANAGER` = `static_cast<MemoryManager const&>(BaseMemoryManager::_Instance)` at all 59 sites.
 - Example: `BaseRefCntObj::deallocate_me` CG 0x18460: `import:HeapFree` -> MATCH. CG +9, LG +11, SCD +15, POD +14.
 
-### A7. Copy the original refs and reads one to one (r1 A11; P22 s3, P23, P40, P43, P45): 26
+### A8. Copy the original refs and reads one to one (r2 A7; P22 s3, P23, P40, P43, P45; round 3): about 36
 - `return _log != nullptr ? _log : L"";` (original refs `L""`): pass the literal `L""`, not a named array.
 - A literal as a pointer variable (`static wchar_t const* const X = L"..."`) makes VS2010 load the pointer; the caller has no
   literal ref. Write `#define X L"..."` (helpers-2, POD handlers).
@@ -102,17 +148,27 @@ A12->A14, A13->A15, A14->A16, A15->A10, A16+A17->A17, new A12 (crypto source for
   `RetrieveCharacterInfoRelayContext::initResponse` 0x1f770 keeps one local downcast `r` (gives the `-8` const). +2.
 - Member stores in the init list when the original orders them so (`CouponJob`, `EventNotiJob` 0x99f0).
 - Log the `GetLastError()` value when the HR shows a second `GetLastError` call (`DChannelMgr::CreateDaemonListXml` 0xd5c0).
+- `Session::Accept` (+4): read the members (`_port->_sessionHandler`, `_id`), not the params. The idle block is one `SetBusyWithPos(id).pos` call (PDB union `IdleStateTable::Pos`).
+- `TrustedPacketBufferHandler::ToPacket` (+4): no short local for the header size. Read `*size` through a `short const*` two times (a local gives a range check with 0xf9e).
+- WPO folds a global with a constant initializer, also when it is not `const`. `volatile int CONFIG_DIR_OPTION_LEN` keeps the 2 reads of the original.
+- `finiMemorySection` (inlined in `Daemon::start`): read `Memory::_Manager[section]` again after the dtor call (`Free` reads it again).
+- Hex-Rays folds reads of zero data (`ID128_GUID_ZERO`) to `0`. When funcdiff shows an orig ref that the pseudocode shows as zero, write the global
+  (`_gameAccountId(ID128_GUID_ZERO)` in `GameEventLogEvent::GameEventLogEvent`).
+- POD `RelayContext::ProcessRelayRequest`: read `PostOfficeDaemon::_instance->` at each use (99.5 -> MATCH).
+- SCD `NPChannel::sendInitialConnectMessage`: use the shared narrow IP buffer of `Network.cpp`, not `t_addressBuffer`. Get the local address before the buffer clear (+1).
+- LG `IdleWatcher`: read the watcher before `IdleStateTable::Create` and keep the pointer for the later table write.
 
-### A8. Member types exactly as in the PDB: no extra `volatile` (r1 A7; P15): 25
-- Cause: `long volatile _ref` in `RefCntObject.h`. The PDB type is plain `long`. A volatile store keeps the dead base ctor stores.
-- Example: `PacketBufferPool::allocate` CG 0x128d0 -> MATCH. Rule: check each `volatile` member with `pdbq <EXE> type <Class>`.
+### A9. Crypto source forms (r2 A12; crypto-2, manual): about 30
+- Blowfish `encrypt`: `(s + 256)[x & 0xFF]` (pointer offset, disp 0x400/0x800/0xc00), not `s[256 + (x & 0xFF)]` (32-bit index add).
+- Blowfish `decrypt` 0x360a0: `for (long long i = round - 1; i > 0; i -= 2) { t = F(r) ^ l; l = pbox[i-1] ^ t; r = F(t) ^ pbox[i] ^ r; }`.
+- `Ctr::Encrypt`: `if (++_counter[j] != 0) break;`, not `_counter[j]++ != 0xFF`.
+- `Prng::setSeed` 0x35d60: `rand() % 256` (orig `and eax,0x800000ff; jge; dec; or; inc`).
+- `Prng::addEntropy` 0x35e10: `_alloca(size + 20)` with `hashSize = 20` before it. A fixed `buf[148]` let LTCG inline it.
+- Manual: `Blowfish::Setup`: the inlined round code steps the index after the first P-box read; read the second entry at the new index minus 1.
+  `BigInteger::sqr`: add 31 to the bit count, shift right by 4, clear the low bit. `BigInteger::Sub`: different signs call `add` first; equal signs select the operands
+  and the sign before one `sub` call. `BigInteger::montgomeryNormalize`: `Pow2` first in source order, one `Set(1LL)` on the other branch.
 
-### A9. CRT template overloads (r1 A8; P9): 25
-- The original calls `swprintf_s<N>` out of line. Source: the 2-argument form with an array destination.
-- Only when the size argument is the full array size. Clang build: `include/vs2010/crt_cpp_overload.h` under `#if defined(__clang__)`.
-- Example: `WinServiceConsole::ServiceMain` 0x177d0. CG +3, LG +7, SCD +2, POD +13.
-
-### A10. Lift helpers as `static __forceinline`, shared END tail (r1 A15; P34, helpers-2): 24
+### A10. Lift helpers as `static __forceinline`, shared END tail (r2 A10; P34, helpers-2; inline-3): 28
 - A lift helper in an anonymous namespace or a plain `static` function is NOT inlined by VS2010 LTCG. The caller then has fewer
   refs (`L"Client.cpp"`, `Channel.h`). Make each helper `static __forceinline` and mark it `// LIFT:`.
 - LobbyD handlers: `if (ch != nullptr) return ch; Log; Alert; return nullptr;`; `ch->GetId()` in each log call (lg-1, +5).
@@ -123,40 +179,49 @@ A12->A14, A13->A15, A14->A16, A15->A10, A16+A17->A17, new A12 (crypto source for
 - Helper shared by 2 functions: POD `UpdatePostStatus` as `static __forceinline` so that the literals become constants in each
   `__declspec(noinline)` wrapper (`UpdateStatusToDelivery*`, +2).
 - A local struct with a `static __forceinline` member can reach a private member through a `friend` line (SCD `DaemonPacketHandlerSend`).
+- `Log::Initialize` (+4): `__forceinline` on the private in-class `Log::Log`. The ctor writes 11 explicit stores `mediaCountPerList[0..10] = 0;` and one
+  `memset(mediaList, 0, 88)`. A second `memset` gave an extra call; a `for` loop gave a rolled loop.
+- A lift helper in an anonymous namespace that the original inlines shows as ONLY-OURS (`initMemorySection`, 133 bytes). Use `__forceinline` and see A4.
+- LG `findDisconnectedNode`, `clearDisconnectedInfo` (`LobbyDChannel.cpp`) as `__forceinline` with an inline 20-character compare loop: score only.
 
-### A11. Map allocator with a non-const pair key, as in the PDB (r1 A9; P22 cg-1, P38, P44, P47): 22
+### A11. Loop forms that VS2010 compiles as the original (r2 A13; P16, P26, P43; consts-3): 26
+- `for (i = 0; i < 128; ++i) { ...; if (!f(i)) break; } if (i >= 128) return true;` is not unrolled (`PortListener::Initialize` 0x31fd0).
+- Count down and step the pointers: `for (; count > 0; --count, ++defList, ++loadDefList)` (BnsCommonConfig, CG +4, POD +4, LG +2, SCD +2).
+- Hex dump: walk a byte pointer and write `temp[k++]` three times (SCD `NPChannel::handlePacket` 0x57d0).
+- `SysInfo::IpAddress` 0x144f0 (+4): the adapter retry loop in the MS sample form `do { malloc; if null break; result = GetAdaptersAddresses(...);
+  if (result != ERROR_BUFFER_OVERFLOW) break; free; p = nullptr; ++retry; } while (result == ERROR_BUFFER_OVERFLOW && retry < 3);`. A `for (;;)` rotated
+  the loop. Write `if (hostname == nullptr) { if (gethostname(...) == 0) {...} } else { WideCharToMultiByte }`.
+- `SysInfo::Hostname` 0x14390 (+4): `sockaddr addr; memset; sockaddr_in* in = reinterpret_cast<sockaddr_in*>(&addr);` stores through `in` keep the struct (frame 0x600).
+  Body in `if (hostname != nullptr) { ... return result; } return 3;`; tail `if (result == 0) { '.' loop } else { inet_ntoa }`.
+
+### A12. Member types exactly as in the PDB: no extra `volatile` (r2 A8; P15): 25
+- Cause: `long volatile _ref` in `RefCntObject.h`. The PDB type is plain `long`. A volatile store keeps the dead base ctor stores.
+- Example: `PacketBufferPool::allocate` CG 0x128d0 -> MATCH. Rule: check each `volatile` member with `pdbq <EXE> type <Class>`.
+
+### A13. CRT template overloads (r2 A9; P9): 25
+- The original calls `swprintf_s<N>` out of line. Source: the 2-argument form with an array destination.
+- Only when the size argument is the full array size. Clang build: `include/vs2010/crt_cpp_overload.h` under `#if defined(__clang__)`.
+- Example: `WinServiceConsole::ServiceMain` 0x177d0. CG +3, LG +7, SCD +2, POD +13.
+
+### A14. Global placement delete with the crash body, `::new`, construct before assign (manual beb4669, round 3): 22
+- Cause: the original global placement `operator delete(void*, void*)` (CG 0x1000) calls `Log::Write` and `AlertSender::Write` (`Memory.h:173`).
+  VS2010 calls it in the unwind code of each placement new. Our CRT form was empty: DIFF score 0 in each exe, and EH state `-2` was missing.
+- Include `PlacementNew.h` before the CRT headers. Use the path of each original binary (last part `Memory.h`). All 4 placement deletes MATCH.
+- `Port::Initialize`: write `::new` for the session pool and the listener. VS2010 then uses the global placement delete if a ctor throws (EH state `-2` in all 4 exes).
+  The declaration and body of the placement delete alone did not give the state.
+- Construct before assign: `Network::Network` constructs the end event, then assigns the allocation pointer to `EndEventObject` once (MATCH in CG, LG, POD;
+  SCD has another ICF vtable name). Same form in `NPChannel::Setup` (`_sessionHandler`).
+- POD `UnsentPostContextManager::addUnsentPostContextList`: allocate the header node in the list ctor (unwind state of the critical section).
+  POD `PostContext::~PostContext`: write the allocation pointer to `__delv_buf__` before `Free`.
+- Side effect: `Console::Flush` MATCH in CG and SCD (the empty functions shared a linker address before).
+
+### A15. Map allocator with a non-const pair key, as in the PDB (r2 A11; P22 cg-1, P38, P44, P47): 22
 - Cause: PDB names are `StlAllocator<std::pair<K,V>,2>` (key not const). Ours used `pair<K const,V>`.
 - Source: the typedef uses `std::pair<K, V>`. Insert with `std::pair<K, V>(k, v)`, not `value_type(k, v)` or `std::make_pair`.
 - Examples: `ClientManager::ReleaseSession` CG 0x6250, LG `ClientManager::RemoveClient` 0x60c0, SCD `JobManager::Clear` 0x6ff0 (SCD +11),
   POD `PostContext.h`, `RelayContext.h`, `RelayTimeContext.h`, `WorldChannel.h`, `WorldConfig.h` (pod-2, +4).
 
-### A12. Crypto source forms (crypto-2): 20 (+5 each exe)
-- Blowfish `encrypt`: `(s + 256)[x & 0xFF]` (pointer offset, disp 0x400/0x800/0xc00), not `s[256 + (x & 0xFF)]` (32-bit index add).
-- Blowfish `decrypt` 0x360a0: `for (long long i = round - 1; i > 0; i -= 2) { t = F(r) ^ l; l = pbox[i-1] ^ t; r = F(t) ^ pbox[i] ^ r; }`.
-- `Ctr::Encrypt`: `if (++_counter[j] != 0) break;`, not `_counter[j]++ != 0xFF`.
-- `Prng::setSeed` 0x35d60: `rand() % 256` (orig `and eax,0x800000ff; jge; dec; or; inc`).
-- `Prng::addEntropy` 0x35e10: `_alloca(size + 20)` with `hashSize = 20` before it. A fixed `buf[148]` let LTCG inline it.
-
-### A13. Loop forms that VS2010 compiles as the original (r1 A10; P16, P26, P43): 18
-- `for (i = 0; i < 128; ++i) { ...; if (!f(i)) break; } if (i >= 128) return true;` is not unrolled (`PortListener::Initialize` 0x31fd0).
-- Count down and step the pointers: `for (; count > 0; --count, ++defList, ++loadDefList)` (BnsCommonConfig, CG +4, POD +4, LG +2, SCD +2).
-- Hex dump: walk a byte pointer and write `temp[k++]` three times (SCD `NPChannel::handlePacket` 0x57d0).
-
-### A14. Error blocks and cleanup tails as in the original (r1 A12; P14, P36, P13 s1): 16
-- One full error block per failed call when the original calls `WSAGetLastError` in each (`Network::initializeSocketInterface` 0xda30).
-- One shared cleanup tail (`goto cleanup;`) when the original has one tail (`TakeGoodsOk` 0x113e0).
-- `__try { ... __leave; } __finally { ... }` when the HR shows `$__FINALLY_n` (`ListLobbyServiceItemInfoOk` 0x117a0).
-- No explicit `p.Clear()` / `fp.packet.Clear()` before `return`: the dtor clears. An explicit Clear gives one more `Packet::Clear` call
-  (`BypassPacket` 0x121d0; LG `Client::SendListGoodsOk` 0x4b20 +2; POD `WorldChannel::SendRelayResponse` 0x1e570 +1).
-- One `Db::ReleaseTransaction` per return: `if (*ret != 0) return false; return true;`, not `return *ret == 0;` (POD `ResetAllDeliveryFailurePost`, +1).
-- Zero-fill after the `Prepare` check, not at the declaration (POD `PostOfficeDB` `paramLen`).
-
-### A15. Compiler-generated destructors (r1 A13; P42, P29, P39): 12
-- No user-declared dtor when the original dtor is a thunk with no vtable store (`EventObject`, `DynamicEventObject`; CG +1, LG +1, POD +5, SCD +2).
-- An inline dtor with a member dtor gives the EH state of the original (`inline Db::~Db()`, `db->~Db();` in `Db::Clear`).
-- Empty body when the member dtor does the work (`FragmentPacket::~FragmentPacket` 0x24e0).
-
-### A16. Allocation forms (r1 A14; P46, P28, P37, scd-2): 12
+### A16. Allocation forms (r2 A16; P46, P28, P37, scd-2; arraynew-3, consts-3): 20
 - Placement array new: `new (Alloc(sizeof(T)*n+8, file, line)) T[n]` (macro `liftArrayNew`, POD +8).
 - Placement array new of a type with a ctor and dtor (orig calls `eh vector constructor iterator`): SCD `CouponJob.cpp`
   `#define __PLACEMENT_VEC_NEW_INLINE` before all includes, own `operator new[](size_t, void*) throw()`, own
@@ -165,8 +230,71 @@ A12->A14, A13->A15, A14->A16, A15->A10, A16+A17->A17, new A12 (crypto source for
   `__delv_buf__` is a PDB `S_GTHREAD32`; no exe imports `??_V@YAXPEAX@Z`. Same shape in LG `GateKeyManager::Initialize` (card arraynew-3).
 - Null-checked placement new before the null test: `T* p = mem != nullptr ? new (mem) T() : nullptr; if (p == nullptr) {fail}`.
 - Inlined Packet ctor: `Packet packet = {nullptr, false};` then the 4 pool stores (`ClientManager::BroadcastAnnounceNotify`).
+- arraynew-3 (LG +4): the scd-2 vec-new form in LG `Client.cpp`. Macro `liftArrayNew1(T, n, line)` = `new (Memory::_Manager[1]->Alloc(sizeof(T)*n+8, L"Client.cpp", line)) T[n]`;
+  delete form `delete[] p; Memory::_Manager[1]->Free(__delv_buf__, L"Client.cpp", line);`. MATCH: `GateKeyManager::Initialize`, `ClientManager::Initialize`,
+  `operator delete[]`, `CriticalSection::CriticalSection` (the vec ctor needs the real function).
+- `PacketBufferAllocator::initAllocator` (+4): plain placement new and a ctor that assigns in the body, so that `InitializeCriticalSection` comes before the stores.
+  `x = mem ? new (mem) T(...) : nullptr` with an init-list ctor moved the stores.
 
-### A17. Small source forms: 1 or 2 each
+### A17. Error blocks and cleanup tails as in the original (r2 A14; P14, P36, P13 s1; inline-3): 19
+- One full error block per failed call when the original calls `WSAGetLastError` in each (`Network::initializeSocketInterface` 0xda30).
+- One shared cleanup tail (`goto cleanup;`) when the original has one tail (`TakeGoodsOk` 0x113e0).
+- `__try { ... __leave; } __finally { ... }` when the HR shows `$__FINALLY_n` (`ListLobbyServiceItemInfoOk` 0x117a0).
+- No explicit `p.Clear()` / `fp.packet.Clear()` before `return`: the dtor clears. An explicit Clear gives one more `Packet::Clear` call
+  (`BypassPacket` 0x121d0; LG `Client::SendListGoodsOk` 0x4b20 +2; POD `WorldChannel::SendRelayResponse` 0x1e570 +1).
+- One `Db::ReleaseTransaction` per return: `if (*ret != 0) return false; return true;`, not `return *ret == 0;` (POD `ResetAllDeliveryFailurePost`, +1).
+- Zero-fill after the `Prepare` check, not at the declaration (POD `PostOfficeDB` `paramLen`).
+- POD `RelayContext::ProcessRelayRequest/Response/Timeout` (+3): write the `AutoCS` in a `{ }` scope block and remove each explicit `lock.Leave()`.
+  The original has the `AutoCS` dtor inline at scope end (one Lock.h line-122 assert tail per exit). Explicit `Leave()` plus the dtor gives 2 tails.
+  For a failure path after the lock: set a flag in the scope, `return true` in the scope, run the failure code after the scope.
+- LG `ClientManager::BroadcastAnnounceNotify`: let the packet dtor call `Clear` (95.8 -> 97.8, score only).
+
+### A18. Compiler-generated destructors (r2 A15; P42, P29, P39): 12
+- No user-declared dtor when the original dtor is a thunk with no vtable store (`EventObject`, `DynamicEventObject`; CG +1, LG +1, POD +5, SCD +2).
+- An inline dtor with a member dtor gives the EH state of the original (`inline Db::~Db()`, `db->~Db();` in `Db::Clear`).
+- Empty body when the member dtor does the work (`FragmentPacket::~FragmentPacket` 0x24e0).
+
+### A19. Struct and packet init with separate stores, no aggregate init (inline-3, handlers-3, manual 27d5420): about 11
+- LG `LobbyD::Send*` (+6): `Packet packet; packet.Splitter = nullptr; packet.IsFragmentPacket = false; memset(&packet.FragmentPacketCmd, 0, 28);`
+  and no explicit `packet.Clear()`. `Packet packet = {};` gives a `memset` over the whole struct.
+- `AlertSender::run` (CG 0x98f0, +4): set each socket event field with a separate store (`WSANETWORKEVENTS events = {0};` emits `memset`). Branch directly to the
+  reconnect and stop blocks; this keeps the separate `sendRemain` sites for `FD_CONNECT` and `FD_WRITE`.
+- POD `ManagementPacketHandler.cpp` `initReply`: set `CurHeader`, `Splitter`, `ListHead`, `ListTail`, `IsFragmentPacket`, `FragmentPacketCmd` one by one, then `Allocate()`
+  (HelloReq 97.0 -> MATCH).
+
+### A20. `#pragma inline_depth(0)` on one caller (manual): 8
+- When the original calls `RefCntObject::removeReferenceCount` out of line in one function but inlines it elsewhere, put `#pragma inline_depth(0)` before that caller and
+  set the default depth again after it. `LogMedia::Write` (CG 0x13910) and `TimerQueue::clearShortTermQueueSlot` (CG 0x16900) MATCH in all 4 exes.
+- These 2 were on the stop list. A global `noinline` on the callee lost MATCH in all 4 exes (B).
+- `inline_depth(1)` had no effect on `SessionSendBuffer::clearPacketBufferList`.
+
+### A21. Read the PDB facts before a source change (cryptolib-3, manual): about 8
+- A removed param: `BigInteger::Set(int, uchar const*, int)` has param 1 = sign and each caller gives 1. LTCG removes it as in the original (+3). Read the mangled name before you write `LIFT:`.
+- A PDB global, not a member: `CryptoKey::s_initializedCount` (also the decrement in `Network::Clear`).
+- An enum value: POD `POSTEVENT_PACKET_PUMP_EVENT` = 0x82 (Agent, CacheGate, World handlers; `TFPP_PumpPacket` MATCH).
+- A return type: LG `PacketConcatenateBuffer::Decompose(VarData*)` 0x1bce0 returns `unsigned short` (the `int` form did not pair).
+- Flag values: LG `ContentsRuleConfig::ConvPacketElement` 0x8ce0 `FormatMessageW` flags 0x3100. A folded argument: `L"LOBBYGATE"` to `AlertSender::init`;
+  LG `Daemon::LoadVersion` passes its length argument to `swprintf_s`.
+- ICF: check all public names at a vtable address before a source change (fix 10).
+
+### A22. Per-exe source form (perexe-3, manual): about 6
+- `tools/vs2010/build.sh` gives `-DLIFT_EXE_<CG|LG|SCD|POD>` to each source that has the token `LIFT_EXE_` (itself or in a repo header).
+  Object: `build-vs2010/obj/<TAG>/<src>.obj`. `xargs -L1` joins a line that ends with a blank: write `"$s${tag:+ $tag}"`.
+- `Session::Send(Packet const*)` `noinline` only for CG, LG; `Session::deallocateCrypt` `noinline` only for LG (0x194c0) with `if (crypt == nullptr) return;` (+1).
+- `deallocateCrypt` type test as a compare chain `type == 0 || ((r1 = type - 1) != 0 && ((r2 = r1 - 1) == 0 || (unsigned)(r2 - 1) <= 1))`, not a `switch`
+  (`Session::~Session` MATCH in CG, SCD, POD; LG inlines it twice under `#if LIFT_EXE_LG`, +1).
+- A per-exe file when only one exe has another form: `ChannelSmartCouponDaemon.cpp` (`Channel::MakeSession` SCD 0x1f2b0 checks `portId - 1` and logs the missing port
+  after the create branch; the same form in all 4 exes lost 3 MATCH).
+
+### A23. PacketHandler form (handlers-3): 5
+- POD `WorldSessionHandler`, `AgentSessionHandler`, `CacheGateSessionHandler`, SCD `ManagerSessionHandler`, LG `ClientSessionHandler::PacketHandler`.
+- `void* iocpHandle = nullptr;` at the top, set it in the pump branch. `short const* const pCmd = &packet->CurHeader[1].size; if (pCmd == nullptr)`. Read `*pCmd`
+  and `session->_id` at each use (no locals).
+- Inline `Session::GetChannel` by hand where the original does (POD World, LG): `if (session->_channel != nullptr && !session->_waitForRelease) { addReferenceCount; channel = ...; }`.
+  SCD 0xe980 calls `GetChannel`.
+- `bool result = false;` after the channel block, `channel == nullptr` first, one `return result;`. LG list tests are signed (`*pCmd >= 0 && *pCmd < 0x6E`).
+
+### A24. Small source forms: 1 or 2 each (r2 A17)
 - UTF-8 BOM for a file with Korean literals (P13 s2; signal `??_C@_1IA@` against `??_C@_1KI@`).
 - `switch` gives dec/dec; `if/else if` gives `cmp 2` (P6, `RefCntHistory::dump`).
 - Keep a member pointer in a local before a lock call (P4, `Daemon::setState`).
@@ -178,6 +306,8 @@ A12->A14, A13->A15, A14->A16, A15->A10, A16+A17->A17, new A12 (crypto source for
 - An inline ctor that the original compiles to `memset` must call `memset`, not a loop (POD `RetrieveCharacterInfoRelayRequest`, +1).
 - Inlined ctor with a folded tag: set `_tag = 778` and `memset` the context in the ctor body (`PortListener`, score only).
 - Inline ctor copies `ID128_GUID_ZERO` (P27; POD `PostInfo::PostInfo` 66.7 -> 88.9, score only).
+- `wchar_t buffer[40] = L"{";` (the compiler emits the `memset` for the rest; `String::GetId128FromGuidString`).
+- LG `ContentsRuleConfig::MakeListPacket` calls `FragmentPacket::FreeSize` in the option loop (0x8b1a); the opening and closing elements use the inlined check.
 
 ## B. Patterns that did not work (do not try again without a new idea)
 - `!wcscmp(...)` or `int r = wcscmp(...)` to keep the -1/0/1 value (`PipeCommandProcess::processCommand`).
@@ -200,6 +330,23 @@ A12->A14, A13->A15, A14->A16, A15->A10, A16+A17->A17, new A12 (crypto source for
 - POD `DbTransaction::BindCol` (6-arg) in the positive form: loses the BindCol MATCH and does not inline. Reverted.
 - POD `MODULE_NAME` as `#define` alone (no helper change): no change.
 - POD lock asserts: local macros instead of `AutoCS` in `UnsentPostContextManager` (score +0.2, no MATCH).
+- Round 3 (do not try again without a new idea):
+  - `WinServiceConsole::UninstallService` (CG 0x17f00, orig 5 `CloseServiceHandle`, ours 4): swapped `DeleteService` branches (95.1, worse) and a
+    `wprintf` select. VS2010 tail-merges the fail path. Compiler cross-jump.
+  - `PipeConsole::SetInvalidInfo` (CG 0x15d90, orig 2 `addNode` sites): loop split per branch, `node == &tail || node == nullptr`, `goto` form. VS2010 merges the calls.
+  - `PipeConsole::run`: 3 more forms in order-3. Stop.
+  - `Channel::MakeSession` port-first in all 4 exes: CG, LG, POD lose MATCH. Use the per-exe file (A22).
+  - POD `UnsentPostContextManager::initContextManager`/`updateWorldList`: `goto` form and RAII form give the same layout.
+  - `PacketBuffer::Compose` case P: `memcpy` tail merge (96.3 -> 93.0). `Session::HandleEvent`: common log (98.5 stays).
+  - `HandleCacheGateRelay` (CG): 3 forms, 93.3 best.
+  - AES: key setup in groups of 5, dec key pointer form. `BigInteger::mul` pointer loop. `ObjPool` init list.
+  - Success-first: `CacheD::Verify` mismatch-first, SCD `loadUnhandledGameEventLog`, POD `WorldConfigManager::loadWorldConfigFile` (lower score).
+  - Failure-first: POD `PingRelayContext::processRelayResponse` (97.6 -> 95.1).
+  - `InitSymbol` common unload. GUID word loads. `#pragma inline_depth(1)` on `SessionSendBuffer::clearPacketBufferList`.
+  - `Network::Clear` countdown loop or cached port. `CacheDList::LoadCachedListConfigFile` loop forms (96.3).
+  - An explicit `Packet::Allocate` in LG `Client::Send*` (the allocator then inlined).
+  - SCD DB loaders with all columns inline: the original inlines only column 1 (dbbind-3).
+  - LG `ClientManager::BroadcastAnnounceNotify` branch swap: no gain (97.8 came from A17).
 
 ## C. Tool and build facts
 ### C1. funcdiff reads a vtable ref as a string (FIXED in lift-parity-tool-2)
@@ -222,9 +369,9 @@ A12->A14, A13->A15, A14->A16, A15->A10, A16+A17->A17, new A12 (crypto source for
   `PostOfficeDaemon::_instance` ref count (`CacheGateSessionHandler::OnConnect`, `AgentSessionHandler::OnClose`).
 
 ### C4. Build facts
-- `tools/vs2010/build.sh` tracks headers (tool-2): `cl /showIncludes` writes `build-vs2010/obj/<src>.dep`. No `touch` is necessary.
+- `tools/vs2010/build.sh` tracks headers (tool-2): `cl /showIncludes` writes `build-vs2010/obj/<src>.dep`. No `touch` is necessary for these headers (see the round-3 line below).
   A new `build-vs2010/obj` builds all objects once (about 5 minutes in a new worktree).
-- `tools/vs2010/build.sh` compiles one object per source path with fixed flags. The per-exe define exists now (section E).
+- `tools/vs2010/build.sh` compiles one object per source path with fixed flags. The per-exe define exists now (A22).
 - Gate link has no `_Init_thread_*`: `add_compile_options(/Zc:threadSafeInit-)` in `CMakeLists.txt` (not the toolchain file; an
   old `CMakeCache.txt` keeps old flags). VS2010 has no thread-safe statics, so parity does not change.
 - Include `crt_cpp_overload.h` only under `#if defined(__clang__)`.
@@ -235,259 +382,49 @@ A12->A14, A13->A15, A14->A16, A15->A10, A16+A17->A17, new A12 (crypto source for
 - Helpers (not in git, copy them from an older worktree or write them again): `.scratch/dis2.py <EXE> '<regex>'` (orig and ours disassembly;
   import `from capstone import x86_const as X86`), `.scratch/fdfull.py` (funcdiff with full diff context), `.scratch/classify.py` (review-2 classifier).
   Run with `uv run -q --no-project --with capstone --with pefile python ...`.
+- Round 3: the `.dep` files list only the `BloodLib/include` headers. After a change in another header, `touch` the `.cpp`.
+  A lowercase `/showIncludes` path is fixed. A new worktree can have no `<EXE>.funcdiff.json`: run `.scratch/fd.sh` or one parity run first.
+- Quick loop for one exe (about 30 to 45 s): `tools/vs2010/build.sh <EXE>`, `funcdiff.py <EXE> --build build-vs2010 --json x.json`, then compare with
+  a copy of `build-vs2010/<EXE>.funcdiff.json` (`parity.sh` overwrites it). Per-exe objects are in `build-vs2010/obj/<TAG>/`.
+- Do not name a script `dis.py`: it shadows the stdlib `dis` (capstone import). Import `funcdiff.Image` for the disassembly of one function.
+- `tools/parity_shared.py --list` showed DIFF for `Session::~Session` and `TimerQueue::~TimerQueue` while `<EXE>.funcdiff.json` showed MATCH (perexe-3). ❓
+  Check `parity_shared.py` input before you trust a single DIFF entry.
+- IDA: a broken `.i64` does not open (status 4). Copy the exe to a scratch directory and open the copy.
 
 ## D. Open causes (not solved, not tool noise)
-- Closed crypto libraries (crypto-2): NOT compile flags. The LG PDB `S_COMPILE3` of BloodLib `Port.obj` and of BloodCrypto `rsa.obj`,
-  `BigInteger.obj` is the same: `ltcg | security checks | hot patchable`. The original links `Security\lib\BloodPacketCrypt64.lib`
-  (BloodPacketCrypt, NoPacketCrypt, HandshakePacketCrypt, SessionPacketCrypt, BroadcastPacketCrypt) and `BloodCert64.lib`
-  (BloodCert, ssn, CertDec, nic, ModuleCodeString, Cert). They have `no dbg info`: no `S_GPROC32`, no pseudocode in `hr/`.
-  They call `Crypto::Create`, `Rsa::Rsa`, `Dh::Dh`, `RsaPrivate::~RsaPrivate` (LG 0x14004cf70, 0x14004c5d0). Ours has
-  `PacketCrypt::Create` / `InstanceSize` as stubs (`TODO(lift-lobbygate-4)`, `Session.cpp:945`, `:955`). Misses: LG 72, SCD 47, POD 47. Card cryptolib-3.
-- LTCG inline choice: `TimerQueue::clearShortTermQueueSlot`, `LogMedia::Write` inline `removeReferenceCount` (stop list).
-- Constant propagation: `ThreadManager::Initialize(128)`, `Network::OpenPort` assert, `Session::Connect` timeout (LG, SCD).
-- Constant CSE: `EventNotiJob::finalize` 0x9cc0, `JobManager::Execute` 0x71a0 (stop list).
-- Merged `Log::Write` tails: `Session::HandleEvent` 0xf1c0, `CacheDList::MakeSessionAll` 0x27d0, SCD `CouponJob::transit` 0x6990 (Alert tail merge).
+Solved in round 3 and removed: closed crypto libraries (A3), `Port::Initialize` EH state -2 and scalar placement delete (A14),
+`TimerQueue::clearShortTermQueueSlot` and `LogMedia::Write` (A20).
+
+- Stop list (no source change without a new idea): `aes128TableEncrypt/Decrypt/SetupEncKey/SetupDecKey` (orig loads the image base 3 times; orig unrolls 5 times),
+  `Session::Session` and `StaticPageMemoryManager::Initialize` (LTCG address fold), `ThreadManager::Initialize(128)` and `Daemon::Start` (constant propagation),
+  `PipeConsole::run`, `PipeConsole::SetInvalidInfo`, `WindowConsole::Open` (ICF), `EventNotiJob::finalize` 0x9cc0 and `JobManager::Execute` 0x71a0 (constant CSE),
+  `Finalize` `.tls` 0x18/0x10, `ZSTD_compressBegin_internal` (vendor).
+- EH state `-2` without a known `::new` site: `wmain` x4 (CG 61.9, LG 66.7, SCD 66.7, POD 85.2), `FragmentPacketConcatenater::Clone` (LG, POD 93.3),
+  LG `IdleWatcher::run`, SCD `NPServiceChannelManager::HandleMessage`, POD `operator delete[]` (score 0). Try A14 first.
+- Crypto (14 shared names in LG, SCD, POD): `BigInteger::Mul` (consts 0x1000/0xffffffe0, `_alloca`), `mul` x2, `sub`, `Sqr`, `Divide` 76.7, `InvMod`, `invMod`
+  (ours inlines `LeftShift`, `add`, `sub`, `RightShift`), `expMod`, `OaepEncoder::Setup/encode/decode`, `Rsa::decrypt`, `RsaPublic::Setup`,
+  `RsaPublic::~RsaPublic` (orig refs `??_7Ripemd128` and `??_7RsaPublic`, ours `??_7Rsa`). LG only: `Crypto::Create` 34.0, `InstanceSize` 44.4,
+  `allocateCrypt` 67.4, `Dh::*`, `RsaPrivate::*`, `IsPrime` 82.2, `isPrimeMR` 88.4, `completeHandshake` 55.6.
+- Merged `Log::Write` tails: `Session::HandleEvent` 0xf1c0 (98.5), `CacheDList::MakeSessionAll` 0x27d0, SCD `CouponJob::transit` 0x6990.
+- Constant propagation: `Network::OpenPort` assert (orig CG has 3 crash sequences, lines 170, 175, 177; orig test `purpose != 1 && purpose != 2`), `Session::Connect` timeout (LG, SCD).
 - `_instance` reload in LG `KickNotify`, `CloseSessionNotify`.
-- DB loaders: SCD `SmartCouponDB::Process*GameEventLog`, `Load*` inline only the first `BindCol` and have no `DbTransaction::Fetch` call.
-  POD `PostOfficeDB::Load*` inline 17 `BindCol` (ODBC import #4) with one shared "Not initialized" tail; `memset`/`PostInfo::PostInfo`
-  after the first acquire `Log::Write`; inline `AttachedItemInfo` ctor loop. Card dbbind-3.
-- Block layout that the source order did not move: SCD 0x8e80, POD 0x1aaa0, LG `Client::SendTakeGoodsOk` 0x4ed0 (orig `Allocate` before
-  the first `Compose`), POD `updateWorldList` x3 (crash block after the loop), `PingRelayContext::processRelayResponse` (one Alert less).
-- Constants with no known cause: `Port::Initialize` EH state -2 (maybe a class `operator new(size,file,line)` + matching delete),
-  POD `PostInfo::CheckValidityPostData` (switch lowering 0x2/0x7 vs 0x5), POD `ComposeResponsePacket` x2 (line numbers, unwind),
-  `Blowfish::Setup` (register allocation), `aes128TableSetupEncKey` (orig unrolls 5 times), `aes128TableSetupDecKey` (not tried).
-- Scalar placement `operator delete(void*, void*)` (Memory.h:173 crash Log): DIFF score 0 in CG, SCD, POD, orig-only in LG. Card arraynew-3.
+- `Session::SendV` (CG 0xfaa0): the orig `Compose` call has the const 0xf9e twice; ours once. Not checked in the disassembly.
+- `SessionSendBuffer::clearPacketBufferList` x4: orig calls `RefCntHistory::add`. A global `noinline` lost MATCH (B); `inline_depth(1)` had no effect.
+- `IoWorker::run` x4 (84.9), `Network::Clear` x4 (97.2), `InitSymbol` x4 (98.0), `PipeConsole::processCommand` x4, `PipeCommandProcess::processCommand` x4.
+- DB loaders (dbbind-3): SCD `SmartCouponDB::Load*`/`Process*` 95.0 to 97.8: ours has one more `DbTransaction::Fetch`, consts 0x2/0x3/0x5 (column index), one more `L"db"` ref.
+  POD 0x14e50 98.3, 0x190f0 98.6: rotated fetch loop (one more `memset, memset, Fetch`), const 0x23 missing.
+  POD 0x15fa0 88.4, 0x18010 88.8: orig merges the 17 `statmentErrorLog` calls into one site and logs "Not initialized" before the binds. POD `RegisterPost` 84.0 not examined.
+- POD `HandleCacheGateRelayFail/Invalid` 82.7: the original has 3 `ProcessRelayResponse` calls (not tried). POD `Packet::Allocate` pool index: orig 0x28, ours 0x90.
+- POD `ManagementSessionHandler::PacketHandler` 97.8: the handler call is at the end in the original.
+- Block layout that the source order did not move: SCD 0x8e80, POD 0x1aaa0, LG `Client::SendTakeGoodsOk` 0x4ed0, POD `updateWorldList` x3,
+  SCD `DChannelMgr::SetupDaemonList` 96.3 (ref order and const 0x178 left).
+- Constants with no known cause: POD `PostInfo::CheckValidityPostData` (switch lowering 0x2/0x7 vs 0x5), POD `ComposeResponsePacket` x2, `Blowfish::Setup`.
+- LG `GateKeyManager::MakeGateKey` 94.3 (not tried). LG `ContentsRuleConfig` 4 path literals.
 
-## E. perexe-3 (2026-11-18, final)
-- Per-exe objects: `tools/vs2010/build.sh` gives `-DLIFT_EXE_<CG|LG|SCD|POD>` to each source that has the token `LIFT_EXE_` (itself or in
-  a repo header, found by the python filter in `tools/vs2010/build.sh`). Object: `build-vs2010/obj/<TAG>/<src>.obj`. Other sources keep one shared object.
-  `xargs -L1` joins a line that ends with a blank with the next line: write `"$s${tag:+ $tag}"`, no trailing blank.
-- `StlMemory.h`: `LIFT_STLMEMORY_FILE` default depends on `LIFT_EXE_*`. `TimerQueue::~TimerQueue` MATCH in LG, SCD, POD (the inlined COMDAT copy had the CG path).
-- `Session::Send(Packet const*)`: `noinline` only for CG, LG. `Session::deallocateCrypt`: `noinline` only for LG (0x194c0). The ONLY-OURS entries are gone in CG, SCD, POD.
-- Measure after stage 1 (last run, parity ok): CG 421 (+1), LG 532 (+2), SCD 512 (+2), POD 592 (+4). Gate ok.
-- Worked: ICF fold name. Orig POD has 2 case forms of the StlMemory.h path: `E:\DailyBuild02\PostOfficeDaemon-Common-...\Program\Server\...` (modules PostContext, RelayContext, RelayTimeContext)
-  and lower case (others). With one lower-case path in all POD objects, ours folds `_Tree<ushort,WorldChannel*>::_Erase` into the `<__int64,PostContext*>` copy and
-  `WorldConfigList::~WorldConfigList` loses MATCH. Fix: the 3 modules define `LIFT_STLMEMORY_FILE` in mixed case (POD +3 with the Session fixes).
-  Count of path forms per exe: `grep -o 'L"[Ee]:[^"]*StlMemory.h"' ~/.cache/bns-lift/hr/<EXE>/*.c`. Mixed case: LG Client; SCD CouponGameEventConfig; POD 3 modules above; CG none.
-- Worked: type test of `deallocateCrypt` as the compare chain `type == 0 || ((r1 = type - 1) != 0 && ((r2 = r1 - 1) == 0 || (unsigned)(r2 - 1) <= 1))`.
-  A `switch` on 0, 2, 3, 4 keeps the constant 0x2. The chain removes consts 0x2,0x3,0x4: `Session::~Session` MATCH in CG, SCD, POD (+1 each).
-- Worked: `if (crypt == nullptr) return;` inside `deallocateCrypt` (orig LG 0x194c0 has it): removes the tail-jump to `Free`, LG `deallocateCrypt` MATCH.
-- Worked: LG `Session::~Session` 0x175a0 inlines `deallocateCrypt` twice by hand under `#if LIFT_EXE_LG`. A local macro with the chain test (not `switch`) gives MATCH (LG +1).
-- Final measure (gate ok, parity ok): CG 421, LG 533, SCD 512, POD 592 (baseline 420/530/510/588). Shared 421/499 (no change: the shared count needs MATCH in all 4 exes).
-- Fact: `tools/parity_shared.py --list` still says DIFF for `Session::~Session` (all 4 exes) and `TimerQueue::~TimerQueue` (LG, SCD, POD) after the full parity run,
-  but `build-vs2010/<EXE>.funcdiff.json` says MATCH for each. The shared count stays 421/499. Cause not found (❓): `parity_shared.py` may compare the shared build, not `obj/<TAG>/`. Read it before the next card.
-- Fact: IDA did not open `CacheGate.exe.i64` in this card (status 4). `Session::SendV` CG 0xfaa0 was not checked in disasm.
-- Not a path literal: the remaining refs-only DIFFs (`Network::Network`, `PacketBufferAllocator::initAllocator`, `Session::Session`, `StaticPageMemoryManager::Initialize`,
-  `DaemonConfig::Dump`) differ in the count of global data refs (`Network::EndEventObject`, `_Allocator`, `BaseMemoryManager::_Instance`), not in a path. They need a data-layout or init-order cause.
-- Not a per-exe cause: scalar placement `operator delete(void*, void*)` (Memory.h:173) is DIFF score 0 in CG, SCD, POD (card arraynew-3). IDA did not open CG in this card; `Session::SendV` CG 0xfaa0 not fixed.
-  The orig `Compose` call there has the const 0xf9e twice; our source has it once (`Compose(..., 0xF9E, format, -1, args)`).
+## F. Manual parity notes (round 3)
+The manual work of round 3 (commits 27d5420, 46fe9c1, beb4669 and later). The patterns are merged into A; the notes stay for the details.
 
-## lift-parity-cryptolib-3 (closed crypto libraries)
-- Worked: lift the callers in the closed libraries from disasm (`PacketCrypt` LG 0x4cc60-0x4da60, `BloodCert`/`CertDec`/`SSN`/`NIC` LG 0x4bf70-0x4ca10). LG +36: the callees in BloodCrypto get a caller and pair.
-- Worked: `#pragma comment(linker, "/INCLUDE:<IsValid>")` under `LIFT_EXE_LG/SCD/POD` keeps an uncalled closed-lib object, as the original does (the lib object is linked whole). SCD +26, POD +26, LG +2. CG has no such object.
-- Fact: the original BloodCert functions have no PDB symbol. Ours are ONLY-OURS. This does not change the MATCH count.
-- Worked: PDB signature `BigInteger::Set(int,uchar const*,int)` with param 1 = sign and all callers give 1. LTCG removes the param as in the original. MATCH in LG, SCD, POD (+1 each).
-  Read a removed param in the PDB mangled name before you write `LIFT:` for it.
-- Worked: `noinline` on `CryptoKey::Initialize` under `LIFT_EXE_LG/SCD/POD` (+1 each). Did not work without the guard: CG loses `Network::Initialize` (CG original inlines it).
-- Worked: `noinline` under `LIFT_EXE_LG` on `Crypto::InstanceSize`, `RsaPrivate::RsaPrivate`, `BigInteger::IsPrime`, `Session::completeHandshake`: 4 orig-only go to paired, LG +1 MATCH (IsPrime DIFF 82, completeHandshake DIFF 56).
-- Final measure (gate ok, parity ok): CG 421, LG 574, SCD 540, POD 620. Crypto orig-only: 0 in each exe.
-
-## inline-3 notes (stage 1, 2026-11-18, not yet sorted by the review)
-- Worktree setup: copy `vendor/zstd/src` from the main checkout, then `git fetch --shallow-since=2018-05-01 origin dev; git checkout bb6eaf64`
-  inside it. Set `LIFT_IDA_DIR`. Baseline before inline-3: CG 421/491, LG 574/739, SCD 540/669, POD 620/759 (gate ok, parity ok).
-- Quick loop for one exe (about 45 s): `tools/vs2010/build.sh <EXE>`, then `funcdiff.py <EXE> --build build-vs2010 --json x.json`, then compare with the
-  `build-vs2010/<EXE>.funcdiff.json` of the last parity run (copy it first: parity.sh overwrites it).
-- Disassemble one function of the original or ours with capstone: import `funcdiff.Image` (never name the script `dis.py`: it shadows the stdlib `dis`).
-- `Log::Initialize` (CG 0x9da0): our `Log::Log` was a call (`private` in-class ctor not inlined). `__forceinline` on it gives the inline stores.
-  The original has `memset(mediaList, 0, 88)` as a call and 44 bytes of `mediaCountPerList` as inline stores. Source: two `memset` calls
-  in the ctor, not a `for` loop (our loop became a rolled loop). Score 84.1 -> 93.0 in CG, still DIFF (see progress note).
-- Worked (stage 2): `Log::Log` counts as 11 explicit stores `mediaCountPerList[0..10] = 0;` plus one `memset(mediaList, 0, 88)`. A second `memset` gave an extra call; a `for` loop gave a rolled loop.
-  `Log::Initialize` MATCH in CG, LG, SCD, POD (+1 each, no loss). Together with `__forceinline` on `Log()`.
-- Worked: `wchar_t buffer[40] = L"{";` in `String::GetId128FromGuidString` (CG 0xdd90). The compiler emits the `memset` call for the rest of the array, as the original does. MATCH in CG (+1). LG, SCD, POD not measured yet.
-- Worked: `__declspec(noinline)` on `InitSymbol` (CrashHandler.cpp, orig 0x7de0). Without it, VS2010 LTCG hoists `LoadLibraryW(L"dbghelp.dll")` out of `InitSymbol` into the 4 call sites in `CrashHandler::handleCrash`. MATCH in CG (+1). Other exes not measured yet.
-- Did not work: `WinServiceConsole::UninstallService` (CG 0x17f00, orig has 5 `CloseServiceHandle` calls, ours 4). VS2010 tail-merges the OpenService-fail path (`Close(manager); return false`) into the DeleteService-fail pair.
-  Swapping the `if (DeleteService)` branches made it worse (score 95.1). Source is back to the original form. Cause class: compiler tail merge (cross-jump). Not fixed.
-- Did not work: `PipeConsole::SetInvalidInfo` (CG 0x15d90, orig 2 `addNode` call sites, ours 1). Orig has the search loop twice (one per `isInvalid` branch) and `addNode` at two places
-  (list end, and `node == nullptr` after a match). Three source forms tried: loop split per branch; `node == &tail || node == nullptr`; `goto` form like the pseudocode. VS2010 merges the calls each time. Source is back to the original form.
-- Fact: `Network::OpenPort` (CG 0xd2c0): orig CG has 3 separate crash sequences (lines 170, 175, 177) inline. Ours has fewer `Log::Write`/`AlertSender::Write`/`MakeCrash` calls.
-  Orig test for line 175 in CG is `purpose != 1 && purpose != 2`. Ours uses `initialMode < 0 || initialMode > 3` (❓ in the source). The macro is `NETWORK_ASSERT_CRASH` in `Network.cpp`. Not changed yet.
-- Fact: `PacketBuffer::Compose` (CG): orig has 2 more `memcpy` calls than ours. `Session::HandleEvent` (CG): ours has one extra `Log::Write` and one extra `L"source\Session.cpp"` ref. Not looked at in the source yet.
-
-### inline-3 stage 3 notes (2026-11-18)
-- Worked (LG +6 MATCH, `LobbyD::Send*` x6): remove each explicit `packet.Clear()` (dtor clears; A14) and write the Packet ctor inline:
-  `Packet packet; packet.Splitter = nullptr; packet.IsFragmentPacket = false; memset(&packet.FragmentPacketCmd, 0, 28);`.
-  `Packet packet = {};` gives a `memset` call over the whole struct that the original does not have. `failCompose` has no `Clear` now.
-- Worked: stage 2 changes (Log, StringUtil, CrashHandler) lose no MATCH in the 4 exes (CG 424, LG 577 before the Send* fix, SCD 543, POD 623).
-- Did not work: `Network::OpenPort` CG form `initialMode != 1 && initialMode != 2` under `LIFT_EXE_CG`: score stays 90.8. The compiler drops the
-  `id == 0` check (callers pass the constants 1 and 2); the original keeps it (orig line 170). Cause: constant propagation. Reverted.
-- Did not work: `PacketBuffer::Compose` case `P` with `p` updated before the `memcpy`: memcpy calls 2 (orig 3) but the crash tails split (score 96.3 -> 93.0). Reverted.
-  Cause: VS2010 merges the identical `memcpy` tails of cases K, P, s.
-- `Session::HandleEvent` 0xf1c0: still one extra `Log::Write` (98.5). Not touched in stage 3.
-- Worked (score only, no new MATCH): LG `findDisconnectedNode` and `clearDisconnectedInfo` (`LobbyDChannel.cpp`) as `__forceinline` with an inline 20-character compare loop (orig: `repe cmpsw`, 0x9310, 0x94c0).
-  `LobbyDSessionHandler::OnConnect` 82.7 -> 94.4 (calls and refs 100); `OnClose` calls 100. Left: consts `0x2` (loop step) and `0x278` in ours only; the `L""` ref (`??_C@_11LOCGONAA`) is not in ours. `LobbyD::Hello` 92.1 -> 91.5 (still DIFF).
-- Did not work: POD `TextStreamPacketBufferHandler::Destroy` (0x2c4a0): `Buffer.GrowingBuffer::~GrowingBuffer()` for `this->~TextStream...()`. Still one extra `<indirect>` (score 93.3). Not understood.
-- Fact: POD `RelayContext::Process*` (0x1bb30, 0x1c090, ...): ours calls `AutoCS::Leave` and the Lock.h assert tail (`Log::Write`, `AlertSender::Write`, `MakeCrash`) more often than the original. The original inlines `AutoCS::Leave` with fewer assert copies. Not changed.
-
-### inline-3 stage 5 notes (2026-11-18)
-- Worked (POD +3 MATCH: `RelayContext::ProcessRelayRequest/Response/Timeout`): the original has the `AutoCS` dtor inline at scope end (one Lock.h line-122 assert tail per exit).
-  Write the `AutoCS` in a `{ }` scope block and remove each explicit `lock.Leave()`. An explicit `Leave()` plus the dtor gives two assert tails per exit (A14 form for `AutoCS`).
-  For the failure path that works after the lock: set a flag in the scope, `return true` inside the scope, and run the failure code after the scope.
-- Worked: read `PostOfficeDaemon::_instance->` at each use. A cached local `daemon` merged the global loads; the original reloads it (2 more refs). Request went 99.5 -> MATCH.
-- Did not work, reverted: POD `TextStreamPacketBufferHandler::Destroy` with `Buffer.GrowingBuffer::~GrowingBuffer()`. No score change.
-- Not fixed: `Network::OpenPort` (CG, 2 overloads): per-exe purpose test and constant propagation; belongs to perexe-3.
-
-## lift-parity-order-3 (stage 1, in progress)
-- Fact: a lift helper in an anonymous namespace that the orig inlines shows as ONLY-OURS and its refs/consts are missing in the caller (`initMemorySection` in `BloodDaemonMain`, 133 bytes in all 4 exes). Fix form: `__forceinline` (A10).
-- Warning: `__forceinline` on that helper also inlines the callee (`Memory::CreateManager` became `HeapCreate`): CG -1 MATCH. Add `noinline` on the callee when the orig calls it out of line. Check all 4 exes.
-- Fact: `int const CONFIG_DIR_OPTION_LEN` folds into the code. The orig reads it from memory (2 refs). Use a non-const `int` and `extern int` in `Daemon.h`.
-- Tool note: `funcdiff.py --show` prints 1 line of context. For the whole call list use a copy of the script with a larger `n` in `difflib.unified_diff` (do not edit `tools/funcdiff.py` outside a tooling card).
-
-## lift-parity-order-3 (CacheGate only measured, 424 -> 427)
-
-Worked:
-- `__forceinline` on a helper that the orig inlines (`initMemorySection`) also inlines its callees. Add `__declspec(noinline)` on the callee the orig calls out of line (`Memory::CreateManager`). Without it CG lost 1 MATCH.
-- WPO folds a global with a constant initializer, even when it is not `const`. The orig reads `CONFIG_DIR_OPTION_LEN` from memory. `volatile int` keeps the read (2 refs). Plain non-const `int` did not.
-- `BloodDaemonMain`: `if (GetConsoleWindow() == nullptr) { RunMode = DAEMON_MODE; } else { ...loop... }` and one shared tail `makeConsole` + `Daemon::Start`. This puts the DAEMON path first, as in the orig. A duplicate tail (early `return` in the DAEMON branch) gave an extra `makeConsole`/`Start` call: do not use it.
-- `makeConsole`: `switch (RunMode)` with `case DAEMON_MODE`, `TEXT_MODE`, `WINDOW_MODE`, `default` (error). The `if` chains in two orders did not match. The switch gives the orig block order.
-- `LogFile::writeFile`: first `CreateFileW` before the retry; retry as `do { Sleep; CreateFileW; if ok goto opened; } while (++tries < 100);` then the error code, then `return`; label `opened:` after. A `while (true)` loop with the error inside was worse (the compiler unrolled one more `Sleep`/`CreateFileW`).
-
-Not worked / open:
-- `PipeConsole::run` 0x157b0 (score 96.3): `switch (pipe.dwState)` for the `GetOverlappedResult` result, and `reconnect:` label moved after case 2, did not change the call order. Orig order: Log(567), GetLastError, Log(538), Log(500), ..., `disconnectAndReconnect` after the `ReadFile` `GetLastError`, then Log(639). Ours has an extra Log before `GetLastError` and `disconnectAndReconnect` too early. Not solved.
-- Not read yet: `Daemon::start` (orig calls `noTimerMain` before `timerMain`; one `Memory::_Manager` ref less in ours), `DaemonConfig::Load` (orig calls the `<indirect>` + `Sleep` after `FreeLibrary`), `BnsCommonConfig::LoadBnsCommonConfig` (orig `Log::Write` before `CheckMinMaxBoundary`; ours reads `BnsCommonConfig::Config` one more time).
-
-## lift-parity-order-3 (stage 3, CacheGate measured 424 -> 430, all 4 exes +3 before these edits)
-Worked:
-- `Daemon::start` 0xb140: swap `if (GetTimerInterval() != 0) timerMain else noTimerMain` to `== 0` first. Call order then matches.
-- `finiMemorySection` (inlined in `Daemon::start`): read `Memory::_Manager[section]` again after the destructor call (volatile global, the binary reads it again for `Free`). This removes the missing `Memory::_Manager` ref.
-- `DaemonConfig::Load` 0xc600: the binary puts the `LoadLibraryW` failure block last. Use `if (module != nullptr) { body } else { fail }`. A `goto` over initialised locals is not legal C++.
-- `BnsCommonConfig::LoadBnsCommonConfig` 0x13e0: write each error exit with its own `Config = nullptr; Log::Write(...)`. The compiler merges the tail and places it after the first error block. A hand-written `goto failed` tail (before or after the blocks) did NOT match. Also keep the allocated object in a local (`config`) and test the local: it removes one `BnsCommonConfig::Config` read.
-Not done:
-- `PipeConsole::run` 0x157b0: 3 tries used, no gain. Stop.
-- SCD `DChannelMgr::SetupDaemonList` (82.8: AddDaemon / GetAddressStringW order, `DaemonChannel.cpp` string ref, consts 0x38 0x178), `Channel::MakeSession` (Log::Write order, consts 0x17 0x24), `GameEventManager::PostGameEventLogList` (Log::Write order, orig refs ID128_GUID_ZERO, ours `GameEventManager::Instance`): diffs seen only, no edit tried.
-
-## lift-parity-order-3, stage 4 (SCD exe-only call order)
-
-- Worked (partial): `DChannelMgr::SetupDaemonList` 0xd270. Source order must follow the original block order:
-  `if (second != nullptr)` first (GetSession, error log, `goto release`, then the "changed" path), `else` alloc path last,
-  one shared `Log::Write(LT_NOTICE, ..., line, fmt, wid, address, port)` after both. Calls now match (score 82.8 -> 96.3).
-  Left: ref order (vtable before file string) and const 0x178 (line number of the inlined FindDaemon addReferenceCount). Not MATCH.
-- Did not work: `Channel::MakeSession` 0x10450, port-first order (`if (port != nullptr) { ... } ` then the "cannot find port" log last). Measured with the wrapper objects rebuilt: CG, LG and POD lose MATCH (score 90.5 / 90.5 / 88.6) and SCD stays DIFF. Undone. The shared form (early `return false` for `port == nullptr`) stays.
-- `touch` rule: the parity build tracks `.cpp` files only (see vs2010-build-header-deps). An `#include "X.cpp"` wrapper needs its own touch.
-- Worked: SCD `GameEventManager::PostGameEventLogList` 0xb140 (MATCH). (1) Read `Instance->_gameEventHandle` one time into a local `gameEventHandle`, test the local; the "handle is null" `Log::Write` is then the last block. (2) Hex-Rays folds reads of zero-initialised data (`ID128_GUID_ZERO`) to `0`: when funcdiff shows an orig ref to a global that the pseudocode shows as constant zero, write the global in the inlined constructor (`_gameAccountId(ID128_GUID_ZERO)` in `GameEventLogEvent::GameEventLogEvent`).
-- POD `UnsentPostContextManager::initContextManager` 0xc6d0 / `updateWorldList` 0xcae0 (seen only, no edit): in the binary the "return true" Leave tail (assert 122 + Leave) is the LAST call block; ours has it right after the `addUnsentPostContextList` call (loop-exit position). The RAII form `AutoCS` does not help: the original has no `~AutoCS` call (comment in `UnsentPostContext.cpp`). Next try: put the success tail after the error blocks (`goto`, or a `for` with the exit moved).
-- POD `UnsentPostContextManager::addUnsentPostContextList` 0xce80: only const `-2` (EH state) differs: toolchain cause, see the `Port::Initialize` line above. `deliverUnsentPost` 0xd510: `removeReferenceCount` order differs, not looked at.
-- Did not work: `Channel::MakeSession` port-first order (see stage 4 note above): measured and undone.
-
-## lift-parity-order-3, stage 6 (final)
-- Full run after all edits: CG 430, LG 588, SCD 550, POD 631 (baseline 424 / 583 / 543 / 626). MATCH lost: 0. Gate ok, parity ok.
-- Did not work: POD `UnsentPostContextManager::initContextManager` 0xc6d0, `for (;; ++it) { if (it == end) goto success; ... } success: Leave; return true;`. The compiler gives the same block order (success tail after the loop exit). Undone. The note about this try also holds for `updateWorldList` 0xcae0 (same shape, not tried).
-
-## lift-parity-consts-3, stage 1
-- Quick CG measure (`.scratch/q.sh CacheGate`): 430 -> 434. New MATCH: `PacketBufferAllocator::initAllocator` 0x12b10, `Session::Accept` 0xe7c0, `Session::recv` 0xf0d0, `TrustedPacketBufferHandler::ToPacket` 0x11e90. LG, SCD and POD are not measured yet.
-- Worked, `initAllocator`: `x = mem ? new (mem) T(...) : nullptr` with an init-list ctor moves or duplicates the stores. Use plain placement new and a ctor that assigns in the body, so that `InitializeCriticalSection` (member ctor) comes before the stores.
-- Did not work, `Network::Network` 0xcdb0: the same placement-new change for `EndEventObject` gives no change (still 2 stores, orig has 1 merged store).
-- Worked, `Session::Accept`: the orig reads the members (`_port->_sessionHandler`, `_id`), not the params. The idle block is one `SetBusyWithPos(id).pos` call (union `IdleStateTable::Pos` from the PDB).
-- Worked, `Session::recv`: take a pointer-to-context local before the stores. Put the failure block (`!AsyncRecv` -> log, return false) first.
-- Worked, `ToPacket`: no short local for the header size. Read `*size` through a `short const*` two times. A short local gives a range check with const 0xf9e.
-- Build fact: the `.dep` files of `tools/vs2010/build.sh` list only headers in `BloodLib/include/`. An edit of a header in `BloodLib/source/` (for example `IdleWatcher.h`) does not rebuild. Touch the `.cpp` files.
-- Not fixable here (stop list): TLS offsets in `Daemon::setAddress`, `Network::GetAddressStringW`, `Network::initWorkerThread`; const 0x80 in `Daemon::Start` (`ThreadManager::Initialize(128)` is constant-propagated); ICF vtable name in `Session::initialize` (`SessionRecvBuffer` vs `CrashHandler`); ICF name in `WindowConsole::Open`.
-- `Session::HandleFailedEvent` 0xf5d0 is still DIFF. Cause: ours keeps `&_lock.CS` in rsi; orig computes `+0x18` again at each use and keeps `removed` in esi. Also ours reads the id with a 64-bit `mov rax`; orig uses `mov r8`, then `r9d = r8d >> 2`.
-
-## lift-parity-consts-3, stage 2
-- Measured with `.scratch/q.sh` on all 4 exes: CG 430 -> 434, LG 589 -> 593, SCD 550 -> 554, POD 631 -> 635. The same 4 functions are MATCH in each exe. No exe lost a MATCH.
-- `Network::Network` placement-new edit reverted. `makeIdleStatePos` in Session.cpp removed (no caller).
-- Did not work, `Session::HandleFailedEvent`: `_lock.Enter()` / `_lock.Leave()` in place of `EnterCriticalSection(&_lock.CS)` gives the same code. `static_cast<short>(id) & 3` in place of `static_cast<short>(id & 3)` in `SetNotAvailable` gives the same code. Both reverted.
-- Cause found, not fixed: `Session::Session(unsigned, PacketBufferHandler const*)` and `StaticPageMemoryManager::Initialize(page,size,allocated,additional)` (CG 0x1a1a0). The only caller is the Session ctor. Orig LTCG folds `size` 2048 and `allocated` 584 into the callee, but still passes `&BaseMemoryManager::_Instance` in r8. Ours folds the address too. No source change is known that stops the address fold.
-- `SysInfo::Hostname` CG 0x14390: orig keeps a 16-byte `sockaddr_in` on the stack (frame 0x600, ours 0x5f0). Stores: 0 (2 qwords), sin_addr, sin_family 2, then sin_port = htons(0). `memset` + this store order alone does not keep the struct (frame still 0x5f0). Orig puts the '.' loop on the fall-through path after `test edi,edi; jne`.
-- `SysInfo::IpAddress` CG 0x144f0: orig tests `address == nullptr` before it reads `*count`; ours reads `*count` first (movsxd before the test). Orig uses r11 frame (`mov r11, rsp`). Call order differs: orig calls gethostname and WSACleanup before malloc.
-
-## lift-parity-consts-3, stage 3
-- Worked, `SysInfo::IpAddress` CG 0x144f0 (91.7 -> MATCH): (1) the adapter retry loop in the MS sample form `do { malloc; if null break; result = GetAdaptersAddresses(...); if (result != ERROR_BUFFER_OVERFLOW) break; free; p = nullptr; ++retry; } while (result == ERROR_BUFFER_OVERFLOW && retry < 3);`. The `for (;;)` form rotates the loop and calls `malloc` two times. (2) `if (hostname == nullptr) { if (gethostname(...) == 0) {...return 5;} } else { WideCharToMultiByte }`. The `if (hostname != nullptr) ... else if (gethostname...)` form moves the gethostname block to the end.
-- Worked, `SysInfo::Hostname` CG 0x14390 (95.8 -> MATCH): `sockaddr addr; memset; sockaddr_in* in = reinterpret_cast<sockaddr_in*>(&addr);` stores through `in` keep the struct on the stack (frame 0x600). Body in `if (hostname != nullptr) { ... return result; } return 3;`. Tail: `if (result == 0) { '.' loop } else { inet_ntoa ... }`. The consts 0x3/0x4 came from the block order (`lea eax,[rsi+3]` against `[rsi+4]`).
-- Cause found, `Port::Initialize` EH state -2: orig has `RefCntObject::operator delete(void*, wchar_t const*, int)` (CG 0x20f0, crash log line 0x8b). So orig creates `SessionPool` (derives `BaseRefCntObj`) with a class `operator new(size_t, wchar_t const*, int)` and the matching delete gives the EH region. Ours uses `Alloc` + plain placement new. Not yet tried.
-
-## lift-parity-consts-3, stage 4
-- Measured `SysInfo::Hostname` and `SysInfo::IpAddress` on LG, SCD, POD: both MATCH in each exe. Total for the card: LG 589 -> 595, SCD 550 -> 556, POD 631 -> 637, CG 430 -> 436. No exe lost a MATCH.
-- The original `Port::Initialize` uses the global placement delete during
-  unwinding. At this stage, the lift used the empty CRT form. See
-  [Placement delete and shared functions](#placement-delete-and-shared-functions)
-  for the measured fix.
-
-## lift-parity-arraynew-3, stage 1 (2026-11-18)
-- Start measure (this worktree, same as baseline): CG 436, LG 595, SCD 556, POD 637, shared 465/546.
-- Worked, LG `Client.cpp` (LG only measured, +4 MATCH, 595 -> 599): the scd-2 pattern of A16. `#define __PLACEMENT_VEC_NEW_INLINE` before all includes; own
-  `operator new[](size_t, void*) throw()`, `operator delete[](void*, void*)` (Memory.h:181 crash Log + Alert, lower case LG path), `inline operator delete[](void* p) { __delv_buf__ = p; }`,
-  `__declspec(thread) void* __delv_buf__`. Macro `liftArrayNew1(T, n, line)` = `new (Memory::_Manager[1]->Alloc(sizeof(T)*n+8, L"Client.cpp", line)) T[n]`.
-  Delete form: `delete[] p; Memory::_Manager[1]->Free(__delv_buf__, L"Client.cpp", line);`.
-  New MATCH: `GateKeyManager::Initialize` 0x3910 (32.6 -> 100), `ClientManager::Initialize` 0x5b90 (30.2 -> 100), `operator delete[]` 0x37a0 (was orig-only), `CriticalSection::CriticalSection` 0x3780 (was orig-only; the vec ctor needs the real function).
-- Open after the change: `GateKeyManager::Finalize` 0x3b10 (97.0) and `ClientManager::Finalize` 0x5cf0 (95.2). Only diff: const 0x18 (orig) against 0x10 (ours). The orig HR reads `ThreadLocalStoragePointer[0] + 24` for `__delv_buf__`;
-  ours has the TLS slot at +0x10. This is the TLS layout (the same cause as in the scd-2 note "__delv_buf__ shared TLS layout differs"). Not fixed.
-- Not touched: `ClientManager::broadcast` 0x6410 (76.9: calls 81, consts 77, refs 73). Orig HR: the push_back is inlined with the `reserve`/`_Xlength_error` growth path twice (aliasing test `p_second >= Mylast || Myfirst > p_second`),
-  `clients.clear()` is `memmove(Myfirst, Mylast, 0)`, and the vector buffer Free call has a 5th arg -2 (EH state/const). Not compared with ours yet.
-- Not touched: scalar placement `operator delete(void*, void*)` (LG `??3@YAXPEAX0@Z` DIFF 0; CG, SCD, POD DIFF 0). See D section; fix is global (Memory.h crash-body placement delete, see consts-3 stage 4).
-- Build fact: in a new worktree `tools/parity.sh` can build the 4 exes but leave no `build-vs2010/<EXE>.funcdiff.*` files. Run funcdiff by hand with `.scratch/fd.sh [EXE]`
-  (`uv run -q --no-project --with capstone --with pefile python tools/funcdiff.py <EXE> --build build-vs2010 --json build-vs2010/<EXE>.funcdiff.json --worst 0 > build-vs2010/<EXE>.funcdiff.txt`). `LIFT_IDA_DIR` must be set.
-- Setup fact: `vendor/zstd/src` copied from the main checkout is at 90ae502; `git fetch --shallow-since=2018-05-01 origin dev; git checkout bb6eaf64` inside it worked.
-
-## lift-parity-arraynew-3, stage 2 (2026-11-18)
-- Worked, LG `ClientManager::broadcast` 0x6410 (76.9 -> MATCH): `__declspec(noinline)` on `Session::send` (`BloodLib/source/Session.cpp`, 0xFE90). VS2010 /LTCG inlined `send` (WSASend, 3 Log::Write) into `broadcast`; the orig calls LG 0x19360. Measured: LG 599 -> 600, CG 436, SCD 556, POD 637 (no change). Run on all 4 exes: no MATCH lost.
-- Did not work, LG `ClientManager::BroadcastAnnounceNotify` 0x62c0 (95.8): swapping the `Compose` branches (success first, as in the HR) gave no change. Diff: orig `Log::Write` before `ClientManager::broadcast` in address order, ours has 2 `Packet::Clear` (tail duplicate). It is block layout. Source reverted.
-- Stop list, `GateKeyManager::Finalize` 0x3b10 (97.0) and `ClientManager::Finalize` 0x5cf0 (95.2): const 0x18 against 0x10 = `.tls` offset of `__delv_buf__`. Orig `.tls` raw data 0xa1 bytes, ours 0xb1 bytes: other TLS variables sit before it in orig (link order). Not fixable in source.
-- `GateKeyManager::MakeGateKey` 0x? (94.3): orig calls `GateKeyEntry::scalar deleting destructor` where ours calls `RefCntObject::removeReferenceCount`, and the order of `LeaveCriticalSection` differs. Not tried.
-- The scalar placement `operator delete(void*, void*)` scored 0 in this
-  round. The LobbyGate PDB gives address 0x1000 and module
-  `ThreadFreePacketPump`. The function logs at `Memory.h:173`.
-  See [Placement delete and shared functions](#placement-delete-and-shared-functions)
-  for the fix and the source of the path literals.
-
-## lift-parity-handlers-3, stage 2 (2026-11-18, PacketHandler form)
-- WORKED: POD `WorldSessionHandler::PacketHandler` 0x1f270 is MATCH (POD 637 -> 638). Form, all parts needed:
-  1. `void* iocpHandle = nullptr;` at the top, then `iocpHandle = Network::iocpHandle();` inside the pump branch (a zero register that stays alive: the range test stays 2 signed compares, const 0xd).
-  2. `short const* const pCmd = &packet->CurHeader[1].size; if (pCmd == nullptr)` (orig `add rsi, 2` + ZF; the `CurHeader == nullptr` form and the `== -2` form are wrong). Read `*pCmd` at each use (orig reloads it after each call). Use `session->_id` at each use, no `sessionId` local (orig loads `[rdx+0x68]` in each block).
-  3. Inline `Session::GetChannel` by hand: `T* channel = nullptr; if (session->_channel != nullptr && !session->_waitForRelease) { session->_channel->addReferenceCount(SESSION_FILE, 1051); channel = static_cast<T*>(session->_channel); }`.
-  4. `bool result = false;` AFTER the GetChannel block, then `if (channel == nullptr) { if (*pCmd == 1 && list[1] != nullptr) result = list[1](session, packet); else Log; } else { if (range ok) result = TFPP_PumpPacket(...); else Log; channel->removeReferenceCount(...); } return result;` (one return, no early return after the CurHeader test).
-  The `GetChannel()` call and the positive-first `if (channel != nullptr)` did not change the block order alone. Build time for one exe: about 30 s (`.scratch/try.sh <EXE> <regex> <file>`).
-- Same signal (consts orig 0x2 + 0x7/0xa, ours 0x5/0x8; calls orig `<indirect>, Log::Write` after addRef) in POD `AgentSessionHandler` (list size 7), POD `CacheGateSessionHandler` (no channel; consts 0x2, 0xa), SCD `ManagerSessionHandler`. The CG/SCD form has no GetChannel: only fix 1 and 2 apply there.
-- POD `ManagementSessionHandler::PacketHandler`: calls only. Ours has 2 extra `<indirect>` (before `Log::Write`, before `Packet::ComposeText`) and `Packet::Clear` where orig has `<indirect>`. Not worked on.
-
-## lift-parity-handlers-3, stage 3 (session handlers)
-- Worked (MATCH): the PacketHandler form of stage 2 for POD `AgentSessionHandler::PacketHandler` 0x3a00 (needs `SESSION_FILE`), POD `CacheGateSessionHandler::PacketHandler` 0x7d90, SCD `ManagerSessionHandler::PacketHandler` 0xe980, LG `ClientSessionHandler::PacketHandler` 0x6b70.
-  The form: `short const* const pCmd = &packet->CurHeader[1].size;`, test `pCmd == nullptr`, read `*pCmd` each time, no `sessionId` local. Use `session->_id` in each Log::Write.
-- SCD 0xe980: `Session::GetChannel` is a real call (not inline). One `bool result = false;` and one `return result;`. `channel == nullptr` first (cmd 1 then list[1]), else the list call and `removeReferenceCount(..., 101)`.
-- LG 0x6b70: the list tests are signed: `*pCmd >= 0 && *pCmd < 0x6E` (Any list), `*pCmd >= 0 && *pCmd <= 0x6E` (Authed, NotAuthed). Do not use `unsigned short`. Inline GetChannel add-ref, then `Client* client = session->_channel` and `client->_state == 1` inside the same `if`. The NotAuthed code follows after it.
-- Worked (partly): POD `ManagementSessionHandler::PacketHandler` 0x10d00: set the Packet fields one by one (`CurHeader`, `Splitter`, `ListHead`, `ListTail`, `IsFragmentPacket`, `FragmentPacketCmd`) instead of `memset`, and drop the explicit `reply.Clear()`. This removes the extra `Packet::Clear` and one `<indirect>` (Splitter test). Score 97.8.
-- Did NOT work (POD 0x10d00): `int line = 61; if (index != 16) line = 68;` (adds const 0x3d). A `goto done` with `result = handler(...)` (no change). Open: orig puts the handler call (`call r8`) at the END of the function, after `Packet::Clear`. Ours puts it before the first `Log::Write`.
-- Open: POD pool index in the inlined `Packet::Allocate` is 0x28 in orig and 0x90 in ours (`mov edx, ...` before `PacketBufferPool::allocate`). Not checked if it is the same in the MATCH functions.
-
-## Handlers stage 4 (lift-parity-handlers-3)
-
-Measured with `.scratch/try.sh PostOfficeDaemon <regex> <file>`. Result: POD 645 (was 640).
-
-Worked:
-- Local `Packet reply` with the packet init written field by field (CurHeader, Splitter, ListHead, ListTail,
-  IsFragmentPacket, FragmentPacketCmd) and then `Allocate()`. Do not use `memset`. A `memset` adds an
-  `<indirect>` call in the call list. File: `ManagementPacketHandler.cpp` `initReply`.
-- Do not write `reply.Clear()` by hand. The destructor does it. A hand `Clear()` before a `return`
-  gives a second `Packet::Clear` call. (HelloReq 97.0 -> MATCH.)
-- Branch order in the management handlers: the failure branch comes first, the success branch last.
-  Write `if (DecomposeText(...) == 0) { fail } else { ... if (!DbCall(...)) { fail } else { success; return true; } }`
-  and then the common failure tail. Do not write `if (call) { success; return } fail`.
-  (ResetAll 96.3 -> MATCH, LoadRetryReadyPostList, ResetPostStatus, LoadRetryReadySinglePost: all MATCH.)
-
-Did not work:
-- `goto done` with `bool result` instead of `return handler(...)` in
-  `ManagementSessionHandler::PacketHandler` (0x10d00). No gain. Reverted.
-- `HandleCacheGateRelay` (0x8070): `if (Decompose != 0)` first with `serviceWid == toWid` first gave 89.1
-  (worse than 92.8). `== 0` first with `!=` first and explicit `endLine = 109` per branch gave 93.3.
-  The orig has the Write(86) decompose failure block AFTER the success block (const order 73, 89, ..., 86).
-  The version `!= 0` first with `serviceWid != toWid` first is written in the file and NOT measured.
-
-Open facts:
-- `HandleCacheGateRelayFail`/`RelayInvalid` (POD): the orig has three `RelayContext::ProcessRelayResponse`
-  calls (one per relay request type, 3 vtable refs of CheckPostCapacityRelayRequest). Our code has one.
-  Needs a switch with three inlined branches. Not tried.
-
-## AlertSender socket event loop
+### AlertSender socket event loop
 
 - Commit `27d5420` added one match in each of the four executables.
 - `AlertSender::run` (CacheGate 0x98f0): Initialize each socket event field
@@ -495,7 +432,7 @@ Open facts:
   Branch directly to the reconnect and stop blocks. This keeps the separate
   `sendRemain` call sites for `FD_CONNECT` and `FD_WRITE`.
 
-## Manual server parity checks
+### Manual server parity checks
 
 - Commit `46fe9c1` added six matches in LobbyGate, two in
   SmartCouponDaemon, and three in PostOfficeDaemon.
@@ -519,7 +456,7 @@ Open facts:
   common unload block gave no new match. A common log block in
   `Session::HandleEvent` also gave no new match.
 
-## Placement delete and shared functions
+### Placement delete and shared functions
 
 - Commit `beb4669` added five matches in CacheGate, five in LobbyGate,
   six in SmartCouponDaemon, and six in PostOfficeDaemon. All previous
@@ -557,7 +494,7 @@ Open facts:
   branch first. The `loadUnhandledGameEventLog` test put the
   successful load branch first.
 
-## Manual parity for arithmetic, startup, and cleanup
+### Manual parity for arithmetic, startup, and cleanup
 
 - The full build added six matches in LobbyGate, four in SmartCouponDaemon,
   and four in PostOfficeDaemon. All previous matches held.
@@ -595,7 +532,7 @@ Open facts:
   Explicit initial allocation in `Client::SendTakeGoodsOk` and
   `Client::SendListLobbyServiceItemInfoOk` inlined the allocator.
 
-## Manual parity for logging, timers, and job dispatch
+### Manual parity for logging, timers, and job dispatch
 
 - This pass added two matches in CacheGate, two in LobbyGate, four in
   SmartCouponDaemon, and two in PostOfficeDaemon. It added three
@@ -641,7 +578,7 @@ Open facts:
   six-instruction check missed the address use. See fix 9 in
   [noise.md](noise.md).
 
-## TLS addresses that the compiler forms in separate blocks
+### TLS addresses that the compiler forms in separate blocks
 
 - Use the TLS block load and the offset definition to check each
   address. The offset can occur before a loop. The address can use an
@@ -660,18 +597,9 @@ Open facts:
   source form across all four builds changed the log order in those
   three builds and lost their matches.
 
-## Public names of folded virtual tables
+### Public names of folded virtual tables
 
 - Check all public names at the address before changing the source.
   The CacheGate build gives the `SessionRecvBuffer` table in
   `Session::initialize` a second name, `CrashHandler`. Use the
   name that the two PDBs share. See fix 10 in [noise.md](noise.md).
-
-## dbbind-3 (2026-11-18, stage 1)
-- Worked, SCD `DbTransaction::BindCol` 0x20e40 (88.9 -> MATCH): null check first (`if (StmtHandle == nullptr) { Log::Write; return false; }`), as the POD form 0x2d010. Keep `noinline`.
-- Worked (score up, not yet MATCH): bind macro `DB_BIND_COL` (`Db.h`, `// LIFT:`) for the column that the original inlines. SCD loaders: only column 1 is inline, columns 2..n stay `BindCol` calls. Source form: `if (!BindParam...) goto _BIND_ERROR; DB_BIND_COL(..., _BIND_ERROR); if (BindCol(2) && ...) {...} _BIND_ERROR: Log::Write`.
-  SCD 0x13620 87.3 -> 95.0, 0x13a30 87.5 -> 95.7, 0x13dd0 89.2 -> 96.7, 0x145f0 87.3 -> 95.0, 0x12170 89.8 -> 97.5, 0x117c0 91.0 -> 97.8. SCD only build: 557 -> 558.
-- Open in these 6: ours has one more `DbTransaction::Fetch` call, consts 0x2/0x3(/0x5) (column index of the `BindCol` calls), and one more `L"db"`/`L""` ref.
-- Worked (stage 2, not yet MATCH): POD loaders in the orig form. `DB_BIND_COL_NI` (`Db.h`): null StmtHandle goes to a `NOT_INIT` label with one "Not initialized" log, then falls into `BIND_ERROR`. Length arrays zeroed after Prepare, `postLen[15,14,13,10,9] = SQL_NTS`, `PostInfo` ctor, inline item zero loop (`ZeroItem`, memset 0x802), 17 post columns inline, 70 item columns via `BindCol(++column, ...)` with `itemLen[i][6] = SQL_NTS` before the XML bind.
-  POD 0x14e50 60.6 -> 98.3, 0x190f0 60.8 -> 98.6, 0x15fa0 69.5 -> 88.4, 0x18010 72.1 -> 88.8. POD MATCH count unchanged (645).
-- Open: 0x15fa0/0x18010 (single-post loaders): orig merges all 17 `statmentErrorLog` calls into one site; ours has one per column, and orig has the "Not initialized" log before the binds. 0x14e50/0x190f0: ours has one more `memset, memset, Fetch` (loop rotation) and the acquire log before SQLSetStmtAttrW; const 0x23 missing.

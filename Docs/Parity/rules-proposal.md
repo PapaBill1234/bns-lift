@@ -89,3 +89,21 @@ Source: `lessons.md` (review-2 numbers), `review-2.md`, the round 2 handoffs.
 | N10 | Read a shared global through its name at each use (`X::_instance->a; X::_instance->b`) when the original reloads it. Do not copy it to a local. | R10 | A7: SCD `Send*Event::HandleEvent`. |
 | N11 | Plan cards by cause and give each card a stop rule: stop a function after 3 tries with no score gain, write it in the handoff. | M8, M9 | review-2 section 2: exe-only cards spent most turns on single functions (scd-2: 8 MATCH per 100 turns). |
 | N12 | The handoff `Turns:` line (M7) is a required line. The runner rejects a handoff with no `Turns:` line. | M7 | tool-2 has no turn count. |
+
+## 5. Changes from round 3 (lift-parity-review-3, 2026-11-18)
+
+Source: `lessons.md` (review-3 numbers), `review-3.md`, the round 3 handoffs and the manual notes (lessons F).
+
+| # | Rule | Change to | Reason (lessons, count) |
+| --- | --- | --- | --- |
+| P1 | Before a source change, read the PDB facts of the function: mangled signature (removed params), return type, enum values, globals against members, and all public names at a vtable address. | M2, N8 | A21 (about 8): `BigInteger::Set` removed param, `s_initializedCount`, enum 0x82, `unsigned short` return, folded vtable names. |
+| P2 | Before a source change on a `tls:` or vtable-name DIFF, check the tool output against the disassembly. Fix the tool first. | M1, C1 | A1: funcdiff fix 9 and fix 10 gave 20 MATCH with no source change. |
+| P3 | When the original calls a function out of line in one caller and inlines it in other callers, put `#pragma inline_depth(0)` before that caller and reset it after. Do not put a global `noinline` on the callee. | R2, N2 | A20 (8): `LogMedia::Write`, `clearShortTermQueueSlot` MATCH in 4 exes; a global noinline lost MATCH in 4 exes (B). |
+| P4 | Lift the global placement `operator delete(void*, void*)` with its crash body from the original. Write `::new` at each placement new site of the original. Construct a member object before you assign the allocation pointer. | R13, N7 | A14 (22): EH state `-2` in `Port::Initialize`, `Network::Network` x3, `NPChannel::Setup`, `Console::Flush`. |
+| P5 | When the original links a whole object of a closed library, keep the lifted object in the link with `#pragma comment(linker, "/INCLUDE:<symbol>")` under the per-exe define. | N1 | A3 (90): SCD +26, POD +26, LG +2. |
+| P6 | Write a lock as an `AutoCS` in a `{ }` scope block. Do not call `Leave()` by hand before the scope end. | R11 | A17: POD `RelayContext::Process*` (3). |
+| P7 | When only one exe has another source form of a shared function, write a per-exe source file for that exe. Do not change the shared form. | N2 | A22: `ChannelSmartCouponDaemon.cpp`; the shared change lost 3 MATCH. |
+| P8 | Set the fields of a packet or a socket struct with separate stores when the original has separate stores. Do not use aggregate init (`= {}`, `= {0}`). | N6 | A19 (about 11): `LobbyD::Send*` 6, `AlertSender::run` 4, POD `initReply`. |
+| P9 | Choose the branch direction (failure first or success first) per function from the original block order. Measure each change. There is no default direction. | R11 | A2: failure-first gave +5 in POD management handlers and -2.5 in `PingRelayContext`; success-first lowered `loadWorldConfigFile`. |
+| P10 | Write the PacketHandler of a session handler in one form: `pCmd` pointer, reads at each use, inline `GetChannel` where the original inlines it, one `result` return. | R14 | A23 (5). |
+| P11 | A card names its lessons sections and its function list. A card that lists more than about 30 functions is split. | N11 | review-3 section 4: consts-3 and handlers-3 stopped by turn budget with many "not tried" items. |
