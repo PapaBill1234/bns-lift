@@ -627,6 +627,9 @@ Open facts:
   completion port handle had no effect on `Network::Clear`. A loop to
   compare the XML element name and a common release call in
   `CacheDList::LoadCachedListConfigFile` lowered its score to 96.3.
+- Initializing the pool lists in the `ObjPool` constructor initializer
+  list and using a local node in `ObjPool::Finalize` did not change
+  their scores.
 - In `ClientManager::BroadcastAnnounceNotify` (LobbyGate 0x62c0),
   let the packet destructor call `Clear`. This removes the extra
   call and raises the score from 95.8 to 97.8. The remaining
@@ -644,6 +647,15 @@ Open facts:
   address. The offset can occur before a loop. The address can use an
   ADD instruction. See fix 9 in [noise.md](noise.md).
 - After the tool fix, SmartCouponDaemon
-  `NPChannel::sendInitialConnectMessage` shows a different TLS variable.
+  `NPChannel::sendInitialConnectMessage` showed a different TLS variable.
   The original uses the shared narrow IP address buffer, at 0xfa40.
-  The lift uses `t_addressBuffer` from `NPChannel2.cpp`.
+  The lift used `t_addressBuffer` from `NPChannel2.cpp`. Use the buffer
+  from `Network.cpp`. Get the local address before clearing the buffer.
+  The function now matches.
+- SmartCouponDaemon `Channel::MakeSession` at 0x1f2b0 checks
+  `portId - 1` against the last valid index before it reads the
+  port array. It puts the missing-port log after the session creation
+  branch. Use this form from `ChannelSmartCouponDaemon.cpp`. The
+  other original builds use a fixed port ID. Applying the same
+  source form across all four builds changed the log order in those
+  three builds and lost their matches.
