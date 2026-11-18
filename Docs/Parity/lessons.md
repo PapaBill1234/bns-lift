@@ -480,3 +480,10 @@ Open facts:
 - `HandleCacheGateRelayFail`/`RelayInvalid` (POD): the orig has three `RelayContext::ProcessRelayResponse`
   calls (one per relay request type, 3 vtable refs of CheckPostCapacityRelayRequest). Our code has one.
   Needs a switch with three inlined branches. Not tried.
+
+## AlertSender socket event loop
+
+- `AlertSender::run` (CacheGate 0x98f0): Initialize each socket event field
+  with a separate store. Aggregate initialization emitted a `memset` call.
+  Branch directly to the reconnect and stop blocks. This keeps the separate
+  `sendRemain` call sites for `FD_CONNECT` and `FD_WRITE`.

@@ -333,13 +333,9 @@ void AlertSender::run()
     {
         HANDLE handles[2] = {_sockEvent, _itemEvent};
         bool failed = false;
-        bool reconnect = false;
-        bool fatal = false;
         if (WaitForMultipleObjects(2, handles, FALSE, 1000) == WAIT_FAILED)
-        {
-            fatal = true;
-        }
-        else
+            goto stopSender;
+
         {
             _lastExecuted = _threadManager->_now;
             DWORD result = WaitForSingleObject(_itemEvent, 0);
@@ -349,48 +345,47 @@ void AlertSender::run()
                 failed = !sendRemain(list);
             }
             else if (result == WAIT_FAILED)
-            {
-                fatal = true;
-            }
+                goto stopSender;
 
-            if (!fatal)
+            result = WaitForSingleObject(_sockEvent, 0);
+            if (result == WAIT_OBJECT_0)
             {
-                result = WaitForSingleObject(_sockEvent, 0);
-                if (result == WAIT_OBJECT_0)
+                WSANETWORKEVENTS events;
+                events.lNetworkEvents = 0;
+                events.iErrorCode[0] = 0;
+                events.iErrorCode[1] = 0;
+                events.iErrorCode[2] = 0;
+                events.iErrorCode[3] = 0;
+                events.iErrorCode[4] = 0;
+                events.iErrorCode[5] = 0;
+                events.iErrorCode[6] = 0;
+                events.iErrorCode[7] = 0;
+                events.iErrorCode[8] = 0;
+                events.iErrorCode[9] = 0;
+                if (WSAEnumNetworkEvents(_socket, _sockEvent, &events) == SOCKET_ERROR)
+                    goto reconnect;
+                if ((events.lNetworkEvents & FD_CONNECT) != 0)
                 {
-                    WSANETWORKEVENTS events = {0};
-                    if (WSAEnumNetworkEvents(_socket, _sockEvent, &events) == SOCKET_ERROR)
-                    {
-                        reconnect = true;
-                    }
-                    else if ((events.lNetworkEvents & FD_CONNECT) != 0)
-                    {
-                        if (events.iErrorCode[FD_CONNECT_BIT] != 0)
-                            reconnect = true;
-                        else
-                            failed = !sendRemain(list);
-                    }
-                    else if ((events.lNetworkEvents & FD_WRITE) != 0)
-                    {
-                        if (events.iErrorCode[FD_WRITE_BIT] != 0)
-                            reconnect = true;
-                        else
-                            failed = !sendRemain(list);
-                    }
-                    else if ((events.lNetworkEvents & FD_CLOSE) != 0)
-                    {
-                        reconnect = true;
-                    }
+                    if (events.iErrorCode[FD_CONNECT_BIT] != 0)
+                        goto reconnect;
+                    failed = !sendRemain(list);
                 }
-                else if (result == WAIT_FAILED)
+                else if ((events.lNetworkEvents & FD_WRITE) != 0)
                 {
-                    fatal = true;
+                    if (events.iErrorCode[FD_WRITE_BIT] != 0)
+                        goto reconnect;
+                    failed = !sendRemain(list);
                 }
+                else if ((events.lNetworkEvents & FD_CLOSE) != 0)
+                    goto reconnect;
             }
+            else if (result == WAIT_FAILED)
+                goto stopSender;
         }
 
-        if (!fatal && (failed || reconnect))
+        if (failed)
         {
+        reconnect:
             Sleep(3000);
             // BUG: 0x19060 the loop does not end if _count > _maxLogCount and _head is null.
             while (_maxLogCount < list._count)
@@ -417,10 +412,12 @@ void AlertSender::run()
             if ((createSocket() && connect(_socket, &_remoteAddr, sizeof(_remoteAddr)) != SOCKET_ERROR) ||
                 WSAGetLastError() == WSAEWOULDBLOCK)
                 continue;
-            fatal = true;
+            goto stopSender;
         }
-        if (fatal)
-            stop();
+        continue;
+
+    stopSender:
+        stop();
     }
 
     AlertBuffer* buffer = list._head;
