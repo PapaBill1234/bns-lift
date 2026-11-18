@@ -4,7 +4,8 @@
 
 #include "blowfishData.inc"
 
-#define BF_F(s, x) ((((s)[(x) >> 24] + (s)[256 + (((x) >> 16) & 0xFF)]) ^ (s)[512 + (((x) >> 8) & 0xFF)]) + (s)[768 + ((x) & 0xFF)])
+// The S-box offset is a pointer offset (64-bit), so the compiler puts it in the address (orig disp 0x400, 0x800, 0xc00).
+#define BF_F(s, x) (((((s))[(x) >> 24] + ((s) + 256)[((x) >> 16) & 0xFF]) ^ ((s) + 512)[((x) >> 8) & 0xFF]) + ((s) + 768)[(x) & 0xFF])
 
 // 0x35fa0 (file-static, no PDB type)
 static void encrypt(int round, unsigned int const* pbox, unsigned int const* sbox, unsigned int* xl, unsigned int* xr)
@@ -26,12 +27,11 @@ static void decrypt(int round, unsigned int const* pbox, unsigned int const* sbo
 {
     unsigned int l = *xr ^ pbox[16];
     unsigned int r = *xl ^ pbox[17];
-    for (long long i = round - 1; i > 0;)
+    for (long long i = round - 1; i > 0; i -= 2)
     {
-        i -= 2;
         unsigned int t = BF_F(sbox, r) ^ l;
-        l = pbox[i + 1] ^ t;
-        r = BF_F(sbox, t) ^ pbox[i + 2] ^ r;
+        l = pbox[i - 1] ^ t;
+        r = BF_F(sbox, t) ^ pbox[i] ^ r;
     }
     *xl = l;
     *xr = r;
@@ -77,43 +77,47 @@ bool Blowfish::Setup(unsigned char const* key, int keySize, int round)
         _error = 3;
         return false;
     }
-    if (static_cast<unsigned int>(keySize - 4) > 0x34)
+    // The original puts the error 5 path after the body (ja to the end of the function).
+    if (static_cast<unsigned int>(keySize - 4) <= 0x34)
     {
-        _error = 5;
-        return false;
-    }
-    if (round == 0)
-        round = 16;
-    _round = round;
-    memcpy(_pbox, P, sizeof(_pbox));
-    memcpy(_sbox, S, sizeof(_sbox));
+        if (round == 0)
+            round = 16;
+        _round = round;
+        memcpy(_pbox, P, sizeof(_pbox));
+        memcpy(_sbox, S, sizeof(_sbox));
 
-    int j = 0;
-    for (int i = 0; i < 18; ++i)
-    {
-        _pbox[i] ^= (static_cast<unsigned int>(key[j]) << 24)
-                  | (static_cast<unsigned int>(key[(j + 1) % keySize]) << 16)
-                  | (static_cast<unsigned int>(key[(j + 2) % keySize]) << 8)
-                  | static_cast<unsigned int>(key[(j + 3) % keySize]);
-        j = (j + 4) % keySize;
-    }
+        int j = 0;
+        for (int i = 0; i < 18; ++i)
+        {
+            _pbox[i] ^= (static_cast<unsigned int>(key[j]) << 24)
+                      | (static_cast<unsigned int>(key[(j + 1) % keySize]) << 16)
+                      | (static_cast<unsigned int>(key[(j + 2) % keySize]) << 8)
+                      | static_cast<unsigned int>(key[(j + 3) % keySize]);
+            j = (j + 4) % keySize;
+        }
 
-    unsigned int l = 0;
-    unsigned int r = 0;
-    for (int i = 0; i < 18; i += 2)
-    {
-        encrypt(_round, _pbox, _sbox, &l, &r);
-        _pbox[i] = l;
-        _pbox[i + 1] = r;
+        unsigned int l = 0;
+        unsigned int r = 0;
+        for (int i = 0; i < 18; i += 2)
+        {
+            encrypt(_round, _pbox, _sbox, &l, &r);
+            _pbox[i] = l;
+            _pbox[i + 1] = r;
+        }
+        for (int i = 0; i < 4; ++i)
+        {
+            for (int j = 0; j < 256; j += 2)
+            {
+                encrypt(_round, _pbox, _sbox, &l, &r);
+                _sbox[256 * i + j] = l;
+                _sbox[256 * i + j + 1] = r;
+            }
+        }
+        _error = 0;
+        return true;
     }
-    for (int i = 0; i < 1024; i += 2)
-    {
-        encrypt(_round, _pbox, _sbox, &l, &r);
-        _sbox[i] = l;
-        _sbox[i + 1] = r;
-    }
-    _error = 0;
-    return true;
+    _error = 5;
+    return false;
 }
 
 // 0x366a0

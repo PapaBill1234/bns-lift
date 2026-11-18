@@ -288,9 +288,9 @@
 },
 "Blowfish::Setup": {
 "calls": 100,
-"consts": 76,
+"consts": 95,
 "refs": 100,
-"score": 92.1,
+"score": 98.2,
 "status": "DIFF"
 },
 "BnsCommonConfig::CheckMinMaxBoundary": {
@@ -799,10 +799,10 @@
 },
 "Ctr::Encrypt": {
 "calls": 100,
-"consts": 67,
+"consts": 100,
 "refs": 100,
-"score": 88.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Ctr::Setup": {
 "calls": 100,
@@ -2869,12 +2869,19 @@
 "score": 100.0,
 "status": "MATCH"
 },
-"Prng::setSeed": {
-"calls": 67,
-"consts": 57,
+"Prng::addEntropy": {
+"calls": 100,
+"consts": 100,
 "refs": 100,
-"score": 74.6,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
+},
+"Prng::setSeed": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "ReconnectTimer::HandleEvent": {
 "calls": 100,
@@ -4726,17 +4733,17 @@
 },
 "decrypt": {
 "calls": 100,
-"consts": 0,
+"consts": 100,
 "refs": 100,
-"score": 66.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "encrypt": {
 "calls": 100,
-"consts": 0,
+"consts": 100,
 "refs": 100,
-"score": 66.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "hash": {
 "calls": 100,

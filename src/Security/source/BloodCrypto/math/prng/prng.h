@@ -20,7 +20,7 @@ public:
 
 private:
     bool setSeed();
-    bool addEntropy(unsigned char const* entropy, int size);
+    __declspec(noinline) bool addEntropy(unsigned char const* entropy, int size); // LIFT: noinline, 0x35d60 calls it
     // LIFT: No PDB symbol. CryptoKey::Initialize reads the TLS instance directly.
     static Prng* instance();
 

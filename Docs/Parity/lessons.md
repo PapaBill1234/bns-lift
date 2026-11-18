@@ -193,4 +193,31 @@ Each new card adds its patterns at the end of section A or B. The next review so
 - `Session::handlePacket` 0xf750: one extra `Packet::Clear` tail.
 - `_instance` reload in LG `KickNotify`, `CloseSessionNotify`.
 - SmartCouponDB `ProcessCharacterGameEventLog` 0x117c0: the original inlines only the first BindCol.
-- Crypto misses and crypto consts: probably other compile flags of the original BloodCrypto lib ❓ (lift-parity-crypto-2).
+- Crypto misses (lift-parity-crypto-2): NOT compile flags. The LG PDB `S_COMPILE3` of BloodLib `Port.obj` and of BloodCrypto
+  `rsa.obj`, `BigInteger.obj` is the same: `ltcg | security checks | hot patchable` (no `S_ENVBLOCK` in LTCG objects).
+  Cause: the original links `Security\lib\BloodPacketCrypt64.lib` (BloodPacketCrypt, NoPacketCrypt, HandshakePacketCrypt,
+  SessionPacketCrypt, BroadcastPacketCrypt) and `BloodCert64.lib` (BloodCert, ssn, CertDec, nic, ModuleCodeString, Cert).
+  Their `S_COMPILE3` has `no dbg info`, so they have no `S_GPROC32` and no pseudocode in `hr/`. They call `Crypto::Create`,
+  `Rsa::Rsa`, `Dh::Dh`, `RsaPrivate::~RsaPrivate` (IDA xrefs, LG 0x14004cf70, 0x14004c5d0). Ours has
+  `PacketCrypt::Create` / `InstanceSize` as stubs (`TODO(lift-lobbygate-4)`, `Session.cpp`). Fix = lift these 2 libs.
+- Crypto consts: source form, not flags. `aes128TableEncrypt`/`Decrypt` in the original use the rijndael-alg-fst loop
+  (`r = 10 >> 1; for (;;) { t = round(s, rk+4); rk += 8; if (--r == 0) break; s = round(t, rk); }`): consts 0x4, 0x20.
+  Result of the fst form: still DIFF (ours has 2 `add rbp,0x20`, orig 1; orig loads the image base 3 times, ours 1).
+  Orig shape: `lea r14,[rk+0x10]`; 4 passes {t-round, s-round, `add r14,0x20`, 64-bit `dec rbx`}; then t-round + final.
+- Fixed (+1 MATCH in each of the 4 exes): blowfish `encrypt`. Cause: `s[256 + (x & 0xFF)]` is a 32-bit unsigned index, so
+  the compiler adds 0x100/0x200/0x300 before the load. `(s + 256)[x & 0xFF]` is a pointer offset: disp 0x400/0x800/0xc00.
+- Fixed (+1 MATCH in each exe): `Ctr::Encrypt`. Use `if (++_counter[j] != 0) break;`, not `_counter[j]++ != 0xFF`.
+- `Prng::setSeed` 0x35d60: orig has `and eax,0x800000ff; jge; dec; or eax,0xffffff00; inc` = `rand() % 256`.
+  Fixed (+1 MATCH in each exe) with `rand() % 256` and a touch of prng.cpp.
+- Fixed (+1 MATCH in each exe): `Prng::addEntropy` 0x35e10. The original uses `_alloca(size + 20)` (frame pointer
+  `lea rbp`, probe `mov eax,[rsp]`, `sub rsp,0xa0`). LTCG folds `size` to 128. `hashSize = 20` comes before `_alloca`.
+  The old fixed `buf[148]` form let LTCG inline it into setSeed, also with `__declspec(noinline)` on the declaration.
+- Fixed (+1 MATCH in each exe): blowfish `decrypt` 0x360a0. Use
+  `for (long long i = round - 1; i > 0; i -= 2) { t = F(r) ^ l; l = pbox[i-1] ^ t; r = F(t) ^ pbox[i] ^ r; }`.
+- `Blowfish::Setup` 0x361d0: orig puts the error 5 path after the body (`ja` to the end). Source form
+  `if ((unsigned)(keySize - 4) <= 0x34) { body; return true; } _error = 5; return false;` gives this layout.
+  Still DIFF 98.2: inside the inlined `encrypt`, ours keeps `rbp = this+0x14` (pbox) live and makes a trip counter;
+  orig indexes `[this + r11*4 + 0x14]`. Register allocation; key loop is the same.
+- Did not work: aes128Table fst form (no MATCH gain; reverted).
+- `aes128TableSetupEncKey` 0x38370: orig unrolls the 10-pass loop 5 times (size 589, `add rbp,0x28` on Rcon,
+  `add rsi,0x50` on rk, end `cmp rbp,r13`). Ours (both the for form and the fst form) is not unrolled (size 293).

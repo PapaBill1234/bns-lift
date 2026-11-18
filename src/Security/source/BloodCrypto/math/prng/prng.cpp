@@ -1,6 +1,7 @@
 // prng.obj (CacheGate PDB).
 #include "prng.h"
 #include <stdlib.h>
+#include <malloc.h>
 #include <string.h>
 #include <new>
 #include "ripemd160.h"
@@ -31,7 +32,7 @@ bool Prng::setSeed()
 {
     unsigned char buf[128];
     for (long long i = 0; i < 128; ++i)
-        buf[i] = static_cast<unsigned char>(rand());
+        buf[i] = static_cast<unsigned char>(rand() % 256);
     bool result = addEntropy(buf, sizeof(buf));
     if (!result)
         return result;
@@ -39,16 +40,17 @@ bool Prng::setSeed()
 }
 
 // 0x35e10
-bool Prng::addEntropy(unsigned char const* entropy, int /*size*/)
+bool Prng::addEntropy(unsigned char const* entropy, int size)
 {
-    // BUG: 0x35e10 ignores size. It always copies 128 bytes of entropy.
-    unsigned char buf[148];
-    memcpy(buf, _state, 20);
-    memcpy(buf + 20, entropy, 128);
-    Ripemd160 ripemd;
+    // The original allocates the buffer on the stack with _alloca (frame pointer, probe of 0xa0 bytes).
+    // LTCG folds size to 128 (the only caller is setSeed).
     int hashSize = 20;
-    bool result = ripemd.Digest(buf, sizeof(buf), _state, &hashSize);
-    memset(buf, 0, sizeof(buf));
+    unsigned char* buf = static_cast<unsigned char*>(_alloca(size + 20));
+    memcpy(buf, _state, 20);
+    memcpy(buf + 20, entropy, size);
+    Ripemd160 ripemd;
+    bool result = ripemd.Digest(buf, size + 20, _state, &hashSize);
+    memset(buf, 0, size + 20);
     return result;
 }
 

@@ -50,7 +50,7 @@ bool Ctr::Encrypt(unsigned char const* in, int size, unsigned char* out, int* /*
         {
             for (int j = 0; j < _blockSize; ++j)
             {
-                if (_counter[j]++ != 0xFF)
+                if (++_counter[j] != 0)
                     break;
             }
             int s = 32;
