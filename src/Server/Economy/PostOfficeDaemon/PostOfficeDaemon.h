@@ -54,6 +54,12 @@ static_assert(offsetof(PostOfficeConfig, _serviceWid) == 0x50, "PostOfficeConfig
 class PostOfficeDaemon : public Daemon
 {
 public:
+    enum PostEvent
+    {
+        POSTEVENT_POST_DELIVERY_EVENT = 0x80,
+        POSTEVENT_RELAY_TIMEOUT_EVENT = 0x81,
+        POSTEVENT_PACKET_PUMP_EVENT = 0x82
+    };
     // Inline constructor. The binary writes it in wmain (0x12ca0).
     PostOfficeDaemon() : _config(nullptr), _serviceWid(0)
     {

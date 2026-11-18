@@ -168,7 +168,7 @@ void Network::Clear()
             Instance->_port[i] = nullptr;
         }
     }
-    _InterlockedDecrement(&CryptoKey::s_initializedCount);  // LIFT: inlined PacketCrypt clean-up (LobbyGate 0x204cb, 0x94108)
+    _InterlockedDecrement(&s_initializedCount);  // LIFT: inlined PacketCrypt clean-up (LobbyGate 0x204cb, 0x94108)
     if (Instance->_iocpHandle != nullptr)
         CloseHandle(Instance->_iocpHandle);
     // BUG: 0xCFD0 Instance and EndEventObject are not released and WSACleanup is not called.
@@ -297,13 +297,14 @@ bool Network::SetMaxIdleTime(unsigned int portId, bool disconnect, long maxIdleT
         Daemon::Instance->threadManager->StartThread(watcher, nullptr);
     }
     Port* port = Instance->_port[0];
+    IdleWatcher* watcher = Instance->_idleWatcher;
     if (port->_idleStateTable != nullptr)
         return false;
     IdleStateTable* table = IdleStateTable::Create(port, static_cast<int>(port->_maxSession), maxIdleTime, disconnect);
     port->_idleStateTable = table;
     if (table == nullptr)
         return false;
-    Instance->_idleWatcher->_table[port->_id] = table;
+    watcher->_table[port->_id] = table;
     return true;
 }
 

@@ -487,3 +487,16 @@ Open facts:
   with a separate store. Aggregate initialization emitted a `memset` call.
   Branch directly to the reconnect and stop blocks. This keeps the separate
   `sendRemain` call sites for `FD_CONNECT` and `FD_WRITE`.
+
+## Manual server parity checks
+
+- The original `CryptoKey::Initialize` uses the PDB global
+  `s_initializedCount`. A class member gave a different data reference.
+- Both LobbyGate callers call `CryptoKey::generateBigNumber` out of line.
+  Keeping that call also restores the range check in the callee.
+- LobbyGate reads the idle watcher before `IdleStateTable::Create`.
+  Keep that pointer for the later table write.
+- The PostOfficeDaemon PDB gives `POSTEVENT_PACKET_PUMP_EVENT` the value
+  `0x82`. Use it at each call to `TFPP_PumpPacket`.
+- In `BigInteger::Sub`, handle different signs with `add` first.
+  For equal signs, select the operands and sign before one call to `sub`.

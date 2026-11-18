@@ -401,7 +401,7 @@ bool ContentsRuleConfig::ConvPacketElement(char* utf8Name, char* utf8Value, wcha
 
     wchar_t* fmtStr = nullptr;
     DWORD lastError = GetLastError();
-    FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, nullptr,
+    FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ARGUMENT_ARRAY, nullptr,
                    lastError, MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US), reinterpret_cast<LPWSTR>(&fmtStr), 0,
                    nullptr);
     Log::Write(Log::LT_ERROR, FILE_NAME, 467,

@@ -160,7 +160,7 @@ bool AgentSessionHandler::PacketHandler(Session const* session, Packet const* pa
         {
             // LIFT: LTCG folded the event id and the offset. The values come from the LobbyGate call.
             iocpHandle = Network::iocpHandle();
-            result = TFPP_PumpPacket(128, iocpHandle, session, packet, *pCmd, 0,
+            result = TFPP_PumpPacket(PostOfficeDaemon::POSTEVENT_PACKET_PUMP_EVENT, iocpHandle, session, packet, *pCmd, 0,
                                      PostOfficePacketServerSideHandlerList, PostOfficePacketServerSideFragmentHandlerList);
         }
         else
