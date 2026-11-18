@@ -1,10 +1,10 @@
 # bns-lift
 
-PRIVATE repo. C++ lift of the 2019 + PDB BnS servers. Plan: `Docs/Plan/plan.md`.
+Public repo. C++ lift of the 2019 + PDB BnS servers. Plan: `Docs/Plan/plan.md`.
 
 - Write all text in ASD-STE100.
 - Never write keys, passwords or certificates. Write `keyhere`.
-- Never commit binaries. Never push to a public repo.
+- Never commit binaries, PDBs, IDA databases or abuse notes. The repo is public.
 - Use PDB names only.
 - Mark an open question with `// ❓`. Remove the mark when the PDB or IDA settles it.
 - Mark a name that can have no PDB name (inlined code, folded code, lift helper) with `// LIFT:`. Give the reason and the address.
