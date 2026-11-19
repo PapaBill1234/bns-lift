@@ -684,3 +684,34 @@ The manual work of round 3 (commits 27d5420, 46fe9c1, beb4669 and later). The pa
 | Single Log::Write exit (score +11, no MATCH) | 1 | `FragmentPacketConcatenater::Add` |
 | Read buffer and offset again after `++index` | 2 | `PacketConcatenateBuffer::Decompose(VarData*)` |
 
+## scd-4
+
+SmartCouponDaemon 582 -> 603 MATCH (+21). Other exes +0, MATCH lost 0.
+
+### A. What worked (21 MATCH)
+
+| Change | MATCH |
+| --- | ---: |
+| DChannelMgr source form | +6 |
+| Handlers and handler contexts | +5 |
+| DB loaders: do-while fetch loops and int params (int gives the `lea` const) | +6 |
+| A count local before Log (loadUnhandledGameEventLog) | +1 |
+| else-if chain with one shared `return false` (CouponJob::transit tail-merge) | +1 |
+| `switch` on the target type gives the orig block order, default block first (GameEventLogEvent::HandleEvent) | +1 (with the next line) |
+| A local copy of the info before PostQueuedCompletionStatus removes the biased pointer const 0x16. It also fixes the orig bug that reads ev after the post. | (same +1) |
+| NPTransactionRegistry::Register: orig alloc line 131, `if (id != nullptr)`, one `return inserted;` for both paths (the result stays in `bl`, `this` dies, `add rbx,0x10` appears) | +1 |
+| A `char` local keeps `mov bl,imm` (retry failReason) | score only |
+
+### B. What failed (0 MATCH)
+
+| Try | Result |
+| --- | --- |
+| goto form of the DB fetch loop | no gain |
+| SendRetryCouponPublicationOk const 0x71 (register allocation) | no gain |
+| HelloReq `> 0` test form | no gain |
+| RetryCouponPublicationEvent goto fail path | no change; the orig needs the read-after-post bug |
+| GameEventByAccountReq goto shared fail path | 93.0 -> 93.9, score only |
+| GameEventByAccountReq one Log for lines 262/271 (format and line locals) | 95.2, score only |
+| GameEventByAccountReq decompose-fail block at the function end | 95.2, no change |
+| NPTransactionRegistry::Register local lock and dict pointers | no change (not needed) |
+| SmartCouponDaemon::initialize | blocked: the orig exe has a patched-out cert-decode call |
