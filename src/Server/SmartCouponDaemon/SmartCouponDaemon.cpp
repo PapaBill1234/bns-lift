@@ -49,6 +49,9 @@ static int const NP_PORT = 6601;
 static int const DEFAULT_MANAGE_LISTEN_PORT = 32000;
 static int const DEFAULT_DAEMON_LISTEN_PORT = 22000;
 static int const DEFAULT_SERVICE_WORLD_ID = 1;
+// LIFT: the PDB gives LOCALHOST_IP as const wchar_t* const (SmartCouponConfig.obj, 0002:55312).
+// _Def reads its value. Thus VS2010 puts _Def in .data, as in the original.
+static wchar_t const* const LOCALHOST_IP = L"127.0.0.1";
 
 XmlCfgDef const SmartCouponConfig::_Def[23] = {
     {static_cast<unsigned long long>(-1), nullptr, 0, 0, nullptr, L"path"},
@@ -75,7 +78,7 @@ XmlCfgDef const SmartCouponConfig::_Def[23] = {
      L"job hash count. 0 means system default."},
     {static_cast<unsigned long long>(-1), nullptr, 0, 0, nullptr, L"network configuration"},
     {offsetof(SmartCouponConfig, _npEnabled), L"np-enabled", XmlCfgDef::CFG_BOOL, 1, nullptr, L"work with next-platform "},
-    {offsetof(SmartCouponConfig, _npAddress), L"np-address", XmlCfgDef::CFG_IP, 0, L"127.0.0.1",  /* 0x72948 text, no PDB name */
+    {offsetof(SmartCouponConfig, _npAddress), L"np-address", XmlCfgDef::CFG_IP, 0, LOCALHOST_IP,
      L"next-platform\taddress"},
     {offsetof(SmartCouponConfig, _npPort), L"np-port", XmlCfgDef::CFG_INT, 0, &NP_PORT, L"next-platform access port"},
     {offsetof(SmartCouponConfig, _manageListenPort), L"manage-listen-port", XmlCfgDef::CFG_INT, 0,
