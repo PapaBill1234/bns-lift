@@ -239,14 +239,26 @@ void Packet::Copy(Packet const* packet)
     }
     do
     {
-        PacketBuffer* pktbuf = PacketBufferAllocator::_Local->allocate();
-        if (ListHead != nullptr)
-            ListTail->Next = pktbuf;
-        else
-            ListHead = pktbuf;
-        ListTail = pktbuf;
+        // LIFT: 0x1707B and 0x170B2 (LobbyGate) the original has two allocate calls. It tests CurHeader first.
         if (CurHeader == nullptr)
+        {
+            PacketBuffer* pktbuf = PacketBufferAllocator::_Local->allocate();
+            if (ListHead != nullptr)
+                ListTail->Next = pktbuf;
+            else
+                ListHead = pktbuf;
+            ListTail = pktbuf;
             CurHeader = reinterpret_cast<Header*>(&pktbuf->Buffer[8]);
+        }
+        else
+        {
+            PacketBuffer* pktbuf = PacketBufferAllocator::_Local->allocate();
+            if (ListHead != nullptr)
+                ListTail->Next = pktbuf;
+            else
+                ListHead = pktbuf;
+            ListTail = pktbuf;
+        }
 
         PacketBuffer* dst = ListTail;
         char const* srcBuf;
