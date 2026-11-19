@@ -64,20 +64,21 @@ void IdleStateTable::scan()
             if (state == 0)
                 continue;
             unsigned long long sessionId = (static_cast<unsigned long long>(portId) << 32) | static_cast<unsigned int>(j + 4 * i);
-            switch (state)
+            // LIFT: 0x24E8C the PDB lines (154, 158, 169) give an if / else if chain, not a switch.
+            if (state == 1)
             {
-            case 1:
                 _table[i] &= ~STATE_MASK[j];
                 _table[i] |= 2 << shift;
-                break;
-            case 2:
+            }
+            else if (state == 2)
+            {
                 if (_maxIdleTime + _port->GetSessionLastRecvTime(sessionId) < now)
                 {
                     _table[i] &= ~STATE_MASK[j];
                     _table[i] |= 3 << shift;
                 }
-                break;
-            case 3:
+            }
+            else if (state == 3)
             {
                 long long lastRecv = _port->GetSessionLastRecvTime(sessionId);
                 if (lastRecv + _maxIdleTime < now)
@@ -98,10 +99,6 @@ void IdleStateTable::scan()
                                    sessionId, lastRecv, now);
                     }
                 }
-                break;
-            }
-            default:
-                break;
             }
         }
     }
