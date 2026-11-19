@@ -47,7 +47,7 @@ bool RetrievePublicationContext::AddPublicationInfo(PublicationInfo const* info)
     if (_maxCount <= _count)
     {
         PublicationInfo* list = static_cast<PublicationInfo*>(Memory::_Manager[2]->ReallocZero(
-            _publicationList, sizeof(PublicationInfo) * 2 * _maxCount, sizeof(PublicationInfo) * _count,
+            _publicationList, sizeof(PublicationInfo) * (_maxCount * 2), sizeof(PublicationInfo) * _count,
             SMARTCOUPONDB_FILE, 49));
         if (list == nullptr)
         {
@@ -55,7 +55,7 @@ bool RetrievePublicationContext::AddPublicationInfo(PublicationInfo const* info)
                        L"failed to realloc publication list, maxCount:%d, itemCount:%d", _maxCount, _count);
             return false;
         }
-        _maxCount *= 2;
+        _maxCount <<= 1;  // LIFT: shift form. The orig has "shl dword ptr [rbx+0xc], 1" (0x10a97).
         _publicationList = list;
     }
     _publicationList[_count] = *info;
@@ -69,7 +69,7 @@ bool RetrieveEventLogContext::AddEventLogInfo(EventLogInfo const* info)
     if (_maxCount <= _count)
     {
         EventLogInfo* list = static_cast<EventLogInfo*>(Memory::_Manager[2]->ReallocZero(
-            _eventLogList, sizeof(EventLogInfo) * 2 * _maxCount, sizeof(EventLogInfo) * _count, SMARTCOUPONDB_FILE,
+            _eventLogList, sizeof(EventLogInfo) * (_maxCount * 2), sizeof(EventLogInfo) * _count, SMARTCOUPONDB_FILE,
             94));
         if (list == nullptr)
         {
@@ -77,7 +77,7 @@ bool RetrieveEventLogContext::AddEventLogInfo(EventLogInfo const* info)
                        L"failed to realloc eventlog list, maxCount:%d, listCount:%d", _maxCount, _count);
             return false;
         }
-        _maxCount *= 2;
+        _maxCount <<= 1;  // LIFT: shift form. The orig has "shl dword ptr [rbx+0xc], 1" (0x10a97).
         _eventLogList = list;
     }
     _eventLogList[_count] = *info;
