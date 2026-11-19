@@ -597,10 +597,11 @@ bool SmartCouponDaemon::loadUnhandledGameEventLog()
         Log::Write(Log::LT_ERROR, kFile, 596, L"failed to load GameEventLogList, dbRetValue:%d", dbRetValue);
         return false;
     }
-    Log::Write(Log::LT_DEBUG, kFile, 600, L"load unhandled game-event-log, count:%d", context._count);
-    if (context._count <= 0)
-        return true;
-    return GameEventManager::PostGameEventLogList(&context);
+    int count = context._count;
+    Log::Write(Log::LT_DEBUG, kFile, 600, L"load unhandled game-event-log, count:%d", count);
+    if (count > 0)
+        return GameEventManager::PostGameEventLogList(&context);
+    return true;
 }
 
 // 0x161a0
