@@ -51,7 +51,8 @@ bool GameEventConfig::SetupGameEventListFromXml(wchar_t const* xml)
 {
     Console* console = Daemon::Instance->console;
 
-    if (xml == nullptr || *xml == L'\0')
+    // LIFT: orig 0x2c80 tests the strings with an inline wcslen (repne scasw, count -1).
+    if (xml == nullptr || wcslen(xml) == 0)
     {
         wchar_t const* message = L"[game-event-cfg], setup game event list fail, invalid xmlfile";
         Log::Write(Log::LT_ERROR, GAME_EVENT_CONFIG_FILE, 48, message);
@@ -60,7 +61,138 @@ bool GameEventConfig::SetupGameEventListFromXml(wchar_t const* xml)
     }
 
     HMODULE library = LoadLibraryW(L"XmlReader_sv64.dll");
-    if (library == nullptr)
+    // LIFT: orig 0x2c80 puts the "missing dll" block (64) at the end of the function.
+    if (library != nullptr)
+    {
+        // BUG: 0x2c80 DestroyXmlReader and FreeLibrary are never called. The reader, the doc and the dll leak.
+        XriGetInterfaceVersion getInterfaceVersion =
+            reinterpret_cast<XriGetInterfaceVersion>(GetProcAddress(library, "GetInterfaceVersion"));
+        GetProcAddress(library, "SetMemAllocator");
+        XriCreateFunc createXmlReader = reinterpret_cast<XriCreateFunc>(GetProcAddress(library, "CreateXmlReader"));
+        GetProcAddress(library, "DestroyXmlReader");
+
+        XmlReader const* reader = createXmlReader();
+        if (reader == nullptr)
+        {
+            wchar_t const* message = L"[game-event-cfg], setup game event list fail, create xmlreader fail";
+            Log::Write(Log::LT_ERROR, GAME_EVENT_CONFIG_FILE, 71, message);
+            writeStartLog(console, message);
+            return false;
+        }
+
+        wchar_t const* version = getInterfaceVersion();
+        if (_wcsicmp(version, L"15") != 0)
+        {
+            wchar_t const* format =
+                L"[game-event-cfg], setup game event list fail, xml version mismatch, current-version:%s, load-version:%s";
+            Log::Write(Log::LT_ERROR, GAME_EVENT_CONFIG_FILE, 78, format, L"15", version);
+            if (console != nullptr)
+            {
+                console->WriteStartLog(0, format, L"15", version);
+                Sleep(5000);
+            }
+            return false;
+        }
+
+        if (!reader->Initialize(nullptr, nullptr, false))
+        {
+            wchar_t const* message = L"[game-event-cfg], setup game event list fail, init xmlreader fail";
+            Log::Write(Log::LT_ERROR, GAME_EVENT_CONFIG_FILE, 84, message);
+            writeStartLog(console, message);
+            return false;
+        }
+
+        XmlDoc* doc = reader->Read(xml, static_cast<XmlPieceReader*>(nullptr));
+        if (doc == nullptr)
+        {
+            wchar_t const* message = L"[game-event-cfg], setup game event list fail, read xml file fail";
+            Log::Write(Log::LT_ERROR, GAME_EVENT_CONFIG_FILE, 91, message);
+            writeStartLog(console, message);
+            return false;
+        }
+
+        XmlElement const* root = doc->Root();
+        if (root == nullptr)
+            return true;
+
+        for (XmlElement const* i = root->FirstChildElement(); i != nullptr; i = i->NextElement())
+        {
+            if (!i->ToXmlNode()->IsValid())
+                break;
+
+            // LIFT: orig 0x2c80 reads the name once and steps the table pointer by 8 in the loop.
+            wchar_t const* daemonName = i->Name();
+            unsigned int daemonType = 0;
+            wchar_t const* const* desc = SmartCouponDaemonTypeDesc;
+            for (; daemonType < 2; ++daemonType, ++desc)
+            {
+                if (_wcsicmp(*desc, daemonName) == 0)
+                    break;
+            }
+            // LIFT: orig 0x2c80 puts the unknown-daemon block (186) after the event loop.
+            if (daemonType < 2 && daemonType != 0)
+            {
+                for (XmlElement const* c = i->FirstChildElement(); c != nullptr; c = c->NextElement())
+                {
+                    if (!c->ToXmlNode()->IsValid())
+                        break;
+
+                    // LIFT: orig 0x2c80 puts the attribute block (137) and the unknown-element block (178) last.
+                    if (_wcsicmp(c->Name(), L"event") == 0)
+                    {
+                        wchar_t const* id = c->Attribute(L"id");
+                        wchar_t const* name = c->Attribute(L"name");
+                        wchar_t const* type = c->Attribute(L"type");
+                        wchar_t const* enable = c->Attribute(L"enable");
+                        if (id != nullptr && wcslen(id) != 0 && name != nullptr && wcslen(name) != 0 &&
+                            type != nullptr && wcslen(type) != 0 && enable != nullptr && wcslen(enable) != 0)
+                        {
+                            int eventId = _wtoi(id);
+                            GameEventInfo* info = FindGameEventInfo(eventId);
+                            if (info != nullptr)
+                            {
+                                wcscpy_s(info->name, 260, name);
+                                info->eventType = static_cast<char>(_wtoi(type));
+                                info->daemonType = static_cast<unsigned char>(daemonType);
+                                info->enable = _wcsicmp(L"true", enable) == 0;
+                            }
+                            else
+                            {
+                                info = static_cast<GameEventInfo*>(
+                                    Memory::_Manager[2]->AllocZero(sizeof(GameEventInfo), GAME_EVENT_CONFIG_FILE, 160));
+                                info->id = eventId;
+                                wcscpy_s(info->name, 260, name);
+                                info->eventType = static_cast<char>(_wtoi(type));
+                                info->daemonType = static_cast<unsigned char>(daemonType);
+                                info->enable = _wcsicmp(L"true", enable) == 0;
+                                addGameEventInfo(info);
+                            }
+                        }
+                        else
+                        {
+                            Log::Write(Log::LT_ERROR, GAME_EVENT_CONFIG_FILE, 137,
+                                       L"[game-event-cfg], setup game event list exception, invalid attribute value, line:%d",
+                                       c->LineNumber());
+                        }
+                    }
+                    else
+                    {
+                        Log::Write(Log::LT_ERROR, GAME_EVENT_CONFIG_FILE, 178,
+                                   L"[game-event-cfg], setup game-event-list exception, unknown element '%s', line:%d",
+                                   c->Name(), c->LineNumber());
+                    }
+                }
+            }
+            else
+            {
+                Log::Write(Log::LT_ERROR, GAME_EVENT_CONFIG_FILE, 186,
+                           L"[game-event-cfg], setup game-event-list exception, unknown element '%s', line:%d", i->Name(),
+                           i->LineNumber());
+            }
+        }
+        return true;
+    }
+    else
     {
         Log::Write(Log::LT_ERROR, GAME_EVENT_CONFIG_FILE, 64, L"[game-event-cfg], setup game event list fail, %s missing",
                    L"XmlReader_sv64.dll");
@@ -71,127 +203,6 @@ bool GameEventConfig::SetupGameEventListFromXml(wchar_t const* xml)
         }
         return false;
     }
-
-    // BUG: 0x2c80 DestroyXmlReader and FreeLibrary are never called. The reader, the doc and the dll leak.
-    XriGetInterfaceVersion getInterfaceVersion =
-        reinterpret_cast<XriGetInterfaceVersion>(GetProcAddress(library, "GetInterfaceVersion"));
-    GetProcAddress(library, "SetMemAllocator");
-    XriCreateFunc createXmlReader = reinterpret_cast<XriCreateFunc>(GetProcAddress(library, "CreateXmlReader"));
-    GetProcAddress(library, "DestroyXmlReader");
-
-    XmlReader const* reader = createXmlReader();
-    if (reader == nullptr)
-    {
-        wchar_t const* message = L"[game-event-cfg], setup game event list fail, create xmlreader fail";
-        Log::Write(Log::LT_ERROR, GAME_EVENT_CONFIG_FILE, 71, message);
-        writeStartLog(console, message);
-        return false;
-    }
-
-    wchar_t const* version = getInterfaceVersion();
-    if (_wcsicmp(version, L"15") != 0)
-    {
-        wchar_t const* format =
-            L"[game-event-cfg], setup game event list fail, xml version mismatch, current-version:%s, load-version:%s";
-        Log::Write(Log::LT_ERROR, GAME_EVENT_CONFIG_FILE, 78, format, L"15", version);
-        if (console != nullptr)
-        {
-            console->WriteStartLog(0, format, L"15", version);
-            Sleep(5000);
-        }
-        return false;
-    }
-
-    if (!reader->Initialize(nullptr, nullptr, false))
-    {
-        wchar_t const* message = L"[game-event-cfg], setup game event list fail, init xmlreader fail";
-        Log::Write(Log::LT_ERROR, GAME_EVENT_CONFIG_FILE, 84, message);
-        writeStartLog(console, message);
-        return false;
-    }
-
-    XmlDoc* doc = reader->Read(xml, static_cast<XmlPieceReader*>(nullptr));
-    if (doc == nullptr)
-    {
-        wchar_t const* message = L"[game-event-cfg], setup game event list fail, read xml file fail";
-        Log::Write(Log::LT_ERROR, GAME_EVENT_CONFIG_FILE, 91, message);
-        writeStartLog(console, message);
-        return false;
-    }
-
-    XmlElement const* root = doc->Root();
-    if (root == nullptr)
-        return true;
-
-    for (XmlElement const* i = root->FirstChildElement(); i != nullptr; i = i->NextElement())
-    {
-        if (!i->ToXmlNode()->IsValid())
-            break;
-
-        wchar_t const* daemonName = i->Name();
-        int daemonType = 0;
-        for (; daemonType < 2; ++daemonType)
-        {
-            if (_wcsicmp(daemonName, SmartCouponDaemonTypeDesc[daemonType]) == 0)
-                break;
-        }
-        if (daemonType == 2 || daemonType == 0)
-        {
-            Log::Write(Log::LT_ERROR, GAME_EVENT_CONFIG_FILE, 186,
-                       L"[game-event-cfg], setup game-event-list exception, unknown element '%s', line:%d", i->Name(),
-                       i->LineNumber());
-            continue;
-        }
-
-        for (XmlElement const* c = i->FirstChildElement(); c != nullptr; c = c->NextElement())
-        {
-            if (!c->ToXmlNode()->IsValid())
-                break;
-
-            if (_wcsicmp(c->Name(), L"event") != 0)
-            {
-                Log::Write(Log::LT_ERROR, GAME_EVENT_CONFIG_FILE, 178,
-                           L"[game-event-cfg], setup game-event-list exception, unknown element '%s', line:%d", c->Name(),
-                           c->LineNumber());
-                continue;
-            }
-
-            wchar_t const* id = c->Attribute(L"id");
-            wchar_t const* name = c->Attribute(L"name");
-            wchar_t const* type = c->Attribute(L"type");
-            wchar_t const* enable = c->Attribute(L"enable");
-            if (id == nullptr || *id == L'\0' || name == nullptr || *name == L'\0' || type == nullptr || *type == L'\0' ||
-                enable == nullptr || *enable == L'\0')
-            {
-                Log::Write(Log::LT_ERROR, GAME_EVENT_CONFIG_FILE, 137,
-                           L"[game-event-cfg], setup game event list exception, invalid attribute value, line:%d",
-                           c->LineNumber());
-                continue;
-            }
-
-            int eventId = _wtoi(id);
-            GameEventInfo* info = FindGameEventInfo(eventId);
-            if (info != nullptr)
-            {
-                wcscpy_s(info->name, 260, name);
-                info->eventType = static_cast<char>(_wtoi(type));
-                info->daemonType = static_cast<unsigned char>(daemonType);
-                info->enable = _wcsicmp(L"true", enable) == 0;
-            }
-            else
-            {
-                info = static_cast<GameEventInfo*>(
-                    Memory::_Manager[2]->AllocZero(sizeof(GameEventInfo), GAME_EVENT_CONFIG_FILE, 160));
-                info->id = eventId;
-                wcscpy_s(info->name, 260, name);
-                info->eventType = static_cast<char>(_wtoi(type));
-                info->daemonType = static_cast<unsigned char>(daemonType);
-                info->enable = _wcsicmp(L"true", enable) == 0;
-                addGameEventInfo(info);
-            }
-        }
-    }
-    return true;
 }
 
 // 0x3260
@@ -241,7 +252,8 @@ GameEventConfig::GameEventInfo* GameEventConfig::FindGameEventInfo(int id)
 bool GameEventConfig::Load(wchar_t const* configPath)
 {
     Console* console = Daemon::Instance->console;
-    wchar_t file[260] = {};
+    // LIFT: orig 0x3430 zeroes file[0] and memsets the other 0x206 bytes, as "= {0}" does.
+    wchar_t file[260] = {0};
 
     if (_wmakepath_s(file, 260, nullptr, configPath, L"game-event.config.xml", nullptr) != 0)
     {
@@ -255,17 +267,19 @@ bool GameEventConfig::Load(wchar_t const* configPath)
         return false;
     }
 
-    if (SetupGameEventListFromXml(file))
-        return true;
-
-    wchar_t const* format = L"[scd], setup coupon game-event list fail, gameEventConfigFileName:%s";
-    Log::Write(Log::LT_ERROR, GAME_EVENT_CONFIG_FILE, 350, format, file);
-    if (console != nullptr)
+    // LIFT: orig 0x3430 puts the fail block before "return true" (no shared console tail).
+    if (!SetupGameEventListFromXml(file))
     {
-        console->WriteStartLog(0, format, file);
-        Sleep(5000);
+        wchar_t const* format = L"[scd], setup coupon game-event list fail, gameEventConfigFileName:%s";
+        Log::Write(Log::LT_ERROR, GAME_EVENT_CONFIG_FILE, 350, format, file);
+        if (console != nullptr)
+        {
+            console->WriteStartLog(0, format, file);
+            Sleep(5000);
+        }
+        return false;
     }
-    return false;
+    return true;
 }
 
 // 0x3580

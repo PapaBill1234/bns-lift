@@ -42,126 +42,126 @@ void BigInteger::expMod(BigInteger const* a, BigInteger const* e, BigInteger con
     else
         winsize = ebits > 450 ? 6 : 5;
 
-    if ((n->digits[0] & 1) == 0)
+    // The modulus must be odd (mp_exptmod_fast).
+    bool oddModulus = (n->digits[0] & 1) != 0;
+    if (oddModulus)
     {
-        memset(res.digits, 0, sizeof(res.digits));
-        return;
-    }
+        // mp_montgomery_setup
+        unsigned int b = n->digits[0];
+        unsigned int x = (((b + 2) & 4) << 1) + b;
+        x *= 2 - b * x;
+        x *= 2 - b * x;
+        x *= 2 - b * x;
+        unsigned int rho = 0u - x;
 
-    // mp_montgomery_setup
-    unsigned int b = n->digits[0];
-    unsigned int x = (((b + 2) & 4) << 1) + b;
-    x *= 2 - b * x;
-    x *= 2 - b * x;
-    x *= 2 - b * x;
-    unsigned int rho = 0u - x;
+        res.montgomeryNormalize(n);
 
-    res.montgomeryNormalize(n);
-
-    BigInteger M1;
-    if (absCompare(n, a) > 0)
-    {
-        if (a != &M1)
+        BigInteger& M1 = M[1];
+        if (absCompare(n, a) > 0)
         {
-            M1.sign = a->sign;
-            M1.bits = a->bits;
-            memcpy(M1.digits, a->digits, sizeof(M1.digits));
+            if (a != &M1)
+            {
+                M1.sign = a->sign;
+                M1.bits = a->bits;
+                memcpy(M1.digits, a->digits, sizeof(M1.digits));
+            }
         }
-    }
-    else
-    {
-        Divide(a, n, 0, &M1);
-    }
-
-    BigInteger tmp;
-    tmp.Mul(&M1, &res);
-    Divide(&tmp, n, 0, &M1);
-
-    int half = 1 << (winsize - 1);
-    BigInteger* top = &M[half];
-    if (&M1 != top)
-    {
-        top->sign = M1.sign;
-        top->bits = M1.bits;
-        for (int i = 0; i < MAX_DIGITS; ++i)
-            top->digits[i] = M1.digits[i];
-    }
-    for (int i = 0; i < winsize - 1; ++i)
-    {
-        top->Sqr(top);
-        top->montgomeryReduce(n, rho);
-    }
-    for (int i = half + 1; i < (1 << winsize); ++i)
-    {
-        M[i].Mul(&M[i - 1], &M1);
-        M[i].montgomeryReduce(n, rho);
-    }
-
-    int mode = 0;
-    int bitcnt = 1;
-    int bitcpy = 0;
-    int bitbuf = 0;
-    int digidx = e->digitCount() - 1;
-    unsigned int buf = 0;
-    for (;;)
-    {
-        if (--bitcnt == 0)
+        else
         {
-            if (digidx == -1)
-                break;
-            buf = e->digits[digidx--];
-            bitcnt = 32;
+            Divide(a, n, 0, &M1);
         }
-        int y = static_cast<int>(buf >> 31);
-        buf <<= 1;
-        if (mode == 0 && y == 0)
-            continue;
-        if (mode == 1 && y == 0)
+
+        BigInteger tmp;
+        tmp.Mul(&M1, &res);
+        Divide(&tmp, n, 0, &M1);
+
+        int half = 1 << (winsize - 1);
+        BigInteger* top = &M[half];
+        if (&M1 != top)
         {
-            res.Sqr(&res);
-            res.montgomeryReduce(n, rho);
-            continue;
+            top->sign = M1.sign;
+            top->bits = M1.bits;
+            for (int i = 0; i < MAX_DIGITS; ++i)
+                top->digits[i] = M1.digits[i];
         }
-        bitbuf |= y << (winsize - ++bitcpy);
-        mode = 2;
-        if (bitcpy == winsize)
+        for (int i = 0; i < winsize - 1; ++i)
         {
-            for (int i = 0; i < winsize; ++i)
+            top->Sqr(top);
+            top->montgomeryReduce(n, rho);
+        }
+        for (int i = half + 1; i < (1 << winsize); ++i)
+        {
+            M[i].Mul(&M[i - 1], &M1);
+            M[i].montgomeryReduce(n, rho);
+        }
+
+        int mode = 0;
+        int bitcnt = 1;
+        int bitcpy = 0;
+        int bitbuf = 0;
+        int digidx = e->digitCount() - 1;
+        unsigned int buf = 0;
+        for (;;)
+        {
+            if (--bitcnt == 0)
+            {
+                if (digidx == -1)
+                    break;
+                buf = e->digits[digidx--];
+                bitcnt = 32;
+            }
+            int y = static_cast<int>(buf >> 31);
+            buf <<= 1;
+            if (mode == 0 && y == 0)
+                continue;
+            if (mode == 1 && y == 0)
             {
                 res.Sqr(&res);
                 res.montgomeryReduce(n, rho);
+                continue;
             }
-            res.Mul(&res, &M[bitbuf]);
-            res.montgomeryReduce(n, rho);
-            bitcpy = 0;
-            bitbuf = 0;
-            mode = 1;
-        }
-    }
-
-    if (mode == 2 && bitcpy > 0)
-    {
-        for (int i = 0; i < bitcpy; ++i)
-        {
-            res.Sqr(&res);
-            res.montgomeryReduce(n, rho);
-            bitbuf <<= 1;
-            if ((bitbuf & (1 << winsize)) != 0)
+            bitbuf |= y << (winsize - ++bitcpy);
+            mode = 2;
+            if (bitcpy == winsize)
             {
-                res.Mul(&res, &M1);
+                for (int i = 0; i < winsize; ++i)
+                {
+                    res.Sqr(&res);
+                    res.montgomeryReduce(n, rho);
+                }
+                res.Mul(&res, &M[bitbuf]);
                 res.montgomeryReduce(n, rho);
+                bitcpy = 0;
+                bitbuf = 0;
+                mode = 1;
             }
         }
-    }
 
-    res.montgomeryReduce(n, rho);
-    if (&res != this)
-    {
-        sign = res.sign;
-        bits = res.bits;
-        memcpy(digits, res.digits, sizeof(digits));
+        if (mode == 2 && bitcpy > 0)
+        {
+            for (int i = 0; i < bitcpy; ++i)
+            {
+                res.Sqr(&res);
+                res.montgomeryReduce(n, rho);
+                bitbuf <<= 1;
+                if ((bitbuf & (1 << winsize)) != 0)
+                {
+                    res.Mul(&res, &M1);
+                    res.montgomeryReduce(n, rho);
+                }
+            }
+        }
+
+        res.montgomeryReduce(n, rho);
+        if (&res != this)
+        {
+            sign = res.sign;
+            bits = res.bits;
+            memcpy(digits, res.digits, sizeof(digits));
+        }
+        // LIFT: 0x58670 (LobbyGate) each path has its own destructor of res. This return keeps the two paths apart.
+        return;
     }
-    memset(res.digits, 0, sizeof(res.digits));
 }
 
 // 0x49db0

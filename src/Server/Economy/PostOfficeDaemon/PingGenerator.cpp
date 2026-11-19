@@ -96,9 +96,11 @@ bool PingGenerator::sendPing()
     unsigned long long const pingSeq =
         static_cast<unsigned long long>(InterlockedIncrement64(reinterpret_cast<long long volatile*>(&_pingSeq)));
 
+    // LIFT: named request local. The original 0x4fab builds it on the stack before Alloc (unwind dtor$0 0x60220).
+    PingRelayRequest const request(pingSeq);
     void* const memory = Memory::_Manager[2]->Alloc(sizeof(PingRelayContext), PING_GENERATOR_FILE, 60);
     PingRelayContext* const relayContext =
-        memory != nullptr ? ::new (memory) PingRelayContext(economyHeader, PingRelayRequest(pingSeq)) : nullptr;
+        memory != nullptr ? ::new (memory) PingRelayContext(economyHeader, request) : nullptr;
 
     // BUG: 0x4ed0 relayContext can be null here (Alloc failed); the call does not check it.
     if (!relayContext->ProcessRelayRequest(channel))

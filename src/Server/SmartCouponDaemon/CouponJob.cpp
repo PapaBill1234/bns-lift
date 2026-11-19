@@ -56,9 +56,17 @@ bool CouponJob::transit(int state)
         AlertSender::Write(kFile, 22,
                            L"== CRASH == [job], transit fail; state out of range, to:%d, jobid:0x%I64X, type:%d, state:%d",
                            state, _id, GetDefinition()->type, _state);
-        return false;
     }
-    if (state >= _state)
+    else if (state < _state)
+    {
+        Log::Write(Log::LT_ERROR, kFile, 28,
+                   L"== CRASH == [job], transit fail; roll back not allowed, to:%d, jobid:0x%I64X, type:%d, state:%d",
+                   state, _id, GetDefinition()->type, _state);
+        AlertSender::Write(kFile, 28,
+                           L"== CRASH == [job], transit fail; roll back not allowed, to:%d, jobid:0x%I64X, type:%d, state:%d",
+                           state, _id, GetDefinition()->type, _state);
+    }
+    else
     {
         _lastState = _state;
         _state = state;
@@ -66,12 +74,6 @@ bool CouponJob::transit(int state)
                    _lastState, _id, GetDefinition()->type, state);
         return true;
     }
-    Log::Write(Log::LT_ERROR, kFile, 28,
-               L"== CRASH == [job], transit fail; roll back not allowed, to:%d, jobid:0x%I64X, type:%d, state:%d",
-               state, _id, GetDefinition()->type, _state);
-    AlertSender::Write(kFile, 28,
-                       L"== CRASH == [job], transit fail; roll back not allowed, to:%d, jobid:0x%I64X, type:%d, state:%d",
-                       state, _id, GetDefinition()->type, _state);
     return false;
 }
 

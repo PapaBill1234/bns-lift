@@ -365,18 +365,17 @@ bool GameEventLogEvent::HandleEvent(EventContext*, unsigned long)
     RetrievePublicationContext publicationContext(128);
     int dbRetValue = 0;
     bool dbOk;
-    if (_eventTargetType == 1)
+    switch (_eventTargetType)
     {
+    case 1:
         dbOk = SmartCouponDB::ProcessAccountGameEventLog(&dbRetValue, _gameEventLogId, &_gameAccountId, _gameEventId,
                                                          &publicationContext);
-    }
-    else if (_eventTargetType == 2)
-    {
+        break;
+    case 2:
         dbOk = SmartCouponDB::ProcessCharacterGameEventLog(&dbRetValue, _gameEventLogId, &_gameAccountId, _wid, _pcdbid,
                                                            _gameEventId, &publicationContext);
-    }
-    else
-    {
+        break;
+    default:
         Log::Write(Log::LT_ERROR, kFile, 353,
                    L"[event-log], handle event, fail, invalid target type, log-id:%I64d, acc:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X, wid:%d, pcdbid:0x%I64X, game-event-id:%d, target-type:%d",
                    _gameEventLogId, GEW_ACC_ARGS(acc), static_cast<int>(_wid), _pcdbid, _gameEventId,
@@ -416,12 +415,17 @@ bool GameEventLogEvent::HandleEvent(EventContext*, unsigned long)
         void* mem = Memory::_Manager[2]->Alloc(sizeof(SendPublicationEvent), kFile, 385);
         SendPublicationEvent* ev =
             mem ? new (mem) SendPublicationEvent(info->publicationId, info->gameAccountId, info->couponEventId) : nullptr;
+        // LIFT: 0xb6e0 the copy is a source-form change. It removes the biased pointer const 0x16.
+        // The behaviour does not change: main already logged the fields of info, not of ev.
+        PublicationInfo const posted = *info;
         PostQueuedCompletionStatus(Network::iocpHandle(), 0, reinterpret_cast<ULONG_PTR>(static_cast<EventObject*>(ev)),
                                    nullptr);
-        auto const& pacc = info->gameAccountId.guid;
+        // BUG: 0xbc19 the original logs the fields of ev after the post. ev can be null or already freed.
+        // This code logs a copy of the publication info.
+        auto const& pacc = posted.gameAccountId.guid;
         Log::Write(Log::LT_DEBUG, kFile, 388,
                    L"[event-log], post publication event, publication-id:%I64d, acc:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X, coupon-event-id:%d",
-                   info->publicationId, GEW_ACC_ARGS(pacc), info->couponEventId);
+                   posted.publicationId, GEW_ACC_ARGS(pacc), posted.couponEventId);
     }
     removeReferenceCount(kFile, 391);
     return true;
@@ -495,43 +499,43 @@ bool RetryCouponPublicationEvent::HandleEvent(EventContext*, unsigned long)
                L"[retry-coupon-publication], handle event, tid:%I64d, acc:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X, publication-id:%I64d",
                _tid, GEW_ACC_ARGS(acc), _publicationId);
     int dbRetValue = 0;
-    short failReason;
+    char failReason;  // LIFT: 0xc477 the original keeps it in bl (mov bl,4)
     if (!SmartCouponDB::LoadSingleCouponPublication(&dbRetValue, _publicationId, &_gameAccountId, &_couponEventId))
     {
         Log::Write(Log::LT_ERROR, kFile, 446,
                    L"[retry-coupon-publication], handle event, failed to load, tid:%I64d, acc:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X, publication-id:%I64d, dbRetValue:%d",
                    _tid, GEW_ACC_ARGS(acc), _publicationId, dbRetValue);
         failReason = 4;
-    }
-    else if (_couponEventId == 0)
-    {
-        failReason = 10;
-    }
-    else
-    {
-        void* mem = Memory::_Manager[2]->Alloc(sizeof(SendPublicationEvent), kFile, 456);
-        SendPublicationEvent* ev = nullptr;
-        if (mem != nullptr)
-        {
-            ev = new (mem) SendPublicationEvent(_publicationId, _gameAccountId, _couponEventId);
-            ev->_managementTid = _tid;
-        }
-        PostQueuedCompletionStatus(Network::iocpHandle(), 0,
-                                   reinterpret_cast<ULONG_PTR>(static_cast<EventObject*>(ev)), nullptr);
-        Log::Write(Log::LT_DEBUG, kFile, 459,
-                   L"[retry-coupon-publication], handle event, post publication-event, publication-id:%I64d, acc:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X, coupon-event-id:%d, management-tid:%I64d",
-                   _publicationId, GEW_ACC_ARGS(acc), _couponEventId, _tid);
-        removeReferenceCount(kFile, 461);
+    // LIFT: 0xc2f0 the original has one shared fail path ($_ERROR_3). The zero coupon-event-id case jumps to it.
+    postFail:
+        void* mem = Memory::_Manager[2]->Alloc(sizeof(SendRetryCouponPublicationFailEvent), kFile, 465);
+        SendRetryCouponPublicationFailEvent* ev = mem ? new (mem) SendRetryCouponPublicationFailEvent(_tid, failReason) : nullptr;
+        PostQueuedCompletionStatus(Network::iocpHandle(), 0, reinterpret_cast<ULONG_PTR>(static_cast<EventObject*>(ev)),
+                                   nullptr);
+        Log::Write(Log::LT_DEBUG, kFile, 468,
+                   L"[retry-coupon-publication], handle event, post retry-coupon-publication-fail-event, tid:%I64d, failReason:%d",
+                   _tid, static_cast<int>(failReason));
+        removeReferenceCount(kFile, 470);
         return true;
     }
-    void* mem = Memory::_Manager[2]->Alloc(sizeof(SendRetryCouponPublicationFailEvent), kFile, 465);
-    SendRetryCouponPublicationFailEvent* ev = mem ? new (mem) SendRetryCouponPublicationFailEvent(_tid, failReason) : nullptr;
-    PostQueuedCompletionStatus(Network::iocpHandle(), 0, reinterpret_cast<ULONG_PTR>(static_cast<EventObject*>(ev)),
-                               nullptr);
-    Log::Write(Log::LT_DEBUG, kFile, 468,
-               L"[retry-coupon-publication], handle event, post retry-coupon-publication-fail-event, tid:%I64d, failReason:%d",
-               _tid, static_cast<int>(failReason));
-    removeReferenceCount(kFile, 470);
+    if (_couponEventId == 0)
+    {
+        failReason = 10;
+        goto postFail;
+    }
+    void* mem = Memory::_Manager[2]->Alloc(sizeof(SendPublicationEvent), kFile, 456);
+    SendPublicationEvent* ev = nullptr;
+    if (mem != nullptr)
+    {
+        ev = new (mem) SendPublicationEvent(_publicationId, _gameAccountId, _couponEventId);
+        ev->_managementTid = _tid;
+    }
+    PostQueuedCompletionStatus(Network::iocpHandle(), 0,
+                               reinterpret_cast<ULONG_PTR>(static_cast<EventObject*>(ev)), nullptr);
+    Log::Write(Log::LT_DEBUG, kFile, 459,
+               L"[retry-coupon-publication], handle event, post publication-event, publication-id:%I64d, acc:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X, coupon-event-id:%d, management-tid:%I64d",
+               _publicationId, GEW_ACC_ARGS(acc), _couponEventId, _tid);
+    removeReferenceCount(kFile, 461);
     return true;
 }
 

@@ -11,6 +11,9 @@ struct AutoDbTran
 {
     // LIFT: Inlined ctor.
     explicit AutoDbTran(unsigned int dbId) : Tran(Db::AllocTransaction(dbId)), TimeoutSec(10) {}
+    // LIFT: Inlined ctor (the PDB lists 3 AutoDbTran overloads). 0x14e50 sets the query timeout before the null check.
+    // The body is in PostOfficeDB.cpp because it calls SQLSetStmtAttrW.
+    inline AutoDbTran(unsigned int dbId, int timeoutSec);
     ~AutoDbTran();  // 0x14e00
 
     DbTransaction* Tran;

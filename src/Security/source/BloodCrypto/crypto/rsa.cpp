@@ -122,8 +122,10 @@ bool RsaPublic::Setup(unsigned char const* key, int keySize, int round)
 {
     int bits = round;
     // BUG: 0x532A0 sets the default 512, but bits == 0 fails the range check first.
-    int v = bits != 0 ? bits : 512;
-    if (static_cast<unsigned int>(bits - 64) > 0x3C0 || (bits & 63) != 0 || key == 0 ||
+    int v = bits;
+    if (v == 0)
+        v = 512;
+    if (static_cast<unsigned int>(bits - 64) > 0x3C0 || bits % 64 != 0 || key == 0 ||
         ((v + 7) >> 3) + 4 > keySize)
     {
         _error = 3;
@@ -191,8 +193,10 @@ bool RsaPrivate::Setup(unsigned char const* key, int keySize, int round)
 {
     int bits = round;
     // BUG: 0x53560 sets the default 512, but bits == 0 fails the range check first.
-    int v = bits != 0 ? bits : 512;
-    if (static_cast<unsigned int>(bits - 64) > 0x3C0 || (bits & 63) != 0 || key == 0 ||
+    int v = bits;
+    if (v == 0)
+        v = 512;
+    if (static_cast<unsigned int>(bits - 64) > 0x3C0 || bits % 64 != 0 || key == 0 ||
         2 * ((v + 7) >> 3) + 8 > keySize)
     {
         _error = 3;

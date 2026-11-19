@@ -45,13 +45,11 @@ class RetryCouponPublicationEvent : public DynamicEventObject
 {
 public:
     // LIFT: Inlined in HandleSmartCouponManager_RetryCouponPublicationReq (0xF2F0).
-    RetryCouponPublicationEvent() : _tid(0), _publicationId(0), _couponEventId(0)
+    RetryCouponPublicationEvent() : _tid(0), _gameAccountId(ID128_GUID_ZERO), _publicationId(0), _couponEventId(0)
     {
         _ref = 1;
         _tag = 10;
         _history = nullptr;
-        _gameAccountId.id[0] = 0;
-        _gameAccountId.id[1] = 0;
     }
     virtual ~RetryCouponPublicationEvent() {}  // 0xEF10
     virtual unsigned int EventId() const;      // 0xEF00

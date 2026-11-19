@@ -20,7 +20,8 @@ static_assert(sizeof(id128) == 0x10, "sizeof id128");
 
 // PDB global (types.h: `id128 ID128_GUID_ZERO`). CacheGate 0x46be8 is in read-only data, and the inline
 // BnsCommonConfig constructor copies it (two qword loads in 0x13e0 and 0x1600).
-extern id128 ID128_GUID_ZERO;
+// LIFT: const. The public symbol is ?ID128_GUID_ZERO@@3Tid128@@B (const) in all 4 originals (POD 0x1993).
+extern id128 const ID128_GUID_ZERO;
 
 class String
 {

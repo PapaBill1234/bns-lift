@@ -3,12 +3,13 @@
 Turns: 95
 
 ## Done
-- MATCH over main: CG 448 -> 450 (+2), LG 627 -> 632 (+5), SCD 582 -> 585 (+3), POD 665 -> 667 (+2). Total +12. MATCH lost: 0.
-- Parity: CG 91.6 %, LG 85.5 %, SCD 87.4 %, POD 87.9 %.
-- New MATCH: `InitSymbol` x4, `WinServiceConsole::UninstallService` x4, SCD `DaemonConfig::Dump`, LG `PipeConsole::SetRunningInfo`,
+- MATCH over main (95ad5be, after the merge with main): CG 454 -> 456 (+2), LG 653 -> 658 (+5), SCD 628 -> 630 (+2), POD 692 -> 694 (+2).
+  Total +11. MATCH lost: 0.
+- Parity: CG 92.9 %, LG 89.0 %, SCD 94.2 %, POD 91.4 %.
+- New MATCH: `InitSymbol` x4, `WinServiceConsole::UninstallService` x4, LG `PipeConsole::SetRunningInfo`,
   LG `IdleStateTable::scan`, LG `PipeConsole::addNode`.
 - Files: `CrashHandler.cpp`, `WinServiceConsole.cpp`, `PipeConsole.cpp`, `IdleWatcher.cpp` (only `IdleStateTable::scan`),
-  `SmartCouponDaemon/SmartCouponDaemon.cpp`, `Docs/Parity/lessons.md` (A25, B console-4, D, `## console-4`).
+  `SmartCouponDaemon/SmartCouponDaemon.cpp`, `Docs/Parity/lessons.md` (A29, B console-4, D, `## console-4`).
 
 ## Not done (function, signal, cause, why stopped)
 
@@ -21,8 +22,7 @@ Turns: 95
 | `PipeCommandProcess::processCommand` | all 4 | 96.3 | consts 89 | `wcscmp` result in `sbb` form | 3 tries, no gain |
 | `PipeConsole::checkFrozenThread` | LG | 91.0 | refs 93, consts 80 | orig inlines `SetInvalidInfo` with `addNode` and the match-node search | needs `SetInvalidInfo` change (stop list); inline `addNode` lost score |
 | `DaemonConfig::Dump` | CG | 97.9 | refs 94 | RTTI data next to `_Def`; we build with `/GR-` | const pointer form gave 0 |
-| `BnsCommonConfig::ReloadBnsCommonConfig` | SCD, POD | 98.9 | refs 97 | orig reloads `ID128_GUID_ZERO` per qword; VS2010 merges ours | 3 tries, no gain |
-| `BnsCommonConfig::LoadBnsCommonConfig` | SCD, POD | 99.1 | refs 97 | same `ID128_GUID_ZERO` cause | same cause |
+| `DaemonConfig::Dump` | SCD | 97.9 | refs 94 | data layout of `_Def`; the `LOCALHOST_IP` form gave +1 on eaba76b, 0 on main after pod-4 | win gone after merge; `LOCALHOST_IP` kept as PDB name |
 | `CacheDList::LoadCachedListConfigFile` | CG | 98.5 | calls 97, refs 98 | loop form (B) | not tried this card; earlier forms failed |
 | `ContentsRuleConfig::CheckMinMaxBoundary` | LG | 93.3 | refs 80 | not examined | time |
 | `ContentsRuleConfig::Dump` | LG | 99.2 | refs 98 | not examined | time |
@@ -40,7 +40,13 @@ Turns: 95
   All 4 PDBs give the same lines (841-859) and the same source file. LTCG folds the `L""` argument in CG/SCD/POD (CG 0x15ed0).
 - `tools/pdbq.py <EXE> lines <lo> <hi>`: new tracked command for the PDB line map. It replaces the untracked `.scratch/lines.py`.
 - `IdleStateTable::scan`: the `// LIFT:` comment names LobbyGate with the address.
-- `Docs/Parity/lessons.md` A25 and `## console-4`: the constant-folding cause replaces the false "newer source" claim.
+- `Docs/Parity/lessons.md` A29 (was A25) and `## console-4`: the constant-folding cause replaces the false "newer source" claim.
+
+## Repair 3 (skeptic findings)
+- Merged main (95ad5be: crypto-4, net-4, packet-4, scd-4, pod-4) into the branch. New numbers over main: CG +2, LG +5, SCD +2, POD +2 (+11).
+- SCD `DaemonConfig::Dump` is DIFF 97.9 on main after the merge. The MATCH claim is removed. `LOCALHOST_IP` stays as the PDB name form.
+- `Docs/Parity/lessons.md`: the console-4 section is A29 (main has A25-A28). The A29 count is 11. The SCD `Dump` bullet moved to B.
+- `BnsCommonConfig::LoadBnsCommonConfig` / `ReloadBnsCommonConfig` (SCD, POD) left the "Not done" table: pod-4 matched them with `memcpy` (A28).
 
 ## ❓
 - None new.
@@ -49,4 +55,5 @@ Turns: 95
 - None.
 
 ## Gate result
-- `tools/gate.sh`: gate ok. `tools/parity.sh`: parity ok, no MATCH lost, on the final source after repair 2.
+- Repair 3, after the merge with main (95ad5be): `tools/gate.sh`: gate ok. `tools/parity.sh`: parity ok.
+  MATCH -> DIFF 0, MATCH name gone 0 in all 4 exes.

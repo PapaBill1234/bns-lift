@@ -134,13 +134,13 @@ void RepeatPacketComposer::PushRepeatCount(Packet* packet)
         PACKETUTIL_ASSERT_CRASH(50);
         return;
     }
-    unsigned short freeSize = packet->CurHeader != nullptr
-                                  ? static_cast<unsigned short>(4000 - packet->CurHeader->size)
-                                  : 0;
-    if (freeSize < 2)
+    // LIFT: 0x1B110 computes the free size two times: one time for the check and one time for the log.
+    if ((packet->CurHeader != nullptr ? static_cast<unsigned short>(4000 - packet->CurHeader->size) : 0) < 2)
     {
         Log::Write(Log::LT_ERROR, PACKETUTIL_FILE, 54,
-                   L"[packet], not enough free size in packet, free size:%d, format:%s", freeSize, format);
+                   L"[packet], not enough free size in packet, free size:%d, format:%s",
+                   packet->CurHeader != nullptr ? static_cast<unsigned short>(4000 - packet->CurHeader->size) : 0,
+                   format);
         PACKETUTIL_ASSERT_CRASH(55);
         return;
     }

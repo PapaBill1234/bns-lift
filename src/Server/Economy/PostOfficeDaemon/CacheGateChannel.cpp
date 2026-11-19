@@ -268,28 +268,28 @@ bool CacheGateSessionHandler::OnConnect(Session const* session, bool firstConnec
     }
     channel->removeReferenceCount(CACHEGATE_CHANNEL_FILE, 252);
 
-    PostOfficeDaemon* const daemon = PostOfficeDaemon::_instance;
-    if (daemon->pipeConsole != nullptr)
-        daemon->pipeConsole->SetInvalidInfo(DISCONNECTED_CACHEGATE, false);
+    if (PostOfficeDaemon::_instance->pipeConsole != nullptr)
+        PostOfficeDaemon::_instance->pipeConsole->SetInvalidInfo(DISCONNECTED_CACHEGATE, false);
 
     // 0x7a75-0x7a95: Send("hhhh" 0x74388, 1, 4, 0xA, word [daemon+0x750]).
-    session->Send("hhhh", CacheGate_HelloCmd, 4, 10, daemon->_serviceWid);
+    // LIFT: _instance is read again after SetInvalidInfo (0x7a60). The wid is read once before Send.
+    unsigned short const serviceWid = PostOfficeDaemon::_instance->_serviceWid;
+    session->Send("hhhh", CacheGate_HelloCmd, 4, 10, serviceWid);
     Log::Write(Log::LT_NOTICE, CACHEGATE_CHANNEL_FILE, 261,
                L"[%s], %s; sent hello request to cachegate, cachegate-packet-version:%d, economy-common-packet-version:%d, postofficeServiceWid:%u",
-               L"cachegate channel", L"CacheGateSessionHandler::OnConnect", 4, 10, daemon->_serviceWid);
+               L"cachegate channel", L"CacheGateSessionHandler::OnConnect", 4, 10, serviceWid);
     return true;
 }
 
 // 0x7b50
 void CacheGateSessionHandler::OnClose(Session const* session, bool tryReconnect) const
 {
-    unsigned long long const sessionId = session->_id;
+    // LIFT: _id and _instance are read again at each use (0x7b50).
     Log::Write(Log::LT_NOTICE, CACHEGATE_CHANNEL_FILE, 268,
                L"[%s], %s; closed connection with cachegate, sessionId:0x%I64X, portId:%u, sessionIndex:%u",
-               L"cachegate channel", L"CacheGateSessionHandler::OnClose", sessionId,
-               static_cast<unsigned int>(sessionId >> 32), static_cast<unsigned int>(sessionId));
+               L"cachegate channel", L"CacheGateSessionHandler::OnClose", session->_id,
+               static_cast<unsigned int>(session->_id >> 32), static_cast<unsigned int>(session->_id));
 
-    PostOfficeDaemon* const daemon = PostOfficeDaemon::_instance;
     Channel* const channel = session->GetChannel();
     if (channel != nullptr)
     {
@@ -297,7 +297,7 @@ void CacheGateSessionHandler::OnClose(Session const* session, bool tryReconnect)
         if (!tryReconnect)
         {
             // LIFT: inlined CacheGateChannelManager release (log line 202). The name is not in the PDB.
-            CacheGateChannelManager* const manager = daemon->_cachegateChannelManager;
+            CacheGateChannelManager* const manager = PostOfficeDaemon::_instance->_cachegateChannelManager;
             manager->_lock.Enter();
             if (manager->_cachegateChannel != nullptr)
             {
@@ -310,17 +310,17 @@ void CacheGateSessionHandler::OnClose(Session const* session, bool tryReconnect)
         channel->removeReferenceCount(CACHEGATE_CHANNEL_FILE, 277);
     }
 
-    daemon->_cachedWatchdogManager->SetAllServiceState(CachedWatchdog::SERVICE_STATE_UNAVAILABLE);  // 0x7cae; LTCG folded the value into 0x4a50 (r12d = 0 at 0x4a78)
+    PostOfficeDaemon::_instance->_cachedWatchdogManager->SetAllServiceState(CachedWatchdog::SERVICE_STATE_UNAVAILABLE);  // 0x7cae; LTCG folded the value into 0x4a50 (r12d = 0 at 0x4a78)
 
     if (tryReconnect)
         Log::Write(Log::LT_DEBUG, CACHEGATE_CHANNEL_FILE, 284,
                    L"[%s], %s; reconnecting to cachegate, sessionId:0x%I64X, portId:%u, sessionIndex:%u",
-                   L"cachegate channel", L"CacheGateSessionHandler::OnClose", sessionId,
-                   static_cast<unsigned int>(sessionId >> 32), static_cast<unsigned int>(sessionId));
+                   L"cachegate channel", L"CacheGateSessionHandler::OnClose", session->_id,
+                   static_cast<unsigned int>(session->_id >> 32), static_cast<unsigned int>(session->_id));
 
     // LIFT: inlined search and addNode; same logic as SetInvalidInfo(key, true).
-    if (daemon->pipeConsole != nullptr)
-        daemon->pipeConsole->SetInvalidInfo(DISCONNECTED_CACHEGATE, true);
+    if (PostOfficeDaemon::_instance->pipeConsole != nullptr)
+        PostOfficeDaemon::_instance->pipeConsole->SetInvalidInfo(DISCONNECTED_CACHEGATE, true);
 }
 
 // 0x7d90

@@ -8,6 +8,9 @@ class Ripemd128 : public CryptoHash
 {
 public:
     Ripemd128() : _flag(false) {}
+    // LIFT: non-virtual user dtor (0x5AB30, 0x531F0). Orig OaepEncoder and RsaPublic dtors store
+    // ??_7Ripemd128 (0x87000). Vtable 0x87000 has no dtor slot, so the dtor is not virtual.
+    ~Ripemd128() {}
     virtual int GetType() const;
     virtual int Size() const;
     virtual bool Digest(unsigned char const* in, int size, unsigned char* digest, int* digestSize) const;

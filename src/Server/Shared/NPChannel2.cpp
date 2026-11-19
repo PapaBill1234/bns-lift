@@ -154,10 +154,16 @@ bool NPTransactionRegistry::Find(unsigned int id, Item* item)
 bool NPTransactionRegistry::Register(ECommand cmd, void* context, unsigned int* id)
 {
     unsigned int txnId;
-    while ((txnId = static_cast<unsigned int>(InterlockedIncrement(reinterpret_cast<LONG volatile*>(&_seed)))) == 0)
+    for (;;)
+    {
+        txnId = static_cast<unsigned int>(InterlockedIncrement(reinterpret_cast<LONG volatile*>(&_seed)));
+        if (txnId != 0)
+            break;
         Log::Write(Log::LT_ERROR, NPCHANNEL_FILE, 211, L"[np], txn-id overflow");
+    }
 
-    Item* item = static_cast<Item*>(Memory::_Manager[2]->Alloc(sizeof(Item), NPCHANNEL_FILE, 134));
+    // LIFT: line 131 from SCD 0x1400046f2 (mov r9d,0x83) in NPTransactionRegistry::Register 0x4690, build 2019 + PDB.
+    Item* item = static_cast<Item*>(Memory::_Manager[2]->Alloc(sizeof(Item), NPCHANNEL_FILE, 131));
     item->cmd = cmd;
     item->context = context;
 
@@ -167,12 +173,15 @@ bool NPTransactionRegistry::Register(ECommand cmd, void* context, unsigned int* 
 
     if (inserted)
     {
-        *id = txnId;
-        return true;
+        if (id != nullptr)
+            *id = txnId;
     }
-    Log::Write(Log::LT_ERROR, NPCHANNEL_FILE, 147, L"[np], register txn-id fail; duplicated, txn-id:%u", txnId);
-    Memory::_Manager[2]->Free(item, NPCHANNEL_FILE, 148);
-    return false;
+    else
+    {
+        Log::Write(Log::LT_ERROR, NPCHANNEL_FILE, 147, L"[np], register txn-id fail; duplicated, txn-id:%u", txnId);
+        Memory::_Manager[2]->Free(item, NPCHANNEL_FILE, 148);
+    }
+    return inserted;
 }
 
 // 0x47D0

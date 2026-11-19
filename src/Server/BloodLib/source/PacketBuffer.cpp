@@ -44,11 +44,21 @@ unsigned short PacketBuffer::Compose(char* buffer, unsigned int count, char cons
 {
     char* p = buffer;
     char* end = buffer + count;
-    for (unsigned long long i = 0; i < fmtCount && format[i] != '\0'; ++i)
+    // LIFT: 0x11FB0 (CacheGate) walks the format with a pointer. The index check is at the top of the body.
+    for (char const* f = format; *f != '\0'; ++f)
     {
-        switch (format[i])
+        if (static_cast<unsigned long long>(f - format) >= fmtCount)
+            break;
+        switch (*f)
         {
+        // LIFT: 0x11FB0 (CacheGate) block order: c, h, d, q, o, f, s, b, P.
         case ';':
+            break;
+        case 'Q':
+        case 'c':
+            if (p + 1 > end)
+                goto compose_overflow;
+            *p++ = static_cast<char>(va_arg(args, int));
             break;
         case 'C':
         case 'E':
@@ -60,43 +70,6 @@ unsigned short PacketBuffer::Compose(char* buffer, unsigned int count, char cons
             *reinterpret_cast<short*>(p) = static_cast<short>(va_arg(args, int));
             p += 2;
             break;
-        case 'K':
-        case 'b':
-        {
-            void const* data = va_arg(args, void const*);
-            unsigned short size = static_cast<unsigned short>(va_arg(args, int));
-            char* next = p + size + 2;
-            if (next > end)
-                goto compose_overflow;
-            *reinterpret_cast<short*>(p) = static_cast<short>(size);
-            memcpy(p + 2, data, size);
-            p = next;
-            break;
-        }
-        case 'P':
-        {
-            if (p + 1 > end)
-                goto compose_overflow;
-            *p = static_cast<char>(va_arg(args, int));
-            if (p + 3 > end)
-                goto compose_overflow;
-            *reinterpret_cast<short*>(p + 1) = static_cast<short>(va_arg(args, int));
-            void const* data = va_arg(args, void const*);
-            unsigned short size = static_cast<unsigned short>(va_arg(args, int));
-            char* next = p + 5 + size;
-            if (next > end)
-                goto compose_overflow;
-            *reinterpret_cast<short*>(p + 3) = static_cast<short>(size);
-            memcpy(p + 5, data, size);
-            p = next;
-            break;
-        }
-        case 'Q':
-        case 'c':
-            if (p + 1 > end)
-                goto compose_overflow;
-            *p++ = static_cast<char>(va_arg(args, int));
-            break;
         case 'd':
         case 'i':
             if (p + 4 > end)
@@ -104,11 +77,11 @@ unsigned short PacketBuffer::Compose(char* buffer, unsigned int count, char cons
             *reinterpret_cast<int*>(p) = va_arg(args, int);
             p += 4;
             break;
-        case 'f':
-            if (p + 4 > end)
+        case 'q':
+            if (p + 8 > end)
                 goto compose_overflow;
-            *reinterpret_cast<float*>(p) = static_cast<float>(va_arg(args, double));
-            p += 4;
+            *reinterpret_cast<long long*>(p) = va_arg(args, long long);
+            p += 8;
             break;
         case 'o':
         {
@@ -120,11 +93,11 @@ unsigned short PacketBuffer::Compose(char* buffer, unsigned int count, char cons
             p += 16;
             break;
         }
-        case 'q':
-            if (p + 8 > end)
+        case 'f':
+            if (p + 4 > end)
                 goto compose_overflow;
-            *reinterpret_cast<long long*>(p) = va_arg(args, long long);
-            p += 8;
+            *reinterpret_cast<float*>(p) = static_cast<float>(va_arg(args, double));
+            p += 4;
             break;
         case 's':
         {
@@ -139,8 +112,46 @@ unsigned short PacketBuffer::Compose(char* buffer, unsigned int count, char cons
             p = next;
             break;
         }
+        case 'K':
+        case 'b':
+        {
+            // LIFT: 0x12142 (CacheGate) reads the size as a signed short (movsx).
+            // BUG: a size above 0x7FFF is negative. It passes the check and memcpy gets a huge size.
+            // The callers give a buffer of at most 0xF9E bytes, so a valid size is never above 0x7FFF.
+            void const* data = va_arg(args, void const*);
+            short size = static_cast<short>(va_arg(args, int));
+            char* next = p + size + 2;
+            if (next > end)
+                goto compose_overflow;
+            *reinterpret_cast<short*>(p) = size;
+            memcpy(p + 2, data, size);
+            p = next;
+            break;
+        }
+        case 'P':
+        {
+            // LIFT: 0x12171 (CacheGate) sets p before the last check. There is no p = next after the copy.
+            // BUG: the size is a signed short, as in case 'b'.
+            char* q1 = p + 1;
+            if (q1 > end)
+                goto compose_overflow;
+            *p = static_cast<char>(va_arg(args, int));
+            char* q3 = q1 + 2;
+            if (q3 > end)
+                goto compose_overflow;
+            *reinterpret_cast<short*>(q1) = static_cast<short>(va_arg(args, int));
+            void const* data = va_arg(args, void const*);
+            short size = static_cast<short>(va_arg(args, int));
+            char* q5 = q3 + 2;
+            p = q5 + size;
+            if (p > end)
+                goto compose_overflow;
+            *reinterpret_cast<short*>(q3) = size;
+            memcpy(q5, data, size);
+            break;
+        }
         default:
-            Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 177, L"Unknown type %C", format[i]);
+            Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 177, L"Unknown type %C", *f);
             PACKETBUFFER_ASSERT_CRASH(178);
             return 0;
         }
@@ -157,20 +168,26 @@ compose_overflow:
 // Checks one format item. Each argument slot is 8 bytes. Returns 5000 on overflow.
 unsigned short PacketBuffer::CheckCompose(char* buffer, unsigned int count, char const* format, char** args)
 {
+    unsigned short size = 0;
     char* end = &buffer[count];
     if (strlen(format) == 0)
     {
         Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 203, L"[PacketBuffer] %s, invalid format", L"PacketBuffer::CheckCompose");
-        return 0;
+        return size;
     }
     char type = *format;
     char* a = *args;
+    // LIFT: 0x23760 (LobbyGate) all cases go to one exit that stores the argument pointer and returns the size.
+    // LIFT: 0x237F1 (LobbyGate) the block order is c, C, d, q, o, s, K, P.
     switch (type)
     {
-    case ';':
-        Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 325, L"[PacketBuffer] %s, Repeat End type %C",
-                   L"PacketBuffer::CheckCompose", type);
-        return 0;
+    case 'Q':
+    case 'c':
+        if (buffer + 1 > end)
+            goto compose_overflow;
+        a += 8;
+        size = 1;
+        break;
     case 'C':
     case 'E':
     case 'U':
@@ -178,16 +195,47 @@ unsigned short PacketBuffer::CheckCompose(char* buffer, unsigned int count, char
     case 'u':
         if (buffer + 2 > end)
             goto compose_overflow;
-        *args = a + 8;
-        return 2;
+        a += 8;
+        size = 2;
+        break;
+    case 'd':
+    case 'f':
+    case 'i':
+        if (buffer + 4 > end)
+            goto compose_overflow;
+        a += 8;
+        size = 4;
+        break;
+    case 'q':
+        if (buffer + 8 > end)
+            goto compose_overflow;
+        a += 8;
+        size = 8;
+        break;
+    case 'o':
+        if (buffer + 16 > end)
+            goto compose_overflow;
+        a += 8;
+        size = 16;
+        break;
+    case 's':
+    {
+        short len = static_cast<short>(wcslen(*reinterpret_cast<wchar_t const**>(a)));
+        a += 8;
+        if (buffer + len * 2 + 2 > end)
+            goto compose_overflow;
+        size = static_cast<unsigned short>((len + 1) * 2);
+        break;
+    }
     case 'K':
     case 'b':
     {
-        short size = *reinterpret_cast<short*>(a + 8);
-        if (&buffer[size + 2] > end)
+        short dataSize = *reinterpret_cast<short*>(a + 8);
+        a += 16;
+        if (buffer + dataSize + 2 > end)
             goto compose_overflow;
-        *args = a + 16;
-        return static_cast<unsigned short>(size + 2);
+        size = static_cast<unsigned short>(dataSize + 2);
+        break;
     }
     case 'P':
     {
@@ -195,49 +243,25 @@ unsigned short PacketBuffer::CheckCompose(char* buffer, unsigned int count, char
             goto compose_overflow;
         if (buffer + 2 > end)
             goto compose_overflow;
-        short size = *reinterpret_cast<short*>(a + 24);
-        if (&buffer[size + 2] > end)
+        short dataSize = *reinterpret_cast<short*>(a + 24);
+        a += 32;
+        if (buffer + dataSize + 2 > end)
             goto compose_overflow;
-        *args = a + 32;
-        return static_cast<unsigned short>(size + 5);
+        size = static_cast<unsigned short>(dataSize + 5);
+        break;
     }
-    case 'Q':
-    case 'c':
-        if (buffer + 1 > end)
-            goto compose_overflow;
-        *args = a + 8;
-        return 1;
-    case 'd':
-    case 'f':
-    case 'i':
-        if (buffer + 4 > end)
-            goto compose_overflow;
-        *args = a + 8;
-        return 4;
-    case 'o':
-        if (buffer + 16 > end)
-            goto compose_overflow;
-        *args = a + 8;
-        return 16;
-    case 'q':
-        if (buffer + 8 > end)
-            goto compose_overflow;
-        *args = a + 8;
-        return 8;
-    case 's':
-    {
-        short len = static_cast<short>(wcslen(*reinterpret_cast<wchar_t const**>(a)));
-        if (&buffer[2 * len + 2] > end)
-            goto compose_overflow;
-        *args = a + 8;
-        return static_cast<unsigned short>(2 * (len + 1));
-    }
+    case ';':
+        Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 325, L"[PacketBuffer] %s, Repeat End type %C",
+                   L"PacketBuffer::CheckCompose", type);
+        return size;
     default:
         Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 331, L"[PacketBuffer] %s, Unknown type %C",
                    L"PacketBuffer::CheckCompose", type);
         PACKETBUFFER_ASSERT_CRASH(332);
-        return 0;
+        return size;
     }
+    *args = a;
+    return size;
 
 compose_overflow:
     Log::Write(Log::LT_DEBUG, PACKETBUFFER_FILE, 342, L"[PacketBuffer] %s, Compose overflow", L"PacketBuffer::CheckCompose");
@@ -251,9 +275,16 @@ unsigned short PacketBuffer::Decompose(char const* buffer, unsigned int count, c
 {
     char const* p = buffer;
     char const* end = buffer + count;
-    for (unsigned long long i = 0; i < fmtCount && format[i] != '\0'; ++i)
+    // LIFT: 0x12320 (CacheGate) uses strlen when fmtCount is 0.
+    if (fmtCount == 0)
+        fmtCount = strlen(format);
+    // LIFT: 0x12320 (CacheGate) walks the format with a pointer. The index check is at the top of the body.
+    for (char const* f = format; *f != '\0'; ++f)
     {
-        switch (format[i])
+        if (static_cast<unsigned long long>(f - format) >= fmtCount)
+            break;
+        // LIFT: 0x12646 (CacheGate) the error tails come in the order s, K/b, P. The source order of the cases is the same.
+        switch (*f)
         {
         case ';':
             break;
@@ -267,6 +298,35 @@ unsigned short PacketBuffer::Decompose(char const* buffer, unsigned int count, c
             *va_arg(args, short*) = *reinterpret_cast<short const*>(p);
             p += 2;
             break;
+        case 's':
+        {
+            if (end < p + 2)
+                goto decompose_overflow;
+            char const* src = p + 2;
+            short len = *reinterpret_cast<short const*>(p);
+            wchar_t* dest = va_arg(args, wchar_t*);
+            short destSize = static_cast<short>(va_arg(args, int));
+            *dest = L'\0';
+            if (len < 0)
+            {
+                Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 421, L"length underflow");
+                return 0;
+            }
+            if (destSize < len + 1)
+            {
+                Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 426, L"string buffer is too small");
+                return 0;
+            }
+            p = src + len * sizeof(wchar_t);
+            if (end < p)
+            {
+                Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 431, L"length overflow");
+                return 0;
+            }
+            memcpy(dest, src, len * sizeof(wchar_t));
+            dest[len] = L'\0';
+            break;
+        }
         case 'K':
         case 'b':
         {
@@ -286,7 +346,7 @@ unsigned short PacketBuffer::Decompose(char const* buffer, unsigned int count, c
                 Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 458, L"not enough buffer");
                 return 0;
             }
-            p += size + 2;
+            p = src + size;
             if (end < p)
             {
                 Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 463, L"buffer overflow");
@@ -370,37 +430,8 @@ unsigned short PacketBuffer::Decompose(char const* buffer, unsigned int count, c
             *va_arg(args, long long*) = *reinterpret_cast<long long const*>(p);
             p += 8;
             break;
-        case 's':
-        {
-            if (end < p + 2)
-                goto decompose_overflow;
-            char const* src = p + 2;
-            short len = *reinterpret_cast<short const*>(p);
-            wchar_t* dest = va_arg(args, wchar_t*);
-            short destSize = static_cast<short>(va_arg(args, int));
-            *dest = L'\0';
-            if (len < 0)
-            {
-                Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 421, L"length underflow");
-                return 0;
-            }
-            if (destSize < len + 1)
-            {
-                Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 426, L"string buffer is too small");
-                return 0;
-            }
-            p += len * 2 + 2;
-            if (end < p)
-            {
-                Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 431, L"length overflow");
-                return 0;
-            }
-            memcpy(dest, src, 2 * static_cast<size_t>(len));
-            dest[len] = L'\0';
-            break;
-        }
         default:
-            Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 556, L"Unknown type %C", format[i]);
+            Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 556, L"Unknown type %C", *f);
             return 0;
         }
     }
@@ -761,7 +792,7 @@ unsigned short PacketBuffer::DecomposeText(char const* buffer, unsigned int coun
             break;
         long long v;
         int n;
-        int errorLine;
+        // BUG: The range calls (0x2FD16) give only v (rcx at 0x2FD01, stack +0x20). %C gets the value. %I64d gets no argument.
         switch (*f)
         {
         case 'C':
@@ -774,8 +805,8 @@ unsigned short PacketBuffer::DecomposeText(char const* buffer, unsigned int coun
             cur += n;
             if (static_cast<unsigned long long>(v + 0x8000) > 0xFFFF)
             {
-                errorLine = 1038;
-                goto decompose_text_range;
+                Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 1038, L"Decompose Text, format('%C'), value(%I64d)", v);
+                return 0;
             }
             *va_arg(args, short*) = static_cast<short>(v);
             continue;
@@ -788,8 +819,8 @@ unsigned short PacketBuffer::DecomposeText(char const* buffer, unsigned int coun
             cur += n;
             if (static_cast<unsigned long long>(v + 128) > 0xFF)
             {
-                errorLine = 1030;
-                goto decompose_text_range;
+                Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 1030, L"Decompose Text, format('%C'), value(%I64d)", v);
+                return 0;
             }
             *va_arg(args, char*) = static_cast<char>(v);
             continue;
@@ -803,8 +834,8 @@ unsigned short PacketBuffer::DecomposeText(char const* buffer, unsigned int coun
             cur += n;
             if (static_cast<unsigned long long>(v + 0x80000000LL) > 0xFFFFFFFF)
             {
-                errorLine = 1046;
-                goto decompose_text_range;
+                Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 1046, L"Decompose Text, format('%C'), value(%I64d)", v);
+                return 0;
             }
             *va_arg(args, int*) = static_cast<int>(v);
             continue;
@@ -836,10 +867,6 @@ unsigned short PacketBuffer::DecomposeText(char const* buffer, unsigned int coun
             Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 1143, L"Unknown type %C", static_cast<int>(*f));
             return 0;
         }
-    decompose_text_range:
-        // BUG: The call (0x2FD16) gives only v (rcx at 0x2FD01, stack +0x20). %C gets the value. %I64d gets no argument.
-        Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, errorLine, L"Decompose Text, format('%C'), value(%I64d)", v);
-        return 0;
     }
     return static_cast<unsigned short>(reinterpret_cast<char const*>(cur) - buffer);
 

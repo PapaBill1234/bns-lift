@@ -49,8 +49,8 @@ static int const NP_PORT = 6601;
 static int const DEFAULT_MANAGE_LISTEN_PORT = 32000;
 static int const DEFAULT_DAEMON_LISTEN_PORT = 22000;
 static int const DEFAULT_SERVICE_WORLD_ID = 1;
-// LIFT: the PDB gives LOCALHOST_IP as const wchar_t* const (SmartCouponConfig.obj, 0002:55312).
-// _Def reads its value. Thus VS2010 puts _Def in .data, as in the original.
+// LIFT: the PDB gives LOCALHOST_IP as const wchar_t* const (SmartCouponConfig.obj, 0002:55312, rva 0x60810).
+// _Def reads its value for the np-address default.
 static wchar_t const* const LOCALHOST_IP = L"127.0.0.1";
 
 XmlCfgDef const SmartCouponConfig::_Def[23] = {
@@ -600,10 +600,11 @@ bool SmartCouponDaemon::loadUnhandledGameEventLog()
         Log::Write(Log::LT_ERROR, kFile, 596, L"failed to load GameEventLogList, dbRetValue:%d", dbRetValue);
         return false;
     }
-    Log::Write(Log::LT_DEBUG, kFile, 600, L"load unhandled game-event-log, count:%d", context._count);
-    if (context._count <= 0)
-        return true;
-    return GameEventManager::PostGameEventLogList(&context);
+    int count = context._count;
+    Log::Write(Log::LT_DEBUG, kFile, 600, L"load unhandled game-event-log, count:%d", count);
+    if (count > 0)
+        return GameEventManager::PostGameEventLogList(&context);
+    return true;
 }
 
 // 0x161a0

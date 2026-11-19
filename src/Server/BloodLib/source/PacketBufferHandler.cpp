@@ -102,14 +102,17 @@ PacketBufferHandler* RawPacketBufferHandler::Clone(void* buffer) const
 // 0x217A0 (SmartCouponDaemon)
 void RawPacketBufferHandler::Destroy(void* buffer)
 {
-    if (buffer != nullptr)
+    // LIFT: Destroy (RawPacketBufferHandler) the original tests a null buffer first and ends with a tail call to Free.
+    if (buffer == nullptr)
+    {
+        if (this != nullptr)
+            this->~RawPacketBufferHandler();
+        Memory::_Manager[2]->Free(this, PBH_FILE, 367);
+    }
+    else
     {
         this->~RawPacketBufferHandler();
-        return;
     }
-    if (this != nullptr)
-        this->~RawPacketBufferHandler();
-    Memory::_Manager[2]->Free(this, PBH_FILE, 367);
 }
 
 // 0x14AA0 (SmartCouponDaemon) folded with Console::Flush
@@ -206,10 +209,10 @@ int ClientPacketBufferHandler::ToPacket(Session const* session, char const* buff
     unsigned short header = *reinterpret_cast<unsigned short const*>(buffer);
     PacketCrypt::Algorithm algorithm = static_cast<PacketCrypt::Algorithm>(header >> 14);
     unsigned int size;
-    if ((header >> 14) != 0)
-        size = 4 * (header & 0xFFF);
-    else
+    if (algorithm == PacketCrypt::ALGORITHM_DEFAULT)
         size = header & 0x3FFF;
+    else
+        size = 4 * (header & 0xFFF);
     int packetSize = 0;
     if (size > 0xFFFF)
         return -1;
@@ -217,7 +220,40 @@ int ClientPacketBufferHandler::ToPacket(Session const* session, char const* buff
         return 0;
 
     PacketCrypt* currentCrypt = session->_currentCrypt;
-    if (currentCrypt != nullptr)
+    // LIFT: 0x219A0 (LobbyGate) the handshake branch comes first. The log line numbers show this order.
+    if (currentCrypt == nullptr)
+    {
+        if (algorithm == PacketCrypt::ALGORITHM_DEFAULT)
+        {
+            Log::Write(Log::LT_ERROR, PBH_FILE, 139,
+                       L"Session(%I64X), Handshake decrypt failed, code 'plain' not acceptable", session->_id);
+            return -1;
+        }
+        if (session->_cryptMode == 2)
+        {
+            PacketCrypt* crypt =
+                static_cast<PacketCrypt*>(session->allocateCrypt(PacketCrypt::HANDSHAKE_CRYPT, algorithm));
+            mutableSession->_handshakeCrypt = crypt;
+            mutableSession->_currentCrypt = crypt;
+        }
+        PacketCrypt* crypt = session->_currentCrypt;
+        if (crypt == nullptr)
+        {
+            Log::Write(Log::LT_ERROR, PBH_FILE, 149, L"Session(%I64X), Handshake decrypt failed;cannot create crypt",
+                       session->_id);
+            return -1;
+        }
+        packetSize = bufferSize;
+        int err = crypt->Decrypt(reinterpret_cast<unsigned char*>(const_cast<char*>(buffer)), bufferSize, &packetSize,
+                                 nullptr);
+        if (err != PacketCrypt::SPCE_NO_ERROR)
+        {
+            Log::Write(Log::LT_ERROR, PBH_FILE, 156, L"Session(%I64X), Handshake decrypt failed, error-code:%d",
+                       session->_id, err);
+            return -1;
+        }
+    }
+    else
     {
         int cryptMode = session->_cryptMode;
         bool with3rdParty = false;
@@ -256,38 +292,6 @@ int ClientPacketBufferHandler::ToPacket(Session const* session, char const* buff
                            L"Session(%I64X), Session 3rd party decrypt failed, error-code: %d", session->_id, err3rd);
                 return -1;
             }
-        }
-    }
-    else
-    {
-        if (algorithm == PacketCrypt::ALGORITHM_DEFAULT)
-        {
-            Log::Write(Log::LT_ERROR, PBH_FILE, 139,
-                       L"Session(%I64X), Handshake decrypt failed, code 'plain' not acceptable", session->_id);
-            return -1;
-        }
-        if (session->_cryptMode == 2)
-        {
-            PacketCrypt* crypt =
-                static_cast<PacketCrypt*>(session->allocateCrypt(PacketCrypt::HANDSHAKE_CRYPT, algorithm));
-            mutableSession->_handshakeCrypt = crypt;
-            mutableSession->_currentCrypt = crypt;
-        }
-        PacketCrypt* crypt = session->_currentCrypt;
-        if (crypt == nullptr)
-        {
-            Log::Write(Log::LT_ERROR, PBH_FILE, 149, L"Session(%I64X), Handshake decrypt failed;cannot create crypt",
-                       session->_id);
-            return -1;
-        }
-        packetSize = bufferSize;
-        int err = crypt->Decrypt(reinterpret_cast<unsigned char*>(const_cast<char*>(buffer)), bufferSize, &packetSize,
-                                 nullptr);
-        if (err != PacketCrypt::SPCE_NO_ERROR)
-        {
-            Log::Write(Log::LT_ERROR, PBH_FILE, 156, L"Session(%I64X), Handshake decrypt failed, error-code:%d",
-                       session->_id, err);
-            return -1;
         }
     }
     if (packet != nullptr)
@@ -333,14 +337,17 @@ PacketBufferHandler* TextStreamPacketBufferHandler::Clone(void* buffer) const
 // 0x2C4A0 (PostOfficeDaemon)
 void TextStreamPacketBufferHandler::Destroy(void* buffer)
 {
-    if (buffer != nullptr)
+    // LIFT: Destroy (TextStreamPacketBufferHandler) the original tests a null buffer first and ends with a tail call to Free.
+    if (buffer == nullptr)
+    {
+        if (this != nullptr)
+            this->~TextStreamPacketBufferHandler();
+        Memory::_Manager[2]->Free(this, PBH_FILE, 254);
+    }
+    else
     {
         this->~TextStreamPacketBufferHandler();
-        return;
     }
-    if (this != nullptr)
-        this->~TextStreamPacketBufferHandler();
-    Memory::_Manager[2]->Free(this, PBH_FILE, 254);
 }
 
 // 0x2C560 (PostOfficeDaemon)
@@ -430,14 +437,15 @@ int TextStreamPacketBufferHandler::ToBuffer(Session const* session, char* buffer
                                             char const** sendBuffer)
 {
     // The packet is [size][chars][text]. Bit 0x8000 of size marks a packet that is already converted.
-    wchar_t* header = reinterpret_cast<wchar_t*>(const_cast<char*>(packet));
+    // LIFT: 0x2C805 (PostOfficeDaemon) the size is a signed short. The flag store uses 0xFFFF8000.
+    short* header = reinterpret_cast<short*>(const_cast<char*>(packet));
     char* out = reinterpret_cast<char*>(header + 1);
     if ((*header & 0x8000) == 0)
     {
         if (*reinterpret_cast<short*>(out) >= 4000)
             return -1;
         WCHAR Destination[4000];
-        wcsncpy(Destination, header + 2, *reinterpret_cast<short*>(out));
+        wcsncpy(Destination, reinterpret_cast<wchar_t*>(header + 2), *reinterpret_cast<short*>(out));
         long long n = *reinterpret_cast<short*>(out);
         Destination[n] = 0;
         wcsncat(Destination, delimiter, 4000 - n);
@@ -446,7 +454,7 @@ int TextStreamPacketBufferHandler::ToBuffer(Session const* session, char* buffer
                             bufferSize + static_cast<int>(reinterpret_cast<long long>(buffer)) -
                                 static_cast<int>(reinterpret_cast<long long>(out)),
                             nullptr, nullptr);
-        *header |= 0x8000;
+        *header |= static_cast<short>(0x8000);
     }
     if (sendBuffer != nullptr)
         *sendBuffer = out;

@@ -158,11 +158,12 @@ void Network::Clear()
         }
     }
     // BUG: 0xCFD0 the _workerThreads array (AllocZero line 377) is never freed.
-    for (int i = 0; i < 24; ++i)
+    for (unsigned int i = 0; i < 24; ++i)
     {
-        if (Instance->_port[i] != nullptr)
+        Port* port = Instance->_port[i];
+        if (port != nullptr)
         {
-            Instance->_port[i]->_enableAccept = false;
+            port->_enableAccept = false;
             Instance->_port[i]->Clear();
             if (Instance->_port[i] != nullptr)
                 Instance->_port[i]->~Port();
@@ -185,11 +186,14 @@ bool Network::OpenPort(unsigned int id, unsigned short portNumber, int initialMo
 {
     // LIFT: LTCG folded the bool params (LobbyGate 0x20500, call 0x20708). All callers give constants.
     // LobbyGate and CacheGate use enableAccept == true and enableRecv == true. PostOfficeDaemon keeps enableAccept and nagle (0x28AB0).
-    if (id == 0)
+    // LIFT: CacheGate 0xd2f2 keeps only "id == 0". LTCG removes an "id == 0" compare when all callers give constants,
+    // but it keeps the lower bound of a range check. The upper bound 24 is the _port size. ❓ exact source form
+    if (id < 1 || id > 24)
         NETWORK_ASSERT_CRASH(170);
-    // LIFT: LTCG keeps only the purposes that the callers of each exe use: CacheGate {1, 2}, LobbyGate {0, 2},
-    // PostOfficeDaemon {2, 3} (0x28AB0). s_defaultMaxSession has 4 entries, so the source range is 0..3.
-    if (initialMode < 0 || initialMode > 3)  // ❓ exact source form of the check
+    // LIFT: LTCG keeps only the purposes that the callers of each exe use: CacheGate {1, 2} (0xd341), LobbyGate {0, 2},
+    // PostOfficeDaemon {2, 3} (0x28AB0). It removes the compares for the other values. A range check gives only
+    // "initialMode < 0". s_defaultMaxSession has 4 entries, so the source list is 0..3. ❓ exact source form
+    if (initialMode != 0 && initialMode != 1 && initialMode != 2 && initialMode != 3)
         NETWORK_ASSERT_CRASH(175);
     if (Instance->_port[id - 1] != nullptr)
         NETWORK_ASSERT_CRASH(177);

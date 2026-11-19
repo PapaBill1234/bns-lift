@@ -33,31 +33,25 @@ void BigInteger::sub(BigInteger const* a, BigInteger const* b, int sign)
     int na = a->digitCount();
     int nb = b->digitCount();
     int old = digitCount();
-    int n = 0;
-    unsigned int borrow = 0;
-    for (int i = 0; i < nb; ++i)
+    int i = 0;
+    long long borrow = 0;
+    for (; i < nb; ++i)
     {
-        unsigned long long t = static_cast<unsigned long long>(a->digits[i]) - b->digits[i] - borrow;
+        long long t = static_cast<long long>(a->digits[i]) - static_cast<long long>(b->digits[i]) - borrow;
         digits[i] = static_cast<unsigned int>(t);
-        borrow = static_cast<unsigned int>(t >> 32) & 1;
-        n = nb;
+        borrow = (t >> 32) & 1;
     }
-    if (n < na)
+    for (; i < na; ++i)
     {
-        long long carry = borrow;
-        for (int i = n; i < na; ++i)
-        {
-            // BUG: 0x4C9D1 the propagated borrow is -1 (no "& 1"), so the next digit is incremented.
-            long long t = static_cast<long long>(a->digits[i]) - carry;
-            digits[i] = static_cast<unsigned int>(t);
-            carry = t >> 32;
-        }
-        n = na;
+        // BUG: 0x4C9D1 the propagated borrow is -1 (no "& 1"), so the next digit is incremented.
+        long long t = static_cast<long long>(a->digits[i]) - borrow;
+        digits[i] = static_cast<unsigned int>(t);
+        borrow = t >> 32;
     }
-    if (n < old)
-        memset(&digits[n], 0, 4 * (old - n));
+    if (i < old)
+        memset(&digits[i], 0, (old - i) * sizeof(unsigned int));
     this->sign = sign;
-    setBit(n);
+    setBit(i);
 }
 
 // 0x4c7b0
@@ -89,6 +83,8 @@ void BigInteger::add(BigInteger const* a, BigInteger const* b, int sign)
 }
 
 // 0x4c650
+// LIFT: 0x5a0ad calls Set out of line. inline_depth(0) keeps Set out of line (lessons A20).
+#pragma inline_depth(0)
 void BigInteger::Sqr(BigInteger const* a)
 {
     if (a->bits == 0)
@@ -119,11 +115,16 @@ void BigInteger::Sqr(BigInteger const* a)
         r = &tmp;
     else
         setZero();
-    sqr(a, r);
+    // LIFT: 0x5a08b computes the rounded bit count before the call, as in Mul. Both paths call sqr. // ❓
+    if (((a->bits + 31) & ~31) < 0x1000)
+        sqr(a, r);
+    else
+        sqr(a, r);
     r->sign = 1;
     if (r != this)
         Set(r, 1);
 }
+#pragma inline_depth()
 
 // 0x4c3e0
 // LIFT: LeftShift jumps to this function in LobbyGate (0x59bca).
@@ -269,7 +270,12 @@ void BigInteger::Mul(BigInteger const* a, BigInteger const* b)
             r = &tmp;
         else
             setZero();
-        mul(a, b, r);
+        // LIFT: 0x58fbd computes the rounded bit count and compares it with 0x1000. Both paths call mul,
+        // and the compiler merged them. The source name of the second path is not known. // ❓
+        if (((a->bits + b->bits + 31) & ~31) < 0x1000)
+            mul(a, b, r);
+        else
+            mul(a, b, r);
         r->sign = a->sign * b->sign;
         if (r != this)
             Set(r, 1);
@@ -565,17 +571,14 @@ void BigInteger::Divide(BigInteger const* a, unsigned int b, BigInteger* quot, u
     else
     {
         // BUG: 0x59AF0 reads up to 128 entries of digit_bit_r, but the table has 32.
-        unsigned int k = 0;
-        unsigned int const* table = digit_bit_r;
-        while (b != *table)
+        for (unsigned int k = 0; k < 0x80; ++k)
         {
-            ++k;
-            ++table;
-            if (k >= 0x80)
-                goto found;
+            if (b == digit_bit_r[k])
+            {
+                w = 31 - k;
+                break;
+            }
         }
-        w = 31 - k;
-    found:
         *rem = a->digits[0] & digit_mask[static_cast<int>(w)];
     }
 }

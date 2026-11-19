@@ -309,16 +309,38 @@ Section E (perexe-3) and the round-3 stage notes are merged into A to D. Section
 - `wchar_t buffer[40] = L"{";` (the compiler emits the `memset` for the rest; `String::GetId128FromGuidString`).
 - LG `ContentsRuleConfig::MakeListPacket` calls `FragmentPacket::FreeSize` in the option loop (0x8b1a); the opening and closing elements use the inlined check.
 
+### A25. BloodCrypto source forms (crypto-4): 38
+- `Rsa` dtor body and a non-virtual `Ripemd128` dtor (+4).
+- `BigInteger::Mul` bit-count compare, inline `completeHandshake` body, `#pragma inline_depth(0)` on `allocateCrypt` (+5).
+- `BigInteger::Sqr` bit-count compare, `inline_depth(0)`, `__forceinline` helpers (+3).
+- `RsaPublic::Setup` / `RsaPrivate::Setup`: `if` form and `% 64` (+4).
+- `sub`: one index and a `long long` borrow. `mul`: comba loop on 32-bit words with a 64-bit carry (+9).
+- `expMod`: `M1 = M[1]`, no explicit `memset`, odd-modulus block with its own `return` (+3).
+- `BigInteger::Divide(uint)`: table search as a `for` loop with `break`. The compiler then does not peel the first compare (LG +1).
+- `OaepEncoder` `Setup`/`encode`/`decode`: call `_hash.Size()` again at each use, as the original does. Test `&_hash` for null in `Setup` (+9: LG, SCD, POD x3).
 
-### A25. PDB line maps give the source shape (console-4): 12
+### A26. Read globals and fields again at each use (pod-4): 2
+- POD `CacheGateSessionHandler::OnConnect`/`OnClose`: no locals for `PostOfficeDaemon::_instance` or `session->_channel`. Write the full expression at each use.
+  The original loads them again after each call.
+
+### A27. Single-expression placement new (pod-4): 1
+- POD `HandlePostOfficeServiceCheckPostCapacityReq` (0x2047c): `ctx = ::new (Memory::_Manager[2]->Alloc(...)) T(...);` with no `memory` local and no null test
+  (`// BUG:` no null check, 0x20250). Set the `_response` member in the ctor init list, not in the body (a body store left a dead store, 0x20556).
+- It does not always work: `MakePostContext` (4 loaders worse) and `HandlePostOfficeRegisterPostReq` (no change). See B.
+
+### A28. Const global and a block copy for an id128 member (pod-4): 5
+- `ID128_GUID_ZERO` is `id128 const` (PDB `?ID128_GUID_ZERO@@3Tid128@@B` in all 4 exes). This alone gives POD `PostInfo::PostInfo` (+1).
+- `BnsCommonConfig` ctor (`BnsCommonConfigDefinition.h`), per-exe form (A22): SCD and POD store the scalars first and then
+  `memcpy(&_npAppId, &ID128_GUID_ZERO, sizeof(id128))`. The original (POD 0x1974) loads the global again for each qword.
+  CG and LG keep the struct assignment (they MATCH with it). SCD +2, POD +2 (`LoadBnsCommonConfig`, `ReloadBnsCommonConfig`).
+
+### A29. PDB line maps give the source shape (console-4): 11
 - Read the PDB line map of the original before a source change: `LIFT_IDA_DIR=... tools/pdbq.py <EXE> lines <lo> <hi>` (hex rva).
   The line numbers show the number of statements, the exits and the order of the blocks.
 - One exit block per lookup (`InitSymbol`, CG 0x7de0; 4). The PDB gives one line per `GetProcAddress` and puts `FreeLibrary` on the last
   lookup line. Write one `if (... == nullptr) { FreeLibrary; return false; }` per lookup. VS2010 merges the blocks. A single `||` chain fails (B).
 - One result exit (`WinServiceConsole::UninstallService`, CG 0x17f00; 4). The PDB gives one `return` for all paths. Use `bool result = false;`,
   set it on success, call each `CloseServiceHandle` once after its block. VS2010 then duplicates the tails as in the original.
-- A PDB const pointer in a table initializer (SCD `DaemonConfig::Dump`; 1). `static wchar_t const* const LOCALHOST_IP = L"127.0.0.1";`
-  (SmartCouponConfig.obj data symbol). The `_Def` initializer reads the pointer value, so the table goes to `.data`, as in the original.
 - Match-node search with a list reference (LG `PipeConsole::SetRunningInfo` 0x2A5A0; 1). `ItemList& list = _running; ItemNode* node = nullptr;`
   and `node = item; break;` on a match. The loop end needs no null test, and the tail address comes from the list address.
 - An `if / else if` chain where the PDB lines give it (LG `IdleStateTable::scan` 0x24E8C, lines 154, 158, 169; 1). The `switch` gave another shape.
@@ -365,11 +387,24 @@ Section E (perexe-3) and the round-3 stage notes are merged into A to D. Section
   - An explicit `Packet::Allocate` in LG `Client::Send*` (the allocator then inlined).
   - SCD DB loaders with all columns inline: the original inlines only column 1 (dbbind-3).
   - LG `ClientManager::BroadcastAnnounceNotify` branch swap: no gain (97.8 came from A17).
+- pod-4 (do not try again without a new idea):
+  - POD `MakePostContext` single-expression `::new` (A27): 4 DB loaders worse. `HandlePostOfficeRegisterPostReq` single-expression `::new`: no change.
+  - POD `PostOfficeDB::LoadPostList` success-first reorder: worse. The loop header stays duplicated (3 tries, 99.1).
+  - `ID128_GUID_ZERO` const alone, or an element copy `.id[0]`/`.id[1]`, in the `BnsCommonConfig` ctor: VS2010 still merges the loads. Use `memcpy` (A28).
+
+- crypto-4 (do not try again without a new idea):
+  - Remove `__declspec(noinline)` from `RightShift`: `LeftShift` loses its tail-jump MATCH and `invMod` loses score.
+  - `#pragma inline_depth(0)` on `LeftShift`: no gain.
+  - `expMod` with one exit (`if/else`): one extra `memset` stays.
+  - `Rsa::decrypt` zero fill (LG 0x52de0, 91.7): pointer byte loop, `while (c < blockSize)` with a hoisted size, `buf` at function scope. VS2010 makes a `memset` each time. The original keeps a byte loop.
+
 - console-4 (do not try again without a new idea):
   - `PipeConsole::processCommand`, `PipeCommandProcess::processCommand`: `wcscmp` result in the `sbb` form (2 forms more, no gain).
-  - CG `DaemonConfig::Dump` and `_Def` (97.9): the original has RTTI data next to `_Def`. We build with `/GR-`. The A25 const pointer form gave 0.
-  - SCD, POD `ReloadBnsCommonConfig` (98.9), `LoadBnsCommonConfig` (99.1): the original reloads `ID128_GUID_ZERO` before each qword store.
-    VS2010 merges the loads in our build. `const`, the init list and per-qword copies did not change it.
+  - CG `DaemonConfig::Dump` and `_Def` (97.9): the original has RTTI data next to `_Def`. We build with `/GR-`. The const pointer form gave 0.
+  - SCD `DaemonConfig::Dump` (97.9, refs 94): the PDB const pointer `LOCALHOST_IP` (SmartCouponConfig.obj) in the `_Def` initializer gave +1
+    on the old base (eaba76b). On main after pod-4 it gives 0. Keep `LOCALHOST_IP` only because it is the PDB name.
+  - SCD, POD `ReloadBnsCommonConfig`, `LoadBnsCommonConfig`: `const`, the init list and per-qword copies did not stop VS2010 from merging the
+    `ID128_GUID_ZERO` loads. pod-4 solved it with `memcpy` (A28).
   - LG `PipeConsole::addNode` without `noinline` (LG only): `LobbyD::Hello` 91.5 -> 78.9, `OnClose` 93.8 -> 81.7. Reverted.
 
 ## C. Tool and build facts
@@ -628,15 +663,140 @@ The manual work of round 3 (commits 27d5420, 46fe9c1, beb4669 and later). The pa
   `Session::initialize` a second name, `CrashHandler`. Use the
   name that the two PDBs share. See fix 10 in [noise.md](noise.md).
 
+## crypto-4
+
+| Result | Count |
+| --- | ---: |
+| MATCH gain (LG +16, SCD +11, POD +11, CG +0) | 38 |
+| MATCH lost | 0 |
+| Working forms (A25) | 8 |
+| Failed forms (B, crypto-4) | 4 |
+
+- Worked: copy the call pattern of the original. Call a virtual getter at each use. Use the loop form of the original (`for` with `break`). Use the word size of the original in `sub`/`mul`.
+- Worked: `#pragma inline_depth(0)` on one caller when the original calls a helper out of line.
+- Failed: VS2010 changes a zero-fill byte loop into `memset`. No source form kept the byte loop.
+- Failed: `noinline` on one helper changes the inline choice in other callers. Check all callers after each change.
+- Open: big `BigInteger::Divide` (76.7), `invMod` (83.1), `InvMod` (89.7), `IsPrime`, `isPrimeMR`, `Crypto::Create`, DH and `BroadcastCrypt`. See the crypto-4 handoff.
+
+## net-4
+
+### A. Worked (+15 MATCH, 0 lost)
+
+| Function | Form | Gain |
+| --- | --- | --- |
+| `SessionSendBuffer::clearPacketBufferList` | `inline_depth(0)` and the `removeReferenceCount` body by hand (A20) | +4 |
+| `Session::HandleFailedEvent` | Close and `Leave` in each case, not one shared tail | +4 |
+| `Network::Clear` | Cache `Port*` only for the null test; read `_port[i]` again for each use | +4 |
+| `Session::Connect` (LG) | Member reads and `memset` in source order | +1 |
+| `Session::SendV` (CG) | Give `Compose` the fields of the header | +1 |
+| `Network::OpenPort` (SCD) | `id < 1 \|\| id > 24`; `initialMode` list 0..3 | +1 |
+
+### B. Failed (2)
+
+- Local non-static `const` array for the max-session table: the compiler copies it to the stack. Keep it `static`.
+- `Port` ctor with body assignments: the store order is correct, but no MATCH. `OpenPort` refs still differ, because the original table has no PDB name.
+- Open: SCD `Session::Connect` keeps a `reconnect` test in the original. Our LTCG propagates the constant. Look at the callers, not the body.
+
+## packet-4
+
+### A. Patterns that worked (count = functions made MATCH)
+
+| Pattern | Count | Example |
+| --- | --- | --- |
+| Pointer loop over the format with the index check in the loop | 8 | `PacketBuffer::Compose` x4, `Decompose` x4 |
+| Block order of the cold error tails from the log line numbers | 10 | `Compose`, `Decompose`, `CheckCompose` |
+| Signed `short` for sizes and headers (the store uses 0xFFFF8000) | 5 | `Compose` x4, `TextStreamPacketBufferHandler::ToBuffer` |
+| 64-bit pointer form for the destination | 4 | `Decompose` x4 |
+| Single exit with a size variable | 2 | `CheckCompose` (LG, POD) |
+| Expression computed two times (no local) | 2 | `PushRepeatCount` (LG, POD) |
+| Case `s` before `K` and `b` (source order of the switch) | 4 | `Decompose` x4 |
+| Test `CurHeader` first, then two `allocate` calls | 1 | `Packet::Copy` (LG) |
+| Branch with the lower log line numbers first | 1 | `ClientPacketBufferHandler::ToPacket` (LG) |
+| Test the enum variable (`algorithm == ALGORITHM_DEFAULT`), not `header >> 14` | 1 | `ToPacket` (removes const 0xC000) |
+| `Destroy`: test `buffer == nullptr` first; Free is then a tail call | 2 | `RawPacketBufferHandler::Destroy` (SCD), `TextStreamPacketBufferHandler::Destroy` (POD) |
+| Log::Write with a literal line in each case, not a shared label with a line variable | 1 | `PacketBuffer::DecomposeText` (POD) |
+
+### B. Patterns that did not work (count = tries)
+
+| Pattern | Count | Function |
+| --- | --- | --- |
+| `memcpy` variants for the case P tail merge | 2 | `PacketBuffer::Compose` |
+| 64-bit form only, without the single exit (97.4) | 1 | `CheckCompose` |
+| Free size forms: ternary, local with sizeof, local `Packet*` | 3 | `FragmentPacket::StartRepeat` |
+| Pointer forms for the dead `add rax,4` | 3 | `FragmentPacketConcatenater::Add` |
+| Single Log::Write exit (score +11, no MATCH) | 1 | `FragmentPacketConcatenater::Add` |
+| Read buffer and offset again after `++index` | 2 | `PacketConcatenateBuffer::Decompose(VarData*)` |
+
+## scd-4
+
+SmartCouponDaemon 582 -> 608 MATCH (+26). Other exes +0, MATCH lost 0.
+
+### A. What worked (26 MATCH)
+
+| Change | MATCH |
+| --- | ---: |
+| DChannelMgr source form | +6 |
+| Handlers and handler contexts | +5 |
+| DB loaders: do-while fetch loops and int params (int gives the `lea` const) | +6 |
+| A count local before Log (loadUnhandledGameEventLog) | +1 |
+| else-if chain with one shared `return false` (CouponJob::transit tail-merge) | +1 |
+| `switch` on the target type gives the orig block order, default block first (GameEventLogEvent::HandleEvent) | +1 (with the next line) |
+| A local copy of the info before PostQueuedCompletionStatus removes the biased pointer const 0x16 (codegen only; main already logged from info, not from ev). | (same +1) |
+| NPTransactionRegistry::Register: orig alloc line 131, `if (id != nullptr)`, one `return inserted;` for both paths (the result stays in `bl`, `this` dies, `add rbx,0x10` appears) | +1 |
+| A `char` local keeps `mov bl,imm` (retry failReason) | score only |
+| Log args test the job pointer like a log macro (`job ? job->_id : 0`, -1 for type and state) (EventNotiJob Initialize, eventNotiReq, eventNotiRes) | +3 (with the 3 rows below) |
+| Compare the GUID with the ID128_GUID_ZERO global, not with 0 (EventNotiJob::Initialize) | (same +3) |
+| `switch` on err gives the orig sub chain (eventNotiRes) | (same +3) |
+| Call GetCommand again for the 270 log, as the orig does (eventNotiRes) | (same +3) |
+| Block order follows the if/else order. Invert a test to move a block. This also stops the tail merge of equal Log::Write and WriteStartLog calls (NPServiceChannelCmdDispatcher, GameEventConfig::Load) | +2 |
+| `wchar_t x[260] = {0}` gives `x[0]=0` and memset 0x206. `= {}` gives memset 0x208 (GameEventConfig::Load) | (same +2) |
+| An inline `wcslen(s) == 0` gives repne scasw and the const -1. `*s == 0` does not (SetupGameEventListFromXml) | score only |
+| A loop with a pointer step gives one table ref and the const 0x8. An index loop or a while loop unrolls (SetupGameEventListFromXml) | score only |
+
+### B. What failed (0 MATCH)
+
+| Try | Result |
+| --- | --- |
+| goto form of the DB fetch loop | no gain |
+| SetupGameEventListFromXml: own NextElement call for the 137 block (`continue` form). VS2010 merges the 2 call sites (4 tries) | no gain, 99.7 |
+| SendRetryCouponPublicationOk const 0x71 (register allocation) | no gain |
+| HelloReq `> 0` test form | no gain |
+| RetryCouponPublicationEvent goto fail path | no change; the orig needs the read-after-post bug |
+| GameEventByAccountReq goto shared fail path | 93.0 -> 93.9, score only |
+| GameEventByAccountReq one Log for lines 262/271 (format and line locals) | 95.2, score only |
+| GameEventByAccountReq decompose-fail block at the function end | 95.2, no change |
+| NPTransactionRegistry::Register local lock and dict pointers | no change (not needed) |
+| SmartCouponDaemon::initialize | blocked: the orig exe has a patched-out cert-decode call |
+
+## pod-4
+Card lift-parity-pod-4 (2026-11-19). POD 665 -> 671, SCD 582 -> 584, CG and LG +0. Total +8. Goal 684 not met.
+
+| Pattern | Result | Functions |
+| --- | --- | --- |
+| A26 reload at each use | +2 POD | `CacheGateSessionHandler::OnConnect`, `OnClose` |
+| A27 single-expression `::new` | +1 POD; worse or no change in 2 | `CheckPostCapacityReq`; not `MakePostContext`, `RegisterPostReq` |
+| A28 const `ID128_GUID_ZERO` and `memcpy` ctor | +3 POD, +2 SCD | `PostInfo::PostInfo`, `LoadBnsCommonConfig`, `ReloadBnsCommonConfig` |
+| `AutoDbTran(dbId, timeoutSec)` ctor | score only | `LoadPostList`, `LoadRetryReadyPostList` 99.1 |
+| Named `PingRelayRequest` local before `Alloc` | score only | `PingGenerator::sendPing` 97.0 -> 99.2 |
+
+What worked:
+- Compare the order of the loads of globals in the original. A reload at each use or a `memcpy` from a `const` global gives the same loads.
+- A named local for a temporary that the original builds on the stack before the call (an unwind `dtor$0` shows it).
+
+What failed:
+- The single-expression `::new` is not a general rule. Measure it per function.
+- LTCG `this` propagation: POD `checkCacheGateServiceState` is called only with `_instance`. /GL /LTCG folds `this` into the callee (ours loads `_instance`
+  inside; orig uses `rcx`). `sendPing` and `checkCacheGateServiceState` stay DIFF. No legitimate source form is known. Add to the stop list.
+- Literal register allocation: `setupWorldConfigList` (orig loads the literal more often) and `AgentSessionHandler::OnClose` (ours loads it more often). Not fixed.
+
 ## console-4
 
-Card lift-parity-console-4 (PipeConsole, CrashHandler, config). MATCH +12 over main: CG +2, LG +5, SCD +3, POD +2. MATCH lost: 0.
+Card lift-parity-console-4 (PipeConsole, CrashHandler, config). MATCH +11 over main (95ad5be): CG 454 -> 456 (+2), LG 653 -> 658 (+5), SCD 628 -> 630 (+2), POD 692 -> 694 (+2). MATCH lost: 0.
 
 | Function | Exe | Form | MATCH |
 | --- | --- | --- | --- |
 | `InitSymbol` | all 4 | one unload block per lookup | +4 |
 | `WinServiceConsole::UninstallService` | all 4 | one result exit | +4 |
-| `DaemonConfig::Dump` | SCD | PDB const pointer `LOCALHOST_IP` in `_Def` | +1 |
 | `PipeConsole::SetRunningInfo` | LG | match-node search, list reference | +1 |
 | `IdleStateTable::scan` | LG | `if / else if` chain from the PDB lines | +1 |
 | `PipeConsole::addNode` | LG | one form: copy `valueString` (LTCG folds `L""` in CG/SCD/POD) | +1 |
@@ -647,6 +807,8 @@ What worked:
   Check for constant folding before you add a per-exe form or a `// BUG:` mark.
 
 What failed:
-- `wcscmp` `sbb` form, CG `_Def` RTTI neighbour, `ID128_GUID_ZERO` reload, LG `addNode` inline (see B).
+- `wcscmp` `sbb` form, CG `_Def` RTTI neighbour, LG `addNode` inline (see B).
+- SCD `DaemonConfig::Dump`: the `LOCALHOST_IP` const pointer gave +1 on the old base. After the merge with main (pod-4) it gives 0 (97.9).
+  Measure again after each merge with main. A data-layout win can go away when other cards change globals.
 - LG `checkFrozenThread` (91.0): the original inlines `SetInvalidInfo` and `addNode`, with the match-node search. This needs a change in
   `SetInvalidInfo` (stop list). Without `noinline` on `addNode`, LG loses score in 2 other functions.

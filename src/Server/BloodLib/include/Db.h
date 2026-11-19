@@ -8,7 +8,8 @@ class DbTransaction
 {
 public:
     // PDB names (SmartCouponDaemon S_REGREL32). LIFT: LTCG folded bufferSize (0x20E40, PDB offset 0).
-    bool BindCol(unsigned int index, void* buffer, unsigned int varType, long long* result);
+    // LIFT: int index and varType as in the PDB symbol. VS2010 then forms the index from varType (lea edx,[r9+0xd], 0x13c19).
+    bool BindCol(int index, void* buffer, int varType, long long* result);
     bool Prepare(wchar_t* query);
     // PDB names (SmartCouponDaemon S_REGREL32). LIFT: LTCG folded bufferSize, columnSize and
     // decimalDigits (0x20FD0, PDB offset 0). dbType is the SQL type. varType is the C type.

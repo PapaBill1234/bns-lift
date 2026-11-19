@@ -3,6 +3,7 @@
 #pragma once
 #include "DaemonConfig.h"
 #include "StringUtil.h"
+#include <string.h>
 
 class BnsCommonConfigLoad
 {
@@ -49,10 +50,19 @@ public:
     {
         _pType[0] = 0;
         _npGameCode[0] = 0;
+#if defined(LIFT_EXE_SCD) || defined(LIFT_EXE_POD)
+        // LIFT: per-exe form. The POD (0x1974) and SCD originals store the scalars first and then load
+        // ID128_GUID_ZERO again for each id128 (4 qword loads). A block copy gives this. ❓ The exact source form.
+        _npAppIdStr[0] = 0;
+        _npClientAppIdStr[0] = 0;
+        memcpy(&_npAppId, &ID128_GUID_ZERO, sizeof(id128));
+        memcpy(&_npClientAppId, &ID128_GUID_ZERO, sizeof(id128));
+#else
         _npAppId = ID128_GUID_ZERO;
         _npAppIdStr[0] = 0;
         _npClientAppId = ID128_GUID_ZERO;
         _npClientAppIdStr[0] = 0;
+#endif
     }
 
     static bool LoadBnsCommonConfig();               // 0x13e0

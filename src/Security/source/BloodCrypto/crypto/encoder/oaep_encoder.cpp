@@ -81,17 +81,20 @@ bool OaepEncoder::Decode(unsigned char const* in, int size, unsigned char* out, 
 // 0x5ABA0
 bool OaepEncoder::Setup(int bits)
 {
-    int h = _hash.Size();
     int k = ((((bits + 7) >> 3) + 3) & ~3);
-    if (k < 2 * h + 2)
+    // The original calls _hash.Size() again at each use (LobbyGate 0x5aba0).
+    int twoH = 2 * _hash.Size();
+    if (k < twoH + 2)
         return false;
     _blockSize = k;
-    _maxSize = k - 2 * h - 2;
-    _dbSize = k - h - 1;
-    if (static_cast<unsigned int>(_dbSize) > 0x100)
+    _maxSize = k - twoH - 2;
+    _dbSize = k - _hash.Size() - 1;
+    CryptoHash* hash = &_hash;
+    // LIFT: 0x5aba0 (LobbyGate) the original tests the hash pointer of the mask generator for null.
+    if (static_cast<unsigned int>(_dbSize) > 0x100 || hash == 0)
         return false;
-    _mgf._hash = &_hash;
-    _mgf._size = _hash.Size();
+    _mgf._hash = hash;
+    _mgf._size = hash->Size();
     return static_cast<unsigned int>(_mgf._size) <= 0x40;
 }
 
@@ -102,22 +105,23 @@ bool OaepEncoder::encode(unsigned char const* in, int size, unsigned char* out, 
     if (in == 0 || size > _maxSize || out == 0 || outSize == 0 || *outSize < _blockSize)
         return false;
 
-    int h = _hash.Size();
-    int hashSize = h;
+    // The original calls _hash.Size() again at each use (LobbyGate 0x5ac40).
+    int psSize = _blockSize - (2 * _hash.Size() + 2) - size;
+    unsigned char* db = out + _hash.Size() + 1;
+    unsigned char* ps = _buffer + _hash.Size();
+    unsigned char* one = ps + psSize;
+    int hashSize = _hash.Size();
     if (label != 0)
         _hash.Digest(static_cast<unsigned char const*>(label), labelSize, _buffer, &hashSize);
     else
         _hash.Digest(nullparam, 16, _buffer, &hashSize);
 
-    unsigned char* ps = _buffer + h;
-    unsigned char* one = ps + (_blockSize - (2 * h + 2) - size);
     memset(ps, 0, one - ps);
     *one = 1;
     memcpy(one + 1, in, size);
 
     unsigned char seed[16];
     Prng::Generate(seed, 16);
-    unsigned char* db = out + h + 1;
     _mgf.generate(seed, 16, db, _dbSize);
     for (int i = 0; i < _dbSize; ++i)
     {
@@ -125,7 +129,7 @@ bool OaepEncoder::encode(unsigned char const* in, int size, unsigned char* out, 
         _buffer[i] = 0;
     }
 
-    _mgf.generate(db, _dbSize, out + 1, h);
+    _mgf.generate(db, _dbSize, out + 1, _hash.Size());
     for (int i = 0; i < _hash.Size(); ++i)
     {
         out[1 + i] ^= seed[i];
@@ -144,11 +148,11 @@ bool OaepEncoder::decode(unsigned char const* in, int size, unsigned char* out, 
     if (in == 0 || size != _blockSize || out == 0 || outSize == 0 || *outSize < _maxSize)
         return false;
 
-    int h = _hash.Size();
     // The input buffer is changed in place.
     unsigned char* data = const_cast<unsigned char*>(in);
     i2os(data, size, data, size);
-    unsigned char* db = data + 1 + h;
+    // The original calls _hash.Size() again at each use (LobbyGate 0x5aeb0).
+    unsigned char* db = data + 1 + _hash.Size();
 
     unsigned char seed[16];
     _mgf.generate(db, _dbSize, seed, 16);
@@ -159,20 +163,20 @@ bool OaepEncoder::decode(unsigned char const* in, int size, unsigned char* out, 
     for (int i = 0; i < _dbSize; ++i)
         _buffer[i] ^= db[i];
 
-    unsigned char* p = _buffer + h;
+    unsigned char* p = _buffer + _hash.Size();
     int n = 0;
     while (*p == 0)
     {
-        if (n >= _dbSize - h)
+        if (n >= _dbSize - _hash.Size())
             break;
         ++p;
         ++n;
     }
-    if (*p != 1 || n >= _dbSize - h)
+    if (*p != 1 || n >= _dbSize - _hash.Size())
         return false;
 
     // BUG: 0x5AEB0 does not compare lHash with the label hash. The seed is not cleared.
-    int len = _blockSize - (2 * h + 2) - n;
+    int len = _blockSize - (2 * _hash.Size() + 2) - n;
     *outSize = len;
     memcpy(out, p + 1, len);
     memset(_buffer, 0, _dbSize);

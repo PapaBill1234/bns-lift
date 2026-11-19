@@ -193,6 +193,26 @@ void SessionSendBuffer::increaseBuffer(SendBufferList* bufferList)
 
 // 0x1A980
 // LIFT: noinline. The original Clear (0x1a750) calls this function in all 4 exes. VS2010 /LTCG inlines it without the attribute.
+// LIFT: per-exe form. The path of include\RefCntObject.h is the build path of each exe (pseudocode of 4 exes).
+#if defined(LIFT_EXE_LG)
+#define SESSIONBUFFER_REFCNT_EXE L"lobbygate"
+#elif defined(LIFT_EXE_SCD)
+#define SESSIONBUFFER_REFCNT_EXE L"smartcoupondaemon"
+#elif defined(LIFT_EXE_POD)
+#define SESSIONBUFFER_REFCNT_EXE L"postofficedaemon"
+#else
+#define SESSIONBUFFER_REFCNT_EXE L"cachegate"
+#endif
+#define SESSIONBUFFER_REFCNT_HEADER                                                                                        \
+    L"e:\\dailybuild02\\" SESSIONBUFFER_REFCNT_EXE                                                                       \
+    L"-common-0.0.348\\depot\\branch\\348nc\\program\\server\\bloodlib\\include\\RefCntObject.h"
+
+// LIFT: the original inlines RefCntObject::removeReferenceCount here, but calls RefCntHistory::add out of line
+// (CacheGate 0x1aa73). Our compiler also inlines add. The body of removeReferenceCount is here by hand, and
+// inline_depth(0) keeps the call to add (lessons A20).
+#if defined(_MSC_VER) && !defined(__clang__)
+#pragma inline_depth(0)
+#endif
 __declspec(noinline) void SessionSendBuffer::clearPacketBufferList(SendBufferList* bufferList)
 {
     if (bufferList->_pbuffer != nullptr)
@@ -201,10 +221,31 @@ __declspec(noinline) void SessionSendBuffer::clearPacketBufferList(SendBufferLis
         {
             if (bufferList->_pbuffer[i] != nullptr)
             {
-                bufferList->_pbuffer[i]->removeReferenceCount(SESSIONBUFFER_FILE, 321);
+                // LIFT: RefCntObject::removeReferenceCount(SESSIONBUFFER_FILE, 321), inlined (RefCntObject.h:177).
+                PacketBuffer* pbuffer = bufferList->_pbuffer[i];
+                if (pbuffer->_ref <= 0)
+                {
+                    Log::Write(Log::LT_ERROR, SESSIONBUFFER_REFCNT_HEADER, 177,
+                               L"== CRASH == [ref obj], cannot remove reference count, this:0x%p, ref:%d, tag:0x%08x, file:%s, line:%d",
+                               pbuffer, pbuffer->_ref, pbuffer->_tag, SESSIONBUFFER_FILE, 321);
+                    AlertSender::Write(SESSIONBUFFER_REFCNT_HEADER, 177,
+                                       L"== CRASH == [ref obj], cannot remove reference count, this:0x%p, ref:%d, tag:0x%08x, file:%s, line:%d",
+                                       pbuffer, pbuffer->_ref, pbuffer->_tag, SESSIONBUFFER_FILE, 321);
+                }
+                else
+                {
+                    if (pbuffer->_history != nullptr)
+                        pbuffer->_history->add(pbuffer->_ref, SESSIONBUFFER_FILE, 321, RefCntHistory::OP_DELREF);
+                    long ref = InterlockedDecrement(&pbuffer->_ref);
+                    if (ref == 0)
+                        pbuffer->deallocate_object(SESSIONBUFFER_FILE, 321);
+                }
                 bufferList->_pbuffer[i] = nullptr;
             }
         }
+        bufferList->_count = 0;
     }
-    bufferList->_count = 0;
 }
+#if defined(_MSC_VER) && !defined(__clang__)
+#pragma inline_depth()
+#endif

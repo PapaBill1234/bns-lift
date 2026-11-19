@@ -281,10 +281,10 @@
 },
 "BigInteger::Mul": {
 "calls": 100,
-"consts": 50,
+"consts": 100,
 "refs": 100,
-"score": 83.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "BigInteger::Pow2": {
 "calls": 100,
@@ -322,11 +322,11 @@
 "status": "MATCH"
 },
 "BigInteger::Sqr": {
-"calls": 89,
-"consts": 75,
+"calls": 100,
+"consts": 100,
 "refs": 100,
-"score": 88.0,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "BigInteger::Sub": {
 "calls": 100,
@@ -350,11 +350,11 @@
 "status": "MATCH"
 },
 "BigInteger::expMod": {
-"calls": 95,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 98.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "BigInteger::invMod": {
 "calls": 59,
@@ -386,17 +386,17 @@
 },
 "BigInteger::mul [?mul@BigInteger@@AEAAXI@Z]": {
 "calls": 100,
-"consts": 89,
+"consts": 100,
 "refs": 100,
-"score": 96.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "BigInteger::mul [?mul@BigInteger@@CAXPEBV1@0PEAV1@@Z]": {
 "calls": 100,
-"consts": 73,
+"consts": 100,
 "refs": 100,
-"score": 90.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "BigInteger::setBit": {
 "calls": 100,
@@ -414,10 +414,10 @@
 },
 "BigInteger::sub": {
 "calls": 100,
-"consts": 86,
+"consts": 100,
 "refs": 100,
-"score": 95.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "BigInteger::~BigInteger": {
 "calls": 100,
@@ -513,16 +513,16 @@
 "BnsCommonConfig::LoadBnsCommonConfig": {
 "calls": 100,
 "consts": 100,
-"refs": 97,
-"score": 99.1,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "BnsCommonConfig::ReloadBnsCommonConfig": {
 "calls": 100,
 "consts": 100,
-"refs": 97,
-"score": 98.9,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "BnsCommonConfig::UpdateAllVariable": {
 "calls": 100,
@@ -618,16 +618,16 @@
 "CacheGateSessionHandler::OnClose": {
 "calls": 100,
 "consts": 100,
-"refs": 91,
-"score": 97.1,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "CacheGateSessionHandler::OnConnect": {
 "calls": 100,
 "consts": 100,
-"refs": 97,
-"score": 98.9,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "CacheGateSessionHandler::PacketHandler": {
 "calls": 100,
@@ -1703,9 +1703,9 @@
 "HandlePostOfficeServiceCheckPostCapacityReq": {
 "calls": 100,
 "consts": 100,
-"refs": 97,
-"score": 99.1,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "HandlePostOfficeServiceHelloReq": {
 "calls": 100,
@@ -2101,10 +2101,10 @@
 },
 "Network::Clear": {
 "calls": 100,
-"consts": 93,
-"refs": 98,
-"score": 97.2,
-"status": "DIFF"
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Network::ClosePort": {
 "calls": 100,
@@ -2142,10 +2142,10 @@
 "status": "MATCH"
 },
 "Network::OpenPort [?OpenPort@Network@@SA_NIGHPEBVSessionHandler@@PEBVPacketBufferHandler@@I_N22@Z]": {
-"calls": 92,
-"consts": 95,
-"refs": 83,
-"score": 89.8,
+"calls": 100,
+"consts": 100,
+"refs": 94,
+"score": 97.9,
 "status": "DIFF"
 },
 "Network::ReconnectSession": {
@@ -2198,25 +2198,25 @@
 "status": "MATCH"
 },
 "OaepEncoder::Setup": {
-"calls": 80,
-"consts": 91,
+"calls": 100,
+"consts": 100,
 "refs": 100,
-"score": 90.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "OaepEncoder::decode": {
-"calls": 62,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 87.5,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "OaepEncoder::encode": {
-"calls": 88,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 96.0,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Packet::Add": {
 "calls": 100,
@@ -2304,17 +2304,17 @@
 },
 "PacketBuffer::CheckCompose": {
 "calls": 100,
-"consts": 96,
+"consts": 100,
 "refs": 100,
-"score": 98.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "PacketBuffer::Compose": {
-"calls": 84,
-"consts": 95,
-"refs": 91,
-"score": 90.1,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "PacketBuffer::ComposeText": {
 "calls": 100,
@@ -2325,17 +2325,17 @@
 },
 "PacketBuffer::Decompose": {
 "calls": 100,
-"consts": 93,
+"consts": 100,
 "refs": 100,
-"score": 97.6,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "PacketBuffer::DecomposeText": {
-"calls": 97,
+"calls": 100,
 "consts": 100,
-"refs": 82,
-"score": 93.0,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "PacketBuffer::deallocate_me": {
 "calls": 100,
@@ -2493,9 +2493,9 @@
 },
 "PingGenerator::sendPing": {
 "calls": 100,
-"consts": 93,
+"consts": 100,
 "refs": 98,
-"score": 97.0,
+"score": 99.2,
 "status": "DIFF"
 },
 "PingRelayContext::ComposeRequestPacket": {
@@ -2921,22 +2921,22 @@
 "PostInfo::PostInfo": {
 "calls": 100,
 "consts": 100,
-"refs": 67,
-"score": 88.9,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "PostOfficeDB::LoadPostList": {
-"calls": 97,
-"consts": 99,
+"calls": 98,
+"consts": 100,
 "refs": 99,
-"score": 98.3,
+"score": 99.1,
 "status": "DIFF"
 },
 "PostOfficeDB::LoadRetryReadyPostList": {
-"calls": 97,
+"calls": 98,
 "consts": 100,
 "refs": 99,
-"score": 98.6,
+"score": 99.1,
 "status": "DIFF"
 },
 "PostOfficeDB::LoadRetryReadySinglePost": {
@@ -3396,10 +3396,10 @@
 },
 "RepeatPacketComposer::PushRepeatCount": {
 "calls": 100,
-"consts": 96,
+"consts": 100,
 "refs": 100,
-"score": 98.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "RepeatPacketComposer::Reset": {
 "calls": 100,
@@ -3571,17 +3571,17 @@
 },
 "RsaPublic::Setup": {
 "calls": 100,
-"consts": 71,
+"consts": 100,
 "refs": 100,
-"score": 90.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "RsaPublic::~RsaPublic": {
 "calls": 100,
 "consts": 100,
-"refs": 40,
-"score": 80.0,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Session::Accept": {
 "calls": 100,
@@ -3606,10 +3606,10 @@
 },
 "Session::HandleFailedEvent": {
 "calls": 100,
-"consts": 91,
+"consts": 100,
 "refs": 100,
-"score": 97.0,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Session::Recv": {
 "calls": 100,
@@ -3808,11 +3808,11 @@
 "status": "MATCH"
 },
 "SessionSendBuffer::clearPacketBufferList": {
-"calls": 75,
-"consts": 89,
-"refs": 91,
-"score": 84.9,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "SessionSendBuffer::increaseBuffer": {
 "calls": 100,
@@ -4011,11 +4011,11 @@
 "status": "MATCH"
 },
 "TextStreamPacketBufferHandler::Destroy": {
-"calls": 80,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 93.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "TextStreamPacketBufferHandler::Initialize": {
 "calls": 100,
@@ -4026,10 +4026,10 @@
 },
 "TextStreamPacketBufferHandler::ToBuffer": {
 "calls": 100,
-"consts": 89,
+"consts": 100,
 "refs": 100,
-"score": 96.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "TextStreamPacketBufferHandler::ToPacket": {
 "calls": 100,

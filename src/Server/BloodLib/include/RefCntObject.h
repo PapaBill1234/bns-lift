@@ -39,6 +39,8 @@ public:
     RefCntHistoryItem* _history;
 
     friend class RefCntObject;
+    // LIFT: SessionSendBuffer::clearPacketBufferList has the removeReferenceCount body by hand (CacheGate 0x1a980).
+    friend class SessionSendBuffer;
 };
 static_assert(sizeof(RefCntHistory) == 0x18, "sizeof RefCntHistory");
 static_assert(offsetof(RefCntHistory, _history) == 0x10, "RefCntHistory::_history");
@@ -68,6 +70,9 @@ public:
     long _tag;
     long _ref;  // PDB: plain long (0x0012), not volatile. A volatile store blocks the dead-store removal of the base vptr store.
     RefCntHistory* _history;
+
+    // LIFT: SessionSendBuffer::clearPacketBufferList has the removeReferenceCount body by hand (CacheGate 0x1a980).
+    friend class SessionSendBuffer;
 };
 static_assert(sizeof(RefCntObject) == 0x18, "sizeof RefCntObject");
 static_assert(offsetof(RefCntObject, _tag) == 0x8, "RefCntObject::_tag");

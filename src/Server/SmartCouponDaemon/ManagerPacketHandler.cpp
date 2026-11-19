@@ -41,6 +41,9 @@ unsigned int RetryCouponPublicationEvent::EventId() const
 // 0xef40
 bool HandleSmartCouponManager_HelloReq(Session const* session, Packet const* packet)
 {
+    short cmd = 0;
+    short version = 0;
+    unsigned short managerWid = 0;
     if (session == nullptr || packet == nullptr)
     {
         unsigned long long id = session != nullptr ? session->_id : 0;
@@ -53,7 +56,6 @@ bool HandleSmartCouponManager_HelloReq(Session const* session, Packet const* pac
 
     Channel* channel = session->GetChannel();
     short failReason = 0;
-    unsigned short managerWid = 0;
     if (channel != nullptr && channel->GetId() != 0)
     {
         Log::Write(Log::LT_ERROR, MANAGERPACKETHANDLER_FILE, 44, L"[mgr-ch], 0x%.16I64X, %I64d, already hello req",
@@ -62,8 +64,6 @@ bool HandleSmartCouponManager_HelloReq(Session const* session, Packet const* pac
     }
     else
     {
-        short cmd = 0;
-        short version = 0;
         if (packet->Decompose("hhh", &cmd, &version, &managerWid) == 0)
         {
             Log::Write(Log::LT_ERROR, MANAGERPACKETHANDLER_FILE, 53,
@@ -77,7 +77,16 @@ bool HandleSmartCouponManager_HelloReq(Session const* session, Packet const* pac
                        L"[mgr-ch], 0x%.16I64X, %I64d, decomposed packet, hello req, smartcouponmanger-packet-version:%d, "
                        L"managerWid:%u",
                        session->_id, channel != nullptr ? channel->GetId() : 0ULL, version, managerWid);
-            if (version == SMARTCOUPONMANAGER_PACKET_VERSION)
+            if (version != SMARTCOUPONMANAGER_PACKET_VERSION)
+            {
+                Log::Write(Log::LT_ERROR, MANAGERPACKETHANDLER_FILE, 64,
+                           L"[mgr-ch], 0x%.16I64X, %I64d, invalid packet version, hello req, my "
+                           L"smartcouponmanger-packet-version:%d, client version:%d",
+                           session->_id, channel != nullptr ? channel->GetId() : 0ULL, SMARTCOUPONMANAGER_PACKET_VERSION,
+                           version);
+                failReason = 9;
+            }
+            else
             {
                 // BUG: 0xEF40 no null check of the alloc result.
                 void* mem = Memory::_Manager[1]->Alloc(sizeof(ManagerChannel), MANAGERPACKETHANDLER_FILE, 69);
@@ -88,16 +97,10 @@ bool HandleSmartCouponManager_HelloReq(Session const* session, Packet const* pac
                 session->Send("h", SmartCouponManager_HelloOkCmd);
                 Log::Write(Log::LT_NOTICE, MANAGERPACKETHANDLER_FILE, 78,
                            L"[mgr-ch], 0x%.16I64X, %I64d, sent hello success ack, managerWid:%u", session->_id,
-                           channel != nullptr ? channel->GetId() : 0ULL, managerWid);
+                           managerChannel->GetId(), managerWid);
                 // BUG: 0xEF40 channel leaks a reference when it is not null and its id is 0.
                 return true;
             }
-            Log::Write(Log::LT_ERROR, MANAGERPACKETHANDLER_FILE, 64,
-                       L"[mgr-ch], 0x%.16I64X, %I64d, invalid packet version, hello req, my "
-                       L"smartcouponmanger-packet-version:%d, client version:%d",
-                       session->_id, channel != nullptr ? channel->GetId() : 0ULL, SMARTCOUPONMANAGER_PACKET_VERSION,
-                       version);
-            failReason = 9;
         }
     }
 
@@ -122,10 +125,10 @@ bool HandleSmartCouponManager_RetryCouponPublicationReq(Session const* session, 
         return false;
     }
 
+    short cmd = 0;
     // BUG: 0xF2F0 no null check of the alloc result.
     void* mem = Memory::_Manager[1]->Alloc(sizeof(RetryCouponPublicationEvent), MANAGERPACKETHANDLER_FILE, 106);
     RetryCouponPublicationEvent* event = new (mem) RetryCouponPublicationEvent();
-    short cmd = 0;
     short failReason = 0;
     if (packet->Decompose("hqoq", &cmd, &event->_tid, &event->_gameAccountId, &event->_publicationId) == 0)
     {
@@ -133,7 +136,7 @@ bool HandleSmartCouponManager_RetryCouponPublicationReq(Session const* session, 
                    L"[mgr-ch], 0x%.16I64X, %I64d, failed to decompose packet", session->_id, channel->GetId());
         failReason = 2;
     }
-    else if (event->_tid > 0 && (event->_gameAccountId.id[0] != 0 || event->_gameAccountId.id[1] != 0) &&
+    else if (event->_tid > 0 && (event->_gameAccountId.id[0] != ID128_GUID_ZERO.id[0] || event->_gameAccountId.id[1] != ID128_GUID_ZERO.id[1]) &&
              event->_publicationId > 0)
     {
         if (GameEventManager::Instance != nullptr && GameEventManager::Instance->_gameEventHandle != nullptr)

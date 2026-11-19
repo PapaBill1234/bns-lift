@@ -297,7 +297,7 @@ bool Session::Connect(Port* port, unsigned long long id, unsigned long ip, unsig
 {
     if (!initialize(port, id, 1))
         return false;
-    port->_sessionHandler->OnCreated(this);
+    _port->_sessionHandler->OnCreated(this);  // LobbyGate 0x17a70: the original reads the member
     _state = CONNECTING;
     _connectCount = 0;
     _option = 2;
@@ -313,15 +313,23 @@ bool Session::Connect(Port* port, unsigned long long id, unsigned long ip, unsig
     _connectContext->_session = this;
     _connectContext->_socket = INVALID_SOCKET;
     _connectContext->_firstConnect = true;
-    // LobbyGate 0x17b40: htons comes before GetTickCount64.
-    _connectContext->_remoteAddr.sin_family = AF_INET;
-    _connectContext->_remoteAddr.sin_port = htons(portNumber);
-    _connectContext->_remoteAddr.sin_addr.s_addr = ip;
-    // LTCG folded the timeout constant in each exe. CacheGate 0xe6ad stores 0 (callers give 0). LobbyGate 0x17bed
-    // stores GetTickCount64() - StartSystemTick64 + 5000 (the caller gives 5000).
-    _connectContext->_timeout =
-        timeout > 0 ? static_cast<long long>(GetTickCount64()) - Daemon::Instance->StartSystemTick64 + timeout : 0;
+    _connectContext->_timeout = 0;
     _connectContext->_tryReconnectCount = 0;
+    // LIFT: LobbyGate 0x17bbc (PDB lines 379-380): the original zeroes the address again and fills it through one
+    // pointer. htons comes before the sin_addr store.
+    sockaddr_in* remoteAddr = &_connectContext->_remoteAddr;
+    memset(remoteAddr, 0, sizeof(sockaddr_in));
+    remoteAddr->sin_family = AF_INET;
+    remoteAddr->sin_port = htons(portNumber);
+    remoteAddr->sin_addr.s_addr = ip;
+    // LTCG folded the timeout constant in each exe. CacheGate callers give 0. LobbyGate 0x17bed (PDB line 384)
+    // stores GetTickCount64() - StartSystemTick64 + 5000 (the caller gives 5000). The signed local keeps the
+    // original "sub; lea +5000" form. One unsigned expression gives "5000 - StartSystemTick64" first.
+    if (timeout > 0)
+    {
+        long long now = GetTickCount64() - Daemon::Instance->StartSystemTick64;
+        _connectContext->_timeout = now + timeout;
+    }
     _connectPending = true;
 
     if (!_connection->AsyncConnect(_connectContext, port->_nagle))
@@ -334,7 +342,7 @@ bool Session::Connect(Port* port, unsigned long long id, unsigned long ip, unsig
         return false;
     }
     Log::Write(Log::LT_DEBUG, SESSION_FILE, 431, L"[session], connect to, port id: %u, id:%I64x, this:%p, ip:%s, port:%d",
-               port->_id, id, this, Network::GetAddressStringW(ip), portNumber);
+               port->_id, _id, this, Network::GetAddressStringW(ip), portNumber);
     return true;
 }
 
@@ -681,12 +689,11 @@ logDebugError:
 // 0xF5D0
 void Session::HandleFailedEvent(EventContext* context, unsigned long numOfBytes)
 {
+    // LIFT: each case has its own close and Leave (PDB lines 906-910, 913-918, 921-925 of CacheGate 0xf5d0).
+    // The compiler merges the 3 tails into one.
+    bool removed;
     switch (context->_id)
     {
-    case EVID_IO_CONNECT:
-        EnterCriticalSection(&_lock.CS);
-        _connectPending = false;
-        break;
     case EVID_IO_RECV:
     {
         IdleStateTable* table = _port->_idleStateTable;
@@ -697,12 +704,22 @@ void Session::HandleFailedEvent(EventContext* context, unsigned long numOfBytes)
         _port->_sessionHandler->OnClose(this, _option == 2);
         EnterCriticalSection(&_lock.CS);
         _recvPending = false;
+        removed = close(false);
+        LeaveCriticalSection(&_lock.CS);
         break;
     }
     case EVID_IO_SEND:
         EnterCriticalSection(&_lock.CS);
         _sendPending = false;
         _sendBuffer->Clear();
+        removed = close(false);
+        LeaveCriticalSection(&_lock.CS);
+        break;
+    case EVID_IO_CONNECT:
+        EnterCriticalSection(&_lock.CS);
+        _connectPending = false;
+        removed = close(false);
+        LeaveCriticalSection(&_lock.CS);
         break;
     default:
         Log::Write(Log::LT_ERROR, SESSION_FILE, 928, L"== CRASH == [session], invalid event, id:%I64x, this:%p, context:%d",
@@ -711,8 +728,6 @@ void Session::HandleFailedEvent(EventContext* context, unsigned long numOfBytes)
                            _id, this, context->_id);
         return;
     }
-    bool removed = close(false);
-    LeaveCriticalSection(&_lock.CS);
     if (removed)
         _port->RemoveSession(this);
 }
@@ -832,7 +847,8 @@ void Session::SendV(char const* format, char* args) const
     packet.CurHeader = reinterpret_cast<Packet::Header*>(&buffer->Buffer[8]);
     packet.CurHeader->size = 2;
     int size = static_cast<short>(
-        PacketBuffer::Compose(&buffer->Buffer[10], 0xF9E, format, static_cast<unsigned long long>(-1), args));
+        PacketBuffer::Compose(reinterpret_cast<char*>(packet.CurHeader) + packet.CurHeader->size,
+                              4000 - packet.CurHeader->size, format, static_cast<unsigned long long>(-1), args));
     if (static_cast<unsigned short>(4000 - packet.CurHeader->size) < size)
         SESSION_ASSERT_CRASH(L"source\\Packet.cpp", "source\\Packet.cpp", 307);
     packet.CurHeader->size += static_cast<short>(size);
@@ -952,6 +968,8 @@ __declspec(thread) PacketCrypt::ErrCode Thread_LastCryptError;
 
 // 0x19460 (LobbyGate)
 // LIFT: noinline. The orig calls it out of line at all call sites (LG 0x19460: not inlined).
+// LIFT: inline_depth(0). LG 0x19460 calls PacketCrypt::InstanceSize (0x4cc60) out of line (lessons A20).
+#pragma inline_depth(0)
 __declspec(noinline) void* Session::allocateCrypt(PacketCrypt::Type type, PacketCrypt::Algorithm algorithm) const
 {
     // LIFT: LTCG removed the algorithm param from InstanceSize and Create. Create gets (type, buffer, size)
@@ -963,6 +981,7 @@ __declspec(noinline) void* Session::allocateCrypt(PacketCrypt::Type type, Packet
     unsigned char* buffer = static_cast<unsigned char*>(self->_allocator.Alloc(size, SESSION_FILE, 1320));
     return PacketCrypt::Create(type, algorithm, buffer, size);
 }
+#pragma inline_depth()
 
 // 0x194C0 (LobbyGate). The CacheGate ~Session (0xE0A0) inlines it.
 // LIFT: per-exe form, only LG 0x194c0 has the function (noinline). CG, SCD and POD inline it in ~Session.
@@ -1064,7 +1083,17 @@ void Session::completeHandshake()
     _cryptMode = 5;
     if (handshakeCrypt != nullptr)
     {
+#if defined(LIFT_EXE_LG)
+        // LIFT: LG 0x197e0 has the body of deallocateCrypt (0x194c0) in place, with no null test.
+        int type = handshakeCrypt->GetType();
+        int rest1;
+        int rest2;
+        if (type == 0 || ((rest1 = type - 1) != 0 && ((rest2 = rest1 - 1) == 0 || static_cast<unsigned int>(rest2 - 1) <= 1)))
+            handshakeCrypt->~PacketCrypt();
+        _allocator.Free(handshakeCrypt, SESSION_FILE, 1331);
+#else
         deallocateCrypt(handshakeCrypt);
+#endif
         _handshakeCrypt = nullptr;
     }
     _currentCrypt = _sessionCrypt;

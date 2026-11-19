@@ -148,28 +148,25 @@ void ManagerChannel::SendRetryCouponPublicationOk(Session* session, long long ti
     {
         Log::Write(Log::LT_ERROR, MANAGERCHANNEL_FILE, 120,
                    L"[manager-ch], 0x%.16I64X, %I64d, send retry coupon publication ok; invalid session; send fail",
-                   session != nullptr ? session->_id : 0ULL, GetId(), -2);
+                   session != nullptr ? session->_id : 0ULL, GetId());
         return;
     }
 
     Packet p;
     zeroPacket(&p);
     p.Allocate();
-    if (p.Compose("hqq", 5, tid, acceptTid) != 0)
-    {
-        PacketBuffer const* buffer = p.ListHead;
-        p.ListHead->encrypt(session->_currentCrypt, session->_security3rd);
-        session->_lock.Enter();
-        session->send(&buffer, 1);  // LIFT: inlined send
-        session->_lock.Leave();
-    }
-    else
+    if (p.Compose("hqq", 5, tid, acceptTid) == 0)
     {
         Log::Write(Log::LT_ERROR, MANAGERCHANNEL_FILE, 113,
                    L"[manager-ch], 0x%.16I64X, %I64d, send retry coupon publication ok; compose packet fail; compose fail",
                    session->_id, GetId());
+        return;
     }
-    p.Clear();
+    PacketBuffer const* buffer = p.ListHead;
+    p.ListHead->encrypt(session->_currentCrypt, session->_security3rd);
+    session->_lock.Enter();
+    session->send(&buffer, 1);  // LIFT: inlined send
+    session->_lock.Leave();
 }
 
 // 0xed20
@@ -179,27 +176,24 @@ void ManagerChannel::SendRetryCouponPublicationFail(Session* session, long long 
     {
         Log::Write(Log::LT_ERROR, MANAGERCHANNEL_FILE, 141,
                    L"[manager-ch], 0x%.16I64X, %I64d, send retry coupon publication fail; invalid session; send fail",
-                   session != nullptr ? session->_id : 0ULL, GetId(), -2);
+                   session != nullptr ? session->_id : 0ULL, GetId());
         return;
     }
 
     Packet p;
     zeroPacket(&p);
     p.Allocate();
-    if (p.Compose("hqE", 6, tid, failReason) != 0)
-    {
-        PacketBuffer const* buffer = p.ListHead;
-        p.ListHead->encrypt(session->_currentCrypt, session->_security3rd);
-        session->_lock.Enter();
-        session->send(&buffer, 1);  // LIFT: inlined send
-        session->_lock.Leave();
-    }
-    else
+    if (p.Compose("hqE", 6, tid, failReason) == 0)
     {
         Log::Write(Log::LT_ERROR, MANAGERCHANNEL_FILE, 134,
                    L"[manager-ch], 0x%.16I64X, %I64d, send retry coupon publication fail; compose packet fail; compose "
                    L"fail",
                    session->_id, GetId());
+        return;
     }
-    p.Clear();
+    PacketBuffer const* buffer = p.ListHead;
+    p.ListHead->encrypt(session->_currentCrypt, session->_security3rd);
+    session->_lock.Enter();
+    session->send(&buffer, 1);  // LIFT: inlined send
+    session->_lock.Leave();
 }

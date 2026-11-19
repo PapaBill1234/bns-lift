@@ -197,10 +197,10 @@
 },
 "BigInteger::Divide [?Divide@BigInteger@@SAXPEBV1@IPEAV1@PEAI@Z]": {
 "calls": 100,
-"consts": 89,
+"consts": 100,
 "refs": 100,
-"score": 96.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "BigInteger::ExpMod": {
 "calls": 100,
@@ -232,10 +232,10 @@
 },
 "BigInteger::Mul": {
 "calls": 100,
-"consts": 50,
+"consts": 100,
 "refs": 100,
-"score": 83.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "BigInteger::Pow2": {
 "calls": 100,
@@ -273,11 +273,11 @@
 "status": "MATCH"
 },
 "BigInteger::Sqr": {
-"calls": 89,
-"consts": 75,
+"calls": 100,
+"consts": 100,
 "refs": 100,
-"score": 88.0,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "BigInteger::Sub": {
 "calls": 100,
@@ -301,11 +301,11 @@
 "status": "MATCH"
 },
 "BigInteger::expMod": {
-"calls": 95,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 98.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "BigInteger::invMod": {
 "calls": 59,
@@ -344,17 +344,17 @@
 },
 "BigInteger::mul [?mul@BigInteger@@AEAAXI@Z]": {
 "calls": 100,
-"consts": 89,
+"consts": 100,
 "refs": 100,
-"score": 96.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "BigInteger::mul [?mul@BigInteger@@CAXPEBV1@0PEAV1@@Z]": {
 "calls": 100,
-"consts": 73,
+"consts": 100,
 "refs": 100,
-"score": 90.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "BigInteger::setBit": {
 "calls": 100,
@@ -372,10 +372,10 @@
 },
 "BigInteger::sub": {
 "calls": 100,
-"consts": 86,
+"consts": 100,
 "refs": 100,
-"score": 95.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "BigInteger::~BigInteger": {
 "calls": 100,
@@ -714,11 +714,11 @@
 "status": "MATCH"
 },
 "ClientPacketBufferHandler::ToPacket": {
-"calls": 58,
-"consts": 97,
+"calls": 100,
+"consts": 100,
 "refs": 100,
-"score": 85.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "ClientSessionHandler::OnAccept": {
 "calls": 100,
@@ -2444,10 +2444,10 @@
 },
 "Network::Clear": {
 "calls": 100,
-"consts": 93,
-"refs": 98,
-"score": 97.2,
-"status": "DIFF"
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Network::ClosePort": {
 "calls": 100,
@@ -2485,10 +2485,10 @@
 "status": "MATCH"
 },
 "Network::OpenPort": {
-"calls": 92,
-"consts": 95,
-"refs": 86,
-"score": 90.8,
+"calls": 100,
+"consts": 100,
+"refs": 97,
+"score": 98.9,
 "status": "DIFF"
 },
 "Network::ReconnectSession": {
@@ -2541,25 +2541,25 @@
 "status": "MATCH"
 },
 "OaepEncoder::Setup": {
-"calls": 80,
-"consts": 91,
+"calls": 100,
+"consts": 100,
 "refs": 100,
-"score": 90.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "OaepEncoder::decode": {
-"calls": 62,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 87.5,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "OaepEncoder::encode": {
-"calls": 88,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 96.0,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Packet::Add": {
 "calls": 100,
@@ -2611,11 +2611,11 @@
 "status": "MATCH"
 },
 "Packet::Copy": {
-"calls": 96,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 98.6,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Packet::Decompose": {
 "calls": 100,
@@ -2654,24 +2654,24 @@
 },
 "PacketBuffer::CheckCompose": {
 "calls": 100,
-"consts": 96,
+"consts": 100,
 "refs": 100,
-"score": 98.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "PacketBuffer::Compose": {
-"calls": 84,
-"consts": 95,
-"refs": 91,
-"score": 90.1,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "PacketBuffer::Decompose": {
 "calls": 100,
-"consts": 93,
+"consts": 100,
 "refs": 100,
-"score": 97.6,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "PacketBuffer::deallocate_me": {
 "calls": 100,
@@ -3263,10 +3263,10 @@
 },
 "RepeatPacketComposer::PushRepeatCount": {
 "calls": 100,
-"consts": 96,
+"consts": 100,
 "refs": 100,
-"score": 98.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "RepeatPacketComposer::Reset": {
 "calls": 100,
@@ -3382,17 +3382,17 @@
 },
 "RsaPrivate::Setup": {
 "calls": 100,
-"consts": 67,
+"consts": 100,
 "refs": 100,
-"score": 88.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "RsaPrivate::~RsaPrivate": {
 "calls": 100,
 "consts": 100,
-"refs": 40,
-"score": 80.0,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "RsaPublic::Decrypt": {
 "calls": 100,
@@ -3417,17 +3417,17 @@
 },
 "RsaPublic::Setup": {
 "calls": 100,
-"consts": 71,
+"consts": 100,
 "refs": 100,
-"score": 90.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "RsaPublic::~RsaPublic": {
 "calls": 100,
 "consts": 100,
-"refs": 40,
-"score": 80.0,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Session::Accept": {
 "calls": 100,
@@ -3445,10 +3445,10 @@
 },
 "Session::Connect": {
 "calls": 100,
-"consts": 93,
+"consts": 100,
 "refs": 100,
-"score": 97.8,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Session::FailHandshake": {
 "calls": 100,
@@ -3466,10 +3466,10 @@
 },
 "Session::HandleFailedEvent": {
 "calls": 100,
-"consts": 91,
+"consts": 100,
 "refs": 100,
-"score": 97.0,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Session::Recv": {
 "calls": 100,
@@ -3535,11 +3535,11 @@
 "status": "MATCH"
 },
 "Session::allocateCrypt": {
-"calls": 80,
-"consts": 22,
+"calls": 100,
+"consts": 100,
 "refs": 100,
-"score": 67.4,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Session::clear": {
 "calls": 100,
@@ -3557,10 +3557,10 @@
 },
 "Session::completeHandshake": {
 "calls": 100,
-"consts": 67,
-"refs": 0,
-"score": 55.6,
-"status": "DIFF"
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Session::deallocateCrypt": {
 "calls": 100,
@@ -3703,11 +3703,11 @@
 "status": "MATCH"
 },
 "SessionSendBuffer::clearPacketBufferList": {
-"calls": 75,
-"consts": 89,
-"refs": 91,
-"score": 84.9,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "SessionSendBuffer::increaseBuffer": {
 "calls": 100,

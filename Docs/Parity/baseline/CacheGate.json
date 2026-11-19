@@ -1436,10 +1436,10 @@
 },
 "Network::Clear": {
 "calls": 100,
-"consts": 93,
-"refs": 98,
-"score": 97.2,
-"status": "DIFF"
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Network::ClosePort": {
 "calls": 100,
@@ -1470,10 +1470,10 @@
 "status": "MATCH"
 },
 "Network::OpenPort": {
-"calls": 92,
-"consts": 95,
-"refs": 86,
-"score": 90.8,
+"calls": 100,
+"consts": 100,
+"refs": 97,
+"score": 98.9,
 "status": "DIFF"
 },
 "Network::ReconnectSession": {
@@ -1547,18 +1547,18 @@
 "status": "MATCH"
 },
 "PacketBuffer::Compose": {
-"calls": 89,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 96.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "PacketBuffer::Decompose": {
 "calls": 100,
-"consts": 93,
+"consts": 100,
 "refs": 100,
-"score": 97.6,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "PacketBuffer::deallocate_me": {
 "calls": 100,
@@ -2122,10 +2122,10 @@
 },
 "Session::HandleFailedEvent": {
 "calls": 100,
-"consts": 91,
+"consts": 100,
 "refs": 100,
-"score": 97.0,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Session::Recv": {
 "calls": 100,
@@ -2150,10 +2150,10 @@
 },
 "Session::SendV": {
 "calls": 100,
-"consts": 91,
+"consts": 100,
 "refs": 100,
-"score": 97.0,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Session::Session [??0Session@@IEAA@IPEBVPacketBufferHandler@@@Z]": {
 "calls": 100,
@@ -2338,11 +2338,11 @@
 "status": "MATCH"
 },
 "SessionSendBuffer::clearPacketBufferList": {
-"calls": 75,
-"consts": 89,
-"refs": 91,
-"score": 84.9,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "SessionSendBuffer::increaseBuffer": {
 "calls": 100,

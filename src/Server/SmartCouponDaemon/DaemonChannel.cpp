@@ -8,6 +8,13 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <malloc.h>
+#ifndef _malloca
+// The Wine headers do not have _malloca and _freea. VS2010 malloc.h has them.
+// This fallback is for the clang-cl toolchain only. It uses the heap for all sizes.
+#define _malloca(size) malloc(size)
+#define _freea(memory) free(memory)
+#endif
 #include <wchar.h>
 #include <new>
 #include <vector>
@@ -40,7 +47,6 @@ DChannelMgr::DChannelMgr()
 // 0xc970
 DChannelMgr::~DChannelMgr()
 {
-    _list.clear();
 }
 
 // 0xca00
@@ -58,156 +64,171 @@ void DChannelMgr::Finalize()
 }
 
 // 0xcac0
-bool DChannelMgr::SetupDaemonListFromXml(wchar_t const* xml)
+// LIFT: noinline. Without it LTCG moves the wcslen check into initNetwork and reload.
+__declspec(noinline) bool DChannelMgr::SetupDaemonListFromXml(wchar_t const* xml)
 {
-    if (xml == nullptr || *xml == L'\0')
+    // BUG: 0xcac0 the original calls wcslen on xml with no nullptr check.
+    if (wcslen(xml) == 0)
     {
         Log::Write(Log::LT_ERROR, DCHANNEL_FILE, 56, L"[ch-mgr], setup daemon list fail, invalid xmlfile");
         return false;
     }
 
-    std::vector<DaemonInfo, StlAllocator<DaemonInfo, 2> > tempDaemonList;
     bool result = false;
-    XmlReader const* reader = nullptr;
-    XmlDoc* doc = nullptr;
-    DaemonInfo** list = nullptr;
     int count = 0;
-    XmlElement const* root = nullptr;
-    XmlElement const* elem = nullptr;
-    wchar_t const* version = nullptr;
+    DaemonInfo** list = nullptr;
+    std::vector<DaemonInfo, StlAllocator<DaemonInfo, 2> > tempDaemonList;
 
     HMODULE library = LoadLibraryW(L"XmlReader_sv64.dll");
-    if (library == nullptr)
+    if (library != nullptr)
     {
-        Log::Write(Log::LT_ERROR, DCHANNEL_FILE, 75, L"[daemon-mgr], setup daemon list fail, %s missing",
-                   L"XmlReader_sv64.dll");
-        return false;
-    }
+        XmlReader const* reader = nullptr;
+        XmlDoc* doc = nullptr;
 
-    XriGetInterfaceVersion getInterfaceVersion =
-        reinterpret_cast<XriGetInterfaceVersion>(GetProcAddress(library, "GetInterfaceVersion"));
-    GetProcAddress(library, "SetMemAllocator");
-    XriCreateFunc createXmlReader = reinterpret_cast<XriCreateFunc>(GetProcAddress(library, "CreateXmlReader"));
-    XriDestoryFunc destroyXmlReader =
-        reinterpret_cast<XriDestoryFunc>(GetProcAddress(library, "DestroyXmlReader"));
+        XriGetInterfaceVersion getInterfaceVersion =
+            reinterpret_cast<XriGetInterfaceVersion>(GetProcAddress(library, "GetInterfaceVersion"));
+        GetProcAddress(library, "SetMemAllocator");
+        XriCreateFunc createXmlReader = reinterpret_cast<XriCreateFunc>(GetProcAddress(library, "CreateXmlReader"));
+        XriDestoryFunc destroyXmlReader =
+            reinterpret_cast<XriDestoryFunc>(GetProcAddress(library, "DestroyXmlReader"));
 
-    reader = createXmlReader();
-    if (reader == nullptr)
-    {
-        Log::Write(Log::LT_ERROR, DCHANNEL_FILE, 81, L"[daemon-mgr], setup daemon list fail, create xmlreader fail");
-        FreeLibrary(library);
-        return false;
-    }
-
-    version = getInterfaceVersion();
-    if (_wcsicmp(version, L"15") != 0)
-    {
-        Log::Write(Log::LT_ERROR, DCHANNEL_FILE, 87,
-                   L"[daemon-mgr], setup daemon list fail, xml version mismatch, current-version:%s, load-version:%s",
-                   L"15", version);
-        goto cleanup;
-    }
-
-    if (!reader->Initialize(nullptr, nullptr, false))
-    {
-        Log::Write(Log::LT_ERROR, DCHANNEL_FILE, 92, L"[daemon-mgr], setup daemon list fail, init xmlreader fail");
-        goto cleanup;
-    }
-
-    doc = reader->Read(xml, static_cast<XmlPieceReader*>(nullptr));
-    if (doc == nullptr)
-    {
-        Log::Write(Log::LT_ERROR, DCHANNEL_FILE, 98, L"[daemon-mgr], setup daemon list fail, read xml file fail");
-        goto cleanup;
-    }
-
-    root = doc->Root();
-    if (root != nullptr)
-        elem = root->FirstChildElement();
-
-    for (; elem != nullptr; elem = elem->NextElement())
-    {
-        if (!elem->ToXmlNode()->IsValid())
-            break;
-
-        wchar_t const* name = elem->Name();
-        unsigned char type = 0;
-        for (int i = 0; i < 2; ++i)
+        reader = createXmlReader();
+        if (reader == nullptr)
         {
-            if (_wcsicmp(name, SmartCouponDaemonTypeDesc[i]) == 0)
+            Log::Write(Log::LT_ERROR, DCHANNEL_FILE, 81, L"[daemon-mgr], setup daemon list fail, create xmlreader fail");
+            goto cleanup;
+        }
+
+        {
+            wchar_t const* version = getInterfaceVersion();
+            if (_wcsicmp(version, L"15") != 0)
             {
-                type = static_cast<unsigned char>(i);
-                break;
+                Log::Write(Log::LT_ERROR, DCHANNEL_FILE, 87,
+                           L"[daemon-mgr], setup daemon list fail, xml version mismatch, current-version:%s, load-version:%s",
+                           L"15", version);
+                goto cleanup;
             }
         }
 
-        if (_wcsicmp(name, L"gamed") != 0)
+        if (!reader->Initialize(nullptr, nullptr, false))
         {
-            Log::Write(Log::LT_ERROR, DCHANNEL_FILE, 145,
-                       L"[daemon-mgr], setup daemon list exception, unknown element '%s', line:%d",
-                       elem->Name(), elem->LineNumber());
-            continue;
+            Log::Write(Log::LT_ERROR, DCHANNEL_FILE, 92, L"[daemon-mgr], setup daemon list fail, init xmlreader fail");
+            goto cleanup;
         }
 
-        wchar_t const* wid = elem->Attribute(L"wid");
-        wchar_t const* ipAddress = elem->Attribute(L"ip-address");
-        wchar_t const* internalPort = elem->Attribute(L"internal-port");
-        if (wid == nullptr || *wid == L'\0' || ipAddress == nullptr || *ipAddress == L'\0' ||
-            internalPort == nullptr || *internalPort == L'\0')
+        doc = reader->Read(xml, static_cast<XmlPieceReader*>(nullptr));
+        if (doc == nullptr)
         {
-            Log::Write(Log::LT_ERROR, DCHANNEL_FILE, 132,
-                       L"[daemon-mgr], setup daemon list exception, invalid attribute value, line:%d",
-                       elem->LineNumber());
-            continue;
+            Log::Write(Log::LT_ERROR, DCHANNEL_FILE, 98, L"[daemon-mgr], setup daemon list fail, read xml file fail");
+            goto cleanup;
         }
 
-        char ip[32] = {};
-        WideCharToMultiByte(CP_ACP, 0, ipAddress, -1, ip, 31, nullptr, nullptr);
-
-        DaemonInfo info;
-        info.daemonId._type = type;
-        info.daemonId._wid = static_cast<unsigned short>(_wtoi(wid));
-        info.daemonId._reserved = 0;
-        info.ipaddr = inet_addr(ip);
-        info.port = static_cast<unsigned short>(_wtoi(internalPort));
-        tempDaemonList.push_back(info);
-    }
-
-    count = static_cast<int>(tempDaemonList.size());
-    if (count == 0)
-    {
-        Log::Write(Log::LT_NOTICE, DCHANNEL_FILE, 166, L"[daemon-mgr], setup daemon list with xml complete, xml:%s", xml);
-        result = true;
-        goto cleanup;
-    }
-
-    list = static_cast<DaemonInfo**>(Memory::_Manager[2]->Alloc(sizeof(DaemonInfo*) * count, DCHANNEL_FILE, 153));
-    for (int i = 0; i < count; ++i)
-    {
-        list[i] = static_cast<DaemonInfo*>(Memory::_Manager[2]->Alloc(sizeof(DaemonInfo), DCHANNEL_FILE, 156));
-        *list[i] = tempDaemonList[i];
-    }
-
-    if (SetupDaemonList(list, count))
-    {
-        Log::Write(Log::LT_NOTICE, DCHANNEL_FILE, 166, L"[daemon-mgr], setup daemon list with xml complete, xml:%s", xml);
-        result = true;
-    }
-
-cleanup:
-    if (list != nullptr)
-    {
-        for (int i = 0; i < count; ++i)
         {
-            if (list[i] != nullptr)
-                Memory::_Manager[2]->Free(list[i], DCHANNEL_FILE, 173);
+            XmlElement const* root = doc->Root();
+            XmlElement const* elem = nullptr;
+            if (root != nullptr)
+                elem = root->FirstChildElement();
+
+            while (elem != nullptr)
+            {
+                if (!elem->ToXmlNode()->IsValid())
+                    break;
+
+                wchar_t const* name = elem->Name();
+                unsigned char type = 0;
+                // LIFT: 0xcd01 pointer walk. The orig steps the table pointer by 8 in the loop.
+                wchar_t const* const* desc = SmartCouponDaemonTypeDesc;
+                for (unsigned int i = 0; i < 2; ++i, ++desc)
+                {
+                    if (_wcsicmp(*desc, name) == 0)
+                    {
+                        type = static_cast<unsigned char>(i);
+                        break;
+                    }
+                }
+
+                if (_wcsicmp(name, L"gamed") == 0)
+                {
+                    DaemonInfo info;
+                    info.daemonId._wid = 0;
+                    info.daemonId._type = 0;
+                    info.daemonId._reserved = 0;
+                    wchar_t const* wid = elem->Attribute(L"wid");
+                    wchar_t const* ipAddress = elem->Attribute(L"ip-address");
+                    wchar_t const* internalPort = elem->Attribute(L"internal-port");
+                    if (wid == nullptr || wcslen(wid) == 0 || ipAddress == nullptr || wcslen(ipAddress) == 0 ||
+                        internalPort == nullptr || wcslen(internalPort) == 0)
+                    {
+                        Log::Write(Log::LT_ERROR, DCHANNEL_FILE, 132,
+                                   L"[daemon-mgr], setup daemon list exception, invalid attribute value, line:%d",
+                                   elem->LineNumber());
+                        elem = elem->NextElement();
+                        continue;
+                    }
+                    {
+                        info.daemonId._wid = static_cast<unsigned short>(_wtoi(wid));
+                        info.daemonId._type = type;
+                        info.daemonId._reserved = 0;
+                        char ip[32];
+                        ip[30] = 0;
+                        ip[31] = 0;
+                        WideCharToMultiByte(CP_ACP, 0, ipAddress, -1, ip, 31, nullptr, nullptr);
+                        info.ipaddr = inet_addr(ip);
+                        info.port = static_cast<unsigned short>(_wtoi(internalPort));
+                        tempDaemonList.push_back(info);
+                    }
+                }
+                else
+                {
+                    Log::Write(Log::LT_ERROR, DCHANNEL_FILE, 145,
+                               L"[daemon-mgr], setup daemon list exception, unknown element '%s', line:%d",
+                               elem->Name(), elem->LineNumber());
+                }
+                elem = elem->NextElement();
+            }
         }
-        Memory::_Manager[2]->Free(list, DCHANNEL_FILE, 175);
+
+        if (!tempDaemonList.empty())
+        {
+            count = static_cast<int>(tempDaemonList.size());
+            list = static_cast<DaemonInfo**>(Memory::_Manager[2]->Alloc(sizeof(DaemonInfo*) * count, DCHANNEL_FILE, 153));
+            for (int i = 0; i < count; ++i)
+            {
+                list[i] = static_cast<DaemonInfo*>(Memory::_Manager[2]->Alloc(sizeof(DaemonInfo), DCHANNEL_FILE, 156));
+                *list[i] = tempDaemonList[i];
+            }
+        }
+
+        if (count == 0 || SetupDaemonList(list, count))
+        {
+            Log::Write(Log::LT_NOTICE, DCHANNEL_FILE, 166, L"[daemon-mgr], setup daemon list with xml complete, xml:%s", xml);
+            result = true;
+        }
+
+        if (list != nullptr)
+        {
+            for (int i = 0; i < count; ++i)
+            {
+                if (list[i] != nullptr)
+                    Memory::_Manager[2]->Free(list[i], DCHANNEL_FILE, 173);
+            }
+            Memory::_Manager[2]->Free(list, DCHANNEL_FILE, 175);
+        }
+
+    cleanup:
+        if (reader != nullptr)
+        {
+            if (doc != nullptr)
+                reader->Close(doc);
+            destroyXmlReader(reader);
+        }
+        FreeLibrary(library);
     }
-    if (doc != nullptr)
-        reader->Close(doc);
-    destroyXmlReader(reader);
-    FreeLibrary(library);
+    else
+    {
+        Log::Write(Log::LT_ERROR, DCHANNEL_FILE, 75, L"[daemon-mgr], setup daemon list fail, %s missing",
+                   L"XmlReader_sv64.dll");
+    }
     return result;
 }
 
@@ -226,7 +247,17 @@ bool DChannelMgr::SetupDaemonList(DaemonInfo** list, int count)
         if (info == nullptr)
             continue;
 
-        DChannel* second = FindDaemon(&info->daemonId);
+        // LIFT: 0xd270 the original has FindDaemon inline here, with the find loop inline (addReferenceCount line 376).
+        DChannel* second = nullptr;
+        _lock.Enter();
+        std::map<GameEventDaemonId, DChannel*, std::less<GameEventDaemonId>,
+                 StlAllocator<std::pair<GameEventDaemonId, DChannel*>, 2> >::iterator it = _list.find(info->daemonId);
+        if (it != _list.end())
+        {
+            second = it->second;
+            second->addReferenceCount(DCHANNEL_FILE, 376);
+        }
+        _lock.Leave();
         // LIFT: goto form gives the original block order (0xd270): error, changed, then add, shared notice log
         wchar_t const* fmt;
         int line;
@@ -348,18 +379,20 @@ void DChannelMgr::writeFileUtf8(void* handle, wchar_t const* format, ...)
     va_list args;
     va_start(args, format);
     int length = _vscwprintf(format, args) + 1;
-    // The original uses _malloca for both buffers.
-    std::vector<wchar_t> wide(length);
-    vswprintf_s(&wide[0], length, format, args);
+    wchar_t* wide = static_cast<wchar_t*>(_malloca(length * sizeof(wchar_t)));
+    vswprintf_s(wide, length, format, args);
     va_end(args);
 
     // LIFT: 0xd99e passes cchWideChar = length - 1, so the terminating zero is not converted or written.
-    int size = WideCharToMultiByte(CP_UTF8, 0, &wide[0], length - 1, nullptr, 0, nullptr, nullptr);
-    std::vector<char> utf8(size + 1);
-    int converted = WideCharToMultiByte(CP_UTF8, 0, &wide[0], length - 1, &utf8[0], size, nullptr, nullptr);
+    int size = WideCharToMultiByte(CP_UTF8, 0, wide, length - 1, nullptr, 0, nullptr, nullptr);
+    char* utf8 = static_cast<char*>(_malloca(size));
+    int converted = WideCharToMultiByte(CP_UTF8, 0, wide, length - 1, utf8, size, nullptr, nullptr);
 
-    DWORD written = 0;
-    WriteFile(handle, &utf8[0], converted, &written, nullptr);  // LIFT: 0xda4c size = WideCharToMultiByte result
+    // BUG: 0xd8e0 the original does not check the _malloca results for nullptr.
+    DWORD written;
+    WriteFile(handle, utf8, converted, &written, nullptr);  // LIFT: 0xda4c size = WideCharToMultiByte result
+    _freea(utf8);
+    _freea(wide);
 }
 
 // 0xdab0
@@ -371,31 +404,39 @@ DChannelMgr::ErrCode DChannelMgr::AddDaemon(DChannel* channel)
         return ERR_INVALID_PARAM;
     }
 
+    ErrCode result = ERR_SUCCESS;
     _lock.Enter();
     bool inserted = _list.insert(std::pair<GameEventDaemonId, DChannel*>(channel->_daemonId, channel)).second;
     if (inserted)
         channel->addReferenceCount(DCHANNEL_FILE, 327);
     _lock.Leave();
 
-    if (inserted)
+    int const wid = channel->_daemonId._wid;
+    int const port = channel->_port;
+    unsigned long const addr = channel->_addr;
+    int const type = channel->_daemonId._type;
+    if (!inserted)
     {
+        result = ERR_ADDWORLD_ALREADY_REGISTERED;
+        wchar_t const* ip = Network::GetAddressStringW(addr);
+        Log::Write(Log::LT_ERROR, DCHANNEL_FILE, 336,
+                   L"[daemon-mgr], register daemon fail; already exists, req-id:%d, req-wid:%d, req-type:%d, req-ip:%s, "
+                   L"req-port:%d",
+                   static_cast<unsigned int>(channel->GetId()), wid, type, ip, port);
+    }
+    else
+    {
+        wchar_t const* ip = Network::GetAddressStringW(addr);
         Log::Write(Log::LT_DEBUG, DCHANNEL_FILE, 332,
                    L"[daemon-mgr], daemon registered, id:%d, wid:%d, type:%d, ip:%s, port:%d",
-                   static_cast<unsigned int>(channel->GetId()), channel->_daemonId._wid, channel->_daemonId._type,
-                   Network::GetAddressStringW(channel->_addr), channel->_port);
-        return ERR_SUCCESS;
+                   static_cast<unsigned int>(channel->GetId()), wid, type, ip, port);
     }
-
-    Log::Write(Log::LT_ERROR, DCHANNEL_FILE, 336,
-               L"[daemon-mgr], register daemon fail; already exists, req-id:%d, req-wid:%d, req-type:%d, req-ip:%s, "
-               L"req-port:%d",
-               static_cast<unsigned int>(channel->GetId()), channel->_daemonId._wid, channel->_daemonId._type,
-               Network::GetAddressStringW(channel->_addr), channel->_port);
-    return ERR_ADDWORLD_ALREADY_REGISTERED;
+    return result;
 }
 
 // 0xdc50
-DChannel* DChannelMgr::FindDaemon(GameEventDaemonId const* daemonId)
+// LIFT: noinline. The orig calls it out of line from HandleSmartCoupon_HelloReq (SCD 0xdc50).
+__declspec(noinline) DChannel* DChannelMgr::FindDaemon(GameEventDaemonId const* daemonId)
 {
     DChannel* second = nullptr;
     _lock.Enter();
@@ -487,8 +528,8 @@ bool DChannelMgr::PacketHandler(Session const* session, Packet const* packet) co
         return false;
     }
 
-    short const* command = reinterpret_cast<short const*>(packet->CurHeader + 1);
-    if (command == nullptr)
+    short const* const pCmd = &packet->CurHeader[1].size;
+    if (pCmd == nullptr)
     {
         Log::Write(Log::LT_ERROR, DCHANNEL_FILE, 459,
                    L"[gamedmgr], invalid packet; command is null, cmd:0x%p, sessionId:0x%I64X, portId:%u, "
@@ -498,43 +539,47 @@ bool DChannelMgr::PacketHandler(Session const* session, Packet const* packet) co
         return false;
     }
 
-    bool result = false;
     Channel* channel = session->GetChannel();
     unsigned long long channelId = channel != nullptr ? channel->GetId() : 0ULL;
-    short cmd = *command;
+    short const cmd = *pCmd;
 
     // BUG: 0xDFE0 there is no check for cmd < 10. A large cmd reads past the handler list.
     if (cmd < 0 || SmartCouponPacketSmartCouponSideHandlerList[cmd] == nullptr)
     {
+        // BUG: 0xDFE0 the channel reference from GetChannel is not released on this path.
         Log::Write(Log::LT_ERROR, DCHANNEL_FILE, 468, L"[daemon-ch], 0x%.16I64X, %I64d, handle fail, no such cmd, cmd:%d",
                    session->_id, channelId, static_cast<int>(cmd));
+        return false;
     }
-    else if (channel != nullptr)
+
+    bool result = false;
+    if (channel == nullptr)
     {
-        Log::Write(Log::LT_DEBUG, DCHANNEL_FILE, 497, L"[daemon-ch], 0x%.16I64X, %I64d, handle start, cmd:%d",
-                   session->_id, channelId, static_cast<int>(cmd));
-        result = SmartCouponPacketSmartCouponSideHandlerList[cmd](session, packet);
-        Log::Write(Log::LT_DEBUG, DCHANNEL_FILE, 499, L"[daemon-ch], 0x%.16I64X, %I64d, handle end, cmd:%d",
-                   session->_id, channelId, static_cast<int>(cmd));
-    }
-    else if (cmd == 1)
-    {
-        Log::Write(Log::LT_DEBUG, DCHANNEL_FILE, 478, L"[daemon-ch], 0x%.16I64X, %I64d, handle start, cmd:%d",
-                   session->_id, channelId, static_cast<int>(cmd));
-        result = SmartCouponPacketSmartCouponSideHandlerList[cmd](session, packet);
-        Log::Write(Log::LT_DEBUG, DCHANNEL_FILE, 480, L"[daemon-ch], 0x%.16I64X, %I64d, handle end, cmd:%d",
-                   session->_id, channelId, static_cast<int>(cmd));
+        if (cmd == 1)
+        {
+            Log::Write(Log::LT_DEBUG, DCHANNEL_FILE, 478, L"[daemon-ch], 0x%.16I64X, %I64d, handle start, cmd:%d",
+                       session->_id, channelId, 1);
+            result = SmartCouponPacketSmartCouponSideHandlerList[*pCmd](session, packet);
+            Log::Write(Log::LT_DEBUG, DCHANNEL_FILE, 480, L"[daemon-ch], 0x%.16I64X, %I64d, handle end, cmd:%d",
+                       session->_id, channelId, static_cast<int>(*pCmd));
+        }
+        else
+        {
+            Log::Write(Log::LT_ERROR, DCHANNEL_FILE, 484,
+                       L"[gamedmgr], invalid packet command of not authorized session, command:%d, sessionId:0x%I64X, "
+                       L"portId:%u, sessionIndex:%u",
+                       static_cast<int>(cmd), session->_id, static_cast<unsigned int>(session->_id >> 32),
+                       static_cast<unsigned int>(session->_id));
+        }
     }
     else
     {
-        Log::Write(Log::LT_ERROR, DCHANNEL_FILE, 484,
-                   L"[gamedmgr], invalid packet command of not authorized session, command:%d, sessionId:0x%I64X, "
-                   L"portId:%u, sessionIndex:%u",
-                   static_cast<int>(cmd), session->_id, static_cast<unsigned int>(session->_id >> 32),
-                   static_cast<unsigned int>(session->_id));
-    }
-
-    if (channel != nullptr)
+        Log::Write(Log::LT_DEBUG, DCHANNEL_FILE, 497, L"[daemon-ch], 0x%.16I64X, %I64d, handle start, cmd:%d",
+                   session->_id, channelId, static_cast<int>(cmd));
+        result = SmartCouponPacketSmartCouponSideHandlerList[*pCmd](session, packet);
+        Log::Write(Log::LT_DEBUG, DCHANNEL_FILE, 499, L"[daemon-ch], 0x%.16I64X, %I64d, handle end, cmd:%d",
+                   session->_id, channelId, static_cast<int>(*pCmd));
         channel->removeReferenceCount(SESSION_SOURCE_FILE, 1059);
+    }
     return result;
 }
