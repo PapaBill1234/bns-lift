@@ -168,20 +168,26 @@ compose_overflow:
 // Checks one format item. Each argument slot is 8 bytes. Returns 5000 on overflow.
 unsigned short PacketBuffer::CheckCompose(char* buffer, unsigned int count, char const* format, char** args)
 {
+    unsigned short size = 0;
     char* end = &buffer[count];
     if (strlen(format) == 0)
     {
         Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 203, L"[PacketBuffer] %s, invalid format", L"PacketBuffer::CheckCompose");
-        return 0;
+        return size;
     }
     char type = *format;
     char* a = *args;
+    // LIFT: 0x23760 (LobbyGate) all cases go to one exit that stores the argument pointer and returns the size.
+    // LIFT: 0x237F1 (LobbyGate) the block order is c, C, d, q, o, s, K, P.
     switch (type)
     {
-    case ';':
-        Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 325, L"[PacketBuffer] %s, Repeat End type %C",
-                   L"PacketBuffer::CheckCompose", type);
-        return 0;
+    case 'Q':
+    case 'c':
+        if (buffer + 1 > end)
+            goto compose_overflow;
+        a += 8;
+        size = 1;
+        break;
     case 'C':
     case 'E':
     case 'U':
@@ -189,16 +195,47 @@ unsigned short PacketBuffer::CheckCompose(char* buffer, unsigned int count, char
     case 'u':
         if (buffer + 2 > end)
             goto compose_overflow;
-        *args = a + 8;
-        return 2;
+        a += 8;
+        size = 2;
+        break;
+    case 'd':
+    case 'f':
+    case 'i':
+        if (buffer + 4 > end)
+            goto compose_overflow;
+        a += 8;
+        size = 4;
+        break;
+    case 'q':
+        if (buffer + 8 > end)
+            goto compose_overflow;
+        a += 8;
+        size = 8;
+        break;
+    case 'o':
+        if (buffer + 16 > end)
+            goto compose_overflow;
+        a += 8;
+        size = 16;
+        break;
+    case 's':
+    {
+        short len = static_cast<short>(wcslen(*reinterpret_cast<wchar_t const**>(a)));
+        a += 8;
+        if (buffer + len * 2 + 2 > end)
+            goto compose_overflow;
+        size = static_cast<unsigned short>((len + 1) * 2);
+        break;
+    }
     case 'K':
     case 'b':
     {
-        short size = *reinterpret_cast<short*>(a + 8);
-        if (&buffer[size + 2] > end)
+        short dataSize = *reinterpret_cast<short*>(a + 8);
+        a += 16;
+        if (buffer + dataSize + 2 > end)
             goto compose_overflow;
-        *args = a + 16;
-        return static_cast<unsigned short>(size + 2);
+        size = static_cast<unsigned short>(dataSize + 2);
+        break;
     }
     case 'P':
     {
@@ -206,49 +243,25 @@ unsigned short PacketBuffer::CheckCompose(char* buffer, unsigned int count, char
             goto compose_overflow;
         if (buffer + 2 > end)
             goto compose_overflow;
-        short size = *reinterpret_cast<short*>(a + 24);
-        if (&buffer[size + 2] > end)
+        short dataSize = *reinterpret_cast<short*>(a + 24);
+        a += 32;
+        if (buffer + dataSize + 2 > end)
             goto compose_overflow;
-        *args = a + 32;
-        return static_cast<unsigned short>(size + 5);
+        size = static_cast<unsigned short>(dataSize + 5);
+        break;
     }
-    case 'Q':
-    case 'c':
-        if (buffer + 1 > end)
-            goto compose_overflow;
-        *args = a + 8;
-        return 1;
-    case 'd':
-    case 'f':
-    case 'i':
-        if (buffer + 4 > end)
-            goto compose_overflow;
-        *args = a + 8;
-        return 4;
-    case 'o':
-        if (buffer + 16 > end)
-            goto compose_overflow;
-        *args = a + 8;
-        return 16;
-    case 'q':
-        if (buffer + 8 > end)
-            goto compose_overflow;
-        *args = a + 8;
-        return 8;
-    case 's':
-    {
-        short len = static_cast<short>(wcslen(*reinterpret_cast<wchar_t const**>(a)));
-        if (&buffer[2 * len + 2] > end)
-            goto compose_overflow;
-        *args = a + 8;
-        return static_cast<unsigned short>(2 * (len + 1));
-    }
+    case ';':
+        Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 325, L"[PacketBuffer] %s, Repeat End type %C",
+                   L"PacketBuffer::CheckCompose", type);
+        return size;
     default:
         Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 331, L"[PacketBuffer] %s, Unknown type %C",
                    L"PacketBuffer::CheckCompose", type);
         PACKETBUFFER_ASSERT_CRASH(332);
-        return 0;
+        return size;
     }
+    *args = a;
+    return size;
 
 compose_overflow:
     Log::Write(Log::LT_DEBUG, PACKETBUFFER_FILE, 342, L"[PacketBuffer] %s, Compose overflow", L"PacketBuffer::CheckCompose");
