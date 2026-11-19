@@ -686,7 +686,7 @@ The manual work of round 3 (commits 27d5420, 46fe9c1, beb4669 and later). The pa
 
 ## scd-4
 
-SmartCouponDaemon 582 -> 603 MATCH (+21). Other exes +0, MATCH lost 0.
+SmartCouponDaemon 582 -> 608 MATCH (+26). Other exes +0, MATCH lost 0.
 
 ### A. What worked (26 MATCH)
 

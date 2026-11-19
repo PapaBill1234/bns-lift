@@ -55,7 +55,7 @@ bool RetrievePublicationContext::AddPublicationInfo(PublicationInfo const* info)
                        L"failed to realloc publication list, maxCount:%d, itemCount:%d", _maxCount, _count);
             return false;
         }
-        _maxCount <<= 1;  // LIFT: shift form. The orig has "shl dword ptr [rbx+0xc], 1" (0x10a97).
+        _maxCount <<= 1;  // LIFT: shift form. The orig has "shl dword ptr [rbx+0xc], 1" (0x10971).
         _publicationList = list;
     }
     _publicationList[_count] = *info;
@@ -282,7 +282,7 @@ bool SmartCouponDB::ProcessCharacterGameEventLog(int* dbRetValue, long long game
         return false;
     }
     int result;
-    do  // LIFT: do-while form. The orig has one Fetch site (0x13cb5); a for (;;) rotated the loop.
+    do  // LIFT: do-while form. The orig has one Fetch site (0x11da7); a for (;;) rotated the loop.
     {
         memset(&publicationInfo, 0, sizeof(publicationInfo));
         result = tran.Tran->Fetch(0);  // LIFT: Fetch (0x21180) never reads edx; no call site sets it
@@ -373,7 +373,7 @@ bool SmartCouponDB::ProcessAccountGameEventLog(int* dbRetValue, long long gameEv
             return false;
         }
         int result;
-        do  // LIFT: do-while form. The orig has one Fetch site (0x13cb5); a for (;;) rotated the loop.
+        do  // LIFT: do-while form. The orig has one Fetch site (0x12677); a for (;;) rotated the loop.
         {
             memset(&publicationInfo, 0, sizeof(publicationInfo));
             result = tran.Tran->Fetch(0);  // LIFT: Fetch (0x21180) never reads edx; no call site sets it
@@ -577,7 +577,7 @@ bool SmartCouponDB::LoadGameEventLogList(int* dbRetValue, RetrieveEventLogContex
             return false;
         }
         int result;
-        do  // LIFT: do-while form. The orig has one Fetch site (0x13cb5); a for (;;) rotated the loop.
+        do  // LIFT: do-while form. The orig has one Fetch site (0x138fd); a for (;;) rotated the loop.
         {
             memset(&eventLogInfo, 0, sizeof(eventLogInfo));
             result = tran.Tran->Fetch(0);  // LIFT: Fetch (0x21180) never reads edx; no call site sets it
@@ -720,7 +720,7 @@ bool SmartCouponDB::LoadSingleCouponPublication(int* dbRetValue, long long publi
             return false;
         }
         int result;
-        do  // LIFT: do-while form. The orig has one Fetch site (0x13cb5); a for (;;) rotated the loop.
+        do  // LIFT: do-while form. The orig has one Fetch site (0x14225); a for (;;) rotated the loop.
         {
             memset(&publicationInfo, 0, sizeof(publicationInfo));
             result = tran.Tran->Fetch(0);  // LIFT: Fetch (0x21180) never reads edx; no call site sets it
@@ -801,7 +801,7 @@ bool SmartCouponDB::LoadRetryReadyGameEventLogList(int* dbRetValue, RetrieveEven
             return false;
         }
         int result;
-        do  // LIFT: do-while form. The orig has one Fetch site (0x13cb5); a for (;;) rotated the loop.
+        do  // LIFT: do-while form. The orig has one Fetch site (0x148cd); a for (;;) rotated the loop.
         {
             memset(&eventLogInfo, 0, sizeof(eventLogInfo));
             result = tran.Tran->Fetch(0);  // LIFT: Fetch (0x21180) never reads edx; no call site sets it

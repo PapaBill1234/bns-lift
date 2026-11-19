@@ -20,7 +20,7 @@ Card: SCD DB loaders, DChannelMgr, EventNotiJob, handlers. Goal: SCD 90 % (603 M
 | 3f572fa | +6 | do-while DB loaders, int params |
 | 4a4f013 | +2 | loadUnhandledGameEventLog count local, CouponJob::transit else-if, retry failReason char |
 | a7addcc | +2 | GameEventLogEvent::HandleEvent switch + posted info copy; NPTransactionRegistry::Register |
-| repair 2 (last commit on the branch) | +5 | EventNotiJob Initialize, eventNotiReq, eventNotiRes; NPServiceChannelCmdDispatcher; GameEventConfig::Load |
+| 9252396 (repair 2) | +5 | EventNotiJob Initialize, eventNotiReq, eventNotiRes; NPServiceChannelCmdDispatcher; GameEventConfig::Load |
 
 ## DIFF functions left (SCD, 59)
 
@@ -48,7 +48,6 @@ Tries = tries in this card. "Out of scope" = not in the card list (crypto, Blood
 | RsaPublic::Setup | 90.2 | consts | Not analysed | Out of scope, 0 tries |
 | OaepEncoder::Setup | 90.3 | calls,consts | Not analysed | Out of scope, 0 tries |
 | BigInteger::mul (static) | 90.9 | consts | Not analysed | Out of scope, 0 tries |
-| GameEventConfig::SetupGameEventListFromXml | 99.7 | calls | The orig 137 block (0x3144) calls NextElement itself and jumps to the loop test (0x31b2). The other paths share the call at 0x31a9. VS2010 merges our 2 call sites into 1 | 4 tries (block order + inline wcslen 99.x; while loop: unrolled; pointer-step loop 99.7; `continue` in the 137 block 99.7), kept 99.7 |
 | Rsa::decrypt | 91.7 | calls,refs | Not analysed | Out of scope, 0 tries |
 | aes128TableSetupDecKey | 91.7 | consts | Not analysed | Out of scope, 0 tries |
 | NPServiceChannelManager::HandleMessage | 92.3 | consts | Not analysed | Card rule: do not change |
@@ -87,6 +86,7 @@ Tries = tries in this card. "Out of scope" = not in the card list (crypto, Blood
 | HandleSmartCoupon_GameEventByCharacterReq | 99.1 | consts | Register allocation (rbx zero, `lea r8d,[rbx+0x7b]`) | 0 tries |
 | PacketBuffer::Decompose | 99.2 | consts | Not analysed | Out of scope, 0 tries |
 | WinServiceConsole::UninstallService | 99.5 | calls | Not analysed | Out of scope, 0 tries |
+| GameEventConfig::SetupGameEventListFromXml | 99.7 | calls | The orig 137 block (0x3144) calls NextElement itself and jumps to the loop test (0x31b2). The other paths share the call at 0x31a9. VS2010 merges our 2 call sites into 1 | 4 tries (block order + inline wcslen 99.x; while loop: unrolled; pointer-step loop 99.7; `continue` in the 137 block 99.7), kept 99.7 |
 
 ## Fixed in repair 2 (were "Not analysed")
 
@@ -110,6 +110,15 @@ Each change was checked with tools/parity.sh on all 4 exes: CG 448 -> 448, LG 62
 | src/Server/SmartCouponDaemon/GameEventWorker.cpp (card file) | `// LIFT: 0xb6e0` comment on `PublicationInfo const posted = *info;` | The copy is a source-form change for the const 0x16. It does not change the behaviour. The `// BUG: 0xbc19` note stays | SCD 0xb6e0 |
 
 Docs/Parity/lessons.md: the posted-copy row now says "codegen only; main already logged from info, not from ev".
+
+## Fixed in repair 3 (skeptic findings)
+
+| Finding | Fix | Source |
+| --- | --- | --- |
+| lessons.md said 582 -> 603 (+21) | Now 582 -> 608 (+26) | tools/parity.sh |
+| LIFT address 0x10a97 in AddPublicationInfo | Now 0x10971. 0x10a97 stays only in AddEventLogInfo | SCD exe, capstone (skeptic) |
+| LIFT Fetch address 0x13cb5 in 5 other loaders | ProcessCharacterGameEventLog 0x11da7, ProcessAccountGameEventLog 0x12677, LoadGameEventLogList 0x138fd, LoadSingleCouponPublication 0x14225, LoadRetryReadyGameEventLogList 0x148cd | SCD exe, capstone (skeptic) |
+| SetupGameEventListFromXml row out of score order | Moved after UninstallService (99.5) | handoff table |
 
 ## Gate result
 
