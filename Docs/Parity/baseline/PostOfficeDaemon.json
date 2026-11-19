@@ -2304,17 +2304,17 @@
 },
 "PacketBuffer::CheckCompose": {
 "calls": 100,
-"consts": 96,
+"consts": 100,
 "refs": 100,
-"score": 98.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "PacketBuffer::Compose": {
-"calls": 84,
-"consts": 95,
-"refs": 91,
-"score": 90.1,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "PacketBuffer::ComposeText": {
 "calls": 100,
@@ -2325,17 +2325,17 @@
 },
 "PacketBuffer::Decompose": {
 "calls": 100,
-"consts": 93,
+"consts": 100,
 "refs": 100,
-"score": 97.6,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "PacketBuffer::DecomposeText": {
-"calls": 97,
+"calls": 100,
 "consts": 100,
-"refs": 82,
-"score": 93.0,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "PacketBuffer::deallocate_me": {
 "calls": 100,
@@ -3396,10 +3396,10 @@
 },
 "RepeatPacketComposer::PushRepeatCount": {
 "calls": 100,
-"consts": 96,
+"consts": 100,
 "refs": 100,
-"score": 98.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "RepeatPacketComposer::Reset": {
 "calls": 100,
@@ -4011,11 +4011,11 @@
 "status": "MATCH"
 },
 "TextStreamPacketBufferHandler::Destroy": {
-"calls": 80,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 93.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "TextStreamPacketBufferHandler::Initialize": {
 "calls": 100,
@@ -4026,10 +4026,10 @@
 },
 "TextStreamPacketBufferHandler::ToBuffer": {
 "calls": 100,
-"consts": 89,
+"consts": 100,
 "refs": 100,
-"score": 96.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "TextStreamPacketBufferHandler::ToPacket": {
 "calls": 100,

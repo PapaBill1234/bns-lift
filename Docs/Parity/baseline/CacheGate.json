@@ -1547,18 +1547,18 @@
 "status": "MATCH"
 },
 "PacketBuffer::Compose": {
-"calls": 89,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 96.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "PacketBuffer::Decompose": {
 "calls": 100,
-"consts": 93,
+"consts": 100,
 "refs": 100,
-"score": 97.6,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "PacketBuffer::deallocate_me": {
 "calls": 100,
