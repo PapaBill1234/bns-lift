@@ -206,10 +206,10 @@ int ClientPacketBufferHandler::ToPacket(Session const* session, char const* buff
     unsigned short header = *reinterpret_cast<unsigned short const*>(buffer);
     PacketCrypt::Algorithm algorithm = static_cast<PacketCrypt::Algorithm>(header >> 14);
     unsigned int size;
-    if ((header >> 14) != 0)
-        size = 4 * (header & 0xFFF);
-    else
+    if (algorithm == PacketCrypt::ALGORITHM_DEFAULT)
         size = header & 0x3FFF;
+    else
+        size = 4 * (header & 0xFFF);
     int packetSize = 0;
     if (size > 0xFFFF)
         return -1;
@@ -217,7 +217,40 @@ int ClientPacketBufferHandler::ToPacket(Session const* session, char const* buff
         return 0;
 
     PacketCrypt* currentCrypt = session->_currentCrypt;
-    if (currentCrypt != nullptr)
+    // LIFT: 0x219A0 (LobbyGate) the handshake branch comes first. The log line numbers show this order.
+    if (currentCrypt == nullptr)
+    {
+        if (algorithm == PacketCrypt::ALGORITHM_DEFAULT)
+        {
+            Log::Write(Log::LT_ERROR, PBH_FILE, 139,
+                       L"Session(%I64X), Handshake decrypt failed, code 'plain' not acceptable", session->_id);
+            return -1;
+        }
+        if (session->_cryptMode == 2)
+        {
+            PacketCrypt* crypt =
+                static_cast<PacketCrypt*>(session->allocateCrypt(PacketCrypt::HANDSHAKE_CRYPT, algorithm));
+            mutableSession->_handshakeCrypt = crypt;
+            mutableSession->_currentCrypt = crypt;
+        }
+        PacketCrypt* crypt = session->_currentCrypt;
+        if (crypt == nullptr)
+        {
+            Log::Write(Log::LT_ERROR, PBH_FILE, 149, L"Session(%I64X), Handshake decrypt failed;cannot create crypt",
+                       session->_id);
+            return -1;
+        }
+        packetSize = bufferSize;
+        int err = crypt->Decrypt(reinterpret_cast<unsigned char*>(const_cast<char*>(buffer)), bufferSize, &packetSize,
+                                 nullptr);
+        if (err != PacketCrypt::SPCE_NO_ERROR)
+        {
+            Log::Write(Log::LT_ERROR, PBH_FILE, 156, L"Session(%I64X), Handshake decrypt failed, error-code:%d",
+                       session->_id, err);
+            return -1;
+        }
+    }
+    else
     {
         int cryptMode = session->_cryptMode;
         bool with3rdParty = false;
@@ -256,38 +289,6 @@ int ClientPacketBufferHandler::ToPacket(Session const* session, char const* buff
                            L"Session(%I64X), Session 3rd party decrypt failed, error-code: %d", session->_id, err3rd);
                 return -1;
             }
-        }
-    }
-    else
-    {
-        if (algorithm == PacketCrypt::ALGORITHM_DEFAULT)
-        {
-            Log::Write(Log::LT_ERROR, PBH_FILE, 139,
-                       L"Session(%I64X), Handshake decrypt failed, code 'plain' not acceptable", session->_id);
-            return -1;
-        }
-        if (session->_cryptMode == 2)
-        {
-            PacketCrypt* crypt =
-                static_cast<PacketCrypt*>(session->allocateCrypt(PacketCrypt::HANDSHAKE_CRYPT, algorithm));
-            mutableSession->_handshakeCrypt = crypt;
-            mutableSession->_currentCrypt = crypt;
-        }
-        PacketCrypt* crypt = session->_currentCrypt;
-        if (crypt == nullptr)
-        {
-            Log::Write(Log::LT_ERROR, PBH_FILE, 149, L"Session(%I64X), Handshake decrypt failed;cannot create crypt",
-                       session->_id);
-            return -1;
-        }
-        packetSize = bufferSize;
-        int err = crypt->Decrypt(reinterpret_cast<unsigned char*>(const_cast<char*>(buffer)), bufferSize, &packetSize,
-                                 nullptr);
-        if (err != PacketCrypt::SPCE_NO_ERROR)
-        {
-            Log::Write(Log::LT_ERROR, PBH_FILE, 156, L"Session(%I64X), Handshake decrypt failed, error-code:%d",
-                       session->_id, err);
-            return -1;
         }
     }
     if (packet != nullptr)
