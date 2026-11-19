@@ -9,6 +9,7 @@ Usage: tools/pdbq.py <Server> <command> <pattern> [...]
   enumv <regex>   enumerator name -> enum type and value
   udt   <regex>   typedef names (S_UDT)
   line  <hex rva> source file and line of an address (rva = address - image base)
+  lines <lo> <hi> all line entries in the rva range [lo, hi): rva, source file, line (the source shape)
   src   <regex>   source files of a module (use it to find the file of a module)
 
 The tool reads text dumps from llvm-pdbutil. It keeps them in ~/.cache/bns-lift/pdbq/.
@@ -312,6 +313,27 @@ def cmd_line(server, pat):
         print("0x%X: %s:%d  [%s]  (entry at 0x%X)" % (rva, best[1], best[2], best[3], best[0]))
 
 
+def cmd_lines(server, lo, hi):
+    lo, hi, secs = int(lo, 16), int(hi, 16), sections(server)
+    fil, seg, out = None, 0, set()
+    for l in dump(server, "lines"):
+        m = re.match(r"^(\S.*) \(MD5: ", l)
+        if m:
+            fil = m.group(1).rsplit("\\", 1)[-1]
+            continue
+        m = re.match(r"^\s+(\d+):([0-9A-F]+)-([0-9A-F]+), line/addr", l)
+        if m:
+            seg = int(m.group(1))
+            continue
+        if seg and seg < len(secs):
+            for ln, off in re.findall(r"(\d+) ([0-9A-F]{8})", l):
+                a = secs[seg] + int(off, 16)
+                if lo <= a < hi:
+                    out.add((a, fil, int(ln)))
+    for a, f, ln in sorted(out):
+        print("0x%X %s:%d" % (a, f, ln))
+
+
 def cmd_src(server, pat):
     r = re.compile(pat, re.I)
     mod = None
@@ -332,6 +354,11 @@ def main():
     f = globals().get("cmd_" + cmd)
     if f is None:
         sys.exit(__doc__)
+    if cmd == "lines":
+        if len(sys.argv) != 5:
+            sys.exit(__doc__)
+        f(server, sys.argv[3], sys.argv[4])
+        return
     for p in sys.argv[3:]:
         f(server, p)
 

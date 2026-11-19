@@ -685,13 +685,8 @@ __declspec(noinline) bool PipeConsole::addNode(ItemList& list, wchar_t const* ke
         return false;
     wcsncpy_s(node->_key, 129, keyString, 128);
     node->_key[128] = 0;
-#if defined(LIFT_EXE_LG)
-    // LIFT: per-exe form, LG 0x2a6d0 copies valueString. The LG build has a newer source.
+    // LIFT: LTCG folds the L"" argument in CG/SCD/POD (CG 0x15ed0); LG 0x2a6d0 shows the copy.
     wcsncpy_s(node->_value, 129, valueString, 128);
-#else
-    // BUG: 0x15ed0 valueString is not used; the value is always L"".
-    wcsncpy_s(node->_value, 129, L"", 128);
-#endif
     node->_value[128] = 0;
     node->_prev = &list._head;
     node->_next = list._head._next;

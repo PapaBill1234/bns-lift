@@ -35,6 +35,13 @@ Turns: 95
 | `WorldConfigManager::setupWorldConfigList` | POD | 98.6 | refs 96 | not examined | time |
 | `WorldConfigManager::updateWorldList` | POD | 80.2 | calls 69, refs 86 | block layout (D) | time |
 
+## Repair 2 (skeptic findings)
+- `PipeConsole::addNode`: one source form in all 4 exes. It copies `valueString`. The per-exe form and the `// BUG:` mark are removed.
+  All 4 PDBs give the same lines (841-859) and the same source file. LTCG folds the `L""` argument in CG/SCD/POD (CG 0x15ed0).
+- `tools/pdbq.py <EXE> lines <lo> <hi>`: new tracked command for the PDB line map. It replaces the untracked `.scratch/lines.py`.
+- `IdleStateTable::scan`: the `// LIFT:` comment names LobbyGate with the address.
+- `Docs/Parity/lessons.md` A25 and `## console-4`: the constant-folding cause replaces the false "newer source" claim.
+
 ## ❓
 - None new.
 
@@ -42,4 +49,4 @@ Turns: 95
 - None.
 
 ## Gate result
-- `tools/gate.sh`: gate ok. `tools/parity.sh`: parity ok, no MATCH lost, on the final source (48df214). Docs only after that run.
+- `tools/gate.sh`: gate ok. `tools/parity.sh`: parity ok, no MATCH lost, on the final source after repair 2.

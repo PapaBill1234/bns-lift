@@ -311,7 +311,7 @@ Section E (perexe-3) and the round-3 stage notes are merged into A to D. Section
 
 
 ### A25. PDB line maps give the source shape (console-4): 12
-- Read the PDB line map of the original before a source change: `LIFT_IDA_DIR=... python3 .scratch/lines.py <EXE> <lo> <hi>`.
+- Read the PDB line map of the original before a source change: `LIFT_IDA_DIR=... tools/pdbq.py <EXE> lines <lo> <hi>` (hex rva).
   The line numbers show the number of statements, the exits and the order of the blocks.
 - One exit block per lookup (`InitSymbol`, CG 0x7de0; 4). The PDB gives one line per `GetProcAddress` and puts `FreeLibrary` on the last
   lookup line. Write one `if (... == nullptr) { FreeLibrary; return false; }` per lookup. VS2010 merges the blocks. A single `||` chain fails (B).
@@ -322,8 +322,10 @@ Section E (perexe-3) and the round-3 stage notes are merged into A to D. Section
 - Match-node search with a list reference (LG `PipeConsole::SetRunningInfo` 0x2A5A0; 1). `ItemList& list = _running; ItemNode* node = nullptr;`
   and `node = item; break;` on a match. The loop end needs no null test, and the tail address comes from the list address.
 - An `if / else if` chain where the PDB lines give it (LG `IdleStateTable::scan` 0x24E8C, lines 154, 158, 169; 1). The `switch` gave another shape.
-- Per-exe source version (LG `PipeConsole::addNode` 0x2a6d0; 1). LG copies `valueString`. CG, SCD and POD copy `L""` (`// BUG:`).
-  Compare the same function in all 4 exes before you write `BUG:`. Use `#if defined(LIFT_EXE_LG)` (A22).
+- Constant folding, not a per-exe source (LG `PipeConsole::addNode` 0x2a6d0; 1). `addNode` is the same source in all 4 exes (PDB lines 841-859).
+  LTCG folds the `L""` argument in CG/SCD/POD. Keep one source form that copies `valueString`.
+  Check for constant folding before you add a per-exe form or a `// BUG:` mark.
+  Compare the same function and its callers in all 4 exes before you write `BUG:`.
 
 ## B. Patterns that did not work (do not try again without a new idea)
 - `!wcscmp(...)` or `int r = wcscmp(...)` to keep the -1/0/1 value (`PipeCommandProcess::processCommand`).
@@ -637,11 +639,12 @@ Card lift-parity-console-4 (PipeConsole, CrashHandler, config). MATCH +12 over m
 | `DaemonConfig::Dump` | SCD | PDB const pointer `LOCALHOST_IP` in `_Def` | +1 |
 | `PipeConsole::SetRunningInfo` | LG | match-node search, list reference | +1 |
 | `IdleStateTable::scan` | LG | `if / else if` chain from the PDB lines | +1 |
-| `PipeConsole::addNode` | LG | per-exe: copy `valueString` | +1 |
+| `PipeConsole::addNode` | LG | one form: copy `valueString` (LTCG folds `L""` in CG/SCD/POD) | +1 |
 
 What worked:
-- The PDB line maps (`lines.py`) and the PDB data symbols gave every win. Read them first.
-- Compare one function in all 4 exes. LG has a newer `addNode` than the other 3 exes.
+- The PDB line maps (`tools/pdbq.py <EXE> lines`) and the PDB data symbols gave every win. Read them first.
+- Compare one function in all 4 exes. `addNode` is the same source in all 4 exes. LTCG folds the `L""` argument in CG/SCD/POD.
+  Check for constant folding before you add a per-exe form or a `// BUG:` mark.
 
 What failed:
 - `wcscmp` `sbb` form, CG `_Def` RTTI neighbour, `ID128_GUID_ZERO` reload, LG `addNode` inline (see B).
