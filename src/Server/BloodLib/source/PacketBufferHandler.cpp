@@ -437,14 +437,15 @@ int TextStreamPacketBufferHandler::ToBuffer(Session const* session, char* buffer
                                             char const** sendBuffer)
 {
     // The packet is [size][chars][text]. Bit 0x8000 of size marks a packet that is already converted.
-    wchar_t* header = reinterpret_cast<wchar_t*>(const_cast<char*>(packet));
+    // LIFT: 0x2C805 (PostOfficeDaemon) the size is a signed short. The flag store uses 0xFFFF8000.
+    short* header = reinterpret_cast<short*>(const_cast<char*>(packet));
     char* out = reinterpret_cast<char*>(header + 1);
     if ((*header & 0x8000) == 0)
     {
         if (*reinterpret_cast<short*>(out) >= 4000)
             return -1;
         WCHAR Destination[4000];
-        wcsncpy(Destination, header + 2, *reinterpret_cast<short*>(out));
+        wcsncpy(Destination, reinterpret_cast<wchar_t*>(header + 2), *reinterpret_cast<short*>(out));
         long long n = *reinterpret_cast<short*>(out);
         Destination[n] = 0;
         wcsncat(Destination, delimiter, 4000 - n);
@@ -453,7 +454,7 @@ int TextStreamPacketBufferHandler::ToBuffer(Session const* session, char* buffer
                             bufferSize + static_cast<int>(reinterpret_cast<long long>(buffer)) -
                                 static_cast<int>(reinterpret_cast<long long>(out)),
                             nullptr, nullptr);
-        *header |= 0x8000;
+        *header |= static_cast<short>(0x8000);
     }
     if (sendBuffer != nullptr)
         *sendBuffer = out;
