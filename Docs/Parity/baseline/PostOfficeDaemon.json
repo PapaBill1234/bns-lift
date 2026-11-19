@@ -513,16 +513,16 @@
 "BnsCommonConfig::LoadBnsCommonConfig": {
 "calls": 100,
 "consts": 100,
-"refs": 97,
-"score": 99.1,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "BnsCommonConfig::ReloadBnsCommonConfig": {
 "calls": 100,
 "consts": 100,
-"refs": 97,
-"score": 98.9,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "BnsCommonConfig::UpdateAllVariable": {
 "calls": 100,
@@ -618,16 +618,16 @@
 "CacheGateSessionHandler::OnClose": {
 "calls": 100,
 "consts": 100,
-"refs": 91,
-"score": 97.1,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "CacheGateSessionHandler::OnConnect": {
 "calls": 100,
 "consts": 100,
-"refs": 97,
-"score": 98.9,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "CacheGateSessionHandler::PacketHandler": {
 "calls": 100,
@@ -1703,9 +1703,9 @@
 "HandlePostOfficeServiceCheckPostCapacityReq": {
 "calls": 100,
 "consts": 100,
-"refs": 97,
-"score": 99.1,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "HandlePostOfficeServiceHelloReq": {
 "calls": 100,
@@ -2493,9 +2493,9 @@
 },
 "PingGenerator::sendPing": {
 "calls": 100,
-"consts": 93,
+"consts": 100,
 "refs": 98,
-"score": 97.0,
+"score": 99.2,
 "status": "DIFF"
 },
 "PingRelayContext::ComposeRequestPacket": {
@@ -2921,22 +2921,22 @@
 "PostInfo::PostInfo": {
 "calls": 100,
 "consts": 100,
-"refs": 67,
-"score": 88.9,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "PostOfficeDB::LoadPostList": {
-"calls": 97,
-"consts": 99,
+"calls": 98,
+"consts": 100,
 "refs": 99,
-"score": 98.3,
+"score": 99.1,
 "status": "DIFF"
 },
 "PostOfficeDB::LoadRetryReadyPostList": {
-"calls": 97,
+"calls": 98,
 "consts": 100,
 "refs": 99,
-"score": 98.6,
+"score": 99.1,
 "status": "DIFF"
 },
 "PostOfficeDB::LoadRetryReadySinglePost": {

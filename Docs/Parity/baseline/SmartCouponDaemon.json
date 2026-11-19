@@ -443,16 +443,16 @@
 "BnsCommonConfig::LoadBnsCommonConfig": {
 "calls": 100,
 "consts": 100,
-"refs": 97,
-"score": 99.1,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "BnsCommonConfig::ReloadBnsCommonConfig": {
 "calls": 100,
 "consts": 100,
-"refs": 97,
-"score": 98.9,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "BnsCommonConfig::UpdateAllVariable": {
 "calls": 100,
