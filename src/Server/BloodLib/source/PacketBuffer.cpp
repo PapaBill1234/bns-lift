@@ -262,9 +262,16 @@ unsigned short PacketBuffer::Decompose(char const* buffer, unsigned int count, c
 {
     char const* p = buffer;
     char const* end = buffer + count;
-    for (unsigned long long i = 0; i < fmtCount && format[i] != '\0'; ++i)
+    // LIFT: 0x12320 (CacheGate) uses strlen when fmtCount is 0.
+    if (fmtCount == 0)
+        fmtCount = strlen(format);
+    // LIFT: 0x12320 (CacheGate) walks the format with a pointer. The index check is at the top of the body.
+    for (char const* f = format; *f != '\0'; ++f)
     {
-        switch (format[i])
+        if (static_cast<unsigned long long>(f - format) >= fmtCount)
+            break;
+        // LIFT: 0x12646 (CacheGate) the error tails come in the order s, K/b, P. The source order of the cases is the same.
+        switch (*f)
         {
         case ';':
             break;
@@ -278,6 +285,35 @@ unsigned short PacketBuffer::Decompose(char const* buffer, unsigned int count, c
             *va_arg(args, short*) = *reinterpret_cast<short const*>(p);
             p += 2;
             break;
+        case 's':
+        {
+            if (end < p + 2)
+                goto decompose_overflow;
+            char const* src = p + 2;
+            short len = *reinterpret_cast<short const*>(p);
+            wchar_t* dest = va_arg(args, wchar_t*);
+            short destSize = static_cast<short>(va_arg(args, int));
+            *dest = L'\0';
+            if (len < 0)
+            {
+                Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 421, L"length underflow");
+                return 0;
+            }
+            if (destSize < len + 1)
+            {
+                Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 426, L"string buffer is too small");
+                return 0;
+            }
+            p = src + len * sizeof(wchar_t);
+            if (end < p)
+            {
+                Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 431, L"length overflow");
+                return 0;
+            }
+            memcpy(dest, src, len * sizeof(wchar_t));
+            dest[len] = L'\0';
+            break;
+        }
         case 'K':
         case 'b':
         {
@@ -297,7 +333,7 @@ unsigned short PacketBuffer::Decompose(char const* buffer, unsigned int count, c
                 Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 458, L"not enough buffer");
                 return 0;
             }
-            p += size + 2;
+            p = src + size;
             if (end < p)
             {
                 Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 463, L"buffer overflow");
@@ -381,37 +417,8 @@ unsigned short PacketBuffer::Decompose(char const* buffer, unsigned int count, c
             *va_arg(args, long long*) = *reinterpret_cast<long long const*>(p);
             p += 8;
             break;
-        case 's':
-        {
-            if (end < p + 2)
-                goto decompose_overflow;
-            char const* src = p + 2;
-            short len = *reinterpret_cast<short const*>(p);
-            wchar_t* dest = va_arg(args, wchar_t*);
-            short destSize = static_cast<short>(va_arg(args, int));
-            *dest = L'\0';
-            if (len < 0)
-            {
-                Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 421, L"length underflow");
-                return 0;
-            }
-            if (destSize < len + 1)
-            {
-                Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 426, L"string buffer is too small");
-                return 0;
-            }
-            p += len * 2 + 2;
-            if (end < p)
-            {
-                Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 431, L"length overflow");
-                return 0;
-            }
-            memcpy(dest, src, 2 * static_cast<size_t>(len));
-            dest[len] = L'\0';
-            break;
-        }
         default:
-            Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 556, L"Unknown type %C", format[i]);
+            Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 556, L"Unknown type %C", *f);
             return 0;
         }
     }
