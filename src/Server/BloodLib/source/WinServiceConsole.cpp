@@ -318,6 +318,8 @@ bool WinServiceConsole::UninstallService(Daemon* daemon, wchar_t const* postfix)
         wcscat_s(desc, 260, (wchar_t const*)daemon);
     }
 
+    // LIFT: CG 0x17f00. The PDB gives one exit (return of a result flag) for all paths.
+    bool result = false;
     SC_HANDLE manager = OpenSCManagerW(nullptr, nullptr, SC_MANAGER_ALL_ACCESS);
     if (manager != nullptr)
     {
@@ -344,28 +346,23 @@ bool WinServiceConsole::UninstallService(Daemon* daemon, wchar_t const* postfix)
             if (DeleteService(service))
             {
                 wprintf(L"[%s] was unregistered.\n", desc);
-                CloseServiceHandle(service);
-                CloseServiceHandle(manager);
-                return true;
+                result = true;
             }
             else
             {
                 wprintf(L"DeleteService failed - %s\n", getLastErrorText(errorString, 0));
-                CloseServiceHandle(service);
-                CloseServiceHandle(manager);
-                return false;
             }
+            CloseServiceHandle(service);
         }
         else
         {
             wprintf(L"OpenService failed - %s\n", getLastErrorText(errorString, 0));
-            CloseServiceHandle(manager);
-            return false;
         }
+        CloseServiceHandle(manager);
     }
     else
     {
         wprintf(L"OpenSCManager failed - %s\n", getLastErrorText(errorString, 0));
-        return false;
     }
+    return result;
 }
