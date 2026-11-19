@@ -688,7 +688,7 @@ The manual work of round 3 (commits 27d5420, 46fe9c1, beb4669 and later). The pa
 
 SmartCouponDaemon 582 -> 603 MATCH (+21). Other exes +0, MATCH lost 0.
 
-### A. What worked (21 MATCH)
+### A. What worked (26 MATCH)
 
 | Change | MATCH |
 | --- | ---: |
@@ -698,15 +698,24 @@ SmartCouponDaemon 582 -> 603 MATCH (+21). Other exes +0, MATCH lost 0.
 | A count local before Log (loadUnhandledGameEventLog) | +1 |
 | else-if chain with one shared `return false` (CouponJob::transit tail-merge) | +1 |
 | `switch` on the target type gives the orig block order, default block first (GameEventLogEvent::HandleEvent) | +1 (with the next line) |
-| A local copy of the info before PostQueuedCompletionStatus removes the biased pointer const 0x16. It also fixes the orig bug that reads ev after the post. | (same +1) |
+| A local copy of the info before PostQueuedCompletionStatus removes the biased pointer const 0x16 (codegen only; main already logged from info, not from ev). | (same +1) |
 | NPTransactionRegistry::Register: orig alloc line 131, `if (id != nullptr)`, one `return inserted;` for both paths (the result stays in `bl`, `this` dies, `add rbx,0x10` appears) | +1 |
 | A `char` local keeps `mov bl,imm` (retry failReason) | score only |
+| Log args test the job pointer like a log macro (`job ? job->_id : 0`, -1 for type and state) (EventNotiJob Initialize, eventNotiReq, eventNotiRes) | +3 (with the 3 rows below) |
+| Compare the GUID with the ID128_GUID_ZERO global, not with 0 (EventNotiJob::Initialize) | (same +3) |
+| `switch` on err gives the orig sub chain (eventNotiRes) | (same +3) |
+| Call GetCommand again for the 270 log, as the orig does (eventNotiRes) | (same +3) |
+| Block order follows the if/else order. Invert a test to move a block. This also stops the tail merge of equal Log::Write and WriteStartLog calls (NPServiceChannelCmdDispatcher, GameEventConfig::Load) | +2 |
+| `wchar_t x[260] = {0}` gives `x[0]=0` and memset 0x206. `= {}` gives memset 0x208 (GameEventConfig::Load) | (same +2) |
+| An inline `wcslen(s) == 0` gives repne scasw and the const -1. `*s == 0` does not (SetupGameEventListFromXml) | score only |
+| A loop with a pointer step gives one table ref and the const 0x8. An index loop or a while loop unrolls (SetupGameEventListFromXml) | score only |
 
 ### B. What failed (0 MATCH)
 
 | Try | Result |
 | --- | --- |
 | goto form of the DB fetch loop | no gain |
+| SetupGameEventListFromXml: own NextElement call for the 137 block (`continue` form). VS2010 merges the 2 call sites (4 tries) | no gain, 99.7 |
 | SendRetryCouponPublicationOk const 0x71 (register allocation) | no gain |
 | HelloReq `> 0` test form | no gain |
 | RetryCouponPublicationEvent goto fail path | no change; the orig needs the read-after-post bug |

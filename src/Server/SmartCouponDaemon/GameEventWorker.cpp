@@ -415,6 +415,8 @@ bool GameEventLogEvent::HandleEvent(EventContext*, unsigned long)
         void* mem = Memory::_Manager[2]->Alloc(sizeof(SendPublicationEvent), kFile, 385);
         SendPublicationEvent* ev =
             mem ? new (mem) SendPublicationEvent(info->publicationId, info->gameAccountId, info->couponEventId) : nullptr;
+        // LIFT: 0xb6e0 the copy is a source-form change. It removes the biased pointer const 0x16.
+        // The behaviour does not change: main already logged the fields of info, not of ev.
         PublicationInfo const posted = *info;
         PostQueuedCompletionStatus(Network::iocpHandle(), 0, reinterpret_cast<ULONG_PTR>(static_cast<EventObject*>(ev)),
                                    nullptr);

@@ -43,11 +43,12 @@ void NPServiceChannelCmdDispatcher(unsigned int id, ECommand& eCmd)
         return;
     }
     NPTransactionRegistry::Item item;
-    if (registry->Find(id, &item))
-        eCmd = item.cmd;
-    else
+    // LIFT: orig 0xFD80 puts the not-found block (34) before the cmd store.
+    if (!registry->Find(id, &item))
         Log::Write(Log::LT_ERROR, NPSERVICECHANNEL_FILE, 34,
                    L"[np], [np-gameservch-tran-reg], dispatch command fail; not found, txn-id:%u", id);
+    else
+        eCmd = item.cmd;
 }
 
 // 0xFE70

@@ -162,6 +162,7 @@ bool NPTransactionRegistry::Register(ECommand cmd, void* context, unsigned int* 
         Log::Write(Log::LT_ERROR, NPCHANNEL_FILE, 211, L"[np], txn-id overflow");
     }
 
+    // LIFT: line 131 from SCD 0x1400046f2 (mov r9d,0x83) in NPTransactionRegistry::Register 0x4690, build 2019 + PDB.
     Item* item = static_cast<Item*>(Memory::_Manager[2]->Alloc(sizeof(Item), NPCHANNEL_FILE, 131));
     item->cmd = cmd;
     item->context = context;

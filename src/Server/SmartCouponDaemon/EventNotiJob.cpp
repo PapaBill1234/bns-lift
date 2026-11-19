@@ -97,7 +97,9 @@ EventNotiJob::~EventNotiJob()
 bool EventNotiJob::Initialize(id128 const* gameAccountId, int couponEventId, long long publicationId,
                               long long managementTid)
 {
-    if ((gameAccountId->id[0] | gameAccountId->id[1]) != 0 && couponEventId != 0 && publicationId != 0)
+    // LIFT: orig 0x9AE0 compares with the ID128_GUID_ZERO global (Hex-Rays folds it to 0).
+    if ((gameAccountId->id[0] != ID128_GUID_ZERO.id[0] || gameAccountId->id[1] != ID128_GUID_ZERO.id[1]) &&
+        couponEventId != 0 && publicationId != 0)
     {
         _gameAccountId = *gameAccountId;
         _couponEventId = couponEventId;
@@ -110,9 +112,11 @@ bool EventNotiJob::Initialize(id128 const* gameAccountId, int couponEventId, lon
         return true;
     }
     auto const& acc = gameAccountId->guid;
+    // LIFT: orig 0x9AE0 tests the job pointer for the id/type/state args (-1 when null), like a log macro.
+    CouponJob const* const job = this;
     Log::Write(Log::LT_ERROR, kFile, 83,
                L"[job], init fail; invalid parameter, jobid:0x%I64X, type:%d, state:%dacc:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X,  coupon-event-id:%d, publicationid:%I64d, management-tid:%I64d",
-               _id, GetDefinition()->type, _state, acc.id1, acc.id2, acc.id3, acc.id4[0], acc.id4[1], acc.id4[2],
+               job ? job->_id : 0, job ? job->GetDefinition()->type : -1, job ? job->_state : -1, acc.id1, acc.id2, acc.id3, acc.id4[0], acc.id4[1], acc.id4[2],
                acc.id4[3], acc.id4[4], acc.id4[5], acc.id4[6], acc.id4[7], couponEventId, publicationId,
                managementTid);
     return false;
@@ -196,22 +200,25 @@ bool EventNotiJob::eventNotiReq()
     NPServiceChannel* const ch = SmartCouponDaemon::_instance->_npChannelMgr->_npServChannel;
     if (ch == nullptr)
     {
+        // LIFT: orig 0xA0E0 tests the job pointer for the id/type/state args (-1 when null), like a log macro.
+        CouponJob const* const job = this;
         Log::Write(Log::LT_ERROR, kFile, 172, L"[job], event-noti req fail; npchannel is null, jobid:0x%I64X, type:%d, state:%d",
-                   _id, GetDefinition()->type, _state);
+                   job ? job->_id : 0, job ? job->GetDefinition()->type : -1, job ? job->_state : -1);
     }
-    else if (ch->SendRequestEventNoti(this, &_gameAccountId, _couponEventId, _publicationId))
-    {
-        Log::Write(Log::LT_DEBUG, kFile, 182, L"[job], event-noti req ok, jobid:0x%I64X, type:%d, state:%d", _id,
-                   GetDefinition()->type, _state);
-        return true;
-    }
-    else
+    // LIFT: orig 0xA0E0 puts the unsent block (178) before the ok block (182).
+    else if (!ch->SendRequestEventNoti(this, &_gameAccountId, _couponEventId, _publicationId))
     {
         auto const& acc = _gameAccountId.guid;
         Log::Write(Log::LT_ERROR, kFile, 178,
                    L"[job], event-noti req fail; unsent, jobid:0x%I64X, type:%d, state:%dacc:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X,  coupon-event-id:%d, publication-id:%I64d",
                    _id, GetDefinition()->type, _state, acc.id1, acc.id2, acc.id3, acc.id4[0], acc.id4[1], acc.id4[2],
                    acc.id4[3], acc.id4[4], acc.id4[5], acc.id4[6], acc.id4[7], _couponEventId, _publicationId);
+    }
+    else
+    {
+        Log::Write(Log::LT_DEBUG, kFile, 182, L"[job], event-noti req ok, jobid:0x%I64X, type:%d, state:%d", _id,
+                   GetDefinition()->type, _state);
+        return true;
     }
     if (_fromManagementDaemon)
         _managementReason = 5;
@@ -222,10 +229,13 @@ bool EventNotiJob::eventNotiReq()
 // 0xA310
 bool EventNotiJob::eventNotiRes(void* param)
 {
+    // LIFT: orig 0xA310 tests the job pointer for the id/type/state args of the 198, 238 and 270 logs
+    // (-1 when null), like a log macro.
+    CouponJob const* const job = this;
     if (param == nullptr)
     {
-        Log::Write(Log::LT_ERROR, kFile, 198, L"[job], null param, jobid:0x%I64X, type:%d, state:%d", _id,
-                   GetDefinition()->type, _state);
+        Log::Write(Log::LT_ERROR, kFile, 198, L"[job], null param, jobid:0x%I64X, type:%d, state:%d",
+                   job ? job->_id : 0, job ? job->GetDefinition()->type : -1, job ? job->_state : -1);
         transit(2);
         return true;
     }
@@ -236,9 +246,19 @@ bool EventNotiJob::eventNotiRes(void* param)
     auto const& acc = _gameAccountId.guid;
 
     bool success = status == 200 || (status == 400 && _wcsicmp(L"Success", reason ? reason : L"null") == 0);
-    if (!success && err != 5809)
+    if (!success)
     {
-        if (err != 42 && err != 5812 && err != 30002)
+        // LIFT: orig 0xA310 tests the error code as a switch (sub chain 42, 0x1687, 0x3, 0x5e7e).
+        switch (err)
+        {
+        case 5809:
+            success = true;
+            break;
+        case 42:
+        case 5812:
+        case 30002:
+            break;
+        default:
         {
             int dbRetValue = 0;
             if (!SmartCouponDB::UpdateStatusToPublicationFailure(&dbRetValue, _publicationId, &_gameAccountId,
@@ -250,19 +270,30 @@ bool EventNotiJob::eventNotiRes(void* param)
                            acc.id4[2], acc.id4[3], acc.id4[4], acc.id4[5], acc.id4[6], acc.id4[7], _couponEventId,
                            _publicationId, dbRetValue);
             }
+            break;
         }
+        }
+    }
+    if (!success)
+    {
         Log::Write(Log::LT_ERROR, kFile, 238,
                    L"[job], event-noti res fail, jobid:0x%I64X, type:%d, state:%d,np-tid:%u, cmd:%d, type:%d, status-code:%u, reason:%s, error-code:%d",
-                   _id, GetDefinition()->type, _state, res->GetTransactionId(), res->GetCommand(),
-                   res->GetMessageType(), status, reason ? reason : L"null", err);
+                   job ? job->_id : 0, job ? job->GetDefinition()->type : -1, job ? job->_state : -1,
+                   res->GetTransactionId(), res->GetCommand(), res->GetMessageType(), status,
+                   reason ? reason : L"null", err);
         if (_fromManagementDaemon)
             _managementReason = 6;
         transit(2);
         return true;
     }
 
-    int const cmd = res->GetCommand();
-    if (static_cast<unsigned int>(cmd - 2851) < 2)
+    // LIFT: orig 0xA310 calls GetCommand again for the 270 log, and puts the 270 block first.
+    if (static_cast<unsigned int>(res->GetCommand() - 2851) >= 2)
+    {
+        Log::Write(Log::LT_ERROR, kFile, 270, L"[job], invalid sts cmd, jobid:0x%I64X, type:%d, state:%dcommand:%d",
+                   job ? job->_id : 0, job ? job->GetDefinition()->type : -1, job ? job->_state : -1, res->GetCommand());
+    }
+    else
     {
         long long const* acceptTid = nullptr;
         wchar_t const* const acceptTidStr =
@@ -303,11 +334,6 @@ bool EventNotiJob::eventNotiRes(void* param)
                    GetDefinition()->type, _state);
         if (_fromManagementDaemon)
             _managementReason = 0;
-    }
-    else
-    {
-        Log::Write(Log::LT_ERROR, kFile, 270, L"[job], invalid sts cmd, jobid:0x%I64X, type:%d, state:%dcommand:%d",
-                   _id, GetDefinition()->type, _state, cmd);
     }
     transit(2);
     return true;
