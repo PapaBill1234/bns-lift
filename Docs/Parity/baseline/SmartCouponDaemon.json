@@ -211,10 +211,10 @@
 },
 "BigInteger::Mul": {
 "calls": 100,
-"consts": 50,
+"consts": 100,
 "refs": 100,
-"score": 83.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "BigInteger::Pow2": {
 "calls": 100,
@@ -252,11 +252,11 @@
 "status": "MATCH"
 },
 "BigInteger::Sqr": {
-"calls": 89,
-"consts": 75,
+"calls": 100,
+"consts": 100,
 "refs": 100,
-"score": 88.0,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "BigInteger::Sub": {
 "calls": 100,
@@ -280,11 +280,11 @@
 "status": "MATCH"
 },
 "BigInteger::expMod": {
-"calls": 95,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 98.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "BigInteger::invMod": {
 "calls": 59,
@@ -316,17 +316,17 @@
 },
 "BigInteger::mul [?mul@BigInteger@@AEAAXI@Z]": {
 "calls": 100,
-"consts": 89,
+"consts": 100,
 "refs": 100,
-"score": 96.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "BigInteger::mul [?mul@BigInteger@@CAXPEBV1@0PEAV1@@Z]": {
 "calls": 100,
-"consts": 73,
+"consts": 100,
 "refs": 100,
-"score": 90.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "BigInteger::setBit": {
 "calls": 100,
@@ -344,10 +344,10 @@
 },
 "BigInteger::sub": {
 "calls": 100,
-"consts": 86,
+"consts": 100,
 "refs": 100,
-"score": 95.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "BigInteger::~BigInteger": {
 "calls": 100,
@@ -2240,25 +2240,25 @@
 "status": "MATCH"
 },
 "OaepEncoder::Setup": {
-"calls": 80,
-"consts": 91,
+"calls": 100,
+"consts": 100,
 "refs": 100,
-"score": 90.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "OaepEncoder::decode": {
-"calls": 62,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 87.5,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "OaepEncoder::encode": {
-"calls": 88,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 96.0,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "ObjPool::Checkin": {
 "calls": 100,
@@ -2983,17 +2983,17 @@
 },
 "RsaPublic::Setup": {
 "calls": 100,
-"consts": 71,
+"consts": 100,
 "refs": 100,
-"score": 90.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "RsaPublic::~RsaPublic": {
 "calls": 100,
 "consts": 100,
-"refs": 40,
-"score": 80.0,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "STSMSGLIB_CHECK_DLL_VERSION": {
 "calls": 100,
