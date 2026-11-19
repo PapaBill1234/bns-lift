@@ -612,29 +612,34 @@ void PipeConsole::SetInvalidInfo(wchar_t const* keyString, bool isInvalid)
 void PipeConsole::SetRunningInfo(wchar_t const* keyString, wchar_t const* valueString)
 {
     _lock.Enter();
-    ItemNode* node = _running._head._next;
-    for (; node != &_running._tail; node = node->_next)
+    // LIFT: 0x2A5A0 (LobbyGate) the loop end goes to the add path with no null test. Only the match path
+    // tests the node. The tail address comes from the list address. The PDB lines put the remove (781)
+    // before wcsncpy_s (786).
+    ItemList& list = _running;
+    ItemNode* node = nullptr;
+    for (ItemNode* item = list._head._next; item != &list._tail; item = item->_next)
     {
-        if (wcscmp(node->_key, keyString) == 0)
+        if (wcscmp(item->_key, keyString) == 0)
+        {
+            node = item;
             break;
+        }
     }
-    if (node == &_running._tail)
-        node = nullptr;
     if (node == nullptr)
     {
         if (valueString != nullptr && *valueString != 0)
-            addNode(_running, keyString, valueString);
+            addNode(list, keyString, valueString);
     }
-    else if (valueString != nullptr && *valueString != 0)
-    {
-        wcsncpy_s(node->_value, 129, valueString, 128);
-        node->_value[128] = 0;
-    }
-    else
+    else if (valueString == nullptr || *valueString == 0)
     {
         node->_next->_prev = node->_prev;
         node->_prev->_next = node->_next;
         Memory::_Manager[2]->Free(node, PIPE_CONSOLE_FILE, 837);
+    }
+    else
+    {
+        wcsncpy_s(node->_value, 129, valueString, 128);
+        node->_value[128] = 0;
     }
     _lock.Leave();
 }
