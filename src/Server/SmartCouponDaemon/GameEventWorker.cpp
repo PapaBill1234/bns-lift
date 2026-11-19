@@ -365,18 +365,17 @@ bool GameEventLogEvent::HandleEvent(EventContext*, unsigned long)
     RetrievePublicationContext publicationContext(128);
     int dbRetValue = 0;
     bool dbOk;
-    if (_eventTargetType == 1)
+    switch (_eventTargetType)
     {
+    case 1:
         dbOk = SmartCouponDB::ProcessAccountGameEventLog(&dbRetValue, _gameEventLogId, &_gameAccountId, _gameEventId,
                                                          &publicationContext);
-    }
-    else if (_eventTargetType == 2)
-    {
+        break;
+    case 2:
         dbOk = SmartCouponDB::ProcessCharacterGameEventLog(&dbRetValue, _gameEventLogId, &_gameAccountId, _wid, _pcdbid,
                                                            _gameEventId, &publicationContext);
-    }
-    else
-    {
+        break;
+    default:
         Log::Write(Log::LT_ERROR, kFile, 353,
                    L"[event-log], handle event, fail, invalid target type, log-id:%I64d, acc:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X, wid:%d, pcdbid:0x%I64X, game-event-id:%d, target-type:%d",
                    _gameEventLogId, GEW_ACC_ARGS(acc), static_cast<int>(_wid), _pcdbid, _gameEventId,
@@ -416,12 +415,15 @@ bool GameEventLogEvent::HandleEvent(EventContext*, unsigned long)
         void* mem = Memory::_Manager[2]->Alloc(sizeof(SendPublicationEvent), kFile, 385);
         SendPublicationEvent* ev =
             mem ? new (mem) SendPublicationEvent(info->publicationId, info->gameAccountId, info->couponEventId) : nullptr;
+        PublicationInfo const posted = *info;
         PostQueuedCompletionStatus(Network::iocpHandle(), 0, reinterpret_cast<ULONG_PTR>(static_cast<EventObject*>(ev)),
                                    nullptr);
-        auto const& pacc = info->gameAccountId.guid;
+        // BUG: 0xbc19 the original logs the fields of ev after the post. ev can be null or already freed.
+        // This code logs a copy of the publication info.
+        auto const& pacc = posted.gameAccountId.guid;
         Log::Write(Log::LT_DEBUG, kFile, 388,
                    L"[event-log], post publication event, publication-id:%I64d, acc:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X, coupon-event-id:%d",
-                   info->publicationId, GEW_ACC_ARGS(pacc), info->couponEventId);
+                   posted.publicationId, GEW_ACC_ARGS(pacc), posted.couponEventId);
     }
     removeReferenceCount(kFile, 391);
     return true;
