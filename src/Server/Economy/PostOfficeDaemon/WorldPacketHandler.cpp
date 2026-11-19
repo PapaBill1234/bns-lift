@@ -299,7 +299,6 @@ bool HandlePostOfficeServiceCheckPostCapacityReq(Session const* session, Packet 
     unsigned short requestWid = 0;
     CacheGateChannel* cachegateChannel = nullptr;
     EconomyHeader economyHeader;
-    void* memory = nullptr;
     CheckPostCapacityRelayContext* relayContext = nullptr;
 
     requestWid = WorldChannel::GetWid(session);
@@ -354,13 +353,13 @@ bool HandlePostOfficeServiceCheckPostCapacityReq(Session const* session, Packet 
         goto $_ERROR;
     }
 
+    // LIFT: 0x2047c gets the relayTid before it reads the wids.
+    economyHeader._relayTid = liftNextRelayTid();
     economyHeader._fromWid = PostOfficeDaemon::_instance->_serviceWid;
     economyHeader._toWid = request._targetWid;
-    economyHeader._relayTid = liftNextRelayTid();
-    memory = Memory::_Manager[2]->Alloc(sizeof(CheckPostCapacityRelayContext), WORLD_PACKET_HANDLER_FILE,
-                                        258);
-    if (memory != nullptr)
-        relayContext = ::new (memory) CheckPostCapacityRelayContext(economyHeader, request);
+    relayContext = ::new (Memory::_Manager[2]->Alloc(sizeof(CheckPostCapacityRelayContext),
+                                                     WORLD_PACKET_HANDLER_FILE, 258))
+        CheckPostCapacityRelayContext(economyHeader, request);
     // BUG: 0x20250 no null check after the Alloc. A failed Alloc gives a null call.
     if (!relayContext->ProcessRelayRequest(cachegateChannel))
     {

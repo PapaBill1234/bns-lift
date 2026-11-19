@@ -98,8 +98,10 @@ class CheckPostCapacityRelayContext : public RelayContext
 {
 public:
     CheckPostCapacityRelayContext(EconomyHeader const& economyHeader, CheckPostCapacityRelayRequest const& request)
-        : RelayContext(economyHeader), _request(request)  // inlined in 0x20250
+        : RelayContext(economyHeader), _request(request),
+          _response(RelayResponse::RESULTSTATE_INVALID, 0)  // inlined in 0x20250
     {
+        // LIFT: 0x20556 stores (RESULTSTATE_INVALID, 0) in _response once.
     }
     virtual ~CheckPostCapacityRelayContext() {}  // 0x1f840 (scalar deleting dtor)
 

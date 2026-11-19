@@ -162,6 +162,16 @@ BIND_ERROR:                                                                     
     Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, bindLine, FAIL_BIND, MODULE_NAME, fn);                \
     return false
 
+inline AutoDbTran::AutoDbTran(unsigned int dbId, int timeoutSec) : Tran(Db::AllocTransaction(dbId)), TimeoutSec(10)
+{
+    if (Tran != nullptr)
+    {
+        TimeoutSec = timeoutSec;
+        SQLSetStmtAttrW(Tran->StmtHandle, SQL_QUERY_TIMEOUT,
+                        reinterpret_cast<SQLPOINTER>(static_cast<long long>(timeoutSec)), 0);
+    }
+}
+
 // 0x14e00
 AutoDbTran::~AutoDbTran()
 {
@@ -179,14 +189,12 @@ AutoDbTran::~AutoDbTran()
 bool PostOfficeDB::LoadPostList(int* dbRetValue)
 {
     wchar_t const* const fn = L"PostOfficeDB::LoadPostList";
-    AutoDbTran tran(kDbId);
+    AutoDbTran tran(kDbId, 0);
     if (tran.Tran == nullptr)
     {
         Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 29, FAIL_ACQUIRE, MODULE_NAME, fn, kDbId);
         return false;
     }
-    tran.TimeoutSec = 0;
-    SQLSetStmtAttrW(tran.Tran->StmtHandle, SQL_QUERY_TIMEOUT, nullptr, 0);
 
     wchar_t const* const query = L"{?=CALL dbo.usp_LoadPostList}";
     DbTransaction* const t = tran.Tran;
@@ -231,24 +239,29 @@ bool PostOfficeDB::LoadPostList(int* dbRetValue)
                 Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 127, FAIL_ADD_CRASH, MODULE_NAME, fn, postInfo._postId);
                 AlertSender::Write(POSTOFFICEDB_FILE, 127, FAIL_ADD_CRASH, MODULE_NAME, fn, postInfo._postId);
                 postContext->removeReferenceCount(POSTOFFICEDB_FILE, 128);
-                continue;
             }
-            postContext->removeReferenceCount(POSTOFFICEDB_FILE, 132);
-            if (!PostOfficeDaemon::_instance->_unsentPostContextManager->RegisterUnsentPost(postInfo._recipientWid,
-                                                                                          postInfo._postId, true))
+            else
             {
-                Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 135, FAIL_REGISTER_UNSENT, MODULE_NAME, fn,
-                           static_cast<unsigned int>(postInfo._recipientWid), postInfo._postId);
-                if (!postContextManager->RemoveContext(postInfo._postId))
+                postContext->removeReferenceCount(POSTOFFICEDB_FILE, 132);
+                if (!PostOfficeDaemon::_instance->_unsentPostContextManager->RegisterUnsentPost(postInfo._recipientWid,
+                                                                                              postInfo._postId, true))
                 {
-                    Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 138, FAIL_REMOVE_CRASH, MODULE_NAME, fn,
-                               postInfo._postId);
-                    AlertSender::Write(POSTOFFICEDB_FILE, 138, FAIL_REMOVE_CRASH, MODULE_NAME, fn, postInfo._postId);
+                    Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 135, FAIL_REGISTER_UNSENT, MODULE_NAME, fn,
+                               static_cast<unsigned int>(postInfo._recipientWid), postInfo._postId);
+                    if (!postContextManager->RemoveContext(postInfo._postId))
+                    {
+                        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 138, FAIL_REMOVE_CRASH, MODULE_NAME, fn,
+                                   postInfo._postId);
+                        AlertSender::Write(POSTOFFICEDB_FILE, 138, FAIL_REMOVE_CRASH, MODULE_NAME, fn,
+                                           postInfo._postId);
+                    }
                 }
             }
         }
     }
-    return *dbRetValue == 0;
+    if (*dbRetValue != 0)
+        return false;
+    return true;
 
     POST_BIND_TAIL(150);
 }
@@ -587,14 +600,12 @@ bool PostOfficeDB::LoadRetryReadySinglePost(int* dbRetValue, long long postId, l
 bool PostOfficeDB::LoadRetryReadyPostList(int* dbRetValue)
 {
     wchar_t const* const fn = L"PostOfficeDB::LoadRetryReadyPostList";
-    AutoDbTran tran(kDbId);
+    AutoDbTran tran(kDbId, 0);
     if (tran.Tran == nullptr)
     {
         Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 636, FAIL_ACQUIRE, MODULE_NAME, fn, kDbId);
         return false;
     }
-    tran.TimeoutSec = 0;
-    SQLSetStmtAttrW(tran.Tran->StmtHandle, SQL_QUERY_TIMEOUT, nullptr, 0);
 
     wchar_t const* const query = L"{?=CALL dbo.usp_LoadRetryReadyPostList}";
     DbTransaction* const t = tran.Tran;
