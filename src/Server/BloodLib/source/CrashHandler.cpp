@@ -133,26 +133,26 @@ __declspec(noinline) bool InitSymbol(SymbolFunctions* sym, wchar_t const* symbol
     if (sym->moduleHandle == nullptr)
         return false;
 
-    if ((*reinterpret_cast<FARPROC*>(&sym->symInitialize) = GetProcAddress(sym->moduleHandle, "SymInitialize")) == nullptr ||
-        (*reinterpret_cast<FARPROC*>(&sym->symCleanup) = GetProcAddress(sym->moduleHandle, "SymCleanup")) == nullptr ||
-        (*reinterpret_cast<FARPROC*>(&sym->stackWalk) = GetProcAddress(sym->moduleHandle, "StackWalk64")) == nullptr ||
-        (*reinterpret_cast<FARPROC*>(&sym->symFunctionTableAccess) =
-             GetProcAddress(sym->moduleHandle, "SymFunctionTableAccess64")) == nullptr ||
-        (*reinterpret_cast<FARPROC*>(&sym->symGetModuleBase) = GetProcAddress(sym->moduleHandle, "SymGetModuleBase64")) ==
-            nullptr ||
-        (*reinterpret_cast<FARPROC*>(&sym->symGetSymFromAddr) = GetProcAddress(sym->moduleHandle, "SymGetSymFromAddr64")) ==
-            nullptr ||
-        (*reinterpret_cast<FARPROC*>(&sym->symGetLineFromAddr) =
-             GetProcAddress(sym->moduleHandle, "SymGetLineFromAddr64")) == nullptr ||
-        (*reinterpret_cast<FARPROC*>(&sym->symGetOptions) = GetProcAddress(sym->moduleHandle, "SymGetOptions")) == nullptr ||
-        (*reinterpret_cast<FARPROC*>(&sym->symSetOptions) = GetProcAddress(sym->moduleHandle, "SymSetOptions")) == nullptr ||
-        (*reinterpret_cast<FARPROC*>(&sym->symMiniDumpWriteDump) = GetProcAddress(sym->moduleHandle, "MiniDumpWriteDump")) ==
-            nullptr)
-    {
-        FreeLibrary(sym->moduleHandle);
-        sym->moduleHandle = nullptr;
-        return false;
+    // LIFT: CG 0x7de0. The PDB gives one line per lookup and puts the unload on the last lookup line.
+    // Each lookup has its own unload block. VS2010 merges the blocks into one.
+#define CRASH_LOAD_SYMBOL_PROC(member, procName)                                              \
+    if ((*reinterpret_cast<FARPROC*>(&sym->member) = GetProcAddress(sym->moduleHandle, procName)) == nullptr) \
+    {                                                                                       \
+        FreeLibrary(sym->moduleHandle);                                                     \
+        sym->moduleHandle = nullptr;                                                        \
+        return false;                                                                       \
     }
+    CRASH_LOAD_SYMBOL_PROC(symInitialize, "SymInitialize")
+    CRASH_LOAD_SYMBOL_PROC(symCleanup, "SymCleanup")
+    CRASH_LOAD_SYMBOL_PROC(stackWalk, "StackWalk64")
+    CRASH_LOAD_SYMBOL_PROC(symFunctionTableAccess, "SymFunctionTableAccess64")
+    CRASH_LOAD_SYMBOL_PROC(symGetModuleBase, "SymGetModuleBase64")
+    CRASH_LOAD_SYMBOL_PROC(symGetSymFromAddr, "SymGetSymFromAddr64")
+    CRASH_LOAD_SYMBOL_PROC(symGetLineFromAddr, "SymGetLineFromAddr64")
+    CRASH_LOAD_SYMBOL_PROC(symGetOptions, "SymGetOptions")
+    CRASH_LOAD_SYMBOL_PROC(symSetOptions, "SymSetOptions")
+    CRASH_LOAD_SYMBOL_PROC(symMiniDumpWriteDump, "MiniDumpWriteDump")
+#undef CRASH_LOAD_SYMBOL_PROC
 
     sym->options = sym->symGetOptions() | SYMOPT_DEFERRED_LOADS | SYMOPT_LOAD_LINES;
     sym->symSetOptions(sym->options);
