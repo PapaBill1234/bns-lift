@@ -309,6 +309,16 @@ Section E (perexe-3) and the round-3 stage notes are merged into A to D. Section
 - `wchar_t buffer[40] = L"{";` (the compiler emits the `memset` for the rest; `String::GetId128FromGuidString`).
 - LG `ContentsRuleConfig::MakeListPacket` calls `FragmentPacket::FreeSize` in the option loop (0x8b1a); the opening and closing elements use the inlined check.
 
+### A25. BloodCrypto source forms (crypto-4): 38
+- `Rsa` dtor body and a non-virtual `Ripemd128` dtor (+4).
+- `BigInteger::Mul` bit-count compare, inline `completeHandshake` body, `#pragma inline_depth(0)` on `allocateCrypt` (+5).
+- `BigInteger::Sqr` bit-count compare, `inline_depth(0)`, `__forceinline` helpers (+3).
+- `RsaPublic::Setup` / `RsaPrivate::Setup`: `if` form and `% 64` (+4).
+- `sub`: one index and a `long long` borrow. `mul`: comba loop on 32-bit words with a 64-bit carry (+9).
+- `expMod`: `M1 = M[1]`, no explicit `memset`, odd-modulus block with its own `return` (+3).
+- `BigInteger::Divide(uint)`: table search as a `for` loop with `break`. The compiler then does not peel the first compare (LG +1).
+- `OaepEncoder` `Setup`/`encode`/`decode`: call `_hash.Size()` again at each use, as the original does. Test `&_hash` for null in `Setup` (+9: LG, SCD, POD x3).
+
 ## B. Patterns that did not work (do not try again without a new idea)
 - `!wcscmp(...)` or `int r = wcscmp(...)` to keep the -1/0/1 value (`PipeCommandProcess::processCommand`).
 - Body of `removeReferenceCount` in the header, `inline`, or `__declspec(noinline)` (all 4 exes lose MATCH: CG -2, LG -2, POD -1).
@@ -347,6 +357,12 @@ Section E (perexe-3) and the round-3 stage notes are merged into A to D. Section
   - An explicit `Packet::Allocate` in LG `Client::Send*` (the allocator then inlined).
   - SCD DB loaders with all columns inline: the original inlines only column 1 (dbbind-3).
   - LG `ClientManager::BroadcastAnnounceNotify` branch swap: no gain (97.8 came from A17).
+
+- crypto-4 (do not try again without a new idea):
+  - Remove `__declspec(noinline)` from `RightShift`: `LeftShift` loses its tail-jump MATCH and `invMod` loses score.
+  - `#pragma inline_depth(0)` on `LeftShift`: no gain.
+  - `expMod` with one exit (`if/else`): one extra `memset` stays.
+  - `Rsa::decrypt` zero fill (LG 0x52de0, 91.7): pointer byte loop, `while (c < blockSize)` with a hoisted size, `buf` at function scope. VS2010 makes a `memset` each time. The original keeps a byte loop.
 
 ## C. Tool and build facts
 ### C1. funcdiff reads a vtable ref as a string (FIXED in lift-parity-tool-2)
@@ -603,3 +619,18 @@ The manual work of round 3 (commits 27d5420, 46fe9c1, beb4669 and later). The pa
   The CacheGate build gives the `SessionRecvBuffer` table in
   `Session::initialize` a second name, `CrashHandler`. Use the
   name that the two PDBs share. See fix 10 in [noise.md](noise.md).
+
+## crypto-4
+
+| Result | Count |
+| --- | ---: |
+| MATCH gain (LG +16, SCD +11, POD +11, CG +0) | 38 |
+| MATCH lost | 0 |
+| Working forms (A25) | 8 |
+| Failed forms (B, crypto-4) | 4 |
+
+- Worked: copy the call pattern of the original. Call a virtual getter at each use. Use the loop form of the original (`for` with `break`). Use the word size of the original in `sub`/`mul`.
+- Worked: `#pragma inline_depth(0)` on one caller when the original calls a helper out of line.
+- Failed: VS2010 changes a zero-fill byte loop into `memset`. No source form kept the byte loop.
+- Failed: `noinline` on one helper changes the inline choice in other callers. Check all callers after each change.
+- Open: big `BigInteger::Divide` (76.7), `invMod` (83.1), `InvMod` (89.7), `IsPrime`, `isPrimeMR`, `Crypto::Create`, DH and `BroadcastCrypt`. See the crypto-4 handoff.
