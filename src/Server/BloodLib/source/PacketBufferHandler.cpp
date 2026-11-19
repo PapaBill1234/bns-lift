@@ -102,14 +102,17 @@ PacketBufferHandler* RawPacketBufferHandler::Clone(void* buffer) const
 // 0x217A0 (SmartCouponDaemon)
 void RawPacketBufferHandler::Destroy(void* buffer)
 {
-    if (buffer != nullptr)
+    // LIFT: Destroy (RawPacketBufferHandler) the original tests a null buffer first and ends with a tail call to Free.
+    if (buffer == nullptr)
+    {
+        if (this != nullptr)
+            this->~RawPacketBufferHandler();
+        Memory::_Manager[2]->Free(this, PBH_FILE, 367);
+    }
+    else
     {
         this->~RawPacketBufferHandler();
-        return;
     }
-    if (this != nullptr)
-        this->~RawPacketBufferHandler();
-    Memory::_Manager[2]->Free(this, PBH_FILE, 367);
 }
 
 // 0x14AA0 (SmartCouponDaemon) folded with Console::Flush
@@ -334,14 +337,17 @@ PacketBufferHandler* TextStreamPacketBufferHandler::Clone(void* buffer) const
 // 0x2C4A0 (PostOfficeDaemon)
 void TextStreamPacketBufferHandler::Destroy(void* buffer)
 {
-    if (buffer != nullptr)
+    // LIFT: Destroy (TextStreamPacketBufferHandler) the original tests a null buffer first and ends with a tail call to Free.
+    if (buffer == nullptr)
+    {
+        if (this != nullptr)
+            this->~TextStreamPacketBufferHandler();
+        Memory::_Manager[2]->Free(this, PBH_FILE, 254);
+    }
+    else
     {
         this->~TextStreamPacketBufferHandler();
-        return;
     }
-    if (this != nullptr)
-        this->~TextStreamPacketBufferHandler();
-    Memory::_Manager[2]->Free(this, PBH_FILE, 254);
 }
 
 // 0x2C560 (PostOfficeDaemon)
