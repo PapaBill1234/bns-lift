@@ -309,6 +309,22 @@ Section E (perexe-3) and the round-3 stage notes are merged into A to D. Section
 - `wchar_t buffer[40] = L"{";` (the compiler emits the `memset` for the rest; `String::GetId128FromGuidString`).
 - LG `ContentsRuleConfig::MakeListPacket` calls `FragmentPacket::FreeSize` in the option loop (0x8b1a); the opening and closing elements use the inlined check.
 
+
+### A25. PDB line maps give the source shape (console-4): 12
+- Read the PDB line map of the original before a source change: `LIFT_IDA_DIR=... python3 .scratch/lines.py <EXE> <lo> <hi>`.
+  The line numbers show the number of statements, the exits and the order of the blocks.
+- One exit block per lookup (`InitSymbol`, CG 0x7de0; 4). The PDB gives one line per `GetProcAddress` and puts `FreeLibrary` on the last
+  lookup line. Write one `if (... == nullptr) { FreeLibrary; return false; }` per lookup. VS2010 merges the blocks. A single `||` chain fails (B).
+- One result exit (`WinServiceConsole::UninstallService`, CG 0x17f00; 4). The PDB gives one `return` for all paths. Use `bool result = false;`,
+  set it on success, call each `CloseServiceHandle` once after its block. VS2010 then duplicates the tails as in the original.
+- A PDB const pointer in a table initializer (SCD `DaemonConfig::Dump`; 1). `static wchar_t const* const LOCALHOST_IP = L"127.0.0.1";`
+  (SmartCouponConfig.obj data symbol). The `_Def` initializer reads the pointer value, so the table goes to `.data`, as in the original.
+- Match-node search with a list reference (LG `PipeConsole::SetRunningInfo` 0x2A5A0; 1). `ItemList& list = _running; ItemNode* node = nullptr;`
+  and `node = item; break;` on a match. The loop end needs no null test, and the tail address comes from the list address.
+- An `if / else if` chain where the PDB lines give it (LG `IdleStateTable::scan` 0x24E8C, lines 154, 158, 169; 1). The `switch` gave another shape.
+- Per-exe source version (LG `PipeConsole::addNode` 0x2a6d0; 1). LG copies `valueString`. CG, SCD and POD copy `L""` (`// BUG:`).
+  Compare the same function in all 4 exes before you write `BUG:`. Use `#if defined(LIFT_EXE_LG)` (A22).
+
 ## B. Patterns that did not work (do not try again without a new idea)
 - `!wcscmp(...)` or `int r = wcscmp(...)` to keep the -1/0/1 value (`PipeCommandProcess::processCommand`).
 - Body of `removeReferenceCount` in the header, `inline`, or `__declspec(noinline)` (all 4 exes lose MATCH: CG -2, LG -2, POD -1).
@@ -347,6 +363,12 @@ Section E (perexe-3) and the round-3 stage notes are merged into A to D. Section
   - An explicit `Packet::Allocate` in LG `Client::Send*` (the allocator then inlined).
   - SCD DB loaders with all columns inline: the original inlines only column 1 (dbbind-3).
   - LG `ClientManager::BroadcastAnnounceNotify` branch swap: no gain (97.8 came from A17).
+- console-4 (do not try again without a new idea):
+  - `PipeConsole::processCommand`, `PipeCommandProcess::processCommand`: `wcscmp` result in the `sbb` form (2 forms more, no gain).
+  - CG `DaemonConfig::Dump` and `_Def` (97.9): the original has RTTI data next to `_Def`. We build with `/GR-`. The A25 const pointer form gave 0.
+  - SCD, POD `ReloadBnsCommonConfig` (98.9), `LoadBnsCommonConfig` (99.1): the original reloads `ID128_GUID_ZERO` before each qword store.
+    VS2010 merges the loads in our build. `const`, the init list and per-qword copies did not change it.
+  - LG `PipeConsole::addNode` without `noinline` (LG only): `LobbyD::Hello` 91.5 -> 78.9, `OnClose` 93.8 -> 81.7. Reverted.
 
 ## C. Tool and build facts
 ### C1. funcdiff reads a vtable ref as a string (FIXED in lift-parity-tool-2)
@@ -410,7 +432,7 @@ Solved in round 3 and removed: closed crypto libraries (A3), `Port::Initialize` 
 - `_instance` reload in LG `KickNotify`, `CloseSessionNotify`.
 - `Session::SendV` (CG 0xfaa0): the orig `Compose` call has the const 0xf9e twice; ours once. Not checked in the disassembly.
 - `SessionSendBuffer::clearPacketBufferList` x4: orig calls `RefCntHistory::add`. A global `noinline` lost MATCH (B); `inline_depth(1)` had no effect.
-- `IoWorker::run` x4 (84.9), `Network::Clear` x4 (97.2), `InitSymbol` x4 (98.0), `PipeConsole::processCommand` x4, `PipeCommandProcess::processCommand` x4.
+- `IoWorker::run` x4 (84.9), `Network::Clear` x4 (97.2), `PipeConsole::processCommand` x4, `PipeCommandProcess::processCommand` x4.
 - DB loaders (dbbind-3): SCD `SmartCouponDB::Load*`/`Process*` 95.0 to 97.8: ours has one more `DbTransaction::Fetch`, consts 0x2/0x3/0x5 (column index), one more `L"db"` ref.
   POD 0x14e50 98.3, 0x190f0 98.6: rotated fetch loop (one more `memset, memset, Fetch`), const 0x23 missing.
   POD 0x15fa0 88.4, 0x18010 88.8: orig merges the 17 `statmentErrorLog` calls into one site and logs "Not initialized" before the binds. POD `RegisterPost` 84.0 not examined.
@@ -603,3 +625,25 @@ The manual work of round 3 (commits 27d5420, 46fe9c1, beb4669 and later). The pa
   The CacheGate build gives the `SessionRecvBuffer` table in
   `Session::initialize` a second name, `CrashHandler`. Use the
   name that the two PDBs share. See fix 10 in [noise.md](noise.md).
+
+## console-4
+
+Card lift-parity-console-4 (PipeConsole, CrashHandler, config). MATCH +12 over main: CG +2, LG +5, SCD +3, POD +2. MATCH lost: 0.
+
+| Function | Exe | Form | MATCH |
+| --- | --- | --- | --- |
+| `InitSymbol` | all 4 | one unload block per lookup | +4 |
+| `WinServiceConsole::UninstallService` | all 4 | one result exit | +4 |
+| `DaemonConfig::Dump` | SCD | PDB const pointer `LOCALHOST_IP` in `_Def` | +1 |
+| `PipeConsole::SetRunningInfo` | LG | match-node search, list reference | +1 |
+| `IdleStateTable::scan` | LG | `if / else if` chain from the PDB lines | +1 |
+| `PipeConsole::addNode` | LG | per-exe: copy `valueString` | +1 |
+
+What worked:
+- The PDB line maps (`lines.py`) and the PDB data symbols gave every win. Read them first.
+- Compare one function in all 4 exes. LG has a newer `addNode` than the other 3 exes.
+
+What failed:
+- `wcscmp` `sbb` form, CG `_Def` RTTI neighbour, `ID128_GUID_ZERO` reload, LG `addNode` inline (see B).
+- LG `checkFrozenThread` (91.0): the original inlines `SetInvalidInfo` and `addNode`, with the match-node search. This needs a change in
+  `SetInvalidInfo` (stop list). Without `noinline` on `addNode`, LG loses score in 2 other functions.
