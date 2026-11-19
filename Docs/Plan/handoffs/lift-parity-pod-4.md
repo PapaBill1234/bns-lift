@@ -14,10 +14,10 @@
 Total gain over main: +8.
 
 ## Changes
-- `CacheGateChannel.cpp`: `OnConnect`/`OnClose` read globals and fields again at each use (lessons A25).
-- `WorldPacketHandler.cpp/.h`: `CheckPostCapacityReq` uses the single-expression `::new` (A26). The `CheckPostCapacityRelayContext` ctor sets `_response` in the init list.
+- `CacheGateChannel.cpp`: `OnConnect`/`OnClose` read globals and fields again at each use (lessons A26).
+- `WorldPacketHandler.cpp/.h`: `CheckPostCapacityReq` uses the single-expression `::new` (A27). The `CheckPostCapacityRelayContext` ctor sets `_response` in the init list.
 - `StringUtil.h/.cpp`: `ID128_GUID_ZERO` is `id128 const` (PDB `?ID128_GUID_ZERO@@3Tid128@@B` in all 4 exes).
-- `BnsCommonConfigDefinition.h`: per-exe ctor form. SCD and POD copy the id128 fields with `memcpy` (A27).
+- `BnsCommonConfigDefinition.h`: per-exe ctor form. SCD and POD copy the id128 fields with `memcpy` (A28).
 - `PostOfficeDB.cpp/.h`: `AutoDbTran(dbId, timeoutSec)` ctor. Score only (`LoadPostList` 98.3 -> 99.1, `LoadRetryReadyPostList` 98.6 -> 99.1).
 - `PingGenerator.cpp`: named `PingRelayRequest` local before `Alloc`. Score only (97.0 -> 99.2).
 
@@ -29,7 +29,7 @@ Total gain over main: +8.
 - `AgentSessionHandler::OnClose` 97.6, refs: ours loads `L"AgentSessionHandler::OnClose"` and `L"agent channel"` once more (the opposite of the item above); register allocation; not fixed.
 - `PingRelayContext::processRelayResponse` 97.6, calls+refs: failure-first form was worse in round 3 (B); no new idea.
 - `ManagementSessionHandler::PacketHandler` 97.8, calls: the handler call is at the end in the original (lessons D); block layout; not tried, out of turns.
-- `HandlePostOfficeRegisterPostReq` 98.0, calls+refs: single-expression `::new` (A26) gave no change; block layout (D, 0x1aaa0); stopped.
+- `HandlePostOfficeRegisterPostReq` 98.0, calls+refs: single-expression `::new` (A27) gave no change; block layout (D, 0x1aaa0); stopped.
 - `DeliverPostRelayContext::processRelayResponse` 96.5, calls+refs: ❓ not examined in this card; out of turns.
 - `RelayTimeoutChecker::checkRelayTimeout` 96.3, consts: ❓ not examined; out of turns.
 - `parseHexInt` 97.4 / `parseDecInt` 94.4, consts: ❓ constant lowering, not examined; out of turns.

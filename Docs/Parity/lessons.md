@@ -319,16 +319,16 @@ Section E (perexe-3) and the round-3 stage notes are merged into A to D. Section
 - `BigInteger::Divide(uint)`: table search as a `for` loop with `break`. The compiler then does not peel the first compare (LG +1).
 - `OaepEncoder` `Setup`/`encode`/`decode`: call `_hash.Size()` again at each use, as the original does. Test `&_hash` for null in `Setup` (+9: LG, SCD, POD x3).
 
-### A25. Read globals and fields again at each use (pod-4): 2
+### A26. Read globals and fields again at each use (pod-4): 2
 - POD `CacheGateSessionHandler::OnConnect`/`OnClose`: no locals for `PostOfficeDaemon::_instance` or `session->_channel`. Write the full expression at each use.
   The original loads them again after each call.
 
-### A26. Single-expression placement new (pod-4): 1
+### A27. Single-expression placement new (pod-4): 1
 - POD `HandlePostOfficeServiceCheckPostCapacityReq` (0x2047c): `ctx = ::new (Memory::_Manager[2]->Alloc(...)) T(...);` with no `memory` local and no null test
   (`// BUG:` no null check, 0x20250). Set the `_response` member in the ctor init list, not in the body (a body store left a dead store, 0x20556).
 - It does not always work: `MakePostContext` (4 loaders worse) and `HandlePostOfficeRegisterPostReq` (no change). See B.
 
-### A27. Const global and a block copy for an id128 member (pod-4): 5
+### A28. Const global and a block copy for an id128 member (pod-4): 5
 - `ID128_GUID_ZERO` is `id128 const` (PDB `?ID128_GUID_ZERO@@3Tid128@@B` in all 4 exes). This alone gives POD `PostInfo::PostInfo` (+1).
 - `BnsCommonConfig` ctor (`BnsCommonConfigDefinition.h`), per-exe form (A22): SCD and POD store the scalars first and then
   `memcpy(&_npAppId, &ID128_GUID_ZERO, sizeof(id128))`. The original (POD 0x1974) loads the global again for each qword.
@@ -373,9 +373,9 @@ Section E (perexe-3) and the round-3 stage notes are merged into A to D. Section
   - SCD DB loaders with all columns inline: the original inlines only column 1 (dbbind-3).
   - LG `ClientManager::BroadcastAnnounceNotify` branch swap: no gain (97.8 came from A17).
 - pod-4 (do not try again without a new idea):
-  - POD `MakePostContext` single-expression `::new` (A26): 4 DB loaders worse. `HandlePostOfficeRegisterPostReq` single-expression `::new`: no change.
+  - POD `MakePostContext` single-expression `::new` (A27): 4 DB loaders worse. `HandlePostOfficeRegisterPostReq` single-expression `::new`: no change.
   - POD `PostOfficeDB::LoadPostList` success-first reorder: worse. The loop header stays duplicated (3 tries, 99.1).
-  - `ID128_GUID_ZERO` const alone, or an element copy `.id[0]`/`.id[1]`, in the `BnsCommonConfig` ctor: VS2010 still merges the loads. Use `memcpy` (A27).
+  - `ID128_GUID_ZERO` const alone, or an element copy `.id[0]`/`.id[1]`, in the `BnsCommonConfig` ctor: VS2010 still merges the loads. Use `memcpy` (A28).
 
 - crypto-4 (do not try again without a new idea):
   - Remove `__declspec(noinline)` from `RightShift`: `LeftShift` loses its tail-jump MATCH and `invMod` loses score.
@@ -749,9 +749,9 @@ Card lift-parity-pod-4 (2026-11-19). POD 665 -> 671, SCD 582 -> 584, CG and LG +
 
 | Pattern | Result | Functions |
 | --- | --- | --- |
-| A25 reload at each use | +2 POD | `CacheGateSessionHandler::OnConnect`, `OnClose` |
-| A26 single-expression `::new` | +1 POD; worse or no change in 2 | `CheckPostCapacityReq`; not `MakePostContext`, `RegisterPostReq` |
-| A27 const `ID128_GUID_ZERO` and `memcpy` ctor | +3 POD, +2 SCD | `PostInfo::PostInfo`, `LoadBnsCommonConfig`, `ReloadBnsCommonConfig` |
+| A26 reload at each use | +2 POD | `CacheGateSessionHandler::OnConnect`, `OnClose` |
+| A27 single-expression `::new` | +1 POD; worse or no change in 2 | `CheckPostCapacityReq`; not `MakePostContext`, `RegisterPostReq` |
+| A28 const `ID128_GUID_ZERO` and `memcpy` ctor | +3 POD, +2 SCD | `PostInfo::PostInfo`, `LoadBnsCommonConfig`, `ReloadBnsCommonConfig` |
 | `AutoDbTran(dbId, timeoutSec)` ctor | score only | `LoadPostList`, `LoadRetryReadyPostList` 99.1 |
 | Named `PingRelayRequest` local before `Alloc` | score only | `PingGenerator::sendPing` 97.0 -> 99.2 |
 
