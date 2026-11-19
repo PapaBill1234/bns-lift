@@ -792,7 +792,7 @@ unsigned short PacketBuffer::DecomposeText(char const* buffer, unsigned int coun
             break;
         long long v;
         int n;
-        int errorLine;
+        // BUG: The range calls (0x2FD16) give only v (rcx at 0x2FD01, stack +0x20). %C gets the value. %I64d gets no argument.
         switch (*f)
         {
         case 'C':
@@ -805,8 +805,8 @@ unsigned short PacketBuffer::DecomposeText(char const* buffer, unsigned int coun
             cur += n;
             if (static_cast<unsigned long long>(v + 0x8000) > 0xFFFF)
             {
-                errorLine = 1038;
-                goto decompose_text_range;
+                Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 1038, L"Decompose Text, format('%C'), value(%I64d)", v);
+                return 0;
             }
             *va_arg(args, short*) = static_cast<short>(v);
             continue;
@@ -819,8 +819,8 @@ unsigned short PacketBuffer::DecomposeText(char const* buffer, unsigned int coun
             cur += n;
             if (static_cast<unsigned long long>(v + 128) > 0xFF)
             {
-                errorLine = 1030;
-                goto decompose_text_range;
+                Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 1030, L"Decompose Text, format('%C'), value(%I64d)", v);
+                return 0;
             }
             *va_arg(args, char*) = static_cast<char>(v);
             continue;
@@ -834,8 +834,8 @@ unsigned short PacketBuffer::DecomposeText(char const* buffer, unsigned int coun
             cur += n;
             if (static_cast<unsigned long long>(v + 0x80000000LL) > 0xFFFFFFFF)
             {
-                errorLine = 1046;
-                goto decompose_text_range;
+                Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 1046, L"Decompose Text, format('%C'), value(%I64d)", v);
+                return 0;
             }
             *va_arg(args, int*) = static_cast<int>(v);
             continue;
@@ -867,10 +867,6 @@ unsigned short PacketBuffer::DecomposeText(char const* buffer, unsigned int coun
             Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 1143, L"Unknown type %C", static_cast<int>(*f));
             return 0;
         }
-    decompose_text_range:
-        // BUG: The call (0x2FD16) gives only v (rcx at 0x2FD01, stack +0x20). %C gets the value. %I64d gets no argument.
-        Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, errorLine, L"Decompose Text, format('%C'), value(%I64d)", v);
-        return 0;
     }
     return static_cast<unsigned short>(reinterpret_cast<char const*>(cur) - buffer);
 
