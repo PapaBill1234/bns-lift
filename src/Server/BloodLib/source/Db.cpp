@@ -257,7 +257,7 @@ void Db::clearList()
 
 // 0x20E40
 // LIFT: noinline. The orig calls it out of line (SCD 0x20e40).
-__declspec(noinline) bool DbTransaction::BindCol(unsigned int index, void* buffer, unsigned int varType, long long* result)
+__declspec(noinline) bool DbTransaction::BindCol(int index, void* buffer, int varType, long long* result)
 {
     if (StmtHandle == nullptr)
     {

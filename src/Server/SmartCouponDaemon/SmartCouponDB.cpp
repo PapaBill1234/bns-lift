@@ -281,10 +281,11 @@ bool SmartCouponDB::ProcessCharacterGameEventLog(int* dbRetValue, long long game
                    MODULE_NAME, gameEventLogId, GUID_ARGS(*gameAccountId), worldId, pcdbid, gameEventId, query);
         return false;
     }
-    for (;;)
+    int result;
+    do  // LIFT: do-while form. The orig has one Fetch site (0x13cb5); a for (;;) rotated the loop.
     {
         memset(&publicationInfo, 0, sizeof(publicationInfo));
-        int const result = tran.Tran->Fetch(0);  // LIFT: Fetch (0x21180) never reads edx; no call site sets it
+        result = tran.Tran->Fetch(0);  // LIFT: Fetch (0x21180) never reads edx; no call site sets it
         if (result == -1)
         {
             Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 302,
@@ -293,18 +294,19 @@ bool SmartCouponDB::ProcessCharacterGameEventLog(int* dbRetValue, long long game
                        MODULE_NAME, gameEventLogId, GUID_ARGS(*gameAccountId), worldId, pcdbid, gameEventId);
             return false;
         }
-        if (result == 0)
-            break;
-        if (publicationLen[0] == -1 || publicationLen[1] == -1 || publicationLen[4] == -1)
-            Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 314,
-                       L"[%s], invalid db data,process-char, logid:%I64d, account-id:" GUID_FMT
-                       L", wid:%d, pcdbid:0x%I64X, game-event-id:%d, publicationdLen:0x%I64X, "
-                       L"gameAccountIdLen:0x%I64X, couponEventIdLen:0x%I64X",
-                       MODULE_NAME, gameEventLogId, GUID_ARGS(*gameAccountId), worldId, pcdbid, gameEventId,
-                       publicationLen[0], publicationLen[1], publicationLen[4]);
-        else
-            outPublicationContext->AddPublicationInfo(&publicationInfo);
-    }
+        if (result != 0)
+        {
+            if (publicationLen[0] == -1 || publicationLen[1] == -1 || publicationLen[4] == -1)
+                Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 314,
+                           L"[%s], invalid db data,process-char, logid:%I64d, account-id:" GUID_FMT
+                           L", wid:%d, pcdbid:0x%I64X, game-event-id:%d, publicationdLen:0x%I64X, "
+                           L"gameAccountIdLen:0x%I64X, couponEventIdLen:0x%I64X",
+                           MODULE_NAME, gameEventLogId, GUID_ARGS(*gameAccountId), worldId, pcdbid, gameEventId,
+                           publicationLen[0], publicationLen[1], publicationLen[4]);
+            else
+                outPublicationContext->AddPublicationInfo(&publicationInfo);
+        }
+    } while (result != 0);
     if (*dbRetValue != 0)
         return false;
     return true;
@@ -370,10 +372,11 @@ bool SmartCouponDB::ProcessAccountGameEventLog(int* dbRetValue, long long gameEv
                        MODULE_NAME, gameEventLogId, GUID_ARGS(*gameAccountId), gameEventId, query);
             return false;
         }
-        for (;;)
+        int result;
+        do  // LIFT: do-while form. The orig has one Fetch site (0x13cb5); a for (;;) rotated the loop.
         {
             memset(&publicationInfo, 0, sizeof(publicationInfo));
-            int const result = tran.Tran->Fetch(0);  // LIFT: Fetch (0x21180) never reads edx; no call site sets it
+            result = tran.Tran->Fetch(0);  // LIFT: Fetch (0x21180) never reads edx; no call site sets it
             if (result == -1)
             {
                 Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 394,
@@ -382,18 +385,19 @@ bool SmartCouponDB::ProcessAccountGameEventLog(int* dbRetValue, long long gameEv
                            MODULE_NAME, gameEventLogId, GUID_ARGS(*gameAccountId), gameEventId);
                 return false;
             }
-            if (result == 0)
-                break;
-            if (publicationLen[0] == -1 || publicationLen[1] == -1 || publicationLen[4] == -1)
-                Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 406,
-                           L"[%s], invalid db data,process-acc, logid:%I64d, account-id:" GUID_FMT
-                           L", game-event-id:%d, publicationdLen:0x%I64X, gameAccountIdLen:0x%I64X, "
-                           L"couponEventIdLen:0x%I64X",
-                           MODULE_NAME, gameEventLogId, GUID_ARGS(*gameAccountId), gameEventId, publicationLen[0],
-                           publicationLen[1], publicationLen[4]);
-            else
-                outPublicationContext->AddPublicationInfo(&publicationInfo);
-        }
+            if (result != 0)
+            {
+                if (publicationLen[0] == -1 || publicationLen[1] == -1 || publicationLen[4] == -1)
+                    Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 406,
+                               L"[%s], invalid db data,process-acc, logid:%I64d, account-id:" GUID_FMT
+                               L", game-event-id:%d, publicationdLen:0x%I64X, gameAccountIdLen:0x%I64X, "
+                               L"couponEventIdLen:0x%I64X",
+                               MODULE_NAME, gameEventLogId, GUID_ARGS(*gameAccountId), gameEventId, publicationLen[0],
+                               publicationLen[1], publicationLen[4]);
+                else
+                    outPublicationContext->AddPublicationInfo(&publicationInfo);
+            }
+        } while (result != 0);
         if (*dbRetValue != 0)
             return false;
         return true;
@@ -572,27 +576,29 @@ bool SmartCouponDB::LoadGameEventLogList(int* dbRetValue, RetrieveEventLogContex
                        MODULE_NAME, kEmpty, query);
             return false;
         }
-        for (;;)
+        int result;
+        do  // LIFT: do-while form. The orig has one Fetch site (0x13cb5); a for (;;) rotated the loop.
         {
             memset(&eventLogInfo, 0, sizeof(eventLogInfo));
-            int const result = tran.Tran->Fetch(0);  // LIFT: Fetch (0x21180) never reads edx; no call site sets it
+            result = tran.Tran->Fetch(0);  // LIFT: Fetch (0x21180) never reads edx; no call site sets it
             if (result == -1)
             {
                 Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 640, L"[%s], failed to fetch, load-game-event-log %s", MODULE_NAME,
                            kEmpty);
                 return false;
             }
-            if (result == 0)
-                break;
-            if (eventLogLen[0] == -1 || eventLogLen[1] == -1 || eventLogLen[4] == -1)
-                Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 655,
-                           L"[%s], invalid db data, load-game-event-log %s, logIdLen:0x%I64X, gameAccountIdLen:0x%I64X, "
-                           L"widLen:0x%I64X, pcIdLen:0x%I64X, EventIdLen:0x%I64X",
-                           MODULE_NAME, kEmpty, eventLogLen[0], eventLogLen[1], eventLogLen[2], eventLogLen[3],
-                           eventLogLen[4]);
-            else
-                outEventLogContext->AddEventLogInfo(&eventLogInfo);
-        }
+            if (result != 0)
+            {
+                if (eventLogLen[0] == -1 || eventLogLen[1] == -1 || eventLogLen[4] == -1)
+                    Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 655,
+                               L"[%s], invalid db data, load-game-event-log %s, logIdLen:0x%I64X, gameAccountIdLen:0x%I64X, "
+                               L"widLen:0x%I64X, pcIdLen:0x%I64X, EventIdLen:0x%I64X",
+                               MODULE_NAME, kEmpty, eventLogLen[0], eventLogLen[1], eventLogLen[2], eventLogLen[3],
+                               eventLogLen[4]);
+                else
+                    outEventLogContext->AddEventLogInfo(&eventLogInfo);
+            }
+        } while (result != 0);
         if (*dbRetValue != 0)
             return false;
         return true;
@@ -636,26 +642,28 @@ bool SmartCouponDB::LoadCouponPublicationList(int* dbRetValue, RetrievePublicati
                        L"[%s], failed to execute sql, load-coupon-publication %s, query:%s", MODULE_NAME, kEmpty, query);
             return false;
         }
-        for (;;)
+        int result;
+        do  // LIFT: do-while form. The orig has one Fetch site (0x13cb5); a for (;;) rotated the loop.
         {
             memset(&publicationInfo, 0, sizeof(publicationInfo));
-            int const result = tran.Tran->Fetch(0);  // LIFT: Fetch (0x21180) never reads edx; no call site sets it
+            result = tran.Tran->Fetch(0);  // LIFT: Fetch (0x21180) never reads edx; no call site sets it
             if (result == -1)
             {
                 Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 723, L"[%s], failed to fetch, load-coupon-publication %s",
                            MODULE_NAME, kEmpty);
                 return false;
             }
-            if (result == 0)
-                break;
-            if (publicationLen[0] == -1 || publicationLen[1] == -1 || publicationLen[4] == -1)
-                Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 735,
-                           L"[%s], invalid db data, load-coupon-publication %s, publicationdLen:0x%I64X, "
-                           L"gameAccountIdLen:0x%I64X, couponEventIdLen:0x%I64X",
-                           MODULE_NAME, kEmpty, publicationLen[0], publicationLen[1], publicationLen[4]);
-            else
-                outPublicationContext->AddPublicationInfo(&publicationInfo);
-        }
+            if (result != 0)
+            {
+                if (publicationLen[0] == -1 || publicationLen[1] == -1 || publicationLen[4] == -1)
+                    Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 735,
+                               L"[%s], invalid db data, load-coupon-publication %s, publicationdLen:0x%I64X, "
+                               L"gameAccountIdLen:0x%I64X, couponEventIdLen:0x%I64X",
+                               MODULE_NAME, kEmpty, publicationLen[0], publicationLen[1], publicationLen[4]);
+                else
+                    outPublicationContext->AddPublicationInfo(&publicationInfo);
+            }
+        } while (result != 0);
         if (*dbRetValue != 0)
             return false;
         return true;
@@ -711,10 +719,11 @@ bool SmartCouponDB::LoadSingleCouponPublication(int* dbRetValue, long long publi
                        MODULE_NAME, GUID_ARGS(*gameAccountId), publicationId, query);
             return false;
         }
-        for (;;)
+        int result;
+        do  // LIFT: do-while form. The orig has one Fetch site (0x13cb5); a for (;;) rotated the loop.
         {
             memset(&publicationInfo, 0, sizeof(publicationInfo));
-            int const result = tran.Tran->Fetch(0);  // LIFT: Fetch (0x21180) never reads edx; no call site sets it
+            result = tran.Tran->Fetch(0);  // LIFT: Fetch (0x21180) never reads edx; no call site sets it
             if (result == -1)
             {
                 Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 808,
@@ -723,26 +732,27 @@ bool SmartCouponDB::LoadSingleCouponPublication(int* dbRetValue, long long publi
                            MODULE_NAME, GUID_ARGS(*gameAccountId), publicationId);
                 return false;
             }
-            if (result == 0)
-                break;
-            if (publicationLen[0] == -1 || publicationLen[1] == -1 || publicationLen[4] == -1)
+            if (result != 0)
             {
-                Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 820,
-                           L"[%s], invalid db data,load single coupon publication, acc:" GUID_FMT
-                           L", publication-id:%I64d, publicationdLen:0x%I64X, gameAccountIdLen:0x%I64X, "
-                           L"couponEventIdLen:0x%I64X",
-                           MODULE_NAME, GUID_ARGS(*gameAccountId), publicationId, publicationLen[0], publicationLen[1],
-                           publicationLen[4]);
-                continue;
+                if (publicationLen[0] == -1 || publicationLen[1] == -1 || publicationLen[4] == -1)
+                {
+                    Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 820,
+                               L"[%s], invalid db data,load single coupon publication, acc:" GUID_FMT
+                               L", publication-id:%I64d, publicationdLen:0x%I64X, gameAccountIdLen:0x%I64X, "
+                               L"couponEventIdLen:0x%I64X",
+                               MODULE_NAME, GUID_ARGS(*gameAccountId), publicationId, publicationLen[0], publicationLen[1],
+                               publicationLen[4]);
+                    continue;
+                }
+                *outCouponEventId = publicationInfo.couponEventId;
+                if (publicationInfo.couponEventId <= 0)
+                    Log::Write(Log::LT_DEBUG, SMARTCOUPONDB_FILE, 829,
+                               L"[%s], invalid coupon-event-id,load single coupon publication, acc:" GUID_FMT
+                               L", publication-id:%I64d, publication-id:%I64d, acc:" GUID_FMT L",coupon-event-id:%d",
+                               MODULE_NAME, GUID_ARGS(*gameAccountId), publicationId, publicationInfo.publicationId,
+                               GUID_ARGS(publicationInfo.gameAccountId), publicationInfo.couponEventId);
             }
-            *outCouponEventId = publicationInfo.couponEventId;
-            if (publicationInfo.couponEventId <= 0)
-                Log::Write(Log::LT_DEBUG, SMARTCOUPONDB_FILE, 829,
-                           L"[%s], invalid coupon-event-id,load single coupon publication, acc:" GUID_FMT
-                           L", publication-id:%I64d, publication-id:%I64d, acc:" GUID_FMT L",coupon-event-id:%d",
-                           MODULE_NAME, GUID_ARGS(*gameAccountId), publicationId, publicationInfo.publicationId,
-                           GUID_ARGS(publicationInfo.gameAccountId), publicationInfo.couponEventId);
-        }
+        } while (result != 0);
         if (*dbRetValue != 0)
             return false;
         return true;
@@ -790,27 +800,29 @@ bool SmartCouponDB::LoadRetryReadyGameEventLogList(int* dbRetValue, RetrieveEven
                        MODULE_NAME, kEmpty, query);
             return false;
         }
-        for (;;)
+        int result;
+        do  // LIFT: do-while form. The orig has one Fetch site (0x13cb5); a for (;;) rotated the loop.
         {
             memset(&eventLogInfo, 0, sizeof(eventLogInfo));
-            int const result = tran.Tran->Fetch(0);  // LIFT: Fetch (0x21180) never reads edx; no call site sets it
+            result = tran.Tran->Fetch(0);  // LIFT: Fetch (0x21180) never reads edx; no call site sets it
             if (result == -1)
             {
                 Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 900, L"[%s], failed to fetch, load-retryready-game-event-log %s", MODULE_NAME,
                            kEmpty);
                 return false;
             }
-            if (result == 0)
-                break;
-            if (eventLogLen[0] == -1 || eventLogLen[1] == -1 || eventLogLen[4] == -1)
-                Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 915,
-                           L"[%s], invalid db data, load-retryready-game-event-log %s, logIdLen:0x%I64X, gameAccountIdLen:0x%I64X, "
-                           L"widLen:0x%I64X, pcIdLen:0x%I64X, EventIdLen:0x%I64X",
-                           MODULE_NAME, kEmpty, eventLogLen[0], eventLogLen[1], eventLogLen[2], eventLogLen[3],
-                           eventLogLen[4]);
-            else
-                outEventLogContext->AddEventLogInfo(&eventLogInfo);
-        }
+            if (result != 0)
+            {
+                if (eventLogLen[0] == -1 || eventLogLen[1] == -1 || eventLogLen[4] == -1)
+                    Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 915,
+                               L"[%s], invalid db data, load-retryready-game-event-log %s, logIdLen:0x%I64X, gameAccountIdLen:0x%I64X, "
+                               L"widLen:0x%I64X, pcIdLen:0x%I64X, EventIdLen:0x%I64X",
+                               MODULE_NAME, kEmpty, eventLogLen[0], eventLogLen[1], eventLogLen[2], eventLogLen[3],
+                               eventLogLen[4]);
+                else
+                    outEventLogContext->AddEventLogInfo(&eventLogInfo);
+            }
+        } while (result != 0);
         if (*dbRetValue != 0)
             return false;
         return true;
