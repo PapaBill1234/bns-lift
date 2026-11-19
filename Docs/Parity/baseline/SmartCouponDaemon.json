@@ -2143,10 +2143,10 @@
 },
 "Network::Clear": {
 "calls": 100,
-"consts": 93,
-"refs": 98,
-"score": 97.2,
-"status": "DIFF"
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Network::ClosePort": {
 "calls": 100,
@@ -2184,11 +2184,11 @@
 "status": "MATCH"
 },
 "Network::OpenPort [?OpenPort@Network@@SA_NIGHPEBVSessionHandler@@PEBVPacketBufferHandler@@I_N22@Z]": {
-"calls": 90,
-"consts": 94,
-"refs": 86,
-"score": 90.1,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Network::ReconnectSession": {
 "calls": 100,
@@ -3074,10 +3074,10 @@
 },
 "Session::HandleFailedEvent": {
 "calls": 100,
-"consts": 91,
+"consts": 100,
 "refs": 100,
-"score": 97.0,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Session::Recv": {
 "calls": 100,
@@ -3276,11 +3276,11 @@
 "status": "MATCH"
 },
 "SessionSendBuffer::clearPacketBufferList": {
-"calls": 75,
-"consts": 89,
-"refs": 91,
-"score": 84.9,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "SessionSendBuffer::increaseBuffer": {
 "calls": 100,

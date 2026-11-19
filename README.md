@@ -11,19 +11,19 @@ This repo is public. Do not commit binaries, keys, PDBs or IDA databases.
 ## Parity
 
 <!-- parity:start -->
-Last update: card `lift-parity-crypto-4` (2026-11-19). Tool: `tools/parity.sh` (VS2010 /GL /LTCG build vs original, funcdiff).
+Last update: card `lift-parity-net-4` (2026-11-19). Tool: `tools/parity.sh` (VS2010 /GL /LTCG build vs original, funcdiff).
 
 | Exe | Parity | MATCH | DIFF | Only in original | Total | Mean score | Start | Change | Level |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| CacheGate | **91.2 %** | 448 | 40 | 3 | 491 | 99.3 | 44.0 % | +47.3 | 90 % ✅ |
-| LobbyGate | **87.0 %** | 643 | 93 | 3 | 739 | 98.8 | 37.9 % | +49.1 | below 90 % |
-| SmartCouponDaemon | **88.6 %** | 593 | 74 | 2 | 669 | 99.1 | 33.6 % | +55.0 | below 90 % |
-| PostOfficeDaemon | **89.1 %** | 676 | 78 | 5 | 759 | 99.0 | 34.5 % | +54.5 | below 90 % |
-| **All 4** | **88.8 %** | 2360 | | | 2658 | | 37.0 % | +51.8 | below 90 % |
+| CacheGate | **92.1 %** | 452 | 36 | 3 | 491 | 99.3 | 44.0 % | +48.1 | 90 % ✅ |
+| LobbyGate | **87.6 %** | 647 | 89 | 3 | 739 | 98.8 | 37.9 % | +49.7 | below 90 % |
+| SmartCouponDaemon | **89.2 %** | 597 | 70 | 2 | 669 | 99.2 | 33.6 % | +55.6 | below 90 % |
+| PostOfficeDaemon | **89.5 %** | 679 | 75 | 5 | 759 | 99.1 | 34.5 % | +54.9 | below 90 % |
+| **All 4** | **89.4 %** | 2375 | | | 2658 | | 37.0 % | +52.4 | below 90 % |
 
 | Shared library (functions in 2+ exes) | Parity | MATCH in each exe | DIFF in 1+ exe | Total | Goal |
 | --- | ---: | ---: | ---: | ---: | --- |
-| BloodLib, Shared, Packet, CRT | **91.3 %** | 501 | 48 | 549 | 99 % |
+| BloodLib, Shared, Packet, CRT | **92.0 %** | 505 | 44 | 549 | 99 % |
 
 Goal: 95 % per exe, 99 % preferred. Shared library: 99 % preferred. Rules: [Docs/Parity/README.md](Docs/Parity/README.md). History: [Docs/Parity/progress.tsv](Docs/Parity/progress.tsv).
 
@@ -58,4 +58,5 @@ Goal: 95 % per exe, 99 % preferred. Shared library: 99 % preferred. Rules: [Docs
 | `manual-parity (astra + opus 6.2)` | 91.2 % | 84.8 % | 87.0 % | 87.6 % |
 | `lift-parity-dbbind-3` | 91.2 % | 84.8 % | 87.0 % | 87.6 % |
 | `lift-parity-crypto-4` | 91.2 % | 87.0 % | 88.6 % | 89.1 % |
+| `lift-parity-net-4` | 92.1 % | 87.6 % | 89.2 % | 89.5 % |
 <!-- parity:end -->
