@@ -654,3 +654,33 @@ The manual work of round 3 (commits 27d5420, 46fe9c1, beb4669 and later). The pa
 - `Port` ctor with body assignments: the store order is correct, but no MATCH. `OpenPort` refs still differ, because the original table has no PDB name.
 - Open: SCD `Session::Connect` keeps a `reconnect` test in the original. Our LTCG propagates the constant. Look at the callers, not the body.
 
+## packet-4
+
+### A. Patterns that worked (count = functions made MATCH)
+
+| Pattern | Count | Example |
+| --- | --- | --- |
+| Pointer loop over the format with the index check in the loop | 8 | `PacketBuffer::Compose` x4, `Decompose` x4 |
+| Block order of the cold error tails from the log line numbers | 10 | `Compose`, `Decompose`, `CheckCompose` |
+| Signed `short` for sizes and headers (the store uses 0xFFFF8000) | 5 | `Compose` x4, `TextStreamPacketBufferHandler::ToBuffer` |
+| 64-bit pointer form for the destination | 4 | `Decompose` x4 |
+| Single exit with a size variable | 2 | `CheckCompose` (LG, POD) |
+| Expression computed two times (no local) | 2 | `PushRepeatCount` (LG, POD) |
+| Case `s` before `K` and `b` (source order of the switch) | 4 | `Decompose` x4 |
+| Test `CurHeader` first, then two `allocate` calls | 1 | `Packet::Copy` (LG) |
+| Branch with the lower log line numbers first | 1 | `ClientPacketBufferHandler::ToPacket` (LG) |
+| Test the enum variable (`algorithm == ALGORITHM_DEFAULT`), not `header >> 14` | 1 | `ToPacket` (removes const 0xC000) |
+| `Destroy`: test `buffer == nullptr` first; Free is then a tail call | 2 | `RawPacketBufferHandler::Destroy` (SCD), `TextStreamPacketBufferHandler::Destroy` (POD) |
+| Log::Write with a literal line in each case, not a shared label with a line variable | 1 | `PacketBuffer::DecomposeText` (POD) |
+
+### B. Patterns that did not work (count = tries)
+
+| Pattern | Count | Function |
+| --- | --- | --- |
+| `memcpy` variants for the case P tail merge | 2 | `PacketBuffer::Compose` |
+| 64-bit form only, without the single exit (97.4) | 1 | `CheckCompose` |
+| Free size forms: ternary, local with sizeof, local `Packet*` | 3 | `FragmentPacket::StartRepeat` |
+| Pointer forms for the dead `add rax,4` | 3 | `FragmentPacketConcatenater::Add` |
+| Single Log::Write exit (score +11, no MATCH) | 1 | `FragmentPacketConcatenater::Add` |
+| Read buffer and offset again after `++index` | 2 | `PacketConcatenateBuffer::Decompose(VarData*)` |
+
