@@ -1491,11 +1491,11 @@
 "status": "MATCH"
 },
 "InitSymbol": {
-"calls": 94,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 98.0,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "IoWorker::Initialize": {
 "calls": 100,
@@ -3990,11 +3990,11 @@
 "status": "MATCH"
 },
 "WinServiceConsole::UninstallService": {
-"calls": 98,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 99.5,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "WinServiceConsole::WriteStartLog": {
 "calls": 100,

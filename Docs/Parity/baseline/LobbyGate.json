@@ -1855,11 +1855,11 @@
 "status": "MATCH"
 },
 "IdleStateTable::scan": {
-"calls": 83,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 94.4,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "IdleWatcher::Name": {
 "calls": 100,
@@ -1876,11 +1876,11 @@
 "status": "DIFF"
 },
 "InitSymbol": {
-"calls": 94,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 98.0,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "IoWorker::Initialize": {
 "calls": 100,
@@ -1927,8 +1927,8 @@
 "LobbyD::Hello": {
 "calls": 95,
 "consts": 86,
-"refs": 94,
-"score": 91.5,
+"refs": 100,
+"score": 93.5,
 "status": "DIFF"
 },
 "LobbyD::SendInitSessionWithLobbyTokenReq": {
@@ -1990,8 +1990,8 @@
 "LobbyDSessionHandler::OnClose": {
 "calls": 100,
 "consts": 86,
-"refs": 96,
-"score": 93.8,
+"refs": 100,
+"score": 95.2,
 "status": "DIFF"
 },
 "LobbyDSessionHandler::OnConnect": {
@@ -2123,8 +2123,8 @@
 "LobbyGate::reload": {
 "calls": 73,
 "consts": 92,
-"refs": 95,
-"score": 86.5,
+"refs": 97,
+"score": 87.1,
 "status": "DIFF"
 },
 "LobbyGate::setArgument": {
@@ -2905,24 +2905,24 @@
 "status": "MATCH"
 },
 "PipeConsole::SetRunningInfo": {
-"calls": 60,
-"consts": 86,
+"calls": 100,
+"consts": 100,
 "refs": 100,
-"score": 81.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "PipeConsole::addNode": {
 "calls": 100,
 "consts": 100,
-"refs": 80,
-"score": 93.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "PipeConsole::checkFrozenThread": {
 "calls": 100,
 "consts": 80,
-"refs": 89,
-"score": 89.6,
+"refs": 93,
+"score": 91.0,
 "status": "DIFF"
 },
 "PipeConsole::cleanup": {
@@ -4186,11 +4186,11 @@
 "status": "MATCH"
 },
 "WinServiceConsole::UninstallService": {
-"calls": 98,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 99.5,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "WinServiceConsole::WriteStartLog": {
 "calls": 100,

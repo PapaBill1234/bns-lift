@@ -11,19 +11,19 @@ This repo is public. Do not commit binaries, keys, PDBs or IDA databases.
 ## Parity
 
 <!-- parity:start -->
-Last update: card `lift-parity-pod-4` (2026-11-19). Tool: `tools/parity.sh` (VS2010 /GL /LTCG build vs original, funcdiff).
+Last update: card `lift-parity-console-4` (2026-11-20). Tool: `tools/parity.sh` (VS2010 /GL /LTCG build vs original, funcdiff).
 
 | Exe | Parity | MATCH | DIFF | Only in original | Total | Mean score | Start | Change | Level |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| CacheGate | **92.5 %** | 454 | 34 | 3 | 491 | 99.3 | 44.0 % | +48.5 | 90 % ✅ |
-| LobbyGate | **88.4 %** | 653 | 83 | 3 | 739 | 98.9 | 37.9 % | +50.5 | below 90 % |
-| SmartCouponDaemon | **93.9 %** | 628 | 39 | 2 | 669 | 99.5 | 33.6 % | +60.2 | 90 % ✅ |
-| PostOfficeDaemon | **91.2 %** | 692 | 62 | 5 | 759 | 99.1 | 34.5 % | +56.7 | 90 % ✅ |
-| **All 4** | **91.3 %** | 2427 | | | 2658 | | 37.0 % | +54.3 | 90 % ✅ |
+| CacheGate | **92.9 %** | 456 | 32 | 3 | 491 | 99.3 | 44.0 % | +48.9 | 90 % ✅ |
+| LobbyGate | **89.0 %** | 658 | 78 | 3 | 739 | 98.9 | 37.9 % | +51.2 | below 90 % |
+| SmartCouponDaemon | **94.2 %** | 630 | 37 | 2 | 669 | 99.5 | 33.6 % | +60.5 | 90 % ✅ |
+| PostOfficeDaemon | **91.4 %** | 694 | 60 | 5 | 759 | 99.1 | 34.5 % | +56.9 | 90 % ✅ |
+| **All 4** | **91.7 %** | 2438 | | | 2658 | | 37.0 % | +54.7 | 90 % ✅ |
 
 | Shared library (functions in 2+ exes) | Parity | MATCH in each exe | DIFF in 1+ exe | Total | Goal |
 | --- | ---: | ---: | ---: | ---: | --- |
-| BloodLib, Shared, Packet, CRT | **93.4 %** | 513 | 36 | 549 | 99 % |
+| BloodLib, Shared, Packet, CRT | **94.0 %** | 516 | 33 | 549 | 99 % |
 
 Goal: 95 % per exe, 99 % preferred. Shared library: 99 % preferred. Rules: [Docs/Parity/README.md](Docs/Parity/README.md). History: [Docs/Parity/progress.tsv](Docs/Parity/progress.tsv).
 
@@ -62,4 +62,5 @@ Goal: 95 % per exe, 99 % preferred. Shared library: 99 % preferred. Rules: [Docs
 | `lift-parity-packet-4` | 92.5 % | 88.4 % | 89.7 % | 90.4 % |
 | `lift-parity-scd-4` | 92.5 % | 88.4 % | 93.6 % | 90.4 % |
 | `lift-parity-pod-4` | 92.5 % | 88.4 % | 93.9 % | 91.2 % |
+| `lift-parity-console-4` | 92.9 % | 89.0 % | 94.2 % | 91.4 % |
 <!-- parity:end -->
