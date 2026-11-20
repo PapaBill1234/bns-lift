@@ -79,7 +79,7 @@ enum LobbyError
 // LIFT: the PDB module of TLobbyError is not known. CliSession.cpp has the definition. ❓
 extern __declspec(thread) LobbyError TLobbyError;
 
-// Inlined in GameAccount::GameAccount (0x33360): each field is set to zero.
+// LIFT: constructor not in the PDB. Inlined in GameAccount::GameAccount (0x33360): each field is set to zero.
 struct TimeBasedPlayInfo
 {
     TimeBasedPlayInfo()

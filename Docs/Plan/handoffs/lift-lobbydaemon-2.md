@@ -103,3 +103,11 @@ Parity after the repair: all 5 exes +0, no MATCH lost (CG 456, LG 658, SCD 630, 
 | `GradeService(1)` comment cited an address in 0x534d0 | Comment now cites the call at 0x1400335bc in 0x33490. That call is the only caller of 0x534d0, so LTCG removed the edx load. The callee stores the constant in `_gradeLevel.level` (0x140053539, `mov dword ptr [rbx+4], 1`). |
 
 Parity after repair 3: all 5 exes +0, no MATCH lost (CG 456, LG 658, SCD 630, POD 694, LD 49).
+
+## Repair 4 (skeptic findings)
+
+| Finding | Fix |
+| --- | --- |
+| `TimeBasedPlayInfo()` is not in the PDB and had no `// LIFT:` prefix | Comment is now `// LIFT: constructor not in the PDB. Inlined in GameAccount::GameAccount (0x33360): each field is set to zero.` Code not changed. |
+
+Parity after repair 4: all 5 exes +0, no MATCH lost (CG 456, LG 658, SCD 630, POD 694, LD 49).
