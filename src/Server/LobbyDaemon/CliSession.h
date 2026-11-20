@@ -2,6 +2,7 @@
 // LIFT: ld-2 added the layouts of CliSession, GameAccount, Presence, ServiceLocation and the member types.
 // LIFT: the presence classes and GameServiceLocation have no bases yet. A later card adds them.
 #pragma once
+#include <new>
 #include <stddef.h>
 #include <string.h>
 #include <vector>
@@ -201,6 +202,11 @@ public:
         GameWorld = 3,
     };
 
+    // LIFT: the original global operator delete(void*) (0x32b50) is empty (ICF with Console::Flush). The callers
+    // do "delete p;" and then Memory::_Manager[2]->Free(p, ...). This empty class operator delete keeps that shape
+    // and frees the memory only once (in Free).
+    static void operator delete(void*) {}
+
     virtual ~Presence();                                                                // slot 0
     virtual Kind GetKind() const = 0;                                                   // slot 1
     virtual bool IsEqual(Presence const* presence) const = 0;                           // slot 2
@@ -270,6 +276,11 @@ public:
     {
         KIND_GAMEWORLD = 0,
     };
+
+    // LIFT: the original global operator delete(void*) (0x32b50) is empty (ICF with Console::Flush). The callers
+    // do "delete p;" and then Memory::_Manager[2]->Free(p, ...). This empty class operator delete keeps that shape
+    // and frees the memory only once (in Free).
+    static void operator delete(void*) {}
 
     virtual ~ServiceLocation();  // 0x329d0, slot 0
     virtual Kind GetKind() const = 0;                                                     // slot 1
@@ -399,7 +410,10 @@ public:
     StopPlayTimerEvent* _reservedStopPlay;
     wchar_t* _chargeKey;
     unsigned int _chargeStopRequestTxnId;
-    GradeService _gradeService;
+    // LIFT: the PDB type is GradeService (size 0x40). Its layout belongs to card ld-4 (GradeService.obj, 0x53370).
+    // ld-2 keeps opaque storage and uses only the GradeService ctors and dtor (placement new). ld-4 restores the
+    // GradeService member when it adds the layout.
+    unsigned long long _gradeService[0x40 / sizeof(unsigned long long)];
     wchar_t* _pcCafeCode;
     PcCafe* _pcCafe;
     bool _pcCafeCharged;
@@ -419,6 +433,7 @@ static_assert(offsetof(CliSession, _table) == 0x7E8, "CliSession::_table");
 static_assert(offsetof(CliSession, _presence) == 0x808, "CliSession::_presence");
 static_assert(offsetof(CliSession, _chargeKey) == 0x820, "CliSession::_chargeKey");
 static_assert(offsetof(CliSession, _gradeService) == 0x830, "CliSession::_gradeService");
+static_assert(sizeof(((CliSession*)0)->_gradeService) == 0x40, "sizeof CliSession::_gradeService");
 static_assert(offsetof(CliSession, _infoGateToken) == 0x890, "CliSession::_infoGateToken");
 static_assert(offsetof(CliSession, _lock) == 0x8A8, "CliSession::_lock");
 static_assert(sizeof(CliSession) == 0x8D0, "sizeof CliSession");

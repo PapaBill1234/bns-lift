@@ -855,7 +855,7 @@ Card lift-lobbydaemon-2: CliSession part 1 (RVA 0x329d0 to 0x35eb0, 29 functions
 | --- | --- |
 | Lifted | 15 |
 | Not done | 14 |
-| New layouts | `CliSession` (0x8D0), `GameAccount` (0x198), `ServiceLocation` (0x10), `GradeService` (0x40), `RefCntPoolObj` (0x18) |
+| New layouts | `CliSession` (0x8D0), `GameAccount` (0x198), `ServiceLocation` (0x10), `RefCntPoolObj` (0x18). `_gradeService` is opaque 0x40 storage; ld-4 owns the `GradeService` layout. |
 | LD MATCH | 49 -> 49 (+0). The other 4 exes: +0, no MATCH lost. |
 
 What worked:
@@ -870,6 +870,9 @@ What failed:
   removes them. The built `LobbyDaemon.pdb` has no public for them. funcdiff cannot pair a function that is not in the exe.
   Check this with `grep -a -F '?name@Class' build-vs2010/LobbyDaemon.pdb` before you expect a gain on LD.
 - The original global `operator delete(void*)` (0x32b50) is empty (ICF with `Console::Flush`). The source frees with
-  `delete p;` and then `Memory::_Manager[2]->Free`. Our `operator delete` is not empty, so the presence and srvloc classes
-  must not get real bases before 0x32b50 is defined. If they do, the memory is freed 2 times.
+  `delete p;` and then `Memory::_Manager[2]->Free`. Our global `operator delete` is not empty. The first version had no
+  guard (skeptic finding: double free when a subclass appears). Fix: `Presence` and `ServiceLocation` have an empty
+  class `static void operator delete(void*) {}`. Use the same fix for each base class that a `delete p; Free(p)` site uses.
+- Do not add the layout of a class that another card of the wave owns (skeptic finding: `GradeService.h` belongs to ld-4).
+  Use opaque storage of the PDB size (`unsigned long long m[N]`, 8-aligned) and placement new with the declared ctor.
 - `tools/vs2010/build.sh` needs the same `LIFT_BUILD_DIR` as the gate. Without it, it stops with "no build/build.ninja".

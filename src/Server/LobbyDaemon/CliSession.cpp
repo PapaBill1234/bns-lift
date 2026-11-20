@@ -33,8 +33,11 @@ void CliSession::deallocate_me(void*, wchar_t const*, int)
 // LIFT: the PDB has this private default ctor. It sets only the base, the members with own ctors and the lock.
 CliSession::CliSession()
     : _acb(), _jumpingCharacterCreationQuota(), _characters(), _serviceEntries(), _auth(), _bans(), _quotaList(),
-      _recycleTimeList(), _gradeService(), _lock()
+      _recycleTimeList(), _lock()
 {
+    // LIFT: _gradeService is opaque storage until ld-4 adds the GradeService layout. The original constructs the
+    // member in the initializer order (0x32a40). Here it is constructed first in the body.
+    ::new (static_cast<void*>(_gradeService)) GradeService();
 }
 
 // 0x32b60
@@ -111,10 +114,13 @@ CliSession::CliSession(unsigned long long clikey, CliSessionTable* table)
       _serviceEntries(), _auth(), _bans(), _quotaList(), _recycleTimeList(), _table(table), _npLogin(false),
       _login(false), _isMobile(false), _teen(false), _scheduledEndTime(nullptr), _presence(nullptr), _srvloc(nullptr),
       _reservedStopPlay(nullptr), _chargeKey(nullptr), _chargeStopRequestTxnId(0),
-      _gradeService(1),  // LIFT: argument 1 at 0x140053539 (LTCG constant; the HR shows edx only)
       _pcCafeCode(nullptr), _pcCafe(nullptr), _pcCafeCharged(false), _mileageSlot(nullptr),
       _infoGateToken(ID128_GUID_ZERO), _renameUserServiceEntry(nullptr), _lock()
 {
+    // LIFT: _gradeService is opaque storage until ld-4 adds the GradeService layout. The original constructs the
+    // member between _chargeStopRequestTxnId and _pcCafeCode. Argument 1 at 0x140053539 (LTCG constant; the HR
+    // shows edx only).
+    ::new (static_cast<void*>(_gradeService)) GradeService(1);
     memset(_authProviderCode, 0, sizeof(_authProviderCode));
     memset(_externalAccountKey, 0, sizeof(_externalAccountKey));
     memset(_externalAccountName, 0, sizeof(_externalAccountName));
@@ -187,7 +193,8 @@ bool CliSession::setPresence(Presence* presence)
     if (_presence != nullptr)
     {
         _presence->OnUnset(_table, this);
-        // LIFT: the original global operator delete(void*) (0x32b50) is empty. Free gives the memory back.
+        // LIFT: the original global operator delete(void*) (0x32b50) is empty. The class operator delete is empty too
+        // (CliSession.h). Free gives the memory back.
         delete _presence;
         Memory::_Manager[2]->Free(_presence, L"CliSession.cpp", 1313);
         _presence = nullptr;
@@ -265,7 +272,8 @@ bool CliSession::enter(ServiceLocation* srvloc)
                    _srvloc->GetKind(), static_cast<int>(_srvloc->_wid), srvloc->GetKind(),
                    static_cast<int>(srvloc->_wid), _clikey, static_cast<unsigned int>(_state) >> 16, _state & 0xFFFF);
         _srvloc->Leave(this);
-        // LIFT: the original global operator delete(void*) (0x32b50) is empty. Free gives the memory back.
+        // LIFT: the original global operator delete(void*) (0x32b50) is empty. The class operator delete is empty too
+        // (CliSession.h). Free gives the memory back.
         delete _srvloc;
         Memory::_Manager[2]->Free(_srvloc, L"CliSession.cpp", 1375);
         _srvloc = nullptr;
@@ -296,7 +304,8 @@ void CliSession::leave()
                    L"[cs], leave service location ok, kind:%d, wid:%d, cli-key:0x%I64X, cli-state:%d.%d",
                    _srvloc->GetKind(), static_cast<int>(_srvloc->_wid), _clikey,
                    static_cast<unsigned int>(_state) >> 16, _state & 0xFFFF);
-        // LIFT: the original global operator delete(void*) (0x32b50) is empty. Free gives the memory back.
+        // LIFT: the original global operator delete(void*) (0x32b50) is empty. The class operator delete is empty too
+        // (CliSession.h). Free gives the memory back.
         delete _srvloc;
         Memory::_Manager[2]->Free(_srvloc, L"CliSession.cpp", 1396);
         _srvloc = nullptr;
