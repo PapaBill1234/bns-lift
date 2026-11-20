@@ -11,7 +11,7 @@ This repo is public. Do not commit binaries, keys, PDBs or IDA databases.
 ## Parity
 
 <!-- parity:start -->
-Last update: card `lift-lobbydaemon-0` (2026-11-20). Tool: `tools/parity.sh` (VS2010 /GL /LTCG build vs original, funcdiff).
+Last update: card `lift-lobbydaemon-2` (2026-11-20). Tool: `tools/parity.sh` (VS2010 /GL /LTCG build vs original, funcdiff).
 
 | Exe | Parity | MATCH | DIFF | Only in original | Total | Mean score | Start | Change | Level |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
@@ -64,4 +64,5 @@ Goal: 95 % per exe, 99 % preferred. Shared library: 99 % preferred. Rules: [Docs
 | `lift-parity-pod-4` | 92.5 % | 88.4 % | 93.9 % | 91.2 % |
 | `lift-parity-console-4` | 92.9 % | 89.0 % | 94.2 % | 91.4 % |
 | `lift-lobbydaemon-0` | 92.9 % | 89.0 % | 94.2 % | 91.4 % |
+| `lift-lobbydaemon-2` | 92.9 % | 89.0 % | 94.2 % | 91.4 % |
 <!-- parity:end -->
