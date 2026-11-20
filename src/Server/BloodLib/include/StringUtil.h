@@ -22,6 +22,8 @@ static_assert(sizeof(id128) == 0x10, "sizeof id128");
 // BnsCommonConfig constructor copies it (two qword loads in 0x13e0 and 0x1600).
 // LIFT: const. The public symbol is ?ID128_GUID_ZERO@@3Tid128@@B (const) in all 4 originals (POD 0x1993).
 extern id128 const ID128_GUID_ZERO;
+// PDB global ID128_ID_ZERO. LobbyDaemon public ?ID128_ID_ZERO@@3Tid128@@B (const, rva 0x12D870).
+extern id128 const ID128_ID_ZERO;
 
 class String
 {

@@ -1,6 +1,7 @@
 // AuctionDeliverJob.obj (LobbyDaemon PDB, 2019 + PDB). Wave 0: declarations of the stubbed functions only.
 // LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
 #pragma once
+#include "RefCntObject.h"
 
 struct LobbyJobDef;
 
@@ -19,8 +20,10 @@ private:
     bool registerPostTimeout();  // 0x13520
 };
 
-class RefCntPoolObj
+// PDB: RefCntPoolObj : RefCntObject (no own members). Same form as SmartCouponDaemon CouponJob.h.
+class RefCntPoolObj : public RefCntObject
 {
 public:
     virtual ~RefCntPoolObj();  // 0x12230
 };
+static_assert(sizeof(RefCntPoolObj) == 0x18, "sizeof RefCntPoolObj");

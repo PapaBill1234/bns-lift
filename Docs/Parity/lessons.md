@@ -846,3 +846,30 @@ What failed:
 - The gate ran per batch of modules, not per module. The generator writes all modules at once, so a per-module gate adds no data.
 - `tools/funcdiff.py` crashed on the first LD run: `is_tls_index` read a register from `mov [mem], <.tls offset>`.
   The fix returns False for a destination that is not a register. Run funcdiff on a new exe alone before `tools/parity.sh`.
+
+## ld-2
+
+Card lift-lobbydaemon-2: CliSession part 1 (RVA 0x329d0 to 0x35eb0, 29 functions).
+
+| Item | Result |
+| --- | --- |
+| Lifted | 15 |
+| Not done | 14 |
+| New layouts | `CliSession` (0x8D0), `GameAccount` (0x198), `ServiceLocation` (0x10), `GradeService` (0x40), `RefCntPoolObj` (0x18) |
+| LD MATCH | 49 -> 49 (+0). The other 4 exes: +0, no MATCH lost. |
+
+What worked:
+- The HR pseudocode was enough. IDA was not opened.
+- `static_assert` on each member offset of `CliSession` found layout errors at compile time, before the VS2010 build.
+- The `Free` line number in the pseudocode shows inlined callers. `finalize` frees `_presence` with line 1313, which is the
+  `setPresence` line. So `finalize` calls `setPresence(nullptr)`.
+- A `this` null test in a log call (`cs != nullptr ? cs->_clikey : 0`) comes from a local `CliSession const* cs = this;`.
+
+What failed:
+- LD MATCH gain is 0. The new functions have no live caller (their callers are `LIFT_STUB` bodies), so `/OPT:REF`
+  removes them. The built `LobbyDaemon.pdb` has no public for them. funcdiff cannot pair a function that is not in the exe.
+  Check this with `grep -a -F '?name@Class' build-vs2010/LobbyDaemon.pdb` before you expect a gain on LD.
+- The original global `operator delete(void*)` (0x32b50) is empty (ICF with `Console::Flush`). The source frees with
+  `delete p;` and then `Memory::_Manager[2]->Free`. Our `operator delete` is not empty, so the presence and srvloc classes
+  must not get real bases before 0x32b50 is defined. If they do, the memory is freed 2 times.
+- `tools/vs2010/build.sh` needs the same `LIFT_BUILD_DIR` as the gate. Without it, it stops with "no build/build.ninja".

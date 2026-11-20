@@ -6,6 +6,8 @@
 
 // LIFT: the PDB module of ID128_GUID_ZERO is not known. ❓ String.obj is a guess.
 extern id128 const ID128_GUID_ZERO = {0};
+// LIFT: the PDB module of ID128_ID_ZERO is not known (LobbyDaemon rva 0x12D870). ❓ String.obj is a guess.
+extern id128 const ID128_ID_ZERO = {0};
 
 // 0x1B360 (SmartCouponDaemon)
 bool String::GetId128FromGuidString(wchar_t const* guidString, id128* id)
