@@ -36,7 +36,7 @@ funcdiff cannot pair a function that is not in the exe. The lifts give MATCH whe
 | 0x329d0 | `ServiceLocation::~ServiceLocation` |
 | 0x32a40 | `CliSession::CliSession()` |
 | 0x32bb0 | `TimeBasedPlayInfoList::~TimeBasedPlayInfoList` |
-| 0x32e20 | `CliSession::SetPlayInfoFromGame` |
+| 0x32e20 | `TimeBasedPlayInfoList::SetPlayInfoFromGame` |
 | 0x33360 | `GameAccount::GameAccount` |
 | 0x33450 | `GameAccount::~GameAccount` |
 | 0x33490 | `CliSession::CliSession(unsigned __int64, CliSessionTable*)` |
@@ -62,7 +62,7 @@ funcdiff cannot pair a function that is not in the exe. The lifts give MATCH whe
 | `AuctionDeliverJob.h` | `RefCntPoolObj` now derives from `RefCntObject` (size 0x18, static_assert). |
 | `TLobbyError` | `__declspec(thread) LobbyError TLobbyError;` is defined in `CliSession.cpp`. The owner module is ❓. |
 | `ID128_ID_ZERO` | Declared in `StringUtil.h`, defined in `StringUtil.cpp`. The owner module is ❓. |
-| IDA | Not used. The HR pseudocode (`CliSession.c`) was enough. |
+| IDA | Not used. Repair 3 used `llvm-objdump` on the original exe and `llvm-pdbutil dump --publics` on the original PDB to name the zero globals. |
 
 ## Not done
 
@@ -93,3 +93,13 @@ funcdiff cannot pair a function that is not in the exe. The lifts give MATCH whe
 | Not done reasons of `login` and `loadDB` | Size in HR lines and blocking callees added. |
 
 Parity after the repair: all 5 exes +0, no MATCH lost (CG 456, LG 658, SCD 630, POD 694, LD 49).
+
+## Repair 3 (skeptic findings)
+
+| Finding | Fix |
+| --- | --- |
+| Lifted row 0x32e20 had the wrong class | Row is now `TimeBasedPlayInfoList::SetPlayInfoFromGame` (PDB, index, code). |
+| `ID128_ID_ZERO` vs `ID128_GUID_ZERO` had no reason | Verified in the disassembly. `GameAccount()` loads `_id` and `_userid` from 0x14012d870 (0x14003336a, 0x140033389). `CliSession(clikey, table)` loads `_infoGateToken` from 0x14012d880 (0x1400335dd, 0x1400335eb). PDB publics: `ID128_ID_ZERO` = 0002:55408 = RVA 0x12d870, `ID128_GUID_ZERO` = 0002:55424 = RVA 0x12d880. `// LIFT:` comments added. Code not changed. |
+| `GradeService(1)` comment cited an address in 0x534d0 | Comment now cites the call at 0x1400335bc in 0x33490. That call is the only caller of 0x534d0, so LTCG removed the edx load. The callee stores the constant in `_gradeLevel.level` (0x140053539, `mov dword ptr [rbx+4], 1`). |
+
+Parity after repair 3: all 5 exes +0, no MATCH lost (CG 456, LG 658, SCD 630, POD 694, LD 49).

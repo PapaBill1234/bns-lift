@@ -96,6 +96,8 @@ bool TimeBasedPlayInfoList::Decompose(RepeatPacketDecomposer&, Packet const*)
 }
 
 // 0x33360
+// LIFT: _id and _userid copy ID128_ID_ZERO (0x14012d870, PDB public ?ID128_ID_ZERO@@3Tid128@@B). The loads are at
+// 0x14003336a and 0x140033389. The HR shows only zero stores, so the disassembly gives the global.
 GameAccount::GameAccount() : _id(ID128_ID_ZERO), _userid(ID128_ID_ZERO)
 {
     memset(&_dbfield, 0, sizeof(_dbfield));
@@ -115,11 +117,15 @@ CliSession::CliSession(unsigned long long clikey, CliSessionTable* table)
       _login(false), _isMobile(false), _teen(false), _scheduledEndTime(nullptr), _presence(nullptr), _srvloc(nullptr),
       _reservedStopPlay(nullptr), _chargeKey(nullptr), _chargeStopRequestTxnId(0),
       _pcCafeCode(nullptr), _pcCafe(nullptr), _pcCafeCharged(false), _mileageSlot(nullptr),
+      // LIFT: _infoGateToken copies ID128_GUID_ZERO (0x14012d880, PDB public ?ID128_GUID_ZERO@@3Tid128@@B). The
+      // loads are at 0x1400335dd and 0x1400335eb. GameAccount() uses ID128_ID_ZERO (0x14012d870) instead.
       _infoGateToken(ID128_GUID_ZERO), _renameUserServiceEntry(nullptr), _lock()
 {
     // LIFT: _gradeService is opaque storage until ld-4 adds the GradeService layout. The original constructs the
-    // member between _chargeStopRequestTxnId and _pcCafeCode. Argument 1 at 0x140053539 (LTCG constant; the HR
-    // shows edx only).
+    // member between _chargeStopRequestTxnId and _pcCafeCode. The call is at 0x1400335bc in 0x33490. This call is
+    // the only caller of GradeService(int) 0x534d0, so LTCG removed the argument (no edx load; the HR shows an
+    // uninitialised edx). The callee stores the constant in `_gradeLevel.level = defaultLevel` (0x140053539,
+    // `mov dword ptr [rbx+4], 1`). So the argument is 1.
     ::new (static_cast<void*>(_gradeService)) GradeService(1);
     memset(_authProviderCode, 0, sizeof(_authProviderCode));
     memset(_externalAccountKey, 0, sizeof(_externalAccountKey));
