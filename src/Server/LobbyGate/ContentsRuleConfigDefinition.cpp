@@ -5,6 +5,7 @@
 #include "Log.h"
 #include "Memory.h"
 #include "MemoryManager.h"
+#include "LiftStub.h"
 #include <windows.h>
 #include <shlwapi.h>
 #include <new>
@@ -545,4 +546,37 @@ bool ContentsRuleConfig::UpdateAllVariable(ContentsRuleConfigLoad const* const l
         }
     }
     return true;
+}
+
+// Wave 0 of LobbyDaemon (lift-lobbydaemon-0): stubs only. A stub is not a lift.
+// The LobbyDaemon RVAs are below. LobbyDaemon does not link this file yet, and LobbyGate does not call
+// these functions. LIFT: a later wave gives LobbyDaemon its own ContentsRuleConfig owner.
+
+// 0x29730 (LobbyDaemon)
+ContentsRuleConfigReload* ContentsRuleConfigReload::Load()
+{
+    LIFT_STUB(0x29730);
+}
+
+// 0x29980 (LobbyDaemon)
+bool ContentsRuleConfig::ReloadContentsRuleConfig(bool& changed, bool& isNotify)
+{
+    (void)changed;
+    (void)isNotify;
+    LIFT_STUB(0x29980);
+}
+
+// 0x2a090 (LobbyDaemon)
+bool ContentsRuleConfig::UpdateReloadedVariable(ContentsRuleConfigReload const* const reload, bool& isNotify)
+{
+    (void)reload;
+    (void)isNotify;
+    LIFT_STUB(0x2a090);
+}
+
+// 0x2a210 (LobbyDaemon)
+bool ContentsRuleConfig::CompareMatch(ContentsRuleConfigReload const* reload) const
+{
+    (void)reload;
+    LIFT_STUB(0x2a210);
 }

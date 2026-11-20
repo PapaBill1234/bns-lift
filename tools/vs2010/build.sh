@@ -5,7 +5,7 @@
 # Needs:
 #   - ~/toolchains/vs2010 (see Docs/Plan/plan.md, "VS2010 SP1 compiler"). Never commit it.
 #   - The clang build dir (default: build). The script takes the object list of each exe and the .res files from it.
-# Usage: tools/vs2010/build.sh [EXE...]   (default: CacheGate LobbyGate SmartCouponDaemon PostOfficeDaemon)
+# Usage: tools/vs2010/build.sh [EXE...]   (default: CacheGate LobbyGate SmartCouponDaemon PostOfficeDaemon LobbyDaemon)
 # Env: LIFT_BUILD_DIR (clang build dir), VS2010_OUT (default: build-vs2010), JOBS (default: nproc)
 # Output: $VS2010_OUT/<EXE>.exe and <EXE>.pdb.
 # Header changes: the .dep file of each object lists its repo headers. A newer header rebuilds the object.
@@ -15,7 +15,7 @@ R="$PWD"
 B="${LIFT_BUILD_DIR:-build}"
 O="${VS2010_OUT:-build-vs2010}"
 JOBS="${JOBS:-$(nproc)}"
-EXES=("$@"); [ ${#EXES[@]} -gt 0 ] || EXES=(CacheGate LobbyGate SmartCouponDaemon PostOfficeDaemon)
+EXES=("$@"); [ ${#EXES[@]} -gt 0 ] || EXES=(CacheGate LobbyGate SmartCouponDaemon PostOfficeDaemon LobbyDaemon)
 # shellcheck source=/dev/null
 source "$HOME/toolchains/vs2010/bin/vs2010-env.sh"
 [ -f "$B/build.ninja" ] || { echo "no $B/build.ninja: run tools/gate.sh first" >&2; exit 2; }
@@ -151,7 +151,7 @@ for exe in "${EXES[@]}"; do
     srcs+=("$s")
   done
   # LIFT: a source that has the token LIFT_EXE_ (itself or in a repo header) gets one object per exe.
-  case "$exe" in CacheGate) tag=CG;; LobbyGate) tag=LG;; SmartCouponDaemon) tag=SCD;; PostOfficeDaemon) tag=POD;; *) tag="";; esac
+  case "$exe" in CacheGate) tag=CG;; LobbyGate) tag=LG;; SmartCouponDaemon) tag=SCD;; PostOfficeDaemon) tag=POD;; LobbyDaemon) tag=LD;; *) tag="";; esac
   declare -A PE=()
   if [ -n "$tag" ]; then
     while IFS= read -r s; do PE[$s]=1; done < <(printf '%s\n' "${srcs[@]}" | python3 -c "$PEREXE_PY" $(sed -n '/set(LIFT_SRC_INCLUDE/,/^)/p' CMakeLists.txt | grep -o 'src/[^ )]*'))

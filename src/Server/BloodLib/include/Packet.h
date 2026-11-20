@@ -49,6 +49,7 @@ public:
     void Concatenate(Packet const* packet, PacketConcatenateHandler const* concatHandler);           // 0x7300 (CacheGate)
     void Concatenate(char const* buffer, unsigned short size, PacketConcatenateHandler const* concatHandler);  // 0x7470 (CacheGate)
     unsigned short Decompose(PacketDecomposer* pdr, int n, ...) const;                                // 0x75B0 (CacheGate)
+    unsigned short FreeSize();                                                                        // 0x29D0 (LobbyDaemon)
 
     // 0x14280 (inline)
     char const* GetFreeBody() const

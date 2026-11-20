@@ -46,6 +46,7 @@ public:
     static bool ClosePort(unsigned int id);                                                           // 0xD5A0
     static bool StopPort(unsigned int portId);                                                        // 0x28F10 (PostOfficeDaemon)
     static wchar_t const* GetAddressStringW(unsigned long address);                                   // 0xD6D0
+    static unsigned long GetAddress(wchar_t const* addrString);                                       // 0xE4900 (LobbyDaemon)
     static void CloseSession(unsigned long long sessionId, bool force);                               // 0x209D0 (LobbyGate)
     // LIFT: LTCG removed portId (the only caller gives 1). LobbyGate 0x20860 reads _port[0].
     static bool SetMaxIdleTime(unsigned int portId, bool disconnect, long maxIdleTime);               // 0x20860 (LobbyGate)

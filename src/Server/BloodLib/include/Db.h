@@ -106,6 +106,7 @@ public:
     static bool initEnv();                                          // 0x20CB0
     void clearList();                                               // 0x20D90
     static long long ConvertTime(tagTIMESTAMP_STRUCT const* ts);    // 0x3c9f0 (MarketDealerDaemon)
+    static void ConvertTimeStamp(long long t, tagTIMESTAMP_STRUCT* ts);     // 0xe81f0 (LobbyDaemon)
 
     static void* EnvHandle;
     static Db* Instance[41];

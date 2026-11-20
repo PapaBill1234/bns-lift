@@ -64,6 +64,7 @@ lift_exe(lift_selftest
           src/selftest/pdb_types_LobbyGate.cpp src/selftest/pdb_types_PostOfficeDaemon.cpp
           src/selftest/pdb_types_MarketDealerDaemon.cpp
           src/selftest/pdb_types_SmartCouponDaemon.cpp
+          src/selftest/pdb_types_LobbyDaemon.cpp
   IMPORTS msvcr100 kernel32)
 # msvcr100 from Wine has no type_info vftable in the import lib. No RTTI for the selftest.
 target_compile_options(lift_selftest PRIVATE /GR-)
@@ -360,3 +361,136 @@ target_compile_options(PostOfficeDaemon PRIVATE /GR-)
 target_include_directories(PostOfficeDaemon BEFORE PRIVATE ${LIFT_STL_INCLUDE})
 add_dependencies(PostOfficeDaemon lift_msvcp100_implib)
 target_link_libraries(PostOfficeDaemon PRIVATE lift_postofficedaemon lift_common lift_common_pod ${LIFT_MSVCP100_IMPLIB})
+
+# LobbyDaemon BloodLib sources with a per-exe __FILE__ path. LobbyDaemon has no wrappers yet, so it uses
+# the plain files and their default path literals. LIFT: a later wave adds the LobbyDaemon wrappers.
+add_library(lift_common_ld STATIC
+  src/Server/BloodLib/source/MemoryManager.cpp
+  src/Server/BloodLib/source/RefCntObject.cpp
+  ${LIFT_COMMON_PATH_SOURCES})
+target_compile_options(lift_common_ld PRIVATE /GR-)
+target_include_directories(lift_common_ld BEFORE PRIVATE ${LIFT_STL_INCLUDE})
+add_dependencies(lift_common_ld lift_msvcp100_implib)
+target_link_libraries(lift_common_ld PUBLIC lift_common)
+
+# LobbyDaemon modules (static lib). Wave 0: declarations and LIFT_STUB bodies only (grep -rn "LIFT_STUB(" src).
+# The 6 common modules (BannedWordFilter, FsdDecomposer, PerfCounterProvider) are in this lib only,
+# so that the other exes do not change.
+add_library(lift_lobbydaemon STATIC
+  src/External/BannedWordFilter/BannedWordFilterLib.cpp
+  src/External/BannedWordFilter/BannedWordFilterLoader.cpp
+  src/External/BannedWordFilter/ConstFilterChat.cpp
+  src/External/BannedWordFilter/ConstFilterName.cpp
+  src/library/FsdReader/FsdDecomposer.cpp
+  src/Server/BloodLib/source/PerfCounterProvider.cpp
+  src/Server/Shared/SharedChannel.cpp
+  src/Server/LobbyDaemon/AbandonChargeJob.cpp
+  src/Server/LobbyDaemon/AccountInventoryChannel.cpp
+  src/Server/LobbyDaemon/AccountInventoryLobbyPacketHandler.cpp
+  src/Server/LobbyDaemon/ActivateGradeJob.cpp
+  src/Server/LobbyDaemon/AddSlotJob.cpp
+  src/Server/LobbyDaemon/AuctionBidJob.cpp
+  src/Server/LobbyDaemon/AuctionDeliverJob.cpp
+  src/Server/LobbyDaemon/AuctionEscrow.cpp
+  src/Server/LobbyDaemon/AuctionEscrowJob.cpp
+  src/Server/LobbyDaemon/AuctionRollbackEscrowJob.cpp
+  src/Server/LobbyDaemon/BLDaemonInfo.cpp
+  src/Server/LobbyDaemon/BindCharacterSlotJob.cpp
+  src/Server/LobbyDaemon/BoundedList.cpp
+  src/Server/LobbyDaemon/CancelWaitCharacterDeletionJob.cpp
+  src/Server/LobbyDaemon/ChangeCharacterAppearanceJob.cpp
+  src/Server/LobbyDaemon/ChangeCharacterRaceJob.cpp
+  src/Server/LobbyDaemon/ChangeCharacterSexJob.cpp
+  src/Server/LobbyDaemon/ChangeUserNameJob.cpp
+  src/Server/LobbyDaemon/Character.cpp
+  src/Server/LobbyDaemon/CliSession.cpp
+  src/Server/LobbyDaemon/CliSessionJob.cpp
+  src/Server/LobbyDaemon/CliSessionManager.cpp
+  src/Server/LobbyDaemon/CliSessionTable.cpp
+  src/Server/LobbyDaemon/CreateCharacterJob.cpp
+  src/Server/LobbyDaemon/CreateInitialUserNameJob.cpp
+  src/Server/LobbyDaemon/DeleteCharacterJob.cpp
+  src/Server/LobbyDaemon/DepositMileageJob.cpp
+  src/Server/LobbyDaemon/EndWaitGameWorldJob.cpp
+  src/Server/LobbyDaemon/EnterGameWorldJob.cpp
+  src/Server/LobbyDaemon/ExtendJumpingCharacterCreationQuotaJob.cpp
+  src/Server/LobbyDaemon/FsdShowcaseRecord.cpp
+  src/Server/LobbyDaemon/GameTimeSchedule.cpp
+  src/Server/LobbyDaemon/GameWorld.cpp
+  src/Server/LobbyDaemon/GamedChannel.cpp
+  src/Server/LobbyDaemon/GetChargeInfoJob.cpp
+  src/Server/LobbyDaemon/GetGoodsCountJob.cpp
+  src/Server/LobbyDaemon/GetLobbyServiceItemJob.cpp
+  src/Server/LobbyDaemon/GiveupWaitGameWorldJob.cpp
+  src/Server/LobbyDaemon/GradeService.cpp
+  src/Server/LobbyDaemon/InfoGateChannel.cpp
+  src/Server/LobbyDaemon/InitCliSessionWlobbyTokenJob.cpp
+  src/Server/LobbyDaemon/InitCliSessionWnpTokenJob.cpp
+  src/Server/LobbyDaemon/KickJob.cpp
+  src/Server/LobbyDaemon/LeaveGameWorldJob.cpp
+  src/Server/LobbyDaemon/ListGoodsJob.cpp
+  src/Server/LobbyDaemon/ListLobbyServiceItemJob.cpp
+  src/Server/LobbyDaemon/LobbyCharacterDeletionScheduler.cpp
+  src/Server/LobbyDaemon/LobbyConfig.cpp
+  src/Server/LobbyDaemon/LobbyDB.cpp
+  src/Server/LobbyDaemon/LobbyDaemon.cpp
+  src/Server/LobbyDaemon/LobbyEvent.cpp
+  src/Server/LobbyDaemon/LobbyGamePacketHandler.cpp
+  src/Server/LobbyDaemon/LobbyGateChannel.cpp
+  src/Server/LobbyDaemon/LobbyInfoGatePacketHandler.cpp
+  src/Server/LobbyDaemon/LobbyJSON.cpp
+  src/Server/LobbyDaemon/LobbyJob.cpp
+  src/Server/LobbyDaemon/LobbyLobbyGatePacketHandler.cpp
+  src/Server/LobbyDaemon/LobbyLocale.cpp
+  src/Server/LobbyDaemon/LobbyManagePacketHandler.cpp
+  src/Server/LobbyDaemon/LobbyMessage.cpp
+  src/Server/LobbyDaemon/LobbyPerfMonitor.cpp
+  src/Server/LobbyDaemon/LobbyPredefine.cpp
+  src/Server/LobbyDaemon/LobbyService.cpp
+  src/Server/LobbyDaemon/LobbyStats.cpp
+  src/Server/LobbyDaemon/LobbyTick.cpp
+  src/Server/LobbyDaemon/LobbyToken.cpp
+  src/Server/LobbyDaemon/LogoutInGameWorldJob.cpp
+  src/Server/LobbyDaemon/LogoutJob.cpp
+  src/Server/LobbyDaemon/ManageChannel.cpp
+  src/Server/LobbyDaemon/MembershipMileage.cpp
+  src/Server/LobbyDaemon/Mileage.cpp
+  src/Server/LobbyDaemon/MileageDailyLimit.cpp
+  src/Server/LobbyDaemon/NPLobbyMessageHandler.cpp
+  src/Server/LobbyDaemon/NPServiceChannel.cpp
+  src/Server/LobbyDaemon/PcCafe.cpp
+  src/Server/LobbyDaemon/PcCafeMileage.cpp
+  src/Server/LobbyDaemon/PostOfficeChannel.cpp
+  src/Server/LobbyDaemon/PostOfficeClientSideHandlerList.cpp
+  src/Server/LobbyDaemon/PostOfficePacketHandler.cpp
+  src/Server/LobbyDaemon/RecoverPcJob.cpp
+  src/Server/LobbyDaemon/RefCntList.cpp
+  src/Server/LobbyDaemon/RenameCharacterJob.cpp
+  src/Server/LobbyDaemon/RuleSet.cpp
+  src/Server/LobbyDaemon/SecondPasswordGetStatusJob.cpp
+  src/Server/LobbyDaemon/SecondPasswordIsVerifiedJob.cpp
+  src/Server/LobbyDaemon/SetupNpScheduleInfoJob.cpp
+  src/Server/LobbyDaemon/StartChargeJob.cpp
+  src/Server/LobbyDaemon/StartCliSessionWlobbyTokenJob.cpp
+  src/Server/LobbyDaemon/StartCliSessionWnpTokenJob.cpp
+  src/Server/LobbyDaemon/StopChargeJob.cpp
+  src/Server/LobbyDaemon/TakeAccountTimeBasedPlayRewardJob.cpp
+  src/Server/LobbyDaemon/TakeGoodsJob.cpp
+  src/Server/LobbyDaemon/TencentUIC.cpp
+  src/Server/LobbyDaemon/TransactionChannel.cpp
+  src/Server/LobbyDaemon/TryEnterGameWorldJob.cpp
+  src/Server/LobbyDaemon/WaitQueue.cpp)
+target_compile_options(lift_lobbydaemon PRIVATE /GR-)
+target_include_directories(lift_lobbydaemon BEFORE PRIVATE ${LIFT_STL_INCLUDE})
+target_include_directories(lift_lobbydaemon PUBLIC ${LIFT_SRC_INCLUDE})
+add_dependencies(lift_lobbydaemon lift_msvcp100_implib)
+target_link_libraries(lift_lobbydaemon PUBLIC lift_common)
+
+# LobbyDaemon server exe. It has no LinkStubs.cpp: each stub is in its owner module.
+lift_exe(LobbyDaemon
+  SOURCES src/Server/LobbyDaemon/LobbyDaemon.rc src/crt/wmain_bridge.c src/crt/tlssup.c src/crt/new_delete.c
+  IMPORTS msvcr100 kernel32 user32 advapi32 shell32 ole32 odbc32 shlwapi version ws2_32 iphlpapi)
+target_compile_options(LobbyDaemon PRIVATE /GR-)
+target_include_directories(LobbyDaemon BEFORE PRIVATE ${LIFT_STL_INCLUDE})
+add_dependencies(LobbyDaemon lift_msvcp100_implib)
+target_link_libraries(LobbyDaemon PRIVATE lift_lobbydaemon lift_common lift_common_ld ${LIFT_MSVCP100_IMPLIB})

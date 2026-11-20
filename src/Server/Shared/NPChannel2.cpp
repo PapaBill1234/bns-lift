@@ -20,6 +20,8 @@
 #include "Packet.h"
 #include "PacketBuffer.h"
 #include "Session.h"
+#include "StringUtil.h"
+#include "LiftStub.h"
 
 using namespace StsMsgLib;
 
@@ -669,4 +671,32 @@ bool NPChannel::checkLibError(EStsMsgError err)
         break;
     }
     return true;
+}
+
+// Wave 0 of LobbyDaemon (lift-lobbydaemon-0): stubs only. A stub is not a lift.
+// LIFT: the LobbyDaemon PDB puts these functions in NPChannel2.cpp. LobbyDaemon does not link this file yet,
+// because it includes the SmartCouponDaemon NPChannel.h.
+
+// 0x2700 (LobbyDaemon)
+void String::UnicodeToMultibyte(char* dst, unsigned long long count, wchar_t const* src)
+{
+    (void)dst;
+    (void)count;
+    (void)src;
+    LIFT_STUB(0x2700);
+}
+
+// 0x29d0 (LobbyDaemon)
+unsigned short Packet::FreeSize()
+{
+    LIFT_STUB(0x29d0);
+}
+
+// 0x2be0 (LobbyDaemon)
+long long NPMsgHelper::LocaleHourToUTCTime(int hour, long long const UTCTime, int const timeZoneSecond)
+{
+    (void)hour;
+    (void)UTCTime;
+    (void)timeZoneSecond;
+    LIFT_STUB(0x2be0);
 }

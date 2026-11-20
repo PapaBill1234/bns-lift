@@ -206,6 +206,9 @@ def is_tls_index(insns, idx):
     win = insns[max(0, idx - 6):idx + 7]
     if not any("gs:" in w.op_str for w in win):
         return False
+    # LobbyDaemon has `mov [mem], <.tls offset>` next to a `gs:` load. The pattern needs a register destination.
+    if ins.operands[0].type != X86.X86_OP_REG:
+        return False
     r = _reg64(ins.operands[0].reg)
     for w in insns[idx + 1:idx + 7]:
         for op in w.operands:

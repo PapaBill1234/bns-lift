@@ -17,6 +17,7 @@
 #include "Port.h"
 #include "SysInfo.h"
 #include "Thread.h"
+#include "LiftStub.h"
 
 static wchar_t const NETWORK_FILE[] = L"source\\Network.cpp";
 
@@ -442,4 +443,11 @@ bool Network::initializeSocketInterface()
     }
     closesocket(sock);
     return true;
+}
+
+// 0xe4900 (LobbyDaemon). Wave 0 of LobbyDaemon: stub only. A stub is not a lift.
+unsigned long Network::GetAddress(wchar_t const* addrString)
+{
+    (void)addrString;
+    LIFT_STUB(0xe4900);
 }

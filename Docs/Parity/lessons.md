@@ -812,3 +812,37 @@ What failed:
   Measure again after each merge with main. A data-layout win can go away when other cards change globals.
 - LG `checkFrozenThread` (91.0): the original inlines `SetInvalidInfo` and `addNode`, with the match-node search. This needs a change in
   `SetInvalidInfo` (stop list). Without `noinline` on `addNode`, LG loses score in 2 other functions.
+
+## ld-0
+
+Card lift-lobbydaemon-0: LobbyDaemon skeleton and stubs. Wave 0 lifts no logic.
+
+| Item | Result |
+| --- | --- |
+| Module files | 96 server modules + 6 common modules, generated from the PDB publics |
+| Stubs (`LIFT_STUB`) | 1400 functions |
+| Not done without stub | 521 functions |
+| Lifted | 0 |
+
+What worked:
+- A generator that reads the PDB publics, the HR index and the module list. It writes one `.h` and one `.cpp` per module,
+  and one table of the functions that it cannot declare. Run it once. Fix the rest by hand.
+- One marker macro (`LIFT_STUB(rva)`). `grep -rn "LIFT_STUB(" src` finds all stubs. The stub stops the process,
+  so it never reports success.
+- `tools/pdb2h.py` failed on types that are local to a member function (`__l46::SortByStartTime`).
+  The fix prefixes the `sizeof` and `offsetof` asserts with `pdb_local::`. The other exes' `types.h` do not change.
+- The exe `VERSIONINFO` resource gives the `.rc` values. Copy them. Do not write a version label from them.
+
+What failed:
+- The clang path links static libs and pulls only the referenced objects. The VS2010 path links ALL objects.
+  So a latent reference in any lib object breaks only the VS2010 link. Always build the new exe with
+  `tools/vs2010/build.sh <EXE>` before the full `tools/parity.sh`. It takes minutes, not 10+.
+- VS2010 `stdlib.h` does not declare `abort` noreturn. A stub with a return type gives error C4716 at LTCG code generation.
+  The clang gate does not show this. The fix: `__assume(0)` after `::abort()` in `LIFT_STUB`.
+- `src/Server/LobbyDaemon/ObjectPool.cpp` is SCD code. It uses `GObjPoolMemAlloc` as `SmartCouponObjPoolMemoryAllocator*`.
+  The LD PDB gives `LobbyObjPoolMemAllocator*`. Do not link it into LD. A later wave must give LD its own form.
+- `ClientSideDaemonChannel::onAccept`: BloodLib `Channel.cpp` emits the vftable, so every exe needs a body.
+  LD has no symbol for it. Without `LinkStubs.cpp`, the LD-only owner is `LobbyDaemon.cpp` (`LIFT_STUB(0)`).
+- The gate ran per batch of modules, not per module. The generator writes all modules at once, so a per-module gate adds no data.
+- `tools/funcdiff.py` crashed on the first LD run: `is_tls_index` read a register from `mov [mem], <.tls offset>`.
+  The fix returns False for a destination that is not a register. Run funcdiff on a new exe alone before `tools/parity.sh`.

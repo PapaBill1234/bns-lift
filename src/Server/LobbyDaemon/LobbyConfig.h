@@ -1,0 +1,10 @@
+// LobbyConfig.obj (LobbyDaemon PDB, 2019 + PDB). Wave 0: declarations of the stubbed functions only.
+// LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
+#pragma once
+
+class LobbyConfig
+{
+public:
+    bool Check() const;  // 0x98980
+    void Reload();  // 0x990f0
+};

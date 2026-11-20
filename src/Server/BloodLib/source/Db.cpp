@@ -18,6 +18,7 @@ extern "C" int __cdecl _vswprintf_c_l(wchar_t* buffer, size_t count, wchar_t con
 #include "Log.h"
 #include "Memory.h"
 #include "MemoryManager.h"
+#include "LiftStub.h"
 
 static wchar_t const kFile[] = L"source\\Db.cpp";
 
@@ -539,4 +540,12 @@ long long Db::ConvertTime(tagTIMESTAMP_STRUCT const* ts)
     time.tm_min = ts->minute;
     time.tm_sec = ts->second;
     return _mktime64(&time);
+}
+
+// 0xe81f0 (LobbyDaemon). Wave 0 of LobbyDaemon: stub only. A stub is not a lift.
+void Db::ConvertTimeStamp(long long t, tagTIMESTAMP_STRUCT* ts)
+{
+    (void)t;
+    (void)ts;
+    LIFT_STUB(0xe81f0);
 }

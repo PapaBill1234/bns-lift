@@ -7,6 +7,7 @@
 #include "Log.h"
 #include "AlertSender.h"
 #include <new>
+#include "LiftStub.h"
 
 static wchar_t const* const SHARED_CHANNEL_FILE = L"..\\Shared\\SharedChannel.cpp";
 static wchar_t const* const CHANNEL_H_FILE =
@@ -120,4 +121,49 @@ bool SharedChannel::IsConnected()
     session->_lock.Leave();
     session->removeReferenceCount(CHANNEL_H_FILE, 52);
     return connected;
+}
+
+// Wave 0 of LobbyDaemon (lift-lobbydaemon-0): stubs only. A stub is not a lift.
+
+// 0x4b70 (LobbyDaemon)
+bool SharedChannel::Send(char const* format, ...)
+{
+    (void)format;
+    LIFT_STUB(0x4b70);
+}
+
+// 0x4ba0 (LobbyDaemon)
+bool SharedChannel::Send(Packet const* packet)
+{
+    (void)packet;
+    LIFT_STUB(0x4ba0);
+}
+
+// 0x4c50 (LobbyDaemon)
+bool SharedChannel::sendV(char const* format, char* args)
+{
+    (void)format;
+    (void)args;
+    LIFT_STUB(0x4c50);
+}
+
+// 0x4d20 (LobbyDaemon)
+SharedChannelList::~SharedChannelList()
+{
+    LIFT_STUB(0x4d20);
+}
+
+// 0x4d60 (LobbyDaemon)
+bool SharedChannelList::Initialize(unsigned long long idmin, unsigned long long idmax)
+{
+    (void)idmin;
+    (void)idmax;
+    LIFT_STUB(0x4d60);
+}
+
+// 0x4e20 (LobbyDaemon)
+bool SharedChannelList::Set(SharedChannel* channel)
+{
+    (void)channel;
+    LIFT_STUB(0x4e20);
 }

@@ -27,4 +27,5 @@ class String
 {
 public:
     static bool GetId128FromGuidString(wchar_t const* guidString, id128* id);  // 0x1B360 (SmartCouponDaemon)
+    static void UnicodeToMultibyte(char* dst, unsigned long long count, wchar_t const* src);  // 0x2700 (LobbyDaemon)
 };

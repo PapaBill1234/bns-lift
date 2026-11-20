@@ -46,6 +46,19 @@ public:
 static_assert(sizeof(ContentsRuleConfigLoad) == 0x28, "sizeof ContentsRuleConfigLoad");
 static_assert(offsetof(ContentsRuleConfigLoad, _enableGuildJoinRenewal) == 0x24, "ContentsRuleConfigLoad::_enableGuildJoinRenewal");
 
+// LobbyDaemon only (2019 + PDB). LobbyGate does not use this class.
+class ContentsRuleConfigReload
+{
+public:
+    bool _useBotPriorityQueue;
+    int _minBotScoreToApplyBotPriorityQueue;
+
+    static ContentsRuleConfigReload* Load();  // 0x29730 (LobbyDaemon)
+};
+static_assert(sizeof(ContentsRuleConfigReload) == 0x8, "sizeof ContentsRuleConfigReload");
+static_assert(offsetof(ContentsRuleConfigReload, _minBotScoreToApplyBotPriorityQueue) == 0x4,
+              "ContentsRuleConfigReload::_minBotScoreToApplyBotPriorityQueue");
+
 class ContentsRuleConfig
 {
 public:
@@ -77,6 +90,7 @@ public:
     static bool LoadContentsRuleConfig();     // 0x82c0
     static void DestroyContentsRuleConfig();  // 0x84d0
     static void Dump();                       // 0x8600
+    static bool ReloadContentsRuleConfig(bool& changed, bool& isNotify);  // 0x29980 (LobbyDaemon)
 
     static FragmentPacket* ListPacket;              // 0x93f68
     static FragmentPacketWrap* ListPacketOlds;      // 0x93f70
@@ -94,6 +108,8 @@ private:
     static bool CheckMinMaxBoundary(void const* const loaded, ContentsRuleXmlCfgDefLocal const* defList,
                                     XmlCfgDef const* loadDefList, int defCount);  // 0x8ef0
     bool UpdateAllVariable(ContentsRuleConfigLoad const* const loaded);         // 0x9060
+    bool UpdateReloadedVariable(ContentsRuleConfigReload const* const reload, bool& isNotify);  // 0x2a090 (LobbyDaemon)
+    bool CompareMatch(ContentsRuleConfigReload const* reload) const;  // 0x2a210 (LobbyDaemon)
 };
 static_assert(sizeof(ContentsRuleConfig) == 0x30, "sizeof ContentsRuleConfig");
 static_assert(offsetof(ContentsRuleConfig, _dummyData) == 0x8, "ContentsRuleConfig::_dummyData");

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Parity gate for the lift-parity cards.
-# 1. Build the 4 exes with VS2010 /GL /LTCG (tools/vs2010/build.sh). Needs build/ from tools/gate.sh.
+# 1. Build the 5 exes with VS2010 /GL /LTCG (tools/vs2010/build.sh). Needs build/ from tools/gate.sh.
 # 2. Compare each exe with the original (tools/funcdiff.py).
 # 3. Compare the result with Docs/Parity/baseline/<EXE>.json.
 # Fail when the MATCH count of an exe goes down, or a MATCH function becomes DIFF.
@@ -16,7 +16,7 @@ UPDATE=0
 [ "${1:-}" = "--update" ] && { UPDATE=1; shift; }
 ACCEPT=0
 [ "${1:-}" = "--accept" ] && { ACCEPT=1; shift; }
-EXES=("$@"); [ ${#EXES[@]} -gt 0 ] || EXES=(CacheGate LobbyGate SmartCouponDaemon PostOfficeDaemon)
+EXES=("$@"); [ ${#EXES[@]} -gt 0 ] || EXES=(CacheGate LobbyGate SmartCouponDaemon PostOfficeDaemon LobbyDaemon)
 O="${VS2010_OUT:-build-vs2010}"
 if [ "$ACCEPT" = 1 ]; then
   for e in "${EXES[@]}"; do cp "$O/$e.funcdiff.json" "Docs/Parity/baseline/$e.json"; done

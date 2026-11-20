@@ -1,0 +1,59 @@
+// NPServiceChannel.obj (LobbyDaemon PDB, 2019 + PDB). Wave 0: declarations of the stubbed functions only.
+// LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
+#pragma once
+
+class LobbyJob;
+class NPChannel;
+class NPTransaction;
+union id128;
+
+class NPGameServiceChannel
+{
+public:
+    bool SendRequestConsumeGameToken(NPTransaction*, id128 const&, id128 const&, unsigned long);  // 0xd0220
+    bool SendRequestAuthChangeMyUserNameIncomplete(NPTransaction*, id128 const&, wchar_t const*, wchar_t const*, wchar_t const*);  // 0xd0370
+    bool SendRequestSlotGetSlot(NPTransaction*, id128 const&, id128 const&);  // 0xd03d0
+    bool SendRequestSlotCreateActivitySlots(NPTransaction*, id128 const&, wchar_t const*, unsigned long long, int, wchar_t const*);  // 0xd0450
+    bool SendRequestSlotSetActivitySlotData(NPTransaction*, id128 const&, id128 const&, unsigned long long);  // 0xd0560
+    bool SendRequestPresenceLogin(NPTransaction*, wchar_t const*, wchar_t const*, wchar_t const*, id128 const&, unsigned long);  // 0xd0650
+    bool SendRequestPresenceLogout(id128 const&);  // 0xd0800
+    bool SendRequestPresenceKick(NPTransaction*, id128 const&, id128 const&, bool);  // 0xd09b0
+    bool SendResponseGateLogoutUser(unsigned int, int);  // 0xd0e20
+    bool SendRequestChargeGetInfo(NPTransaction*, id128 const&, unsigned long);  // 0xd0e90
+    bool SendRequestChargeStart(NPTransaction*, id128 const&, unsigned long, short, unsigned int);  // 0xd0fc0
+    bool SendRequestChargeStop(NPTransaction*, id128 const&, unsigned long, wchar_t const*);  // 0xd1110
+    bool SendRequestChargeAbandon(NPTransaction*, id128 const&, wchar_t const*);  // 0xd1230
+    bool SendResponseChargeRequestStopFail(unsigned int, wchar_t const*, int);  // 0xd1310
+    bool SendRequestListUserLastPresences(NPTransaction*, id128 const&);  // 0xd1390
+    bool SendRequestGradeListAllGrades(NPTransaction*, id128 const&);  // 0xd1410
+    bool SendRequestGradeActivateGrade(NPTransaction*, id128 const&, int, int);  // 0xd1510
+    bool SendResponseGameAuctionEscrowOk(unsigned int, unsigned long long);  // 0xd1610
+    bool SendResponseGameAuctionEscrowFail(unsigned int, wchar_t const*, int, unsigned long long);  // 0xd1710
+    bool SendResponseGameAuctionRollbackEscrowOk(unsigned int);  // 0xd17f0
+    bool SendResponseGameAuctionRollbackEscrowFail(unsigned int, wchar_t const*, int);  // 0xd1860
+    bool SendResponseGameAuctionDeliveryOk(unsigned int, unsigned long long);  // 0xd18e0
+    bool SendResponseGameAuctionDeliveryFail(unsigned int, wchar_t const*, int, unsigned long long);  // 0xd19e0
+    bool SendRequestListUserBans(NPTransaction*, id128 const&);  // 0xd1af0
+    bool SendRequestRMSInquiry(NPTransaction*, id128 const&, char*, unsigned long);  // 0xd1be0
+    bool SendRequestProfileGetUserProfile(NPTransaction*, id128 const&);  // 0xd1ce0
+    bool SendRequestGameTimeGetGameTime(NPTransaction*, id128 const&);  // 0xd1d60
+    bool SendRequestPromotionStampListCurrentPromotions(NPTransaction*, wchar_t const*);  // 0xd1de0
+    bool SendRequestPromotionStampGetPromotionPolicy(NPTransaction*, int);  // 0xd1f00
+    bool SendRequestPromotionStampGetUserPromotionStatus(NPTransaction*, id128 const&, int, short, wchar_t const*);  // 0xd1f90
+    bool SendRequestPromotionStampAttendPromotionSecured(NPTransaction*, id128 const&, int, short, wchar_t const*, short, long long);  // 0xd20d0
+};
+
+class NPLobbyJobTransaction
+{
+public:
+    virtual void Expire();  // 0xd2250
+    NPTransaction* Set(LobbyJob*, int);  // 0xd22c0
+};
+
+class NPServiceChannelManager
+{
+public:
+    bool Initialize(unsigned int, unsigned long, unsigned short, long);  // 0xcfba0
+    virtual bool OnConnect(NPChannel*, bool) const;  // 0xcfdb0
+    virtual bool OnClose(NPChannel*, bool) const;  // 0xcff70
+};

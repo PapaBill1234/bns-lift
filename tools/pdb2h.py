@@ -1193,7 +1193,7 @@ class Gen:
         for n in order:
             lines, asserts = bodies[n]
             L += self.wrap(n, lines)
-            L += asserts
+            L += self.local_asserts(n, asserts)
             L.append("")
         if glob:
             L.append("// Global data (S_GDATA32)")
@@ -1209,6 +1209,14 @@ class Gen:
         with open(path, "w", newline="\n") as f:
             f.write("\n".join(L) + "\n")
         return path, len(order), len(dropped), len(glob)
+
+    def local_asserts(self, n, asserts):
+        """The asserts of a type that is local to a member function must use the pdb_local:: name."""
+        ns, _s = self.split_ns(n)
+        if not ns or ns.split("::")[0] not in self.defs:
+            return asserts
+        return [a.replace("sizeof(%s" % n, "sizeof(pdb_local::%s" % n)
+                 .replace("offsetof(%s" % n, "offsetof(pdb_local::%s" % n) for a in asserts]
 
     def wrap(self, n, lines):
         ns, _s = self.split_ns(n)

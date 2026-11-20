@@ -42,6 +42,7 @@ TARGET_PDB = {
     "LobbyGate": "LobbyGate", "lift_lobbygate": "LobbyGate",
     "PostOfficeDaemon": "PostOfficeDaemon", "lift_postofficedaemon": "PostOfficeDaemon",
     "SmartCouponDaemon": "SmartCouponDaemon", "lift_smartcoupondaemon": "SmartCouponDaemon",
+    "LobbyDaemon": "LobbyDaemon", "lift_lobbydaemon": "LobbyDaemon",
 }
 SKIP_TARGETS = {"lift_selftest", "lift_zstd"}
 
