@@ -70,6 +70,7 @@ class ChangeCharacterSexService
 {
 public:
     virtual bool Fetch(CliSession*, FragmentPacket*) const;  // 0x6fc10
+    virtual bool IsServiceTarget(Character*);  // 0x6c760
     bool Start(CliSession*, unsigned int, char, char*, int);  // 0x6fe20
     bool ConsumeItemTried(CliSession*);  // 0x70040
     bool TaskDone(CliSession*);  // 0x70240
@@ -87,7 +88,8 @@ public:
 
     CharacterCosmesisService() : _characterCosmesisServiceDB() {}
     bool Setup(LobbyService::DB*, DB*);  // 0x6c4a0
-    virtual bool Fetch(CliSession*, FragmentPacket*) const;  // 0x6c550
+    virtual bool Fetch(CliSession*, FragmentPacket*) const override;  // 0x6c550
+    virtual bool IsServiceTarget(Character*) override;  // 0x6c760
     bool Start(CliSession*, unsigned int, char*, int);  // 0x6c780
     bool ConsumeItemTried(CliSession*);  // 0x6c980
     bool TaskDone(CliSession*);  // 0x6cb80
@@ -133,10 +135,16 @@ private:
 };
 static_assert(sizeof(RenameCharacterService) == 0x30, "sizeof RenameCharacterService");
 
-class RenameUserService
+class RenameUserService : public LobbyService
 {
 public:
-    virtual bool Fetch(CliSession*, FragmentPacket*) const;  // 0x6ec40
+    RenameUserService() : _oldUserName(), _newUserName() {}
+    virtual bool Fetch(CliSession*, FragmentPacket*) const override;  // 0x6ec40
     bool Start(CliSession*, wchar_t const*, wchar_t const*);  // 0x6ece0
     bool Finish(CliSession*, unsigned long long, unsigned int);  // 0x6edf0
+
+private:
+    wchar_t _oldUserName[65];
+    wchar_t _newUserName[65];
 };
+static_assert(sizeof(RenameUserService) == 0x130, "sizeof RenameUserService");

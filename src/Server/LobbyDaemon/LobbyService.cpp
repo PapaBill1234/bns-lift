@@ -92,6 +92,18 @@ bool ChangeCharacterRaceService::IsServiceTarget(Character*)
     LIFT_STUB(0x6c760);
 }
 
+// 0x6c760 (folded)
+bool ChangeCharacterSexService::IsServiceTarget(Character*)
+{
+    LIFT_STUB(0x6c760);
+}
+
+// 0x6c760 (folded)
+bool CharacterCosmesisService::IsServiceTarget(Character*)
+{
+    LIFT_STUB(0x6c760);
+}
+
 // 0x6c780
 bool CharacterCosmesisService::Start(CliSession*, unsigned int, char*, int)
 {

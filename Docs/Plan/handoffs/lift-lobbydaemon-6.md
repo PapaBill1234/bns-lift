@@ -1,6 +1,6 @@
 # lift-lobbydaemon-6: LobbyService part 1 and LobbyEvent
 
-Source: LobbyDaemon 2019 + PDB. The lift uses the indexed pseudocode cache and the PDB types. It covers 11 of 38 functions. It leaves 27 functions Not done. The count excludes four compiler-generated deleting destructors.
+Source: LobbyDaemon 2019 + PDB. The lift uses the indexed pseudocode cache and the PDB types. It covers 11 of 38 function RVAs. It leaves 27 RVAs Not done. Three names share the RVA at `0x6c760`. The count excludes four compiler-generated deleting destructors.
 
 ## Lifted
 
@@ -18,9 +18,9 @@ Source: LobbyDaemon 2019 + PDB. The lift uses the indexed pseudocode cache and t
 | LobbyEvent | `0xbb9e0` | `SharedChannelFragmentPacketHandleEvent::~SharedChannelFragmentPacketHandleEvent` | 100.0 | MATCH |
 | LobbyEvent | `0xbba60` | `SharedChannelFragmentPacketHandleEvent::HandleEvent` | 100.0 | MATCH |
 
-The three setup functions reject null input before they change either record. The original wrote the base record before it checked the second input. The slot check rejects the zero ID and compares both parts of the ID. The rename-user fetch always rejects the request. It does not put the session identifier in logs or alerts.
+The three setup functions reject null input before they change either record. The original wrote the base record before it checked the second input. The slot check rejects the zero ID and compares both parts of the ID. The rename-user fetch rejects the request through `LobbyService`. It does not put the session identifier in logs or alerts. The PDB gives a `LobbyService` base and two 65-element `wchar_t` arrays at `0x28` and `0xAA`.
 
-The event constructors take one channel reference if a channel is present. The callbacks run only when the handler, channel, and payload are present. Each handler releases the event reference. Each destructor destroys its payload before it returns the storage to the allocator, then releases its channel reference. The PDB folds both `EventId` functions at `0x5a0a0`; the cached body returns zero.
+The event owners do not allow copy construction or copy assignment. The event constructors take one channel reference if a channel is present. The callbacks run only when the handler, channel, and payload are present. Each handler releases the event reference. Each destructor destroys its payload before it returns the storage to the allocator, then releases its channel reference. The PDB folds both `EventId` functions at `0x5a0a0`; the cached body returns zero.
 
 ## Not done
 
@@ -28,7 +28,9 @@ The event constructors take one channel reference if a channel is present. The c
 | --- | --- | --- | --- |
 | LobbyService | `0x6c330` | `LobbyService::Fetch` | The caller's packet composer contract still needs verification. |
 | LobbyService | `0x6c550` | `CharacterCosmesisService::Fetch` | Needs the base fetch and the character record layout. |
-| LobbyService | `0x6c760` | `ChangeCharacterRaceService::IsServiceTarget` | Needs the character record and race-service layouts. |
+| LobbyService | `0x6c760` | `CharacterCosmesisService::IsServiceTarget(Character*)` | The override uses a stub, not the base result. It needs the verified `Character` layout. |
+| LobbyService | `0x6c760` | `ChangeCharacterRaceService::IsServiceTarget(Character*)` | The stub needs the verified `Character` and race-service layouts. |
+| LobbyService | `0x6c760` | `ChangeCharacterSexService::IsServiceTarget(Character*)` | The stub needs the verified `Character` and sex-service layouts. |
 | LobbyService | `0x6c780` | `CharacterCosmesisService::Start` | Needs the database start operation and session state checks. |
 | LobbyService | `0x6c980` | `CharacterCosmesisService::ConsumeItemTried` | Needs the database state transition. |
 | LobbyService | `0x6cb80` | `CharacterCosmesisService::TaskDone` | Needs the database state transition. |
@@ -58,11 +60,11 @@ The event constructors take one channel reference if a channel is present. The c
 
 The first parity build did not link. The retry worktree did not have zstd. The local retry uses the pinned `bb6eaf64` library source in an ignored directory. No baseline or progress file changed. No live service tests ran.
 
-`tools/gate.sh` printed `gate ok` after each module. It also passed after the linker retention directives and pinned zstd source were in place.
+`tools/gate.sh` printed `gate ok` after each module and after the review fixes. The review build used `LIFT_BUILD_DIR=build-ld-6-sol`.
 
-A local service fixture passed. It checked valid setup, null input, no change on rejection, the zero ID, a mismatch in each ID half, and the rename-user fetch rejection. The fixture used fake log and alert sinks. The event bodies have build and parity checks only.
+A local service fixture passed. It checked valid setup, null input, no change on rejection, the zero ID, a mismatch in each ID half, and the rename-user fetch rejection through a `LobbyService` reference. The fixture used fake log and alert sinks. The compiler confirmed the rename-user member offsets. It also confirmed that both event classes prevent copy construction and copy assignment. No test ran the event bodies.
 
-`tools/parity.sh` printed `parity ok`. The name sets of the four earlier servers did not change. LobbyDaemon lost no MATCH names.
+`tools/parity.sh` printed `parity ok`. The four earlier servers kept the same MATCH names. LobbyDaemon lost no MATCH names against the baseline or the pre-review build.
 
 | Server | Baseline MATCH | Retry MATCH | Lost names |
 | --- | ---: | ---: | ---: |

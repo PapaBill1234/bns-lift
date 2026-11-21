@@ -31,6 +31,9 @@ public:
     virtual bool HandleEvent(EventContext*, unsigned long);  // 0xbba60
 
 private:
+    SharedChannelFragmentPacketHandleEvent(SharedChannelFragmentPacketHandleEvent const&);
+    SharedChannelFragmentPacketHandleEvent& operator=(SharedChannelFragmentPacketHandleEvent const&);
+
     SharedChannel* _channel;
     FragmentPacketConcatenater* _fpc;
     bool (__cdecl* _handler)(SharedChannel*, FragmentPacketConcatenater*);
@@ -46,6 +49,9 @@ public:
     virtual bool HandleEvent(EventContext*, unsigned long);  // 0xbb900
 
 private:
+    SharedChannelPacketHandleEvent(SharedChannelPacketHandleEvent const&);
+    SharedChannelPacketHandleEvent& operator=(SharedChannelPacketHandleEvent const&);
+
     SharedChannel* _channel;
     Packet const* _packet;
     bool (__cdecl* _handler)(SharedChannel*, Packet const*);
