@@ -1,6 +1,78 @@
-// LobbyService.obj (LobbyDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
+// LobbyService.obj (LobbyDaemon PDB, 2019 + PDB).
 #include "LobbyService.h"
+#include "AlertSender.h"
+#include "CliSession.h"
 #include "LiftStub.h"
+#include "Log.h"
+
+#pragma comment(linker, "/INCLUDE:?Setup@CharacterCosmesisService@@QEAA_NPEAUDB@LobbyService@@PEAU21@@Z")  // LIFT: Keep 0x6c4a0 until its caller is lifted.
+#pragma comment(linker, "/INCLUDE:?Setup@AddSlotService@@QEAA_NPEAUDB@LobbyService@@PEAU21@@Z")  // LIFT: Keep 0x6d180 until its caller is lifted.
+#pragma comment(linker, "/INCLUDE:?IsServiceTarget@AddSlotService@@UEAA_NAEBTid128@@@Z")  // LIFT: Keep 0x6d3e0 until its caller is lifted.
+#pragma comment(linker, "/INCLUDE:?Setup@RenameCharacterService@@QEAA_NPEAUDB@LobbyService@@PEAU21@@Z")  // LIFT: Keep 0x6deb0 until its caller is lifted.
+#pragma comment(linker, "/INCLUDE:?Fetch@RenameUserService@@UEBA_NPEAVCliSession@@PEAVFragmentPacket@@@Z")  // LIFT: Keep 0x6ec40 until its caller is lifted.
+
+bool LobbyService::setup(DB* sedb)
+{
+    if (sedb != nullptr)
+    {
+        _db = *sedb;
+        return true;
+    }
+    Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 30, L"== CRASH == [lobby-service], setup fail; invalid param");
+    AlertSender::Write(L"LobbyService.cpp", 30, L"== CRASH == [lobby-service], setup fail; invalid param");
+    return false;
+}
+
+// 0x6c4a0
+bool CharacterCosmesisService::Setup(LobbyService::DB* sedb, DB* db)
+{
+    if (sedb == nullptr)
+        return setup(sedb);
+    if (db == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 85, L"== CRASH == [lobby-service], setup character cosmesis service entry fail; invalid param");
+        AlertSender::Write(L"LobbyService.cpp", 85, L"== CRASH == [lobby-service], setup character cosmesis service entry fail; invalid param");
+        return false;
+    }
+    // LIFT: 0x6c4a0. Check both inputs before changing either record.
+    setup(sedb);
+    _characterCosmesisServiceDB = *db;
+    return true;
+}
+
+// 0x6d180
+bool AddSlotService::Setup(LobbyService::DB* sedb, DB* db)
+{
+    if (sedb == nullptr)
+        return setup(sedb);
+    if (db == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 302, L"== CRASH == [lobby-service], setup add slot service entry fail; invalid param");
+        AlertSender::Write(L"LobbyService.cpp", 302, L"== CRASH == [lobby-service], setup add slot service entry fail; invalid param");
+        return false;
+    }
+    // LIFT: 0x6d180. Check both inputs before changing either record.
+    setup(sedb);
+    _dbAddSlotService = *db;
+    return true;
+}
+
+// 0x6deb0
+bool RenameCharacterService::Setup(LobbyService::DB* sedb, DB* db)
+{
+    if (sedb == nullptr)
+        return setup(sedb);
+    if (db == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 512, L"== CRASH == [lobby-service], setup rename character service entry fail; invalid param");
+        AlertSender::Write(L"LobbyService.cpp", 512, L"== CRASH == [lobby-service], setup rename character service entry fail; invalid param");
+        return false;
+    }
+    // LIFT: 0x6deb0. Check both inputs before changing either record.
+    setup(sedb);
+    _dbRenameCharacterService = *db;
+    return true;
+}
 
 // 0x6c330
 bool LobbyService::Fetch(CliSession*, FragmentPacket*) const
@@ -16,6 +88,18 @@ bool CharacterCosmesisService::Fetch(CliSession*, FragmentPacket*) const
 
 // 0x6c760
 bool ChangeCharacterRaceService::IsServiceTarget(Character*)
+{
+    LIFT_STUB(0x6c760);
+}
+
+// 0x6c760 (folded)
+bool ChangeCharacterSexService::IsServiceTarget(Character*)
+{
+    LIFT_STUB(0x6c760);
+}
+
+// 0x6c760 (folded)
+bool CharacterCosmesisService::IsServiceTarget(Character*)
 {
     LIFT_STUB(0x6c760);
 }
@@ -57,9 +141,11 @@ bool AddSlotService::Fetch(CliSession*, FragmentPacket*) const
 }
 
 // 0x6d3e0
-bool AddSlotService::IsServiceTarget(id128 const&)
+bool AddSlotService::IsServiceTarget(id128 const& slotid)
 {
-    LIFT_STUB(0x6d3e0);
+    if (slotid.id[0] == 0 && slotid.id[1] == 0)
+        return false;
+    return _dbAddSlotService.slotid.id[0] == slotid.id[0] && _dbAddSlotService.slotid.id[1] == slotid.id[1];
 }
 
 // 0x6d420
@@ -135,9 +221,19 @@ bool RenameCharacterService::Finish(CliSession*)
 }
 
 // 0x6ec40
-bool RenameUserService::Fetch(CliSession*, FragmentPacket*) const
+bool RenameUserService::Fetch(CliSession* owner, FragmentPacket*) const
 {
-    LIFT_STUB(0x6ec40);
+    unsigned int state = 0;
+    if (owner != nullptr)
+        state = static_cast<unsigned int>(owner->_state);
+    // LIFT: 0x6ec40. Do not write client session identifiers to logs or alerts.
+    Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 746,
+               L"== CRASH == [lobby-service], rename user service must not be fetched, cli-state:%d.%d",
+               static_cast<int>(state >> 16), static_cast<int>(state & 0xffff));
+    AlertSender::Write(L"LobbyService.cpp", 746,
+                       L"== CRASH == [lobby-service], rename user service must not be fetched, cli-state:%d.%d",
+                       static_cast<int>(state >> 16), static_cast<int>(state & 0xffff));
+    return false;
 }
 
 // 0x6ece0

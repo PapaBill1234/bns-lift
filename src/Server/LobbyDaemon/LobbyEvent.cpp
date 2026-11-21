@@ -1,41 +1,73 @@
-// LobbyEvent.obj (LobbyDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
+// LobbyEvent.obj (LobbyDaemon PDB, 2019 + PDB).
 #include "LobbyEvent.h"
+#include "FragmentPacket.h"
 #include "LiftStub.h"
+#include "Memory.h"
+#include "SharedChannel.h"
+
+#pragma comment(linker, "/INCLUDE:??0SharedChannelPacketHandleEvent@@QEAA@PEAVSharedChannel@@PEAVPacket@@P6A_N0PEBV2@@Z@Z")  // LIFT: Keep 0xbb7f0 until its caller is lifted.
+#pragma comment(linker, "/INCLUDE:??0SharedChannelFragmentPacketHandleEvent@@QEAA@PEAVSharedChannel@@PEAVFragmentPacketConcatenater@@P6A_N01@Z@Z")  // LIFT: Keep 0xbb950 until its caller is lifted.
 
 // 0xbb7f0
-SharedChannelPacketHandleEvent::SharedChannelPacketHandleEvent(SharedChannel*, Packet*, bool (__cdecl*)(SharedChannel*, Packet const*))
+SharedChannelPacketHandleEvent::SharedChannelPacketHandleEvent(
+    SharedChannel* channel, Packet* packet, bool (__cdecl* handler)(SharedChannel*, Packet const*))
+    : _channel(channel), _packet(packet), _handler(handler)
 {
-    LIFT_STUB(0xbb7f0);
+    if (channel != nullptr)
+        channel->addReferenceCount(L"LobbyEvent.cpp", 25);
 }
 
 // 0xbb880
 SharedChannelPacketHandleEvent::~SharedChannelPacketHandleEvent()
 {
-    LIFT_STUB(0xbb880);
+    if (_packet != nullptr)
+    {
+        Packet* packet = const_cast<Packet*>(_packet);
+        packet->~Packet();
+        Memory::_Manager[Memory::DYNAMIC]->Free(packet, L"LobbyEvent.cpp", 30);
+    }
+    if (_channel != nullptr)
+        _channel->removeReferenceCount(L"LobbyEvent.cpp", 32);
 }
 
 // 0xbb900
 bool SharedChannelPacketHandleEvent::HandleEvent(EventContext*, unsigned long)
 {
-    LIFT_STUB(0xbb900);
+    if (_handler != nullptr && _channel != nullptr && _packet != nullptr)
+        _handler(_channel, _packet);
+    removeReferenceCount(L"LobbyEvent.cpp", 38);
+    return true;
 }
 
 // 0xbb950
-SharedChannelFragmentPacketHandleEvent::SharedChannelFragmentPacketHandleEvent(SharedChannel*, FragmentPacketConcatenater*, bool (__cdecl*)(SharedChannel*, FragmentPacketConcatenater*))
+SharedChannelFragmentPacketHandleEvent::SharedChannelFragmentPacketHandleEvent(
+    SharedChannel* channel, FragmentPacketConcatenater* fpc,
+    bool (__cdecl* handler)(SharedChannel*, FragmentPacketConcatenater*))
+    : _channel(channel), _fpc(fpc), _handler(handler)
 {
-    LIFT_STUB(0xbb950);
+    if (channel != nullptr)
+        channel->addReferenceCount(L"LobbyEvent.cpp", 50);
 }
 
 // 0xbb9e0
 SharedChannelFragmentPacketHandleEvent::~SharedChannelFragmentPacketHandleEvent()
 {
-    LIFT_STUB(0xbb9e0);
+    if (_fpc != nullptr)
+    {
+        _fpc->~FragmentPacketConcatenater();
+        Memory::_Manager[Memory::DYNAMIC]->Free(_fpc, L"LobbyEvent.cpp", 55);
+    }
+    if (_channel != nullptr)
+        _channel->removeReferenceCount(L"LobbyEvent.cpp", 57);
 }
 
 // 0xbba60
 bool SharedChannelFragmentPacketHandleEvent::HandleEvent(EventContext*, unsigned long)
 {
-    LIFT_STUB(0xbba60);
+    if (_handler != nullptr && _channel != nullptr && _fpc != nullptr)
+        _handler(_channel, _fpc);
+    removeReferenceCount(L"LobbyEvent.cpp", 63);
+    return true;
 }
 
 // 0xbbad0
