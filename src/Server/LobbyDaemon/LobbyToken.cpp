@@ -1,11 +1,24 @@
-// LobbyToken.obj (LobbyDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
+// LobbyToken.obj (LobbyDaemon PDB, 2019 + PDB).
 #include "LobbyToken.h"
+#include "CliSession.h"
 #include "LiftStub.h"
 
+// LIFT: keep until the caller is lifted (0x96750).
+#pragma comment(linker, "/INCLUDE:??0LobbyToken@@QEAA@PEAVCliSession@@@Z")
+
 // 0x96750
-LobbyToken::LobbyToken(CliSession*)
+LobbyToken::LobbyToken(CliSession* clisession) : _tokenkey(0), _clisession(clisession), _expire(0)
 {
-    LIFT_STUB(0x96750);
+    if (clisession != nullptr)
+        clisession->addReferenceCount(L"LobbyToken.cpp", 27);
+}
+
+// LIFT: the original emits this body as part of the deleting destructor (0x967d0).
+LobbyToken::~LobbyToken()
+{
+    CliSession* clisession = _clisession;
+    if (clisession != nullptr)
+        clisession->removeReferenceCount(L"LobbyToken.cpp", 33);
 }
 
 // 0x96830

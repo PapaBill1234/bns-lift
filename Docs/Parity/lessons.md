@@ -953,3 +953,12 @@ What failed:
   (same as ld-2). The LD gain comes only when the caller cards land.
 - GameTimeSchedule is blocked: 11 of 12 functions need the `RefCntList` layout, which ld-3 owns and which is not on
   main. Do not add it here. Put cards that share a base layout in a sequence, not in the same wave.
+
+## ld-8
+
+- Use the PDB line map to check the order of the log, list walk, vector insert, and reference increment in `CliSessionTable::Select_index_gate` (1 MATCH).
+- Use the existing VS2010 map and vector types with the PDB allocator (23 card functions). Do not write the STL internals by hand. Funcdiff skips `std::` functions.
+- Restore the PDB base and member offsets before you lift the constructor (1 MATCH). Keep the reference release in the source destructor. The original emits it in the deleting destructor.
+- Retain the two public symbols while their callers are stubs (2 retained symbols). The base destructor also matched (1 additional MATCH). LobbyDaemon gained 3 MATCH in total.
+- No source variant failed. Both new card bodies matched on the first comparison.
+- Do not infer a layout from a stub. The token checks need the LobbyDaemon and LobbyConfig layouts. The expiration path needs the job layouts. The desk needs its own PDB layout (9 functions not done).

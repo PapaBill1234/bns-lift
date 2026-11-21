@@ -1,18 +1,36 @@
-// LobbyToken.obj (LobbyDaemon PDB, 2019 + PDB). Wave 0: declarations of the stubbed functions only.
-// LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
+// LobbyToken.obj (LobbyDaemon PDB, 2019 + PDB).
 #pragma once
+#include "RefCntList.h"
 
 class CliSession;
-class LobbyToken;
 
-class LobbyToken
+class LobbyToken : public RefCntListNode
 {
 public:
-    LobbyToken(CliSession*);  // 0x96750
-    bool Verify(int, unsigned long long, unsigned long long, unsigned long) const;  // 0x96830
-    virtual void Expire();  // 0x96b00
-};
+    enum Kind
+    {
+        TOKEN_INVALID = 0,
+        TOKEN_ENTER_GAME_WORLD = 1,
+        TOKEN_LEAVE_GAME_WORLD = 2,
+        TOKEN_KIND_MAX = 3,
+    };
 
+    LobbyToken(CliSession* clisession);  // 0x96750
+    virtual ~LobbyToken();  // Inlined in 0x967d0.
+    bool Verify(int, unsigned long long, unsigned long long, unsigned long) const;  // 0x96830
+    virtual Kind GetKind() const = 0;
+    virtual void Expire();  // 0x96b00
+
+    unsigned long long _tokenkey;
+    CliSession* _clisession;
+    long long _expire;
+};
+static_assert(sizeof(LobbyToken) == 0x48, "sizeof LobbyToken");
+static_assert(offsetof(LobbyToken, _tokenkey) == 0x30, "LobbyToken::_tokenkey");
+static_assert(offsetof(LobbyToken, _clisession) == 0x38, "LobbyToken::_clisession");
+static_assert(offsetof(LobbyToken, _expire) == 0x40, "LobbyToken::_expire");
+
+// ❓ The PDB layout is not confirmed. Keep the existing stub layout (0x96c30).
 class LobbyTokenDesk
 {
 public:

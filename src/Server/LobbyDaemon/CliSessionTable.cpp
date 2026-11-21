@@ -12,7 +12,6 @@
 #include "AlertSender.h"
 #include "Memory.h"
 #include "MemoryManager.h"
-#include "LiftStub.h"
 
 // PDB S_GTHREAD32 (void*). The original operator delete[] only keeps the pointer here. ❓ module of the definition.
 __declspec(thread) void* __delv_buf__;
@@ -509,8 +508,40 @@ bool CliSessionTable::SelectAll(CliSessionList& out)
     return true;
 }
 
+// LIFT: keep until the caller is lifted (0x3eef0).
+#pragma comment(linker, "/INCLUDE:?Select_index_gate@CliSessionTable@@QEAA_NFAEAV?$vector@PEAVCliSession@@V?$StlAllocator@PEAVCliSession@@$01@@@std@@@Z")
+
 // 0x3eef0
-bool CliSessionTable::Select_index_gate(short, CliSessionList&)
+bool CliSessionTable::Select_index_gate(short gatewid, CliSessionList& out)
 {
-    LIFT_STUB(0x3eef0);
+    int hash = gatewid - _minGatewid;
+    if (hash < 0 || hash >= _sizeGatewid)
+    {
+        Log::Write(Log::LT_ERROR, L"CliSessionTable.cpp", 601,
+                   L"[cs-table], select * from gate-index fail; gate-wid out of range, gate-wid:%d", gatewid);
+        return false;
+    }
+    EnterCriticalSection(&_lock_index_gate[hash].CS);
+    RefCntList& list = _index_gate[hash];  // LIFT: name for the indexed list (0x3eef0).
+    if (list.Size() > 0)
+    {
+        for (RefCntListNode* i = list.Begin(); i != nullptr; i = i->NextNode())
+        {
+            CliSession* gateCs = static_cast<GateNode*>(i)->_clisession;
+            if (gateCs != nullptr)
+            {
+                out.push_back(gateCs);
+                gateCs->addReferenceCount(L"CliSessionTable.cpp", 614);
+            }
+            else
+            {
+                Log::Write(Log::LT_ERROR, L"CliSessionTable.cpp", 617,
+                           L"== CRASH == [cs-table], select * from gate-index exception; null cli-session");
+                AlertSender::Write(L"CliSessionTable.cpp", 617,
+                                   L"== CRASH == [cs-table], select * from gate-index exception; null cli-session");
+            }
+        }
+    }
+    LeaveCriticalSection(&_lock_index_gate[hash].CS);
+    return true;
 }
