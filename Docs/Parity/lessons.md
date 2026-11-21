@@ -924,3 +924,32 @@ What failed:
 - LTCG changes the signature of a small function in the binary (0x3ec40 gets the hash in place of `wid`). Lift the
   PDB source form and add a `// LIFT:` note. Do not copy the LTCG form.
 - The Write tool refuses a file that was read only through Bash. Use a Bash heredoc in that case.
+
+## ld-4
+
+Card lift-lobbydaemon-4: Character, GradeService and GameTimeSchedule (49 functions).
+
+| Item | Result |
+| --- | --- |
+| Lifted | 37 (Character 21, GradeService 15, GameTimeSchedule 1) |
+| Not done | 12 (`GradeService::ApplyChangedGrade`, 11 `GameTimeQueue` / `GameTimeScheduler` functions) |
+| New layouts | `Character` (0xA0), `GradeService`, `Grade`, the 4 grade StsMsg types (`StsMsgGrade.h`). `CliSession::_gradeService` is a real member again. |
+| LD MATCH | 49 -> 49 (+0). The other 4 exes: +0, no MATCH lost, no MATCH name gone. |
+
+What worked:
+- The HR pseudocode and the PDB types were enough. IDA was not opened.
+- LTCG constant propagation can remove an argument at the call site. Read the callee pseudocode: it shows the constant
+  (`TryCharacterCreation` binds `char = 1` at 0xa39b0). Pass the constant and mark it `// LIFT:` + ❓.
+- `_gradeList.insert(std::pair<int, Grade*>(k, g))` gives the original STL pair `_Linsert` / `_Buynode`. Restore STL
+  calls this way; do not write the tree code by hand.
+- After ld-4 owns the `GradeService` layout, the ld-2 opaque storage and placement new go away. The ctor init lists
+  construct the member directly.
+
+What failed:
+- VS2010 refuses an opaque enum declaration (`enum ECommand : int;` gives C2059). The clang gate accepts it, so the gate
+  did not find the error. Only the VS2010 build in `tools/parity.sh` found it. Define the full PDB enum. Run the VS2010
+  build before the handoff, not only the gate.
+- LD MATCH gain is 0 again. The callers of the new functions are still `LIFT_STUB` bodies, so `/OPT:REF` removes them
+  (same as ld-2). The LD gain comes only when the caller cards land.
+- GameTimeSchedule is blocked: 11 of 12 functions need the `RefCntList` layout, which ld-3 owns and which is not on
+  main. Do not add it here. Put cards that share a base layout in a sequence, not in the same wave.

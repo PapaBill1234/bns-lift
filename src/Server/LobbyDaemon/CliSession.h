@@ -410,10 +410,7 @@ public:
     StopPlayTimerEvent* _reservedStopPlay;
     wchar_t* _chargeKey;
     unsigned int _chargeStopRequestTxnId;
-    // LIFT: the PDB type is GradeService (size 0x40). Its layout belongs to card ld-4 (GradeService.obj, 0x53370).
-    // ld-2 keeps opaque storage and uses only the GradeService ctors and dtor (placement new). ld-4 restores the
-    // GradeService member when it adds the layout.
-    unsigned long long _gradeService[0x40 / sizeof(unsigned long long)];
+    GradeService _gradeService;
     wchar_t* _pcCafeCode;
     PcCafe* _pcCafe;
     bool _pcCafeCharged;
@@ -433,7 +430,6 @@ static_assert(offsetof(CliSession, _table) == 0x7E8, "CliSession::_table");
 static_assert(offsetof(CliSession, _presence) == 0x808, "CliSession::_presence");
 static_assert(offsetof(CliSession, _chargeKey) == 0x820, "CliSession::_chargeKey");
 static_assert(offsetof(CliSession, _gradeService) == 0x830, "CliSession::_gradeService");
-static_assert(sizeof(((CliSession*)0)->_gradeService) == 0x40, "sizeof CliSession::_gradeService");
 static_assert(offsetof(CliSession, _infoGateToken) == 0x890, "CliSession::_infoGateToken");
 static_assert(offsetof(CliSession, _lock) == 0x8A8, "CliSession::_lock");
 static_assert(sizeof(CliSession) == 0x8D0, "sizeof CliSession");

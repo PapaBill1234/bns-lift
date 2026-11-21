@@ -1,5 +1,7 @@
-// GameTimeSchedule.obj (LobbyDaemon PDB, 2019 + PDB). Wave 0: declarations of the stubbed functions only.
-// LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
+// GameTimeSchedule.obj (LobbyDaemon PDB, 2019 + PDB). Layouts from include/pdb/LobbyDaemon/types.h.
+// LIFT: GameTimeQueue (size 0x48: _index, _block, _lock, RefCntList _queue) and GameTimeScheduler
+// (Timer base, GameTimeQueue _queues[168], _currentQueue, _currentQueueTime, _run) have no members yet.
+// The RefCntList layout belongs to card ld-3. Card ld-4 does not add these layouts.
 #pragma once
 
 class CliSession;
@@ -32,4 +34,7 @@ class IDEV612_TimeTable
 {
 public:
     bool Initialize(char const*);  // 0x4b8e0
+
+    bool _table[168];  // 7 days x 24 hours
 };
+static_assert(sizeof(IDEV612_TimeTable) == 168, "sizeof IDEV612_TimeTable");

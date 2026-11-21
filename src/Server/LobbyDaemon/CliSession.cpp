@@ -33,11 +33,8 @@ void CliSession::deallocate_me(void*, wchar_t const*, int)
 // LIFT: the PDB has this private default ctor. It sets only the base, the members with own ctors and the lock.
 CliSession::CliSession()
     : _acb(), _jumpingCharacterCreationQuota(), _characters(), _serviceEntries(), _auth(), _bans(), _quotaList(),
-      _recycleTimeList(), _lock()
+      _recycleTimeList(), _gradeService(), _lock()
 {
-    // LIFT: _gradeService is opaque storage until ld-4 adds the GradeService layout. The original constructs the
-    // member in the initializer order (0x32a40). Here it is constructed first in the body.
-    ::new (static_cast<void*>(_gradeService)) GradeService();
 }
 
 // 0x32b60
@@ -116,17 +113,15 @@ CliSession::CliSession(unsigned long long clikey, CliSessionTable* table)
       _serviceEntries(), _auth(), _bans(), _quotaList(), _recycleTimeList(), _table(table), _npLogin(false),
       _login(false), _isMobile(false), _teen(false), _scheduledEndTime(nullptr), _presence(nullptr), _srvloc(nullptr),
       _reservedStopPlay(nullptr), _chargeKey(nullptr), _chargeStopRequestTxnId(0),
+      // LIFT: 0x33490 is the only caller of GradeService(int) 0x534d0, so LTCG removed the argument (no edx load at
+      // 0x1400335bc; the HR shows an uninitialised edx). The callee stores the constant in
+      // `_gradeLevel.level = defaultLevel` (0x140053539, `mov dword ptr [rbx+4], 1`). So the argument is 1.
+      _gradeService(1),
       _pcCafeCode(nullptr), _pcCafe(nullptr), _pcCafeCharged(false), _mileageSlot(nullptr),
       // LIFT: _infoGateToken copies ID128_GUID_ZERO (0x14012d880, PDB public ?ID128_GUID_ZERO@@3Tid128@@B). The
       // loads are at 0x1400335dd and 0x1400335eb. GameAccount() uses ID128_ID_ZERO (0x14012d870) instead.
       _infoGateToken(ID128_GUID_ZERO), _renameUserServiceEntry(nullptr), _lock()
 {
-    // LIFT: _gradeService is opaque storage until ld-4 adds the GradeService layout. The original constructs the
-    // member between _chargeStopRequestTxnId and _pcCafeCode. The call is at 0x1400335bc in 0x33490. This call is
-    // the only caller of GradeService(int) 0x534d0, so LTCG removed the argument (no edx load; the HR shows an
-    // uninitialised edx). The callee stores the constant in `_gradeLevel.level = defaultLevel` (0x140053539,
-    // `mov dword ptr [rbx+4], 1`). So the argument is 1.
-    ::new (static_cast<void*>(_gradeService)) GradeService(1);
     memset(_authProviderCode, 0, sizeof(_authProviderCode));
     memset(_externalAccountKey, 0, sizeof(_externalAccountKey));
     memset(_externalAccountName, 0, sizeof(_externalAccountName));
