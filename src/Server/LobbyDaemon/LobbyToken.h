@@ -21,16 +21,24 @@ public:
     virtual Kind GetKind() const = 0;
     virtual void Expire();  // 0x96b00
 
+private:
+    friend struct LobbyTokenLayoutCheck;  // LIFT: check private PDB field offsets (0x96750).
+
     unsigned long long _tokenkey;
     CliSession* _clisession;
     long long _expire;
 };
 static_assert(sizeof(LobbyToken) == 0x48, "sizeof LobbyToken");
-static_assert(offsetof(LobbyToken, _tokenkey) == 0x30, "LobbyToken::_tokenkey");
-static_assert(offsetof(LobbyToken, _clisession) == 0x38, "LobbyToken::_clisession");
-static_assert(offsetof(LobbyToken, _expire) == 0x40, "LobbyToken::_expire");
 
-// ❓ The PDB layout is not confirmed. Keep the existing stub layout (0x96c30).
+// LIFT: check private PDB field offsets at compile time (0x96750).
+struct LobbyTokenLayoutCheck
+{
+    static_assert(offsetof(LobbyToken, _tokenkey) == 0x30, "LobbyToken::_tokenkey");
+    static_assert(offsetof(LobbyToken, _clisession) == 0x38, "LobbyToken::_clisession");
+    static_assert(offsetof(LobbyToken, _expire) == 0x40, "LobbyToken::_expire");
+};
+
+// ❓ The PDB gives the desk layout (0x96c30). Wait for the LobbyTick::Listener base from lift-lobbydaemon-12.
 class LobbyTokenDesk
 {
 public:
