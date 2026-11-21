@@ -899,3 +899,28 @@ What failed:
 - Do not add the layout of a class that another card of the wave owns (skeptic finding: `GradeService.h` belongs to ld-4).
   Use opaque storage of the PDB size (`unsigned long long m[N]`, 8-aligned) and placement new with the declared ctor.
 - `tools/vs2010/build.sh` needs the same `LIFT_BUILD_DIR` as the gate. Without it, it stops with "no build/build.ninja".
+
+## ld-3
+
+Card lift-lobbydaemon-3: CliSessionTable part 1 and containers (37 functions).
+
+| Item | Result |
+| --- | --- |
+| Lifted | 37 (CliSessionTable 21, BoundedList 4, RefCntList 4, WaitQueue 8) |
+| Not done | 0 |
+| New layouts | `CliSessionTable` (0x80), `GateNode` (0x38) |
+| LD MATCH | 49 -> 49 (+0). The other 4 exes: +0, no MATCH lost. |
+
+What worked:
+- The HR pseudocode was enough for all bodies except the account hash. Check the hash in the disasm of 0x3e670: the
+  source adds the 4 dwords of the `id128` as 64-bit values.
+- The `Free` line numbers in the dtor give the source order of the 10 delete blocks.
+- A16 placement array new from `CouponJob.cpp` works for arrays of `std::map`, `CriticalSection` and `RefCntList`.
+- The `std::map::~map` at 0x3d8f0 needs no code. The typedef instantiates it.
+
+What failed:
+- LD MATCH gain is 0 again (same cause as ld-2). `/OPT:REF` removes each function that only `LIFT_STUB` bodies call.
+  Check with `grep -a -c -F '?Name@Class' build-vs2010/LobbyDaemon.pdb`.
+- LTCG changes the signature of a small function in the binary (0x3ec40 gets the hash in place of `wid`). Lift the
+  PDB source form and add a `// LIFT:` note. Do not copy the LTCG form.
+- The Write tool refuses a file that was read only through Bash. Use a Bash heredoc in that case.
