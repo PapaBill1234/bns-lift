@@ -13,7 +13,7 @@ class BigInteger
 public:
     enum { MAX_DIGITS = 128 }; // LobbyGate Set 0x55fe6 clears 0x200 bytes
 
-    // 0x46580
+    // 0x46580 (LobbyGate), 0x10dfb0 (LobbyDaemon)
     // LIFT: __forceinline keeps the inline helpers inline under inline_depth(0) (Sqr 0x59f80).
     __forceinline BigInteger()
     {
@@ -21,7 +21,7 @@ public:
         bits = 1;
         memset(digits, 0, sizeof(digits));
     }
-    // 0x465B0
+    // 0x465B0 (LobbyGate), 0x10dfe0 (LobbyDaemon)
     __forceinline ~BigInteger() { memset(digits, 0, sizeof(digits)); }
 
     void Set(BigInteger const* src, int sign);

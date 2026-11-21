@@ -17,7 +17,6 @@
 #include "Port.h"
 #include "SysInfo.h"
 #include "Thread.h"
-#include "LiftStub.h"
 
 static wchar_t const NETWORK_FILE[] = L"source\\Network.cpp";
 
@@ -445,9 +444,14 @@ bool Network::initializeSocketInterface()
     return true;
 }
 
-// 0xe4900 (LobbyDaemon). Wave 0 of LobbyDaemon: stub only. A stub is not a lift.
+// 0xe4900 (LobbyDaemon)
 unsigned long Network::GetAddress(wchar_t const* addrString)
 {
-    (void)addrString;
-    LIFT_STUB(0xe4900);
+    char ipstr[32];
+    // LIFT: inline copy of String::UnicodeToMultibyte (LobbyDaemon 0x2700) with count 32 (0xe4900).
+    // LobbyDaemon does not link NPChannel2.cpp, which has the out-of-line body.
+    // ❓ HR shows one 16-bit store of 0 at ipstr[30]. The source form is not known.
+    *reinterpret_cast<wchar_t*>(&ipstr[30]) = 0;
+    WideCharToMultiByte(CP_ACP, 0, addrString, -1, ipstr, 31, nullptr, nullptr);
+    return inet_addr(ipstr);
 }
