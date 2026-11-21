@@ -1,35 +1,106 @@
-// Mileage.obj (LobbyDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
+// Mileage.obj (LobbyDaemon PDB, 2019 + PDB).
 #include "Mileage.h"
 #include "LiftStub.h"
+#include "Memory.h"
+#include <string.h>
 
 // 0x5d370
 LobbyMessageAcceptor::~LobbyMessageAcceptor()
 {
-    LIFT_STUB(0x5d370);
 }
 
 // 0x5d390
 bool MileageInfo::check() const
 {
-    LIFT_STUB(0x5d390);
+    if (id != 0 && policyId > 0)
+    {
+        if (effectiveStartTime < effectiveEndTime && effectiveStartTime > 0)
+        {
+            if (effectiveStartTime < accumulateEndTime && accumulateEndTime > 0)
+            {
+                return accumulateFrequencyType > 0 && accumulateFrequencyType < 3 &&
+                    accumulateFrequency > 0 && virtualCurrencyId > 0 &&
+                    virtualCurrencyAmount >= 0 && virtualCurrencyExpireTime > 0 &&
+                    accumulateMinuteLimitPerDay >= 0;
+            }
+        }
+    }
+    return false;
 }
 
 // 0x5d410
 MileageConfig::MileageConfig()
+    : policyConditions(nullptr), policyConditionCount(0), fevers(nullptr), feverCount(0)
 {
-    LIFT_STUB(0x5d410);
+    memset(&mileage, 0, sizeof(mileage));
+    memset(&policy, 0, sizeof(policy));
 }
 
 // 0x5d460
 MileageConfig::~MileageConfig()
 {
-    LIFT_STUB(0x5d460);
+    if (policyConditions != nullptr)
+    {
+        for (int i = 0; i < policyConditionCount; ++i)
+        {
+            if (policyConditions[i] != nullptr)
+            {
+                Memory::_Manager[Memory::DYNAMIC]->Free(policyConditions[i], L"Mileage.cpp", 103);
+                policyConditions[i] = nullptr;
+            }
+        }
+        Memory::_Manager[Memory::DYNAMIC]->Free(policyConditions, L"Mileage.cpp", 104);
+        policyConditions = nullptr;
+    }
+    if (fevers != nullptr)
+    {
+        for (int i = 0; i < feverCount; ++i)
+        {
+            if (fevers[i] != nullptr)
+            {
+                Memory::_Manager[Memory::DYNAMIC]->Free(fevers[i], L"Mileage.cpp", 109);
+                fevers[i] = nullptr;
+            }
+        }
+        Memory::_Manager[Memory::DYNAMIC]->Free(fevers, L"Mileage.cpp", 110);
+        fevers = nullptr;
+    }
 }
 
 // 0x5d760
 bool MileageConfig::Check() const
 {
-    LIFT_STUB(0x5d760);
+    if (!mileage.check() || policy.id <= 0 || policy.mileageType <= 0 || policy.mileageType >= 3)
+        return false;
+
+    // LIFT: Reject incomplete arrays before 0x5d940 copies and sorts the records.
+    if (policyConditionCount < 0 || (policyConditionCount > 0 && policyConditions == nullptr))
+        return false;
+    for (int i = 0; i < policyConditionCount; ++i)
+    {
+        MileagePolicyCondition const* condition = policyConditions[i];
+        if (condition == nullptr || condition->type <= 0 || condition->type >= 4)
+            return false;
+    }
+
+    if (feverCount < 0 || (feverCount > 0 && fevers == nullptr))
+        return false;
+    for (int i = 0; i < feverCount; ++i)
+    {
+        MileageFeverTimeInfo const* fever = fevers[i];
+        if (fever == nullptr || fever->mileageId == 0 ||
+            fever->effectiveStartTime >= fever->effectiveEndTime || fever->repeatStartTime >= 86400 ||
+            fever->virtualCurrencyAmount <= 0)
+            return false;
+
+        char repeatType = fever->repeatType;
+        if (repeatType <= 0 || repeatType >= 4 ||
+            (repeatType >= 2 && (fever->repeatStartTime < 0 || fever->repeatDuration <= 0)))
+            return false;
+        if (repeatType >= 3 && fever->daysOfWeek == 0)
+            return false;
+    }
+    return true;
 }
 
 // 0x5d8a0
