@@ -1,4 +1,18 @@
 {
+"AddSlotService::IsServiceTarget": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
+"AddSlotService::Setup": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "AlertSender::AlertSender": {
 "calls": 100,
 "consts": 100,
@@ -7,6 +21,13 @@
 "status": "MATCH"
 },
 "AlertSender::Name": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"AlertSender::Write": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -35,6 +56,41 @@
 "status": "MATCH"
 },
 "AlertSender::sendRemain": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"AlertSender::writev2": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CharacterCosmesisService::Setup": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CoolDown::TimerClass": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DynamicEventObject::deallocate_me": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DynamicEventObject::~DynamicEventObject": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -84,6 +140,202 @@
 "status": "MATCH"
 },
 "HeapMemoryManager::ReallocZero": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Log::Add": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Log::Write [?Write@Log@@SAXW4Type@1@PEB_WH1ZZ]": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LogBuffer::Acquire": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LogBuffer::GetLog": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LogBuffer::GetType": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LogBuffer::Prepare": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LogBuffer::Release": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LogBuffer::deallocate_me": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LogBufferAllocator::allocate": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LogBufferPool::allocate": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LogBufferPool::deallocate": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LogMedia::Add": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Packet::Clear": {
+"calls": 100,
+"consts": 100,
+"refs": 67,
+"score": 88.9,
+"status": "DIFF"
+},
+"RefCntHistory::add": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RefCntHistory::dump": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RefCntObject::DumpRefCntHistory": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RefCntObject::addReferenceCount": {
+"calls": 100,
+"consts": 100,
+"refs": 50,
+"score": 83.3,
+"status": "DIFF"
+},
+"RefCntObject::deallocate_object": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RefCntObject::removeReferenceCount": {
+"calls": 100,
+"consts": 100,
+"refs": 50,
+"score": 83.3,
+"status": "DIFF"
+},
+"RefCntObject::~RefCntObject": {
+"calls": 100,
+"consts": 100,
+"refs": 60,
+"score": 86.7,
+"status": "DIFF"
+},
+"RenameCharacterService::Setup": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RenameUserService::Fetch": {
+"calls": 100,
+"consts": 100,
+"refs": 50,
+"score": 83.3,
+"status": "DIFF"
+},
+"SharedChannelFragmentPacketHandleEvent::HandleEvent": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"SharedChannelFragmentPacketHandleEvent::SharedChannelFragmentPacketHandleEvent": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"SharedChannelFragmentPacketHandleEvent::~SharedChannelFragmentPacketHandleEvent": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"SharedChannelPacketHandleEvent::HandleEvent": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"SharedChannelPacketHandleEvent::SharedChannelPacketHandleEvent": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"SharedChannelPacketHandleEvent::~SharedChannelPacketHandleEvent": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -469,6 +721,27 @@
 "status": "MATCH"
 },
 "pre_cpp_init": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"swprintf": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"swprintf_s<260>": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"swprintf_s<64>": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
