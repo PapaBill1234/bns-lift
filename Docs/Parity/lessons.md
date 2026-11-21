@@ -847,6 +847,29 @@ What failed:
 - `tools/funcdiff.py` crashed on the first LD run: `is_tls_index` read a register from `mov [mem], <.tls offset>`.
   The fix returns False for a destination that is not a register. Run funcdiff on a new exe alone before `tools/parity.sh`.
 
+## ld-1
+
+Card lift-lobbydaemon-1: common modules and missing Part A functions. 39 lifted, 3 covered by an existing lift, 4 Not done.
+LD MATCH 49 -> 49. CG, LG, SCD, POD: +0, no MATCH lost.
+
+What worked:
+- Grep `src/` for the PDB name and the RVA before each lift. 3 card functions already had a body or are compiler-generated
+  (`BigInteger` ctor/dtor inline in `BigInteger.h`, `EventObject::~EventObject`). Add the LD RVA to the comment. Do not lift again.
+- Per-exe path literals with `#if defined(LIFT_EXE_LD)` in `SharedChannel.cpp` (A6). SCD keeps its literals.
+- An inlined helper is a check of the source form: `Network::GetAddress` 0xe4900 has the `String::UnicodeToMultibyte`
+  body with count 32.
+- STL functions of a module come from the STL headers with the PDB allocator (`BannedWordFilterAllocator`). Do not write them by hand.
+
+What failed:
+- LD gain is 0. The LD callers are still `LIFT_STUB` bodies, and LTCG drops code with no caller. A common-module card
+  on LD gives MATCH only after the callers are lifted. Plan LD cards from the callers down, or accept a 0 gain.
+- A new worktree has no `vendor/zstd/src` (it is in `.gitignore`). The VS2010 link then fails with `ZSTD_*` unresolved
+  in all 5 exes. Fix: copy `vendor/zstd/src` (bb6eaf64) from the main checkout, then run `cmake <build dir>` again,
+  because CMake adds `lift_zstd` only at configure time.
+- The LD `ContentsRuleConfig` is a different class from the LobbyGate one (other members, literals and `_Def` counts).
+  The card pattern file is wrong for LD. A later wave must add an LD owner file.
+- The Wine headers do not declare `_mkgmtime64`. Declare the msvcr100 export in the source (same as `_vswprintf_c_l` in `Db.cpp`).
+
 ## ld-2
 
 Card lift-lobbydaemon-2: CliSession part 1 (RVA 0x329d0 to 0x35eb0, 29 functions).
