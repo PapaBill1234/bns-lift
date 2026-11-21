@@ -7,11 +7,22 @@
 #include "Log.h"
 #include "AlertSender.h"
 #include <new>
-#include "LiftStub.h"
+
+#include <stdarg.h>
 
 static wchar_t const* const SHARED_CHANNEL_FILE = L"..\\Shared\\SharedChannel.cpp";
+// LIFT: A6. Each exe has its own build path in the header literals. The default is SmartCouponDaemon.
+#if defined(LIFT_EXE_LD)
+static wchar_t const* const CHANNEL_H_FILE =
+    L"E:\\DailyBuild02\\LobbyDaemon-Common-0.0.348\\depot\\Branch\\348NC\\Program\\Server\\BloodLib\\include\\Channel.h";
+#define LIFT_SHARED_CHANNEL_H_FILE \
+    L"e:\\dailybuild02\\lobbydaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\shared\\SharedChannel.h"
+#else
 static wchar_t const* const CHANNEL_H_FILE =
     L"E:\\DailyBuild02\\SmartCouponDaemon-Common-0.0.348\\depot\\Branch\\348NC\\Program\\Server\\BloodLib\\include\\Channel.h";
+#define LIFT_SHARED_CHANNEL_H_FILE \
+    L"e:\\dailybuild02\\smartcoupondaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\shared\\SharedChannel.h"
+#endif
 
 // 0x4270. The original body is inline in SharedChannel.h.
 SharedChannel::~SharedChannel()
@@ -19,9 +30,7 @@ SharedChannel::~SharedChannel()
     if (_rawChannel != nullptr)
     {
         _rawChannel->RemoveSession(nullptr, false);  // slot 5 at 0x42a1
-        _rawChannel->removeReferenceCount(
-            L"e:\\dailybuild02\\smartcoupondaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\shared\\SharedChannel.h",
-            36);
+        _rawChannel->removeReferenceCount(LIFT_SHARED_CHANNEL_H_FILE, 36);
         _rawChannel = nullptr;
     }
 }
@@ -123,47 +132,116 @@ bool SharedChannel::IsConnected()
     return connected;
 }
 
-// Wave 0 of LobbyDaemon (lift-lobbydaemon-0): stubs only. A stub is not a lift.
+// The functions below are from the LobbyDaemon PDB (2019 + PDB). SmartCouponDaemon does not call them.
 
 // 0x4b70 (LobbyDaemon)
 bool SharedChannel::Send(char const* format, ...)
 {
-    (void)format;
-    LIFT_STUB(0x4b70);
+    va_list args;
+    va_start(args, format);
+    return sendV(format, args);
 }
 
 // 0x4ba0 (LobbyDaemon)
 bool SharedChannel::Send(Packet const* packet)
 {
-    (void)packet;
-    LIFT_STUB(0x4ba0);
+    if (_rawChannel == nullptr)
+        return false;
+    Session* session = const_cast<Session*>(_rawChannel->GetSession());
+    if (session == nullptr)
+        return false;
+    session->_lock.Enter();
+    bool connected = session->_state == Session::CONNECTED && session->_connection->_socket != INVALID_SOCKET;
+    session->_lock.Leave();
+    // BUG: 0x4c0b returns without removeReferenceCount. The session reference leaks when it is not connected.
+    if (!connected)
+        return false;
+    session->Send(packet);
+    session->removeReferenceCount(CHANNEL_H_FILE, 52);
+    return true;
 }
 
 // 0x4c50 (LobbyDaemon)
 bool SharedChannel::sendV(char const* format, char* args)
 {
-    (void)format;
-    (void)args;
-    LIFT_STUB(0x4c50);
+    if (_rawChannel == nullptr)
+        return false;
+    Session* session = const_cast<Session*>(_rawChannel->GetSession());
+    if (session == nullptr)
+        return false;
+    session->_lock.Enter();
+    bool connected = session->_state == Session::CONNECTED && session->_connection->_socket != INVALID_SOCKET;
+    session->_lock.Leave();
+    // BUG: 0x4cbb returns without removeReferenceCount. The session reference leaks when it is not connected.
+    if (!connected)
+        return false;
+    session->SendV(format, args);
+    session->removeReferenceCount(CHANNEL_H_FILE, 52);
+    return true;
 }
 
 // 0x4d20 (LobbyDaemon)
 SharedChannelList::~SharedChannelList()
 {
-    LIFT_STUB(0x4d20);
+    Memory::_Manager[2]->Free(_channels, SHARED_CHANNEL_FILE, 190);
+    _channels = nullptr;
+    _idmin = 0;
+    _idsize = 0;
+    _size = 0;
 }
 
 // 0x4d60 (LobbyDaemon)
 bool SharedChannelList::Initialize(unsigned long long idmin, unsigned long long idmax)
 {
-    (void)idmin;
-    (void)idmax;
-    LIFT_STUB(0x4d60);
+    if (idmax == 0 || idmin > idmax)
+    {
+        Log::Write(Log::LT_ERROR, SHARED_CHANNEL_FILE, 170,
+                   L"== CRASH == [shared-channel-list], initialize fail; invalid parameter");
+        AlertSender::Write(SHARED_CHANNEL_FILE, 170,
+                           L"== CRASH == [shared-channel-list], initialize fail; invalid parameter");
+        return false;
+    }
+    if (_channels != nullptr)
+    {
+        Log::Write(Log::LT_ERROR, SHARED_CHANNEL_FILE, 176,
+                   L"== CRASH == [shared-channel-list], initialize fail; already initialized");
+        AlertSender::Write(SHARED_CHANNEL_FILE, 176,
+                           L"== CRASH == [shared-channel-list], initialize fail; already initialized");
+        return false;
+    }
+    _idmin = idmin;
+    _idsize = static_cast<int>(idmax - idmin + 1);
+    _channels = static_cast<SharedChannel**>(
+        Memory::_Manager[2]->AllocZero(sizeof(SharedChannel*) * _idsize, SHARED_CHANNEL_FILE, 182));
+    _size = 0;
+    return true;
 }
 
 // 0x4e20 (LobbyDaemon)
 bool SharedChannelList::Set(SharedChannel* channel)
 {
-    (void)channel;
-    LIFT_STUB(0x4e20);
+    if (channel == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, SHARED_CHANNEL_FILE, 209, L"== CRASH == [shared-channel-list], add fail; null channel");
+        AlertSender::Write(SHARED_CHANNEL_FILE, 209, L"== CRASH == [shared-channel-list], add fail; null channel");
+        return false;
+    }
+    // LIFT: 0x4e6e. The orig gets the id from the inlined channel getter (null _rawChannel gives 0).
+    int index = static_cast<int>(channel->_rawChannel != nullptr ? channel->_rawChannel->GetId() : 0) -
+                static_cast<int>(_idmin);
+    if (index < 0 || index >= _idsize)
+    {
+        Log::Write(Log::LT_ERROR, SHARED_CHANNEL_FILE, 215, L"[shared-channel-list], add fail; id out of range, id:%I64d",
+                   channel->_rawChannel != nullptr ? channel->_rawChannel->GetId() : 0ULL);
+        return false;
+    }
+    if (_channels[index] != nullptr)
+    {
+        Log::Write(Log::LT_ERROR, SHARED_CHANNEL_FILE, 220, L"[shared-channel-list], add fail; already exists, id:%I64d",
+                   channel->_rawChannel != nullptr ? channel->_rawChannel->GetId() : 0ULL);
+        return false;
+    }
+    _channels[index] = channel;
+    ++_size;
+    return true;
 }
