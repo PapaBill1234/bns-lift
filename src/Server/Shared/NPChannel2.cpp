@@ -7,6 +7,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <wchar.h>
+#include <time.h>
+
+// msvcr100 export. The Wine msvcrt headers do not declare it.
+extern "C" __time64_t __cdecl _mkgmtime64(struct tm* tm);
 #include <new>
 #include "NPChannel.h"
 #include "AlertSender.h"
@@ -21,7 +25,6 @@
 #include "PacketBuffer.h"
 #include "Session.h"
 #include "StringUtil.h"
-#include "LiftStub.h"
 
 using namespace StsMsgLib;
 
@@ -673,30 +676,34 @@ bool NPChannel::checkLibError(EStsMsgError err)
     return true;
 }
 
-// Wave 0 of LobbyDaemon (lift-lobbydaemon-0): stubs only. A stub is not a lift.
 // LIFT: the LobbyDaemon PDB puts these functions in NPChannel2.cpp. LobbyDaemon does not link this file yet,
-// because it includes the SmartCouponDaemon NPChannel.h.
+// because it includes the SmartCouponDaemon NPChannel.h. SmartCouponDaemon does not call them.
+// 0x2a20 EventObject::~EventObject (LobbyDaemon) is a compiler-generated dtor. See TimerQueue.h.
 
 // 0x2700 (LobbyDaemon)
 void String::UnicodeToMultibyte(char* dst, unsigned long long count, wchar_t const* src)
 {
-    (void)dst;
-    (void)count;
-    (void)src;
-    LIFT_STUB(0x2700);
+    // ❓ HR shows one 16-bit store of 0 at dst[count - 2]. The source form is not known.
+    *reinterpret_cast<wchar_t*>(&dst[count - 2]) = 0;
+    WideCharToMultiByte(CP_ACP, 0, src, -1, dst, static_cast<int>(count - 1), nullptr, nullptr);
 }
 
 // 0x29d0 (LobbyDaemon)
 unsigned short Packet::FreeSize()
 {
-    LIFT_STUB(0x29d0);
+    if (CurHeader != nullptr)
+        return static_cast<unsigned short>(4000 - CurHeader->size);
+    return 0;
 }
 
 // 0x2be0 (LobbyDaemon)
 long long NPMsgHelper::LocaleHourToUTCTime(int hour, long long const UTCTime, int const timeZoneSecond)
 {
-    (void)hour;
-    (void)UTCTime;
-    (void)timeZoneSecond;
-    LIFT_STUB(0x2be0);
+    long long timeInTimeZone = timeZoneSecond + UTCTime;
+    tm tmTimeInTimeZone;
+    _gmtime64_s(&tmTimeInTimeZone, &timeInTimeZone);
+    tmTimeInTimeZone.tm_hour = hour;
+    tmTimeInTimeZone.tm_sec = 0;
+    tmTimeInTimeZone.tm_min = 0;
+    return _mkgmtime64(&tmTimeInTimeZone) - timeZoneSecond;
 }
