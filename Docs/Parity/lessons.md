@@ -846,3 +846,33 @@ What failed:
 - The gate ran per batch of modules, not per module. The generator writes all modules at once, so a per-module gate adds no data.
 - `tools/funcdiff.py` crashed on the first LD run: `is_tls_index` read a register from `mov [mem], <.tls offset>`.
   The fix returns False for a destination that is not a register. Run funcdiff on a new exe alone before `tools/parity.sh`.
+
+## ld-2
+
+Card lift-lobbydaemon-2: CliSession part 1 (RVA 0x329d0 to 0x35eb0, 29 functions).
+
+| Item | Result |
+| --- | --- |
+| Lifted | 15 |
+| Not done | 14 |
+| New layouts | `CliSession` (0x8D0), `GameAccount` (0x198), `ServiceLocation` (0x10), `RefCntPoolObj` (0x18). `_gradeService` is opaque 0x40 storage; ld-4 owns the `GradeService` layout. |
+| LD MATCH | 49 -> 49 (+0). The other 4 exes: +0, no MATCH lost. |
+
+What worked:
+- The HR pseudocode was enough. IDA was not opened.
+- `static_assert` on each member offset of `CliSession` found layout errors at compile time, before the VS2010 build.
+- The `Free` line number in the pseudocode shows inlined callers. `finalize` frees `_presence` with line 1313, which is the
+  `setPresence` line. So `finalize` calls `setPresence(nullptr)`.
+- A `this` null test in a log call (`cs != nullptr ? cs->_clikey : 0`) comes from a local `CliSession const* cs = this;`.
+
+What failed:
+- LD MATCH gain is 0. The new functions have no live caller (their callers are `LIFT_STUB` bodies), so `/OPT:REF`
+  removes them. The built `LobbyDaemon.pdb` has no public for them. funcdiff cannot pair a function that is not in the exe.
+  Check this with `grep -a -F '?name@Class' build-vs2010/LobbyDaemon.pdb` before you expect a gain on LD.
+- The original global `operator delete(void*)` (0x32b50) is empty (ICF with `Console::Flush`). The source frees with
+  `delete p;` and then `Memory::_Manager[2]->Free`. Our global `operator delete` is not empty. The first version had no
+  guard (skeptic finding: double free when a subclass appears). Fix: `Presence` and `ServiceLocation` have an empty
+  class `static void operator delete(void*) {}`. Use the same fix for each base class that a `delete p; Free(p)` site uses.
+- Do not add the layout of a class that another card of the wave owns (skeptic finding: `GradeService.h` belongs to ld-4).
+  Use opaque storage of the PDB size (`unsigned long long m[N]`, 8-aligned) and placement new with the declared ctor.
+- `tools/vs2010/build.sh` needs the same `LIFT_BUILD_DIR` as the gate. Without it, it stops with "no build/build.ninja".

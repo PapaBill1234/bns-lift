@@ -14,6 +14,8 @@
 #define LIFT_STLMEMORY_EXE L"smartcoupondaemon"
 #elif defined(LIFT_EXE_POD)
 #define LIFT_STLMEMORY_EXE L"postofficedaemon"
+#elif defined(LIFT_EXE_LD)
+#define LIFT_STLMEMORY_EXE L"lobbydaemon"
 #else
 #define LIFT_STLMEMORY_EXE L"cachegate"
 #endif
