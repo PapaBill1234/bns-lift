@@ -6,6 +6,9 @@
 #include "CliSession.h"
 #include "Db.h"
 #include "GameWorld.h"
+#include "StlMemory.h"
+#include "StringUtil.h"
+#include <vector>
 
 struct MileageDepositInfo;
 struct MileageFeverTimeInfo;
@@ -15,7 +18,6 @@ struct MileagePolicy;
 struct MileagePolicyCondition;
 class RandomStoreInitializationSchedule;
 class TimeBasedPlayInfoList;
-union id128;
 
 // RAII holder of a DbTransaction. The PDB lists 3 constructors and the DbTransaction wrappers (Get, Alloc, Release,
 // BindCol, Execute, Prepare, BindParam, BindBinaryParam, Fetch, MoreResults). The compiler inlines all of them.
@@ -35,6 +37,14 @@ static_assert(sizeof(AutoDbTran) == 0x10, "sizeof AutoDbTran");
 class LobbyDB
 {
 public:
+    // PDB UDT LobbyDB::EndWaitDeletionInfo (0x20 bytes).
+    struct EndWaitDeletionInfo
+    {
+        id128 gameAccountId;
+        short wid;
+        unsigned long long pcid;
+    };
+
     static bool LoadGameAccount(int&, id128 const&, bool&, GameAccount::DB&);  // 0x9fe00
     static bool LoadGameAccountTimeBasedPlayInfo(int&, id128 const&, TimeBasedPlayInfoList&);  // 0xa03e0
     static bool UpdateGameAccountTimeBasedPlayInfo(int&, id128 const&, TimeBasedPlayInfoList const&);  // 0xa0a40
@@ -53,6 +63,7 @@ public:
     static bool CancelCharacterDeletion(int&, unsigned long long);  // 0xa47c0
     static bool TryCharacterRestoration(int&, unsigned long long);  // 0xa4990
     static bool FinishCharacterRestoration(int&, unsigned long long);  // 0xa4b60
+    static bool RetrieveExpiredDeletionWaitingList(int&, int, std::vector<EndWaitDeletionInfo*, StlAllocator<EndWaitDeletionInfo*, 2> >&);  // 0xa4d30
     static bool ExpireCharacterDeletionWaiting(int&, unsigned long long);  // 0xa5220
     static bool UpdateLastPlayStart(int&, unsigned long long, unsigned long);  // 0xa53f0
     static bool UpdateLastPlayEnd(int&, unsigned long long);  // 0xa5690
@@ -65,8 +76,14 @@ public:
     static bool TryRenameGuild(int&, unsigned long long, int, wchar_t const*, int, long, unsigned long long*);  // 0xa68f0
     static bool FinishRenameGuild(int&, unsigned long long, unsigned long long);  // 0xa6c60
     static bool CancelRenameGuild(int&, unsigned long long);  // 0xa6ec0
+    static bool LoadJumpingCharacterCreationQuota(int&, id128 const&, JumpingCharacterCreationQuota::DB&);  // 0xa70b0
     static bool BindCharacterSlot(int&, unsigned long long, id128 const&);  // 0xa7570
     static bool UpdateJumpingCharacterStateComplete(int&, unsigned long long, bool);  // 0xa77e0
+    static bool LoadGameAccounExpInfo(int&, id128 const&, bool&, GameAccountExpInfo::ExpInfo&);  // 0xa79f0
+    static bool RegisterGameAccountExpInfo(int&, id128 const&, GameAccountExpInfo::ExpInfo const&);  // 0xa7e90
+    static bool UpdateGameAccountExpInfo(int&, id128 const&, GameAccountExpInfo::ExpInfo const&);  // 0xa81e0
+    static bool LoadGameAccountContentQuotaList(int&, id128 const&, std::vector<AccountContentQuota, StlAllocator<AccountContentQuota, 2> >&);  // 0xa84f0
+    static bool UpdateGameAccountContentQuota(int&, id128 const&, std::vector<AccountContentQuota, StlAllocator<AccountContentQuota, 2> > const&);  // 0xa8a00
     static bool LoadRandomStoreInitializationSchedule(int&, RandomStoreInitializationSchedule*);  // 0xa95f0
     static bool LoadCharacterCosmesisService(int&, unsigned long long, unsigned long long*);  // 0xaa1d0
     static bool TryCharacterCosmesisService(int&, id128 const&, unsigned long long, unsigned long long, unsigned int, char*, int, unsigned long long*);  // 0xaa670

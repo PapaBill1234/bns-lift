@@ -1252,3 +1252,23 @@ What failed or is blocked (tries):
 - Low scores (18.9 to 65.8) on lifted handlers with `import:abort` in the funcdiff call list: a stub callee (`ExecuteW`, `Find`, `SendRequestPresenceKick`) ends in `abort()`.
   LTCG sees a noreturn call and removes the code after it. The source form is not the cause. Do not try forms. Wait for the callee card.
 - Checkpoints can list non-functions (`0x8be40`, `0x8be50`: no `.pdata`, inside an epilogue). Check `.pdata` before you list an RVA.
+
+## ld-19
+
+Card lift-lobbydaemon-19: LobbyDB part 2 (26 functions, `0xa4320` to `0xa8a00`).
+
+| Item | Result |
+| --- | --- |
+| Lifted | 26 (0 Not done) |
+| LD MATCH | 436 -> 460 over main 480a25b (+24: 22 card functions, `Character::SetLevel`, `Character::SetSlotId`). The other 4 exes: +0. |
+
+What worked (count = functions made MATCH):
+- Dead-strip pragmas: 24 `/INCLUDE:<public name>` lines took the card from +3 to +21 MATCH. The callers (`Character::*`, `HandleLobbyGame_*`, `CliSession::*`) are still stubs. Public names come from `llvm-pdbutil dump -publics`.
+- A17 tail form (3 trials, one per function): `if (dbrtn == 0) return true; return false;` after `Execute` instead of `return dbrtn == 0;`.
+  VS2010 then keeps the second `Db::ReleaseTransaction` block as the original does. `UpdateCharacterLevel` 98.9, `UpdateCharacterData` 99.0, `RegisterGameAccountExpInfo` 99.0: all 100 (+3). This is the same fix as ld-15 `FinishCharacterCreation`. Apply it first to every `LobbyDB` function that ends in `return dbrtn == 0;`.
+
+Not tried (trial limit of 3):
+- `RetrieveExpiredDeletionWaitingList` 89.2, `LoadJumpingCharacterCreationQuota` 98.0 (1 extra `Fetch` call, ours has one `DbTransaction::Fetch` too many), `LoadGameAccounExpInfo` 86.5, `LoadGameAccountContentQuotaList` 80.6.
+- Idea for the next card: Fetch loop form as in `LoadGameAccount` (80.5) and `LoadCharacterList` (79.0). They share the same DIFF family.
+
+Build fact: a new worktree can lack the ignored `vendor/zstd/src` (same as ld-17). Copy it before `tools/parity.sh`.
