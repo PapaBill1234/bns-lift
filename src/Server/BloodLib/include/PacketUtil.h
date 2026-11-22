@@ -50,6 +50,16 @@ public:
 
     void PushRepeatCount(Packet* packet);
     void PopRepeatCount();
+    // LIFT: inline in the original (PDB member). The inline site is in TimeBasedPlaySeasonSchedule::Compose (0x99ef0).
+    void IncRepeatCount()
+    {
+        int const index = start[top] + 1;
+        if (subTop < 0)
+            this->index = index;
+        else
+            sub[subTop].index = index;
+        ++*counts[top];
+    }
 
     short* counts[3];
     int start[3];

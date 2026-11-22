@@ -1,8 +1,10 @@
-// VS2010 STL subset: heap algorithms (push_heap, pop_heap, make_heap) for priority_queue.
-// The hole logic follows VS2010 _Push_heap and _Adjust_heap.
+// VS2010 STL subset: heap algorithms (push_heap, pop_heap, make_heap) for priority_queue, and std::sort.
+// The hole logic follows VS2010 _Push_heap and _Adjust_heap. The sort follows VS2010 _Sort (operator< form).
 #pragma once
 #include <xstddef>
 #include <xutility>
+#include <utility>
+#include <string.h>
 
 namespace std {
 template<class RanIt, class Diff, class T, class Pr>
@@ -74,4 +76,153 @@ template<class RanIt>
 inline void pop_heap(RanIt first, RanIt last) { std::pop_heap(first, last, less<typename remove_reference<decltype(*first)>::type>()); }
 template<class RanIt>
 inline void make_heap(RanIt first, RanIt last) { std::make_heap(first, last, less<typename remove_reference<decltype(*first)>::type>()); }
+} // namespace std
+
+// LIFT: std::sort in the VS2010 form (operator< overloads: _Sort, _Unguarded_partition, _Median, _Make_heap, _Sort_heap,
+// _Insertion_sort1). The original LobbyDaemon.exe has these as separate functions (0x9f6e0 .. 0x9fcb0).
+namespace std {
+enum { _ISORT_MAX = 32 };
+
+template<class FwdIt1, class FwdIt2>
+inline void iter_swap(FwdIt1 a, FwdIt2 b) { std::swap(*a, *b); }
+
+template<class T>
+inline T* _Move_backward1(T* first, T* last, T* dest, bool)
+{
+    ptrdiff_t const n = last - first;
+    ::memmove(dest - n, first, n * sizeof(T));
+    return dest - n;
+}
+template<class BidIt1, class BidIt2>
+inline BidIt2 _Move_backward(BidIt1 first, BidIt1 last, BidIt2 dest) { return std::copy_backward(first, last, dest); }
+template<class T>
+inline T* _Move_backward(T* first, T* last, T* dest)
+{
+    return std::_Move_backward1(first, last, dest, true);
+}
+
+template<class RanIt, class Diff, class T>
+inline void _Make_heap(RanIt first, RanIt last, Diff*, T*)
+{
+    std::make_heap(first, last);
+}
+
+template<class RanIt>
+inline void _Sort_heap(RanIt first, RanIt last)
+{
+    for (; 1 < last - first; --last)
+        std::pop_heap(first, last);
+}
+
+template<class RanIt>
+inline void _Med3(RanIt first, RanIt mid, RanIt last)
+{
+    if (*mid < *first)
+        std::iter_swap(mid, first);
+    if (*last < *mid) {
+        std::iter_swap(last, mid);
+        if (*mid < *first)
+            std::iter_swap(mid, first);
+    }
+}
+
+template<class RanIt>
+inline void _Median(RanIt first, RanIt mid, RanIt last)
+{
+    if (40 < last - first) {
+        size_t step = (last - first + 1) / 8;
+        std::_Med3(first, first + step, first + 2 * step);
+        std::_Med3(mid - step, mid, mid + step);
+        std::_Med3(last - 2 * step, last - step, last);
+        std::_Med3(first + step, mid, last - step);
+    } else
+        std::_Med3(first, mid, last);
+}
+
+template<class RanIt>
+inline pair<RanIt, RanIt> _Unguarded_partition(RanIt first, RanIt last)
+{
+    RanIt mid = first + (last - first) / 2;
+    std::_Median(first, mid, last - 1);
+    RanIt pfirst = mid;
+    RanIt plast = pfirst + 1;
+    while (first < pfirst && !(*(pfirst - 1) < *pfirst) && !(*pfirst < *(pfirst - 1)))
+        --pfirst;
+    while (plast < last && !(*plast < *pfirst) && !(*pfirst < *plast))
+        ++plast;
+    RanIt gfirst = plast;
+    RanIt glast = pfirst;
+    for (;;) {
+        for (; gfirst < last; ++gfirst)
+            if (*pfirst < *gfirst)
+                ;
+            else if (*gfirst < *pfirst)
+                break;
+            else if (plast++ != gfirst)
+                std::iter_swap(plast - 1, gfirst);
+        for (; first < glast; --glast)
+            if (*(glast - 1) < *pfirst)
+                ;
+            else if (*pfirst < *(glast - 1))
+                break;
+            else if (--pfirst != glast - 1)
+                std::iter_swap(pfirst, glast - 1);
+        if (glast == first && gfirst == last)
+            return pair<RanIt, RanIt>(pfirst, plast);
+        if (glast == first) {
+            if (plast != gfirst)
+                std::iter_swap(pfirst, plast);
+            ++plast;
+            std::iter_swap(pfirst++, gfirst++);
+        } else if (gfirst == last) {
+            if (--glast != --pfirst)
+                std::iter_swap(glast, pfirst);
+            std::iter_swap(pfirst, --plast);
+        } else
+            std::iter_swap(gfirst++, --glast);
+    }
+}
+
+template<class BidIt, class T>
+inline void _Insertion_sort1(BidIt first, BidIt last, T*)
+{
+    if (first != last)
+        for (BidIt next = first; ++next != last;)
+            if (*next < *first) {
+                T val = *next;
+                std::_Move_backward(first, next, next + 1);
+                *first = val;
+            } else {
+                BidIt dest = next;
+                T val = *next;
+                for (; val < *--dest; next = dest)
+                    *next = *dest;
+                *next = val;
+            }
+}
+
+template<class RanIt, class Diff>
+void _Sort(RanIt first, RanIt last, Diff ideal)
+{
+    Diff count;
+    for (; _ISORT_MAX < (count = last - first) && 0 < ideal;) {
+        pair<RanIt, RanIt> mid = std::_Unguarded_partition(first, last);
+        ideal /= 2, ideal += ideal / 2;
+        if (mid.first - first < last - mid.second)
+            std::_Sort(first, mid.first, ideal), first = mid.second;
+        else
+            std::_Sort(mid.second, last, ideal), last = mid.first;
+    }
+    if (_ISORT_MAX < count) {
+        std::_Make_heap(first, last, (ptrdiff_t*)0, (typename remove_reference<decltype(*first)>::type*)0);
+        std::_Sort_heap(first, last);
+    } else if (1 < count)
+        std::_Insertion_sort1(first, last, (typename remove_reference<decltype(*first)>::type*)0);
+}
+
+template<class RanIt>
+inline void sort(RanIt first, RanIt last)
+{
+    std::_Sort(first, last, last - first);
+}
 } // namespace std

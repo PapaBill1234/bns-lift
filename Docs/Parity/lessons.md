@@ -1087,7 +1087,7 @@ Card lift-lobbydaemon-15: LobbyDaemon part 1 (33 functions, 30 lifted, 3 Not don
 
 | Item | Result |
 | --- | --- |
-| LD MATCH | 219 -> 350 (+131) over main bfb4c98 (earlier run: 195 -> 325 over ef1fa96). The other 4 exes: +0, no MATCH lost. |
+| LD MATCH | 219 -> 351 (+132) over main bfb4c98 (earlier run: 195 -> 325 over ef1fa96). The other 4 exes: +0, no MATCH lost. |
 
 What worked:
 - The `/INCLUDE` pragma finds wrong signatures. A name that the original PDB has and the lift does not define is an undefined symbol at link time.
@@ -1111,6 +1111,12 @@ What failed:
 
 Other facts:
 - A worktree without `vendor/zstd/src` fails the VS2010 link with 3 `ZSTD_*` errors in all 5 exes. Copy the directory from another worktree.
+- A13 for `std::sort`: the clang shim `include/vs2010/algorithm` had no `std::sort`. The VS2010 parity build uses the real headers and does not need it.
+  Write `std::sort(v.begin(), v.end())` with no empty guard. `ServiceItems::Add` 98.7 -> 100.0 (MATCH). A heap sort and a guard are a wrong form.
+  The 6 instances (`_Sort`, `_Unguarded_partition`, `_Median`, `_Make_heap`, `_Sort_heap`, `_Insertion_sort1`) are 100.0 when funcdiff does not skip `std::`.
+  Check STL instances this way: copy `tools/funcdiff.py` to a temp file and remove `std::` from `SKIP_NAME`. Do not commit the copy.
+- Use the PDB inline member (`RepeatPacketComposer::IncRepeatCount`, in the class header) instead of an anonymous-namespace helper. Same code, PDB name.
+- A static counter has the PDB type `unsigned __int64`. Cast to `volatile __int64*` at the `_Interlocked*64` calls. No code change.
 
 
 ## ld-13

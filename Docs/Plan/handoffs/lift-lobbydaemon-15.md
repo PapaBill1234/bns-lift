@@ -13,10 +13,10 @@ scalar deleting destructors (`0x99310`, `0x99340`, `0x99370`, `0x9a3a0`) and are
 | Not done | 3 |
 | `tools/gate.sh` (`LIFT_BUILD_DIR=build-ld-15`) | gate ok (after merging main bfb4c98) |
 | `tools/parity.sh` (same build) | parity ok |
-| LobbyDaemon MATCH | 219 -> 350 (+131) over main bfb4c98 |
+| LobbyDaemon MATCH | 219 -> 351 (+132) over main bfb4c98 |
 | CacheGate, LobbyGate, SmartCouponDaemon, PostOfficeDaemon MATCH | 456, 658, 630, 694 (+0 each, no MATCH lost) |
 
-LobbyDaemon parity: 350/2204 = 15.9 %. Paired 465, mean score 95.6.
+LobbyDaemon parity: 351/2204 = 15.9 %. Paired 465, mean score 95.6.
 Baseline: Docs/Parity/baseline/LobbyDaemon.json = 219 MATCH. The baseline files are unchanged.
 
 ## Gate
@@ -30,6 +30,8 @@ The earlier run stopped at the binary check because main tracked 3 LegacyBin DLL
 | --- | --- |
 | `CMakeLists.txt` | `src/Server/Shared/NPChannel2.cpp` added to `lift_lobbydaemon`. `Packet::FreeSize` (`0x29d0`) and `NPMsgHelper::LocaleHourToUTCTime` (`0x2be0`) are lifted in this file. `Compose` and `GetNextResetTimeUTC` call them. Without it the link fails. |
 | `src/Server/LobbyDaemon/LobbyDaemon.cpp` | 18 `/INCLUDE` pragmas (dead-strip rule, see below). |
+| `include/vs2010/algorithm` | `std::sort` in the VS2010 operator< form (`_Sort`, `_Unguarded_partition`, `_Median`, `_Med3`, `_Make_heap`, `_Sort_heap`, `_Insertion_sort1`, `iter_swap`, `_Move_backward`). Clang shim only. The VS2010 build uses the real headers. |
+| `src/Server/BloodLib/include/PacketUtil.h` | Inline member `RepeatPacketComposer::IncRepeatCount` (PDB name). It replaces the anonymous helper `incRepeatCount`. |
 | `src/Server/BloodLib/include/Packet.h`, `src/Server/BloodLib/source/Packet.cpp` | `Packet::Compose(PacketComposer*, int n, ...)` (`0xde140`) added. `TimeBasedPlaySeasonSchedule::Compose` calls it. VS2010 cannot inline a variadic helper, so the old `composeWith` helper was an extra call. The other 4 exes are +0. |
 | `LobbyDaemon.h`, `LobbyConfig.h`, `CliSessionManager.h`, `GameWorld.h`, `Lock.h` | PDB layouts for the classes that the card functions use. |
 
@@ -66,7 +68,7 @@ Score = funcdiff score of the final build. MATCH = 100.0.
 | `0x99990` | `LobbydReloadInvalidRestoreTimer::EventId` | 100.0 | yes |
 | `0x999a0` | `LobbydReloadInvalidRestoreTimer::HandleEvent` | 100.0 | yes |
 | `0x999b0` | `LobbydReloadInvalidRestoreTimer::restoreInvalid` | 93.3 | no |
-| `0x99ac0` | `ServiceItems::Add` | 98.7 | no |
+| `0x99ac0` | `ServiceItems::Add` | 100.0 | yes |
 | `0x99d20` | `TimeBasedPlaySeasonSchedule::Data::GetNextResetTimeUTC` | 66.7 | no |
 | `0x99df0` | `TimeBasedPlaySeasonSchedule::TimeBasedPlaySeasonSchedule` | 100.0 | yes |
 | `0x99ef0` | `TimeBasedPlaySeasonSchedule::Compose` | 90.0 | no |
@@ -78,7 +80,7 @@ Score = funcdiff score of the final build. MATCH = 100.0.
 | `0x9af80` | `LobbyDaemon::SetTimeZoneBias` | 100.0 | yes |
 | `0x9b0c0` | `LobbyDaemon::FailedEventObjectHandler` | 100.0 | yes |
 
-21 of the 30 card functions are MATCH. The other 110 new MATCH (131 in total) are shared BloodLib code (including `Packet::Compose`) and inline members that are paired for the first time (the 19 `/INCLUDE` functions pull their callees into the exe).
+22 of the 30 card functions are MATCH (`ServiceItems::Add` is now MATCH). The other 110 new MATCH (132 in total) are shared BloodLib code (including `Packet::Compose`) and inline members that are paired for the first time (the 18 `/INCLUDE` functions pull their callees into the exe).
 
 ## Not done
 
@@ -113,6 +115,7 @@ Rule: max 3 functions, 1 trial each. Only functions above 85 %.
 | `TimeBasedPlaySeasonSchedule::Compose` (repair) | pointer loops over `_scheduleData` and `rule` | 89.9 | 90.0 (kept) |
 | `TimeBasedPlaySeasonSchedule::Compose` (repair) | `static_cast<unsigned short>(minutes) == 0xFFFF` | 90.0 | 90.0 (reverted) |
 | `restoreInvalid` (repair) | Search first, then `if (node != tail && node != nullptr)` before the unlink (the original null check) | 93.3 | 93.3 (kept, logic as the original) |
+| `ServiceItems::Add` (repair 3, A13) | `std::sort(idList.begin(), idList.end())` with no empty guard. `std::sort` added to the clang shim `include/vs2010/algorithm`. The VS2010 build uses the real headers, so the earlier heap sort and the guard were not needed | 98.7 | 100.0 (kept) |
 | `CoolDown::HandleEvent`, `CoolDown::Start` | `GlobalTimerQueue->Add(...)` instead of `Daemon::AddTimer` | 94.3, 95.0 | no result. `TimerQueue::Add` is protected. Reverted. |
 
 Not tried (for a later card):
@@ -124,7 +127,19 @@ Not tried (for a later card):
 | `restoreInvalid` | 93.3 | The original loop end is `&CONFIG_FILENAME` (data order). Ours is `TextConsole::COLOR_TABLE`. Data layout, not source form. The null check before the unlink is now in the source. |
 | `GameWorldReporterListener` | 86.3 | The original calls `InfoGateChannelManager::Broadcast` (not lifted) and a second `Log::Write`. Retry after that module. |
 | `Compose` | 90.0 | The consts differ (`0x2`, `0x10`, `0x34` ours; `-1`, `-32`, `-16` original). The original uses pointer strides of 344 and 52. Try other loop forms. |
-| `ServiceItems::Add` (rest) | 98.7 | The original calls `std::_Sort` (`0x9f6e0`). The VS2010 headers here have no `std::sort`. Heap sort stands in. |
+
+## Std sort family
+
+The 6 STL instances of `std::sort<unsigned int*>` (`0x9f6e0` to `0x9fcb0`) are built from the real VS2010 headers in the parity build.
+`tools/funcdiff.py` skips `std::` names. A local run with that skip removed gave MATCH 100.0 for `_Sort`, `_Unguarded_partition`, `_Median`,
+`_Make_heap`, `_Sort_heap` and `_Insertion_sort1`. This run changed no file in the repository.
+
+## Other repair 3 changes
+
+| Item | Change |
+| --- | --- |
+| `GenerateClikey`, `GenerateJobid`, `GenerateLobbyTokenkey` | `static unsigned __int64 __seed__` (PDB type). The `_Interlocked*64` calls take a `volatile __int64*` cast. Code unchanged. |
+| `INVALID_REASON_STR` | Order verified against the LobbyDaemon exe table at rva `0x201268`. The ❓ is removed. |
 
 ## Safety differences
 
@@ -139,7 +154,6 @@ Not tried (for a later card):
 ## ❓ items
 
 - `GenerateClikey`, `GenerateJobid`: the initial value of the seed is 0 (not verified).
-- `LobbydReloadInvalidRestoreTimer::INVALID_REASON_STR`: the order of the 5 pointers is not checked in the binary.
 - `TimeBasedPlaySeasonSchedule::Compose`: the argument order comes from the stack args only.
 - `LobbyDaemon::setArgument`, `Free`: no LD RVA in the index (folded).
 - `CoolDown::Start`: whether the source used `this` (see above).

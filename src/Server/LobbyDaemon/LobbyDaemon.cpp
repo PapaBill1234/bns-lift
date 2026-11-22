@@ -27,7 +27,7 @@ LobbyDaemon* LobbyDaemon::_instance = nullptr;  // PDB static member (file-scope
 CoolDown* GCoolDown = nullptr;                  // PDB global.
 
 // LIFT: strings from LobbyDaemon.exe (UTF-16 literals). The order follows the PDB enum ReloadInvalidReason.
-// ❓ The order of the 5 pointers in the original array is not checked in the binary.
+// The order was verified against the LobbyDaemon exe table at rva 0x201268.
 wchar_t const* LobbydReloadInvalidRestoreTimer::INVALID_REASON_STR[5] = {
     L"daemon config reload failed",
     L"daemon list reload failed",
@@ -35,20 +35,6 @@ wchar_t const* LobbydReloadInvalidRestoreTimer::INVALID_REASON_STR[5] = {
     L"contents rule config reload failed",
     L"bns common config reload failed",
 };
-
-namespace
-{
-// LIFT: inlined increment of the repeat count of RepeatPacketComposer (same code as FragmentPacket::IncRepeatCount).
-static __forceinline void incRepeatCount(RepeatPacketComposer& rpc)
-{
-    int const index = rpc.start[rpc.top] + 1;
-    if (rpc.subTop < 0)
-        rpc.index = index;
-    else
-        rpc.sub[rpc.subTop].index = index;
-    ++*rpc.counts[rpc.top];
-}
-}  // namespace
 
 // 0x991c0 SystemEvent::~SystemEvent is inline in Lock.h.
 
@@ -128,12 +114,12 @@ void BannedWordFilterMemoryAllocator::Free(void* ptr, wchar_t const* file, int l
 // 0x993c0
 unsigned long long GenerateClikey()
 {
-    static long long __seed__ = 0;  // PDB static counter (file-scope data in the original).
-    long long const result = _InterlockedIncrement64(&__seed__);
+    static unsigned __int64 __seed__ = 0;  // PDB static counter (file-scope data in the original).
+    long long const result = _InterlockedIncrement64(reinterpret_cast<volatile __int64*>(&__seed__));
     if (result == 0)
     {
         // The counter wrapped to 0. Take the next value and log it.
-        long long const v = _InterlockedExchangeAdd64(&__seed__, 1);
+        long long const v = _InterlockedExchangeAdd64(reinterpret_cast<volatile __int64*>(&__seed__), 1);
         Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 157, L"[lobby], cli-key overflow");
         return static_cast<unsigned long long>(v + 1);
     }
@@ -144,12 +130,12 @@ unsigned long long GenerateClikey()
 // 0x99410
 unsigned long long GenerateJobid()
 {
-    static long long __seed__ = 0;  // PDB static counter (file-scope data in the original).
-    long long const result = _InterlockedIncrement64(&__seed__);
+    static unsigned __int64 __seed__ = 0;  // PDB static counter (file-scope data in the original).
+    long long const result = _InterlockedIncrement64(reinterpret_cast<volatile __int64*>(&__seed__));
     if (result == 0)
     {
         // The counter wrapped to 0. Take the next value and log it.
-        long long const v = _InterlockedExchangeAdd64(&__seed__, 1);
+        long long const v = _InterlockedExchangeAdd64(reinterpret_cast<volatile __int64*>(&__seed__), 1);
         Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 173, L"[lobby], job-id overflow");
         return static_cast<unsigned long long>(v + 1);
     }
@@ -160,12 +146,12 @@ unsigned long long GenerateJobid()
 // 0x99460
 unsigned long long GenerateLobbyTokenkey()
 {
-    static long long __seed__ = 0;  // PDB static counter (file-scope data in the original).
-    long long const result = _InterlockedIncrement64(&__seed__);
+    static unsigned __int64 __seed__ = 0;  // PDB static counter (file-scope data in the original).
+    long long const result = _InterlockedIncrement64(reinterpret_cast<volatile __int64*>(&__seed__));
     if (result == 0)
     {
         // The counter wrapped to 0. Take the next value and log it.
-        long long const v = _InterlockedExchangeAdd64(&__seed__, 1);
+        long long const v = _InterlockedExchangeAdd64(reinterpret_cast<volatile __int64*>(&__seed__), 1);
         Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 188, L"[lobby], token-key overflow");
         return static_cast<unsigned long long>(v + 1);
     }
@@ -406,16 +392,7 @@ bool ServiceItems::Add(LobbyDaemon::ServiceItemType type, wchar_t const* idListS
             }
             idList.push_back(id);
         }
-        // LIFT: the original calls std::_Sort<unsigned int*, __int64> (0x9f6e0, a later range). include/vs2010 has
-        // no std::sort, so a heap sort gives the same sorted list.
-        if (!idList.empty())
-        {
-            unsigned int* const first = &idList[0];
-            unsigned int* last = first + idList.size();
-            std::make_heap(first, last);
-            for (; last - first > 1; --last)
-                std::pop_heap(first, last);
-        }
+        std::sort(idList.begin(), idList.end());
         Memory::_Manager[2]->Free(buffer, L"LobbyDaemon.cpp", 456);
     }
     Log::Write(Log::LT_DEBUG, L"LobbyDaemon.cpp", 459, L"[lobby], add service item id candidates ok, type:%d, source:%s",
@@ -519,10 +496,10 @@ bool TimeBasedPlaySeasonSchedule::Compose(RepeatPacketComposer& rpc, Packet& pac
                            L"[time-based], packet compose failed - time based schedule rule");
                 return false;
             }
-            incRepeatCount(rpc);
+            rpc.IncRepeatCount();
         }
         rpc.PopRepeatCount();
-        incRepeatCount(rpc);
+        rpc.IncRepeatCount();
     }
     rpc.PopRepeatCount();
     return true;
