@@ -69,6 +69,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"BoundedList::Remove": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "ChangeCharacterRaceService::ConsumeItemFinished": {
 "calls": 60,
 "consts": 67,
@@ -211,10 +218,10 @@
 },
 "CliSession::NotifyChangedGradeLevel": {
 "calls": 100,
-"consts": 67,
+"consts": 100,
 "refs": 100,
-"score": 88.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "CliSession::UpdateBotScore": {
 "calls": 100,
@@ -321,6 +328,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"DecomposeShowcaseFsd": {
+"calls": 97,
+"consts": 80,
+"refs": 100,
+"score": 92.2,
+"status": "DIFF"
+},
 "DynamicEventObject::deallocate_me": {
 "calls": 100,
 "consts": 100,
@@ -398,7 +412,280 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"FragmentPacket::FragmentPacket": {
+"calls": 100,
+"consts": 86,
+"refs": 80,
+"score": 88.6,
+"status": "DIFF"
+},
 "FragmentPacket::FreeSize": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"FragmentPacket::IncRepeatCount": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"FragmentPacketSplitter::AddBuffer": {
+"calls": 100,
+"consts": 100,
+"refs": 50,
+"score": 83.3,
+"status": "DIFF"
+},
+"FragmentPacketSplitter::Clear": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"FragmentPacketSplitter::Finalize": {
+"calls": 100,
+"consts": 100,
+"refs": 50,
+"score": 83.3,
+"status": "DIFF"
+},
+"FsdDecomposer::Decompose": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"FsdDecomposer::GetByte": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"FsdDecomposer::GetDword": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"FsdDecomposer::GetQword": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"FsdDecomposer::GetString": {
+"calls": 0,
+"consts": 67,
+"refs": 100,
+"score": 55.6,
+"status": "DIFF"
+},
+"FsdDecomposer::GetWord": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GameWorld::EnterUser": {
+"calls": 90,
+"consts": 100,
+"refs": 100,
+"score": 96.7,
+"status": "DIFF"
+},
+"GameWorld::FetchWorldInfo": {
+"calls": 100,
+"consts": 91,
+"refs": 100,
+"score": 97.0,
+"status": "DIFF"
+},
+"GameWorld::FetchWorldInfoForInfoGate": {
+"calls": 100,
+"consts": 75,
+"refs": 100,
+"score": 91.7,
+"status": "DIFF"
+},
+"GameWorld::GameWorld": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GameWorld::GetWid": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GameWorld::PermitCharacterManagement": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GameWorld::Setup": {
+"calls": 100,
+"consts": 89,
+"refs": 100,
+"score": 96.3,
+"status": "DIFF"
+},
+"GameWorld::Update": {
+"calls": 83,
+"consts": 86,
+"refs": 100,
+"score": 89.7,
+"status": "DIFF"
+},
+"GameWorldCluster::GameWorldCluster": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GameWorldCluster::UpdateCounters": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GameWorldCluster::addGameWorld": {
+"calls": 83,
+"consts": 100,
+"refs": 100,
+"score": 94.4,
+"status": "DIFF"
+},
+"GameWorldCluster::giveupWait": {
+"calls": 100,
+"consts": 86,
+"refs": 100,
+"score": 95.2,
+"status": "DIFF"
+},
+"GameWorldCluster::~GameWorldCluster": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GameWorldRegistry::EnumerateCluster": {
+"calls": 57,
+"consts": 0,
+"refs": 100,
+"score": 52.4,
+"status": "DIFF"
+},
+"GameWorldRegistry::FetchWorldInfoList": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GameWorldRegistry::FetchWorldInfoListForInfoGate": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GameWorldRegistry::GameWorldRegistry": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GameWorldRegistry::Get": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GameWorldRegistry::addGameWorldCluster": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GameWorldRegistry::getGameWorldCluster": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GameWorldRegistry::~GameWorldRegistry": {
+"calls": 91,
+"consts": 100,
+"refs": 91,
+"score": 93.9,
+"status": "DIFF"
+},
+"GameWorldReport::GetPacket": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GameWorldReport::Write": {
+"calls": 80,
+"consts": 94,
+"refs": 95,
+"score": 89.8,
+"status": "DIFF"
+},
+"GameWorldReport::~GameWorldReport": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GameWorldReporter::HandleEvent": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GameWorldReporter::Initialize": {
+"calls": 100,
+"consts": 100,
+"refs": 89,
+"score": 96.3,
+"status": "DIFF"
+},
+"GameWorldReporter::WriteReport": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GameWorldReporter::~GameWorldReporter": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -741,6 +1028,20 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Packet::GetFreeBody": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Packet::~Packet": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "PacketBuffer::CheckCompose": {
 "calls": 100,
 "consts": 100,
@@ -782,6 +1083,20 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"PacketFormatIterator::GetIndex": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PacketFormatIterator::SetFormat": {
+"calls": 100,
+"consts": 100,
+"refs": 50,
+"score": 83.3,
+"status": "DIFF"
 },
 "RefCntHistory::add": {
 "calls": 100,
@@ -860,6 +1175,27 @@
 "score": 63.7,
 "status": "DIFF"
 },
+"RepeatPacketComposer::Allocated": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RepeatPacketComposer::CurrentFormat": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RepeatPacketComposer::Forward": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "RepeatPacketComposer::PopRepeatCount": {
 "calls": 100,
 "consts": 100,
@@ -868,6 +1204,27 @@
 "status": "MATCH"
 },
 "RepeatPacketComposer::PushRepeatCount": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RepeatPacketComposer::Reset": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RepeatPacketComposer::Rewind": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RepeatPacketComposer::skipRepeatFormat": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -923,6 +1280,20 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"SystemPerfMonitor::Initialize": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"SystemPerfMonitor::~SystemPerfMonitor": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Thread::stop": {
 "calls": 100,
 "consts": 100,
@@ -950,6 +1321,62 @@
 "refs": 100,
 "score": 55.6,
 "status": "DIFF"
+},
+"Timer::EventId": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Timer::~Timer": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TimerQueue::Add": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TimerQueue::addLongTermQueue": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WaitQueue::Remove": {
+"calls": 100,
+"consts": 50,
+"refs": 100,
+"score": 83.3,
+"status": "DIFF"
+},
+"WaitQueue::WaitQueue": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WaitQueue::~WaitQueue": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WaitQueueList::~WaitQueueList": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "ZSTD_BtFindBestMatch": {
 "calls": 100,
@@ -1016,30 +1443,30 @@
 },
 "ZSTD_compressBlock_btopt": {
 "calls": 98,
+"consts": 100,
+"refs": 86,
+"score": 94.7,
+"status": "DIFF"
+},
+"ZSTD_compressBlock_btopt_extDict": {
+"calls": 97,
+"consts": 100,
+"refs": 86,
+"score": 94.2,
+"status": "DIFF"
+},
+"ZSTD_compressBlock_btultra": {
+"calls": 98,
 "consts": 98,
 "refs": 86,
 "score": 94.1,
 "status": "DIFF"
 },
-"ZSTD_compressBlock_btopt_extDict": {
+"ZSTD_compressBlock_btultra_extDict": {
 "calls": 97,
 "consts": 98,
 "refs": 86,
-"score": 93.6,
-"status": "DIFF"
-},
-"ZSTD_compressBlock_btultra": {
-"calls": 98,
-"consts": 96,
-"refs": 86,
 "score": 93.5,
-"status": "DIFF"
-},
-"ZSTD_compressBlock_btultra_extDict": {
-"calls": 97,
-"consts": 96,
-"refs": 86,
-"score": 92.9,
 "status": "DIFF"
 },
 "ZSTD_compressBlock_doubleFast": {
@@ -1294,6 +1721,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"operator delete [??3@YAXPEAX0@Z]": {
+"calls": 100,
+"consts": 100,
+"refs": 50,
+"score": 83.3,
+"status": "DIFF"
+},
 "pre_c_init": {
 "calls": 100,
 "consts": 100,
@@ -1309,6 +1743,13 @@
 "status": "MATCH"
 },
 "swprintf": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"swprintf_s<128>": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
