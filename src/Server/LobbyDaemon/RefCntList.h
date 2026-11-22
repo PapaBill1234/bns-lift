@@ -33,6 +33,29 @@ public:
     RefCntListNode* Begin() { return _head; }
     int Size() { return _size; }
 
+    // LIFT: The PDB names Popfront. Its loop body is inline at 0x60b20 and 0x60d00.
+    RefCntListNode* Popfront()
+    {
+        RefCntListNode* node = _head;
+        if (node == nullptr)
+            return nullptr;
+        if (node == _tail)
+        {
+            _tail = nullptr;
+            _head = nullptr;
+        }
+        else
+        {
+            node->_next->_prev = nullptr;
+            _head = _head->_next;
+        }
+        node->_next = nullptr;
+        node->_prev = nullptr;
+        node->_list = nullptr;
+        --_size;
+        return node;
+    }
+
 private:
     RefCntListNode* _head;  // +0
     RefCntListNode* _tail;  // +8

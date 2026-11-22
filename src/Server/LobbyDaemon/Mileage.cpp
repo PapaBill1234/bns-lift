@@ -1,8 +1,19 @@
 // Mileage.obj (LobbyDaemon PDB, 2019 + PDB).
+#include "PlacementNew.h"
 #include "Mileage.h"
+#include "Daemon.h"
 #include "LiftStub.h"
+#include "LobbyMessage.h"
+#include "Log.h"
 #include "Memory.h"
 #include <string.h>
+#include <time.h>
+#if defined(__clang__)
+#include "crt_cpp_overload.h"
+#endif
+
+#pragma comment(linker, "/INCLUDE:??$swprintf_s@$0CAB@@@YAHAEAY0CAB@_WPEB_WZZ")  // LIFT: keep until the caller is lifted (0x614d0)
+template int __cdecl swprintf_s<513>(wchar_t (&)[513], wchar_t const*, ...);
 
 // 0x5d370
 LobbyMessageAcceptor::~LobbyMessageAcceptor()
@@ -145,16 +156,32 @@ MileageSlot* MileageManager::CreateSlot(id128 const&, unsigned long long)
     LIFT_STUB(0x5fc30);
 }
 
-// 0x60660
-void MileageManager::Accept(LobbyMessage*)
+#pragma comment(linker, "/INCLUDE:?Accept@MileageManager@@UEAAXPEAVLobbyMessage@@@Z")  // LIFT: keep until the caller is lifted (0x60660)
+void MileageManager::Accept(LobbyMessage* message)
 {
-    LIFT_STUB(0x60660);
+    for (std::vector<Mileage*>::iterator it = _mileages.begin(); it != _mileages.end(); ++it)
+    {
+        if (*it != nullptr)
+            (*it)->Accept(message);
+    }
 }
 
+// LIFT: The PDB has no name for the counter at 0x209b40. The ctor at 0x606b0 owns it.
+static long long volatile mileageSessionId;
+
 // 0x606b0
-MileageSession::MileageSession(Mileage*, long long)
+MileageSession::MileageSession(Mileage* owner, long long startTime)
 {
-    LIFT_STUB(0x606b0);
+    unsigned long long id = _InterlockedIncrement64(&mileageSessionId);
+    if (id == 0)
+    {
+        id = _InterlockedIncrement64(&mileageSessionId);
+        Log::Write(Log::LT_ERROR, L"Mileage.cpp", 1256, L"[mileage], session id overflow");
+    }
+    _owner = owner;
+    _startTime = startTime;
+    _id = id;
+    _timerNode = nullptr;
 }
 
 // 0x60770
@@ -169,34 +196,111 @@ void MileageSession::ReserveInterimDeposit(unsigned long long)
     LIFT_STUB(0x60800);
 }
 
-// 0x608d0
-MileageSlot::MileageSlot(int)
+#pragma comment(linker, "/INCLUDE:??0MileageSlot@@QEAA@H@Z")  // LIFT: keep until the caller is lifted (0x608d0)
+MileageSlot::MileageSlot(int size) : _limits(nullptr), _sessions(nullptr), _size(0)
 {
-    LIFT_STUB(0x608d0);
+    unsigned long long bytes = sizeof(void*) * static_cast<unsigned long long>(size);
+    _limits = static_cast<MileageLimit**>(Memory::_Manager[Memory::DYNAMIC]->AllocZero(bytes, L"Mileage.cpp", 1304));
+    MileageSession** sessions = static_cast<MileageSession**>(
+        Memory::_Manager[Memory::DYNAMIC]->AllocZero(bytes, L"Mileage.cpp", 1305));
+    _size = size;
+    _sessions = sessions;
 }
 
-// 0x60950
+#pragma comment(linker, "/INCLUDE:??1MileageSlot@@QEAA@XZ")  // LIFT: keep until the caller is lifted (0x60950)
 MileageSlot::~MileageSlot()
 {
-    LIFT_STUB(0x60950);
+    if (_limits != nullptr)
+    {
+        for (int i = 0; i < _size; ++i)
+        {
+            if (_limits[i] != nullptr)
+            {
+                delete _limits[i];
+                Memory::_Manager[Memory::DYNAMIC]->Free(_limits[i], L"Mileage.cpp", 1314);
+                _limits[i] = nullptr;
+            }
+        }
+        Memory::_Manager[Memory::DYNAMIC]->Free(_limits, L"Mileage.cpp", 1316);
+        _limits = nullptr;
+    }
+    if (_sessions != nullptr)
+    {
+        for (int i = 0; i < _size; ++i)
+        {
+            if (_sessions[i] != nullptr)
+            {
+                delete _sessions[i];
+                Memory::_Manager[Memory::DYNAMIC]->Free(_sessions[i], L"Mileage.cpp", 1321);
+                _sessions[i] = nullptr;
+            }
+        }
+        Memory::_Manager[Memory::DYNAMIC]->Free(_sessions, L"Mileage.cpp", 1323);
+        _sessions = nullptr;
+    }
 }
 
-// 0x60a80
-MileageInterimDepositTimer::MileageInterimDepositTimer(long long)
+#pragma comment(linker, "/INCLUDE:??0MileageInterimDepositTimer@@QEAA@_J@Z")  // LIFT: keep until the caller is lifted (0x60a80)
+MileageInterimDepositTimer::MileageInterimDepositTimer(long long period) : _period(period)
 {
-    LIFT_STUB(0x60a80);
 }
 
 // 0x60b20
 MileageInterimDepositTimer::~MileageInterimDepositTimer()
 {
-    LIFT_STUB(0x60b20);
+    RefCntListNode* node;
+    while ((node = _sessions.Popfront()) != nullptr)
+        node->removeReferenceCount(L"Mileage.cpp", 1376);
+}
+
+#pragma comment(linker, "/INCLUDE:?Register@MileageInterimDepositTimer@@QEAAPEAVNode@1@_K0@Z")  // LIFT: keep until the caller is lifted (0x60be0)
+MileageInterimDepositTimer::Node* MileageInterimDepositTimer::Register(unsigned long long clikey, unsigned long long sessionId)
+{
+    long long expire = GetTickCount64() - Daemon::Instance->StartSystemTick64 + _period;
+    void* memory = Memory::_Manager[Memory::DYNAMIC]->Alloc(sizeof(Node), L"Mileage.cpp", 1384);
+    Node* node = memory != nullptr ? ::new (memory) Node(clikey, sessionId, expire) : nullptr;
+    _lock.Enter();
+    bool added = node != nullptr && _sessions.Pushback(node);
+    _lock.Leave();
+    if (added)
+        return node;
+    // BUG: The original can release a null node on allocation failure (0x60be0).
+    if (node != nullptr)
+        node->removeReferenceCount(L"Mileage.cpp", 1393);
+    return nullptr;
 }
 
 // 0x60d00
-bool MileageInterimDepositTimer::Tick(long long)
+bool MileageInterimDepositTimer::Tick(long long elapsed)
 {
-    LIFT_STUB(0x60d00);
+    RefCntList expiredlist;
+    _lock.Enter();
+    for (RefCntListNode* head = _sessions.Begin(); head != nullptr; head = _sessions.Begin())
+    {
+        Node* node = static_cast<Node*>(head);
+        if (!node->IsExpired(elapsed))
+            break;
+        _sessions.Popfront();
+        expiredlist.Pushback(node);
+        node->removeReferenceCount(L"Mileage.cpp", 1421);
+    }
+    _lock.Leave();
+    if (expiredlist.Size() > 0)
+    {
+        long long expiredTime = _time64(nullptr);
+        for (RefCntListNode* head = expiredlist.Popfront(); head != nullptr; head = expiredlist.Popfront())
+        {
+            Node* node = static_cast<Node*>(head);
+            node->Expire(expiredTime);
+            node->removeReferenceCount(L"Mileage.cpp", 1432);
+        }
+    }
+    return true;
+}
+
+void MileageInterimDepositTimer::Node::Expire(long long)
+{
+    LIFT_STUB(0x60f20);
 }
 
 // 0x61060

@@ -962,3 +962,8 @@ What failed:
 - Retain the two public symbols while their callers are stubs (2 retained symbols). The base destructor also matched (1 additional MATCH). LobbyDaemon gained 3 MATCH in total.
 - No source variant failed. Both new card bodies matched on the first comparison.
 - Do not infer a layout from a stub. The token checks need the LobbyDaemon and LobbyConfig layouts. The expiration path needs the job layouts. The desk needs its own PDB layout (9 functions not done).
+
+## ld-10
+
+- `MembershipMileage::Start` (`0x5c300`): conditional placement new (A16) with a null result check gave 95.9, the same score as the early return before construction. Keep the early return.
+- The VS2010 STL emits four `std::vector<Section<__int64>,StlAllocator<Section<__int64>,2> >` functions through the normal container calls. Check the decorated names in the built PDB. The parity count excludes these STL functions.
