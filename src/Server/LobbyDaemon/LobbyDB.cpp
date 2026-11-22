@@ -581,6 +581,8 @@ bool LobbyDB::LoadGameWorldCluster(int& dbrtn, GameWorldCluster::DB**& out, int&
         return false;
     }
     dbrtn = 0;
+    // BUG: the PDB Column enum starts with COL_RETURN, so each bind-column error logs the name of the column
+    // before it (0xa24c0, ColumnDesc[v8]). Kept.
     int column = COL_RETURN;
     unsigned long long paramlen[PARAM_MAX];
     unsigned long long collen[COL_MAX];

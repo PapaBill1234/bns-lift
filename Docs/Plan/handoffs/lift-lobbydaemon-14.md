@@ -113,3 +113,4 @@ Not tried:
 - `LobbyDB::CheckValidityOfCharacterName` does not read its third argument. The PDB keeps it.
 - `LobbyDB::TryCharacterCreation` keeps the PDB signature. LTCG folds the `right` argument to 1 in the binary. The lift binds the argument. `Character::TryCreation` passes 1.
 - `vendor/zstd/src` was copied from the `lift-lobbydaemon-12` worktree (HEAD bb6eaf64). It is not committed.
+- `LobbyDB::LoadGameWorldCluster` has a `// BUG:` mark. The PDB Column enum starts with `COL_RETURN`, so each bind-column error logs the name of the column before it. `COL_MAX_WAITING_COUNT` is never logged. The lift keeps this (0xa24c0).
