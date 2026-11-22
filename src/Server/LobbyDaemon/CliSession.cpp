@@ -42,10 +42,9 @@ CliSession::CliSession()
 {
 }
 
-// 0x32b60
+// 0x32b60. The CliSessionMessage base releases the session reference.
 CliSessionStopPcCafeChargeMessage::~CliSessionStopPcCafeChargeMessage()
 {
-    LIFT_STUB(0x32b60);
 }
 
 // 0x32bb0

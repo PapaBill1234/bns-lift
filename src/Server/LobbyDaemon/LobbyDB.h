@@ -86,6 +86,8 @@ public:
     static bool UpdateLobbyServiceStateToTaskDoneState_ExtendJumpingCharacterCreationQuota(int&, unsigned long long, id128 const&);  // 0xb3910
     static bool UpdateLobbyServiceStateToItemConsumptionFinishState_ExtendJumpingCharacterCreationQuota(int&, unsigned long long, id128 const&);  // 0xb3e40
     static bool FinishExtendJumpingCharacterCreationQuota(int&, unsigned long long, id128 const&);  // 0xb4370
+    struct TryAuctionEscrowRollbackOutParam;
+
     static bool TryAuctionEscrow(int&, id128 const&, id128 const&, short, unsigned long long, long long, unsigned long long&);  // 0xb4630
     static bool CancelAuctionEscrow(int&, unsigned long long, unsigned long long);  // 0xb4e70
     static bool FinishAuctionEscrow(int&, unsigned long long, unsigned long long);  // 0xb5140

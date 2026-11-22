@@ -1048,3 +1048,29 @@ Verify round (ld-11):
 - A stub body is identical code for every stub, so ICF folds the stubs. funcdiff pairs the folded body with one name. Moving a function to a stub can drop another stub from the paired list (`wmain`, DIFF 33.3). This is not a MATCH loss.
 - A8, `SystemPerfMonitor::Initialize` (`0x59d60`): an inline `CounterSet::create` with an extra handle test and `return _instance != nullptr` scored MATCH 100.0 but was not the same code (extra `test rcx,rcx`, `setne al`, `test al,al`). funcdiff does not see these. Fix: no handle test, and `create` returns the instance pointer, so the caller emits `mov [rbx+48h],rax; test rax,rax; je` as the original does. The bytes now agree with the original. Check disassembly of a MATCH 100 function that has an inline `bool` helper.
 - Review 4, `CounterSet::create` (`0x59d60`): the PDB return type is `bool`. With `bool` and no handle test (`return _instance != nullptr;`), the score stays MATCH 100.0, but VS2010 emits `setne al; test al,al` after `test rax,rax`. The original has only `test rax,rax; je`. The PDB type is kept. The difference is recorded in the handoff.
+
+## ld-12
+
+Card lift-lobbydaemon-12: AuctionEscrow, LobbyStats, LobbyTick, TencentUIC, LobbyMessage (26 functions).
+
+| Item | Result |
+| --- | --- |
+| Lifted | 23 |
+| Not done | 3 (`CliSessionGradeChangedMessage::Dispatch`, `CliSessionMileageInterimDepositMessage::Dispatch`, `LobbyStats::update`) |
+| LD MATCH | 82 -> 108 (+26: 16 card functions, 10 shared functions reached for the first time). The other 4 exes: +0, no MATCH lost. |
+
+What worked (count = functions made MATCH):
+- The `/INCLUDE` dead-strip rule gives the first real LD gain. Leaf modules with no layout dependency (LobbyTick, TencentUIC,
+  LobbyMessage) reach MATCH at once, and they pull shared code (`TimerQueue::Add`, `RefCntList::Pushback`) into the exe: +10.
+- A17 error block first: `LobbyTick::Add` 58.3 -> 100, `LobbyTick::Remove` 80.6 -> 100, `TencentUIC::Initialize` 95.2 -> 100 (3).
+  The HR pseudocode shows `if (p != nullptr) { ... } else { log }`, but the original layout has the log block first.
+  Read the disassembly order, not the HR branch order.
+- A4 `__declspec(noinline)` on `LobbyTickEvent::~LobbyTickEvent`: the scalar deleting destructor calls it out of line (1).
+  Without it, VS2010 inlines the body into `_G` and funcdiff has no pair.
+
+What failed or is blocked (tries):
+- `LobbyStats::Initialize` 93.3 and both AuctionEscrow functions (94.9, 82.1): LTCG folds caller constants (`L"lobby"`, `L"stats"`,
+  `bufsizeInWords = 1025`) into the original body. A function that only `/INCLUDE` keeps has no caller, so no fold. 0 tries; retry
+  after the callers (LobbyDaemon::initialize, the auction handlers) are lifted.
+- `LobbyStats::HandleEvent` 33.3: its callee `update` is a `LIFT_STUB`, so the abort is inlined. Not a source-form problem.
+- funcdiff skips names that start with `__` (`SKIP_NAME`). `__printXml` is in the built PDB but has no score.

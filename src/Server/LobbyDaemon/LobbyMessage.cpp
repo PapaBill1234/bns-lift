@@ -1,38 +1,76 @@
-// LobbyMessage.obj (LobbyDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
+// LobbyMessage.obj (LobbyDaemon 2019 + PDB).
 #include "LobbyMessage.h"
+#include "AlertSender.h"
+#include "CliSession.h"
 #include "LiftStub.h"
+#include "Log.h"
+#include "PcCafeMileage.h"
+#include <time.h>
+
+#pragma comment(linker, "/INCLUDE:??1LobbyMessage@@UEAA@XZ")  // LIFT: keep until the callers are lifted (0x2f9d0).
+#pragma comment(linker, "/INCLUDE:?Dispatch@LobbyMessage@@UEAAXPEAVLobbyMessageAcceptor@@@Z")  // LIFT: keep until the callers are lifted (0x2f9e0).
+#pragma comment(linker, "/INCLUDE:?Dispatch@CliSessionStopPcCafeChargeMessage@@UEAAXPEAVPcCafeMileage@@@Z")  // LIFT: keep until the callers are lifted (0x2fa90).
+#pragma comment(linker, "/INCLUDE:?Dispatch@CliSessionStartPcCafeChargeMessage@@UEAAXPEAVPcCafeMileage@@@Z")  // LIFT: keep until the callers are lifted (0x2fad0).
 
 // 0x2f9d0
 LobbyMessage::~LobbyMessage()
 {
-    LIFT_STUB(0x2f9d0);
 }
 
 // 0x2f9e0
-void LobbyMessage::Dispatch(LobbyMessageAcceptor*)
+void LobbyMessage::Dispatch(LobbyMessageAcceptor* acceptor)
 {
-    LIFT_STUB(0x2f9e0);
+    Log::Write(Log::LT_ERROR,
+               L"e:\\dailybuild02\\lobbydaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\lobbydaemon\\LobbyMessage.h",
+               70, L"== CRASH == [message], dispatching unregistered acceptor, address:%p", acceptor);
+    AlertSender::Write(
+        L"e:\\dailybuild02\\lobbydaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\lobbydaemon\\LobbyMessage.h",
+        70, L"== CRASH == [message], dispatching unregistered acceptor, address:%p", acceptor);
+}
+
+// LIFT: inlined at the call site of 0x2fad0 in CliSession::onPcCafeChargeStart.
+CliSessionMessage::CliSessionMessage(CliSession* cs) : _cs(cs)
+{
+    if (_cs != nullptr)
+        _cs->addReferenceCount(L"LobbyMessage.cpp", 21);
+}
+
+// LIFT: the original deleting destructor at 0x2fa40 inlines this body.
+CliSessionMessage::~CliSessionMessage()
+{
+    if (_cs != nullptr)
+        _cs->removeReferenceCount(L"LobbyMessage.cpp", 27);
 }
 
 // 0x2fa90
-void CliSessionStopPcCafeChargeMessage::Dispatch(PcCafeMileage*)
+void CliSessionStopPcCafeChargeMessage::Dispatch(PcCafeMileage* acceptor)
 {
-    LIFT_STUB(0x2fa90);
+    if (acceptor != nullptr)
+    {
+        long long now = _time64(nullptr);
+        acceptor->Stop(_cs, now, nullptr);
+    }
 }
 
 // 0x2fad0
-void CliSessionStartPcCafeChargeMessage::Dispatch(PcCafeMileage*)
+void CliSessionStartPcCafeChargeMessage::Dispatch(PcCafeMileage* acceptor)
 {
-    LIFT_STUB(0x2fad0);
+    if (acceptor != nullptr)
+    {
+        long long now = _time64(nullptr);
+        acceptor->Start(_cs, now);
+    }
 }
 
 // 0x2fb10
+// LIFT: Not done. It needs MembershipMileage::GradeChanged, which lift-lobbydaemon-10 declares (0x2fb10).
 void CliSessionGradeChangedMessage::Dispatch(MembershipMileage*)
 {
     LIFT_STUB(0x2fb10);
 }
 
 // 0x2fb60
+// LIFT: Not done. It needs the MileageSlot and MileageSession layouts (lift-lobbydaemon-10) and the PcCafeMileage layout (0x2fb60).
 void CliSessionMileageInterimDepositMessage::Dispatch(PcCafeMileage*)
 {
     LIFT_STUB(0x2fb60);

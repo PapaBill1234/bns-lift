@@ -1,10 +1,20 @@
-// TencentUIC.obj (LobbyDaemon PDB, 2019 + PDB). Wave 0: declarations of the stubbed functions only.
-// LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
+// TencentUIC.obj (LobbyDaemon 2019 + PDB).
 #pragma once
+
+namespace tss_sdk_if
+{
+struct STssSdk;
+}
 
 class TencentUIC
 {
 public:
-    bool Initialize(wchar_t const*);  // 0x7ad30
-    bool CheckNameFilter(unsigned int, wchar_t const*);  // 0x7ae80
+    TencentUIC() : _tss_sdk(nullptr) {}
+    virtual ~TencentUIC() {}
+    bool Initialize(wchar_t const* configfile);  // 0x7ad30
+    bool CheckNameFilter(unsigned int qqid, wchar_t const* name);  // 0x7ae80
+
+private:
+    tss_sdk_if::STssSdk* _tss_sdk;
 };
+static_assert(sizeof(TencentUIC) == 0x10, "sizeof TencentUIC");
