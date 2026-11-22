@@ -82,7 +82,7 @@ The `ID128_ID_ZERO` comparisons improve the scores of `FetchCharacterInfo` and `
 
 ## Checks
 
-`tools/gate.sh` printed `gate ok`. `tools/parity.sh` printed `parity ok`. Both used `LIFT_BUILD_DIR=build-ld-7`. The zstd source is at `bb6eaf64`. The rebuilt LobbyDaemon PDB contains all 16 card retention names. The baseline is main at `5627050`. No baseline changed.
+`tools/gate.sh` printed `gate ok`. `tools/parity.sh` printed `parity ok`. Both used `LIFT_BUILD_DIR=build-ld-7`. The zstd source is at `bb6eaf64`. The rebuilt LobbyDaemon PDB contains all 17 card retention names. The baseline is main at `5627050`. No baseline changed.
 
 | Server | Baseline MATCH | Final MATCH | Gain | Parity |
 | --- | ---: | ---: | ---: | ---: |
