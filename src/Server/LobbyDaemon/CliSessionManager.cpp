@@ -26,3 +26,7 @@ void CliSessionManager::OnCloseGamedChannel(short)
 {
     LIFT_STUB(0x3cdd0);
 }
+
+// 0x61490 std::vector<CliSession*,StlAllocator<CliSession*,2> >::~vector: STL template instance. Not done: no lifted caller makes it yet (CliSessionTable dtor is a stub).
+// LIFT: the compiler makes it from CliSessionTable::CliSessionList (CliSessionTable.h). StlAllocator<T,2>::deallocate
+// frees through Memory::_Manager[2] with StlMemory.h line 64 (BloodLib/include/StlMemory.h), the same as the binary.

@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- SDK-style project: builds with Visual Studio 2019+ or `dotnet build` (also on Linux/macOS via reference assemblies). -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>LegacyBin</AssemblyName>
+    <RootNamespace>LegacyBin</RootNamespace>
+    <StartupObject>LegacyBin.Program</StartupObject>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
+    <EnableDefaultCompileItems>true</EnableDefaultCompileItems>
+    <NoWarn>$(NoWarn);CS0168;CS0169;CS0219;CS0414;CS0649</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+    <PackageReference Include="System.Resources.Extensions" Version="8.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\LegacyBin.Core\LegacyBin.Core.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="DotNetZip">
+      <HintPath>DotNetZip.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="MaterialSkin">
+      <HintPath>Resources\MaterialSkin.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Web.Extensions" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\DotNetZip.dll" LogicalName="LegacyBin.Resources.DotNetZip.dll" />
+    <EmbeddedResource Include="Resources\MaterialSkin.dll" LogicalName="LegacyBin.Resources.MaterialSkin.dll" />
+    <None Remove="docs\**" />
+  </ItemGroup>
+</Project>

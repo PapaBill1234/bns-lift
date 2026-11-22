@@ -1,6 +1,7 @@
 // LobbyLobbyGatePacketHandler.obj (LobbyDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
 #include "LobbyLobbyGatePacketHandler.h"
 #include "LiftStub.h"
+#include "Log.h"
 
 // 0xc25c0
 bool HandleLobbyLobbyGate_HelloReq(Session const*, Packet const*)
@@ -81,9 +82,11 @@ bool HandleLobbyLobbyGate_GetCharacterInfoReq(SharedChannel*, Packet const*)
 }
 
 // 0xc5ae0
+#pragma comment(linker, "/INCLUDE:?HandleLobbyLobbyGate_CheckCharacterNameReq@@YA_NPEAVSharedChannel@@PEBVPacket@@@Z")  // LIFT: keep until the caller is lifted (0xc5ae0, caller is the handler table)
 bool HandleLobbyLobbyGate_CheckCharacterNameReq(SharedChannel*, Packet const*)
 {
-    LIFT_STUB(0xc5ae0);
+    Log::Write(Log::LT_ERROR, L"LobbyLobbyGatePacketHandler.cpp", 807, L"[lobby-gate], check character name req fail; N/A");
+    return true;
 }
 
 // 0xc5b10
