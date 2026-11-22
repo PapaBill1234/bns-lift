@@ -89,6 +89,8 @@ extern "C" __declspec(noinline) tss_sdk_if::STssSdk* tss_load_sdk(char const* sh
 {
     char shared_lib_file[1024] = "";
 #if defined(__clang__)
+    // LIFT: the Wine headers have no _snprintf_s<1024> template overload (0x7b0a0). The clang build calls the 4-argument form
+    // (count = array size). VS2010 compiles the 2-argument form below, which is the original (0x7ac30).
     _snprintf_s(shared_lib_file, sizeof(shared_lib_file), sizeof(shared_lib_file), "%s/%s.%s", shared_lib_dir, "tss_sdk", "dll");
 #else
     _snprintf_s(shared_lib_file, sizeof(shared_lib_file), "%s/%s.%s", shared_lib_dir, "tss_sdk", "dll");  // 0x7b0a0
