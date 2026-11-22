@@ -49,7 +49,7 @@ Scores come from `build-vs2010/LobbyDaemon.funcdiff.json` of the final run. "Not
 | LobbyLocale | `0x58120` | `LobbyLocale::GetNextThaiCell` | 100.0 | MATCH |
 | LobbyLocale | `0x58260` | `LobbyLocale::GetVietVowelType` | 100.0 | MATCH |
 | LobbyLocale | `0x58460` | `LobbyLocale::GetVietToneMarkType` | 100.0 | MATCH |
-| LobbyLocale | `0x584a0` | `LobbyLocale::GetStringLengthWithCellCombination` | 75.0 | DIFF |
+| LobbyLocale | `0x584a0` | `LobbyLocale::GetStringLengthWithCellCombination` | 81.5 | DIFF |
 | LobbyLocale | `0x585d0` | `IsVietnamese` | 100.0 | MATCH |
 
 ## Not done
@@ -60,14 +60,26 @@ None. All 33 RVAs are lifted.
 
 | Item | Functions | Reason |
 | --- | --- | --- |
-| No client session key in logs | 16 Start, ConsumeItemTried, TaskDone, ConsumeItemFinished and Finish functions (45 log calls) | The lift does not write `cli-key:0x%I64X` and `owner->_clikey`. One shared `// LIFT:` note at the top of `LobbyService.cpp` covers all 45 calls. Each function also has its own `// LIFT:` note. The client cannot see this change. It costs the calls, consts and refs signals (scores near 60). An attempt to restore the key in repair 2 was blocked, because it writes a session credential to the log files. Restoring it needs an owner decision. |
+| No client session key in logs (safety difference, see below) | 16 Start, ConsumeItemTried, TaskDone, ConsumeItemFinished and Finish functions (45 log calls) | The lift does not write `cli-key:0x%I64X` and `owner->_clikey`. One shared `// LIFT:` note at the top of `LobbyService.cpp` covers all 45 calls. Each function also has its own `// LIFT:` note. The client cannot see this change. It costs the calls, consts and refs signals (scores near 60). The lift does not log session keys or other secrets. This is a deliberate safety difference. |
 | Three derived `Fetch` functions score 0.0 | `0x6f000`, `0x6fc10`, `0x70900` | Cause: each one calls `LobbyService::Fetch` (`0x6c330`) first. `0x6c330` is still a `LIFT_STUB` (Not done in lift-lobbydaemon-6). /LTCG sees that the stub does not return, so it removes the rest of each caller. Then `/OPT:ICF` folds the three callers into one body at one address. Funcdiff scores the folded body as `ChangeCharacterRaceService::Fetch`. Fix: lift `0x6c330`. `__declspec(noinline)` on the stub was tried. It does not help (see trial 4). |
 | `LobbyService::IsServiceTarget` not paired | `0xefb20` | The body is `return false`. The linker folds it. IDA shows the folded body as `WinServiceConsole::IsServiceTarget`. |
 | Kanji table form | `IsAllowedChar`, `GetLanguageTypeOfChar` | The original uses one byte table `byte_140161BD0` (kanji, French, German, Brazilian Portuguese at offsets `0x5200`, `0x52C0`, `0x5300`). The lift uses a bit table for kanji and three small tables. This is the last consts gap (98). One shared byte table is a suggestion for a later round. |
 | `// BUG:` marks, original behavior kept | the three `Setup` functions, `IsVietnamese` (`0xaea7`) | The lift keeps the original behavior and marks it. |
-| Behavior changed (bug fixed) | Sex `Start` (`0x6fe20`), Race `Start` (`0x70b10`) | The original tests only `newAppearanceDataSize != 0`, so a negative byte count reaches the database call. The lift rejects `newAppearanceDataSize <= 0`. The `// BUG:` mark says so. The client sends a valid count, so the client cannot see this change. |
-| Corrected range check | `GetThaiCharType` (inline in `GetNextThaiCell`, `0x58159`) | The original range test is wrong. The lift uses the table bounds and marks it `// BUG:`. `GetNextThaiCell` still matches. |
-| Added null test | `GetNextThaiCell` (`0x58120`) | The original tests only `strLen`. The lift also tests `str == nullptr`. A `// LIFT:` note marks it. The function still scores 100.0 MATCH. |
+
+## Safety differences
+
+These differences are deliberate. The lift keeps them. A missing MATCH or a branch difference that comes only from one of them is not a problem.
+
+| # | Function (RVA) | Original | Lift | Effect on funcdiff |
+| --- | --- | --- | --- | --- |
+| 1 | 16 Start, ConsumeItemTried, TaskDone, ConsumeItemFinished and Finish functions (`0x6f1b0` to `0x71350`, 45 log and alert calls) | Writes `cli-key:0x%I64X` with `owner->_clikey` | Does not write the client session key. The rest of each message is the original text. | calls, consts and refs signals; scores near 60 |
+| 2 | `ChangeCharacterSexService::Start` (`0x6fe20`) | Tests only `newAppearanceDataSize != 0` (`// BUG:`) | Rejects `newAppearanceDataSize <= 0` (input validation) | one branch; DIFF |
+| 3 | `ChangeCharacterRaceService::Start` (`0x70b10`) | Tests only `newAppearanceDataSize != 0` (`// BUG:`) | Rejects `newAppearanceDataSize <= 0` (input validation) | one branch; DIFF |
+| 4 | `GetThaiCharType`, inline in `GetNextThaiCell` (`0x58159`) | Wrong range test; can read past the table (`// BUG:`) | Reads the table only inside its bounds (bounds check) | none; `GetNextThaiCell` is MATCH |
+| 5 | `LobbyLocale::GetNextThaiCell` (`0x58120`) | Tests only `strLen` | Also tests `str == nullptr` (input validation) | none; MATCH |
+| 6 | `LobbyLocale::GetStringLengthWithCellCombination` (`0x584a0`) | Reads `str[0]` before any null test | Returns 0 for a null `str` before the loop (input validation). The in-loop `str + i` tests of the original stay. | small; 81.5 |
+
+Skeptic 2 findings 1 to 5 ask to remove items 1 to 5. The verify round keeps them under the safety rule. Findings 6 (`this` null test in the log blocks) and 7 (in-loop `str + i` tests of `0x584a0`) are fixed. Finding 8 (DIFF functions at 90 or more in LobbyLocale) is a suggestion for a later parity round.
 
 ## Codegen trials
 
@@ -78,12 +90,14 @@ None. All 33 RVAs are lifted.
 | 3 | `GetLanguageTypeOfChar` | `unsigned int` index for the Brazilian Portuguese table | 99.4 | 99.4 | no (reverted) |
 | 4 | three derived `Fetch` | `__declspec(noinline)` on the `0x6c330` stub | 0.0 | 0.0 | no (reverted). The callers call the stub, but the code after the call is still removed and folded. |
 | 5 | Sex and Race `Fetch` | Add `/INCLUDE` | not in PDB | in PDB, folded | yes |
+| 6 | `GetStringLengthWithCellCombination` | Shape of the PDB line map (lines 635-669): `for` loop with `i += count`, `cell` at function scope, `str + i` tests in the Thai and Vietnamese branches, one `count <= 0` test. The safety null test before the loop stays. | 75.0 | 81.5 | yes |
+| 7 | `GetStringLengthWithCellCombination` | Read `str[i]` in each range test in place of a local | 81.5 | 81.5 | no (reverted). The gap is the consts of the Thai range test (orig `0xe3a`, `0xe5b`; ours `0xe01`, `0xe3f`, `0x1c`). |
+| 8 | 19 null-owner and compose-fail log blocks (`0x6edf0` to `0x71350`) | `Xxx const* s = this;` and `s != nullptr ? s->_db.field : 0` for each log argument (ld-2 form, macro `LOBBY_SERVICE_DB_LOG_ARGS`) | same | same | yes (source form of the original) |
 
 Not tried:
-- Restore the client session key in the 45 log calls (user decision).
 - Make one shared byte table for the locale tables (large data change).
 - Lift `0x6c330` (owned by lift-lobbydaemon-6, out of scope for this card).
-- `GetStringLengthWithCellCombination` consts 25. The detail tool (`funcdiff.py --show`) did not run in this session.
+- `GetStringLengthWithCellCombination` third form (max 3 forms). The consts gap is the Thai range test (see trial 7).
 
 ## Checks
 

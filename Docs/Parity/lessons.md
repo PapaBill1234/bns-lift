@@ -1021,3 +1021,15 @@ What failed:
   after the call. `/OPT:ICF` then folds callers with the same prefix into one body (`0x6f000`, `0x6fc10`, `0x70900`
   share one address). `__declspec(noinline)` on the stub does not help: the call stays, but the rest is still removed.
   Fix: lift the callee first (`0x6c330`). Check folding with `llvm-pdbutil dump --publics` (same `addr`).
+
+Verify round (ld-11):
+
+| Function | Change | Before | After | Kept |
+| --- | --- | ---: | ---: | --- |
+| `GetStringLengthWithCellCombination` (0x584a0) | Original shape from the PDB line map (lines 635-669): `for` loop with `i += count`, `cell` at function scope, `str + i` null tests in the Thai and Vietnamese branches, one `count <= 0` test after both branches. A safety null test on `str` stays before the loop. | 75.0 | 81.5 | yes |
+| `GetStringLengthWithCellCombination` (0x584a0) | Read `str[i]` in each range test in place of one local `c` | 81.5 | 81.5 | no (reverted) |
+| 19 null-owner and compose-fail log blocks (0x6edf0 to 0x71350) | `Xxx const* s = this;` and a `s != nullptr ? s->_db.field : 0` test for each log argument (ld-2 form) | 40.7-63.7 | 40.7-63.7 | yes (source form of the original; no score change) |
+
+- The remaining consts gap of 0x584a0 is the Thai range test. The original compares with `0xe01`, `0xe3a`, `0xe3f` and `0xe5b`
+  in four short-circuit tests. Our build uses a subtract-and-compare form (`0x1c`). Two source forms gave the same code.
+- The `this` null test in the service log blocks does not change the score. The missing client session key arguments set the score.

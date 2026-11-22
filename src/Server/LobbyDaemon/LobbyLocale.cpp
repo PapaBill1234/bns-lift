@@ -178,7 +178,8 @@ static __forceinline bool IsJapaneseKanji(wchar_t c)
 }
 
 // LIFT: 0x58120. Use the PDB names for the inlined Thai table operations.
-// BUG: 0x58159 has a wrong range check. The lift uses the table bounds.
+// BUG: 0x58159 has a wrong range check.
+// LIFT: Safety guard (0x58159). The lift reads the table only inside its bounds. See "Safety differences" in the handoff.
 __forceinline LobbyLocale::ThaiCharType LobbyLocale::GetThaiCharType(wchar_t c)
 {
     unsigned int index = c - 0x0e00;
@@ -358,7 +359,7 @@ bool LobbyLocale::IsWupperNotApplied(wchar_t c)
 __declspec(noinline)  // LIFT: The original calls this function out of line at 0x584a0.
 int LobbyLocale::GetNextThaiCell(wchar_t const* str, int strLen, ThaiCell* cell)
 {
-    // LIFT: 0x58120 tests only strLen. The null test on str is added for safety.
+    // LIFT: Safety guard (0x58120). The original tests only strLen. The lift also tests str for null.
     if (strLen <= 0 || str == nullptr)
         return 0;
     if (cell != nullptr)
@@ -450,36 +451,42 @@ LobbyLocale::VietToneMarkType LobbyLocale::GetVietToneMarkType(wchar_t ch)
 #pragma comment(linker, "/INCLUDE:?GetStringLengthWithCellCombination@LobbyLocale@@SAHPEB_WH@Z")  // LIFT: Keep 0x584a0 until its caller is lifted.
 int LobbyLocale::GetStringLengthWithCellCombination(wchar_t const* str, int strLen)
 {
-    // LIFT: 0x584a0 tests str + i in the loop after it reads str[i] (inlined GetNextVietCell, VietCell).
-    // The lift tests str one time here.
+    // LIFT: Safety guard (0x584a0). The original reads str[0] before any null test. The lift returns 0 for a null str.
     if (str == nullptr)
         return 0;
     int length = 0;
-    int i = 0;
-    while (i < strLen)
+    ThaiCell cell;
+    int count = 0;
+    for (int i = 0; i < strLen; i += count)
     {
         int width = 1;
-        int count = 1;
+        count = 1;
         wchar_t c = str[i];
         if ((c >= 0x0e01 && c <= 0x0e3a) || (c >= 0x0e3f && c <= 0x0e5b))
         {
-            ThaiCell cell;
             cell.base = 0;
             cell.hilo = 0;
             cell.top = 0;
+            // LIFT: 0x5851a tests str + i before the call (inlined cell helper; the PDB has no name for it).
+            if (str + i == nullptr)
+                return length;
             count = GetNextThaiCell(str + i, strLen - i, &cell);
             if (cell.hilo == 0x0e33)
                 width = 2;
-            if (count <= 0)
-                return length;
         }
         else if (IsVietnamese(c))
         {
-            if (GetVietVowelType(c) != VIETVOWEL_TYPE_NONE && strLen - i >= 2 &&
-                GetVietToneMarkType(str[i + 1]) != VIETTONEMARK_TYPE_NONE)
+            // LIFT: 0x58562 inlines the Vietnamese cell test (the PDB has no name for it).
+            if (str + i == nullptr || strLen - i < 1)
+                return length;
+            if (GetVietVowelType(c) == VIETVOWEL_TYPE_NONE || strLen - i < 2 ||
+                GetVietToneMarkType(str[i + 1]) == VIETTONEMARK_TYPE_NONE)
+                count = 1;
+            else
                 count = 2;
         }
-        i += count;
+        if (count <= 0)
+            return length;
         length += width;
     }
     return length;

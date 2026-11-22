@@ -14,6 +14,11 @@
 // authenticates the client session, so this lift keeps it out of the log files. The rest of each message is
 // the original text. The client cannot see this change. Restoring the key needs an owner decision.
 
+// LIFT: The original null-owner paths test this for null before each _db read for a log argument (for example 0x70040).
+#define LOBBY_SERVICE_DB_LOG_ARGS(s) \
+    ((s) != nullptr ? (s)->_db.serviceId : 0ULL), ((s) != nullptr ? (s)->_db.serviceType : 0), \
+    ((s) != nullptr ? (s)->_db.serviceState : 0), ((s) != nullptr ? (s)->_db.itemInstanceId : 0ULL)
+
 #pragma comment(linker, "/INCLUDE:?Setup@CharacterCosmesisService@@QEAA_NPEAUDB@LobbyService@@PEAU21@@Z")  // LIFT: Keep 0x6c4a0 until its caller is lifted.
 #pragma comment(linker, "/INCLUDE:?Setup@AddSlotService@@QEAA_NPEAUDB@LobbyService@@PEAU21@@Z")  // LIFT: Keep 0x6d180 until its caller is lifted.
 #pragma comment(linker, "/INCLUDE:?IsServiceTarget@AddSlotService@@UEAA_NAEBTid128@@@Z")  // LIFT: Keep 0x6d3e0 until its caller is lifted.
@@ -260,12 +265,13 @@ bool RenameUserService::Finish(CliSession* owner, unsigned long long itemInstanc
 {
     if (owner == nullptr)
     {
+        RenameUserService const* s = this;  // LIFT: The original tests this for null before it reads _db for the log arguments.
         Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 775,
             L"== CRASH == [lobby-service], finish rename user service fail; null owner, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
-            _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
         AlertSender::Write(L"LobbyService.cpp", 775,
             L"== CRASH == [lobby-service], finish rename user service fail; null owner, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
-            _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
         return false;
     }
     if (_db.serviceState == 1)
@@ -306,12 +312,13 @@ bool ExtendJumpingCharacterCreationQuotaService::Fetch(CliSession* owner, Fragme
         return false;
     if (owner == nullptr || fp == nullptr)
     {
+        ExtendJumpingCharacterCreationQuotaService const* s = this;  // LIFT: The original tests this for null before it reads _db for the log arguments.
         Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 826,
             L"== CRASH == [lobby-service], fetch extend jumping character creation quota service entry fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
-            _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
         AlertSender::Write(L"LobbyService.cpp", 826,
             L"== CRASH == [lobby-service], fetch extend jumping character creation quota service entry fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
-            _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
         return false;
     }
     // LIFT: 0x6f000. The entry has no slot id. The original composes ID128_GUID_ZERO and two zeros.
@@ -319,9 +326,10 @@ bool ExtendJumpingCharacterCreationQuotaService::Fetch(CliSession* owner, Fragme
         fp->packet.Allocate(&fp->composer);
     if (fp->Compose(3, ID128_GUID_ZERO, 0, 0) == 0)
     {
+        ExtendJumpingCharacterCreationQuotaService const* s = this;  // LIFT: The original tests this for null here too (0x6f000, line 845).
         Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 845,
             L"[lobby-service], fetch extend jumping character creation quota service entry fail; compose fail, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
-            _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
         return false;
     }
     return true;
@@ -334,9 +342,10 @@ bool ExtendJumpingCharacterCreationQuotaService::Start(CliSession* owner, unsign
     // LIFT: 0x6f1b0 to 0x6f560. The original also logs owner->_clikey. This lift does not log the client session key.
     if (owner == nullptr)
     {
+        ExtendJumpingCharacterCreationQuotaService const* s = this;  // LIFT: The original tests this for null before it reads _db for the log arguments.
         Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 856,
             L"[lobby-service], start fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
-            _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
         return false;
     }
     if (_db.serviceState == 0)
@@ -367,12 +376,13 @@ bool ExtendJumpingCharacterCreationQuotaService::ConsumeItemTried(CliSession* ow
 {
     if (owner == nullptr)
     {
+        ExtendJumpingCharacterCreationQuotaService const* s = this;  // LIFT: The original tests this for null before it reads _db for the log arguments.
         Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 884,
             L"== CRASH == [lobby-service], consume-item-tried fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
-            _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
         AlertSender::Write(L"LobbyService.cpp", 884,
             L"== CRASH == [lobby-service], consume-item-tried fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
-            _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
         return false;
     }
     if (_db.serviceState == 1)
@@ -403,12 +413,13 @@ bool ExtendJumpingCharacterCreationQuotaService::TaskDone(CliSession* owner)
 {
     if (owner == nullptr)
     {
+        ExtendJumpingCharacterCreationQuotaService const* s = this;  // LIFT: The original tests this for null before it reads _db for the log arguments.
         Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 912,
             L"== CRASH == [lobby-service], task done fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
-            _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
         AlertSender::Write(L"LobbyService.cpp", 912,
             L"== CRASH == [lobby-service], task done fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
-            _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
         return false;
     }
     if (_db.serviceState == 2)
@@ -440,12 +451,13 @@ bool ExtendJumpingCharacterCreationQuotaService::ConsumeItemFinished(CliSession*
     // LIFT: 0x6f760. The original also logs owner->_clikey. This lift does not log the client session key.
     if (owner == nullptr)
     {
+        ExtendJumpingCharacterCreationQuotaService const* s = this;  // LIFT: The original tests this for null before it reads _db for the log arguments.
         Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 940,
             L"== CRASH == [lobby-service], consume-item-finished fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
-            _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
         AlertSender::Write(L"LobbyService.cpp", 940,
             L"== CRASH == [lobby-service], consume-item-finished fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
-            _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
         return false;
     }
     if (_db.serviceState == 3)
@@ -477,12 +489,13 @@ bool ExtendJumpingCharacterCreationQuotaService::Finish(CliSession* owner)
     // LIFT: 0x6f960. The original also logs owner->_clikey. This lift does not log the client session key.
     if (owner == nullptr)
     {
+        ExtendJumpingCharacterCreationQuotaService const* s = this;  // LIFT: The original tests this for null before it reads _db for the log arguments.
         Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 968,
             L"== CRASH == [lobby-service], finish fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
-            _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
         AlertSender::Write(L"LobbyService.cpp", 968,
             L"== CRASH == [lobby-service], finish fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
-            _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
         return false;
     }
     if (_db.serviceState == 4)
@@ -533,12 +546,13 @@ bool ChangeCharacterSexService::Fetch(CliSession* owner, FragmentPacket* fp) con
         return false;
     if (owner == nullptr || fp == nullptr)
     {
+        ChangeCharacterSexService const* s = this;  // LIFT: The original tests this for null before it reads _db for the log arguments.
         Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 1028,
             L"== CRASH == [lobby-service], fetch change character sex service entry fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
-            _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
         AlertSender::Write(L"LobbyService.cpp", 1028,
             L"== CRASH == [lobby-service], fetch change character sex service entry fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
-            _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
         return false;
     }
     // LIFT: 0x6fc10 inlines CliSession::getCharacter (0x35cf0).
@@ -582,14 +596,16 @@ bool ChangeCharacterSexService::Start(CliSession* owner, unsigned int itemDataId
                                       char newSex, char* newAppearanceData, int newAppearanceDataSize)
 {
     // LIFT: 0x6fe20 to 0x70040. The original also logs owner->_clikey. This lift does not log the client session key.
-    // BUG: 0x6fe20 tests only newAppearanceDataSize != 0, so a negative byte count reaches the database call. Bug fixed: the lift rejects a count <= 0.
+    // BUG: 0x6fe20 tests only newAppearanceDataSize != 0.
+    // LIFT: Safety guard (0x6fe20). The lift rejects newAppearanceDataSize <= 0. See "Safety differences" in the handoff.
     if (owner == nullptr || newSex <= 0 ||
         newAppearanceData == nullptr || newAppearanceDataSize <= 0)
     {
+        ChangeCharacterSexService const* s = this;  // LIFT: The original tests this for null before it reads _db for the log arguments.
         Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 1073,
             L"[lobby-service], start fail; invalid param, owner:%p, new-sex:%d, new-appearance-data:%p, new-apperance-data-size:%d, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
             owner, static_cast<int>(newSex), newAppearanceData, newAppearanceDataSize,
-            _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
         return false;
     }
     if (_db.serviceState == 0)
@@ -623,12 +639,13 @@ bool ChangeCharacterSexService::ConsumeItemTried(CliSession* owner)
     // LIFT: 0x70040. The original also logs owner->_clikey. This lift does not log the client session key.
     if (owner == nullptr)
     {
+        ChangeCharacterSexService const* s = this;  // LIFT: The original tests this for null before it reads _db for the log arguments.
         Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 1101,
             L"== CRASH == [lobby-service], consume-item-tried fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
-            _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
         AlertSender::Write(L"LobbyService.cpp", 1101,
             L"== CRASH == [lobby-service], consume-item-tried fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
-            _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
         return false;
     }
     if (_db.serviceState == 1)
@@ -660,12 +677,13 @@ bool ChangeCharacterSexService::TaskDone(CliSession* owner)
     // LIFT: 0x70240. The original also logs owner->_clikey. This lift does not log the client session key.
     if (owner == nullptr)
     {
+        ChangeCharacterSexService const* s = this;  // LIFT: The original tests this for null before it reads _db for the log arguments.
         Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 1129,
             L"== CRASH == [lobby-service], task done fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
-            _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
         AlertSender::Write(L"LobbyService.cpp", 1129,
             L"== CRASH == [lobby-service], task done fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
-            _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
         return false;
     }
     if (_db.serviceState == 2)
@@ -697,12 +715,13 @@ bool ChangeCharacterSexService::ConsumeItemFinished(CliSession* owner)
     // LIFT: 0x70440. The original also logs owner->_clikey. This lift does not log the client session key.
     if (owner == nullptr)
     {
+        ChangeCharacterSexService const* s = this;  // LIFT: The original tests this for null before it reads _db for the log arguments.
         Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 1157,
             L"== CRASH == [lobby-service], consume-item-finished fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
-            _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
         AlertSender::Write(L"LobbyService.cpp", 1157,
             L"== CRASH == [lobby-service], consume-item-finished fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
-            _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
         return false;
     }
     if (_db.serviceState == 3)
@@ -734,12 +753,13 @@ bool ChangeCharacterSexService::Finish(CliSession* owner)
     // LIFT: 0x70640. The original also logs owner->_clikey. This lift does not log the client session key.
     if (owner == nullptr)
     {
+        ChangeCharacterSexService const* s = this;  // LIFT: The original tests this for null before it reads _db for the log arguments.
         Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 1185,
             L"== CRASH == [lobby-service], finish fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
-            _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
         AlertSender::Write(L"LobbyService.cpp", 1185,
             L"== CRASH == [lobby-service], finish fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
-            _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
         return false;
     }
     if (_db.serviceState == 4)
@@ -790,12 +810,13 @@ bool ChangeCharacterRaceService::Fetch(CliSession* owner, FragmentPacket* fp) co
         return false;
     if (owner == nullptr || fp == nullptr)
     {
+        ChangeCharacterRaceService const* s = this;  // LIFT: The original tests this for null before it reads _db for the log arguments.
         Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 1245,
             L"== CRASH == [lobby-service], fetch change character race service entry fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
-            _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
         AlertSender::Write(L"LobbyService.cpp", 1245,
             L"== CRASH == [lobby-service], fetch change character race service entry fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
-            _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
         return false;
     }
     // LIFT: 0x70900 inlines CliSession::getCharacter (0x35cf0).
@@ -839,14 +860,16 @@ bool ChangeCharacterRaceService::Start(CliSession* owner, unsigned int itemDataI
                                       char newSex, char* newAppearanceData, int newAppearanceDataSize)
 {
     // LIFT: 0x70b10 to 0x70d50. The original also logs owner->_clikey. This lift does not log the client session key.
-    // BUG: 0x70b10 tests only newAppearanceDataSize != 0, so a negative byte count reaches the database call. Bug fixed: the lift rejects a count <= 0.
+    // BUG: 0x70b10 tests only newAppearanceDataSize != 0.
+    // LIFT: Safety guard (0x70b10). The lift rejects newAppearanceDataSize <= 0. See "Safety differences" in the handoff.
     if (owner == nullptr || newRace <= 0 || newSex <= 0 ||
         newAppearanceData == nullptr || newAppearanceDataSize <= 0)
     {
+        ChangeCharacterRaceService const* s = this;  // LIFT: The original tests this for null before it reads _db for the log arguments.
         Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 1290,
             L"[lobby-service], start fail; invalid param, owner:%p, new-race:%d, new-sex:%d, new-appearance-data:%p, new-apperance-data-size:%d, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
             owner, static_cast<int>(newRace), static_cast<int>(newSex), newAppearanceData, newAppearanceDataSize,
-            _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
         return false;
     }
     if (_db.serviceState == 0)
@@ -880,12 +903,13 @@ bool ChangeCharacterRaceService::ConsumeItemTried(CliSession* owner)
     // LIFT: 0x70d50. The original also logs owner->_clikey in the state, db and ok logs. This lift does not log the client session key.
     if (owner == nullptr)
     {
+        ChangeCharacterRaceService const* s = this;  // LIFT: The original tests this for null before it reads _db for the log arguments.
         Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 1318,
             L"== CRASH == [lobby-service], consume-item-tried fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
-            _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
         AlertSender::Write(L"LobbyService.cpp", 1318,
             L"== CRASH == [lobby-service], consume-item-tried fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
-            _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
         return false;
     }
     if (_db.serviceState == 1)
@@ -917,12 +941,13 @@ bool ChangeCharacterRaceService::TaskDone(CliSession* owner)
     // LIFT: 0x70f50. The original also logs owner->_clikey in the state, db and ok logs. This lift does not log the client session key.
     if (owner == nullptr)
     {
+        ChangeCharacterRaceService const* s = this;  // LIFT: The original tests this for null before it reads _db for the log arguments.
         Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 1346,
             L"== CRASH == [lobby-service], task done fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
-            _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
         AlertSender::Write(L"LobbyService.cpp", 1346,
             L"== CRASH == [lobby-service], task done fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
-            _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
         return false;
     }
     if (_db.serviceState == 2)
@@ -954,12 +979,13 @@ bool ChangeCharacterRaceService::ConsumeItemFinished(CliSession* owner)
     // LIFT: 0x71150. The original also logs owner->_clikey in the state, db and ok logs. This lift does not log the client session key.
     if (owner == nullptr)
     {
+        ChangeCharacterRaceService const* s = this;  // LIFT: The original tests this for null before it reads _db for the log arguments.
         Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 1374,
             L"== CRASH == [lobby-service], consume-item-finished fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
-            _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
         AlertSender::Write(L"LobbyService.cpp", 1374,
             L"== CRASH == [lobby-service], consume-item-finished fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
-            _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
         return false;
     }
     if (_db.serviceState == 3)
@@ -991,12 +1017,13 @@ bool ChangeCharacterRaceService::Finish(CliSession* owner)
     // LIFT: 0x71350. The original also logs owner->_clikey in the state, db and ok logs. This lift does not log the client session key.
     if (owner == nullptr)
     {
+        ChangeCharacterRaceService const* s = this;  // LIFT: The original tests this for null before it reads _db for the log arguments.
         Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 1402,
             L"== CRASH == [lobby-service], finish fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
-            _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
         AlertSender::Write(L"LobbyService.cpp", 1402,
             L"== CRASH == [lobby-service], finish fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
-            _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
         return false;
     }
     if (_db.serviceState == 4)
