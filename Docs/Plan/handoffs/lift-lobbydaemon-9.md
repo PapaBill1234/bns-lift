@@ -70,6 +70,22 @@ Source: LobbyDaemon 2019 + PDB, VS2010 SP1. The seven checkpoints cover all 46 c
 
 The `/INCLUDE` rule pairs `GameWorld::EnterUser` at 88.0. It does not change the function body. The final PDB contains all 23 names kept by the card. No other codegen trial ran. The reporter setup keeps its PDB callback parameter. The Fsd and wait queue code keeps its input checks. The other DIFF rows did not get a trial after the trial limit.
 
+## Safety differences
+
+These guards are deliberate. Each guard can cause a missing MATCH or a branch difference. Keep each guard. Do not remove a guard to get a MATCH.
+
+| RVA | Function | Original behaviour | Lift guard |
+| --- | --- | --- | --- |
+| `0x11a040` | `FsdDecomposer::GetString` | Calls `wcslen` on the data before it checks the data size. A string without a terminator reads past the buffer. | Searches for the terminator only inside the remaining data. Returns -1 if no terminator is found. |
+| `0x2e0b0` | `FsdPointer::Initialize` (inline in `DecomposeShowcaseFsd`) | Compares the frame size as unsigned. A negative size passes. A negative format size is not rejected. | Rejects a negative frame size and a negative format size. |
+| `0x4e310` | `WaitQueueList::Remove` (inline in `GameWorldCluster::giveupWait`) | Indexes the wait queue array with the queue type. It does not check the range. | Returns false if the type is not less than `MAX_WAIT_QUEUE_TYPE`. |
+| `0x4fa80` | `GameWorldReporter::WriteReport` | Calls `GameWorldReport::Write` on the allocation also when the allocation fails. | Returns false if the allocation fails. |
+| `0x4fc70` | `GameWorldReport::Write` | Constructs the `FragmentPacket` in the allocation without a null test. | Returns false if the allocation fails. |
+
+Each guard has a `// BUG:` note at its source line. No lifted function logs a session key or another secret. The appearance index check in `DecomposeShowcaseFsd` is not a safety difference. The original has the same check.
+
+The review asked to remove input guards. The repair did not remove them, because the safety rule keeps them. No other review finding was given.
+
 ## Checks
 
 The full gate and parity runs on the final source exited zero. They printed `gate ok` and `parity ok`. No baseline MATCH was lost. The baseline comes from `main` at `562705035d7c9bb04be7992457dc78fde0e0a4f8`. The vendor zstd checkout remains at `bb6eaf64`. No live service test ran.

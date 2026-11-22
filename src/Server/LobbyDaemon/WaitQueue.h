@@ -50,6 +50,7 @@ public:
     ~WaitQueueList();  // 0xdc920
     bool Init(int capacity);   // 0xdc940
     // LIFT: Inlined in GameWorldCluster::giveupWait (0x4e310).
+    // BUG: The original indexes _waitQueue with the type and does not check the range (0x4e310).
     bool Remove(WaitQueue::Type type, short const& waitpos, unsigned long long clikey)
     {
         if (static_cast<unsigned int>(type) >= WaitQueue::MAX_WAIT_QUEUE_TYPE)
