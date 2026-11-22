@@ -69,6 +69,20 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"AuctionEscrow::GetDeliveryPostMessage": {
+"calls": 76,
+"consts": 94,
+"refs": 76,
+"score": 82.1,
+"status": "DIFF"
+},
+"AuctionEscrow::GetRollbackEscrowPostMessage": {
+"calls": 97,
+"consts": 88,
+"refs": 100,
+"score": 94.9,
+"status": "DIFF"
+},
 "BoundedList::Remove": {
 "calls": 100,
 "consts": 100,
@@ -294,6 +308,27 @@
 "status": "DIFF"
 },
 "CliSession::setRMSInquiryResult": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CliSessionEnterWorldMessage::Dispatch": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CliSessionGradeChangedMessage::Dispatch": {
+"calls": 50,
+"consts": 100,
+"refs": 100,
+"score": 83.3,
+"status": "DIFF"
+},
+"CliSessionLeaveWorldMessage::Dispatch": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -818,6 +853,90 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"LobbyMessage::Dispatch": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyMessage::~LobbyMessage": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyStats::HandleEvent": {
+"calls": 0,
+"consts": 100,
+"refs": 0,
+"score": 33.3,
+"status": "DIFF"
+},
+"LobbyStats::Initialize": {
+"calls": 100,
+"consts": 100,
+"refs": 80,
+"score": 93.3,
+"status": "DIFF"
+},
+"LobbyTick::Add": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyTick::HandleEvent": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyTick::Remove": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyTick::process": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyTick::~LobbyTick": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyTickEvent::HandleEvent": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyTickEvent::LobbyTickEvent": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyTickEvent::~LobbyTickEvent": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "LobbyToken::Expire": {
 "calls": 0,
 "consts": 0,
@@ -839,12 +958,26 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Log::Write [?Write@Log@@SAXPEB_WHJ0ZZ]": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Log::Write [?Write@Log@@SAXW4Type@1@PEB_WH1ZZ]": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"Log::WriteV": {
+"calls": 86,
+"consts": 100,
+"refs": 100,
+"score": 95.2,
+"status": "DIFF"
 },
 "LogBuffer::Acquire": {
 "calls": 100,
@@ -993,6 +1126,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Network::iocpHandle": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Packet::AddSize": {
 "calls": 100,
 "consts": 100,
@@ -1106,6 +1246,20 @@
 "status": "MATCH"
 },
 "RefCntHistory::dump": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RefCntList::Pushback": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RefCntList::Remove": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -1288,6 +1442,20 @@
 "status": "MATCH"
 },
 "SystemPerfMonitor::~SystemPerfMonitor": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TencentUIC::CheckNameFilter": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TencentUIC::Initialize": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -1714,6 +1882,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"_snprintf_s<1024>": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "atexit": {
 "calls": 100,
 "consts": 100,
@@ -1771,6 +1946,13 @@
 "status": "MATCH"
 },
 "swprintf_s<64>": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"tss_load_sdk": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
