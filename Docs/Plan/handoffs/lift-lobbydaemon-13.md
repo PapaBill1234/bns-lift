@@ -109,9 +109,14 @@ Not tried:
 
 ## Safety differences
 
-None. This card adds no guard and removes no guard. The original has no allocation-failure test after `AllocZero` in
-`CliSession::setPcCafeCode` (`0x3a000`) and after `Alloc` in `LobbyGatePresence::OnSet` (`0x3a7d0`). The lift keeps the original form
-(both are MATCH). No log prints a key or a secret.
+This card adds no guard and removes no guard. The table lists the checked items.
+
+| Function | Item | Result |
+| --- | --- | --- |
+| `CliSession::setPcCafeCode` (`0x3a000`) | No allocation-failure test after `AllocZero` | Original form. The original has no test. The other `AllocZero` callers in the lift have no test either. MATCH. |
+| `LobbyGatePresence::OnSet` (`0x3a7d0`) | No allocation-failure test after `Alloc` | Original form. MATCH. |
+| `CliSession::setRole` (`0x39f70`) | Bounds checks on `roles[i]` | Both checks are in the original (`role - 1 <= 6` in `Role::Set`, `role < 8` before the `GRoleAuthorityTable` read). Kept. |
+| All lifted logs | Secrets in logs | No log prints a session key, a charge key or a secret. `cli-key` is the session lookup id. The original log text prints it, and main prints it in 38 other places. |
 
 ## Review notes
 
@@ -122,3 +127,13 @@ None. This card adds no guard and removes no guard. The original has no allocati
 - `PcCafe` has an empty class `operator delete` (`// LIFT:`). The original global `operator delete` (`0x32b50`) is empty, and
   `CliSession::setPcCafe` frees the memory with `Memory::_Manager[2]->Free` after `delete`.
 - `friend class CliSession;` in `PcCafe` is a `// LIFT:` with `// ❓`: the PDB has no friend record.
+
+## Verify (retry after the 429 stop)
+
+| Check | Candidate | Result |
+| --- | --- | --- |
+| `tools/gate.sh` (`LIFT_BUILD_DIR=build-ld-13`) | `4bcab1e` source | exit 0, `gate ok` |
+| `tools/parity.sh` (`VS2010_OUT=build-ld-13/vs2010`, clean VS2010 dir) | `4bcab1e` source | exit 0, `parity ok`. LobbyDaemon 195 -> 217 (+22), MATCH -> DIFF 0, name gone 0. Other exes +0. |
+
+- No code finding. The verify commit changes only this handoff.
+- `vendor/zstd` is not changed by the branch.
