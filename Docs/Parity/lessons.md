@@ -954,6 +954,87 @@ What failed:
 - GameTimeSchedule is blocked: 11 of 12 functions need the `RefCntList` layout, which ld-3 owns and which is not on
   main. Do not add it here. Put cards that share a base layout in a sequence, not in the same wave.
 
+## ld-8
+
+- Use the PDB line map to check the order of the log, list walk, vector insert, and reference increment in `CliSessionTable::Select_index_gate` (1 MATCH).
+- Use the existing VS2010 map and vector types with the PDB allocator (23 card functions). Do not write the STL internals by hand. Funcdiff skips `std::` functions.
+- Restore the PDB base and member offsets before you lift the constructor (1 MATCH). Keep the reference release in the source destructor. The original emits it in the deleting destructor.
+- Retain the two public symbols while their callers are stubs (2 retained symbols). The base destructor also matched (1 additional MATCH). LobbyDaemon gained 3 MATCH in total.
+- No source variant failed. Both new card bodies matched on the first comparison.
+- Do not infer a layout from a stub. The token checks need the LobbyDaemon and LobbyConfig layouts. The expiration path needs the job layouts. The desk needs its own PDB layout (9 functions not done).
+
+## ld-10
+
+- Follow the original flow. Do not add a null check that the original does not have, even if the score does not change. `Start` (`0x5c300`), `GradeChanged` (`0x5ca20`) and `Register` (`0x60be0`) had added checks. The guard removal was blocked, so these three functions are stubs again.
+- When a lifted caller becomes a stub, LTCG can remove its callees. `GradeService::GetGrade` and the `std::vector<Section<__int64>>` ctor (`0x9f540`) went out of the build with `Start`. ❓ `RefCntList::Pushback` was probably inlined into its last caller `Tick`. Use `/INCLUDE` with a `// LIFT:` reason only for bodies in the card's own files.
+- The VS2010 STL emits the `std::vector<Section<__int64>,StlAllocator<Section<__int64>,2> >` functions through the normal container calls. Check the decorated names in the built PDB. The parity count excludes these STL functions.
+
+## ld-7
+
+| Function | RVA | Trial | Score before → after | Result |
+| --- | --- | --- | ---: | --- |
+| `CliSession::FetchCharacterInfoList` | `0x379b0` | A20: disable inlining for this caller. Write the original inline lock and `StartRepeat` code in the body. | 98.0 → 93.3 | Reverted. The calls match. The constants do not. |
+| `CliSession::FetchCharacterInfo` | `0x37af0` | A8: compare the ID with the PDB global `ID128_ID_ZERO` instead of literal zero. | 90.3 → 97.0 | Kept. The references match. One extra constant remains. |
+| `CliSession::FetchServiceEntryList` | `0x37c70` | A20: disable inlining for this caller. Write the original inline lock and `StartRepeat` code in the body. | 98.0 → 97.0 | Reverted. The calls match. The constants do not. |
+
+The two A20 trials made `FragmentPacket::IncRepeatCount` pair and match. Neither caller improved. Do not apply A20 to these two callers without a new source form.
+
+| Function | RVA | Repair trial | Score before → after | Result |
+| --- | --- | --- | ---: | --- |
+| `CliSession::BindCharacterSlot` | `0x37eb0` | A8: use `ID128_ID_ZERO` for both slot ID tests. | 64.3 → 73.3 | Kept. The references and constants improve. |
+| `CliSession::FetchCharacterInfoList` | `0x379b0` | A2: test states in the original order. | 98.0 → 98.0 | Reverted. The score did not increase. |
+
+Resumed run (codegen pass on the DIFF functions above 85 %):
+
+| Function | RVA | Trial | Score before → after | Result |
+| --- | --- | --- | ---: | --- |
+| `CliSession::setContentBans` | `0x366e0` | A20: `#pragma inline_depth(0)` on the caller, so `push_back` stays out of line. | 85.2 → 91.7 | Reverted. The calls pair, but `clear`, `begin`, `end` and the iterator steps also become calls. The original inlines them. The 0x18 step constant goes away. The code is further from the original. |
+| `CliSession::NotifyChangedGradeLevel` | `0x36170` | None. The disassembly is the same as the original. | 88.9 | Tool noise. Funcdiff drops an immediate below the image size as an RVA. The original image is larger, so `0x40000` is dropped only on the original side. |
+| `CliSession::NotifyChangedGrade` | `0x360a0` | None. | 85.7 | LTCG inlines the `GradeService::ApplyChangedGrade` stub. Wait for the callee card. |
+| `CliSession::UpdateCharacterData` | `0x381c0` | None. | 55.0 | LTCG inlines the `getCharacter` stub (`0x35cf0`, noreturn). The rest of the body is dead. Wait for part 1. |
+
+- Do not use A20 when the original inlines other STL calls in the same function. A20 removes all inlining in the caller.
+- A small constant can differ only because our image is smaller than the original. Check the disassembly before a source trial.
+
+
+## ld-11
+
+| Item | Result |
+| --- | --- |
+| Lifted | 33 (LobbyService part 2: 23, LobbyLocale: 10) |
+| Not done | 0 |
+| LD MATCH | 82 -> 91 (+9). 8 are card functions. The other 4 exes: +0, no MATCH lost, no MATCH name gone. |
+
+What worked:
+- Write a digit test in the same form as the original. The original keeps the constants `0x30` and `0x39`, so write
+  `(c < L'0' || c > L'9')`. The form `static_cast<unsigned short>(c - L'0') > 9` changes the consts signal.
+  `IsSentenceCase` went from 94.1 to 98.0. `IsMonolingualString` went from 88.9 to 96.3.
+- Keep the test order of the original: the digit test first, then the space test.
+
+What failed:
+- An `unsigned int` index in place of an `unsigned short` index for a range-checked table read gave no change
+  (`GetLanguageTypeOfChar`, 99.4 before and after).
+- The original LobbyLocale tables are one byte table (`byte_140161BD0`) with fixed offsets. Separate tables and a bit
+  table for kanji leave a consts gap near 98. Do not change it in a slice card. It is a large data change.
+- The service functions without the client session key in the log calls stay near 60. This is a known cost.
+- A caller of a `LIFT_STUB` cannot score above 0. /LTCG sees that the stub does not return and removes the code
+  after the call. `/OPT:ICF` then folds callers with the same prefix into one body (`0x6f000`, `0x6fc10`, `0x70900`
+  share one address). `__declspec(noinline)` on the stub does not help: the call stays, but the rest is still removed.
+  Fix: lift the callee first (`0x6c330`). Check folding with `llvm-pdbutil dump --publics` (same `addr`).
+
+Verify round (ld-11):
+
+| Function | Change | Before | After | Kept |
+| --- | --- | ---: | ---: | --- |
+| `GetStringLengthWithCellCombination` (0x584a0) | Original shape from the PDB line map (lines 635-669): `for` loop with `i += count`, `cell` at function scope, `str + i` null tests in the Thai and Vietnamese branches, one `count <= 0` test after both branches. A safety null test on `str` stays before the loop. | 75.0 | 81.5 | yes |
+| `GetStringLengthWithCellCombination` (0x584a0) | Read `str[i]` in each range test in place of one local `c` | 81.5 | 81.5 | no (reverted) |
+| 19 null-owner and compose-fail log blocks (0x6edf0 to 0x71350) | `Xxx const* s = this;` and a `s != nullptr ? s->_db.field : 0` test for each log argument (ld-2 form) | 40.7-63.7 | 40.7-63.7 | yes (source form of the original; no score change) |
+
+- The remaining consts gap of 0x584a0 is the Thai range test. The original compares with `0xe01`, `0xe3a`, `0xe3f` and `0xe5b`
+  in four short-circuit tests. Our build uses a subtract-and-compare form (`0x1c`). Two source forms gave the same code.
+- A21 and A10 for `GetStringLengthWithCellCombination` (0x584a0): declare the PDB `LobbyLocale::VietCell` (ctor, dtor, `Reset`), the `ThaiCell` ctor, dtor and `Reset`, and a `static __forceinline GetNextVietCell` (inlined at 0x58562). Score 81.5 before and after. Kept as the source form of the PDB.
+- The `this` null test in the service log blocks does not change the score. The missing client session key arguments set the score.
+
 ## ld-9
 
 - Keep `GameWorld::EnterUser` (`0x4cf40`) with its original PDB public name until the caller is lifted. The function pairs at 88.0. It was unpaired before. The body did not change.

@@ -1,10 +1,15 @@
 // CliSession.obj (LobbyDaemon PDB, 2019 + PDB). Source: hr/LobbyDaemon/CliSession.c.
-// ld-2 lifted part 1 (0x329d0..0x35eb0). The other functions are still stubs. A stub is not a lift.
+// ld-2 lifts part 1. ld-7 lifts part 2. A stub is not a lift.
 #include <string.h>
 #include <wchar.h>
+#include "Character.h"
 #include "CliSession.h"
 #include "CliSessionTable.h"
+#include "FragmentPacket.h"
+#include "LobbyDB.h"
 #include "LobbyMessage.h"
+#include "LobbyService.h"
+#include "StsMsgGrade.h"
 #include "Log.h"
 #include "Memory.h"
 #include "LiftStub.h"
@@ -358,16 +363,146 @@ void CliSession::cleanupCharge()
     LIFT_STUB(0x35fc0);
 }
 
+#pragma comment(linker, "/INCLUDE:?NotifyChangedGrade@CliSession@@QEAA_NAEBU_StsMsgNotifyGradeNotifyGradeChanged@StsMsgLib@@@Z") // LIFT: keep until the caller is lifted (0x360a0).
+// 0x360a0
+bool CliSession::NotifyChangedGrade(StsMsgLib::_StsMsgNotifyGradeNotifyGradeChanged const& msg)
+{
+    bool result = true;
+    _lock.Enter();
+    int state = _state;
+    if (_gradeService._initGradeList)
+    {
+        result = _gradeService.ApplyChangedGrade(this, &msg);
+        if (result && (state == 0x10003 || state == 0x20000 ||
+                       (state > 0x30000 && (state <= 0x30002 || state == 0x40000))) && _presence != nullptr)
+            _presence->NotifyChangedGrade(this, msg);
+    }
+    _lock.Leave();
+    return result;
+}
+
+#pragma comment(linker, "/INCLUDE:?NotifyChangedGradeLevel@CliSession@@QEAA_NAEBU_StsMsgNotifyGradeNotifyScoreChanged@StsMsgLib@@@Z") // LIFT: keep until the caller is lifted (0x36170).
+// 0x36170
+bool CliSession::NotifyChangedGradeLevel(StsMsgLib::_StsMsgNotifyGradeNotifyScoreChanged const& msg)
+{
+    bool result = true;
+    _lock.Enter();
+    int state = _state;
+    if (_gradeService._initGradeLevel)
+    {
+        result = _gradeService.ApplyChangedGradeLevel(this, &msg);
+        if (result && (state == 0x10003 || state == 0x20000 ||
+                       (state > 0x30000 && (state <= 0x30002 || state == 0x40000))) && _presence != nullptr)
+            _presence->NotifyChangedGradeLevel(this, msg);
+    }
+    _lock.Leave();
+    return result;
+}
+
 // 0x36240
 void CliSession::HandleGameGetGradeList(GamedChannel*, unsigned long long, char, unsigned long long, int) const
 {
     LIFT_STUB(0x36240);
 }
 
-// 0x36df0
-bool CliSession::fetchContentBans(FragmentPacket*)
+#pragma comment(linker, "/INCLUDE:?setContentBans@CliSession@@QEAAXPEAU_StsMsgResponseListUserBans@StsMsgLib@@@Z") // LIFT: keep until the caller is lifted (0x366e0).
+// 0x366e0
+void CliSession::setContentBans(StsMsgLib::_StsMsgResponseListUserBans* bans)
 {
-    LIFT_STUB(0x36df0);
+    _bans.clear();
+    if (bans == nullptr || bans->nUserBanCount <= 0)
+        return;
+    _bans.reserve(static_cast<size_t>(bans->nUserBanCount) + 1);
+    for (int i = 0; i < bans->nUserBanCount; ++i)
+    {
+        StsMsgLib::UserBan const& ban = bans->pUserBanList[i];
+        if (ban.nContentBanId <= 0)
+        {
+            Log::Write(Log::LT_ERROR, L"CliSession.cpp", 1726,
+                       L"[cs], set content-ban fail; invalid content-ban-id, id:%d, policy-id:%s, from:%I64d, "
+                       L"to:%I64d, cli-key:0x%I64X, cli-state:%d.%d",
+                       ban.nContentBanId, ban.pwszContenBanPolicyId != nullptr ? ban.pwszContenBanPolicyId : L"(null)",
+                       ban.tEffectiveFrom, ban.tEffectiveUntil, _clikey,
+                       static_cast<unsigned int>(_state) >> 16, _state & 0xFFFF);
+            continue;
+        }
+        std::vector<ContentBan, StlAllocator<ContentBan, 2> >::iterator item = _bans.begin();
+        for (; item != _bans.end(); ++item)
+        {
+            if (item->id == ban.nContentBanId)
+                break;
+        }
+        if (item == _bans.end())
+        {
+            ContentBan newBan = {};
+            newBan.id = ban.nContentBanId;
+            newBan.from = ban.tEffectiveFrom;
+            newBan.to = ban.tEffectiveUntil;
+            _bans.push_back(newBan);
+        }
+        else if (item->to < ban.tEffectiveUntil)
+        {
+            item->to = ban.tEffectiveUntil;
+        }
+        Log::Write(Log::LT_DEBUG, L"CliSession.cpp", 1747,
+                   L"[cs], set content-ban, id:%d, policy-id:%s, from:%I64d, to:%I64d, cli-key:0x%I64X, cli-state:%d.%d",
+                   ban.nContentBanId, ban.pwszContenBanPolicyId != nullptr ? ban.pwszContenBanPolicyId : L"(null)",
+                   ban.tEffectiveFrom, ban.tEffectiveUntil, _clikey,
+                   static_cast<unsigned int>(_state) >> 16, _state & 0xFFFF);
+    }
+}
+
+#pragma comment(linker, "/INCLUDE:?setRMSInquiryResult@CliSession@@QEAAXPEAU_StsMsgResponseRiskMgmtInquiry@StsMsgLib@@@Z") // LIFT: keep until the caller is lifted (0x36960).
+// 0x36960
+void CliSession::setRMSInquiryResult(StsMsgLib::_StsMsgResponseRiskMgmtInquiry* resp)
+{
+    if (resp != nullptr && resp->pszResult != nullptr && strcmp(resp->pszResult, "decline") == 0)
+    {
+        for (std::vector<ContentBan, StlAllocator<ContentBan, 2> >::const_iterator i = _bans.begin(); i != _bans.end(); ++i)
+        {
+            if (i->id == CONTENT_BAN_ID_RMS_INQUIRY)
+            {
+                Log::Write(Log::LT_ERROR, L"CliSession.cpp", 1777,
+                           L"[rms], rms inquiry failed, content ban id already exists; content-ban id:%d", i->id);
+                return;
+            }
+        }
+        ContentBan newBan = {};
+        newBan.id = CONTENT_BAN_ID_RMS_INQUIRY;
+        newBan.to = 0x7FFFFFFFFFFFFFFFLL;
+        _bans.push_back(newBan);
+    }
+}
+
+#pragma comment(linker, "/INCLUDE:?fetchContentBans@CliSession@@QEAA_NPEAVFragmentPacket@@@Z") // LIFT: keep until the caller is lifted (0x36df0).
+// 0x36df0
+bool CliSession::fetchContentBans(FragmentPacket* fp)
+{
+    if (fp == nullptr)
+    {
+        CliSession const* cs = this;
+        unsigned int state = (cs != nullptr) ? static_cast<unsigned int>(cs->_state) : 0;
+        Log::Write(Log::LT_ERROR, L"CliSession.cpp", 1896,
+                   L"[cs], fetch content bans fail; invalid parameter, cli-key:0x%I64X, cli-state:%d.%d",
+                   (cs != nullptr) ? cs->_clikey : 0ULL, state >> 16, state & 0xFFFF);
+        TLobbyError = LOBERR_INVALID_PARAMETER;
+        return false;
+    }
+
+    fp->StartRepeat();
+    for (std::vector<ContentBan, StlAllocator<ContentBan, 2> >::const_iterator i = _bans.begin(); i != _bans.end(); ++i)
+    {
+        if (fp->FreeSize() < 20)
+            fp->packet.Allocate(&fp->composer);
+        if (fp->Compose(3, i->id, i->from, i->to) == 0)
+        {
+            TLobbyError = LOBERR_SYSTEM;
+            return false;
+        }
+        fp->IncRepeatCount();
+    }
+    fp->composer.PopRepeatCount();
+    return true;
 }
 
 // 0x36fa0
@@ -382,34 +517,129 @@ bool CliSession::fetchAccountRecycleTimeList(FragmentPacket*)
     LIFT_STUB(0x371b0);
 }
 
+#pragma comment(linker, "/INCLUDE:?addLobbyService@CliSession@@QEAA_NPEAVLobbyService@@@Z") // LIFT: keep until the caller is lifted (0x373a0).
 // 0x373a0
-bool CliSession::addLobbyService(LobbyService*)
+bool CliSession::addLobbyService(LobbyService* serviceEntry)
 {
-    LIFT_STUB(0x373a0);
+    CliSession const* cs = this;
+    if (serviceEntry == nullptr)
+    {
+        unsigned int state = (cs != nullptr) ? static_cast<unsigned int>(cs->_state) : 0;
+        Log::Write(Log::LT_ERROR, L"CliSession.cpp", 2008,
+                   L"[cs], add lobby-service fail; invalid param, cli-key:0x%I64X, cli-state:%d.%d",
+                   (cs != nullptr) ? cs->_clikey : 0ULL, state >> 16, state & 0xFFFF);
+        return false;
+    }
+    _serviceEntries.push_back(serviceEntry);
+    unsigned int state = (cs != nullptr) ? static_cast<unsigned int>(cs->_state) : 0;
+    Log::Write(Log::LT_DEBUG, L"CliSession.cpp", 2014,
+               L"[cs], add lobby-service ok, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X, "
+               L"cli-key:0x%I64X, cli-state:%d.%d",
+               serviceEntry->GetDB().serviceId, serviceEntry->GetDB().serviceType, serviceEntry->GetDB().serviceState,
+               serviceEntry->GetDB().itemInstanceId, (cs != nullptr) ? cs->_clikey : 0ULL, state >> 16, state & 0xFFFF);
+    return true;
 }
 
+#pragma comment(linker, "/INCLUDE:?removeLobbyService@CliSession@@QEAAX_K@Z") // LIFT: keep until the caller is lifted (0x37530).
 // 0x37530
-void CliSession::removeLobbyService(unsigned long long)
+void CliSession::removeLobbyService(unsigned long long serviceId)
 {
-    LIFT_STUB(0x37530);
+    if (serviceId == 0)
+    {
+        CliSession const* cs = this;
+        unsigned int state = (cs != nullptr) ? static_cast<unsigned int>(cs->_state) : 0;
+        Log::Write(Log::LT_ERROR, L"CliSession.cpp", 2023,
+                   L"[cs], remove service entry fail; invalid parameter, cli-key:0x%I64X, cli-state:%d.%d",
+                   (cs != nullptr) ? cs->_clikey : 0ULL, state >> 16, state & 0xFFFF);
+        return;
+    }
+    for (std::vector<LobbyService*, StlAllocator<LobbyService*, 2> >::iterator i = _serviceEntries.begin();
+         i != _serviceEntries.end(); ++i)
+    {
+        if (*i != nullptr && serviceId == (*i)->GetDB().serviceId)
+        {
+            _serviceEntries.erase(i);
+            Log::Write(Log::LT_DEBUG, L"CliSession.cpp", 2040,
+                       L"[cs], remove service entry ok, lobby-service-id:0x%I64X, cli-key:0x%I64X, cli-state:%d.%d",
+                       serviceId, _clikey, static_cast<unsigned int>(_state) >> 16, _state & 0xFFFF);
+            return;
+        }
+    }
+    Log::Write(Log::LT_ERROR, L"CliSession.cpp", 2042,
+               L"[cs], remove service entry fail; no such entry exists, lobby-service-id:0x%I64X, "
+               L"cli-key:0x%I64X, cli-state:%d.%d",
+               serviceId, _clikey, static_cast<unsigned int>(_state) >> 16, _state & 0xFFFF);
 }
 
+#pragma comment(linker, "/INCLUDE:?getLobbyServiceByType@CliSession@@QEAAPEAVLobbyService@@_KH@Z") // LIFT: keep until the caller is lifted (0x37670).
 // 0x37670
-LobbyService* CliSession::getLobbyServiceByType(unsigned long long, int)
+LobbyService* CliSession::getLobbyServiceByType(unsigned long long serviceId, int type)
 {
-    LIFT_STUB(0x37670);
+    for (std::vector<LobbyService*, StlAllocator<LobbyService*, 2> >::iterator i = _serviceEntries.begin();
+         i != _serviceEntries.end(); ++i)
+    {
+        LobbyService* serviceEntry = *i;
+        if (serviceEntry != nullptr && serviceEntry->GetDB().serviceId == serviceId)
+        {
+            if (serviceEntry->GetDB().serviceType == type)
+                return *i;
+            return nullptr;
+        }
+    }
+    return nullptr;
 }
 
+#pragma comment(linker, "/INCLUDE:?queryLobbyService@CliSession@@QEAAPEAVLobbyService@@PEAVCharacter@@@Z") // LIFT: keep until the caller is lifted (0x376b0).
 // 0x376b0
-LobbyService* CliSession::queryLobbyService(Character*)
+LobbyService* CliSession::queryLobbyService(Character* pc)
 {
-    LIFT_STUB(0x376b0);
+    if (pc == nullptr)
+    {
+        CliSession const* cs = this;
+        unsigned int state = (cs != nullptr) ? static_cast<unsigned int>(cs->_state) : 0;
+        Log::Write(Log::LT_ERROR, L"CliSession.cpp", 2076,
+                   L"[cs], query service entry fail; invalid parameter, cli-key:0x%I64X, cli-state:%d.%d",
+                   (cs != nullptr) ? cs->_clikey : 0ULL, state >> 16, state & 0xFFFF);
+        return nullptr;
+    }
+    for (std::vector<LobbyService*, StlAllocator<LobbyService*, 2> >::iterator i = _serviceEntries.begin();
+         i != _serviceEntries.end(); ++i)
+    {
+        LobbyService* serviceEntry = *i;
+        if (serviceEntry != nullptr && serviceEntry->IsServiceTarget(pc))
+            return serviceEntry;
+    }
+    return nullptr;
 }
 
+#pragma comment(linker, "/INCLUDE:?addRenameUserService@CliSession@@QEAA_NPEAVRenameUserService@@@Z") // LIFT: keep until the caller is lifted (0x37790).
 // 0x37790
-bool CliSession::addRenameUserService(RenameUserService*)
+bool CliSession::addRenameUserService(RenameUserService* serviceEntry)
 {
-    LIFT_STUB(0x37790);
+    if (serviceEntry == nullptr)
+    {
+        CliSession const* cs = this;
+        unsigned int state = (cs != nullptr) ? static_cast<unsigned int>(cs->_state) : 0;
+        Log::Write(Log::LT_ERROR, L"CliSession.cpp", 2132,
+                   L"[cs], add rename user service fail; invalid param, cli-key:0x%I64X, cli-state:%d.%d",
+                   (cs != nullptr) ? cs->_clikey : 0ULL, state >> 16, state & 0xFFFF);
+        return false;
+    }
+    if (_renameUserServiceEntry != nullptr)
+    {
+        Log::Write(Log::LT_ERROR, L"CliSession.cpp", 2137,
+                   L"[cs], add rename user service fail; already exists, cli-key:0x%I64X, cli-state:%d.%d",
+                   _clikey, static_cast<unsigned int>(_state) >> 16, _state & 0xFFFF);
+        return false;
+    }
+    unsigned int state = static_cast<unsigned int>(_state);
+    _renameUserServiceEntry = serviceEntry;
+    Log::Write(Log::LT_DEBUG, L"CliSession.cpp", 2143,
+               L"[cs], add rename user service ok, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X, "
+               L"cli-key:0x%I64X, cli-state:%d.%d",
+               serviceEntry->GetDB().serviceId, serviceEntry->GetDB().serviceType, serviceEntry->GetDB().serviceState,
+               serviceEntry->GetDB().itemInstanceId, _clikey, state >> 16, state & 0xFFFF);
+    return true;
 }
 
 // 0x37890
@@ -424,40 +654,297 @@ void CliSession::releaseScheduledEndTime()
     LIFT_STUB(0x37950);
 }
 
+#pragma comment(linker, "/INCLUDE:?FetchCharacterInfoList@CliSession@@QEBA?AW4ErrCode@1@PEAVFragmentPacket@@@Z") // LIFT: keep until the caller is lifted (0x379b0).
+// 0x379b0
+CliSession::ErrCode CliSession::FetchCharacterInfoList(FragmentPacket* fp) const
+{
+    // LIFT: the const PDB function enters and leaves the session lock (0x379b0).
+    CriticalSection& lock = const_cast<CriticalSection&>(_lock);
+    lock.Enter();
+    if ((_state & 0xFFFF0000) != 0x20000 && _state != 0x10003)
+    {
+        lock.Leave();
+        return ERR_INVALID_STATE;
+    }
+    fp->StartRepeat();
+    for (std::vector<Character*, StlAllocator<Character*, 2> >::const_iterator i = _characters.begin();
+         i != _characters.end(); ++i)
+    {
+        Character* pc = *i;
+        if (pc != nullptr)
+        {
+            int state = pc->_db.state;
+            if (state == Character::IN_NORMAL || state == Character::IN_TRY_DELETE ||
+                state == Character::IN_WAIT_DELETE || state == Character::IN_TRY_RESTORE)
+            {
+                if (!pc->FetchCharacterInfo(fp))
+                {
+                    lock.Leave();
+                    return ERR_SYSTEM;
+                }
+                fp->IncRepeatCount();
+            }
+        }
+    }
+    fp->composer.PopRepeatCount();
+    lock.Leave();
+    return ERR_OK;
+}
+
+#pragma comment(linker, "/INCLUDE:?FetchCharacterInfo@CliSession@@QEBA_NAEBTid128@@PEAVPacket@@PEAVPacketComposer@@@Z") // LIFT: keep until the caller is lifted (0x37af0).
 // 0x37af0
-bool CliSession::FetchCharacterInfo(id128 const&, Packet*, PacketComposer*) const
+bool CliSession::FetchCharacterInfo(id128 const& slotid, Packet* p, PacketComposer* pcr) const
 {
-    LIFT_STUB(0x37af0);
+    if (p == nullptr || pcr == nullptr)
+    {
+        TLobbyError = LOBERR_INVALID_PARAMETER;
+        return false;
+    }
+    // LIFT: the const PDB function enters and leaves the session lock (0x37af0).
+    CriticalSection& lock = const_cast<CriticalSection&>(_lock);
+    lock.Enter();
+    bool result = false;
+    if ((_state & 0xFFFF0000) == 0x20000 || _state == 0x10003)
+    {
+        id128 id = slotid;
+        Character* pc = nullptr;
+        if (id.id[0] != ID128_ID_ZERO.id[0] || id.id[1] != ID128_ID_ZERO.id[1])
+        {
+            for (std::vector<Character*, StlAllocator<Character*, 2> >::const_iterator i = _characters.begin();
+                 i != _characters.end(); ++i)
+            {
+                if (*i != nullptr && (*i)->_db.slotid.id[0] == id.id[0] && (*i)->_db.slotid.id[1] == id.id[1])
+                {
+                    pc = *i;
+                    break;
+                }
+            }
+        }
+        if (pc == nullptr)
+            TLobbyError = LOBERR_NO_SUCH_CHARACTER;
+        else if (!pc->FetchCharacterInfo(p, pcr))
+            TLobbyError = LOBERR_SYSTEM;
+        else
+            result = true;
+    }
+    else
+    {
+        TLobbyError = LOBERR_INVALID_SESSION_STATE;
+    }
+    lock.Leave();
+    return result;
 }
 
+#pragma comment(linker, "/INCLUDE:?FetchServiceEntryList@CliSession@@QEBA_NPEAVFragmentPacket@@@Z") // LIFT: keep until the caller is lifted (0x37c70).
 // 0x37c70
-bool CliSession::FetchServiceEntryList(FragmentPacket*) const
+bool CliSession::FetchServiceEntryList(FragmentPacket* fp) const
 {
-    LIFT_STUB(0x37c70);
+    if (fp == nullptr)
+    {
+        TLobbyError = LOBERR_INVALID_PARAMETER;
+        return false;
+    }
+    // LIFT: the const PDB function enters and leaves the session lock (0x37c70).
+    CriticalSection& lock = const_cast<CriticalSection&>(_lock);
+    lock.Enter();
+    int state = _state;
+    if (state != 0x20000 && state != 0x10003)
+    {
+        lock.Leave();
+        TLobbyError = LOBERR_INVALID_SESSION_STATE;
+        return false;
+    }
+    fp->StartRepeat();
+    for (std::vector<LobbyService*, StlAllocator<LobbyService*, 2> >::const_iterator i = _serviceEntries.begin();
+         i != _serviceEntries.end(); ++i)
+    {
+        if (*i != nullptr)
+        {
+            if (!(*i)->Fetch(const_cast<CliSession*>(this), fp))
+            {
+                lock.Leave();
+                TLobbyError = LOBERR_SYSTEM;
+                return false;
+            }
+            fp->IncRepeatCount();
+        }
+    }
+    fp->composer.PopRepeatCount();
+    lock.Leave();
+    return true;
 }
 
+#pragma comment(linker, "/INCLUDE:?UpdateBotScore@CliSession@@QEAA_N_KH@Z") // LIFT: keep until the caller is lifted (0x37de0).
 // 0x37de0
-bool CliSession::UpdateBotScore(unsigned long long, int)
+bool CliSession::UpdateBotScore(unsigned long long pcid, int botScore)
 {
-    LIFT_STUB(0x37de0);
+    if (pcid != 0 && botScore >= 0)
+    {
+        _lock.Enter();
+        _acb._dbfield.botScore = botScore;
+        _lock.Leave();
+        return true;
+    }
+    CliSession const* cs = this;
+    unsigned int state = (cs != nullptr) ? static_cast<unsigned int>(cs->_state) : 0;
+    Log::Write(Log::LT_ERROR, L"CliSession.cpp", 2324,
+               L"[cs], update bot-score fail; invalid parameter, pcid:0x%I64X, bot-score:%dcli-key:0x%I64X, "
+               L"cli-state:%d.%d",
+               pcid, botScore, (cs != nullptr) ? cs->_clikey : 0ULL, state >> 16, state & 0xFFFF);
+    TLobbyError = LOBERR_INVALID_PARAMETER;
+    return false;
 }
 
+#pragma comment(linker, "/INCLUDE:?BindCharacterSlot@CliSession@@QEAA_N_KAEBTid128@@@Z") // LIFT: keep until the caller is lifted (0x37eb0).
 // 0x37eb0
-bool CliSession::BindCharacterSlot(unsigned long long, id128 const&)
+bool CliSession::BindCharacterSlot(unsigned long long pcid, id128 const& slotid)
 {
-    LIFT_STUB(0x37eb0);
+    // LIFT: Compare with ID128_ID_ZERO (0x14012d870). The loads are at 0x37ed2 and 0x37ede.
+    if (pcid == 0 || (slotid.id[0] == ID128_ID_ZERO.id[0] && slotid.id[1] == ID128_ID_ZERO.id[1]))
+    {
+        CliSession const* cs = this;
+        unsigned int state = (cs != nullptr) ? static_cast<unsigned int>(cs->_state) : 0;
+        Log::Write(Log::LT_ERROR, L"CliSession.cpp", 2341,
+                   L"[cs], bind character slot fail; invalid parameter, pcid:0x%I64X, "
+                   L"slot-id:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X, cli-key:0x%I64X, cli-state:%d.%d",
+                   pcid, slotid.guid.id1, slotid.guid.id2, slotid.guid.id3, slotid.guid.id4[0], slotid.guid.id4[1],
+                   slotid.guid.id4[2], slotid.guid.id4[3], slotid.guid.id4[4], slotid.guid.id4[5], slotid.guid.id4[6],
+                   slotid.guid.id4[7], (cs != nullptr) ? cs->_clikey : 0ULL, state >> 16, state & 0xFFFF);
+        TLobbyError = LOBERR_INVALID_PARAMETER;
+        return false;
+    }
+    _lock.Enter();
+    Character* pc = nullptr;
+    // LIFT: 0x37eb0 inlines the pcid search. The out-of-line getCharacter at 0x35cf0 is still a stub.
+    for (std::vector<Character*, StlAllocator<Character*, 2> >::const_iterator i = _characters.begin();
+         i != _characters.end(); ++i)
+    {
+        if (*i != nullptr && (*i)->_db.pcid == pcid)
+        {
+            pc = *i;
+            break;
+        }
+    }
+    if (pc == nullptr)
+    {
+        TLobbyError = LOBERR_NO_SUCH_CHARACTER;
+        _lock.Leave();
+        return false;
+    }
+    // LIFT: Compare with ID128_ID_ZERO (0x14012d870). The loads are at 0x37f58 and 0x37f69.
+    if (pc->_db.slotid.id[0] != ID128_ID_ZERO.id[0] || pc->_db.slotid.id[1] != ID128_ID_ZERO.id[1])
+    {
+        TLobbyError = LOBERR_NOT_FOUND;
+        _lock.Leave();
+        return false;
+    }
+    int dbrtn = 0;
+    if (LobbyDB::BindCharacterSlot(dbrtn, pcid, slotid))
+    {
+        pc->SetSlotId(slotid);
+        _lock.Leave();
+        return true;
+    }
+    Log::Write(Log::LT_ERROR, L"CliSession.cpp", 2366,
+               L"[cs], bind character slot db fail; dbrtn:%d, pcid:0x%I64X, "
+               L"slot-id:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
+               dbrtn, pcid, slotid.guid.id1, slotid.guid.id2, slotid.guid.id3, slotid.guid.id4[0], slotid.guid.id4[1],
+               slotid.guid.id4[2], slotid.guid.id4[3], slotid.guid.id4[4], slotid.guid.id4[5], slotid.guid.id4[6],
+               slotid.guid.id4[7]);
+    TLobbyError = LOBERR_DB_FAIL;
+    _lock.Leave();
+    return false;
 }
 
 // 0x381c0
-bool CliSession::UpdateCharacterData(unsigned long long, short, char*, short)
+#pragma comment(linker, "/INCLUDE:?UpdateCharacterData@CliSession@@QEAA_N_KFPEADF@Z") // LIFT: keep until the caller is lifted (0x381c0).
+// 0x381c0
+bool CliSession::UpdateCharacterData(unsigned long long pcid, short level, char* showcase, short showcaseSize)
 {
-    LIFT_STUB(0x381c0);
+    // LIFT: the original tests only showcaseSize != 0 (0x381c0). The range guard keeps a negative or oversized
+    // length away from LobbyDB::UpdateCharacterData. It is the same bound as Character::SetShowcase (0x32510).
+    if (pcid == 0 || level <= 0 || showcase == nullptr || static_cast<unsigned short>(showcaseSize - 1) > 0x1FF)
+    {
+        CliSession const* cs = this;
+        unsigned int state = (cs != nullptr) ? static_cast<unsigned int>(cs->_state) : 0;
+        Log::Write(Log::LT_ERROR, L"CliSession.cpp", 2382,
+                   L"[cs], update pc showcase fail; invalid parameter, pcid:0x%I64X, level:%d, showcase:%p, showcase-size:%d, cli-key:0x%I64X, cli-state:%d.%d",
+                   pcid, level, showcase, showcaseSize, (cs != nullptr) ? cs->_clikey : 0ULL, state >> 16,
+                   state & 0xFFFF);
+        TLobbyError = LOBERR_INVALID_PARAMETER;
+        return false;
+    }
+    bool result = false;
+    _lock.Enter();
+    Character* pc = getCharacter(pcid);
+    if (pc != nullptr)
+    {
+        int dbrtn = 0;
+        if (LobbyDB::UpdateCharacterData(dbrtn, pcid, pc->_db.job, level, showcase, showcaseSize))
+        {
+            pc->SetLevel(level);
+            pc->SetShowcase(showcase, showcaseSize);
+            result = true;
+        }
+        else
+        {
+            TLobbyError = dbrtn != 0 ? LOBERR_DB_FAIL : LOBERR_SYSTEM;
+        }
+    }
+    else
+    {
+        TLobbyError = LOBERR_NO_SUCH_CHARACTER;
+    }
+    _lock.Leave();
+    return result;
 }
 
+#pragma comment(linker, "/INCLUDE:?UpdateCharacterLevel@CliSession@@QEAA_N_KF@Z") // LIFT: keep until the caller is lifted (0x38380).
 // 0x38380
-bool CliSession::UpdateCharacterLevel(unsigned long long, short)
+bool CliSession::UpdateCharacterLevel(unsigned long long pcid, short level)
 {
-    LIFT_STUB(0x38380);
+    if (pcid == 0 || level <= 0)
+    {
+        CliSession const* cs = this;
+        unsigned int state = (cs != nullptr) ? static_cast<unsigned int>(cs->_state) : 0;
+        Log::Write(Log::LT_ERROR, L"CliSession.cpp", 2419,
+                   L"[cs], update character level fail; invalid parameter, pcid:0x%I64X, level:%d, cli-key:0x%I64X, cli-state:%d.%d",
+                   pcid, level, (cs != nullptr) ? cs->_clikey : 0ULL, state >> 16, state & 0xFFFF);
+        TLobbyError = LOBERR_INVALID_PARAMETER;
+        return false;
+    }
+    bool result = false;
+    _lock.Enter();
+    Character* pc = nullptr;
+    // LIFT: 0x38380 inlines the pcid search. The out-of-line getCharacter at 0x35cf0 is still a stub.
+    for (std::vector<Character*, StlAllocator<Character*, 2> >::const_iterator i = _characters.begin();
+         i != _characters.end(); ++i)
+    {
+        if (*i != nullptr && (*i)->_db.pcid == pcid)
+        {
+            pc = *i;
+            break;
+        }
+    }
+    if (pc != nullptr)
+    {
+        int dbrtn = 0;
+        if (LobbyDB::UpdateCharacterLevel(dbrtn, pcid, level))
+        {
+            pc->SetLevel(level);
+            result = true;
+        }
+        else
+        {
+            TLobbyError = dbrtn != 0 ? LOBERR_DB_FAIL : LOBERR_SYSTEM;
+        }
+    }
+    else
+    {
+        TLobbyError = LOBERR_NO_SUCH_CHARACTER;
+    }
+    _lock.Leave();
+    return result;
 }
 
 // 0x38500

@@ -69,6 +69,104 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"ChangeCharacterRaceService::ConsumeItemFinished": {
+"calls": 60,
+"consts": 67,
+"refs": 62,
+"score": 63.1,
+"status": "DIFF"
+},
+"ChangeCharacterRaceService::ConsumeItemTried": {
+"calls": 60,
+"consts": 57,
+"refs": 62,
+"score": 59.9,
+"status": "DIFF"
+},
+"ChangeCharacterRaceService::Finish": {
+"calls": 60,
+"consts": 67,
+"refs": 62,
+"score": 63.1,
+"status": "DIFF"
+},
+"ChangeCharacterRaceService::Setup": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ChangeCharacterRaceService::Start": {
+"calls": 50,
+"consts": 67,
+"refs": 50,
+"score": 55.6,
+"status": "DIFF"
+},
+"ChangeCharacterRaceService::TaskDone": {
+"calls": 60,
+"consts": 67,
+"refs": 62,
+"score": 63.1,
+"status": "DIFF"
+},
+"ChangeCharacterSexService::ConsumeItemFinished": {
+"calls": 60,
+"consts": 67,
+"refs": 62,
+"score": 63.1,
+"status": "DIFF"
+},
+"ChangeCharacterSexService::ConsumeItemTried": {
+"calls": 60,
+"consts": 57,
+"refs": 62,
+"score": 59.9,
+"status": "DIFF"
+},
+"ChangeCharacterSexService::Finish": {
+"calls": 60,
+"consts": 67,
+"refs": 62,
+"score": 63.1,
+"status": "DIFF"
+},
+"ChangeCharacterSexService::Setup": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ChangeCharacterSexService::Start": {
+"calls": 50,
+"consts": 57,
+"refs": 50,
+"score": 52.4,
+"status": "DIFF"
+},
+"ChangeCharacterSexService::TaskDone": {
+"calls": 60,
+"consts": 67,
+"refs": 62,
+"score": 63.1,
+"status": "DIFF"
+},
+"Character::FetchCharacterInfo [?FetchCharacterInfo@Character@@QEBA_NPEAVFragmentPacket@@@Z]": {
+"calls": 97,
+"consts": 100,
+"refs": 100,
+"score": 99.0,
+"status": "DIFF"
+},
+"Character::FetchCharacterInfo [?FetchCharacterInfo@Character@@QEBA_NPEAVPacket@@PEAVPacketComposer@@@Z]": {
+"calls": 21,
+"consts": 100,
+"refs": 100,
+"score": 73.7,
+"status": "DIFF"
+},
 "CharacterCosmesisService::Setup": {
 "calls": 100,
 "consts": 100,
@@ -76,7 +174,147 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"CliSession::BindCharacterSlot": {
+"calls": 57,
+"consts": 77,
+"refs": 86,
+"score": 73.3,
+"status": "DIFF"
+},
+"CliSession::FetchCharacterInfo": {
+"calls": 100,
+"consts": 91,
+"refs": 100,
+"score": 97.0,
+"status": "DIFF"
+},
+"CliSession::FetchCharacterInfoList": {
+"calls": 94,
+"consts": 100,
+"refs": 100,
+"score": 98.0,
+"status": "DIFF"
+},
+"CliSession::FetchServiceEntryList": {
+"calls": 94,
+"consts": 100,
+"refs": 100,
+"score": 98.0,
+"status": "DIFF"
+},
+"CliSession::NotifyChangedGrade": {
+"calls": 57,
+"consts": 100,
+"refs": 100,
+"score": 85.7,
+"status": "DIFF"
+},
+"CliSession::NotifyChangedGradeLevel": {
+"calls": 100,
+"consts": 67,
+"refs": 100,
+"score": 88.9,
+"status": "DIFF"
+},
+"CliSession::UpdateBotScore": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CliSession::UpdateCharacterData": {
+"calls": 40,
+"consts": 50,
+"refs": 75,
+"score": 55.0,
+"status": "DIFF"
+},
+"CliSession::UpdateCharacterLevel": {
+"calls": 67,
+"consts": 80,
+"refs": 89,
+"score": 78.5,
+"status": "DIFF"
+},
+"CliSession::addLobbyService": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CliSession::addRenameUserService": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CliSession::fetchContentBans": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CliSession::getLobbyServiceByType": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CliSession::queryLobbyService": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CliSession::removeLobbyService": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CliSession::setContentBans": {
+"calls": 67,
+"consts": 89,
+"refs": 100,
+"score": 85.2,
+"status": "DIFF"
+},
+"CliSession::setRMSInquiryResult": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CliSessionTable::Select_index_gate": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "CoolDown::TimerClass": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CrashHandler::MakeCrash": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CriticalSection::~CriticalSection": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -97,7 +335,77 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"DynamicRefCntObj::~DynamicRefCntObj": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ExtendJumpingCharacterCreationQuotaService::ConsumeItemFinished": {
+"calls": 60,
+"consts": 67,
+"refs": 62,
+"score": 63.1,
+"status": "DIFF"
+},
+"ExtendJumpingCharacterCreationQuotaService::ConsumeItemTried": {
+"calls": 60,
+"consts": 57,
+"refs": 62,
+"score": 59.9,
+"status": "DIFF"
+},
+"ExtendJumpingCharacterCreationQuotaService::Finish": {
+"calls": 60,
+"consts": 67,
+"refs": 62,
+"score": 63.1,
+"status": "DIFF"
+},
+"ExtendJumpingCharacterCreationQuotaService::Setup": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ExtendJumpingCharacterCreationQuotaService::Start": {
+"calls": 29,
+"consts": 57,
+"refs": 36,
+"score": 40.7,
+"status": "DIFF"
+},
+"ExtendJumpingCharacterCreationQuotaService::TaskDone": {
+"calls": 60,
+"consts": 67,
+"refs": 62,
+"score": 63.1,
+"status": "DIFF"
+},
 "FSE_count_simple": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"FragmentPacket::Compose": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"FragmentPacket::FreeSize": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GradeService::ApplyChangedGradeLevel": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -140,6 +448,97 @@
 "status": "MATCH"
 },
 "HeapMemoryManager::ReallocZero": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"IsVietnamese": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyDaemon::setArgument": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyLocale::GetLanguageTypeOfChar": {
+"calls": 100,
+"consts": 98,
+"refs": 100,
+"score": 99.4,
+"status": "DIFF"
+},
+"LobbyLocale::GetNextThaiCell": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyLocale::GetStringLengthWithCellCombination": {
+"calls": 100,
+"consts": 44,
+"refs": 100,
+"score": 81.5,
+"status": "DIFF"
+},
+"LobbyLocale::GetVietToneMarkType": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyLocale::GetVietVowelType": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyLocale::IsAllowedChar": {
+"calls": 100,
+"consts": 98,
+"refs": 100,
+"score": 99.3,
+"status": "DIFF"
+},
+"LobbyLocale::IsMonolingualString": {
+"calls": 100,
+"consts": 89,
+"refs": 100,
+"score": 96.3,
+"status": "DIFF"
+},
+"LobbyLocale::IsSentenceCase": {
+"calls": 100,
+"consts": 94,
+"refs": 100,
+"score": 98.0,
+"status": "DIFF"
+},
+"LobbyLocale::IsWupperNotApplied": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyToken::Expire": {
+"calls": 0,
+"consts": 0,
+"refs": 0,
+"score": 0.0,
+"status": "DIFF"
+},
+"LobbyToken::LobbyToken": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -230,12 +629,159 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"MembershipMileage::Accept": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"MembershipMileageSession::start": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"MembershipMileageSession::stop": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"MembershipMileageSession::update": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"MileageInterimDepositTimer::MileageInterimDepositTimer": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"MileageInterimDepositTimer::Tick": {
+"calls": 74,
+"consts": 83,
+"refs": 86,
+"score": 80.9,
+"status": "DIFF"
+},
+"MileageInterimDepositTimer::~MileageInterimDepositTimer": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"MileageManager::Accept": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"MileageSession::MileageSession": {
+"calls": 100,
+"consts": 100,
+"refs": 60,
+"score": 86.7,
+"status": "DIFF"
+},
+"MileageSlot::MileageSlot": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"MileageSlot::~MileageSlot": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Packet::AddSize": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Packet::Allocate [?Allocate@Packet@@QEAAPEBDPEAVPacketComposer@@@Z]": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Packet::Allocate [?Allocate@Packet@@QEAAPEBDXZ]": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Packet::Clear": {
 "calls": 100,
 "consts": 100,
 "refs": 67,
 "score": 88.9,
 "status": "DIFF"
+},
+"Packet::ComposeV": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PacketBuffer::CheckCompose": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PacketBuffer::Compose": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PacketBuffer::deallocate_me": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PacketBufferAllocator::allocate": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PacketBufferPool::allocate": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PacketBufferPool::deallocate": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "RefCntHistory::add": {
 "calls": 100,
@@ -250,6 +796,13 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"RefCntList::~RefCntList": {
+"calls": 22,
+"consts": 40,
+"refs": 29,
+"score": 30.3,
+"status": "DIFF"
 },
 "RefCntObject::DumpRefCntHistory": {
 "calls": 100,
@@ -299,6 +852,34 @@
 "refs": 50,
 "score": 83.3,
 "status": "DIFF"
+},
+"RenameUserService::Finish": {
+"calls": 67,
+"consts": 44,
+"refs": 80,
+"score": 63.7,
+"status": "DIFF"
+},
+"RepeatPacketComposer::PopRepeatCount": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RepeatPacketComposer::PushRepeatCount": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Section<__int64>::Intersect<__int64,std::vector,StlAllocator<Section<__int64>,2> >": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "SharedChannelFragmentPacketHandleEvent::HandleEvent": {
 "calls": 100,
@@ -741,19 +1322,19 @@
 "score": 100.0,
 "status": "MATCH"
 },
-"swprintf_s<64>": {
+"swprintf_s<513>": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
 },
-"wmain": {
-"calls": 0,
-"consts": 0,
+"swprintf_s<64>": {
+"calls": 100,
+"consts": 100,
 "refs": 100,
-"score": 33.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "wmainCRTStartup": {
 "calls": 100,

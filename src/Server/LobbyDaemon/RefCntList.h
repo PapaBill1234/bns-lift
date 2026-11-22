@@ -30,6 +30,30 @@ public:
     ~RefCntList();  // 0x64c90
     bool Pushback(RefCntListNode* node);  // 0x64d00
     bool Remove(RefCntListNode* node);    // 0x64da0
+
+    // LIFT: PDB inline method. LobbyTick::~LobbyTick uses it at 0x5a610.
+    RefCntListNode* Popfront()
+    {
+        RefCntListNode* head = _head;
+        if (head == nullptr)
+            return nullptr;
+        if (head == _tail)
+        {
+            _tail = nullptr;
+            _head = nullptr;
+        }
+        else
+        {
+            head->_next->_prev = nullptr;
+            _head = _head->_next;
+        }
+        head->_next = nullptr;
+        head->_prev = nullptr;
+        head->_list = nullptr;
+        --_size;
+        return head;
+    }
+
     RefCntListNode* Begin() { return _head; }
     int Size() { return _size; }
 
