@@ -1017,3 +1017,7 @@ What failed:
 - The original LobbyLocale tables are one byte table (`byte_140161BD0`) with fixed offsets. Separate tables and a bit
   table for kanji leave a consts gap near 98. Do not change it in a slice card. It is a large data change.
 - The service functions without the client session key in the log calls stay near 60. This is a known cost.
+- A caller of a `LIFT_STUB` cannot score above 0. /LTCG sees that the stub does not return and removes the code
+  after the call. `/OPT:ICF` then folds callers with the same prefix into one body (`0x6f000`, `0x6fc10`, `0x70900`
+  share one address). `__declspec(noinline)` on the stub does not help: the call stays, but the rest is still removed.
+  Fix: lift the callee first (`0x6c330`). Check folding with `llvm-pdbutil dump --publics` (same `addr`).

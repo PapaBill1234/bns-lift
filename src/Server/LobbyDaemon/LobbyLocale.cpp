@@ -358,6 +358,7 @@ bool LobbyLocale::IsWupperNotApplied(wchar_t c)
 __declspec(noinline)  // LIFT: The original calls this function out of line at 0x584a0.
 int LobbyLocale::GetNextThaiCell(wchar_t const* str, int strLen, ThaiCell* cell)
 {
+    // LIFT: 0x58120 tests only strLen. The null test on str is added for safety.
     if (strLen <= 0 || str == nullptr)
         return 0;
     if (cell != nullptr)

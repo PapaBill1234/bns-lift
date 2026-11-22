@@ -9,6 +9,11 @@
 #include "Log.h"
 #include "StringUtil.h"
 
+// LIFT: Shared note for 0x6f1b0 to 0x71350 (45 log calls). The original Start, ConsumeItemTried, TaskDone,
+// ConsumeItemFinished and Finish logs write "cli-key:0x%I64X" with owner->_clikey. The client session key
+// authenticates the client session, so this lift keeps it out of the log files. The rest of each message is
+// the original text. The client cannot see this change. Restoring the key needs an owner decision.
+
 #pragma comment(linker, "/INCLUDE:?Setup@CharacterCosmesisService@@QEAA_NPEAUDB@LobbyService@@PEAU21@@Z")  // LIFT: Keep 0x6c4a0 until its caller is lifted.
 #pragma comment(linker, "/INCLUDE:?Setup@AddSlotService@@QEAA_NPEAUDB@LobbyService@@PEAU21@@Z")  // LIFT: Keep 0x6d180 until its caller is lifted.
 #pragma comment(linker, "/INCLUDE:?IsServiceTarget@AddSlotService@@UEAA_NAEBTid128@@@Z")  // LIFT: Keep 0x6d3e0 until its caller is lifted.
@@ -79,6 +84,9 @@ bool RenameCharacterService::Setup(LobbyService::DB* sedb, DB* db)
 }
 
 // 0x6c330
+// LIFT: 0x6f000, 0x6fc10 and 0x70900 call this stub first. /LTCG sees that the stub does not return, so it
+// removes the rest of each caller, and /OPT:ICF folds the three callers into one body. Their funcdiff score
+// stays 0.0 until 0x6c330 is lifted (Not done in lift-lobbydaemon-6). noinline does not stop this.
 bool LobbyService::Fetch(CliSession*, FragmentPacket*) const
 {
     LIFT_STUB(0x6c330);
@@ -518,6 +526,7 @@ bool ChangeCharacterSexService::Setup(LobbyService::DB* sedb, DB* db)
 }
 
 // 0x6fc10
+#pragma comment(linker, "/INCLUDE:?Fetch@ChangeCharacterSexService@@UEBA_NPEAVCliSession@@PEAVFragmentPacket@@@Z")  // LIFT: Keep 0x6fc10 until its caller is lifted.
 bool ChangeCharacterSexService::Fetch(CliSession* owner, FragmentPacket* fp) const
 {
     if (!LobbyService::Fetch(owner, fp))
@@ -573,7 +582,7 @@ bool ChangeCharacterSexService::Start(CliSession* owner, unsigned int itemDataId
                                       char newSex, char* newAppearanceData, int newAppearanceDataSize)
 {
     // LIFT: 0x6fe20 to 0x70040. The original also logs owner->_clikey. This lift does not log the client session key.
-    // BUG: 0x6fe20 checks only newAppearanceDataSize != 0. This lift also rejects a negative byte count before the database call.
+    // BUG: 0x6fe20 tests only newAppearanceDataSize != 0, so a negative byte count reaches the database call. Bug fixed: the lift rejects a count <= 0.
     if (owner == nullptr || newSex <= 0 ||
         newAppearanceData == nullptr || newAppearanceDataSize <= 0)
     {
@@ -774,6 +783,7 @@ bool ChangeCharacterRaceService::Setup(LobbyService::DB* sedb, DB* db)
 }
 
 // 0x70900
+#pragma comment(linker, "/INCLUDE:?Fetch@ChangeCharacterRaceService@@UEBA_NPEAVCliSession@@PEAVFragmentPacket@@@Z")  // LIFT: Keep 0x70900 until its caller is lifted.
 bool ChangeCharacterRaceService::Fetch(CliSession* owner, FragmentPacket* fp) const
 {
     if (!LobbyService::Fetch(owner, fp))
@@ -829,7 +839,7 @@ bool ChangeCharacterRaceService::Start(CliSession* owner, unsigned int itemDataI
                                       char newSex, char* newAppearanceData, int newAppearanceDataSize)
 {
     // LIFT: 0x70b10 to 0x70d50. The original also logs owner->_clikey. This lift does not log the client session key.
-    // BUG: 0x70b10 checks only newAppearanceDataSize != 0. This lift also rejects a negative byte count before the database call.
+    // BUG: 0x70b10 tests only newAppearanceDataSize != 0, so a negative byte count reaches the database call. Bug fixed: the lift rejects a count <= 0.
     if (owner == nullptr || newRace <= 0 || newSex <= 0 ||
         newAppearanceData == nullptr || newAppearanceDataSize <= 0)
     {
