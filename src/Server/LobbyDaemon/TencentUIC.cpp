@@ -159,12 +159,12 @@ bool TencentUIC::CheckNameFilter(unsigned int qqid, wchar_t const* name)
     notify_data.plugin_id = tss_sdk_if::ETSS_SDK_PLUGIN_ID_UIC;
     user_message.uin = qqid;
     user_message.callback_data_len = 0;
-    user_message.callback_data = nullptr;
+    user_message.callback_data = nullptr;  // LIFT: safety initialization; the original sets only the length (0x7ae80).
     user_message.message = reinterpret_cast<unsigned char*>(content);
     notify_data.notify_data = &user_message;
     user_message.message_len = static_cast<unsigned int>(strlen(content) + 1);
     user_message.game_data_len = 0;
-    user_message.game_data = nullptr;
+    user_message.game_data = nullptr;  // LIFT: safety initialization; the original sets only the length (0x7ae80).
     user_message.input_type = EUITYPE_NAME;
     // BUG: the original requires prior SDK initialization and has no null check at 0x7ae80.
     int result = g_tss_sdk->notify(notify_data);

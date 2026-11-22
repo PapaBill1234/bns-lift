@@ -1056,8 +1056,8 @@ Card lift-lobbydaemon-12: AuctionEscrow, LobbyStats, LobbyTick, TencentUIC, Lobb
 | Item | Result |
 | --- | --- |
 | Lifted | 23 |
-| Not done | 3 (`CliSessionGradeChangedMessage::Dispatch`, `CliSessionMileageInterimDepositMessage::Dispatch`, `LobbyStats::update`) |
-| LD MATCH | 82 -> 108 (+26: 16 card functions, 10 shared functions reached for the first time). The other 4 exes: +0, no MATCH lost. |
+| Not done | 3 (`CliSessionMileageInterimDepositMessage::Dispatch`, `LobbyStats::update`, `sprintf_s<1024>`) |
+| LD MATCH | 97 -> 122 over main (+25: 15 card functions, 10 shared functions reached for the first time). The other 4 exes: +0, no MATCH lost. |
 
 What worked (count = functions made MATCH):
 - The `/INCLUDE` dead-strip rule gives the first real LD gain. Leaf modules with no layout dependency (LobbyTick, TencentUIC,
@@ -1074,3 +1074,9 @@ What failed or is blocked (tries):
   after the callers (LobbyDaemon::initialize, the auction handlers) are lifted.
 - `LobbyStats::HandleEvent` 33.3: its callee `update` is a `LIFT_STUB`, so the abort is inlined. Not a source-form problem.
 - funcdiff skips names that start with `__` (`SKIP_NAME`). `__printXml` is in the built PDB but has no score.
+- MSVC puts overloaded virtual functions in the vtable in reverse declaration order. Take the slot order from the PDB method
+  list, then declare the overloads in reverse. Check with `clang-cl -Xclang -fdump-vtable-layouts -Xclang -emit-llvm-only`.
+  Funcdiff records indirect calls without a displacement, so a wrong slot still scores MATCH (`LobbyMessage::Dispatch` x3).
+- Retry after ld-10 landed: `CliSessionGradeChangedMessage::Dispatch` lifts at 83.3. The only DIFF is the callee
+  `MembershipMileage::GradeChanged`, still a `LIFT_STUB` (inlined abort). No source form to try.
+- Do not edit a source file of another card, even for a one-line stub (`CliSession.cpp` `0x32b60`). Write it in the handoff.

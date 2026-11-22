@@ -4,12 +4,14 @@
 #include "CliSession.h"
 #include "LiftStub.h"
 #include "Log.h"
+#include "MembershipMileage.h"
 #include "PcCafeMileage.h"
 #include <time.h>
 
 #pragma comment(linker, "/INCLUDE:??1LobbyMessage@@UEAA@XZ")  // LIFT: keep until the callers are lifted (0x2f9d0).
 #pragma comment(linker, "/INCLUDE:?Dispatch@LobbyMessage@@UEAAXPEAVLobbyMessageAcceptor@@@Z")  // LIFT: keep until the callers are lifted (0x2f9e0).
 #pragma comment(linker, "/INCLUDE:?Dispatch@CliSessionStopPcCafeChargeMessage@@UEAAXPEAVPcCafeMileage@@@Z")  // LIFT: keep until the callers are lifted (0x2fa90).
+#pragma comment(linker, "/INCLUDE:?Dispatch@CliSessionGradeChangedMessage@@UEAAXPEAVMembershipMileage@@@Z")  // LIFT: keep until the caller is lifted (0x2fb10).
 #pragma comment(linker, "/INCLUDE:?Dispatch@CliSessionStartPcCafeChargeMessage@@UEAAXPEAVPcCafeMileage@@@Z")  // LIFT: keep until the callers are lifted (0x2fad0).
 
 // 0x2f9d0
@@ -63,14 +65,17 @@ void CliSessionStartPcCafeChargeMessage::Dispatch(PcCafeMileage* acceptor)
 }
 
 // 0x2fb10
-// LIFT: Not done. It needs MembershipMileage::GradeChanged, which lift-lobbydaemon-10 declares (0x2fb10).
-void CliSessionGradeChangedMessage::Dispatch(MembershipMileage*)
+void CliSessionGradeChangedMessage::Dispatch(MembershipMileage* acceptor)
 {
-    LIFT_STUB(0x2fb10);
+    if (acceptor != nullptr)
+    {
+        long long now = _time64(nullptr);
+        acceptor->GradeChanged(_cs, now, gameGradeKey, reason, grade);
+    }
 }
 
 // 0x2fb60
-// LIFT: Not done. It needs the MileageSlot and MileageSession layouts (lift-lobbydaemon-10) and the PcCafeMileage layout (0x2fb60).
+// LIFT: Not done. It needs the PcCafeMileage layout (_slotId, Mileage base), which lift-lobbydaemon-5 owns and main does not have yet (0x2fb60).
 void CliSessionMileageInterimDepositMessage::Dispatch(PcCafeMileage*)
 {
     LIFT_STUB(0x2fb60);
