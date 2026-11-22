@@ -1145,7 +1145,7 @@ Card lift-lobbydaemon-18: GamedChannel part 1 (35 functions) and AccountInventor
 | --- | --- |
 | Lifted | 50 (incl. 2 shared: `Network::iocpHandle`, `swprintf_s<129>`) |
 | Not done | 5 (`AccountInventoryChannel::Connect`, `AccountInventorySessionHandler::OnConnect`, `AccountInventorySessionHandler::OnClose`, `AccountInventorySessionHandler` scalar deleting destructor, `GamedChannelManager::OnClose`) |
-| LD MATCH | 195 -> 254 over main 75f0769 (+59: 42 card functions, 17 shared functions). No MATCH lost. |
+| LD MATCH | 219 -> 279 over main bfb4c98 (+60: 43 card functions, 17 shared functions), measured after the merge. The other 4 exes: +0. No MATCH lost. |
 
 What worked (count = functions made MATCH):
 - A19 separate stores for the inlined `Packet` constructor, in the PDB order: `CurHeader`, `Splitter`, `ListHead`, `ListTail`,
@@ -1177,7 +1177,7 @@ What failed or is blocked (tries):
   3. Success first, `if (0 != p.Compose(...)) return TSend(t, &p); log; return false;`: consts 100 for `Create`, but calls 75 to 80.
      The original puts the error block first (A17). Reverted.
   The only DIFF left is one immediate (`0x14`, `0x79`, `0x16`) against a `lea` from the zero register.
-- `SendCreateCharacterReq` (repair 3): form 1 `p.Compose(...) == 0` scored 97.0 (consts 91). Form 2 `0 == p.Compose(...)` scored 100 (MATCH, 254 -> 255). Form 2 kept.
+- `SendCreateCharacterReq` (repair 3): form 1 `p.Compose(...) == 0` scored 97.0 (consts 91). Form 2 `0 == p.Compose(...)` scored 100 (MATCH, +1 in the +60 total). Form 2 kept.
 - `GamedChannel::SendAccountInventoryNotify` 79.1 (calls 56): the original calls `Packet::Allocate()` out of line from the inlined
   `Packet::Allocate(PacketComposer*)`. Ours inlines both. `noinline` on `Packet::Allocate()` would break the `Send*` functions
   that inline it (BloodLib, shared by all 5 exes). Below 85: no tries.

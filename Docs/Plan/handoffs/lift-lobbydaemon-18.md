@@ -4,7 +4,7 @@ Source: LobbyDaemon 2019 + PDB (VS2010 SP1). The lift uses the indexed pseudocod
 The index lists 55 functions in scope (the card says 54; `Network::iocpHandle` at `0x64e0` is the extra one). 50 are lifted. 5 are Not done.
 
 `Network::iocpHandle` was already MATCH on main before this card. It adds no new MATCH.
-Base: main 75f0769. All counts are measured against it.
+Base: main bfb4c98 (merged into the branch). All counts are measured against its baseline (LobbyDaemon 219 MATCH). Main 75f0769 had 195; ld-13 and ld-17 added the other 24.
 
 ## Result
 
@@ -14,7 +14,7 @@ Base: main 75f0769. All counts are measured against it.
 | Not done | 5 |
 | Gate (`tools/gate.sh`, `LIFT_BUILD_DIR=build-ld-18`) | gate ok |
 | Parity (`tools/parity.sh`) | parity ok |
-| LobbyDaemon MATCH | 195 -> 255 (+60) over main 75f0769 |
+| LobbyDaemon MATCH | 219 -> 279 (+60) over main bfb4c98 |
 | CacheGate, LobbyGate, SmartCouponDaemon, PostOfficeDaemon MATCH | 456, 658, 630, 694 (+0 each, no MATCH lost) |
 
 The gain is 43 card functions and 17 shared functions. No MATCH function turns into DIFF or disappears.
@@ -84,7 +84,7 @@ Other changes:
 - `SharedChannel::Send(Packet const*)` (`0x4ba0`, shared) gets `__declspec(noinline)` (A4). The original `Send*` functions call it out of line. One edit gives +21 MATCH. Parity of the 4 other exes is unchanged.
 - The `Packet` constructor is inlined in the original. The lift writes the six stores in the PDB order, then `p.Allocate()` (A19).
 - `GamedChannel.h`, `AccountInventoryChannel.h` and `TransactionChannel.h` get the PDB layouts and the new declarations. `CharacterInventoryItem` has the PDB layout.
-- `AccountInventoryChannel::SendFinishWarehouseItemConsumptionReq` has the PDB parameter `short result`. The original never reads it (LTCG folded 0 into the body), so the body passes 0.
+- `AccountInventoryChannel::SendFinishWarehouseItemConsumptionReq` has the PDB parameter `short result`. The original never reads it (LTCG folded 0 into the body), so the body passes 0. The function scores 97.0 (DIFF), not MATCH. The review asked to write `result` only if it stays MATCH, so the `// LIFT:` note stays and the body keeps the 0.
 
 ## Placeholders that later cards must remove
 
