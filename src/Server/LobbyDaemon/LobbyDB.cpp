@@ -609,9 +609,9 @@ bool LobbyDB::LoadGameWorldCluster(int& dbrtn, GameWorldCluster::DB**& out, int&
     column = COL_GAME_PUBLIC_PORT;
     DB_BIND_COL_NI(tran.Tran, 5, &dbfield.mobile_port, 0, SQL_C_USHORT, &collen[4], NOT_INIT, BIND_ERROR);
     column = COL_GAME_INTERNAL_PORT;
-    DB_BIND_COL_NI(tran.Tran, 6, &dbfield.maxPlayerCount, 0, SQL_C_SLONG, &collen[5], NOT_INIT, BIND_ERROR);
+    DB_BIND_COL_NI(tran.Tran, 6, &dbfield.maxPlayerCount, 0, SQL_C_LONG, &collen[5], NOT_INIT, BIND_ERROR);
     column = COL_MAX_PLAYER_COUNT;
-    DB_BIND_COL_NI(tran.Tran, 7, &dbfield.maxWaitingCount, 0, SQL_C_SLONG, &collen[6], NOT_INIT, BIND_ERROR);
+    DB_BIND_COL_NI(tran.Tran, 7, &dbfield.maxWaitingCount, 0, SQL_C_LONG, &collen[6], NOT_INIT, BIND_ERROR);
     if (!tran.Tran->Execute())
     {
         Log::Write(Log::LT_ERROR, LOBBYDB_FILE, 900, L"[lobbydb], load game-world-cluster fail; execute fail, dbrtn:%d",
@@ -677,6 +677,7 @@ bool LobbyDB::LoadGameWorldCluster(int& dbrtn, GameWorldCluster::DB**& out, int&
 NOT_INIT:
     Log::Write(Log::LT_ERROR, L"source\\Db.cpp", 286, L"DbTransaction::BindCol(), Not initialized");
 BIND_ERROR:
+    // BUG: same copied "game world group" text as the bind parameter log above. Kept.
     Log::Write(Log::LT_ERROR, LOBBYDB_FILE, 957, L"[lobbydb], load game world group fail; bind column fail, column:%s",
                ColumnDesc[column]);
     return false;

@@ -82,6 +82,7 @@ The 10 `LobbyDB` card functions have only stub callers. Each has `#pragma commen
 | `FinishCharacterCreation` | A17: explicit `if (dbrtn == 0) return true; return false;` | 99.1 -> 100 |
 | `UpdateGameAccountTimeBasedPlayInfo` | A8: same (repair round 2) | 97.4 -> 100 |
 | `LoadGameAccount` | A8: same (repair round 2) | 78.9 -> 80.5 |
+| `LoadGameWorldCluster` | Columns 6 and 7: `SQL_C_LONG` as in the original, not `SQL_C_SLONG` (repair round 3). The `// BUG:` comment now also marks the bind-column log. | 84.2 -> 84.2 |
 | `LoadCharacterList` | A8: same (repair round 2) | 78.1 -> 79.0 |
 
 Not tried:
