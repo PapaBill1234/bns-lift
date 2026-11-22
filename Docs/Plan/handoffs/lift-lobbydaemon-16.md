@@ -119,3 +119,16 @@ The LD ObjectPool card can re-add the six bodies and the pool definitions.
 
 `tools/gate.sh` and `tools/parity.sh` both ran on the final tree with `LIFT_BUILD_DIR=build-ld-16` and printed `gate ok` and `parity ok`.
 `--accept`, the baselines, `progress.tsv` and the README parity table were not changed.
+
+## Repair round 2
+
+| Problem | Fix |
+| --- | --- |
+| `HandleLobbyGame_CreateCharacterOk` log text had a space after the comma | Changed to `ok ok,wid:%d`, as the original (0x8a7c0). |
+| `HandleLobbyGame_HelloReq` null `channel` after a failed `Alloc` | Marked `// BUG:` (0x88260). The bug is kept. No guard was added. |
+| `LGP_HELLO_FAIL_LOG` had no `// LIFT:` comment | Added reason and address. |
+| `HandleLobbyGame_UpdateBotScoreNotify` copy-paste log text | Marked `// BUG:` (0x89d90). |
+| `changedPaths` was 15 | The count with `-- src include CMakeLists.txt cmake tools tests` is the number in the claim. Docs are not counted. |
+
+The repair changes comments and one literal. The MATCH count is unchanged: LobbyDaemon 442.
+Gate and parity ran again on the repaired tree: `gate ok`, `parity ok`.

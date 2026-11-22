@@ -68,6 +68,7 @@ wchar_t const* LobbyErrorDesc[28] = {
     L"LOBERR_GAME_TIME_SCHEDULE_NO_NEED_TO_SCHEDULE", L"LOBERR_GAME_TIME_SCHEDULE_IN_SCHEDULED_BLOCK_TIME"};
 
 // 0x88260
+// LIFT: local log helper for the 10 fail logs of HandleLobbyGame_HelloReq (0x88260). Not a PDB name.
 #define LGP_HELLO_FAIL_LOG(line, reason)                                                                              \
     Log::Write(Log::LT_ERROR, L"LobbyGamePacketHandler.cpp", line,                                                    \
                L"[gamed], handle hello fail; " reason                                                                 \
@@ -166,6 +167,7 @@ bool HandleLobbyGame_HelloReq(Session const* session, Packet const* packet)
     }
 
     void* mem = Memory::_Manager[2]->Alloc(48, L"LobbyGamePacketHandler.cpp", 115);
+    // BUG: the original dereferences a null channel when Alloc fails (0x88260).
     GamedChannel* channel = mem != nullptr ? new (mem) GamedChannel() : nullptr;
     if (!channel->InitializeTransactionChannel(LobbyDaemon::_instance->_config->_lobbyJobTransactionLifeTime))
     {
@@ -472,6 +474,7 @@ bool HandleLobbyGame_UpdateBotScoreNotify(SharedChannel* channel, Packet const* 
             unsigned int error = static_cast<unsigned int>(TLobbyError);
             unsigned long long id = LgpChannelId(channel);
             wchar_t const* desc = error >= 28 ? L"LOBERR_UNDEFINED" : LobbyErrorDesc[error];
+            // BUG: the original log text says update character-data in the bot score handler (0x89d90).
             Log::Write(Log::LT_ERROR, L"LobbyGamePacketHandler.cpp", 495,
                        L"[gamed], handle update character-data fail; update fail, error:%s, channel-id:%I64d, pcid:0x%I64X, cli-key:0x%I64X, botScore:%d",
                        desc, id, pcid, clikey, botScore);
@@ -571,7 +574,7 @@ bool HandleLobbyGame_CreateCharacterOk(SharedChannel* channel, Packet const* pac
         return true;
     }
     Log::Write(Log::LT_DEBUG, L"LobbyGamePacketHandler.cpp", 644,
-               L"[gamed], handle create character ok ok, wid:%d, tid:0x%I64X, job:%d, level:%d, showcase-size:%d",
+               L"[gamed], handle create character ok ok,wid:%d, tid:0x%I64X, job:%d, level:%d, showcase-size:%d",
                LgpWid(channel), tid, static_cast<int>(param.job), static_cast<int>(param.level), static_cast<int>(param.showcaseDataSize));
     return true;
 }
