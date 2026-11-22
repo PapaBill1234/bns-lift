@@ -56,6 +56,7 @@ class SystemEvent
 public:
     SystemEvent() : Event(nullptr) {}
     ~SystemEvent();
+    bool Make();  // 0x991f0 (LobbyDaemon)
 
     void* Event;
 };

@@ -1080,3 +1080,31 @@ What failed or is blocked (tries):
 - Retry after ld-10 landed: `CliSessionGradeChangedMessage::Dispatch` lifts at 83.3. The only DIFF is the callee
   `MembershipMileage::GradeChanged`, still a `LIFT_STUB` (inlined abort). No source form to try.
 - Do not edit a source file of another card, even for a one-line stub (`CliSession.cpp` `0x32b60`). Write it in the handoff.
+
+## ld-15
+
+Card lift-lobbydaemon-15: LobbyDaemon part 1 (33 functions, 30 lifted, 3 Not done: `~LobbyDaemon`, `initLog`, `initialize`).
+
+| Item | Result |
+| --- | --- |
+| LD MATCH | 195 -> 325 (+130) over main ef1fa96. The other 4 exes: +0, no MATCH lost. |
+
+What worked:
+- The `/INCLUDE` pragma finds wrong signatures. A name that the original PDB has and the lift does not define is an undefined symbol at link time.
+  3 first-lift signatures were wrong: `static` for a member (`CoolDown::Start`), public for private (`restoreInvalid`), pointer for reference
+  (`GetNextResetTimeUTC`). Copy the decorated name first. Fix the declaration until it links.
+- A19 for a constant string copy: `wcscpy(delimiter, L";")` in HR is two stores in the original. Write `d[0] = L';'; d[1] = 0;`.
+  `ServiceItems::Add` 94.1 -> 98.7 (refs and consts now equal).
+- A17 variant: HR shows `v5 = line; ... Log::Write(v5)` after the branches. The original source has one `Log::Write` per branch (the lines 1140, 1148, 1153 differ).
+  Write one call per branch. `FailedEventObjectHandler` 91.7 -> 93.3. The call order (`GetLastError` before `EventId`) is not done yet.
+
+What failed:
+- `Daemon::Instance->GlobalTimerQueue->Add(...)` does not compile. `TimerQueue::Add` is protected. LTCG inlines `Daemon::AddTimer` in the original.
+  Funcdiff already expands `AddTimer` to `TimerQueue::Add`. The extra `Log::Write` in `CoolDown::Start` comes from this expansion. Do not retry.
+- `restoreInvalid` refs 80: the loop end pointer is the address of the next global. The original has `CONFIG_FILENAME`. Ours has `TextConsole::COLOR_TABLE`.
+  This depends on the data order, not on the source form.
+
+Other facts:
+- `tools/gate.sh` fails on main ef1fa96 (3 tracked DLLs in `tools/LegacyBin`). `tools/gate_extra.sh` has mode 644, so the gate skips it.
+- A worktree without `vendor/zstd/src` fails the VS2010 link with 3 `ZSTD_*` errors in all 5 exes. Copy the directory from another worktree.
+

@@ -159,6 +159,8 @@ public:
     virtual unsigned long long TimerId() const { return 0; }  // 0x5a0a0 (folded).
     virtual bool HandleEvent(EventContext*, unsigned long);  // 0x4fa30
     bool WriteReport();  // 0x4fa80
+    // LIFT: GameWorldReporterListener (0x994b0) has an inlined accessor: it takes _lock and adds a reference to _report.
+    friend void GameWorldReporterListener(GameWorldReporter*);
 private:
     bool volatile _run;
     long _period;

@@ -1,126 +1,588 @@
 // LobbyDaemon.obj (LobbyDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
 #include "LobbyDaemon.h"
+#include <algorithm>
+#include <intrin.h>
+#include <stdarg.h>
+#include <string.h>
+#include <time.h>
+#include <wchar.h>
 #include "Channel.h"
+#include "CliSession.h"
+#include "CliSessionManager.h"
+#include "Console.h"
+#include "GameWorld.h"
+#include "InfoGateChannel.h"
+#include "LobbyConfig.h"
 #include "LiftStub.h"
+#include "Log.h"
+#include "Memory.h"
+#include "MemoryManager.h"
+#include "NPChannel.h"
+#include "Packet.h"
+#include "PacketUtil.h"
+#include "PipeConsole.h"
+#include "RefCntObject.h"
+
+LobbyDaemon* LobbyDaemon::_instance = nullptr;  // PDB static member (file-scope data in the original).
+CoolDown* GCoolDown = nullptr;                  // PDB global.
+
+// LIFT: strings from LobbyDaemon.exe (UTF-16 literals). The order follows the PDB enum ReloadInvalidReason.
+// ❓ The order of the 5 pointers in the original array is not checked in the binary.
+wchar_t const* LobbydReloadInvalidRestoreTimer::INVALID_REASON_STR[5] = {
+    L"daemon config reload failed",
+    L"daemon list reload failed",
+    L"world list reload failed",
+    L"contents rule config reload failed",
+    L"bns common config reload failed",
+};
+
+namespace
+{
+// LIFT: the original calls Packet::Compose(PacketComposer*, int n, ...). Packet.h has only ComposeV.
+unsigned short composeWith(Packet& packet, PacketComposer* pcr, int n, ...)
+{
+    va_list args;
+    va_start(args, n);
+    unsigned short const result = packet.ComposeV(pcr, n, args);
+    va_end(args);
+    return result;
+}
+
+// LIFT: inlined increment of the repeat count of RepeatPacketComposer (same code as FragmentPacket::IncRepeatCount).
+void incRepeatCount(RepeatPacketComposer& rpc)
+{
+    int const index = rpc.start[rpc.top] + 1;
+    if (rpc.subTop < 0)
+        rpc.index = index;
+    else
+        rpc.sub[rpc.subTop].index = index;
+    ++*rpc.counts[rpc.top];
+}
+}  // namespace
+
+// 0x991c0 SystemEvent::~SystemEvent is inline in Lock.h.
+
+#pragma comment(linker, "/INCLUDE:?Make@SystemEvent@@QEAA_NXZ")  // LIFT: keep until the caller is lifted (0x991f0)
+// 0x991f0
+bool SystemEvent::Make()
+{
+    Event = CreateEventW(nullptr, FALSE, FALSE, nullptr);
+    return Event != nullptr;
+}
 
 // 0x99220
 wchar_t const* LobbyDaemon::ShortName()
 {
-    LIFT_STUB(0x99220);
+    return L"lobbyd";
 }
 
 // 0x99230
 wchar_t const* LobbyDaemon::Name()
 {
-    LIFT_STUB(0x99230);
+    return L"LobbyDaemon";
 }
 
 // 0x99240
 wchar_t const* LobbyDaemon::ServiceName()
 {
-    LIFT_STUB(0x99240);
+    return L"BnS lobby daemon";
 }
 
 // 0x99250
 wchar_t const* LobbyDaemon::Descriptions()
 {
-    LIFT_STUB(0x99250);
+    return L"Blade&Soul Lobby Daemon";
 }
 
+#pragma comment(linker, "/INCLUDE:?Alloc@LobbyObjPoolMemAllocator@@UEAAPEAX_KPEB_WH@Z")  // LIFT: keep until the caller is lifted (0x99260)
 // 0x99260
-void* LobbyObjPoolMemAllocator::Alloc(unsigned long long, wchar_t const*, int)
+void* LobbyObjPoolMemAllocator::Alloc(unsigned long long size, wchar_t const*, int)
 {
-    LIFT_STUB(0x99260);
+    unsigned long long const sz = _alignment * ((_alignment + size - 1) / _alignment);
+    _lock.Enter();
+    if (static_cast<unsigned long long>(_end - _mem) < sz)
+    {
+        // BUG: 0x99260 the rest of the old block leaks, and the VirtualAlloc result is not checked.
+        _mem = static_cast<unsigned char*>(VirtualAlloc(nullptr, _systemAllocationGranularity, MEM_COMMIT | MEM_RESERVE,
+                                                        PAGE_READWRITE));
+        _end = _mem + _systemAllocationGranularity;
+    }
+    unsigned char* const ret = _mem;
+    _mem += sz;
+    _lock.Leave();
+    return ret;
 }
 
+#pragma comment(linker, "/INCLUDE:?Alloc@BannedWordFilterMemoryAllocator@@UEAAPEAX_KPEB_WH@Z")  // LIFT: keep until the caller is lifted (0x99380)
 // 0x99380
-void* BannedWordFilterMemoryAllocator::Alloc(unsigned long long, wchar_t const*, int)
+void* BannedWordFilterMemoryAllocator::Alloc(unsigned long long size, wchar_t const* file, int line)
 {
-    LIFT_STUB(0x99380);
+    return Memory::_Manager[2]->Alloc(size, file, line);
 }
 
+#pragma comment(linker, "/INCLUDE:?Realloc@BannedWordFilterMemoryAllocator@@UEAAPEAXPEAX_KPEB_WH@Z")  // LIFT: keep until the caller is lifted (0x99390)
 // 0x99390
-void* BannedWordFilterMemoryAllocator::Realloc(void*, unsigned long long, wchar_t const*, int)
+void* BannedWordFilterMemoryAllocator::Realloc(void* ptr, unsigned long long size, wchar_t const* file, int line)
 {
-    LIFT_STUB(0x99390);
+    return Memory::_Manager[2]->Realloc(ptr, size, file, line);
 }
 
+#pragma comment(linker, "/INCLUDE:?Free@BannedWordFilterMemoryAllocator@@UEAAXPEAXPEB_WH@Z")  // LIFT: keep until the caller is lifted (0x993b0)
 // 0x993b0
-void BannedWordFilterMemoryAllocator::Free(void*, wchar_t const*, int)
+void BannedWordFilterMemoryAllocator::Free(void* ptr, wchar_t const* file, int line)
 {
-    LIFT_STUB(0x993b0);
+    Memory::_Manager[2]->Free(ptr, file, line);
 }
 
+#pragma comment(linker, "/INCLUDE:?GenerateClikey@@YA_KXZ")  // LIFT: keep until the caller is lifted (0x993c0)
 // 0x993c0
 unsigned long long GenerateClikey()
 {
-    LIFT_STUB(0x993c0);
+    static long long __seed__ = 0;  // PDB static counter (file-scope data in the original).
+    long long const result = _InterlockedIncrement64(&__seed__);
+    if (result == 0)
+    {
+        // The counter wrapped to 0. Take the next value and log it.
+        long long const v = _InterlockedExchangeAdd64(&__seed__, 1);
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 157, L"[lobby], cli-key overflow");
+        return static_cast<unsigned long long>(v + 1);
+    }
+    return static_cast<unsigned long long>(result);
 }
 
+#pragma comment(linker, "/INCLUDE:?GenerateJobid@@YA_KXZ")  // LIFT: keep until the caller is lifted (0x99410)
 // 0x99410
 unsigned long long GenerateJobid()
 {
-    LIFT_STUB(0x99410);
+    static long long __seed__ = 0;  // PDB static counter (file-scope data in the original).
+    long long const result = _InterlockedIncrement64(&__seed__);
+    if (result == 0)
+    {
+        // The counter wrapped to 0. Take the next value and log it.
+        long long const v = _InterlockedExchangeAdd64(&__seed__, 1);
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 173, L"[lobby], job-id overflow");
+        return static_cast<unsigned long long>(v + 1);
+    }
+    return static_cast<unsigned long long>(result);
 }
 
+#pragma comment(linker, "/INCLUDE:?GenerateLobbyTokenkey@@YA_KXZ")  // LIFT: keep until the caller is lifted (0x99460)
 // 0x99460
 unsigned long long GenerateLobbyTokenkey()
 {
-    LIFT_STUB(0x99460);
+    static long long __seed__ = 0;  // PDB static counter (file-scope data in the original).
+    long long const result = _InterlockedIncrement64(&__seed__);
+    if (result == 0)
+    {
+        // The counter wrapped to 0. Take the next value and log it.
+        long long const v = _InterlockedExchangeAdd64(&__seed__, 1);
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 188, L"[lobby], token-key overflow");
+        return static_cast<unsigned long long>(v + 1);
+    }
+    return static_cast<unsigned long long>(result);
 }
 
+#pragma comment(linker, "/INCLUDE:?GameWorldReporterListener@@YAXPEAVGameWorldReporter@@@Z")  // LIFT: keep until the caller is lifted (0x994b0)
 // 0x994b0
-void GameWorldReporterListener(GameWorldReporter*)
+void GameWorldReporterListener(GameWorldReporter* reporter)
 {
-    LIFT_STUB(0x994b0);
+    if (reporter == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 201, L"[lobby], listen world reporter fail; invalid parameter");
+        return;
+    }
+    // Inlined accessor: copy _report under the lock and add a reference.
+    GameWorldReport* report = nullptr;
+    reporter->_lock.Enter();
+    if (reporter->_report != nullptr)
+    {
+        report = reporter->_report;
+        report->addReferenceCount(L"GameWorld.cpp", 1246);
+    }
+    reporter->_lock.Leave();
+    if (report == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 215, L"[lobby], listen world reporter fail; null report");
+        return;
+    }
+    // LIFT: the original calls 0x2ef40 with _lgatechmgr. InfoGateChannelManager::Broadcast and the
+    // LobbyGateChannelManager body are the same (folded). Both classes have the same layout (0x48).
+    InfoGateChannelManager* const lgatechmgr = reinterpret_cast<InfoGateChannelManager*>(LobbyDaemon::_instance->_lgatechmgr);
+    Packet const* const packet = report->GetPacket();
+    if (packet != nullptr)
+    {
+        if (!lgatechmgr->Broadcast(packet))
+            Log::Write(Log::LT_ERROR, L"LobbyGateChannel.cpp", 1054,
+                       L"[lobby-gate], broadcast update-world-info-list-notify fail; broadcast fail");
+    }
+    else
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyGateChannel.cpp", 1049,
+                   L"[lobby-gate], broadcast update-world-info-list-notify fail; invalid parameter");
+    }
+    report->removeReferenceCount(L"LobbyDaemon.cpp", 212);
 }
 
+#pragma comment(linker, "/INCLUDE:?HandleEvent@CoolDown@@UEAA_NPEAUEventContext@@K@Z")  // LIFT: keep until the caller is lifted (0x995c0)
 // 0x995c0
 bool CoolDown::HandleEvent(EventContext*, unsigned long)
 {
-    LIFT_STUB(0x995c0);
+    if (!_run)
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 240, L"[cooldown], not started");
+        return false;
+    }
+    CliSessionManager* const clisessionMgr = LobbyDaemon::_instance->_clisessionMgr;
+    if (clisessionMgr == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 246, L"[cooldown], cli-session manager not found");
+        return false;
+    }
+    long long const elapsed = static_cast<long long>(GetTickCount64()) - Daemon::Instance->StartSystemTick64;
+    long long const halfEnd = _end - _duration / 2;
+    int const size = clisessionMgr->_size;
+    int remain = 0;
+    if (static_cast<int>((_end - elapsed) / 1000) > 0)
+        remain = static_cast<int>((_end - elapsed) / 1000);
+    Log::Write(Log::LT_NOTICE, L"LobbyDaemon.cpp", 258,
+               L"[cooldown], report status, remain-cli-session-count:%d, remain-time:%d(sec)", clisessionMgr->_size,
+               remain);
+    if ((size > 0 || elapsed < halfEnd) && elapsed < _end)
+    {
+        if (!Daemon::Instance->AddTimer(_period, this))
+        {
+            Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 297,
+                       L"[cooldown], fail; add timer fail; u may try SHUTDOWN UNSAFELY or retry COOLDOWN, "
+                       L"remain-cli-session-count:%d",
+                       size);
+            _run = false;
+        }
+    }
+    else
+    {
+        if (size > 0)
+        {
+            CliSessionTable::CliSessionList remainCsList;
+            clisessionMgr->SelectAll(remainCsList);
+            for (CliSessionTable::CliSessionList::iterator it = remainCsList.begin(); it != remainCsList.end(); ++it)
+            {
+                CliSession* const cs = *it;
+                if (cs != nullptr)
+                {
+                    int const state = cs->_state;
+                    Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 281,
+                               L"[cooldown], cli-session not finished, cli-key:0x%I64X, cli-state:%d.%d", cs->_clikey,
+                               static_cast<int>(static_cast<unsigned short>(static_cast<unsigned int>(state) >> 16)),
+                               static_cast<int>(static_cast<unsigned short>(state)));
+                    cs->removeReferenceCount(L"LobbyDaemon.cpp", 282);
+                }
+            }
+            Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 286,
+                       L"[cooldown], fail; some jobs remains; u may try SHUTDOWN UNSAFELY or retry COOLDOWN, "
+                       L"remain-cli-session-count:%d",
+                       size);
+        }
+        else
+        {
+            Log::Write(Log::LT_NOTICE, L"LobbyDaemon.cpp", 270, L"[cooldown], success. u can SHUTDOWN SAFELY");
+        }
+        // Inlined Daemon::setState(STATE_COOLDOWNED).
+        LobbyDaemon* const daemon = LobbyDaemon::_instance;
+        daemon->State = Daemon::STATE_COOLDOWNED;
+        PipeConsole* const pipeConsole = daemon->pipeConsole;
+        if (pipeConsole != nullptr)
+        {
+            pipeConsole->_lock.Enter();
+            pipeConsole->_state = 8;
+            pipeConsole->_lock.Leave();
+        }
+        if (daemon->console != nullptr)
+            daemon->console->SetState(8);
+        _run = false;
+    }
+    return true;
 }
 
+#pragma comment(linker, "/INCLUDE:?Start@CoolDown@@QEAA_NJJ@Z")  // LIFT: keep until the caller is lifted (0x99880)
 // 0x99880
-bool CoolDown::Start(long, long)
+bool CoolDown::Start(long period, long duration)
 {
-    LIFT_STUB(0x99880);
+    CoolDown* const self = GCoolDown;
+    if (duration <= 0)
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 309, L"[cooldown], start fail; invalid parameter");
+        return false;
+    }
+    if (self->_run)
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 314, L"[cooldown], start fail; already running");
+        return false;
+    }
+    self->_period = period;
+    self->_duration = duration;
+    long long const now = static_cast<long long>(GetTickCount64());
+    self->_run = true;
+    self->_end = (static_cast<long long>(duration) - Daemon::Instance->StartSystemTick64) + now;
+    if (Daemon::Instance->AddTimer(self->_period, self))
+    {
+        Log::Write(Log::LT_NOTICE, L"LobbyDaemon.cpp", 330, L"[cooldown], start, period:%d(msec), duration:%d(msec)",
+                   period, duration);
+        return true;
+    }
+    Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 325, L"[cooldown], start fail; add timer fail");
+    self->_run = false;
+    return false;
 }
 
+#pragma comment(linker, "/INCLUDE:?EventId@LobbydReloadInvalidRestoreTimer@@UEBAIXZ")  // LIFT: keep until the caller is lifted (0x99990)
 // 0x99990
 unsigned int LobbydReloadInvalidRestoreTimer::EventId() const
 {
-    LIFT_STUB(0x99990);
+    return 130;
 }
 
+#pragma comment(linker, "/INCLUDE:?HandleEvent@LobbydReloadInvalidRestoreTimer@@UEAA_NPEAUEventContext@@K@Z")  // LIFT: keep until the caller is lifted (0x999a0)
 // 0x999a0
 bool LobbydReloadInvalidRestoreTimer::HandleEvent(EventContext*, unsigned long)
 {
-    LIFT_STUB(0x999a0);
+    restoreInvalid();
+    return true;
 }
 
+#pragma comment(linker, "/INCLUDE:?restoreInvalid@LobbydReloadInvalidRestoreTimer@@AEAAXXZ")  // LIFT: keep until the caller is lifted (0x999b0)
 // 0x999b0
 void LobbydReloadInvalidRestoreTimer::restoreInvalid()
 {
-    LIFT_STUB(0x999b0);
+    for (int i = 0; i < 5; ++i)
+    {
+        wchar_t const* const reason = INVALID_REASON_STR[i];
+        PipeConsole* const pipeConsole = Daemon::Instance->pipeConsole;
+        if (pipeConsole == nullptr)
+            continue;
+        // Inlined PipeConsole::SetInvalidInfo(reason, false).
+        pipeConsole->_lock.Enter();
+        for (PipeConsole::ItemNode* node = pipeConsole->_invalid._head._next; node != &pipeConsole->_invalid._tail;
+             node = node->_next)
+        {
+            if (wcscmp(node->_key, reason) == 0)
+            {
+                node->_next->_prev = node->_prev;
+                node->_prev->_next = node->_next;
+                Memory::_Manager[2]->Free(node, L"source\\PipeConsole.cpp", 837);
+                break;
+            }
+        }
+        pipeConsole->_lock.Leave();
+    }
+    _isExecuted = true;
+}
+
+#pragma comment(linker, "/INCLUDE:?Add@ServiceItems@@QEAA_NW4ServiceItemType@LobbyDaemon@@PEB_W@Z")  // LIFT: keep until the caller is lifted (0x99ac0)
+// 0x99ac0
+bool ServiceItems::Add(LobbyDaemon::ServiceItemType type, wchar_t const* idListString)
+{
+    if (static_cast<unsigned int>(type) > LobbyDaemon::SERVICEITEMTYPE_RENAME_CHARACTER_BY_SYSTEM ||
+        idListString == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 424,
+                   L"[lobby], add service item id candidates fail; invalid param, type:%d, source-str:%s",
+                   static_cast<int>(type), idListString != nullptr ? idListString : L"null");
+        return false;
+    }
+    unsigned long long const length = wcslen(idListString);
+    if (length != 0)
+    {
+        wchar_t* const buffer =
+            static_cast<wchar_t*>(Memory::_Manager[2]->AllocZero(2 * length + 2, L"LobbyDaemon.cpp", 431));
+        wcscpy_s(buffer, length + 1, idListString);
+        wchar_t delimiter[2];
+        delimiter[0] = L';';
+        delimiter[1] = 0;
+        wchar_t* next = nullptr;
+        std::vector<unsigned int, StlAllocator<unsigned int, 2> >& idList = _idList[type];
+        for (wchar_t* token = wcstok_s(buffer, delimiter, &next); token != nullptr;
+             token = wcstok_s(nullptr, delimiter, &next))
+        {
+            unsigned int const id = static_cast<unsigned int>(_wtoi(token));
+            if (id == 0)
+            {
+                // LIFT: the ids that were added before stay in the list (the original has no rollback).
+                Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 444,
+                           L"[lobby], add service item id candidates fail; not numeric token exists, token:%s, type:%d",
+                           token, static_cast<int>(type));
+                Memory::_Manager[2]->Free(buffer, L"LobbyDaemon.cpp", 445);
+                return false;
+            }
+            idList.push_back(id);
+        }
+        // LIFT: the original calls std::_Sort<unsigned int*, __int64> (0x9f6e0, a later range). include/vs2010 has
+        // no std::sort, so a heap sort gives the same sorted list.
+        if (!idList.empty())
+        {
+            unsigned int* const first = &idList[0];
+            unsigned int* last = first + idList.size();
+            std::make_heap(first, last);
+            for (; last - first > 1; --last)
+                std::pop_heap(first, last);
+        }
+        Memory::_Manager[2]->Free(buffer, L"LobbyDaemon.cpp", 456);
+    }
+    Log::Write(Log::LT_DEBUG, L"LobbyDaemon.cpp", 459, L"[lobby], add service item id candidates ok, type:%d, source:%s",
+               static_cast<int>(type), idListString);
+    return true;
+}
+
+#pragma comment(linker, "/INCLUDE:?GetNextResetTimeUTC@Data@TimeBasedPlaySeasonSchedule@@QEBAX_JAEA_J1@Z")  // LIFT: keep until the caller is lifted (0x99d20)
+// 0x99d20
+void TimeBasedPlaySeasonSchedule::Data::GetNextResetTimeUTC(long long conditionTimeUTC, long long& prevResetTimeUTC,
+                                                            long long& nextResetTimeUTC) const
+{
+    nextResetTimeUTC = 0;
+    prevResetTimeUTC = 0;
+    long long const now = _time64(nullptr);
+    long long const startTimeUTC = scheduleTime.startTimeUTC;
+    long long reset;
+    if (startTimeUTC <= conditionTimeUTC)
+    {
+        if (scheduleTime.endTimeUTC < conditionTimeUTC)
+        {
+            prevResetTimeUTC = 0;
+            nextResetTimeUTC = 0;
+            return;
+        }
+        if (targetType != 0)
+        {
+            prevResetTimeUTC = startTimeUTC;
+            nextResetTimeUTC = scheduleTime.endTimeUTC;
+            return;
+        }
+        reset = NPMsgHelper::LocaleHourToUTCTime(resetHour, now, resetHourTimeZoneBiasSecond);
+        if (reset <= now)
+            reset += 86400;
+    }
+    else
+    {
+        if (targetType != 0)
+        {
+            if (targetType != 1)
+                return;
+            prevResetTimeUTC = startTimeUTC;
+            nextResetTimeUTC = scheduleTime.endTimeUTC;
+            return;
+        }
+        reset = NPMsgHelper::LocaleHourToUTCTime(resetHour, startTimeUTC, resetHourTimeZoneBiasSecond);
+        if (reset <= startTimeUTC)
+            reset += 86400;
+    }
+    nextResetTimeUTC = reset;
+    prevResetTimeUTC = reset - 86400;
 }
 
 // 0x99df0
 TimeBasedPlaySeasonSchedule::TimeBasedPlaySeasonSchedule()
 {
-    LIFT_STUB(0x99df0);
+    // The Data and Rule constructors are inline (LobbyDaemon.h). They set the same values as 0x99df0 sets.
+    for (int i = 0; i < 2; ++i)
+        _scheduleData[i].targetType = static_cast<char>(i);
 }
 
+#pragma comment(linker, "/INCLUDE:?Compose@TimeBasedPlaySeasonSchedule@@QEBA_NAEAVRepeatPacketComposer@@AEAVPacket@@@Z")  // LIFT: keep until the caller is lifted (0x99ef0)
 // 0x99ef0
-bool TimeBasedPlaySeasonSchedule::Compose(RepeatPacketComposer&, Packet&) const
+bool TimeBasedPlaySeasonSchedule::Compose(RepeatPacketComposer& rpc, Packet& packet) const
 {
-    LIFT_STUB(0x99ef0);
+    rpc.PushRepeatCount(&packet);
+    for (int i = 0; i < 2; ++i)
+    {
+        Data const& data = _scheduleData[i];
+        if (packet.FreeSize() < 0x17u)
+            packet.Allocate();
+        if (composeWith(packet, &rpc, 6, static_cast<int>(data.targetType), data.resetHour,
+                        data.resetHourTimeZoneBiasSecond, data.scheduleNumber, data.scheduleTime.startTimeUTC,
+                        data.scheduleTime.endTimeUTC) == 0)
+        {
+            Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 634,
+                       L"[time-based], packet compose failed - time based schedule");
+            return false;
+        }
+        rpc.PushRepeatCount(&packet);
+        for (int j = 0; j < 6; ++j)
+        {
+            Rule const& rule = data.rule[j];
+            int k = 0;
+            while (rule.rewardList[k].id == 0)
+            {
+                if (++k >= 4)
+                    break;
+            }
+            // All 4 reward ids are 0 and minutes is -1: the rule list ends here.
+            if (k >= 4 && rule.minutes == -1)
+                break;
+            if (packet.FreeSize() < 0x12u)
+                packet.Allocate();
+            bool ok = composeWith(packet, &rpc, 1, static_cast<int>(rule.minutes)) != 0;
+            for (int r = 0; r < 4; ++r)
+                ok = ok && composeWith(packet, &rpc, 1, rule.rewardList[r].id) != 0;
+            if (!ok)
+            {
+                Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 669,
+                           L"[time-based], packet compose failed - time based schedule rule");
+                return false;
+            }
+            incRepeatCount(rpc);
+        }
+        rpc.PopRepeatCount();
+        incRepeatCount(rpc);
+    }
+    rpc.PopRepeatCount();
+    return true;
 }
 
 // 0x9a230
 LobbyDaemon::LobbyDaemon()
 {
-    LIFT_STUB(0x9a230);
+    // LIFT: Daemon::Daemon() and the member constructors (TimeBasedPlaySeasonSchedule 0x99df0) run before this body.
+    _config = nullptr;
+    _timeZoneBias = 0;
+    _serviceItems = nullptr;
+    _tick = nullptr;
+    _daemonInfoTable = nullptr;
+    _gameWorldRegistry = nullptr;
+    _gameWorldReporter = nullptr;
+    _bannedWordFilter = nullptr;
+    _charaterDeletionScheduler = nullptr;
+    _stats = nullptr;
+    _tencentUIC = nullptr;
+    _clisessionMgr = nullptr;
+    _jobMgr = nullptr;
+    _tokenDesk = nullptr;
+    _npServchmgr = nullptr;
+    _accountInventoryChannel = nullptr;
+    _accountInventorySessionHandler = nullptr;
+    _gamedchmgr = nullptr;
+    _lgatechmgr = nullptr;
+    _manageSessionHandler = nullptr;
+    _infogatechmgr = nullptr;
+    _postOfficeChannel = nullptr;
+    _postOfficeSessionHandler = nullptr;
+    _npInitialConnectEvent.Event = nullptr;
+    _setupNpScheduleInfoEvent.Event = nullptr;
+    _accountInventoryInitialConnectEvent.Event = nullptr;
+    _postOfficeInitialConnectEvent.Event = nullptr;
+    _systemPerfMon = nullptr;
+    _currentRandomStoreInitSchedule.scheduleNumber = 0;
+    _currentRandomStoreInitSchedule.slotCountInitScheduleNumber = 0;
+    _currentRandomStoreInitSchedule.premiumDrawCountInitScheduleNumber = 0;
+    _mileageManager = nullptr;
+    _mileageInterimDepositTimer = nullptr;
+    _gameTimeScheduler = nullptr;
+    _restoreReloadTimer = nullptr;
+    LobbyDaemon::_instance = this;
+    _localeset.locales = nullptr;
+    _localeset.count = 0;
+    memset(_localeset.languages, 0, sizeof(_localeset.languages));  // the original clears count and languages with two 8-byte stores
+    _currentRandomStoreInitSchedule.scheduleNumber = 0;
+    _currentRandomStoreInitSchedule.slotCountInitScheduleNumber = 0;
+    _currentRandomStoreInitSchedule.premiumDrawCountInitScheduleNumber = 0;
 }
 
 // 0x9a3c0
@@ -132,31 +594,100 @@ LobbyDaemon::~LobbyDaemon()
 // 0x9ae30
 void LobbyDaemon::PrintDependency()
 {
-    LIFT_STUB(0x9ae30);
+    wprintf(L"packet lobby-lobbygate %d.0\n", 58);
+    wprintf(L"packet lobby-game %d.0\n", 83);
+    wprintf(L"packet lobby-manage %d.0\n", 7);
+    wprintf(L"packet accountinventory-lobby %d.0\n", 9);
+    wprintf(L"packet lobby-infogate %d.0\n", 3);
+    wprintf(L"packet post-office %d.0\n", 15);
+    wprintf(L"packet ecomomy-common %d.0\n", 10);
+    wprintf(L"lib xmlreader %s.0\n", L"15");
+    wprintf(L"lib stsmsglib %s.0\n", L"119");
+    wprintf(L"lib bannedwordfilter %s.0\n", L"2");
+    wprintf(L"lib fsdreader %s.0\n", L"1");
+    wprintf(L"security cert %d.0\n", 6);
+    wprintf(L"config bns-common-config %d\n", 2);
+    // BUG: 0x9ae30 the format has two %d but the call gives one argument.
+    wprintf(L"config contents-rule-client %d.%d\n", 65);
+    // BUG: 0x9ae30 the format has two %d but the call gives one argument.
+    wprintf(L"config contents-rule-server %d.%d\n", 72);
 }
 
 // 0x9af60
 long LobbyDaemon::GetTimerInterval()
 {
-    LIFT_STUB(0x9af60);
+    return _config->_timerInterval;
 }
 
 // 0x9af70
 long LobbyDaemon::GetTimerMaxTime()
 {
-    LIFT_STUB(0x9af70);
+    return _config->_timerMaxTime;
 }
 
+#pragma comment(linker, "/INCLUDE:?SetTimeZoneBias@LobbyDaemon@@QEAA_NXZ")  // LIFT: keep until the caller is lifted (0x9af80)
 // 0x9af80
 bool LobbyDaemon::SetTimeZoneBias()
 {
-    LIFT_STUB(0x9af80);
+    TIME_ZONE_INFORMATION tzi;
+    DWORD const result = GetTimeZoneInformation(&tzi);
+    if (result == TIME_ZONE_ID_INVALID)
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1106, L"GetTimeZoneInfomation failed");
+        return false;
+    }
+    int bias = tzi.Bias;
+    if (result == TIME_ZONE_ID_UNKNOWN)
+    {
+        Log::Write(Log::LT_DEBUG, L"LobbyDaemon.cpp", 1113, L"[lobbyd], SetTimeZoneBias, Name:%s", tzi.StandardName);
+    }
+    else if (result == TIME_ZONE_ID_STANDARD)
+    {
+        bias = tzi.StandardBias + tzi.Bias;
+        Log::Write(Log::LT_DEBUG, L"LobbyDaemon.cpp", 1117, L"[lobbyd], SetTimeZoneBias, StandardName:%s",
+                   tzi.StandardName);
+    }
+    else if (result == TIME_ZONE_ID_DAYLIGHT)
+    {
+        bias = tzi.DaylightBias + tzi.Bias;
+        Log::Write(Log::LT_DEBUG, L"LobbyDaemon.cpp", 1121, L"[lobbyd], SetTimeZoneBias, DaylightName:%s",
+                   tzi.DaylightName);
+    }
+    long long const seconds = -60LL * bias;
+    _timeZoneBias = seconds;
+    Log::Write(Log::LT_DEBUG, L"LobbyDaemon.cpp", 1127, L"[lobbyd], SetTimeZoneBias, bias(minutes):%d", seconds / 60);
+    return true;
 }
 
+#pragma comment(linker, "/INCLUDE:?FailedEventObjectHandler@LobbyDaemon@@SAXPEAVEventObject@@@Z")  // LIFT: keep until the caller is lifted (0x9b0c0)
 // 0x9b0c0
-void LobbyDaemon::FailedEventObjectHandler(EventObject*)
+void LobbyDaemon::FailedEventObjectHandler(EventObject* eventObject)
 {
-    LIFT_STUB(0x9b0c0);
+    unsigned int const id = eventObject->EventId();
+    if (id == 3)
+    {
+        int const mask = LobbyDaemon::_instance->_config->_typeForFailedEventObjectLog;
+        if (((1 << eventObject->EventId()) & mask) == 0)
+            return;
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1140,
+                   L"[lobbydaemon], FailedEventObjectHandler, id: %d, object: %p, error:%d", eventObject->EventId(),
+                   eventObject, GetLastError());
+    }
+    else if (id == 5)
+    {
+        int const mask = LobbyDaemon::_instance->_config->_typeForFailedEventObjectLog;
+        if (((1 << eventObject->EventId()) & mask) == 0)
+            return;
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1148,
+                   L"[lobbydaemon], FailedEventObjectHandler, id: %d, object: %p, error:%d", eventObject->EventId(),
+                   eventObject, GetLastError());
+    }
+    else
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1153,
+                   L"[lobbydaemon], FailedEventObjectHandler, id: %d, object: %p, error:%d", eventObject->EventId(),
+                   eventObject, GetLastError());
+    }
 }
 
 // 0x9b1b0
@@ -226,9 +757,12 @@ bool ConcatenatePacket(Session const*, Packet const*, bool&)
 }
 
 // 0x9a1b0. C linkage, the signature is not in the public. wmain_bridge.c calls it.
-extern "C" int __cdecl wmain(int, wchar_t**)
+// LIFT: LobbyDaemon::_instance is set in the constructor (0x9a230), not here.
+extern "C" int __cdecl wmain(int argc, wchar_t** argv)
 {
-    LIFT_STUB(0x9a1b0);
+    LobbyDaemon daemonInstance;
+    BloodDaemonMain(argc, argv);
+    return 0;
 }
 
 // LIFT: LobbyDaemon.exe (2019 + PDB) has no ClientSideDaemonChannel symbol, so this function has no LD RVA.

@@ -384,6 +384,7 @@ add_library(lift_lobbydaemon STATIC
   src/library/FsdReader/FsdDecomposer.cpp
   src/Server/BloodLib/source/PerfCounterProvider.cpp
   src/Server/Shared/SharedChannel.cpp
+  src/Server/Shared/NPChannel2.cpp  # LIFT: Packet::FreeSize (0x29d0) and NPMsgHelper::LocaleHourToUTCTime (0x2be0), called by lift-lobbydaemon-15
   src/Server/LobbyDaemon/AbandonChargeJob.cpp
   src/Server/LobbyDaemon/AccountInventoryChannel.cpp
   src/Server/LobbyDaemon/AccountInventoryLobbyPacketHandler.cpp
