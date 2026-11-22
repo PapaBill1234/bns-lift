@@ -1,5 +1,5 @@
-// LobbyDB.obj (LobbyDaemon PDB, 2019 + PDB). Wave 0: declarations of the stubbed functions only.
-// LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
+// LobbyDB.obj (LobbyDaemon PDB, 2019 + PDB). Declarations of the LobbyDB functions.
+// LIFT: AutoDbTran has its PDB layout (Tran, TimeoutSec). The other classes have no members and no bases yet. Later waves add the PDB layouts.
 #pragma once
 
 #include "Character.h"

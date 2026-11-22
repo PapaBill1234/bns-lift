@@ -13,14 +13,14 @@ Branch base: main 75f0769. The lift was built in 5 checkpoints. This run checked
 | Gate (`tools/gate.sh`, `LIFT_BUILD_DIR=build-ld-14`) | gate ok |
 | Parity (`tools/parity.sh`) | parity ok |
 | LobbyDaemon MATCH, baseline (main 75f0769) | 195 (paired 281) |
-| LobbyDaemon MATCH, final | 216 (paired 307) = +21 |
+| LobbyDaemon MATCH, final | 217 (paired 307) = +22 |
 | CacheGate, LobbyGate, SmartCouponDaemon, PostOfficeDaemon MATCH | 456, 658, 630, 694 (+0 each, no MATCH lost) |
 
-The gain is 6 card functions and 15 shared `Db::*` functions. All 21 are new pairs.
+The gain is 7 card functions and 15 shared `Db::*` functions. All 22 are new pairs.
 
 | Group | New MATCH |
 | --- | --- |
-| Card (6) | `AutoDbTran::~AutoDbTran`, `LobbyDB::UpdateLastLogout`, `CheckValidityOfCharacterName`, `TryCharacterCreation`, `FinishCharacterCreation`, `CancelCharacterCreation` |
+| Card (7) | `AutoDbTran::~AutoDbTran`, `LobbyDB::UpdateGameAccountTimeBasedPlayInfo`, `LobbyDB::UpdateLastLogout`, `CheckValidityOfCharacterName`, `TryCharacterCreation`, `FinishCharacterCreation`, `CancelCharacterCreation` |
 | Shared (15) | `Db::AllocTransaction`, `Db::ConvertTime`, `Db::Log`, `Db::ReleaseTransaction`, `Db::errorLog`, `DbTransaction::BindParam`, `Execute`, `Fetch`, `Prepare`, `close`, `connect`, `connectionErrorLog`, `initStatement`, `initialize`, `statmentErrorLog` |
 
 ## Checkpoint check
@@ -38,10 +38,10 @@ The gain is 6 card functions and 15 shared `Db::*` functions. All 21 are new pai
 | RVA | Function | Funcdiff score | MATCH |
 | --- | --- | ---: | --- |
 | `0x9fdb0` | `AutoDbTran::~AutoDbTran` | 100.0 | yes |
-| `0x9fe00` | `LobbyDB::LoadGameAccount` | 78.9 | no |
-| `0xa0a40` | `LobbyDB::UpdateGameAccountTimeBasedPlayInfo` | 97.4 | no |
+| `0x9fe00` | `LobbyDB::LoadGameAccount` | 80.5 | no |
+| `0xa0a40` | `LobbyDB::UpdateGameAccountTimeBasedPlayInfo` | 100.0 | yes |
 | `0xa1580` | `LobbyDB::UpdateLastLogout` | 100.0 | yes |
-| `0xa17f0` | `LobbyDB::LoadCharacterList` | 78.1 | no |
+| `0xa17f0` | `LobbyDB::LoadCharacterList` | 79.0 | no |
 | `0xa24c0` | `LobbyDB::LoadGameWorldCluster` | 84.2 | no |
 | `0xa2dd0` | `LobbyDB::LoadGameWorld` | 77.5 | no |
 | `0xa37e0` | `LobbyDB::CheckValidityOfCharacterName` | 100.0 | yes |
@@ -73,21 +73,23 @@ The 10 `LobbyDB` card functions have only stub callers. Each has `#pragma commen
 
 ## Codegen trials
 
-3 trials, 3 kept. Details are in `Docs/Parity/lessons.md`, section ld-14.
+6 trials, 6 kept. Details are in `Docs/Parity/lessons.md`, section ld-14. The limit of 3 is per function, not per card.
 
 | Function | Trial | Score |
 | --- | --- | --- |
 | `UpdateLastLogout` | A8: compare with `ID128_ID_ZERO` | 97.4 -> 100 |
 | `TryCharacterCreation` | A8: same, both ids | 97.4 -> 100 |
 | `FinishCharacterCreation` | A17: explicit `if (dbrtn == 0) return true; return false;` | 99.1 -> 100 |
+| `UpdateGameAccountTimeBasedPlayInfo` | A8: same (repair round 2) | 97.4 -> 100 |
+| `LoadGameAccount` | A8: same (repair round 2) | 78.9 -> 80.5 |
+| `LoadCharacterList` | A8: same (repair round 2) | 78.1 -> 79.0 |
 
-Not tried (limit of 3 trials):
+Not tried:
 
 | Function | Score | Idea |
 | --- | ---: | --- |
-| `UpdateGameAccountTimeBasedPlayInfo` | 97.4 | Same A8 `ID128_ID_ZERO` form as the 3 kept trials. The refs diff is identical. |
-| `LoadGameAccount`, `LoadCharacterList` | 78.9, 78.1 | A8 `ID128_ID_ZERO`. Then a `static __forceinline` BindCol helper with one shared error tail (A10, A17). The original has one `statmentErrorLog` call for all bind-column errors. |
-| `LoadGameWorldCluster`, `LoadGameWorld` | 84.2, 77.5 | The same BindCol helper. Both are below the 85 % threshold. |
+| `LoadGameAccount` | 80.5 | `static __forceinline` BindCol helper with one shared error tail (A10, A17). The original has one shared `statmentErrorLog` block here only. |
+| `LoadCharacterList`, `LoadGameWorldCluster`, `LoadGameWorld` | 79.0, 84.2, 77.5 | The original has one `statmentErrorLog` call per `SQLBindCol` failure. Do not use a shared tail. Compare the refs and the call order first. |
 
 ## Safety differences
 

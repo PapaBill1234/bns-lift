@@ -1,4 +1,4 @@
-// LobbyDB.obj (LobbyDaemon PDB, 2019 + PDB). Card ld-14 lifts 0x9fdb0, 0x9fe00, 0xa0a40, 0xa1580, 0xa17f0, 0xa24c0, 0xa2dd0, 0xa37e0, 0xa39b0 and 0xa3da0. A stub is not a lift.
+// LobbyDB.obj (LobbyDaemon PDB, 2019 + PDB). Card ld-14 lifts 0x9fdb0, 0x9fe00, 0xa0a40, 0xa1580, 0xa17f0, 0xa24c0, 0xa2dd0, 0xa37e0, 0xa39b0, 0xa3da0 and 0xa4150. A stub is not a lift.
 #include <winsock2.h>
 #include <windows.h>
 #include <sql.h>
@@ -20,11 +20,9 @@ namespace
 {
 unsigned long long const kNullData = static_cast<unsigned long long>(-1);  // SQL_NULL_DATA
 
-// LIFT: inline compare of the 128 bits with zero (0x9fe00: two qword compares). Not the ID128_GUID_ZERO symbol.
-bool IsZeroId(id128 const& id) { return id.id[0] == 0 && id.id[1] == 0; }
-
-// LIFT: UpdateLastLogout (0xa1580) and TryCharacterCreation (0xa39b0) compare with the PDB global ID128_ID_ZERO
-// (0x12d870). Codegen trial of card ld-14.
+// LIFT: the original compares both qwords with the PDB global ID128_ID_ZERO (0x12d870, StringUtil.h) in
+// LoadGameAccount (0x9fe00), UpdateGameAccountTimeBasedPlayInfo (0xa0a40), UpdateLastLogout (0xa1580),
+// LoadCharacterList (0xa17f0) and TryCharacterCreation (0xa39b0). Codegen trial A8 of card ld-14.
 bool IsIdZero(id128 const& id) { return id.id[0] == ID128_ID_ZERO.id[0] && id.id[1] == ID128_ID_ZERO.id[1]; }
 }  // namespace
 
@@ -69,7 +67,7 @@ bool LobbyDB::LoadGameAccount(int& dbrtn, id128 const& gameAccountId, bool& exis
                                                     L"COL_GAME_ACCOUNT_BOT_SCORE", L"COL_GAME_ACCOUNT_BOT_SCORE_IGNORE"};
     wchar_t const* const query = L"{?=CALL dbo.usp_LoadGameAccount(?)}";
 
-    if (IsZeroId(gameAccountId))
+    if (IsIdZero(gameAccountId))
     {
         Log::Write(Log::LT_ERROR, LOBBYDB_FILE, 73, L"[lobbydb], load game-account fail; invalid parameter");
         return false;
@@ -191,7 +189,7 @@ bool LobbyDB::UpdateGameAccountTimeBasedPlayInfo(int& dbrtn, id128 const& gameAc
         L"PARAM_EXPIRE_TIME", L"PARAM_DURATION",      L"PARAM_LAST_UPDATE"};
     wchar_t const* const query = L"{?=CALL dbo.usp_UpdateGameAccountTimeBasedPlayInfo(?, ?, ?, ?, ?, ?)}";
 
-    if (IsZeroId(gameAccountId))
+    if (IsIdZero(gameAccountId))
     {
         Log::Write(Log::LT_ERROR, LOBBYDB_FILE, 333,
                    L"[lobbydb], update game-account-time-based-reward fail; invalid parameter");
@@ -386,7 +384,7 @@ bool LobbyDB::LoadCharacterList(int& dbrtn, id128 const& gameAccountId, Characte
     typedef std::vector<Character::DB*, StlAllocator<Character::DB*, 2> > DBList;  // PDB local UDT DBList
     wchar_t const* const query = L"{?=CALL dbo.usp_LoadCharacterList(?)}";
 
-    if (IsZeroId(gameAccountId))
+    if (IsIdZero(gameAccountId))
     {
         Log::Write(Log::LT_ERROR, LOBBYDB_FILE, 646, L"[lobbydb], load character list fail; invalid parameter");
         return false;

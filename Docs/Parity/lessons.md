@@ -1083,17 +1083,22 @@ What failed or is blocked (tries):
 
 ## ld-14
 
-Card lift-lobbydaemon-14: LobbyDB part 1 (14 functions: 11 lifted, 3 Not done). Codegen trials: 3 (3 kept).
+Card lift-lobbydaemon-14: LobbyDB part 1 (14 functions: 11 lifted, 3 Not done). Codegen trials: 6 (6 kept).
 
 | Function | RVA | Trial | Score before → after | Result |
 | --- | --- | --- | ---: | --- |
 | `LobbyDB::UpdateLastLogout` | `0xa1580` | A8: compare the `id128` argument with the PDB global `ID128_ID_ZERO` (`id[0]` and `id[1]`), not with literal zero. | 97.4 → 100 | Kept. |
 | `LobbyDB::TryCharacterCreation` | `0xa39b0` | A8: same form for both ids (`gameAccountId`, `slotid`). | 97.4 → 100 | Kept. |
 | `LobbyDB::FinishCharacterCreation` | `0xa3da0` | A17: write `if (dbrtn == 0) return true; return false;` after `Execute`. `return dbrtn == 0;` lets VS2010 merge the two `Db::ReleaseTransaction` blocks. The original has two. | 99.1 → 100 | Kept. |
+| `LobbyDB::UpdateGameAccountTimeBasedPlayInfo` | `0xa0a40` | A8: same form (repair round 2). | 97.4 → 100 | Kept. |
+| `LobbyDB::LoadGameAccount` | `0x9fe00` | A8: same form (repair round 2). | 78.9 → 80.5 | Kept (score up). |
+| `LobbyDB::LoadCharacterList` | `0xa17f0` | A8: same form (repair round 2). | 78.1 → 79.0 | Kept (score up). |
 
-New pattern (A8, id128 zero test): every LobbyDB function that tests an `id128` argument for zero uses `ID128_ID_ZERO` (the refs show `<data>` and `ID128_ID_ZERO`). Not tried yet on `UpdateGameAccountTimeBasedPlayInfo` (97.4, same refs diff), `LoadGameAccount` and `LoadCharacterList`.
-The verify card or the next LobbyDB card can apply it with no new risk. `LoadGameAccount` has a comment that says the original does not use the symbol. Check this against the refs first.
+New pattern (A8, id128 zero test): every LobbyDB function that tests an `id128` argument for zero uses `ID128_ID_ZERO` (the refs show `<data>` and `ID128_ID_ZERO`). Disassembly of `0x9fe00` (`LoadGameAccount`) loads both qwords from `0x14012d870` and `0x14012d878`. That is `ID128_ID_ZERO` (PE data, 0 and 0), not a literal zero. All 6 functions now use it. A first lift wrote a helper with a false comment ("not the ID128_GUID_ZERO symbol"). Check the comment against the disassembly, not against the idea of the source.
+The limit of 3 trials is per function, not per card.
 
-What did not reach MATCH (below 85 %, not tried):
-- `LoadCharacterList` 78.1, `LoadGameAccount` 78.9, `LoadGameWorld` 77.5, `LoadGameWorldCluster` 84.2. The original calls `statmentErrorLog` once for all bind-column errors (13 ODBC calls in a row, then one log call). The `DB_BIND_COL_NI` macro gives one `statmentErrorLog` call per column. The PDB lists `DbTransaction::BindCol` as an inline wrapper. Try a `static __forceinline` BindCol helper (A10) with the shared error tail (A17) first.
+What did not reach MATCH (below 85 %, not tried beyond A8):
+- `LoadCharacterList` 79.0, `LoadGameAccount` 80.5, `LoadGameWorld` 77.5, `LoadGameWorldCluster` 84.2.
+- `LoadGameAccount` (`0x9fe00`) has one shared `statmentErrorLog` block for all bind-column errors. Try a `static __forceinline` BindCol helper (A10) with one shared error tail (A17) on this function.
+- `LoadCharacterList` (`0xa17f0`), `LoadGameWorldCluster` (`0xa24c0`) and `LoadGameWorld` (`0xa2dd0`) have one `statmentErrorLog` call for each `SQLBindCol` failure (`LobbyDB.c`). Do not use the shared tail on them. The `DB_BIND_COL_NI` form (one call per column) is the right shape. Look for the difference in the refs and the call order first.
 - Dead-strip: the 10 `LobbyDB` card functions have only stub callers (`CliSession`, `Character`, `GameWorldRegistry`, `CreateCharacterJob`). They need `/INCLUDE`. Without it, 0 card functions pair. With it, `~AutoDbTran` is reached and the 15 shared `Db::*` functions pair and match for the first time.
