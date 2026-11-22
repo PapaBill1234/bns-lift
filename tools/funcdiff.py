@@ -23,6 +23,7 @@ import bisect
 import collections
 import difflib
 import json
+import hashlib
 import os
 import re
 import subprocess
@@ -55,11 +56,16 @@ NOISE = {"__security_check_cookie", "__security_cookie", "__GSHandlerCheck", "_R
 
 def pdb_dump(pdb, flag):
     os.makedirs(CACHE, exist_ok=True)
-    out = os.path.join(CACHE, "%s.%d%s.txt" % (os.path.basename(pdb), int(os.path.getmtime(pdb)), flag))
+    # The key holds the real path, the size and the mtime in ns. Worktrees with the same PDB name
+    # must not share a cache file. A unique tmp name lets parallel runs write at the same time.
+    st = os.stat(pdb)
+    key = hashlib.sha1(("%s|%d|%d" % (os.path.realpath(pdb), st.st_size, st.st_mtime_ns)).encode()).hexdigest()[:16]
+    out = os.path.join(CACHE, "%s.%s%s.txt" % (os.path.basename(pdb), key, flag))
     if not os.path.exists(out):
-        with open(out + ".tmp", "w") as f:
+        tmp = "%s.%d.tmp" % (out, os.getpid())
+        with open(tmp, "w") as f:
             subprocess.run(["llvm-pdbutil", "dump", flag, pdb], stdout=f, stderr=subprocess.DEVNULL, check=True)
-        os.rename(out + ".tmp", out)
+        os.replace(tmp, out)
     with open(out, errors="replace") as f:
         return f.read().split("\n")
 
