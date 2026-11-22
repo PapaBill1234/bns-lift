@@ -4,13 +4,20 @@ Sources (all in git): Docs/Parity/baseline/<EXE>.json (per-function results),
 Docs/Parity/progress.tsv (total per exe = paired + only in original; start and last card).
 tools/parity.sh --accept runs this after each accepted lift-parity card. Manual run: tools/parity_readme.py"""
 import collections, json, re
-EXES = ["CacheGate", "LobbyGate", "SmartCouponDaemon", "PostOfficeDaemon"]
+# CORE: the first 4 exes (summary row and shared library). LobbyDaemon is in the lift; it gets its own row.
+CORE = ["CacheGate", "LobbyGate", "SmartCouponDaemon", "PostOfficeDaemon"]
+EXES = CORE + ["LobbyDaemon"]
 START, END = "<!-- parity:start -->", "<!-- parity:end -->"
 
 rows = [l.rstrip("\n").split("\t") for l in open("Docs/Parity/progress.tsv")][1:]
 def cells(row):
     return {m[0]: (int(m[1]), int(m[2])) for m in re.findall(r"(\w+) (\d+)/(\d+)", row[2])}
-first, last = cells(rows[0]), cells(rows[-1])
+last = cells(rows[-1])
+first = {}
+for row in rows:  # start = first card that measured the exe
+    for e, v in cells(row).items():
+        first.setdefault(e, v)
+EXES = [e for e in EXES if e in last]
 d = {e: json.load(open(f"Docs/Parity/baseline/{e}.json")) for e in EXES}
 
 def pct(m, t):
@@ -32,20 +39,21 @@ for e in EXES:
     mean = sum(x["score"] for x in r.values()) / max(len(r), 1)
     p0 = pct(*first[e]) if e in first else 0
     p = pct(m, t)
-    sm += m; st += t
+    if e in CORE:
+        sm += m; st += t
     out.append(f"| {e} | **{p:.1f} %** | {m} | {diff} | {only} | {t} | {mean:.1f} | {p0:.1f} % | {p - p0:+.1f} | {level(p)} |")
 p = pct(sm, st)
-p0 = pct(sum(v[0] for v in first.values()), sum(v[1] for v in first.values()))
-out.append(f"| **All 4** | **{p:.1f} %** | {sm} | | | {st} | | {p0:.1f} % | {p - p0:+.1f} | {level(p)} |")
+p0 = pct(sum(first[e][0] for e in CORE), sum(first[e][1] for e in CORE))
+out.append(f"| **First 4** | **{p:.1f} %** | {sm} | | | {st} | | {p0:.1f} % | {p - p0:+.1f} | {level(p)} |")
 
-count = collections.Counter(k for e in EXES for k in d[e])
+count = collections.Counter(k for e in CORE for k in d[e])
 shared = [k for k, n in count.items() if n >= 2]
-sbad = [k for k in shared if any(k in d[e] and d[e][k]["status"] != "MATCH" for e in EXES)]
+sbad = [k for k in shared if any(k in d[e] and d[e][k]["status"] != "MATCH" for e in CORE)]
 sp = pct(len(shared) - len(sbad), len(shared))
 out += ["", "| Shared library (functions in 2+ exes) | Parity | MATCH in each exe | DIFF in 1+ exe | Total | Goal |",
         "| --- | ---: | ---: | ---: | ---: | --- |",
         f"| BloodLib, Shared, Packet, CRT | **{sp:.1f} %** | {len(shared) - len(sbad)} | {len(sbad)} | {len(shared)} | 99 % |"]
-out += ["", "Goal: 95 % per exe, 99 % preferred. Shared library: 99 % preferred. Rules: [Docs/Parity/README.md](Docs/Parity/README.md). History: [Docs/Parity/progress.tsv](Docs/Parity/progress.tsv).",
+out += ["", "First 4 and shared library: CacheGate, LobbyGate, SmartCouponDaemon, PostOfficeDaemon. LobbyDaemon: lift in progress; most functions are still stubs (only in original). Goal: 95 % per exe, 99 % preferred. Shared library: 99 % preferred. Rules: [Docs/Parity/README.md](Docs/Parity/README.md). History: [Docs/Parity/progress.tsv](Docs/Parity/progress.tsv).",
         "", "| Card | " + " | ".join(EXES) + " |", "| --- |" + " ---: |" * len(EXES)]
 for row in rows:
     c = cells(row)
@@ -59,4 +67,4 @@ if START in s:
 else:
     s = s.rstrip("\n") + f"\n\n## Parity\n\n{START}\n{body}\n{END}\n"
 open("README.md", "w").write(s)
-print(f"README parity table: all 4 {p:.1f} %, shared {sp:.1f} %")
+print(f"README parity table: first 4 {p:.1f} %, shared {sp:.1f} %")
