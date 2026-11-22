@@ -1119,6 +1119,30 @@ Other facts:
 - A static counter has the PDB type `unsigned __int64`. Cast to `volatile __int64*` at the `_Interlocked*64` calls. No code change.
 
 
+## ld-14
+
+Card lift-lobbydaemon-14: LobbyDB part 1 (14 functions: 11 lifted, 3 Not done). Codegen trials: 6 (6 kept).
+
+| Function | RVA | Trial | Score before → after | Result |
+| --- | --- | --- | ---: | --- |
+| `LobbyDB::UpdateLastLogout` | `0xa1580` | A8: compare the `id128` argument with the PDB global `ID128_ID_ZERO` (`id[0]` and `id[1]`), not with literal zero. | 97.4 → 100 | Kept. |
+| `LobbyDB::TryCharacterCreation` | `0xa39b0` | A8: same form for both ids (`gameAccountId`, `slotid`). | 97.4 → 100 | Kept. |
+| `LobbyDB::FinishCharacterCreation` | `0xa3da0` | A17: write `if (dbrtn == 0) return true; return false;` after `Execute`. `return dbrtn == 0;` lets VS2010 merge the two `Db::ReleaseTransaction` blocks. The original has two. | 99.1 → 100 | Kept. |
+| `LobbyDB::UpdateGameAccountTimeBasedPlayInfo` | `0xa0a40` | A8: same form (repair round 2). | 97.4 → 100 | Kept. |
+| `LobbyDB::LoadGameAccount` | `0x9fe00` | A8: same form (repair round 2). | 78.9 → 80.5 | Kept (score up). |
+| `LobbyDB::LoadCharacterList` | `0xa17f0` | A8: same form (repair round 2). | 78.1 → 79.0 | Kept (score up). |
+
+New pattern (A8, id128 zero test): every LobbyDB function that tests an `id128` argument for zero uses `ID128_ID_ZERO` (the refs show `<data>` and `ID128_ID_ZERO`). Disassembly of `0x9fe00` (`LoadGameAccount`) loads both qwords from `0x14012d870` and `0x14012d878`. That is `ID128_ID_ZERO` (PE data, 0 and 0), not a literal zero. All 5 functions (6 call sites) now use it. A first lift wrote a helper with a false comment ("not the ID128_GUID_ZERO symbol"). Check the comment against the disassembly, not against the idea of the source.
+The limit of 3 trials is per function, not per card.
+
+What did not reach MATCH (below 85 %, not tried beyond A8):
+- `LoadCharacterList` 79.0, `LoadGameAccount` 80.5, `LoadGameWorld` 77.5, `LoadGameWorldCluster` 84.2.
+- `LoadGameAccount` (`0x9fe00`) has one shared `statmentErrorLog` block for all bind-column errors. Try a `static __forceinline` BindCol helper (A10) with one shared error tail (A17) on this function.
+- `LoadCharacterList` (`0xa17f0`), `LoadGameWorldCluster` (`0xa24c0`) and `LoadGameWorld` (`0xa2dd0`) have one `statmentErrorLog` call for each `SQLBindCol` failure (`LobbyDB.c`). Do not use the shared tail on them. The `DB_BIND_COL_NI` form (one call per column) is the right shape. Look for the difference in the refs and the call order first.
+- Repair 3, `LoadGameWorldCluster`: columns 6 and 7 used `SQL_C_SLONG` (-16). The original passes `SQL_C_LONG` (4) (`LobbyDB.c`, `SQLBindCol` and `statmentErrorLog`). Fixed. The score stays 84.2. The constant is correct, but it is not the cause of the gap. Check all `SQLBindCol` type constants against the pseudocode first (a script over all 39 calls found only these 2).
+- Binding the PDB parameters directly (`&wid`, `&pcid`, `&job`, `&level`) instead of a local copy keeps `TryCharacterCreation`, `FinishCharacterCreation` and `CancelCharacterCreation` at 100.0. Do not add a copy of a by-value parameter for `BindParam`.
+- Dead-strip: 7 of the 10 `LobbyDB` card functions have only stub callers (`CliSession`, `GameWorldRegistry`, `CreateCharacterJob::init`). The other 3 (`TryCharacterCreation`, `FinishCharacterCreation`, `CancelCharacterCreation`) have lifted callers `Character::TryCreation`, `FinishCreation`, `CancelCreation`, but those are dead-stripped because `CreateCharacterJob::tryCreateCharacter`, `createCharacterOk` and `createCharacterFail` are still stubs. All 10 need `/INCLUDE`. Name the stub caller in the pragma comment, not the lifted one. Without it, 0 card functions pair. With it, `~AutoDbTran` is reached and the 15 shared `Db::*` functions pair and match for the first time.
+
 ## ld-13
 
 Card lift-lobbydaemon-13: CliSession part 3, CliSessionManager (56 functions).
@@ -1151,3 +1175,56 @@ Card lift-lobbydaemon-13: CliSession part 3, CliSessionManager (56 functions).
 | Dead-strip, handler table | A handler that only the (stub) handler table calls needs `/INCLUDE:` too. `HandleLobbyLobbyGate_CheckCharacterNameReq` was unpaired until the pragma was added. Then it was MATCH 100.0 (+1). |
 | Build input | A new worktree can lack the ignored `vendor/zstd/src`. All 5 VS2010 links fail with `ZSTD_*` unresolved. Copy the source from another worktree. Check `git rev-parse HEAD` = bb6eaf64. Delete `build-vs2010/obj/vendor` after the copy. |
 | Trials | None. 16 of 17 functions need layouts that main does not have. |
+## ld-18
+
+Card lift-lobbydaemon-18: GamedChannel part 1 (35 functions) and AccountInventoryChannel (19 functions).
+
+| Item | Result |
+| --- | --- |
+| Lifted | 50 (incl. 2 shared: `Network::iocpHandle`, `swprintf_s<129>`) |
+| Not done | 5 (`AccountInventoryChannel::Connect`, `AccountInventorySessionHandler::OnConnect`, `AccountInventorySessionHandler::OnClose`, `AccountInventorySessionHandler` scalar deleting destructor, `GamedChannelManager::OnClose`) |
+| LD MATCH | 219 -> 279 over main bfb4c98 (+60: 43 card functions, 17 shared functions), measured after the merge. The other 4 exes: +0. No MATCH lost. |
+
+What worked (count = functions made MATCH):
+- A19 separate stores for the inlined `Packet` constructor, in the PDB order: `CurHeader`, `Splitter`, `ListHead`, `ListTail`,
+  `IsFragmentPacket`, `FragmentPacketCmd`, then `p.Allocate()`. `memset` and `= {}` do not fold `Allocate`. All 30 `Send*` functions
+  use it (try 1 of each; about 56.7 -> 91.7).
+- A4 `__declspec(noinline)` on `SharedChannel::Send(Packet const*)` (0x4ba0). The original `Send*` functions call it out of line.
+  Ours inlined it (calls 40, consts 50). One edit: +21 MATCH, and `SharedChannel::Send` itself becomes MATCH. The other 4 exes lose nothing.
+- Zero register form: the original keeps a zero in a callee-saved register (`cmp r12w, ax`, `lea r8d, [r12 + cmd]`). The source form of
+  the `Compose` test decides this. Same code, three forms (counts are functions that reached 100):
+
+  | Form | Result |
+  | --- | --- |
+  | `if (p.Compose(...) != 0)` | `SendStartChargeOk` 95.2 (consts: ours has an extra immediate) |
+  | `if (0 != p.Compose(...))` | `SendStartChargeOk` 100 (+1). The same change on the other 18 `GamedChannel` functions with a `!= 0` test. |
+  | `if (0 == p.Compose(...)) { log; return false; } return TSend(t, &p);` | With the `TSend` fixes below: 242 -> 253 MATCH in total |
+  | `if (p.Compose(...) == 0)` | `SendChangeCharacterAppearanceReq` 100 (the `0 ==` form gave 96.3: the `0x39` immediate moved to a `lea`) |
+
+- A4 plus an ICF guard on the `TransactionChannel::TSend` stub (0x7b2b0). The stub is a `LIFT_STUB`. Three effects:
+  1. LTCG inlined the stub as `abort`. The callers lost `TSend` and the second `Packet::Clear` (calls 80). `noinline` fixes it.
+  2. `/OPT:ICF` folded the stub into `GamedChannelManager::OnClose` (another stub). The call then scored as `OnClose`.
+     A volatile write in the body keeps it unique.
+  3. The stub is noreturn (`abort`, `__assume(0)`), so LTCG dropped the `Packet::Clear` after the call. A volatile flag test and a
+     `return false` stop that. +11 MATCH. The next card (ld-28) lifts `TSend` and must delete these workarounds.
+
+What failed or is blocked (tries):
+- `SendListGoodsReq` 96.3 and `SendFinishWarehouseItemConsumptionReq` 97.0 (3 forms each, consts 89 to 91):
+  1. `if (p.Compose(...) == 0) { log; return false; }` (first lift): consts 80 to 91.
+  2. `if (0 == p.Compose(...))`: best (consts 89 to 91, calls 100). Kept.
+  3. Success first, `if (0 != p.Compose(...)) return TSend(t, &p); log; return false;`: consts 100 for `Create`, but calls 75 to 80.
+     The original puts the error block first (A17). Reverted.
+  The only DIFF left is one immediate (`0x14`, `0x79`, `0x16`) against a `lea` from the zero register.
+- `SendCreateCharacterReq` (repair 3): form 1 `p.Compose(...) == 0` scored 97.0 (consts 91). Form 2 `0 == p.Compose(...)` scored 100 (MATCH, +1 in the +60 total). Form 2 kept.
+- `GamedChannel::SendAccountInventoryNotify` 79.1 (calls 56): the original calls `Packet::Allocate()` out of line from the inlined
+  `Packet::Allocate(PacketComposer*)`. Ours inlines both. `noinline` on `Packet::Allocate()` would break the `Send*` functions
+  that inline it (BloodLib, shared by all 5 exes). Below 85: no tries.
+- `GamedChannelManager::PacketHandler` 82.2 and `AccountInventorySessionHandler::PacketHandler` 76.9: the original calls a handler
+  through the table, and `LobbyGamePacketLobbySideHandlerList` and `AccountInventoryLobbyPacketLobbySideHandlerList` are empty here
+  (null tables, owners ld-16 / ld-21 / ld-26 and the AccountInventory handler card). Below 85: no tries.
+- A /INCLUDE for a function with a wrong signature fails the link (`LNK2001`). The PDB public name encodes the signature, so the
+  failure points to the exact mistake: a missing `short` parameter (`SendFinishWarehouseItemConsumptionReq`), a pointer for a
+  reference (`SendCreateCharacterReq`). Take the decorated names with `llvm-pdbutil dump -publics`.
+- A class with a virtual function and no `virtual` destructor declared emits no vtable and no scalar deleting destructor, so an
+  /INCLUDE of `??_G` does not link (`AccountInventorySessionHandler`).
+- A /INCLUDE for a stub that another card owns is not allowed here. Define a local stub with a LIFT comment and list it in the handoff.

@@ -1,4 +1,102 @@
 {
+"AccountInventoryChannel::SendConsumeWarehouseItemReq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"AccountInventoryChannel::SendFinishWarehouseItemConsumptionReq": {
+"calls": 100,
+"consts": 91,
+"refs": 100,
+"score": 97.0,
+"status": "DIFF"
+},
+"AccountInventoryChannel::SendGetGoodsCountReq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"AccountInventoryChannel::SendHelloReq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"AccountInventoryChannel::SendListGoodsReq": {
+"calls": 100,
+"consts": 89,
+"refs": 100,
+"score": 96.3,
+"status": "DIFF"
+},
+"AccountInventoryChannel::SendLoginNotify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"AccountInventoryChannel::SendLogoutNotify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"AccountInventoryChannel::SendRetrieveCharacterGoodsCountReq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"AccountInventoryChannel::SendRetrieveLobbyServiceItemListReq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"AccountInventoryChannel::SendRetrieveSingleWarehouseItemReq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"AccountInventoryChannel::SendTakeGoodsReq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"AccountInventoryChannel::SendTryWarehouseItemConsumptionReq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"AccountInventorySessionHandler::OnAccept": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"AccountInventorySessionHandler::PacketHandler": {
+"calls": 68,
+"consts": 83,
+"refs": 79,
+"score": 76.9,
+"status": "DIFF"
+},
 "AddSlotService::IsServiceTarget": {
 "calls": 100,
 "consts": 100,
@@ -117,6 +215,13 @@
 "refs": 100,
 "score": 94.9,
 "status": "DIFF"
+},
+"AutoDbTran::~AutoDbTran": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "BoundedList::Remove": {
 "calls": 100,
@@ -440,6 +545,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Connection::AsyncSend": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "CoolDown::TimerClass": {
 "calls": 100,
 "consts": 100,
@@ -455,6 +567,111 @@
 "status": "MATCH"
 },
 "CriticalSection::~CriticalSection": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Db::AllocTransaction": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Db::ConvertTime": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Db::Log": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Db::ReleaseTransaction": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Db::errorLog": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DbTransaction::BindParam": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DbTransaction::Execute": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DbTransaction::Fetch": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DbTransaction::Prepare": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DbTransaction::close": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DbTransaction::connect": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DbTransaction::connectionErrorLog": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DbTransaction::initStatement": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DbTransaction::initialize": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DbTransaction::statmentErrorLog": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -547,10 +764,10 @@
 },
 "FragmentPacket::FragmentPacket": {
 "calls": 100,
-"consts": 86,
-"refs": 80,
-"score": 88.6,
-"status": "DIFF"
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "FragmentPacket::FreeSize": {
 "calls": 100,
@@ -560,6 +777,13 @@
 "status": "MATCH"
 },
 "FragmentPacket::IncRepeatCount": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"FragmentPacket::~FragmentPacket": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -827,9 +1051,9 @@
 },
 "GameWorldReport::Write": {
 "calls": 80,
-"consts": 94,
-"refs": 95,
-"score": 89.8,
+"consts": 100,
+"refs": 100,
+"score": 93.3,
 "status": "DIFF"
 },
 "GameWorldReport::~GameWorldReport": {
@@ -861,6 +1085,244 @@
 "status": "MATCH"
 },
 "GameWorldReporter::~GameWorldReporter": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendAccountInventoryNotify": {
+"calls": 56,
+"consts": 91,
+"refs": 91,
+"score": 79.1,
+"status": "DIFF"
+},
+"GamedChannel::SendApplyNewChargeItemNotify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendChangeCharacterAppearanceReq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendChangeCharacterSexReq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendCloseSessionNotify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendCreateCharacterReq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendDeleteCharacterCompleteNotify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendDeleteCharacterReq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendEnterWorldFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendKickReq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendLeaveWorldFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendLeaveWorldOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendRestoreCharacterReq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendStartChargeFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendStartChargeOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendStopChargeFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendStopChargeOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendStopPlayNotify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendTryRegisterGuildFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendTryRegisterGuildOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendTryRenameGuildFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendTryRenameGuildOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendUpdateAccountDataFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendUpdateAccountDataOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendUpdateCharacterDataFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendUpdateCharacterDataOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendUpdateChargeRemainTimeNotify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannelManager::Acquire": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannelManager::Add": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannelManager::OnAccept": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannelManager::OnConnect": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannelManager::PacketHandler": {
+"calls": 62,
+"consts": 92,
+"refs": 92,
+"score": 82.2,
+"status": "DIFF"
+},
+"GamedChannelManager::Remove": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannelManager::~GamedChannelManager": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -931,6 +1393,76 @@
 "status": "MATCH"
 },
 "LeaveGameWorldToken::GetKind": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyDB::CancelCharacterCreation": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyDB::CheckValidityOfCharacterName": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyDB::FinishCharacterCreation": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyDB::LoadCharacterList": {
+"calls": 60,
+"consts": 94,
+"refs": 84,
+"score": 79.0,
+"status": "DIFF"
+},
+"LobbyDB::LoadGameAccount": {
+"calls": 64,
+"consts": 91,
+"refs": 86,
+"score": 80.5,
+"status": "DIFF"
+},
+"LobbyDB::LoadGameWorld": {
+"calls": 56,
+"consts": 97,
+"refs": 79,
+"score": 77.5,
+"status": "DIFF"
+},
+"LobbyDB::LoadGameWorldCluster": {
+"calls": 71,
+"consts": 97,
+"refs": 85,
+"score": 84.2,
+"status": "DIFF"
+},
+"LobbyDB::TryCharacterCreation": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyDB::UpdateGameAccountTimeBasedPlayInfo": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyDB::UpdateLastLogout": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -1301,7 +1833,21 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Network::GetAddressStringW": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Network::iocpHandle": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Packet::Add": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -1335,6 +1881,13 @@
 "refs": 67,
 "score": 88.9,
 "status": "DIFF"
+},
+"Packet::Compose [?Compose@Packet@@QEAAGPEBDZZ]": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Packet::ComposeV": {
 "calls": 100,
@@ -1372,6 +1925,13 @@
 "status": "MATCH"
 },
 "PacketBuffer::deallocate_me": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PacketBuffer::encrypt": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -1567,6 +2127,55 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Session::GetChannel": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Session::Send [?Send@Session@@QEBAXPEBVPacket@@@Z]": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Session::send": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"SessionHandler::~SessionHandler": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"SessionSendBuffer::Add": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"SessionSendBuffer::increaseBuffer": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"SharedChannel::Send [?Send@SharedChannel@@QEAA_NPEBVPacket@@@Z]": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "SharedChannelFragmentPacketHandleEvent::HandleEvent": {
 "calls": 100,
 "consts": 100,
@@ -1582,6 +2191,20 @@
 "status": "MATCH"
 },
 "SharedChannelFragmentPacketHandleEvent::~SharedChannelFragmentPacketHandleEvent": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"SharedChannelList::Set": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"SharedChannelList::~SharedChannelList": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -1692,6 +2315,13 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"TransactionChannel::TSend": {
+"calls": 0,
+"consts": 0,
+"refs": 0,
+"score": 0.0,
+"status": "DIFF"
 },
 "WaitQueue::Remove": {
 "calls": 100,
@@ -2100,6 +2730,13 @@
 "status": "MATCH"
 },
 "swprintf_s<128>": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"swprintf_s<129>": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
