@@ -1,6 +1,7 @@
 // NPServiceChannel.obj (LobbyDaemon PDB, 2019 + PDB). Wave 0: declarations of the stubbed functions only.
 // LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
 #pragma once
+#include <stddef.h>
 
 class LobbyJob;
 class NPChannel;
@@ -56,4 +57,11 @@ public:
     bool Initialize(unsigned int, unsigned long, unsigned short, long);  // 0xcfba0
     virtual bool OnConnect(NPChannel*, bool) const;  // 0xcfdb0
     virtual bool OnClose(NPChannel*, bool) const;  // 0xcff70
+
+    // LIFT: PDB layout (sizeof 0x18). The PDB base NPMessageHandler (vptr at +0) is not declared here.
+    bool _init;
+    NPGameServiceChannel* _gameServChannel;
 };
+static_assert(offsetof(NPServiceChannelManager, _init) == 0x8, "NPServiceChannelManager::_init");
+static_assert(offsetof(NPServiceChannelManager, _gameServChannel) == 0x10, "NPServiceChannelManager::_gameServChannel");
+static_assert(sizeof(NPServiceChannelManager) == 0x18, "sizeof NPServiceChannelManager");

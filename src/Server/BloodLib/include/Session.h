@@ -133,6 +133,8 @@ public:
     friend bool HandleLobbyGate_ContentsRuleListReq(Session* session, Packet const* packet);
     friend bool HandleLobbyGate_HelloReq(Session* session, Packet* packet);
     friend bool HandleLobbyGate_BypassPacket(Client* client, Packet const* packet);
+    // LIFT: access for the inlined send in HandleLobbyGame_HelloReq (LobbyDaemon 0x88260)
+    friend bool HandleLobbyGame_HelloReq(Session const* session, Packet const* packet);
 };
 static_assert(sizeof(Session) == 0x128, "sizeof Session");
 static_assert(offsetof(Session, _lock) == 0x18, "Session::_lock");

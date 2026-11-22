@@ -1,19 +1,38 @@
 // LobbyJob.obj (LobbyDaemon PDB, 2019 + PDB). Wave 0: declarations of the stubbed functions only.
 // LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
 #pragma once
+#include <stddef.h>
+#include "AuctionDeliverJob.h"
+#include "Lock.h"
 
 struct EventContext;
 class LobbyJob;
 class LobbyJobTaskParam;
 
-class LobbyJob
+// LIFT: PDB layout (sizeof 0x50, RefCntPoolObj base). Only the members that lift-lobbydaemon-16 needs are laid out here.
+class LobbyJob : public RefCntPoolObj
 {
 public:
+    // LIFT: constructor not in the PDB. Inlined in CliSessionJob::CliSessionJob (0x3bef0): _id, _state and _lastState are set to zero.
+    LobbyJob() : _id(0), _state(0), _lastState(0) {}
+    virtual LobbyJobDef const* GetDefinition() const = 0;  // slot 4
     virtual ~LobbyJob();  // 0x12270
 protected:
     virtual bool dispatch_work(int, void*);  // 0x122b0
+public:
+    virtual bool work(int, void*) = 0;  // slot 6
+protected:
     bool transit(int);  // 0xc1710
+
+public:
+    unsigned long long _id;
+    int _state;
+    int _lastState;
+    CriticalSection _lock;
 };
+static_assert(sizeof(LobbyJob) == 0x50, "sizeof LobbyJob");
+static_assert(offsetof(LobbyJob, _id) == 0x18, "LobbyJob::_id");
+static_assert(offsetof(LobbyJob, _lock) == 0x28, "LobbyJob::_lock");
 
 class LobbyJobManager
 {

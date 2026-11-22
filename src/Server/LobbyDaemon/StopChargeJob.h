@@ -1,13 +1,19 @@
 // StopChargeJob.obj (LobbyDaemon PDB, 2019 + PDB). Wave 0: declarations of the stubbed functions only.
-// LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
 #pragma once
+#include <stddef.h>
+#include "CliSessionJob.h"
 
+class CliSession;
 class GamedChannel;
+class ObjPool;
 struct LobbyJobDef;
 
-class StopChargeJob
+// LIFT: PDB layout (CliSessionJob base). The constructor is not in the PDB. It is inlined in the packet handler (0x8b9b0).
+class StopChargeJob : public CliSessionJob
 {
 public:
+    StopChargeJob(CliSession* owner) : CliSessionJob(owner), _gamed(nullptr), _gametid(0), _pcid(0) { _chargeKey[0] = 0; }
+    virtual ~StopChargeJob() {}
     virtual LobbyJobDef const* GetDefinition() const;  // 0x77c90
     static void* _vtbl();  // 0x77cf0
     bool Initialize(GamedChannel*, unsigned long long, unsigned long long, wchar_t*);  // 0x77dc0
@@ -18,4 +24,16 @@ private:
     bool requestChargeStop();  // 0x78290
     bool responseChargeStop(void*);  // 0x78430
     bool expireChargeStop();  // 0x78790
+
+public:
+    GamedChannel* _gamed;
+    unsigned long long _gametid;
+    unsigned long long _pcid;
+    wchar_t _chargeKey[65];
+
+    static ObjPool _pool;  // LIFT: no definition yet (like LeaveGameWorldJob::_pool).
 };
+static_assert(sizeof(StopChargeJob) == 0xF8, "sizeof StopChargeJob");
+static_assert(offsetof(StopChargeJob, _gamed) == 0x58, "StopChargeJob::_gamed");
+static_assert(offsetof(StopChargeJob, _gametid) == 0x60, "StopChargeJob::_gametid");
+static_assert(offsetof(StopChargeJob, _pcid) == 0x68, "StopChargeJob::_pcid");

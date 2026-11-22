@@ -17,6 +17,7 @@ class GameWorldCluster;
 class GameWorldRegistry;
 class GameWorldReporter;
 class Packet;
+class Session;
 struct WaitInfo;
 
 class GameWorld
@@ -53,6 +54,9 @@ public:
     DB const& GetDB() const { return _db; }
     int GetPlayingUserCount() const { return _playingUserCount; }
     int GetQuickpassUserCount() const { return _quickPassPlayingUserCount; }
+    // LIFT: access helper. No PDB in the set has friend records. The handlers read and write _live (HelloReq 0x88260, ServiceOpenNotify 0x88cd0).
+    friend bool HandleLobbyGame_HelloReq(Session const*, Packet const*);
+    friend bool HandleLobbyGame_ServiceOpenNotify(Session const*, Packet const*);
 private:
     mutable SRWLOCK _infolock;
     DB _db;
@@ -123,6 +127,8 @@ public:
     bool FetchWorldInfoListForInfoGate(FragmentPacket*);  // 0x4ead0
     bool Setup(short, short);  // 0x4ed00
     void Update();  // 0x4f330
+    // LIFT: access helper. ServiceOpenNotify (0x88cd0) has Get (0x4e8b0) inlined and reads _worlds, _min and _size.
+    friend bool HandleLobbyGame_ServiceOpenNotify(Session const*, Packet const*);
 private:
     GameWorldCluster* getGameWorldCluster(short);  // 0x4ebf0
     bool addGameWorldCluster(GameWorldCluster*);  // 0x4ec90

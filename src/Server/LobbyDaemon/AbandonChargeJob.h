@@ -1,12 +1,19 @@
 // AbandonChargeJob.obj (LobbyDaemon PDB, 2019 + PDB). Wave 0: declarations of the stubbed functions only.
-// LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
 #pragma once
+#include <stddef.h>
+#include "CliSessionJob.h"
 
+class CliSession;
+class ObjPool;
 struct LobbyJobDef;
 
-class AbandonChargeJob
+// LIFT: PDB layout (CliSessionJob base). The constructor is not in the PDB. It is inlined in the packet handler (0x8be60).
+// The inlined constructor sets _pcid and _chargeKey[0] only. It leaves _clikey as it is.
+class AbandonChargeJob : public CliSessionJob
 {
 public:
+    AbandonChargeJob(CliSession* owner) : CliSessionJob(owner), _pcid(0) { _chargeKey[0] = 0; }
+    virtual ~AbandonChargeJob() {}
     virtual LobbyJobDef const* GetDefinition() const;  // 0x4f70
     static void* _vtbl();  // 0x5020
     bool Initialize(unsigned long long, wchar_t const*);  // 0x50d0
@@ -17,4 +24,15 @@ private:
     bool requestChargeAbandon();  // 0x54a0
     bool responseChargeAbandon(void*);  // 0x5690
     bool expireChargeAbandon();  // 0x5b10
+
+public:
+    unsigned long long _clikey;
+    unsigned long long _pcid;
+    wchar_t _chargeKey[65];
+
+    static ObjPool _pool;  // LIFT: no definition yet (like StopChargeJob::_pool).
 };
+static_assert(sizeof(AbandonChargeJob) == 0xF0, "sizeof AbandonChargeJob");
+static_assert(offsetof(AbandonChargeJob, _clikey) == 0x58, "AbandonChargeJob::_clikey");
+static_assert(offsetof(AbandonChargeJob, _pcid) == 0x60, "AbandonChargeJob::_pcid");
+static_assert(offsetof(AbandonChargeJob, _chargeKey) == 0x68, "AbandonChargeJob::_chargeKey");

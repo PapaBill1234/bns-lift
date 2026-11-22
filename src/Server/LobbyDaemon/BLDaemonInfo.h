@@ -2,8 +2,39 @@
 // LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
 #pragma once
 
-struct BLDaemonID;
-struct BLDaemonInfo;
+// Layouts: include/pdb/LobbyDaemon/types.h (BLDaemonID sizeof 0x8, BLDaemonInfo sizeof 0x10).
+struct BLDaemonID
+{
+    int kind;
+    short wid;
+};
+static_assert(sizeof(BLDaemonID) == 0x8, "sizeof BLDaemonID");
+
+struct BLDaemonInfo
+{
+    BLDaemonID id;
+    unsigned long internal_ipv4;
+    union
+    {
+        struct
+        {
+            unsigned short internal_port;
+        } gamed;
+        struct
+        {
+            unsigned short internal_port;
+        } cached;
+        struct
+        {
+            unsigned short internal_port;
+        } lobby_gate;
+        struct
+        {
+            unsigned short internal_port;
+        } infogate;
+    } ind;
+};
+static_assert(sizeof(BLDaemonInfo) == 0x10, "sizeof BLDaemonInfo");
 
 class BLDaemonInfoTable
 {

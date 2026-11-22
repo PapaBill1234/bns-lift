@@ -1239,3 +1239,16 @@ What failed or is blocked (tries):
 - A class with a virtual function and no `virtual` destructor declared emits no vtable and no scalar deleting destructor, so an
   /INCLUDE of `??_G` does not link (`AccountInventorySessionHandler`).
 - A /INCLUDE for a stub that another card owns is not allowed here. Define a local stub with a LIFT comment and list it in the handoff.
+
+## ld-16
+What worked:
+- The gate (clang static libs) does not link the exes. A body that needs a symbol with no definition passes the gate and fails the VS2010 link in `tools/parity.sh`.
+  Run `tools/parity.sh` (or `link.exe` through it) before you trust "obj compiles" from a checkpoint.
+- `ObjPool::Checkout` and `X::_pool` have no LobbyDaemon definition (SCD form only). A handler that checks out a job from a pool is Not done until the LD ObjectPool card lands (same as ld-2, ld-13).
+- `BnsCommonConfig::Config` and `LobbyErrorDesc` are plain data. A placeholder with `// LIFT:` links. Read the table from `.data` (`llvm-pdbutil dump -publics` gives `section:offset` in decimal).
+- A fresh worktree has no `vendor/zstd/src` (ignored). Copy it from another worktree and check `git -C vendor/zstd/src rev-parse HEAD` = `bb6eaf64...`.
+
+What failed or is blocked (tries):
+- Low scores (18.9 to 65.8) on lifted handlers with `import:abort` in the funcdiff call list: a stub callee (`ExecuteW`, `Find`, `SendRequestPresenceKick`) ends in `abort()`.
+  LTCG sees a noreturn call and removes the code after it. The source form is not the cause. Do not try forms. Wait for the callee card.
+- Checkpoints can list non-functions (`0x8be40`, `0x8be50`: no `.pdata`, inside an epilogue). Check `.pdata` before you list an RVA.
