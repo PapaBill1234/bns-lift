@@ -2,6 +2,11 @@
 // LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
 #pragma once
 
+#include "Character.h"
+#include "CliSession.h"
+#include "Db.h"
+#include "GameWorld.h"
+
 struct MileageDepositInfo;
 struct MileageFeverTimeInfo;
 struct MileageInfo;
@@ -12,20 +17,33 @@ class RandomStoreInitializationSchedule;
 class TimeBasedPlayInfoList;
 union id128;
 
+// RAII holder of a DbTransaction. The PDB lists 3 constructors and the DbTransaction wrappers (Get, Alloc, Release,
+// BindCol, Execute, Prepare, BindParam, BindBinaryParam, Fetch, MoreResults). The compiler inlines all of them.
+// LIFT: the PDB members are private. The LobbyDB functions read Tran directly, as in the other servers.
 class AutoDbTran
 {
 public:
+    // LIFT: inlined ctor. Db::AllocTransaction ignores the dbId (folded to 1).
+    explicit AutoDbTran(unsigned int dbId) : Tran(Db::AllocTransaction(dbId)), TimeoutSec(10) {}
     ~AutoDbTran();  // 0x9fdb0
+
+    DbTransaction* Tran;
+    int TimeoutSec;
 };
+static_assert(sizeof(AutoDbTran) == 0x10, "sizeof AutoDbTran");
 
 class LobbyDB
 {
 public:
+    static bool LoadGameAccount(int&, id128 const&, bool&, GameAccount::DB&);  // 0x9fe00
     static bool LoadGameAccountTimeBasedPlayInfo(int&, id128 const&, TimeBasedPlayInfoList&);  // 0xa03e0
     static bool UpdateGameAccountTimeBasedPlayInfo(int&, id128 const&, TimeBasedPlayInfoList const&);  // 0xa0a40
     static bool RegisterGameAccount(int&, id128 const&, wchar_t const*, int, char, unsigned long);  // 0xa0eb0
     static bool UpdateLastLogin(int&, id128 const&, unsigned long);  // 0xa12a0
     static bool UpdateLastLogout(int&, id128 const&, int);  // 0xa1580
+    static bool LoadCharacterList(int&, id128 const&, Character::DB**&, int&);  // 0xa17f0
+    static bool LoadGameWorldCluster(int&, GameWorldCluster::DB**&, int&);  // 0xa24c0
+    static bool LoadGameWorld(int&, GameWorld::DB**&, int&);  // 0xa2dd0
     static bool CheckValidityOfCharacterName(int&, wchar_t const*, int);  // 0xa37e0
     static bool TryCharacterCreation(int&, id128 const&, id128 const&, short, wchar_t const*, int, char, unsigned long long*);  // 0xa39b0
     static bool FinishCharacterCreation(int&, unsigned long long, short, short, char, bool, char const*, int);  // 0xa3da0

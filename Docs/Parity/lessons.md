@@ -1080,3 +1080,20 @@ What failed or is blocked (tries):
 - Retry after ld-10 landed: `CliSessionGradeChangedMessage::Dispatch` lifts at 83.3. The only DIFF is the callee
   `MembershipMileage::GradeChanged`, still a `LIFT_STUB` (inlined abort). No source form to try.
 - Do not edit a source file of another card, even for a one-line stub (`CliSession.cpp` `0x32b60`). Write it in the handoff.
+
+## ld-14
+
+Card lift-lobbydaemon-14: LobbyDB part 1 (14 functions: 11 lifted, 3 Not done). Codegen trials: 3 (3 kept).
+
+| Function | RVA | Trial | Score before → after | Result |
+| --- | --- | --- | ---: | --- |
+| `LobbyDB::UpdateLastLogout` | `0xa1580` | A8: compare the `id128` argument with the PDB global `ID128_ID_ZERO` (`id[0]` and `id[1]`), not with literal zero. | 97.4 → 100 | Kept. |
+| `LobbyDB::TryCharacterCreation` | `0xa39b0` | A8: same form for both ids (`gameAccountId`, `slotid`). | 97.4 → 100 | Kept. |
+| `LobbyDB::FinishCharacterCreation` | `0xa3da0` | A17: write `if (dbrtn == 0) return true; return false;` after `Execute`. `return dbrtn == 0;` lets VS2010 merge the two `Db::ReleaseTransaction` blocks. The original has two. | 99.1 → 100 | Kept. |
+
+New pattern (A8, id128 zero test): every LobbyDB function that tests an `id128` argument for zero uses `ID128_ID_ZERO` (the refs show `<data>` and `ID128_ID_ZERO`). Not tried yet on `UpdateGameAccountTimeBasedPlayInfo` (97.4, same refs diff), `LoadGameAccount` and `LoadCharacterList`.
+The verify card or the next LobbyDB card can apply it with no new risk. `LoadGameAccount` has a comment that says the original does not use the symbol. Check this against the refs first.
+
+What did not reach MATCH (below 85 %, not tried):
+- `LoadCharacterList` 78.1, `LoadGameAccount` 78.9, `LoadGameWorld` 77.5, `LoadGameWorldCluster` 84.2. The original calls `statmentErrorLog` once for all bind-column errors (13 ODBC calls in a row, then one log call). The `DB_BIND_COL_NI` macro gives one `statmentErrorLog` call per column. The PDB lists `DbTransaction::BindCol` as an inline wrapper. Try a `static __forceinline` BindCol helper (A10) with the shared error tail (A17) first.
+- Dead-strip: the 10 `LobbyDB` card functions have only stub callers (`CliSession`, `Character`, `GameWorldRegistry`, `CreateCharacterJob`). They need `/INCLUDE`. Without it, 0 card functions pair. With it, `~AutoDbTran` is reached and the 15 shared `Db::*` functions pair and match for the first time.
