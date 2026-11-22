@@ -2,6 +2,8 @@
 
 Source: LobbyDaemon 2019 + PDB (VS2010 SP1). The lift uses the indexed pseudocode cache and the PDB types. IDA was not opened.
 The index lists 55 functions in scope (the card says 54; `Network::iocpHandle` at `0x64e0` is the extra one). 50 are lifted. 5 are Not done.
+
+`Network::iocpHandle` was already MATCH on main before this card. It adds no new MATCH.
 Base: main 75f0769. All counts are measured against it.
 
 ## Result

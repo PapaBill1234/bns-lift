@@ -62,6 +62,7 @@ static_assert(sizeof(AccountInventoryLobbyPacketHandlerDef) == 0x10, "sizeof Acc
 AccountInventoryLobbyPacketHandlerDef AccountInventoryLobbyPacketLobbySideHandlerList[37];
 
 // The game-account-id log arguments: id1 id2 id3 id4[0..7] (format %08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X).
+// LIFT: lift-only macro. It writes the guid fields as the original call sites do for the %08X-%04X-... log text (0x82f0 and the send functions).
 #define ACCOUNT_GUID_ARGS(a)                                                                                        \
     (a).guid.id1, (a).guid.id2, (a).guid.id3, (a).guid.id4[0], (a).guid.id4[1], (a).guid.id4[2], (a).guid.id4[3], \
         (a).guid.id4[4], (a).guid.id4[5], (a).guid.id4[6], (a).guid.id4[7]
@@ -464,6 +465,7 @@ bool AccountInventorySessionHandler::PacketHandler(Session const* session, Packe
                 FragmentPacketConcatenater* concatenater = static_cast<FragmentPacketConcatenater*>(session->_concatenater);
                 void* mem = Memory::_Manager[2]->Alloc(sizeof(FragmentPacketConcatenater), ACCOUNT_INVENTORY_FILE, 416);
                 FragmentPacketConcatenater* fpc = mem != nullptr ? ::new (mem) FragmentPacketConcatenater : nullptr;
+                // BUG: 0x82f0 fpc is not checked for nullptr before Copy when the alloc fails.
                 if (fpc->Copy(concatenater))
                 {
                     void* eventMem = Memory::_Manager[2]->Alloc(sizeof(SharedChannelFragmentPacketHandleEvent), ACCOUNT_INVENTORY_FILE, 418);
@@ -503,6 +505,7 @@ bool AccountInventorySessionHandler::PacketHandler(Session const* session, Packe
                 copy->IsFragmentPacket = false;
                 copy->FragmentPacketCmd = 0;
             }
+            // BUG: 0x82f0 copy is not checked for nullptr before Allocate/Add when the alloc fails.
             copy->Allocate();
             copy->Add(&packet->CurHeader[1], static_cast<short>(packet->CurHeader->size - 2));
             void* eventMem = Memory::_Manager[2]->Alloc(sizeof(SharedChannelPacketHandleEvent), ACCOUNT_INVENTORY_FILE, 433);

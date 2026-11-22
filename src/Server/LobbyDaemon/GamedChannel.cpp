@@ -18,7 +18,9 @@
 namespace
 {
 wchar_t const* const GAMED_FILE = L"GamedChannel.cpp";  // LIFT: No PDB symbol. The binary uses the literal.
+// LIFT: No PDB symbol. The binary uses the literal as the file string of SharedChannelList::Acquire/Remove errors (lines 200 and 234; used in GamedChannelManager::Remove and Acquire).
 wchar_t const* const SHARED_CHANNEL_FILE = L"..\\Shared\\SharedChannel.cpp";
+// LIFT: No PDB symbol. The binary uses the literal as the file string of the Session reference count call (line 1059; used in GamedChannelManager::PacketHandler).
 wchar_t const* const SESSION_FILE = L"source\\Session.cpp";
 }
 
