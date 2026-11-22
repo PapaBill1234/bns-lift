@@ -14,6 +14,8 @@ class CliSession;
 class GateNode : public RefCntListNode
 {
 public:
+    // LIFT: inlined in LobbyGatePresence::OnSet (0x3a7d0). The body is in CliSession.cpp (CliSession is incomplete here).
+    explicit GateNode(CliSession* clisession);
     virtual ~GateNode();  // inlined in 0x3d020
     CliSession* _clisession;  // +48
 };

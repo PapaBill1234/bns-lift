@@ -1105,6 +1105,38 @@ What failed:
   This depends on the data order, not on the source form.
 
 Other facts:
-- `tools/gate.sh` fails on main ef1fa96 (3 tracked DLLs in `tools/LegacyBin`). `tools/gate_extra.sh` has mode 644, so the gate skips it.
 - A worktree without `vendor/zstd/src` fails the VS2010 link with 3 `ZSTD_*` errors in all 5 exes. Copy the directory from another worktree.
 
+
+## ld-13
+
+Card lift-lobbydaemon-13: CliSession part 3, CliSessionManager (56 functions).
+
+| Item | Result |
+| --- | --- |
+| Lifted | 25 |
+| Not done | 31 (most need the `LobbyDaemon`, `LobbyGateChannel` or LobbyJob layouts; `CliSession::_pool` needs the LD ObjectPool module) |
+| LD MATCH | 195 -> 218 over main 75f0769 (+23: 19 card functions, 4 shared functions). The other 4 exes: +0, no MATCH lost. |
+
+- The clang gate links static libs. An object with an unresolved symbol passes the gate when no other object pulls it. The VS2010
+  parity build links each object and fails. Example: a `CliSession::_pool` definition needs `ObjPool::ObjPool`, but `ObjectPool.cpp`
+  is only in `lift_smartcoupondaemon`. Run parity before you write "links" in a handoff.
+- Virtual functions of a class with no lifted ctor have no reference. `/OPT:REF` removes them. Keep them with `/INCLUDE` (21 pragmas
+  in `CliSession.cpp`). Take the decorated names from `llvm-pdbutil dump -publics` on the original PDB.
+- A small `GetKind` can fold (ICF) with a function of another module. funcdiff then scores it under the other name
+  (`LeaveGameWorldToken::GetKind`, `Aes128::GetType`). A `return 0` body folds with many names and gets no new score.
+- funcdiff `SKIP_NAME` also skips `std::` and backtick names. STL instances and `dynamic initializer` / `atexit` functions have no score.
+- An inlined loop over a small enum (`Authority::Merge`, `for i < OP_MAX`) gives the same code as separate `|=` stores (A19, no change).
+- `CliSession::setRole` (`0x39f70`, 93.3, one extra `0x4`): A8 (`int const role = roles[i]`) gave 88.9, with `int` or `long long` index. A11 alone
+  worked: `for (long long i = 0; i < roleCount; ++i)` with `roles[i]` read in place gives 100.0 (MATCH). The original steps a 64-bit index,
+  not a pointer. Try the index type before you add a local.
+- An STL instance (`std::vector<...>::~vector`) is not in the PDB when no lifted caller makes it. Do not list it as Lifted (skeptic check 2b).
+- The 4 `CliSessionTable` index functions paired for the first time when their presence callers were lifted (shared gain).
+
+## ld-17
+
+| Item | Fact |
+| --- | --- |
+| Dead-strip, handler table | A handler that only the (stub) handler table calls needs `/INCLUDE:` too. `HandleLobbyLobbyGate_CheckCharacterNameReq` was unpaired until the pragma was added. Then it was MATCH 100.0 (+1). |
+| Build input | A new worktree can lack the ignored `vendor/zstd/src`. All 5 VS2010 links fail with `ZSTD_*` unresolved. Copy the source from another worktree. Check `git rev-parse HEAD` = bb6eaf64. Delete `build-vs2010/obj/vendor` after the copy. |
+| Trials | None. 16 of 17 functions need layouts that main does not have. |

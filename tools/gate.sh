@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 # Gate for bns-lift cards. Exit 0 = pass.
 # 1. No binaries in the tree that git tracks or would add.
+# Exception: tools/LegacyBin/ holds unchanged upstream DLLs (DotNetZip, MaterialSkin). The user allowed them on 2026-11-22.
 # 2. If CMakeLists.txt exists: configure and build all targets with the clang-cl toolchain.
 set -euo pipefail
 cd "$(dirname "$0")/.."
-BAD="$(git ls-files -co --exclude-standard | grep -iE '\.(exe|dll|pdb|i64|idb|lib|a|obj|o|bin|dat|pem|key)$' || true)"
+BAD="$(git ls-files -co --exclude-standard | grep -v '^tools/LegacyBin/' | grep -iE '\.(exe|dll|pdb|i64|idb|lib|a|obj|o|bin|dat|pem|key)$' || true)"
 [ -z "$BAD" ] || { echo "binary or key files: $BAD"; exit 1; }
 if [ -f CMakeLists.txt ]; then
   B="${LIFT_BUILD_DIR:-build}"
