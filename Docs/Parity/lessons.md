@@ -1102,6 +1102,7 @@ What did not reach MATCH (below 85 %, not tried beyond A8):
 - `LoadGameAccount` (`0x9fe00`) has one shared `statmentErrorLog` block for all bind-column errors. Try a `static __forceinline` BindCol helper (A10) with one shared error tail (A17) on this function.
 - `LoadCharacterList` (`0xa17f0`), `LoadGameWorldCluster` (`0xa24c0`) and `LoadGameWorld` (`0xa2dd0`) have one `statmentErrorLog` call for each `SQLBindCol` failure (`LobbyDB.c`). Do not use the shared tail on them. The `DB_BIND_COL_NI` form (one call per column) is the right shape. Look for the difference in the refs and the call order first.
 - Repair 3, `LoadGameWorldCluster`: columns 6 and 7 used `SQL_C_SLONG` (-16). The original passes `SQL_C_LONG` (4) (`LobbyDB.c`, `SQLBindCol` and `statmentErrorLog`). Fixed. The score stays 84.2. The constant is correct, but it is not the cause of the gap. Check all `SQLBindCol` type constants against the pseudocode first (a script over all 39 calls found only these 2).
+- Binding the PDB parameters directly (`&wid`, `&pcid`, `&job`, `&level`) instead of a local copy keeps `TryCharacterCreation`, `FinishCharacterCreation` and `CancelCharacterCreation` at 100.0. Do not add a copy of a by-value parameter for `BindParam`.
 - Dead-strip: the 10 `LobbyDB` card functions have only stub callers (`CliSession`, `Character`, `GameWorldRegistry`, `CreateCharacterJob`). They need `/INCLUDE`. Without it, 0 card functions pair. With it, `~AutoDbTran` is reached and the 15 shared `Db::*` functions pair and match for the first time.
 
 ## ld-13

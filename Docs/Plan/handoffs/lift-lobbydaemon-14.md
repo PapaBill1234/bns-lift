@@ -2,7 +2,7 @@
 
 Source: LobbyDaemon 2019 + PDB (VS2010 SP1). Pseudocode from the indexed cache and the PDB types. IDA was not opened.
 The card index has 14 functions (RVA `0x9fdb0` to `0xa4150`). 11 are lifted. 3 are Not done.
-Branch base: main 75f0769. The lift was built in 5 checkpoints. This run checked them against the card index and finished the 2 functions that no checkpoint covered.
+Branch base: main 75f0769. Main bfb4c98 is merged. The lift was built in 5 checkpoints. This run checked them against the card index and finished the 2 functions that no checkpoint covered.
 
 ## Result
 
@@ -12,8 +12,8 @@ Branch base: main 75f0769. The lift was built in 5 checkpoints. This run checked
 | Not done | 3 |
 | Gate (`tools/gate.sh`, `LIFT_BUILD_DIR=build-ld-14`) | gate ok |
 | Parity (`tools/parity.sh`) | parity ok |
-| LobbyDaemon MATCH, baseline (main 75f0769) | 195 (paired 281) |
-| LobbyDaemon MATCH, final | 217 (paired 307) = +22 |
+| LobbyDaemon MATCH, baseline (main bfb4c98) | 219 (paired 306) |
+| LobbyDaemon MATCH, final | 241 (paired 332) = +22 |
 | CacheGate, LobbyGate, SmartCouponDaemon, PostOfficeDaemon MATCH | 456, 658, 630, 694 (+0 each, no MATCH lost) |
 
 The gain is 7 card functions and 15 shared `Db::*` functions. All 22 are new pairs.
@@ -98,6 +98,15 @@ Not tried:
 | --- | --- |
 | `LoadCharacterList` (`0xa17f0`) | The showcase `memcpy` is limited to the 512 byte bound buffer. The original copies `showcaseSize` bytes with no limit. The showcase allocation result is checked before the copy. |
 | `LoadGameWorldCluster`, `LoadGameWorld` | None. The lift keeps the original allocation and copy code. The `// BUG:` comments mark two copied log texts: "load game world group" and "load character list". |
+
+## Review fixes
+
+| Finding | Fix |
+| --- | --- |
+| `LoadCharacterList` local names | Renamed to the PDB names `db_gameAccountId`, `db_right`, `db_deletionDelayTime`, `db_lastPlayEndTime`, `db_showcaseData` (`tools/pdbq.py`). |
+| Param copies in `TryCharacterCreation`, `FinishCharacterCreation`, `CancelCharacterCreation` | Removed. The lift binds `wid`, `pcid`, `job` and `level` directly. All 3 stay MATCH (100.0). |
+| `LoadGameWorldCluster` `MultiByteStr` | Has a `// LIFT:` comment: the PDB has no name for the buffer. |
+| `kNullData` | Has a `// LIFT:` comment: the name is not in the PDB. |
 
 ## Notes
 

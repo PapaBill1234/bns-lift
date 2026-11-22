@@ -18,6 +18,8 @@
 
 namespace
 {
+// LIFT: the original compares the column length with the literal -1 (SQL_NULL_DATA). This name is not in the PDB
+// (0x9fe00, 0xa17f0, 0xa24c0). The name keeps the constant readable.
 unsigned long long const kNullData = static_cast<unsigned long long>(-1);  // SQL_NULL_DATA
 
 // LIFT: the original compares both qwords with the PDB global ID128_ID_ZERO (0x12d870, StringUtil.h) in
@@ -408,15 +410,15 @@ bool LobbyDB::LoadCharacterList(int& dbrtn, id128 const& gameAccountId, Characte
     unsigned long long collen[COL_MAX];
     memset(paramlen, 0, sizeof(paramlen));
     memset(collen, 0, sizeof(collen));
-    char dbRight = 0;
+    char db_right = 0;
     DBList dblist;
     collen[COL_CHARACTER_NAME] = SQL_NTS;
     collen[COL_SHOWCASE_DATA] = 512;
     Character::DB dbfield;
-    tagTIMESTAMP_STRUCT dbLastPlayEndTime;
-    tagTIMESTAMP_STRUCT dbDeletionDelayTime;
-    id128 dbGameAccountId;
-    char dbShowcaseData[512];
+    tagTIMESTAMP_STRUCT db_lastPlayEndTime;
+    tagTIMESTAMP_STRUCT db_deletionDelayTime;
+    id128 db_gameAccountId;
+    char db_showcaseData[512];
     if (!tran.Tran->BindParam(1, SQL_PARAM_OUTPUT, &dbrtn, 0, 0, SQL_INTEGER, SQL_C_SLONG, &paramlen[0]) ||
         (param = PARAM_GAME_ACCOUNT_ID,
          !tran.Tran->BindParam(2, SQL_PARAM_INPUT, const_cast<id128*>(&gameAccountId), 0, 0, SQL_GUID, SQL_C_GUID,
@@ -429,7 +431,7 @@ bool LobbyDB::LoadCharacterList(int& dbrtn, id128 const& gameAccountId, Characte
     // LIFT: the original has the DbTransaction::BindCol body inline (see LoadGameAccount 0x9fe00).
     DB_BIND_COL_NI(tran.Tran, 1, &dbfield.pcid, 0, SQL_C_SBIGINT, &collen[0], NOT_INIT, BIND_ERROR);
     column = COL_GAME_ACCOUNT_ID;
-    DB_BIND_COL_NI(tran.Tran, 2, &dbGameAccountId, 0, SQL_C_GUID, &collen[1], NOT_INIT, BIND_ERROR);
+    DB_BIND_COL_NI(tran.Tran, 2, &db_gameAccountId, 0, SQL_C_GUID, &collen[1], NOT_INIT, BIND_ERROR);
     column = COL_SLOT_ID;
     DB_BIND_COL_NI(tran.Tran, 3, &dbfield.slotid, 0, SQL_C_GUID, &collen[2], NOT_INIT, BIND_ERROR);
     column = COL_WORLD_ID;
@@ -441,18 +443,18 @@ bool LobbyDB::LoadCharacterList(int& dbrtn, id128 const& gameAccountId, Characte
     column = COL_CHARACTER_NAME;
     DB_BIND_COL_NI(tran.Tran, 7, dbfield.name, 66, SQL_C_WCHAR, &collen[6], NOT_INIT, BIND_ERROR);
     column = COL_CHARACTER_RIGHT;
-    DB_BIND_COL_NI(tran.Tran, 8, &dbRight, 0, SQL_C_TINYINT, &collen[7], NOT_INIT, BIND_ERROR);
+    DB_BIND_COL_NI(tran.Tran, 8, &db_right, 0, SQL_C_TINYINT, &collen[7], NOT_INIT, BIND_ERROR);
     column = COL_CHARACTER_STATE;
     DB_BIND_COL_NI(tran.Tran, 9, &dbfield.state, 0, SQL_C_TINYINT, &collen[8], NOT_INIT, BIND_ERROR);
     column = COL_DELETION_DELAY_TIME;
-    DB_BIND_COL_NI(tran.Tran, 10, &dbDeletionDelayTime, 16, SQL_C_TYPE_TIMESTAMP, &collen[9], NOT_INIT, BIND_ERROR);
+    DB_BIND_COL_NI(tran.Tran, 10, &db_deletionDelayTime, 16, SQL_C_TYPE_TIMESTAMP, &collen[9], NOT_INIT, BIND_ERROR);
     column = COL_LAST_PLAY_END_TIME;
-    DB_BIND_COL_NI(tran.Tran, 11, &dbLastPlayEndTime, 16, SQL_C_TYPE_TIMESTAMP, &collen[10], NOT_INIT, BIND_ERROR);
+    DB_BIND_COL_NI(tran.Tran, 11, &db_lastPlayEndTime, 16, SQL_C_TYPE_TIMESTAMP, &collen[10], NOT_INIT, BIND_ERROR);
     column = COL_JUMPING_CHARACTER_STATE;
     DB_BIND_COL_NI(tran.Tran, 12, &dbfield.jumpingCharacterState, 0, SQL_C_TINYINT, &collen[11], NOT_INIT,
                    BIND_ERROR);
     column = COL_SHOWCASE_DATA;
-    DB_BIND_COL_NI(tran.Tran, 13, dbShowcaseData, 512, SQL_C_BINARY, &collen[12], NOT_INIT, BIND_ERROR);
+    DB_BIND_COL_NI(tran.Tran, 13, db_showcaseData, 512, SQL_C_BINARY, &collen[12], NOT_INIT, BIND_ERROR);
     column = COL_BLOCKED;
     DB_BIND_COL_NI(tran.Tran, 14, &dbfield.block, 0, SQL_C_BIT, &collen[13], NOT_INIT, BIND_ERROR);
     if (!tran.Tran->Execute())
@@ -464,11 +466,11 @@ bool LobbyDB::LoadCharacterList(int& dbrtn, id128 const& gameAccountId, Characte
     for (;;)
     {
         memset(&dbfield, 0, sizeof(dbfield));
-        memset(&dbGameAccountId, 0, sizeof(dbGameAccountId));
-        dbRight = 0;
-        memset(&dbDeletionDelayTime, 0, sizeof(dbDeletionDelayTime));
-        memset(&dbLastPlayEndTime, 0, sizeof(dbLastPlayEndTime));
-        memset(dbShowcaseData, 0, sizeof(dbShowcaseData));
+        memset(&db_gameAccountId, 0, sizeof(db_gameAccountId));
+        db_right = 0;
+        memset(&db_deletionDelayTime, 0, sizeof(db_deletionDelayTime));
+        memset(&db_lastPlayEndTime, 0, sizeof(db_lastPlayEndTime));
+        memset(db_showcaseData, 0, sizeof(db_showcaseData));
         int const fetched = tran.Tran->Fetch(0);  // LIFT: Fetch never reads edx (see SmartCouponDB.cpp)
         if (fetched == -1)
         {
@@ -492,9 +494,9 @@ bool LobbyDB::LoadCharacterList(int& dbrtn, id128 const& gameAccountId, Characte
             return true;  // LIFT: the original frees the vector buffer here (StlMemory.h 64), dblist does it.
         }
         if (collen[COL_DELETION_DELAY_TIME] != kNullData)
-            dbfield.deletionDelayTime = Db::ConvertTime(&dbDeletionDelayTime);
+            dbfield.deletionDelayTime = Db::ConvertTime(&db_deletionDelayTime);
         if (collen[COL_LAST_PLAY_END_TIME] != kNullData)
-            dbfield.lastPlayEndTime = Db::ConvertTime(&dbLastPlayEndTime);
+            dbfield.lastPlayEndTime = Db::ConvertTime(&db_lastPlayEndTime);
         if (collen[COL_SHOWCASE_DATA] != kNullData)
         {
             dbfield.showcaseSize = static_cast<short>(collen[COL_SHOWCASE_DATA]);
@@ -503,10 +505,10 @@ bool LobbyDB::LoadCharacterList(int& dbrtn, id128 const& gameAccountId, Characte
             // LIFT: the driver reports the full length. The bound buffer has 512 bytes. Copy at most 512 bytes.
             // The original copies showcaseSize bytes without a limit.
             long long copySize = dbfield.showcaseSize;
-            if (copySize > static_cast<long long>(sizeof(dbShowcaseData)))
-                copySize = sizeof(dbShowcaseData);
+            if (copySize > static_cast<long long>(sizeof(db_showcaseData)))
+                copySize = sizeof(db_showcaseData);
             if (dbfield.showcase != nullptr && copySize > 0)
-                memcpy(dbfield.showcase, dbShowcaseData, static_cast<size_t>(copySize));
+                memcpy(dbfield.showcase, db_showcaseData, static_cast<size_t>(copySize));
         }
         Character::DB* loaded = static_cast<Character::DB*>(Memory::_Manager[2]->Alloc(144, LOBBYDB_FILE, 778));
         memcpy(loaded, &dbfield, sizeof(Character::DB));
@@ -590,6 +592,8 @@ bool LobbyDB::LoadGameWorldCluster(int& dbrtn, GameWorldCluster::DB**& out, int&
     GameWorldCluster::DB dbfield;
     wchar_t db_pubip4str[16];
     wchar_t db_privip4str[16];
+    // LIFT: the PDB has no name for this 32-byte buffer (0xa24c0). The original converts db_pubip4str and
+    // db_privip4str into it for inet_addr (LobbyDB.c). The name is the Hex-Rays one.
     char MultiByteStr[32];
     if (!tran.Tran->BindParam(1, SQL_PARAM_OUTPUT, &dbrtn, 0, 0, SQL_INTEGER, SQL_C_SLONG, &paramlen[0]))
     {
@@ -932,7 +936,6 @@ bool LobbyDB::TryCharacterCreation(int& dbrtn, id128 const& gameAccountId, id128
     memset(paramlen, 0, sizeof(paramlen));
     paramlen[PARAM_CHARACTER_NAME] = static_cast<unsigned long long>(SQL_NTS);
     unsigned long long pcid = 0;
-    short buffer = wid;
     if (!tran.Tran->BindParam(1, SQL_PARAM_OUTPUT, &dbrtn, 0, 0, SQL_INTEGER, SQL_C_SLONG, &paramlen[0]) ||
         (param = PARAM_GAME_ACCOUNT_ID,
          !tran.Tran->BindParam(2, SQL_PARAM_INPUT, const_cast<id128*>(&gameAccountId), 0, 0, SQL_GUID, SQL_C_GUID,
@@ -941,7 +944,7 @@ bool LobbyDB::TryCharacterCreation(int& dbrtn, id128 const& gameAccountId, id128
          !tran.Tran->BindParam(3, SQL_PARAM_INPUT, const_cast<id128*>(&slotid), 0, 0, SQL_GUID, SQL_C_GUID,
                                &paramlen[2])) ||
         (param = PARAM_WORLD_ID,
-         !tran.Tran->BindParam(4, SQL_PARAM_INPUT, &buffer, 0, 0, SQL_SMALLINT, SQL_C_SSHORT, &paramlen[3])) ||
+         !tran.Tran->BindParam(4, SQL_PARAM_INPUT, &wid, 0, 0, SQL_SMALLINT, SQL_C_SSHORT, &paramlen[3])) ||
         (param = PARAM_CHARACTER_NAME,
          !tran.Tran->BindParam(5, SQL_PARAM_INPUT, const_cast<wchar_t*>(name), nameBufSizeInBytes, 32, SQL_WVARCHAR,
                                SQL_C_WCHAR, &paramlen[4])) ||
@@ -1018,16 +1021,13 @@ bool LobbyDB::FinishCharacterCreation(int& dbrtn, unsigned long long pcid, short
     unsigned long long paramlen[PARAM_MAX];
     memset(paramlen, 0, sizeof(paramlen));
     paramlen[PARAM_SHOWCASE_DATA] = static_cast<unsigned long long>(static_cast<long long>(showcaseDataSize));
-    unsigned long long buffer = pcid;
-    short dbJob = job;
-    short dbLevel = level;
     if (!tran.Tran->BindParam(1, SQL_PARAM_OUTPUT, &dbrtn, 0, 0, SQL_INTEGER, SQL_C_SLONG, &paramlen[0]) ||
         (param = PARAM_PCID,
-         !tran.Tran->BindParam(2, SQL_PARAM_INPUT, &buffer, 0, 0, SQL_BIGINT, SQL_C_UBIGINT, &paramlen[1])) ||
+         !tran.Tran->BindParam(2, SQL_PARAM_INPUT, &pcid, 0, 0, SQL_BIGINT, SQL_C_UBIGINT, &paramlen[1])) ||
         (param = PARAM_JOB,
-         !tran.Tran->BindParam(3, SQL_PARAM_INPUT, &dbJob, 0, 0, SQL_SMALLINT, SQL_C_SSHORT, &paramlen[2])) ||
+         !tran.Tran->BindParam(3, SQL_PARAM_INPUT, &job, 0, 0, SQL_SMALLINT, SQL_C_SSHORT, &paramlen[2])) ||
         (param = PARAM_LEVEL,
-         !tran.Tran->BindParam(4, SQL_PARAM_INPUT, &dbLevel, 0, 0, SQL_SMALLINT, SQL_C_SSHORT, &paramlen[3])) ||
+         !tran.Tran->BindParam(4, SQL_PARAM_INPUT, &level, 0, 0, SQL_SMALLINT, SQL_C_SSHORT, &paramlen[3])) ||
         (param = PARAM_JUMPING_CHARACTER_STATE,
          !tran.Tran->BindParam(5, SQL_PARAM_INPUT, &jumpingCharacterState, 0, 0, SQL_TINYINT, SQL_C_TINYINT,
                                &paramlen[4])) ||
@@ -1083,10 +1083,9 @@ bool LobbyDB::CancelCharacterCreation(int& dbrtn, unsigned long long pcid)
     dbrtn = 0;
     int param = PARAM_RETURN;
     unsigned long long paramlen[PARAM_MAX] = {0, 0};
-    unsigned long long buffer = pcid;
     if (!tran.Tran->BindParam(1, SQL_PARAM_OUTPUT, &dbrtn, 0, 0, SQL_INTEGER, SQL_C_SLONG, &paramlen[0]) ||
         (param = PARAM_PCID,
-         !tran.Tran->BindParam(2, SQL_PARAM_INPUT, &buffer, 0, 0, SQL_BIGINT, SQL_C_UBIGINT, &paramlen[1])))
+         !tran.Tran->BindParam(2, SQL_PARAM_INPUT, &pcid, 0, 0, SQL_BIGINT, SQL_C_UBIGINT, &paramlen[1])))
     {
         Log::Write(Log::LT_ERROR, LOBBYDB_FILE, 1448,
                    L"[lobbydb], cancel character creation fail; bind parameter fail, param:%s", ParamDesc[param]);
