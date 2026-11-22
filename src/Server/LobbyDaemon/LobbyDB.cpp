@@ -892,7 +892,7 @@ bool LobbyDB::CheckValidityOfCharacterName(int& dbrtn, wchar_t const* name, int)
 }
 
 // 0xa39b0
-#pragma comment(linker, "/INCLUDE:?TryCharacterCreation@LobbyDB@@SA_NAEAHAEBTid128@@1FPEB_WHDPEA_K@Z")   // LIFT: keep until the caller is lifted (0x31550)
+#pragma comment(linker, "/INCLUDE:?TryCharacterCreation@LobbyDB@@SA_NAEAHAEBTid128@@1FPEB_WHDPEA_K@Z")   // LIFT: keep until CreateCharacterJob::tryCreateCharacter (0x43b90) is lifted. Character::TryCreation (0x31550) is lifted but dead-stripped.
 bool LobbyDB::TryCharacterCreation(int& dbrtn, id128 const& gameAccountId, id128 const& slotid, short wid,
                                    wchar_t const* name, int nameBufSizeInBytes, char right, unsigned long long* outpcid)
 {
@@ -973,7 +973,7 @@ bool LobbyDB::TryCharacterCreation(int& dbrtn, id128 const& gameAccountId, id128
 }
 
 // 0xa3da0
-#pragma comment(linker, "/INCLUDE:?FinishCharacterCreation@LobbyDB@@SA_NAEAH_KFFD_NPEBDH@Z")   // LIFT: keep until the caller is lifted (0x319b0)
+#pragma comment(linker, "/INCLUDE:?FinishCharacterCreation@LobbyDB@@SA_NAEAH_KFFD_NPEBDH@Z")   // LIFT: keep until CreateCharacterJob::createCharacterOk (0x44270) is lifted. Character::FinishCreation (0x319b0) is lifted but dead-stripped.
 bool LobbyDB::FinishCharacterCreation(int& dbrtn, unsigned long long pcid, short job, short level,
                                       char jumpingCharacterState, bool consumptionJumpingCharacterCreationQuota,
                                       char const* showcaseData, int showcaseDataSize)
@@ -1057,7 +1057,7 @@ bool LobbyDB::FinishCharacterCreation(int& dbrtn, unsigned long long pcid, short
 }
 
 // 0xa4150
-#pragma comment(linker, "/INCLUDE:?CancelCharacterCreation@LobbyDB@@SA_NAEAH_K@Z")   // LIFT: keep until the caller is lifted (0x31c00)
+#pragma comment(linker, "/INCLUDE:?CancelCharacterCreation@LobbyDB@@SA_NAEAH_K@Z")   // LIFT: keep until CreateCharacterJob::createCharacterFail (0x44900) is lifted. Character::CancelCreation (0x31c00) is lifted but dead-stripped.
 bool LobbyDB::CancelCharacterCreation(int& dbrtn, unsigned long long pcid)
 {
     // PDB local enum LobbyDB::CancelCharacterCreation::__l11::Param. ParamDesc holds the names.

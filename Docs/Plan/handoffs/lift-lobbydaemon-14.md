@@ -59,7 +59,7 @@ The gain is 7 card functions and 15 shared `Db::*` functions. All 22 are new pai
 
 ## Dead-strip
 
-The 10 `LobbyDB` card functions have only stub callers. Each has `#pragma comment(linker, "/INCLUDE:...")` with the decorated PDB name and the caller RVA. `AutoDbTran::~AutoDbTran` needs none: the kept functions reach it. The verify card removes the pragmas.
+7 of the 10 `LobbyDB` card functions have only stub callers. The other 3 (`TryCharacterCreation`, `FinishCharacterCreation`, `CancelCharacterCreation`) have lifted callers in `Character.cpp`. Those callers are dead-stripped, because their own callers in `CreateCharacterJob.cpp` are still stubs. Each of the 10 has `#pragma comment(linker, "/INCLUDE:...")` with the decorated PDB name and the caller RVA. `AutoDbTran::~AutoDbTran` needs none: the kept functions reach it. The verify card removes the pragmas.
 
 | Function | Caller kept for |
 | --- | --- |
@@ -69,11 +69,13 @@ The 10 `LobbyDB` card functions have only stub callers. Each has `#pragma commen
 | `LoadCharacterList` | `CliSession::loadDB` `0x349a0` |
 | `LoadGameWorldCluster`, `LoadGameWorld` | `GameWorldRegistry::Setup` `0x4ed00` |
 | `CheckValidityOfCharacterName` | `CreateCharacterJob::init` `0x41b10` |
-| `TryCharacterCreation`, `FinishCharacterCreation`, `CancelCharacterCreation` | `Character::TryCreation` `0x31550`, `FinishCreation` `0x319b0`, `CancelCreation` `0x31c00` |
+| `TryCharacterCreation` | `CreateCharacterJob::tryCreateCharacter` `0x43b90` (stub). Lifted `Character::TryCreation` `0x31550` is dead-stripped. |
+| `FinishCharacterCreation` | `CreateCharacterJob::createCharacterOk` `0x44270` (stub). Lifted `Character::FinishCreation` `0x319b0` is dead-stripped. |
+| `CancelCharacterCreation` | `CreateCharacterJob::createCharacterFail` `0x44900` (stub). Lifted `Character::CancelCreation` `0x31c00` is dead-stripped. |
 
 ## Codegen trials
 
-6 trials, 6 kept. Details are in `Docs/Parity/lessons.md`, section ld-14. The limit of 3 is per function, not per card.
+6 trials, 6 kept (the `LoadGameWorldCluster` constant fix is under Review fixes). Details are in `Docs/Parity/lessons.md`, section ld-14. The limit of 3 is per function, not per card.
 
 | Function | Trial | Score |
 | --- | --- | --- |
@@ -82,7 +84,6 @@ The 10 `LobbyDB` card functions have only stub callers. Each has `#pragma commen
 | `FinishCharacterCreation` | A17: explicit `if (dbrtn == 0) return true; return false;` | 99.1 -> 100 |
 | `UpdateGameAccountTimeBasedPlayInfo` | A8: same (repair round 2) | 97.4 -> 100 |
 | `LoadGameAccount` | A8: same (repair round 2) | 78.9 -> 80.5 |
-| `LoadGameWorldCluster` | Columns 6 and 7: `SQL_C_LONG` as in the original, not `SQL_C_SLONG` (repair round 3). The `// BUG:` comment now also marks the bind-column log. | 84.2 -> 84.2 |
 | `LoadCharacterList` | A8: same (repair round 2) | 78.1 -> 79.0 |
 
 Not tried:
@@ -107,6 +108,7 @@ Not tried:
 | Param copies in `TryCharacterCreation`, `FinishCharacterCreation`, `CancelCharacterCreation` | Removed. The lift binds `wid`, `pcid`, `job` and `level` directly. All 3 stay MATCH (100.0). |
 | `LoadGameWorldCluster` `MultiByteStr` | Has a `// LIFT:` comment: the PDB has no name for the buffer. |
 | `kNullData` | Has a `// LIFT:` comment: the name is not in the PDB. |
+| `LoadGameWorldCluster` columns 6 and 7 | `SQL_C_LONG` as in the original, not `SQL_C_SLONG` (repair round 3). The `// BUG:` comment now also marks the bind-column log. Score 84.2 -> 84.2. This is a constant fix, not a codegen trial. |
 
 ## Notes
 
