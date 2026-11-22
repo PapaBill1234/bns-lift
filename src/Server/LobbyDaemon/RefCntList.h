@@ -30,31 +30,32 @@ public:
     ~RefCntList();  // 0x64c90
     bool Pushback(RefCntListNode* node);  // 0x64d00
     bool Remove(RefCntListNode* node);    // 0x64da0
-    RefCntListNode* Begin() { return _head; }
-    int Size() { return _size; }
 
-    // LIFT: The PDB names Popfront. Its loop body is inline at 0x60b20 and 0x60d00.
+    // LIFT: PDB inline method. LobbyTick::~LobbyTick uses it at 0x5a610.
     RefCntListNode* Popfront()
     {
-        RefCntListNode* node = _head;
-        if (node == nullptr)
+        RefCntListNode* head = _head;
+        if (head == nullptr)
             return nullptr;
-        if (node == _tail)
+        if (head == _tail)
         {
             _tail = nullptr;
             _head = nullptr;
         }
         else
         {
-            node->_next->_prev = nullptr;
+            head->_next->_prev = nullptr;
             _head = _head->_next;
         }
-        node->_next = nullptr;
-        node->_prev = nullptr;
-        node->_list = nullptr;
+        head->_next = nullptr;
+        head->_prev = nullptr;
+        head->_list = nullptr;
         --_size;
-        return node;
+        return head;
     }
+
+    RefCntListNode* Begin() { return _head; }
+    int Size() { return _size; }
 
 private:
     RefCntListNode* _head;  // +0

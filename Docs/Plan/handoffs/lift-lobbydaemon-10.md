@@ -14,13 +14,10 @@ Source: LobbyDaemon 2019 + PDB. Base: `56270503`. The lift uses the cached pseud
 | Mileage | `0x60950` | `MileageSlot::~MileageSlot` | 100.0 |
 | Mileage | `0x60a80` | `MileageInterimDepositTimer::MileageInterimDepositTimer` | 100.0 |
 | Mileage | `0x60b20` | `MileageInterimDepositTimer::~MileageInterimDepositTimer` | 100.0 |
-| Mileage | `0x60be0` | `MileageInterimDepositTimer::Register` | 100.0 |
 | Mileage | `0x60d00` | `MileageInterimDepositTimer::Tick` | 80.9 |
 | Mileage | `0x614d0` | `swprintf_s<513>` | 100.0 |
 | MembershipMileage | `0x5bff0` | `MembershipMileage::Accept` | 100.0 |
-| MembershipMileage | `0x5c040` | `MembershipMileage::Initialize` | 0.0 |
-| MembershipMileage | `0x5c300` | `MembershipMileage::Start` | 95.9 |
-| MembershipMileage | `0x5ca20` | `MembershipMileage::GradeChanged` | 100.0 |
+| MembershipMileage | `0x5c040` | `MembershipMileage::Initialize` | 0.0 (lifted, not verified: callee `Mileage::Initialize` is a noreturn stub) |
 | MembershipMileage | `0x5cca0` | `MembershipMileageSession::start` | 100.0 |
 | MembershipMileage | `0x5ce40` | `MembershipMileageSession::update` | 100.0 |
 | MembershipMileage | `0x5cfd0` | `MembershipMileageSession::stop` | 100.0 |
@@ -28,11 +25,12 @@ Source: LobbyDaemon 2019 + PDB. Base: `56270503`. The lift uses the cached pseud
 | MembershipMileage | `0x5d160` | `std::vector<Section<__int64>,StlAllocator<Section<__int64>,2> >::reserve` | Excluded |
 | MembershipMileage | `0x5d240` | `Section<__int64>::Intersect<__int64,std::vector,StlAllocator<Section<__int64>,2> >` | 100.0 |
 | MembershipMileage | `0x96440` | `std::_Uninit_move<Section<__int64> *,Section<__int64> *,StlAllocator<Section<__int64>,2>,Section<__int64> >` | Excluded |
-| MembershipMileage | `0x9f540` | `std::vector<Section<__int64>,StlAllocator<Section<__int64>,2> >::vector<Section<__int64>,StlAllocator<Section<__int64>,2> >` | Excluded |
 
-Total: 21 lifted, including four VS2010 STL bodies. Their decorated names are in the built PDB. The comparison tool excludes `std::` functions. It does not give them MATCH credit.
+Total: 17 lifted, including three VS2010 STL bodies. Their decorated names are in the built PDB. The comparison tool excludes `std::` functions. It does not give them MATCH credit.
 
-`MembershipMileage::Initialize` has a source body. VS2010 removes its tail because the base initializer still stops the process. `MileageInterimDepositTimer::Tick` still reaches the stub for `Node::Expire` when a node expires.
+`MembershipMileage::Initialize` is lifted, not verified: callee `Mileage::Initialize` is a noreturn stub. VS2010 removes the tail of the body. `MileageInterimDepositTimer::Tick` still reaches the stub for `Node::Expire` (`0x60f20`) when a node expires.
+
+The callers of `MileageSession::MileageSession` and the three `MembershipMileageSession` methods are now stubs. Each of these functions has a `/INCLUDE` pragma with a `// LIFT:` reason, so `/OPT:REF` keeps it.
 
 ## Not done
 
@@ -58,14 +56,27 @@ Total: 21 lifted, including four VS2010 STL bodies. Their decorated names are in
 | Mileage | `0x62410` | `std::_Med3<Section<__int64> *,SortByStartTime>` | The `Mileage::FeverTime::Initiaize` body is not in this card. |
 | Mileage | `0x62490` | `std::_Pop_heap_0<MileageFeverTimeInfo **,MileageFeverTimeInfo *,FeverTimeSorter>` | The `Mileage::Initialize` body is a stub. |
 | MembershipMileage | `0x5c6c0` | `MembershipMileage::Stop` | Needs `Mileage::settle` (`0x5dd60`). The earlier card did not add a definition for it. |
+| MembershipMileage | `0x5c300` | `MembershipMileage::Start` | Blocked. The original flow has no null check after the inline `MembershipMileageSession` construction. The repair removed the added check, but the permission classifier denied that edit. The restore needs explicit user approval. The body is a stub again. |
+| MembershipMileage | `0x5ca20` | `MembershipMileage::GradeChanged` | Blocked. Same reason as `Start`: the lift added a null check that the original does not have. The guard removal needs explicit user approval. |
+| Mileage | `0x60be0` | `MileageInterimDepositTimer::Register` | Blocked. Same reason: the lift added a null check that the original does not have. The guard removal needs explicit user approval. |
+| MembershipMileage | `0x9f540` | `std::vector<Section<__int64>,StlAllocator<Section<__int64>,2> >::vector<Section<__int64>,StlAllocator<Section<__int64>,2> >` | Only the inline `MembershipMileageSession` ctor in `Start` emits it. It comes back when `Start` is lifted. |
 
-Total: 18 not done. The card does not count deleting destructors.
+Total: 22 not done. The card does not count deleting destructors.
+
+## Header changes
+
+The card overlaps with ld-12 in two shared headers. Each header now has one declaration that matches the ld-12 shape.
+
+| Header | Change | Merge plan |
+| --- | --- | --- |
+| `src/Server/LobbyDaemon/LobbyTick.h` | `LobbyTick::Listener` uses the ld-12 members (`IsListen`, `SetListen`, pure `Tick`, `volatile bool _listen`). ld-10 adds only the inline ctor `Listener() : _listen(false) {}` (inline at `0x60a80`). The `static_assert(sizeof(LobbyTick::Listener) == 0x38)` is at the end of the file. | Merge ld-12 first. Then keep only the ctor line from ld-10. |
+| `src/Server/LobbyDaemon/RefCntList.h` | `RefCntList::Popfront` is the same text as the ld-12 hunk (after `Remove`, `0x64da0`). | The hunks are identical. Git takes one copy. |
 
 ## Verification
 
-The five checkpoints cover the 39 indexed functions with no overlap. They exclude four scalar deleting destructors. Checkpoint 5 did not verify four STL bodies. The VS2010 PDB contains all four original decorated public names. It also contains each card `/INCLUDE` name.
+The VS2010 PDB contains each card `/INCLUDE` name and the three STL decorated names that remain.
 
-The full gate and parity checks exited zero and printed `gate ok` and `parity ok`. The source patch did not change during the checks.
+The full gate and parity checks ran on the committed source with `LIFT_BUILD_DIR=build-ld-10`. Both exited zero and printed `gate ok` and `parity ok`. There is no MATCH -> DIFF change and no MATCH name is gone.
 
 | Exe | Baseline MATCH | Final MATCH | Gain |
 | --- | ---: | ---: | ---: |
@@ -73,12 +84,21 @@ The full gate and parity checks exited zero and printed `gate ok` and `parity ok
 | LobbyGate | 658 | 658 | 0 |
 | SmartCouponDaemon | 630 | 630 | 0 |
 | PostOfficeDaemon | 694 | 694 | 0 |
-| LobbyDaemon | 82 | 99 | +17 |
+| LobbyDaemon | 82 | 95 | +13 |
+
+The earlier candidate had +17. The repair lost four MATCH entries:
+
+| Function | Cause |
+| --- | --- |
+| `MembershipMileage::GradeChanged` | Stub again (blocked guard removal). |
+| `MileageInterimDepositTimer::Register` | Stub again (blocked guard removal). |
+| `GradeService::GetGrade` | Its only lifted caller was `Start`. LTCG removes it now. Its body is in another card's file. |
+| `RefCntList::Pushback` | ❓ LTCG probably inlines it into `Tick`, which is now its only caller. |
 
 `vendor/zstd/src` is at `bb6eaf6495a0`. No baseline files changed.
 
 ## Codegen trials
 
-The conditional placement new in `MembershipMileage::Start` (`0x5c300`) kept the null check. Its score stayed at 95.9. The final patch keeps the early return before construction.
+`MembershipMileage::Start` (`0x5c300`): the earlier candidate added a null check after the placement new. The original has no such check. This trial does not follow the original flow, so the repair drops it. The original-flow body is not in this commit (see Not done).
 
-No trial changed `MileageSession::MileageSession` (`0x606b0`). The cached body already agrees with the source store order. No trial changed `Tick` (`0x60d00`) or `Initialize` (`0x5c040`). Their scores are below 85, and their callees still have stubs.
+No trial changed `MileageSession::MileageSession` (`0x606b0`). It stays at 86.7. No trial changed `Tick` (`0x60d00`) or `Initialize` (`0x5c040`). Their scores are below 85, and their callees still have stubs.

@@ -13,13 +13,15 @@ public:
     {
     public:
         // LIFT: The ctor is inline at MileageInterimDepositTimer::MileageInterimDepositTimer (0x60a80).
+        // LIFT: ld-12 owns this class. Merge ld-12 first, then keep only this ctor line from ld-10.
         Listener() : _listen(false) {}
-        virtual bool Tick(long long) = 0;
+        bool IsListen() { return _listen; }
+        void SetListen(bool listen) { _listen = listen; }
+        virtual bool Tick(long long elapsed) = 0;
 
     private:
-        bool volatile _listen;
+        volatile bool _listen;
     };
-    static_assert(sizeof(Listener) == 0x38, "sizeof LobbyTick::Listener");
 
     virtual ~LobbyTick();  // 0x5a610
     virtual bool HandleEvent(EventContext*, unsigned long);  // 0x5a7f0
@@ -33,3 +35,4 @@ public:
     virtual ~LobbyTickEvent();  // 0x5a9b0
     virtual bool HandleEvent(EventContext*, unsigned long);  // 0x5aa20
 };
+static_assert(sizeof(LobbyTick::Listener) == 0x38, "sizeof LobbyTick::Listener");

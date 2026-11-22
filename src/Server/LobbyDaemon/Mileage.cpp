@@ -169,7 +169,7 @@ void MileageManager::Accept(LobbyMessage* message)
 // LIFT: The PDB has no name for the counter at 0x209b40. The ctor at 0x606b0 owns it.
 static long long volatile mileageSessionId;
 
-// 0x606b0
+#pragma comment(linker, "/INCLUDE:??0MileageSession@@QEAA@PEAVMileage@@_J@Z")  // LIFT: keep until the caller is lifted (0x606b0)
 MileageSession::MileageSession(Mileage* owner, long long startTime)
 {
     unsigned long long id = _InterlockedIncrement64(&mileageSessionId);
@@ -253,21 +253,10 @@ MileageInterimDepositTimer::~MileageInterimDepositTimer()
         node->removeReferenceCount(L"Mileage.cpp", 1376);
 }
 
-#pragma comment(linker, "/INCLUDE:?Register@MileageInterimDepositTimer@@QEAAPEAVNode@1@_K0@Z")  // LIFT: keep until the caller is lifted (0x60be0)
-MileageInterimDepositTimer::Node* MileageInterimDepositTimer::Register(unsigned long long clikey, unsigned long long sessionId)
+// 0x60be0
+MileageInterimDepositTimer::Node* MileageInterimDepositTimer::Register(unsigned long long, unsigned long long)
 {
-    long long expire = GetTickCount64() - Daemon::Instance->StartSystemTick64 + _period;
-    void* memory = Memory::_Manager[Memory::DYNAMIC]->Alloc(sizeof(Node), L"Mileage.cpp", 1384);
-    Node* node = memory != nullptr ? ::new (memory) Node(clikey, sessionId, expire) : nullptr;
-    _lock.Enter();
-    bool added = node != nullptr && _sessions.Pushback(node);
-    _lock.Leave();
-    if (added)
-        return node;
-    // BUG: The original can release a null node on allocation failure (0x60be0).
-    if (node != nullptr)
-        node->removeReferenceCount(L"Mileage.cpp", 1393);
-    return nullptr;
+    LIFT_STUB(0x60be0);
 }
 
 // 0x60d00
@@ -298,6 +287,7 @@ bool MileageInterimDepositTimer::Tick(long long elapsed)
     return true;
 }
 
+// 0x60f20
 void MileageInterimDepositTimer::Node::Expire(long long)
 {
     LIFT_STUB(0x60f20);

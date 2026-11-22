@@ -965,5 +965,6 @@ What failed:
 
 ## ld-10
 
-- `MembershipMileage::Start` (`0x5c300`): conditional placement new (A16) with a null result check gave 95.9, the same score as the early return before construction. Keep the early return.
-- The VS2010 STL emits four `std::vector<Section<__int64>,StlAllocator<Section<__int64>,2> >` functions through the normal container calls. Check the decorated names in the built PDB. The parity count excludes these STL functions.
+- Follow the original flow. Do not add a null check that the original does not have, even if the score does not change. `Start` (`0x5c300`), `GradeChanged` (`0x5ca20`) and `Register` (`0x60be0`) had added checks. The guard removal was blocked, so these three functions are stubs again.
+- When a lifted caller becomes a stub, LTCG can remove its callees. `GradeService::GetGrade` and the `std::vector<Section<__int64>>` ctor (`0x9f540`) went out of the build with `Start`. ❓ `RefCntList::Pushback` was probably inlined into its last caller `Tick`. Use `/INCLUDE` with a `// LIFT:` reason only for bodies in the card's own files.
+- The VS2010 STL emits the `std::vector<Section<__int64>,StlAllocator<Section<__int64>,2> >` functions through the normal container calls. Check the decorated names in the built PDB. The parity count excludes these STL functions.
