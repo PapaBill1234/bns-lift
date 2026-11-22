@@ -1137,3 +1137,55 @@ Card lift-lobbydaemon-13: CliSession part 3, CliSessionManager (56 functions).
 | Dead-strip, handler table | A handler that only the (stub) handler table calls needs `/INCLUDE:` too. `HandleLobbyLobbyGate_CheckCharacterNameReq` was unpaired until the pragma was added. Then it was MATCH 100.0 (+1). |
 | Build input | A new worktree can lack the ignored `vendor/zstd/src`. All 5 VS2010 links fail with `ZSTD_*` unresolved. Copy the source from another worktree. Check `git rev-parse HEAD` = bb6eaf64. Delete `build-vs2010/obj/vendor` after the copy. |
 | Trials | None. 16 of 17 functions need layouts that main does not have. |
+## ld-18
+
+Card lift-lobbydaemon-18: GamedChannel part 1 (35 functions) and AccountInventoryChannel (19 functions).
+
+| Item | Result |
+| --- | --- |
+| Lifted | 50 (incl. 2 shared: `Network::iocpHandle`, `swprintf_s<129>`) |
+| Not done | 5 (`AccountInventoryChannel::Connect`, `AccountInventorySessionHandler::OnConnect`, `AccountInventorySessionHandler::OnClose`, `AccountInventorySessionHandler` scalar deleting destructor, `GamedChannelManager::OnClose`) |
+| LD MATCH | 195 -> 254 over main 75f0769 (+59: 42 card functions, 17 shared functions). No MATCH lost. |
+
+What worked (count = functions made MATCH):
+- A19 separate stores for the inlined `Packet` constructor, in the PDB order: `CurHeader`, `Splitter`, `ListHead`, `ListTail`,
+  `IsFragmentPacket`, `FragmentPacketCmd`, then `p.Allocate()`. `memset` and `= {}` do not fold `Allocate`. All 30 `Send*` functions
+  use it (try 1 of each; about 56.7 -> 91.7).
+- A4 `__declspec(noinline)` on `SharedChannel::Send(Packet const*)` (0x4ba0). The original `Send*` functions call it out of line.
+  Ours inlined it (calls 40, consts 50). One edit: +21 MATCH, and `SharedChannel::Send` itself becomes MATCH. The other 4 exes lose nothing.
+- Zero register form: the original keeps a zero in a callee-saved register (`cmp r12w, ax`, `lea r8d, [r12 + cmd]`). The source form of
+  the `Compose` test decides this. Same code, three forms (counts are functions that reached 100):
+
+  | Form | Result |
+  | --- | --- |
+  | `if (p.Compose(...) != 0)` | `SendStartChargeOk` 95.2 (consts: ours has an extra immediate) |
+  | `if (0 != p.Compose(...))` | `SendStartChargeOk` 100 (+1). The same change on the other 18 `GamedChannel` functions with a `!= 0` test. |
+  | `if (0 == p.Compose(...)) { log; return false; } return TSend(t, &p);` | With the `TSend` fixes below: 242 -> 253 MATCH in total |
+  | `if (p.Compose(...) == 0)` | `SendChangeCharacterAppearanceReq` 100 (the `0 ==` form gave 96.3: the `0x39` immediate moved to a `lea`) |
+
+- A4 plus an ICF guard on the `TransactionChannel::TSend` stub (0x7b2b0). The stub is a `LIFT_STUB`. Three effects:
+  1. LTCG inlined the stub as `abort`. The callers lost `TSend` and the second `Packet::Clear` (calls 80). `noinline` fixes it.
+  2. `/OPT:ICF` folded the stub into `GamedChannelManager::OnClose` (another stub). The call then scored as `OnClose`.
+     A volatile write in the body keeps it unique.
+  3. The stub is noreturn (`abort`, `__assume(0)`), so LTCG dropped the `Packet::Clear` after the call. A volatile flag test and a
+     `return false` stop that. +11 MATCH. The next card (ld-28) lifts `TSend` and must delete these workarounds.
+
+What failed or is blocked (tries):
+- `SendListGoodsReq` 96.3, `SendFinishWarehouseItemConsumptionReq` 97.0, `SendCreateCharacterReq` 97.0 (3 forms each, consts 89 to 91):
+  1. `if (p.Compose(...) == 0) { log; return false; }` (first lift): consts 80 to 91.
+  2. `if (0 == p.Compose(...))`: best (consts 89 to 91, calls 100). Kept.
+  3. Success first, `if (0 != p.Compose(...)) return TSend(t, &p); log; return false;`: consts 100 for `Create`, but calls 75 to 80.
+     The original puts the error block first (A17). Reverted.
+  The only DIFF left is one immediate (`0x14`, `0x79`, `0x16`) against a `lea` from the zero register.
+- `GamedChannel::SendAccountInventoryNotify` 79.1 (calls 56): the original calls `Packet::Allocate()` out of line from the inlined
+  `Packet::Allocate(PacketComposer*)`. Ours inlines both. `noinline` on `Packet::Allocate()` would break the `Send*` functions
+  that inline it (BloodLib, shared by all 5 exes). Below 85: no tries.
+- `GamedChannelManager::PacketHandler` 82.2 and `AccountInventorySessionHandler::PacketHandler` 76.9: the original calls a handler
+  through the table, and `LobbyGamePacketLobbySideHandlerList` and `AccountInventoryLobbyPacketLobbySideHandlerList` are empty here
+  (null tables, owners ld-16 / ld-21 / ld-26 and the AccountInventory handler card). Below 85: no tries.
+- A /INCLUDE for a function with a wrong signature fails the link (`LNK2001`). The PDB public name encodes the signature, so the
+  failure points to the exact mistake: a missing `short` parameter (`SendFinishWarehouseItemConsumptionReq`), a pointer for a
+  reference (`SendCreateCharacterReq`). Take the decorated names with `llvm-pdbutil dump -publics`.
+- A class with a virtual function and no `virtual` destructor declared emits no vtable and no scalar deleting destructor, so an
+  /INCLUDE of `??_G` does not link (`AccountInventorySessionHandler`).
+- A /INCLUDE for a stub that another card owns is not allowed here. Define a local stub with a LIFT comment and list it in the handoff.

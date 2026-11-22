@@ -143,7 +143,8 @@ bool SharedChannel::Send(char const* format, ...)
 }
 
 // 0x4ba0 (LobbyDaemon)
-bool SharedChannel::Send(Packet const* packet)
+// LIFT: noinline. The orig GamedChannel Send* functions call it out of line (A4).
+__declspec(noinline) bool SharedChannel::Send(Packet const* packet)
 {
     if (_rawChannel == nullptr)
         return false;

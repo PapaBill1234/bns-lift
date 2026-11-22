@@ -1,19 +1,33 @@
 // GamedChannel.obj (LobbyDaemon PDB, 2019 + PDB). Wave 0: declarations of the stubbed functions only.
-// LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
+// LIFT: GamedChannel and GamedChannelManager have their PDB layouts (ld-18 batch 3).
 #pragma once
+#include <stddef.h>
+#include "Channel.h"
+#include "Lock.h"
+#include "SharedChannel.h"
+#include "TransactionChannel.h"
 
-struct CharacterInventoryItem;
+struct CharacterInventoryItem  // PDB sizeof 0x18
+{
+    unsigned long long instanceId;
+    unsigned long long labelId;
+    unsigned int dataId;
+};
 class GamedChannel;
 class Packet;
 class Session;
 union id128;
 
-class GamedChannel
+class GamedChannel : public TransactionChannel
 {
 public:
-    void SendStopPlayNotify(unsigned long long, short);  // 0x80d50
+    void SendStopPlayNotify(unsigned long long pcid, short reason);  // 0x80d50
+    bool SendCreateCharacterReq(TransactionChannel::Transaction* t, unsigned long long pcid, id128 const& gameAccountId, char const* externalInfoData, short externalInfoSize, int ipaddress, wchar_t const* characterName, char* characterCreationData, short characterCreationDataSize, bool jumpingCharacter, short topCharacterLevel);  // 0x80e20
+    bool SendDeleteCharacterReq(TransactionChannel::Transaction* t, unsigned long long pcid, char const* externalInfoData, short externalInfoSize, int ipaddress);  // 0x81040
+    bool SendRestoreCharacterReq(TransactionChannel::Transaction* t, unsigned long long pcid);  // 0x811c0
     void SendDeleteCharacterCompleteNotify(unsigned long long);  // 0x81320
     void SendCloseSessionNotify(unsigned long long);  // 0x813e0
+    bool SendKickReq(TransactionChannel::Transaction* t, unsigned long long pcid, unsigned long long clikey, unsigned long long gamekey, char reason);  // 0x814a0
     void SendEnterWorldFail(unsigned long long, short);  // 0x81620
     void SendLeaveWorldOk(unsigned long long, unsigned long long);  // 0x816f0
     void SendLeaveWorldFail(unsigned long long, short);  // 0x817c0
@@ -32,6 +46,8 @@ public:
     void SendStopChargeFail(unsigned long long, short);  // 0x82490
     void SendUpdateChargeRemainTimeNotify(unsigned long long, long, short, unsigned int);  // 0x82560
     void SendApplyNewChargeItemNotify(unsigned long long, wchar_t const*, long, unsigned int, short);  // 0x82650
+    bool SendChangeCharacterAppearanceReq(TransactionChannel::Transaction* t, unsigned long long serviceId, unsigned long long pcid, char* showcaseData, short showcaseDataSize, char* makingData, short makingDataSize);  // 0x82750
+    bool SendChangeCharacterSexReq(TransactionChannel::Transaction* t, unsigned long long serviceId, unsigned long long pcid, char newSex, char* showcaseData, short showcaseDataSize, char* makingData, short makingDataSize);  // 0x82950
     void SendExtendJumpingCharacterCreationQuotaWithAccountInventoryItemOk(unsigned long long, int);  // 0x82f70
     void SendExtendJumpingCharacterCreationQuotaWithAccountInventoryItemFail(unsigned long long, short);  // 0x83060
     void SendUpgradeJumpingCharacterStateWithCreationQuotaOk(unsigned long long, char, int);  // 0x83150
@@ -60,15 +76,23 @@ public:
     void SendUpdateAccountRecycleTimeFail(unsigned long long, unsigned long long, short);  // 0x84d20
 };
 
-class GamedChannelManager
+static_assert(sizeof(GamedChannel) == 0x30, "sizeof GamedChannel");
+
+class GamedChannelManager : public SessionHandler
 {
 public:
     virtual ~GamedChannelManager();  // 0x80300
-    bool Add(GamedChannel*);  // 0x803e0
-    void Remove(short);  // 0x804a0
-    GamedChannel* Acquire(short);  // 0x805b0
-    virtual bool OnAccept(Session const*) const;  // 0x80680
-    virtual bool OnConnect(Session const*, bool) const;  // 0x806e0
-    virtual void OnClose(Session const*, bool) const;  // 0x80790
-    virtual bool PacketHandler(Session const*, Packet const*) const;  // 0x80980
+    bool Add(GamedChannel* channel);  // 0x803e0
+    void Remove(short wid);  // 0x804a0
+    GamedChannel* Acquire(short wid);  // 0x805b0
+    virtual bool OnAccept(Session const* session) const;  // 0x80680
+    virtual bool OnConnect(Session const* session, bool firstConnected) const;  // 0x806e0
+    virtual void OnClose(Session const* session, bool tryReconnect) const;  // 0x80790 (Not done)
+    virtual bool PacketHandler(Session const* session, Packet const* packet) const;  // 0x80980
+
+    SharedChannelList _channels;
+    CriticalSection _lock;
 };
+static_assert(sizeof(GamedChannelManager) == 0x48, "sizeof GamedChannelManager");
+static_assert(offsetof(GamedChannelManager, _channels) == 0x8, "GamedChannelManager::_channels");
+static_assert(offsetof(GamedChannelManager, _lock) == 0x20, "GamedChannelManager::_lock");
