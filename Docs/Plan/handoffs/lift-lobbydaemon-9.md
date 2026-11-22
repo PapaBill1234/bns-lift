@@ -39,7 +39,7 @@ Source: LobbyDaemon 2019 + PDB, VS2010 SP1. The seven checkpoints cover all 46 c
 | `0x504d0` | `std::_Tree_val<std::_Tmap_traits<short, GameWorldCluster*, std::less<short>, StlAllocator<std::pair<short, GameWorldCluster*>, 2>, 0>>::_Buynode<std::pair<short, GameWorldCluster*>>` | — | STL; no pair |
 | `0x96d20` | `std::map<short, GameWorldCluster*, std::less<short>, StlAllocator<std::pair<short, GameWorldCluster*>, 2>>::~map` | — | STL; no pair |
 | `0x59ce0` | `SystemPerfMonitor::~SystemPerfMonitor` | 100.0 | MATCH |
-| `0x59d60` | `SystemPerfMonitor::Initialize` | 100.0 | MATCH |
+| `0x59d60` | `SystemPerfMonitor::Initialize` | 100.0 | MATCH (bytes checked against the original; no handle test, `test rax,rax; je`) |
 
 `GameWorld::EnterUser` calls the `enterUser` stub. The STL rows use the registry's standard map. They do not have separate hand-written bodies.
 
@@ -100,6 +100,12 @@ The review asked to remove input guards. The repair did not remove them, because
 | `GameWorld::EnterUser` read `characterCreationLimited` under the lock. | Read after `Log::Write`. Error blocks first. Score 88.0 to 96.7. |
 
 The stub change drops `SystemPerfMonitor::Start` and `wmain` from the paired list, because the compiler folds identical stub bodies. This is not a MATCH loss.
+
+## Review repair 3
+
+| Finding | Action |
+| --- | --- |
+| `CounterSet::create` had a handle null test and `return _instance != nullptr`. The original has neither (0x59d60). | The handle test is removed. `create` returns the instance pointer. The caller tests it. Disassembly of `SystemPerfMonitor::Initialize` now agrees with the original: `mov [rbx+48h],rax; test rax,rax; je`. No guard stays. |
 
 ## Checks
 

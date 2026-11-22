@@ -7,7 +7,7 @@ class SystemCounterSet : public CounterSet
 {
 public:
     // LIFT: Inlined in SystemPerfMonitor::Initialize (0x59d60).
-    bool Create(wchar_t const* name) { return create(&ID, name); }
+    BL_PERF_COUNTERSET_INSTANCE* Create(wchar_t const* name) { return create(&ID, name); }
 private:
     static GUID const ID;
 };
