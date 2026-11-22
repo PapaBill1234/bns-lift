@@ -223,6 +223,34 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"BannedWordFilterMemoryAllocator::Alloc": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BannedWordFilterMemoryAllocator::Free": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BannedWordFilterMemoryAllocator::Realloc": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BloodDaemonMain": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "BoundedList::Remove": {
 "calls": 100,
 "consts": 100,
@@ -538,6 +566,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"CliSessionTable::SelectAll": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "CliSessionTable::Select_index_gate": {
 "calls": 100,
 "consts": 100,
@@ -552,12 +587,61 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Console::SetTitle": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Console::~Console": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CoolDown::HandleEvent": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CoolDown::Start": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "CoolDown::TimerClass": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"CrashHandler::CrashHandler": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CrashHandler::Handle": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CrashHandler::Initialize": {
+"calls": 100,
+"consts": 100,
+"refs": 89,
+"score": 96.3,
+"status": "DIFF"
 },
 "CrashHandler::MakeCrash": {
 "calls": 100,
@@ -566,7 +650,119 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"CrashHandler::SetLogPath": {
+"calls": 100,
+"consts": 100,
+"refs": 95,
+"score": 98.4,
+"status": "DIFF"
+},
+"CrashHandler::SetMailInfo": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CrashHandler::handleCrash": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "CriticalSection::~CriticalSection": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Daemon::Cooldown": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Daemon::Daemon": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Daemon::LoadVersion": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Daemon::Reload": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Daemon::Start": {
+"calls": 100,
+"consts": 89,
+"refs": 100,
+"score": 96.3,
+"status": "DIFF"
+},
+"Daemon::cooldown": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Daemon::noTimerMain": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Daemon::setAddress": {
+"calls": 100,
+"consts": 98,
+"refs": 100,
+"score": 99.2,
+"status": "DIFF"
+},
+"Daemon::setCurrentDirectory": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Daemon::start": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Daemon::startDaemon": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Daemon::timerMain": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Daemon::~Daemon": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -685,6 +881,41 @@
 "score": 92.2,
 "status": "DIFF"
 },
+"DelayedRelease::Cleanup": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DelayedRelease::Release": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DelayedRelease::releaseNode": {
+"calls": 100,
+"consts": 100,
+"refs": 71,
+"score": 90.5,
+"status": "DIFF"
+},
+"DumpRegister": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DumpStack": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "DynamicEventObject::deallocate_me": {
 "calls": 100,
 "consts": 100,
@@ -700,6 +931,13 @@
 "status": "MATCH"
 },
 "DynamicRefCntObj::~DynamicRefCntObj": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ExceptionCodeString": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -1091,6 +1329,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"GameWorldReporterListener": {
+"calls": 78,
+"consts": 92,
+"refs": 89,
+"score": 86.3,
+"status": "DIFF"
+},
 "GamedChannel::SendAccountInventoryNotify": {
 "calls": 56,
 "consts": 91,
@@ -1329,6 +1574,27 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"GenerateClikey": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GenerateJobid": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GenerateLobbyTokenkey": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "GradeService::ApplyChangedGradeLevel": {
 "calls": 100,
 "consts": 100,
@@ -1379,6 +1645,13 @@
 "status": "MATCH"
 },
 "HeapMemoryManager::ReallocZero": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"InitSymbol": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -1463,6 +1736,76 @@
 "status": "MATCH"
 },
 "LobbyDB::UpdateLastLogout": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyDaemon::Descriptions": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyDaemon::FailedEventObjectHandler": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyDaemon::GetTimerInterval": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyDaemon::GetTimerMaxTime": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyDaemon::LobbyDaemon": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyDaemon::Name": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyDaemon::PrintDependency": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyDaemon::ServiceName": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyDaemon::SetTimeZoneBias": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyDaemon::ShortName": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -1574,6 +1917,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"LobbyObjPoolMemAllocator::Alloc": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "LobbyStats::HandleEvent": {
 "calls": 0,
 "consts": 100,
@@ -1658,7 +2008,56 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"LobbydReloadInvalidRestoreTimer::EventId": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbydReloadInvalidRestoreTimer::HandleEvent": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbydReloadInvalidRestoreTimer::restoreInvalid": {
+"calls": 100,
+"consts": 100,
+"refs": 80,
+"score": 93.3,
+"status": "DIFF"
+},
 "Log::Add": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Log::Close": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Log::Flush": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Log::Initialize": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Log::Name": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -1685,6 +2084,13 @@
 "refs": 100,
 "score": 95.2,
 "status": "DIFF"
+},
+"Log::run": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "LogBuffer::Acquire": {
 "calls": 100,
@@ -1728,7 +2134,21 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"LogBufferAllocator::Initialize": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "LogBufferAllocator::allocate": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LogBufferAllocator::initAllocator": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -1750,6 +2170,13 @@
 "status": "MATCH"
 },
 "LogMedia::Add": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LogMedia::Write": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -1778,6 +2205,13 @@
 "status": "MATCH"
 },
 "MembershipMileageSession::update": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Memory::CreateManager": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -1833,7 +2267,28 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"NPMsgHelper::LocaleHourToUTCTime": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Network::GetAddressStringW": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Network::Network": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Network::initInstance": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -1882,6 +2337,13 @@
 "score": 88.9,
 "status": "DIFF"
 },
+"Packet::Compose [?Compose@Packet@@QEAAGPEAVPacketComposer@@HZZ]": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Packet::Compose [?Compose@Packet@@QEAAGPEBDZZ]": {
 "calls": 100,
 "consts": 100,
@@ -1890,6 +2352,13 @@
 "status": "MATCH"
 },
 "Packet::ComposeV": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Packet::FreeSize": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -1938,7 +2407,21 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"PacketBufferAllocator::Initialize": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "PacketBufferAllocator::allocate": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PacketBufferAllocator::initAllocator": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -1972,6 +2455,174 @@
 "refs": 50,
 "score": 83.3,
 "status": "DIFF"
+},
+"PagePoolMemoryManager::Initialize": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PipeCommandProcess::Name": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PipeCommandProcess::PipeCommandProcess": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PipeCommandProcess::addCommand": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PipeCommandProcess::clear": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PipeCommandProcess::processCommand": {
+"calls": 100,
+"consts": 89,
+"refs": 100,
+"score": 96.3,
+"status": "DIFF"
+},
+"PipeCommandProcess::run": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PipeCommandProcess::~PipeCommandProcess": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PipeConsole::Name": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PipeConsole::PipeConsole": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PipeConsole::addNode": {
+"calls": 100,
+"consts": 100,
+"refs": 80,
+"score": 93.3,
+"status": "DIFF"
+},
+"PipeConsole::checkFrozenThread": {
+"calls": 100,
+"consts": 80,
+"refs": 89,
+"score": 89.6,
+"status": "DIFF"
+},
+"PipeConsole::cleanup": {
+"calls": 100,
+"consts": 91,
+"refs": 100,
+"score": 97.0,
+"status": "DIFF"
+},
+"PipeConsole::clear": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PipeConsole::connectPipe": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PipeConsole::disconnectAndReconnect": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PipeConsole::init": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PipeConsole::initPipe": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PipeConsole::processCommand": {
+"calls": 100,
+"consts": 91,
+"refs": 100,
+"score": 97.0,
+"status": "DIFF"
+},
+"PipeConsole::run": {
+"calls": 89,
+"consts": 100,
+"refs": 100,
+"score": 96.3,
+"status": "DIFF"
+},
+"PipeConsole::writeReply": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PipeConsole::writeStateInfo": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PipeConsole::writeStateReply": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PipeConsole::writeStateReply2": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "RefCntHistory::add": {
 "calls": 100,
@@ -2042,6 +2693,20 @@
 "refs": 60,
 "score": 86.7,
 "status": "DIFF"
+},
+"ReleaseEvent::EventId": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ReleaseEvent::HandleEvent": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "RenameCharacterService::Setup": {
 "calls": 100,
@@ -2121,6 +2786,13 @@
 "status": "MATCH"
 },
 "Section<__int64>::Intersect<__int64,std::vector,StlAllocator<Section<__int64>,2> >": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ServiceItems::Add": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -2232,6 +2904,34 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"SysInfo::Hostname": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"SysInfo::IpAddress": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"SystemEvent::Make": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"SystemEvent::~SystemEvent": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "SystemPerfMonitor::Initialize": {
 "calls": 100,
 "consts": 100,
@@ -2260,6 +2960,76 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"TextConsole::Close": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TextConsole::Open": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TextConsole::TextConsole": {
+"calls": 80,
+"consts": 100,
+"refs": 100,
+"score": 93.3,
+"status": "DIFF"
+},
+"TextConsole::Write": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TextConsole::WriteStartLog": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TextConsole::WriteStatusLog": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TextConsole::controlHandler": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TextConsole::setTitle": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TextConsole::write": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TextConsoleControlHandler": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Thread::stop": {
 "calls": 100,
 "consts": 100,
@@ -2281,12 +3051,75 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"ThreadManager::Initialize": {
+"calls": 100,
+"consts": 67,
+"refs": 100,
+"score": 88.9,
+"status": "DIFF"
+},
+"ThreadManager::StartThread": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ThreadManager::StopAll": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "ThreadManager::StopThread": {
 "calls": 0,
 "consts": 67,
 "refs": 100,
 "score": 55.6,
 "status": "DIFF"
+},
+"ThreadManager::entry": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ThreadManager::~ThreadManager": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TimeBasedPlaySeasonSchedule::Compose": {
+"calls": 100,
+"consts": 70,
+"refs": 100,
+"score": 90.0,
+"status": "DIFF"
+},
+"TimeBasedPlaySeasonSchedule::Data::GetNextResetTimeUTC": {
+"calls": 100,
+"consts": 0,
+"refs": 100,
+"score": 66.7,
+"status": "DIFF"
+},
+"TimeBasedPlaySeasonSchedule::Rule::Rule": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TimeBasedPlaySeasonSchedule::TimeBasedPlaySeasonSchedule": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Timer::EventId": {
 "calls": 100,
@@ -2309,7 +3142,42 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"TimerQueue::Initialize": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TimerQueue::TimeExpired": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "TimerQueue::addLongTermQueue": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TimerQueue::clearLongTermQueueSlot": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TimerQueue::clearShortTermQueueSlot": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TimerQueue::~TimerQueue": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -2345,6 +3213,202 @@
 "status": "MATCH"
 },
 "WaitQueueList::~WaitQueueList": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WinMsgHandler::Name": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WinMsgHandler::WaitInit": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WinMsgHandler::run": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WinMsgHandler::~WinMsgHandler": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WinServiceConsole::Close": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WinServiceConsole::InstallService": {
+"calls": 100,
+"consts": 88,
+"refs": 100,
+"score": 95.8,
+"status": "DIFF"
+},
+"WinServiceConsole::Open": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WinServiceConsole::ServiceMain": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WinServiceConsole::SetState": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WinServiceConsole::UninstallService": {
+"calls": 100,
+"consts": 75,
+"refs": 100,
+"score": 91.7,
+"status": "DIFF"
+},
+"WinServiceConsole::WriteStartLog": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WinServiceConsole::addLog": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WinServiceConsole::controlHandler": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WinServiceConsole::getLastErrorText": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WinServiceConsole::reportStatusToSCManager": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WinServiceControlHandler": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WindowConsole::Close": {
+"calls": 100,
+"consts": 0,
+"refs": 100,
+"score": 66.7,
+"status": "DIFF"
+},
+"WindowConsole::Open": {
+"calls": 100,
+"consts": 86,
+"refs": 92,
+"score": 92.5,
+"status": "DIFF"
+},
+"WindowConsole::SetState": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WindowConsole::WindowConsole": {
+"calls": 0,
+"consts": 100,
+"refs": 100,
+"score": 66.7,
+"status": "DIFF"
+},
+"WindowConsole::Write": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WindowConsole::WriteStartLog": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WindowConsole::setTitle": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WindowConsole::write": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WindowConsole::~WindowConsole": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WindowConsoleOnClose": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WindowConsoleOnReload": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WindowConsoleOnSafeShutdown": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -2554,6 +3618,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"ZSTD_freeCDict": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "ZSTD_hashPtr": {
 "calls": 100,
 "consts": 100,
@@ -2701,6 +3772,20 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"makeConsole": {
+"calls": 88,
+"consts": 100,
+"refs": 100,
+"score": 95.8,
+"status": "DIFF"
+},
+"makeDirectory": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "operator delete [??3@YAXPEAX0@Z]": {
 "calls": 100,
 "consts": 100,
@@ -2716,6 +3801,13 @@
 "status": "MATCH"
 },
 "pre_cpp_init": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"printUsage": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -2743,6 +3835,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"swprintf_s<256>": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "swprintf_s<260>": {
 "calls": 100,
 "consts": 100,
@@ -2751,6 +3850,13 @@
 "status": "MATCH"
 },
 "swprintf_s<513>": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"swprintf_s<520>": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -2770,6 +3876,13 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"wmain": {
+"calls": 67,
+"consts": 0,
+"refs": 0,
+"score": 22.2,
+"status": "DIFF"
 },
 "wmainCRTStartup": {
 "calls": 100,
