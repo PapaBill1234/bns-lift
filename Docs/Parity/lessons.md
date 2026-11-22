@@ -968,3 +968,31 @@ What failed:
 - Follow the original flow. Do not add a null check that the original does not have, even if the score does not change. `Start` (`0x5c300`), `GradeChanged` (`0x5ca20`) and `Register` (`0x60be0`) had added checks. The guard removal was blocked, so these three functions are stubs again.
 - When a lifted caller becomes a stub, LTCG can remove its callees. `GradeService::GetGrade` and the `std::vector<Section<__int64>>` ctor (`0x9f540`) went out of the build with `Start`. ❓ `RefCntList::Pushback` was probably inlined into its last caller `Tick`. Use `/INCLUDE` with a `// LIFT:` reason only for bodies in the card's own files.
 - The VS2010 STL emits the `std::vector<Section<__int64>,StlAllocator<Section<__int64>,2> >` functions through the normal container calls. Check the decorated names in the built PDB. The parity count excludes these STL functions.
+
+## ld-7
+
+| Function | RVA | Trial | Score before → after | Result |
+| --- | --- | --- | ---: | --- |
+| `CliSession::FetchCharacterInfoList` | `0x379b0` | A20: disable inlining for this caller. Write the original inline lock and `StartRepeat` code in the body. | 98.0 → 93.3 | Reverted. The calls match. The constants do not. |
+| `CliSession::FetchCharacterInfo` | `0x37af0` | A8: compare the ID with the PDB global `ID128_ID_ZERO` instead of literal zero. | 90.3 → 97.0 | Kept. The references match. One extra constant remains. |
+| `CliSession::FetchServiceEntryList` | `0x37c70` | A20: disable inlining for this caller. Write the original inline lock and `StartRepeat` code in the body. | 98.0 → 97.0 | Reverted. The calls match. The constants do not. |
+
+The two A20 trials made `FragmentPacket::IncRepeatCount` pair and match. Neither caller improved. Do not apply A20 to these two callers without a new source form.
+
+| Function | RVA | Repair trial | Score before → after | Result |
+| --- | --- | --- | ---: | --- |
+| `CliSession::BindCharacterSlot` | `0x37eb0` | A8: use `ID128_ID_ZERO` for both slot ID tests. | 64.3 → 73.3 | Kept. The references and constants improve. |
+| `CliSession::FetchCharacterInfoList` | `0x379b0` | A2: test states in the original order. | 98.0 → 98.0 | Reverted. The score did not increase. |
+
+Resumed run (codegen pass on the DIFF functions above 85 %):
+
+| Function | RVA | Trial | Score before → after | Result |
+| --- | --- | --- | ---: | --- |
+| `CliSession::setContentBans` | `0x366e0` | A20: `#pragma inline_depth(0)` on the caller, so `push_back` stays out of line. | 85.2 → 91.7 | Reverted. The calls pair, but `clear`, `begin`, `end` and the iterator steps also become calls. The original inlines them. The 0x18 step constant goes away. The code is further from the original. |
+| `CliSession::NotifyChangedGradeLevel` | `0x36170` | None. The disassembly is the same as the original. | 88.9 | Tool noise. Funcdiff drops an immediate below the image size as an RVA. The original image is larger, so `0x40000` is dropped only on the original side. |
+| `CliSession::NotifyChangedGrade` | `0x360a0` | None. | 85.7 | LTCG inlines the `GradeService::ApplyChangedGrade` stub. Wait for the callee card. |
+| `CliSession::UpdateCharacterData` | `0x381c0` | None. | 55.0 | LTCG inlines the `getCharacter` stub (`0x35cf0`, noreturn). The rest of the body is dead. Wait for part 1. |
+
+- Do not use A20 when the original inlines other STL calls in the same function. A20 removes all inlining in the caller.
+- A small constant can differ only because our image is smaller than the original. Check the disassembly before a source trial.
+

@@ -39,6 +39,8 @@ namespace StsMsgLib
 {
 struct _StsMsgNotifyGradeNotifyGradeChanged;
 struct _StsMsgNotifyGradeNotifyScoreChanged;
+struct _StsMsgResponseListUserBans;
+struct _StsMsgResponseRiskMgmtInquiry;
 }
 
 // PDB enum LobbyError (types.h:3429).
@@ -343,7 +345,11 @@ public:
     void setChargeKey(wchar_t const* chargeKey);  // 0x35e20
     void completeRequestChargeStop(bool);  // 0x35eb0
     void cleanupCharge();  // 0x35fc0
+    bool NotifyChangedGrade(StsMsgLib::_StsMsgNotifyGradeNotifyGradeChanged const&);  // 0x360a0
+    bool NotifyChangedGradeLevel(StsMsgLib::_StsMsgNotifyGradeNotifyScoreChanged const&);  // 0x36170
     void HandleGameGetGradeList(GamedChannel*, unsigned long long, char, unsigned long long, int) const;  // 0x36240
+    void setContentBans(StsMsgLib::_StsMsgResponseListUserBans*);  // 0x366e0
+    void setRMSInquiryResult(StsMsgLib::_StsMsgResponseRiskMgmtInquiry*);  // 0x36960
     bool fetchContentBans(FragmentPacket*);  // 0x36df0
     bool fetchAccountContentQuotaList(FragmentPacket*);  // 0x36fa0
     bool fetchAccountRecycleTimeList(FragmentPacket*);  // 0x371b0
@@ -354,6 +360,7 @@ public:
     bool addRenameUserService(RenameUserService*);  // 0x37790
     void setScheduledEndTime(GameTimeScheduleNode*);  // 0x37890
     void releaseScheduledEndTime();  // 0x37950
+    ErrCode FetchCharacterInfoList(FragmentPacket*) const;  // 0x379b0
     bool FetchCharacterInfo(id128 const&, Packet*, PacketComposer*) const;  // 0x37af0
     bool FetchServiceEntryList(FragmentPacket*) const;  // 0x37c70
     bool UpdateBotScore(unsigned long long, int);  // 0x37de0

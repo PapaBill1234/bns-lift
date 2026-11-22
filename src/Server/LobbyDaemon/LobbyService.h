@@ -23,6 +23,8 @@ public:
     virtual bool Fetch(CliSession*, FragmentPacket*) const;  // 0x6c330
     virtual bool IsServiceTarget(id128 const&);  // 0xefb20
     virtual bool IsServiceTarget(Character*) { return false; }  // 0xefb20 (folded)
+    // LIFT: Inline the PDB accessor for the DB reads in CliSession::addLobbyService (0x373a0).
+    DB const& GetDB() const { return _db; }
 
 protected:
     bool setup(DB*);

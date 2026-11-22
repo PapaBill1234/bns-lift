@@ -299,6 +299,35 @@ struct _StsMsgResponse : public _StsMsg
 };
 static_assert(sizeof(_StsMsgResponse) == 0x60, "sizeof StsMsgLib::_StsMsgResponse");
 
+struct UserBan
+{
+    int nContentBanId;
+    wchar_t* pwszContenBanName;
+    wchar_t* pwszContenBanPolicyId;
+    long long tEffectiveFrom;
+    long long tEffectiveUntil;
+};
+static_assert(sizeof(UserBan) == 0x28, "sizeof StsMsgLib::UserBan");
+static_assert(offsetof(UserBan, pwszContenBanPolicyId) == 0x10, "UserBan::pwszContenBanPolicyId");
+static_assert(offsetof(UserBan, tEffectiveFrom) == 0x18, "UserBan::tEffectiveFrom");
+static_assert(offsetof(UserBan, tEffectiveUntil) == 0x20, "UserBan::tEffectiveUntil");
+
+struct _StsMsgResponseListUserBans : public _StsMsgResponse
+{
+    int nUserBanCount;
+    UserBan* pUserBanList;
+};
+static_assert(sizeof(_StsMsgResponseListUserBans) == 0x70, "sizeof StsMsgLib::_StsMsgResponseListUserBans");
+static_assert(offsetof(_StsMsgResponseListUserBans, nUserBanCount) == 0x60, "_StsMsgResponseListUserBans::nUserBanCount");
+static_assert(offsetof(_StsMsgResponseListUserBans, pUserBanList) == 0x68, "_StsMsgResponseListUserBans::pUserBanList");
+
+struct _StsMsgResponseRiskMgmtInquiry : public _StsMsgResponse
+{
+    char* pszResult;
+};
+static_assert(sizeof(_StsMsgResponseRiskMgmtInquiry) == 0x68, "sizeof StsMsgLib::_StsMsgResponseRiskMgmtInquiry");
+static_assert(offsetof(_StsMsgResponseRiskMgmtInquiry, pszResult) == 0x60, "_StsMsgResponseRiskMgmtInquiry::pszResult");
+
 struct _StsMsgNotify : public _StsMsg
 {
     _StsMsgInfoNotify msgInfo;
