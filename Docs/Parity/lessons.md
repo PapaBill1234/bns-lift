@@ -1087,7 +1087,7 @@ Card lift-lobbydaemon-15: LobbyDaemon part 1 (33 functions, 30 lifted, 3 Not don
 
 | Item | Result |
 | --- | --- |
-| LD MATCH | 195 -> 325 (+130) over main ef1fa96. The other 4 exes: +0, no MATCH lost. |
+| LD MATCH | 219 -> 348 (+129) over main bfb4c98 (earlier run: 195 -> 325 over ef1fa96). The other 4 exes: +0, no MATCH lost. |
 
 What worked:
 - The `/INCLUDE` pragma finds wrong signatures. A name that the original PDB has and the lift does not define is an undefined symbol at link time.

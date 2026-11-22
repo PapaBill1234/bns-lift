@@ -11,27 +11,18 @@ scalar deleting destructors (`0x99310`, `0x99340`, `0x99370`, `0x9a3a0`) and are
 | --- | --- |
 | Lifted | 30 |
 | Not done | 3 |
-| `tools/gate.sh` (`LIFT_BUILD_DIR=build-ld-15`) | FAIL. See "Gate failure" below. |
-| Gate steps without the binary-file check (copy of `gate.sh`) | gate ok |
-| `tools/parity.sh` | parity ok |
-| LobbyDaemon MATCH | 195 -> 325 (+130) over main ef1fa96 |
+| `tools/gate.sh` (`LIFT_BUILD_DIR=build-ld-15`) | gate ok (after merging main bfb4c98) |
+| `tools/parity.sh` (same build) | parity ok |
+| LobbyDaemon MATCH | 219 -> 348 (+129) over main bfb4c98 |
 | CacheGate, LobbyGate, SmartCouponDaemon, PostOfficeDaemon MATCH | 456, 658, 630, 694 (+0 each, no MATCH lost) |
 
-LobbyDaemon parity: 325/2204 = 14.7 %. Paired 440, mean score 95.4.
-Baseline: Docs/Parity/baseline/LobbyDaemon.json = 195 MATCH. The baseline files are unchanged.
+LobbyDaemon parity: 348/2204 = 15.8 %. Paired 464, mean score 95.6.
+Baseline: Docs/Parity/baseline/LobbyDaemon.json = 219 MATCH. The baseline files are unchanged.
 
-## Gate failure
+## Gate
 
-`tools/gate.sh` stops at its first step (binary check). It prints 3 files and exits 1:
-
-- `tools/LegacyBin/LegacyBin/DotNetZip.dll`
-- `tools/LegacyBin/LegacyBin/Resources/DotNetZip.dll`
-- `tools/LegacyBin/LegacyBin/Resources/MaterialSkin.dll`
-
-Main commit ef1fa96 ("LegacyBin: add upstream DLLs") tracks them. Main fails the same check. This card did not add them.
-This card does not remove them. Fix on main: `git rm --cached` the 3 DLLs, then run the gate again.
-A copy of `gate.sh` without the `tools/LegacyBin/` paths in the binary check printed `gate ok` (cmake configure and full build).
-`tools/gate_extra.sh` is not executable (mode 644). The gate skips it. It was not run.
+The earlier run stopped at the binary check because main tracked 3 LegacyBin DLLs. Main now allows `tools/LegacyBin/`.
+`tools/gate.sh` and `tools/parity.sh` both passed on the merge commit. `tools/gate_extra.sh` is not executable (mode 644). The gate skips it.
 
 ## Changes beyond the stub bodies
 
@@ -144,4 +135,4 @@ Not tried (for a later card):
 ## Build notes
 
 - `vendor/zstd/src` was missing in this worktree. It was copied from the worktree `lift-lobbydaemon-12` (`bb6eaf64`, checked). The directory is git-ignored.
-- Final run: `tools/parity.sh` output is in `build-ld-15/parity.log` (ignored directory).
+- Final run: `tools/parity.sh` output is in `build-ld-15/parity_final.log` (ignored directory).
