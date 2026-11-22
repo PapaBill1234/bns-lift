@@ -76,6 +76,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"CliSessionTable::Select_index_gate": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "CoolDown::TimerClass": {
 "calls": 100,
 "consts": 100,
@@ -91,6 +98,13 @@
 "status": "MATCH"
 },
 "DynamicEventObject::~DynamicEventObject": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DynamicRefCntObj::~DynamicRefCntObj": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -140,6 +154,20 @@
 "status": "MATCH"
 },
 "HeapMemoryManager::ReallocZero": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyToken::Expire": {
+"calls": 0,
+"consts": 0,
+"refs": 0,
+"score": 0.0,
+"status": "DIFF"
+},
+"LobbyToken::LobbyToken": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -747,13 +775,6 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
-},
-"wmain": {
-"calls": 0,
-"consts": 0,
-"refs": 100,
-"score": 33.3,
-"status": "DIFF"
 },
 "wmainCRTStartup": {
 "calls": 100,
