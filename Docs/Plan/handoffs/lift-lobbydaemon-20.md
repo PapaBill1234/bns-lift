@@ -79,7 +79,7 @@ Not tried (trial limit, and both are below 85):
 
 ## Dead-strip pragmas
 
-The callers of these functions are still `LIFT_STUB` bodies. Each has `#pragma comment(linker, "/INCLUDE:...")` with a `// LIFT:` comment.
+The callers of these 7 functions are still `LIFT_STUB` bodies. Each has `#pragma comment(linker, "/INCLUDE:...")` with a `// LIFT:` comment.
 The verify card removes them when the callers are lifted.
 
 | RVA | Decorated name | File |
@@ -88,13 +88,13 @@ The verify card removes them when the callers are lifted.
 | `0x40490` | `??1BLDaemonInfoTable@@QEAA@XZ` | `BLDaemonInfo.cpp` |
 | `0x40f30` | `?Load@BLDaemonInfoTable@@QEAA_NPEB_W@Z` | `BLDaemonInfo.cpp` |
 | `0x41090` | `?Update@BLDaemonInfoTable@@QEAAXPEB_W@Z` | `BLDaemonInfo.cpp` |
-| `0x41210` | `?Find@BLDaemonInfoTable@@QEBAPEBUBLDaemonInfo@@AEBUBLDaemonID@@@Z` | `BLDaemonInfo.cpp` |
-| `0x412d0` | `?Clear@BLDaemonInfoTable@@QEAAXXZ` | `BLDaemonInfo.cpp` |
 | `0x9f240` | `?FilterBannedWord@LobbyDaemon@@QEAA?AW4BannedWordFilterResult@1@PEB_W@Z` | `LobbyDaemon.cpp` |
 | `0x9f340` | `?CheckServiceItemDataId@LobbyDaemon@@QEAA_NW4ServiceItemType@1@I@Z` | `LobbyDaemon.cpp` |
 | `0x9f3c0` | `?GetAddressStringWForLogs@LobbyDaemon@@SAPEB_WK@Z` | `LobbyDaemon.cpp` (the lifted caller in `Character.cpp` is dead-stripped too) |
 
 `load` and `add` need no pragma: `Load` and `Update` reach them.
+
+`Find` and `Clear` need no pragma: `Update` and `~BLDaemonInfoTable` reach them (checked: both stay in the build PDB without the pragma).
 
 ## Not done
 

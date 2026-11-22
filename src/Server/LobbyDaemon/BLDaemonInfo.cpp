@@ -280,7 +280,6 @@ void BLDaemonInfoTable::Update(wchar_t const* xml)
 }
 
 // 0x41210
-#pragma comment(linker, "/INCLUDE:?Find@BLDaemonInfoTable@@QEBAPEBUBLDaemonInfo@@AEBUBLDaemonID@@@Z")  // LIFT: keep until the caller is lifted (0x41210)
 BLDaemonInfo const* BLDaemonInfoTable::Find(BLDaemonID const& id) const
 {
     BLDaemonInfo const* found = nullptr;
@@ -295,7 +294,6 @@ BLDaemonInfo const* BLDaemonInfoTable::Find(BLDaemonID const& id) const
 }
 
 // 0x412d0
-#pragma comment(linker, "/INCLUDE:?Clear@BLDaemonInfoTable@@QEAAXXZ")  // LIFT: keep until the caller is lifted (0x412d0)
 void BLDaemonInfoTable::Clear()
 {
     for (BLDaemonInfoMap::iterator it = _daemons.begin(); it != _daemons.end(); ++it)
