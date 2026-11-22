@@ -170,7 +170,7 @@ static const bool BrazilianPortugueseChars[96] =
     1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 0,
 };
 
-// LIFT: 0x57ab0. The original uses a separate Japanese character table.
+// LIFT: 0x57ab0. The original reads kanji bytes from the shared table byte_140161BD0 (first 0x5200 bytes). The lift uses a bit table.
 static __forceinline bool IsJapaneseKanji(wchar_t c)
 {
     unsigned int index = c - 0x4e00;

@@ -34,7 +34,7 @@ Scores come from `build-vs2010/LobbyDaemon.funcdiff.json` of the final run. "Not
 | LobbyService | `0x70440` | `ChangeCharacterSexService::ConsumeItemFinished` | 63.1 | DIFF |
 | LobbyService | `0x70640` | `ChangeCharacterSexService::Finish` | 63.1 | DIFF |
 | LobbyService | `0x70850` | `ChangeCharacterRaceService::Setup` | 100.0 | MATCH |
-| LobbyService | `0x70900` | `ChangeCharacterRaceService::Fetch` | 0.0 | DIFF |
+| LobbyService | `0x70900` | `ChangeCharacterRaceService::Fetch` | - | not paired (folded) |
 | LobbyService | `0x70b10` | `ChangeCharacterRaceService::Start` | 55.6 | DIFF |
 | LobbyService | `0x70d50` | `ChangeCharacterRaceService::ConsumeItemTried` | 59.9 | DIFF |
 | LobbyService | `0x70f50` | `ChangeCharacterRaceService::TaskDone` | 63.1 | DIFF |
@@ -61,7 +61,7 @@ None. All 33 RVAs are lifted.
 | Item | Functions | Reason |
 | --- | --- | --- |
 | No client session key in logs (safety difference, see below) | 16 Start, ConsumeItemTried, TaskDone, ConsumeItemFinished and Finish functions (45 log calls) | The lift does not write `cli-key:0x%I64X` and `owner->_clikey`. One shared `// LIFT:` note at the top of `LobbyService.cpp` covers all 45 calls. Each function also has its own `// LIFT:` note. The client cannot see this change. It costs the calls, consts and refs signals (scores near 60). The lift does not log session keys or other secrets. This is a deliberate safety difference. |
-| Three derived `Fetch` functions score 0.0 | `0x6f000`, `0x6fc10`, `0x70900` | Cause: each one calls `LobbyService::Fetch` (`0x6c330`) first. `0x6c330` is still a `LIFT_STUB` (Not done in lift-lobbydaemon-6). /LTCG sees that the stub does not return, so it removes the rest of each caller. Then `/OPT:ICF` folds the three callers into one body at one address. Funcdiff scores the folded body as `ChangeCharacterRaceService::Fetch`. Fix: lift `0x6c330`. `__declspec(noinline)` on the stub was tried. It does not help (see trial 4). |
+| Three derived `Fetch` functions are not paired | `0x6f000`, `0x6fc10`, `0x70900` | Cause: each one calls `LobbyService::Fetch` (`0x6c330`) first. `0x6c330` is still a `LIFT_STUB` (Not done in lift-lobbydaemon-6). /LTCG sees that the stub does not return, so it removes the rest of each caller. Then `/OPT:ICF` folds the three callers into one 12-byte body. That body also holds `LobbyToken::Expire` and `MembershipMileage::Initialize`. Funcdiff keys the folded body as `LobbyToken::Expire` (0.0 DIFF, same as the baseline). The three `Fetch` names are not paired in the final run. Older runs showed 0.0 for `0x70900`. Fix: lift `0x6c330`. `__declspec(noinline)` on the stub was tried. It does not help (see trial 4). |
 | `LobbyService::IsServiceTarget` not paired | `0xefb20` | The body is `return false`. The linker folds it. IDA shows the folded body as `WinServiceConsole::IsServiceTarget`. |
 | Kanji table form | `IsAllowedChar`, `GetLanguageTypeOfChar` | The original uses one byte table `byte_140161BD0` (kanji, French, German, Brazilian Portuguese at offsets `0x5200`, `0x52C0`, `0x5300`). The lift uses a bit table for kanji and three small tables. This is the last consts gap (98). One shared byte table is a suggestion for a later round. |
 | `// BUG:` marks, original behavior kept | the three `Setup` functions, `IsVietnamese` (`0xaea7`) | The lift keeps the original behavior and marks it. |
