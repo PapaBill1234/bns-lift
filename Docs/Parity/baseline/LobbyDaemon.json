@@ -69,7 +69,140 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Character::FetchCharacterInfo [?FetchCharacterInfo@Character@@QEBA_NPEAVFragmentPacket@@@Z]": {
+"calls": 97,
+"consts": 100,
+"refs": 100,
+"score": 99.0,
+"status": "DIFF"
+},
+"Character::FetchCharacterInfo [?FetchCharacterInfo@Character@@QEBA_NPEAVPacket@@PEAVPacketComposer@@@Z]": {
+"calls": 21,
+"consts": 100,
+"refs": 100,
+"score": 73.7,
+"status": "DIFF"
+},
 "CharacterCosmesisService::Setup": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CliSession::BindCharacterSlot": {
+"calls": 57,
+"consts": 77,
+"refs": 86,
+"score": 73.3,
+"status": "DIFF"
+},
+"CliSession::FetchCharacterInfo": {
+"calls": 100,
+"consts": 91,
+"refs": 100,
+"score": 97.0,
+"status": "DIFF"
+},
+"CliSession::FetchCharacterInfoList": {
+"calls": 94,
+"consts": 100,
+"refs": 100,
+"score": 98.0,
+"status": "DIFF"
+},
+"CliSession::FetchServiceEntryList": {
+"calls": 94,
+"consts": 100,
+"refs": 100,
+"score": 98.0,
+"status": "DIFF"
+},
+"CliSession::NotifyChangedGrade": {
+"calls": 57,
+"consts": 100,
+"refs": 100,
+"score": 85.7,
+"status": "DIFF"
+},
+"CliSession::NotifyChangedGradeLevel": {
+"calls": 100,
+"consts": 67,
+"refs": 100,
+"score": 88.9,
+"status": "DIFF"
+},
+"CliSession::UpdateBotScore": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CliSession::UpdateCharacterData": {
+"calls": 40,
+"consts": 50,
+"refs": 75,
+"score": 55.0,
+"status": "DIFF"
+},
+"CliSession::UpdateCharacterLevel": {
+"calls": 67,
+"consts": 80,
+"refs": 89,
+"score": 78.5,
+"status": "DIFF"
+},
+"CliSession::addLobbyService": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CliSession::addRenameUserService": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CliSession::fetchContentBans": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CliSession::getLobbyServiceByType": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CliSession::queryLobbyService": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CliSession::removeLobbyService": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CliSession::setContentBans": {
+"calls": 67,
+"consts": 89,
+"refs": 100,
+"score": 85.2,
+"status": "DIFF"
+},
+"CliSession::setRMSInquiryResult": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -84,6 +217,13 @@
 "status": "MATCH"
 },
 "CoolDown::TimerClass": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CrashHandler::MakeCrash": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -119,6 +259,27 @@
 "status": "MATCH"
 },
 "FSE_count_simple": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"FragmentPacket::Compose": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"FragmentPacket::FreeSize": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GradeService::ApplyChangedGradeLevel": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -342,12 +503,82 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Packet::AddSize": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Packet::Allocate [?Allocate@Packet@@QEAAPEBDPEAVPacketComposer@@@Z]": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Packet::Allocate [?Allocate@Packet@@QEAAPEBDXZ]": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Packet::Clear": {
 "calls": 100,
 "consts": 100,
 "refs": 67,
 "score": 88.9,
 "status": "DIFF"
+},
+"Packet::ComposeV": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PacketBuffer::CheckCompose": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PacketBuffer::Compose": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PacketBuffer::deallocate_me": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PacketBufferAllocator::allocate": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PacketBufferPool::allocate": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PacketBufferPool::deallocate": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "RefCntHistory::add": {
 "calls": 100,
@@ -418,6 +649,20 @@
 "refs": 50,
 "score": 83.3,
 "status": "DIFF"
+},
+"RepeatPacketComposer::PopRepeatCount": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RepeatPacketComposer::PushRepeatCount": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Section<__int64>::Intersect<__int64,std::vector,StlAllocator<Section<__int64>,2> >": {
 "calls": 100,
