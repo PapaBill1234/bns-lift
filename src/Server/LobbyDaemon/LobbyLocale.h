@@ -19,6 +19,20 @@ public:
         wchar_t base;
         wchar_t hilo;
         wchar_t top;
+
+        ThaiCell() { Reset(); }
+        ~ThaiCell() {}
+        void Reset() { base = 0; hilo = 0; top = 0; }
+    };
+
+    struct VietCell
+    {
+        wchar_t base;
+        wchar_t top;
+
+        VietCell() { Reset(); }
+        ~VietCell() {}
+        void Reset() { base = 0; top = 0; }
     };
 
     enum ThaiCharType
@@ -81,6 +95,7 @@ public:
     static int GetNextThaiCell(wchar_t const*, int, ThaiCell*);  // 0x58120
     static VietVowelType GetVietVowelType(wchar_t);  // 0x58260
     static VietToneMarkType GetVietToneMarkType(wchar_t);  // 0x58460
+    static int GetNextVietCell(wchar_t const*, int, VietCell*);  // LIFT: Inlined at 0x58562.
     static int GetStringLengthWithCellCombination(wchar_t const*, int);  // 0x584a0
 
 private:
@@ -98,6 +113,7 @@ struct LobbyLocaleSet
 
 static_assert(sizeof(LobbyLocale) == 4, "sizeof LobbyLocale");
 static_assert(sizeof(LobbyLocale::ThaiCell) == 6, "sizeof LobbyLocale::ThaiCell");
+static_assert(sizeof(LobbyLocale::VietCell) == 4, "sizeof LobbyLocale::VietCell");
 static_assert(sizeof(LobbyLocaleSet) == 24, "sizeof LobbyLocaleSet");
 
 bool IsVietnamese(wchar_t);  // 0x585d0

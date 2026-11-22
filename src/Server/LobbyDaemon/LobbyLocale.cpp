@@ -448,6 +448,19 @@ LobbyLocale::VietToneMarkType LobbyLocale::GetVietToneMarkType(wchar_t ch)
     }
 }
 
+// LIFT: The PDB names this helper (GetNextVietCell) but gives it no RVA. The original inlines it at 0x58562.
+__forceinline int LobbyLocale::GetNextVietCell(wchar_t const* str, int strLen, VietCell* cell)
+{
+    if (str == nullptr || strLen < 1)
+        return 0;
+    cell->base = str[0];
+    if (GetVietVowelType(str[0]) == VIETVOWEL_TYPE_NONE || strLen < 2 ||
+        GetVietToneMarkType(str[1]) == VIETTONEMARK_TYPE_NONE)
+        return 1;
+    cell->top = str[1];
+    return 2;
+}
+
 #pragma comment(linker, "/INCLUDE:?GetStringLengthWithCellCombination@LobbyLocale@@SAHPEB_WH@Z")  // LIFT: Keep 0x584a0 until its caller is lifted.
 int LobbyLocale::GetStringLengthWithCellCombination(wchar_t const* str, int strLen)
 {
@@ -464,10 +477,8 @@ int LobbyLocale::GetStringLengthWithCellCombination(wchar_t const* str, int strL
         wchar_t c = str[i];
         if ((c >= 0x0e01 && c <= 0x0e3a) || (c >= 0x0e3f && c <= 0x0e5b))
         {
-            cell.base = 0;
-            cell.hilo = 0;
-            cell.top = 0;
-            // LIFT: 0x5851a tests str + i before the call (inlined cell helper; the PDB has no name for it).
+            cell.Reset();
+            // LIFT: 0x5851a tests str + i before the call (inlined ThaiCell::Reset and the null test of the call site).
             if (str + i == nullptr)
                 return length;
             count = GetNextThaiCell(str + i, strLen - i, &cell);
@@ -476,14 +487,9 @@ int LobbyLocale::GetStringLengthWithCellCombination(wchar_t const* str, int strL
         }
         else if (IsVietnamese(c))
         {
-            // LIFT: 0x58562 inlines the Vietnamese cell test (the PDB has no name for it).
-            if (str + i == nullptr || strLen - i < 1)
-                return length;
-            if (GetVietVowelType(c) == VIETVOWEL_TYPE_NONE || strLen - i < 2 ||
-                GetVietToneMarkType(str[i + 1]) == VIETTONEMARK_TYPE_NONE)
-                count = 1;
-            else
-                count = 2;
+            // LIFT: 0x58562 inlines the PDB function LobbyLocale::GetNextVietCell.
+            VietCell vietCell;
+            count = GetNextVietCell(str + i, strLen - i, &vietCell);
         }
         if (count <= 0)
             return length;
