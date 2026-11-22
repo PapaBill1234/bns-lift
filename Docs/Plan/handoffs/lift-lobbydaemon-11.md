@@ -94,6 +94,8 @@ Skeptic 2 findings 1 to 5 ask to remove items 1 to 5. The verify round keeps the
 | 7 | `GetStringLengthWithCellCombination` | Read `str[i]` in each range test in place of a local | 81.5 | 81.5 | no (reverted). The gap is the consts of the Thai range test (orig `0xe3a`, `0xe5b`; ours `0xe01`, `0xe3f`, `0x1c`). |
 | 8 | 19 null-owner and compose-fail log blocks (`0x6edf0` to `0x71350`) | `Xxx const* s = this;` and `s != nullptr ? s->_db.field : 0` for each log argument (ld-2 form, macro `LOBBY_SERVICE_DB_LOG_ARGS`) | same | same | yes (source form of the original) |
 
+| 9 | `GetStringLengthWithCellCombination` | A21 and A10: PDB struct `LobbyLocale::VietCell` (`base`@0, `top`@2, ctor, dtor, `Reset`), `ThaiCell` ctor, dtor and `Reset`, `static __forceinline GetNextVietCell` called from the function, `cell.Reset()` at 0x5851a | 81.5 | 81.5 | yes (source form of the PDB; no score change) |
+
 Not tried:
 - Make one shared byte table for the locale tables (large data change).
 - Lift `0x6c330` (owned by lift-lobbydaemon-6, out of scope for this card).
@@ -110,6 +112,7 @@ Not tried:
 | `tools/parity.sh` (`LIFT_BUILD_DIR=build-ld-11`) | repair 2 final candidate | `parity ok`, exit 0; LobbyDaemon paired 139 |
 | `tools/gate.sh` (`LIFT_BUILD_DIR=build-ld-11`) | verify candidate `d2fd3e2` (clean tree) | `gate ok`, exit 0 |
 | `tools/parity.sh` (`LIFT_BUILD_DIR=build-ld-11`) | verify candidate `d2fd3e2` (clean tree) | `parity ok`, exit 0; LobbyDaemon MATCH 82 -> 91 (+9), paired 139 |
+| `tools/gate.sh` and `tools/parity.sh` (`LIFT_BUILD_DIR=build-ld-11`) | repair 3 candidate (main 94b02f6 merged, lessons.md conflict resolved, VietCell added) | `gate ok` and `parity ok`, exit 0. LobbyDaemon MATCH 97 -> 106 (+9) against the main baseline. MATCH -> DIFF 0. MATCH name gone 0. |
 
 | Server | Baseline MATCH | Final MATCH | MATCH lost | Names gone |
 | --- | ---: | ---: | ---: | ---: |
@@ -117,6 +120,12 @@ Not tried:
 | LobbyGate | 658 | 658 | 0 | 0 |
 | SmartCouponDaemon | 630 | 630 | 0 | 0 |
 | PostOfficeDaemon | 694 | 694 | 0 | 0 |
-| LobbyDaemon | 82 | 91 | 0 | 0 |
+| LobbyDaemon (main baseline) | 97 | 106 | 0 | 0 |
 
 Eight of the 9 new LobbyDaemon MATCH names are card functions. The ninth is `LobbyDaemon::setArgument`. It is not a card function. No baseline, progress file or README table changed. No `--accept` ran.
+
+## Repair 3
+
+- LIFT comments corrected. The PDB names the inlined helpers: `LobbyLocale::GetNextVietCell`, `VietCell`, `ThaiCell::Reset`.
+- `main` (94b02f6) is merged. The `Docs/Parity/lessons.md` conflict kept both the ld-8/ld-10 and ld-11 sections.
+- The LobbyDaemon baseline is now 97 (main). The card gives +9 (106).

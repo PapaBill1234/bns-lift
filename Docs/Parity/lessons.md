@@ -1032,4 +1032,5 @@ Verify round (ld-11):
 
 - The remaining consts gap of 0x584a0 is the Thai range test. The original compares with `0xe01`, `0xe3a`, `0xe3f` and `0xe5b`
   in four short-circuit tests. Our build uses a subtract-and-compare form (`0x1c`). Two source forms gave the same code.
+- A21 and A10 for `GetStringLengthWithCellCombination` (0x584a0): declare the PDB `LobbyLocale::VietCell` (ctor, dtor, `Reset`), the `ThaiCell` ctor, dtor and `Reset`, and a `static __forceinline GetNextVietCell` (inlined at 0x58562). Score 81.5 before and after. Kept as the source form of the PDB.
 - The `this` null test in the service log blocks does not change the score. The missing client session key arguments set the score.
