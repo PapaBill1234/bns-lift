@@ -1080,3 +1080,25 @@ What failed or is blocked (tries):
 - Retry after ld-10 landed: `CliSessionGradeChangedMessage::Dispatch` lifts at 83.3. The only DIFF is the callee
   `MembershipMileage::GradeChanged`, still a `LIFT_STUB` (inlined abort). No source form to try.
 - Do not edit a source file of another card, even for a one-line stub (`CliSession.cpp` `0x32b60`). Write it in the handoff.
+
+## ld-13
+
+Card lift-lobbydaemon-13: CliSession part 3, CliSessionManager (56 functions).
+
+| Item | Result |
+| --- | --- |
+| Lifted | 27 |
+| Not done | 29 (most need the `LobbyDaemon`, `LobbyGateChannel` or LobbyJob layouts; `CliSession::_pool` needs the LD ObjectPool module) |
+| LD MATCH | 195 -> 217 over main 75f0769 (+22: 18 card functions, 4 shared functions). The other 4 exes: +0, no MATCH lost. |
+
+- The clang gate links static libs. An object with an unresolved symbol passes the gate when no other object pulls it. The VS2010
+  parity build links each object and fails. Example: a `CliSession::_pool` definition needs `ObjPool::ObjPool`, but `ObjectPool.cpp`
+  is only in `lift_smartcoupondaemon`. Run parity before you write "links" in a handoff.
+- Virtual functions of a class with no lifted ctor have no reference. `/OPT:REF` removes them. Keep them with `/INCLUDE` (21 pragmas
+  in `CliSession.cpp`). Take the decorated names from `llvm-pdbutil dump -publics` on the original PDB.
+- A small `GetKind` can fold (ICF) with a function of another module. funcdiff then scores it under the other name
+  (`LeaveGameWorldToken::GetKind`, `Aes128::GetType`). A `return 0` body folds with many names and gets no new score.
+- funcdiff `SKIP_NAME` also skips `std::` and backtick names. STL instances and `dynamic initializer` / `atexit` functions have no score.
+- An inlined loop over a small enum (`Authority::Merge`, `for i < OP_MAX`) gives the same code as separate `|=` stores. The
+  `setRole` DIFF (93.3, one extra `0x4` const) did not change. 1 try.
+- The 4 `CliSessionTable` index functions paired for the first time when their presence callers were lifted (shared gain).

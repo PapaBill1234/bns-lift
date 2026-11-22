@@ -9,8 +9,10 @@
 #include "AuctionDeliverJob.h"
 #include "GradeService.h"
 #include "Lock.h"
+#include "ObjectPool.h"
 #include "StlMemory.h"
 #include "StringUtil.h"
+#include "WaitQueue.h"
 
 class Character;
 class CliSession;
@@ -18,6 +20,7 @@ class CliSessionTable;
 class FragmentPacket;
 class GameTimeScheduleNode;
 class GamedChannel;
+class GateNode;
 struct GoodsInventoryChangedNotifyParam;
 class LobbyGateChannel;
 class LobbyService;
@@ -103,7 +106,30 @@ static_assert(offsetof(TimeBasedPlayInfo, acknowledgedPlayTime) == 0x1C, "TimeBa
 class Role
 {
 public:
+    // PDB enum Role::<unnamed-tag>.
+    enum
+    {
+        ROLE_ADMIN = 1,
+        ROLE_CBT = 2,
+        ROLE_VIP = 3,
+        ROLE_IN_COMPANY = 4,
+        ROLE_CBT_PC_CAFE = 5,
+        ROLE_FULL_CBT = 6,
+        ROLE_QA = 7,
+        ROLE_COUNT = 8,
+    };
+
     Role() : _roles(0) {}  // LIFT: inlined in GameAccount::GameAccount (0x33360)
+
+    // LIFT: PDB Role::Set(unsigned) and Role::Reset() have no own RVA. Inlined in CliSession::setRole (0x39f70).
+    bool Set(unsigned int role)
+    {
+        if (role < ROLE_ADMIN || role >= ROLE_COUNT)
+            return false;
+        _roles |= static_cast<unsigned char>(1 << (role - 1));
+        return true;
+    }
+    void Reset() { _roles = 0; }
 
     unsigned char _roles;
 };
@@ -165,9 +191,19 @@ public:
 
     Authority() { memset(&_table, 0, sizeof(_table)); }  // LIFT: inlined in CliSession::CliSession (0x33490)
 
+    // LIFT: PDB Authority::Merge(Authority::Table const&) has no own RVA. Inlined in CliSession::setRole (0x39f70).
+    void Merge(Table const& table)
+    {
+        for (int i = 0; i < OP_MAX; ++i)
+            _table.field[i] |= table.field[i];
+    }
+
     Table _table;
 };
 static_assert(sizeof(Authority) == 0x4, "sizeof Authority");
+
+// PDB global GRoleAuthorityTable (Authority::Table[8], .data rva 0x201d70). Index: Role value.
+extern Authority::Table GRoleAuthorityTable[Role::ROLE_COUNT];
 
 struct ContentBan
 {
@@ -298,16 +334,27 @@ public:
 };
 static_assert(sizeof(ServiceLocation) == 0x10, "sizeof ServiceLocation");
 
-class AnonymousLobbyGatePresence
+// PDB class AnonymousLobbyGatePresence (size 0x18).
+class AnonymousLobbyGatePresence : public Presence
 {
 public:
     AnonymousLobbyGatePresence(LobbyGateChannel*, unsigned long long);  // 0x3a3f0
+    virtual ~AnonymousLobbyGatePresence();  // 0x3a450 (scalar deleting destructor)
+    virtual Kind GetKind() const;  // 0xe3ec0 (folded)
     virtual bool IsEqual(Presence const*) const;  // 0x3a4a0
     virtual bool OnSet(CliSessionTable*, CliSession*);  // 0x3a530
     virtual void OnUnset(CliSessionTable*, CliSession*);  // 0x3a600
     virtual void Close(CliSession*);  // 0x3a650
     virtual void Kick(CliSession*, int);  // 0x3a670
+    // LIFT: PDB rva 0x32b50 for both (folded empty function).
+    virtual void NotifyChangedGrade(CliSession*, StsMsgLib::_StsMsgNotifyGradeNotifyGradeChanged const&) {}
+    virtual void NotifyChangedGradeLevel(CliSession*, StsMsgLib::_StsMsgNotifyGradeNotifyScoreChanged const&) {}
+
+private:
+    LobbyGateChannel* _lgate;
+    unsigned long long _gatekey;
 };
+static_assert(sizeof(AnonymousLobbyGatePresence) == 0x18, "sizeof AnonymousLobbyGatePresence");
 
 class CliSession : public RefCntPoolObj
 {
@@ -425,6 +472,8 @@ public:
     id128 _infoGateToken;
     LobbyService* _renameUserServiceEntry;
     CriticalSection _lock;
+
+    static ObjPool _pool;  // .data RVA 0x2042b0, dynamic init 0x11dd50, atexit dtor 0x11ebc0
 };
 static_assert(offsetof(CliSession, _state) == 0x18, "CliSession::_state");
 static_assert(offsetof(CliSession, _acb) == 0x30, "CliSession::_acb");
@@ -441,10 +490,20 @@ static_assert(offsetof(CliSession, _infoGateToken) == 0x890, "CliSession::_infoG
 static_assert(offsetof(CliSession, _lock) == 0x8A8, "CliSession::_lock");
 static_assert(sizeof(CliSession) == 0x8D0, "sizeof CliSession");
 
-class GameServiceLocation
+// PDB class GameServiceLocation (size 0x30).
+class GameServiceLocation : public ServiceLocation
 {
 public:
+    enum ChargeApplyType
+    {
+        CHARGEAPPLYTYPE_INVALID = 0,
+        CHARGEAPPLYTYPE_NEEDTOCHARGE = 1,
+        CHARGEAPPLYTYPE_TRIAL = 2,
+        CHARGEAPPLYTYPE_FREETOPLAY = 3,
+    };
+
     virtual ~GameServiceLocation();  // 0x3b360
+    virtual Kind GetKind() const;  // 0x5a0a0
     virtual void OnEnter(CliSession*);  // 0x3b3d0
     virtual void OnLeave(CliSession*);  // 0x3b540
     virtual bool Enter(CliSession*);  // 0x3b6f0
@@ -452,25 +511,54 @@ public:
     virtual bool ReserveStopPlay(CliSession*, StopPlayTimerEvent*);  // 0x3bb60
     virtual bool TimeoutStopPlay(CliSession*, StopPlayTimerEvent*);  // 0x3bc80
     virtual void NotifyStopPlay(CliSession*, int);  // 0x3bda0
-};
 
-class GameWorldPresence
+private:
+    unsigned long long _pcid;
+    short _waitPos;
+    WaitQueue::Type _waitQueueType;
+    ChargeApplyType _chargeApplyType;
+    StopPlayTimerEvent* _reservedStopPlay;
+};
+static_assert(sizeof(GameServiceLocation) == 0x30, "sizeof GameServiceLocation");
+
+// PDB class GameWorldPresence (size 0x20).
+class GameWorldPresence : public Presence
 {
 public:
+    virtual ~GameWorldPresence();  // 0x329e0 (scalar deleting destructor)
+    virtual Kind GetKind() const;  // 0xe51f0 (folded)
     virtual bool IsEqual(Presence const*) const;  // 0x3adf0
     virtual bool OnSet(CliSessionTable*, CliSession*);  // 0x3ae90
     virtual void OnUnset(CliSessionTable*, CliSession*);  // 0x3aff0
     virtual void Close(CliSession*);  // 0x3b0c0
     virtual void Kick(CliSession*, int);  // 0x3b120
-};
+    virtual void NotifyChangedGrade(CliSession*, StsMsgLib::_StsMsgNotifyGradeNotifyGradeChanged const&);  // 0x3b1c0
+    virtual void NotifyChangedGradeLevel(CliSession*, StsMsgLib::_StsMsgNotifyGradeNotifyScoreChanged const&);  // 0x3b290
 
-class LobbyGatePresence
+private:
+    short _wid;
+    unsigned long long _pcid;
+    unsigned long long _gamekey;
+};
+static_assert(sizeof(GameWorldPresence) == 0x20, "sizeof GameWorldPresence");
+
+// PDB class LobbyGatePresence (size 0x18).
+class LobbyGatePresence : public Presence
 {
 public:
+    virtual ~LobbyGatePresence();  // 0x3a710 (scalar deleting destructor)
+    virtual Kind GetKind() const;  // 0x99980
     virtual bool IsEqual(Presence const*) const;  // 0x3a760
     virtual bool OnSet(CliSessionTable*, CliSession*);  // 0x3a7d0
     virtual void OnUnset(CliSessionTable*, CliSession*);  // 0x3aa30
     virtual void Close(CliSession*);  // 0x3abc0
     virtual void Kick(CliSession*, int);  // 0x3ac20
+    virtual void NotifyChangedGrade(CliSession*, StsMsgLib::_StsMsgNotifyGradeNotifyGradeChanged const&);  // 0x3aca0
+    virtual void NotifyChangedGradeLevel(CliSession*, StsMsgLib::_StsMsgNotifyGradeNotifyScoreChanged const&);  // 0x3ad60
+
+private:
+    short _gatewid;
+    GateNode* _node;
 };
+static_assert(sizeof(LobbyGatePresence) == 0x18, "sizeof LobbyGatePresence");
 

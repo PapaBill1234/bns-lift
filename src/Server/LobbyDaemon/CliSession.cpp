@@ -7,8 +7,11 @@
 #include "CliSessionTable.h"
 #include "FragmentPacket.h"
 #include "LobbyDB.h"
+#include "LobbyGateChannel.h"
 #include "LobbyMessage.h"
 #include "LobbyService.h"
+#include "PcCafe.h"
+#include "AlertSender.h"
 #include "StsMsgGrade.h"
 #include "Log.h"
 #include "Memory.h"
@@ -17,6 +20,20 @@
 // PDB public ?TLobbyError@@3W4LobbyError@@A. enter (0x359c0) writes it at TLS +0x60.
 // LIFT: the PDB module of TLobbyError is not known. ❓ CliSession.obj is a guess.
 __declspec(thread) LobbyError TLobbyError;
+
+// PDB global GRoleAuthorityTable (.data rva 0x201d70, 32 bytes). Data from LobbyDaemon.exe (2019 + PDB).
+// LIFT: the PDB module of GRoleAuthorityTable is not known ([globals]). ❓ CliSession.obj is a guess.
+// The field order is Authority::Operation (manage character, create character, enter on entrance, enter on full).
+Authority::Table GRoleAuthorityTable[Role::ROLE_COUNT] = {
+    {{false, false, false, false}},  // 0
+    {{true, true, true, true}},      // ROLE_ADMIN
+    {{false, false, false, false}},  // ROLE_CBT
+    {{false, false, false, true}},   // ROLE_VIP
+    {{false, false, false, false}},  // ROLE_IN_COMPANY
+    {{false, false, false, false}},  // ROLE_CBT_PC_CAFE
+    {{false, false, false, false}},  // ROLE_FULL_CBT
+    {{true, true, true, true}},      // ROLE_QA
+};
 
 // LIFT: Presence::~Presence has no own RVA (empty; folded). The out-of-line definition gives the key function.
 Presence::~Presence()
@@ -27,6 +44,11 @@ Presence::~Presence()
 ServiceLocation::~ServiceLocation()
 {
 }
+
+// LIFT: CliSession::_pool (.data RVA 0x2042b0) has no definition yet. Its dynamic init (0x11dd50) and atexit dtor
+// (0x11ebc0) are Not done in card ld-13. The original arguments are id 1, objsize 0x8d0 and desc L"CliSession".
+// ObjectPool.cpp is the SmartCouponDaemon form and is not in lift_lobbydaemon. A definition here does not link in the
+// VS2010 build (no ObjPool::ObjPool, ObjPool::~ObjPool). Define it when the LobbyDaemon ObjectPool module is lifted.
 
 // 0x329f0
 void CliSession::deallocate_me(void*, wchar_t const*, int)
@@ -966,204 +988,618 @@ bool CliSession::NotifyGoodsInventoryChangedAlongPresence(GoodsInventoryChangedN
 }
 
 // 0x39820
+// LIFT: not lifted in card ld-13 (0x39820). The body uses LobbyDaemon::_instance->GlobalTimerQueue and _config.
+// The LobbyDaemon layout belongs to cards ld-15 and ld-20.
 bool CliSession::ReserveStopPlay(bool, int, int)
 {
     LIFT_STUB(0x39820);
 }
 
 // 0x39a70
-bool CliSession::TimeoutStopPlay(StopPlayTimerEvent*)
+#pragma comment(linker, "/INCLUDE:?TimeoutStopPlay@CliSession@@QEAA_NPEAVStopPlayTimerEvent@@@Z")  // LIFT: keep until the caller is lifted (0x39a70).
+bool CliSession::TimeoutStopPlay(StopPlayTimerEvent* event)
 {
-    LIFT_STUB(0x39a70);
+    if (event == nullptr)
+    {
+        CliSession const* cs = this;
+        Log::Write(Log::LT_ERROR, L"CliSession.cpp", 2943,
+                   L"== CRASH == [cs], timeout stop play fail; invalid parameter, event:%p, cli-key:0x%I64X, cli-state:%d.%d",
+                   event, (cs != nullptr) ? cs->_clikey : 0ULL,
+                   (cs != nullptr) ? static_cast<unsigned int>(cs->_state) >> 16 : 0,
+                   (cs != nullptr) ? cs->_state & 0xFFFF : 0);
+        AlertSender::Write(L"CliSession.cpp", 2943,
+                           L"== CRASH == [cs], timeout stop play fail; invalid parameter, event:%p, cli-key:0x%I64X, cli-state:%d.%d",
+                           event, (cs != nullptr) ? cs->_clikey : 0ULL,
+                           (cs != nullptr) ? static_cast<unsigned int>(cs->_state) >> 16 : 0,
+                           (cs != nullptr) ? cs->_state & 0xFFFF : 0);
+        return false;
+    }
+    bool result = false;
+    _lock.Enter();
+    if (_reservedStopPlay == event)
+    {
+        result = true;
+        _reservedStopPlay = nullptr;
+    }
+    else if (_srvloc != nullptr)
+    {
+        result = _srvloc->TimeoutStopPlay(this, event);
+    }
+    else
+    {
+        Log::Write(Log::LT_ERROR, L"CliSession.cpp", 2959,
+                   L"[cs], timeout stop play fail; not in service location, reserved:%p, event:%p, cli-key:0x%I64X, cli-state:%d.%d",
+                   _reservedStopPlay, event, _clikey, static_cast<unsigned int>(_state) >> 16, _state & 0xFFFF);
+    }
+    _lock.Leave();
+    return result;
 }
 
 // 0x39be0
-bool CliSession::OnChargeStopRequested(unsigned int)
+#pragma comment(linker, "/INCLUDE:?OnChargeStopRequested@CliSession@@QEAA_NI@Z")  // LIFT: keep until the caller is lifted (0x39be0).
+bool CliSession::OnChargeStopRequested(unsigned int txnid)
 {
-    LIFT_STUB(0x39be0);
+    bool result = false;
+    _lock.Enter();
+    if (_state == 0x40000)
+    {
+        if (_chargeKey != nullptr)
+        {
+            _chargeStopRequestTxnId = txnid;
+            Log::Write(Log::LT_DEBUG, L"CliSession.cpp", 2977,
+                       L"[cs], response reserved for charge stop request, txn-id:%u, cli-key:0x%I64X, cli-state:%d.%d",
+                       txnid, _clikey, static_cast<unsigned int>(_state) >> 16, _state & 0xFFFF);
+            result = true;
+        }
+        else
+        {
+            TLobbyError = LOBERR_CHARGE_NOT_STARTED;
+        }
+    }
+    else
+    {
+        TLobbyError = LOBERR_INVALID_SESSION_STATE;
+    }
+    _lock.Leave();
+    return result;
 }
 
 // 0x39cc0
+// LIFT: not lifted in card ld-13 (0x39cc0). The body uses LobbyDaemon::_instance->_gamedchmgr.
+// The LobbyDaemon layout belongs to cards ld-15 and ld-20.
 bool CliSession::ApplyNewChargeItem(wchar_t const*, long, unsigned int, short)
 {
     LIFT_STUB(0x39cc0);
 }
 
 // 0x39e50
+// LIFT: not lifted in card ld-13 (0x39e50). The body uses LobbyDaemon::_instance->_gamedchmgr.
+// The LobbyDaemon layout belongs to cards ld-15 and ld-20.
 bool CliSession::NotifyChargeRemainTime(long, short, unsigned int)
 {
     LIFT_STUB(0x39e50);
 }
 
 // 0x39f70
-bool CliSession::setRole(unsigned int const* const, int)
+#pragma comment(linker, "/INCLUDE:?setRole@CliSession@@QEAA_NQEBIH@Z")  // LIFT: keep until the caller is lifted (0x39f70).
+bool CliSession::setRole(unsigned int const* const roles, int const roleCount)
 {
-    LIFT_STUB(0x39f70);
+    _acb._roles.Reset();
+    for (int i = 0; i < roleCount; ++i)
+    {
+        _acb._roles.Set(roles[i]);
+        if (roles[i] < Role::ROLE_COUNT)
+            _auth.Merge(GRoleAuthorityTable[roles[i]]);
+    }
+    return true;
 }
 
 // 0x3a000
-bool CliSession::setPcCafeCode(wchar_t const*)
+#pragma comment(linker, "/INCLUDE:?setPcCafeCode@CliSession@@QEAA_NPEB_W@Z")  // LIFT: keep until the caller is lifted (0x3a000).
+bool CliSession::setPcCafeCode(wchar_t const* pcCafeCode)
 {
-    LIFT_STUB(0x3a000);
+    if (_pcCafeCode != nullptr)
+    {
+        Memory::_Manager[2]->Free(_pcCafeCode, L"CliSession.cpp", 3132);
+        _pcCafeCode = nullptr;
+    }
+    if (pcCafeCode != nullptr)
+    {
+        size_t const len = wcslen(pcCafeCode);
+        _pcCafeCode = static_cast<wchar_t*>(
+            Memory::_Manager[2]->AllocZero(sizeof(wchar_t) * (len + 1), L"CliSession.cpp", 3137));
+        wcscpy_s(_pcCafeCode, len + 1, pcCafeCode);
+    }
+    Log::Write(Log::LT_DEBUG, L"CliSession.cpp", 3141,
+               L"[cs], set pc-cafe-code, pc-cafe-code:%s, cli-key:0x%I64X, cli-state:%d.%d",
+               (pcCafeCode != nullptr) ? pcCafeCode : L"N/A", _clikey, static_cast<unsigned int>(_state) >> 16,
+               _state & 0xFFFF);
+    return true;
 }
 
 // 0x3a100
-void CliSession::setPcCafe(PcCafe*)
+#pragma comment(linker, "/INCLUDE:?setPcCafe@CliSession@@QEAAXPEAVPcCafe@@@Z")  // LIFT: keep until the caller is lifted (0x3a100).
+void CliSession::setPcCafe(PcCafe* pcCafe)
 {
-    LIFT_STUB(0x3a100);
+    if (_pcCafe != nullptr)
+    {
+        _pcCafe->onUnset(this);
+        // LIFT: the class operator delete is empty (PcCafe.h). Free gives the memory back.
+        delete _pcCafe;
+        Memory::_Manager[2]->Free(_pcCafe, L"CliSession.cpp", 3161);
+        _pcCafe = nullptr;
+    }
+    if (pcCafe != nullptr)
+    {
+        _pcCafe = pcCafe;
+        pcCafe->onSet(this);
+    }
 }
 
 // 0x3a190
+// LIFT: not lifted in card ld-13 (0x3a190). The body uses LobbyDaemon::_instance->_mileageManager.
+// The LobbyDaemon layout belongs to cards ld-15 and ld-20.
 void CliSession::onPcCafeChargeStart()
 {
     LIFT_STUB(0x3a190);
 }
 
 // 0x3a2c0
+// LIFT: not lifted in card ld-13 (0x3a2c0). The body uses LobbyDaemon::_instance->_mileageManager.
+// The LobbyDaemon layout belongs to cards ld-15 and ld-20.
 void CliSession::onPcCafeChargeStop()
 {
     LIFT_STUB(0x3a2c0);
 }
 
 // 0x3a3f0
+// LIFT: not lifted in card ld-13 (0x3a3f0). The body calls _lgate->addReferenceCount(L"CliSession.cpp", 3212).
+// LobbyGateChannel has no PDB base (RefCntObject) in LobbyGateChannel.h yet.
 AnonymousLobbyGatePresence::AnonymousLobbyGatePresence(LobbyGateChannel*, unsigned long long)
 {
     LIFT_STUB(0x3a3f0);
 }
 
-// 0x3a4a0
-bool AnonymousLobbyGatePresence::IsEqual(Presence const*) const
+// 0x3a450 (scalar deleting destructor)
+// LIFT: declared in ld-13 with the PDB layout of AnonymousLobbyGatePresence. Not in batch 1.
+AnonymousLobbyGatePresence::~AnonymousLobbyGatePresence()
 {
-    LIFT_STUB(0x3a4a0);
+    LIFT_STUB(0x3a450);
+}
+
+// 0xe3ec0 (folded)
+#pragma comment(linker, "/INCLUDE:?GetKind@AnonymousLobbyGatePresence@@UEBA?AW4Kind@Presence@@XZ")  // LIFT: keep until the caller is lifted (0xe3ec0).
+Presence::Kind AnonymousLobbyGatePresence::GetKind() const
+{
+    return AnonymousLobbyGate;
+}
+
+// 0x3a4a0
+#pragma comment(linker, "/INCLUDE:?IsEqual@AnonymousLobbyGatePresence@@UEBA_NPEBVPresence@@@Z")  // LIFT: keep until the caller is lifted (0x3a4a0).
+bool AnonymousLobbyGatePresence::IsEqual(Presence const* presence) const
+{
+    if (presence == nullptr)
+        return false;
+    if (this == presence)
+        return true;
+    if (presence->GetKind() != GetKind())
+        return false;
+    AnonymousLobbyGatePresence const* other = static_cast<AnonymousLobbyGatePresence const*>(presence);
+    return _lgate == other->_lgate && _gatekey == other->_gatekey;
 }
 
 // 0x3a530
+// LIFT: not lifted in card ld-13 (0x3a530). The body reads _lgate->_rawChannel->GetId().
+// LobbyGateChannel has no PDB base (with _rawChannel) in LobbyGateChannel.h yet.
 bool AnonymousLobbyGatePresence::OnSet(CliSessionTable*, CliSession*)
 {
     LIFT_STUB(0x3a530);
 }
 
 // 0x3a600
+// LIFT: not lifted in card ld-13 (0x3a600). Same reason as OnSet 0x3a530 (_lgate->_rawChannel->GetId()).
 void AnonymousLobbyGatePresence::OnUnset(CliSessionTable*, CliSession*)
 {
     LIFT_STUB(0x3a600);
 }
 
 // 0x3a650
+#pragma comment(linker, "/INCLUDE:?Close@AnonymousLobbyGatePresence@@UEAAXPEAVCliSession@@@Z")  // LIFT: keep until the caller is lifted (0x3a650).
 void AnonymousLobbyGatePresence::Close(CliSession*)
 {
-    LIFT_STUB(0x3a650);
+    if (_lgate != nullptr)
+        _lgate->SendCloseAnonymousSessionNotify(_gatekey);
 }
 
 // 0x3a670
-void AnonymousLobbyGatePresence::Kick(CliSession*, int)
+#pragma comment(linker, "/INCLUDE:?Kick@AnonymousLobbyGatePresence@@UEAAXPEAVCliSession@@H@Z")  // LIFT: keep until the caller is lifted (0x3a670).
+void AnonymousLobbyGatePresence::Kick(CliSession* owner, int)
 {
-    LIFT_STUB(0x3a670);
+    Log::Write(Log::LT_ERROR, L"CliSession.cpp", 3261,
+               L"== CRASH == [cs], kick anonymous lobby-gate presence is forbidden, cli-key:0x%I64X, cli-state:%d.%d",
+               (owner != nullptr) ? owner->_clikey : 0ULL,
+               (owner != nullptr) ? static_cast<unsigned int>(owner->_state) >> 16 : 0,
+               (owner != nullptr) ? owner->_state & 0xFFFF : 0);
+    AlertSender::Write(L"CliSession.cpp", 3261,
+                       L"== CRASH == [cs], kick anonymous lobby-gate presence is forbidden, cli-key:0x%I64X, cli-state:%d.%d",
+                       (owner != nullptr) ? owner->_clikey : 0ULL,
+                       (owner != nullptr) ? static_cast<unsigned int>(owner->_state) >> 16 : 0,
+                       (owner != nullptr) ? owner->_state & 0xFFFF : 0);
+}
+
+// 0x3a710 (scalar deleting destructor)
+// LIFT: declared in ld-13 with the PDB layout of LobbyGatePresence. Not in batch 2.
+LobbyGatePresence::~LobbyGatePresence()
+{
+    LIFT_STUB(0x3a710);
+}
+
+// 0x99980
+#pragma comment(linker, "/INCLUDE:?GetKind@LobbyGatePresence@@UEBA?AW4Kind@Presence@@XZ")  // LIFT: keep until the caller is lifted (0x99980).
+Presence::Kind LobbyGatePresence::GetKind() const
+{
+    return LobbyGate;
 }
 
 // 0x3a760
-bool LobbyGatePresence::IsEqual(Presence const*) const
+#pragma comment(linker, "/INCLUDE:?IsEqual@LobbyGatePresence@@UEBA_NPEBVPresence@@@Z")  // LIFT: keep until the caller is lifted (0x3a760).
+bool LobbyGatePresence::IsEqual(Presence const* presence) const
 {
-    LIFT_STUB(0x3a760);
+    if (presence == nullptr)
+        return false;
+    if (this == presence)
+        return true;
+    if (presence->GetKind() != GetKind())
+        return false;
+    return _gatewid == static_cast<LobbyGatePresence const*>(presence)->_gatewid;
+}
+
+// LIFT: inlined GateNode ctor (in LobbyGatePresence::OnSet 0x3a7d0). The addReferenceCount line is 19
+// (CliSessionTable.cpp). The body is here because CliSession is incomplete in CliSessionTable.h.
+inline GateNode::GateNode(CliSession* clisession)
+    : _clisession(clisession)
+{
+    _clisession->addReferenceCount(L"CliSessionTable.cpp", 19);
 }
 
 // 0x3a7d0
-bool LobbyGatePresence::OnSet(CliSessionTable*, CliSession*)
+#pragma comment(linker, "/INCLUDE:?OnSet@LobbyGatePresence@@UEAA_NPEAVCliSessionTable@@PEAVCliSession@@@Z")  // LIFT: keep until the caller is lifted (0x3a7d0).
+bool LobbyGatePresence::OnSet(CliSessionTable* table, CliSession* owner)
 {
-    LIFT_STUB(0x3a7d0);
+    if (table == nullptr || owner == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, L"CliSession.cpp", 3309,
+                   L"== CRASH == [cs], on set lobby-gate presence fail; invalid parameter, table:%p, owner:%p",
+                   table, owner);
+        AlertSender::Write(L"CliSession.cpp", 3309,
+                           L"== CRASH == [cs], on set lobby-gate presence fail; invalid parameter, table:%p, owner:%p",
+                           table, owner);
+        return false;
+    }
+    if (_node != nullptr)
+    {
+        Log::Write(Log::LT_ERROR, L"CliSession.cpp", 3314,
+                   L"== CRASH == [cs], on set lobby-gate presence fail; already set into gate-index table, cli-key:0x%I64X, cli-state:%d.%d",
+                   owner->_clikey, static_cast<unsigned int>(owner->_state) >> 16, owner->_state & 0xFFFF);
+        AlertSender::Write(L"CliSession.cpp", 3314,
+                           L"== CRASH == [cs], on set lobby-gate presence fail; already set into gate-index table, cli-key:0x%I64X, cli-state:%d.%d",
+                           owner->_clikey, static_cast<unsigned int>(owner->_state) >> 16, owner->_state & 0xFFFF);
+        return false;
+    }
+    if (_gatewid == 0)
+    {
+        Log::Write(Log::LT_ERROR, L"CliSession.cpp", 3319,
+                   L"== CRASH == [cs], on set lobby-gate presence fail; invalid lobby-gate wid, cli-key:0x%I64X, cli-state:%d.%d",
+                   owner->_clikey, static_cast<unsigned int>(owner->_state) >> 16, owner->_state & 0xFFFF);
+        AlertSender::Write(L"CliSession.cpp", 3319,
+                           L"== CRASH == [cs], on set lobby-gate presence fail; invalid lobby-gate wid, cli-key:0x%I64X, cli-state:%d.%d",
+                           owner->_clikey, static_cast<unsigned int>(owner->_state) >> 16, owner->_state & 0xFFFF);
+        return false;
+    }
+    _node = new (Memory::_Manager[2]->Alloc(sizeof(GateNode), L"CliSession.cpp", 3323)) GateNode(owner);
+    if (table->Insert_index_gate(_gatewid, _node))
+        return true;
+    Log::Write(Log::LT_ERROR, L"CliSession.cpp", 3325,
+               L"[cs], on set lobby-gate presence fail; insert index on gate fail, cli-key:0x%I64X, cli-state:%d.%d",
+               owner->_clikey, static_cast<unsigned int>(owner->_state) >> 16, owner->_state & 0xFFFF);
+    _node->removeReferenceCount(L"CliSession.cpp", 3326);
+    _node = nullptr;
+    return false;
 }
 
 // 0x3aa30
-void LobbyGatePresence::OnUnset(CliSessionTable*, CliSession*)
+#pragma comment(linker, "/INCLUDE:?OnUnset@LobbyGatePresence@@UEAAXPEAVCliSessionTable@@PEAVCliSession@@@Z")  // LIFT: keep until the caller is lifted (0x3aa30).
+void LobbyGatePresence::OnUnset(CliSessionTable* table, CliSession* owner)
 {
-    LIFT_STUB(0x3aa30);
+    if (_node == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, L"CliSession.cpp", 3337,
+                   L"== CRASH == [cs], on unset lobby-gate presence fail; not ever set into gate-index table, cli-key:0x%I64X, cli-state:%d.%d",
+                   (owner != nullptr) ? owner->_clikey : 0ULL,
+                   (owner != nullptr) ? static_cast<unsigned int>(owner->_state) >> 16 : 0,
+                   (owner != nullptr) ? owner->_state & 0xFFFF : 0);
+        AlertSender::Write(L"CliSession.cpp", 3337,
+                           L"== CRASH == [cs], on unset lobby-gate presence fail; not ever set into gate-index table, cli-key:0x%I64X, cli-state:%d.%d",
+                           (owner != nullptr) ? owner->_clikey : 0ULL,
+                           (owner != nullptr) ? static_cast<unsigned int>(owner->_state) >> 16 : 0,
+                           (owner != nullptr) ? owner->_state & 0xFFFF : 0);
+        return;
+    }
+    if (_gatewid == 0)
+    {
+        Log::Write(Log::LT_ERROR, L"CliSession.cpp", 3342,
+                   L"== CRASH == [cs], on unset lobby-gate presence fail; invalid lobby-gate wid, cli-key:0x%I64X, cli-state:%d.%d",
+                   (owner != nullptr) ? owner->_clikey : 0ULL,
+                   (owner != nullptr) ? static_cast<unsigned int>(owner->_state) >> 16 : 0,
+                   (owner != nullptr) ? owner->_state & 0xFFFF : 0);
+        AlertSender::Write(L"CliSession.cpp", 3342,
+                           L"== CRASH == [cs], on unset lobby-gate presence fail; invalid lobby-gate wid, cli-key:0x%I64X, cli-state:%d.%d",
+                           (owner != nullptr) ? owner->_clikey : 0ULL,
+                           (owner != nullptr) ? static_cast<unsigned int>(owner->_state) >> 16 : 0,
+                           (owner != nullptr) ? owner->_state & 0xFFFF : 0);
+        return;
+    }
+    if (table == nullptr || owner == nullptr)
+        return;
+    table->Delete_index_gate(_gatewid, _node);
+    _node->removeReferenceCount(L"CliSession.cpp", 3348);
+    _node = nullptr;
 }
 
 // 0x3abc0
+// LIFT: not lifted in card ld-13 (0x3abc0). The body uses LobbyDaemon::_instance->_lgatechmgr and
+// removeReferenceCount on LobbyGateChannel. LobbyDaemon.h and LobbyGateChannel.h have no PDB layout yet.
 void LobbyGatePresence::Close(CliSession*)
 {
     LIFT_STUB(0x3abc0);
 }
 
 // 0x3ac20
+// LIFT: not lifted in card ld-13 (0x3ac20). Same reason as Close 0x3abc0.
 void LobbyGatePresence::Kick(CliSession*, int)
 {
     LIFT_STUB(0x3ac20);
 }
 
-// 0x3adf0
-bool GameWorldPresence::IsEqual(Presence const*) const
+// 0x3aca0
+// LIFT: not lifted in card ld-13 (0x3aca0). Same reason as Close 0x3abc0.
+void LobbyGatePresence::NotifyChangedGrade(CliSession*, StsMsgLib::_StsMsgNotifyGradeNotifyGradeChanged const&)
 {
-    LIFT_STUB(0x3adf0);
+    LIFT_STUB(0x3aca0);
+}
+
+// 0x3ad60
+// LIFT: not lifted in card ld-13 (0x3ad60). Same reason as Close 0x3abc0.
+void LobbyGatePresence::NotifyChangedGradeLevel(CliSession*, StsMsgLib::_StsMsgNotifyGradeNotifyScoreChanged const&)
+{
+    LIFT_STUB(0x3ad60);
+}
+
+// 0x329e0 (scalar deleting destructor)
+// LIFT: declared in ld-13 with the PDB layout of GameWorldPresence. Not in batch 2.
+GameWorldPresence::~GameWorldPresence()
+{
+    LIFT_STUB(0x329e0);
+}
+
+// 0xe51f0 (folded)
+#pragma comment(linker, "/INCLUDE:?GetKind@GameWorldPresence@@UEBA?AW4Kind@Presence@@XZ")  // LIFT: keep until the caller is lifted (0xe51f0).
+Presence::Kind GameWorldPresence::GetKind() const
+{
+    return GameWorld;
+}
+
+// 0x3adf0
+#pragma comment(linker, "/INCLUDE:?IsEqual@GameWorldPresence@@UEBA_NPEBVPresence@@@Z")  // LIFT: keep until the caller is lifted (0x3adf0).
+bool GameWorldPresence::IsEqual(Presence const* presence) const
+{
+    if (presence == nullptr)
+        return false;
+    if (this == presence)
+        return true;
+    if (presence->GetKind() != GetKind())
+        return false;
+    GameWorldPresence const* other = static_cast<GameWorldPresence const*>(presence);
+    return _wid == other->_wid && _pcid != 0 && other->_pcid != 0 && _gamekey == other->_gamekey;
 }
 
 // 0x3ae90
-bool GameWorldPresence::OnSet(CliSessionTable*, CliSession*)
+#pragma comment(linker, "/INCLUDE:?OnSet@GameWorldPresence@@UEAA_NPEAVCliSessionTable@@PEAVCliSession@@@Z")  // LIFT: keep until the caller is lifted (0x3ae90).
+bool GameWorldPresence::OnSet(CliSessionTable* table, CliSession* owner)
 {
-    LIFT_STUB(0x3ae90);
+    if (table == nullptr || owner == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, L"CliSession.cpp", 3431,
+                   L"== CRASH == [cs], on set game-world presence fail; invalid paramter, table:%p, owner:%p",
+                   table, owner);
+        AlertSender::Write(L"CliSession.cpp", 3431,
+                           L"== CRASH == [cs], on set game-world presence fail; invalid paramter, table:%p, owner:%p",
+                           table, owner);
+        return false;
+    }
+    if (_wid == 0)
+    {
+        Log::Write(Log::LT_ERROR, L"CliSession.cpp", 3436,
+                   L"== CRASH == [cs], on set game-world presence fail; invalid game-world wid, cli-key:0x%I64X, cli-state:%d.%d",
+                   owner->_clikey, static_cast<unsigned int>(owner->_state) >> 16, owner->_state & 0xFFFF);
+        AlertSender::Write(L"CliSession.cpp", 3436,
+                           L"== CRASH == [cs], on set game-world presence fail; invalid game-world wid, cli-key:0x%I64X, cli-state:%d.%d",
+                           owner->_clikey, static_cast<unsigned int>(owner->_state) >> 16, owner->_state & 0xFFFF);
+        return false;
+    }
+    if (!table->Insert_index_pcid(_wid, _pcid, owner))
+    {
+        Log::Write(Log::LT_ERROR, L"CliSession.cpp", 3442,
+                   L"[cs], on set game-world presence exception; insert pc-id index fail, cli-key:0x%I64X, cli-state:%d.%d",
+                   owner->_clikey, static_cast<unsigned int>(owner->_state) >> 16, owner->_state & 0xFFFF);
+        return false;
+    }
+    return true;
 }
 
 // 0x3aff0
-void GameWorldPresence::OnUnset(CliSessionTable*, CliSession*)
+#pragma comment(linker, "/INCLUDE:?OnUnset@GameWorldPresence@@UEAAXPEAVCliSessionTable@@PEAVCliSession@@@Z")  // LIFT: keep until the caller is lifted (0x3aff0).
+void GameWorldPresence::OnUnset(CliSessionTable* table, CliSession* owner)
 {
-    LIFT_STUB(0x3aff0);
+    if (_wid == 0)
+    {
+        Log::Write(Log::LT_ERROR, L"CliSession.cpp", 3456,
+                   L"== CRASH == [cs], on unset game-world presence fail; invalid game-world wid, cli-key:0x%I64X, cli-state:%d.%d",
+                   (owner != nullptr) ? owner->_clikey : 0ULL,
+                   (owner != nullptr) ? static_cast<unsigned int>(owner->_state) >> 16 : 0,
+                   (owner != nullptr) ? owner->_state & 0xFFFF : 0);
+        AlertSender::Write(L"CliSession.cpp", 3456,
+                           L"== CRASH == [cs], on unset game-world presence fail; invalid game-world wid, cli-key:0x%I64X, cli-state:%d.%d",
+                           (owner != nullptr) ? owner->_clikey : 0ULL,
+                           (owner != nullptr) ? static_cast<unsigned int>(owner->_state) >> 16 : 0,
+                           (owner != nullptr) ? owner->_state & 0xFFFF : 0);
+        return;
+    }
+    if (table != nullptr && owner != nullptr)
+        table->Delete_index_pcid(_wid, _pcid);
 }
 
 // 0x3b0c0
+// LIFT: not lifted in card ld-13 (0x3b0c0). The body uses LobbyDaemon::_instance->_gamedchmgr.
+// LobbyDaemon.h has no PDB layout yet.
 void GameWorldPresence::Close(CliSession*)
 {
     LIFT_STUB(0x3b0c0);
 }
 
 // 0x3b120
-void GameWorldPresence::Kick(CliSession*, int)
+#pragma comment(linker, "/INCLUDE:?Kick@GameWorldPresence@@UEAAXPEAVCliSession@@H@Z")  // LIFT: keep until the caller is lifted (0x3b120).
+void GameWorldPresence::Kick(CliSession* owner, int)
 {
-    LIFT_STUB(0x3b120);
+    Log::Write(Log::LT_ERROR, L"CliSession.cpp", 3482,
+               L"== CRASH == [cs], kick world presence is forbidden, cli-key:0x%I64X, cli-state:%d.%d",
+               (owner != nullptr) ? owner->_clikey : 0ULL,
+               (owner != nullptr) ? static_cast<unsigned int>(owner->_state) >> 16 : 0,
+               (owner != nullptr) ? owner->_state & 0xFFFF : 0);
+    AlertSender::Write(L"CliSession.cpp", 3482,
+                       L"== CRASH == [cs], kick world presence is forbidden, cli-key:0x%I64X, cli-state:%d.%d",
+                       (owner != nullptr) ? owner->_clikey : 0ULL,
+                       (owner != nullptr) ? static_cast<unsigned int>(owner->_state) >> 16 : 0,
+                       (owner != nullptr) ? owner->_state & 0xFFFF : 0);
+}
+
+// 0x3b1c0
+// LIFT: not lifted in card ld-13 (0x3b1c0). Same reason as Close 0x3b0c0.
+void GameWorldPresence::NotifyChangedGrade(CliSession*, StsMsgLib::_StsMsgNotifyGradeNotifyGradeChanged const&)
+{
+    LIFT_STUB(0x3b1c0);
+}
+
+// 0x3b290
+// LIFT: not lifted in card ld-13 (0x3b290). Same reason as Close 0x3b0c0.
+void GameWorldPresence::NotifyChangedGradeLevel(CliSession*, StsMsgLib::_StsMsgNotifyGradeNotifyScoreChanged const&)
+{
+    LIFT_STUB(0x3b290);
 }
 
 // 0x3b360
+// LIFT: not lifted in card ld-13 (0x3b360). The body uses LobbyDaemon::_instance->GlobalTimerQueue.
+// LobbyDaemon.h has no PDB layout yet.
 GameServiceLocation::~GameServiceLocation()
 {
     LIFT_STUB(0x3b360);
 }
 
+// 0x5a0a0 (folded)
+#pragma comment(linker, "/INCLUDE:?GetKind@GameServiceLocation@@UEBA?AW4Kind@ServiceLocation@@XZ")  // LIFT: keep until the caller is lifted (0x5a0a0).
+ServiceLocation::Kind GameServiceLocation::GetKind() const
+{
+    return KIND_GAMEWORLD;
+}
+
 // 0x3b3d0
+// LIFT: not lifted in card ld-13 (0x3b3d0). The body uses LobbyDaemon::_instance->_gameWorldRegistry and _mileageManager.
+// LobbyDaemon.h has no PDB layout yet.
 void GameServiceLocation::OnEnter(CliSession*)
 {
     LIFT_STUB(0x3b3d0);
 }
 
 // 0x3b540
+// LIFT: not lifted in card ld-13 (0x3b540). The body uses LobbyDaemon::_instance->_gameWorldRegistry, GlobalTimerQueue and _mileageManager.
+// LobbyDaemon.h has no PDB layout yet.
 void GameServiceLocation::OnLeave(CliSession*)
 {
     LIFT_STUB(0x3b540);
 }
 
 // 0x3b6f0
+// LIFT: not lifted in card ld-13 (0x3b6f0). The body uses LobbyDaemon::_instance->_gameWorldRegistry.
+// LobbyDaemon.h has no PDB layout yet.
 bool GameServiceLocation::Enter(CliSession*)
 {
     LIFT_STUB(0x3b6f0);
 }
 
 // 0x3b9a0
+// LIFT: not lifted in card ld-13 (0x3b9a0). The body uses LobbyDaemon::_instance->_gameWorldRegistry.
+// LobbyDaemon.h has no PDB layout yet.
 bool GameServiceLocation::Leave(CliSession*)
 {
     LIFT_STUB(0x3b9a0);
 }
 
 // 0x3bb60
-bool GameServiceLocation::ReserveStopPlay(CliSession*, StopPlayTimerEvent*)
+#pragma comment(linker, "/INCLUDE:?ReserveStopPlay@GameServiceLocation@@UEAA_NPEAVCliSession@@PEAVStopPlayTimerEvent@@@Z")  // LIFT: keep until the caller is lifted (0x3bb60).
+bool GameServiceLocation::ReserveStopPlay(CliSession* owner, StopPlayTimerEvent* event)
 {
-    LIFT_STUB(0x3bb60);
+    if (owner == nullptr || event == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, L"CliSession.cpp", 3658,
+                   L"== CRASH == [wr], reserve stop play fail; invalid parameter, owner:%p, event:%p", owner, event);
+        AlertSender::Write(L"CliSession.cpp", 3658,
+                           L"== CRASH == [wr], reserve stop play fail; invalid parameter, owner:%p, event:%p", owner, event);
+        return false;
+    }
+    if (_reservedStopPlay != nullptr)
+    {
+        Log::Write(Log::LT_ERROR, L"CliSession.cpp", 3663,
+                   L"[wr], reserve stop play fail; already reserved, wid:%d, cli-key:0x%I64X, cli-state:%d.%d",
+                   _wid, owner->_clikey, static_cast<unsigned int>(owner->_state) >> 16, owner->_state & 0xFFFF);
+        return false;
+    }
+    _reservedStopPlay = event;
+    Log::Write(Log::LT_DEBUG, L"CliSession.cpp", 3669,
+               L"[wr], reserve stop play ok, event:%p, wid:%d, cli-key:0x%I64X, cli-state:%d.%d",
+               event, _wid, owner->_clikey, static_cast<unsigned int>(owner->_state) >> 16, owner->_state & 0xFFFF);
+    return true;
 }
 
 // 0x3bc80
-bool GameServiceLocation::TimeoutStopPlay(CliSession*, StopPlayTimerEvent*)
+#pragma comment(linker, "/INCLUDE:?TimeoutStopPlay@GameServiceLocation@@UEAA_NPEAVCliSession@@PEAVStopPlayTimerEvent@@@Z")  // LIFT: keep until the caller is lifted (0x3bc80).
+bool GameServiceLocation::TimeoutStopPlay(CliSession* owner, StopPlayTimerEvent* event)
 {
-    LIFT_STUB(0x3bc80);
+    if (owner == nullptr || event == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, L"CliSession.cpp", 3677,
+                   L"== CRASH == [wr], timeout stop play fail; invalid parameter, owner:%p, event:%p", owner, event);
+        AlertSender::Write(L"CliSession.cpp", 3677,
+                           L"== CRASH == [wr], timeout stop play fail; invalid parameter, owner:%p, event:%p", owner, event);
+        return false;
+    }
+    if (_reservedStopPlay != event)
+    {
+        Log::Write(Log::LT_ERROR, L"CliSession.cpp", 3683,
+                   L"[wr], timeout stop play fail; event mismatch, reserved-event:%p, event:%p, cli-key:0x%I64X, cli-state:%d.%d",
+                   _reservedStopPlay, event, owner->_clikey, static_cast<unsigned int>(owner->_state) >> 16,
+                   owner->_state & 0xFFFF);
+        return false;
+    }
+    _reservedStopPlay = nullptr;
+    Log::Write(Log::LT_DEBUG, L"CliSession.cpp", 3687,
+               L"[wr], timeout stop play ok, event:%p, cli-key:0x%I64X, cli-state:%d.%d",
+               event, owner->_clikey, static_cast<unsigned int>(owner->_state) >> 16, owner->_state & 0xFFFF);
+    return true;
 }
 
 // 0x3bda0
+// LIFT: not lifted in card ld-13 (0x3bda0). The body uses LobbyDaemon::_instance->_gamedchmgr.
+// LobbyDaemon.h has no PDB layout yet.
 void GameServiceLocation::NotifyStopPlay(CliSession*, int)
 {
     LIFT_STUB(0x3bda0);
