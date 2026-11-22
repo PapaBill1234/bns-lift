@@ -162,16 +162,24 @@ bool FsdDecomposer::GetQword(__int64* buffer)
 // Returns 0 on success, -1 if the data is too short, or the necessary count if the buffer is too small.
 int FsdDecomposer::GetString(wchar_t* buffer, int count)
 {
-    wchar_t* str = reinterpret_cast<wchar_t*>(_ptr.GetCurrentData());
-    int length = static_cast<int>(wcslen(str)) + 1;
-    if (_ptr.GetRemainDataSize() < static_cast<short>(length * sizeof(wchar_t)))
-        return -1;
-    if (buffer != NULL)
+    // BUG: The original searches for a terminator before it checks the data size (0x11a040).
+    char const* str = _ptr.GetCurrentData();
+    int limit = _ptr.GetRemainDataSize() / static_cast<int>(sizeof(wchar_t));
+    for (int i = 0; i < limit; ++i)
     {
-        if (count < length)
-            return length;
-        wcscpy_s(buffer, count, str);
+        wchar_t ch;
+        memcpy(&ch, str + i * sizeof(ch), sizeof(ch));
+        if (ch != L'\0')
+            continue;
+        int length = i + 1;
+        if (buffer != nullptr)
+        {
+            if (count < length)
+                return length;
+            memcpy(buffer, str, length * sizeof(ch));
+        }
+        _ptr.ForwardData(length * sizeof(ch));
+        return 0;
     }
-    _ptr.ForwardData(length * sizeof(wchar_t));
-    return 0;
+    return -1;
 }

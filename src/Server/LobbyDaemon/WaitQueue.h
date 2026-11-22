@@ -49,7 +49,19 @@ public:
     // LIFT: WaitQueueList::WaitQueueList has no body in the binary. The implicit ctor is used.
     ~WaitQueueList();  // 0xdc920
     bool Init(int capacity);   // 0xdc940
+    // LIFT: Inlined in GameWorldCluster::giveupWait (0x4e310).
+    bool Remove(WaitQueue::Type type, short const& waitpos, unsigned long long clikey)
+    {
+        if (static_cast<unsigned int>(type) >= WaitQueue::MAX_WAIT_QUEUE_TYPE)
+            return false;
+        if (!_waitQueue[type].Remove(waitpos, clikey))
+            return false;
+        --_currentWaitingPlayer;
+        return true;
+    }
     unsigned long long Pop();  // 0xdca20
+    // LIFT: Inlined in GameWorldCluster::UpdateCounters (0x4dc70).
+    int GetAllWaitingPlayer() const { return _currentWaitingPlayer; }
 
 private:
     WaitQueue _waitQueue[WaitQueue::MAX_WAIT_QUEUE_TYPE];  // +0

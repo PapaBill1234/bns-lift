@@ -953,3 +953,10 @@ What failed:
   (same as ld-2). The LD gain comes only when the caller cards land.
 - GameTimeSchedule is blocked: 11 of 12 functions need the `RefCntList` layout, which ld-3 owns and which is not on
   main. Do not add it here. Put cards that share a base layout in a sequence, not in the same wave.
+
+## ld-9
+
+- Keep `GameWorld::EnterUser` (`0x4cf40`) with its original PDB public name until the caller is lifted. The function pairs at 88.0. It was unpaired before. The body did not change.
+- A2/A8, `GameWorld::Setup` (`0x4c880`): explicit flag branches and ordered reads for log arguments lowered the score from 96.3 to 91.7. Reverted.
+- A2/A8, `GameWorld::FetchWorldInfo` (`0x4cc40`): a direct capacity test, a cluster DB snapshot, and ordered crowdness tests lowered the score from 97.0 to 90.9. Reverted.
+- A8, `GameWorldCluster::addGameWorld` (`0x4e4f0`): a separate local pointer for `push_back` gave the same score, 94.4. Reverted.

@@ -73,6 +73,7 @@ public:
     typedef BL_PERF_COUNTERSET_INSTANCE* (*CreateCounterSet)(void*, const GUID*, const wchar_t*, unsigned long);
 
 private:
+    friend class CounterSet;
     static void* getHandle();
 
     static PerfCounterProvider Instance;  // rva 0x209a80
@@ -101,3 +102,41 @@ private:
     DecU32Counter _decU32Counter;           // +0x60
     DecU64Counter _decU64Counter;           // +0x68
 };
+
+// LIFT: inlined in GameWorldCluster (0x4d390, 0x4dc70) and SystemPerfMonitor (0x59ce0, 0x59d60).
+class CounterSet
+{
+public:
+    bool Destroy()
+    {
+        if (_instance == nullptr)
+            return false;
+        if (PerfCounterProvider::Instance._deleteCounterSet(PerfCounterProvider::Instance._handle, _instance) != 0)
+            return false;
+        _instance = nullptr;
+        return true;
+    }
+
+protected:
+    CounterSet() : _instance(nullptr) {}
+    virtual ~CounterSet() { Destroy(); }
+
+    bool create(GUID const* id, wchar_t const* name)
+    {
+        if (_instance != nullptr || PerfCounterProvider::Instance._handle == nullptr)
+            return false;
+        _instance = PerfCounterProvider::Instance._createCounterSet(PerfCounterProvider::Instance._handle, id, name, 0);
+        return _instance != nullptr;
+    }
+
+    bool setU64(unsigned long id, unsigned __int64 value)
+    {
+        if (_instance == nullptr)
+            return false;
+        return PerfCounterProvider::Instance._setU64Counter(PerfCounterProvider::Instance._handle, _instance, id, value) == 0;
+    }
+
+private:
+    BL_PERF_COUNTERSET_INSTANCE* _instance;
+};
+static_assert(sizeof(CounterSet) == 0x10, "sizeof CounterSet");
