@@ -41,6 +41,7 @@ public:
     unsigned short ComposeText(char const* format, ...);         // 0x21EB0 (PostOfficeDaemon)
     unsigned short DecomposeText(char const* format, ...) const; // 0x22220 (PostOfficeDaemon)
     char const* Allocate(PacketComposer* pcr);
+    unsigned short Compose(PacketComposer* pcr, int n, ...);  // 0xde140 (LobbyDaemon)
     unsigned short ComposeV(PacketComposer* pcr, int n, char* args);
     void Add(void const* data, short size);
     void Copy(Packet const* packet);

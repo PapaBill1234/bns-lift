@@ -38,18 +38,8 @@ wchar_t const* LobbydReloadInvalidRestoreTimer::INVALID_REASON_STR[5] = {
 
 namespace
 {
-// LIFT: the original calls Packet::Compose(PacketComposer*, int n, ...). Packet.h has only ComposeV.
-unsigned short composeWith(Packet& packet, PacketComposer* pcr, int n, ...)
-{
-    va_list args;
-    va_start(args, n);
-    unsigned short const result = packet.ComposeV(pcr, n, args);
-    va_end(args);
-    return result;
-}
-
 // LIFT: inlined increment of the repeat count of RepeatPacketComposer (same code as FragmentPacket::IncRepeatCount).
-void incRepeatCount(RepeatPacketComposer& rpc)
+static __forceinline void incRepeatCount(RepeatPacketComposer& rpc)
 {
     int const index = rpc.start[rpc.top] + 1;
     if (rpc.subTop < 0)
@@ -349,7 +339,6 @@ bool LobbydReloadInvalidRestoreTimer::HandleEvent(EventContext*, unsigned long)
     return true;
 }
 
-#pragma comment(linker, "/INCLUDE:?restoreInvalid@LobbydReloadInvalidRestoreTimer@@AEAAXXZ")  // LIFT: keep until the caller is lifted (0x999b0)
 // 0x999b0
 void LobbydReloadInvalidRestoreTimer::restoreInvalid()
 {
@@ -361,16 +350,18 @@ void LobbydReloadInvalidRestoreTimer::restoreInvalid()
             continue;
         // Inlined PipeConsole::SetInvalidInfo(reason, false).
         pipeConsole->_lock.Enter();
-        for (PipeConsole::ItemNode* node = pipeConsole->_invalid._head._next; node != &pipeConsole->_invalid._tail;
-             node = node->_next)
+        PipeConsole::ItemNode* node = pipeConsole->_invalid._head._next;
+        while (node != &pipeConsole->_invalid._tail)
         {
             if (wcscmp(node->_key, reason) == 0)
-            {
-                node->_next->_prev = node->_prev;
-                node->_prev->_next = node->_next;
-                Memory::_Manager[2]->Free(node, L"source\\PipeConsole.cpp", 837);
                 break;
-            }
+            node = node->_next;
+        }
+        if (node != &pipeConsole->_invalid._tail && node != nullptr)
+        {
+            node->_next->_prev = node->_prev;
+            node->_prev->_next = node->_next;
+            Memory::_Manager[2]->Free(node, L"source\\PipeConsole.cpp", 837);
         }
         pipeConsole->_lock.Leave();
     }
@@ -491,12 +482,12 @@ TimeBasedPlaySeasonSchedule::TimeBasedPlaySeasonSchedule()
 bool TimeBasedPlaySeasonSchedule::Compose(RepeatPacketComposer& rpc, Packet& packet) const
 {
     rpc.PushRepeatCount(&packet);
-    for (int i = 0; i < 2; ++i)
+    for (Data const* pdata = &_scheduleData[0]; pdata != &_scheduleData[2]; ++pdata)
     {
-        Data const& data = _scheduleData[i];
+        Data const& data = *pdata;
         if (packet.FreeSize() < 0x17u)
             packet.Allocate();
-        if (composeWith(packet, &rpc, 6, static_cast<int>(data.targetType), data.resetHour,
+        if (packet.Compose(&rpc, 6, static_cast<int>(data.targetType), data.resetHour,
                         data.resetHourTimeZoneBiasSecond, data.scheduleNumber, data.scheduleTime.startTimeUTC,
                         data.scheduleTime.endTimeUTC) == 0)
         {
@@ -505,9 +496,9 @@ bool TimeBasedPlaySeasonSchedule::Compose(RepeatPacketComposer& rpc, Packet& pac
             return false;
         }
         rpc.PushRepeatCount(&packet);
-        for (int j = 0; j < 6; ++j)
+        for (Rule const* prule = &data.rule[0]; prule != &data.rule[6]; ++prule)
         {
-            Rule const& rule = data.rule[j];
+            Rule const& rule = *prule;
             int k = 0;
             while (rule.rewardList[k].id == 0)
             {
@@ -519,9 +510,9 @@ bool TimeBasedPlaySeasonSchedule::Compose(RepeatPacketComposer& rpc, Packet& pac
                 break;
             if (packet.FreeSize() < 0x12u)
                 packet.Allocate();
-            bool ok = composeWith(packet, &rpc, 1, static_cast<int>(rule.minutes)) != 0;
+            bool ok = packet.Compose(&rpc, 1, static_cast<int>(rule.minutes)) != 0;
             for (int r = 0; r < 4; ++r)
-                ok = ok && composeWith(packet, &rpc, 1, rule.rewardList[r].id) != 0;
+                ok = ok && packet.Compose(&rpc, 1, rule.rewardList[r].id) != 0;
             if (!ok)
             {
                 Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 669,
@@ -663,30 +654,41 @@ bool LobbyDaemon::SetTimeZoneBias()
 // 0x9b0c0
 void LobbyDaemon::FailedEventObjectHandler(EventObject* eventObject)
 {
-    unsigned int const id = eventObject->EventId();
-    if (id == 3)
+    switch (eventObject->EventId())
+    {
+    case 3:
     {
         int const mask = LobbyDaemon::_instance->_config->_typeForFailedEventObjectLog;
         if (((1 << eventObject->EventId()) & mask) == 0)
             return;
+        unsigned long const lastError = GetLastError();
+        unsigned int const eventId = eventObject->EventId();
         Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1140,
-                   L"[lobbydaemon], FailedEventObjectHandler, id: %d, object: %p, error:%d", eventObject->EventId(),
-                   eventObject, GetLastError());
+                   L"[lobbydaemon], FailedEventObjectHandler, id: %d, object: %p, error:%d", eventId, eventObject,
+                   lastError);
+        break;
     }
-    else if (id == 5)
+    case 5:
     {
         int const mask = LobbyDaemon::_instance->_config->_typeForFailedEventObjectLog;
         if (((1 << eventObject->EventId()) & mask) == 0)
             return;
+        unsigned long const lastError = GetLastError();
+        unsigned int const eventId = eventObject->EventId();
         Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1148,
-                   L"[lobbydaemon], FailedEventObjectHandler, id: %d, object: %p, error:%d", eventObject->EventId(),
-                   eventObject, GetLastError());
+                   L"[lobbydaemon], FailedEventObjectHandler, id: %d, object: %p, error:%d", eventId, eventObject,
+                   lastError);
+        break;
     }
-    else
+    default:
     {
+        unsigned long const lastError = GetLastError();
+        unsigned int const eventId = eventObject->EventId();
         Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1153,
-                   L"[lobbydaemon], FailedEventObjectHandler, id: %d, object: %p, error:%d", eventObject->EventId(),
-                   eventObject, GetLastError());
+                   L"[lobbydaemon], FailedEventObjectHandler, id: %d, object: %p, error:%d", eventId, eventObject,
+                   lastError);
+        break;
+    }
     }
 }
 

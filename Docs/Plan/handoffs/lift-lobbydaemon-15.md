@@ -13,10 +13,10 @@ scalar deleting destructors (`0x99310`, `0x99340`, `0x99370`, `0x9a3a0`) and are
 | Not done | 3 |
 | `tools/gate.sh` (`LIFT_BUILD_DIR=build-ld-15`) | gate ok (after merging main bfb4c98) |
 | `tools/parity.sh` (same build) | parity ok |
-| LobbyDaemon MATCH | 219 -> 348 (+129) over main bfb4c98 |
+| LobbyDaemon MATCH | 219 -> 350 (+131) over main bfb4c98 |
 | CacheGate, LobbyGate, SmartCouponDaemon, PostOfficeDaemon MATCH | 456, 658, 630, 694 (+0 each, no MATCH lost) |
 
-LobbyDaemon parity: 348/2204 = 15.8 %. Paired 464, mean score 95.6.
+LobbyDaemon parity: 350/2204 = 15.9 %. Paired 465, mean score 95.6.
 Baseline: Docs/Parity/baseline/LobbyDaemon.json = 219 MATCH. The baseline files are unchanged.
 
 ## Gate
@@ -29,7 +29,8 @@ The earlier run stopped at the binary check because main tracked 3 LegacyBin DLL
 | File | Change |
 | --- | --- |
 | `CMakeLists.txt` | `src/Server/Shared/NPChannel2.cpp` added to `lift_lobbydaemon`. `Packet::FreeSize` (`0x29d0`) and `NPMsgHelper::LocaleHourToUTCTime` (`0x2be0`) are lifted in this file. `Compose` and `GetNextResetTimeUTC` call them. Without it the link fails. |
-| `src/Server/LobbyDaemon/LobbyDaemon.cpp` | 19 `/INCLUDE` pragmas (dead-strip rule, see below). |
+| `src/Server/LobbyDaemon/LobbyDaemon.cpp` | 18 `/INCLUDE` pragmas (dead-strip rule, see below). |
+| `src/Server/BloodLib/include/Packet.h`, `src/Server/BloodLib/source/Packet.cpp` | `Packet::Compose(PacketComposer*, int n, ...)` (`0xde140`) added. `TimeBasedPlaySeasonSchedule::Compose` calls it. VS2010 cannot inline a variadic helper, so the old `composeWith` helper was an extra call. The other 4 exes are +0. |
 | `LobbyDaemon.h`, `LobbyConfig.h`, `CliSessionManager.h`, `GameWorld.h`, `Lock.h` | PDB layouts for the classes that the card functions use. |
 
 The `/INCLUDE` pragmas show 3 signature errors in the first lift. The linker found them. They are fixed:
@@ -68,16 +69,16 @@ Score = funcdiff score of the final build. MATCH = 100.0.
 | `0x99ac0` | `ServiceItems::Add` | 98.7 | no |
 | `0x99d20` | `TimeBasedPlaySeasonSchedule::Data::GetNextResetTimeUTC` | 66.7 | no |
 | `0x99df0` | `TimeBasedPlaySeasonSchedule::TimeBasedPlaySeasonSchedule` | 100.0 | yes |
-| `0x99ef0` | `TimeBasedPlaySeasonSchedule::Compose` | 81.5 | no |
+| `0x99ef0` | `TimeBasedPlaySeasonSchedule::Compose` | 90.0 | no |
 | `0x9a1b0` | `wmain` | 22.2 | no |
 | `0x9a230` | `LobbyDaemon::LobbyDaemon` | 100.0 | yes |
 | `0x9ae30` | `LobbyDaemon::PrintDependency` | 96.7 | no |
 | `0x9af60` | `LobbyDaemon::GetTimerInterval` | 100.0 | yes |
 | `0x9af70` | `LobbyDaemon::GetTimerMaxTime` | 100.0 | yes |
 | `0x9af80` | `LobbyDaemon::SetTimeZoneBias` | 100.0 | yes |
-| `0x9b0c0` | `LobbyDaemon::FailedEventObjectHandler` | 93.3 | no |
+| `0x9b0c0` | `LobbyDaemon::FailedEventObjectHandler` | 100.0 | yes |
 
-21 of the 30 card functions are MATCH. The other 109 new MATCH are shared BloodLib code and inline members that are paired for the first time (the 19 `/INCLUDE` functions pull their callees into the exe).
+21 of the 30 card functions are MATCH. The other 110 new MATCH (131 in total) are shared BloodLib code (including `Packet::Compose`) and inline members that are paired for the first time (the 19 `/INCLUDE` functions pull their callees into the exe).
 
 ## Not done
 
@@ -91,11 +92,12 @@ Score = funcdiff score of the final build. MATCH = 100.0.
 
 ## Dead-strip
 
-19 lifted functions have only `LIFT_STUB` callers. Each has `#pragma comment(linker, "/INCLUDE:<name>")` with a `// LIFT: keep until the caller is lifted (<rva>)` comment in `LobbyDaemon.cpp`.
-The names are from the original PDB publics. All 19 are now in the built PDB.
+18 lifted functions have only `LIFT_STUB` callers. Each has `#pragma comment(linker, "/INCLUDE:<name>")` with a `// LIFT: keep until the caller is lifted (<rva>)` comment in `LobbyDaemon.cpp`.
+The names are from the original PDB publics. All 18 are now in the built PDB.
+`restoreInvalid` has no pragma: the lifted `HandleEvent` calls it.
 The verify card removes them when the callers are lifted.
 
-`SystemEvent::Make`, `LobbyObjPoolMemAllocator::Alloc`, `BannedWordFilterMemoryAllocator::{Alloc,Realloc,Free}`, `GenerateClikey`, `GenerateJobid`, `GenerateLobbyTokenkey`, `GameWorldReporterListener`, `CoolDown::{HandleEvent,Start}`, `LobbydReloadInvalidRestoreTimer::{EventId,HandleEvent,restoreInvalid}`, `ServiceItems::Add`, `TimeBasedPlaySeasonSchedule::Data::GetNextResetTimeUTC`, `TimeBasedPlaySeasonSchedule::Compose`, `LobbyDaemon::SetTimeZoneBias`, `LobbyDaemon::FailedEventObjectHandler`.
+`SystemEvent::Make`, `LobbyObjPoolMemAllocator::Alloc`, `BannedWordFilterMemoryAllocator::{Alloc,Realloc,Free}`, `GenerateClikey`, `GenerateJobid`, `GenerateLobbyTokenkey`, `GameWorldReporterListener`, `CoolDown::{HandleEvent,Start}`, `LobbydReloadInvalidRestoreTimer::{EventId,HandleEvent}`, `ServiceItems::Add`, `TimeBasedPlaySeasonSchedule::Data::GetNextResetTimeUTC`, `TimeBasedPlaySeasonSchedule::Compose`, `LobbyDaemon::SetTimeZoneBias`, `LobbyDaemon::FailedEventObjectHandler`.
 
 ## Codegen trials
 
@@ -105,24 +107,34 @@ Rule: max 3 functions, 1 trial each. Only functions above 85 %.
 | --- | --- | ---: | ---: |
 | `ServiceItems::Add` | `delimiter[0] = L';'; delimiter[1] = 0;` instead of `wcscpy(delimiter, L";")` | 94.1 | 98.7 (kept) |
 | `LobbyDaemon::FailedEventObjectHandler` | 3 separate `Log::Write` calls with lines 1140, 1148, 1153 instead of one shared tail | 91.7 | 93.3 (kept) |
+| `LobbyDaemon::FailedEventObjectHandler` (repair) | `GetLastError()` and `EventId()` in locals, in the original order, in each branch | 93.3 | 93.3 (call order still wrong) |
+| `LobbyDaemon::FailedEventObjectHandler` (repair) | `switch (EventId())` with `case 3`, `case 5`, `default` and the locals | 93.3 | 100.0 (kept) |
+| `TimeBasedPlaySeasonSchedule::Compose` (repair) | `Packet::Compose(PacketComposer*, int, ...)` instead of the `composeWith` helper | 81.5 | 89.9 (kept) |
+| `TimeBasedPlaySeasonSchedule::Compose` (repair) | pointer loops over `_scheduleData` and `rule` | 89.9 | 90.0 (kept) |
+| `TimeBasedPlaySeasonSchedule::Compose` (repair) | `static_cast<unsigned short>(minutes) == 0xFFFF` | 90.0 | 90.0 (reverted) |
+| `restoreInvalid` (repair) | Search first, then `if (node != tail && node != nullptr)` before the unlink (the original null check) | 93.3 | 93.3 (kept, logic as the original) |
 | `CoolDown::HandleEvent`, `CoolDown::Start` | `GlobalTimerQueue->Add(...)` instead of `Daemon::AddTimer` | 94.3, 95.0 | no result. `TimerQueue::Add` is protected. Reverted. |
 
 Not tried (for a later card):
 
 | Function | Score | Idea |
 | --- | ---: | --- |
-| `FailedEventObjectHandler` | 93.3 | The original calls `GetLastError` before `EventId` in each branch. Use locals in this order inside the 3 branches. |
 | `GetNextResetTimeUTC` | 66.7 | Ours has the const `-86400` (`0xfffffffffffeae80`). The original has none. Try `reset - 86400` as one `sub`, or a local. |
 | `PrintDependency` | 96.7 | Ours has the consts 65 and 72. The original has none. The second `%d` has no argument (BUG). Check the register use in the disassembly. |
-| `restoreInvalid` | 93.3 | The original loop end is `&CONFIG_FILENAME` (data order). Ours is `TextConsole::COLOR_TABLE`. Data layout, not source form. The original also has `if (next != nullptr)` before the unlink. |
+| `restoreInvalid` | 93.3 | The original loop end is `&CONFIG_FILENAME` (data order). Ours is `TextConsole::COLOR_TABLE`. Data layout, not source form. The null check before the unlink is now in the source. |
 | `GameWorldReporterListener` | 86.3 | The original calls `InfoGateChannelManager::Broadcast` (not lifted) and a second `Log::Write`. Retry after that module. |
-| `Compose` | 81.5 | The original calls `Packet::Compose` (variadic). `Packet.h` has only `ComposeV`. |
+| `Compose` | 90.0 | The consts differ (`0x2`, `0x10`, `0x34` ours; `-1`, `-32`, `-16` original). The original uses pointer strides of 344 and 52. Try other loop forms. |
 | `ServiceItems::Add` (rest) | 98.7 | The original calls `std::_Sort` (`0x9f6e0`). The VS2010 headers here have no `std::sort`. Heap sort stands in. |
 
 ## Safety differences
 
 - `LobbyObjPoolMemAllocator::Alloc`: the original does not check the `VirtualAlloc` result and leaks the old block (marked `// BUG:`). The lift keeps this logic. No guard was added.
 - No session key or secret is logged.
+
+## Notes
+
+- `GameWorldReporterListener` uses `reinterpret_cast<InfoGateChannelManager*>(_lgatechmgr)->Broadcast(packet)`. The original calls the folded body at `0x2ef40` (ICF with `InfoGateChannelManager::Broadcast`). The real type is `LobbyGateChannelManager`. The cast stays until the module of `LobbyGateChannelManager` is lifted. ❓ whether `LobbyGateChannelManager::Broadcast` is the PDB name.
+- `tools/funcdiff.py` pdb_dump cache key (basename + mtime) collided with a stale cache file from another worktree. The first parity run showed a false 15 MATCH. Fix in a separate tool card: add a content hash or the full path to the key.
 
 ## ❓ items
 

@@ -153,6 +153,24 @@ char const* Packet::Allocate(PacketComposer* pcr)
     return body;
 }
 
+// 0xde140 (LobbyDaemon)
+unsigned short Packet::Compose(PacketComposer* pcr, int n, ...)
+{
+    va_list args;
+    va_start(args, n);
+    if (IsFragmentPacket)
+        return ComposeV(pcr, n, args);
+    if (pcr == nullptr || CurHeader == nullptr)
+        PACKET_ASSERT_CRASH(140);
+    int count = n >= 0 ? n : pcr->len - pcr->index;
+    unsigned short size = PacketBuffer::Compose(reinterpret_cast<char*>(CurHeader) + CurHeader->size,
+                                                4000 - CurHeader->size, pcr->CurrentFormat(),
+                                                static_cast<unsigned long long>(count), args);
+    pcr->Forward(n);
+    AddSize(size);
+    return size;
+}
+
 // 0x16A50 (LobbyGate)
 unsigned short Packet::ComposeV(PacketComposer* pcr, int n, char* args)
 {

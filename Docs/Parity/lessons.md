@@ -1087,7 +1087,7 @@ Card lift-lobbydaemon-15: LobbyDaemon part 1 (33 functions, 30 lifted, 3 Not don
 
 | Item | Result |
 | --- | --- |
-| LD MATCH | 219 -> 348 (+129) over main bfb4c98 (earlier run: 195 -> 325 over ef1fa96). The other 4 exes: +0, no MATCH lost. |
+| LD MATCH | 219 -> 350 (+131) over main bfb4c98 (earlier run: 195 -> 325 over ef1fa96). The other 4 exes: +0, no MATCH lost. |
 
 What worked:
 - The `/INCLUDE` pragma finds wrong signatures. A name that the original PDB has and the lift does not define is an undefined symbol at link time.
@@ -1099,6 +1099,11 @@ What worked:
   Write one call per branch. `FailedEventObjectHandler` 91.7 -> 93.3. The call order (`GetLastError` before `EventId`) is not done yet.
 
 What failed:
+- A8/A2 plus a source form: `FailedEventObjectHandler` 93.3 -> 100.0. Locals for `GetLastError()` and `EventId()` in the original order did not change the call order.
+  A `switch (EventId())` with `case 3`, `case 5` and `default` and one `Log::Write` per case gave the original layout (MATCH).
+- A variadic helper is never inlined by VS2010, even with `__forceinline`. It stays a PDB function and an extra call. Lift the real variadic member
+  instead (`Packet::Compose(PacketComposer*, int, ...)`, 0xde140, in `Packet.cpp`). `TimeBasedPlaySeasonSchedule::Compose` 81.5 -> 89.9. Then pointer loops: 90.0.
+  `Compose` loop with `unsigned short == 0xFFFF` instead of `== -1`: no change.
 - `Daemon::Instance->GlobalTimerQueue->Add(...)` does not compile. `TimerQueue::Add` is protected. LTCG inlines `Daemon::AddTimer` in the original.
   Funcdiff already expands `AddTimer` to `TimerQueue::Add`. The extra `Log::Write` in `CoolDown::Start` comes from this expansion. Do not retry.
 - `restoreInvalid` refs 80: the loop end pointer is the address of the next global. The original has `CONFIG_FILENAME`. Ours has `TextConsole::COLOR_TABLE`.
