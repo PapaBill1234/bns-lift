@@ -48,6 +48,8 @@ public:
     void SendApplyNewChargeItemNotify(unsigned long long, wchar_t const*, long, unsigned int, short);  // 0x82650
     bool SendChangeCharacterAppearanceReq(TransactionChannel::Transaction* t, unsigned long long serviceId, unsigned long long pcid, char* showcaseData, short showcaseDataSize, char* makingData, short makingDataSize);  // 0x82750
     bool SendChangeCharacterSexReq(TransactionChannel::Transaction* t, unsigned long long serviceId, unsigned long long pcid, char newSex, char* showcaseData, short showcaseDataSize, char* makingData, short makingDataSize);  // 0x82950
+    bool SendChangeCharacterRaceReq(TransactionChannel::Transaction* t, unsigned long long serviceId, unsigned long long pcid, char newRace, char newSex, char* showcaseData, short showcaseDataSize, char* makingData, short makingDataSize);  // 0x82b70
+    bool SendRenameCharacterReq(TransactionChannel::Transaction* t, unsigned long long serviceId, unsigned long long pcid, wchar_t const* oldName, wchar_t const* newName);  // 0x82db0
     void SendExtendJumpingCharacterCreationQuotaWithAccountInventoryItemOk(unsigned long long, int);  // 0x82f70
     void SendExtendJumpingCharacterCreationQuotaWithAccountInventoryItemFail(unsigned long long, short);  // 0x83060
     void SendUpgradeJumpingCharacterStateWithCreationQuotaOk(unsigned long long, char, int);  // 0x83150
@@ -58,7 +60,8 @@ public:
     void SendSecondPasswordGetStatusFail(unsigned long long, unsigned long long, short);  // 0x83670
     void SendSecondPasswordIsVerifiedOk(unsigned long long, unsigned long long);  // 0x83770
     void SendSecondPasswordIsVerifiedFail(unsigned long long, unsigned long long, short);  // 0x83860
-    void SendGetGradeListFail(unsigned long long, char, unsigned long long, short);  // 0x83b00
+    bool SendAuctionEscrowReq(TransactionChannel::Transaction* t, unsigned long long pcid, long long money, id128 const& auctionId, unsigned long long escrowId);  // 0x83960
+    void SendGetGradeListFail(unsigned long long tid, char locationHint, unsigned long long pcid, short reason);  // 0x83b00
     void SendActivateGradeOk(unsigned long long, unsigned long long, int, int, long long, long long);  // 0x83c20
     void SendActivateGradeFail(unsigned long long, unsigned long long, int, int, short);  // 0x83d60
     void SendChangedGradeNotify(unsigned long long, int, int, int, bool, int, long long, long long, wchar_t const*);  // 0x83ea0

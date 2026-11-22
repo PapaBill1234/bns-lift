@@ -1304,3 +1304,23 @@ Card lift-lobbydaemon-20: LobbyDaemon part 2 (21 functions) and BLDaemonInfo (9 
 | Range check form | `LobbyDaemon::CheckServiceItemDataId` (0x9f340): the original has `cmp 7; ja`. `(unsigned)type >= SERVICEITEMTYPE_MAX` gave `cmp 8` (consts 50, 83.3). `(unsigned)type > SERVICEITEMTYPE_RENAME_CHARACTER_BY_SYSTEM` (the form of `ServiceItems::Add`) gives MATCH. |
 | Dead-strip | 7 `/INCLUDE:` pragmas (4 `BLDaemonInfoTable`, `FilterBannedWord`, `CheckServiceItemDataId`, `GetAddressStringWForLogs`) paired 14 functions: `load` and `add` come with `Load`/`Update`; `Find` and `Clear` need no pragma (`Update` and `~BLDaemonInfoTable` reach them), and `FilterName`, `StrNormalize`, `ConstFilterName` with `FilterBannedWord`. |
 | Not tried | `BLDaemonInfoTable::load` 70.6 (the original interleaves the 5 inlined element blocks; ours groups the `_wcsicmp` calls) and `BLDaemonInfoTable::Clear` 57.8 (the original calls `_Tree::clear` out of line; ours inlines it into `_Erase`). Both below 85 and over the trial limit. |
+
+## ld-23
+
+Card lift-lobbydaemon-23: GamedChannel part 2, InfoGateChannel, LobbyInfoGatePacketHandler (45 functions, 0 Not done).
+
+| Item | Result |
+| --- | --- |
+| LD MATCH | 436 -> 463 over main 9d0ef81 (+27: 24 card functions, 3 shared). The other 4 exes: +0. No MATCH lost. |
+
+What worked (count = functions made MATCH):
+- A17 for a `void` `Send*` function: error block first. `if (0 == p.Compose(...)) { Log::Write(...); } else Send(&p);`
+  The first lift had `if (0 != Compose) Send(&p); else Log::Write(...)`. Funcdiff showed `SharedChannel::Send` before `Log::Write` (calls 80, one extra immediate).
+  Try 1 of each: `SendUpdateJumpingCharacterStateOk` 93.3 -> 100, `SendAuctionBidOk` 93.3 -> 100, `SendAuthTokenFail` 88.6 -> 100 (+3).
+  16 more functions of this card have the same funcdiff signature (93.3 or 88.6). They were not tried (trial limit).
+  Rule: a `Send*` with a log in the else branch uses the error-first form from the start. The ld-18 form `0 != Compose` is for functions with no log.
+
+Notes:
+- A function that only a null handler table reaches is dead-stripped (`HandleLobbyInfoGate_*` were absent from funcdiff). Add `/INCLUDE` for each at once, and check the paired count.
+- A worktree without `vendor/zstd/src` fails to link all 5 exes (`ZSTD_freeCDict`, `ZSTD_createCCtx_advanced`, `ZSTD_compress_usingCDict`). Copy it from another worktree (it is git-ignored).
+- A caller that calls a noreturn `LIFT_STUB` (`BLDaemonInfoTable::Find`) loses all code after the call under LTCG. `HandleLobbyInfoGate_HelloReq` scored 30.4 for this reason. It is not a source error.

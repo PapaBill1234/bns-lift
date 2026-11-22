@@ -59,6 +59,35 @@ wchar_t const* const SESSION_FILE = L"source\\Session.cpp";
 #pragma comment(linker, "/INCLUDE:?SendApplyNewChargeItemNotify@GamedChannel@@QEAAX_KPEB_WJIF@Z")  // LIFT: keep until the caller is lifted (0x82650)
 #pragma comment(linker, "/INCLUDE:?SendChangeCharacterAppearanceReq@GamedChannel@@QEAA_NPEAVTransaction@TransactionChannel@@_K1PEADF2F@Z")  // LIFT: keep until the caller is lifted (0x82750)
 #pragma comment(linker, "/INCLUDE:?SendChangeCharacterSexReq@GamedChannel@@QEAA_NPEAVTransaction@TransactionChannel@@_K1DPEADF2F@Z")  // LIFT: keep until the caller is lifted (0x82950)
+#pragma comment(linker, "/INCLUDE:?SendChangeCharacterRaceReq@GamedChannel@@QEAA_NPEAVTransaction@TransactionChannel@@_K1DDPEADF2F@Z")  // LIFT: keep until the caller is lifted (0x82b70)
+#pragma comment(linker, "/INCLUDE:?SendRenameCharacterReq@GamedChannel@@QEAA_NPEAVTransaction@TransactionChannel@@_K1PEB_W2@Z")  // LIFT: keep until the caller is lifted (0x82db0)
+#pragma comment(linker, "/INCLUDE:?SendExtendJumpingCharacterCreationQuotaWithAccountInventoryItemOk@GamedChannel@@QEAAX_KH@Z")  // LIFT: keep until the caller is lifted (0x82f70)
+#pragma comment(linker, "/INCLUDE:?SendExtendJumpingCharacterCreationQuotaWithAccountInventoryItemFail@GamedChannel@@QEAAX_KF@Z")  // LIFT: keep until the caller is lifted (0x83060)
+#pragma comment(linker, "/INCLUDE:?SendUpgradeJumpingCharacterStateWithCreationQuotaOk@GamedChannel@@QEAAX_KDH@Z")  // LIFT: keep until the caller is lifted (0x83150)
+#pragma comment(linker, "/INCLUDE:?SendUpgradeJumpingCharacterStateWithCreationQuotaFail@GamedChannel@@QEAAX_KF@Z")  // LIFT: keep until the caller is lifted (0x83250)
+#pragma comment(linker, "/INCLUDE:?SendUpdateJumpingCharacterStateOk@GamedChannel@@QEAAX_KD@Z")  // LIFT: keep until the caller is lifted (0x83340)
+#pragma comment(linker, "/INCLUDE:?SendUpdateJumpingCharacterStateFail@GamedChannel@@QEAAX_KF@Z")  // LIFT: keep until the caller is lifted (0x83430)
+#pragma comment(linker, "/INCLUDE:?SendSecondPasswordGetStatusOk@GamedChannel@@QEAAX_K0DHH_J11@Z")  // LIFT: keep until the caller is lifted (0x83520)
+#pragma comment(linker, "/INCLUDE:?SendSecondPasswordGetStatusFail@GamedChannel@@QEAAX_K0F@Z")  // LIFT: keep until the caller is lifted (0x83670)
+#pragma comment(linker, "/INCLUDE:?SendSecondPasswordIsVerifiedOk@GamedChannel@@QEAAX_K0@Z")  // LIFT: keep until the caller is lifted (0x83770)
+#pragma comment(linker, "/INCLUDE:?SendSecondPasswordIsVerifiedFail@GamedChannel@@QEAAX_K0F@Z")  // LIFT: keep until the caller is lifted (0x83860)
+#pragma comment(linker, "/INCLUDE:?SendAuctionEscrowReq@GamedChannel@@QEAA_NPEAVTransaction@TransactionChannel@@_K_JAEBTid128@@1@Z")  // LIFT: keep until the caller is lifted (0x83960)
+#pragma comment(linker, "/INCLUDE:?SendGetGradeListFail@GamedChannel@@QEAAX_KD0F@Z")  // LIFT: keep until the caller is lifted (0x83b00)
+#pragma comment(linker, "/INCLUDE:?SendActivateGradeOk@GamedChannel@@QEAAX_K0HH_J1@Z")  // LIFT: keep until the caller is lifted (0x83c20)
+#pragma comment(linker, "/INCLUDE:?SendActivateGradeFail@GamedChannel@@QEAAX_K0HHF@Z")  // LIFT: keep until the caller is lifted (0x83d60)
+#pragma comment(linker, "/INCLUDE:?SendChangedGradeNotify@GamedChannel@@QEAAX_KHHH_NH_J2PEB_W@Z")  // LIFT: keep until the caller is lifted (0x83ea0)
+#pragma comment(linker, "/INCLUDE:?SendChangedGradeLevelNotify@GamedChannel@@QEAAX_KHHHHHH@Z")  // LIFT: keep until the caller is lifted (0x84090)
+#pragma comment(linker, "/INCLUDE:?SendDepositGameMileageOk@GamedChannel@@QEAAX_KDD000AEBTid128@@0F_JH@Z")  // LIFT: keep until the caller is lifted (0x841a0)
+#pragma comment(linker, "/INCLUDE:?SendDepositGameMileageFail@GamedChannel@@QEAAX_KDD000AEBTid128@@FH@Z")  // LIFT: keep until the caller is lifted (0x84310)
+#pragma comment(linker, "/INCLUDE:?SendAuctionBidOk@GamedChannel@@QEAAX_KAEATid128@@@Z")  // LIFT: keep until the caller is lifted (0x84460)
+#pragma comment(linker, "/INCLUDE:?SendAuctionBidFail@GamedChannel@@QEAAX_KAEATid128@@F@Z")  // LIFT: keep until the caller is lifted (0x845f0)
+#pragma comment(linker, "/INCLUDE:?SendTakeAccountTimeBasedPlayRewardFail@GamedChannel@@QEAAX_K0HDF_JFH@Z")  // LIFT: keep until the caller is lifted (0x84790)
+#pragma comment(linker, "/INCLUDE:?SendUpdateAccountExpOk@GamedChannel@@QEAAX_K0@Z")  // LIFT: keep until the caller is lifted (0x848f0)
+#pragma comment(linker, "/INCLUDE:?SendUpdateAccountExpFail@GamedChannel@@QEAAX_K0F@Z")  // LIFT: keep until the caller is lifted (0x849c0)
+#pragma comment(linker, "/INCLUDE:?SendUpdateAccountContentQuotaOk@GamedChannel@@QEAAX_K0@Z")  // LIFT: keep until the caller is lifted (0x84aa0)
+#pragma comment(linker, "/INCLUDE:?SendUpdateAccountContentQuotaFail@GamedChannel@@QEAAX_K0F@Z")  // LIFT: keep until the caller is lifted (0x84b70)
+#pragma comment(linker, "/INCLUDE:?SendUpdateAccountRecycleTimeOk@GamedChannel@@QEAAX_K0@Z")  // LIFT: keep until the caller is lifted (0x84c50)
+#pragma comment(linker, "/INCLUDE:?SendUpdateAccountRecycleTimeFail@GamedChannel@@QEAAX_K0F@Z")  // LIFT: keep until the caller is lifted (0x84d20)
 
 // PDB LobbyGamePacketHandlerDef (sizeof 16).
 struct LobbyGamePacketHandlerDef
@@ -868,158 +897,569 @@ bool GamedChannel::SendChangeCharacterSexReq(TransactionChannel::Transaction* t,
     return TSend(t, &p);
 }
 
-// 0x82f70
-void GamedChannel::SendExtendJumpingCharacterCreationQuotaWithAccountInventoryItemOk(unsigned long long, int)
+// 0x82b70
+bool GamedChannel::SendChangeCharacterRaceReq(TransactionChannel::Transaction* t, unsigned long long serviceId, unsigned long long pcid, char newRace, char newSex, char* showcaseData, short showcaseDataSize, char* makingData, short makingDataSize)
 {
-    LIFT_STUB(0x82f70);
+    if (t == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, GAMED_FILE, 612,
+                   L"== CRASH == [gamed], send change-character-race req fail; null transaction");
+        AlertSender::Write(GAMED_FILE, 612,
+                           L"== CRASH == [gamed], send change-character-race req fail; null transaction");
+        return false;
+    }
+
+    if (!(newRace > 0 && newSex > 0 && showcaseData != nullptr && showcaseDataSize > 0 && makingData != nullptr && makingDataSize > 0))
+    {
+        Log::Write(Log::LT_ERROR, GAMED_FILE, 618,
+                   L"== CRASH == [gamed], send change-character-race req fail; invalid parameter, tid:0x%I64X", t->GetTid());
+        AlertSender::Write(GAMED_FILE, 618,
+                           L"== CRASH == [gamed], send change-character-race req fail; invalid parameter, tid:0x%I64X",
+                           t->GetTid());
+        return false;
+    }
+
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    if (0 == p.Compose("hqqqccbb", 63, t->GetTid(), serviceId, pcid, static_cast<int>(newRace), static_cast<int>(newSex), showcaseData, static_cast<int>(showcaseDataSize), makingData, static_cast<int>(makingDataSize)))
+    {
+        Log::Write(Log::LT_ERROR, GAMED_FILE, 634,
+                   L"[gamed], send change-character-race req fail; compose fail, tid:0x%I64X", t->GetTid());
+        return false;
+    }
+    return TSend(t, &p);
+}
+
+// 0x82db0
+bool GamedChannel::SendRenameCharacterReq(TransactionChannel::Transaction* t, unsigned long long serviceId, unsigned long long pcid, wchar_t const* oldName, wchar_t const* newName)
+{
+    if (t == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, GAMED_FILE, 645,
+                   L"== CRASH == [gamed], send rename-character req fail; null transaction");
+        AlertSender::Write(GAMED_FILE, 645,
+                           L"== CRASH == [gamed], send rename-character req fail; null transaction");
+        return false;
+    }
+
+    if (!(oldName != nullptr && newName != nullptr))
+    {
+        Log::Write(Log::LT_ERROR, GAMED_FILE, 651,
+                   L"== CRASH == [gamed], send rename-character req fail; invalid parameter, tid:0x%I64X", t->GetTid());
+        AlertSender::Write(GAMED_FILE, 651,
+                           L"== CRASH == [gamed], send rename-character req fail; invalid parameter, tid:0x%I64X",
+                           t->GetTid());
+        return false;
+    }
+
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    if (0 == p.Compose("hqqqss", 66, t->GetTid(), serviceId, pcid, oldName, newName))
+    {
+        Log::Write(Log::LT_ERROR, GAMED_FILE, 665,
+                   L"[gamed], send rename-character req fail; compose fail, tid:0x%I64X", t->GetTid());
+        return false;
+    }
+    return TSend(t, &p);
+}
+
+// 0x82f70
+void GamedChannel::SendExtendJumpingCharacterCreationQuotaWithAccountInventoryItemOk(unsigned long long tid, int remainQuota)
+{
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    if (0 != p.Compose("hqi", 70, tid, remainQuota))
+        Send(&p);
+    else
+        Log::Write(Log::LT_ERROR, GAMED_FILE, 679,
+                   L"[gamed], send extend-jumping-character-creation-quota ok fail; compose fail, game-tid:0x%I64X", tid);
 }
 
 // 0x83060
-void GamedChannel::SendExtendJumpingCharacterCreationQuotaWithAccountInventoryItemFail(unsigned long long, short)
+void GamedChannel::SendExtendJumpingCharacterCreationQuotaWithAccountInventoryItemFail(unsigned long long tid, short reason)
 {
-    LIFT_STUB(0x83060);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    if (0 != p.Compose("hqE", 71, tid, static_cast<int>(reason)))
+        Send(&p);
+    else
+        Log::Write(Log::LT_ERROR, GAMED_FILE, 693,
+                   L"[gamed], send extend-jumping-character-creation-quota fail; compose fail, game-tid:0x%I64X", tid);
 }
 
 // 0x83150
-void GamedChannel::SendUpgradeJumpingCharacterStateWithCreationQuotaOk(unsigned long long, char, int)
+void GamedChannel::SendUpgradeJumpingCharacterStateWithCreationQuotaOk(unsigned long long tid, char jumpingCharacterState, int remainQuota)
 {
-    LIFT_STUB(0x83150);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    if (0 != p.Compose("hqQi", 73, tid, static_cast<int>(jumpingCharacterState), remainQuota))
+        Send(&p);
+    else
+        Log::Write(Log::LT_ERROR, GAMED_FILE, 707,
+                   L"[gamed], send upgrade-jumping-character-state ok fail; compose fail, game-tid:0x%I64X", tid);
 }
 
 // 0x83250
-void GamedChannel::SendUpgradeJumpingCharacterStateWithCreationQuotaFail(unsigned long long, short)
+void GamedChannel::SendUpgradeJumpingCharacterStateWithCreationQuotaFail(unsigned long long tid, short reason)
 {
-    LIFT_STUB(0x83250);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    if (0 != p.Compose("hqE", 74, tid, static_cast<int>(reason)))
+        Send(&p);
+    else
+        Log::Write(Log::LT_ERROR, GAMED_FILE, 721,
+                   L"[gamed], send upgrade-jumping-character-state fail; compose fail, game-tid:0x%I64X", tid);
 }
 
 // 0x83340
-void GamedChannel::SendUpdateJumpingCharacterStateOk(unsigned long long, char)
+void GamedChannel::SendUpdateJumpingCharacterStateOk(unsigned long long tid, char jumpingCharacterState)
 {
-    LIFT_STUB(0x83340);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    if (0 == p.Compose("hqQ", 76, tid, static_cast<int>(jumpingCharacterState)))
+        Log::Write(Log::LT_ERROR, GAMED_FILE, 735,
+                   L"[gamed], send update-jumping-character-state ok fail; compose fail, game-tid:0x%I64X", tid);
+    else
+        Send(&p);
 }
 
 // 0x83430
-void GamedChannel::SendUpdateJumpingCharacterStateFail(unsigned long long, short)
+void GamedChannel::SendUpdateJumpingCharacterStateFail(unsigned long long tid, short reason)
 {
-    LIFT_STUB(0x83430);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    if (0 != p.Compose("hqE", 77, tid, static_cast<int>(reason)))
+        Send(&p);
+    else
+        Log::Write(Log::LT_ERROR, GAMED_FILE, 749,
+                   L"[gamed], send update-jumping-character-state fail; compose fail, game-tid:0x%I64X", tid);
 }
 
 // 0x83520
-void GamedChannel::SendSecondPasswordGetStatusOk(unsigned long long, unsigned long long, char, int, int, long long, long long, long long)
+void GamedChannel::SendSecondPasswordGetStatusOk(unsigned long long tid, unsigned long long pcid, char blockStatus, int authFailLimitCount, int authFailCount, long long blockedUntil, long long deleteAt, long long actionMask)
 {
-    LIFT_STUB(0x83520);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    if (0 != p.Compose("hqqQiiqqq", 81, tid, pcid, static_cast<int>(blockStatus), authFailLimitCount, authFailCount, blockedUntil, deleteAt, actionMask))
+        Send(&p);
+    else
+        Log::Write(Log::LT_ERROR, GAMED_FILE, 764,
+                   L"[gamed], send second-password-get-status ok fail; compose fail, game-tid:0x%I64X", tid);
 }
 
 // 0x83670
-void GamedChannel::SendSecondPasswordGetStatusFail(unsigned long long, unsigned long long, short)
+void GamedChannel::SendSecondPasswordGetStatusFail(unsigned long long tid, unsigned long long pcid, short reason)
 {
-    LIFT_STUB(0x83670);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    if (0 != p.Compose("hqqE", 82, tid, pcid, static_cast<int>(reason)))
+        Send(&p);
+    else
+        Log::Write(Log::LT_ERROR, GAMED_FILE, 778,
+                   L"[gamed], send second-password-get-status fail fail; compose fail, game-tid:0x%I64X", tid);
 }
 
 // 0x83770
-void GamedChannel::SendSecondPasswordIsVerifiedOk(unsigned long long, unsigned long long)
+void GamedChannel::SendSecondPasswordIsVerifiedOk(unsigned long long tid, unsigned long long pcid)
 {
-    LIFT_STUB(0x83770);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    if (0 != p.Compose("hqq", 84, tid, pcid))
+        Send(&p);
+    else
+        Log::Write(Log::LT_ERROR, GAMED_FILE, 792,
+                   L"[gamed], send second-password-is-verified ok fail; compose fail, game-tid:0x%I64X", tid);
 }
 
 // 0x83860
-void GamedChannel::SendSecondPasswordIsVerifiedFail(unsigned long long, unsigned long long, short)
+void GamedChannel::SendSecondPasswordIsVerifiedFail(unsigned long long tid, unsigned long long pcid, short reason)
 {
-    LIFT_STUB(0x83860);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    if (0 != p.Compose("hqqE", 85, tid, pcid, static_cast<int>(reason)))
+        Send(&p);
+    else
+        Log::Write(Log::LT_ERROR, GAMED_FILE, 806,
+                   L"[gamed], send second-password-is-verified fail fail; compose fail, game-tid:0x%I64X", tid);
+}
+
+// 0x83960
+bool GamedChannel::SendAuctionEscrowReq(TransactionChannel::Transaction* t, unsigned long long pcid, long long money, id128 const& auctionId, unsigned long long escrowId)
+{
+    if (t == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, GAMED_FILE, 816,
+                   L"== CRASH == [gamed], send auction escrow req fail; null transaction");
+        AlertSender::Write(GAMED_FILE, 816,
+                           L"== CRASH == [gamed], send auction escrow req fail; null transaction");
+        return false;
+    }
+
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    if (0 == p.Compose("hqqqoq", 86, t->GetTid(), pcid, money, auctionId, escrowId))
+    {
+        Log::Write(Log::LT_ERROR, GAMED_FILE, 829,
+                   L"[gamed], send auction escrow req fail; compose fail, tid:0x%I64X", t->GetTid());
+        return false;
+    }
+    return TSend(t, &p);
 }
 
 // 0x83b00
-void GamedChannel::SendGetGradeListFail(unsigned long long, char, unsigned long long, short)
+void GamedChannel::SendGetGradeListFail(unsigned long long tid, char locationHint, unsigned long long pcid, short reason)
 {
-    LIFT_STUB(0x83b00);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    if (0 != p.Compose("hqQqE", 94, tid, static_cast<int>(locationHint), pcid, static_cast<int>(reason)))
+        Send(&p);
+    else
+        Log::Write(Log::LT_ERROR, GAMED_FILE, 842,
+                   L"[gamed], send get grade list fail fail; compose fail, game-tid:0x%I64X, location-hint:%d, pcid:0x%I64X, reason:%d",
+                   tid, static_cast<int>(locationHint), pcid, static_cast<int>(reason));
 }
 
 // 0x83c20
-void GamedChannel::SendActivateGradeOk(unsigned long long, unsigned long long, int, int, long long, long long)
+void GamedChannel::SendActivateGradeOk(unsigned long long tid, unsigned long long pcid, int gameGradeKey, int gradeId, long long effectiveFrom, long long effectiveTo)
 {
-    LIFT_STUB(0x83c20);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    if (0 != p.Compose("hqqiiqq", 98, tid, pcid, gameGradeKey, gradeId, effectiveFrom, effectiveTo))
+        Send(&p);
+    else
+        Log::Write(Log::LT_ERROR, GAMED_FILE, 855,
+                   L"[gamed], send activate grade ok fail; compose fail, game-tid:0x%I64X, pcid:0x%I64X, game-grade-key:%d, grade-id:%d",
+                   tid, pcid, gameGradeKey, gradeId);
 }
 
 // 0x83d60
-void GamedChannel::SendActivateGradeFail(unsigned long long, unsigned long long, int, int, short)
+void GamedChannel::SendActivateGradeFail(unsigned long long tid, unsigned long long pcid, int keyType, int key, short reason)
 {
-    LIFT_STUB(0x83d60);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    if (0 != p.Compose("hqqQiE", 99, tid, pcid, keyType, key, static_cast<int>(reason)))
+        Send(&p);
+    else
+        Log::Write(Log::LT_ERROR, GAMED_FILE, 868,
+                   L"[gamed], send activate grade fail fail; compose fail, game-tid:0x%I64X, pcid:0x%I64X, key-type:%d, key:%d, reason:%d",
+                   tid, pcid, keyType, key, static_cast<int>(reason));
 }
 
 // 0x83ea0
-void GamedChannel::SendChangedGradeNotify(unsigned long long, int, int, int, bool, int, long long, long long, wchar_t const*)
+void GamedChannel::SendChangedGradeNotify(unsigned long long pcid, int revision, int gameGradeKey, int gradeId, bool activation, int gradeCount, long long totalEffectiveFrom, long long totalEffectiveTo, wchar_t const* reason)
 {
-    LIFT_STUB(0x83ea0);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    // LIFT: The binary compares the reason text with the five known names. Other text (and null or empty text) gives 0.
+    char reasonCode = 0;
+    if (reason != nullptr && reason[0] != L'\0')
+    {
+        if (wcscmp(reason, L"Activated") == 0)
+            reasonCode = 1;
+        else if (wcscmp(reason, L"ActivatedWithAdding") == 0)
+            reasonCode = 2;
+        else if (wcscmp(reason, L"Added") == 0)
+            reasonCode = 3;
+        else if (wcscmp(reason, L"Deleted") == 0)
+            reasonCode = 4;
+        else if (wcscmp(reason, L"DeletedAndExhausted") == 0)
+            reasonCode = 5;
+    }
+
+    if (0 != p.Compose("hqiiiQiqqQ", 95, pcid, revision, gameGradeKey, gradeId, static_cast<int>(activation), gradeCount, totalEffectiveFrom, totalEffectiveTo, static_cast<int>(reasonCode)))
+        Send(&p);
 }
 
 // 0x84090
-void GamedChannel::SendChangedGradeLevelNotify(unsigned long long, int, int, int, int, int, int)
+void GamedChannel::SendChangedGradeLevelNotify(unsigned long long pcid, int revision, int levelId, int accumulateGradeScore, int minimumLevelScore, int maximumLevelScore, int maximumGradeScore)
 {
-    LIFT_STUB(0x84090);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    if (0 != p.Compose("hqiiiiii", 96, pcid, revision, levelId, accumulateGradeScore, minimumLevelScore, maximumLevelScore, maximumGradeScore))
+        Send(&p);
 }
 
 // 0x841a0
-void GamedChannel::SendDepositGameMileageOk(unsigned long long, char, char, unsigned long long, unsigned long long, unsigned long long, id128 const&, unsigned long long, short, long long, int)
+void GamedChannel::SendDepositGameMileageOk(unsigned long long tid, char locationHint, char depositType, unsigned long long requestId, unsigned long long externalKey, unsigned long long pcid, id128 const& userId, unsigned long long receiptId, short virtualCurrencyId, long long virtualCurrencyAmount, int errorInfo)
 {
-    LIFT_STUB(0x841a0);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    if (0 != p.Compose("hqQQqqqoqhqi", 101, tid, static_cast<int>(locationHint), static_cast<int>(depositType), requestId, externalKey, pcid, userId, receiptId, static_cast<int>(virtualCurrencyId), virtualCurrencyAmount, errorInfo))
+        Send(&p);
 }
 
 // 0x84310
-void GamedChannel::SendDepositGameMileageFail(unsigned long long, char, char, unsigned long long, unsigned long long, unsigned long long, id128 const&, short, int)
+void GamedChannel::SendDepositGameMileageFail(unsigned long long tid, char locationHint, char depositType, unsigned long long requestId, unsigned long long externalKey, unsigned long long pcid, id128 const& userId, short failReason, int errorInfo)
 {
-    LIFT_STUB(0x84310);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    if (0 != p.Compose("hqQQqqqoEi", 102, tid, static_cast<int>(locationHint), static_cast<int>(depositType), requestId, externalKey, pcid, userId, static_cast<int>(failReason), errorInfo))
+        Send(&p);
 }
 
 // 0x84460
-void GamedChannel::SendAuctionBidOk(unsigned long long, id128&)
+void GamedChannel::SendAuctionBidOk(unsigned long long pcId, id128& auctionId)
 {
-    LIFT_STUB(0x84460);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    if (0 == p.Compose("hqo", 90, pcId, auctionId))
+        Log::Write(Log::LT_ERROR, GAMED_FILE, 986,
+                   L"[gamed], send auction bid ok fail; compose fail, pcid:0x%I64X, %08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
+                   pcId, auctionId.guid.id1, auctionId.guid.id2, auctionId.guid.id3, auctionId.guid.id4[0], auctionId.guid.id4[1], auctionId.guid.id4[2], auctionId.guid.id4[3], auctionId.guid.id4[4], auctionId.guid.id4[5], auctionId.guid.id4[6], auctionId.guid.id4[7]);
+    else
+        Send(&p);
 }
 
 // 0x845f0
-void GamedChannel::SendAuctionBidFail(unsigned long long, id128&, short)
+void GamedChannel::SendAuctionBidFail(unsigned long long pcId, id128& auctionId, short reason)
 {
-    LIFT_STUB(0x845f0);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    if (0 != p.Compose("hqoE", 91, pcId, auctionId, static_cast<int>(reason)))
+        Send(&p);
+    else
+        Log::Write(Log::LT_ERROR, GAMED_FILE, 1000,
+                   L"[gamed], send auction bid fail fail; compose fail, pcid:0x%I64X, %08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X, reason:%d",
+                   pcId, auctionId.guid.id1, auctionId.guid.id2, auctionId.guid.id3, auctionId.guid.id4[0], auctionId.guid.id4[1], auctionId.guid.id4[2], auctionId.guid.id4[3], auctionId.guid.id4[4], auctionId.guid.id4[5], auctionId.guid.id4[6], auctionId.guid.id4[7], static_cast<int>(reason));
 }
 
 // 0x84790
-void GamedChannel::SendTakeAccountTimeBasedPlayRewardFail(unsigned long long, unsigned long long, int, char, short, long long, short, int)
+void GamedChannel::SendTakeAccountTimeBasedPlayRewardFail(unsigned long long tid, unsigned long long pcid, int schedule, char targetType, short playTime, long long requestTime, short failReason, int errorInfo)
 {
-    LIFT_STUB(0x84790);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    if (0 != p.Compose("hqqiQhqEi", 106, tid, pcid, schedule, static_cast<int>(targetType), static_cast<int>(playTime), requestTime, static_cast<int>(failReason), errorInfo))
+        Send(&p);
+    else
+        Log::Write(Log::LT_ERROR, GAMED_FILE, 1015,
+                   L"[gamed], send take account time based play reward fail fail; compose fail, pcid:%#I64x, reason:%d, error:%d",
+                   pcid, static_cast<int>(failReason), errorInfo);
 }
 
 // 0x848f0
-void GamedChannel::SendUpdateAccountExpOk(unsigned long long, unsigned long long)
+void GamedChannel::SendUpdateAccountExpOk(unsigned long long tid, unsigned long long pcid)
 {
-    LIFT_STUB(0x848f0);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    if (0 != p.Compose("hqq", 108, tid, pcid))
+        Send(&p);
 }
 
 // 0x849c0
-void GamedChannel::SendUpdateAccountExpFail(unsigned long long, unsigned long long, short)
+void GamedChannel::SendUpdateAccountExpFail(unsigned long long tid, unsigned long long pcid, short reason)
 {
-    LIFT_STUB(0x849c0);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    if (0 != p.Compose("hqqE", 109, tid, pcid, static_cast<int>(reason)))
+        Send(&p);
 }
 
 // 0x84aa0
-void GamedChannel::SendUpdateAccountContentQuotaOk(unsigned long long, unsigned long long)
+void GamedChannel::SendUpdateAccountContentQuotaOk(unsigned long long tid, unsigned long long pcid)
 {
-    LIFT_STUB(0x84aa0);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    if (0 != p.Compose("hqq", 111, tid, pcid))
+        Send(&p);
 }
 
 // 0x84b70
-void GamedChannel::SendUpdateAccountContentQuotaFail(unsigned long long, unsigned long long, short)
+void GamedChannel::SendUpdateAccountContentQuotaFail(unsigned long long tid, unsigned long long pcid, short reason)
 {
-    LIFT_STUB(0x84b70);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    if (0 != p.Compose("hqqE", 112, tid, pcid, static_cast<int>(reason)))
+        Send(&p);
 }
 
 // 0x84c50
-void GamedChannel::SendUpdateAccountRecycleTimeOk(unsigned long long, unsigned long long)
+void GamedChannel::SendUpdateAccountRecycleTimeOk(unsigned long long tid, unsigned long long pcid)
 {
-    LIFT_STUB(0x84c50);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    if (0 != p.Compose("hqq", 114, tid, pcid))
+        Send(&p);
 }
 
 // 0x84d20
-void GamedChannel::SendUpdateAccountRecycleTimeFail(unsigned long long, unsigned long long, short)
+void GamedChannel::SendUpdateAccountRecycleTimeFail(unsigned long long tid, unsigned long long pcid, short reason)
 {
-    LIFT_STUB(0x84d20);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    if (0 != p.Compose("hqqE", 115, tid, pcid, static_cast<int>(reason)))
+        Send(&p);
 }
