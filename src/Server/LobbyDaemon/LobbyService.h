@@ -56,29 +56,51 @@ private:
 };
 static_assert(sizeof(AddSlotService) == 0x38, "sizeof AddSlotService");
 
-class ChangeCharacterRaceService
+class ChangeCharacterRaceService : public LobbyService
 {
 public:
-    virtual bool IsServiceTarget(Character*);  // 0x6c760
-    virtual bool Fetch(CliSession*, FragmentPacket*) const;  // 0x70900
+    struct DB
+    {
+        unsigned long long pcid;
+    };
+
+    ChangeCharacterRaceService() : _changeCharacterRaceServiceDB() {}
+    bool Setup(LobbyService::DB*, DB*);  // 0x70850
+    virtual bool Fetch(CliSession*, FragmentPacket*) const override;  // 0x70900
+    virtual bool IsServiceTarget(Character*) override;  // 0x6c760
     bool Start(CliSession*, unsigned int, char, char, char*, int);  // 0x70b10
     bool ConsumeItemTried(CliSession*);  // 0x70d50
     bool TaskDone(CliSession*);  // 0x70f50
     bool ConsumeItemFinished(CliSession*);  // 0x71150
     bool Finish(CliSession*);  // 0x71350
-};
 
-class ChangeCharacterSexService
+private:
+    DB _changeCharacterRaceServiceDB;
+};
+static_assert(sizeof(ChangeCharacterRaceService) == 0x30, "sizeof ChangeCharacterRaceService");
+
+class ChangeCharacterSexService : public LobbyService
 {
 public:
-    virtual bool Fetch(CliSession*, FragmentPacket*) const;  // 0x6fc10
-    virtual bool IsServiceTarget(Character*);  // 0x6c760
+    struct DB
+    {
+        unsigned long long pcid;
+    };
+
+    ChangeCharacterSexService() : _changeCharacterSexServiceDB() {}
+    bool Setup(LobbyService::DB*, DB*);  // 0x6fb60
+    virtual bool Fetch(CliSession*, FragmentPacket*) const override;  // 0x6fc10
+    virtual bool IsServiceTarget(Character*) override;  // 0x6c760
     bool Start(CliSession*, unsigned int, char, char*, int);  // 0x6fe20
     bool ConsumeItemTried(CliSession*);  // 0x70040
     bool TaskDone(CliSession*);  // 0x70240
     bool ConsumeItemFinished(CliSession*);  // 0x70440
     bool Finish(CliSession*);  // 0x70640
+
+private:
+    DB _changeCharacterSexServiceDB;
 };
+static_assert(sizeof(ChangeCharacterSexService) == 0x30, "sizeof ChangeCharacterSexService");
 
 class CharacterCosmesisService : public LobbyService
 {
@@ -103,16 +125,18 @@ private:
 };
 static_assert(sizeof(CharacterCosmesisService) == 0x30, "sizeof CharacterCosmesisService");
 
-class ExtendJumpingCharacterCreationQuotaService
+class ExtendJumpingCharacterCreationQuotaService : public LobbyService
 {
 public:
-    virtual bool Fetch(CliSession*, FragmentPacket*) const;  // 0x6f000
+    bool Setup(LobbyService::DB*);  // 0x6ef90
+    virtual bool Fetch(CliSession*, FragmentPacket*) const override;  // 0x6f000
     bool Start(CliSession*, unsigned int);  // 0x6f1b0
     bool ConsumeItemTried(CliSession*);  // 0x6f360
     bool TaskDone(CliSession*);  // 0x6f560
     bool ConsumeItemFinished(CliSession*);  // 0x6f760
     bool Finish(CliSession*);  // 0x6f960
 };
+static_assert(sizeof(ExtendJumpingCharacterCreationQuotaService) == 0x28, "sizeof ExtendJumpingCharacterCreationQuotaService");
 
 class RenameCharacterService : public LobbyService
 {

@@ -996,3 +996,24 @@ Resumed run (codegen pass on the DIFF functions above 85 %):
 - Do not use A20 when the original inlines other STL calls in the same function. A20 removes all inlining in the caller.
 - A small constant can differ only because our image is smaller than the original. Check the disassembly before a source trial.
 
+
+## ld-11
+
+| Item | Result |
+| --- | --- |
+| Lifted | 33 (LobbyService part 2: 23, LobbyLocale: 10) |
+| Not done | 0 |
+| LD MATCH | 82 -> 91 (+9). 8 are card functions. The other 4 exes: +0, no MATCH lost, no MATCH name gone. |
+
+What worked:
+- Write a digit test in the same form as the original. The original keeps the constants `0x30` and `0x39`, so write
+  `(c < L'0' || c > L'9')`. The form `static_cast<unsigned short>(c - L'0') > 9` changes the consts signal.
+  `IsSentenceCase` went from 94.1 to 98.0. `IsMonolingualString` went from 88.9 to 96.3.
+- Keep the test order of the original: the digit test first, then the space test.
+
+What failed:
+- An `unsigned int` index in place of an `unsigned short` index for a range-checked table read gave no change
+  (`GetLanguageTypeOfChar`, 99.4 before and after).
+- The original LobbyLocale tables are one byte table (`byte_140161BD0`) with fixed offsets. Separate tables and a bit
+  table for kanji leave a consts gap near 98. Do not change it in a slice card. It is a large data change.
+- The service functions without the client session key in the log calls stay near 60. This is a known cost.
