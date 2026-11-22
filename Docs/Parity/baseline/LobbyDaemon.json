@@ -118,6 +118,13 @@
 "score": 94.9,
 "status": "DIFF"
 },
+"AutoDbTran::~AutoDbTran": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "BoundedList::Remove": {
 "calls": 100,
 "consts": 100,
@@ -455,6 +462,111 @@
 "status": "MATCH"
 },
 "CriticalSection::~CriticalSection": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Db::AllocTransaction": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Db::ConvertTime": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Db::Log": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Db::ReleaseTransaction": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Db::errorLog": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DbTransaction::BindParam": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DbTransaction::Execute": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DbTransaction::Fetch": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DbTransaction::Prepare": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DbTransaction::close": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DbTransaction::connect": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DbTransaction::connectionErrorLog": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DbTransaction::initStatement": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DbTransaction::initialize": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DbTransaction::statmentErrorLog": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -931,6 +1043,76 @@
 "status": "MATCH"
 },
 "LeaveGameWorldToken::GetKind": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyDB::CancelCharacterCreation": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyDB::CheckValidityOfCharacterName": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyDB::FinishCharacterCreation": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyDB::LoadCharacterList": {
+"calls": 60,
+"consts": 94,
+"refs": 84,
+"score": 79.0,
+"status": "DIFF"
+},
+"LobbyDB::LoadGameAccount": {
+"calls": 64,
+"consts": 91,
+"refs": 86,
+"score": 80.5,
+"status": "DIFF"
+},
+"LobbyDB::LoadGameWorld": {
+"calls": 56,
+"consts": 97,
+"refs": 79,
+"score": 77.5,
+"status": "DIFF"
+},
+"LobbyDB::LoadGameWorldCluster": {
+"calls": 71,
+"consts": 97,
+"refs": 85,
+"score": 84.2,
+"status": "DIFF"
+},
+"LobbyDB::TryCharacterCreation": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyDB::UpdateGameAccountTimeBasedPlayInfo": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyDB::UpdateLastLogout": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
