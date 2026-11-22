@@ -69,6 +69,90 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"ChangeCharacterRaceService::ConsumeItemFinished": {
+"calls": 60,
+"consts": 67,
+"refs": 62,
+"score": 63.1,
+"status": "DIFF"
+},
+"ChangeCharacterRaceService::ConsumeItemTried": {
+"calls": 60,
+"consts": 57,
+"refs": 62,
+"score": 59.9,
+"status": "DIFF"
+},
+"ChangeCharacterRaceService::Finish": {
+"calls": 60,
+"consts": 67,
+"refs": 62,
+"score": 63.1,
+"status": "DIFF"
+},
+"ChangeCharacterRaceService::Setup": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ChangeCharacterRaceService::Start": {
+"calls": 50,
+"consts": 67,
+"refs": 50,
+"score": 55.6,
+"status": "DIFF"
+},
+"ChangeCharacterRaceService::TaskDone": {
+"calls": 60,
+"consts": 67,
+"refs": 62,
+"score": 63.1,
+"status": "DIFF"
+},
+"ChangeCharacterSexService::ConsumeItemFinished": {
+"calls": 60,
+"consts": 67,
+"refs": 62,
+"score": 63.1,
+"status": "DIFF"
+},
+"ChangeCharacterSexService::ConsumeItemTried": {
+"calls": 60,
+"consts": 57,
+"refs": 62,
+"score": 59.9,
+"status": "DIFF"
+},
+"ChangeCharacterSexService::Finish": {
+"calls": 60,
+"consts": 67,
+"refs": 62,
+"score": 63.1,
+"status": "DIFF"
+},
+"ChangeCharacterSexService::Setup": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ChangeCharacterSexService::Start": {
+"calls": 50,
+"consts": 57,
+"refs": 50,
+"score": 52.4,
+"status": "DIFF"
+},
+"ChangeCharacterSexService::TaskDone": {
+"calls": 60,
+"consts": 67,
+"refs": 62,
+"score": 63.1,
+"status": "DIFF"
+},
 "Character::FetchCharacterInfo [?FetchCharacterInfo@Character@@QEBA_NPEAVFragmentPacket@@@Z]": {
 "calls": 97,
 "consts": 100,
@@ -258,6 +342,48 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"ExtendJumpingCharacterCreationQuotaService::ConsumeItemFinished": {
+"calls": 60,
+"consts": 67,
+"refs": 62,
+"score": 63.1,
+"status": "DIFF"
+},
+"ExtendJumpingCharacterCreationQuotaService::ConsumeItemTried": {
+"calls": 60,
+"consts": 57,
+"refs": 62,
+"score": 59.9,
+"status": "DIFF"
+},
+"ExtendJumpingCharacterCreationQuotaService::Finish": {
+"calls": 60,
+"consts": 67,
+"refs": 62,
+"score": 63.1,
+"status": "DIFF"
+},
+"ExtendJumpingCharacterCreationQuotaService::Setup": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ExtendJumpingCharacterCreationQuotaService::Start": {
+"calls": 29,
+"consts": 57,
+"refs": 36,
+"score": 40.7,
+"status": "DIFF"
+},
+"ExtendJumpingCharacterCreationQuotaService::TaskDone": {
+"calls": 60,
+"consts": 67,
+"refs": 62,
+"score": 63.1,
+"status": "DIFF"
+},
 "FSE_count_simple": {
 "calls": 100,
 "consts": 100,
@@ -322,6 +448,83 @@
 "status": "MATCH"
 },
 "HeapMemoryManager::ReallocZero": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"IsVietnamese": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyDaemon::setArgument": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyLocale::GetLanguageTypeOfChar": {
+"calls": 100,
+"consts": 98,
+"refs": 100,
+"score": 99.4,
+"status": "DIFF"
+},
+"LobbyLocale::GetNextThaiCell": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyLocale::GetStringLengthWithCellCombination": {
+"calls": 100,
+"consts": 44,
+"refs": 100,
+"score": 81.5,
+"status": "DIFF"
+},
+"LobbyLocale::GetVietToneMarkType": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyLocale::GetVietVowelType": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyLocale::IsAllowedChar": {
+"calls": 100,
+"consts": 98,
+"refs": 100,
+"score": 99.3,
+"status": "DIFF"
+},
+"LobbyLocale::IsMonolingualString": {
+"calls": 100,
+"consts": 89,
+"refs": 100,
+"score": 96.3,
+"status": "DIFF"
+},
+"LobbyLocale::IsSentenceCase": {
+"calls": 100,
+"consts": 94,
+"refs": 100,
+"score": 98.0,
+"status": "DIFF"
+},
+"LobbyLocale::IsWupperNotApplied": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -648,6 +851,13 @@
 "consts": 100,
 "refs": 50,
 "score": 83.3,
+"status": "DIFF"
+},
+"RenameUserService::Finish": {
+"calls": 67,
+"consts": 44,
+"refs": 80,
+"score": 63.7,
 "status": "DIFF"
 },
 "RepeatPacketComposer::PopRepeatCount": {
