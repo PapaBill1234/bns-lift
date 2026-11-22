@@ -223,20 +223,13 @@ bool CoolDown::HandleEvent(EventContext*, unsigned long)
     Log::Write(Log::LT_NOTICE, L"LobbyDaemon.cpp", 258,
                L"[cooldown], report status, remain-cli-session-count:%d, remain-time:%d(sec)", clisessionMgr->_size,
                remain);
-    if ((size > 0 || elapsed < halfEnd) && elapsed < _end)
+    if (!((size > 0 || elapsed < halfEnd) && elapsed < _end))
     {
-        if (!Daemon::Instance->AddTimer(_period, this))
+        if (size <= 0)
         {
-            Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 297,
-                       L"[cooldown], fail; add timer fail; u may try SHUTDOWN UNSAFELY or retry COOLDOWN, "
-                       L"remain-cli-session-count:%d",
-                       size);
-            _run = false;
+            Log::Write(Log::LT_NOTICE, L"LobbyDaemon.cpp", 270, L"[cooldown], success. u can SHUTDOWN SAFELY");
         }
-    }
-    else
-    {
-        if (size > 0)
+        else
         {
             CliSessionTable::CliSessionList remainCsList;
             clisessionMgr->SelectAll(remainCsList);
@@ -257,10 +250,7 @@ bool CoolDown::HandleEvent(EventContext*, unsigned long)
                        L"[cooldown], fail; some jobs remains; u may try SHUTDOWN UNSAFELY or retry COOLDOWN, "
                        L"remain-cli-session-count:%d",
                        size);
-        }
-        else
-        {
-            Log::Write(Log::LT_NOTICE, L"LobbyDaemon.cpp", 270, L"[cooldown], success. u can SHUTDOWN SAFELY");
+            remainCsList.clear();
         }
         // Inlined Daemon::setState(STATE_COOLDOWNED).
         LobbyDaemon* const daemon = LobbyDaemon::_instance;
@@ -274,6 +264,14 @@ bool CoolDown::HandleEvent(EventContext*, unsigned long)
         }
         if (daemon->console != nullptr)
             daemon->console->SetState(8);
+        _run = false;
+    }
+    else if (!Daemon::Instance->AddTimer(_period, this))
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 297,
+                   L"[cooldown], fail; add timer fail; u may try SHUTDOWN UNSAFELY or retry COOLDOWN, "
+                   L"remain-cli-session-count:%d",
+                   size);
         _run = false;
     }
     return true;
@@ -299,15 +297,15 @@ bool CoolDown::Start(long period, long duration)
     long long const now = static_cast<long long>(GetTickCount64());
     self->_run = true;
     self->_end = (static_cast<long long>(duration) - Daemon::Instance->StartSystemTick64) + now;
-    if (Daemon::Instance->AddTimer(self->_period, self))
+    if (!Daemon::Instance->AddTimer(self->_period, self))
     {
-        Log::Write(Log::LT_NOTICE, L"LobbyDaemon.cpp", 330, L"[cooldown], start, period:%d(msec), duration:%d(msec)",
-                   period, duration);
-        return true;
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 325, L"[cooldown], start fail; add timer fail");
+        self->_run = false;
+        return false;
     }
-    Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 325, L"[cooldown], start fail; add timer fail");
-    self->_run = false;
-    return false;
+    Log::Write(Log::LT_NOTICE, L"LobbyDaemon.cpp", 330, L"[cooldown], start, period:%d(msec), duration:%d(msec)", period,
+               duration);
+    return true;
 }
 
 #pragma comment(linker, "/INCLUDE:?EventId@LobbydReloadInvalidRestoreTimer@@UEBAIXZ")  // LIFT: keep until the caller is lifted (0x99990)
@@ -410,7 +408,25 @@ void TimeBasedPlaySeasonSchedule::Data::GetNextResetTimeUTC(long long conditionT
     long long const now = _time64(nullptr);
     long long const startTimeUTC = scheduleTime.startTimeUTC;
     long long reset;
-    if (startTimeUTC <= conditionTimeUTC)
+    if (startTimeUTC > conditionTimeUTC)
+    {
+        if (targetType == 0)
+        {
+            reset = NPMsgHelper::LocaleHourToUTCTime(resetHour, scheduleTime.startTimeUTC, resetHourTimeZoneBiasSecond);
+            if (reset <= scheduleTime.startTimeUTC)
+                reset += 86400;
+        }
+        else
+        {
+            if (targetType == 1)
+            {
+                prevResetTimeUTC = startTimeUTC;
+                nextResetTimeUTC = scheduleTime.endTimeUTC;
+            }
+            return;
+        }
+    }
+    else
     {
         if (scheduleTime.endTimeUTC < conditionTimeUTC)
         {
@@ -426,20 +442,6 @@ void TimeBasedPlaySeasonSchedule::Data::GetNextResetTimeUTC(long long conditionT
         }
         reset = NPMsgHelper::LocaleHourToUTCTime(resetHour, now, resetHourTimeZoneBiasSecond);
         if (reset <= now)
-            reset += 86400;
-    }
-    else
-    {
-        if (targetType != 0)
-        {
-            if (targetType != 1)
-                return;
-            prevResetTimeUTC = startTimeUTC;
-            nextResetTimeUTC = scheduleTime.endTimeUTC;
-            return;
-        }
-        reset = NPMsgHelper::LocaleHourToUTCTime(resetHour, startTimeUTC, resetHourTimeZoneBiasSecond);
-        if (reset <= startTimeUTC)
             reset += 86400;
     }
     nextResetTimeUTC = reset;
@@ -575,10 +577,8 @@ void LobbyDaemon::PrintDependency()
     wprintf(L"lib fsdreader %s.0\n", L"1");
     wprintf(L"security cert %d.0\n", 6);
     wprintf(L"config bns-common-config %d\n", 2);
-    // BUG: 0x9ae30 the format has two %d but the call gives one argument.
-    wprintf(L"config contents-rule-client %d.%d\n", 65);
-    // BUG: 0x9ae30 the format has two %d but the call gives one argument.
-    wprintf(L"config contents-rule-server %d.%d\n", 72);
+    wprintf(L"config contents-rule-client %d.%d\n", 65, 0);
+    wprintf(L"config contents-rule-server %d.%d\n", 72, 0);
 }
 
 // 0x9af60

@@ -1087,7 +1087,7 @@ Card lift-lobbydaemon-15: LobbyDaemon part 1 (33 functions, 30 lifted, 3 Not don
 
 | Item | Result |
 | --- | --- |
-| LD MATCH | 219 -> 351 (+132) over main bfb4c98 (earlier run: 195 -> 325 over ef1fa96). The other 4 exes: +0, no MATCH lost. |
+| LD MATCH | 301 -> 436 (+135) over main 9ca5a30, measured after the merge (25 of the 30 card functions MATCH). The other 4 exes: +0, no MATCH lost. |
 
 What worked:
 - The `/INCLUDE` pragma finds wrong signatures. A name that the original PDB has and the lift does not define is an undefined symbol at link time.
@@ -1098,6 +1098,17 @@ What worked:
 - A17 variant: HR shows `v5 = line; ... Log::Write(v5)` after the branches. The original source has one `Log::Write` per branch (the lines 1140, 1148, 1153 differ).
   Write one call per branch. `FailedEventObjectHandler` 91.7 -> 93.3. The call order (`GetLastError` before `EventId`) is not done yet.
 
+Review trials (after the merge of main 9ca5a30):
+- A2, error block first (`CoolDown::Start`): write `if (!AddTimer) { log 325; _run = false; return false; } log 330; return true;`. 95.0 -> 100.0 (calls and refs agree).
+- A2 and A8 (`CoolDown::HandleEvent`): put the cooldown-end block first (`if (!((size > 0 || elapsed < halfEnd) && elapsed < _end))`), `size <= 0` log (line 270) first
+  inside it, the AddTimer failure (line 297) in the `else`. Add `remainCsList.clear()` after log 286: the pseudocode `if (Myfirst != i) memmove(Myfirst, i, 0)` is `clear()`.
+  The source line numbers (270, 281, 286, 297) give the block order. 94.3 -> 100.0.
+- A8, a false BUG (`PrintDependency`): the original passes a second argument 0 (`xor r8d, r8d`). The pseudocode hides it. Check the register setup in the disassembly before a `// BUG:`
+  mark. `wprintf(L"... %d.%d\n", 65, 0)`. 96.7 -> 100.0.
+- `GetNextResetTimeUTC` 66.7, 3 forms, no gain: (1) read `scheduleTime.startTimeUTC` at each use in the else branch, (2) the `startTimeUTC > conditionTimeUTC` block first,
+  (3) `targetType == 0` inline first. Form 3 gives the original size (193) and layout. The only DIFF is `add rax, -0x15180` (ours) against `sub rax, 0x15180` (original).
+  VS2010 folds `x - 86400` to an add of a negative constant. Open: try a named day-length constant or an unsigned type.
+
 What failed:
 - A8/A2 plus a source form: `FailedEventObjectHandler` 93.3 -> 100.0. Locals for `GetLastError()` and `EventId()` in the original order did not change the call order.
   A `switch (EventId())` with `case 3`, `case 5` and `default` and one `Log::Write` per case gave the original layout (MATCH).
@@ -1105,7 +1116,7 @@ What failed:
   instead (`Packet::Compose(PacketComposer*, int, ...)`, 0xde140, in `Packet.cpp`). `TimeBasedPlaySeasonSchedule::Compose` 81.5 -> 89.9. Then pointer loops: 90.0.
   `Compose` loop with `unsigned short == 0xFFFF` instead of `== -1`: no change.
 - `Daemon::Instance->GlobalTimerQueue->Add(...)` does not compile. `TimerQueue::Add` is protected. LTCG inlines `Daemon::AddTimer` in the original.
-  Funcdiff already expands `AddTimer` to `TimerQueue::Add`. The extra `Log::Write` in `CoolDown::Start` comes from this expansion. Do not retry.
+  Funcdiff already expands `AddTimer` to `TimerQueue::Add`. The extra call in `CoolDown::Start` came from the block order, not from the expansion (see the review trials above). Keep `Daemon::AddTimer`.
 - `restoreInvalid` refs 80: the loop end pointer is the address of the next global. The original has `CONFIG_FILENAME`. Ours has `TextConsole::COLOR_TABLE`.
   This depends on the data order, not on the source form.
 
