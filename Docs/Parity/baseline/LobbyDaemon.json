@@ -90,6 +90,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"CriticalSection::~CriticalSection": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "DynamicEventObject::deallocate_me": {
 "calls": 100,
 "consts": 100,
@@ -258,6 +265,83 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"MembershipMileage::Accept": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"MembershipMileageSession::start": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"MembershipMileageSession::stop": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"MembershipMileageSession::update": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"MileageInterimDepositTimer::MileageInterimDepositTimer": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"MileageInterimDepositTimer::Tick": {
+"calls": 74,
+"consts": 83,
+"refs": 86,
+"score": 80.9,
+"status": "DIFF"
+},
+"MileageInterimDepositTimer::~MileageInterimDepositTimer": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"MileageManager::Accept": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"MileageSession::MileageSession": {
+"calls": 100,
+"consts": 100,
+"refs": 60,
+"score": 86.7,
+"status": "DIFF"
+},
+"MileageSlot::MileageSlot": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"MileageSlot::~MileageSlot": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Packet::Clear": {
 "calls": 100,
 "consts": 100,
@@ -278,6 +362,13 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"RefCntList::~RefCntList": {
+"calls": 22,
+"consts": 40,
+"refs": 29,
+"score": 30.3,
+"status": "DIFF"
 },
 "RefCntObject::DumpRefCntHistory": {
 "calls": 100,
@@ -327,6 +418,13 @@
 "refs": 50,
 "score": 83.3,
 "status": "DIFF"
+},
+"Section<__int64>::Intersect<__int64,std::vector,StlAllocator<Section<__int64>,2> >": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "SharedChannelFragmentPacketHandleEvent::HandleEvent": {
 "calls": 100,
@@ -763,6 +861,13 @@
 "status": "MATCH"
 },
 "swprintf_s<260>": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"swprintf_s<513>": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
