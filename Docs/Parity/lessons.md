@@ -1105,3 +1105,11 @@ Card lift-lobbydaemon-13: CliSession part 3, CliSessionManager (56 functions).
   not a pointer. Try the index type before you add a local.
 - An STL instance (`std::vector<...>::~vector`) is not in the PDB when no lifted caller makes it. Do not list it as Lifted (skeptic check 2b).
 - The 4 `CliSessionTable` index functions paired for the first time when their presence callers were lifted (shared gain).
+
+## ld-17
+
+| Item | Fact |
+| --- | --- |
+| Dead-strip, handler table | A handler that only the (stub) handler table calls needs `/INCLUDE:` too. `HandleLobbyLobbyGate_CheckCharacterNameReq` was unpaired until the pragma was added. Then it was MATCH 100.0 (+1). |
+| Build input | A new worktree can lack the ignored `vendor/zstd/src`. All 5 VS2010 links fail with `ZSTD_*` unresolved. Copy the source from another worktree. Check `git rev-parse HEAD` = bb6eaf64. Delete `build-vs2010/obj/vendor` after the copy. |
+| Trials | None. 16 of 17 functions need layouts that main does not have. |
