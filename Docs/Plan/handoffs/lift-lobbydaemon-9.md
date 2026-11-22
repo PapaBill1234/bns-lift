@@ -39,7 +39,7 @@ Source: LobbyDaemon 2019 + PDB, VS2010 SP1. The seven checkpoints cover all 46 c
 | `0x504d0` | `std::_Tree_val<std::_Tmap_traits<short, GameWorldCluster*, std::less<short>, StlAllocator<std::pair<short, GameWorldCluster*>, 2>, 0>>::_Buynode<std::pair<short, GameWorldCluster*>>` | — | STL; no pair |
 | `0x96d20` | `std::map<short, GameWorldCluster*, std::less<short>, StlAllocator<std::pair<short, GameWorldCluster*>, 2>>::~map` | — | STL; no pair |
 | `0x59ce0` | `SystemPerfMonitor::~SystemPerfMonitor` | 100.0 | MATCH |
-| `0x59d60` | `SystemPerfMonitor::Initialize` | 100.0 | MATCH (bytes checked against the original; no handle test, `test rax,rax; je`) |
+| `0x59d60` | `SystemPerfMonitor::Initialize` | 100.0 | MATCH (PDB `bool` return; no handle test; 2 extra instructions, see Review repair 4) |
 
 `GameWorld::EnterUser` calls the `enterUser` stub. The STL rows use the registry's standard map. They do not have separate hand-written bodies.
 
@@ -107,9 +107,25 @@ The stub change drops `SystemPerfMonitor::Start` and `wmain` from the paired lis
 | --- | --- |
 | `CounterSet::create` had a handle null test and `return _instance != nullptr`. The original has neither (0x59d60). | The handle test is removed. `create` returns the instance pointer. The caller tests it. Disassembly of `SystemPerfMonitor::Initialize` now agrees with the original: `mov [rbx+48h],rax; test rax,rax; je`. No guard stays. |
 
+## Review repair 4
+
+| Finding | Action |
+| --- | --- |
+| The handoff and the claim did not agree on the Not done count. | The count is 12 in both. 34 lifted rows + 12 Not done rows = 46 card RVAs. |
+| `CounterSet::create` and `SystemCounterSet::Create` returned the instance pointer. The PDB return type is `bool`. | Both return `bool` again. The body has no handle test: `if (_instance != nullptr) return false; _instance = ...; return _instance != nullptr;`. |
+
+Codegen of `SystemPerfMonitor::Initialize` (`0x59d60`) with the `bool` return:
+
+| Build | Bytes after the `_createCounterSet` call |
+| --- | --- |
+| Original | `mov [rbx+48h],rax; test rax,rax; je` |
+| Lift | `test rax,rax; mov [rbx+48h],rax; setne al; test al,al; je` |
+
+Funcdiff still gives MATCH 100.0, because it does not compare these instructions. The two extra instructions come from the inline `bool` result. The PDB return type is kept. This is a recorded difference, not a safety difference.
+
 ## Checks
 
-The full gate and parity runs on the final source exited zero. They printed `gate ok` and `parity ok`. No baseline MATCH was lost. The baseline comes from `main` at `562705035d7c9bb04be7992457dc78fde0e0a4f8`. The vendor zstd checkout remains at `bb6eaf64`. No live service test ran.
+The full gate and parity runs on the final source exited zero. They printed `gate ok` and `parity ok`. No baseline MATCH was lost. The baseline comes from `main` at `ef056b363a0498e75a4d4530c1df66bc4cacab41` (cards 7, 8, 10 and 11 merged). The vendor zstd checkout remains at `bb6eaf64`. No live service test ran.
 
 | Exe | Baseline MATCH | Final MATCH | Gain | Parity |
 | --- | ---: | ---: | ---: | ---: |
@@ -117,4 +133,4 @@ The full gate and parity runs on the final source exited zero. They printed `gat
 | LobbyGate | 658/739 | 658/739 | 0 | 89.0% |
 | SmartCouponDaemon | 630/669 | 630/669 | 0 | 94.2% |
 | PostOfficeDaemon | 694/759 | 694/759 | 0 | 91.4% |
-| LobbyDaemon | 82/2204 | 142/2204 | +60 | 6.4% |
+| LobbyDaemon | 130/2204 | 175/2204 | +45 | 7.9% |

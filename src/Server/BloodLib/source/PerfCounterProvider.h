@@ -121,13 +121,13 @@ protected:
     CounterSet() : _instance(nullptr) {}
     virtual ~CounterSet() { Destroy(); }
 
-    // LIFT: Returns the instance pointer, null on failure. The original tests the stored pointer and has no handle test (0x59d60).
-    BL_PERF_COUNTERSET_INSTANCE* create(GUID const* id, wchar_t const* name)
+    // LIFT: PDB return type bool. The original has no handle test; it tests the stored pointer (0x59d60).
+    bool create(GUID const* id, wchar_t const* name)
     {
         if (_instance != nullptr)
-            return nullptr;
+            return false;
         _instance = PerfCounterProvider::Instance._createCounterSet(PerfCounterProvider::Instance._handle, id, name, 0);
-        return _instance;
+        return _instance != nullptr;
     }
 
     bool setU64(unsigned long id, unsigned __int64 value)
