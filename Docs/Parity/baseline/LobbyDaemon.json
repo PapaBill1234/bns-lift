@@ -874,6 +874,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"HandleLobbyLobbyGate_CheckCharacterNameReq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "HeapMemoryManager::Alloc": {
 "calls": 100,
 "consts": 100,
