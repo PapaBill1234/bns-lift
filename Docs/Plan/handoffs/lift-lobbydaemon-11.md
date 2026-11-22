@@ -108,6 +108,8 @@ Not tried:
 | `tools/parity.sh` | trial build | `parity ok` |
 | `tools/gate.sh` (`LIFT_BUILD_DIR=build-ld-11`) | repair 2 final candidate | `gate ok`, exit 0 |
 | `tools/parity.sh` (`LIFT_BUILD_DIR=build-ld-11`) | repair 2 final candidate | `parity ok`, exit 0; LobbyDaemon paired 139 |
+| `tools/gate.sh` (`LIFT_BUILD_DIR=build-ld-11`) | verify candidate `d2fd3e2` (clean tree) | `gate ok`, exit 0 |
+| `tools/parity.sh` (`LIFT_BUILD_DIR=build-ld-11`) | verify candidate `d2fd3e2` (clean tree) | `parity ok`, exit 0; LobbyDaemon MATCH 82 -> 91 (+9), paired 139 |
 
 | Server | Baseline MATCH | Final MATCH | MATCH lost | Names gone |
 | --- | ---: | ---: | ---: | ---: |
