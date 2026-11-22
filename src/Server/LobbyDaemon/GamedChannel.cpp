@@ -17,7 +17,8 @@
 
 namespace
 {
-wchar_t const* const GAMED_FILE = L"GamedChannel.cpp";  // LIFT: No PDB symbol. The binary uses the literal.
+// LIFT: No PDB symbol. The binary uses the literal as the file string of the log and reference count calls (first use at 0x804a0).
+wchar_t const* const GAMED_FILE = L"GamedChannel.cpp";
 // LIFT: No PDB symbol. The binary uses the literal as the file string of SharedChannelList::Acquire/Remove errors (lines 200 and 234; used in GamedChannelManager::Remove and Acquire).
 wchar_t const* const SHARED_CHANNEL_FILE = L"..\\Shared\\SharedChannel.cpp";
 // LIFT: No PDB symbol. The binary uses the literal as the file string of the Session reference count call (line 1059; used in GamedChannelManager::PacketHandler).
@@ -357,10 +358,10 @@ bool GamedChannel::SendCreateCharacterReq(TransactionChannel::Transaction* t, un
     p.IsFragmentPacket = false;
     p.FragmentPacketCmd = 0;
     p.Allocate();
-    if (p.Compose("hqqobisbQh", 20, t->GetTid(), pcid, gameAccountId, externalInfoData,
+    if (0 == p.Compose("hqqobisbQh", 20, t->GetTid(), pcid, gameAccountId, externalInfoData,
                   static_cast<int>(externalInfoSize), ipaddress, characterName, characterCreationData,
                   static_cast<int>(characterCreationDataSize), static_cast<int>(jumpingCharacter),
-                  static_cast<int>(topCharacterLevel)) == 0)
+                  static_cast<int>(topCharacterLevel)))
     {
         Log::Write(Log::LT_ERROR, GAMED_FILE, 267,
                    L"[gamed], send create character req fail; compose fail, tid:0x%I64X", t->GetTid());

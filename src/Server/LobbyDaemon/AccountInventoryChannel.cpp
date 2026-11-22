@@ -42,7 +42,9 @@ template int __cdecl swprintf_s<129>(wchar_t (&)[129], wchar_t const*, ...);  //
 
 namespace
 {
-wchar_t const* const ACCOUNT_INVENTORY_FILE = L"AccountInventoryChannel.cpp";  // LIFT: No PDB symbol. The binary uses the literal.
+// LIFT: No PDB symbol. The binary uses the literal as the file string of the log calls (first use at 0x66b0).
+wchar_t const* const ACCOUNT_INVENTORY_FILE = L"AccountInventoryChannel.cpp";
+// LIFT: No PDB symbol. The binary uses the literal as the file string of the Session reference count call (line 1059; used in AccountInventorySessionHandler::PacketHandler 0x82f0).
 wchar_t const* const SESSION_FILE = L"source\\Session.cpp";
 
 }

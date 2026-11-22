@@ -14,10 +14,10 @@ Base: main 75f0769. All counts are measured against it.
 | Not done | 5 |
 | Gate (`tools/gate.sh`, `LIFT_BUILD_DIR=build-ld-18`) | gate ok |
 | Parity (`tools/parity.sh`) | parity ok |
-| LobbyDaemon MATCH | 195 -> 254 (+59) over main 75f0769 |
+| LobbyDaemon MATCH | 195 -> 255 (+60) over main 75f0769 |
 | CacheGate, LobbyGate, SmartCouponDaemon, PostOfficeDaemon MATCH | 456, 658, 630, 694 (+0 each, no MATCH lost) |
 
-The gain is 42 card functions and 17 shared functions. No MATCH function turns into DIFF or disappears.
+The gain is 43 card functions and 17 shared functions. No MATCH function turns into DIFF or disappears.
 
 New shared MATCH (17): `Connection::AsyncSend`, `FragmentPacket::FragmentPacket`, `FragmentPacket::~FragmentPacket`, `Network::GetAddressStringW`, `Packet::Add`,
 `Packet::Compose`, `PacketBuffer::encrypt`, `Session::GetChannel`, `Session::Send`, `Session::send`, `SessionHandler::~SessionHandler`,
@@ -52,7 +52,7 @@ New shared MATCH (17): `Connection::AsyncSend`, `FragmentPacket::FragmentPacket`
 | GamedChannel | `0x806e0` | `GamedChannelManager::OnConnect` | 100.0 | yes |
 | GamedChannel | `0x80980` | `GamedChannelManager::PacketHandler` | 82.2 | no |
 | GamedChannel | `0x80d50` | `GamedChannel::SendStopPlayNotify` | 100.0 | yes |
-| GamedChannel | `0x80e20` | `GamedChannel::SendCreateCharacterReq` | 97.0 | no |
+| GamedChannel | `0x80e20` | `GamedChannel::SendCreateCharacterReq` | 100.0 | yes |
 | GamedChannel | `0x81040` | `GamedChannel::SendDeleteCharacterReq` | 100.0 | yes |
 | GamedChannel | `0x811c0` | `GamedChannel::SendRestoreCharacterReq` | 100.0 | yes |
 | GamedChannel | `0x81320` | `GamedChannel::SendDeleteCharacterCompleteNotify` | 100.0 | yes |
@@ -104,7 +104,6 @@ The original tables have entries (handler, auth, fragment). ❓ This card did no
 | --- | ---: | --- |
 | `AccountInventoryChannel::SendListGoodsReq` | 96.3 | Consts 89: one immediate (`0x79`) where the original has a `lea` from the zero register. Three forms tried (see lessons ld-18). |
 | `AccountInventoryChannel::SendFinishWarehouseItemConsumptionReq` | 97.0 | Consts 91: the original has the immediate `0x16`, ours a `lea`. Three forms tried. |
-| `GamedChannel::SendCreateCharacterReq` | 97.0 | Consts 91: ours has the immediate `0x14`, the original a `lea`. Three forms tried. |
 | `GamedChannel::SendAccountInventoryNotify` | 79.1 | Calls 56: the original calls `Packet::Allocate()` out of line from the inlined `Packet::Allocate(PacketComposer*)`. Ours inlines both. A `noinline` on the shared `Packet::Allocate()` breaks the other `Send*` functions. Below 85, no tries. |
 | `GamedChannelManager::PacketHandler` | 82.2 | The handler table is a null placeholder. LTCG sees the `handler` entries as constants and drops the handler branches (calls 62: the original has the `ConcatenatePacket`, handler and log calls). Retry after the tables are filled. Below 85. |
 | `AccountInventorySessionHandler::PacketHandler` | 76.9 | Same null table. Below 85. |
@@ -120,7 +119,7 @@ The original tables have entries (handler, auth, fragment). ❓ This card did no
 | AccountInventoryChannel | `0x81b0` | `AccountInventorySessionHandler::OnClose` | Same: no class layout and no `LobbyDaemon` layout. |
 | GamedChannel | `0x80790` | `GamedChannelManager::OnClose` | Needs `LobbyDaemon::_instance` with `_gameWorldRegistry` and `_clisessionMgr`, the `GameWorldRegistry` accessors (`_min`, `_size`, `_worlds`) and `GameWorld::_live`. These layouts are not on main. |
 
-The remaining `GamedChannel` functions from `0x82f0` on are part 2 of the module. They stay as `LIFT_STUB`, as the card says.
+The remaining `GamedChannel` functions from `0x82b70` (`GamedChannel::SendChangeCharacterRaceReq`) on are part 2 of the module. They stay as `LIFT_STUB`, as the card says.
 
 ## Safety differences
 
@@ -138,3 +137,12 @@ The remaining `GamedChannel` functions from `0x82f0` on are part 2 of the module
 | Remove the two null tables and the `TSend` stub | handler cards, ld-28 | See "Placeholders". |
 | Lift the 5 Not done functions | after the `LobbyDaemon`, `PipeConsole` and `GameWorld` layouts land | Add the `AccountInventorySessionHandler` base, vtable and constructor first. |
 | `SendAccountInventoryNotify` 79.1 | BloodLib follow-up | Find a form that makes LTCG call `Packet::Allocate()` out of line only from `Allocate(PacketComposer*)`. |
+
+## Merge note
+
+This card defines the placeholder `LobbyGamePacketHandlerDef LobbyGamePacketLobbySideHandlerList[116];` in `GamedChannel.cpp`. The owner is card ld-16 (wave 3). If ld-16 also defines the table, the link fails with a duplicate symbol.
+
+| Merge order | Action |
+| --- | --- |
+| ld-18 first | The ld-16 repair deletes the placeholder in `GamedChannel.cpp`. |
+| ld-16 first | The ld-18 merge deletes the placeholder in the same commit. |

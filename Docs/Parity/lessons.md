@@ -1171,12 +1171,13 @@ What worked (count = functions made MATCH):
      `return false` stop that. +11 MATCH. The next card (ld-28) lifts `TSend` and must delete these workarounds.
 
 What failed or is blocked (tries):
-- `SendListGoodsReq` 96.3, `SendFinishWarehouseItemConsumptionReq` 97.0, `SendCreateCharacterReq` 97.0 (3 forms each, consts 89 to 91):
+- `SendListGoodsReq` 96.3 and `SendFinishWarehouseItemConsumptionReq` 97.0 (3 forms each, consts 89 to 91):
   1. `if (p.Compose(...) == 0) { log; return false; }` (first lift): consts 80 to 91.
   2. `if (0 == p.Compose(...))`: best (consts 89 to 91, calls 100). Kept.
   3. Success first, `if (0 != p.Compose(...)) return TSend(t, &p); log; return false;`: consts 100 for `Create`, but calls 75 to 80.
      The original puts the error block first (A17). Reverted.
   The only DIFF left is one immediate (`0x14`, `0x79`, `0x16`) against a `lea` from the zero register.
+- `SendCreateCharacterReq` (repair 3): form 1 `p.Compose(...) == 0` scored 97.0 (consts 91). Form 2 `0 == p.Compose(...)` scored 100 (MATCH, 254 -> 255). Form 2 kept.
 - `GamedChannel::SendAccountInventoryNotify` 79.1 (calls 56): the original calls `Packet::Allocate()` out of line from the inlined
   `Packet::Allocate(PacketComposer*)`. Ours inlines both. `noinline` on `Packet::Allocate()` would break the `Send*` functions
   that inline it (BloodLib, shared by all 5 exes). Below 85: no tries.

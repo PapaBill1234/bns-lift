@@ -31,7 +31,8 @@ public:
     bool InitializeTransactionChannel(long);  // 0x7b170
     bool TSend(Transaction* t, Packet const* packet);  // 0x7b2b0 (Not done: card ld-18 batch 1 only calls it)
 
-    void* _mgr;
+    class Manager;  // PDB type 0x485B; no layout yet
+    Manager* _mgr;
     long _tranLifetime;
 };
 static_assert(sizeof(TransactionChannel) == 0x30, "sizeof TransactionChannel");
