@@ -1,6 +1,5 @@
 // LobbyPerfMonitor.obj (LobbyDaemon PDB, 2019 + PDB).
 #include "LobbyPerfMonitor.h"
-#include "Daemon.h"
 #include "LiftStub.h"
 #include "Log.h"
 #include <wchar.h>
@@ -9,7 +8,6 @@
 #else
 #pragma comment(linker, "/INCLUDE:??1SystemPerfMonitor@@UEAA@XZ")  // LIFT: keep until the caller is lifted (0x59ce0).
 #pragma comment(linker, "/INCLUDE:?Initialize@SystemPerfMonitor@@QEAA_NXZ")  // LIFT: keep until the caller is lifted (0x59d60).
-#pragma comment(linker, "/INCLUDE:?Start@SystemPerfMonitor@@QEAA_NXZ")  // LIFT: keep until the caller is lifted (0x59e30).
 #endif
 
 // 0x201ab8
@@ -36,43 +34,19 @@ bool SystemPerfMonitor::Initialize()
 }
 
 // 0x59e30
+// LIFT: Not lifted. The original calls TimerQueue::Add on LobbyDaemon::_instance->GlobalTimerQueue (0x59e30).
+// The LobbyDaemon::_instance layout and GlobalTimerQueue member belong to later cards (ld-15, ld-20).
 bool SystemPerfMonitor::Start()
 {
-    if (_run)
-    {
-        Log::Write(Log::LT_NOTICE, L"LobbyPerfMonitor.cpp", 52,
-            L"[perfmon-system], start fail; alread run");
-        return false;
-    }
-
-    _run = true;
-    if (Daemon::Instance->AddTimer(1000, this))
-    {
-        Log::Write(Log::LT_NOTICE, L"LobbyPerfMonitor.cpp", 64,
-            L"[perfmon-system], start ok, update-period:%d(msec)", 1000);
-        return true;
-    }
-
-    _run = false;
-    Log::Write(Log::LT_ERROR, L"LobbyPerfMonitor.cpp", 60,
-        L"[perfmon-system], start fail; add timer fail");
-    return false;
+    LIFT_STUB(0x59e30);
 }
 
 // 0x59ee0
+// LIFT: Not lifted. The original calls TimerQueue::Add on LobbyDaemon::_instance->GlobalTimerQueue (0x59ee0).
+// The LobbyDaemon::_instance layout and GlobalTimerQueue member belong to later cards (ld-15, ld-20).
 bool SystemPerfMonitor::HandleEvent(EventContext*, unsigned long)
 {
-    if (_run)
-    {
-        update();
-        if (!Daemon::Instance->AddTimer(1000, this))
-        {
-            _run = false;
-            Log::Write(Log::LT_ERROR, L"LobbyPerfMonitor.cpp", 83,
-                L"[perfmon-system], add timer fail");
-        }
-    }
-    return true;
+    LIFT_STUB(0x59ee0);
 }
 
 // 0x59f40

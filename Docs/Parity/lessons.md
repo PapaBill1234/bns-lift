@@ -960,3 +960,8 @@ What failed:
 - A2/A8, `GameWorld::Setup` (`0x4c880`): explicit flag branches and ordered reads for log arguments lowered the score from 96.3 to 91.7. Reverted.
 - A2/A8, `GameWorld::FetchWorldInfo` (`0x4cc40`): a direct capacity test, a cluster DB snapshot, and ordered crowdness tests lowered the score from 97.0 to 90.9. Reverted.
 - A8, `GameWorldCluster::addGameWorld` (`0x4e4f0`): a separate local pointer for `push_back` gave the same score, 94.4. Reverted.
+- A16/A17, `GameWorldReporter::WriteReport` (`0x4fa80`): `T* next = mem != nullptr ? ::new (mem) T : nullptr; if (next == nullptr) return false;` alone kept 90.0. Both error blocks first (registry test inverted, `Write` failure before the success path) gave 100.0 MATCH. The allocation guard stays. Kept.
+- A8/A17, `GameWorld::EnterUser` (`0x4cf40`): error blocks first, one `if`/`else` with two separate `TLobbyError` stores, and `_db.characterCreationLimited` read after `Log::Write` raised the score from 88.0 to 96.7. Kept. The rest is the `enterUser` stub body.
+- The `/INCLUDE` for `GameWorldReporter::HandleEvent` (`0x4fa30`) is not needed. The kept destructor stores the vftable. The function stays MATCH without it. Removed.
+- `SystemPerfMonitor::Start` (`0x59e30`) and `HandleEvent` (`0x59ee0`) go back to stubs. The original uses `LobbyDaemon::_instance->GlobalTimerQueue`, not `Daemon::Instance`. They return when the `LobbyDaemon` layout exists (ld-15, ld-20).
+- A stub body is identical code for every stub, so ICF folds the stubs. funcdiff pairs the folded body with one name. Moving a function to a stub can drop another stub from the paired list (`wmain`, DIFF 33.3). This is not a MATCH loss.

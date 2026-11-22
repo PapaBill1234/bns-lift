@@ -144,41 +144,43 @@ bool GameWorld::FetchWorldInfoForInfoGate(FragmentPacket* fp) const
 // 0x4cf40
 bool GameWorld::EnterUser(CliSession* cs, bool& wait, WaitInfo& waitinfo)
 {
-    if (cs != nullptr)
+    if (cs == nullptr)
     {
-        AcquireSRWLockShared(&_infolock);
-        if (_live)
-        {
-            if (_db.use)
-            {
-                if (_db.entrance || cs->_auth._table.field[Authority::OP_ENTER_GAMEWORLD_ON_ENTRANCE_NOT_ALLOWED])
-                {
-                    ReleaseSRWLockShared(&_infolock);
-                    return _cluster->enterUser(this, cs, wait, waitinfo);
-                }
-                bool limited = _db.characterCreationLimited;
-                ReleaseSRWLockShared(&_infolock);
-                Log::Write(Log::LT_ERROR, L"GameWorld.cpp", 221,
-                    L"[game-world], enter user fail; entrance not allowed, wid:%d", _db.wid);
-                TLobbyError = limited ? LOBERR_GAMEWORLD_ENTRANCE_NOT_ALLOWED : LOBERR_GAMEWORLD_PRE_CHARACTER_CREATION_MODE;
-                return false;
-            }
-            ReleaseSRWLockShared(&_infolock);
-            Log::Write(Log::LT_ERROR, L"GameWorld.cpp", 214,
-                L"[game-world], enter user fail; world not usable, wid:%d", _db.wid);
-            TLobbyError = LOBERR_GAMEWORLD_NOT_USABLE;
-            return false;
-        }
+        Log::Write(Log::LT_ERROR, L"GameWorld.cpp", 198,
+            L"[game-world], enter user fail; null cli-session, wid:%d", _db.wid);
+        TLobbyError = LOBERR_INVALID_PARAMETER;
+        return false;
+    }
+    AcquireSRWLockShared(&_infolock);
+    if (!_live)
+    {
         ReleaseSRWLockShared(&_infolock);
         Log::Write(Log::LT_ERROR, L"GameWorld.cpp", 207,
             L"[game-world], enter user fail; world not alive, wid:%d", _db.wid);
         TLobbyError = LOBERR_GAMEWORLD_NOT_ALIVE;
         return false;
     }
-    Log::Write(Log::LT_ERROR, L"GameWorld.cpp", 198,
-        L"[game-world], enter user fail; null cli-session, wid:%d", _db.wid);
-    TLobbyError = LOBERR_INVALID_PARAMETER;
-    return false;
+    if (!_db.use)
+    {
+        ReleaseSRWLockShared(&_infolock);
+        Log::Write(Log::LT_ERROR, L"GameWorld.cpp", 214,
+            L"[game-world], enter user fail; world not usable, wid:%d", _db.wid);
+        TLobbyError = LOBERR_GAMEWORLD_NOT_USABLE;
+        return false;
+    }
+    if (!_db.entrance && !cs->_auth._table.field[Authority::OP_ENTER_GAMEWORLD_ON_ENTRANCE_NOT_ALLOWED])
+    {
+        ReleaseSRWLockShared(&_infolock);
+        Log::Write(Log::LT_ERROR, L"GameWorld.cpp", 221,
+            L"[game-world], enter user fail; entrance not allowed, wid:%d", _db.wid);
+        if (_db.characterCreationLimited)
+            TLobbyError = LOBERR_GAMEWORLD_ENTRANCE_NOT_ALLOWED;
+        else
+            TLobbyError = LOBERR_GAMEWORLD_PRE_CHARACTER_CREATION_MODE;
+        return false;
+    }
+    ReleaseSRWLockShared(&_infolock);
+    return _cluster->enterUser(this, cs, wait, waitinfo);
 }
 
 #if !defined(__clang__)
@@ -505,7 +507,6 @@ void GameWorldRegistry::Update()
 #if !defined(__clang__)
 #pragma comment(linker, "/INCLUDE:??1GameWorldReporter@@UEAA@XZ")  // LIFT: keep until the caller is lifted (0x4f940).
 #pragma comment(linker, "/INCLUDE:?Initialize@GameWorldReporter@@QEAA_NP6AXPEAV1@@ZPEAVGameWorldRegistry@@J@Z")  // LIFT: keep until the caller is lifted (0x4f9b0).
-#pragma comment(linker, "/INCLUDE:?HandleEvent@GameWorldReporter@@UEAA_NPEAUEventContext@@K@Z")  // LIFT: keep until the caller is lifted (0x4fa30).
 #endif
 
 // 0x4f940
@@ -553,31 +554,31 @@ bool GameWorldReporter::HandleEvent(EventContext*, unsigned long)
 // 0x4fa80
 bool GameWorldReporter::WriteReport()
 {
-    if (_registry != nullptr)
+    if (_registry == nullptr)
     {
-        void* mem = Memory::_Manager[2]->Alloc(sizeof(GameWorldReport), L"GameWorld.cpp", 1210);
-        // BUG: The original calls Write even if the allocation fails (0x4fa80).
-        if (mem == nullptr)
-            return false;
-        GameWorldReport* next = ::new (mem) GameWorldReport;
-        if (next->Write(_registry))
-        {
-            _lock.Enter();
-            if (_report != nullptr)
-                _report->removeReferenceCount(L"GameWorld.cpp", 1228);
-            _report = next;
-            next->addReferenceCount(L"GameWorld.cpp", 1233);
-            _lock.Leave();
-            next->removeReferenceCount(L"GameWorld.cpp", 1219);
-            return true;
-        }
+        Log::Write(Log::LT_ERROR, L"GameWorld.cpp", 1206,
+            L"[world-reporter], write report fail; invalid parameter, registry:%p", static_cast<void*>(nullptr));
+        return false;
+    }
+    void* mem = Memory::_Manager[2]->Alloc(sizeof(GameWorldReport), L"GameWorld.cpp", 1210);
+    GameWorldReport* next = mem != nullptr ? ::new (mem) GameWorldReport : nullptr;
+    // BUG: The original calls Write even if the allocation fails (0x4fa80).
+    if (next == nullptr)
+        return false;
+    if (!next->Write(_registry))
+    {
         Log::Write(Log::LT_ERROR, L"GameWorld.cpp", 1212, L"[world-reporter], write report fail; writing fail");
         next->removeReferenceCount(L"GameWorld.cpp", 1213);
         return false;
     }
-    Log::Write(Log::LT_ERROR, L"GameWorld.cpp", 1206,
-        L"[world-reporter], write report fail; invalid parameter, registry:%p", static_cast<void*>(nullptr));
-    return false;
+    _lock.Enter();
+    if (_report != nullptr)
+        _report->removeReferenceCount(L"GameWorld.cpp", 1228);
+    _report = next;
+    next->addReferenceCount(L"GameWorld.cpp", 1233);
+    _lock.Leave();
+    next->removeReferenceCount(L"GameWorld.cpp", 1219);
+    return true;
 }
 
 // 0x4fc00
