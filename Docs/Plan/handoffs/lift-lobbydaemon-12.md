@@ -2,7 +2,7 @@
 
 Source: LobbyDaemon 2019 + PDB (VS2010 SP1). The lift uses the indexed pseudocode cache and the PDB types. IDA was not opened.
 The card has 26 functions (deleting destructors excluded). 23 are lifted. 3 are Not done.
-The branch is rebased on main 94b02f6 (ld-8 and ld-10 are on main).
+The branch has main ef056b3 merged (ld-7, ld-8, ld-10 and ld-11 are on main). All counts are measured after this merge.
 
 ## Result
 
@@ -12,18 +12,24 @@ The branch is rebased on main 94b02f6 (ld-8 and ld-10 are on main).
 | Not done | 3 |
 | Gate (`tools/gate.sh`, `LIFT_BUILD_DIR=build-ld-12`) | gate ok |
 | Parity (`tools/parity.sh`) | parity ok |
-| LobbyDaemon MATCH | 97 -> 122 (+25) over main |
+| LobbyDaemon MATCH | 130 -> 155 (+25) over main ef056b3 |
 | CacheGate, LobbyGate, SmartCouponDaemon, PostOfficeDaemon MATCH | 456, 658, 630, 694 (+0 each, no MATCH lost) |
 
-The gain is 16 card functions and 9 shared functions that the new code reaches for the first time.
+The gain is 16 card functions and 9 shared functions. 8 shared functions pair for the first time. 1 shared function changes from DIFF to MATCH.
 `0x2fa90` and `0x2fad0` are scored under the folded names `CliSessionLeaveWorldMessage::Dispatch` and `CliSessionEnterWorldMessage::Dispatch` (ICF).
 
 | Group | New MATCH |
 | --- | --- |
 | Card (16) | `LobbyMessage::~LobbyMessage`, `LobbyMessage::Dispatch`, `CliSessionLeaveWorldMessage::Dispatch` (`0x2fa90`), `CliSessionEnterWorldMessage::Dispatch` (`0x2fad0`), the 8 `LobbyTick` and `LobbyTickEvent` functions, `TencentUIC::Initialize`, `TencentUIC::CheckNameFilter`, `tss_load_sdk`, `_snprintf_s<1024>` |
-| Shared (9) | `RefCntList::Pushback`, `RefCntList::Remove`, `TimerQueue::Add`, `TimerQueue::addLongTermQueue`, `Timer::~Timer`, `Timer::EventId`, `CrashHandler::MakeCrash`, `Network::iocpHandle`, `Log::Write` (the error-code overload) |
+| Shared (9) | New pair: `RefCntList::Pushback`, `RefCntList::Remove`, `TimerQueue::Add`, `TimerQueue::addLongTermQueue`, `Timer::~Timer`, `Timer::EventId`, `Network::iocpHandle`, `Log::Write` (the error-code overload). DIFF -> MATCH: `CliSession::NotifyChangedGradeLevel` (88.9 -> 100; ld-7 found an image-size immediate filter in funcdiff; our image is now larger) |
 
-New paired DIFF that is not on this card: `Log::WriteV` 95.2.
+New paired DIFFs that are not on this card (shared BloodLib code). This card does not edit BloodLib.
+
+| Function | Score | Reason | Fix |
+| --- | ---: | --- | --- |
+| `Log::WriteV` | 95.2 | Calls 86: the original calls `LogBuffer::Prepare` out of line. Our build inlines it (`GetLocalTime` in the caller). | A4 `noinline` on `LogBuffer::Prepare`. BloodLib follow-up. |
+| `operator delete(void*, void*)` (`0x1000`) | 83.3 | Refs 50: the `Memory.h` path literal has the CacheGate project path. The original has the LobbyDaemon project path. | A6: a `MemoryManagerLobbyDaemon.cpp` wrapper that sets `LIFT_MEMORY_H_FILE` for LobbyDaemon. BloodLib follow-up. |
+
 `RefCntList::~RefCntList` 30.3 (lift-lobbydaemon-3) is unchanged from the baseline.
 
 ## Lifted
@@ -40,7 +46,7 @@ New paired DIFF that is not on this card: `Log::WriteV` 95.2.
 | LobbyMessage | `0x2fb10` | `CliSessionGradeChangedMessage::Dispatch` | 83.3 | no |
 | LobbyStats | `0x5a0b0` | `LobbyStats::Initialize` | 93.3 | no |
 | LobbyStats | `0x5a1d0` | `LobbyStats::HandleEvent` | 33.3 | no |
-| LobbyStats | `0x5a590` | `swprintf_s<260>` | - | not scored (funcdiff skips templates; the function is in the built PDB) |
+| LobbyStats | `0x5a590` | `swprintf_s<260>` | 100.0 | yes (already MATCH on main) |
 | LobbyTick | `0x5a610` | `LobbyTick::~LobbyTick` | 100.0 | yes |
 | LobbyTick | `0x5a6e0` | `LobbyTick::Add` | 100.0 | yes |
 | LobbyTick | `0x5a770` | `LobbyTick::Remove` | 100.0 | yes |
@@ -97,3 +103,4 @@ Other changes:
 | --- | --- | --- |
 | `CliSessionStopPcCafeChargeMessage::~CliSessionStopPcCafeChargeMessage` (`0x32b60`, `CliSession.cpp`) | ld-7 or the integration step | The body is empty in the HR. Replace the `LIFT_STUB` with an empty body. The `CliSessionMessage` base destructor releases the session reference. This card does not edit `CliSession.cpp`. |
 | `CliSessionMileageInterimDepositMessage::Dispatch` (`0x2fb60`) | after ld-5 | Lift it when the `PcCafeMileage` layout is on main. |
+| `Log::WriteV` and `operator delete(void*, void*)` (`0x1000`) | BloodLib follow-up | A6: add a `MemoryManagerLobbyDaemon.cpp` wrapper with the LobbyDaemon `LIFT_MEMORY_H_FILE`. A4: `noinline` on `LogBuffer::Prepare`. Check the other 4 exes for MATCH loss. |

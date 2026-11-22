@@ -1057,11 +1057,11 @@ Card lift-lobbydaemon-12: AuctionEscrow, LobbyStats, LobbyTick, TencentUIC, Lobb
 | --- | --- |
 | Lifted | 23 |
 | Not done | 3 (`CliSessionMileageInterimDepositMessage::Dispatch`, `LobbyStats::update`, `sprintf_s<1024>`) |
-| LD MATCH | 97 -> 122 over main (+25: 15 card functions, 10 shared functions reached for the first time). The other 4 exes: +0, no MATCH lost. |
+| LD MATCH | 130 -> 155 over main ef056b3 (+25: 16 card functions, 9 shared functions). The other 4 exes: +0, no MATCH lost. |
 
 What worked (count = functions made MATCH):
 - The `/INCLUDE` dead-strip rule gives the first real LD gain. Leaf modules with no layout dependency (LobbyTick, TencentUIC,
-  LobbyMessage) reach MATCH at once, and they pull shared code (`TimerQueue::Add`, `RefCntList::Pushback`) into the exe: +10.
+  LobbyMessage) reach MATCH at once, and they pull shared code (`TimerQueue::Add`, `RefCntList::Pushback`) into the exe: +9 shared.
 - A17 error block first: `LobbyTick::Add` 58.3 -> 100, `LobbyTick::Remove` 80.6 -> 100, `TencentUIC::Initialize` 95.2 -> 100 (3).
   The HR pseudocode shows `if (p != nullptr) { ... } else { log }`, but the original layout has the log block first.
   Read the disassembly order, not the HR branch order.
