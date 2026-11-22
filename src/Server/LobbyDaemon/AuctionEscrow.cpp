@@ -9,15 +9,15 @@
 #pragma comment(linker, "/INCLUDE:?GetRollbackEscrowPostMessage@AuctionEscrow@@SA_NPEAUTryAuctionEscrowRollbackOutParam@LobbyDB@@PEA_WH@Z")  // LIFT: keep until the caller is lifted (0x14770).
 
 // 0x135e0
-bool __printXml(wchar_t*& __lob_json_buf, wchar_t* __lob_json_end, wchar_t const* fmt, ...)
+bool __printXml(wchar_t*& __xmlbuf, wchar_t* __xmlend, wchar_t const* fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
-    int count = _vsnwprintf_s(__lob_json_buf, __lob_json_end - __lob_json_buf, static_cast<size_t>(-1), fmt, args);
+    int count = _vsnwprintf_s(__xmlbuf, __xmlend - __xmlbuf, static_cast<size_t>(-1), fmt, args);
     va_end(args);
     if (count < 0)
         return false;
-    __lob_json_buf += count;
+    __xmlbuf += count;
     return true;
 }
 

@@ -11,9 +11,11 @@ class LobbyMessage
 {
 public:
     virtual ~LobbyMessage();  // 0x2f9d0
-    virtual void Dispatch(MembershipMileage*) {}  // 0x32b50 (folded)
-    virtual void Dispatch(PcCafeMileage*) {}  // 0x32b50 (folded)
+    // LIFT: MSVC reverses overloaded virtuals in the vtable. The PDB slots are
+    // MembershipMileage* at +8, PcCafeMileage* at +16, LobbyMessageAcceptor* at +24.
     virtual void Dispatch(LobbyMessageAcceptor* acceptor);  // 0x2f9e0
+    virtual void Dispatch(PcCafeMileage*) {}  // 0x32b50 (folded)
+    virtual void Dispatch(MembershipMileage*) {}  // 0x32b50 (folded)
 };
 static_assert(sizeof(LobbyMessage) == 0x8, "sizeof LobbyMessage");
 
