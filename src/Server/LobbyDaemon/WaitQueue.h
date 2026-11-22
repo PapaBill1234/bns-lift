@@ -69,3 +69,30 @@ private:
     int _maxWaitingPlayer;                                 // +264
     int _currentWaitingPlayer;                             // +268
 };
+
+// LIFT: WaitQueueInfo and WaitInfo are PDB structs (sizes 0x8 and 0x2C). Used by LobbyGateChannel::SendStartWaitNotify (0xbd6e0).
+struct WaitQueueInfo
+{
+    WaitQueue::Type queueType;
+    short waitingPlayerCount;
+};
+static_assert(sizeof(WaitQueueInfo) == 0x8, "sizeof WaitQueueInfo");
+static_assert(offsetof(WaitQueueInfo, queueType) == 0x0, "WaitQueueInfo::queueType");
+static_assert(offsetof(WaitQueueInfo, waitingPlayerCount) == 0x4, "WaitQueueInfo::waitingPlayerCount");
+
+struct WaitInfo
+{
+    short pos;
+    int turn;
+    long avg;
+    WaitQueue::Type queueType;
+    int waitQueueInfoCount;
+    WaitQueueInfo waitQueueInfo[3];
+};
+static_assert(sizeof(WaitInfo) == 0x2C, "sizeof WaitInfo");
+static_assert(offsetof(WaitInfo, pos) == 0x0, "WaitInfo::pos");
+static_assert(offsetof(WaitInfo, turn) == 0x4, "WaitInfo::turn");
+static_assert(offsetof(WaitInfo, avg) == 0x8, "WaitInfo::avg");
+static_assert(offsetof(WaitInfo, queueType) == 0xC, "WaitInfo::queueType");
+static_assert(offsetof(WaitInfo, waitQueueInfoCount) == 0x10, "WaitInfo::waitQueueInfoCount");
+static_assert(offsetof(WaitInfo, waitQueueInfo) == 0x14, "WaitInfo::waitQueueInfo");

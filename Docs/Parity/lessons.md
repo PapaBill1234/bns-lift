@@ -1350,3 +1350,27 @@ Notes:
 - Merging two cards that each added a file-scope helper for the same inlined code (`LgpChannelId` and `ChannelIdOf`): keep one `static __forceinline` helper with a `const` argument. The scores did not change. Also check for a second definition of a placeholder (`BnsCommonConfig::Config`) when the later card adds the real file.
 - A7 on `skipRepeatFormat` (`static_cast<PacketFormatIterator&>(pdr).skipRepeatFormat();`): the original calls it through the vtable, it does not inline it. A call on a local `PacketDecomposer` binds statically in VS2010. The cast gives the `call [rax+0x38]`. It is needed for MATCH, but alone it did not change the score of `SetAppDataNotify` (99.2).
 - Layout of a ternary after a repeat end (`SetAppDataNotify` 0x907e0): the original puts the `GetId` call of the wid in a far block (`cmp [rdi+0x18],rbx; jne far`). Three forms for `short wid`: `p != nullptr ? GetId : 0` 99.2, `short wid = 0; if (p != nullptr) wid = GetId` 97.7, `p == nullptr ? 0 : GetId` 100.0 (MATCH, +1). Try the reversed ternary when the original has a `jne` to a far block.
+
+## ld-24
+
+Card lift-lobbydaemon-24: LobbyGateChannel part 1 (41), PostOfficeChannel (7), PostOfficeClientSideHandlerList (1), PostOfficePacketHandler (4).
+
+| Item | Result |
+| --- | --- |
+| LD MATCH | 436 -> 521 (+85 over main 9d0ef81: 38 card functions, 47 shared functions). The other 4 exes: +0. |
+| Dead-strip | 11 more `/INCLUDE` pragmas were needed. Without them the `Send*` functions were unpaired and not counted. |
+| Build input | The worktree had no `vendor/zstd/src` (see ld-17). Copy it before the first parity run. |
+
+What worked:
+- A21 and A10: a local pointer to the member list (`PipeConsole::ItemList* const invalidList = &console->_invalid;`) and one to the lock, taken as in the pseudocode (`p_invalid`, `p_CS`).
+  `PostOfficeChannel::Connect` 90.3 -> 97.0 and `PostOfficeSessionHandler::OnClose` 93.3 -> 97.0 (consts 80 and 89 -> 100). The extra `0x278` and missing `0x60` immediates came from `_invalid` and the key offset
+  being computed at each use. Only a `L""` reference (`valueString`) is left (see B, `addNode`).
+- A data table that a lifted handler reads needs its own definition in the table module (`PostOfficePacketClientSideHandlerList`, `0x203770`). Read the entries from the exe with `pefile` (value - image base = RVA).
+  Take the type from the public name (`PAP6A_NPEBVSession@@PEBVPacket@@@ZA` = `Daemon::PacketHandler[]`), not `void*`. A checkpoint that says "compile ok" does not test this. Only the VS2010 link does.
+- A call into a module with no owner card (`Goods::Fetch` `0x6010`) fails the link. Make a skeleton file with a `LIFT_STUB` body and a LIFT comment. Do not lift it inside another card.
+
+What failed (1 try each):
+- `HandlePostOfficeHelloFail` 93.3: the decomposer fields in the pseudocode order (`format`, `reason = 0`, `len`, `index`, `offset`). No change. The original keeps zero in `rbx` and uses `lea r8d, [rbx + 0x23]`.
+  Ours uses `ecx`. Not solved.
+- `PostOfficeSessionHandler::PacketHandler` 97.6: `if (session != nullptr && packet != nullptr) { ... } crash block last`. No change. The compiler puts the block first in both forms.
+  The original has it last, with the other `Log::Write` blocks inline.

@@ -387,6 +387,7 @@ add_library(lift_lobbydaemon STATIC
   src/Server/Shared/NPChannel2.cpp  # LIFT: Packet::FreeSize (0x29d0) and NPMsgHelper::LocaleHourToUTCTime (0x2be0), called by lift-lobbydaemon-15
   src/Server/Shared/BnsCommonConfigDefinition.cpp  # LIFT: BnsCommonConfig::Config, read by lift-lobbydaemon-21 (0x907e0)
   src/Server/LobbyDaemon/AbandonChargeJob.cpp
+  src/Server/LobbyDaemon/AccountInventory.cpp  # LIFT: Goods::Fetch (0x6010) stub; no card owns the module, SendListGoodsOk (0xbe770) calls it
   src/Server/LobbyDaemon/AccountInventoryChannel.cpp
   src/Server/LobbyDaemon/AccountInventoryLobbyPacketHandler.cpp
   src/Server/LobbyDaemon/ActivateGradeJob.cpp

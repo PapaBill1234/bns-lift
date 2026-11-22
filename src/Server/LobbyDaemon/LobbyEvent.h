@@ -6,6 +6,7 @@
 struct EventContext;
 class FragmentPacketConcatenater;
 class Packet;
+class Session;
 class SharedChannel;
 
 class NPLobbyMessageHandleEvent
@@ -15,12 +16,20 @@ public:
     virtual bool HandleEvent(EventContext*, unsigned long);  // 0xbbb60
 };
 
-class PacketHandleEvent
+class PacketHandleEvent : public DynamicEventObject
 {
 public:
+    // LIFT: The constructor is inlined (PostOfficeSessionHandler::PacketHandler 0x64420). Layout: include/pdb/LobbyDaemon/types.h.
+    PacketHandleEvent(Session const*, Packet const*, void*);
     virtual ~PacketHandleEvent();  // 0xbbbe0
+    virtual unsigned int EventId() const { return 0; }  // 0x5a0a0 (folded)
     virtual bool HandleEvent(EventContext*, unsigned long);  // 0xbbc60
+
+    Session const* _session;
+    Packet const* _packet;
+    void* _handler;
 };
+static_assert(sizeof(PacketHandleEvent) == 0x30, "sizeof PacketHandleEvent");
 
 class SharedChannelFragmentPacketHandleEvent : public DynamicEventObject
 {

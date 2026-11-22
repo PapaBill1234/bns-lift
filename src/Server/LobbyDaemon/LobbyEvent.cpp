@@ -3,6 +3,7 @@
 #include "FragmentPacket.h"
 #include "LiftStub.h"
 #include "Memory.h"
+#include "Session.h"
 #include "SharedChannel.h"
 
 #pragma comment(linker, "/INCLUDE:??0SharedChannelPacketHandleEvent@@QEAA@PEAVSharedChannel@@PEAVPacket@@P6A_N0PEBV2@@Z@Z")  // LIFT: Keep 0xbb7f0 until its caller is lifted.
@@ -80,6 +81,14 @@ NPLobbyMessageHandleEvent::~NPLobbyMessageHandleEvent()
 bool NPLobbyMessageHandleEvent::HandleEvent(EventContext*, unsigned long)
 {
     LIFT_STUB(0xbbb60);
+}
+
+// LobbyEvent.cpp line 107 (no LD RVA: the constructor is inlined in PostOfficeSessionHandler::PacketHandler 0x64420)
+PacketHandleEvent::PacketHandleEvent(Session const* session, Packet const* packet, void* handler)
+    : _session(session), _packet(packet), _handler(handler)
+{
+    if (session != nullptr)
+        const_cast<Session*>(session)->addReferenceCount(L"LobbyEvent.cpp", 107);
 }
 
 // 0xbbbe0

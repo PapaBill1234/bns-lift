@@ -1,6 +1,9 @@
 // LobbyGateChannel.obj (LobbyDaemon PDB, 2019 + PDB). Wave 0: declarations of the stubbed functions only.
-// LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
+// LIFT: LobbyGateChannel has its base and members (ld-24 batch 1). The other classes have no layout yet.
 #pragma once
+#include <stddef.h>
+#include "SharedChannel.h"
+#include "Character.h"
 
 class GameAccountExpInfo;
 struct Goods;
@@ -12,9 +15,10 @@ class Session;
 struct WaitInfo;
 union id128;
 
-class LobbyGateChannel
+class LobbyGateChannel : public SharedChannel
 {
 public:
+    void SendInitSessionWithNPTokenOk(unsigned long long gatekey, unsigned long long clikey, id128 const& nptoken, id128 const& portalAccountId);  // 0xbbe90
     void SendInitSessionWithNPTokenFail(unsigned long long, short);  // 0xbbfb0
     void SendInitSessionWithLobbyTokenOk(unsigned long long, unsigned long long);  // 0xbc080
     void SendInitSessionWithLobbyTokenFail(unsigned long long, short);  // 0xbc150
@@ -30,7 +34,9 @@ public:
     void SendCreateCharacterOk(unsigned long long, unsigned long long, id128 const&, short, wchar_t const*, char*, short, long long, char, long long, int);  // 0xbcdd0
     void SendCreateCharacterFail(unsigned long long, id128 const&, short);  // 0xbcf40
     void SendDeleteCharacterOk(unsigned long long, id128 const&, char, long);  // 0xbd030
+    void SendDeleteCharacterFail(unsigned long long, id128 const&, Character::ClientState, short);  // 0xbd130
     void SendCancelWaitCharacterDeletionOk(unsigned long long, id128 const&);  // 0xbd250
+    void SendCancelWaitCharacterDeletionFail(unsigned long long, id128 const&, Character::ClientState, short);  // 0xbd330
     void SendEndWaitCharacterDeletionNotify(unsigned long long, id128 const&);  // 0xbd450
     void SendGetEnterWorldTokenFail(unsigned long long, short);  // 0xbd530
     void SendGetEnterWorldTokenOk(unsigned long long, unsigned long long, short);  // 0xbd600
@@ -43,6 +49,7 @@ public:
     void SendGetChargeInfoOk(unsigned long long, char, char, long, short, char, unsigned int, char, char, char);  // 0xbdfd0
     void SendGetChargeInfoFail(unsigned long long, short);  // 0xbe120
     void SendRecoverCharacterOk(unsigned long long, id128 const&);  // 0xbe1f0
+    void SendRecoverCharacterFail(unsigned long long, id128 const&, Character::ClientState, short);  // 0xbe2d0
     void SendBindCharacterSlotFail(unsigned long long, id128 const&, unsigned long long, short);  // 0xbe3f0
     void SendAccountInventoryNotify(unsigned long long, char, unsigned long long);  // 0xbe4f0
     void SendGetGoodsCountOk(unsigned long long, int);  // 0xbe5d0
@@ -76,7 +83,13 @@ public:
     void SendActivateGradeFail(unsigned long long, int, int, short);  // 0xc0670
     void SendChangedGradeNotify(unsigned long long, int, int, bool, int, long long, long long, wchar_t const*);  // 0xc0790
     void SendChangedGradeLevelNotify(unsigned long long, int, int, int, int, int);  // 0xc0970
+
+    bool _broadcastable;
+    bool _isMobileGate;
 };
+static_assert(sizeof(LobbyGateChannel) == 0x28, "sizeof LobbyGateChannel");
+static_assert(offsetof(LobbyGateChannel, _broadcastable) == 0x20, "LobbyGateChannel::_broadcastable");
+static_assert(offsetof(LobbyGateChannel, _isMobileGate) == 0x21, "LobbyGateChannel::_isMobileGate");
 
 class LobbyGateChannelManager
 {

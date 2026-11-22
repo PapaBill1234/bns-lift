@@ -119,6 +119,8 @@ private:
     friend class LobbyD;  // LIFT: LobbyD::Hello (LobbyGate 0x9bd0) uses _invalid and addNode (inlined SetInvalidInfo).
     friend class LobbyDSessionHandler;  // LIFT: friend; inlined private access: OnConnect/OnClose (LobbyGate 0x9310, 0x94c0) use _invalid and addNode.
     friend class LobbyGate;  // LIFT: LobbyGate::reload (LobbyGate 0x13770) calls addNode (inlined SetInvalidInfo).
+    friend class PostOfficeChannel;  // LIFT: friend; inlined private access: PostOfficeChannel::Connect (LobbyDaemon 0x639f0) uses _invalid and addNode.
+    friend class PostOfficeSessionHandler;  // LIFT: friend; inlined private access: PostOfficeSessionHandler::OnClose (LobbyDaemon 0x642e0) uses _invalid and addNode.
     friend class PostOfficeDaemon;  // LIFT: initNetwork (PostOfficeDaemon 0x135e0) inlines SetInvalidInfo.
     friend class LobbyGateReloadInvalidRestoreTimer;  // LIFT: friend; inlined private access: restoreInvalid (LobbyGate 0x127a0) uses _invalid.
 };
