@@ -22,7 +22,7 @@ public:
     static void operator delete(void*) {}
 
     virtual ~PcCafe();  // 0x63340 (scalar deleting destructor)
-    virtual Type GetType() = 0;
+    virtual Type GetType() const = 0;
 
 protected:
     virtual void onSet(CliSession*) = 0;

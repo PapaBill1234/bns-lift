@@ -1085,7 +1085,7 @@ bool CliSession::NotifyChargeRemainTime(long, short, unsigned int)
 bool CliSession::setRole(unsigned int const* const roles, int const roleCount)
 {
     _acb._roles.Reset();
-    for (int i = 0; i < roleCount; ++i)
+    for (long long i = 0; i < roleCount; ++i)
     {
         _acb._roles.Set(roles[i]);
         if (roles[i] < Role::ROLE_COUNT)

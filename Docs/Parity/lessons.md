@@ -1087,9 +1087,9 @@ Card lift-lobbydaemon-13: CliSession part 3, CliSessionManager (56 functions).
 
 | Item | Result |
 | --- | --- |
-| Lifted | 27 |
-| Not done | 29 (most need the `LobbyDaemon`, `LobbyGateChannel` or LobbyJob layouts; `CliSession::_pool` needs the LD ObjectPool module) |
-| LD MATCH | 195 -> 217 over main 75f0769 (+22: 18 card functions, 4 shared functions). The other 4 exes: +0, no MATCH lost. |
+| Lifted | 25 |
+| Not done | 31 (most need the `LobbyDaemon`, `LobbyGateChannel` or LobbyJob layouts; `CliSession::_pool` needs the LD ObjectPool module) |
+| LD MATCH | 195 -> 218 over main 75f0769 (+23: 19 card functions, 4 shared functions). The other 4 exes: +0, no MATCH lost. |
 
 - The clang gate links static libs. An object with an unresolved symbol passes the gate when no other object pulls it. The VS2010
   parity build links each object and fails. Example: a `CliSession::_pool` definition needs `ObjPool::ObjPool`, but `ObjectPool.cpp`
@@ -1099,6 +1099,9 @@ Card lift-lobbydaemon-13: CliSession part 3, CliSessionManager (56 functions).
 - A small `GetKind` can fold (ICF) with a function of another module. funcdiff then scores it under the other name
   (`LeaveGameWorldToken::GetKind`, `Aes128::GetType`). A `return 0` body folds with many names and gets no new score.
 - funcdiff `SKIP_NAME` also skips `std::` and backtick names. STL instances and `dynamic initializer` / `atexit` functions have no score.
-- An inlined loop over a small enum (`Authority::Merge`, `for i < OP_MAX`) gives the same code as separate `|=` stores. The
-  `setRole` DIFF (93.3, one extra `0x4` const) did not change. 1 try.
+- An inlined loop over a small enum (`Authority::Merge`, `for i < OP_MAX`) gives the same code as separate `|=` stores (A19, no change).
+- `CliSession::setRole` (`0x39f70`, 93.3, one extra `0x4`): A8 (`int const role = roles[i]`) gave 88.9, with `int` or `long long` index. A11 alone
+  worked: `for (long long i = 0; i < roleCount; ++i)` with `roles[i]` read in place gives 100.0 (MATCH). The original steps a 64-bit index,
+  not a pointer. Try the index type before you add a local.
+- An STL instance (`std::vector<...>::~vector`) is not in the PDB when no lifted caller makes it. Do not list it as Lifted (skeptic check 2b).
 - The 4 `CliSessionTable` index functions paired for the first time when their presence callers were lifted (shared gain).
