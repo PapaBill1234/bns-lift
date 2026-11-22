@@ -52,7 +52,10 @@ public:
 class CoolDown : public Timer
 {
 public:
-    // LIFT: ~CoolDown, TimerClass and TimerId have no LD RVA in the index (folded). A later card lifts them.
+    // LIFT: the constructor is inline at the allocation site (LobbyDaemon::cooldown 0x9ef40).
+    CoolDown() : _run(false), _period(0), _end(0), _duration(0) {}
+    // LIFT: ~CoolDown is compiler-generated. TimerClass and TimerId have no LD RVA in the index: vftable
+    // ??_7CoolDown@@6B@ (rva 0x19f550) slots 6 and 7 point to the folded 0x5a0a0 (return 0).
     virtual unsigned int TimerClass() const;
     virtual unsigned long long TimerId() const;
     virtual bool HandleEvent(EventContext*, unsigned long);  // 0x995c0
@@ -198,6 +201,8 @@ public:
     virtual long GetTimerMaxTime();  // 0x9af70
     bool SetTimeZoneBias();  // 0x9af80
     static void FailedEventObjectHandler(EventObject*);  // 0x9b0c0
+    BannedWordFilterResult FilterBannedWord(wchar_t const*);  // 0x9f240
+    bool CheckServiceItemDataId(ServiceItemType, unsigned int);  // 0x9f340
     static wchar_t const* GetAddressStringWForLogs(unsigned long);  // 0x9f3c0
     // LIFT: ❓ LobbyDaemon::setArgument has no LD RVA in the index. The vftable slot folds with another
     // function. SmartCouponDaemon 0x14a90 returns false. This body is the same ❓ and not verified in the LD vftable.

@@ -6,22 +6,26 @@
 #include <string.h>
 #include <time.h>
 #include <wchar.h>
+#include "../../External/BannedWordFilter/BannedWordFilterLib.h"
 #include "Channel.h"
 #include "CliSession.h"
 #include "CliSessionManager.h"
 #include "Console.h"
+#include "FragmentPacket.h"
 #include "GameWorld.h"
 #include "InfoGateChannel.h"
 #include "LobbyConfig.h"
 #include "LiftStub.h"
 #include "Log.h"
 #include "Memory.h"
+#include "Network.h"
 #include "MemoryManager.h"
 #include "NPChannel.h"
 #include "Packet.h"
 #include "PacketUtil.h"
 #include "PipeConsole.h"
 #include "RefCntObject.h"
+#include "Session.h"
 
 LobbyDaemon* LobbyDaemon::_instance = nullptr;  // PDB static member (file-scope data in the original).
 CoolDown* GCoolDown = nullptr;                  // PDB global.
@@ -705,10 +709,29 @@ bool LobbyDaemon::reload(wchar_t**, int)
     LIFT_STUB(0x9e5b0);
 }
 
+// LIFT: no LD RVA. vftable ??_7CoolDown@@6B@ slot 6 points to the folded 0x5a0a0 (xor eax, eax; ret).
+unsigned int CoolDown::TimerClass() const
+{
+    return 0;
+}
+
+// LIFT: no LD RVA. vftable ??_7CoolDown@@6B@ slot 7 points to the folded 0x5a0a0 (xor eax, eax; ret).
+unsigned long long CoolDown::TimerId() const
+{
+    return 0;
+}
+
 // 0x9ef40
+// LIFT: the return value is as in the exe (0x9efdc): Start ok returns false, Start fail logs and returns true.
 bool LobbyDaemon::cooldown()
 {
-    LIFT_STUB(0x9ef40);
+    if (GCoolDown == nullptr)
+        GCoolDown = ::new (Memory::_Manager[2]->Alloc(sizeof(CoolDown), L"LobbyDaemon.cpp", 2234)) CoolDown();
+    // BUG: 0x9ef40 does not check GCoolDown after a failed Alloc. Start then runs with a null this.
+    if (GCoolDown->Start(5000, 2 * _config->_lobbyTokenLifeTime))
+        return false;
+    Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 2238, L"[lobby], start cooldown fail");
+    return true;
 }
 
 // 0x9f010
@@ -723,16 +746,89 @@ bool LobbyDaemon::setupNpScheduleInfo()
     LIFT_STUB(0x9f130);
 }
 
-// 0x9f3c0
-wchar_t const* LobbyDaemon::GetAddressStringWForLogs(unsigned long)
+// 0x9f240
+#pragma comment(linker, "/INCLUDE:?FilterBannedWord@LobbyDaemon@@QEAA?AW4BannedWordFilterResult@1@PEB_W@Z")  // LIFT: keep until the caller is lifted (0x9f240)
+LobbyDaemon::BannedWordFilterResult LobbyDaemon::FilterBannedWord(wchar_t const* word)
 {
-    LIFT_STUB(0x9f3c0);
+    if (word == nullptr || wcslen(word) == 0)
+        return SWF_INVALID_PARAMETER;
+    bool filtered = false;
+    if (_bannedWordFilter == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 2302, L"[lobby], filter word fail;not ready, word:%s", word);
+        return SWF_ERROR;
+    }
+    if (!_bannedWordFilter->FilterName(word, &filtered))
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 2307, L"[lobby], filter word fail;try fail, word:%s", word);
+        return SWF_ERROR;
+    }
+    if (filtered)
+    {
+        Log::Write(Log::LT_DEBUG, L"LobbyDaemon.cpp", 2312, L"[lobby], forbidden word, name:%s", word);
+        return SWF_FORBIDDEN;
+    }
+    return SWF_OK;
+}
+
+// 0x9f340
+#pragma comment(linker, "/INCLUDE:?CheckServiceItemDataId@LobbyDaemon@@QEAA_NW4ServiceItemType@1@I@Z")  // LIFT: keep until the caller is lifted (0x9f340)
+bool LobbyDaemon::CheckServiceItemDataId(ServiceItemType type, unsigned int itemDataId)
+{
+    if (_serviceItems == nullptr || static_cast<unsigned int>(type) > SERVICEITEMTYPE_RENAME_CHARACTER_BY_SYSTEM)
+        return false;
+    // LIFT: the exe inlines std::binary_search (VS2010 _Lower_bound loop). include/vs2010/algorithm has no
+    // binary_search, so the loop is written here.
+    typedef std::vector<unsigned int, StlAllocator<unsigned int, 2> > IdList;
+    IdList const& idList = _serviceItems->_idList[type];
+    IdList::const_iterator first = idList.begin();
+    IdList::const_iterator const last = idList.end();
+    long long count = last - first;
+    while (count > 0)
+    {
+        long long const half = count / 2;
+        if (first[half] < itemDataId)
+        {
+            first += half + 1;
+            count -= half + 1;
+        }
+        else
+        {
+            count = half;
+        }
+    }
+    return first != last && !(itemDataId < *first);
+}
+
+// 0x9f3c0
+#pragma comment(linker, "/INCLUDE:?GetAddressStringWForLogs@LobbyDaemon@@SAPEB_WK@Z")  // LIFT: keep until the caller is lifted (0x9f3c0)
+wchar_t const* LobbyDaemon::GetAddressStringWForLogs(unsigned long addr)
+{
+    if (_instance != nullptr)
+    {
+        LobbyConfig const* const config = _instance->_config;
+        if (config != nullptr && !config->_allowClientIPAddressInLogs)
+            addr = 0;
+    }
+    return Network::GetAddressStringW(addr);
 }
 
 // 0x9f3f0
-bool ConcatenatePacket(Session const*, Packet const*, bool&)
+bool ConcatenatePacket(Session const* session, Packet const* packet, bool& completed)
 {
-    LIFT_STUB(0x9f3f0);
+    completed = false;
+    FragmentPacketConcatenater* concatenater = static_cast<FragmentPacketConcatenater*>(session->_concatenater);
+    if (concatenater == nullptr)
+    {
+        FragmentPacketConcatenater c;
+        concatenater = static_cast<FragmentPacketConcatenater*>(session->SetPacketConcatenater(&c));
+    }
+    // LIFT: the LD PDB gives Add (0x1530) 2 parameters. The shared header has a 3rd, unused parameter.
+    // 0x9f4f8 does not set r9b, so false is given here.
+    if (concatenater->Add(packet, &completed, false))
+        return true;
+    concatenater->Clear();
+    return false;
 }
 
 // 0x9a1b0. C linkage, the signature is not in the public. wmain_bridge.c calls it.

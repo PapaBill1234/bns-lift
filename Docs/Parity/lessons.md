@@ -1292,3 +1292,15 @@ What did not reach MATCH:
 Build facts:
 - A new worktree can lack the ignored `vendor/zstd/src` (same as ld-17). Copy it before `tools/parity.sh`.
 - A full `tools/parity.sh` right after `gate.sh` gave LD 460 once, while the same source gave 462 in `tools/parity.sh LobbyDaemon` and in a second full run. Run parity twice when the LD count looks low. ❓ (cause not found)
+
+## ld-20
+
+Card lift-lobbydaemon-20: LobbyDaemon part 2 (21 functions) and BLDaemonInfo (9 functions). LD MATCH 436 -> 464 (+28) over main 9d0ef81.
+
+| Item | Fact |
+| --- | --- |
+| A15 again, ICF side effect | `BLDaemonInfoTable::add` (0x40e30) inserted `value_type`. Ours made `_Buynode<std::pair<BLDaemonID const,...>>`; the PDB has `_Buynode<std::pair<BLDaemonID,...>>`. `/OPT:ICF` folds this node builder with the one of `CliSessionTable::Insert_index_pcid`, so that MATCH function turned DIFF (100 -> 93.3, calls 80). Insert `std::pair<K, V>(k, v)`: `add` 95.2 -> 100 and `Insert_index_pcid` back to 100. A new map instance can break a MATCH in another module through ICF. Check the whole LD diff after each new map. |
+| A27 works with a `throw()` placement new | `LobbyDaemon::cooldown` (0x9ef40): `GCoolDown = mem ? new (mem) CoolDown() : nullptr;` stored the global in each branch and reloaded it (refs 93). `GCoolDown = ::new (Alloc(...)) CoolDown();` gives the null test (PlacementNew.h is `throw()`), one store, and MATCH (97.8 -> 100). |
+| Range check form | `LobbyDaemon::CheckServiceItemDataId` (0x9f340): the original has `cmp 7; ja`. `(unsigned)type >= SERVICEITEMTYPE_MAX` gave `cmp 8` (consts 50, 83.3). `(unsigned)type > SERVICEITEMTYPE_RENAME_CHARACTER_BY_SYSTEM` (the form of `ServiceItems::Add`) gives MATCH. |
+| Dead-strip | 9 `/INCLUDE:` pragmas (6 `BLDaemonInfoTable`, `FilterBannedWord`, `CheckServiceItemDataId`, `GetAddressStringWForLogs`) paired 14 functions: `load` and `add` come with `Load`/`Update`, and `FilterName`, `StrNormalize`, `ConstFilterName` with `FilterBannedWord`. |
+| Not tried | `BLDaemonInfoTable::load` 70.6 (the original interleaves the 5 inlined element blocks; ours groups the `_wcsicmp` calls) and `BLDaemonInfoTable::Clear` 57.8 (the original calls `_Tree::clear` out of line; ours inlines it into `_Erase`). Both below 85 and over the trial limit. |
