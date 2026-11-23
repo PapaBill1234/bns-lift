@@ -2050,6 +2050,62 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"HandleLobbyGame_CancelRegisterGuildNotify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleLobbyGame_CancelRenameGuildNotify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleLobbyGame_ChangeCharacterAppearanceFail": {
+"calls": 25,
+"consts": 55,
+"refs": 50,
+"score": 43.2,
+"status": "DIFF"
+},
+"HandleLobbyGame_ChangeCharacterAppearanceOk": {
+"calls": 21,
+"consts": 62,
+"refs": 50,
+"score": 44.3,
+"status": "DIFF"
+},
+"HandleLobbyGame_ChangeCharacterRaceFail": {
+"calls": 25,
+"consts": 55,
+"refs": 50,
+"score": 43.2,
+"status": "DIFF"
+},
+"HandleLobbyGame_ChangeCharacterRaceOk": {
+"calls": 21,
+"consts": 62,
+"refs": 50,
+"score": 44.3,
+"status": "DIFF"
+},
+"HandleLobbyGame_ChangeCharacterSexFail": {
+"calls": 25,
+"consts": 55,
+"refs": 50,
+"score": 43.2,
+"status": "DIFF"
+},
+"HandleLobbyGame_ChangeCharacterSexOk": {
+"calls": 21,
+"consts": 62,
+"refs": 50,
+"score": 44.3,
+"status": "DIFF"
+},
 "HandleLobbyGame_CreateCharacterFail": {
 "calls": 25,
 "consts": 29,
@@ -2077,6 +2133,27 @@
 "refs": 43,
 "score": 32.1,
 "status": "DIFF"
+},
+"HandleLobbyGame_DeleteGuildNotify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleLobbyGame_FinishRegisterGuildNotify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleLobbyGame_FinishRenameGuildNotify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "HandleLobbyGame_HelloReq": {
 "calls": 44,
@@ -2106,6 +2183,20 @@
 "score": 65.8,
 "status": "DIFF"
 },
+"HandleLobbyGame_RenameCharacterFail": {
+"calls": 25,
+"consts": 55,
+"refs": 50,
+"score": 43.2,
+"status": "DIFF"
+},
+"HandleLobbyGame_RenameCharacterOk": {
+"calls": 25,
+"consts": 55,
+"refs": 50,
+"score": 43.2,
+"status": "DIFF"
+},
 "HandleLobbyGame_RestoreCharacterFail": {
 "calls": 25,
 "consts": 29,
@@ -2126,6 +2217,20 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"HandleLobbyGame_SetAppDataNotify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleLobbyGame_UpdateAccountDataReq": {
+"calls": 8,
+"consts": 26,
+"refs": 9,
+"score": 14.2,
+"status": "DIFF"
 },
 "HandleLobbyGame_UpdateBotScoreNotify": {
 "calls": 100,
@@ -2436,10 +2541,10 @@
 "status": "DIFF"
 },
 "LobbyDB::LoadGameAccountContentQuotaList": {
-"calls": 94,
-"consts": 92,
+"calls": 100,
+"consts": 97,
 "refs": 100,
-"score": 95.3,
+"score": 99.1,
 "status": "DIFF"
 },
 "LobbyDB::LoadGameWorld": {
@@ -3128,7 +3233,28 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"NPChannel::SendMsg": {
+"calls": 76,
+"consts": 77,
+"refs": 84,
+"score": 79.2,
+"status": "DIFF"
+},
+"NPChannel::checkLibError": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "NPMsgHelper::LocaleHourToUTCTime": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"NPTransactionRegistry::Register": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -3226,12 +3352,33 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Packet::Decompose [?Decompose@Packet@@QEBAGPEAVPacketDecomposer@@HZZ]": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Packet::Decompose [?Decompose@Packet@@QEBAGPEAVPacketDecomposer@@PEAUVarData@1@@Z]": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Packet::Decompose [?Decompose@Packet@@QEBAGPEAVPacketDecomposer@@PEAUVarStr@1@@Z]": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Packet::Decompose [?Decompose@Packet@@QEBAGPEBDZZ]": {
 "calls": 100,
-"consts": 80,
+"consts": 100,
 "refs": 100,
-"score": 93.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Packet::FreeSize": {
 "calls": 100,
@@ -3270,10 +3417,10 @@
 },
 "PacketBuffer::Decompose": {
 "calls": 100,
-"consts": 98,
+"consts": 100,
 "refs": 100,
-"score": 99.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "PacketBuffer::deallocate_me": {
 "calls": 100,
@@ -3346,6 +3493,13 @@
 "status": "MATCH"
 },
 "PacketConcatenateBuffer::~PacketConcatenateBuffer": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PacketDecomposer::Reset": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -4031,6 +4185,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"SharedChannel::IsConnected": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "SharedChannel::RawChannel::GetId": {
 "calls": 100,
 "consts": 100,
@@ -4179,6 +4340,34 @@
 "status": "MATCH"
 },
 "StrNormalize": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"String::UnicodeToMultibyte": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"StsMsgLib::_StsMsgRequest::GetCommand": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"StsMsgLib::_StsMsgRequest::GetMessageType": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"StsMsgLib::_StsMsgRequest::GetTransactionId": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -4368,6 +4557,13 @@
 "status": "MATCH"
 },
 "ThreadManager::~ThreadManager": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TimeBasedPlayInfoList::~TimeBasedPlayInfoList": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
