@@ -1386,9 +1386,9 @@ What worked:
 
 What failed or is blocked:
 - A handler that calls `ObjPool::Checkout(&X::_pool)` is Not done until a LobbyDaemon ObjectPool card defines `ObjPool` and the `_pool` statics. This holds even when the job layouts are lifted from the PDB (same as ld-16).
-  A /INCLUDE pragma is not the issue here: the 5 handlers are reached from the handler table, so the link needs the symbols.
-- `GetServiceEntryListReq` 77.9 (calls 61): no form was tried (below 85). ❓ The call list is not compared.
+  The VS2010 link resolves all externals of `LobbyLobbyGatePacketHandler.obj`, even of functions that `/OPT:REF` removes later. A missing `<Job>::_pool` or `ObjPool::Checkout` fails the link.
+- `GetServiceEntryListReq` 77.9 -> 78.5 (calls 61 -> 63): the first lift had an explicit `fp.packet.Clear()` on each path. `~FragmentPacket` -> `~Packet` already calls `Packet::Clear` (inlined destructor), so every path ran Clear twice. Remove the explicit calls and let the destructor do the one Clear (A-pattern: destructor alone, as in `Client.cpp`). No other form was tried (below 85).
 
 Build facts:
 - A new worktree has no ignored `vendor/zstd/src`. All 5 exes then fail with `ZSTD_*` unresolved. Copy it from another worktree (`bb6eaf64`) and run `tools/gate.sh` again.
-- A lifted handler can pull a neighbour into the link and pair it (`CliSessionTable::Select`, +1 MATCH, not a card function).
+- A lifted handler can pull a neighbour into the link and pair it (`CliSessionTable::Select`). On main this neighbour is already MATCH, so the card adds +0 MATCH there.

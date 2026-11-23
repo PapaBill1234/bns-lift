@@ -11,15 +11,17 @@ The card has 18 functions (RVA `0xc6e30` to `0xcb330`). 1 is lifted. 17 are Not 
 | Not done | 17 |
 | `tools/gate.sh` (`LIFT_BUILD_DIR=build-ld-22`) | gate ok |
 | `tools/parity.sh` (same build) | parity ok |
-| LobbyDaemon MATCH, baseline (committed baseline of the branch base f8db35b) | 468 |
-| LobbyDaemon MATCH, final | 469 (+1) |
+| LobbyDaemon MATCH, baseline (main aefe11d) | 645 |
+| LobbyDaemon MATCH, final | 645 (+0) |
 | Card functions at MATCH | 0 of 1 lifted |
 | CacheGate, LobbyGate, SmartCouponDaemon, PostOfficeDaemon MATCH | 456, 658, 630, 694 (+0 each, no MATCH lost) |
+| `changedPaths` (src, include, CMakeLists.txt, cmake, tools, tests) | 1 (the `.cpp`). Docs are not counted. The diff touches 3 paths in total |
 
-LobbyDaemon parity: 469/2204 = 21.3 %. Paired 605, mean score 95.2.
-The +1 is not a card function. `CliSessionTable::Select` became MATCH (100.0) when the lifted handler called it and the linker kept it.
+LobbyDaemon parity: 645/2204 = 29.3 %. Paired 825, mean score 95.2. No MATCH lost.
+CacheGate, LobbyGate, SmartCouponDaemon, PostOfficeDaemon: +0 each.
+`CliSessionTable::Select` is already MATCH (100.0) on main. The card brings 0 new MATCH.
 Baseline files are unchanged. No `--accept` was run.
-`main` has moved on (ld-20 is accepted there). The gain is measured against the branch base.
+The branch is rebased onto main aefe11d (only `lessons.md` conflicted: both appends kept). The gain is measured against main.
 
 ## Checkpoint check
 
@@ -46,10 +48,12 @@ The reverted work (PDB layouts of the 5 jobs, 5 parameter structs, 5 handler bod
 
 | RVA | Function | Score | MATCH |
 | --- | --- | ---: | --- |
-| `0xc8aa0` | `HandleLobbyLobbyGate_GetServiceEntryListReq` | 77.9 | no |
+| `0xc8aa0` | `HandleLobbyLobbyGate_GetServiceEntryListReq` | 78.5 | no |
 
-`#pragma comment(linker, "/INCLUDE:...")` keeps it (the PDB public name is present: checked with `grep -a -F`). The handler table that calls it is still a stub.
-Funcdiff for this function: calls 61, consts 87, refs 86. It is below 85, so no codegen form was tried (see "Not tried").
+`#pragma comment(linker, "/INCLUDE:...")` keeps it (the PDB public name is present: checked with `grep -a -F`). The caller is not lifted. ❓ The lift has no caller for any `HandleLobbyLobbyGate_` handler yet.
+Funcdiff for this function: score 78.5, calls 63, consts 87, refs 86. It is below 85, so no codegen form was tried (see "Not tried").
+Repair 2 removed the 2 explicit `fp.packet.Clear()` calls (the original has one Clear per path, from the inlined `~FragmentPacket`). Score 77.9 -> 78.5, calls 61 -> 63.
+The cast is now `static_cast<LobbyGateChannel*>` (LobbyGateChannel derives from SharedChannel on main). The /INCLUDE comment gives the RVA of the kept function (0xc8aa0).
 
 ## Not done
 
@@ -85,6 +89,6 @@ Unblock all 17: a card that lifts the LobbyDaemon `ObjectPool` module (`ObjPool:
 
 | Item | Reason |
 | --- | --- |
-| Codegen forms for `GetServiceEntryListReq` (77.9) | Below the 85 threshold. The 3 trials were saved for functions above 85. No such function exists on this card |
+| Codegen forms for `GetServiceEntryListReq` (78.5) | Below the 85 threshold. The 3 trials were saved for functions above 85. No such function exists on this card |
 | Re-lift of the 5 reverted handlers | Cannot link. Waits for the ObjectPool card |
 | `ObjPool` definition in this card | Out of scope. The card lists only `LobbyLobbyGatePacketHandler.cpp` and `CMakeLists.txt` |

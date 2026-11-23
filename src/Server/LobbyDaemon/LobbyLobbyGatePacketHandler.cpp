@@ -93,7 +93,7 @@ bool HandleLobbyLobbyGate_GetCharacterInfoReq(SharedChannel*, Packet const*)
 }
 
 // 0xc5ae0
-#pragma comment(linker, "/INCLUDE:?HandleLobbyLobbyGate_CheckCharacterNameReq@@YA_NPEAVSharedChannel@@PEBVPacket@@@Z")  // LIFT: keep until the caller is lifted (0xc5ae0, caller is the handler table)
+#pragma comment(linker, "/INCLUDE:?HandleLobbyLobbyGate_CheckCharacterNameReq@@YA_NPEAVSharedChannel@@PEBVPacket@@@Z")  // LIFT: keep until the caller is lifted (0xc8aa0).
 bool HandleLobbyLobbyGate_CheckCharacterNameReq(SharedChannel*, Packet const*)
 {
     Log::Write(Log::LT_ERROR, L"LobbyLobbyGatePacketHandler.cpp", 807, L"[lobby-gate], check character name req fail; N/A");
@@ -167,11 +167,11 @@ bool HandleLobbyLobbyGate_GetLobbyServiceItemInfoReq(SharedChannel*, Packet cons
 }
 
 // 0xc8aa0
-#pragma comment(linker, "/INCLUDE:?HandleLobbyLobbyGate_GetServiceEntryListReq@@YA_NPEAVSharedChannel@@PEBVPacket@@@Z")  // LIFT: keep until the caller is lifted (0xc5ae0, caller is the handler table)
+#pragma comment(linker, "/INCLUDE:?HandleLobbyLobbyGate_GetServiceEntryListReq@@YA_NPEAVSharedChannel@@PEBVPacket@@@Z")  // LIFT: keep until the caller is lifted (0xc8aa0).
 bool HandleLobbyLobbyGate_GetServiceEntryListReq(SharedChannel* channel, Packet const* packet)
 {
-    // LIFT: the PDB signature has SharedChannel*; the pseudocode types it as LobbyGateChannel* (same pointer, LobbyGateChannel derives from SharedChannel).
-    LobbyGateChannel* gate = reinterpret_cast<LobbyGateChannel*>(channel);
+    // LIFT: the PDB signature has SharedChannel*; the pseudocode types it as LobbyGateChannel* (LobbyGateChannel derives from SharedChannel).
+    LobbyGateChannel* gate = static_cast<LobbyGateChannel*>(channel);
     short cmd = 0;
     unsigned long long clikey = 0;
     if (packet->Decompose("hq", &cmd, &clikey) == 0)
@@ -199,7 +199,6 @@ bool HandleLobbyLobbyGate_GetServiceEntryListReq(SharedChannel* channel, Packet 
         Log::Write(Log::LT_DEBUG, L"LobbyLobbyGatePacketHandler.cpp", 1401,
                    L"[lobby-gate], handle get service-entry list req ok, cli-key:0x%I64X", clikey);
         cliSession->removeReferenceCount(L"LobbyLobbyGatePacketHandler.cpp", 1403);
-        fp.packet.Clear();
         return true;
     }
     unsigned int error = static_cast<unsigned int>(TLobbyError);
@@ -220,7 +219,6 @@ bool HandleLobbyLobbyGate_GetServiceEntryListReq(SharedChannel* channel, Packet 
                desc, clikey);
     gate->SendGetServiceEntryListFail(clikey, failCode);
     cliSession->removeReferenceCount(L"LobbyLobbyGatePacketHandler.cpp", 1393);
-    fp.packet.Clear();
     return true;
 }
 
