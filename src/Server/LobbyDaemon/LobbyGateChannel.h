@@ -18,7 +18,7 @@ union id128;
 class LobbyGateChannel : public SharedChannel
 {
 public:
-    void SendInitSessionWithNPTokenOk(unsigned long long gatekey, unsigned long long clikey, id128 const& nptoken, id128 const& portalAccountId);  // 0xbbe90
+    void SendInitSessionWithNPTokenOk(unsigned long long gatekey, unsigned long long clikey, id128 nptoken, id128 portalAccountId);  // 0xbbe90
     void SendInitSessionWithNPTokenFail(unsigned long long, short);  // 0xbbfb0
     void SendInitSessionWithLobbyTokenOk(unsigned long long, unsigned long long);  // 0xbc080
     void SendInitSessionWithLobbyTokenFail(unsigned long long, short);  // 0xbc150

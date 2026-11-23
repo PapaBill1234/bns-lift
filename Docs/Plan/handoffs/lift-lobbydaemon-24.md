@@ -120,6 +120,10 @@ Not tried:
 - `Connect` and `OnClose`: the last difference is a `L""` reference (`valueString`). Lessons section B says LTCG folds it. No change possible.
 - All functions below 85 (see Notes).
 
+## Repair 3
+
+- `LobbyGateChannel::SendInitSessionWithNPTokenOk` (0xbbe90): both `id128` parameters are by value now. The decorated name is `?SendInitSessionWithNPTokenOk@LobbyGateChannel@@QEAAX_K0Tid128@@1@Z`, as in the PDB. The `/INCLUDE` pragma uses this name. MATCH 100 stays. LobbyDaemon MATCH 436 -> 523.
+
 ## Safety differences
 
 - No guard was removed or added. `PostOfficeSessionHandler::PacketHandler` keeps the null checks of the original.

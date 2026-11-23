@@ -11,7 +11,7 @@
 #include "StringUtil.h"
 #include "WaitQueue.h"
 
-#pragma comment(linker, "/INCLUDE:?SendInitSessionWithNPTokenOk@LobbyGateChannel@@QEAAX_K0AEBTid128@@1@Z")  // LIFT: keep until the caller is lifted (0xbbe90)
+#pragma comment(linker, "/INCLUDE:?SendInitSessionWithNPTokenOk@LobbyGateChannel@@QEAAX_K0Tid128@@1@Z")  // LIFT: keep until the caller is lifted (0xbbe90)
 #pragma comment(linker, "/INCLUDE:?SendInitSessionWithNPTokenFail@LobbyGateChannel@@QEAAX_KF@Z")  // LIFT: keep until the caller is lifted (0xbbfb0)
 #pragma comment(linker, "/INCLUDE:?SendInitSessionWithLobbyTokenOk@LobbyGateChannel@@QEAAX_K0@Z")  // LIFT: keep until the caller is lifted (0xbc080)
 #pragma comment(linker, "/INCLUDE:?SendInitSessionWithLobbyTokenFail@LobbyGateChannel@@QEAAX_KF@Z")  // LIFT: keep until the caller is lifted (0xbc150)
@@ -53,7 +53,7 @@
 #pragma comment(linker, "/INCLUDE:?SendListLobbyServiceItemInfoOk@LobbyGateChannel@@QEAAX_KDHPEAULobbyServiceItem@@H@Z")  // LIFT: keep until the caller is lifted (0xbedd0)
 
 // 0xbbe90
-void LobbyGateChannel::SendInitSessionWithNPTokenOk(unsigned long long gatekey, unsigned long long clikey, id128 const& nptoken, id128 const& portalAccountId)
+void LobbyGateChannel::SendInitSessionWithNPTokenOk(unsigned long long gatekey, unsigned long long clikey, id128 nptoken, id128 portalAccountId)
 {
     Packet p;  // LIFT: inlined constructor
     p.CurHeader = nullptr;
