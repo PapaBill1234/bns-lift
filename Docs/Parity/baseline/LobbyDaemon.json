@@ -685,6 +685,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"CliSessionTable::Select": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "CliSessionTable::SelectAll": {
 "calls": 100,
 "consts": 100,
@@ -1568,10 +1575,10 @@
 "status": "MATCH"
 },
 "GameWorldReporterListener": {
-"calls": 78,
-"consts": 92,
-"refs": 89,
-"score": 86.3,
+"calls": 89,
+"consts": 100,
+"refs": 100,
+"score": 96.3,
 "status": "DIFF"
 },
 "GamedChannel::SendAccountInventoryNotify": {
@@ -1581,7 +1588,42 @@
 "score": 79.1,
 "status": "DIFF"
 },
+"GamedChannel::SendActivateGradeFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendActivateGradeOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "GamedChannel::SendApplyNewChargeItemNotify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendAuctionBidFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendAuctionBidOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendAuctionEscrowReq": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -1595,7 +1637,28 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"GamedChannel::SendChangeCharacterRaceReq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "GamedChannel::SendChangeCharacterSexReq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendChangedGradeLevelNotify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendChangedGradeNotify": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -1630,7 +1693,42 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"GamedChannel::SendDepositGameMileageFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendDepositGameMileageOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "GamedChannel::SendEnterWorldFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendExtendJumpingCharacterCreationQuotaWithAccountInventoryItemFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendExtendJumpingCharacterCreationQuotaWithAccountInventoryItemOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendGetGradeListFail": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -1658,7 +1756,42 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"GamedChannel::SendRenameCharacterReq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "GamedChannel::SendRestoreCharacterReq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendSecondPasswordGetStatusFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendSecondPasswordGetStatusOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendSecondPasswordIsVerifiedFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendSecondPasswordIsVerifiedOk": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -1700,6 +1833,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"GamedChannel::SendTakeAccountTimeBasedPlayRewardFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "GamedChannel::SendTryRegisterGuildFail": {
 "calls": 100,
 "consts": 100,
@@ -1728,6 +1868,20 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"GamedChannel::SendUpdateAccountContentQuotaFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendUpdateAccountContentQuotaOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "GamedChannel::SendUpdateAccountDataFail": {
 "calls": 100,
 "consts": 100,
@@ -1736,6 +1890,34 @@
 "status": "MATCH"
 },
 "GamedChannel::SendUpdateAccountDataOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendUpdateAccountExpFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendUpdateAccountExpOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendUpdateAccountRecycleTimeFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendUpdateAccountRecycleTimeOk": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -1757,6 +1939,34 @@
 "status": "MATCH"
 },
 "GamedChannel::SendUpdateChargeRemainTimeNotify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendUpdateJumpingCharacterStateFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendUpdateJumpingCharacterStateOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendUpgradeJumpingCharacterStateWithCreationQuotaFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedChannel::SendUpgradeJumpingCharacterStateWithCreationQuotaOk": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -1931,6 +2141,27 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"HandleLobbyInfoGate_AuthTokenReq": {
+"calls": 97,
+"consts": 100,
+"refs": 96,
+"score": 97.7,
+"status": "DIFF"
+},
+"HandleLobbyInfoGate_GetWorldInfoListReq": {
+"calls": 67,
+"consts": 86,
+"refs": 96,
+"score": 82.7,
+"status": "DIFF"
+},
+"HandleLobbyInfoGate_HelloReq": {
+"calls": 84,
+"consts": 100,
+"refs": 100,
+"score": 94.6,
+"status": "DIFF"
+},
 "HandleLobbyLobbyGate_CheckCharacterNameReq": {
 "calls": 100,
 "consts": 100,
@@ -1974,6 +2205,97 @@
 "status": "MATCH"
 },
 "HeapMemoryManager::ReallocZero": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"InfoGateChannel::SendAuthTokenFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"InfoGateChannel::SendAuthTokenOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"InfoGateChannel::SendGetWorldInfoListFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"InfoGateChannelManager::Acquire": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"InfoGateChannelManager::Add": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"InfoGateChannelManager::Broadcast": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"InfoGateChannelManager::BroadcastBoastEventInWorldNotify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"InfoGateChannelManager::OnAccept": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"InfoGateChannelManager::OnClose": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"InfoGateChannelManager::OnConnect": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"InfoGateChannelManager::PacketHandler": {
+"calls": 94,
+"consts": 100,
+"refs": 100,
+"score": 97.9,
+"status": "DIFF"
+},
+"InfoGateChannelManager::Remove": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"InfoGateChannelManager::~InfoGateChannelManager": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
