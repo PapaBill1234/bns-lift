@@ -2288,6 +2288,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"HandleLobbyLobbyGate_GetServiceEntryListReq": {
+"calls": 69,
+"consts": 87,
+"refs": 86,
+"score": 80.4,
+"status": "DIFF"
+},
 "HandlePostOfficeHelloFail": {
 "calls": 100,
 "consts": 100,
