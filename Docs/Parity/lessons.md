@@ -1357,8 +1357,8 @@ Card lift-lobbydaemon-24: LobbyGateChannel part 1 (41), PostOfficeChannel (7), P
 
 | Item | Result |
 | --- | --- |
-| LD MATCH | 436 -> 521 (+85 over main 9d0ef81: 38 card functions, 47 shared functions). The other 4 exes: +0. |
-| Dead-strip | 11 more `/INCLUDE` pragmas were needed. Without them the `Send*` functions were unpaired and not counted. |
+| LD MATCH | 436 -> 523 (+87 over main 9d0ef81: 40 card functions, 47 shared functions). The other 4 exes: +0. |
+| Dead-strip | The final code has 40 `/INCLUDE` pragmas in `LobbyGateChannel.cpp` and 6 in `PostOfficeChannel.cpp` (46 in total). Without them the `Send*` functions were unpaired and not counted. The `SendCloseAnonymousSessionNotify` pragma (removed in d5cbf87) and the `SendHelloReq` pragma (removed in repair 2) are not needed, because lifted callers reference those functions. |
 | Build input | The worktree had no `vendor/zstd/src` (see ld-17). Copy it before the first parity run. |
 
 What worked:
@@ -1377,4 +1377,4 @@ Repair 2 (kept):
   `*pCmd` at each use (no `cmd` local), `iocpHandle = Network::iocpHandle()` in the pump branch.
 - `HandlePostOfficeHelloFail` 93.3 -> 100.0 MATCH with the constant first: `if (0 == packet->Decompose(&pdr, 1, &reason))` (A24, P21 form). The first try (decomposer field order) did not change the score.
   The same form in `HandlePostOfficeRegisterPostOk` and `HandlePostOfficeRegisterPostFail` raised 38.1 -> 40.0 and 36.7 -> 40.0. Kept.
-- `/INCLUDE` for `SendHelloReq` removed. The lifted `OnConnect` calls it, so `/OPT:REF` keeps it. LD MATCH 521 -> 523.
+- `/INCLUDE` for `SendHelloReq` removed. The lifted `OnConnect` calls it, so `/OPT:REF` keeps it. LD MATCH 521 -> 523 (the +87 total above).

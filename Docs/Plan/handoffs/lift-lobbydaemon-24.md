@@ -74,8 +74,8 @@ The +87 is 40 card functions and 47 shared functions. The shared functions are B
 | PostOfficeClientSideHandlerList | `0x32b50` | `operator delete (folded with Console::Flush)` | n/a | no |
 | PostOfficePacketHandler | `0x646f0` | `HandlePostOfficeHelloOk` | 100.0 | yes |
 | PostOfficePacketHandler | `0x64740` | `HandlePostOfficeHelloFail` | 100.0 | yes |
-| PostOfficePacketHandler | `0x647f0` | `HandlePostOfficeRegisterPostOk` | 38.1 | no |
-| PostOfficePacketHandler | `0x64a20` | `HandlePostOfficeRegisterPostFail` | 36.7 | no |
+| PostOfficePacketHandler | `0x647f0` | `HandlePostOfficeRegisterPostOk` | 40.0 | no |
+| PostOfficePacketHandler | `0x64a20` | `HandlePostOfficeRegisterPostFail` | 40.0 | no |
 
 ## Not done
 
@@ -98,10 +98,10 @@ None. Two items need a note.
   The type is `Daemon::PacketHandler[7]` (public name `?PostOfficePacketClientSideHandlerList@@3PAP6A_NPEBVSession@@PEBVPacket@@@ZA`).
 - `Goods::Fetch` (`0x6010`, module `AccountInventory`) has no owner card and no skeleton file. `SendListGoodsOk` calls it, so the link failed. New file `src/Server/LobbyDaemon/AccountInventory.cpp`
   holds a `LIFT_STUB(0x6010)` body and is in `CMakeLists.txt`. The card that lifts the module `AccountInventory` (also `GoodsItem::Fetch` `0x5e60`) replaces the body and keeps the file.
-- Dead-strip: 11 more functions got `#pragma comment(linker, "/INCLUDE:...")` (5 in `LobbyGateChannel.cpp`, 5 in `PostOfficeChannel.cpp`; the `SendHelloReq` pragma was removed in repair 2 because the lifted `OnConnect` calls it). The checkpoints had already added 36 in `LobbyGateChannel.cpp` and 1 in `PostOfficeChannel.cpp`.
-  They were unpaired before. The verify card removes them when the callers are lifted.
+- Dead-strip: the final code has 40 `#pragma comment(linker, "/INCLUDE:...")` lines in `LobbyGateChannel.cpp` and 6 in `PostOfficeChannel.cpp` (46 in total). They keep lifted functions whose callers are still `LIFT_STUB` bodies. They were unpaired before. The verify card removes them when the callers are lifted.
+  Two pragmas are gone. The `SendCloseAnonymousSessionNotify` pragma was removed in d5cbf87 and the `SendHelloReq` pragma in repair 2. A lifted caller reaches both functions, so `/OPT:REF` keeps them.
 - The worktree lacked the ignored `vendor/zstd/src`. All 5 VS2010 links failed on `ZSTD_*`. It was copied from the main checkout (`git rev-parse HEAD` = bb6eaf64). The first gate run had no zstd and still passed.
-- `HandlePostOfficeRegisterPostOk` (38.1) and `HandlePostOfficeRegisterPostFail` (36.7): the original inlines `LobbyJobManager::find` and the job call. `LobbyJob` has no PDB layout in the repo yet, so
+- `HandlePostOfficeRegisterPostOk` and `HandlePostOfficeRegisterPostFail` (both 40.0 after repair 2; 38.1 and 36.7 before): the original inlines `LobbyJobManager::find` and the job call. `LobbyJob` has no PDB layout in the repo yet, so
   the lift calls `LobbyJobManager::ExecuteW`. The behaviour is the same, the code is not. The verify card can revisit it when `LobbyJob` has its layout.
 - `SendStartSessionWithNPTokenOk` (72.0) and `SendStartSessionWithLobbyTokenOk` (65.1) build a `FragmentPacket`. `SendListGoodsOk` (64.3), `SendTakeGoodsOk` (81.6), `SendListLobbyServiceItemInfoOk` (79.0),
   `SendStartWaitNotify` and `SendGetWaitInfoOk` (84.8) and `SendRegisterPostReq` (80.9, the original calls `Packet::Allocate`, ours `PacketBufferPool::allocate`) are all below 85. No codegen trial.
