@@ -1,7 +1,18 @@
-// LobbyLobbyGatePacketHandler.obj (LobbyDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
+// LobbyLobbyGatePacketHandler.obj (LobbyDaemon PDB, 2019 + PDB). A function with LIFT_STUB is not a lift.
+#include <winsock2.h>
+#include <windows.h>
 #include "LobbyLobbyGatePacketHandler.h"
+#include "CliSession.h"
+#include "CliSessionManager.h"
+#include "FragmentPacket.h"
 #include "LiftStub.h"
+#include "LobbyDaemon.h"
+#include "LobbyGateChannel.h"
 #include "Log.h"
+#include "Packet.h"
+#include "SharedChannel.h"
+
+extern wchar_t const* LobbyErrorDesc[28];  // LIFT: defined in LobbyGamePacketHandler.cpp (placeholder, owner module not found).
 
 // 0xc25c0
 bool HandleLobbyLobbyGate_HelloReq(Session const*, Packet const*)
@@ -156,9 +167,61 @@ bool HandleLobbyLobbyGate_GetLobbyServiceItemInfoReq(SharedChannel*, Packet cons
 }
 
 // 0xc8aa0
-bool HandleLobbyLobbyGate_GetServiceEntryListReq(SharedChannel*, Packet const*)
+#pragma comment(linker, "/INCLUDE:?HandleLobbyLobbyGate_GetServiceEntryListReq@@YA_NPEAVSharedChannel@@PEBVPacket@@@Z")  // LIFT: keep until the caller is lifted (0xc5ae0, caller is the handler table)
+bool HandleLobbyLobbyGate_GetServiceEntryListReq(SharedChannel* channel, Packet const* packet)
 {
-    LIFT_STUB(0xc8aa0);
+    // LIFT: the PDB signature has SharedChannel*; the pseudocode types it as LobbyGateChannel* (same pointer, LobbyGateChannel derives from SharedChannel).
+    LobbyGateChannel* gate = reinterpret_cast<LobbyGateChannel*>(channel);
+    short cmd = 0;
+    unsigned long long clikey = 0;
+    if (packet->Decompose("hq", &cmd, &clikey) == 0)
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyLobbyGatePacketHandler.cpp", 1359,
+                   L"[lobby-gate], handle get service-entry list req fail; decompose fail, cli-key:0x%I64X", clikey);
+        return true;
+    }
+    CliSession* cliSession = LobbyDaemon::_instance->_clisessionMgr->Select(clikey);
+    if (cliSession == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyLobbyGatePacketHandler.cpp", 1366,
+                   L"[lobby-gate], handle get service-entry list req fail; no such cli-session, cli-key:0x%I64X", clikey);
+        gate->SendGetServiceEntryListFail(clikey, 4);
+        return true;
+    }
+    FragmentPacket fp(80, "hiqCqQqohq;");
+    fp.packet.Allocate(&fp.composer);
+    fp.Compose(1, clikey);
+    if (cliSession->FetchServiceEntryList(&fp))
+    {
+        if (fp.packet.Splitter != nullptr)
+            fp.packet.Splitter->Finalize(fp.packet.CurHeader);
+        channel->Send(&fp.packet);
+        Log::Write(Log::LT_DEBUG, L"LobbyLobbyGatePacketHandler.cpp", 1401,
+                   L"[lobby-gate], handle get service-entry list req ok, cli-key:0x%I64X", clikey);
+        cliSession->removeReferenceCount(L"LobbyLobbyGatePacketHandler.cpp", 1403);
+        fp.packet.Clear();
+        return true;
+    }
+    unsigned int error = static_cast<unsigned int>(TLobbyError);
+    short failCode;
+    wchar_t const* desc;
+    if (error == 5)
+    {
+        failCode = 5;
+        desc = LobbyErrorDesc[error];
+    }
+    else
+    {
+        failCode = 2;
+        desc = error >= 28 ? L"LOBERR_UNDEFINED" : LobbyErrorDesc[error];
+    }
+    Log::Write(Log::LT_ERROR, L"LobbyLobbyGatePacketHandler.cpp", 1390,
+               L"[lobby-gate], handle get service-entry list req fail; compose lsit fail, error:%s, cli-key:0x%I64X",
+               desc, clikey);
+    gate->SendGetServiceEntryListFail(clikey, failCode);
+    cliSession->removeReferenceCount(L"LobbyLobbyGatePacketHandler.cpp", 1393);
+    fp.packet.Clear();
+    return true;
 }
 
 // 0xc8d00

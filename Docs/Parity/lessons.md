@@ -1378,3 +1378,17 @@ Repair 2 (kept):
 - `HandlePostOfficeHelloFail` 93.3 -> 100.0 MATCH with the constant first: `if (0 == packet->Decompose(&pdr, 1, &reason))` (A24, P21 form). The first try (decomposer field order) did not change the score.
   The same form in `HandlePostOfficeRegisterPostOk` and `HandlePostOfficeRegisterPostFail` raised 38.1 -> 40.0 and 36.7 -> 40.0. Kept.
 - `/INCLUDE` for `SendHelloReq` removed. The lifted `OnConnect` calls it, so `/OPT:REF` keeps it. LD MATCH 521 -> 523 (the +87 total above).
+
+## ld-22
+What worked:
+- Run `tools/parity.sh LobbyDaemon` on a checkpoint before you trust "lifted". The gate builds clang static libs and never links the exe.
+  Checkpoint 4 listed 5 lifted job-start handlers. All 5 failed the VS2010 link (`<Job>::_pool`, `ObjPool::Checkout`).
+
+What failed or is blocked:
+- A handler that calls `ObjPool::Checkout(&X::_pool)` is Not done until a LobbyDaemon ObjectPool card defines `ObjPool` and the `_pool` statics. This holds even when the job layouts are lifted from the PDB (same as ld-16).
+  A /INCLUDE pragma is not the issue here: the 5 handlers are reached from the handler table, so the link needs the symbols.
+- `GetServiceEntryListReq` 77.9 (calls 61): no form was tried (below 85). ❓ The call list is not compared.
+
+Build facts:
+- A new worktree has no ignored `vendor/zstd/src`. All 5 exes then fail with `ZSTD_*` unresolved. Copy it from another worktree (`bb6eaf64`) and run `tools/gate.sh` again.
+- A lifted handler can pull a neighbour into the link and pair it (`CliSessionTable::Select`, +1 MATCH, not a card function).
