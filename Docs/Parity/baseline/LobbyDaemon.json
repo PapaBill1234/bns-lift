@@ -580,6 +580,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"CliSessionTable::Select_index_pcid": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Connection::AsyncSend": {
 "calls": 100,
 "consts": 100,
@@ -1602,6 +1609,97 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"HandleLobbyGame_CreateCharacterFail": {
+"calls": 25,
+"consts": 29,
+"refs": 43,
+"score": 32.1,
+"status": "DIFF"
+},
+"HandleLobbyGame_CreateCharacterOk": {
+"calls": 31,
+"consts": 55,
+"refs": 43,
+"score": 42.7,
+"status": "DIFF"
+},
+"HandleLobbyGame_DeleteCharacterFail": {
+"calls": 25,
+"consts": 29,
+"refs": 43,
+"score": 32.1,
+"status": "DIFF"
+},
+"HandleLobbyGame_DeleteCharacterOk": {
+"calls": 25,
+"consts": 29,
+"refs": 43,
+"score": 32.1,
+"status": "DIFF"
+},
+"HandleLobbyGame_HelloReq": {
+"calls": 12,
+"consts": 27,
+"refs": 17,
+"score": 18.9,
+"status": "DIFF"
+},
+"HandleLobbyGame_KickFail": {
+"calls": 25,
+"consts": 29,
+"refs": 43,
+"score": 32.1,
+"status": "DIFF"
+},
+"HandleLobbyGame_KickOk": {
+"calls": 50,
+"consts": 50,
+"refs": 55,
+"score": 51.5,
+"status": "DIFF"
+},
+"HandleLobbyGame_NPPresenceKickReq": {
+"calls": 62,
+"consts": 67,
+"refs": 69,
+"score": 65.8,
+"status": "DIFF"
+},
+"HandleLobbyGame_RestoreCharacterFail": {
+"calls": 25,
+"consts": 29,
+"refs": 43,
+"score": 32.1,
+"status": "DIFF"
+},
+"HandleLobbyGame_RestoreCharacterOk": {
+"calls": 50,
+"consts": 50,
+"refs": 55,
+"score": 51.5,
+"status": "DIFF"
+},
+"HandleLobbyGame_ServiceOpenNotify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleLobbyGame_UpdateBotScoreNotify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleLobbyGame_UpdateCharacterDataReq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "HandleLobbyLobbyGate_CheckCharacterNameReq": {
 "calls": 100,
 "consts": 100,
@@ -2358,6 +2456,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Packet::Decompose [?Decompose@Packet@@QEBAGPEBDZZ]": {
+"calls": 100,
+"consts": 80,
+"refs": 100,
+"score": 93.3,
+"status": "DIFF"
+},
 "Packet::FreeSize": {
 "calls": 100,
 "consts": 100,
@@ -2392,6 +2497,13 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"PacketBuffer::Decompose": {
+"calls": 100,
+"consts": 98,
+"refs": 100,
+"score": 99.2,
+"status": "DIFF"
 },
 "PacketBuffer::deallocate_me": {
 "calls": 100,
@@ -2806,7 +2918,21 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Session::Send [?Send@Session@@QEBAXPEBDZZ]": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Session::Send [?Send@Session@@QEBAXPEBVPacket@@@Z]": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Session::SendV": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
