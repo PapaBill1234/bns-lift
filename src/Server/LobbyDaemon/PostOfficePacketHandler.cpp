@@ -92,6 +92,8 @@ bool HandlePostOfficeRegisterPostFail(Session const*, Packet const* packet)
     PacketDecomposer pdr;
     setupDecomposer(pdr, "hqqE", 4);
     unsigned long long tid = 0;
+    // LIFT: zero-init on purpose. The original (0x64a20) leaves param uninitialised and the
+    // decompose-fail log then prints stack garbage for receipt-id and reason. We fix this bug.
     PostOfficeRegisterPostFailParam param = {};
     if (packet->Decompose(&pdr, 3, &tid, &param, &param.reason) == 0)
     {

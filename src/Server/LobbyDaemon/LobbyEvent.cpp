@@ -83,6 +83,7 @@ bool NPLobbyMessageHandleEvent::HandleEvent(EventContext*, unsigned long)
     LIFT_STUB(0xbbb60);
 }
 
+// LIFT: card 24 adds this constructor (card 6 module). The null check is safe: the original inlines it in 0x64420 after its own session null check.
 // LobbyEvent.cpp line 107 (no LD RVA: the constructor is inlined in PostOfficeSessionHandler::PacketHandler 0x64420)
 PacketHandleEvent::PacketHandleEvent(Session const* session, Packet const* packet, void* handler)
     : _session(session), _packet(packet), _handler(handler)

@@ -122,5 +122,7 @@ Not tried:
 
 ## Safety differences
 
-- None. No guard was removed or added. `PostOfficeSessionHandler::PacketHandler` keeps the null checks of the original.
+- No guard was removed or added. `PostOfficeSessionHandler::PacketHandler` keeps the null checks of the original.
+- Card 24 adds the `PacketHandleEvent` constructor to `LobbyEvent.cpp` (card 6 module). It has a null check on `session` before `addReferenceCount`. The original inlines the constructor in 0x64420 after its own null check, so behaviour is the same (`// LIFT:` tag in the code).
+- `HandlePostOfficeRegisterPostFail` (0x64a20): `param` is zero-initialised. The original leaves it uninitialised, and its decompose-fail log then prints uninitialised stack memory. The lift fixes this bug on purpose (`// LIFT:` tag in the code).
 - `// BUG:` in `PostOfficeSessionHandler::PacketHandler`: the original does not check the packet copy for `nullptr` after a failed allocation. The lift keeps this (marked).

@@ -19,7 +19,6 @@
 #pragma comment(linker, "/INCLUDE:?SendStartSessionWithNPTokenFail@LobbyGateChannel@@QEAAX_KF@Z")  // LIFT: keep until the caller is lifted (0xbc540)
 #pragma comment(linker, "/INCLUDE:?SendStartSessionWithLobbyTokenOk@LobbyGateChannel@@QEAAX_K_NAEBVGradeService@@HAEBVGameAccountExpInfo@@@Z")  // LIFT: keep until the caller is lifted (0xbc610)
 #pragma comment(linker, "/INCLUDE:?SendStartSessionWithLobbyTokenFail@LobbyGateChannel@@QEAAX_KF@Z")  // LIFT: keep until the caller is lifted (0xbc8f0)
-#pragma comment(linker, "/INCLUDE:?SendCloseAnonymousSessionNotify@LobbyGateChannel@@QEAAX_K@Z")  // LIFT: keep until the caller is lifted (0xbc9c0)
 #pragma comment(linker, "/INCLUDE:?SendCloseSessionNotify@LobbyGateChannel@@QEAAX_K@Z")  // LIFT: keep until the caller is lifted (0xbca80)
 #pragma comment(linker, "/INCLUDE:?SendKickNotify@LobbyGateChannel@@QEAAX_KD@Z")  // LIFT: keep until the caller is lifted (0xbcb40)
 #pragma comment(linker, "/INCLUDE:?SendGetCharacterInfoListFail@LobbyGateChannel@@QEAAX_KF@Z")  // LIFT: keep until the caller is lifted (0xbcc10)
