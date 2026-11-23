@@ -1003,7 +1003,7 @@ bool HandleLobbyGame_UpdateAccountDataReq(SharedChannel* sharedChannel, Packet c
     // LIFT: inlined end of repeat of PacketUtil.cpp (assert at line 248: the repeat format must start with 'C').
     if (rpd.top < 0 || rpd.format[rpd.start[rpd.top]] != 'C')
         assertCrash(L"source\\PacketUtil.cpp", "source\\PacketUtil.cpp", 248);
-    rpd.skipRepeatFormat();
+    static_cast<PacketFormatIterator&>(rpd).skipRepeatFormat();  // LIFT: virtual call as in the original (0x8c660)
     --rpd.top;
 
     // LIFT: the original keeps the repeat count of the recycle list in a 16-bit value (0x8c660).
@@ -1031,7 +1031,7 @@ bool HandleLobbyGame_UpdateAccountDataReq(SharedChannel* sharedChannel, Packet c
     }
     if (rpd.top < 0 || rpd.format[rpd.start[rpd.top]] != 'C')
         assertCrash(L"source\\PacketUtil.cpp", "source\\PacketUtil.cpp", 248);
-    rpd.skipRepeatFormat();
+    static_cast<PacketFormatIterator&>(rpd).skipRepeatFormat();  // LIFT: virtual call as in the original (0x8c660)
     --rpd.top;
 
     short const wid = channel->_rawChannel != nullptr ? static_cast<short>(channel->_rawChannel->GetId()) : 0;
@@ -1680,10 +1680,12 @@ bool HandleLobbyGame_SetAppDataNotify(SharedChannel* channel, Packet const* pack
         // LIFT: inlined end of repeat of PacketUtil.cpp (assert at line 248: the repeat format must start with 'C').
         if (pdr.top < 0 || pdr.format[pdr.start[pdr.top]] != 'C')
             assertCrash(L"source\\PacketUtil.cpp", "source\\PacketUtil.cpp", 248);
-        pdr.skipRepeatFormat();
+        static_cast<PacketFormatIterator&>(pdr).skipRepeatFormat();  // LIFT: virtual call as in the original (0x907e0)
         --pdr.top;
 
-        CliSession* const session = LobbyDaemon::_instance->_clisessionMgr->Select_index_pcid(LgpWid(channel), pcid);
+        // LIFT: the original tests only the raw channel here, not the shared channel (0x907e0).
+        short const wid = channel->_rawChannel == nullptr ? 0 : static_cast<short>(channel->_rawChannel->GetId());
+        CliSession* const session = LobbyDaemon::_instance->_clisessionMgr->Select_index_pcid(wid, pcid);
         if (session == nullptr)
         {
             Log::Write(Log::LT_ERROR, HANDLER_FILE, 2101,

@@ -12,11 +12,11 @@ Base: 8cddc33 (main with card lift-lobbydaemon-16; LobbyDaemon 442 MATCH on main
 | Not done | 5 |
 | Gate (`tools/gate.sh`, `LIFT_BUILD_DIR=build-ld-21`) | gate ok |
 | Parity (`tools/parity.sh`) | parity ok |
-| LobbyDaemon MATCH | 442 -> 461 (+19) over main (baseline 8cddc33) |
+| LobbyDaemon MATCH | 442 -> 462 (+20) over main (baseline 8cddc33) |
 | CacheGate, LobbyGate, SmartCouponDaemon, PostOfficeDaemon MATCH | 456, 658, 630, 694 (+0 each, no MATCH lost) |
 | Card 16 MATCH (`ServiceOpenNotify`, `UpdateBotScoreNotify`, `UpdateCharacterDataReq`, `Session::Send`, `Session::SendV`) | All kept (MATCH -> DIFF 0) |
 
-No card handler is MATCH. The 19 new MATCH are shared functions that the handlers now reach:
+One card handler is MATCH (`HandleLobbyGame_SetAppDataNotify`). The other 19 new MATCH are shared functions that the handlers now reach:
 `NPChannel::checkLibError`, `NPTransactionRegistry::Register`, 4 `Packet::Decompose` forms, `PacketBuffer::Decompose`,
 `PacketDecomposer::Reset`, `PacketFormatIterator::CurrentFormat`, `Forward`, `Rewind`, `skipRepeatFormat`,
 `RepeatPacketDecomposer::Reset`, `SharedChannel::IsConnected`, `String::UnicodeToMultibyte`, the 3 `_StsMsgRequest` virtuals
@@ -62,7 +62,7 @@ Scores are from funcdiff on the VS2010 build. The scores are low where a callee 
 | `0x8f340` | `HandleLobbyGame_ChangeCharacterRaceFail` | 43.2 |
 | `0x8f5d0` | `HandleLobbyGame_RenameCharacterOk` | 43.2 |
 | `0x8f870` | `HandleLobbyGame_RenameCharacterFail` | 43.2 |
-| `0x907e0` | `HandleLobbyGame_SetAppDataNotify` | 99.2 |
+| `0x907e0` | `HandleLobbyGame_SetAppDataNotify` | 100.0 (MATCH) |
 
 Each lifted handler has a `#pragma comment(linker, "/INCLUDE:...")` with a LIFT comment. Its caller (the handler list) is still a stub.
 
@@ -105,13 +105,16 @@ The checkpoints only compiled with clang. The VS2010 link of LobbyDaemon failed.
 | --- | --- | --- |
 | `HandleLobbyGame_SetAppDataNotify` | A4: `__declspec(noinline)` on `String::UnicodeToMultibyte` (the original calls it out of line) | 96.4 -> 97.2. `String::UnicodeToMultibyte` becomes MATCH (+1). Kept. |
 | `HandleLobbyGame_SetAppDataNotify` | A10: `static __forceinline` on all file helpers (`assertCrash`, `LobbyErrorText`, `UpdateFailCode`, `ChannelIdOf` (now `LgpChannelId`), `WorkerIdOf` (now `LgpWid`), `SetupDecomposer`, `HandleShowcaseOk`) | 97.2 -> 99.2. The 3 `ChangeCharacter*Ok` handlers 11.9 -> 44.3. Kept. |
-| `HandleLobbyGame_SetAppDataNotify` | A8: read `channel->_rawChannel` with no `channel != nullptr` test in `ChannelIdOf` | No score change in any function. Not kept. The original has the test in most handlers; only the log lines of `0x8c660` and `0x907e0` omit it (see Safety differences). |
+| `HandleLobbyGame_SetAppDataNotify` | A8: read `channel->_rawChannel` with no `channel != nullptr` test in `LgpChannelId` | No score change in any function. Not kept. The original has the test in the log lines (see Safety differences). |
+| `HandleLobbyGame_SetAppDataNotify` | A7: `static_cast<PacketFormatIterator&>(pdr).skipRepeatFormat();` (also at the 2 sites of `0x8c660`) | The call goes through the vtable as in the original. Score 99.2 (unchanged). Kept. |
+| `HandleLobbyGame_SetAppDataNotify` | A8: wid for `Select_index_pcid` read from `_rawChannel` only (no channel test, as in the original), as `p != nullptr ? GetId : 0` | 99.2 (unchanged). |
+| `HandleLobbyGame_SetAppDataNotify` | Same, as `short wid = 0; if (p != nullptr) wid = GetId` | 97.7. Not kept. |
+| `HandleLobbyGame_SetAppDataNotify` | Same, as `p == nullptr ? 0 : GetId` | 100.0, MATCH (+1). Kept. |
 
 Not tried:
 
 | Function | Reason |
 | --- | --- |
-| `HandleLobbyGame_SetAppDataNotify` rest | One call to `PacketFormatIterator::skipRepeatFormat` (out of line here, inlined in the original) and doubled assert strings. No simple source form found. |
 | `HandleLobbyGame_FinishRenameGuildNotify` 85.6 | Stub-limited (inlined `abort`). No source form changes this. |
 | `HandleLobbyGame_FinishRegisterGuildNotify`, `CancelRegisterGuildNotify` 81.5 | Same. |
 
@@ -128,7 +131,8 @@ Not tried:
 | Place | Difference |
 | --- | --- |
 | `HandleLobbyGame_SetAppDataNotify` | Keeps the key length and value length checks. The `AllocZero` results are not checked (as in the original). |
-| `ChannelIdOf`, `WorkerIdOf` in the log lines of `0x8c660` and `0x907e0` | Test `channel != nullptr` before `channel->_rawChannel`. The original tests only `_rawChannel` there. Removing the test gave no score change (A8 trial), so the guard stays. The other handlers have the same test as the original (`channel != nullptr && channel->_rawChannel != nullptr`). |
+| `LgpChannelId`, `LgpWid` in the log lines of `0x907e0` | Test `channel != nullptr` before `channel->_rawChannel`, as the original does. No difference. |
+| `0x8c660` and the `Select_index_pcid` wid of `0x907e0` | Keep the original form: they test only `channel->_rawChannel`, with no channel test. No guard was added. |
 | `HandleLobbyGame_UpdateAccountDataReq` | Keeps the token, cli-key and session checks. No key is logged. |
 
 ## Open points for later cards
