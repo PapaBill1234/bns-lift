@@ -1388,6 +1388,7 @@ What failed or is blocked:
 - A handler that calls `ObjPool::Checkout(&X::_pool)` is Not done until a LobbyDaemon ObjectPool card defines `ObjPool` and the `_pool` statics. This holds even when the job layouts are lifted from the PDB (same as ld-16).
   The VS2010 link resolves all externals of `LobbyLobbyGatePacketHandler.obj`, even of functions that `/OPT:REF` removes later. A missing `<Job>::_pool` or `ObjPool::Checkout` fails the link.
 - `GetServiceEntryListReq` 77.9 -> 78.5 (calls 61 -> 63): the first lift had an explicit `fp.packet.Clear()` on each path. `~FragmentPacket` -> `~Packet` already calls `Packet::Clear` (inlined destructor), so every path ran Clear twice. Remove the explicit calls and let the destructor do the one Clear (A-pattern: destructor alone, as in `Client.cpp`). No other form was tried (below 85).
+- `GetServiceEntryListReq` 78.5 -> 80.4 (calls 63 -> 69): error block first (A17/A29). The PDB line map for 0xc8aa0 has the failure block at lines 1376-1394 and the success path at 1397-1404. Write `if (!FetchServiceEntryList(&fp)) { error mapping; Log 1390; SendGetServiceEntryListFail; removeReferenceCount 1393; return true; }` and then the success path. Kept. Still below 85, so no other form was tried.
 
 Build facts:
 - A new worktree has no ignored `vendor/zstd/src`. All 5 exes then fail with `ZSTD_*` unresolved. Copy it from another worktree (`bb6eaf64`) and run `tools/gate.sh` again.

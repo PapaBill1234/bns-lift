@@ -48,12 +48,14 @@ The reverted work (PDB layouts of the 5 jobs, 5 parameter structs, 5 handler bod
 
 | RVA | Function | Score | MATCH |
 | --- | --- | ---: | --- |
-| `0xc8aa0` | `HandleLobbyLobbyGate_GetServiceEntryListReq` | 78.5 | no |
+| `0xc8aa0` | `HandleLobbyLobbyGate_GetServiceEntryListReq` | 80.4 | no |
 
 `#pragma comment(linker, "/INCLUDE:...")` keeps it (the PDB public name is present: checked with `grep -a -F`). The caller is not lifted. ❓ The lift has no caller for any `HandleLobbyLobbyGate_` handler yet.
-Funcdiff for this function: score 78.5, calls 63, consts 87, refs 86. It is below 85, so no codegen form was tried (see "Not tried").
+Funcdiff for this function: score 80.4, calls 69, consts 87, refs 86. It is below 85, so only 1 codegen form was tried (see "Not tried").
+Repair 3 wrote the error block first (A17/A29, as in the PDB line map: failure lines 1376-1394, success lines 1397-1404). Score 78.5 -> 80.4, calls 63 -> 69. Kept. Recorded in lessons.md under ld-22.
 Repair 2 removed the 2 explicit `fp.packet.Clear()` calls (the original has one Clear per path, from the inlined `~FragmentPacket`). Score 77.9 -> 78.5, calls 61 -> 63.
-The cast is now `static_cast<LobbyGateChannel*>` (LobbyGateChannel derives from SharedChannel on main). The /INCLUDE comment gives the RVA of the kept function (0xc8aa0).
+The cast is now `static_cast<LobbyGateChannel*>` (LobbyGateChannel derives from SharedChannel on main). Each /INCLUDE comment gives the RVA of its own kept function. `GetServiceEntryListReq` has (0xc8aa0). The pragma for `CheckCharacterNameReq` (card ld-17, not lifted here) keeps its own RVA (0xc5ae0).
+The `extern LobbyErrorDesc` comment now has the address (.data 0003:2032).
 
 ## Not done
 
@@ -89,6 +91,6 @@ Unblock all 17: a card that lifts the LobbyDaemon `ObjectPool` module (`ObjPool:
 
 | Item | Reason |
 | --- | --- |
-| Codegen forms for `GetServiceEntryListReq` (78.5) | Below the 85 threshold. The 3 trials were saved for functions above 85. No such function exists on this card |
+| More codegen forms for `GetServiceEntryListReq` (80.4) | Below the 85 threshold. Only the error-first form was tried (repair 3). No other function above 85 exists on this card |
 | Re-lift of the 5 reverted handlers | Cannot link. Waits for the ObjectPool card |
 | `ObjPool` definition in this card | Out of scope. The card lists only `LobbyLobbyGatePacketHandler.cpp` and `CMakeLists.txt` |

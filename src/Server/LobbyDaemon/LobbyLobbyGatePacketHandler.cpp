@@ -12,7 +12,7 @@
 #include "Packet.h"
 #include "SharedChannel.h"
 
-extern wchar_t const* LobbyErrorDesc[28];  // LIFT: defined in LobbyGamePacketHandler.cpp (placeholder, owner module not found).
+extern wchar_t const* LobbyErrorDesc[28];  // LIFT: PDB public LobbyErrorDesc (.data 0003:2032), defined in LobbyGamePacketHandler.cpp (placeholder, owner module not found).
 
 // 0xc25c0
 bool HandleLobbyLobbyGate_HelloReq(Session const*, Packet const*)
@@ -93,7 +93,7 @@ bool HandleLobbyLobbyGate_GetCharacterInfoReq(SharedChannel*, Packet const*)
 }
 
 // 0xc5ae0
-#pragma comment(linker, "/INCLUDE:?HandleLobbyLobbyGate_CheckCharacterNameReq@@YA_NPEAVSharedChannel@@PEBVPacket@@@Z")  // LIFT: keep until the caller is lifted (0xc8aa0).
+#pragma comment(linker, "/INCLUDE:?HandleLobbyLobbyGate_CheckCharacterNameReq@@YA_NPEAVSharedChannel@@PEBVPacket@@@Z")  // LIFT: keep until the caller is lifted (0xc5ae0).
 bool HandleLobbyLobbyGate_CheckCharacterNameReq(SharedChannel*, Packet const*)
 {
     Log::Write(Log::LT_ERROR, L"LobbyLobbyGatePacketHandler.cpp", 807, L"[lobby-gate], check character name req fail; N/A");
@@ -191,34 +191,34 @@ bool HandleLobbyLobbyGate_GetServiceEntryListReq(SharedChannel* channel, Packet 
     FragmentPacket fp(80, "hiqCqQqohq;");
     fp.packet.Allocate(&fp.composer);
     fp.Compose(1, clikey);
-    if (cliSession->FetchServiceEntryList(&fp))
+    if (!cliSession->FetchServiceEntryList(&fp))
     {
-        if (fp.packet.Splitter != nullptr)
-            fp.packet.Splitter->Finalize(fp.packet.CurHeader);
-        channel->Send(&fp.packet);
-        Log::Write(Log::LT_DEBUG, L"LobbyLobbyGatePacketHandler.cpp", 1401,
-                   L"[lobby-gate], handle get service-entry list req ok, cli-key:0x%I64X", clikey);
-        cliSession->removeReferenceCount(L"LobbyLobbyGatePacketHandler.cpp", 1403);
+        unsigned int error = static_cast<unsigned int>(TLobbyError);
+        short failCode;
+        wchar_t const* desc;
+        if (error == 5)
+        {
+            failCode = 5;
+            desc = LobbyErrorDesc[error];
+        }
+        else
+        {
+            failCode = 2;
+            desc = error >= 28 ? L"LOBERR_UNDEFINED" : LobbyErrorDesc[error];
+        }
+        Log::Write(Log::LT_ERROR, L"LobbyLobbyGatePacketHandler.cpp", 1390,
+                   L"[lobby-gate], handle get service-entry list req fail; compose lsit fail, error:%s, cli-key:0x%I64X",
+                   desc, clikey);
+        gate->SendGetServiceEntryListFail(clikey, failCode);
+        cliSession->removeReferenceCount(L"LobbyLobbyGatePacketHandler.cpp", 1393);
         return true;
     }
-    unsigned int error = static_cast<unsigned int>(TLobbyError);
-    short failCode;
-    wchar_t const* desc;
-    if (error == 5)
-    {
-        failCode = 5;
-        desc = LobbyErrorDesc[error];
-    }
-    else
-    {
-        failCode = 2;
-        desc = error >= 28 ? L"LOBERR_UNDEFINED" : LobbyErrorDesc[error];
-    }
-    Log::Write(Log::LT_ERROR, L"LobbyLobbyGatePacketHandler.cpp", 1390,
-               L"[lobby-gate], handle get service-entry list req fail; compose lsit fail, error:%s, cli-key:0x%I64X",
-               desc, clikey);
-    gate->SendGetServiceEntryListFail(clikey, failCode);
-    cliSession->removeReferenceCount(L"LobbyLobbyGatePacketHandler.cpp", 1393);
+    if (fp.packet.Splitter != nullptr)
+        fp.packet.Splitter->Finalize(fp.packet.CurHeader);
+    channel->Send(&fp.packet);
+    Log::Write(Log::LT_DEBUG, L"LobbyLobbyGatePacketHandler.cpp", 1401,
+               L"[lobby-gate], handle get service-entry list req ok, cli-key:0x%I64X", clikey);
+    cliSession->removeReferenceCount(L"LobbyLobbyGatePacketHandler.cpp", 1403);
     return true;
 }
 
