@@ -1260,15 +1260,35 @@ Card lift-lobbydaemon-19: LobbyDB part 2 (26 functions, `0xa4320` to `0xa8a00`).
 | Item | Result |
 | --- | --- |
 | Lifted | 26 (0 Not done) |
-| LD MATCH | 436 -> 460 over main 480a25b (+24: 22 card functions, `Character::SetLevel`, `Character::SetSlotId`). The other 4 exes: +0. |
+| LD MATCH | 436 -> 462 over main 480a25b (+26: 24 card functions, `Character::SetLevel`, `Character::SetSlotId`). The other 4 exes: +0. |
 
 What worked (count = functions made MATCH):
-- Dead-strip pragmas: 24 `/INCLUDE:<public name>` lines took the card from +3 to +21 MATCH. The callers (`Character::*`, `HandleLobbyGame_*`, `CliSession::*`) are still stubs. Public names come from `llvm-pdbutil dump -publics`.
-- A17 tail form (3 trials, one per function): `if (dbrtn == 0) return true; return false;` after `Execute` instead of `return dbrtn == 0;`.
-  VS2010 then keeps the second `Db::ReleaseTransaction` block as the original does. `UpdateCharacterLevel` 98.9, `UpdateCharacterData` 99.0, `RegisterGameAccountExpInfo` 99.0: all 100 (+3). This is the same fix as ld-15 `FinishCharacterCreation`. Apply it first to every `LobbyDB` function that ends in `return dbrtn == 0;`.
+- Dead-strip pragmas: 24 `/INCLUDE:<public name>` lines took the card from +3 to +21 MATCH. Public names come from `llvm-pdbutil dump -publics`.
+  Name the real stub caller in the comment. A lifted `Character::*` caller is dead-stripped too when its own callers are stubs.
+  A test removal of the `LobbyDB::UpdateCharacterData` pragma lost one pair and one MATCH (the lifted `CliSession::UpdateCharacterData` calls the stub `getCharacter` first). Keep it.
+- A17 tail form: `if (dbrtn == 0) return true; return false;` after `Execute` instead of `return dbrtn == 0;`.
+  `UpdateCharacterLevel` 98.9, `UpdateCharacterData` 99.0, `RegisterGameAccountExpInfo` 99.0: all 100 (+3). Same as ld-15 `FinishCharacterCreation`.
+- New (A10/A17 family, +2 and large score gains): use the `DbTransaction::BindCol` member call (`tran.Tran->BindCol(i, &buf, 0, type, &collen[i-1])`, `goto BIND_ERROR`) for the
+  columns of a loader, not the `DB_BIND_COL_NI` macro. VS2010 inlines it and then merges the error paths into one `statmentErrorLog` site as the original does.
+  The macro kept one site for each column. Scores: `LoadGameAccounExpInfo` 86.5 -> 100, `LoadJumpingCharacterCreationQuota` 98.0 -> 100 (with column 1 as member call too),
+  `LoadGameAccountContentQuotaList` 80.6 -> 95.3, `RetrieveExpiredDeletionWaitingList` 89.2 -> 97.8.
+  Inline choices are global: changing one loader moved `LoadJumpingCharacterCreationQuota` 100 -> 97.3 until its column 1 used the member call too. Change all loaders of one file together.
+- do-while fetch loop (scd-4) plus the A17 tail and the `ID128_ID_ZERO` copy (A8) on the 4 loaders: small gains (+1.9 to +0.5) and the base for the BindCol form.
 
-Not tried (trial limit of 3):
-- `RetrieveExpiredDeletionWaitingList` 89.2, `LoadJumpingCharacterCreationQuota` 98.0 (1 extra `Fetch` call, ours has one `DbTransaction::Fetch` too many), `LoadGameAccounExpInfo` 86.5, `LoadGameAccountContentQuotaList` 80.6.
-- Idea for the next card: Fetch loop form as in `LoadGameAccount` (80.5) and `LoadCharacterList` (79.0). They share the same DIFF family.
+Trials (max 3 forms per function; each loader used 2):
 
-Build fact: a new worktree can lack the ignored `vendor/zstd/src` (same as ld-17). Copy it before `tools/parity.sh`.
+| Function | Form | Result |
+| --- | --- | --- |
+| `LoadGameAccounExpInfo` | 1 do-while, A17, A8; 2 BindCol member | 86.5, 88.4, 100 |
+| `LoadJumpingCharacterCreationQuota` | 1 do-while, A17, A8; 2 BindCol member for column 1 | 98.0 -> 100, 97.3 (after neighbour change), 100 |
+| `LoadGameAccountContentQuotaList` | 1 do-while, A17, A8; 2 BindCol member | 80.6, 82.5, 95.3 |
+| `RetrieveExpiredDeletionWaitingList` | 1 do-while; 2 BindCol member | 89.2, 89.7, 97.8 |
+
+What did not reach MATCH:
+- `LoadGameAccountContentQuotaList` 95.3: the original calls `vector<AccountContentQuota>::push_back` out of line; ours inlines it. The other callers are stubs. A `noinline` wrapper would only fool funcdiff.
+- `RetrieveExpiredDeletionWaitingList` 97.8: the original calls `vector<LobbyService::DB*>::_Reserve` (linker folding of pointer-vector code, other PDB name) and `vector::clear` out of line.
+- Next card idea: try the BindCol member form on `LoadGameAccount` 80.5, `LoadCharacterList` 79.0, `LoadGameWorldCluster` 84.2, `LoadGameWorld` 77.5 (they use the macro). The ld-17 note said "one `statmentErrorLog` per column" for the last three. Check it with the disassembly first.
+
+Build facts:
+- A new worktree can lack the ignored `vendor/zstd/src` (same as ld-17). Copy it before `tools/parity.sh`.
+- A full `tools/parity.sh` right after `gate.sh` gave LD 460 once, while the same source gave 462 in `tools/parity.sh LobbyDaemon` and in a second full run. Run parity twice when the LD count looks low. ❓ (cause not found)

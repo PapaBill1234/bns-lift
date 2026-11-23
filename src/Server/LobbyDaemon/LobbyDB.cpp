@@ -132,7 +132,7 @@ bool LobbyDB::LoadGameAccount(int& dbrtn, id128 const& gameAccountId, bool& exis
     }
     for (;;)
     {
-        int const fetched = tran.Tran->Fetch(0);  // LIFT: Fetch never reads edx (see SmartCouponDB.cpp)
+        int const fetched = tran.Tran->Fetch(0);  // LIFT: DbTransaction::Fetch (0xe8850) never reads edx; no call site sets it (see SmartCouponDB.cpp)
         if (fetched == -1)
         {
             Log::Write(Log::LT_ERROR, LOBBYDB_FILE, 154, L"[lobbydb], load game-account fail; fetch fail");
@@ -474,7 +474,7 @@ bool LobbyDB::LoadCharacterList(int& dbrtn, id128 const& gameAccountId, Characte
         memset(&db_deletionDelayTime, 0, sizeof(db_deletionDelayTime));
         memset(&db_lastPlayEndTime, 0, sizeof(db_lastPlayEndTime));
         memset(db_showcaseData, 0, sizeof(db_showcaseData));
-        int const fetched = tran.Tran->Fetch(0);  // LIFT: Fetch never reads edx (see SmartCouponDB.cpp)
+        int const fetched = tran.Tran->Fetch(0);  // LIFT: DbTransaction::Fetch (0xe8850) never reads edx; no call site sets it (see SmartCouponDB.cpp)
         if (fetched == -1)
         {
             Log::Write(Log::LT_ERROR, LOBBYDB_FILE, 762, L"[lobbydb], load character list fail; fetch fail");
@@ -632,7 +632,7 @@ bool LobbyDB::LoadGameWorldCluster(int& dbrtn, GameWorldCluster::DB**& out, int&
         memset(&dbfield, 0, sizeof(dbfield));
         db_pubip4str[0] = 0;
         db_privip4str[0] = 0;
-        int const fetched = tran.Tran->Fetch(0);  // LIFT: Fetch never reads edx (see SmartCouponDB.cpp)
+        int const fetched = tran.Tran->Fetch(0);  // LIFT: DbTransaction::Fetch (0xe8850) never reads edx; no call site sets it (see SmartCouponDB.cpp)
         if (fetched == -1)
         {
             Log::Write(Log::LT_ERROR, LOBBYDB_FILE, 912, L"[lobbydb], load game-world-cluster fail; fetch fail");
@@ -800,7 +800,7 @@ bool LobbyDB::LoadGameWorld(int& dbrtn, GameWorld::DB**& out, int& count)
     for (;;)
     {
         memset(&dbfield, 0, sizeof(dbfield));
-        int const fetched = tran.Tran->Fetch(0);  // LIFT: Fetch never reads edx (see SmartCouponDB.cpp)
+        int const fetched = tran.Tran->Fetch(0);  // LIFT: DbTransaction::Fetch (0xe8850) never reads edx; no call site sets it (see SmartCouponDB.cpp)
         if (fetched == -1)
         {
             Log::Write(Log::LT_ERROR, LOBBYDB_FILE, 1067, L"[lobbydb], load game world fail; fetch fail");
@@ -1106,7 +1106,7 @@ bool LobbyDB::CancelCharacterCreation(int& dbrtn, unsigned long long pcid)
 }
 
 // 0xa4320
-#pragma comment(linker, "/INCLUDE:?TryCharacterDeletion@LobbyDB@@SA_NAEAH_K@Z")   // LIFT: keep until the caller is lifted (0x31cf0)
+#pragma comment(linker, "/INCLUDE:?TryCharacterDeletion@LobbyDB@@SA_NAEAH_K@Z")   // LIFT: keep. Character::TryDeletion (0x31cf0) is lifted but dead-stripped. Its caller DeleteCharacterJob::deleteReq (0x482b0) is a stub.
 bool LobbyDB::TryCharacterDeletion(int& dbrtn, unsigned long long pcid)
 {
     // PDB local enum LobbyDB::TryCharacterDeletion::__l11::Param. ParamDesc holds the names.
@@ -1151,7 +1151,7 @@ bool LobbyDB::TryCharacterDeletion(int& dbrtn, unsigned long long pcid)
 }
 
 // 0xa44f0
-#pragma comment(linker, "/INCLUDE:?FinishCharacterDeletion@LobbyDB@@SA_NAEAH_KJPEA_J@Z")   // LIFT: keep until the caller is lifted (0x31e60)
+#pragma comment(linker, "/INCLUDE:?FinishCharacterDeletion@LobbyDB@@SA_NAEAH_KJPEA_J@Z")   // LIFT: keep. Character::FinishDeletion (0x31e60) is lifted but dead-stripped. Its callers DeleteCharacterJob::directDelete (0x493a0) and scheduleDelete (0x49770) are stubs.
 bool LobbyDB::FinishCharacterDeletion(int& dbrtn, unsigned long long pcid, long remain, long long* until)
 {
     // PDB local enum LobbyDB::FinishCharacterDeletion::__l11::Param. ParamDesc holds the names.
@@ -1212,7 +1212,7 @@ bool LobbyDB::FinishCharacterDeletion(int& dbrtn, unsigned long long pcid, long 
 }
 
 // 0xa47c0
-#pragma comment(linker, "/INCLUDE:?CancelCharacterDeletion@LobbyDB@@SA_NAEAH_K@Z")   // LIFT: keep until the caller is lifted (0x31fb0)
+#pragma comment(linker, "/INCLUDE:?CancelCharacterDeletion@LobbyDB@@SA_NAEAH_K@Z")   // LIFT: keep. Character::CancelDeletion (0x31fb0) is lifted but dead-stripped. Its callers DeleteCharacterJob::deleteReq (0x482b0), deleteFail (0x48a10) and RecoverPcJob::__restoreStuckPc (0x66600) are stubs.
 bool LobbyDB::CancelCharacterDeletion(int& dbrtn, unsigned long long pcid)
 {
     // PDB local enum LobbyDB::CancelCharacterDeletion::__l11::Param. ParamDesc holds the names.
@@ -1257,7 +1257,7 @@ bool LobbyDB::CancelCharacterDeletion(int& dbrtn, unsigned long long pcid)
 }
 
 // 0xa4990
-#pragma comment(linker, "/INCLUDE:?TryCharacterRestoration@LobbyDB@@SA_NAEAH_K@Z")   // LIFT: keep until the caller is lifted (0x320a0)
+#pragma comment(linker, "/INCLUDE:?TryCharacterRestoration@LobbyDB@@SA_NAEAH_K@Z")   // LIFT: keep. Character::TryRestore (0x320a0) is lifted but dead-stripped. Its caller CancelWaitCharacterDeletionJob::restore (0x196f0) is a stub.
 bool LobbyDB::TryCharacterRestoration(int& dbrtn, unsigned long long pcid)
 {
     // PDB local enum LobbyDB::TryCharacterRestoration::__l11::Param. ParamDesc holds the names.
@@ -1302,7 +1302,7 @@ bool LobbyDB::TryCharacterRestoration(int& dbrtn, unsigned long long pcid)
 }
 
 // 0xa4b60
-#pragma comment(linker, "/INCLUDE:?FinishCharacterRestoration@LobbyDB@@SA_NAEAH_K@Z")   // LIFT: keep until the caller is lifted (0x321e0)
+#pragma comment(linker, "/INCLUDE:?FinishCharacterRestoration@LobbyDB@@SA_NAEAH_K@Z")   // LIFT: keep. Character::FinishRestore (0x321e0) is lifted but dead-stripped. Its callers CancelWaitCharacterDeletionJob::restoreCharacterOk (0x19f30), RecoverPcJob::__restoreStuckPc (0x66600), TryEnterGameWorldJob::restorePcOk (0x7c820) and restorePcFail (0x7cba0) are stubs.
 bool LobbyDB::FinishCharacterRestoration(int& dbrtn, unsigned long long pcid)
 {
     // PDB local enum LobbyDB::FinishCharacterRestoration::__l11::Param. ParamDesc holds the names.
@@ -1347,7 +1347,7 @@ bool LobbyDB::FinishCharacterRestoration(int& dbrtn, unsigned long long pcid)
 }
 
 // 0xa4d30
-#pragma comment(linker, "/INCLUDE:?RetrieveExpiredDeletionWaitingList@LobbyDB@@SA_NAEAHHAEAV?$vector@PEAUEndWaitDeletionInfo@LobbyDB@@V?$StlAllocator@PEAUEndWaitDeletionInfo@LobbyDB@@$01@@@std@@@Z")   // LIFT: keep until the caller is lifted (0x568e0)
+#pragma comment(linker, "/INCLUDE:?RetrieveExpiredDeletionWaitingList@LobbyDB@@SA_NAEAHHAEAV?$vector@PEAUEndWaitDeletionInfo@LobbyDB@@V?$StlAllocator@PEAUEndWaitDeletionInfo@LobbyDB@@$01@@@std@@@Z")   // LIFT: keep. The caller LobbyCharacterDeletionScheduler (0x568e0) is a stub.
 bool LobbyDB::RetrieveExpiredDeletionWaitingList(int& dbrtn, int concurrentProcessingCount,
                                                  std::vector<EndWaitDeletionInfo*, StlAllocator<EndWaitDeletionInfo*, 2> >& out)
 {
@@ -1367,7 +1367,7 @@ bool LobbyDB::RetrieveExpiredDeletionWaitingList(int& dbrtn, int concurrentProce
         COL_MAX = 3
     };
     static wchar_t const* const ParamDesc[PARAM_MAX] = {L"PARAM_RETURN", L"PARAM_MAX_SEARCH_COUNT"};
-    static wchar_t const* const ColumnDesc[COL_MAX] = {L"COL_GAME_ACCOUNT_ID", L"COL_WORLDID", L"COL_PCID"};
+    static wchar_t const* const ColDesc[COL_MAX] = {L"COL_GAME_ACCOUNT_ID", L"COL_WORLDID", L"COL_PCID"};
     wchar_t const* const query = L"{?=CALL dbo.usp_RetrieveExpiredDeletionWaitingList(?)}";
 
     AutoDbTran tran(1);
@@ -1400,39 +1400,43 @@ bool LobbyDB::RetrieveExpiredDeletionWaitingList(int& dbrtn, int concurrentProce
                    ParamDesc[param]);
         return false;
     }
-    // LIFT: the original has the DbTransaction::BindCol body inline (see LoadGameAccount 0x9fe00).
-    DB_BIND_COL_NI(tran.Tran, 1, &rows, 0, SQL_C_GUID, &collen[0], NOT_INIT, BIND_ERROR);
+    // LIFT: BindCol (Db.cpp:286) as a member call. VS2010 inlines it as the original does. The DB_BIND_COL_NI form kept
+    // one statmentErrorLog site for each column; the original has one site (0xa4d30, 0xa79f0, 0xa84f0).
+    if (!tran.Tran->BindCol(1, &rows, 0, SQL_C_GUID, &collen[0]))
+        goto BIND_ERROR;
     column = COL_WORLDID;
-    DB_BIND_COL_NI(tran.Tran, 2, &rows.wid, 0, SQL_C_SSHORT, &collen[1], NOT_INIT, BIND_ERROR);
+    if (!tran.Tran->BindCol(2, &rows.wid, 0, SQL_C_SSHORT, &collen[1]))
+        goto BIND_ERROR;
     column = COL_PCID;
-    DB_BIND_COL_NI(tran.Tran, 3, &rows.pcid, 0, SQL_C_SBIGINT, &collen[2], NOT_INIT, BIND_ERROR);
+    if (!tran.Tran->BindCol(3, &rows.pcid, 0, SQL_C_SBIGINT, &collen[2]))
+        goto BIND_ERROR;
     if (!tran.Tran->Execute())
     {
         Log::Write(Log::LT_ERROR, LOBBYDB_FILE, 1825,
                    L"[lobbydb], retrieve expired deletion waiting list fail; execute fail, dbrtn:%d", dbrtn);
         return false;
     }
-    for (;;)
+    int fetched;
+    do  // LIFT: do-while form (scd-4). The original has one Fetch site; a for (;;) duplicated the loop header.
     {
         memset(&rows, 0, sizeof(rows));
-        int const fetched = tran.Tran->Fetch(0);  // LIFT: Fetch never reads edx (see SmartCouponDB.cpp)
+        fetched = tran.Tran->Fetch(0);  // LIFT: DbTransaction::Fetch (0xe8850) never reads edx; no call site sets it (see SmartCouponDB.cpp)
         if (fetched == -1)
         {
             Log::Write(Log::LT_ERROR, LOBBYDB_FILE, 1835,
                        L"[lobbydb], retrieve expired deletion waiting list fail; fetch fail");
             break;
         }
-        if (fetched == 0)
+        if (fetched != 0)
         {
-            if (dbrtn == 0)
-                return true;
-            break;
+            EndWaitDeletionInfo* loaded =
+                static_cast<EndWaitDeletionInfo*>(Memory::_Manager[2]->AllocZero(32, LOBBYDB_FILE, 1841));
+            *loaded = rows;
+            out.push_back(loaded);
         }
-        EndWaitDeletionInfo* loaded =
-            static_cast<EndWaitDeletionInfo*>(Memory::_Manager[2]->AllocZero(32, LOBBYDB_FILE, 1841));
-        *loaded = rows;
-        out.push_back(loaded);
-    }
+    } while (fetched != 0);
+    if (fetched == 0 && dbrtn == 0)
+        return true;
     // $_error_3: free the rows read so far.
     for (std::vector<EndWaitDeletionInfo*, StlAllocator<EndWaitDeletionInfo*, 2> >::iterator it = out.begin();
          it != out.end(); ++it)
@@ -1443,17 +1447,15 @@ bool LobbyDB::RetrieveExpiredDeletionWaitingList(int& dbrtn, int concurrentProce
     out.clear();
     return false;
 
-NOT_INIT:
-    Log::Write(Log::LT_ERROR, L"source\\Db.cpp", 286, L"DbTransaction::BindCol(), Not initialized");
 BIND_ERROR:
     Log::Write(Log::LT_ERROR, LOBBYDB_FILE, 1860,
                L"[lobbydb], retrieve expired deletion waiting list fail; bind column fail, column:%s",
-               ColumnDesc[column]);
+               ColDesc[column]);
     return false;
 }
 
 // 0xa5220
-#pragma comment(linker, "/INCLUDE:?ExpireCharacterDeletionWaiting@LobbyDB@@SA_NAEAH_K@Z")   // LIFT: keep until the caller is lifted (0x568e0)
+#pragma comment(linker, "/INCLUDE:?ExpireCharacterDeletionWaiting@LobbyDB@@SA_NAEAH_K@Z")   // LIFT: keep. The caller LobbyCharacterDeletionScheduler (0x568e0) is a stub.
 bool LobbyDB::ExpireCharacterDeletionWaiting(int& dbrtn, unsigned long long pcid)
 {
     // PDB local enum LobbyDB::ExpireCharacterDeletionWaiting::__l11::Param. ParamDesc holds the names.
@@ -1498,7 +1500,7 @@ bool LobbyDB::ExpireCharacterDeletionWaiting(int& dbrtn, unsigned long long pcid
 }
 
 // 0xa53f0
-#pragma comment(linker, "/INCLUDE:?UpdateLastPlayStart@LobbyDB@@SA_NAEAH_KK@Z")   // LIFT: keep until the caller is lifted (0x326c0)
+#pragma comment(linker, "/INCLUDE:?UpdateLastPlayStart@LobbyDB@@SA_NAEAH_KK@Z")   // LIFT: keep. Character::StartGameWorldPlay (0x326c0) is lifted but dead-stripped. Its caller EnterGameWorldJob::enterGameWorld (0x85240) is a stub.
 bool LobbyDB::UpdateLastPlayStart(int& dbrtn, unsigned long long pcid, unsigned long ipv4)
 {
     // PDB local enum LobbyDB::UpdateLastPlayStart::__l11::Param. ParamDesc holds the names.
@@ -1562,7 +1564,7 @@ bool LobbyDB::UpdateLastPlayStart(int& dbrtn, unsigned long long pcid, unsigned 
 }
 
 // 0xa5690
-#pragma comment(linker, "/INCLUDE:?UpdateLastPlayEnd@LobbyDB@@SA_NAEAH_K@Z")   // LIFT: keep until the caller is lifted (0x32800)
+#pragma comment(linker, "/INCLUDE:?UpdateLastPlayEnd@LobbyDB@@SA_NAEAH_K@Z")   // LIFT: keep. Character::EndGameWorldPlay (0x32800) is lifted but dead-stripped. Its callers KickJob::kick (0x865e0), LeaveGameWorldJob::leaveGameWorld (0x87e90) and LogoutInGameWorldJob::logout (0x5af30) are stubs.
 bool LobbyDB::UpdateLastPlayEnd(int& dbrtn, unsigned long long pcid)
 {
     // PDB local enum LobbyDB::UpdateLastPlayEnd::__l11::Param. ParamDesc holds the names.
@@ -1612,7 +1614,7 @@ bool LobbyDB::UpdateLastPlayEnd(int& dbrtn, unsigned long long pcid)
 }
 
 // 0xa58b0
-#pragma comment(linker, "/INCLUDE:?UpdateCharacterData@LobbyDB@@SA_NAEAH_KFFPEADH@Z")   // LIFT: keep until the caller is lifted (0x381c0)
+#pragma comment(linker, "/INCLUDE:?UpdateCharacterData@LobbyDB@@SA_NAEAH_KFFPEADH@Z")   // LIFT: keep. The lifted caller CliSession::UpdateCharacterData (0x381c0) calls the stub CliSession::getCharacter (0x35cf0) first. The stub aborts, so the build drops the call to this function.
 bool LobbyDB::UpdateCharacterData(int& dbrtn, unsigned long long pcid, short job, short level, char* showcase, int showcaseSize)
 {
     // PDB local enum LobbyDB::UpdateCharacterData::__l11::Param. ParamDesc holds the names.
@@ -1672,8 +1674,8 @@ bool LobbyDB::UpdateCharacterData(int& dbrtn, unsigned long long pcid, short job
     }
     if (!tran.Tran->Execute())
     {
-        // LIFT: the original format string ends after dbrtn:%d. The call passes a second literal and the other values
-        // after it (0x1a7296, 0x1a7210). The lift keeps the call. The log line shows only the first value. Log text only.
+        // BUG: (0xa58b0, strings 0x1a7296/0x1a7210) the format ends after dbrtn:%d. %d prints the address of the second
+        // literal, not dbrtn. The lift keeps the call for parity. Log text only.
         Log::Write(Log::LT_ERROR, LOBBYDB_FILE, 2123, L"[lobbydb], update character data fail; execute fail, dbrtn:%d",
                    L"pcid:0x%I64X, job:%d, level:%d, showcase:%p, size:%d", dbrtn, pcid, job, level, showcase, showcaseSize);
         return false;
@@ -1744,7 +1746,7 @@ bool LobbyDB::UpdateCharacterLevel(int& dbrtn, unsigned long long pcid, short le
 }
 
 // 0xa5f80
-// LIFT: the PDB signature has an int between guildname and outGuildid. The 2019 body does not read it (Hex-rays shows
+// LIFT: the PDB signature has an int between guildname and outGuildid. The 2019 body (0xa5f80) does not read it (Hex-rays shows
 // 6 parameters). The int stays unnamed. ❓
 #pragma comment(linker, "/INCLUDE:?TryGuildRegistration@LobbyDB@@SA_NAEAHFFDPEB_WHPEA_K@Z")   // LIFT: keep until the caller is lifted (0x8d590)
 bool LobbyDB::TryGuildRegistration(int& dbrtn, short clusterId, short wid, char guildType, wchar_t const* guildname, int,
@@ -1784,7 +1786,7 @@ bool LobbyDB::TryGuildRegistration(int& dbrtn, short clusterId, short wid, char 
     dbrtn = 0;
     int param = PARAM_RETURN;
     unsigned long long paramlen[PARAM_MAX] = {0, 0, 0, 0, static_cast<unsigned long long>(SQL_NTS), 0};
-    unsigned long long guildId = 0;
+    unsigned long long guildid = 0;
     if (!tran.Tran->BindParam(1, SQL_PARAM_OUTPUT, &dbrtn, 0, 0, SQL_INTEGER, SQL_C_SLONG, &paramlen[0]) ||
         (param = PARAM_WORLD_CLUSTER_ID,
          !tran.Tran->BindParam(2, SQL_PARAM_INPUT, &clusterId, 0, 0, SQL_SMALLINT, SQL_C_SSHORT, &paramlen[1])) ||
@@ -1796,7 +1798,7 @@ bool LobbyDB::TryGuildRegistration(int& dbrtn, short clusterId, short wid, char 
          !tran.Tran->BindParam(5, SQL_PARAM_INPUT, const_cast<wchar_t*>(guildname), 0x42, 0x20, SQL_WVARCHAR, SQL_C_WCHAR,
                                &paramlen[4])) ||
         (param = PARAM_GUILD_ID,
-         !tran.Tran->BindParam(6, SQL_PARAM_INPUT_OUTPUT, &guildId, 0, 0, SQL_BIGINT, SQL_C_UBIGINT, &paramlen[5])))
+         !tran.Tran->BindParam(6, SQL_PARAM_INPUT_OUTPUT, &guildid, 0, 0, SQL_BIGINT, SQL_C_UBIGINT, &paramlen[5])))
     {
         Log::Write(Log::LT_ERROR, LOBBYDB_FILE, 2281,
                    L"[lobbydb], try guild registration fail; bind parameter fail, param:%s", ParamDesc[param]);
@@ -1810,7 +1812,7 @@ bool LobbyDB::TryGuildRegistration(int& dbrtn, short clusterId, short wid, char 
     if (dbrtn != 0)
         return false;
     if (outGuildid != nullptr)
-        *outGuildid = guildId;
+        *outGuildid = guildid;
     return true;
 }
 
@@ -2179,7 +2181,7 @@ bool LobbyDB::LoadJumpingCharacterCreationQuota(int& dbrtn, id128 const& gameAcc
     memset(paramlen, 0, sizeof(paramlen));
     memset(collen, 0, sizeof(collen));
     id128 dbGameAccountId;
-    memset(&dbGameAccountId, 0, sizeof(dbGameAccountId));
+    dbGameAccountId = ID128_ID_ZERO;  // LIFT: A8 (ld-14). The original copies ID128_ID_ZERO (0x12d870), not a literal zero.
     if (!tran.Tran->BindParam(1, SQL_PARAM_OUTPUT, &dbrtn, 0, 0, SQL_INTEGER, SQL_C_SLONG, &paramlen[0]) ||
         (param = PARAM_GAME_ACCOUNT_ID,
          !tran.Tran->BindParam(2, SQL_PARAM_INPUT, const_cast<id128*>(&gameAccountId), 0, 0, SQL_GUID, SQL_C_GUID,
@@ -2190,9 +2192,10 @@ bool LobbyDB::LoadJumpingCharacterCreationQuota(int& dbrtn, id128 const& gameAcc
                    ParamDesc[param]);
         return false;
     }
-    // LIFT: the original has the DbTransaction::BindCol body inline for column 1 only (see LoadGameAccount 0x9fe00).
-    // Columns 2 and 3 call DbTransaction::BindCol.
-    DB_BIND_COL_NI(tran.Tran, 1, &dbGameAccountId, 0, SQL_C_GUID, &collen[0], NOT_INIT, BIND_ERROR);
+    // LIFT: BindCol (Db.cpp:286) as a member call for all 3 columns (0xa70b0). The DB_BIND_COL_NI form for column 1 gave 97.3
+    // once the other loaders used the member call.
+    if (!tran.Tran->BindCol(1, &dbGameAccountId, 0, SQL_C_GUID, &collen[0]))
+        goto BIND_ERROR;
     column = COL_QUOTA_CREATION_QUOTA;
     if (!tran.Tran->BindCol(2, &outDb, 0, SQL_C_SLONG, &collen[1]))
         goto BIND_ERROR;
@@ -2205,25 +2208,24 @@ bool LobbyDB::LoadJumpingCharacterCreationQuota(int& dbrtn, id128 const& gameAcc
                    L"[lobbydb], load jumping-character-creation-quota fail; execute fail, dbrtn:%d", dbrtn);
         return false;
     }
-    for (;;)
+    int fetched;
+    do  // LIFT: do-while form (scd-4). The original has one Fetch site (0xa70b0).
     {
-        int const fetched = tran.Tran->Fetch(0);  // LIFT: Fetch never reads edx (see SmartCouponDB.cpp)
+        fetched = tran.Tran->Fetch(0);  // LIFT: DbTransaction::Fetch (0xe8850) never reads edx; no call site sets it (see SmartCouponDB.cpp)
         if (fetched == -1)
         {
             Log::Write(Log::LT_ERROR, LOBBYDB_FILE, 2737,
                        L"[lobbydb], load jumping-character-creation-quota fail; fetch fail");
             return false;
         }
-        if (fetched == 0)
-            break;
-        if (++fetchCount > 1)
+        if (fetched != 0 && ++fetchCount > 1)
         {
             Log::Write(Log::LT_ERROR, LOBBYDB_FILE, 2747,
                        L"[lobbydb], load jumping-character-creation-quota fail; invalid fetch count, fetchCount:%d",
                        fetchCount);
             return false;
         }
-    }
+    } while (fetched != 0);
     {
         auto const& id = gameAccountId.guid;
         Log::Write(Log::LT_DEBUG, LOBBYDB_FILE, 2752,
@@ -2231,10 +2233,10 @@ bool LobbyDB::LoadJumpingCharacterCreationQuota(int& dbrtn, id128 const& gameAcc
                    id.id1, id.id2, id.id3, id.id4[0], id.id4[1], id.id4[2], id.id4[3], id.id4[4], id.id4[5],
                    id.id4[6], id.id4[7], fetchCount);
     }
-    return dbrtn == 0;
+    if (dbrtn != 0)
+        return false;
+    return true;
 
-NOT_INIT:
-    Log::Write(Log::LT_ERROR, L"source\\Db.cpp", 286, L"DbTransaction::BindCol(), Not initialized");
 BIND_ERROR:
     Log::Write(Log::LT_ERROR, LOBBYDB_FILE, 2765,
                L"[lobbydb], load jumping-character-creation-quota fail; bind column fail, column:%s", ColDesc[column]);
@@ -2295,7 +2297,7 @@ bool LobbyDB::BindCharacterSlot(int& dbrtn, unsigned long long pcid, id128 const
 }
 
 // 0xa77e0
-#pragma comment(linker, "/INCLUDE:?UpdateJumpingCharacterStateComplete@LobbyDB@@SA_NAEAH_K_N@Z")   // LIFT: keep until the caller is lifted (0x32350)
+#pragma comment(linker, "/INCLUDE:?UpdateJumpingCharacterStateComplete@LobbyDB@@SA_NAEAH_K_N@Z")   // LIFT: keep. Character::UpgradeJumpingCharacterState (0x32350) is lifted but dead-stripped. Its caller UpgradeJumpingCharacterStateJob::upgradeJumpingCharacterState (0x2d9c0) is a stub.
 bool LobbyDB::UpdateJumpingCharacterStateComplete(int& dbrtn, unsigned long long pcid, bool withCreateionQuota)
 {
     // PDB local enum LobbyDB::UpdateJumpingCharacterStateComplete::__l14::Param. ParamDesc holds the names.
@@ -2399,7 +2401,7 @@ bool LobbyDB::LoadGameAccounExpInfo(int& dbrtn, id128 const& gameAccountId, bool
     memset(paramlen, 0, sizeof(paramlen));
     memset(collen, 0, sizeof(collen));
     id128 dbGameAccountId;
-    memset(&dbGameAccountId, 0, sizeof(dbGameAccountId));
+    dbGameAccountId = ID128_ID_ZERO;  // LIFT: A8 (ld-14). The original copies ID128_ID_ZERO (0x12d870), not a literal zero.
     GameAccountExpInfo::ExpInfo db;
     memset(&db, 0, sizeof(db));
     long long db_lastUpdateTime = 0;
@@ -2412,39 +2414,46 @@ bool LobbyDB::LoadGameAccounExpInfo(int& dbrtn, id128 const& gameAccountId, bool
                    L"[lobbydb], load game-account-exp fail; bind parameter fail, param:%s", ParamDesc[param]);
         return false;
     }
-    // LIFT: the original has the DbTransaction::BindCol body inline (see LoadGameAccount 0x9fe00).
-    DB_BIND_COL_NI(tran.Tran, 1, &dbGameAccountId, 0, SQL_C_GUID, &collen[0], NOT_INIT, BIND_ERROR);
+    // LIFT: BindCol (Db.cpp:286) as a member call. VS2010 inlines it as the original does. The DB_BIND_COL_NI form kept
+    // one statmentErrorLog site for each column; the original has one site (0xa4d30, 0xa79f0, 0xa84f0).
+    if (!tran.Tran->BindCol(1, &dbGameAccountId, 0, SQL_C_GUID, &collen[0]))
+        goto BIND_ERROR;
     column = COL_GAME_ACCOUNT_EXP;
-    DB_BIND_COL_NI(tran.Tran, 2, &db, 0, SQL_C_SBIGINT, &collen[1], NOT_INIT, BIND_ERROR);
+    if (!tran.Tran->BindCol(2, &db, 0, SQL_C_SBIGINT, &collen[1]))
+        goto BIND_ERROR;
     column = COL_GAME_ACCOUNT_EXP_QUOTA_PER_DAY;
-    DB_BIND_COL_NI(tran.Tran, 3, &db.expQuotaPerDay, 0, SQL_C_LONG, &collen[2], NOT_INIT, BIND_ERROR);
+    if (!tran.Tran->BindCol(3, &db.expQuotaPerDay, 0, SQL_C_LONG, &collen[2]))
+        goto BIND_ERROR;
     column = COL_GAME_ACCOUNT_LAST_UPDATE_TIME;
-    DB_BIND_COL_NI(tran.Tran, 4, &db_lastUpdateTime, 0, SQL_C_SBIGINT, &collen[3], NOT_INIT, BIND_ERROR);
+    if (!tran.Tran->BindCol(4, &db_lastUpdateTime, 0, SQL_C_SBIGINT, &collen[3]))
+        goto BIND_ERROR;
     if (!tran.Tran->Execute())
     {
         Log::Write(Log::LT_ERROR, LOBBYDB_FILE, 2966,
                    L"[lobbydb], load game-account-exp fail; execute fail, dbrtn:%d", dbrtn);
         return false;
     }
-    for (;;)
+    int fetched;
+    do  // LIFT: do-while form (scd-4). The original has one Fetch site (0xa79f0).
     {
-        int const fetched = tran.Tran->Fetch(0);  // LIFT: Fetch never reads edx (see SmartCouponDB.cpp)
+        fetched = tran.Tran->Fetch(0);  // LIFT: DbTransaction::Fetch (0xe8850) never reads edx; no call site sets it (see SmartCouponDB.cpp)
         if (fetched == -1)
         {
             Log::Write(Log::LT_ERROR, LOBBYDB_FILE, 2974, L"[lobbydb], load game-account-exp fail; fetch fail");
             return false;
         }
-        if (fetched == 0)
-            break;
-        outExpInfo.exp = db.exp;
-        outExpInfo.expQuotaPerDay = db.expQuotaPerDay;
-        outExpInfo.lastUpdateTime = db_lastUpdateTime;
-        exists = true;
-    }
-    return dbrtn == 0;
+        if (fetched != 0)
+        {
+            outExpInfo.exp = db.exp;
+            outExpInfo.expQuotaPerDay = db.expQuotaPerDay;
+            outExpInfo.lastUpdateTime = db_lastUpdateTime;
+            exists = true;
+        }
+    } while (fetched != 0);
+    if (dbrtn != 0)
+        return false;
+    return true;
 
-NOT_INIT:
-    Log::Write(Log::LT_ERROR, L"source\\Db.cpp", 286, L"DbTransaction::BindCol(), Not initialized");
 BIND_ERROR:
     Log::Write(Log::LT_ERROR, LOBBYDB_FILE, 2998,
                L"[lobbydb], load game-account-exp fail; bind column fail, column:%s", ColDesc[column]);
@@ -2642,7 +2651,7 @@ bool LobbyDB::LoadGameAccountContentQuotaList(int& dbrtn, id128 const& gameAccou
     memset(paramlen, 0, sizeof(paramlen));
     memset(collen, 0, sizeof(collen));
     id128 dbGameAccountId;
-    memset(&dbGameAccountId, 0, sizeof(dbGameAccountId));
+    dbGameAccountId = ID128_ID_ZERO;  // LIFT: A8 (ld-14). The original copies ID128_ID_ZERO (0x12d870), not a literal zero.
     AccountContentQuota db;
     memset(&db, 0, sizeof(db));
     if (!tran.Tran->BindParam(1, SQL_PARAM_OUTPUT, &dbrtn, 0, 0, SQL_INTEGER, SQL_C_SLONG, &paramlen[0]) ||
@@ -2655,39 +2664,45 @@ bool LobbyDB::LoadGameAccountContentQuotaList(int& dbrtn, id128 const& gameAccou
                    ParamDesc[param]);
         return false;
     }
-    // LIFT: the original has the DbTransaction::BindCol body inline (see LoadGameAccount 0x9fe00).
-    DB_BIND_COL_NI(tran.Tran, 1, &dbGameAccountId, 0, SQL_C_GUID, &collen[0], NOT_INIT, BIND_ERROR);
+    // LIFT: BindCol (Db.cpp:286) as a member call. VS2010 inlines it as the original does. The DB_BIND_COL_NI form kept
+    // one statmentErrorLog site for each column; the original has one site (0xa4d30, 0xa79f0, 0xa84f0).
+    if (!tran.Tran->BindCol(1, &dbGameAccountId, 0, SQL_C_GUID, &collen[0]))
+        goto BIND_ERROR;
     column = COL_DATA_ID;
-    DB_BIND_COL_NI(tran.Tran, 2, &db, 0, SQL_C_SLONG, &collen[1], NOT_INIT, BIND_ERROR);
+    if (!tran.Tran->BindCol(2, &db, 0, SQL_C_SLONG, &collen[1]))
+        goto BIND_ERROR;
     column = COL_VERSION;
-    DB_BIND_COL_NI(tran.Tran, 3, &db.version, 0, SQL_C_SSHORT, &collen[2], NOT_INIT, BIND_ERROR);
+    if (!tran.Tran->BindCol(3, &db.version, 0, SQL_C_SSHORT, &collen[2]))
+        goto BIND_ERROR;
     column = COL_QUANTITY;
-    DB_BIND_COL_NI(tran.Tran, 4, &db.quantity, 0, SQL_C_SBIGINT, &collen[3], NOT_INIT, BIND_ERROR);
+    if (!tran.Tran->BindCol(4, &db.quantity, 0, SQL_C_SBIGINT, &collen[3]))
+        goto BIND_ERROR;
     column = COL_LAST_UPDATE_TIME;
-    DB_BIND_COL_NI(tran.Tran, 5, &db.lastUpdateTime, 0, SQL_C_SBIGINT, &collen[4], NOT_INIT, BIND_ERROR);
+    if (!tran.Tran->BindCol(5, &db.lastUpdateTime, 0, SQL_C_SBIGINT, &collen[4]))
+        goto BIND_ERROR;
     if (!tran.Tran->Execute())
     {
         Log::Write(Log::LT_ERROR, LOBBYDB_FILE, 3205,
                    L"[lobbydb], load game-account-content-quota fail; execute fail, dbrtn:%d", dbrtn);
         return false;
     }
-    for (;;)
+    int fetched;
+    do  // LIFT: do-while form (scd-4). The original has one Fetch site (0xa84f0).
     {
-        int const fetched = tran.Tran->Fetch(0);  // LIFT: Fetch never reads edx (see SmartCouponDB.cpp)
+        fetched = tran.Tran->Fetch(0);  // LIFT: DbTransaction::Fetch (0xe8850) never reads edx; no call site sets it (see SmartCouponDB.cpp)
         if (fetched == -1)
         {
             Log::Write(Log::LT_ERROR, LOBBYDB_FILE, 3213,
                        L"[lobbydb], load game-account-content-quota fail; fetch fail");
             return false;
         }
-        if (fetched == 0)
-            break;
-        quotaList.push_back(db);
-    }
-    return dbrtn == 0;
+        if (fetched != 0)
+            quotaList.push_back(db);
+    } while (fetched != 0);
+    if (dbrtn != 0)
+        return false;
+    return true;
 
-NOT_INIT:
-    Log::Write(Log::LT_ERROR, L"source\\Db.cpp", 286, L"DbTransaction::BindCol(), Not initialized");
 BIND_ERROR:
     Log::Write(Log::LT_ERROR, LOBBYDB_FILE, 3233,
                L"[lobbydb], load game-account-content-quota fail; bind column fail, column:%s", ColDesc[column]);
