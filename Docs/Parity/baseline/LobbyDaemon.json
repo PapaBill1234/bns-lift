@@ -175,11 +175,11 @@
 "status": "MATCH"
 },
 "AnonymousLobbyGatePresence::Close": {
-"calls": 0,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 66.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "AnonymousLobbyGatePresence::GetKind": {
 "calls": 100,
@@ -2043,12 +2043,26 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Grade::FetchGame": {
+"calls": 100,
+"consts": 75,
+"refs": 100,
+"score": 91.7,
+"status": "DIFF"
+},
 "GradeService::ApplyChangedGradeLevel": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"GradeService::FetchGameGradeList": {
+"calls": 100,
+"consts": 80,
+"refs": 0,
+"score": 60.0,
+"status": "DIFF"
 },
 "HandleLobbyGame_CancelRegisterGuildNotify": {
 "calls": 100,
@@ -2273,6 +2287,34 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"HandlePostOfficeHelloFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandlePostOfficeHelloOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandlePostOfficeRegisterPostFail": {
+"calls": 20,
+"consts": 50,
+"refs": 50,
+"score": 40.0,
+"status": "DIFF"
+},
+"HandlePostOfficeRegisterPostOk": {
+"calls": 20,
+"consts": 50,
+"refs": 50,
+"score": 40.0,
+"status": "DIFF"
 },
 "HeapMemoryManager::Alloc": {
 "calls": 100,
@@ -2784,6 +2826,293 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"LobbyGateChannel::SendAccountInventoryNotify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyGateChannel::SendBindCharacterSlotFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyGateChannel::SendCancelWaitCharacterDeletionFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyGateChannel::SendCancelWaitCharacterDeletionOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyGateChannel::SendCloseAnonymousSessionNotify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyGateChannel::SendCloseSessionNotify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyGateChannel::SendCreateCharacterFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyGateChannel::SendCreateCharacterOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyGateChannel::SendDeleteCharacterFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyGateChannel::SendDeleteCharacterOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyGateChannel::SendEndWaitCharacterDeletionNotify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyGateChannel::SendEndWaitNotify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyGateChannel::SendGetCharacterInfoFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyGateChannel::SendGetCharacterInfoListFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyGateChannel::SendGetChargeInfoFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyGateChannel::SendGetChargeInfoOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyGateChannel::SendGetEnterWorldTokenFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyGateChannel::SendGetEnterWorldTokenOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyGateChannel::SendGetGoodsCountFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyGateChannel::SendGetGoodsCountOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyGateChannel::SendGetWaitInfoFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyGateChannel::SendGetWaitInfoOk": {
+"calls": 97,
+"consts": 82,
+"refs": 75,
+"score": 84.8,
+"status": "DIFF"
+},
+"LobbyGateChannel::SendGiveupWaitFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyGateChannel::SendGiveupWaitOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyGateChannel::SendInitSessionWithLobbyTokenFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyGateChannel::SendInitSessionWithLobbyTokenOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyGateChannel::SendInitSessionWithNPTokenFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyGateChannel::SendInitSessionWithNPTokenOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyGateChannel::SendKickNotify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyGateChannel::SendListGoodsFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyGateChannel::SendListGoodsOk": {
+"calls": 56,
+"consts": 77,
+"refs": 60,
+"score": 64.3,
+"status": "DIFF"
+},
+"LobbyGateChannel::SendListLobbyServiceItemInfoOk": {
+"calls": 60,
+"consts": 100,
+"refs": 77,
+"score": 79.0,
+"status": "DIFF"
+},
+"LobbyGateChannel::SendRecoverCharacterFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyGateChannel::SendRecoverCharacterOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyGateChannel::SendStartSessionWithLobbyTokenFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyGateChannel::SendStartSessionWithLobbyTokenOk": {
+"calls": 51,
+"consts": 84,
+"refs": 60,
+"score": 65.1,
+"status": "DIFF"
+},
+"LobbyGateChannel::SendStartSessionWithNPTokenFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyGateChannel::SendStartSessionWithNPTokenOk": {
+"calls": 51,
+"consts": 90,
+"refs": 75,
+"score": 72.0,
+"status": "DIFF"
+},
+"LobbyGateChannel::SendStartWaitNotify": {
+"calls": 97,
+"consts": 82,
+"refs": 75,
+"score": 84.8,
+"status": "DIFF"
+},
+"LobbyGateChannel::SendTakeGoodsFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyGateChannel::SendTakeGoodsOk": {
+"calls": 62,
+"consts": 100,
+"refs": 82,
+"score": 81.6,
+"status": "DIFF"
 },
 "LobbyGatePresence::IsEqual": {
 "calls": 100,
@@ -3625,6 +3954,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"PipeConsole::SetInvalidInfo": {
+"calls": 100,
+"consts": 100,
+"refs": 80,
+"score": 93.3,
+"status": "DIFF"
+},
 "PipeConsole::addNode": {
 "calls": 100,
 "consts": 100,
@@ -3745,6 +4081,55 @@
 "status": "MATCH"
 },
 "Port::makeSession": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PostOfficeChannel::Connect": {
+"calls": 100,
+"consts": 100,
+"refs": 91,
+"score": 97.0,
+"status": "DIFF"
+},
+"PostOfficeChannel::SendHelloReq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PostOfficeChannel::SendRegisterPostReq": {
+"calls": 68,
+"consts": 87,
+"refs": 88,
+"score": 80.9,
+"status": "DIFF"
+},
+"PostOfficeSessionHandler::OnAccept": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PostOfficeSessionHandler::OnClose": {
+"calls": 100,
+"consts": 100,
+"refs": 91,
+"score": 97.0,
+"status": "DIFF"
+},
+"PostOfficeSessionHandler::OnConnect": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PostOfficeSessionHandler::PacketHandler": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
