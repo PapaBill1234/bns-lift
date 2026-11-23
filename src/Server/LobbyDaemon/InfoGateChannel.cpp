@@ -4,6 +4,7 @@
 #include <windows.h>
 #include <new>
 #include "InfoGateChannel.h"
+#include "LobbyInfoGatePacketHandler.h"
 #include "AlertSender.h"
 #include "Connection.h"
 #include "Daemon.h"
@@ -31,9 +32,6 @@ wchar_t const* const CHANNEL_H_FILE =
     L"E:\\DailyBuild02\\LobbyDaemon-Common-0.0.348\\depot\\Branch\\348NC\\Program\\Server\\BloodLib\\include\\Channel.h";
 }
 
-#pragma comment(linker, "/INCLUDE:?SendAuthTokenOk@InfoGateChannel@@QEAAX_K0AEBTid128@@@Z")  // LIFT: keep until the caller is lifted (0x2e6d0)
-#pragma comment(linker, "/INCLUDE:?SendAuthTokenFail@InfoGateChannel@@QEAAX_K0F@Z")  // LIFT: keep until the caller is lifted (0x2e870)
-#pragma comment(linker, "/INCLUDE:?SendGetWorldInfoListFail@InfoGateChannel@@QEAAXF@Z")  // LIFT: keep until the caller is lifted (0x2e980)
 #pragma comment(linker, "/INCLUDE:??1InfoGateChannelManager@@UEAA@XZ")  // LIFT: keep until the caller is lifted (0x2ea70)
 #pragma comment(linker, "/INCLUDE:?Add@InfoGateChannelManager@@QEAA_NPEAVInfoGateChannel@@@Z")  // LIFT: keep until the caller is lifted (0x2eb50)
 #pragma comment(linker, "/INCLUDE:?Remove@InfoGateChannelManager@@QEAAXF@Z")  // LIFT: keep until the caller is lifted (0x2ec10)
@@ -55,12 +53,12 @@ void InfoGateChannel::SendAuthTokenOk(unsigned long long tid, unsigned long long
     p.IsFragmentPacket = false;
     p.FragmentPacketCmd = 0;
     p.Allocate();
-    if (0 != p.Compose("hqqo", 5, tid, clikey, infoGateToken))
-        Send(&p);
-    else
+    if (0 == p.Compose("hqqo", 5, tid, clikey, infoGateToken))
         Log::Write(Log::LT_ERROR, INFOGATE_FILE, 29,
                    L"[infogate], send auth token ok fail; compose fail, tid:0x%I64X, cli-key:0x%I64X, infogate-token:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
                    tid, clikey, infoGateToken.guid.id1, infoGateToken.guid.id2, infoGateToken.guid.id3, infoGateToken.guid.id4[0], infoGateToken.guid.id4[1], infoGateToken.guid.id4[2], infoGateToken.guid.id4[3], infoGateToken.guid.id4[4], infoGateToken.guid.id4[5], infoGateToken.guid.id4[6], infoGateToken.guid.id4[7]);
+    else
+        Send(&p);
 }
 
 // 0x2e870
@@ -94,11 +92,11 @@ void InfoGateChannel::SendGetWorldInfoListFail(short reason)
     p.IsFragmentPacket = false;
     p.FragmentPacketCmd = 0;
     p.Allocate();
-    if (0 != p.Compose("hh", 9, 2))
-        Send(&p);
-    else
+    if (0 == p.Compose("hh", 9, 2))
         Log::Write(Log::LT_ERROR, INFOGATE_FILE, 62,
                    L"[infogate], send auth token fail fail; compose fail, reason:%d", 2);
+    else
+        Send(&p);
 }
 
 // 0x2ea70
@@ -217,17 +215,18 @@ void InfoGateChannelManager::BroadcastBoastEventInWorldNotify(short worldCluster
     p.IsFragmentPacket = false;
     p.FragmentPacketCmd = 0;
     p.Allocate();
-    if (0 != p.Compose("hhsh", 10, static_cast<unsigned int>(worldClusterId), pcName, static_cast<int>(boastEventDataId)))
-    {
-        if (!Broadcast(&p))
-            Log::Write(Log::LT_ERROR, INFOGATE_FILE, 162,
-                       L"[infogate], broadcast boast event in world notify fail; broadcast fail");
-    }
-    else
+    if (0 == p.Compose("hhsh", 10, static_cast<unsigned int>(worldClusterId), pcName, static_cast<int>(boastEventDataId)))
     {
         Log::Write(Log::LT_ERROR, INFOGATE_FILE, 156,
                    L"[infogate], broadcast boast event in world notify fail; compose fail, world-cluster-id:%d, pc-name:%s, boast-event-dataId:%d",
                    static_cast<int>(worldClusterId), pcName, static_cast<int>(boastEventDataId));
+        return;
+    }
+    if (!Broadcast(&p))
+    {
+        Log::Write(Log::LT_ERROR, INFOGATE_FILE, 162,
+                   L"[infogate], broadcast boast event in world notify fail; broadcast fail");
+        return;
     }
 }
 
@@ -239,7 +238,7 @@ bool InfoGateChannelManager::Broadcast(Packet const* packet)
     for (SharedChannel** i = channels + _channels._idsize; channels != i; ++channels)
     {
         SharedChannel* channel = *channels;
-        if (channel != nullptr && static_cast<InfoGateChannel*>(channel)->_broadcastable && channel->_rawChannel != nullptr)
+        if (channel != nullptr && static_cast<InfoGateChannel*>(channel)->IsBroadcastable() && channel->_rawChannel != nullptr)
         {
             // LIFT: Channel::GetSession returns a counted reference (released below, Channel.h:52).
             Session* session = const_cast<Session*>(channel->_rawChannel->GetSession());
@@ -350,20 +349,6 @@ void InfoGateChannelManager::OnClose(Session const* session, bool) const
                L"[infogate], session closed, session-id:0x%I64X, ip-address:%s, port:%d", id,
                Network::GetAddressStringW(connection->_ip), portNumber);
 }
-
-// PDB LobbyInfoGatePacketHandlerDef (sizeof 16).
-struct LobbyInfoGatePacketHandlerDef
-{
-    void* handler;
-    bool auth;
-    bool fragment;
-};
-static_assert(sizeof(LobbyInfoGatePacketHandlerDef) == 0x10, "sizeof LobbyInfoGatePacketHandlerDef");
-
-// PDB global (11 entries). No lifted module owns the table yet.
-// LIFT: This file defines it with null entries so that LobbyDaemon.exe links. The LobbyInfoGatePacketHandler card fills it
-// and then removes this definition. ❓ The original entries (handler, auth, fragment) are not read.
-LobbyInfoGatePacketHandlerDef LobbyInfoGatePacketLobbySideHandlerList[11];
 
 // 0x2f300
 bool InfoGateChannelManager::PacketHandler(Session const* session, Packet const* packet) const

@@ -16,14 +16,26 @@ class InfoGateChannel : public SharedChannel
 public:
     // LIFT: inlined in HandleLobbyInfoGate_HelloReq (0x56d40): vftable, _broadcastable = false.
     InfoGateChannel() : _broadcastable(false) {}
+    // LIFT: PDB inline methods (type 0x53EC, 0x53ED, 0x53EA). The bodies are not in the PDB; they come from the inlined code at the callers.
+    short GetWid()
+    {
+        short wid = 0;
+        if (_rawChannel != nullptr)
+            wid = static_cast<short>(_rawChannel->GetId());
+        return wid;
+    }
+    bool IsBroadcastable() const { return _broadcastable; }
+    void StartBroadcast() { _broadcastable = true; }
     void SendAuthTokenOk(unsigned long long, unsigned long long, id128 const&);  // 0x2e6d0
     void SendAuthTokenFail(unsigned long long, unsigned long long, short);  // 0x2e870
     void SendGetWorldInfoListFail(short);  // 0x2e980
 
-    bool _broadcastable;
+private:
+    bool _broadcastable;  // PDB: private
+    // LIFT: offsetof of a private member is only legal inside the class.
+    static void CheckLayout() { static_assert(offsetof(InfoGateChannel, _broadcastable) == 0x20, "InfoGateChannel::_broadcastable"); }
 };
 static_assert(sizeof(InfoGateChannel) == 0x28, "sizeof InfoGateChannel");
-static_assert(offsetof(InfoGateChannel, _broadcastable) == 0x20, "InfoGateChannel::_broadcastable");
 
 class InfoGateChannelManager : public SessionHandler
 {

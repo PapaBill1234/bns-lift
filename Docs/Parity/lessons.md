@@ -1311,16 +1311,27 @@ Card lift-lobbydaemon-23: GamedChannel part 2, InfoGateChannel, LobbyInfoGatePac
 
 | Item | Result |
 | --- | --- |
-| LD MATCH | 436 -> 463 over main 9d0ef81 (+27: 24 card functions, 3 shared). The other 4 exes: +0. No MATCH lost. |
+| LD MATCH | 436 -> 480 over main 9d0ef81 (+44: 41 card functions, 3 shared). The other 4 exes: +0. No MATCH lost. |
 
 What worked (count = functions made MATCH):
 - A17 for a `void` `Send*` function: error block first. `if (0 == p.Compose(...)) { Log::Write(...); } else Send(&p);`
   The first lift had `if (0 != Compose) Send(&p); else Log::Write(...)`. Funcdiff showed `SharedChannel::Send` before `Log::Write` (calls 80, one extra immediate).
-  Try 1 of each: `SendUpdateJumpingCharacterStateOk` 93.3 -> 100, `SendAuctionBidOk` 93.3 -> 100, `SendAuthTokenFail` 88.6 -> 100 (+3).
-  16 more functions of this card have the same funcdiff signature (93.3 or 88.6). They were not tried (trial limit).
+  Form 1 on 19 functions: all reach MATCH (93.3 or 88.6 -> 100). The trial limit is 3 forms per function, not 3 functions in total.
   Rule: a `Send*` with a log in the else branch uses the error-first form from the start. The ld-18 form `0 != Compose` is for functions with no log.
+- `BroadcastBoastEventInWorldNotify` (87.5 -> 100, +1): error block first with `return`, then the broadcast block also ends in `if (!Broadcast(&p)) { Log; return; }`.
+  The original has 3 `Packet::Clear` calls (compose fail, broadcast fail, broadcast ok). Two `return` statements and the fall-through give the same 3 inlined destructor calls. A single `if` with no `return` gives 2.
+- A PDB line map gives the source order of a handler. `HandleLobbyInfoGate_AuthTokenReq`: line 136 (mismatch) lies before line 142 (OK) in the source and after it in the code (the compiler moves the error block).
+
+What failed or is blocked (tries):
+- `HandleLobbyInfoGate_AuthTokenReq` 97.7 (2 forms): the OK path and the mismatch path both end in `removeReferenceCount(cliSession, FILE, line)`. VS2010 merges the tails and loads `r8d` per path.
+  The original keeps 2 calls because the mismatch log reads the session token from a saved copy of the session pointer. Ours writes zeros in place of the token (safety), so the tails merge. Not fixable without logging the secret.
+  Form 1 (OK first) and form 2 (mismatch first) both give 97.7.
+- `InfoGateChannelManager::PacketHandler` 77.3 (1 form): the table now holds 3 entries and none is a fragment handler. LTCG folds the table into `PacketHandler` and drops the fragment branch.
+  A separate translation unit for the table does not stop it (LTCG sees all `/GL` objects). The original has one `lea` to the table and keeps the fragment branch. ❓ Why is not known. Below 85 at the start: no more tries.
 
 Notes:
-- A function that only a null handler table reaches is dead-stripped (`HandleLobbyInfoGate_*` were absent from funcdiff). Add `/INCLUDE` for each at once, and check the paired count.
+- A function that only a null handler table reaches is dead-stripped. When the table is filled, remove the `/INCLUDE` pragmas of the handlers. A caller that is lifted in the same card does not need a pragma.
 - A worktree without `vendor/zstd/src` fails to link all 5 exes (`ZSTD_freeCDict`, `ZSTD_createCCtx_advanced`, `ZSTD_compress_usingCDict`). Copy it from another worktree (it is git-ignored).
 - A caller that calls a noreturn `LIFT_STUB` (`BLDaemonInfoTable::Find`) loses all code after the call under LTCG. `HandleLobbyInfoGate_HelloReq` scored 30.4 for this reason. It is not a source error.
+- A header of another card of the same wave is not edited. Read the 2 fields with a local layout struct and a `// LIFT:` comment.
+- PDB inline methods (`InfoGateChannel::GetWid`, `IsBroadcastable`, `StartBroadcast`) belong in the class header as inline members, not as a file-local helper.

@@ -9,3 +9,15 @@ class SharedChannel;
 bool HandleLobbyInfoGate_HelloReq(Session const*, Packet const*);  // 0x56d40
 bool HandleLobbyInfoGate_AuthTokenReq(SharedChannel*, Packet const*);  // 0x57350
 bool HandleLobbyInfoGate_GetWorldInfoListReq(SharedChannel*, Packet const*);  // 0x57880
+
+// PDB LobbyInfoGatePacketHandlerDef (sizeof 16).
+struct LobbyInfoGatePacketHandlerDef
+{
+    void* handler;
+    bool auth;
+    bool fragment;
+};
+static_assert(sizeof(LobbyInfoGatePacketHandlerDef) == 0x10, "sizeof LobbyInfoGatePacketHandlerDef");
+
+// PDB global (11 entries), defined in LobbyInfoGatePacketLobbySideHandlerList.cpp (data only, .data rva 0x202D30).
+extern LobbyInfoGatePacketHandlerDef LobbyInfoGatePacketLobbySideHandlerList[11];

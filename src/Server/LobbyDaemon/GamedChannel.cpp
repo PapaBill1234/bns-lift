@@ -986,11 +986,11 @@ void GamedChannel::SendExtendJumpingCharacterCreationQuotaWithAccountInventoryIt
     p.IsFragmentPacket = false;
     p.FragmentPacketCmd = 0;
     p.Allocate();
-    if (0 != p.Compose("hqi", 70, tid, remainQuota))
-        Send(&p);
-    else
+    if (0 == p.Compose("hqi", 70, tid, remainQuota))
         Log::Write(Log::LT_ERROR, GAMED_FILE, 679,
                    L"[gamed], send extend-jumping-character-creation-quota ok fail; compose fail, game-tid:0x%I64X", tid);
+    else
+        Send(&p);
 }
 
 // 0x83060
@@ -1004,11 +1004,11 @@ void GamedChannel::SendExtendJumpingCharacterCreationQuotaWithAccountInventoryIt
     p.IsFragmentPacket = false;
     p.FragmentPacketCmd = 0;
     p.Allocate();
-    if (0 != p.Compose("hqE", 71, tid, static_cast<int>(reason)))
-        Send(&p);
-    else
+    if (0 == p.Compose("hqE", 71, tid, static_cast<int>(reason)))
         Log::Write(Log::LT_ERROR, GAMED_FILE, 693,
                    L"[gamed], send extend-jumping-character-creation-quota fail; compose fail, game-tid:0x%I64X", tid);
+    else
+        Send(&p);
 }
 
 // 0x83150
@@ -1022,11 +1022,11 @@ void GamedChannel::SendUpgradeJumpingCharacterStateWithCreationQuotaOk(unsigned 
     p.IsFragmentPacket = false;
     p.FragmentPacketCmd = 0;
     p.Allocate();
-    if (0 != p.Compose("hqQi", 73, tid, static_cast<int>(jumpingCharacterState), remainQuota))
-        Send(&p);
-    else
+    if (0 == p.Compose("hqQi", 73, tid, static_cast<int>(jumpingCharacterState), remainQuota))
         Log::Write(Log::LT_ERROR, GAMED_FILE, 707,
                    L"[gamed], send upgrade-jumping-character-state ok fail; compose fail, game-tid:0x%I64X", tid);
+    else
+        Send(&p);
 }
 
 // 0x83250
@@ -1040,11 +1040,11 @@ void GamedChannel::SendUpgradeJumpingCharacterStateWithCreationQuotaFail(unsigne
     p.IsFragmentPacket = false;
     p.FragmentPacketCmd = 0;
     p.Allocate();
-    if (0 != p.Compose("hqE", 74, tid, static_cast<int>(reason)))
-        Send(&p);
-    else
+    if (0 == p.Compose("hqE", 74, tid, static_cast<int>(reason)))
         Log::Write(Log::LT_ERROR, GAMED_FILE, 721,
                    L"[gamed], send upgrade-jumping-character-state fail; compose fail, game-tid:0x%I64X", tid);
+    else
+        Send(&p);
 }
 
 // 0x83340
@@ -1076,11 +1076,11 @@ void GamedChannel::SendUpdateJumpingCharacterStateFail(unsigned long long tid, s
     p.IsFragmentPacket = false;
     p.FragmentPacketCmd = 0;
     p.Allocate();
-    if (0 != p.Compose("hqE", 77, tid, static_cast<int>(reason)))
-        Send(&p);
-    else
+    if (0 == p.Compose("hqE", 77, tid, static_cast<int>(reason)))
         Log::Write(Log::LT_ERROR, GAMED_FILE, 749,
                    L"[gamed], send update-jumping-character-state fail; compose fail, game-tid:0x%I64X", tid);
+    else
+        Send(&p);
 }
 
 // 0x83520
@@ -1094,11 +1094,11 @@ void GamedChannel::SendSecondPasswordGetStatusOk(unsigned long long tid, unsigne
     p.IsFragmentPacket = false;
     p.FragmentPacketCmd = 0;
     p.Allocate();
-    if (0 != p.Compose("hqqQiiqqq", 81, tid, pcid, static_cast<int>(blockStatus), authFailLimitCount, authFailCount, blockedUntil, deleteAt, actionMask))
-        Send(&p);
-    else
+    if (0 == p.Compose("hqqQiiqqq", 81, tid, pcid, static_cast<int>(blockStatus), authFailLimitCount, authFailCount, blockedUntil, deleteAt, actionMask))
         Log::Write(Log::LT_ERROR, GAMED_FILE, 764,
                    L"[gamed], send second-password-get-status ok fail; compose fail, game-tid:0x%I64X", tid);
+    else
+        Send(&p);
 }
 
 // 0x83670
@@ -1112,11 +1112,11 @@ void GamedChannel::SendSecondPasswordGetStatusFail(unsigned long long tid, unsig
     p.IsFragmentPacket = false;
     p.FragmentPacketCmd = 0;
     p.Allocate();
-    if (0 != p.Compose("hqqE", 82, tid, pcid, static_cast<int>(reason)))
-        Send(&p);
-    else
+    if (0 == p.Compose("hqqE", 82, tid, pcid, static_cast<int>(reason)))
         Log::Write(Log::LT_ERROR, GAMED_FILE, 778,
                    L"[gamed], send second-password-get-status fail fail; compose fail, game-tid:0x%I64X", tid);
+    else
+        Send(&p);
 }
 
 // 0x83770
@@ -1130,11 +1130,11 @@ void GamedChannel::SendSecondPasswordIsVerifiedOk(unsigned long long tid, unsign
     p.IsFragmentPacket = false;
     p.FragmentPacketCmd = 0;
     p.Allocate();
-    if (0 != p.Compose("hqq", 84, tid, pcid))
-        Send(&p);
-    else
+    if (0 == p.Compose("hqq", 84, tid, pcid))
         Log::Write(Log::LT_ERROR, GAMED_FILE, 792,
                    L"[gamed], send second-password-is-verified ok fail; compose fail, game-tid:0x%I64X", tid);
+    else
+        Send(&p);
 }
 
 // 0x83860
@@ -1148,11 +1148,11 @@ void GamedChannel::SendSecondPasswordIsVerifiedFail(unsigned long long tid, unsi
     p.IsFragmentPacket = false;
     p.FragmentPacketCmd = 0;
     p.Allocate();
-    if (0 != p.Compose("hqqE", 85, tid, pcid, static_cast<int>(reason)))
-        Send(&p);
-    else
+    if (0 == p.Compose("hqqE", 85, tid, pcid, static_cast<int>(reason)))
         Log::Write(Log::LT_ERROR, GAMED_FILE, 806,
                    L"[gamed], send second-password-is-verified fail fail; compose fail, game-tid:0x%I64X", tid);
+    else
+        Send(&p);
 }
 
 // 0x83960
@@ -1195,12 +1195,12 @@ void GamedChannel::SendGetGradeListFail(unsigned long long tid, char locationHin
     p.IsFragmentPacket = false;
     p.FragmentPacketCmd = 0;
     p.Allocate();
-    if (0 != p.Compose("hqQqE", 94, tid, static_cast<int>(locationHint), pcid, static_cast<int>(reason)))
-        Send(&p);
-    else
+    if (0 == p.Compose("hqQqE", 94, tid, static_cast<int>(locationHint), pcid, static_cast<int>(reason)))
         Log::Write(Log::LT_ERROR, GAMED_FILE, 842,
                    L"[gamed], send get grade list fail fail; compose fail, game-tid:0x%I64X, location-hint:%d, pcid:0x%I64X, reason:%d",
                    tid, static_cast<int>(locationHint), pcid, static_cast<int>(reason));
+    else
+        Send(&p);
 }
 
 // 0x83c20
@@ -1214,12 +1214,12 @@ void GamedChannel::SendActivateGradeOk(unsigned long long tid, unsigned long lon
     p.IsFragmentPacket = false;
     p.FragmentPacketCmd = 0;
     p.Allocate();
-    if (0 != p.Compose("hqqiiqq", 98, tid, pcid, gameGradeKey, gradeId, effectiveFrom, effectiveTo))
-        Send(&p);
-    else
+    if (0 == p.Compose("hqqiiqq", 98, tid, pcid, gameGradeKey, gradeId, effectiveFrom, effectiveTo))
         Log::Write(Log::LT_ERROR, GAMED_FILE, 855,
                    L"[gamed], send activate grade ok fail; compose fail, game-tid:0x%I64X, pcid:0x%I64X, game-grade-key:%d, grade-id:%d",
                    tid, pcid, gameGradeKey, gradeId);
+    else
+        Send(&p);
 }
 
 // 0x83d60
@@ -1233,12 +1233,12 @@ void GamedChannel::SendActivateGradeFail(unsigned long long tid, unsigned long l
     p.IsFragmentPacket = false;
     p.FragmentPacketCmd = 0;
     p.Allocate();
-    if (0 != p.Compose("hqqQiE", 99, tid, pcid, keyType, key, static_cast<int>(reason)))
-        Send(&p);
-    else
+    if (0 == p.Compose("hqqQiE", 99, tid, pcid, keyType, key, static_cast<int>(reason)))
         Log::Write(Log::LT_ERROR, GAMED_FILE, 868,
                    L"[gamed], send activate grade fail fail; compose fail, game-tid:0x%I64X, pcid:0x%I64X, key-type:%d, key:%d, reason:%d",
                    tid, pcid, keyType, key, static_cast<int>(reason));
+    else
+        Send(&p);
 }
 
 // 0x83ea0
@@ -1347,12 +1347,12 @@ void GamedChannel::SendAuctionBidFail(unsigned long long pcId, id128& auctionId,
     p.IsFragmentPacket = false;
     p.FragmentPacketCmd = 0;
     p.Allocate();
-    if (0 != p.Compose("hqoE", 91, pcId, auctionId, static_cast<int>(reason)))
-        Send(&p);
-    else
+    if (0 == p.Compose("hqoE", 91, pcId, auctionId, static_cast<int>(reason)))
         Log::Write(Log::LT_ERROR, GAMED_FILE, 1000,
                    L"[gamed], send auction bid fail fail; compose fail, pcid:0x%I64X, %08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X, reason:%d",
                    pcId, auctionId.guid.id1, auctionId.guid.id2, auctionId.guid.id3, auctionId.guid.id4[0], auctionId.guid.id4[1], auctionId.guid.id4[2], auctionId.guid.id4[3], auctionId.guid.id4[4], auctionId.guid.id4[5], auctionId.guid.id4[6], auctionId.guid.id4[7], static_cast<int>(reason));
+    else
+        Send(&p);
 }
 
 // 0x84790
@@ -1366,12 +1366,12 @@ void GamedChannel::SendTakeAccountTimeBasedPlayRewardFail(unsigned long long tid
     p.IsFragmentPacket = false;
     p.FragmentPacketCmd = 0;
     p.Allocate();
-    if (0 != p.Compose("hqqiQhqEi", 106, tid, pcid, schedule, static_cast<int>(targetType), static_cast<int>(playTime), requestTime, static_cast<int>(failReason), errorInfo))
-        Send(&p);
-    else
+    if (0 == p.Compose("hqqiQhqEi", 106, tid, pcid, schedule, static_cast<int>(targetType), static_cast<int>(playTime), requestTime, static_cast<int>(failReason), errorInfo))
         Log::Write(Log::LT_ERROR, GAMED_FILE, 1015,
                    L"[gamed], send take account time based play reward fail fail; compose fail, pcid:%#I64x, reason:%d, error:%d",
                    pcid, static_cast<int>(failReason), errorInfo);
+    else
+        Send(&p);
 }
 
 // 0x848f0
