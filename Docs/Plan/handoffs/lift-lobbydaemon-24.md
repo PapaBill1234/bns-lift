@@ -13,10 +13,10 @@ Base: main 9d0ef81. All counts use its baseline (LobbyDaemon 436 MATCH).
 | Gate (`tools/gate.sh`, `LIFT_BUILD_DIR=build-ld-24`) | gate ok |
 | Parity (`tools/parity.sh`) | parity ok |
 | LobbyDaemon MATCH, baseline (main) | 436 |
-| LobbyDaemon MATCH, final | 521 (+85) |
+| LobbyDaemon MATCH, final | 523 (+87) |
 | CacheGate, LobbyGate, SmartCouponDaemon, PostOfficeDaemon MATCH | 456, 658, 630, 694 (+0 each, no MATCH lost) |
 
-The +85 is 38 card functions and 47 shared functions. The shared functions are BloodLib code that the real link now keeps (`Session::*`, `Channel::*`,
+The +87 is 40 card functions and 47 shared functions. The shared functions are BloodLib code that the real link now keeps (`Session::*`, `Channel::*`,
 `Connection::*`, `Port::*`, `SessionPool::*`, `PacketFormatIterator::*`, `StaticPageMemoryManager::*` and others). No MATCH turns into DIFF and none disappears.
 
 ## Lifted
@@ -70,10 +70,10 @@ The +85 is 38 card functions and 47 shared functions. The shared functions are B
 | PostOfficeChannel | `0x64170` | `PostOfficeSessionHandler::OnAccept` | 100.0 | yes |
 | PostOfficeChannel | `0x641d0` | `PostOfficeSessionHandler::OnConnect` | 100.0 | yes |
 | PostOfficeChannel | `0x642e0` | `PostOfficeSessionHandler::OnClose` | 97.0 | no |
-| PostOfficeChannel | `0x64420` | `PostOfficeSessionHandler::PacketHandler` | 97.6 | no |
+| PostOfficeChannel | `0x64420` | `PostOfficeSessionHandler::PacketHandler` | 100.0 | yes |
 | PostOfficeClientSideHandlerList | `0x32b50` | `operator delete (folded with Console::Flush)` | n/a | no |
 | PostOfficePacketHandler | `0x646f0` | `HandlePostOfficeHelloOk` | 100.0 | yes |
-| PostOfficePacketHandler | `0x64740` | `HandlePostOfficeHelloFail` | 93.3 | no |
+| PostOfficePacketHandler | `0x64740` | `HandlePostOfficeHelloFail` | 100.0 | yes |
 | PostOfficePacketHandler | `0x647f0` | `HandlePostOfficeRegisterPostOk` | 38.1 | no |
 | PostOfficePacketHandler | `0x64a20` | `HandlePostOfficeRegisterPostFail` | 36.7 | no |
 
@@ -98,7 +98,7 @@ None. Two items need a note.
   The type is `Daemon::PacketHandler[7]` (public name `?PostOfficePacketClientSideHandlerList@@3PAP6A_NPEBVSession@@PEBVPacket@@@ZA`).
 - `Goods::Fetch` (`0x6010`, module `AccountInventory`) has no owner card and no skeleton file. `SendListGoodsOk` calls it, so the link failed. New file `src/Server/LobbyDaemon/AccountInventory.cpp`
   holds a `LIFT_STUB(0x6010)` body and is in `CMakeLists.txt`. The card that lifts the module `AccountInventory` (also `GoodsItem::Fetch` `0x5e60`) replaces the body and keeps the file.
-- Dead-strip: 11 more functions got `#pragma comment(linker, "/INCLUDE:...")` (5 in `LobbyGateChannel.cpp`, 6 in `PostOfficeChannel.cpp`). The checkpoints had already added 36 in `LobbyGateChannel.cpp` and 1 in `PostOfficeChannel.cpp`.
+- Dead-strip: 11 more functions got `#pragma comment(linker, "/INCLUDE:...")` (5 in `LobbyGateChannel.cpp`, 5 in `PostOfficeChannel.cpp`; the `SendHelloReq` pragma was removed in repair 2 because the lifted `OnConnect` calls it). The checkpoints had already added 36 in `LobbyGateChannel.cpp` and 1 in `PostOfficeChannel.cpp`.
   They were unpaired before. The verify card removes them when the callers are lifted.
 - The worktree lacked the ignored `vendor/zstd/src`. All 5 VS2010 links failed on `ZSTD_*`. It was copied from the main checkout (`git rev-parse HEAD` = bb6eaf64). The first gate run had no zstd and still passed.
 - `HandlePostOfficeRegisterPostOk` (38.1) and `HandlePostOfficeRegisterPostFail` (36.7): the original inlines `LobbyJobManager::find` and the job call. `LobbyJob` has no PDB layout in the repo yet, so
@@ -113,10 +113,10 @@ None. Two items need a note.
 | `PostOfficeChannel::Connect` and `PostOfficeSessionHandler::OnClose` (one macro) | 90.3 and 93.3 | Locals `lockPtr` and `invalidList` in `POST_OFFICE_SET_INVALID_INFO` (the original takes `&pipeConsole->_invalid` once before the loop, as in the pseudocode) | 97.0 and 97.0 | yes |
 | `HandlePostOfficeHelloFail` | 93.3 | Decomposer fields in the pseudocode order, `reason = 0` in between | 93.3 | no |
 | `PostOfficeSessionHandler::PacketHandler` | 97.6 | The invalid parameter block after the main path (the original has it last) | 97.6 | no |
+| `HandlePostOfficeHelloFail` (repair 2) | 93.3 | Constant first: `if (0 == packet->Decompose(...))` (also in the two other handlers: 38.1 -> 40.0, 36.7 -> 40.0) | 100.0 | yes |
+| `PostOfficeSessionHandler::PacketHandler` (repair 2) | 97.6 | A23: `iocpHandle` at the top, `short const* const pCmd`, `*pCmd` at each use, no `cmd` local | 100.0 | yes |
 
 Not tried:
-- `HandlePostOfficeHelloFail`: second form (zero in a callee-saved register, as ld-18). One try only.
-- `PostOfficeSessionHandler::PacketHandler`: the `Log::Write` order in the original follows a different block order. Other layout forms (A17, A20).
 - `Connect` and `OnClose`: the last difference is a `L""` reference (`valueString`). Lessons section B says LTCG folds it. No change possible.
 - All functions below 85 (see Notes).
 

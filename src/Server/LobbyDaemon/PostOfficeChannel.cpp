@@ -28,7 +28,6 @@
 
 #pragma comment(linker, "/INCLUDE:?SendRegisterPostReq@PostOfficeChannel@@QEAA_NPEAVTransaction@TransactionChannel@@_KDD1AEBTid128@@AEBUPostOfficeSenderInfo@@AEBUPostOfficeRecipientInfo@@PEA_W5PEBUPostOfficeAttachedItemInfo@@H@Z")  // LIFT: keep until the caller is lifted (0x63cb0)
 #pragma comment(linker, "/INCLUDE:?Connect@PostOfficeChannel@@UEAA_N_KIKGJ_N@Z")  // LIFT: keep until the caller is lifted (0x639f0)
-#pragma comment(linker, "/INCLUDE:?SendHelloReq@PostOfficeChannel@@QEAA_NXZ")  // LIFT: keep until the caller is lifted (0x63ba0)
 #pragma comment(linker, "/INCLUDE:?OnAccept@PostOfficeSessionHandler@@UEBA_NPEBVSession@@@Z")  // LIFT: keep until the caller is lifted (0x64170)
 #pragma comment(linker, "/INCLUDE:?OnConnect@PostOfficeSessionHandler@@UEBA_NPEBVSession@@_N@Z")  // LIFT: keep until the caller is lifted (0x641d0)
 #pragma comment(linker, "/INCLUDE:?OnClose@PostOfficeSessionHandler@@UEBAXPEBVSession@@_N@Z")  // LIFT: keep until the caller is lifted (0x642e0)
@@ -65,7 +64,7 @@ wchar_t const* const SESSION_FILE = L"source\\Session.cpp";
         lockPtr->Leave();                                                             \
     } while (0)
 
-// LIFT: Inlined Session::GetChannel with the reference (source\Session.cpp 1051).
+// LIFT: Inlined Session::GetChannel with the reference (source\Session.cpp 1051) in 0x641d0 and 0x642e0.
 Channel* acquireChannel(Session const* session)
 {
     Channel* channel = session->_channel;
@@ -262,6 +261,7 @@ void PostOfficeSessionHandler::OnClose(Session const* session, bool) const
 // 0x64420
 bool PostOfficeSessionHandler::PacketHandler(Session const* session, Packet const* packet) const
 {
+    void* iocpHandle = nullptr;
     if (session == nullptr || packet == nullptr)
     {
         Log::Write(Log::LT_ERROR, POST_OFFICE_FILE, 201,
@@ -280,31 +280,31 @@ bool PostOfficeSessionHandler::PacketHandler(Session const* session, Packet cons
         return false;
     }
 
-    short cmd = header[1].size;
-    if (static_cast<unsigned short>(cmd - 1) > 5u)
+    short const* const pCmd = &header[1].size;
+    if (pCmd == nullptr || static_cast<unsigned short>(*pCmd - 1) > 5u)
     {
         Log::Write(Log::LT_ERROR, POST_OFFICE_FILE, 216,
                    L"[post-office], handle packet failed; invalid packet command, cmd:%d, session-id:0x%I64X",
-                   static_cast<int>(cmd), session->_id);
+                   static_cast<int>(*pCmd), session->_id);
         return false;
     }
 
-    Daemon::PacketHandler handler = PostOfficePacketClientSideHandlerList[cmd];
+    Daemon::PacketHandler handler = PostOfficePacketClientSideHandlerList[*pCmd];
     if (handler == nullptr)
     {
         Log::Write(Log::LT_ERROR, POST_OFFICE_FILE, 222,
                    L"[post-office], handle packet failed; handler not exists, cmd:%d, session-id:0x%I64X",
-                   static_cast<int>(cmd), session->_id);
+                   static_cast<int>(*pCmd), session->_id);
         return false;
     }
 
-    if (cmd == 2 || cmd == 3)
+    if (*pCmd == 2 || *pCmd == 3)
     {
         Log::Write(Log::LT_DEBUG, POST_OFFICE_FILE, 231, L"[post-office], handle begin, cmd:%d, session-id:0x%I64X",
-                   static_cast<int>(cmd), session->_id);
+                   static_cast<int>(*pCmd), session->_id);
         bool result = handler(session, packet);
         Log::Write(Log::LT_DEBUG, POST_OFFICE_FILE, 233, L"[post-office], handle end, cmd:%d, session-id:0x%I64X",
-                   static_cast<int>(cmd), session->_id);
+                   static_cast<int>(*pCmd), session->_id);
         return result;
     }
 
@@ -327,7 +327,7 @@ bool PostOfficeSessionHandler::PacketHandler(Session const* session, Packet cons
 
     void* eventMem = Memory::_Manager[2]->Alloc(sizeof(PacketHandleEvent), POST_OFFICE_FILE, 240);
     PacketHandleEvent* event = eventMem != nullptr ? ::new (eventMem) PacketHandleEvent(session, copy, reinterpret_cast<void*>(handler)) : nullptr;
-    void* iocp = Network::iocpHandle();
-    PostQueuedCompletionStatus(iocp, 0, reinterpret_cast<ULONG_PTR>(event), nullptr);
+    iocpHandle = Network::iocpHandle();
+    PostQueuedCompletionStatus(iocpHandle, 0, reinterpret_cast<ULONG_PTR>(event), nullptr);
     return true;
 }

@@ -10,7 +10,7 @@
 
 namespace
 {
-wchar_t const* const POST_OFFICE_PH_FILE = L"PostOfficePacketHandler.cpp";  // LIFT: No PDB symbol. The binary uses the literal.
+wchar_t const* const POST_OFFICE_PH_FILE = L"PostOfficePacketHandler.cpp";  // LIFT: No PDB symbol. The binary uses the literal as the file string of the log calls (0x64740, 0x647f0, 0x64a20).
 
 // PDB struct PostOfficeRegisterPostFailParam (LobbyDaemon type, sizeof 0x10).
 struct PostOfficeRegisterPostFailParam
@@ -20,7 +20,7 @@ struct PostOfficeRegisterPostFailParam
 };
 static_assert(sizeof(PostOfficeRegisterPostFailParam) == 0x10, "sizeof PostOfficeRegisterPostFailParam");
 
-// LIFT: The binary sets the decomposer fields by hand: len = strlen(format), index = 1, offset = 2.
+// LIFT: The binary sets the decomposer fields by hand in each handler (0x64740, 0x647f0, 0x64a20): len = strlen(format), index = 1, offset = 2.
 void setupDecomposer(PacketDecomposer& pdr, char const* format, int len)
 {
     pdr.format = format;
@@ -49,7 +49,7 @@ bool HandlePostOfficeHelloFail(Session const*, Packet const* packet)
     PacketDecomposer pdr;
     setupDecomposer(pdr, "hh", 2);
     short reason = 0;
-    if (packet->Decompose(&pdr, 1, &reason) == 0)
+    if (0 == packet->Decompose(&pdr, 1, &reason))
     {
         Log::Write(Log::LT_ERROR, POST_OFFICE_PH_FILE, 35,
                    L"[post-office], handle hello fail fail; decompose fail, reason:%d", static_cast<int>(reason));
@@ -67,7 +67,7 @@ bool HandlePostOfficeRegisterPostOk(Session const*, Packet const* packet)
     setupDecomposer(pdr, "hqq", 3);
     unsigned long long tid = 0;
     unsigned long long receiptId = 0;
-    if (packet->Decompose(&pdr, 2, &tid, &receiptId) == 0)
+    if (0 == packet->Decompose(&pdr, 2, &tid, &receiptId))
     {
         Log::Write(Log::LT_ERROR, POST_OFFICE_PH_FILE, 58,
                    L"[post-office], handle register post ok fail; decompose fail, tid:0x%I64X, receipt-id:0x%I64X", tid,
@@ -95,7 +95,7 @@ bool HandlePostOfficeRegisterPostFail(Session const*, Packet const* packet)
     // LIFT: zero-init on purpose. The original (0x64a20) leaves param uninitialised and the
     // decompose-fail log then prints stack garbage for receipt-id and reason. We fix this bug.
     PostOfficeRegisterPostFailParam param = {};
-    if (packet->Decompose(&pdr, 3, &tid, &param, &param.reason) == 0)
+    if (0 == packet->Decompose(&pdr, 3, &tid, &param, &param.reason))
     {
         Log::Write(Log::LT_ERROR, POST_OFFICE_PH_FILE, 92,
                    L"[post-office], handle register post fail fail; decompose fail, tid:0x%I64X, receipt-id:0x%I64X, reason:%d",

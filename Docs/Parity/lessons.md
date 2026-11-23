@@ -1370,7 +1370,11 @@ What worked:
 - A call into a module with no owner card (`Goods::Fetch` `0x6010`) fails the link. Make a skeleton file with a `LIFT_STUB` body and a LIFT comment. Do not lift it inside another card.
 
 What failed (1 try each):
-- `HandlePostOfficeHelloFail` 93.3: the decomposer fields in the pseudocode order (`format`, `reason = 0`, `len`, `index`, `offset`). No change. The original keeps zero in `rbx` and uses `lea r8d, [rbx + 0x23]`.
-  Ours uses `ecx`. Not solved.
 - `PostOfficeSessionHandler::PacketHandler` 97.6: `if (session != nullptr && packet != nullptr) { ... } crash block last`. No change. The compiler puts the block first in both forms.
-  The original has it last, with the other `Log::Write` blocks inline.
+
+Repair 2 (kept):
+- `PostOfficeSessionHandler::PacketHandler` 97.6 -> 100.0 MATCH with A23: `void* iocpHandle = nullptr;` at the top, `short const* const pCmd = &header[1].size;` tested for `nullptr`,
+  `*pCmd` at each use (no `cmd` local), `iocpHandle = Network::iocpHandle()` in the pump branch.
+- `HandlePostOfficeHelloFail` 93.3 -> 100.0 MATCH with the constant first: `if (0 == packet->Decompose(&pdr, 1, &reason))` (A24, P21 form). The first try (decomposer field order) did not change the score.
+  The same form in `HandlePostOfficeRegisterPostOk` and `HandlePostOfficeRegisterPostFail` raised 38.1 -> 40.0 and 36.7 -> 40.0. Kept.
+- `/INCLUDE` for `SendHelloReq` removed. The lifted `OnConnect` calls it, so `/OPT:REF` keeps it. LD MATCH 521 -> 523.
