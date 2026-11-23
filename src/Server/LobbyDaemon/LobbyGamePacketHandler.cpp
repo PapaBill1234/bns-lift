@@ -1,4 +1,6 @@
 // LobbyGamePacketHandler.obj (LobbyDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
+#include <new>
+#include <vector>
 #include "PlacementNew.h"
 #include <string.h>
 #include <wchar.h>
@@ -35,6 +37,10 @@
 #include "PacketUtil.h"
 #include "Session.h"
 #include "BnsCommonConfigDefinition.h"
+#include "CrashHandler.h"
+#include "LobbyDB.h"
+#include "RefCntObject.h"
+#include "StlMemory.h"
 #include "LiftStub.h"
 
 // LIFT: the handler table (LobbyGamePacketLobbySideHandlerList) is a null placeholder (ld-18). The handlers have no lifted caller. Keep them until the table is lifted.
@@ -51,9 +57,6 @@
 #pragma comment(linker, "/INCLUDE:?HandleLobbyGame_RestoreCharacterOk@@YA_NPEAVSharedChannel@@PEBVPacket@@@Z")  // LIFT: keep until the caller is lifted (0x8b1f0)
 #pragma comment(linker, "/INCLUDE:?HandleLobbyGame_RestoreCharacterFail@@YA_NPEAVSharedChannel@@PEBVPacket@@@Z")  // LIFT: keep until the caller is lifted (0x8b350)
 #pragma comment(linker, "/INCLUDE:?HandleLobbyGame_UpdateCharacterDataReq@@YA_NPEAVSharedChannel@@PEBVPacket@@@Z")  // LIFT: keep until the caller is lifted (0x8c250)
-
-// LIFT: placeholder. The owner is the LobbyDaemon BnsCommonConfigDefinition module (0x1890 and up). Delete this line when that module lands.
-BnsCommonConfig* BnsCommonConfig::Config = nullptr;
 
 // LIFT: placeholder for the PDB public LobbyErrorDesc (.data 0003:2032, 28 entries, names as in enum LobbyError). The owner is the module that defines it (not found in the PDB module list). ❓
 wchar_t const* LobbyErrorDesc[28] = {
@@ -409,19 +412,139 @@ cleanup:
     return true;
 }
 
-// LIFT: inlined in 0x89270, 0x899a0, 0x89d90 and 0x8a060: the id of the raw channel, or 0.
-static unsigned long long LgpChannelId(SharedChannel* channel)
+// LIFT: inlined in 0x89270, 0x899a0, 0x89d90, 0x8a060, 0x8d9a0, 0x8db10, 0x8e010, 0x8e220, 0x8e390, 0x8e520 to 0x8f870 and 0x907e0: the id of the raw channel, or 0.
+static __forceinline unsigned long long LgpChannelId(SharedChannel const* channel)
 {
     if (channel != nullptr && channel->_rawChannel != nullptr)
         return channel->_rawChannel->GetId();
     return 0;
 }
 
-// LIFT: inlined in 0x8a400 to 0x8b350: the id of the raw channel, as a signed 16-bit wid.
-static int LgpWid(SharedChannel* channel)
+// LIFT: inlined in 0x8a400 to 0x8b350, 0x8c660 and 0x907e0: the id of the raw channel, as a signed 16-bit wid.
+static __forceinline int LgpWid(SharedChannel const* channel)
 {
     return static_cast<short>(LgpChannelId(channel));
 }
+
+// LIFT: inlined __FILEW__ literal of the assert and log macros (0x8c660, 0x8d9a0, 0x8db10, 0x8e010, 0x8e220, 0x8e390, 0x8e820, 0x8edb0, 0x8f340, 0x8f5d0, 0x8f870, 0x907e0).
+static wchar_t const HANDLER_FILE[] = L"LobbyGamePacketHandler.cpp";
+
+// LIFT: inlined assert of BloodLib (Log, alert, crash). No PDB name. Inlined in 0x8c660 and 0x907e0.
+static __forceinline void assertCrash(wchar_t const* wideFile, char const* file, int line)
+{
+    Log::Write(Log::LT_ERROR, wideFile, line, L"== CRASH == ASSERT CRASH");
+    AlertSender::Write(wideFile, line, L"== CRASH == ASSERT CRASH");
+    CrashHandler::MakeCrash(file, line, L"");
+}
+
+// LIFT: inlined in 0x8c660. A TLobbyError value of 28 or more gives the text "LOBERR_UNDEFINED".
+static __forceinline wchar_t const* LobbyErrorText(int error)
+{
+    if (static_cast<unsigned int>(error) >= 28)
+        return L"LOBERR_UNDEFINED";
+    return LobbyErrorDesc[error];
+}
+
+// LIFT: inlined in 0x8c660. LOBERR_DB_FAIL gives 3, LOBERR_INVALID_PARAMETER gives 4, all other errors give 2.
+static __forceinline short UpdateFailCode(int error)
+{
+    switch (error)
+    {
+    case 2:
+        return 3;
+    case 3:
+        return 4;
+    default:
+        return 2;
+    }
+}
+
+// LIFT: inlined __FILEW__ literal of the LobbyDB checks (guild id and rename key) in 0x8d9a0, 0x8db10, 0x8e010 and 0x8e390. LobbyDB.cpp logs the invalid-parameter case in the caller.
+static wchar_t const LOBBYDB_FILE[] = L"LobbyDB.cpp";
+
+// LIFT: inlined LobbyJobManager::ExecuteW (0xc20a0) in the job-result handlers. The task ids have no PDB name. ❓
+enum
+{
+    JOB_TASK_CHANGE_APPEARANCE_OK = 123,
+    JOB_TASK_CHANGE_APPEARANCE_FAIL = 124,
+    JOB_TASK_RENAME_CHARACTER_OK = 126,
+    JOB_TASK_RENAME_CHARACTER_FAIL = 127,
+    JOB_TASK_CHANGE_SEX_OK = 136,
+    JOB_TASK_CHANGE_SEX_FAIL = 137,
+    JOB_TASK_CHANGE_RACE_OK = 139,
+    JOB_TASK_CHANGE_RACE_FAIL = 140
+};
+
+// PDB layouts (include/pdb/LobbyDaemon/types.h).
+struct ChangeCharacterAppearanceOkParam
+{
+    char* showcaseData;
+    short showcaseDataSize;
+};
+static_assert(sizeof(ChangeCharacterAppearanceOkParam) == 0x10, "sizeof ChangeCharacterAppearanceOkParam");
+struct ChangeCharacterSexOkParam
+{
+    char* showcaseData;
+    short showcaseDataSize;
+};
+static_assert(sizeof(ChangeCharacterSexOkParam) == 0x10, "sizeof ChangeCharacterSexOkParam");
+struct ChangeCharacterRaceOkParam
+{
+    char* showcaseData;
+    short showcaseDataSize;
+};
+static_assert(sizeof(ChangeCharacterRaceOkParam) == 0x10, "sizeof ChangeCharacterRaceOkParam");
+struct RenameCharacterOkParam
+{
+    unsigned long long pcid;
+};
+static_assert(sizeof(RenameCharacterOkParam) == 0x8, "sizeof RenameCharacterOkParam");
+
+// LIFT: inlined PacketDecomposer setup in 0x8e820, 0x8edb0, 0x8f340, 0x8f5d0, 0x8f870 and the showcase handlers (0x8e520, 0x8eab0, 0x8f040). The command (first format letter) is skipped.
+static __forceinline void SetupDecomposer(PacketDecomposer* pdr, char const* format, int len)
+{
+    pdr->format = format;
+    pdr->len = len;
+    pdr->index = 1;
+    pdr->offset = 2;
+}
+
+// LIFT: shared body of the three showcase "Ok" handlers (0x8e520, 0x8eab0, 0x8f040). The original code has one copy per handler.
+// Format "hqb": tid, then a variable block (showcase data).
+template <typename Param>
+static __forceinline bool HandleShowcaseOk(SharedChannel* channel, Packet const* packet, int task, wchar_t const* decomposeFail1,
+                             int line1, wchar_t const* decomposeFail2, int line2, wchar_t const* execFail, int lineExec,
+                             wchar_t const* okText, int lineOk)
+{
+    Param param = {};
+    PacketDecomposer pdr;
+    SetupDecomposer(&pdr, "hqb", 3);
+    Packet::VarData showcaseData = {};
+    unsigned long long tid = 0;
+    if (packet->Decompose(&pdr, 1, &tid) == 0)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, line1, decomposeFail1, LgpChannelId(channel), tid, 0);
+        return true;
+    }
+    if (packet->Decompose(&pdr, &showcaseData) == 0)
+    {
+        int size = showcaseData.size != nullptr ? *showcaseData.size : 0;
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, line2, decomposeFail2, LgpChannelId(channel), tid, size);
+        return true;
+    }
+    param.showcaseData = showcaseData.buffer;
+    param.showcaseDataSize = *showcaseData.size;
+    if (!LobbyDaemon::_instance->_jobMgr->ExecuteW(tid, task, &param))
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, lineExec, execFail, LgpChannelId(channel), tid,
+                   static_cast<int>(*showcaseData.size));
+        return true;
+    }
+    Log::Write(Log::LT_DEBUG, HANDLER_FILE, lineOk, okText, LgpChannelId(channel), tid,
+               static_cast<int>(*showcaseData.size));
+    return true;
+}
+
 
 // 0x89270
 bool HandleLobbyGame_EnterWorldReq(SharedChannel*, Packet const*)
@@ -793,10 +916,213 @@ bool HandleLobbyGame_UpdateCharacterDataReq(SharedChannel* sharedChannel, Packet
     return true;
 }
 
+#pragma comment(linker, "/INCLUDE:?HandleLobbyGame_UpdateAccountDataReq@@YA_NPEAVSharedChannel@@PEBVPacket@@@Z")   // LIFT: keep until the caller is lifted (0x8c660)
 // 0x8c660
-bool HandleLobbyGame_UpdateAccountDataReq(SharedChannel*, Packet const*)
+bool HandleLobbyGame_UpdateAccountDataReq(SharedChannel* sharedChannel, Packet const* packet)
 {
-    LIFT_STUB(0x8c660);
+    GamedChannel* const channel = static_cast<GamedChannel*>(sharedChannel);
+
+    // LIFT: inlined RepeatPacketDecomposer setup. The command is skipped (index 1, offset 2).
+    RepeatPacketDecomposer rpd;
+    rpd.format = "hqqqiCQiqqihcccc;qiqCihqq;Chq;";
+    rpd.len = 30;
+    rpd.index = 1;
+    rpd.offset = 2;
+    rpd.top = -1;
+
+    unsigned long long channelId = 0;
+    unsigned long long gametid = 0;
+    unsigned long long pcid = 0;
+    unsigned long long clikey = 0;
+    int botScore = 0;
+    TimeBasedPlayInfoList playInfo;
+    GameAccountExpInfo::ExpInfo accExpInfo;
+    memset(&accExpInfo, 0, sizeof(accExpInfo));
+    std::vector<AccountContentQuota, StlAllocator<AccountContentQuota, 2> > quotaList;
+    std::vector<AccountRecycleTime, StlAllocator<AccountRecycleTime, 2> > recycleTimeList;
+
+    if (packet->Decompose(&rpd, 4, &gametid, &pcid, &clikey, &botScore) == 0)
+    {
+        if (channel != nullptr && channel->_rawChannel != nullptr)
+            channelId = channel->_rawChannel->GetId();
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1051,
+                   L"[gamed], handle update account-data fail; decompose fail, channel-id:%I64d, game-tid:0x%I64X, "
+                   L"pcid:0x%I64X, cli-key:0x%I64X, bot-score:%d",
+                   channelId, gametid, pcid, clikey, botScore);
+        return true;
+    }
+    if (!playInfo.Decompose(rpd, packet))
+    {
+        if (channel != nullptr && channel->_rawChannel != nullptr)
+            channelId = channel->_rawChannel->GetId();
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1057,
+                   L"[gamed], handle update account-data fail; decompose(TimeBasedPlayInfoList) fail, "
+                   L"channel-id:%I64d, game-tid:0x%I64X, pcid:0x%I64X, cli-key:0x%I64X, bot-score:%d",
+                   channelId, gametid, pcid, clikey, botScore);
+        return true;
+    }
+    if (packet->Decompose(&rpd, 3, &accExpInfo.exp, &accExpInfo.expQuotaPerDay, &accExpInfo.lastUpdateTime) == 0)
+    {
+        if (channel != nullptr && channel->_rawChannel != nullptr)
+            channelId = channel->_rawChannel->GetId();
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1063,
+                   L"[gamed], handle update account-data fail; decompose(AccountExpInfo) fail, channel-id:%I64d, "
+                   L"game-tid:0x%I64X, pcid:0x%I64X, cli-key:0x%I64X, bot-score:%d",
+                   channelId, gametid, pcid, clikey, botScore);
+        return true;
+    }
+
+    // LIFT: inlined repeat count read of PacketUtil.cpp (assert at line 241).
+    if (packet == nullptr)
+        assertCrash(L"source\\PacketUtil.cpp", "source\\PacketUtil.cpp", 241);
+    // BUG: 0x8c660 the count is a signed value from the packet. A negative count converts to a huge reserve size.
+    unsigned long long const quotaCount = static_cast<unsigned long long>(rpd.PushRepeatCount(
+        reinterpret_cast<char const*>(packet->CurHeader + 1) + rpd.offset,
+        static_cast<unsigned short>(packet->CurHeader->size - 2) - rpd.offset));
+    quotaList.reserve(quotaCount);
+    for (int i = 0; i < static_cast<int>(quotaCount); ++i)
+    {
+        AccountContentQuota quota;
+        memset(&quota, 0, sizeof(quota));
+        if (packet->Decompose(&rpd, 4, &quota.dataId, &quota.version, &quota.quantity, &quota.lastUpdateTime) == 0)
+        {
+            if (channel != nullptr && channel->_rawChannel != nullptr)
+                channelId = channel->_rawChannel->GetId();
+            Log::Write(Log::LT_ERROR, HANDLER_FILE, 1078,
+                       L"[gamed], handle update account-data fail; decompose(AccountContentQuotaList) fail, "
+                       L"channel-id:%I64d, game-tid:0x%I64X, pcid:0x%I64X, cli-key:0x%I64X, bot-score:%d",
+                       channelId, gametid, pcid, clikey, botScore);
+            return true;
+        }
+        // LIFT: inlined decrement of the repeat count of RepeatPacketDecomposer.
+        rpd.index = rpd.start[rpd.top] + 1;
+        --rpd.counts[rpd.top];
+        quotaList.push_back(quota);
+    }
+
+    // LIFT: inlined end of repeat of PacketUtil.cpp (assert at line 248: the repeat format must start with 'C').
+    if (rpd.top < 0 || rpd.format[rpd.start[rpd.top]] != 'C')
+        assertCrash(L"source\\PacketUtil.cpp", "source\\PacketUtil.cpp", 248);
+    rpd.skipRepeatFormat();
+    --rpd.top;
+
+    // LIFT: the original keeps the repeat count of the recycle list in a 16-bit value (0x8c660).
+    short const recycleCount = static_cast<short>(rpd.PushRepeatCount(
+        reinterpret_cast<char const*>(packet->CurHeader + 1) + rpd.offset,
+        static_cast<unsigned short>(packet->CurHeader->size - 2) - rpd.offset));
+    recycleTimeList.reserve(static_cast<unsigned long long>(static_cast<long long>(recycleCount)));
+    for (int i = 0; i < static_cast<int>(recycleCount); ++i)
+    {
+        AccountRecycleTime recycleTime;
+        memset(&recycleTime, 0, sizeof(recycleTime));
+        if (packet->Decompose(&rpd, 2, &recycleTime.groupId, &recycleTime.time) == 0)
+        {
+            if (channel != nullptr && channel->_rawChannel != nullptr)
+                channelId = channel->_rawChannel->GetId();
+            Log::Write(Log::LT_ERROR, HANDLER_FILE, 1099,
+                       L"[gamed], handle update account-data fail; decompose(AccountRecycleTimeList) fail, "
+                       L"channel-id:%I64d, game-tid:0x%I64X, pcid:0x%I64X, cli-key:0x%I64X, bot-score:%d",
+                       channelId, gametid, pcid, clikey, botScore);
+            return true;
+        }
+        rpd.index = rpd.start[rpd.top] + 1;
+        --rpd.counts[rpd.top];
+        recycleTimeList.push_back(recycleTime);
+    }
+    if (rpd.top < 0 || rpd.format[rpd.start[rpd.top]] != 'C')
+        assertCrash(L"source\\PacketUtil.cpp", "source\\PacketUtil.cpp", 248);
+    rpd.skipRepeatFormat();
+    --rpd.top;
+
+    short const wid = channel->_rawChannel != nullptr ? static_cast<short>(channel->_rawChannel->GetId()) : 0;
+    CliSession* const session = LobbyDaemon::_instance->_clisessionMgr->Select_index_pcid(wid, pcid);
+    if (session == nullptr)
+    {
+        if (channel->_rawChannel != nullptr)
+            channelId = channel->_rawChannel->GetId();
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1112,
+                   L"[gamed], handle update account-data fail; no such cli-session, channel-id:%I64d, "
+                   L"game-tid:0x%I64X, pcid:0x%I64X, cli-key:0x%I64X, bot-score:%d",
+                   channelId, gametid, pcid, clikey, botScore);
+        channel->SendUpdateAccountDataFail(gametid, 5);
+        return true;
+    }
+    if (clikey != session->_clikey)
+    {
+        if (channel->_rawChannel != nullptr)
+            channelId = channel->_rawChannel->GetId();
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1119,
+                   L"[gamed], handle update account-data fail; cli-key mismatch, found-cli-key:0x%I64X, "
+                   L"channel-id:%I64d, game-tid:0x%I64X, pcid:0x%I64X, cli-key:0x%I64X, bot-score:%d",
+                   session->_clikey, channelId, gametid, pcid, clikey, botScore);
+        channel->SendUpdateAccountDataFail(gametid, 5);
+        session->removeReferenceCount(HANDLER_FILE, 1121);
+        return true;
+    }
+
+    short dataCode = 0;
+    if (!session->UpdateAccountData(pcid, botScore, playInfo))
+    {
+        int const error = TLobbyError;
+        unsigned long long const id = channel->_rawChannel != nullptr ? channel->_rawChannel->GetId() : 0;
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1129,
+                   L"[gamed], handle update account-data fail; update fail, error:%s, channel-id:%I64d, "
+                   L"game-tid:0x%I64X, pcid:0x%I64X, cli-key:0x%I64X, bot-score:%d",
+                   LobbyErrorText(error), id, gametid, pcid, clikey, botScore);
+        dataCode = UpdateFailCode(error);
+    }
+    short expCode = 0;
+    if (!session->UpdateAccountExp(pcid, accExpInfo))
+    {
+        int const error = TLobbyError;
+        unsigned long long const id = channel->_rawChannel != nullptr ? channel->_rawChannel->GetId() : 0;
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1152,
+                   L"[gamed], handle update account-exp fail; update fail, error:%s, channel-id:%I64d, "
+                   L"game-tid:0x%I64X, pcid:0x%I64X, cli-key:0x%I64X, bot-score:%d",
+                   LobbyErrorText(error), id, gametid, pcid, clikey, botScore);
+        expCode = UpdateFailCode(error);
+    }
+    short quotaCode = 0;
+    if (!session->UpdateAccountContentQuota(pcid, quotaList))
+    {
+        int const error = TLobbyError;
+        unsigned long long const id = channel->_rawChannel != nullptr ? channel->_rawChannel->GetId() : 0;
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1169,
+                   L"[gamed], handle update account-content-quota fail; update fail, error:%s, channel-id:%I64d, "
+                   L"game-tid:0x%I64X, pcid:0x%I64X, cli-key:0x%I64X, bot-score:%d",
+                   LobbyErrorText(error), id, gametid, pcid, clikey, botScore);
+        quotaCode = UpdateFailCode(error);
+    }
+    short recycleCode = 0;
+    if (!session->UpdateAccountRecycleTime(pcid, recycleTimeList))
+    {
+        int const error = TLobbyError;
+        unsigned long long const id = channel->_rawChannel != nullptr ? channel->_rawChannel->GetId() : 0;
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1186,
+                   L"[gamed], handle update account-recycle-time fail; update fail, error:%s, channel-id:%I64d, "
+                   L"game-tid:0x%I64X, pcid:0x%I64X, cli-key:0x%I64X, bot-score:%d",
+                   LobbyErrorText(error), id, gametid, pcid, clikey, botScore);
+        recycleCode = UpdateFailCode(error);
+    }
+
+    if (dataCode != 0 || expCode != 0 || quotaCode != 0 || recycleCode != 0)
+    {
+        // BUG: 0x8c660 sends only the UpdateAccountData code (0 when only a later update fails); kept for parity.
+        channel->SendUpdateAccountDataFail(gametid, dataCode);
+        session->removeReferenceCount(HANDLER_FILE, 1202);
+    }
+    else
+    {
+        channel->SendUpdateAccountDataOk(gametid);
+        if (channel->_rawChannel != nullptr)
+            channelId = channel->_rawChannel->GetId();
+        Log::Write(Log::LT_DEBUG, HANDLER_FILE, 1208,
+                   L"[gamed], handle update account-data ok, channel-id:%I64d, game-tid:0x%I64X, pcid:0x%I64X, "
+                   L"cli-key:0x%I64X, bot-score:%d",
+                   channelId, gametid, pcid, clikey, botScore);
+        session->removeReferenceCount(HANDLER_FILE, 1210);
+    }
+    return true;
 }
 
 // 0x8d590
@@ -805,16 +1131,82 @@ bool HandleLobbyGame_TryRegisterGuildReq(SharedChannel*, Packet const*)
     LIFT_STUB(0x8d590);
 }
 
+#pragma comment(linker, "/INCLUDE:?HandleLobbyGame_FinishRegisterGuildNotify@@YA_NPEAVSharedChannel@@PEBVPacket@@@Z")   // LIFT: keep until the caller is lifted (0x8d9a0)
 // 0x8d9a0
-bool HandleLobbyGame_FinishRegisterGuildNotify(SharedChannel*, Packet const*)
+bool HandleLobbyGame_FinishRegisterGuildNotify(SharedChannel* sharedChannel, Packet const* packet)
 {
-    LIFT_STUB(0x8d9a0);
+    SharedChannel* const channel = sharedChannel;
+    short cmd = 0;
+    unsigned long long gametid = 0;
+    unsigned long long guildid = 0;
+    if (packet->Decompose("hqq", &cmd, &gametid, &guildid) == 0)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1329,
+                   L"[gamed], handle finish register guild notify fail; decompose fail");
+        return true;
+    }
+    int dbrtn = 0;
+    bool dbOk = false;
+    if (guildid == 0)
+    {
+        // LIFT: inlined invalid-parameter check of LobbyDB::FinishGuildRegistration.
+        Log::Write(Log::LT_ERROR, LOBBYDB_FILE, 2288, L"[lobbydb], finish guild registration fail; invalid parameter");
+    }
+    else
+    {
+        dbOk = LobbyDB::FinishGuildRegistration(dbrtn, guildid);
+    }
+    if (!dbOk)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1335,
+                   L"[gamed], handle finish register guild notify fail; db fail, dbrtn:%d, channel-id:%I64d, game-tid:0x%I64X, "
+                   L"guild-id:0x%I64X",
+                   dbrtn, LgpChannelId(channel), gametid, guildid);
+        return true;
+    }
+    Log::Write(Log::LT_DEBUG, HANDLER_FILE, 1339,
+               L"[gamed], handle finish register guild notify ok, channel-id:%I64d, game-tid:0x%I64X, guild-id:0x%I64X",
+               LgpChannelId(channel), gametid, guildid);
+    return true;
 }
 
+#pragma comment(linker, "/INCLUDE:?HandleLobbyGame_CancelRegisterGuildNotify@@YA_NPEAVSharedChannel@@PEBVPacket@@@Z")   // LIFT: keep until the caller is lifted (0x8db10)
 // 0x8db10
-bool HandleLobbyGame_CancelRegisterGuildNotify(SharedChannel*, Packet const*)
+bool HandleLobbyGame_CancelRegisterGuildNotify(SharedChannel* sharedChannel, Packet const* packet)
 {
-    LIFT_STUB(0x8db10);
+    SharedChannel* const channel = sharedChannel;
+    short cmd = 0;
+    unsigned long long gametid = 0;
+    unsigned long long guildid = 0;
+    if (packet->Decompose("hqq", &cmd, &gametid, &guildid) == 0)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1358,
+                   L"[gamed], handle cancel register guild notify fail; decompose fail");
+        return true;
+    }
+    int dbrtn = 0;
+    bool dbOk = false;
+    if (guildid == 0)
+    {
+        // LIFT: inlined invalid-parameter check of LobbyDB::CancelGuildRegistration.
+        Log::Write(Log::LT_ERROR, LOBBYDB_FILE, 2348, L"[lobbydb], cancel guild registration fail; invalid parameter");
+    }
+    else
+    {
+        dbOk = LobbyDB::CancelGuildRegistration(dbrtn, guildid);
+    }
+    if (!dbOk)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1364,
+                   L"[gamed], handle cancel register guild notify fail; db fail, dbrtn:%d, channel-id:%I64d, game-tid:0x%I64X, "
+                   L"guild-id:0x%I64X",
+                   dbrtn, LgpChannelId(channel), gametid, guildid);
+        return true;
+    }
+    Log::Write(Log::LT_DEBUG, HANDLER_FILE, 1368,
+               L"[gamed], handle cancel register guild notify ok, channel-id:%I64d, game-tid:0x%I64X, guild-id:0x%I64X",
+               LgpChannelId(channel), gametid, guildid);
+    return true;
 }
 
 // 0x8dc80
@@ -823,94 +1215,539 @@ bool HandleLobbyGame_TryRenameGuildReq(SharedChannel*, Packet const*)
     LIFT_STUB(0x8dc80);
 }
 
+#pragma comment(linker, "/INCLUDE:?HandleLobbyGame_FinishRenameGuildNotify@@YA_NPEAVSharedChannel@@PEBVPacket@@@Z")   // LIFT: keep until the caller is lifted (0x8e010)
 // 0x8e010
-bool HandleLobbyGame_FinishRenameGuildNotify(SharedChannel*, Packet const*)
+bool HandleLobbyGame_FinishRenameGuildNotify(SharedChannel* sharedChannel, Packet const* packet)
 {
-    LIFT_STUB(0x8e010);
+    SharedChannel* const channel = sharedChannel;
+    short cmd = 0;
+    unsigned long long tid = 0;
+    unsigned long long guildId = 0;
+    unsigned long long renameKey = 0;
+    if (packet->Decompose("hqqq", &cmd, &tid, &guildId, &renameKey) == 0)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1482,
+                   L"[gamed], rename-guild; handle finish rename guild notify fail; decompose fail");
+        return true;
+    }
+    Log::Write(Log::LT_DEBUG, HANDLER_FILE, 1486,
+               L"[gamed], rename-guild; handle finish rename guild notify; packet decomposed, channel-id:%I64d, "
+               L"game-tid:0x%I64X, guild-id:0x%I64X, guild-rename-key:0x%I64X",
+               LgpChannelId(channel), tid, guildId, renameKey);
+    int dbrtn = 0;
+    bool dbOk = false;
+    if (renameKey != 0)
+    {
+        dbOk = LobbyDB::FinishRenameGuild(dbrtn, guildId, renameKey);
+    }
+    else
+    {
+        // LIFT: inlined invalid-parameter check of LobbyDB::FinishRenameGuild.
+        Log::Write(Log::LT_ERROR, LOBBYDB_FILE, 2548, L"[lobbydb], finish rename guild; invalid parameter");
+    }
+    if (dbOk)
+    {
+        Log::Write(Log::LT_DEBUG, HANDLER_FILE, 1495,
+                   L"[gamed], rename-guild; handle finish rename guild notify ok, channel-id:%I64d, "
+                   L"game-tid:0x%I64X, guild-id:0x%I64X, guild-rename-key:0x%I64X",
+                   LgpChannelId(channel), tid, guildId, renameKey);
+        return true;
+    }
+    Log::Write(Log::LT_ERROR, HANDLER_FILE, 1491,
+               L"[gamed], rename-guild; handle finish rename guild notify fail; db fail, dbrtn:%d, "
+               L"channel-id:%I64d, game-tid:0x%I64X, guild-id:0x%I64X, guild-rename-key:0x%I64X",
+               dbrtn, LgpChannelId(channel), tid, guildId, renameKey);
+    return true;
 }
 
+#pragma comment(linker, "/INCLUDE:?HandleLobbyGame_CancelRenameGuildNotify@@YA_NPEAVSharedChannel@@PEBVPacket@@@Z")   // LIFT: keep until the caller is lifted (0x8e220)
 // 0x8e220
-bool HandleLobbyGame_CancelRenameGuildNotify(SharedChannel*, Packet const*)
+bool HandleLobbyGame_CancelRenameGuildNotify(SharedChannel* sharedChannel, Packet const* packet)
 {
-    LIFT_STUB(0x8e220);
+    SharedChannel* const channel = sharedChannel;
+    short cmd = 0;
+    unsigned long long renameKey = 0;
+    if (packet->Decompose("hq", &cmd, &renameKey) == 0)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1515,
+                   L"[gamed], rename-guild; handle cancel rename guild notify fail; decompose fail");
+        return true;
+    }
+    Log::Write(Log::LT_DEBUG, HANDLER_FILE, 1519,
+               L"[gamed], rename-guild; handle cancel rename guild notify packet decomposed, channel-id:%I64d, "
+               L"guild-rename-key:0x%I64X",
+               LgpChannelId(channel), renameKey);
+    int dbrtn = 0;
+    if (!LobbyDB::CancelRenameGuild(dbrtn, renameKey))
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1523,
+                   L"[gamed], rename-guild; handle cancel rename guild notify fail; db fail, dbrtn:%d, "
+                   L"channel-id:%I64d, guild-rename-key:0x%I64X",
+                   dbrtn, LgpChannelId(channel), renameKey);
+        return true;
+    }
+    Log::Write(Log::LT_DEBUG, HANDLER_FILE, 1527,
+               L"[gamed], rename-guild; handle cancel rename guild notify ok, channel-id:%I64d, "
+               L"guild-rename-key:0x%I64X",
+               LgpChannelId(channel), renameKey);
+    return true;
 }
 
+#pragma comment(linker, "/INCLUDE:?HandleLobbyGame_DeleteGuildNotify@@YA_NPEAVSharedChannel@@PEBVPacket@@@Z")   // LIFT: keep until the caller is lifted (0x8e390)
 // 0x8e390
-bool HandleLobbyGame_DeleteGuildNotify(SharedChannel*, Packet const*)
+bool HandleLobbyGame_DeleteGuildNotify(SharedChannel* sharedChannel, Packet const* packet)
 {
-    LIFT_STUB(0x8e390);
+    SharedChannel* const channel = sharedChannel;
+    short cmd = 0;
+    unsigned long long gametid = 0;
+    unsigned long long guildid = 0;
+    if (packet->Decompose("hqq", &cmd, &gametid, &guildid) == 0)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1546,
+                   L"[gamed], handle delete guild notify fail; decompose fail");
+        return true;
+    }
+    int dbrtn = 0;
+    bool dbOk = false;
+    if (guildid == 0)
+    {
+        // LIFT: inlined invalid-parameter check of LobbyDB::DeleteGuild.
+        Log::Write(Log::LT_ERROR, LOBBYDB_FILE, 2408, L"[lobbydb], guild deletion fail; invalid parameter");
+    }
+    else
+    {
+        dbOk = LobbyDB::DeleteGuild(dbrtn, guildid, LobbyDaemon::_instance->_config->_guildNameReuseLimitDuration);
+    }
+    if (!dbOk)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1552,
+                   L"[gamed], handle delete guild notify fail; db fail, dbrtn:%d, channel-id:%I64d, game-tid:0x%I64X, "
+                   L"guild-id:0x%I64X",
+                   dbrtn, LgpChannelId(channel), gametid, guildid);
+        return true;
+    }
+    Log::Write(Log::LT_DEBUG, HANDLER_FILE, 1556,
+               L"[gamed], handle delete guild notify ok, channel-id:%I64d, game-tid:0x%I64X, guild-id:0x%I64X",
+               LgpChannelId(channel), gametid, guildid);
+    return true;
 }
 
+#pragma comment(linker, "/INCLUDE:?HandleLobbyGame_ChangeCharacterAppearanceOk@@YA_NPEAVSharedChannel@@PEBVPacket@@@Z")   // LIFT: keep until the caller is lifted (0x8e520)
 // 0x8e520
-bool HandleLobbyGame_ChangeCharacterAppearanceOk(SharedChannel*, Packet const*)
+bool HandleLobbyGame_ChangeCharacterAppearanceOk(SharedChannel* channel, Packet const* packet)
 {
-    LIFT_STUB(0x8e520);
+    return HandleShowcaseOk<ChangeCharacterAppearanceOkParam>(channel, packet, JOB_TASK_CHANGE_APPEARANCE_OK,
+                                L"[gamed], handle change-character-appearance-ok fail; decompose fail, channel-id:%I64d, tid:0x%I64X, "
+                                L"showcase-data-size:%d",
+                                1579,
+                                L"[gamed], handle change-character-appearance-ok fail; decompose fail, channel-id:%I64d, tid:0x%I64X, "
+                                L"showcase-data-size:%d",
+                                1585,
+                                L"[gamed], handle change-character-appearance-ok fail; execute job fail, channel-id:%I64d, tid:0x%I64X, "
+                                L"showcase-data-size:%d",
+                                1594,
+                                L"[gamed], handle change-character-appearance-ok ok, channel-id:%I64d, tid:0x%I64X, "
+                                L"showcase-data-size:%d",
+                                1598);
 }
 
+#pragma comment(linker, "/INCLUDE:?HandleLobbyGame_ChangeCharacterAppearanceFail@@YA_NPEAVSharedChannel@@PEBVPacket@@@Z")   // LIFT: keep until the caller is lifted (0x8e820)
 // 0x8e820
-bool HandleLobbyGame_ChangeCharacterAppearanceFail(SharedChannel*, Packet const*)
+bool HandleLobbyGame_ChangeCharacterAppearanceFail(SharedChannel* channel, Packet const* packet)
 {
-    LIFT_STUB(0x8e820);
+    PacketDecomposer pdr;
+    SetupDecomposer(&pdr, "hqE", 3);
+    unsigned long long tid = 0;
+    short reason = 0;
+    if (packet->Decompose(&pdr, 2, &tid, &reason) == 0)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1617,
+                   L"[gamed], handle change-character-appearance-fail fail; decompose fail, channel-id:%I64d, tid:0x%I64X, reason:%d",
+                   LgpChannelId(channel), tid, static_cast<int>(reason));
+        return true;
+    }
+    if (!LobbyDaemon::_instance->_jobMgr->ExecuteW(tid, JOB_TASK_CHANGE_APPEARANCE_FAIL, &reason))
+    {
+        // BUG: 0x8e820 original logs 'appearance-ok' in the Fail handler (copy-paste); kept for parity
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1623,
+                   L"[gamed], handle change-character-appearance-ok fail; execute job fail, channel-id:%I64d, tid:0x%I64X, "
+                   L"reason:%d",
+                   LgpChannelId(channel), tid, static_cast<int>(reason));
+        return true;
+    }
+    Log::Write(Log::LT_DEBUG, HANDLER_FILE, 1627,
+               L"[gamed], handle change-character-appearance-fail ok, channel-id:%I64d, tid:0x%I64X, reason:%d",
+               LgpChannelId(channel), tid, static_cast<int>(reason));
+    return true;
 }
 
+#pragma comment(linker, "/INCLUDE:?HandleLobbyGame_ChangeCharacterSexOk@@YA_NPEAVSharedChannel@@PEBVPacket@@@Z")   // LIFT: keep until the caller is lifted (0x8eab0)
 // 0x8eab0
-bool HandleLobbyGame_ChangeCharacterSexOk(SharedChannel*, Packet const*)
+bool HandleLobbyGame_ChangeCharacterSexOk(SharedChannel* channel, Packet const* packet)
 {
-    LIFT_STUB(0x8eab0);
+    return HandleShowcaseOk<ChangeCharacterSexOkParam>(channel, packet, JOB_TASK_CHANGE_SEX_OK,
+                                L"[gamed], handle change-character-sex-ok fail; decompose fail, channel-id:%I64d, tid:0x%I64X, "
+                                L"showcase-data-size:%d",
+                                1650,
+                                L"[gamed], handle change-character-sex-ok fail; decompose fail, channel-id:%I64d, tid:0x%I64X, "
+                                L"showcase-data-size:%d",
+                                1656,
+                                L"[gamed], handle change-character-sex-ok fail; execute job fail, channel-id:%I64d, tid:0x%I64X, "
+                                L"showcase-data-size:%d",
+                                1665,
+                                L"[gamed], handle change-character-sex-ok ok, channel-id:%I64d, tid:0x%I64X, "
+                                L"showcase-data-size:%d",
+                                1669);
 }
 
+#pragma comment(linker, "/INCLUDE:?HandleLobbyGame_ChangeCharacterSexFail@@YA_NPEAVSharedChannel@@PEBVPacket@@@Z")   // LIFT: keep until the caller is lifted (0x8edb0)
 // 0x8edb0
-bool HandleLobbyGame_ChangeCharacterSexFail(SharedChannel*, Packet const*)
+bool HandleLobbyGame_ChangeCharacterSexFail(SharedChannel* channel, Packet const* packet)
 {
-    LIFT_STUB(0x8edb0);
+    PacketDecomposer pdr;
+    SetupDecomposer(&pdr, "hqE", 3);
+    unsigned long long tid = 0;
+    short reason = 0;
+    if (packet->Decompose(&pdr, 2, &tid, &reason) == 0)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1688,
+                   L"[gamed], handle change-character-sex-fail fail; decompose fail, channel-id:%I64d, tid:0x%I64X, reason:%d",
+                   LgpChannelId(channel), tid, static_cast<int>(reason));
+        return true;
+    }
+    if (!LobbyDaemon::_instance->_jobMgr->ExecuteW(tid, JOB_TASK_CHANGE_SEX_FAIL, &reason))
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1694,
+                   L"[gamed], handle change-character-sex-fail fail; execute job fail, channel-id:%I64d, tid:0x%I64X, "
+                   L"reason:%d",
+                   LgpChannelId(channel), tid, static_cast<int>(reason));
+        return true;
+    }
+    Log::Write(Log::LT_DEBUG, HANDLER_FILE, 1698,
+               L"[gamed], handle change-character-sex-fail ok, channel-id:%I64d, tid:0x%I64X, reason:%d",
+               LgpChannelId(channel), tid, static_cast<int>(reason));
+    return true;
 }
 
+#pragma comment(linker, "/INCLUDE:?HandleLobbyGame_ChangeCharacterRaceOk@@YA_NPEAVSharedChannel@@PEBVPacket@@@Z")   // LIFT: keep until the caller is lifted (0x8f040)
 // 0x8f040
-bool HandleLobbyGame_ChangeCharacterRaceOk(SharedChannel*, Packet const*)
+bool HandleLobbyGame_ChangeCharacterRaceOk(SharedChannel* channel, Packet const* packet)
 {
-    LIFT_STUB(0x8f040);
+    return HandleShowcaseOk<ChangeCharacterRaceOkParam>(channel, packet, JOB_TASK_CHANGE_RACE_OK,
+                                L"[gamed], handle change-character-race-ok fail; decompose fail, channel-id:%I64d, tid:0x%I64X, "
+                                L"showcase-data-size:%d",
+                                1721,
+                                L"[gamed], handle change-character-race-ok fail; decompose fail, channel-id:%I64d, tid:0x%I64X, "
+                                L"showcase-data-size:%d",
+                                1727,
+                                L"[gamed], handle change-character-race-ok fail; execute job fail, channel-id:%I64d, tid:0x%I64X, "
+                                L"showcase-data-size:%d",
+                                1736,
+                                L"[gamed], handle change-character-race-ok ok, channel-id:%I64d, tid:0x%I64X, "
+                                L"showcase-data-size:%d",
+                                1740);
 }
 
+#pragma comment(linker, "/INCLUDE:?HandleLobbyGame_ChangeCharacterRaceFail@@YA_NPEAVSharedChannel@@PEBVPacket@@@Z")   // LIFT: keep until the caller is lifted (0x8f340)
 // 0x8f340
-bool HandleLobbyGame_ChangeCharacterRaceFail(SharedChannel*, Packet const*)
+bool HandleLobbyGame_ChangeCharacterRaceFail(SharedChannel* channel, Packet const* packet)
 {
-    LIFT_STUB(0x8f340);
+    PacketDecomposer pdr;
+    SetupDecomposer(&pdr, "hqE", 3);
+    unsigned long long tid = 0;
+    short reason = 0;
+    if (packet->Decompose(&pdr, 2, &tid, &reason) == 0)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1759,
+                   L"[gamed], handle change-character-race-fail fail; decompose fail, channel-id:%I64d, tid:0x%I64X, reason:%d",
+                   LgpChannelId(channel), tid, static_cast<int>(reason));
+        return true;
+    }
+    if (!LobbyDaemon::_instance->_jobMgr->ExecuteW(tid, JOB_TASK_CHANGE_RACE_FAIL, &reason))
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1765,
+                   L"[gamed], handle change-character-race-fail fail; execute job fail, channel-id:%I64d, tid:0x%I64X, "
+                   L"reason:%d",
+                   LgpChannelId(channel), tid, static_cast<int>(reason));
+        return true;
+    }
+    Log::Write(Log::LT_DEBUG, HANDLER_FILE, 1769,
+               L"[gamed], handle change-character-race-fail ok, channel-id:%I64d, tid:0x%I64X, reason:%d",
+               LgpChannelId(channel), tid, static_cast<int>(reason));
+    return true;
 }
 
+#pragma comment(linker, "/INCLUDE:?HandleLobbyGame_RenameCharacterOk@@YA_NPEAVSharedChannel@@PEBVPacket@@@Z")   // LIFT: keep until the caller is lifted (0x8f5d0)
 // 0x8f5d0
-bool HandleLobbyGame_RenameCharacterOk(SharedChannel*, Packet const*)
+bool HandleLobbyGame_RenameCharacterOk(SharedChannel* channel, Packet const* packet)
 {
-    LIFT_STUB(0x8f5d0);
+    PacketDecomposer pdr;
+    SetupDecomposer(&pdr, "hqq", 3);
+    unsigned long long tid = 0;
+    RenameCharacterOkParam param = {};
+    if (packet->Decompose(&pdr, 2, &tid, &param) == 0)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1790,
+                   L"[gamed], handle rename-character-ok fail; decompose fail, channel-id:%I64d, tid:0x%I64X, pcid:0x%I64X",
+                   LgpChannelId(channel), tid, param.pcid);
+        return true;
+    }
+    if (!LobbyDaemon::_instance->_jobMgr->ExecuteW(tid, JOB_TASK_RENAME_CHARACTER_OK, &param))
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1796,
+                   L"[gamed], handle rename-character-ok fail; execute job fail, channel-id:%I64d, tid:0x%I64X, "
+                   L"pcid:0x%I64X",
+                   LgpChannelId(channel), tid, param.pcid);
+        return true;
+    }
+    Log::Write(Log::LT_DEBUG, HANDLER_FILE, 1800,
+               L"[gamed], handle rename-character-ok ok, channel-id:%I64d, tid:0x%I64X, pcid:0x%I64X",
+               LgpChannelId(channel), tid, param.pcid);
+    return true;
 }
 
+#pragma comment(linker, "/INCLUDE:?HandleLobbyGame_RenameCharacterFail@@YA_NPEAVSharedChannel@@PEBVPacket@@@Z")   // LIFT: keep until the caller is lifted (0x8f870)
 // 0x8f870
-bool HandleLobbyGame_RenameCharacterFail(SharedChannel*, Packet const*)
+bool HandleLobbyGame_RenameCharacterFail(SharedChannel* channel, Packet const* packet)
 {
-    LIFT_STUB(0x8f870);
+    PacketDecomposer pdr;
+    SetupDecomposer(&pdr, "hqE", 3);
+    unsigned long long tid = 0;
+    short reason = 0;
+    if (packet->Decompose(&pdr, 2, &tid, &reason) == 0)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1819,
+                   L"[gamed], handle rename-character-fail fail; decompose fail, channel-id:%I64d, tid:0x%I64X, reason:%d",
+                   LgpChannelId(channel), tid, static_cast<int>(reason));
+        return true;
+    }
+    if (!LobbyDaemon::_instance->_jobMgr->ExecuteW(tid, JOB_TASK_RENAME_CHARACTER_FAIL, &reason))
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1825,
+                   L"[gamed], handle rename-character-fail fail; execute job fail, channel-id:%I64d, tid:0x%I64X, "
+                   L"reason:%d",
+                   LgpChannelId(channel), tid, static_cast<int>(reason));
+        return true;
+    }
+    Log::Write(Log::LT_DEBUG, HANDLER_FILE, 1829,
+               L"[gamed], handle rename-character-fail ok, channel-id:%I64d, tid:0x%I64X, reason:%d",
+               LgpChannelId(channel), tid, static_cast<int>(reason));
+    return true;
 }
 
 // 0x8fb00
+// LIFT: the body needs ExtendJumpingCharacterCreationQuotaJob::_pool (.data 0x2040a0) and ObjPool::Checkout (0x628c0). The LobbyDaemon ObjectPool module is not lifted. ❓
 bool HandleLobbyGame_ExtendJumpingCharacterCreationQuotaWithAccountInventoryItemReq(SharedChannel*, Packet const*)
 {
     LIFT_STUB(0x8fb00);
 }
 
 // 0x8ffc0
+// LIFT: the body needs UpgradeJumpingCharacterStateJob::_pool (0x204150) and ObjPool::Checkout (0x628c0). The LobbyDaemon ObjectPool module is not lifted.
 bool HandleLobbyGame_UpgradeJumpingCharacterStateWithCreationQuotaReq(SharedChannel*, Packet const*)
 {
     LIFT_STUB(0x8ffc0);
 }
 
 // 0x903d0
+// LIFT: the body needs UpgradeJumpingCharacterStateJob::_pool (0x204150) and ObjPool::Checkout (0x628c0). The LobbyDaemon ObjectPool module is not lifted.
 bool HandleLobbyGame_UpdateJumpingCharacterStateReq(SharedChannel*, Packet const*)
 {
     LIFT_STUB(0x903d0);
 }
 
+#pragma comment(linker, "/INCLUDE:?HandleLobbyGame_SetAppDataNotify@@YA_NPEAVSharedChannel@@PEBVPacket@@@Z")   // LIFT: keep until the caller is lifted (0x907e0)
 // 0x907e0
-bool HandleLobbyGame_SetAppDataNotify(SharedChannel*, Packet const*)
+// LIFT: PDB StsMsgLib::_StsMsgRequestPresenceSetAppData (sizeof 0x38). The type is not in a LobbyDaemon header yet.
+namespace StsMsgLib
 {
-    LIFT_STUB(0x907e0);
+struct _StsMsgRequestPresenceSetAppData : public _StsMsgRequest
+{
+    struct AppData
+    {
+        struct Field
+        {
+            char* pszKey;
+            wchar_t* pwszValue;
+        };
+        Field* pFields;
+        int nFieldCount;
+    };
+    id128* pUserId;
+    id128* pAppId;
+    AppData appData;
+};
+static_assert(sizeof(_StsMsgRequestPresenceSetAppData) == 0x38, "sizeof _StsMsgRequestPresenceSetAppData");
+static_assert(offsetof(_StsMsgRequestPresenceSetAppData, appData) == 0x28, "_StsMsgRequestPresenceSetAppData::appData");
+}  // namespace StsMsgLib
+
+bool HandleLobbyGame_SetAppDataNotify(SharedChannel* channel, Packet const* packet)
+{
+    // LIFT: inlined RepeatPacketDecomposer setup. The command is skipped (index 1, offset 2).
+    RepeatPacketDecomposer pdr;
+    pdr.format = "hqCss;";
+    pdr.len = 6;
+    pdr.index = 1;
+    pdr.offset = 2;
+    pdr.top = -1;
+
+    unsigned long long pcid = 0;
+    StsMsgLib::_StsMsgRequestPresenceSetAppData::AppData::Field* fields = nullptr;
+    int fieldCount = 0;
+
+    if (packet->Decompose(&pdr, 1, &pcid) == 0)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 2039,
+                   L"[gamed], handle set-app-data notify fail; decompose pc-id fail, channel-id:%I64d, pcid:0x%I64X",
+                   LgpChannelId(channel), pcid);
+        return true;
+    }
+    if (!LobbyDaemon::_instance->_config->_enableFriendMessageNotification)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 2045,
+                   L"[gamed], handle set-app-data-notify fail; configuration disabled, channel-id:%I64d, "
+                   L"pcid:0x%I64X",
+                   LgpChannelId(channel), pcid);
+        return true;
+    }
+
+    // LIFT: inlined repeat count read of PacketUtil.cpp (assert at line 241). The count is kept in a 16-bit value.
+    if (packet == nullptr)
+        assertCrash(L"source\\PacketUtil.cpp", "source\\PacketUtil.cpp", 241);
+    short const count = static_cast<short>(pdr.PushRepeatCount(
+        reinterpret_cast<char const*>(packet->CurHeader + 1) + pdr.offset,
+        static_cast<unsigned short>(packet->CurHeader->size - 2) - pdr.offset));
+    bool decomposed = true;
+    if (count > 0)
+    {
+        fieldCount = count;
+        fields = static_cast<StsMsgLib::_StsMsgRequestPresenceSetAppData::AppData::Field*>(
+            Memory::_Manager[2]->AllocZero(16 * static_cast<long long>(count), HANDLER_FILE, 2053));
+        for (int i = 0; i < count; ++i)
+        {
+            Packet::VarStr key = {nullptr, nullptr};
+            Packet::VarStr value = {nullptr, nullptr};
+            if (packet->Decompose(&pdr, &key) == 0)
+            {
+                Log::Write(Log::LT_ERROR, HANDLER_FILE, 2065,
+                           L"[gamed], handle set-app-data notify fail; decompose app-data-key fail, key-index:%d, "
+                           L"channel-id:%I64d, pcid:0x%I64X",
+                           i, LgpChannelId(channel), pcid);
+                decomposed = false;
+                break;
+            }
+            if (packet->Decompose(&pdr, &value) == 0)
+            {
+                Log::Write(Log::LT_ERROR, HANDLER_FILE, 2071,
+                           L"[gamed], handle set-app-data notify fail; decompose app-data-value fail, "
+                           L"value-index:%d, channel-id:%I64d, pcid:0x%I64X",
+                           i, LgpChannelId(channel), pcid);
+                decomposed = false;
+                break;
+            }
+            if (*key.len <= 0)
+            {
+                Log::Write(Log::LT_ERROR, HANDLER_FILE, 2077,
+                           L"[gamed], handle set-app-data notify fail; invalid key length, key-index:%d, "
+                           L"key-length:%d, channel-id:%I64d, pcid:0x%I64X",
+                           i, *key.len, LgpChannelId(channel), pcid);
+                decomposed = false;
+                break;
+            }
+            if (*value.len < 0)
+            {
+                Log::Write(Log::LT_ERROR, HANDLER_FILE, 2083,
+                           L"[gamed], handle set-app-data notify fail; invalid value length, value-index:%d, "
+                           L"value-length:%d, channel-id:%I64d, pcid:0x%I64X",
+                           i, *value.len, LgpChannelId(channel), pcid);
+                decomposed = false;
+                break;
+            }
+            fields[i].pszKey = static_cast<char*>(
+                Memory::_Manager[2]->AllocZero(*key.len + 1, HANDLER_FILE, 2087));
+            fields[i].pwszValue = static_cast<wchar_t*>(
+                Memory::_Manager[2]->AllocZero(2LL * (*value.len + 1), HANDLER_FILE, 2088));
+            String::UnicodeToMultibyte(fields[i].pszKey, *key.len + 1, key.str);
+            wcsncpy(fields[i].pwszValue, value.str, *value.len);
+            // LIFT: inlined decrement of the repeat count of RepeatPacketDecomposer.
+            pdr.index = pdr.start[pdr.top] + 1;
+            --pdr.counts[pdr.top];
+        }
+    }
+
+    if (decomposed)
+    {
+        // LIFT: inlined end of repeat of PacketUtil.cpp (assert at line 248: the repeat format must start with 'C').
+        if (pdr.top < 0 || pdr.format[pdr.start[pdr.top]] != 'C')
+            assertCrash(L"source\\PacketUtil.cpp", "source\\PacketUtil.cpp", 248);
+        pdr.skipRepeatFormat();
+        --pdr.top;
+
+        CliSession* const session = LobbyDaemon::_instance->_clisessionMgr->Select_index_pcid(LgpWid(channel), pcid);
+        if (session == nullptr)
+        {
+            Log::Write(Log::LT_ERROR, HANDLER_FILE, 2101,
+                       L"[gamed], handle set-app-data notify fail; cli-session not found, channel-id:%I64d, "
+                       L"pcid:0x%I64X",
+                       LgpChannelId(channel), pcid);
+        }
+        else
+        {
+            NPGameServiceChannel* const gameServChannel = LobbyDaemon::_instance->_npServchmgr->_gameServChannel;
+            if (gameServChannel == nullptr)
+            {
+                Log::Write(Log::LT_ERROR, HANDLER_FILE, 2108,
+                           L"[gamed], handle set-app-data notify fail; np N/A, channel-id:%I64d, pcid:0x%I64X",
+                           LgpChannelId(channel), pcid);
+            }
+            else
+            {
+                StsMsgLib::_StsMsgRequestPresenceSetAppData msg;
+                msg.msgInfo.eCmd = StsMsgLib::COMMAND_SRV_PRES_SET_APP_DATA;
+                msg.msgInfo.msgType = StsMsgLib::MESSAGE_TYPE_REQUEST;
+                msg.msgInfo.nTxnId = 0;
+                msg.pUserId = &session->_acb._id;
+                msg.pAppId = &BnsCommonConfig::Config->_npAppId;
+                msg.appData.pFields = fields;
+                msg.appData.nFieldCount = fieldCount;
+                if (gameServChannel->SendMsg(&msg, true, nullptr))
+                {
+                    Log::Write(Log::LT_DEBUG, HANDLER_FILE, 2118,
+                               L"[gamed], handle set-app-data notify ok, cli-key:0x%I64X, channel-id:%I64d, "
+                               L"pcid:0x%I64X",
+                               session->_clikey, LgpChannelId(channel), pcid);
+                }
+                else
+                {
+                    Log::Write(Log::LT_ERROR, HANDLER_FILE, 2114,
+                               L"[gamed], handle set-app-data notify fail; send to np fail, cli-key:0x%I64X, "
+                               L"channel-id:%I64d, pcid:0x%I64X",
+                               session->_clikey, LgpChannelId(channel), pcid);
+                }
+            }
+            session->removeReferenceCount(HANDLER_FILE, 2122);
+        }
+    }
+
+    // LIFT: free the key and value copies. The unused entries are zero (AllocZero).
+    if (fields != nullptr)
+    {
+        for (int i = 0; i < fieldCount; ++i)
+        {
+            if (fields[i].pszKey != nullptr)
+            {
+                Memory::_Manager[2]->Free(fields[i].pszKey, HANDLER_FILE, 2129);
+                fields[i].pszKey = nullptr;
+            }
+            if (fields[i].pwszValue != nullptr)
+            {
+                Memory::_Manager[2]->Free(fields[i].pwszValue, HANDLER_FILE, 2131);
+                fields[i].pwszValue = nullptr;
+            }
+        }
+        Memory::_Manager[2]->Free(fields, HANDLER_FILE, 2134);
+    }
+    return true;
 }
 
 // 0x90f70

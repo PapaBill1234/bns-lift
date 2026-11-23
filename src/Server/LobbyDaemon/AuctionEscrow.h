@@ -13,9 +13,11 @@ struct _StsMsgInfoRequest : public _StsMsgInfo
 
 struct _StsMsgRequest : public _StsMsg
 {
-    virtual ECommand GetCommand() { return msgInfo.eCmd; }
-    virtual unsigned int GetTransactionId() { return msgInfo.nTxnId; }
-    virtual EMessageType GetMessageType() { return msgInfo.msgType; }
+    // LIFT: defined once in src/Server/Shared/NPChannel2.cpp (0x4440, 0x4450, 0x4460). An in-class body here gives a second
+    // definition in each TU that builds the vtable (LNK2005 in the VS2010 /LTCG link).
+    virtual ECommand GetCommand();            // 0x4440
+    virtual unsigned int GetTransactionId();  // 0x4450
+    virtual EMessageType GetMessageType();    // 0x4460
     _StsMsgInfoRequest msgInfo;
 };
 static_assert(sizeof(_StsMsgRequest) == 0x18, "sizeof _StsMsgRequest");

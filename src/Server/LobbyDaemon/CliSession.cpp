@@ -975,6 +975,26 @@ bool CliSession::UpdateAccountData(unsigned long long, int, TimeBasedPlayInfoLis
     LIFT_STUB(0x38500);
 }
 
+// 0x38930
+bool CliSession::UpdateAccountExp(unsigned long long, GameAccountExpInfo::ExpInfo&)
+{
+    LIFT_STUB(0x38930);
+}
+
+// 0x38b50
+bool CliSession::UpdateAccountContentQuota(unsigned long long,
+                                           std::vector<AccountContentQuota, StlAllocator<AccountContentQuota, 2> > const&)
+{
+    LIFT_STUB(0x38b50);
+}
+
+// 0x38cc0
+bool CliSession::UpdateAccountRecycleTime(unsigned long long,
+                                          std::vector<AccountRecycleTime, StlAllocator<AccountRecycleTime, 2> > const&)
+{
+    LIFT_STUB(0x38cc0);
+}
+
 // 0x38670
 bool CliSession::UpdateTimeBasedPlayReward(unsigned long long, int, char, short, UserPromotionReward&, long long)
 {

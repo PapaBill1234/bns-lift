@@ -1335,3 +1335,16 @@ Notes:
 - A caller that calls a noreturn `LIFT_STUB` (`BLDaemonInfoTable::Find`) loses all code after the call under LTCG. `HandleLobbyInfoGate_HelloReq` scored 30.4 for this reason. It is not a source error.
 - A header of another card of the same wave is not edited. Read the 2 fields with a local layout struct and a `// LIFT:` comment.
 - PDB inline methods (`InfoGateChannel::GetWid`, `IsBroadcastable`, `StartBroadcast`) belong in the class header as inline members, not as a file-local helper.
+
+## ld-21
+
+- A card that compiles with clang can still fail the VS2010 link. Run `tools/parity.sh` (or `tools/vs2010/build.sh LobbyDaemon`) before you accept a checkpoint. New references to a non-lifted `static ObjPool _pool` or to data without a definition give LNK2001.
+- LTCG inlines a `LIFT_STUB` (noreturn `abort`) into its caller. The caller then loses all code after the call. Scores of 11 to 65 on handlers that call stubs are a stub effect, not a codegen miss. Do not spend tries on them.
+- An in-class body of a virtual function in a header (`AuctionEscrow.h` `_StsMsgRequest`) gives LNK2005 when another TU defines the same function (`NPChannel2.cpp`). Use declarations in headers.
+- A4 worked for `String::UnicodeToMultibyte` (`__declspec(noinline)` on the shared definition): `SetAppDataNotify` 96.4 to 97.2 and the callee is MATCH.
+- A worktree without `vendor/zstd/src` links with the stub zstd in the clang build. The VS2010 link then fails for all 5 exes (`ZSTD_*` unresolved). Copy the ignored checkout (bb6eaf64) in first.
+- Checkpoint rows can name a cold chunk or an inner address (`0x8d990`, `0x8e620`) instead of the index entry. Check each card row against `index.tsv`.
+- A10 worked on a plain-`static` helper set (`assertCrash`, `LobbyErrorText`, `UpdateFailCode`, `ChannelIdOf`, `WorkerIdOf`, `SetupDecomposer`, `HandleShowcaseOk`): `static __forceinline` made `SetAppDataNotify` 97.2 to 99.2 and the 3 `ChangeCharacter*Ok` handlers 11.9 to 44.3. Try A10 on every DIFF handler of a card before you call the score a stub effect.
+- A8 on `ChannelIdOf` (drop the `channel != nullptr` test, read `_rawChannel` only): no score change in any function. The original has the channel test in most handlers (`channel != nullptr && channel->_rawChannel != nullptr`). Only the log lines of `0x8c660` and `0x907e0` read `_rawChannel` alone. Keep the test.
+- Two LobbyDaemon header families define `StsMsgLib` (`StsMsgGrade.h`/`AuctionEscrow.h` and `SmartCouponDaemon/NPChannel.h`). Do not put a second `class NPChannel` in a LobbyDaemon header (ODR). Include `NPChannelBase.h`, and do not include `AuctionEscrow.h` in the same TU.
+- Merging two cards that each added a file-scope helper for the same inlined code (`LgpChannelId` and `ChannelIdOf`): keep one `static __forceinline` helper with a `const` argument. The scores did not change. Also check for a second definition of a placeholder (`BnsCommonConfig::Config`) when the later card adds the real file.

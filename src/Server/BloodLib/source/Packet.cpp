@@ -400,3 +400,47 @@ unsigned short Packet::Decompose(PacketDecomposer* pdr, int n, ...) const
     va_end(args);
     return result;
 }
+
+// 0xde970 (LobbyDaemon)
+unsigned short Packet::Decompose(PacketDecomposer* pdr, VarStr* str) const
+{
+    if (CurHeader == nullptr || str == nullptr || pdr == nullptr)
+        PACKET_ASSERT_CRASH(565);
+    if (*pdr->CurrentFormat() != 's')
+        PACKET_ASSERT_CRASH(566);
+    unsigned int offset = pdr->offset;
+    unsigned long long limit = static_cast<unsigned long long>(CurHeader->size - 2);
+    if (limit < static_cast<unsigned long long>(offset) + 2)
+        return 0;
+    short length = *reinterpret_cast<short const*>(reinterpret_cast<char const*>(CurHeader + 1) + offset);
+    // LIFT: the original keeps the byte size (2 * length) in a 16-bit value. A value with bit 15 set is refused.
+    short byteSize = static_cast<short>(length * 2);
+    if (byteSize < 0 || limit < static_cast<unsigned long long>(byteSize) + offset + 2)
+        return 0;
+    ++pdr->index;
+    str->len = reinterpret_cast<short*>(const_cast<char*>(reinterpret_cast<char const*>(CurHeader + 1)) + offset);
+    str->str = reinterpret_cast<wchar_t*>(const_cast<char*>(reinterpret_cast<char const*>(CurHeader + 2)) + offset);
+    pdr->offset = offset + byteSize + 2;
+    return static_cast<unsigned short>(byteSize + 2);
+}
+
+// 0xdeab0 (LobbyDaemon)
+unsigned short Packet::Decompose(PacketDecomposer* pdr, VarData* data) const
+{
+    if (CurHeader == nullptr || data == nullptr || pdr == nullptr)
+        PACKET_ASSERT_CRASH(589);
+    if (*pdr->CurrentFormat() != 'b')
+        PACKET_ASSERT_CRASH(590);
+    unsigned int offset = pdr->offset;
+    unsigned long long limit = static_cast<unsigned long long>(CurHeader->size - 2);
+    if (limit < static_cast<unsigned long long>(offset) + 2)
+        return 0;
+    short length = *reinterpret_cast<short const*>(reinterpret_cast<char const*>(CurHeader + 1) + offset);
+    if (length < 0 || limit < static_cast<unsigned long long>(length) + offset + 2)
+        return 0;
+    ++pdr->index;
+    data->size = reinterpret_cast<short*>(const_cast<char*>(reinterpret_cast<char const*>(CurHeader + 1)) + offset);
+    data->buffer = const_cast<char*>(reinterpret_cast<char const*>(CurHeader + 2)) + offset;
+    pdr->offset = offset + length + 2;
+    return static_cast<unsigned short>(length + 2);
+}

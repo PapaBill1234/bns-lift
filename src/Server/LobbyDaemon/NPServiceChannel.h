@@ -8,7 +8,10 @@ class NPChannel;
 class NPTransaction;
 union id128;
 
-class NPGameServiceChannel
+// LIFT: NPChannel is the real class of NPChannelBase.h (SendMsg 0x3ac0 is defined in NPChannel2.cpp). No local copy: one definition only.
+#include "NPChannelBase.h"
+
+class NPGameServiceChannel : public NPChannel
 {
 public:
     bool SendRequestConsumeGameToken(NPTransaction*, id128 const&, id128 const&, unsigned long);  // 0xd0220

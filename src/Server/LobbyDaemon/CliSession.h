@@ -415,6 +415,10 @@ public:
     bool UpdateCharacterData(unsigned long long, short, char*, short);  // 0x381c0
     bool UpdateCharacterLevel(unsigned long long, short);  // 0x38380
     bool UpdateAccountData(unsigned long long, int, TimeBasedPlayInfoList&);  // 0x38500
+    // LIFT: declared for 0x8c660 (LobbyGamePacketHandler). The bodies are not lifted yet. PDB types: const vector&, ExpInfo&.
+    bool UpdateAccountExp(unsigned long long pcid, GameAccountExpInfo::ExpInfo& info);  // 0x38930
+    bool UpdateAccountContentQuota(unsigned long long pcid, std::vector<AccountContentQuota, StlAllocator<AccountContentQuota, 2> > const& quotaList);  // 0x38b50
+    bool UpdateAccountRecycleTime(unsigned long long pcid, std::vector<AccountRecycleTime, StlAllocator<AccountRecycleTime, 2> > const& recycleTimeList);  // 0x38cc0
     bool UpdateTimeBasedPlayReward(unsigned long long, int, char, short, UserPromotionReward&, long long);  // 0x38670
     bool NotifyGoodsInventoryChangedAlongPresence(GoodsInventoryChangedNotifyParam&);  // 0x392c0
     bool ReserveStopPlay(bool, int, int);  // 0x39820

@@ -31,6 +31,12 @@ public:
         char* buffer;
     };
 
+    struct VarStr
+    {
+        short* len;
+        wchar_t* str;
+    };
+
     ~Packet();
     void Clear();
     char const* Allocate();
@@ -50,6 +56,8 @@ public:
     void Concatenate(Packet const* packet, PacketConcatenateHandler const* concatHandler);           // 0x7300 (CacheGate)
     void Concatenate(char const* buffer, unsigned short size, PacketConcatenateHandler const* concatHandler);  // 0x7470 (CacheGate)
     unsigned short Decompose(PacketDecomposer* pdr, int n, ...) const;                                // 0x75B0 (CacheGate)
+    unsigned short Decompose(PacketDecomposer* pdr, VarStr* str) const;                               // 0xde970 (LobbyDaemon)
+    unsigned short Decompose(PacketDecomposer* pdr, VarData* data) const;                             // 0xdeab0 (LobbyDaemon)
     unsigned short FreeSize();                                                                        // 0x29D0 (LobbyDaemon)
 
     // 0x14280 (inline)

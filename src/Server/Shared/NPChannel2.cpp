@@ -681,7 +681,8 @@ bool NPChannel::checkLibError(EStsMsgError err)
 // 0x2a20 EventObject::~EventObject (LobbyDaemon) is a compiler-generated dtor. See TimerQueue.h.
 
 // 0x2700 (LobbyDaemon)
-void String::UnicodeToMultibyte(char* dst, unsigned long long count, wchar_t const* src)
+// LIFT: noinline. The orig HandleLobbyGame_SetAppDataNotify (0x907e0) calls it out of line (A4).
+__declspec(noinline) void String::UnicodeToMultibyte(char* dst, unsigned long long count, wchar_t const* src)
 {
     // ❓ HR shows one 16-bit store of 0 at dst[count - 2]. The source form is not known.
     *reinterpret_cast<wchar_t*>(&dst[count - 2]) = 0;
