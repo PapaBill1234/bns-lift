@@ -224,102 +224,104 @@ bool ChangeCharacterSexJob::init(void* param)
     _itemDataId = p->itemDataId;
     _lgate->addReferenceCount(false, kFile, 228);
 
-    short reason = 0;
+    // The original sends the Fail packet and calls transit(FIN) in each failure branch.
     _acciv = LobbyDaemon::_instance->_accountInventoryChannel;
     if (_acciv == nullptr || !_acciv->IsConnected())
     {
         JOB_LOG(Log::LT_ERROR, 233, L"[job], init fail; account-inventory N/A", L"");
-        reason = 7;
+        _lgate->SendChangeCharacterSexWithAccountInventoryItemFail(_owner->_clikey, _slotid, _labelId, _itemInstanceId,
+                                                                    7);
+        transit(FIN);
+        return true;
     }
-    else if (!LobbyDaemon::_instance->CheckServiceItemDataId(LobbyDaemon::SERVICEITEMTYPE_CHANGE_CHARACTER_SEX,
-                                                             _itemDataId))
+    if (!LobbyDaemon::_instance->CheckServiceItemDataId(LobbyDaemon::SERVICEITEMTYPE_CHANGE_CHARACTER_SEX, _itemDataId))
     {
         JOB_LOG(Log::LT_ERROR, 241, L"[job], not proper item", L", item-data-id:%u", _itemDataId);
-        reason = 183;
+        _lgate->SendChangeCharacterSexWithAccountInventoryItemFail(_owner->_clikey, _slotid, _labelId, _itemInstanceId,
+                                                                    183);
+        transit(FIN);
+        return true;
     }
-    else if (_owner->_state != 0x20000)  // CSS_LOBBY
+    if (_owner->_state != 0x20000)  // CSS_LOBBY
     {
         JOB_LOG(Log::LT_ERROR, 250, L"[job], cli-session not in lobby", L"");
-        reason = 5;
+        _lgate->SendChangeCharacterSexWithAccountInventoryItemFail(_owner->_clikey, _slotid, _labelId, _itemInstanceId,
+                                                                    5);
+        transit(FIN);
+        return true;
+    }
+    Character* const pc = _owner->getCharacterInSlot(_slotid);
+    if (pc == nullptr)
+    {
+        JOB_LOG(Log::LT_ERROR, 259, L"[job], init fail; no such character", SLOT_FMT, SLOT_ARGS(_slotid));
+        _lgate->SendChangeCharacterSexWithAccountInventoryItemFail(_owner->_clikey, _slotid, _labelId, _itemInstanceId,
+                                                                    179);
+        transit(FIN);
+        return true;
+    }
+    Character::ErrCode const err = pc->IsPlayable();
+    if (err != 0)
+    {
+        JOB_LOG(Log::LT_ERROR, 268, L"[job], init fail; not servicable pc", L", error:%d, pcid:0x%I64X", err,
+                pc->_db.pcid);
+        _lgate->SendChangeCharacterSexWithAccountInventoryItemFail(_owner->_clikey, _slotid, _labelId, _itemInstanceId,
+                                                                    180);
+        transit(FIN);
+        return true;
+    }
+    if (_owner->queryLobbyService(pc) != nullptr)
+    {
+        JOB_LOG(Log::LT_ERROR, 276, L"[job], init fail; pc already in service", L", pcid:0x%I64X", pc->_db.pcid);
+        _lgate->SendChangeCharacterSexWithAccountInventoryItemFail(_owner->_clikey, _slotid, _labelId, _itemInstanceId,
+                                                                    9);
+        transit(FIN);
+        return true;
+    }
+    int line = -1;
+    wchar_t const* msg = nullptr;
+    _gamed = LobbyDaemon::_instance->_gamedchmgr->Acquire(pc->_db.belongingWorld);
+    if (_gamed == nullptr)
+    {
+        line = 285;
+        msg = L"[job], init fail; world not available" JOB_SUFFIX L", wid:%d";
     }
     else
     {
-        Character* const pc = _owner->getCharacterInSlot(_slotid);
-        if (pc == nullptr)
+        GameWorld* const world = LobbyDaemon::_instance->_gameWorldRegistry->Get(pc->_db.belongingWorld);
+        if (world == nullptr)
         {
-            JOB_LOG(Log::LT_ERROR, 259, L"[job], init fail; no such character", SLOT_FMT, SLOT_ARGS(_slotid));
-            reason = 179;
+            JOB_LOG(Log::LT_ERROR, 294, L"[job], init fail; world not found", L", wid:%d", pc->_db.belongingWorld);
+            _lgate->SendChangeCharacterSexWithAccountInventoryItemFail(_owner->_clikey, _slotid, _labelId, _itemInstanceId,
+                                                                        2);
+            transit(FIN);
+            return true;
         }
-        else
+        if (!world->IsLive())
         {
-            Character::ErrCode const err = pc->IsPlayable();
-            if (err != 0)
-            {
-                JOB_LOG(Log::LT_ERROR, 268, L"[job], init fail; not servicable pc", L", error:%d, pcid:0x%I64X", err,
-                        pc->_db.pcid);
-                reason = 180;
-            }
-            else if (_owner->queryLobbyService(pc) != nullptr)
-            {
-                JOB_LOG(Log::LT_ERROR, 276, L"[job], init fail; pc already in service", L", pcid:0x%I64X", pc->_db.pcid);
-                reason = 9;
-            }
-            else
-            {
-                int line = -1;
-                wchar_t const* msg = nullptr;
-                _gamed = LobbyDaemon::_instance->_gamedchmgr->Acquire(pc->_db.belongingWorld);
-                if (_gamed == nullptr)
-                {
-                    line = 285;
-                    msg = L"[job], init fail; world not available" JOB_SUFFIX L", wid:%d";
-                }
-                else
-                {
-                    GameWorld* const world = LobbyDaemon::_instance->_gameWorldRegistry->Get(pc->_db.belongingWorld);
-                    if (world == nullptr)
-                    {
-                        JOB_LOG(Log::LT_ERROR, 294, L"[job], init fail; world not found", L", wid:%d",
-                                pc->_db.belongingWorld);
-                        reason = 2;
-                    }
-                    else if (!world->IsLive())
-                    {
-                        line = 302;
-                        msg = L"[job], init fail; world not live" JOB_SUFFIX L", wid:%d";
-                    }
-                    else if (!world->GetDB().entrance &&
-                             !_owner->_auth.Authorize(Authority::OP_ENTER_GAMEWORLD_ON_ENTRANCE_NOT_ALLOWED))
-                    {
-                        line = 310;
-                        msg = L"[job], init fail; world not allowed" JOB_SUFFIX L", wid:%d";
-                    }
-                    else
-                    {
-                        JOB_LOG(Log::LT_DEBUG, 318, L"[job], init ok",
-                                L", gate-wid:%d, wid:%d" SLOT_FMT
-                                L", label-id:0x%I64X, item-instance-id:0x%I64X, item-data-id:%u, making-data-size:%d",
-                                _lgate != nullptr ? (_lgate->_rawChannel != nullptr ? static_cast<short>(_lgate->_rawChannel->GetId()) : 0) : 0,
-                                pc->_db.belongingWorld, SLOT_ARGS(_slotid), _labelId, _itemInstanceId, _itemDataId,
-                                _makingDataSize);
-                    }
-                }
-                if (msg != nullptr)
-                {
-                    Log::Write(Log::LT_ERROR, kFile, line, msg, JOB_ARGS, pc->_db.belongingWorld);
-                    reason = 184;
-                }
-            }
+            line = 302;
+            msg = L"[job], init fail; world not live" JOB_SUFFIX L", wid:%d";
+        }
+        else if (!world->GetDB().entrance &&
+                 !_owner->_auth.Authorize(Authority::OP_ENTER_GAMEWORLD_ON_ENTRANCE_NOT_ALLOWED))
+        {
+            line = 310;
+            msg = L"[job], init fail; world not allowed" JOB_SUFFIX L", wid:%d";
         }
     }
-    int next = CHECK_ACCOUNT_INVENTORY_ITEM;
-    if (reason != 0)
+    if (msg != nullptr)
     {
+        Log::Write(Log::LT_ERROR, kFile, line, msg, JOB_ARGS, pc->_db.belongingWorld);
         _lgate->SendChangeCharacterSexWithAccountInventoryItemFail(_owner->_clikey, _slotid, _labelId, _itemInstanceId,
-                                                                    reason);
-        next = FIN;
+                                                                    184);
+        transit(FIN);
+        return true;
     }
-    transit(next);
+    JOB_LOG(Log::LT_DEBUG, 318, L"[job], init ok",
+            L", gate-wid:%d, wid:%d" SLOT_FMT
+            L", label-id:0x%I64X, item-instance-id:0x%I64X, item-data-id:%u, making-data-size:%d",
+            _lgate != nullptr ? (_lgate->_rawChannel != nullptr ? static_cast<short>(_lgate->_rawChannel->GetId()) : 0) : 0,
+            pc->_db.belongingWorld, SLOT_ARGS(_slotid), _labelId, _itemInstanceId, _itemDataId, _makingDataSize);
+    transit(CHECK_ACCOUNT_INVENTORY_ITEM);
     return true;
 }
 
@@ -344,7 +346,7 @@ bool ChangeCharacterSexJob::checkAccountInventoryItemOk(void* param)
 {
     _acciv->TRecv(_tran);
     RetrieveSingleWarehouseItemOkParam* const ok = static_cast<RetrieveSingleWarehouseItemOkParam*>(param);
-    short reason = 0;
+    short reason;
     if (ok == nullptr)
     {
         JOB_CRASH(344, L"== CRASH == [job], invalid param");
@@ -372,16 +374,15 @@ bool ChangeCharacterSexJob::checkAccountInventoryItemOk(void* param)
             JOB_LOG(Log::LT_ERROR, 371, L"[job], unusable item", L"");
             reason = 182;
         }
+        else
+        {
+            transit(REGISTER_SERVICE_ENTRY);
+            return true;
+        }
     }
-    // The original has one transit call: the next state is in a register.
-    int next = REGISTER_SERVICE_ENTRY;
-    if (reason != 0)
-    {
-        _lgate->SendChangeCharacterSexWithAccountInventoryItemFail(_owner->_clikey, _slotid, _labelId, _itemInstanceId,
-                                                                    reason);
-        next = FIN;
-    }
-    transit(next);
+    _lgate->SendChangeCharacterSexWithAccountInventoryItemFail(_owner->_clikey, _slotid, _labelId, _itemInstanceId,
+                                                                reason);
+    transit(FIN);
     return true;
 }
 
@@ -455,6 +456,7 @@ bool ChangeCharacterSexJob::registerServiceEntry()
             JOB_LOG(Log::LT_ERROR, 478, L"[job], start new lobby service fail", L"");
             _lgate->SendChangeCharacterSexWithAccountInventoryItemFail(_owner->_clikey, _slotid, _labelId,
                                                                         _itemInstanceId, 2);
+            delete service;
             line = 480;
         }
         else if (!_owner->addLobbyService(service))
@@ -464,6 +466,7 @@ bool ChangeCharacterSexJob::registerServiceEntry()
                     service->GetDB().serviceId);
             _lgate->SendChangeCharacterSexWithAccountInventoryItemFail(_owner->_clikey, _slotid, _labelId,
                                                                         _itemInstanceId, 185);
+            delete service;
             line = 489;
         }
         else
@@ -474,8 +477,8 @@ bool ChangeCharacterSexJob::registerServiceEntry()
             transit(TRY_CONSUME_ACCOUNT_INVENTORY_ITEM);
             return true;
         }
-        // LIFT: the class operator delete is empty (LobbyService.h). Free gives the memory back.
-        delete service;
+        // LIFT: the class operator delete is empty (LobbyService.h). Free gives the memory back. The original
+        // destroys the service in each branch and frees it once.
         Memory::_Manager[2]->Free(service, kFile, line);
         transit(FIN);
         return true;
