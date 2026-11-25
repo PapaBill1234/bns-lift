@@ -13,9 +13,12 @@ Usage: tools/pdbq.py <Server> <command> <pattern> [...]
   src   <regex>   source files of a module (use it to find the file of a module)
 
 The tool reads text dumps from llvm-pdbutil. It keeps them in ~/.cache/bns-lift/pdbq/.
+The cache file name has a short hash of the absolute PDB path (<Server>.<8 hex>.<kind>.txt),
+so jobs with a different LIFT_IDA_DIR do not overwrite each other.
 The PDB path is ../ida/lift/<Server>/<Server>.pdb (or $LIFT_IDA_DIR/<Server>/<Server>.pdb).
 A regex matches the full name unless it contains a regex character.
 """
+import hashlib
 import os
 import re
 import struct
@@ -42,7 +45,8 @@ def ida_dir():
 def dump(server, kind):
     os.makedirs(CACHE, exist_ok=True)
     pdb = os.path.join(ida_dir(), server, server + ".pdb")
-    out = os.path.join(CACHE, "%s.%s.txt" % (server, kind))
+    tag = hashlib.sha1(os.path.abspath(pdb).encode("utf-8", "surrogateescape")).hexdigest()[:8]
+    out = os.path.join(CACHE, "%s.%s.%s.txt" % (server, tag, kind))
     if not os.path.exists(out) or os.path.getmtime(out) < os.path.getmtime(pdb):
         flag = {"types": "-types", "syms": "-symbols", "globals": "-globals", "lines": "-l"}[kind]
         with open(out + ".tmp", "w") as f:
