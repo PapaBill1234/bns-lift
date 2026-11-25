@@ -25,6 +25,8 @@ public:
     virtual ~TransactionChannel();  // 0x7b100
     bool InitializeTransactionChannel(long);  // 0x7b170
     bool TSend(Transaction* t, Packet const* packet);  // 0x7b2b0 (Not done: card ld-18 batch 1 only calls it)
+    // PDB type 0x485A. LTCG inlines it at all callers. The binary has no own body (gap-06: the goods jobs).
+    bool TRecv(Transaction* t);
 
     class Manager;  // PDB type 0x485B; layout below
     Manager* _mgr;

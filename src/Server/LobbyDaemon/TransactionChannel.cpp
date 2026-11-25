@@ -48,6 +48,16 @@ bool TransactionChannel::InitializeTransactionChannel(long transactionLifetime)
     return false;
 }
 
+// No own body. LTCG inlines it at the callers (for example GetGoodsCountJob::getGoodsCountOk, 0x51b80).
+bool TransactionChannel::TRecv(Transaction* t)
+{
+    if (_mgr != nullptr)
+        return _mgr->remove(t);
+    Log::Write(Log::LT_ERROR, kFile, 155, L"== CRASH == [tran-channel], send fail; manager not initialized");
+    AlertSender::Write(kFile, 155, L"== CRASH == [tran-channel], send fail; manager not initialized");
+    return false;
+}
+
 // 0x7b440
 bool TransactionChannel::Manager::add(Transaction* t)
 {

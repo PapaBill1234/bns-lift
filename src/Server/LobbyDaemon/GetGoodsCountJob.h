@@ -1,18 +1,31 @@
-// GetGoodsCountJob.obj (LobbyDaemon PDB, 2019 + PDB). Wave 0: declarations of the stubbed functions only.
-// LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
+// GetGoodsCountJob.obj (LobbyDaemon PDB, 2019 + PDB). Layout from tools/pdbcls.py LobbyDaemon GetGoodsCountJob.
 #pragma once
+#include <stddef.h>
+#include "CliSessionJob.h"
 
+class AccountInventoryChannel;
 class CliSession;
 class LobbyGateChannel;
+class LobbyJobTransaction;
+class ObjPool;
 struct LobbyJobDef;
 
-class GetGoodsCountJob
+// PDB layout (sizeof 0x70, CliSessionJob base). The PDB also has Initialize(LobbyGateChannel*). The binary has no
+// body for it. It is not declared here.
+class GetGoodsCountJob : public CliSessionJob
 {
 public:
-    virtual LobbyJobDef const* GetDefinition() const;  // 0x51460
+    enum State
+    {
+        INIT = 0,
+        GET_GOODS_COUNT = 1,
+        FIN = 2
+    };
+
     static void* _vtbl();  // 0x514c0
-    GetGoodsCountJob(CliSession*, LobbyGateChannel*);  // 0x51540
+    GetGoodsCountJob(CliSession* owner, LobbyGateChannel* lgate);  // 0x51540
     virtual ~GetGoodsCountJob();  // 0x515d0
+    virtual LobbyJobDef const* GetDefinition() const;  // 0x51460
 private:
     virtual void deallocate_me(void*, wchar_t const*, int);  // 0x51470
     virtual bool work(int, void*);  // 0x51640
@@ -21,4 +34,22 @@ private:
     bool getGoodsCountOk(void*);  // 0x51b80
     bool getGoodsCountFail(void*);  // 0x51d60
     bool getGoodsCountTimeout();  // 0x51f60
+
+    LobbyGateChannel* _lgate;  // +0x58
+    AccountInventoryChannel* _acciv;  // +0x60
+    LobbyJobTransaction* _tran;  // +0x68
+
+public:
+    static ObjPool _pool;
+    static LobbyJobDef _def;
+
+    friend struct GetGoodsCountJobLayoutCheck;
+};
+
+struct GetGoodsCountJobLayoutCheck
+{
+    static_assert(sizeof(GetGoodsCountJob) == 0x70, "sizeof GetGoodsCountJob");
+    static_assert(offsetof(GetGoodsCountJob, _lgate) == 0x58, "GetGoodsCountJob::_lgate");
+    static_assert(offsetof(GetGoodsCountJob, _acciv) == 0x60, "GetGoodsCountJob::_acciv");
+    static_assert(offsetof(GetGoodsCountJob, _tran) == 0x68, "GetGoodsCountJob::_tran");
 };

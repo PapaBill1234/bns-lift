@@ -3,6 +3,7 @@
 #pragma once
 #include <stddef.h>
 
+struct Goods;
 struct LobbyServiceItem;
 
 struct WorldKickFailParam
@@ -49,3 +50,35 @@ struct RetrieveSingleWarehouseItemOkParam
 };
 static_assert(sizeof(RetrieveSingleWarehouseItemOkParam) == 0x8, "sizeof RetrieveSingleWarehouseItemOkParam");
 static_assert(offsetof(RetrieveSingleWarehouseItemOkParam, item) == 0x0, "RetrieveSingleWarehouseItemOkParam::item");
+
+// LIFT: gap-06. AccountInventoryLobbyPacketHandler fills a local of this type for ListGoodsJob.
+struct ListGoodsOkParam
+{
+    Goods* goodsList;
+    int goodsCount;
+};
+static_assert(sizeof(ListGoodsOkParam) == 0x10, "sizeof ListGoodsOkParam");
+static_assert(offsetof(ListGoodsOkParam, goodsList) == 0x0, "ListGoodsOkParam::goodsList");
+static_assert(offsetof(ListGoodsOkParam, goodsCount) == 0x8, "ListGoodsOkParam::goodsCount");
+
+// LIFT: gap-06. AccountInventoryLobbyPacketHandler fills a local of this type for TakeGoodsJob.
+struct TakeGoodsOkParam
+{
+    LobbyServiceItem* items;
+    int itemCount;
+};
+static_assert(sizeof(TakeGoodsOkParam) == 0x10, "sizeof TakeGoodsOkParam");
+static_assert(offsetof(TakeGoodsOkParam, items) == 0x0, "TakeGoodsOkParam::items");
+static_assert(offsetof(TakeGoodsOkParam, itemCount) == 0x8, "TakeGoodsOkParam::itemCount");
+
+// LIFT: gap-06. AccountInventoryLobbyPacketHandler fills a local of this type for ListLobbyServiceItemJob.
+struct RetrieveLobbyServiceItemListOkParam
+{
+    int searchCount;
+    LobbyServiceItem* items;
+    int itemCount;
+};
+static_assert(sizeof(RetrieveLobbyServiceItemListOkParam) == 0x18, "sizeof RetrieveLobbyServiceItemListOkParam");
+static_assert(offsetof(RetrieveLobbyServiceItemListOkParam, searchCount) == 0x0, "RetrieveLobbyServiceItemListOkParam::searchCount");
+static_assert(offsetof(RetrieveLobbyServiceItemListOkParam, items) == 0x8, "RetrieveLobbyServiceItemListOkParam::items");
+static_assert(offsetof(RetrieveLobbyServiceItemListOkParam, itemCount) == 0x10, "RetrieveLobbyServiceItemListOkParam::itemCount");
