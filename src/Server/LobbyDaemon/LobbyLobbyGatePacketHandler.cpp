@@ -116,7 +116,20 @@ bool HandleLobbyLobbyGate_GetEnterWorldTokenReq(SharedChannel* channel, Packet c
         return true;
     }
     LobbyJobManager* jobMgr = LobbyDaemon::_instance->_jobMgr;
-    if (!jobMgr->Register(job))
+    // LIFT: the original puts the register ok block first (block order 0xc48b0).
+    if (jobMgr->Register(job))
+    {
+        jobMgr->Execute(job, 13, nullptr);
+        Log::Write(Log::LT_DEBUG, L"LobbyLobbyGatePacketHandler.cpp", 575,
+                   L"[lobby-gate], handle get enter world token ok, gate-wid:%d, cli-key:0x%I64X, slot-id:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
+                   gate != nullptr ? static_cast<int>(gate->GetWid()) : 0, clikey,
+                   slotid.guid.id1, slotid.guid.id2, slotid.guid.id3,
+                   slotid.guid.id4[0], slotid.guid.id4[1], slotid.guid.id4[2], slotid.guid.id4[3],
+                   slotid.guid.id4[4], slotid.guid.id4[5], slotid.guid.id4[6], slotid.guid.id4[7]);
+        job->removeReferenceCount(L"LobbyLobbyGatePacketHandler.cpp", 577);
+        cliSession->removeReferenceCount(L"LobbyLobbyGatePacketHandler.cpp", 578);
+    }
+    else
     {
         Log::Write(Log::LT_ERROR, L"LobbyLobbyGatePacketHandler.cpp", 569,
                    L"[lobby-gate], handle get enter world token fail; start job fail, gate-wid:%d, cli-key:0x%I64X, slot-id:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
@@ -126,17 +139,7 @@ bool HandleLobbyLobbyGate_GetEnterWorldTokenReq(SharedChannel* channel, Packet c
                    slotid.guid.id4[4], slotid.guid.id4[5], slotid.guid.id4[6], slotid.guid.id4[7]);
         job->removeReferenceCount(L"LobbyLobbyGatePacketHandler.cpp", 570);
         cliSession->removeReferenceCount(L"LobbyLobbyGatePacketHandler.cpp", 571);
-        return true;
     }
-    jobMgr->Execute(job, 13, nullptr);
-    Log::Write(Log::LT_DEBUG, L"LobbyLobbyGatePacketHandler.cpp", 575,
-               L"[lobby-gate], handle get enter world token ok, gate-wid:%d, cli-key:0x%I64X, slot-id:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
-               gate != nullptr ? static_cast<int>(gate->GetWid()) : 0, clikey,
-               slotid.guid.id1, slotid.guid.id2, slotid.guid.id3,
-               slotid.guid.id4[0], slotid.guid.id4[1], slotid.guid.id4[2], slotid.guid.id4[3],
-               slotid.guid.id4[4], slotid.guid.id4[5], slotid.guid.id4[6], slotid.guid.id4[7]);
-    job->removeReferenceCount(L"LobbyLobbyGatePacketHandler.cpp", 577);
-    cliSession->removeReferenceCount(L"LobbyLobbyGatePacketHandler.cpp", 578);
     return true;
 }
 
