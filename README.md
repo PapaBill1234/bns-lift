@@ -8,10 +8,21 @@ C++ lift of the 2019 + PDB BnS server executables.
 
 This repo is public. Do not commit binaries, keys, PDBs or IDA databases.
 
+## Status (2026-11-25)
+
+| Item | State |
+| --- | --- |
+| First 4 exes | 91.7 % parity. 3 of 4 are above 90 %. LobbyGate is at 89.0 %. |
+| LobbyDaemon | Lift in progress: 674 MATCH (30.6 %). Most of the other functions are still `LIFT_STUB` bodies. |
+| Method | Gap cards. Each card lifts the PDB class layout and the stub bodies of one class or job group. |
+| Last landed | Gap cards 01-03 (LobbyJob core, LobbyGate channel, presence) and the `addReferenceCount` PDB signature: +29 MATCH, 0 lost in all 5 exes. |
+| Checks per landing | Full VS2010 build of all 5 exes, funcdiff against the original, 0 lost MATCH, 0 strict regress. A model review checks each new MATCH without a strict full proof. |
+| Next | Gap cards 04 (NPGame service channel) and 05 (charge jobs), then the other job cards. |
+
 ## Parity
 
 <!-- parity:start -->
-Last update: card `lift-lobbydaemon-22` (2026-11-23). Tool: `tools/parity.sh` (VS2010 /GL /LTCG build vs original, funcdiff).
+Last update: card `lift-lobbydaemon-gap-int-2` (2026-11-25). Tool: `tools/parity.sh` (VS2010 /GL /LTCG build vs original, funcdiff).
 
 | Exe | Parity | MATCH | DIFF | Only in original | Total | Mean score | Start | Change | Level |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
@@ -19,7 +30,7 @@ Last update: card `lift-lobbydaemon-22` (2026-11-23). Tool: `tools/parity.sh` (V
 | LobbyGate | **89.0 %** | 658 | 78 | 3 | 739 | 98.9 | 37.9 % | +51.2 | below 90 % |
 | SmartCouponDaemon | **94.2 %** | 630 | 37 | 2 | 669 | 99.5 | 33.6 % | +60.5 | 90 % ✅ |
 | PostOfficeDaemon | **91.4 %** | 694 | 60 | 5 | 759 | 99.1 | 34.5 % | +56.9 | 90 % ✅ |
-| LobbyDaemon | **29.3 %** | 645 | 180 | 1379 | 2204 | 95.2 | 2.2 % | +27.0 | below 90 % |
+| LobbyDaemon | **30.6 %** | 674 | 167 | 1363 | 2204 | 96.5 | 2.2 % | +28.4 | below 90 % |
 | **First 4** | **91.7 %** | 2438 | | | 2658 | | 37.0 % | +54.7 | 90 % ✅ |
 
 | Shared library (functions in 2+ exes) | Parity | MATCH in each exe | DIFF in 1+ exe | Total | Goal |
@@ -89,4 +100,5 @@ First 4 and shared library: CacheGate, LobbyGate, SmartCouponDaemon, PostOfficeD
 | `lift-lobbydaemon-21` | 92.9 % | 89.0 % | 94.2 % | 91.4 % | 27.4 % |
 | `lift-lobbydaemon-24` | 92.9 % | 89.0 % | 94.2 % | 91.4 % | 29.3 % |
 | `lift-lobbydaemon-22` | 92.9 % | 89.0 % | 94.2 % | 91.4 % | 29.3 % |
+| `lift-lobbydaemon-gap-int-2` | 92.9 % | 89.0 % | 94.2 % | 91.4 % | 30.6 % |
 <!-- parity:end -->

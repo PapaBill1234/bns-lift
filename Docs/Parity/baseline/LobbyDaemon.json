@@ -1994,6 +1994,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"GamedChannelManager::OnClose": {
+"calls": 89,
+"consts": 91,
+"refs": 88,
+"score": 89.3,
+"status": "DIFF"
+},
 "GamedChannelManager::OnConnect": {
 "calls": 100,
 "consts": 100,
@@ -2079,74 +2086,74 @@
 "status": "MATCH"
 },
 "HandleLobbyGame_ChangeCharacterAppearanceFail": {
-"calls": 25,
-"consts": 55,
-"refs": 50,
-"score": 43.2,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "HandleLobbyGame_ChangeCharacterAppearanceOk": {
-"calls": 21,
-"consts": 62,
-"refs": 50,
-"score": 44.3,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "HandleLobbyGame_ChangeCharacterRaceFail": {
-"calls": 25,
-"consts": 55,
-"refs": 50,
-"score": 43.2,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "HandleLobbyGame_ChangeCharacterRaceOk": {
-"calls": 21,
-"consts": 62,
-"refs": 50,
-"score": 44.3,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "HandleLobbyGame_ChangeCharacterSexFail": {
-"calls": 25,
-"consts": 55,
-"refs": 50,
-"score": 43.2,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "HandleLobbyGame_ChangeCharacterSexOk": {
-"calls": 21,
-"consts": 62,
-"refs": 50,
-"score": 44.3,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "HandleLobbyGame_CreateCharacterFail": {
-"calls": 25,
-"consts": 29,
-"refs": 43,
-"score": 32.1,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "HandleLobbyGame_CreateCharacterOk": {
-"calls": 31,
-"consts": 55,
-"refs": 43,
-"score": 42.7,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "HandleLobbyGame_DeleteCharacterFail": {
-"calls": 25,
-"consts": 29,
-"refs": 43,
-"score": 32.1,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "HandleLobbyGame_DeleteCharacterOk": {
-"calls": 25,
-"consts": 29,
-"refs": 43,
-"score": 32.1,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "HandleLobbyGame_DeleteGuildNotify": {
 "calls": 100,
@@ -2170,25 +2177,25 @@
 "status": "MATCH"
 },
 "HandleLobbyGame_HelloReq": {
-"calls": 44,
-"consts": 67,
-"refs": 53,
-"score": 54.7,
+"calls": 96,
+"consts": 99,
+"refs": 98,
+"score": 97.4,
 "status": "DIFF"
 },
 "HandleLobbyGame_KickFail": {
-"calls": 25,
-"consts": 29,
-"refs": 43,
-"score": 32.1,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "HandleLobbyGame_KickOk": {
-"calls": 50,
-"consts": 50,
-"refs": 55,
-"score": 51.5,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "HandleLobbyGame_NPPresenceKickReq": {
 "calls": 62,
@@ -2198,32 +2205,32 @@
 "status": "DIFF"
 },
 "HandleLobbyGame_RenameCharacterFail": {
-"calls": 25,
-"consts": 55,
-"refs": 50,
-"score": 43.2,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "HandleLobbyGame_RenameCharacterOk": {
-"calls": 25,
-"consts": 55,
-"refs": 50,
-"score": 43.2,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "HandleLobbyGame_RestoreCharacterFail": {
-"calls": 25,
-"consts": 29,
-"refs": 43,
-"score": 32.1,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "HandleLobbyGame_RestoreCharacterOk": {
-"calls": 50,
-"consts": 50,
-"refs": 55,
-"score": 51.5,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "HandleLobbyGame_ServiceOpenNotify": {
 "calls": 100,
@@ -2288,6 +2295,20 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"HandleLobbyLobbyGate_GetCharacterInfoListReq": {
+"calls": 87,
+"consts": 92,
+"refs": 90,
+"score": 89.9,
+"status": "DIFF"
+},
+"HandleLobbyLobbyGate_GetCharacterInfoReq": {
+"calls": 97,
+"consts": 95,
+"refs": 97,
+"score": 96.5,
+"status": "DIFF"
+},
 "HandleLobbyLobbyGate_GetServiceEntryListReq": {
 "calls": 69,
 "consts": 87,
@@ -2310,18 +2331,18 @@
 "status": "MATCH"
 },
 "HandlePostOfficeRegisterPostFail": {
-"calls": 20,
-"consts": 50,
-"refs": 50,
-"score": 40.0,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "HandlePostOfficeRegisterPostOk": {
-"calls": 20,
-"consts": 50,
-"refs": 50,
-"score": 40.0,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "HeapMemoryManager::Alloc": {
 "calls": 100,
@@ -3142,6 +3163,48 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"LobbyJob::execute": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyJob::transit": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyJobManager::Execute": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyJobManager::ExecuteW": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyJobManager::find": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyJobManager::remove": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "LobbyLocale::GetLanguageTypeOfChar": {
 "calls": 100,
 "consts": 98,
@@ -3571,9 +3634,9 @@
 },
 "NPChannel::SendMsg": {
 "calls": 76,
-"consts": 77,
+"consts": 85,
 "refs": 84,
-"score": 79.2,
+"score": 81.8,
 "status": "DIFF"
 },
 "NPChannel::checkLibError": {
@@ -3863,6 +3926,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"PacketFormatIterator::Reset": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "PacketFormatIterator::Rewind": {
 "calls": 100,
 "consts": 100,
@@ -3878,6 +3948,20 @@
 "status": "DIFF"
 },
 "PacketFormatIterator::skipRepeatFormat": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PacketHandleEvent::HandleEvent": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PacketHandleEvent::~PacketHandleEvent": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -4605,6 +4689,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"SharedChannel::~SharedChannel": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "SharedChannelFragmentPacketHandleEvent::HandleEvent": {
 "calls": 100,
 "consts": 100,
@@ -5067,11 +5158,32 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"TransactionChannel::InitializeTransactionChannel": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TransactionChannel::Manager::Tick": {
+"calls": 91,
+"consts": 93,
+"refs": 95,
+"score": 93.0,
+"status": "DIFF"
+},
 "TransactionChannel::TSend": {
 "calls": 0,
 "consts": 0,
 "refs": 0,
 "score": 0.0,
+"status": "DIFF"
+},
+"TransactionChannel::~TransactionChannel": {
+"calls": 50,
+"consts": 80,
+"refs": 67,
+"score": 65.6,
 "status": "DIFF"
 },
 "WaitQueue::Remove": {
