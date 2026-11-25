@@ -1,4 +1,4 @@
-// AbandonChargeJob.obj (LobbyDaemon PDB, 2019 + PDB). Wave 0: declarations of the stubbed functions only.
+// AbandonChargeJob.obj (LobbyDaemon PDB, 2019 + PDB). Layout from tools/pdbcls.py LobbyDaemon AbandonChargeJob.
 #pragma once
 #include <stddef.h>
 #include "CliSessionJob.h"
@@ -12,6 +12,13 @@ struct LobbyJobDef;
 class AbandonChargeJob : public CliSessionJob
 {
 public:
+    enum State
+    {
+        INIT = 0,
+        ABANDON_CHARGE = 1,
+        FIN = 2
+    };
+
     AbandonChargeJob(CliSession* owner) : CliSessionJob(owner), _pcid(0) { _chargeKey[0] = 0; }
     virtual ~AbandonChargeJob() {}
     virtual LobbyJobDef const* GetDefinition() const;  // 0x4f70
@@ -30,7 +37,8 @@ public:
     unsigned long long _pcid;
     wchar_t _chargeKey[65];
 
-    static ObjPool _pool;  // LIFT: no definition yet (like StopChargeJob::_pool).
+    static ObjPool _pool;
+    static LobbyJobDef _def;
 };
 static_assert(sizeof(AbandonChargeJob) == 0xF0, "sizeof AbandonChargeJob");
 static_assert(offsetof(AbandonChargeJob, _clikey) == 0x58, "AbandonChargeJob::_clikey");

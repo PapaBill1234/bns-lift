@@ -1,4 +1,4 @@
-// StopChargeJob.obj (LobbyDaemon PDB, 2019 + PDB). Wave 0: declarations of the stubbed functions only.
+// StopChargeJob.obj (LobbyDaemon PDB, 2019 + PDB). Layout from tools/pdbcls.py LobbyDaemon StopChargeJob.
 #pragma once
 #include <stddef.h>
 #include "CliSessionJob.h"
@@ -12,8 +12,15 @@ struct LobbyJobDef;
 class StopChargeJob : public CliSessionJob
 {
 public:
+    enum State
+    {
+        INIT = 0,
+        STOP_CHARGE = 1,
+        FIN = 2
+    };
+
     StopChargeJob(CliSession* owner) : CliSessionJob(owner), _gamed(nullptr), _gametid(0), _pcid(0) { _chargeKey[0] = 0; }
-    virtual ~StopChargeJob() {}
+    virtual ~StopChargeJob();  // LIFT: inlined in the scalar deleting destructor. It removes the reference on _gamed.
     virtual LobbyJobDef const* GetDefinition() const;  // 0x77c90
     static void* _vtbl();  // 0x77cf0
     bool Initialize(GamedChannel*, unsigned long long, unsigned long long, wchar_t*);  // 0x77dc0
@@ -31,7 +38,8 @@ public:
     unsigned long long _pcid;
     wchar_t _chargeKey[65];
 
-    static ObjPool _pool;  // LIFT: no definition yet (like LeaveGameWorldJob::_pool).
+    static ObjPool _pool;
+    static LobbyJobDef _def;
 };
 static_assert(sizeof(StopChargeJob) == 0xF8, "sizeof StopChargeJob");
 static_assert(offsetof(StopChargeJob, _gamed) == 0x58, "StopChargeJob::_gamed");

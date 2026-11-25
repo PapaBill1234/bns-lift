@@ -1,18 +1,21 @@
-// CliSessionJob.obj (LobbyDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
+// CliSessionJob.obj (LobbyDaemon PDB, 2019 + PDB). Lifted from the pseudocode with PDB types.
 #include "CliSessionJob.h"
 #include "CliSession.h"
 #include "LiftStub.h"
 
 // 0x3bef0
-CliSessionJob::CliSessionJob(CliSession*)
+// The LobbyJob base is inline (RefCntObject: tag 10, ref 1; LobbyJob: _id, _state and _lastState are zero, lock).
+CliSessionJob::CliSessionJob(CliSession* owner) : _owner(owner)
 {
-    LIFT_STUB(0x3bef0);
+    if (owner != nullptr)
+        owner->addReferenceCount(false, L"CliSessionJob.cpp", 17);
 }
 
 // 0x3bfa0
 CliSessionJob::~CliSessionJob()
 {
-    LIFT_STUB(0x3bfa0);
+    if (_owner != nullptr)
+        _owner->removeReferenceCount(L"CliSessionJob.cpp", 23);
 }
 
 // 0x3c010
