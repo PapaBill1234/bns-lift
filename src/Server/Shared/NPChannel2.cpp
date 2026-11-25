@@ -140,15 +140,20 @@ bool NPTransactionRegistry::Find(unsigned int id, Item* item)
     bool result = false;
     _lock.Enter();
     auto it = _dict.find(id);
-    if (it != _dict.end() && item != nullptr)
+    if (it != _dict.end())
     {
-        if (it->second == nullptr)
+        // The original returns true for a known id also when item is null (LD 0x2d60, SC 0x4580).
+        if (item != nullptr)
         {
-            Log::Write(Log::LT_ERROR, NPCHANNEL_FILE, 112, L"== CRASH == ASSERT CRASH");
-            AlertSender::Write(NPCHANNEL_FILE, 112, L"== CRASH == ASSERT CRASH");
-            CrashHandler::MakeCrash("..\\Shared\\NPChannel2.cpp", 112, L"");
+            if (it->second == nullptr)
+            {
+                Log::Write(Log::LT_ERROR, NPCHANNEL_FILE, 112, L"== CRASH == ASSERT CRASH");
+                AlertSender::Write(NPCHANNEL_FILE, 112, L"== CRASH == ASSERT CRASH");
+                CrashHandler::MakeCrash("..\\Shared\\NPChannel2.cpp", 112, L"");
+            }
+            item->cmd = it->second->cmd;          // The original copies the fields (4-byte cmd), not the padding.
+            item->context = it->second->context;
         }
-        *item = *it->second;
         result = true;
     }
     _lock.Leave();
