@@ -1184,7 +1184,7 @@ bool CliSession::UpdateAccountData(unsigned long long pcid, int botScore, TimeBa
     _lock.Enter();
     if (botScore != -1)
         _acb._dbfield.botScore = botScore;
-    if (ContentsRuleConfig::Config->GetUseTimeBasedPlaySchedule())
+    if (ContentsRuleConfig::GetContentsRuleConfig()->GetUseTimeBasedPlaySchedule())
     {
         _acb._timeBasedPlayInfoList.SetPlayInfoFromGame(playTime);
         int dbrtn = 0;
@@ -1201,7 +1201,7 @@ bool CliSession::UpdateAccountData(unsigned long long pcid, int botScore, TimeBa
 // 0x38930
 bool CliSession::UpdateAccountExp(unsigned long long pcid, GameAccountExpInfo::ExpInfo& info)
 {
-    if (!ContentsRuleConfig::Config->GetEnableAccountContents())
+    if (!ContentsRuleConfig::GetContentsRuleConfig()->GetEnableAccountContents())
         return true;
     if (info.exp == -1)
         return true;

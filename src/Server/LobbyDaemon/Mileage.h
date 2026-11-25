@@ -224,6 +224,7 @@ private:
     // LIFT: access helper. No PDB in the set has friend records. GameServiceLocation::OnEnter (0x3b3d0) and OnLeave
     // (0x3b540) walk _mileages.
     friend class GameServiceLocation;
+    friend class CliSession;  // LIFT: access helper; onPcCafeChargeStart (0x3a190) and onPcCafeChargeStop (0x3a2c0) walk _mileages.
     std::vector<Mileage*> _mileages;
     int* _limitedIdList;
     int* _limitedSlotList;
