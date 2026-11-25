@@ -17,7 +17,8 @@ public:
     public:
         virtual unsigned long long GetTid() const = 0;  // slot 4
         virtual void Expire() = 0;  // slot 5
-        virtual ~Transaction();
+        // LIFT: the PDB has no out-of-line body. It is inline (LobbyJobTransaction scalar deleting destructor 0x61030).
+        virtual ~Transaction() {}
 
         long long _expire;
     };
