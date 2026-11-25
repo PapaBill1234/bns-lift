@@ -14,7 +14,6 @@
 #include "AlertSender.h"
 #include "Memory.h"
 #include "MemoryManager.h"
-#include "LiftStub.h"  // LIFT: LobbyJobManager::find is a stub.
 
 // PDB S_GTHREAD32 (void*). Defined in CliSessionTable.cpp.
 extern __declspec(thread) void* __delv_buf__;
@@ -309,12 +308,23 @@ void LobbyJobManager::remove(unsigned long long jobid)
 }
 
 // 0xc23d0
-// LIFT: stub as in d5b3dc3. The PDB callee is addReferenceCount(bool ignoreHistory, wchar_t const*, int) (rva 0xb9e0).
-// RefCntObject.h declares the LTCG-folded (wchar_t const*, int) form, so the call target name differs. Fix the header
-// for all 5 exes first (122 call sites), then lift this body again.
-LobbyJob* LobbyJobManager::find(unsigned long long)
+LobbyJob* LobbyJobManager::find(unsigned long long jobid)
 {
-    LIFT_STUB(0xc23d0);
+    if (jobid == 0)
+        return nullptr;
+    int const slot = static_cast<int>(jobid % _hashCount);
+    LobbyJob* job = nullptr;
+    EnterCriticalSection(&_lock[slot].CS);
+    LobbyJobMap& jobs = _jobs[slot];
+    LobbyJobMap::iterator it = jobs.find(jobid);
+    if (it != jobs.end())
+    {
+        job = it->second;
+        // The original call passes L"LobbyJob.cpp" in rdx and 328 in r8. LTCG removed ignoreHistory (see RefCntObject.h).
+        job->addReferenceCount(false, kFile, 328);
+    }
+    LeaveCriticalSection(&_lock[slot].CS);
+    return job;
 }
 
 // 0xc24c0
