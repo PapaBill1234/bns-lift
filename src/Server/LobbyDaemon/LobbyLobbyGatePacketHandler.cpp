@@ -185,10 +185,15 @@ bool HandleLobbyLobbyGate_GetCharacterInfoReq(SharedChannel* channel, Packet con
                    slotid.guid.id4[0], slotid.guid.id4[1], slotid.guid.id4[2], slotid.guid.id4[3],
                    slotid.guid.id4[4], slotid.guid.id4[5], slotid.guid.id4[6], slotid.guid.id4[7]);
         short reason = 2;
-        if (error == LOBERR_INVALID_SESSION_STATE)
+        switch (error)  // LIFT: HR 0xc5630 shows a switch (error - 5, then == 1).
+        {
+        case LOBERR_INVALID_SESSION_STATE:
             reason = 5;
-        else if (error == LOBERR_NO_SUCH_CHARACTER)
+            break;
+        case LOBERR_NO_SUCH_CHARACTER:
             reason = 6;
+            break;
+        }
         gate->SendGetCharacterInfoFail(clikey, slotid, reason);
         // BUG: 0xc5630 the fetch fail path does not release the cli-session reference (Select adds one). Kept for parity.
     }
