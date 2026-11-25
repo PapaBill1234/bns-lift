@@ -102,7 +102,7 @@ bool ListLobbyServiceItemJob::work(int task, void* param)
 // 0x55dc0
 bool ListLobbyServiceItemJob::init()
 {
-    JOB_LOG(Log::LT_DEBUG, 111, L"[job], init param", L", gate-wid:%d", _lgate != nullptr ? _lgate->GetWid() : 0);
+    JOB_LOG(Log::LT_DEBUG, 111, L"[job], init param", L", gate-wid:%d", _lgate != nullptr ? (_lgate->_rawChannel != nullptr ? static_cast<short>(_lgate->_rawChannel->GetId()) : 0) : 0);
     short reason = 0;
     int const cliState = _owner->_state;
     if (cliState != 0x20000 && cliState != 0x10003)  // CSS_LOBBY, CSS_INIT_create_initial_user_name
@@ -155,16 +155,16 @@ bool ListLobbyServiceItemJob::listLobbyServiceItemOk(void* param)
 {
     _acciv->TRecv(_tran);
     RetrieveLobbyServiceItemListOkParam* const ok = static_cast<RetrieveLobbyServiceItemListOkParam*>(param);
-    if (ok != nullptr)
+    if (ok == nullptr)
     {
-        JOB_LOG(Log::LT_DEBUG, 168, L"[job], ok recv", L", item-count:%d", ok->itemCount);
-        _lgate->SendListLobbyServiceItemInfoOk(_owner->_clikey, _searchType, ok->searchCount, ok->items, ok->itemCount);
+        JOB_LOG(Log::LT_ERROR, 158, L"[job], invalid param on ok ack", L"");
+        _lgate->SendListLobbyServiceItemInfoFail(_owner->_clikey, _searchType, 2);
         transit(FIN);
     }
     else
     {
-        JOB_LOG(Log::LT_ERROR, 158, L"[job], invalid param on ok ack", L"");
-        _lgate->SendListLobbyServiceItemInfoFail(_owner->_clikey, _searchType, 2);
+        JOB_LOG(Log::LT_DEBUG, 168, L"[job], ok recv", L", item-count:%d", ok->itemCount);
+        _lgate->SendListLobbyServiceItemInfoOk(_owner->_clikey, _searchType, ok->searchCount, ok->items, ok->itemCount);
         transit(FIN);
     }
     return true;
@@ -176,15 +176,15 @@ bool ListLobbyServiceItemJob::listLobbyServiceItemFail(void* param)
     _acciv->TRecv(_tran);
     short* const fail = static_cast<short*>(param);
     short reason;
-    if (fail != nullptr)
-    {
-        JOB_LOG(Log::LT_DEBUG, 188, L"[job], fail recv", L", reason:%d", *fail);
-        reason = *fail == 3 ? 7 : 2;
-    }
-    else
+    if (fail == nullptr)
     {
         JOB_LOG(Log::LT_ERROR, 181, L"[job], invalid param on fail ack", L"");
         reason = 2;
+    }
+    else
+    {
+        JOB_LOG(Log::LT_DEBUG, 188, L"[job], fail recv", L", reason:%d", *fail);
+        reason = *fail == 3 ? 7 : 2;
     }
     _lgate->SendListLobbyServiceItemInfoFail(_owner->_clikey, _searchType, reason);
     transit(FIN);

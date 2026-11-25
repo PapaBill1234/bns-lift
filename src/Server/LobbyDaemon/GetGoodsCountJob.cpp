@@ -102,7 +102,7 @@ bool GetGoodsCountJob::work(int task, void* param)
 // 0x516e0
 bool GetGoodsCountJob::init()
 {
-    JOB_LOG(Log::LT_DEBUG, 108, L"[job], init param", L", gate-wid:%d", _lgate != nullptr ? _lgate->GetWid() : 0);
+    JOB_LOG(Log::LT_DEBUG, 108, L"[job], init param", L", gate-wid:%d", _lgate != nullptr ? (_lgate->_rawChannel != nullptr ? static_cast<short>(_lgate->_rawChannel->GetId()) : 0) : 0);
     short reason = 0;
     int const cliState = _owner->_state;
     if (cliState != 0x20000 && cliState != 0x10003)  // CSS_LOBBY, CSS_INIT_create_initial_user_name
@@ -155,17 +155,17 @@ bool GetGoodsCountJob::getGoodsCountOk(void* param)
 {
     _acciv->TRecv(_tran);
     int* const count = static_cast<int*>(param);
-    if (count != nullptr)
+    if (count == nullptr)
     {
-        int const n = *count;
-        JOB_LOG(Log::LT_DEBUG, 166, L"[job], ok recv", L", count:%d", n);
-        _lgate->SendGetGoodsCountOk(_owner->_clikey, n);
+        JOB_LOG(Log::LT_ERROR, 158, L"[job], invalid param on ok ack", L"");
+        _lgate->SendGetGoodsCountFail(_owner->_clikey, 2);
         transit(FIN);
     }
     else
     {
-        JOB_LOG(Log::LT_ERROR, 158, L"[job], invalid param on ok ack", L"");
-        _lgate->SendGetGoodsCountFail(_owner->_clikey, 2);
+        int const n = *count;
+        JOB_LOG(Log::LT_DEBUG, 166, L"[job], ok recv", L", count:%d", n);
+        _lgate->SendGetGoodsCountOk(_owner->_clikey, n);
         transit(FIN);
     }
     return true;
@@ -176,17 +176,17 @@ bool GetGoodsCountJob::getGoodsCountFail(void* param)
 {
     _acciv->TRecv(_tran);
     short* const fail = static_cast<short*>(param);
-    if (fail != nullptr)
+    if (fail == nullptr)
     {
-        short const reason = *fail;
-        JOB_LOG(Log::LT_DEBUG, 186, L"[job], fail recv", L", reason:%d", reason);
-        _lgate->SendGetGoodsCountFail(_owner->_clikey, reason == 3 || reason == 5 ? 7 : 2);
+        JOB_LOG(Log::LT_ERROR, 179, L"[job], invalid param on fail ack", L"");
+        _lgate->SendGetGoodsCountFail(_owner->_clikey, 2);
         transit(FIN);
     }
     else
     {
-        JOB_LOG(Log::LT_ERROR, 179, L"[job], invalid param on fail ack", L"");
-        _lgate->SendGetGoodsCountFail(_owner->_clikey, 2);
+        short const reason = *fail;
+        JOB_LOG(Log::LT_DEBUG, 186, L"[job], fail recv", L", reason:%d", reason);
+        _lgate->SendGetGoodsCountFail(_owner->_clikey, reason == 3 || reason == 5 ? 7 : 2);
         transit(FIN);
     }
     return true;

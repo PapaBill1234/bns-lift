@@ -103,7 +103,7 @@ bool GetLobbyServiceItemJob::work(int task, void* param)
 bool GetLobbyServiceItemJob::init()
 {
     JOB_LOG(Log::LT_DEBUG, 110, L"[job], init param", L", item-instance-id:0x%I64X, gate-wid:%d", _itemInstanceId,
-            _lgate != nullptr ? _lgate->GetWid() : 0);
+            _lgate != nullptr ? (_lgate->_rawChannel != nullptr ? static_cast<short>(_lgate->_rawChannel->GetId()) : 0) : 0);
     short reason = 0;
     if (_owner->_state != 0x20000)  // CSS_LOBBY
     {
@@ -188,7 +188,13 @@ bool GetLobbyServiceItemJob::getLobbyServiceItemFail(void* param)
 {
     _acciv->TRecv(_tran);
     short* const fail = static_cast<short*>(param);
-    if (fail != nullptr)
+    if (fail == nullptr)
+    {
+        JOB_LOG(Log::LT_ERROR, 184, L"[job], invalid param on fail ack", L"");
+        _lgate->SendGetLobbyServiceItemInfoFail(_owner->_clikey, _itemInstanceId, 2);
+        transit(FIN);
+    }
+    else
     {
         short const reason = *fail;
         JOB_LOG(Log::LT_DEBUG, 191, L"[job], fail recv", L", reason:%d", reason);
@@ -198,12 +204,6 @@ bool GetLobbyServiceItemJob::getLobbyServiceItemFail(void* param)
         else if (reason == 20)
             out = 171;
         _lgate->SendGetLobbyServiceItemInfoFail(_owner->_clikey, _itemInstanceId, out);
-        transit(FIN);
-    }
-    else
-    {
-        JOB_LOG(Log::LT_ERROR, 184, L"[job], invalid param on fail ack", L"");
-        _lgate->SendGetLobbyServiceItemInfoFail(_owner->_clikey, _itemInstanceId, 2);
         transit(FIN);
     }
     return true;

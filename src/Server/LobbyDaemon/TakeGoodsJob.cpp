@@ -103,7 +103,7 @@ bool TakeGoodsJob::work(int task, void* param)
 bool TakeGoodsJob::init()
 {
     JOB_LOG(Log::LT_DEBUG, 110, L"[job], init param", L", gate-wid:%d, goods-id:0x%I64X",
-            _lgate != nullptr ? _lgate->GetWid() : 0, _goodsId);
+            _lgate != nullptr ? (_lgate->_rawChannel != nullptr ? static_cast<short>(_lgate->_rawChannel->GetId()) : 0) : 0, _goodsId);
     short reason = 0;
     if (_goodsId == 0)
     {
@@ -160,16 +160,16 @@ bool TakeGoodsJob::takeGoodsOk(void* param)
 {
     _acciv->TRecv(_tran);
     TakeGoodsOkParam* const ok = static_cast<TakeGoodsOkParam*>(param);
-    if (ok != nullptr)
+    if (ok == nullptr)
     {
-        JOB_LOG(Log::LT_DEBUG, 173, L"[job], ok recv", L", item-count:%d", ok->itemCount);
-        _lgate->SendTakeGoodsOk(_owner->_clikey, _goodsId, ok->items, ok->itemCount);
+        JOB_LOG(Log::LT_ERROR, 164, L"[job], invalid param on ok ack", L"");
+        _lgate->SendTakeGoodsFail(_owner->_clikey, 2);
         transit(FIN);
     }
     else
     {
-        JOB_LOG(Log::LT_ERROR, 164, L"[job], invalid param on ok ack", L"");
-        _lgate->SendTakeGoodsFail(_owner->_clikey, 2);
+        JOB_LOG(Log::LT_DEBUG, 173, L"[job], ok recv", L", item-count:%d", ok->itemCount);
+        _lgate->SendTakeGoodsOk(_owner->_clikey, _goodsId, ok->items, ok->itemCount);
         transit(FIN);
     }
     return true;
@@ -181,7 +181,12 @@ bool TakeGoodsJob::takeGoodsFail(void* param)
     _acciv->TRecv(_tran);
     short* const fail = static_cast<short*>(param);
     short reason;
-    if (fail != nullptr)
+    if (fail == nullptr)
+    {
+        JOB_LOG(Log::LT_ERROR, 186, L"[job], invalid param on fail ack", L"");
+        reason = 2;
+    }
+    else
     {
         JOB_LOG(Log::LT_DEBUG, 193, L"[job], fail recv", L", reason:%d", *fail);
         switch (*fail)
@@ -209,11 +214,6 @@ bool TakeGoodsJob::takeGoodsFail(void* param)
             reason = 2;
             break;
         }
-    }
-    else
-    {
-        JOB_LOG(Log::LT_ERROR, 186, L"[job], invalid param on fail ack", L"");
-        reason = 2;
     }
     _lgate->SendTakeGoodsFail(_owner->_clikey, reason);
     transit(FIN);
