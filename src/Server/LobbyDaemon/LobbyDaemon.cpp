@@ -180,27 +180,29 @@ void GameWorldReporterListener(GameWorldReporter* reporter)
         report->addReferenceCount(false, L"GameWorld.cpp", 1246);
     }
     reporter->_lock.Leave();
-    if (report == nullptr)
+    if (report != nullptr)
     {
-        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 215, L"[lobby], listen world reporter fail; null report");
-        return;
-    }
-    // LIFT: the original calls 0x2ef40 with _lgatechmgr. InfoGateChannelManager::Broadcast and the
-    // LobbyGateChannelManager body are the same (folded). Both classes have the same layout (0x48).
-    InfoGateChannelManager* const lgatechmgr = reinterpret_cast<InfoGateChannelManager*>(LobbyDaemon::_instance->_lgatechmgr);
-    Packet const* const packet = report->GetPacket();
-    if (packet != nullptr)
-    {
-        if (!lgatechmgr->Broadcast(packet))
-            Log::Write(Log::LT_ERROR, L"LobbyGateChannel.cpp", 1054,
-                       L"[lobby-gate], broadcast update-world-info-list-notify fail; broadcast fail");
+        // LIFT: the original calls 0x2ef40 with _lgatechmgr. InfoGateChannelManager::Broadcast and the
+        // LobbyGateChannelManager body are the same (folded). Both classes have the same layout (0x48).
+        InfoGateChannelManager* const lgatechmgr = reinterpret_cast<InfoGateChannelManager*>(LobbyDaemon::_instance->_lgatechmgr);
+        Packet const* const packet = report->GetPacket();
+        if (packet == nullptr)
+        {
+            Log::Write(Log::LT_ERROR, L"LobbyGateChannel.cpp", 1049,
+                       L"[lobby-gate], broadcast update-world-info-list-notify fail; invalid parameter");
+        }
+        else
+        {
+            if (!lgatechmgr->Broadcast(packet))
+                Log::Write(Log::LT_ERROR, L"LobbyGateChannel.cpp", 1054,
+                           L"[lobby-gate], broadcast update-world-info-list-notify fail; broadcast fail");
+        }
+        report->removeReferenceCount(L"LobbyDaemon.cpp", 212);
     }
     else
     {
-        Log::Write(Log::LT_ERROR, L"LobbyGateChannel.cpp", 1049,
-                   L"[lobby-gate], broadcast update-world-info-list-notify fail; invalid parameter");
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 215, L"[lobby], listen world reporter fail; null report");
     }
-    report->removeReferenceCount(L"LobbyDaemon.cpp", 212);
 }
 
 #pragma comment(linker, "/INCLUDE:?HandleEvent@CoolDown@@UEAA_NPEAUEventContext@@K@Z")  // LIFT: keep until the caller is lifted (0x995c0)

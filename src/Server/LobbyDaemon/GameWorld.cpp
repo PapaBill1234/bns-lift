@@ -342,19 +342,19 @@ bool GameWorldCluster::giveupWait(GameWorld* world, unsigned long long clikey, W
 // 0x4e4f0
 bool GameWorldCluster::addGameWorld(GameWorld* world)
 {
-    if (world != nullptr)
+    if (world == nullptr)
     {
-        _worldLock.Enter();
-        _worlds.push_back(world);
-        _worldLock.Leave();
-        Log::Write(Log::LT_DEBUG, L"GameWorld.cpp", 725,
-            L"[game-world-cluster], add game-world ok, wid:%d, world-cluster-id:%d",
-            world->GetDB().wid, _db.clusterId);
-        return true;
+        Log::Write(Log::LT_ERROR, L"GameWorld.cpp", 715,
+            L"[game-world-cluster], add game-world fail; null param, world-cluster-id:%d", _db.clusterId);
+        return false;
     }
-    Log::Write(Log::LT_ERROR, L"GameWorld.cpp", 715,
-        L"[game-world-cluster], add game-world fail; null param, world-cluster-id:%d", _db.clusterId);
-    return false;
+    _worldLock.Enter();
+    _worlds.push_back(world);
+    _worldLock.Leave();
+    Log::Write(Log::LT_DEBUG, L"GameWorld.cpp", 725,
+        L"[game-world-cluster], add game-world ok, wid:%d, world-cluster-id:%d",
+        world->GetDB().wid, _db.clusterId);
+    return true;
 }
 
 // 0x4e630
