@@ -445,6 +445,7 @@ add_library(lift_lobbydaemon STATIC
   src/Server/LobbyDaemon/LobbyJSON.cpp
   src/Server/LobbyDaemon/LobbyJob.cpp
   src/Server/LobbyDaemon/LobbyLobbyGatePacketHandler.cpp
+  src/Server/LobbyDaemon/LobbyLobbyGatePacketLobbySideHandlerList.cpp
   src/Server/LobbyDaemon/LobbyLocale.cpp
   src/Server/LobbyDaemon/LobbyManagePacketHandler.cpp
   src/Server/LobbyDaemon/LobbyMessage.cpp
