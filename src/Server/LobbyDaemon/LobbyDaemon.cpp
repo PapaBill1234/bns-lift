@@ -7,26 +7,34 @@
 #include <time.h>
 #include <wchar.h>
 #include "../../External/BannedWordFilter/BannedWordFilterLib.h"
+#include "AccountInventoryChannel.h"
 #include "Channel.h"
 #include "CliSession.h"
 #include "CliSessionManager.h"
 #include "Console.h"
+#include "ContentsRuleConfigDefinition.h"
 #include "FragmentPacket.h"
+#include "GameTimeSchedule.h"
 #include "GameWorld.h"
 #include "InfoGateChannel.h"
-#include "AccountInventoryChannel.h"
 #include "GamedChannel.h"
 #include "LobbyGateChannel.h"
 #include "ManageChannel.h"
 #include "PacketBufferHandler.h"
 #include "PostOfficeChannel.h"
+#include "LobbyCharacterDeletionScheduler.h"
 #include "LobbyConfig.h"
+#include "LobbyPerfMonitor.h"
+#include "LobbyStats.h"
+#include "LobbyTick.h"
 #include "LiftStub.h"
 #include "Log.h"
 #include "Memory.h"
 #include "Network.h"
 #include "MemoryManager.h"
 #include "NPChannelBase.h"
+#include "Mileage.h"
+#include "NPServiceChannel.h"
 #include "Packet.h"
 #include "PacketUtil.h"
 #include "PipeConsole.h"
@@ -34,6 +42,7 @@
 #include "Session.h"
 
 LobbyDaemon* LobbyDaemon::_instance = nullptr;  // PDB static member (file-scope data in the original).
+ObjPoolTimer* GObjPoolTimer = nullptr;           // rva 0x2095E0; LIFT: LobbyDaemon::initialize (0x9b300, line 1534) sets it
 CoolDown* GCoolDown = nullptr;                  // PDB global.
 
 // LIFT: strings from LobbyDaemon.exe (UTF-16 literals). The order follows the PDB enum ReloadInvalidReason.
@@ -836,7 +845,131 @@ bool LobbyDaemon::initNetwork()
 // 0x9dca0
 bool LobbyDaemon::onStart()
 {
-    LIFT_STUB(0x9dca0);
+    ObjPoolTimer::Start(1000);  // LIFT: LTCG put 1000 in the body of 0x62c80
+    _tick->Start();
+    if (_gameTimeScheduler != nullptr && !_gameTimeScheduler->Start())
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1867, L"[lobby], start game-time-scheduler fail");
+        return false;
+    }
+    if (!startNPChannel())
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1875, L"[lobby], start np fail");
+        return false;
+    }
+    if (ContentsRuleConfig::GetContentsRuleConfig()->GetUseTimeBasedPlaySchedule() && !setupNpScheduleInfo())
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1886, L"[lobby], request time based play season schedule to np fail");
+        return false;
+    }
+    if (_config->_useAccountInventory)
+    {
+        if (!Network::OpenPort(3))
+        {
+            Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1897, L"[lobby], start fail; open account-inventory port fail");
+            return false;
+        }
+        _accountInventoryChannel = ::new (Memory::_Manager[2]->Alloc(sizeof(AccountInventoryChannel), L"LobbyDaemon.cpp", 1901))
+            AccountInventoryChannel(_accountInventorySessionHandler);
+        // BUG: 0x9dca0 does not check the channel after a failed Alloc. InitializeTransactionChannel then runs with a
+        // null this. The same is true for the post-office channel below.
+        if (!_accountInventoryChannel->InitializeTransactionChannel(LobbyDaemon::_instance->_config->_lobbyJobTransactionLifeTime))
+        {
+            Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1904, L"[lobby], start fail; init account inventory channel fail");
+            return false;
+        }
+        _accountInventoryInitialConnectEvent.Make();
+        if (!_accountInventoryChannel->Connect(1, 3, _config->_accountInventoryAddr,
+                                               static_cast<unsigned short>(_config->_accountInventoryPort), 5, true))
+        {
+            Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1918, L"[lobby], start fail; connect to account inventory fail");
+            return false;
+        }
+        if (_accountInventoryInitialConnectEvent.Event == nullptr
+            || WaitForSingleObject(_accountInventoryInitialConnectEvent.Event, 5000) != WAIT_OBJECT_0)
+        {
+            Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1924, L"[lobby], start fail; initial connect to account inventory fail");
+            return false;
+        }
+    }
+    if (_config->_enableAuctionEscrowService)
+    {
+        if (!Network::OpenPort(7))
+        {
+            Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1934, L"[lobby], open post-office port fail");
+            return false;
+        }
+        _postOfficeChannel = ::new (Memory::_Manager[2]->Alloc(sizeof(PostOfficeChannel), L"LobbyDaemon.cpp", 1938))
+            PostOfficeChannel(_postOfficeSessionHandler);
+        if (!_postOfficeChannel->InitializeTransactionChannel(LobbyDaemon::_instance->_config->_lobbyJobTransactionLifeTime))
+        {
+            Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1941, L"[lobby], start fail; init post-office channel fail");
+            return false;
+        }
+        _postOfficeInitialConnectEvent.Make();
+        if (!_postOfficeChannel->Connect(1, 7, _config->_postOfficeAddr,
+                                         static_cast<unsigned short>(_config->_postOfficePort), 5, true))
+        {
+            Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1950, L"[lobby], start fail; connect to post-office fail");
+            return false;
+        }
+        if (_postOfficeInitialConnectEvent.Event == nullptr
+            || WaitForSingleObject(_postOfficeInitialConnectEvent.Event, 5000) != WAIT_OBJECT_0)
+        {
+            Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1955, L"[lobby], start fail; initial connect to post-office fail");
+            return false;
+        }
+    }
+    if (!Network::OpenPort(5))
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1961, L"[lobby], open gamed port fail");
+        return false;
+    }
+    if (!Network::OpenPort(4))
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1966, L"[lobby], open lobby-gate port fail");
+        return false;
+    }
+    if (_config->_useInfoGate && !Network::OpenPort(6))
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1973, L"[lobby], open info-gate port fail");
+        return false;
+    }
+    if (!Network::OpenPort(1))
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1979, L"[lobby], open manage port fail");
+        return false;
+    }
+    if (_gameWorldReporter != nullptr && !_gameWorldReporter->Start())
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1984, L"[lobby], start world repoter fail");
+        return false;
+    }
+    if (_charaterDeletionScheduler != nullptr
+        && !_charaterDeletionScheduler->Start(1000 * _config->_characterDeletionSchedulerPeriod,
+                                              _config->_characterDeletionSchedulerConcurrentProcessingCount))
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1991, L"[lobby], start character deletion scheduler fail");
+        return false;
+    }
+    if (_config->_enableMileageBatchRetryOnStartup)
+    {
+        MileageBatchRetryDeposit* retry = ::new (Memory::_Manager[2]->Alloc(sizeof(MileageBatchRetryDeposit), L"LobbyDaemon.cpp", 1998))
+            MileageBatchRetryDeposit(_config->_mileageBatchRetryConcurrentCount);
+        if (!_tick->Add(retry))
+            Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 2001, L"[lobby], start mileage deposit batch retry fail");
+        // BUG: 0x9dca0 calls removeReferenceCount also when Alloc failed (null this).
+        retry->removeReferenceCount(L"LobbyDaemon.cpp", 2002);
+    }
+    if (_stats != nullptr)
+        _stats->Start();
+    if (_systemPerfMon != nullptr && !_systemPerfMon->Start())
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 2011, L"[lobby], start system perf monitor fail");
+        return false;
+    }
+    Log::Write(Log::LT_NOTICE, L"LobbyDaemon.cpp", 2016, L"[lobby], ready");
+    return true;
 }
 
 // 0x9e2f0
@@ -879,7 +1012,28 @@ bool LobbyDaemon::cooldown()
 // 0x9f010
 bool LobbyDaemon::startNPChannel()
 {
-    LIFT_STUB(0x9f010);
+    if (!Network::OpenPort(2))
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 2252, L"[lobby], start np channel fail; open np port fail");
+        return false;
+    }
+    _npServchmgr = ::new (Memory::_Manager[2]->Alloc(sizeof(NPServiceChannelManager), L"LobbyDaemon.cpp", 2256))
+        NPServiceChannelManager();
+    _npInitialConnectEvent.Make();
+    // BUG: 0x9f010 does not check _npServchmgr after a failed Alloc. Initialize then runs with a null this.
+    if (!_npServchmgr->Initialize(2, _config->_npAddr, static_cast<unsigned short>(_config->_npPort), 5))
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 2261,
+                   L"[lobby], start np channel fail; initialize np service channel manager fail");
+        return false;
+    }
+    if (_npInitialConnectEvent.Event == nullptr || WaitForSingleObject(_npInitialConnectEvent.Event, 5000) != WAIT_OBJECT_0)
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 2266, L"[lobby], start np channel fail; wait initiali connect fail");
+        return false;
+    }
+    Log::Write(Log::LT_NOTICE, L"LobbyDaemon.cpp", 2271, L"[lobby], start np channel ok");
+    return true;
 }
 
 // 0x9f130

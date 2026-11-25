@@ -23,6 +23,8 @@ public:
         long long _expire;
     };
 
+    // LIFT: no out-of-line body. The ctor is inline at the allocation sites in LobbyDaemon::onStart (0x9dca0).
+    TransactionChannel() : _mgr(nullptr), _tranLifetime(0) {}
     virtual ~TransactionChannel();  // 0x7b100
     bool InitializeTransactionChannel(long);  // 0x7b170
     bool TSend(Transaction* t, Packet const* packet);  // 0x7b2b0 (Not done: card ld-18 batch 1 only calls it)

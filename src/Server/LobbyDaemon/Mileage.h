@@ -35,11 +35,26 @@ template<class T> struct Section
 };
 static_assert(sizeof(Section<long long>) == 0x10, "sizeof Section<__int64>");
 
-class MileageBatchRetryDeposit
+// PDB MileageBatchRetryDeposit (sizeof 0x58, LobbyTick::Listener base).
+class MileageBatchRetryDeposit : public LobbyTick::Listener
 {
 public:
+    // LIFT: the PDB ctor has no out-of-line body. It is inline in LobbyDaemon::onStart (0x9dca0).
+    explicit MileageBatchRetryDeposit(int retryCountPerTick)
+        : _retryCountPerTick(retryCountPerTick), _retryIdFrom(1), _retryIdTo(0), _batchCount(0)
+    {
+    }
+    // LIFT: the PDB dtor has no out-of-line body. The scalar deleting destructor is 0x61030.
+    virtual ~MileageBatchRetryDeposit() {}
     virtual bool Tick(long long);  // 0x61060
+
+private:
+    int const _retryCountPerTick;
+    unsigned long long _retryIdFrom;
+    unsigned long long _retryIdTo;
+    int _batchCount;
 };
+static_assert(sizeof(MileageBatchRetryDeposit) == 0x58, "sizeof MileageBatchRetryDeposit");
 
 struct MileageInfo
 {

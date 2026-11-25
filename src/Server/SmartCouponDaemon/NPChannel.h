@@ -53,3 +53,5 @@ static_assert(sizeof(NPServiceChannelManager) == 0x18, "sizeof NPServiceChannelM
 
 void NPServiceChannelCmdDispatcher(unsigned int id, StsMsgLib::ECommand& eCmd);            // 0xFD80
 bool NPHandlerEventNoti(NPChannel* channel, StsMsgLib::_StsMsg* msg, NPTransaction* tran);  // 0xFBC0
+
+// LIFT: NPMsgHelper is in NPChannelBase.h. LobbyDaemon.cpp uses it and has its own NPServiceChannelManager.

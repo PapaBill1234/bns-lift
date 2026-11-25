@@ -14,6 +14,7 @@ public:
     }
 
     bool Initialize(wchar_t const* dir, wchar_t const* fname, wchar_t const* fext, long period);  // 0x5a0b0
+    bool Start();  // LIFT: no out-of-line body; LTCG inlines it in LobbyDaemon::onStart (0x9dca0).
     virtual bool HandleEvent(EventContext*, unsigned long);  // 0x5a1d0
     virtual unsigned int TimerClass() const { return 0; }  // 0x5a0a0 (folded)
     virtual unsigned long long TimerId() const { return 0; }  // 0x5a0a0 (folded)

@@ -34,6 +34,19 @@ bool LobbyStats::Initialize(wchar_t const* dir, wchar_t const* fname, wchar_t co
     return true;
 }
 
+// LIFT: no LD RVA. LTCG inlines it in LobbyDaemon::onStart (0x9dca0). Log line 58 is from the inlined copy.
+bool LobbyStats::Start()
+{
+    if (_run)
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyStats.cpp", 58, L"[stats], start fail; already run");
+        return false;
+    }
+    _run = true;
+    Daemon::Instance->AddTimer(_period, this);
+    return true;
+}
+
 // 0x5a1d0
 bool LobbyStats::HandleEvent(EventContext*, unsigned long)
 {

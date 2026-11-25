@@ -128,6 +128,8 @@ static_assert(offsetof(NPLobbyJobTransaction, _task) == 0x14, "NPLobbyJobTransac
 class NPServiceChannelManager : public NPMessageHandler
 {
 public:
+    // LIFT: the PDB ctor has no out-of-line body. It is inline in LobbyDaemon::startNPChannel (0x9f010).
+    NPServiceChannelManager() : _init(false), _gameServChannel(nullptr) {}
     bool Initialize(unsigned int, unsigned long, unsigned short, long);  // 0xcfba0
     virtual bool OnConnect(NPChannel*, bool) const;  // 0xcfdb0
     virtual bool OnClose(NPChannel*, bool) const;  // 0xcff70

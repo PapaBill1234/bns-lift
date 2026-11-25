@@ -14,7 +14,10 @@ class AccountInventorySessionHandler;
 class AccountInventoryChannel : public TransactionChannel
 {
 public:
-    virtual ~AccountInventoryChannel();
+    // LIFT: the PDB ctor has no out-of-line body. It is inline in LobbyDaemon::onStart (0x9dca0).
+    explicit AccountInventoryChannel(AccountInventorySessionHandler* handler) : _handler(handler) {}
+    // LIFT: the PDB dtor has no out-of-line body. The scalar deleting destructor is 0x99310 (LobbyDaemon.obj).
+    virtual ~AccountInventoryChannel() {}
     virtual bool Connect(unsigned long long, unsigned int, unsigned long, unsigned short, long, bool);  // 0x6500
     bool SendHelloReq(short version, short wid, short internalPort);  // 0x66b0
     bool SendLoginNotify(id128 const& account);  // 0x67b0

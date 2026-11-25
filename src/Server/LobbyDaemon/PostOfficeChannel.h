@@ -64,6 +64,9 @@ class PostOfficeSessionHandler;
 class PostOfficeChannel : public TransactionChannel
 {
 public:
+    // LIFT: the PDB ctor has no out-of-line body. It is inline in LobbyDaemon::onStart (0x9dca0).
+    // The scalar deleting destructor is 0x99340 (LobbyDaemon.obj).
+    explicit PostOfficeChannel(PostOfficeSessionHandler* handler) : _handler(handler) {}
     virtual bool Connect(unsigned long long, unsigned int, unsigned long, unsigned short, long, bool);  // 0x639f0
     bool SendHelloReq();  // 0x63ba0
     // LIFT: The PDB has 12 parameters. Call sites give deliveryReason = 1, postHint = 0, reservedHint = ID128_GUID_ZERO

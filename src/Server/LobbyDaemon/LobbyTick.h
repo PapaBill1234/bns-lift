@@ -22,6 +22,7 @@ public:
     // LIFT: inline constructor at the allocation site in LobbyDaemon::initialize (0x5a610 dtor).
     explicit LobbyTick(long period) : _run(false), _period(period) {}
     virtual ~LobbyTick();  // 0x5a610
+    bool Start();  // LIFT: no out-of-line body; LTCG inlines it in LobbyDaemon::onStart (0x9dca0).
     bool Add(Listener* listener);  // 0x5a6e0
     bool Remove(Listener* listener);  // 0x5a770
     virtual bool HandleEvent(EventContext*, unsigned long);  // 0x5a7f0

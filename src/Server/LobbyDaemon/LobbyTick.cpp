@@ -17,6 +17,19 @@ LobbyTick::~LobbyTick()
         head->removeReferenceCount(L"LobbyTick.cpp", 25);
 }
 
+// LIFT: no LD RVA. LTCG inlines it in LobbyDaemon::onStart (0x9dca0). Log line 31 is from the inlined copy.
+bool LobbyTick::Start()
+{
+    if (_run)
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyTick.cpp", 31, L"[tick], start fail; already started");
+        return false;
+    }
+    _run = true;
+    Daemon::Instance->AddTimer(_period, this);
+    return true;
+}
+
 // 0x5a6e0
 bool LobbyTick::Add(Listener* listener)
 {

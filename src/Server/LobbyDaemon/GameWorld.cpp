@@ -538,6 +538,19 @@ bool GameWorldReporter::Initialize(void (__cdecl* listener)(GameWorldReporter*),
     return false;
 }
 
+// LIFT: no LD RVA. LTCG inlines it in LobbyDaemon::onStart (0x9dca0). Log line 1172 is from the inlined copy.
+bool GameWorldReporter::Start()
+{
+    if (_run)
+    {
+        Log::Write(Log::LT_ERROR, L"GameWorld.cpp", 1172, L"[world-reporter], start fail; already started");
+        return false;
+    }
+    Daemon::Instance->AddTimer(_period, this);
+    _run = true;
+    return true;
+}
+
 // 0x4fa30
 bool GameWorldReporter::HandleEvent(EventContext*, unsigned long)
 {
