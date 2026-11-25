@@ -144,7 +144,7 @@ bool GamedChannelManager::Add(GamedChannel* channel)
         _lock.Enter();
         if (_channels.Set(channel))
         {
-            channel->addReferenceCount(GAMED_FILE, 53);
+            channel->addReferenceCount(false, GAMED_FILE, 53);
             result = true;
         }
         _lock.Leave();
@@ -213,7 +213,7 @@ GamedChannel* GamedChannelManager::Acquire(short wid)
     {
         channel = _channels._channels[index];
         if (channel != nullptr)
-            channel->addReferenceCount(GAMED_FILE, 86);
+            channel->addReferenceCount(false, GAMED_FILE, 86);
     }
     _lock.Leave();
     return static_cast<GamedChannel*>(channel);

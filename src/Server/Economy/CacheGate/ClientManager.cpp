@@ -82,7 +82,7 @@ bool ClientManager::AddSession(unsigned short wid, Session const* session)
         return false;
     _lock.Enter();
     Session* target = const_cast<Session*>(session);
-    target->addReferenceCount(CLIENT_MANAGER_FILE, 77);
+    target->addReferenceCount(false, CLIENT_MANAGER_FILE, 77);
     if (!_clientMap->insert(SessionMap::value_type(wid, target)).second)
     {
         target->removeReferenceCount(CLIENT_MANAGER_FILE, 80);

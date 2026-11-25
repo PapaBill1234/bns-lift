@@ -52,7 +52,7 @@ void LogBuffer::deallocate_me(void* ptr, wchar_t const* file, int line)
 // 0x200D0 (SmartCouponDaemon)
 bool LogBuffer::Acquire()
 {
-    addReferenceCount(LOGBUFFER_FILE, 100);
+    addReferenceCount(false, LOGBUFFER_FILE, 100);
     return true;
 }
 

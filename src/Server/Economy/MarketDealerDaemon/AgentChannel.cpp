@@ -38,7 +38,7 @@ AgentChannel* AgentChannelManager::GetMarketAgentChannel()
     _lock.Enter();
     if (_marketAgentChannel != nullptr)
     {
-        _marketAgentChannel->addReferenceCount(AGENT_CHANNEL_FILE, 65);
+        _marketAgentChannel->addReferenceCount(false, AGENT_CHANNEL_FILE, 65);
         result = _marketAgentChannel;
     }
     _lock.Leave();
@@ -69,7 +69,7 @@ bool AgentChannelManager::SetMarketAgentChannel(AgentChannel* const marketAgentC
                    static_cast<unsigned int>(marketAgentChannel->_agentWid));
         return false;
     }
-    marketAgentChannel->addReferenceCount(AGENT_CHANNEL_FILE, 88);
+    marketAgentChannel->addReferenceCount(false, AGENT_CHANNEL_FILE, 88);
     _marketAgentChannel = marketAgentChannel;
     _lock.Leave();
     return true;

@@ -23,7 +23,7 @@ static wchar_t const* const MODULE_NAME = L"relaytime context";  // PDB MODULE_N
 RelayTimeContext::RelayTimeContext(unsigned long long relayTid, RelayContext* const relayContext)
     : _relayTid(relayTid), _relayContext(relayContext), _disuse(false)
 {
-    _relayContext->addReferenceCount(RELAY_TIME_CONTEXT_FILE, 27);
+    _relayContext->addReferenceCount(false, RELAY_TIME_CONTEXT_FILE, 27);
 }
 
 // 0xb080

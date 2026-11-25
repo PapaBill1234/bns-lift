@@ -1371,7 +1371,7 @@ bool LobbyGateChannelManager::Add(LobbyGateChannel* channel)
         _lock.Enter();
         if (_channels.Set(channel))
         {
-            channel->addReferenceCount(LOBBYGATE_FILE, 1008);
+            channel->addReferenceCount(false, LOBBYGATE_FILE, 1008);
             result = true;
         }
         _lock.Leave();
@@ -1440,7 +1440,7 @@ LobbyGateChannel* LobbyGateChannelManager::Acquire(short wid)
     {
         channel = _channels._channels[index];
         if (channel != nullptr)
-            channel->addReferenceCount(LOBBYGATE_FILE, 1041);
+            channel->addReferenceCount(false, LOBBYGATE_FILE, 1041);
     }
     _lock.Leave();
     return static_cast<LobbyGateChannel*>(channel);

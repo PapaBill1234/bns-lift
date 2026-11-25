@@ -16,7 +16,7 @@ SharedChannelPacketHandleEvent::SharedChannelPacketHandleEvent(
     : _channel(channel), _packet(packet), _handler(handler)
 {
     if (channel != nullptr)
-        channel->addReferenceCount(L"LobbyEvent.cpp", 25);
+        channel->addReferenceCount(false, L"LobbyEvent.cpp", 25);
 }
 
 // 0xbb880
@@ -48,7 +48,7 @@ SharedChannelFragmentPacketHandleEvent::SharedChannelFragmentPacketHandleEvent(
     : _channel(channel), _fpc(fpc), _handler(handler)
 {
     if (channel != nullptr)
-        channel->addReferenceCount(L"LobbyEvent.cpp", 50);
+        channel->addReferenceCount(false, L"LobbyEvent.cpp", 50);
 }
 
 // 0xbb9e0
@@ -105,7 +105,7 @@ PacketHandleEvent::PacketHandleEvent(Session const* session, Packet const* packe
     : _session(session), _packet(packet), _handler(handler)
 {
     if (session != nullptr)
-        const_cast<Session*>(session)->addReferenceCount(L"LobbyEvent.cpp", 107);
+        const_cast<Session*>(session)->addReferenceCount(false, L"LobbyEvent.cpp", 107);
 }
 
 // 0xbbbe0

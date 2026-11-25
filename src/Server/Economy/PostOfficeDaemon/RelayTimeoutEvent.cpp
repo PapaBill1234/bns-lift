@@ -10,7 +10,7 @@ static wchar_t const* const MODULE_NAME = L"relay timeout event";  // PDB MODULE
 RelayTimeoutEvent::RelayTimeoutEvent(unsigned long long relayTid, RelayContext* const relayContext)
     : _relayTid(relayTid), _relayContext(relayContext)
 {
-    _relayContext->addReferenceCount(RELAY_TIMEOUT_EVENT_FILE, 25);
+    _relayContext->addReferenceCount(false, RELAY_TIMEOUT_EVENT_FILE, 25);
 }
 
 // 0x1dcf0

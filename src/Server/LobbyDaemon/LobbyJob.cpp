@@ -283,7 +283,7 @@ bool LobbyJobManager::add(LobbyJob* job)
     EnterCriticalSection(&_lock[slot].CS);
     bool const inserted = _jobs[slot].insert(std::pair<unsigned long long, LobbyJob*>(job->_id, job)).second;
     if (inserted)
-        job->addReferenceCount(kFile, 284);
+        job->addReferenceCount(false, kFile, 284);
     LeaveCriticalSection(&_lock[slot].CS);
     return inserted;
 }

@@ -644,7 +644,7 @@ CacheGateChannel* PostOfficeDaemon::checkCacheGateServiceState()
     manager->_lock.Enter();
     CacheGateChannel* const cachegateChannel = manager->_cachegateChannel;
     if (cachegateChannel != nullptr)
-        cachegateChannel->addReferenceCount(L"CacheGateChannel.cpp", 168);
+        cachegateChannel->addReferenceCount(false, L"CacheGateChannel.cpp", 168);
     manager->_lock.Leave();
     if (cachegateChannel == nullptr)
     {

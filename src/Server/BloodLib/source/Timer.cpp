@@ -119,7 +119,7 @@ void TimerQueue::TimeExpired(Slot* slot)
             last.tail = timer;
             timer->StartTick = startTick;
             timer->SlotIndex = last.index;
-            timer->addReferenceCount(TIMER_FILE, 288);
+            timer->addReferenceCount(false, TIMER_FILE, 288);
         }
         timer->removeReferenceCount(TIMER_FILE, 114);
     }
@@ -149,7 +149,7 @@ bool TimerQueue::Add(long elapse, Timer* timer)
         slot.tail = timer;
         timer->StartTick = currentTick;
         timer->SlotIndex = slot.index;
-        timer->addReferenceCount(TIMER_FILE, 288);
+        timer->addReferenceCount(false, TIMER_FILE, 288);
     }
     else
     {
@@ -227,7 +227,7 @@ void TimerQueue::addLongTermQueue(unsigned int slice, Timer* timer)
     timer->StartTick = Daemon::Instance->CurrentTick;
     timer->SlotIndex = Daemon::Instance->CurrentTick + slice;
     timer->InLtq = true;
-    timer->addReferenceCount(TIMER_FILE, 326);
+    timer->addReferenceCount(false, TIMER_FILE, 326);
     LtQueue.push(timer);
 }
 

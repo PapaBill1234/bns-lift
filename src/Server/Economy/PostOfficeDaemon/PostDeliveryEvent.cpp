@@ -34,9 +34,9 @@ PostDeliveryEvent::PostDeliveryEvent(PostContext* const postContext, CacheGateCh
     : _postContext(postContext), _cachegateChannel(cachegateChannel)
 {
     if (postContext != nullptr)
-        postContext->addReferenceCount(POST_DELIVERY_EVENT_FILE, 30);
+        postContext->addReferenceCount(false, POST_DELIVERY_EVENT_FILE, 30);
     if (_cachegateChannel != nullptr)
-        _cachegateChannel->addReferenceCount(POST_DELIVERY_EVENT_FILE, 32);
+        _cachegateChannel->addReferenceCount(false, POST_DELIVERY_EVENT_FILE, 32);
 }
 
 // 0x10530

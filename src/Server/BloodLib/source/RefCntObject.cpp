@@ -35,8 +35,10 @@ void RefCntObject::operator delete(void* ptr, wchar_t const* file, int line)
 }
 
 // 0x2150
-long RefCntObject::addReferenceCount(wchar_t const* file, int line)
+// LIFT: the original body has no trace of ignoreHistory (LTCG removed it). The lift does not read it.
+long RefCntObject::addReferenceCount(bool ignoreHistory, wchar_t const* file, int line)
 {
+    (void)ignoreHistory;
     if (_ref <= 0)
     {
         Log::Write(Log::LT_ERROR, REFCNT_HEADER_ALT, 153,

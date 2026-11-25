@@ -287,7 +287,7 @@ PostContext* PostContextManager::GetContext(long long postId)
                                MODULE_NAME, L"PostContextManager::GetContext", postId, nullptr);
             return nullptr;
         }
-        postContext->addReferenceCount(POST_CONTEXT_FILE, 375);
+        postContext->addReferenceCount(false, POST_CONTEXT_FILE, 375);
     }
     _lockList[index].Leave();
     return postContext;
@@ -325,7 +325,7 @@ bool PostContextManager::AddContext(PostContext* postContext)
                    MODULE_NAME, L"PostContextManager::AddContext", postId);
         return false;
     }
-    postContext->addReferenceCount(POST_CONTEXT_FILE, 410);
+    postContext->addReferenceCount(false, POST_CONTEXT_FILE, 410);
     InterlockedIncrement(&_contextCount);
     _lockList[index].Leave();
     return true;

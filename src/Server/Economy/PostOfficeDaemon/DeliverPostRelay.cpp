@@ -33,7 +33,7 @@ DeliverPostRelayContext::DeliverPostRelayContext(EconomyHeader const& economyHea
     _response._resultState = RelayResponse::RESULTSTATE_INVALID;
     _response._failReason = 0;
     if (postContext != nullptr)
-        postContext->addReferenceCount(DELIVER_POST_RELAY_FILE, 35);
+        postContext->addReferenceCount(false, DELIVER_POST_RELAY_FILE, 35);
 }
 
 // 0xfc70

@@ -577,7 +577,7 @@ bool GameWorldReporter::WriteReport()
     if (_report != nullptr)
         _report->removeReferenceCount(L"GameWorld.cpp", 1228);
     _report = next;
-    next->addReferenceCount(L"GameWorld.cpp", 1233);
+    next->addReferenceCount(false, L"GameWorld.cpp", 1233);
     _lock.Leave();
     next->removeReferenceCount(L"GameWorld.cpp", 1219);
     return true;

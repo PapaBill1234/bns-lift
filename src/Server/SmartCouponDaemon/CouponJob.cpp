@@ -239,7 +239,7 @@ bool JobManager::add(CouponJob* job)
     EnterCriticalSection(&_lock[slot].CS);
     bool const inserted = _jobs[slot].insert(std::pair<unsigned long long, CouponJob*>(job->_id, job)).second;
     if (inserted)
-        job->addReferenceCount(kFile, 281);
+        job->addReferenceCount(false, kFile, 281);
     LeaveCriticalSection(&_lock[slot].CS);
     return inserted;
 }
@@ -277,7 +277,7 @@ CouponJob* JobManager::find(unsigned long long jobid)
     if (it != jobs.end())
     {
         job = it->second;
-        job->addReferenceCount(kFile, 325);
+        job->addReferenceCount(false, kFile, 325);
     }
     LeaveCriticalSection(&_lock[slot].CS);
     return job;

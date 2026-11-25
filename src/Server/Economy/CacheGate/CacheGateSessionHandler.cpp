@@ -161,7 +161,7 @@ bool HandleCacheGateHelloOk(Session const* session, Packet const* packet)
     Channel* channel = nullptr;
     if (session->_channel != nullptr && !session->_waitForRelease)
     {
-        session->_channel->addReferenceCount(SESSION_FILE, 1051);
+        session->_channel->addReferenceCount(false, SESSION_FILE, 1051);
         channel = session->_channel;
     }
     if (channel == nullptr)
@@ -199,7 +199,7 @@ bool HandleCacheGateHelloFail(Session const* session, Packet const* packet)
     Channel* channel = nullptr;
     if (session->_channel != nullptr && !session->_waitForRelease)
     {
-        session->_channel->addReferenceCount(SESSION_FILE, 1051);
+        session->_channel->addReferenceCount(false, SESSION_FILE, 1051);
         channel = session->_channel;
     }
     if (channel != nullptr)

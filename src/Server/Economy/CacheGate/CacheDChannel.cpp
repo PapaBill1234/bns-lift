@@ -38,7 +38,7 @@ bool CacheDChannel::onConnect(Session const* session, bool firstConnected)
     CacheD* cached = nullptr;
     if (session->_channel != nullptr && !session->_waitForRelease)
     {
-        session->_channel->addReferenceCount(SESSION_FILE, 1051);
+        session->_channel->addReferenceCount(false, SESSION_FILE, 1051);
         cached = static_cast<CacheD*>(session->_channel);
     }
     if (cached != nullptr)
@@ -78,7 +78,7 @@ void CacheDChannel::onClose(Session const* session, bool tryReconnect, bool clos
     CacheD* cached = nullptr;
     if (session->_channel != nullptr && !session->_waitForRelease)
     {
-        session->_channel->addReferenceCount(SESSION_FILE, 1051);
+        session->_channel->addReferenceCount(false, SESSION_FILE, 1051);
         cached = static_cast<CacheD*>(session->_channel);
     }
     if (cached == nullptr)

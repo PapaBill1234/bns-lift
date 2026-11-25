@@ -56,7 +56,7 @@ bool ThreadFreePacketPumpEvent::initialize(Session const* session, Daemon::Packe
     {
         _session = session;
         _handler = handler;
-        const_cast<Session*>(session)->addReferenceCount(TFPP_FILE, 45);
+        const_cast<Session*>(session)->addReferenceCount(false, TFPP_FILE, 45);
         return true;
     }
     Log::Write(Log::LT_ERROR, TFPP_FILE, 38,

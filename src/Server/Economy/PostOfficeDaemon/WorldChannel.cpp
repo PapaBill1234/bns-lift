@@ -59,7 +59,7 @@ unsigned short WorldChannel::GetWid(Session const* session)
     WorldChannel* channel = nullptr;
     if (session->_channel != nullptr && !session->_waitForRelease)
     {
-        session->_channel->addReferenceCount(SESSION_FILE, 1051);
+        session->_channel->addReferenceCount(false, SESSION_FILE, 1051);
         channel = static_cast<WorldChannel*>(session->_channel);
     }
     if (channel != nullptr)
@@ -148,7 +148,7 @@ WorldChannel* WorldChannelManager::GetWorldChannel(unsigned short wid)
                                 static_cast<void*>(nullptr));
             return nullptr;
         }
-        worldChannel->addReferenceCount(WORLD_CHANNEL_FILE, 134);
+        worldChannel->addReferenceCount(false, WORLD_CHANNEL_FILE, 134);
     }
     _lockList[index].Leave();
     return worldChannel;
@@ -187,7 +187,7 @@ bool WorldChannelManager::AddWorldChannel(WorldChannel* const worldChannel)
                    MODULE_NAME, L"WorldChannelManager::AddWorldChannel", static_cast<unsigned int>(wid));
         return false;
     }
-    worldChannel->addReferenceCount(WORLD_CHANNEL_FILE, 169);
+    worldChannel->addReferenceCount(false, WORLD_CHANNEL_FILE, 169);
     InterlockedIncrement(&_worldCount);
     _lockList[index].Leave();
     return true;
@@ -305,7 +305,7 @@ bool WorldSessionHandler::PacketHandler(Session const* session, Packet const* pa
     WorldChannel* channel = nullptr;
     if (session->_channel != nullptr && !session->_waitForRelease)
     {
-        session->_channel->addReferenceCount(SESSION_FILE, 1051);
+        session->_channel->addReferenceCount(false, SESSION_FILE, 1051);
         channel = static_cast<WorldChannel*>(session->_channel);
     }
     bool result = false;

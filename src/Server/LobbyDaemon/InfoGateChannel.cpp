@@ -123,7 +123,7 @@ bool InfoGateChannelManager::Add(InfoGateChannel* channel)
         _lock.Enter();
         if (_channels.Set(channel))
         {
-            channel->addReferenceCount(INFOGATE_FILE, 104);
+            channel->addReferenceCount(false, INFOGATE_FILE, 104);
             result = true;
         }
         _lock.Leave();
@@ -192,7 +192,7 @@ InfoGateChannel* InfoGateChannelManager::Acquire(short wid)
     {
         channel = _channels._channels[index];
         if (channel != nullptr)
-            channel->addReferenceCount(INFOGATE_FILE, 137);
+            channel->addReferenceCount(false, INFOGATE_FILE, 137);
     }
     _lock.Leave();
     return static_cast<InfoGateChannel*>(channel);

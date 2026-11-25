@@ -217,7 +217,7 @@ bool CliSessionTable::Insert(CliSession* s)
     std::pair<CliSessionMap::iterator, bool> r =
         _table[hash].insert(std::pair<unsigned long long, CliSession*>(s->_clikey, s));
     if (r.second)
-        s->addReferenceCount(kFile, 207);
+        s->addReferenceCount(false, kFile, 207);
     LeaveCriticalSection(&_lock[hash].CS);
     if (r.second)
         InterlockedIncrement(reinterpret_cast<long volatile*>(&_size));
@@ -285,7 +285,7 @@ CliSession* CliSessionTable::Select(unsigned long long clikey)
     {
         s = it->second;
         // BUG: 0x3e180 no null check of the session before addReferenceCount (the other Select functions have one).
-        s->addReferenceCount(kFile, 290);
+        s->addReferenceCount(false, kFile, 290);
     }
     LeaveCriticalSection(&_lock[hash].CS);
     return s;
@@ -303,7 +303,7 @@ bool CliSessionTable::Insert_index_gatekey(short gatewid, unsigned long long gat
     std::pair<GatekeyIndexMap::iterator, bool> r =
         _index_gatekey[hash].insert(std::pair<unsigned long long, CliSession*>(gatekey, s));
     if (r.second)
-        s->addReferenceCount(kFile, 315);
+        s->addReferenceCount(false, kFile, 315);
     LeaveCriticalSection(&_lock_index_gatekey[hash].CS);
     return r.second;
 }
@@ -344,7 +344,7 @@ CliSession* CliSessionTable::Select_index_gatekey(short gatewid, unsigned long l
     {
         s = it->second;
         if (s != nullptr)
-            s->addReferenceCount(kFile, 372);
+            s->addReferenceCount(false, kFile, 372);
     }
     LeaveCriticalSection(&_lock_index_gatekey[hash].CS);
     return s;
@@ -362,7 +362,7 @@ bool CliSessionTable::SelectAll_index_gatekey(short gatewid, CliSessionList& out
         if (it->second != nullptr)
         {
             out.push_back(it->second);
-            it->second->addReferenceCount(kFile, 399);
+            it->second->addReferenceCount(false, kFile, 399);
         }
     }
     LeaveCriticalSection(&_lock_index_gatekey[hash].CS);
@@ -377,7 +377,7 @@ bool CliSessionTable::Insert_index_account(id128 const& account, CliSession* s)
     std::pair<AccountIndexMap::iterator, bool> r =
         _index_account[hash].insert(std::pair<id128, CliSession*>(account, s));
     if (r.second)
-        s->addReferenceCount(kFile, 420);
+        s->addReferenceCount(false, kFile, 420);
     LeaveCriticalSection(&_lock_index_account[hash].CS);
     return r.second;
 }
@@ -409,7 +409,7 @@ CliSession* CliSessionTable::Select_index_account(id128 const& account)
     if (it != _index_account[hash].end() && it->second != nullptr)
     {
         s = it->second;
-        s->addReferenceCount(kFile, 466);
+        s->addReferenceCount(false, kFile, 466);
     }
     LeaveCriticalSection(&_lock_index_account[hash].CS);
     return s;
@@ -425,7 +425,7 @@ bool CliSessionTable::Insert_index_pcid(short wid, unsigned long long pcid, CliS
     std::pair<PcidIndexMap::iterator, bool> r =
         _index_pcid[hash].insert(std::pair<unsigned long long, CliSession*>(pcid, s));
     if (r.second)
-        s->addReferenceCount(kFile, 488);
+        s->addReferenceCount(false, kFile, 488);
     LeaveCriticalSection(&_lock_index_pcid[hash].CS);
     return r.second;
 }
@@ -461,7 +461,7 @@ CliSession* CliSessionTable::Select_index_pcid(short wid, unsigned long long pci
     if (it != _index_pcid[hash].end() && it->second != nullptr)
     {
         s = it->second;
-        s->addReferenceCount(kFile, 538);
+        s->addReferenceCount(false, kFile, 538);
     }
     LeaveCriticalSection(&_lock_index_pcid[hash].CS);
     return s;
@@ -481,7 +481,7 @@ bool CliSessionTable::SelectAll_index_pcid(short wid, CliSessionList& out)
         if (it->second != nullptr)
         {
             out.push_back(it->second);
-            it->second->addReferenceCount(kFile, 563);
+            it->second->addReferenceCount(false, kFile, 563);
         }
     }
     LeaveCriticalSection(&_lock_index_pcid[hash].CS);
@@ -500,7 +500,7 @@ bool CliSessionTable::SelectAll(CliSessionList& out)
             if (s != nullptr)
             {
                 out.push_back(s);
-                s->addReferenceCount(kFile, 586);
+                s->addReferenceCount(false, kFile, 586);
             }
         }
         LeaveCriticalSection(&_lock[i].CS);
@@ -531,7 +531,7 @@ bool CliSessionTable::Select_index_gate(short gatewid, CliSessionList& out)
             if (gateCs != nullptr)
             {
                 out.push_back(gateCs);
-                gateCs->addReferenceCount(L"CliSessionTable.cpp", 614);
+                gateCs->addReferenceCount(false, L"CliSessionTable.cpp", 614);
             }
             else
             {

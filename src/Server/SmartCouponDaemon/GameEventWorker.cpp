@@ -312,7 +312,7 @@ void GameEventWorker::run()
             }
             if (eventObject != nullptr)
             {
-                eventObject->addReferenceCount(kFile, 270);
+                eventObject->addReferenceCount(false, kFile, 270);
                 if (!eventObject->HandleEvent(context, numOfBytes))
                 {
                     Log::Write(Log::LT_DEBUG, kFile, 273,
@@ -546,7 +546,7 @@ bool SendRetryCouponPublicationOkEvent::HandleEvent(EventContext*, unsigned long
     EnterCriticalSection(&SmartCouponDaemon::_instance->_managerChannelLock.CS);
     ManagerChannel* channel = SmartCouponDaemon::_instance->_managerChannel;
     if (channel != nullptr)
-        channel->addReferenceCount(L"SmartCouponDaemon.cpp", 88);
+        channel->addReferenceCount(false, L"SmartCouponDaemon.cpp", 88);
     LeaveCriticalSection(&SmartCouponDaemon::_instance->_managerChannelLock.CS);
     if (channel != nullptr)
     {
@@ -570,7 +570,7 @@ bool SendRetryCouponPublicationFailEvent::HandleEvent(EventContext*, unsigned lo
     EnterCriticalSection(&SmartCouponDaemon::_instance->_managerChannelLock.CS);
     ManagerChannel* channel = SmartCouponDaemon::_instance->_managerChannel;
     if (channel != nullptr)
-        channel->addReferenceCount(L"SmartCouponDaemon.cpp", 88);
+        channel->addReferenceCount(false, L"SmartCouponDaemon.cpp", 88);
     LeaveCriticalSection(&SmartCouponDaemon::_instance->_managerChannelLock.CS);
     if (channel != nullptr)
     {

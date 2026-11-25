@@ -87,7 +87,7 @@ LobbyD* acquireChannel(Session const* session)
     Channel* channel = session->_channel;
     if (channel == nullptr || session->_waitForRelease)
         return nullptr;
-    channel->addReferenceCount(SESSION_FILE, 1051);
+    channel->addReferenceCount(false, SESSION_FILE, 1051);
     return static_cast<LobbyD*>(session->_channel);
 }
 

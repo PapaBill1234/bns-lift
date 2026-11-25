@@ -70,7 +70,7 @@ Channel* acquireChannel(Session const* session)
     Channel* channel = session->_channel;
     if (channel == nullptr || session->_waitForRelease)
         return nullptr;
-    channel->addReferenceCount(SESSION_FILE, 1051);
+    channel->addReferenceCount(false, SESSION_FILE, 1051);
     return session->_channel;
 }
 }  // namespace

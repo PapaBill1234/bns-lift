@@ -61,10 +61,12 @@ public:
     // LIFT: Not in the PDB. The placement form above hides the global form. The virtual
     // destructor needs a usual form for clang-cl.
     static void operator delete(void* ptr) { ::operator delete(ptr); }
-    // LIFT: LTCG folded ignoreHistory. The PDB signature is addReferenceCount(bool ignoreHistory,
-    // wchar_t const* file, int line). ignoreHistory has PDB offset 0. file is at offset 104 (rdx home)
-    // (CacheGate 0x2150).
-    long addReferenceCount(wchar_t const* file, int line);
+    // PDB signature (all 6 server PDBs, CacheGate 0x2150): addReferenceCount(bool ignoreHistory,
+    // wchar_t const* file, int line). LTCG removes ignoreHistory: it has PDB offset 0, and file is in rdx
+    // (offset 104). The body (HR LobbyDaemon 0xb9e0) adds history whenever _history is set.
+    // ❓ No call site in the originals passes the bool (rdx = file at each site). Each lift call site passes false.
+    // false keeps the original behavior: history is added.
+    long addReferenceCount(bool ignoreHistory, wchar_t const* file, int line);
     long removeReferenceCount(wchar_t const* file, int line);
 
     long _tag;

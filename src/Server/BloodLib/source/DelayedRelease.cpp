@@ -71,11 +71,11 @@ bool DelayedRelease::Add(long long current, void (*callback)(RefCntObject*, RefC
     node->_callback = callback;
     node->_ref3 = ref3;
     if (ref1 != nullptr)
-        ref1->addReferenceCount(DELAYED_RELEASE_FILE, 51);
+        ref1->addReferenceCount(false, DELAYED_RELEASE_FILE, 51);
     if (ref2 != nullptr)
-        ref2->addReferenceCount(DELAYED_RELEASE_FILE, 52);
+        ref2->addReferenceCount(false, DELAYED_RELEASE_FILE, 52);
     if (ref3 != nullptr)
-        ref3->addReferenceCount(DELAYED_RELEASE_FILE, 53);  // ❓ LTCG removed this call (ref3 is nullptr)
+        ref3->addReferenceCount(false, DELAYED_RELEASE_FILE, 53);  // ❓ LTCG removed this call (ref3 is nullptr)
     node->_next = nullptr;
     _lock.Enter();
     if (_head == nullptr)

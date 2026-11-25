@@ -13,7 +13,7 @@ public:
     InstantSaleTimeoutEvent(long long const saleId, SaleContext* const saleContext)
         : _saleId(saleId), _saleContext(saleContext)
     {
-        _saleContext->addReferenceCount(L"TimeoutEvent.cpp", 35);
+        _saleContext->addReferenceCount(false, L"TimeoutEvent.cpp", 35);
     }
     virtual ~InstantSaleTimeoutEvent();
     virtual unsigned int EventId() const;
@@ -34,7 +34,7 @@ public:
     AuctionTimeoutEvent(long long const saleId, SaleContext* const saleContext)
         : _saleId(saleId), _saleContext(saleContext)
     {
-        _saleContext->addReferenceCount(L"TimeoutEvent.cpp", 139);
+        _saleContext->addReferenceCount(false, L"TimeoutEvent.cpp", 139);
     }
     virtual ~AuctionTimeoutEvent();
     virtual unsigned int EventId() const;

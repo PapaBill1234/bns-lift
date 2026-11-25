@@ -67,7 +67,7 @@ static Channel* acquireChannel(Session const* session)
     Channel* channel = session->_channel;
     if (channel != nullptr && !session->_waitForRelease)
     {
-        channel->addReferenceCount(SESSION_FILE, 1051);
+        channel->addReferenceCount(false, SESSION_FILE, 1051);
         return channel;
     }
     return nullptr;

@@ -88,7 +88,7 @@ void DeliveryTimer::checkDelivery() const
                                      MODULE_NAME, fn, deliveryId, static_cast<DeliveryContext*>(nullptr));
                 continue;
             }
-            deliveryContext->addReferenceCount(DELIVERY_TIMER_FILE, 69);
+            deliveryContext->addReferenceCount(false, DELIVERY_TIMER_FILE, 69);
             deliveryContext->_lock.Enter();
             char const jobStatus = deliveryContext->_deliveryInfo._jobStatus;
             if ((jobStatus == DeliveryInfo::JOBSTATUS_DELIVERY_READY ||

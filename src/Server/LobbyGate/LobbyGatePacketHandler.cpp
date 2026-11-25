@@ -396,7 +396,7 @@ bool HandleLobbyGate_GetWorldInfoListReq(Client* client, Packet const* packet)
     if (manager->_worldList != nullptr)
     {
         worldList = manager->_worldList;
-        worldList->addReferenceCount(L"WorldListManager.cpp", 0xEA);
+        worldList->addReferenceCount(false, L"WorldListManager.cpp", 0xEA);
     }
     ReleaseSRWLockShared(&manager->_srwLock);
 
@@ -451,7 +451,7 @@ bool HandleLobbyGate_GetPcCafeMileageFeverTimeScheduleListReq(Client* client, Pa
     if (manager->_scheduleList != nullptr)
     {
         scheduleList = manager->_scheduleList;
-        scheduleList->addReferenceCount(L"PcCafeMileageFeverTimeScheduleList.cpp", 0x8D);
+        scheduleList->addReferenceCount(false, L"PcCafeMileageFeverTimeScheduleList.cpp", 0x8D);
     }
     ReleaseSRWLockShared(&manager->_srwLock);
 

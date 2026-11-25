@@ -74,7 +74,7 @@ bool PortListener::Initialize(Port* port, void* iocpHandle, unsigned short portN
 
     _socket = listenSocket;
     _portInstance = port;
-    addReferenceCount(LISTENER_FILE, 71);
+    addReferenceCount(false, LISTENER_FILE, 71);
 
     if (CreateIoCompletionPort(reinterpret_cast<HANDLE>(_socket), iocpHandle, reinterpret_cast<ULONG_PTR>(this), 0) ==
         nullptr)

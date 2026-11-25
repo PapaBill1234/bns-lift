@@ -177,7 +177,7 @@ void GameWorldReporterListener(GameWorldReporter* reporter)
     if (reporter->_report != nullptr)
     {
         report = reporter->_report;
-        report->addReferenceCount(L"GameWorld.cpp", 1246);
+        report->addReferenceCount(false, L"GameWorld.cpp", 1246);
     }
     reporter->_lock.Leave();
     if (report == nullptr)

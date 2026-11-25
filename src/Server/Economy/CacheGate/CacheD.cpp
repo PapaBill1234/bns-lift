@@ -120,7 +120,7 @@ CacheD* CacheDList::Find(unsigned short id)
     if (it != _cachedMap->end() && it->second != nullptr)
     {
         result = it->second;
-        result->addReferenceCount(CACHED_FILE, 151);
+        result->addReferenceCount(false, CACHED_FILE, 151);
     }
     _lock.Leave();
     return result;
@@ -394,7 +394,7 @@ bool CacheDList::add(CacheD* cached)
     _lock.Enter();
     bool result = _cachedMap->insert(CacheDMap::value_type(cached->_id, cached)).second;
     if (result)
-        cached->addReferenceCount(CACHED_FILE, 434);
+        cached->addReferenceCount(false, CACHED_FILE, 434);
     _lock.Leave();
     return result;
 }

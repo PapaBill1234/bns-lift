@@ -781,7 +781,7 @@ bool Session::SetChannel(Channel* channel)
 {
     if (_channel != nullptr)
         return false;
-    channel->addReferenceCount(SESSION_FILE, 0x403);
+    channel->addReferenceCount(false, SESSION_FILE, 0x403);
     _channel = channel;
     return true;
 }
@@ -791,7 +791,7 @@ Channel* Session::GetChannel() const
 {
     if (_channel == nullptr || _waitForRelease)
         return nullptr;
-    _channel->addReferenceCount(SESSION_FILE, 1051);
+    _channel->addReferenceCount(false, SESSION_FILE, 1051);
     return _channel;
 }
 

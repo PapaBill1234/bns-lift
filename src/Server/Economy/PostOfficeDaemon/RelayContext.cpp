@@ -243,7 +243,7 @@ RelayContext* RelayContextManager::GetContext(unsigned long long relayTid)
                                 MODULE_NAME, L"RelayContextManager::GetContext", relayTid, nullptr);
             return nullptr;
         }
-        relayContext->addReferenceCount(RELAY_CONTEXT_FILE, 245);
+        relayContext->addReferenceCount(false, RELAY_CONTEXT_FILE, 245);
     }
     _lockList[index].Leave();
     return relayContext;
@@ -281,7 +281,7 @@ bool RelayContextManager::AddContext(RelayContext* const relayContext)
                    MODULE_NAME, L"RelayContextManager::AddContext", relayTid);
         return false;
     }
-    relayContext->addReferenceCount(RELAY_CONTEXT_FILE, 280);
+    relayContext->addReferenceCount(false, RELAY_CONTEXT_FILE, 280);
     InterlockedIncrement(&_contextCount);
     _lockList[index].Leave();
     return true;

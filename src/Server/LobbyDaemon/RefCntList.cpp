@@ -59,7 +59,7 @@ bool RefCntList::Pushback(RefCntListNode* node)
     }
     ++_size;
     _tail = node;
-    node->addReferenceCount(L"RefCntList.cpp", 50);
+    node->addReferenceCount(false, L"RefCntList.cpp", 50);
     return true;
 }
 

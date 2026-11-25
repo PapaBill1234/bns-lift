@@ -34,7 +34,7 @@ void LobbyMessage::Dispatch(LobbyMessageAcceptor* acceptor)
 CliSessionMessage::CliSessionMessage(CliSession* cs) : _cs(cs)
 {
     if (_cs != nullptr)
-        _cs->addReferenceCount(L"LobbyMessage.cpp", 21);
+        _cs->addReferenceCount(false, L"LobbyMessage.cpp", 21);
 }
 
 // LIFT: the original deleting destructor at 0x2fa40 inlines this body.

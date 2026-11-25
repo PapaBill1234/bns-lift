@@ -255,7 +255,7 @@ bool DChannelMgr::SetupDaemonList(DaemonInfo** list, int count)
         if (it != _list.end())
         {
             second = it->second;
-            second->addReferenceCount(DCHANNEL_FILE, 376);
+            second->addReferenceCount(false, DCHANNEL_FILE, 376);
         }
         _lock.Leave();
         // LIFT: goto form gives the original block order (0xd270): error, changed, then add, shared notice log
@@ -408,7 +408,7 @@ DChannelMgr::ErrCode DChannelMgr::AddDaemon(DChannel* channel)
     _lock.Enter();
     bool inserted = _list.insert(std::pair<GameEventDaemonId, DChannel*>(channel->_daemonId, channel)).second;
     if (inserted)
-        channel->addReferenceCount(DCHANNEL_FILE, 327);
+        channel->addReferenceCount(false, DCHANNEL_FILE, 327);
     _lock.Leave();
 
     int const wid = channel->_daemonId._wid;
@@ -445,7 +445,7 @@ __declspec(noinline) DChannel* DChannelMgr::FindDaemon(GameEventDaemonId const* 
     if (it != _list.end())
     {
         second = it->second;
-        second->addReferenceCount(DCHANNEL_FILE, 376);
+        second->addReferenceCount(false, DCHANNEL_FILE, 376);
     }
     _lock.Leave();
     return second;
@@ -473,7 +473,7 @@ bool DChannelMgr::ReplaceDaemon(DChannel* newDaemon)
     bool inserted =
         _list.insert(std::pair<GameEventDaemonId, DChannel*>(newDaemon->_daemonId, newDaemon)).second;
     if (inserted)
-        newDaemon->addReferenceCount(DCHANNEL_FILE, 409);
+        newDaemon->addReferenceCount(false, DCHANNEL_FILE, 409);
     _lock.Leave();
 
     if (second != nullptr)

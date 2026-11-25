@@ -109,7 +109,7 @@ void IoWorker::run()
         {
             if (eventObject != nullptr && context != nullptr)
             {
-                eventObject->addReferenceCount(IOWORKER_FILE, 126);
+                eventObject->addReferenceCount(false, IOWORKER_FILE, 126);
                 handleFailedEvent(eventObject, static_cast<EventContext*>(context), numOfBytes);
                 eventObject->removeReferenceCount(IOWORKER_FILE, 128);
             }
@@ -130,7 +130,7 @@ void IoWorker::run()
 
         if (eventObject != nullptr)
         {
-            eventObject->addReferenceCount(IOWORKER_FILE, 111);
+            eventObject->addReferenceCount(false, IOWORKER_FILE, 111);
             if (!eventObject->HandleEvent(static_cast<EventContext*>(context), numOfBytes))
             {
                 Log::Write(Log::LT_DEBUG, IOWORKER_FILE, 114, L"[worker], event object handle failed, id: %d", WorkerId);

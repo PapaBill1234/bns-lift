@@ -225,7 +225,7 @@ bool CacheGateChannelManager::SetCacheGateChannel(CacheGateChannel* const cacheg
                    L"CacheGateChannelManager::SetCacheGateChannel", _cachegateChannel);
         return false;
     }
-    cachegateChannel->addReferenceCount(CACHEGATE_CHANNEL_FILE, 190);
+    cachegateChannel->addReferenceCount(false, CACHEGATE_CHANNEL_FILE, 190);
     _cachegateChannel = cachegateChannel;
     _lock.Leave();
     return true;

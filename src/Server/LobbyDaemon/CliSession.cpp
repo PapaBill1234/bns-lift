@@ -1185,7 +1185,7 @@ void CliSession::onPcCafeChargeStop()
 }
 
 // 0x3a3f0
-// LIFT: not lifted in card ld-13 (0x3a3f0). The body calls _lgate->addReferenceCount(L"CliSession.cpp", 3212).
+// LIFT: not lifted in card ld-13 (0x3a3f0). The body calls _lgate->addReferenceCount(false, L"CliSession.cpp", 3212).
 // LobbyGateChannel has no PDB base (RefCntObject) in LobbyGateChannel.h yet.
 AnonymousLobbyGatePresence::AnonymousLobbyGatePresence(LobbyGateChannel*, unsigned long long)
 {
@@ -1303,7 +1303,7 @@ bool LobbyGatePresence::IsEqual(Presence const* presence) const
 inline GateNode::GateNode(CliSession* clisession)
     : _clisession(clisession)
 {
-    _clisession->addReferenceCount(L"CliSessionTable.cpp", 19);
+    _clisession->addReferenceCount(false, L"CliSessionTable.cpp", 19);
 }
 
 // 0x3a7d0

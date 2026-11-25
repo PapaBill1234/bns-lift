@@ -225,7 +225,7 @@ BidContext* SaleContext::GetBidContext(long long bidderPcId)
                            MODULE_NAME, L"SaleContext::GetBidContext", bidderPcId, nullptr);
         return nullptr;
     }
-    bidContext->addReferenceCount(SALE_CONTEXT_FILE, 233);
+    bidContext->addReferenceCount(false, SALE_CONTEXT_FILE, 233);
     return static_cast<BidContext*>(bidContext);
 }
 
@@ -306,7 +306,7 @@ PurchaseContext* SaleContext::GetPurchaseContext(long long purchaserPcId)
                            MODULE_NAME, L"SaleContext::GetPurchaseContext", purchaserPcId, nullptr);
         return nullptr;
     }
-    purchaseContext->addReferenceCount(SALE_CONTEXT_FILE, 316);
+    purchaseContext->addReferenceCount(false, SALE_CONTEXT_FILE, 316);
     return static_cast<PurchaseContext*>(purchaseContext);
 }
 
@@ -414,7 +414,7 @@ SaleContext* SaleContextManager::GetContext(long long saleId) const
     SaleContext* const saleContext = it->second;
     if (saleContext != nullptr)
     {
-        saleContext->addReferenceCount(SALE_CONTEXT_FILE, 455);
+        saleContext->addReferenceCount(false, SALE_CONTEXT_FILE, 455);
         _lockList[index].Leave();
         return saleContext;
     }
@@ -451,7 +451,7 @@ bool SaleContextManager::AddContext(SaleContext* const saleContext)
     _lockList[index].Enter();
     if (_containerList[index].insert(Container::value_type(saleId, saleContext)).second)
     {
-        saleContext->addReferenceCount(SALE_CONTEXT_FILE, 490);
+        saleContext->addReferenceCount(false, SALE_CONTEXT_FILE, 490);
         InterlockedIncrement(&_contextCount);
         _lockList[index].Leave();
         return true;

@@ -37,7 +37,7 @@ static T* saleTimeArrayNew(int count, wchar_t const* file, int line)
 SaleTimeContext::SaleTimeContext(long long saleId, char saleType, SaleContext* const saleContext)
     : _saleId(saleId), _saleType(saleType), _saleContext(saleContext)
 {
-    _saleContext->addReferenceCount(SALE_TIME_CONTEXT_FILE, 38);
+    _saleContext->addReferenceCount(false, SALE_TIME_CONTEXT_FILE, 38);
 }
 
 // 0x2d830

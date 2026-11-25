@@ -34,7 +34,7 @@ AsyncSendContext* SessionSendBuffer::Add(PacketBuffer const** const pbufferList,
         {
             if (next->_size <= next->_count + 1)
                 increaseBuffer(next);
-            i->addReferenceCount(SESSIONBUFFER_FILE, 116);
+            i->addReferenceCount(false, SESSIONBUFFER_FILE, 116);
             char const* sendBuffer = i->sendBuffer != nullptr ? i->sendBuffer : &i->Buffer[8];
             WSABUF* wsaBuffer = static_cast<WSABUF*>(next->_wsaBuffer);
             wsaBuffer[next->_count].len =

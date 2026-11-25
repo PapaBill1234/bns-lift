@@ -10,7 +10,7 @@
 LobbyToken::LobbyToken(CliSession* clisession) : _tokenkey(0), _clisession(clisession), _expire(0)
 {
     if (clisession != nullptr)
-        clisession->addReferenceCount(L"LobbyToken.cpp", 27);
+        clisession->addReferenceCount(false, L"LobbyToken.cpp", 27);
 }
 
 // LIFT: the original emits this body as part of the deleting destructor (0x967d0).

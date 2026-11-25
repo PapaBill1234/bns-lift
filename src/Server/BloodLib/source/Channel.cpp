@@ -96,7 +96,7 @@ void Channel::SetSession(Session const* session)
         CHANNEL_ASSERT_CRASH(53);
 
     Session* newSession = const_cast<Session*>(session);
-    newSession->addReferenceCount(CHANNEL_FILE, 55);
+    newSession->addReferenceCount(false, CHANNEL_FILE, 55);
     _session = newSession;
     newSession->SetChannel(this);
 }
@@ -160,7 +160,7 @@ Session const* Channel::GetSession() const
     Session* session = _session;
     if (session == nullptr || _waitForRelease)
         return nullptr;
-    session->addReferenceCount(CHANNEL_FILE, 112);
+    session->addReferenceCount(false, CHANNEL_FILE, 112);
     return session;
 }
 
@@ -254,7 +254,7 @@ Session* ClientSideDaemonChannel::getSession()
             return nullptr;
         found = session[0];
     }
-    found->addReferenceCount(CHANNEL_FILE, 380);
+    found->addReferenceCount(false, CHANNEL_FILE, 380);
     return found;
 }
 

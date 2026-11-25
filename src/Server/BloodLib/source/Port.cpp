@@ -118,7 +118,7 @@ Session* SessionPool::MakeSession(PacketBufferHandler const* bufferHandler)
     _InterlockedIncrement64(&Using);
     // BUG: 0x18820 a new session runs Session::Session() and then this constructor (no destructor between).
     new (session) Session(_portId, bufferHandler);
-    addReferenceCount(PORT_FILE, 140);
+    addReferenceCount(false, PORT_FILE, 140);
     return session;
 }
 
@@ -284,7 +284,7 @@ Session* Port::MakeNewSession(unsigned long long* socket, unsigned long ip, unsi
     Session* session = makeSession(id);
     if (session == nullptr)
         return nullptr;
-    session->addReferenceCount(PORT_FILE, 387);
+    session->addReferenceCount(false, PORT_FILE, 387);
     if (!session->Accept(this, id, socket, ip, portNumber, option))
     {
         session->removeReferenceCount(PORT_FILE, 390);
@@ -305,7 +305,7 @@ bool Port::MakeNewSession(unsigned long ip, unsigned short portNumber, Channel* 
     // BUG: 0x19010 if session is null, the new session stays in the session list (leak).
     if (session == nullptr)
         return false;
-    newSession->addReferenceCount(PORT_FILE, 416);
+    newSession->addReferenceCount(false, PORT_FILE, 416);
     if (channel != nullptr)
         newSession->SetChannel(channel);
     *session = newSession;
@@ -364,7 +364,7 @@ void Port::ReconnectSession(unsigned long long id)
             (found->_state != Session::CONNECTED || found->_connection->_socket == INVALID_SOCKET))
         {
             session = found;
-            session->addReferenceCount(PORT_FILE, 561);
+            session->addReferenceCount(false, PORT_FILE, 561);
         }
     }
     _sessionLock.Leave();
@@ -395,7 +395,7 @@ void Port::CloseSession(unsigned long long sessionId, bool force)
     _sessionLock.Enter();
     Session* session = _sessionList[static_cast<unsigned int>(sessionId)];
     if (session != nullptr && session->_id == sessionId)
-        session->addReferenceCount(PORT_FILE, 531);
+        session->addReferenceCount(false, PORT_FILE, 531);
     else
         session = nullptr;
     _sessionLock.Leave();

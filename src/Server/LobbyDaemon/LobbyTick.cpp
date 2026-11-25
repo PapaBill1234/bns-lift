@@ -85,9 +85,9 @@ __declspec(noinline) LobbyTickEvent::LobbyTickEvent(LobbyTick* owner, LobbyTick:
     : _owner(owner), _listener(listener), _elapsed(elapsed)
 {
     if (_owner != nullptr)
-        _owner->addReferenceCount(L"LobbyTick.cpp", 123);
+        _owner->addReferenceCount(false, L"LobbyTick.cpp", 123);
     if (_listener != nullptr)
-        _listener->addReferenceCount(L"LobbyTick.cpp", 126);
+        _listener->addReferenceCount(false, L"LobbyTick.cpp", 126);
 }
 
 // 0x5a9b0

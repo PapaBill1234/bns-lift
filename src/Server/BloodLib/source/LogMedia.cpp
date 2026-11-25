@@ -19,7 +19,7 @@ wchar_t* LogMedia::GetLastFileName()
 __declspec(noinline) int LogMedia::Add(LogBuffer* logbuffer)
 {
     int first = 0;
-    logbuffer->addReferenceCount(L"source\\LogMedia.cpp", 40);
+    logbuffer->addReferenceCount(false, L"source\\LogMedia.cpp", 40);
     _lock.Enter();
     if (_bufferNodePos >= 0)
         logbuffer->_next[_bufferNodePos] = nullptr;

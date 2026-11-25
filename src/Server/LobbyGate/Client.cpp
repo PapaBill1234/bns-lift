@@ -137,7 +137,7 @@ Client::~Client()
 // LIFT: inlined in GateKeyManager::MakeGateKey (0x3ec0)
 GateKeyEntry::GateKeyEntry(Session* session)
 {
-    session->addReferenceCount(CLIENT_FILE, 39);
+    session->addReferenceCount(false, CLIENT_FILE, 39);
     _session = session;
     _cliKey = 0;
 }
@@ -588,7 +588,7 @@ Client* ClientManager::AcquireClient(long long cliKey)
     if (it != _cliMap[index].end())
     {
         client = it->second;
-        client->addReferenceCount(CLIENT_FILE, 785);
+        client->addReferenceCount(false, CLIENT_FILE, 785);
     }
     _cliLock[index].Leave();
     return client;
@@ -650,7 +650,7 @@ bool ClientManager::broadcast(Packet* packet)
             if (client != nullptr && client->_broadcast)
             {
                 clients.push_back(client);
-                client->addReferenceCount(CLIENT_FILE, 916);
+                client->addReferenceCount(false, CLIENT_FILE, 916);
             }
         }
         _cliLock[i].Leave();
@@ -711,7 +711,7 @@ void ClientSessionHandler::OnClose(Session const* session, bool tryReconnect) co
     Client* client = nullptr;
     if (s->_channel != nullptr && !s->_waitForRelease)
     {
-        s->_channel->addReferenceCount(SESSION_FILE, 1051);
+        s->_channel->addReferenceCount(false, SESSION_FILE, 1051);
         client = static_cast<Client*>(s->_channel);
     }
 
@@ -775,7 +775,7 @@ bool ClientSessionHandler::PacketHandler(Session const* session, Packet const* p
     // LIFT: Inlined Session::GetChannel with the add-ref (Session.cpp line 1051).
     if (session->_channel != nullptr && !session->_waitForRelease)
     {
-        session->_channel->addReferenceCount(SESSION_FILE, 1051);
+        session->_channel->addReferenceCount(false, SESSION_FILE, 1051);
         Client* client = static_cast<Client*>(session->_channel);
         // BUG: 0x6b70 no release of the channel reference when Client::_state is not 1.
         if (client != nullptr && client->_state == 1)
@@ -930,7 +930,7 @@ int ClientManager::DisconnectAll()
             if (it->second != nullptr)
             {
                 clients.push_back(it->second);
-                it->second->addReferenceCount(CLIENT_FILE, 1229);
+                it->second->addReferenceCount(false, CLIENT_FILE, 1229);
             }
         }
         _cliLock[i].Leave();

@@ -196,7 +196,7 @@ DeliveryContext* DeliveryContextManager::GetContext(long long deliveryId) const
     DeliveryContext* const deliveryContext = it->second;
     if (deliveryContext != nullptr)
     {
-        deliveryContext->addReferenceCount(DELIVERY_CONTEXT_FILE, 219);
+        deliveryContext->addReferenceCount(false, DELIVERY_CONTEXT_FILE, 219);
         _lockList[index].Leave();
         return deliveryContext;
     }
@@ -235,7 +235,7 @@ bool DeliveryContextManager::AddContext(DeliveryContext* const deliveryContext)
     _lockList[index].Enter();
     if (_containerList[index].insert(Container::value_type(deliveryId, deliveryContext)).second)
     {
-        deliveryContext->addReferenceCount(DELIVERY_CONTEXT_FILE, 254);
+        deliveryContext->addReferenceCount(false, DELIVERY_CONTEXT_FILE, 254);
         InterlockedIncrement(&_contextCount);
         _lockList[index].Leave();
         return true;

@@ -137,7 +137,7 @@ inline LobbyJobTaskEvent::LobbyJobTaskEvent(LobbyJob* job, int task, LobbyJobTas
     : _job(job), _task(task), _param(param)
 {
     if (job != nullptr)
-        job->addReferenceCount(
+        job->addReferenceCount(false,
             L"e:\\dailybuild02\\lobbydaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\lobbydaemon\\LobbyJob.h",
             195);
 }
