@@ -137,7 +137,7 @@ bool HandleLobbyLobbyGate_GetCharacterInfoReq(SharedChannel* channel, Packet con
     LobbyGateChannel* gate = static_cast<LobbyGateChannel*>(channel);
     short cmd = 0;
     unsigned long long clikey = 0;
-    id128 slotid = {};
+    id128 slotid = ID128_GUID_ZERO;  // LIFT: the original loads the zero id from ID128_GUID_ZERO.
     if (packet->Decompose("hqo", &cmd, &clikey, &slotid) == 0)
     {
         Log::Write(Log::LT_ERROR, L"LobbyLobbyGatePacketHandler.cpp", 756,
@@ -174,7 +174,25 @@ bool HandleLobbyLobbyGate_GetCharacterInfoReq(SharedChannel* channel, Packet con
     pcr.SetFormat("hqqohsbqQQi", 0);
     p.Allocate();
     p.Compose(&pcr, 2, 39, clikey);
-    if (cliSession->FetchCharacterInfo(slotid, &p, &pcr))
+    // LIFT: the original puts the fetch fail block first (block order 0xc5630).
+    if (!cliSession->FetchCharacterInfo(slotid, &p, &pcr))
+    {
+        int error = static_cast<int>(TLobbyError);
+        Log::Write(Log::LT_ERROR, L"LobbyLobbyGatePacketHandler.cpp", 778,
+                   L"[lobby-gate], get character info fail; fetch fail, error:%d, gate-wid:%d, cli-key:0x%I64X, slot-id:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
+                   error, gate != nullptr ? static_cast<int>(gate->GetWid()) : 0, clikey,
+                   slotid.guid.id1, slotid.guid.id2, slotid.guid.id3,
+                   slotid.guid.id4[0], slotid.guid.id4[1], slotid.guid.id4[2], slotid.guid.id4[3],
+                   slotid.guid.id4[4], slotid.guid.id4[5], slotid.guid.id4[6], slotid.guid.id4[7]);
+        short reason = 2;
+        if (error == LOBERR_INVALID_SESSION_STATE)
+            reason = 5;
+        else if (error == LOBERR_NO_SUCH_CHARACTER)
+            reason = 6;
+        gate->SendGetCharacterInfoFail(clikey, slotid, reason);
+        // BUG: 0xc5630 the fetch fail path does not release the cli-session reference (Select adds one). Kept for parity.
+    }
+    else
     {
         channel->Send(&p);
         Log::Write(Log::LT_DEBUG, L"LobbyLobbyGatePacketHandler.cpp", 800,
@@ -184,22 +202,7 @@ bool HandleLobbyLobbyGate_GetCharacterInfoReq(SharedChannel* channel, Packet con
                    slotid.guid.id4[0], slotid.guid.id4[1], slotid.guid.id4[2], slotid.guid.id4[3],
                    slotid.guid.id4[4], slotid.guid.id4[5], slotid.guid.id4[6], slotid.guid.id4[7]);
         cliSession->removeReferenceCount(L"LobbyLobbyGatePacketHandler.cpp", 802);
-        return true;
     }
-    int error = static_cast<int>(TLobbyError);
-    Log::Write(Log::LT_ERROR, L"LobbyLobbyGatePacketHandler.cpp", 778,
-               L"[lobby-gate], get character info fail; fetch fail, error:%d, gate-wid:%d, cli-key:0x%I64X, slot-id:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
-               error, gate != nullptr ? static_cast<int>(gate->GetWid()) : 0, clikey,
-               slotid.guid.id1, slotid.guid.id2, slotid.guid.id3,
-               slotid.guid.id4[0], slotid.guid.id4[1], slotid.guid.id4[2], slotid.guid.id4[3],
-               slotid.guid.id4[4], slotid.guid.id4[5], slotid.guid.id4[6], slotid.guid.id4[7]);
-    short reason = 2;
-    if (error == LOBERR_INVALID_SESSION_STATE)
-        reason = 5;
-    else if (error == LOBERR_NO_SUCH_CHARACTER)
-        reason = 6;
-    gate->SendGetCharacterInfoFail(clikey, slotid, reason);
-    // BUG: 0xc5630 the fetch fail path does not release the cli-session reference (Select adds one). Kept for parity.
     return true;
 }
 

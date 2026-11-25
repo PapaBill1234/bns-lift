@@ -90,7 +90,7 @@ void LobbyGateChannel::SendInitSessionWithNPTokenOk(unsigned long long gatekey, 
     p.IsFragmentPacket = false;
     p.FragmentPacketCmd = 0;
     p.Allocate();
-    if (0 != p.Compose("hqqoo", 7, gatekey, clikey, nptoken, portalAccountId))
+    if (0 == p.Compose("hqqoo", 7, gatekey, clikey, nptoken, portalAccountId))
         Send(&p);
 }
 
@@ -1173,10 +1173,10 @@ void LobbyGateChannel::SendChangeUserNameWithAccountInventoryItemOk(unsigned lon
     p.FragmentPacketCmd = 0;
     p.Allocate();
     if (0 != p.Compose("hqsqqi", 98, clikey, newUserName, labelId, itemInstanceId, itemDataId))
-        Send(&p);
-    else
         Log::Write(Log::LT_ERROR, L"LobbyGateChannel.cpp", 812,
                    L"[lobby-gate], send change-user-name-with-account-inventory-item-ok fail; compose fail, cli-key:0x%I64X", clikey);
+    else
+        Send(&p);
 }
 
 // 0xc0050
@@ -1190,11 +1190,11 @@ void LobbyGateChannel::SendChangeUserNameWithAccountInventoryItemFail(unsigned l
     p.IsFragmentPacket = false;
     p.FragmentPacketCmd = 0;
     p.Allocate();
-    if (0 != p.Compose("hqqqE", 99, clikey, labelId, itemInstanceId, static_cast<int>(reason)))
-        Send(&p);
-    else
+    if (0 == p.Compose("hqqqE", 99, clikey, labelId, itemInstanceId, static_cast<int>(reason)))
         Log::Write(Log::LT_ERROR, L"LobbyGateChannel.cpp", 827,
                    L"[lobby-gate], send change-user-name-with-account-inventory-item-fail fail; compose fail, cli-key:0x%I64X", clikey);
+    else
+        Send(&p);
 }
 
 // 0xc0160
@@ -1208,7 +1208,7 @@ void LobbyGateChannel::SendExtendJumpingCharacterCreationQuotaWithAccountInvento
     p.IsFragmentPacket = false;
     p.FragmentPacketCmd = 0;
     p.Allocate();
-    if (0 != p.Compose("hqqqi", 101, clikey, labelId, itemInstanceId, remainQuota))
+    if (0 == p.Compose("hqqqi", 101, clikey, labelId, itemInstanceId, remainQuota))
         Send(&p);
 }
 
@@ -1245,10 +1245,10 @@ void LobbyGateChannel::SendCreateInitialUserNameOk(unsigned long long clikey, wc
     p.FragmentPacketCmd = 0;
     p.Allocate();
     if (0 != p.Compose("hqs", 104, clikey, newUserName))
-        Send(&p);
-    else
         Log::Write(Log::LT_ERROR, L"LobbyGateChannel.cpp", 874,
                    L"[lobby-gate], send create-initial-user-name-ok fail; compose fail, cli-key:0x%I64X, new-user-name:%s", clikey, newUserName);
+    else
+        Send(&p);
 }
 
 // 0xc0460
@@ -1263,11 +1263,11 @@ void LobbyGateChannel::SendCreateInitialUserNameFail(unsigned long long clikey, 
     p.FragmentPacketCmd = 0;
     p.Allocate();
     // LIFT: the original log text says "ok" in the fail function (0xc0460, line 891). Kept as is.
-    if (0 != p.Compose("hqE", 105, clikey, static_cast<int>(reason)))
-        Send(&p);
-    else
+    if (0 == p.Compose("hqE", 105, clikey, static_cast<int>(reason)))
         Log::Write(Log::LT_ERROR, L"LobbyGateChannel.cpp", 891,
                    L"[lobby-gate], send create-initial-user-name-ok fail; compose fail, cli-key:0x%I64X", clikey);
+    else
+        Send(&p);
 }
 
 // 0xc0550
@@ -1281,12 +1281,12 @@ void LobbyGateChannel::SendActivateGradeOk(unsigned long long clikey, int gameGr
     p.IsFragmentPacket = false;
     p.FragmentPacketCmd = 0;
     p.Allocate();
-    if (0 != p.Compose("hqiiqq", 107, clikey, gameGradeKey, gradeId, effectiveFrom, effectiveTo))
-        Send(&p);
-    else
+    if (0 == p.Compose("hqiiqq", 107, clikey, gameGradeKey, gradeId, effectiveFrom, effectiveTo))
         Log::Write(Log::LT_ERROR, L"LobbyGateChannel.cpp", 904,
                    L"[lobby-gate], send activate-grade-ok fail; compose fail, cli-key:0x%I64X, game-grade-key:%d, grade-id:%d",
                    clikey, gameGradeKey, gradeId);
+    else
+        Send(&p);
 }
 
 // 0xc0670
@@ -1300,12 +1300,12 @@ void LobbyGateChannel::SendActivateGradeFail(unsigned long long clikey, int keyT
     p.IsFragmentPacket = false;
     p.FragmentPacketCmd = 0;
     p.Allocate();
-    if (0 != p.Compose("hqQiE", 108, clikey, keyType, key, static_cast<int>(reason)))
-        Send(&p);
-    else
+    if (0 == p.Compose("hqQiE", 108, clikey, keyType, key, static_cast<int>(reason)))
         Log::Write(Log::LT_ERROR, L"LobbyGateChannel.cpp", 917,
                    L"[lobby-gate], send activate-grade-fail fail; compose fail, cli-key:0x%I64X, key-type:%d, key:%d, reason:%d",
                    clikey, keyType, key, static_cast<int>(reason));
+    else
+        Send(&p);
 }
 
 // 0xc0790
