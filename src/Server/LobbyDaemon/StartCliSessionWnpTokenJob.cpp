@@ -82,22 +82,13 @@ void StartCliSessionWnpTokenJob::deallocate_me(void*, wchar_t const*, int)
 }
 
 // 0xd23a0
-StartCliSessionWnpTokenJob::StartCliSessionWnpTokenJob(CliSession* owner) : CliSessionJob(owner), _lgate(nullptr), _clikey(0)
+StartCliSessionWnpTokenJob::StartCliSessionWnpTokenJob(CliSession* owner)
+    : CliSessionJob(owner), _lgate(nullptr), _clikey(0),
+      _nptoken(ID128_ID_ZERO), _portalAccountId(ID128_ID_ZERO), _gameAccountId(ID128_ID_ZERO), _userId(ID128_ID_ZERO),
+      _activityStatus(0), _activitySlotId(ID128_ID_ZERO), _gameTimeSchedule(nullptr),
+      _lastGetUserPromotionStatusTargetType(0), _lastGetUserPromotionStatusPromotionId(0)
 {
-    _nptoken.id[0] = 0;
-    _nptoken.id[1] = 0;
-    _portalAccountId.id[0] = 0;
-    _portalAccountId.id[1] = 0;
-    _gameAccountId.id[0] = 0;
-    _gameAccountId.id[1] = 0;
-    _userId.id[0] = 0;
-    _userId.id[1] = 0;
-    _activityStatus = 0;
-    _activitySlotId.id[0] = 0;
-    _activitySlotId.id[1] = 0;
-    _gameTimeSchedule = nullptr;
-    _lastGetUserPromotionStatusTargetType = 0;
-    _lastGetUserPromotionStatusPromotionId = 0;
+    // The original copies the zero ids from the global ID128_ID_ZERO (rva 0x12D870).
     _gameAccountName[0] = 0;
     _userName[0] = 0;
     _timeBasedPromotionIds[0] = 0;
@@ -107,9 +98,8 @@ StartCliSessionWnpTokenJob::StartCliSessionWnpTokenJob(CliSession* owner) : CliS
 // 0xd24a0 (scalar deleting destructor 0xd2480)
 StartCliSessionWnpTokenJob::~StartCliSessionWnpTokenJob()
 {
-    // The original clears the NP token first.
-    _nptoken.id[0] = 0;
-    _nptoken.id[1] = 0;
+    // The original clears the NP token first (copy of ID128_ID_ZERO).
+    _nptoken = ID128_ID_ZERO;
     if (_lgate != nullptr)
         _lgate->removeReferenceCount(kFile, 132);
     if (_gameTimeSchedule != nullptr)
