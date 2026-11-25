@@ -2,7 +2,7 @@
 #pragma once
 #include <stddef.h>
 #include <map>
-#include "AuctionDeliverJob.h"
+#include "RefCntPoolObj.h"
 #include "Lock.h"
 #include "StlMemory.h"
 #include "TimerQueue.h"

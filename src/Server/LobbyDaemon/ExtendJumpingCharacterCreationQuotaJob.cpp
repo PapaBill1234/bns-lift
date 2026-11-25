@@ -33,7 +33,7 @@ void* ExtendJumpingCharacterCreationQuotaJob::_vtbl()
 }
 
 // 0x2a440
-ExtendJumpingCharacterCreationQuotaJob::ExtendJumpingCharacterCreationQuotaJob(CliSession*)
+ExtendJumpingCharacterCreationQuotaJob::ExtendJumpingCharacterCreationQuotaJob(CliSession* owner) : CliSessionJob(owner)  // LIFT: base init only (fix7 layout)
 {
     LIFT_STUB(0x2a440);
 }
@@ -159,7 +159,7 @@ void* UpgradeJumpingCharacterStateJob::_vtbl()
 }
 
 // 0x2d4c0
-UpgradeJumpingCharacterStateJob::UpgradeJumpingCharacterStateJob(CliSession*)
+UpgradeJumpingCharacterStateJob::UpgradeJumpingCharacterStateJob(CliSession* owner) : CliSessionJob(owner)  // LIFT: base init only (fix7 layout)
 {
     LIFT_STUB(0x2d4c0);
 }

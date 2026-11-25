@@ -1,6 +1,10 @@
 // LobbyToken.obj (LobbyDaemon PDB, 2019 + PDB).
 #pragma once
+#include <map>
+#include "Lock.h"
+#include "LobbyTick.h"
 #include "RefCntList.h"
+#include "StlMemory.h"
 
 class CliSession;
 class Packet;
@@ -55,13 +59,36 @@ static_assert(sizeof(EnterGameWorldToken) == 0x58, "sizeof EnterGameWorldToken")
 static_assert(offsetof(EnterGameWorldToken, _targetGameWorld) == 0x48, "EnterGameWorldToken::_targetGameWorld");
 static_assert(offsetof(EnterGameWorldToken, _targetPcid) == 0x50, "EnterGameWorldToken::_targetPcid");
 
-// ❓ The PDB gives the desk layout (0x96c30). Wait for the LobbyTick::Listener base from lift-lobbydaemon-12.
-class LobbyTokenDesk
+// LIFT: PDB layout (sizeof 0xa8, LobbyTick::Listener base). Layout from tools/pdbcls.py LobbyDaemon LobbyTokenDesk (fix7).
+// The function bodies are still LIFT_STUB.
+class LobbyTokenDesk : public LobbyTick::Listener
 {
 public:
+    typedef unsigned long long (*LobbyTokenkeyGenerater)();
+    typedef std::map<unsigned long long, LobbyToken*, std::less<unsigned long long>,
+                     StlAllocator<std::pair<unsigned long long, LobbyToken*>, 2> > TokenMap;
+
     LobbyTokenDesk(long, unsigned long long (__cdecl*)(void));  // 0x96c30
     virtual ~LobbyTokenDesk();  // 0x96d70
     bool Issue(LobbyToken*);  // 0x96e20
     LobbyToken* Verify(int, unsigned long long, unsigned long long, unsigned long, bool&);  // 0x96fb0
     virtual bool Tick(long long);  // 0x97240
+
+private:
+    friend struct LobbyTokenDeskLayoutCheck;  // LIFT: checks the private PDB offsets.
+
+    long _tokenLifeTime;  // +0x38
+    LobbyTokenkeyGenerater _keygen;  // +0x40
+    TokenMap _tokenmap;  // +0x48
+    RefCntList _tokenlist;  // +0x68
+    CriticalSection _lock;  // +0x80
+};
+static_assert(sizeof(LobbyTokenDesk) == 0xa8, "sizeof LobbyTokenDesk");
+struct LobbyTokenDeskLayoutCheck
+{
+    static_assert(offsetof(LobbyTokenDesk, _tokenLifeTime) == 0x38, "LobbyTokenDesk::_tokenLifeTime");
+    static_assert(offsetof(LobbyTokenDesk, _keygen) == 0x40, "LobbyTokenDesk::_keygen");
+    static_assert(offsetof(LobbyTokenDesk, _tokenmap) == 0x48, "LobbyTokenDesk::_tokenmap");
+    static_assert(offsetof(LobbyTokenDesk, _tokenlist) == 0x68, "LobbyTokenDesk::_tokenlist");
+    static_assert(offsetof(LobbyTokenDesk, _lock) == 0x80, "LobbyTokenDesk::_lock");
 };

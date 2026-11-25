@@ -15,7 +15,7 @@ void ChangeCharacterAppearanceJob::deallocate_me(void*, wchar_t const*, int)
 }
 
 // 0x1abc0
-ChangeCharacterAppearanceJob::ChangeCharacterAppearanceJob(CliSession*)
+ChangeCharacterAppearanceJob::ChangeCharacterAppearanceJob(CliSession* owner) : CliSessionJob(owner)  // LIFT: base init only (fix7 layout)
 {
     LIFT_STUB(0x1abc0);
 }

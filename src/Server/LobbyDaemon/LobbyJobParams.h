@@ -3,6 +3,8 @@
 #pragma once
 #include <stddef.h>
 
+struct LobbyServiceItem;
+
 struct WorldKickFailParam
 {
     short reason;
@@ -29,3 +31,21 @@ struct DeleteCharacterOkParam
 };
 static_assert(sizeof(DeleteCharacterOkParam) == 0x2, "sizeof DeleteCharacterOkParam");
 static_assert(offsetof(DeleteCharacterOkParam, level) == 0x0, "DeleteCharacterOkParam::level");
+
+// LIFT: fix7. AccountInventoryLobbyPacketHandler (0xb0c0) fills a local of this type.
+struct GetCharacterGoodsCountOkParam
+{
+    int goodsCount;
+    int takedGoodsCount;
+};
+static_assert(sizeof(GetCharacterGoodsCountOkParam) == 0x8, "sizeof GetCharacterGoodsCountOkParam");
+static_assert(offsetof(GetCharacterGoodsCountOkParam, goodsCount) == 0x0, "GetCharacterGoodsCountOkParam::goodsCount");
+static_assert(offsetof(GetCharacterGoodsCountOkParam, takedGoodsCount) == 0x4, "GetCharacterGoodsCountOkParam::takedGoodsCount");
+
+// LIFT: fix7. AccountInventoryLobbyPacketHandler (0xa160) fills a local of this type.
+struct RetrieveSingleWarehouseItemOkParam
+{
+    LobbyServiceItem* item;
+};
+static_assert(sizeof(RetrieveSingleWarehouseItemOkParam) == 0x8, "sizeof RetrieveSingleWarehouseItemOkParam");
+static_assert(offsetof(RetrieveSingleWarehouseItemOkParam, item) == 0x0, "RetrieveSingleWarehouseItemOkParam::item");

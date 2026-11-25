@@ -1,6 +1,7 @@
 // PcCafe.obj (LobbyDaemon PDB, 2019 + PDB). Wave 0: declarations of the stubbed functions only.
 // LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
 #pragma once
+#include <stddef.h>
 
 class CliSession;
 class TencentNetBar;
@@ -32,10 +33,24 @@ protected:
     friend class CliSession;
 };
 
-class TencentNetBar
+// LIFT: PDB layout (sizeof 0x10, PcCafe base) (fix7). The function bodies are still LIFT_STUB. The PDB ctors, dtor,
+// GetType, onUnset, Validate and IsValid have no own symbol in the lift scope. They are not declared. So the class
+// stays abstract (PcCafe::GetType and onUnset are pure).
+class TencentNetBar : public PcCafe
 {
 public:
     static TencentNetBar* CreateFromExternalAuthData(char const*, CliSession const*);  // 0x62e90
 private:
     virtual void onSet(CliSession*);  // 0x63350
+
+    friend struct TencentNetBarLayoutCheck;  // LIFT: checks the private PDB offsets.
+
+    unsigned int _sigType;  // +0x8
+    unsigned int _level;  // +0xc
+};
+static_assert(sizeof(TencentNetBar) == 0x10, "sizeof TencentNetBar");
+struct TencentNetBarLayoutCheck
+{
+    static_assert(offsetof(TencentNetBar, _sigType) == 0x8, "TencentNetBar::_sigType");
+    static_assert(offsetof(TencentNetBar, _level) == 0xc, "TencentNetBar::_level");
 };

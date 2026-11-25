@@ -1,7 +1,9 @@
 // AccountInventoryChannel.obj (LobbyDaemon PDB, 2019 + PDB). Wave 0: declarations of the stubbed functions only.
-// LIFT: AccountInventoryChannel has its PDB layout (ld-18 batch 1). AccountInventorySessionHandler has no layout yet.
+// LIFT: AccountInventoryChannel has its PDB layout (ld-18 batch 1). AccountInventorySessionHandler has its PDB layout (fix7).
 #pragma once
 #include <stddef.h>
+#include "Channel.h"
+#include "Lock.h"
 #include "TransactionChannel.h"
 
 class Packet;
@@ -34,11 +36,26 @@ static_assert(sizeof(AccountInventoryChannel) == 0x140, "sizeof AccountInventory
 static_assert(offsetof(AccountInventoryChannel, _handler) == 0x30, "AccountInventoryChannel::_handler");
 static_assert(offsetof(AccountInventoryChannel, _daemonInvalidInfoKey) == 0x38, "AccountInventoryChannel::_daemonInvalidInfoKey");
 
-class AccountInventorySessionHandler
+// LIFT: PDB layout (sizeof 0x30, SessionHandler base). The PDB ctor, dtor, enterConnectLock and leaveConnectLock
+// have no own symbol in the lift scope. They are not declared.
+class AccountInventorySessionHandler : public SessionHandler
 {
 public:
     virtual bool OnAccept(Session const*) const;  // 0x8020
     virtual bool OnConnect(Session const*, bool) const;  // 0x8080
     virtual void OnClose(Session const*, bool) const;  // 0x81b0
     virtual bool PacketHandler(Session const*, Packet const*) const;  // 0x82f0
+
+private:
+    friend struct AccountInventorySessionHandlerLayoutCheck;  // LIFT: checks the private PDB offsets.
+    // LIFT: access helper. AccountInventoryChannel::Connect (0x6500) locks _connectLock (HR: handler->_connectLock).
+    // ❓ The PDB has no friend records.
+    friend class AccountInventoryChannel;
+
+    CriticalSection _connectLock;  // +0x8
+};
+static_assert(sizeof(AccountInventorySessionHandler) == 0x30, "sizeof AccountInventorySessionHandler");
+struct AccountInventorySessionHandlerLayoutCheck
+{
+    static_assert(offsetof(AccountInventorySessionHandler, _connectLock) == 0x8, "AccountInventorySessionHandler::_connectLock");
 };

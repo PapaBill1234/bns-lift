@@ -21,7 +21,7 @@ void* TryEnterGameWorldJob::_vtbl()
 }
 
 // 0x7b920
-TryEnterGameWorldJob::TryEnterGameWorldJob(CliSession*)
+TryEnterGameWorldJob::TryEnterGameWorldJob(CliSession* owner) : CliSessionJob(owner)  // LIFT: base init only (fix7 layout)
 {
     LIFT_STUB(0x7b920);
 }

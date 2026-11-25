@@ -1,14 +1,18 @@
-// PcCafeMileage.obj (LobbyDaemon PDB, 2019 + PDB). Wave 0: declarations of the stubbed functions only.
-// LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
+// PcCafeMileage.obj (LobbyDaemon PDB, 2019 + PDB). Layout from tools/pdbcls.py LobbyDaemon PcCafeMileage.
+// LIFT: header layout only (fix7). The function bodies are still LIFT_STUB.
 #pragma once
+#include "Mileage.h"
 
 class CliSession;
 class LobbyMessage;
 
-class PcCafeMileage
+// LIFT: PDB layout (sizeof 0x1368, Mileage base, no own members). The PDB ctor PcCafeMileage(int) and the virtual
+// dtor have no own symbol in the lift scope. They are not declared.
+class PcCafeMileage : public Mileage
 {
 public:
     virtual void Accept(LobbyMessage*);  // 0x633b0
     virtual bool Start(CliSession*, long long);  // 0x63400
     virtual bool Stop(CliSession*, long long, long long*);  // 0x636b0
 };
+static_assert(sizeof(PcCafeMileage) == 0x1368, "sizeof PcCafeMileage");
