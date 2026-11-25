@@ -426,7 +426,8 @@ bool NPChannel::Connect(unsigned long long id, unsigned int portId, unsigned lon
 }
 
 // 0x53D0
-bool NPChannel::SendMsg(_StsMsg* msg, bool response, void* context)
+// LIFT: noinline. The SmartCouponDaemon and LobbyDaemon originals keep a call at every call site.
+__declspec(noinline) bool NPChannel::SendMsg(_StsMsg* msg, bool response, void* context)
 {
     if (msg == nullptr)
     {

@@ -1,5 +1,4 @@
-// NPServiceChannel.obj (LobbyDaemon PDB, 2019 + PDB). Wave 0: declarations of the stubbed functions only.
-// LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
+// NPServiceChannel.obj (LobbyDaemon PDB, 2019 + PDB). Class layouts from the PDB.
 #pragma once
 #include <stddef.h>
 
@@ -58,6 +57,7 @@ static_assert(offsetof(_StsMsgRequestFriendSendMessage, pwszMessageName) == 0x40
 static_assert(offsetof(_StsMsgRequestFriendSendMessage, contents) == 0x48, "_StsMsgRequestFriendSendMessage::contents");
 }  // namespace StsMsgLib
 
+// PDB NPGameServiceChannel (sizeof 0x40, NPChannel base, no own members).
 class NPGameServiceChannel : public NPChannel
 {
 public:
@@ -124,17 +124,19 @@ static_assert(sizeof(NPLobbyJobTransaction) == 0x18, "sizeof NPLobbyJobTransacti
 static_assert(offsetof(NPLobbyJobTransaction, _jobid) == 0x08, "NPLobbyJobTransaction::_jobid");
 static_assert(offsetof(NPLobbyJobTransaction, _task) == 0x14, "NPLobbyJobTransaction::_task");
 
-class NPServiceChannelManager
+// PDB NPServiceChannelManager (sizeof 0x18, NPMessageHandler base).
+class NPServiceChannelManager : public NPMessageHandler
 {
 public:
     bool Initialize(unsigned int, unsigned long, unsigned short, long);  // 0xcfba0
     virtual bool OnConnect(NPChannel*, bool) const;  // 0xcfdb0
     virtual bool OnClose(NPChannel*, bool) const;  // 0xcff70
+    virtual bool HandleMessage(NPChannel*, StsMsgLib::_StsMsg*, void*) const;  // 0xd0100
 
-    // LIFT: PDB layout (sizeof 0x18). The PDB base NPMessageHandler (vptr at +0) is not declared here.
     bool _init;
     NPGameServiceChannel* _gameServChannel;
 };
 static_assert(offsetof(NPServiceChannelManager, _init) == 0x8, "NPServiceChannelManager::_init");
 static_assert(offsetof(NPServiceChannelManager, _gameServChannel) == 0x10, "NPServiceChannelManager::_gameServChannel");
 static_assert(sizeof(NPServiceChannelManager) == 0x18, "sizeof NPServiceChannelManager");
+static_assert(sizeof(NPGameServiceChannel) == 0x40, "sizeof NPGameServiceChannel");

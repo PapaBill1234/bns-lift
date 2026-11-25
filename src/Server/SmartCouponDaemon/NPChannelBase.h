@@ -387,6 +387,12 @@ static_assert(sizeof(_StsMsgInfoResponse) == 0x58, "sizeof StsMsgLib::_StsMsgInf
 
 struct _StsMsgResponse : public _StsMsg
 {
+    // LIFT: PDB overrides. LobbyDaemon defines them in NPServiceChannel.cpp (NPServiceChannel.obj). Declarations only:
+    // SmartCouponDaemon builds no response object, so it emits no _StsMsgResponse vftable.
+    virtual ECommand GetCommand();
+    virtual unsigned int GetTransactionId();
+    virtual EMessageType GetMessageType();
+
     _StsMsgInfoResponse msgInfo;
 };
 static_assert(sizeof(_StsMsgResponse) == 0x60, "sizeof StsMsgLib::_StsMsgResponse");
