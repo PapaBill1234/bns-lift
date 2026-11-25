@@ -31,6 +31,11 @@ private:
     friend struct LobbyTokenLayoutCheck;  // LIFT: check private PDB field offsets (0x96750).
     // LIFT: access helper. HandleLobbyGame_EnterWorldReq (0x89270) reads _clisession (the PDB has no friend records).
     friend bool HandleLobbyGame_EnterWorldReq(SharedChannel*, Packet const*);
+    // LIFT: access helpers (the PDB has no friend records). LobbyTokenDesk::Issue (0x96e20) sets _tokenkey and _expire.
+    // EndWaitGameWorldJob::endWait (0x4b460) and LeaveGameWorldJob::leaveGameWorld (0x87e90) read _tokenkey.
+    friend class LobbyTokenDesk;
+    friend class EndWaitGameWorldJob;
+    friend class LeaveGameWorldJob;
 
     unsigned long long _tokenkey;
     CliSession* _clisession;
@@ -46,12 +51,17 @@ struct LobbyTokenLayoutCheck
     static_assert(offsetof(LobbyToken, _expire) == 0x40, "LobbyToken::_expire");
 };
 
-// LIFT: PDB layout (sizeof 0x58). The definitions of the two virtual functions are not lifted yet.
+// LIFT: PDB layout (sizeof 0x58). The PDB members are private; the lift keeps them public.
 class EnterGameWorldToken : public LobbyToken
 {
 public:
-    virtual ~EnterGameWorldToken();
-    virtual Kind GetKind() const;
+    // The constructor is inline (EndWaitGameWorldJob::endWait, 0x4b460).
+    EnterGameWorldToken(CliSession* clisession, short targetGameWorld, unsigned long long targetPcid)
+        : LobbyToken(clisession), _targetGameWorld(targetGameWorld), _targetPcid(targetPcid)
+    {
+    }
+    virtual ~EnterGameWorldToken();  // 0x967d0 (scalar deleting destructor, shared)
+    virtual Kind GetKind() const;  // 0xe3ec0
     short _targetGameWorld;
     unsigned long long _targetPcid;
 };
@@ -59,8 +69,19 @@ static_assert(sizeof(EnterGameWorldToken) == 0x58, "sizeof EnterGameWorldToken")
 static_assert(offsetof(EnterGameWorldToken, _targetGameWorld) == 0x48, "EnterGameWorldToken::_targetGameWorld");
 static_assert(offsetof(EnterGameWorldToken, _targetPcid) == 0x50, "EnterGameWorldToken::_targetPcid");
 
+// PDB layout (sizeof 0x48, LobbyToken base).
+class LeaveGameWorldToken : public LobbyToken
+{
+public:
+    // The constructor is inline (LeaveGameWorldJob::leaveGameWorld, 0x87e90).
+    LeaveGameWorldToken(CliSession* clisession) : LobbyToken(clisession) {}
+    virtual ~LeaveGameWorldToken();  // 0x967d0 (scalar deleting destructor, shared)
+    virtual Kind GetKind() const;  // 0x99980 (folded)
+};
+static_assert(sizeof(LeaveGameWorldToken) == 0x48, "sizeof LeaveGameWorldToken");
+
 // LIFT: PDB layout (sizeof 0xa8, LobbyTick::Listener base). Layout from tools/pdbcls.py LobbyDaemon LobbyTokenDesk (fix7).
-// The function bodies are still LIFT_STUB.
+// The function bodies except Issue are still LIFT_STUB.
 class LobbyTokenDesk : public LobbyTick::Listener
 {
 public:

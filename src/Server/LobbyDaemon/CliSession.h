@@ -535,6 +535,11 @@ private:
 
     // PDB static member: static __declspec(thread) WaitInfo _waitResult (S_GTHREAD32, TLS +0x10).
     // LIFT: not declared. A new TLS variable reorders the LTCG TLS block (see CliSession.cpp).
+
+    // LIFT: access helpers (the PDB has no friend records). EndWaitGameWorldJob::endWait (0x4b460) and
+    // GiveupWaitGameWorldJob::giveupWait (0x530d0) read _pcid; endWait sets _waitPos.
+    friend class EndWaitGameWorldJob;
+    friend class GiveupWaitGameWorldJob;
 };
 static_assert(sizeof(GameServiceLocation) == 0x30, "sizeof GameServiceLocation");
 
@@ -582,6 +587,9 @@ public:
 private:
     short _gatewid;
     GateNode* _node;
+
+    // LIFT: access helper (the PDB has no friend records). EndWaitGameWorldJob::init (0x4b150) reads _gatewid.
+    friend class EndWaitGameWorldJob;
 };
 static_assert(sizeof(LobbyGatePresence) == 0x18, "sizeof LobbyGatePresence");
 

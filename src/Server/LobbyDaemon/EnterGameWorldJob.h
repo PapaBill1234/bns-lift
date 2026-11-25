@@ -1,5 +1,4 @@
-// EnterGameWorldJob.obj (LobbyDaemon PDB, 2019 + PDB). Wave 0: declarations of the stubbed functions only.
-// LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
+// EnterGameWorldJob.obj (LobbyDaemon PDB, 2019 + PDB). Layout from tools/pdbcls.py LobbyDaemon EnterGameWorldJob.
 #pragma once
 #include <stddef.h>
 #include "CliSessionJob.h"
@@ -13,8 +12,15 @@ struct LobbyJobDef;
 class EnterGameWorldJob : public CliSessionJob
 {
 public:
+    enum State
+    {
+        INIT = 0,
+        ENTER_GAME_WORLD = 1,
+        FIN = 2
+    };
+
     EnterGameWorldJob(CliSession* owner) : CliSessionJob(owner), _gamed(nullptr), _gametid(0), _pcid(0) {}
-    virtual ~EnterGameWorldJob() {}
+    virtual ~EnterGameWorldJob();  // 0x84ee0 (scalar deleting destructor)
     virtual LobbyJobDef const* GetDefinition() const;  // 0x84e00
     static void* _vtbl();  // 0x84e60
     bool Initialize(GamedChannel*, unsigned long long, unsigned long long);  // 0x84f30
@@ -30,6 +36,7 @@ public:
     unsigned long long _pcid;
 
     static ObjPool _pool;  // LIFT: no definition yet (like CliSession::_pool).
+    static LobbyJobDef _def;
 };
 static_assert(sizeof(EnterGameWorldJob) == 0x70, "sizeof EnterGameWorldJob");
 static_assert(offsetof(EnterGameWorldJob, _gamed) == 0x58, "EnterGameWorldJob::_gamed");
