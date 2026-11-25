@@ -113,56 +113,57 @@ bool HandleLobbyManage_KickReq(Session const*, Packet const*)
 // 0x590a0
 bool HandleLobbyManage_CleanupGameAccountIdIndexReq(Session const* session, Packet const* packet)
 {
-    id128 account;
-    account.id[0] = 0;
-    account.id[1] = 0;
+    id128 account = ID128_GUID_ZERO;
     unsigned long long id = 0;
     short cmd = 0;
     unsigned long long tid = 0;
-    if (packet->Decompose("hqo", &cmd, &tid, &account) == 0)
+    if (packet->Decompose("hqo", &cmd, &tid, &account) != 0)
+    {
+        CliSessionManager* mgr = LobbyDaemon::_instance != nullptr ? LobbyDaemon::_instance->_clisessionMgr : nullptr;
+        if (mgr != nullptr)
+        {
+            CliSession* cs = mgr->Select_index_account(account);
+            if (cs != nullptr)
+            {
+                mgr->Delete_index_account(account);
+                ManageChannel::SendCleanupGameAccountIdIndexOk(session, tid);
+                if (session != nullptr)
+                    id = session->_id;
+                int const state = cs->_state;
+                Log::Write(Log::LT_DEBUG, MANAGE_HANDLER_FILE, 168,
+                           L"[manage], handle cleanup game-account-id index req ok, cli-key:0x%I64X, cli-state:%d.%d, session-id:0x%I64X, tid:0x%I64X, game-account-id:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
+                           cs->_clikey, static_cast<int>(static_cast<unsigned short>(static_cast<unsigned int>(state) >> 16)),
+                           static_cast<int>(static_cast<unsigned short>(state)), id, tid, ACCOUNT_GUID_ARGS(account));
+                cs->removeReferenceCount(MANAGE_HANDLER_FILE, 170);
+            }
+            else
+            {
+                if (session != nullptr)
+                    id = session->_id;
+                Log::Write(Log::LT_ERROR, MANAGE_HANDLER_FILE, 159,
+                           L"[manage], handle cleanup game-account-id index req fail; no such game-account-id index, session-id:0x%I64X, tid:0x%I64X, game-account-id:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
+                           id, tid, ACCOUNT_GUID_ARGS(account));
+                ManageChannel::SendCleanupGameAccountIdIndexFail(session, tid, 4);
+            }
+        }
+        else
+        {
+            if (session != nullptr)
+                id = session->_id;
+            Log::Write(Log::LT_ERROR, MANAGE_HANDLER_FILE, 152,
+                       L"[manage], handle cleanup game-account-id index req fail; cli-session manager unavailable, session-id:0x%I64X, tid:0x%I64X, game-account-id:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
+                       id, tid, ACCOUNT_GUID_ARGS(account));
+            ManageChannel::SendCleanupGameAccountIdIndexFail(session, tid, 2);
+        }
+    }
+    else
     {
         if (session != nullptr)
             id = session->_id;
         Log::Write(Log::LT_ERROR, MANAGE_HANDLER_FILE, 146,
                    L"[manage], handle cleanup game-account-id index req fail; decompose fail, session-id:0x%I64X, tid:0x%I64X, game-account-id:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
                    id, tid, ACCOUNT_GUID_ARGS(account));
-        return true;
     }
-
-    CliSessionManager* mgr = LobbyDaemon::_instance != nullptr ? LobbyDaemon::_instance->_clisessionMgr : nullptr;
-    if (mgr == nullptr)
-    {
-        if (session != nullptr)
-            id = session->_id;
-        Log::Write(Log::LT_ERROR, MANAGE_HANDLER_FILE, 152,
-                   L"[manage], handle cleanup game-account-id index req fail; cli-session manager unavailable, session-id:0x%I64X, tid:0x%I64X, game-account-id:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
-                   id, tid, ACCOUNT_GUID_ARGS(account));
-        ManageChannel::SendCleanupGameAccountIdIndexFail(session, tid, 2);
-        return true;
-    }
-
-    CliSession* cs = mgr->Select_index_account(account);
-    if (cs == nullptr)
-    {
-        if (session != nullptr)
-            id = session->_id;
-        Log::Write(Log::LT_ERROR, MANAGE_HANDLER_FILE, 159,
-                   L"[manage], handle cleanup game-account-id index req fail; no such game-account-id index, session-id:0x%I64X, tid:0x%I64X, game-account-id:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
-                   id, tid, ACCOUNT_GUID_ARGS(account));
-        ManageChannel::SendCleanupGameAccountIdIndexFail(session, tid, 4);
-        return true;
-    }
-
-    mgr->Delete_index_account(account);
-    ManageChannel::SendCleanupGameAccountIdIndexOk(session, tid);
-    if (session != nullptr)
-        id = session->_id;
-    int const state = cs->_state;
-    Log::Write(Log::LT_DEBUG, MANAGE_HANDLER_FILE, 168,
-               L"[manage], handle cleanup game-account-id index req ok, cli-key:0x%I64X, cli-state:%d.%d, session-id:0x%I64X, tid:0x%I64X, game-account-id:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
-               cs->_clikey, static_cast<int>(static_cast<unsigned short>(static_cast<unsigned int>(state) >> 16)),
-               static_cast<int>(static_cast<unsigned short>(state)), id, tid, ACCOUNT_GUID_ARGS(account));
-    cs->removeReferenceCount(MANAGE_HANDLER_FILE, 170);
     return true;
 }
 
@@ -174,7 +175,47 @@ bool HandleLobbyManage_CleanupPcidIndexReq(Session const* session, Packet const*
     unsigned long long tid = 0;
     unsigned long long pcid = 0;
     short wid = 0;
-    if (packet->Decompose("hqqh", &cmd, &tid, &pcid, &wid) == 0)
+    if (packet->Decompose("hqqh", &cmd, &tid, &pcid, &wid) != 0)
+    {
+        CliSessionManager* mgr = LobbyDaemon::_instance != nullptr ? LobbyDaemon::_instance->_clisessionMgr : nullptr;
+        if (mgr != nullptr)
+        {
+            CliSession* cs = mgr->Select_index_pcid(wid, pcid);
+            if (cs != nullptr)
+            {
+                mgr->Delete_index_pcid(wid, pcid);
+                ManageChannel::SendCleanupPcidIndexOk(session, tid);
+                if (session != nullptr)
+                    id = session->_id;
+                int const state = cs->_state;
+                Log::Write(Log::LT_DEBUG, MANAGE_HANDLER_FILE, 211,
+                           L"[manage], handle cleanup pc-id index ok, cli-key:0x%I64X, cli-state:%d.%d, session-id:0x%I64X, tid:0x%I64X, pcid:0x%I64X, wid:%d",
+                           cs->_clikey, static_cast<int>(static_cast<unsigned short>(static_cast<unsigned int>(state) >> 16)),
+                           static_cast<int>(static_cast<unsigned short>(state)), id, tid, pcid, static_cast<int>(wid));
+                cs->removeReferenceCount(MANAGE_HANDLER_FILE, 213);
+            }
+            else
+            {
+                if (session != nullptr)
+                    id = session->_id;
+                Log::Write(Log::LT_ERROR, MANAGE_HANDLER_FILE, 201,
+                           L"[manage], handle cleanup pc-id index fail; no such pc-id index, session-id:0x%I64X, tid:0x%I64X, pcid:0x%I64X, wid:%d",
+                           id, tid, pcid, static_cast<int>(wid));
+                ManageChannel::SendCleanupPcidIndexFail(session, tid, 4);
+            }
+        }
+        else
+        {
+            if (session != nullptr)
+                id = session->_id;
+            Log::Write(Log::LT_DEBUG, MANAGE_HANDLER_FILE, 194,
+                       L"[manage], handle cleanup pc-id index fail; cli-session manager not available, session-id:0x%I64X, tid:0x%I64X, pcid:0x%I64X, wid:%d",
+                       id, tid, pcid, static_cast<int>(wid));
+            ManageChannel::SendCleanupPcidIndexFail(session, tid, 2);
+        }
+        return true;
+    }
+    else
     {
         if (session != nullptr)
             id = session->_id;
@@ -183,42 +224,6 @@ bool HandleLobbyManage_CleanupPcidIndexReq(Session const* session, Packet const*
                    id, tid, pcid, static_cast<int>(wid));
         return false;
     }
-
-    CliSessionManager* mgr = LobbyDaemon::_instance != nullptr ? LobbyDaemon::_instance->_clisessionMgr : nullptr;
-    if (mgr == nullptr)
-    {
-        if (session != nullptr)
-            id = session->_id;
-        Log::Write(Log::LT_DEBUG, MANAGE_HANDLER_FILE, 194,
-                   L"[manage], handle cleanup pc-id index fail; cli-session manager not available, session-id:0x%I64X, tid:0x%I64X, pcid:0x%I64X, wid:%d",
-                   id, tid, pcid, static_cast<int>(wid));
-        ManageChannel::SendCleanupPcidIndexFail(session, tid, 2);
-        return true;
-    }
-
-    CliSession* cs = mgr->Select_index_pcid(wid, pcid);
-    if (cs == nullptr)
-    {
-        if (session != nullptr)
-            id = session->_id;
-        Log::Write(Log::LT_ERROR, MANAGE_HANDLER_FILE, 201,
-                   L"[manage], handle cleanup pc-id index fail; no such pc-id index, session-id:0x%I64X, tid:0x%I64X, pcid:0x%I64X, wid:%d",
-                   id, tid, pcid, static_cast<int>(wid));
-        ManageChannel::SendCleanupPcidIndexFail(session, tid, 4);
-        return true;
-    }
-
-    mgr->Delete_index_pcid(wid, pcid);
-    ManageChannel::SendCleanupPcidIndexOk(session, tid);
-    if (session != nullptr)
-        id = session->_id;
-    int const state = cs->_state;
-    Log::Write(Log::LT_DEBUG, MANAGE_HANDLER_FILE, 211,
-               L"[manage], handle cleanup pc-id index ok, cli-key:0x%I64X, cli-state:%d.%d, session-id:0x%I64X, tid:0x%I64X, pcid:0x%I64X, wid:%d",
-               cs->_clikey, static_cast<int>(static_cast<unsigned short>(static_cast<unsigned int>(state) >> 16)),
-               static_cast<int>(static_cast<unsigned short>(state)), id, tid, pcid, static_cast<int>(wid));
-    cs->removeReferenceCount(MANAGE_HANDLER_FILE, 213);
-    return true;
 }
 
 // 0x59820

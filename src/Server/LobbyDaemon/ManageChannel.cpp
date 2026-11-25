@@ -77,74 +77,76 @@ bool ManageSessionHandler::PacketHandler(Session const* session, Packet const* p
     }
 
     short cmd = header[1].size;
-    if (static_cast<unsigned short>(cmd - 1) > 15u)
+    if (static_cast<unsigned short>(cmd - 1) <= 15u)
     {
-        Log::Write(Log::LT_ERROR, MANAGE_CHANNEL_FILE, 71,
-                   L"[manage], handle packet failed; packet command out of range, cmd:%d, session-id:0x%I64X",
-                   static_cast<int>(cmd), session->_id);
-        return false;
-    }
-
-    LobbyManagePacketHandlerDef const* def = &LobbyManagePacketLobbySideHandlerList[cmd];
-    if (def->handler == nullptr)
-    {
-        Log::Write(Log::LT_ERROR, MANAGE_CHANNEL_FILE, 78,
-                   L"[manage], handle packet failed; handler not exists, cmd:%d, session-id:0x%I64X",
-                   static_cast<int>(cmd), session->_id);
-        return false;
-    }
-
-    bool result = false;
-    ManageChannel* channel = static_cast<ManageChannel*>(session->GetChannel());
-    if (!def->auth)
-    {
-        Log::Write(Log::LT_DEBUG, MANAGE_CHANNEL_FILE, 87, L"[manage], handle begin, cmd:%d, session-id:0x%I64X",
-                   static_cast<int>(cmd), session->_id);
-        result = reinterpret_cast<Daemon::PacketHandler>(def->handler)(session, packet);
-        Log::Write(Log::LT_DEBUG, MANAGE_CHANNEL_FILE, 89, L"[manage], handle end, cmd:%d, session-id:0x%I64X",
-                   static_cast<int>(cmd), session->_id);
-    }
-    else
-    {
-        if (channel == nullptr)
+        LobbyManagePacketHandlerDef const* def = &LobbyManagePacketLobbySideHandlerList[cmd];
+        if (def->handler == nullptr)
         {
-            Log::Write(Log::LT_ERROR, MANAGE_CHANNEL_FILE, 115,
-                       L"[manage], handle packet fail; unknown handler type, cmd:%d, session-id:0x%I64X",
+            Log::Write(Log::LT_ERROR, MANAGE_CHANNEL_FILE, 78,
+                       L"[manage], handle packet failed; handler not exists, cmd:%d, session-id:0x%I64X",
                        static_cast<int>(cmd), session->_id);
             return false;
         }
-        if (def->fragment)
+
+        bool result = false;
+        ManageChannel* channel = static_cast<ManageChannel*>(session->GetChannel());
+        if (def->auth)
         {
-            bool completed = false;
-            ConcatenatePacket(session, packet, completed);
-            if (completed)
+            if (channel != nullptr)
             {
-                PacketConcatenater* concatenater = session->_concatenater;
-                Log::Write(Log::LT_DEBUG, MANAGE_CHANNEL_FILE, 100,
-                           L"[manage], handle begin, cmd:%d, session-id:0x%I64X, mgt-wid:%d", static_cast<int>(cmd),
-                           session->_id, static_cast<int>(channel->GetManageWid()));
-                reinterpret_cast<bool (*)(Session const*, PacketConcatenater*)>(def->handler)(session, concatenater);
-                Log::Write(Log::LT_DEBUG, MANAGE_CHANNEL_FILE, 102,
-                           L"[manage], handle end, cmd:%d, session-id:0x%I64X, mgt-wid:%d", static_cast<int>(cmd),
-                           session->_id, static_cast<int>(channel->GetManageWid()));
-                concatenater->Clear();
+                if (def->fragment)
+                {
+                    bool completed = false;
+                    ConcatenatePacket(session, packet, completed);
+                    if (completed)
+                    {
+                        PacketConcatenater* concatenater = session->_concatenater;
+                        Log::Write(Log::LT_DEBUG, MANAGE_CHANNEL_FILE, 100,
+                                   L"[manage], handle begin, cmd:%d, session-id:0x%I64X, mgt-wid:%d", static_cast<int>(cmd),
+                                   session->_id, static_cast<int>(channel->GetManageWid()));
+                        reinterpret_cast<bool (*)(Session const*, PacketConcatenater*)>(def->handler)(session, concatenater);
+                        Log::Write(Log::LT_DEBUG, MANAGE_CHANNEL_FILE, 102,
+                                   L"[manage], handle end, cmd:%d, session-id:0x%I64X, mgt-wid:%d", static_cast<int>(cmd),
+                                   session->_id, static_cast<int>(channel->GetManageWid()));
+                        concatenater->Clear();
+                    }
+                }
+                else
+                {
+                    Log::Write(Log::LT_DEBUG, MANAGE_CHANNEL_FILE, 108,
+                               L"[manage], handle begin, cmd:%d, session-id:0x%I64X, mgt-wid:%d", static_cast<int>(cmd),
+                               session->_id, static_cast<int>(channel->GetManageWid()));
+                    reinterpret_cast<Daemon::PacketHandler>(def->handler)(session, packet);
+                    Log::Write(Log::LT_DEBUG, MANAGE_CHANNEL_FILE, 110,
+                               L"[manage], handle end, cmd:%d, session-id:0x%I64X, mgt-wid:%d", static_cast<int>(cmd),
+                               session->_id, static_cast<int>(channel->GetManageWid()));
+                }
+                result = true;
+            }
+            else
+            {
+                Log::Write(Log::LT_ERROR, MANAGE_CHANNEL_FILE, 115,
+                           L"[manage], handle packet fail; unknown handler type, cmd:%d, session-id:0x%I64X",
+                           static_cast<int>(cmd), session->_id);
+                return result;
             }
         }
         else
         {
-            Log::Write(Log::LT_DEBUG, MANAGE_CHANNEL_FILE, 108,
-                       L"[manage], handle begin, cmd:%d, session-id:0x%I64X, mgt-wid:%d", static_cast<int>(cmd),
-                       session->_id, static_cast<int>(channel->GetManageWid()));
-            reinterpret_cast<Daemon::PacketHandler>(def->handler)(session, packet);
-            Log::Write(Log::LT_DEBUG, MANAGE_CHANNEL_FILE, 110,
-                       L"[manage], handle end, cmd:%d, session-id:0x%I64X, mgt-wid:%d", static_cast<int>(cmd),
-                       session->_id, static_cast<int>(channel->GetManageWid()));
+            Log::Write(Log::LT_DEBUG, MANAGE_CHANNEL_FILE, 87, L"[manage], handle begin, cmd:%d, session-id:0x%I64X",
+                       static_cast<int>(cmd), session->_id);
+            result = reinterpret_cast<Daemon::PacketHandler>(def->handler)(session, packet);
+            Log::Write(Log::LT_DEBUG, MANAGE_CHANNEL_FILE, 89, L"[manage], handle end, cmd:%d, session-id:0x%I64X",
+                       static_cast<int>(cmd), session->_id);
         }
-        result = true;
+        if (channel != nullptr)
+            channel->removeReferenceCount(SESSION_FILE, 1059);
+        return result;
     }
-    if (channel != nullptr)
-        channel->removeReferenceCount(SESSION_FILE, 1059);
-    return result;
+    Log::Write(Log::LT_ERROR, MANAGE_CHANNEL_FILE, 71,
+               L"[manage], handle packet failed; packet command out of range, cmd:%d, session-id:0x%I64X",
+               static_cast<int>(cmd), session->_id);
+    return false;
 }
 
 // LIFT: the senders below share one shape. The original inlines the Packet ctor and Session::Send(Packet const*).
@@ -164,12 +166,12 @@ void ManageChannel::SendKickOk(Session const* s, unsigned long long tid)
     if (s != nullptr)
     {
         MANAGE_PACKET_INIT(p);
-        if (0 != p.Compose("hq", 6, tid))
-            s->Send(&p);
-        else
+        if (0 == p.Compose("hq", 6, tid))
             Log::Write(Log::LT_ERROR, MANAGE_CHANNEL_FILE, 133,
                        L"[manage], send kick ok fail; compose packet fail; compose fail, tid:0x%I64X, session-id:0x%I64X", tid,
                        s->_id);
+        else
+            s->Send(&p);
     }
 }
 
@@ -179,12 +181,12 @@ void ManageChannel::SendKickFail(Session const* s, unsigned long long tid, short
     if (s != nullptr)
     {
         MANAGE_PACKET_INIT(p);
-        if (0 != p.Compose("hqE", 7, tid, static_cast<int>(reason)))
-            s->Send(&p);
-        else
+        if (0 == p.Compose("hqE", 7, tid, static_cast<int>(reason)))
             Log::Write(Log::LT_ERROR, MANAGE_CHANNEL_FILE, 148,
                        L"[manage], send kick fail fail; compose packet fail; compose fail, tid:0x%I64X, reason:%d, session-id:0x%I64X",
                        tid, static_cast<int>(reason), s->_id);
+        else
+            s->Send(&p);
     }
 }
 
@@ -194,12 +196,12 @@ void ManageChannel::SendCleanupGameAccountIdIndexOk(Session const* s, unsigned l
     if (s != nullptr)
     {
         MANAGE_PACKET_INIT(p);
-        if (0 != p.Compose("hq", 9, tid))
-            s->Send(&p);
-        else
+        if (0 == p.Compose("hq", 9, tid))
             Log::Write(Log::LT_ERROR, MANAGE_CHANNEL_FILE, 163,
                        L"[manage], send cleanup game-account-id index ok fail; compose fail, tid:0x%I64X, session-id:0x%I64X", tid,
                        s->_id);
+        else
+            s->Send(&p);
     }
 }
 
@@ -209,12 +211,12 @@ void ManageChannel::SendCleanupGameAccountIdIndexFail(Session const* s, unsigned
     if (s != nullptr)
     {
         MANAGE_PACKET_INIT(p);
-        if (0 != p.Compose("hqE", 10, tid, static_cast<int>(reason)))
-            s->Send(&p);
-        else
+        if (0 == p.Compose("hqE", 10, tid, static_cast<int>(reason)))
             Log::Write(Log::LT_ERROR, MANAGE_CHANNEL_FILE, 178,
                        L"[manage], send game-account-id index fail fail; compose fail, tid:0x%I64X, reason:%d, session-id:0x%I64X",
                        tid, static_cast<int>(reason), s->_id);
+        else
+            s->Send(&p);
     }
 }
 
@@ -224,11 +226,11 @@ void ManageChannel::SendCleanupPcidIndexOk(Session const* s, unsigned long long 
     if (s != nullptr)
     {
         MANAGE_PACKET_INIT(p);
-        if (0 != p.Compose("hq", 12, tid))
-            s->Send(&p);
-        else
+        if (0 == p.Compose("hq", 12, tid))
             Log::Write(Log::LT_ERROR, MANAGE_CHANNEL_FILE, 193,
                        L"[manage], send cleanup pc-id index ok fail; compose fail, tid:0x%I64X, session-id:0x%I64X", tid, s->_id);
+        else
+            s->Send(&p);
     }
 }
 
@@ -238,12 +240,12 @@ void ManageChannel::SendCleanupPcidIndexFail(Session const* s, unsigned long lon
     if (s != nullptr)
     {
         MANAGE_PACKET_INIT(p);
-        if (0 != p.Compose("hqE", 13, tid, static_cast<int>(reason)))
-            s->Send(&p);
-        else
+        if (0 == p.Compose("hqE", 13, tid, static_cast<int>(reason)))
             Log::Write(Log::LT_ERROR, MANAGE_CHANNEL_FILE, 208,
                        L"[manage], send cleanup pc-id index fail fail; compose fail, tid:0x%I64X, reason:%d, session-id:0x%I64X",
                        tid, static_cast<int>(reason), s->_id);
+        else
+            s->Send(&p);
     }
 }
 
@@ -253,11 +255,11 @@ void ManageChannel::SendRetryMileageDepositOk(Session const* s, unsigned long lo
     if (s != nullptr)
     {
         MANAGE_PACKET_INIT(p);
-        if (0 != p.Compose("hq", 15, tid))
-            s->Send(&p);
-        else
+        if (0 == p.Compose("hq", 15, tid))
             Log::Write(Log::LT_ERROR, MANAGE_CHANNEL_FILE, 224,
                        L"[manage], send retry mileage deposit ok fail; compose fail, tid:0x%I64X, session-id:0x%I64X", tid, s->_id);
+        else
+            s->Send(&p);
     }
 }
 
@@ -267,13 +269,13 @@ void ManageChannel::SendRetryMileageDepositFail(Session const* s, unsigned long 
     if (s != nullptr)
     {
         MANAGE_PACKET_INIT(p);
-        if (0 != p.Compose("hqE", 16, tid, static_cast<int>(reason)))
-            s->Send(&p);
-        else
+        if (0 == p.Compose("hqE", 16, tid, static_cast<int>(reason)))
             // LIFT: the original log text says "ok" on the fail path (0x5beb0). Kept as is.
             Log::Write(Log::LT_ERROR, MANAGE_CHANNEL_FILE, 241,
                        L"[manage], send retry mileage deposit ok fail; compose fail, tid:0x%I64X, reason:%d, session-id:0x%I64X",
                        tid, static_cast<int>(reason), s->_id);
+        else
+            s->Send(&p);
     }
 }
 
