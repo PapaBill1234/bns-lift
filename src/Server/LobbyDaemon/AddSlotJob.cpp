@@ -21,6 +21,9 @@
 #include "MemoryManager.h"
 #include "NPServiceChannel.h"
 #include "TransactionChannel.h"
+#if defined(__clang__)
+#include "crt_cpp_overload.h"  // the swprintf_s array template (VS2010 has it in its CRT headers)
+#endif
 
 namespace StsMsgLib
 {
