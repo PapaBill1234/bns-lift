@@ -168,3 +168,27 @@ struct DeleteCharacterReqParam
 static_assert(sizeof(DeleteCharacterReqParam) == 0x18, "sizeof DeleteCharacterReqParam");
 static_assert(offsetof(DeleteCharacterReqParam, lgate) == 0x0, "DeleteCharacterReqParam::lgate");
 static_assert(offsetof(DeleteCharacterReqParam, slotid) == 0x8, "DeleteCharacterReqParam::slotid");
+
+// LIFT: gap-14. AddSlotJob::init (0xd570) reads this type.
+struct AddSlotWithAccountInventoryItemReqParam
+{
+    LobbyGateChannel* lgate;
+    unsigned long long labelId;
+    unsigned long long itemInstanceId;
+    unsigned int itemDataId;
+};
+static_assert(sizeof(AddSlotWithAccountInventoryItemReqParam) == 0x20, "sizeof AddSlotWithAccountInventoryItemReqParam");
+static_assert(offsetof(AddSlotWithAccountInventoryItemReqParam, labelId) == 0x8, "AddSlotWithAccountInventoryItemReqParam::labelId");
+static_assert(offsetof(AddSlotWithAccountInventoryItemReqParam, itemInstanceId) == 0x10, "AddSlotWithAccountInventoryItemReqParam::itemInstanceId");
+static_assert(offsetof(AddSlotWithAccountInventoryItemReqParam, itemDataId) == 0x18, "AddSlotWithAccountInventoryItemReqParam::itemDataId");
+
+// LIFT: gap-14. BindCharacterSlotJob::init (0x17050) reads this type.
+struct BindCharacterSlotReqParam
+{
+    LobbyGateChannel* lgate;
+    id128 slotid;
+    unsigned long long pcId;
+};
+static_assert(sizeof(BindCharacterSlotReqParam) == 0x20, "sizeof BindCharacterSlotReqParam");
+static_assert(offsetof(BindCharacterSlotReqParam, slotid) == 0x8, "BindCharacterSlotReqParam::slotid");
+static_assert(offsetof(BindCharacterSlotReqParam, pcId) == 0x18, "BindCharacterSlotReqParam::pcId");

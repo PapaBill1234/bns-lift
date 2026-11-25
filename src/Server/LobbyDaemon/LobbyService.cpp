@@ -167,33 +167,184 @@ bool AddSlotService::IsServiceTarget(id128 const& slotid)
 }
 
 // 0x6d420
-bool AddSlotService::Start(CliSession*, unsigned int)
+bool AddSlotService::Start(CliSession* owner, unsigned int itemDataId)
 {
-    LIFT_STUB(0x6d420);
+    // LIFT: 0x6d420 to 0x6dcb0 (gap-14). The original also logs owner->_clikey. This lift does not log the client session key.
+    if (owner == nullptr)
+    {
+        AddSlotService const* s = this;  // LIFT: The original tests this for null before it reads _db for the log arguments.
+        Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 355,
+            L"[lobby-service], start fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
+        return false;
+    }
+    if (_db.serviceState == 0)
+    {
+        int dbrtn = 0;
+        if (LobbyDB::TrySlotAdditionService(dbrtn, owner->_acb._id, _db.itemInstanceId, itemDataId, &_db.serviceId))
+        {
+            _db.serviceState = 1;
+            Log::Write(Log::LT_DEBUG, L"LobbyService.cpp", 374,
+                L"[lobby-service], register ok, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+                _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            return true;
+        }
+        Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 368,
+            L"[lobby-service], start fail; db error, dbrtn:%d, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+            dbrtn, _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+        return false;
+    }
+    Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 361,
+        L"[lobby-service], start fail; invalid state, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+        _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+    return false;
 }
 
 // 0x6d5d0
-bool AddSlotService::ConsumeItemTried(CliSession*)
+bool AddSlotService::ConsumeItemTried(CliSession* owner)
 {
-    LIFT_STUB(0x6d5d0);
+    if (owner == nullptr)
+    {
+        AddSlotService const* s = this;  // LIFT: The original tests this for null before it reads _db for the log arguments.
+        Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 383,
+            L"== CRASH == [lobby-service], consume-item-tried fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
+        AlertSender::Write(L"LobbyService.cpp", 383,
+            L"== CRASH == [lobby-service], consume-item-tried fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
+        return false;
+    }
+    if (_db.serviceState == 1)
+    {
+        int dbrtn = 0;
+        if (LobbyDB::UpdateLobbyServiceStateToItemConsumptionTryState_SlotAdditionService(dbrtn, _db.serviceId, owner->_acb._id))
+        {
+            _db.serviceState = 2;
+            Log::Write(Log::LT_DEBUG, L"LobbyService.cpp", 402,
+                L"[lobby-service], consume-item-tried ok, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+                _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            return true;
+        }
+        Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 396,
+            L"[lobby-service], consume-item-tried fail; db error, dbrtn:%d, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+            dbrtn, _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+        return false;
+    }
+    Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 389,
+        L"[lobby-service], consume-item-tried fail; invalid state, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+        _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+    return false;
 }
 
 // 0x6d7d0
-bool AddSlotService::TaskDone(CliSession*, id128 const&)
+bool AddSlotService::TaskDone(CliSession* owner, id128 const& slotid)
 {
-    LIFT_STUB(0x6d7d0);
+    if (owner == nullptr)
+    {
+        AddSlotService const* s = this;  // LIFT: The original tests this for null before it reads _db for the log arguments.
+        Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 411,
+            L"== CRASH == [lobby-service], task done fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
+        AlertSender::Write(L"LobbyService.cpp", 411,
+            L"== CRASH == [lobby-service], task done fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
+        return false;
+    }
+    if (_db.serviceState == 2)
+    {
+        int dbrtn = 0;
+        if (LobbyDB::UpdateLobbyServiceStateToTaskDoneState_SlotAdditionService(dbrtn, _db.serviceId, owner->_acb._id, slotid))
+        {
+            _dbAddSlotService.slotid = slotid;
+            _db.serviceState = 3;
+            Log::Write(Log::LT_DEBUG, L"LobbyService.cpp", 431,
+                L"[lobby-service], task done ok, slot-id:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+                slotid.guid.id1, slotid.guid.id2, slotid.guid.id3, slotid.guid.id4[0], slotid.guid.id4[1], slotid.guid.id4[2],
+                slotid.guid.id4[3], slotid.guid.id4[4], slotid.guid.id4[5], slotid.guid.id4[6], slotid.guid.id4[7],
+                _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            return true;
+        }
+        Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 424,
+            L"[lobby-service], task done fail; db error, dbrtn:%d, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+            dbrtn, _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+        return false;
+    }
+    Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 417,
+        L"[lobby-service], task done fail; invalid state, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+        _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+    return false;
 }
 
 // 0x6dab0
-bool AddSlotService::ConsumeItemFinished(CliSession*)
+bool AddSlotService::ConsumeItemFinished(CliSession* owner)
 {
-    LIFT_STUB(0x6dab0);
+    if (owner == nullptr)
+    {
+        AddSlotService const* s = this;  // LIFT: The original tests this for null before it reads _db for the log arguments.
+        Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 440,
+            L"== CRASH == [lobby-service], consume-item-finished fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
+        AlertSender::Write(L"LobbyService.cpp", 440,
+            L"== CRASH == [lobby-service], consume-item-finished fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
+        return false;
+    }
+    if (_db.serviceState == 3)
+    {
+        int dbrtn = 0;
+        if (LobbyDB::UpdateLobbyServiceStateToItemConsumptionFinishState_SlotAdditionService(dbrtn, _db.serviceId, owner->_acb._id))
+        {
+            _db.serviceState = 4;
+            Log::Write(Log::LT_DEBUG, L"LobbyService.cpp", 459,
+                L"[lobby-service], consume-item-finished ok, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+                _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            return true;
+        }
+        Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 453,
+            L"[lobby-service], consume-item-finished fail; db error, dbrtn:%d, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+            dbrtn, _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+        return false;
+    }
+    Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 446,
+        L"[lobby-service], consume-item-finished fail; invalid state, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+        _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+    return false;
 }
 
 // 0x6dcb0
-bool AddSlotService::Finish(CliSession*)
+bool AddSlotService::Finish(CliSession* owner)
 {
-    LIFT_STUB(0x6dcb0);
+    if (owner == nullptr)
+    {
+        AddSlotService const* s = this;  // LIFT: The original tests this for null before it reads _db for the log arguments.
+        Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 468,
+            L"== CRASH == [lobby-service], finish fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
+        AlertSender::Write(L"LobbyService.cpp", 468,
+            L"== CRASH == [lobby-service], finish fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
+        return false;
+    }
+    if (_db.serviceState == 4)
+    {
+        int dbrtn = 0;
+        if (LobbyDB::FinishSlotAdditionService(dbrtn, _db.serviceId, owner->_acb._id))
+        {
+            _db.serviceState = 5;
+            Log::Write(Log::LT_DEBUG, L"LobbyService.cpp", 487,
+                L"[lobby-service], finish ok, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+                _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            return true;
+        }
+        Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 481,
+            L"[lobby-service], finish fail; db error, dbrtn:%d, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+            dbrtn, _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+        return false;
+    }
+    Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 474,
+        L"[lobby-service], finish fail; invalid state, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+        _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+    return false;
 }
 
 // 0x6df60

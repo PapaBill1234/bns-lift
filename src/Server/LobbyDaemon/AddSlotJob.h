@@ -1,17 +1,38 @@
-// AddSlotJob.obj (LobbyDaemon PDB, 2019 + PDB). Wave 0: declarations of the stubbed functions only.
-// LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
+// AddSlotJob.obj (LobbyDaemon PDB, 2019 + PDB). Layout from tools/pdbcls.py LobbyDaemon AddSlotJob.
 #pragma once
+#include <stddef.h>
+#include "CliSessionJob.h"
+#include "StringUtil.h"
 
+class AccountInventoryChannel;
 class CliSession;
+class LobbyGateChannel;
+class LobbyJobTransaction;
+class ObjPool;
 struct LobbyJobDef;
 
-class AddSlotJob
+// PDB layout (sizeof 0xA0, CliSessionJob base). The PDB also has Initialize(LobbyGateChannel*). The binary has no
+// body for it. It is not declared here.
+class AddSlotJob : public CliSessionJob
 {
 public:
-    virtual LobbyJobDef const* GetDefinition() const;  // 0xd1e0
+    enum State
+    {
+        INIT = 0,
+        CHECK_ACCOUNT_INVENTORY_ITEM = 1,
+        CHECK_SLOT_CAPACITY = 2,
+        REGISTER_SERVICE_ENTRY = 3,
+        TRY_CONSUME_ACCOUNT_INVENTORY_ITEM = 4,
+        CREATE_SLOT = 5,
+        FIN_CONSUME_ACCOUNT_INVENTORY_ITEM = 6,
+        FIN_SERVICE_ENTRY = 7,
+        FIN = 8
+    };
+
     static void* _vtbl();  // 0xd240
-    AddSlotJob(CliSession*);  // 0xd2c0
+    AddSlotJob(CliSession* owner);  // 0xd2c0
     virtual ~AddSlotJob();  // 0xd340
+    virtual LobbyJobDef const* GetDefinition() const;  // 0xd1e0
 private:
     virtual void deallocate_me(void*, wchar_t const*, int);  // 0xd1f0
     virtual bool work(int, void*);  // 0xd3b0
@@ -36,4 +57,32 @@ private:
     bool finConsumeAccountInventoryItemFail(void*);  // 0x10b10
     bool finConsumeAccountInventoryItemTimeout();  // 0x10d60
     bool finServiceEntry();  // 0x10e70
+
+    LobbyJobTransaction* _tran;  // +0x58
+    LobbyGateChannel* _lgate;  // +0x60
+    AccountInventoryChannel* _acciv;  // +0x68
+    unsigned long long _labelId;  // +0x70
+    unsigned long long _itemInstanceId;  // +0x78
+    unsigned int _itemDataId;  // +0x80
+    unsigned long long _serviceId;  // +0x88
+    id128 _slotId;  // +0x90
+
+public:
+    static ObjPool _pool;
+    static LobbyJobDef _def;
+
+    friend struct AddSlotJobLayoutCheck;
+};
+
+struct AddSlotJobLayoutCheck
+{
+    static_assert(sizeof(AddSlotJob) == 0xA0, "sizeof AddSlotJob");
+    static_assert(offsetof(AddSlotJob, _tran) == 0x58, "AddSlotJob::_tran");
+    static_assert(offsetof(AddSlotJob, _lgate) == 0x60, "AddSlotJob::_lgate");
+    static_assert(offsetof(AddSlotJob, _acciv) == 0x68, "AddSlotJob::_acciv");
+    static_assert(offsetof(AddSlotJob, _labelId) == 0x70, "AddSlotJob::_labelId");
+    static_assert(offsetof(AddSlotJob, _itemInstanceId) == 0x78, "AddSlotJob::_itemInstanceId");
+    static_assert(offsetof(AddSlotJob, _itemDataId) == 0x80, "AddSlotJob::_itemDataId");
+    static_assert(offsetof(AddSlotJob, _serviceId) == 0x88, "AddSlotJob::_serviceId");
+    static_assert(offsetof(AddSlotJob, _slotId) == 0x90, "AddSlotJob::_slotId");
 };
