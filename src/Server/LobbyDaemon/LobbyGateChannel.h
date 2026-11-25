@@ -1,7 +1,9 @@
 // LobbyGateChannel.obj (LobbyDaemon PDB, 2019 + PDB). Wave 0: declarations of the stubbed functions only.
-// LIFT: LobbyGateChannel has its base and members (ld-24 batch 1). The other classes have no layout yet.
+// LIFT: LobbyGateChannel has its base and members (ld-24 batch 1). LobbyGateChannelManager has its PDB layout (gap-02).
 #pragma once
 #include <stddef.h>
+#include "Channel.h"
+#include "Lock.h"
 #include "SharedChannel.h"
 #include "Character.h"
 
@@ -18,6 +20,15 @@ union id128;
 class LobbyGateChannel : public SharedChannel
 {
 public:
+    // LIFT: PDB inline method. The body is not in the PDB; it comes from the inlined code at the callers
+    // (for example HandleLobbyLobbyGate_GetCharacterInfoListReq, 0xc5360).
+    short GetWid() const
+    {
+        short wid = 0;
+        if (_rawChannel != nullptr)
+            wid = static_cast<short>(_rawChannel->GetId());
+        return wid;
+    }
     void SendInitSessionWithNPTokenOk(unsigned long long gatekey, unsigned long long clikey, id128 nptoken, id128 portalAccountId);  // 0xbbe90
     void SendInitSessionWithNPTokenFail(unsigned long long, short);  // 0xbbfb0
     void SendInitSessionWithLobbyTokenOk(unsigned long long, unsigned long long);  // 0xbc080
@@ -91,7 +102,7 @@ static_assert(sizeof(LobbyGateChannel) == 0x28, "sizeof LobbyGateChannel");
 static_assert(offsetof(LobbyGateChannel, _broadcastable) == 0x20, "LobbyGateChannel::_broadcastable");
 static_assert(offsetof(LobbyGateChannel, _isMobileGate) == 0x21, "LobbyGateChannel::_isMobileGate");
 
-class LobbyGateChannelManager
+class LobbyGateChannelManager : public SessionHandler
 {
 public:
     virtual ~LobbyGateChannelManager();  // 0xc0aa0
@@ -99,8 +110,16 @@ public:
     void Remove(short);  // 0xc0c40
     LobbyGateChannel* Acquire(short);  // 0xc0d50
     void BroadcastAnnounceNotify(wchar_t const*);  // 0xc0e20
+    // LIFT: the PDB also has Broadcast(Packet const*). Its body is folded with InfoGateChannelManager::Broadcast
+    // (0x2ef40), so the lift does not declare a second copy. The callers use the InfoGate body (LobbyDaemon.cpp:188).
     virtual bool OnAccept(Session const*) const;  // 0xc0f20
     virtual bool OnConnect(Session const*, bool) const;  // 0xc0f80
     virtual void OnClose(Session const*, bool) const;  // 0xc1030
     virtual bool PacketHandler(Session const*, Packet const*) const;  // 0xc11d0
+
+    SharedChannelList _channels;  // PDB: private
+    CriticalSection _lock;  // PDB: private
 };
+static_assert(sizeof(LobbyGateChannelManager) == 0x48, "sizeof LobbyGateChannelManager");
+static_assert(offsetof(LobbyGateChannelManager, _channels) == 0x8, "LobbyGateChannelManager::_channels");
+static_assert(offsetof(LobbyGateChannelManager, _lock) == 0x20, "LobbyGateChannelManager::_lock");

@@ -41,3 +41,15 @@ bool HandleLobbyLobbyGate_ChangeUserNameWithAccountInventoryItemReq(SharedChanne
 bool HandleLobbyLobbyGate_ExtendJumpingCharacterCreationQuotaWithAccountInventoryItemReq(SharedChannel*, Packet const*);  // 0xcac70
 bool HandleLobbyLobbyGate_CreateInitialUserNameReq(SharedChannel*, Packet const*);  // 0xcafd0
 bool HandleLobbyLobbyGate_ActivateGradeReq(SharedChannel*, Packet const*);  // 0xcb330
+
+// PDB LobbyLobbyGatePacketHandlerDef (sizeof 16).
+struct LobbyLobbyGatePacketHandlerDef
+{
+    void* handler;
+    bool auth;
+    bool fragment;
+};
+static_assert(sizeof(LobbyLobbyGatePacketHandlerDef) == 0x10, "sizeof LobbyLobbyGatePacketHandlerDef");
+
+// PDB global (111 entries), defined in LobbyLobbyGatePacketLobbySideHandlerList.cpp (data only, .data rva 0x202640).
+extern LobbyLobbyGatePacketHandlerDef LobbyLobbyGatePacketLobbySideHandlerList[111];

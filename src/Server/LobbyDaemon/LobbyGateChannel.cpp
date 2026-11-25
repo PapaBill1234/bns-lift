@@ -1,15 +1,42 @@
-// LobbyGateChannel.obj (LobbyDaemon PDB, 2019 + PDB). Part 1 lifted (ld-24 batches 1-2); the other functions are stubs. A stub is not a lift.
+// LobbyGateChannel.obj (LobbyDaemon PDB, 2019 + PDB). Lifted: ld-24 batches 1-2 and gap-02 (0xbf080 to 0xc11d0).
+#include "PlacementNew.h"
+#include <winsock2.h>
+#include <windows.h>
+#include <new>
+#include <wchar.h>
 #include "LobbyGateChannel.h"
+#include "LobbyLobbyGatePacketHandler.h"
+#include "AlertSender.h"
+#include "CliSessionManager.h"
+#include "Connection.h"
+#include "Daemon.h"
 #include "FragmentPacket.h"
 #include "GradeService.h"
 #include "CliSession.h"
+#include "InfoGateChannel.h"
 #include "LiftStub.h"
+#include "LobbyDaemon.h"
+#include "LobbyEvent.h"
 #include "LobbyGoodsTypes.h"
 #include "Log.h"
+#include "Memory.h"
+#include "MemoryManager.h"
+#include "Network.h"
 #include "Packet.h"
 #include "PacketUtil.h"
+#include "Session.h"
 #include "StringUtil.h"
 #include "WaitQueue.h"
+
+namespace
+{
+// LIFT: No PDB symbol. The binary uses the literal as the file string of the log and reference count calls.
+wchar_t const* const LOBBYGATE_FILE = L"LobbyGateChannel.cpp";
+// LIFT: No PDB symbol. The binary uses the literal as the file string of SharedChannelList::Acquire/Remove errors (lines 200 and 234).
+wchar_t const* const SHARED_CHANNEL_FILE = L"..\\Shared\\SharedChannel.cpp";
+// LIFT: No PDB symbol. The binary uses the literal as the file string of the Session reference count calls (line 1059).
+wchar_t const* const SESSION_FILE = L"source\\Session.cpp";
+}
 
 #pragma comment(linker, "/INCLUDE:?SendInitSessionWithNPTokenOk@LobbyGateChannel@@QEAAX_K0Tid128@@1@Z")  // LIFT: keep until the caller is lifted (0xbbe90)
 #pragma comment(linker, "/INCLUDE:?SendInitSessionWithNPTokenFail@LobbyGateChannel@@QEAAX_KF@Z")  // LIFT: keep until the caller is lifted (0xbbfb0)
@@ -898,199 +925,745 @@ void LobbyGateChannel::SendListLobbyServiceItemInfoOk(unsigned long long clikey,
 }
 
 // 0xbf080
-void LobbyGateChannel::SendListLobbyServiceItemInfoFail(unsigned long long, char, short)
+void LobbyGateChannel::SendListLobbyServiceItemInfoFail(unsigned long long clikey, char searchType, short reason)
 {
-    LIFT_STUB(0xbf080);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    if (0 != p.Compose("hqQE", 75, clikey, static_cast<int>(searchType), static_cast<int>(reason)))
+        Send(&p);
 }
 
 // 0xbf160
-void LobbyGateChannel::SendGetLobbyServiceItemInfoOk(unsigned long long, LobbyServiceItem const&)
+void LobbyGateChannel::SendGetLobbyServiceItemInfoOk(unsigned long long clikey, LobbyServiceItem const& item)
 {
-    LIFT_STUB(0xbf160);
+    PacketComposer pcr;  // LIFT: inlined constructor
+    pcr.format = nullptr;
+    pcr.len = 0;
+    pcr.index = 0;
+    pcr.SetFormat("hqqqqiQ", 0);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    if (0 != p.Compose(&pcr, 2, 77, clikey) &&
+        0 != p.Compose(&pcr, 5, item.ownerPcId, item.instanceId, item.labelId, item.dataId, static_cast<int>(item.state)))
+        Send(&p);
 }
 
 // 0xbf2e0
-void LobbyGateChannel::SendGetLobbyServiceItemInfoFail(unsigned long long, unsigned long long, short)
+void LobbyGateChannel::SendGetLobbyServiceItemInfoFail(unsigned long long clikey, unsigned long long itemInstanceId, short reason)
 {
-    LIFT_STUB(0xbf2e0);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    if (0 != p.Compose("hqqE", 78, clikey, itemInstanceId, static_cast<int>(reason)))
+        Send(&p);
 }
 
 // 0xbf3c0
-void LobbyGateChannel::SendGetServiceEntryListFail(unsigned long long, short)
+void LobbyGateChannel::SendGetServiceEntryListFail(unsigned long long clikey, short reason)
 {
-    LIFT_STUB(0xbf3c0);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    if (0 != p.Compose("hqE", 81, clikey, static_cast<int>(reason)))
+        Send(&p);
 }
 
 // 0xbf490
-void LobbyGateChannel::SendChangeCharacterAppearanceWithAccountInventoryItemOk(unsigned long long, id128 const&, char*, short, unsigned long long, unsigned long long)
+void LobbyGateChannel::SendChangeCharacterAppearanceWithAccountInventoryItemOk(unsigned long long clikey, id128 const& slotid, char* newShowcaseData, short newShowcaseDataSize, unsigned long long labelId, unsigned long long itemInstanceId)
 {
-    LIFT_STUB(0xbf490);
+    if (newShowcaseData == nullptr || newShowcaseDataSize < 0)
+        return;
+    Packet packet;  // LIFT: inlined constructor
+    packet.CurHeader = nullptr;
+    packet.Splitter = nullptr;
+    packet.ListHead = nullptr;
+    packet.ListTail = nullptr;
+    packet.IsFragmentPacket = false;
+    packet.FragmentPacketCmd = 0;
+    packet.Allocate();
+    id128 slot = slotid;
+    if (0 != packet.Compose("hqobqq", 83, clikey, &slot, newShowcaseData, static_cast<int>(newShowcaseDataSize), labelId, itemInstanceId))
+        Send(&packet);
 }
 
 // 0xbf5a0
-void LobbyGateChannel::SendChangeCharacterAppearanceWithAccountInventoryItemFail(unsigned long long, id128 const&, unsigned long long, unsigned long long, short)
+void LobbyGateChannel::SendChangeCharacterAppearanceWithAccountInventoryItemFail(unsigned long long clikey, id128 const& slotid, unsigned long long labelId, unsigned long long itemInstanceId, short reason)
 {
-    LIFT_STUB(0xbf5a0);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    id128 slot = slotid;
+    if (0 != p.Compose("hqoqqE", 84, clikey, &slot, labelId, itemInstanceId, static_cast<int>(reason)))
+        Send(&p);
 }
 
 // 0xbf6b0
-void LobbyGateChannel::SendChangeCharacterSexWithAccountInventoryItemOk(unsigned long long, id128 const&, char*, short, unsigned long long, unsigned long long)
+void LobbyGateChannel::SendChangeCharacterSexWithAccountInventoryItemOk(unsigned long long clikey, id128 const& slotid, char* newShowcaseData, short newShowcaseDataSize, unsigned long long labelId, unsigned long long itemInstanceId)
 {
-    LIFT_STUB(0xbf6b0);
+    if (newShowcaseData == nullptr || newShowcaseDataSize < 0)
+        return;
+    Packet packet;  // LIFT: inlined constructor
+    packet.CurHeader = nullptr;
+    packet.Splitter = nullptr;
+    packet.ListHead = nullptr;
+    packet.ListTail = nullptr;
+    packet.IsFragmentPacket = false;
+    packet.FragmentPacketCmd = 0;
+    packet.Allocate();
+    id128 slot = slotid;
+    if (0 != packet.Compose("hqobqq", 86, clikey, &slot, newShowcaseData, static_cast<int>(newShowcaseDataSize), labelId, itemInstanceId))
+        Send(&packet);
 }
 
 // 0xbf7c0
-void LobbyGateChannel::SendChangeCharacterSexWithAccountInventoryItemFail(unsigned long long, id128 const&, unsigned long long, unsigned long long, short)
+void LobbyGateChannel::SendChangeCharacterSexWithAccountInventoryItemFail(unsigned long long clikey, id128 const& slotid, unsigned long long labelId, unsigned long long itemInstanceId, short reason)
 {
-    LIFT_STUB(0xbf7c0);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    id128 slot = slotid;
+    if (0 != p.Compose("hqoqqE", 87, clikey, &slot, labelId, itemInstanceId, static_cast<int>(reason)))
+        Send(&p);
 }
 
 // 0xbf8d0
-void LobbyGateChannel::SendChangeCharacterRaceWithAccountInventoryItemOk(unsigned long long, id128 const&, char*, short, unsigned long long, unsigned long long)
+void LobbyGateChannel::SendChangeCharacterRaceWithAccountInventoryItemOk(unsigned long long clikey, id128 const& slotid, char* newShowcaseData, short newShowcaseDataSize, unsigned long long labelId, unsigned long long itemInstanceId)
 {
-    LIFT_STUB(0xbf8d0);
+    if (newShowcaseData == nullptr || newShowcaseDataSize < 0)
+        return;
+    Packet packet;  // LIFT: inlined constructor
+    packet.CurHeader = nullptr;
+    packet.Splitter = nullptr;
+    packet.ListHead = nullptr;
+    packet.ListTail = nullptr;
+    packet.IsFragmentPacket = false;
+    packet.FragmentPacketCmd = 0;
+    packet.Allocate();
+    id128 slot = slotid;
+    if (0 != packet.Compose("hqobqq", 89, clikey, &slot, newShowcaseData, static_cast<int>(newShowcaseDataSize), labelId, itemInstanceId))
+        Send(&packet);
 }
 
 // 0xbf9e0
-void LobbyGateChannel::SendChangeCharacterRaceWithAccountInventoryItemFail(unsigned long long, id128 const&, unsigned long long, unsigned long long, short)
+void LobbyGateChannel::SendChangeCharacterRaceWithAccountInventoryItemFail(unsigned long long clikey, id128 const& slotid, unsigned long long labelId, unsigned long long itemInstanceId, short reason)
 {
-    LIFT_STUB(0xbf9e0);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    id128 slot = slotid;
+    if (0 != p.Compose("hqoqqE", 90, clikey, &slot, labelId, itemInstanceId, static_cast<int>(reason)))
+        Send(&p);
 }
 
 // 0xbfaf0
-void LobbyGateChannel::SendRenameCharacterWithAccountInventoryItemOk(unsigned long long, id128 const&, wchar_t const*, unsigned long long, unsigned long long)
+void LobbyGateChannel::SendRenameCharacterWithAccountInventoryItemOk(unsigned long long clikey, id128 const& slotid, wchar_t const* newName, unsigned long long labelId, unsigned long long itemInstanceId)
 {
-    LIFT_STUB(0xbfaf0);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    id128 slot = slotid;
+    if (0 != p.Compose("hqosqq", 92, clikey, &slot, newName, labelId, itemInstanceId))
+        Send(&p);
 }
 
 // 0xbfc00
-void LobbyGateChannel::SendRenameCharacterWithAccountInventoryItemFail(unsigned long long, id128 const&, unsigned long long, unsigned long long, short)
+void LobbyGateChannel::SendRenameCharacterWithAccountInventoryItemFail(unsigned long long clikey, id128 const& slotid, unsigned long long labelId, unsigned long long itemInstanceId, short reason)
 {
-    LIFT_STUB(0xbfc00);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    id128 slot = slotid;
+    if (0 != p.Compose("hqoqqE", 93, clikey, &slot, labelId, itemInstanceId, static_cast<int>(reason)))
+        Send(&p);
 }
 
 // 0xbfd10
-void LobbyGateChannel::SendAddSlotWithAccountInventoryItemOk(unsigned long long, unsigned long long, unsigned long long, id128 const&)
+void LobbyGateChannel::SendAddSlotWithAccountInventoryItemOk(unsigned long long clikey, unsigned long long labelId, unsigned long long itemInstanceId, id128 const& slotid)
 {
-    LIFT_STUB(0xbfd10);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    id128 slot = slotid;
+    if (0 != p.Compose("hqqqo", 95, clikey, labelId, itemInstanceId, &slot))
+        Send(&p);
 }
 
 // 0xbfe10
-void LobbyGateChannel::SendAddSlotWithAccountInventoryItemFail(unsigned long long, unsigned long long, unsigned long long, short)
+void LobbyGateChannel::SendAddSlotWithAccountInventoryItemFail(unsigned long long clikey, unsigned long long labelId, unsigned long long itemInstanceId, short reason)
 {
-    LIFT_STUB(0xbfe10);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    if (0 != p.Compose("hqqqE", 96, clikey, labelId, itemInstanceId, static_cast<int>(reason)))
+        Send(&p);
 }
 
 // 0xbff00
-void LobbyGateChannel::SendChangeUserNameWithAccountInventoryItemOk(unsigned long long, wchar_t const*, unsigned long long, unsigned long long, unsigned int)
+void LobbyGateChannel::SendChangeUserNameWithAccountInventoryItemOk(unsigned long long clikey, wchar_t const* newUserName, unsigned long long labelId, unsigned long long itemInstanceId, unsigned int itemDataId)
 {
-    LIFT_STUB(0xbff00);
+    if (newUserName == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyGateChannel.cpp", 802,
+                   L"[lobby-gate], send change-user-name-with-account-inventory-item-ok fail; null new-user-name, cli-key:0x%I64X", clikey);
+        return;
+    }
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    if (0 != p.Compose("hqsqqi", 98, clikey, newUserName, labelId, itemInstanceId, itemDataId))
+        Send(&p);
+    else
+        Log::Write(Log::LT_ERROR, L"LobbyGateChannel.cpp", 812,
+                   L"[lobby-gate], send change-user-name-with-account-inventory-item-ok fail; compose fail, cli-key:0x%I64X", clikey);
 }
 
 // 0xc0050
-void LobbyGateChannel::SendChangeUserNameWithAccountInventoryItemFail(unsigned long long, unsigned long long, unsigned long long, short)
+void LobbyGateChannel::SendChangeUserNameWithAccountInventoryItemFail(unsigned long long clikey, unsigned long long labelId, unsigned long long itemInstanceId, short reason)
 {
-    LIFT_STUB(0xc0050);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    if (0 != p.Compose("hqqqE", 99, clikey, labelId, itemInstanceId, static_cast<int>(reason)))
+        Send(&p);
+    else
+        Log::Write(Log::LT_ERROR, L"LobbyGateChannel.cpp", 827,
+                   L"[lobby-gate], send change-user-name-with-account-inventory-item-fail fail; compose fail, cli-key:0x%I64X", clikey);
 }
 
 // 0xc0160
-void LobbyGateChannel::SendExtendJumpingCharacterCreationQuotaWithAccountInventoryItemOk(unsigned long long, unsigned long long, unsigned long long, int)
+void LobbyGateChannel::SendExtendJumpingCharacterCreationQuotaWithAccountInventoryItemOk(unsigned long long clikey, unsigned long long labelId, unsigned long long itemInstanceId, int remainQuota)
 {
-    LIFT_STUB(0xc0160);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    if (0 != p.Compose("hqqqi", 101, clikey, labelId, itemInstanceId, remainQuota))
+        Send(&p);
 }
 
 // 0xc0250
-void LobbyGateChannel::SendExtendJumpingCharacterCreationQuotaWithAccountInventoryItemFail(unsigned long long, unsigned long long, unsigned long long, short)
+void LobbyGateChannel::SendExtendJumpingCharacterCreationQuotaWithAccountInventoryItemFail(unsigned long long clikey, unsigned long long labelId, unsigned long long itemInstanceId, short reason)
 {
-    LIFT_STUB(0xc0250);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    if (0 != p.Compose("hqqqE", 102, clikey, labelId, itemInstanceId, static_cast<int>(reason)))
+        Send(&p);
 }
 
 // 0xc0340
-void LobbyGateChannel::SendCreateInitialUserNameOk(unsigned long long, wchar_t const*)
+void LobbyGateChannel::SendCreateInitialUserNameOk(unsigned long long clikey, wchar_t const* newUserName)
 {
-    LIFT_STUB(0xc0340);
+    if (newUserName == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyGateChannel.cpp", 862,
+                   L"[lobby-gate], send create-initial-user-name-ok fail; null new-user-name, cli-key:0x%I64X", clikey);
+        return;
+    }
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    if (0 != p.Compose("hqs", 104, clikey, newUserName))
+        Send(&p);
+    else
+        Log::Write(Log::LT_ERROR, L"LobbyGateChannel.cpp", 874,
+                   L"[lobby-gate], send create-initial-user-name-ok fail; compose fail, cli-key:0x%I64X, new-user-name:%s", clikey, newUserName);
 }
 
 // 0xc0460
-void LobbyGateChannel::SendCreateInitialUserNameFail(unsigned long long, short)
+void LobbyGateChannel::SendCreateInitialUserNameFail(unsigned long long clikey, short reason)
 {
-    LIFT_STUB(0xc0460);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    // LIFT: the original log text says "ok" in the fail function (0xc0460, line 891). Kept as is.
+    if (0 != p.Compose("hqE", 105, clikey, static_cast<int>(reason)))
+        Send(&p);
+    else
+        Log::Write(Log::LT_ERROR, L"LobbyGateChannel.cpp", 891,
+                   L"[lobby-gate], send create-initial-user-name-ok fail; compose fail, cli-key:0x%I64X", clikey);
 }
 
 // 0xc0550
-void LobbyGateChannel::SendActivateGradeOk(unsigned long long, int, int, long long, long long)
+void LobbyGateChannel::SendActivateGradeOk(unsigned long long clikey, int gameGradeKey, int gradeId, long long effectiveFrom, long long effectiveTo)
 {
-    LIFT_STUB(0xc0550);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    if (0 != p.Compose("hqiiqq", 107, clikey, gameGradeKey, gradeId, effectiveFrom, effectiveTo))
+        Send(&p);
+    else
+        Log::Write(Log::LT_ERROR, L"LobbyGateChannel.cpp", 904,
+                   L"[lobby-gate], send activate-grade-ok fail; compose fail, cli-key:0x%I64X, game-grade-key:%d, grade-id:%d",
+                   clikey, gameGradeKey, gradeId);
 }
 
 // 0xc0670
-void LobbyGateChannel::SendActivateGradeFail(unsigned long long, int, int, short)
+void LobbyGateChannel::SendActivateGradeFail(unsigned long long clikey, int keyType, int key, short reason)
 {
-    LIFT_STUB(0xc0670);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    if (0 != p.Compose("hqQiE", 108, clikey, keyType, key, static_cast<int>(reason)))
+        Send(&p);
+    else
+        Log::Write(Log::LT_ERROR, L"LobbyGateChannel.cpp", 917,
+                   L"[lobby-gate], send activate-grade-fail fail; compose fail, cli-key:0x%I64X, key-type:%d, key:%d, reason:%d",
+                   clikey, keyType, key, static_cast<int>(reason));
 }
 
 // 0xc0790
-void LobbyGateChannel::SendChangedGradeNotify(unsigned long long, int, int, bool, int, long long, long long, wchar_t const*)
+void LobbyGateChannel::SendChangedGradeNotify(unsigned long long clikey, int gameGradeKey, int gradeId, bool activation, int gradeCount, long long totalEffectiveFrom, long long totalEffectiveTo, wchar_t const* reason)
 {
-    LIFT_STUB(0xc0790);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    // LIFT: The binary compares the reason text with the five known names. Other text (and null or empty text) gives 0.
+    char reasonCode = 0;
+    if (reason != nullptr && reason[0] != L'\0')
+    {
+        if (wcscmp(reason, L"Activated") == 0)
+            reasonCode = 1;
+        else if (wcscmp(reason, L"ActivatedWithAdding") == 0)
+            reasonCode = 2;
+        else if (wcscmp(reason, L"Added") == 0)
+            reasonCode = 3;
+        else if (wcscmp(reason, L"Deleted") == 0)
+            reasonCode = 4;
+        else if (wcscmp(reason, L"DeletedAndExhausted") == 0)
+            reasonCode = 5;
+    }
+
+    if (0 != p.Compose("hqiiQiqqQ", 109, clikey, gameGradeKey, gradeId, static_cast<int>(activation), gradeCount, totalEffectiveFrom, totalEffectiveTo, static_cast<int>(reasonCode)))
+        Send(&p);
 }
 
 // 0xc0970
-void LobbyGateChannel::SendChangedGradeLevelNotify(unsigned long long, int, int, int, int, int)
+void LobbyGateChannel::SendChangedGradeLevelNotify(unsigned long long clikey, int levelId, int accumulateGradeScore, int minimumLevelScore, int maximumLevelScore, int maximumGradeScore)
 {
-    LIFT_STUB(0xc0970);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    if (0 != p.Compose("hqiiiii", 110, clikey, levelId, accumulateGradeScore, minimumLevelScore, maximumLevelScore, maximumGradeScore))
+        Send(&p);
 }
 
 // 0xc0aa0
 LobbyGateChannelManager::~LobbyGateChannelManager()
 {
-    LIFT_STUB(0xc0aa0);
+    // LIFT: 0xc0aa0 loop at LobbyGateChannel.cpp:985 releases each channel. The explicit list destructor call is
+    // inlined (SharedChannel.cpp:190). The member destructors run it a second time (original sequence).
+    SharedChannel** channels = _channels._channels;
+    for (SharedChannel** i = channels + _channels._idsize; channels != i; ++channels)
+    {
+        if (*channels != nullptr)
+            (*channels)->removeReferenceCount(LOBBYGATE_FILE, 985);
+    }
+    _channels.~SharedChannelList();
 }
 
 // 0xc0b80
-bool LobbyGateChannelManager::Add(LobbyGateChannel*)
+bool LobbyGateChannelManager::Add(LobbyGateChannel* channel)
 {
-    LIFT_STUB(0xc0b80);
+    if (channel != nullptr && channel->_rawChannel != nullptr &&
+        static_cast<unsigned short>(channel->_rawChannel->GetId()) != 0)
+    {
+        bool result = false;
+        _lock.Enter();
+        if (_channels.Set(channel))
+        {
+            channel->addReferenceCount(LOBBYGATE_FILE, 1008);
+            result = true;
+        }
+        _lock.Leave();
+        return result;
+    }
+    Log::Write(Log::LT_ERROR, LOBBYGATE_FILE, 1002, L"[lobby-gate], add fail; invalid parameter");
+    return false;
 }
 
 // 0xc0c40
-void LobbyGateChannelManager::Remove(short)
+void LobbyGateChannelManager::Remove(short wid)
 {
-    LIFT_STUB(0xc0c40);
+    if (wid == 0)
+    {
+        Log::Write(Log::LT_ERROR, LOBBYGATE_FILE, 1018, L"[lobby-gate], remove fail; invalid wid");
+        return;
+    }
+    _lock.Enter();
+    long long id = wid;
+    int index = wid - static_cast<int>(_channels._idmin);
+    if (index < 0 || index >= _channels._idsize)
+    {
+        Log::Write(Log::LT_ERROR, SHARED_CHANNEL_FILE, 200,
+                   L"[shared-channel-list], acquire fail; id out of range, id:%I64d", id);
+    }
+    else
+    {
+        SharedChannel* channel = _channels._channels[index];
+        if (channel != nullptr)
+        {
+            int removeIndex = static_cast<int>(id) - static_cast<int>(_channels._idmin);
+            if (removeIndex < 0 || removeIndex >= _channels._idsize)
+            {
+                Log::Write(Log::LT_ERROR, SHARED_CHANNEL_FILE, 234,
+                           L"[shared-channel-list], remove fail; id out of range, id:%I64d", id);
+            }
+            else if (_channels._channels[removeIndex] != nullptr)
+            {
+                _channels._channels[removeIndex] = nullptr;
+                --_channels._size;
+            }
+            channel->removeReferenceCount(LOBBYGATE_FILE, 1026);
+        }
+    }
+    _lock.Leave();
 }
 
 // 0xc0d50
-LobbyGateChannel* LobbyGateChannelManager::Acquire(short)
+LobbyGateChannel* LobbyGateChannelManager::Acquire(short wid)
 {
-    LIFT_STUB(0xc0d50);
+    if (wid == 0)
+    {
+        Log::Write(Log::LT_ERROR, LOBBYGATE_FILE, 1034, L"[lobby-gate], acquire fail; invalid wid");
+        return nullptr;
+    }
+    _lock.Enter();
+    SharedChannel* channel;
+    int index = wid - static_cast<int>(_channels._idmin);
+    if (index < 0 || index >= _channels._idsize)
+    {
+        Log::Write(Log::LT_ERROR, SHARED_CHANNEL_FILE, 200,
+                   L"[shared-channel-list], acquire fail; id out of range, id:%I64d", static_cast<long long>(wid));
+        channel = nullptr;
+    }
+    else
+    {
+        channel = _channels._channels[index];
+        if (channel != nullptr)
+            channel->addReferenceCount(LOBBYGATE_FILE, 1041);
+    }
+    _lock.Leave();
+    return static_cast<LobbyGateChannel*>(channel);
 }
 
 // 0xc0e20
-void LobbyGateChannelManager::BroadcastAnnounceNotify(wchar_t const*)
+void LobbyGateChannelManager::BroadcastAnnounceNotify(wchar_t const* message)
 {
-    LIFT_STUB(0xc0e20);
+    Packet p;  // LIFT: inlined constructor
+    p.CurHeader = nullptr;
+    p.Splitter = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.Allocate();
+    if (0 == p.Compose("hs", 5, message))
+    {
+        Log::Write(Log::LT_ERROR, LOBBYGATE_FILE, 1074,
+                   L"[lobby-gate], broadcast announce notify fail; compose fail, message:%s", message);
+        return;
+    }
+    // LIFT: the original calls 0x2ef40 with this. InfoGateChannelManager::Broadcast and the LobbyGateChannelManager
+    // body are the same (folded). Both classes have the same layout (0x48). Precedent: LobbyDaemon.cpp:188.
+    if (!reinterpret_cast<InfoGateChannelManager*>(this)->Broadcast(&p))
+    {
+        Log::Write(Log::LT_ERROR, LOBBYGATE_FILE, 1080,
+                   L"[lobby-gate], broadcast announce notify fail; broadcast fail, message:%s", message);
+        return;
+    }
 }
 
 // 0xc0f20
-bool LobbyGateChannelManager::OnAccept(Session const*) const
+bool LobbyGateChannelManager::OnAccept(Session const* session) const
 {
-    LIFT_STUB(0xc0f20);
+    unsigned long long id = session != nullptr ? session->_id : 0;
+    // BUG: 0xc0f20 checks session for nullptr only for the id. It reads session->_connection without a check.
+    Connection* connection = session->_connection;
+    int portNumber = connection->_portNumber;
+    Log::Write(Log::LT_DEBUG, LOBBYGATE_FILE, 1118,
+               L"[lobby-gate], accept session, session-id:0x%I64X, ip-address:%s, port:%d", id,
+               Network::GetAddressStringW(connection->_ip), portNumber);
+    return true;
 }
 
 // 0xc0f80
-bool LobbyGateChannelManager::OnConnect(Session const*, bool) const
+bool LobbyGateChannelManager::OnConnect(Session const* session, bool) const
 {
-    LIFT_STUB(0xc0f80);
+    unsigned long long id = session != nullptr ? session->_id : 0;
+    // BUG: 0xc0f80 checks session for nullptr only for the id. It reads session->_connection without a check.
+    Connection* connection = session->_connection;
+    int portNumber = connection->_portNumber;
+    Log::Write(Log::LT_ERROR, LOBBYGATE_FILE, 1124,
+               L"== CRASH == [lobby-gate], connect session forbidden, session-id:0x%I64X, ip-address:%s, port:%d", id,
+               Network::GetAddressStringW(connection->_ip), portNumber);
+    connection = session->_connection;
+    portNumber = connection->_portNumber;
+    AlertSender::Write(LOBBYGATE_FILE, 1124,
+                       L"== CRASH == [lobby-gate], connect session forbidden, session-id:0x%I64X, ip-address:%s, port:%d",
+                       session->_id, Network::GetAddressStringW(connection->_ip), portNumber);
+    return false;
 }
 
 // 0xc1030
-void LobbyGateChannelManager::OnClose(Session const*, bool) const
+void LobbyGateChannelManager::OnClose(Session const* session, bool) const
 {
-    LIFT_STUB(0xc1030);
+    Channel* channel = session->GetChannel();
+    if (channel != nullptr)
+    {
+        SharedChannel* shared = static_cast<SharedChannel::RawChannel*>(channel)->_owner;
+        short closedWid = 0;
+        if (shared != nullptr)
+        {
+            short wid = 0;
+            Log::Write(Log::LT_ERROR, LOBBYGATE_FILE, 1138, L"[lobby-gate], lobby-gate channel closed, gate-wid:%d",
+                       shared->_rawChannel != nullptr ? static_cast<int>(static_cast<short>(shared->_rawChannel->GetId())) : 0);
+            if (shared->_rawChannel != nullptr)
+                closedWid = static_cast<short>(shared->_rawChannel->GetId());
+            if (shared->_rawChannel != nullptr)
+                wid = static_cast<short>(shared->_rawChannel->GetId());
+            const_cast<LobbyGateChannelManager*>(this)->Remove(wid);
+        }
+        else
+        {
+            Log::Write(Log::LT_ERROR, LOBBYGATE_FILE, 1143,
+                       L"== CRASH == [lobby-gate], lobby-gate channel closed exception; raw-channel has no shared-channel, channel-id:%I64d",
+                       channel->GetId());
+            AlertSender::Write(LOBBYGATE_FILE, 1143,
+                               L"== CRASH == [lobby-gate], lobby-gate channel closed exception; raw-channel has no shared-channel, channel-id:%I64d",
+                               channel->GetId());
+        }
+        LobbyDaemon::_instance->_clisessionMgr->OnCloseLobbyGateChannel(closedWid);
+        channel->removeReferenceCount(SESSION_FILE, 1059);
+    }
+    Log::Write(Log::LT_ERROR, LOBBYGATE_FILE, 1150, L"[lobby-gate], session closed, session-id:0x%I64X", session->_id);
 }
 
 // 0xc11d0
-bool LobbyGateChannelManager::PacketHandler(Session const*, Packet const*) const
+bool LobbyGateChannelManager::PacketHandler(Session const* session, Packet const* packet) const
 {
-    LIFT_STUB(0xc11d0);
+    if (session == nullptr || packet == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, LOBBYGATE_FILE, 1159,
+                   L"== CRASH == [lobby-gate], handle packet failed; invalid parameter");
+        AlertSender::Write(LOBBYGATE_FILE, 1159,
+                           L"== CRASH == [lobby-gate], handle packet failed; invalid parameter");
+        return false;
+    }
+
+    Packet::Header const* header = packet->CurHeader;
+    unsigned short bodySize = static_cast<unsigned short>(header->size - 2);
+    if (bodySize < 2u)
+    {
+        Log::Write(Log::LT_ERROR, LOBBYGATE_FILE, 1165,
+                   L"[lobby-gate], handle packet failed; invalid packet size, size:%d, session-id:0x%I64X",
+                   static_cast<int>(bodySize), session->_id);
+        return false;
+    }
+
+    short cmd = header[1].size;
+    if (static_cast<unsigned short>(cmd - 1) > 109u)
+    {
+        Log::Write(Log::LT_ERROR, LOBBYGATE_FILE, 1173,
+                   L"[lobby-gate], handle packet failed; invalid packet command, cmd:%d, session-id:0x%I64X",
+                   static_cast<int>(cmd), session->_id);
+        return false;
+    }
+
+    LobbyLobbyGatePacketHandlerDef const* def = &LobbyLobbyGatePacketLobbySideHandlerList[cmd];
+    if (def->handler == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, LOBBYGATE_FILE, 1180,
+                   L"[lobby-gate], handle packet failed; handler not exists, cmd:%d, session-id:0x%I64X",
+                   static_cast<int>(cmd), session->_id);
+        return false;
+    }
+
+    bool result = false;
+    Channel* channel = session->GetChannel();
+    void* iocp = nullptr;
+    SharedChannel* shared = channel != nullptr ? static_cast<SharedChannel::RawChannel*>(channel)->_owner : nullptr;
+    if (cmd == 1)
+    {
+        Log::Write(Log::LT_DEBUG, LOBBYGATE_FILE, 1191, L"[lobby-gate], handle begin, cmd:%d, session-id:0x%I64X", 1,
+                   session->_id);
+        result = reinterpret_cast<Daemon::PacketHandler>(def->handler)(session, packet);
+        Log::Write(Log::LT_DEBUG, LOBBYGATE_FILE, 1193, L"[lobby-gate], handle end, cmd:%d, session-id:0x%I64X", 1,
+                   session->_id);
+    }
+    else if (shared != nullptr && def->auth)
+    {
+        if (def->fragment)
+        {
+            bool completed = false;
+            ConcatenatePacket(session, packet, completed);
+            if (completed)
+            {
+                FragmentPacketConcatenater* concatenater = static_cast<FragmentPacketConcatenater*>(session->_concatenater);
+                void* mem = Memory::_Manager[2]->Alloc(sizeof(FragmentPacketConcatenater), LOBBYGATE_FILE, 1204);
+                FragmentPacketConcatenater* fpc = mem != nullptr ? ::new (mem) FragmentPacketConcatenater : nullptr;
+                // BUG: 0xc11d0 fpc is not checked for nullptr before Copy when the alloc fails.
+                if (fpc->Copy(concatenater))
+                {
+                    void* eventMem = Memory::_Manager[2]->Alloc(sizeof(SharedChannelFragmentPacketHandleEvent), LOBBYGATE_FILE, 1206);
+                    SharedChannelFragmentPacketHandleEvent* event =
+                        eventMem != nullptr
+                            ? ::new (eventMem) SharedChannelFragmentPacketHandleEvent(
+                                  shared, fpc, reinterpret_cast<bool (*)(SharedChannel*, FragmentPacketConcatenater*)>(def->handler))
+                            : nullptr;
+                    iocp = Network::iocpHandle();
+                    PostQueuedCompletionStatus(iocp, 0, reinterpret_cast<ULONG_PTR>(event), nullptr);
+                }
+                else
+                {
+                    if (shared->_rawChannel != nullptr)
+                        iocp = reinterpret_cast<void*>(shared->_rawChannel->GetId());
+                    Log::Write(Log::LT_ERROR, LOBBYGATE_FILE, 1210,
+                               L"[lobby-gate], handle packet fail; copy fragment packet concatenater fail, cmd:%d, channel-id:%I64d",
+                               static_cast<int>(cmd), iocp);
+                    if (fpc != nullptr)
+                        fpc->~FragmentPacketConcatenater();  // LIFT: vtable slot 4 with flag 1 runs the destructor only.
+                    Memory::_Manager[2]->Free(fpc, LOBBYGATE_FILE, 1211);
+                }
+                concatenater->Clear();
+            }
+        }
+        else
+        {
+            void* mem = Memory::_Manager[2]->Alloc(sizeof(Packet), LOBBYGATE_FILE, 1218);
+            Packet* copy = nullptr;
+            if (mem != nullptr)
+            {
+                copy = static_cast<Packet*>(mem);
+                copy->CurHeader = nullptr;
+                copy->Splitter = nullptr;
+                copy->ListHead = nullptr;
+                copy->ListTail = nullptr;
+                copy->IsFragmentPacket = false;
+                copy->FragmentPacketCmd = 0;
+            }
+            // BUG: 0xc11d0 copy is not checked for nullptr before Allocate/Add when the alloc fails.
+            copy->Allocate();
+            copy->Add(&packet->CurHeader[1], static_cast<short>(packet->CurHeader->size - 2));
+            void* eventMem = Memory::_Manager[2]->Alloc(sizeof(SharedChannelPacketHandleEvent), LOBBYGATE_FILE, 1221);
+            SharedChannelPacketHandleEvent* event =
+                eventMem != nullptr
+                    ? ::new (eventMem) SharedChannelPacketHandleEvent(
+                          shared, copy, reinterpret_cast<bool (*)(SharedChannel*, Packet const*)>(def->handler))
+                    : nullptr;
+            iocp = Network::iocpHandle();
+            PostQueuedCompletionStatus(iocp, 0, reinterpret_cast<ULONG_PTR>(event), nullptr);
+        }
+        result = true;
+    }
+
+    if (channel != nullptr)
+        channel->removeReferenceCount(SESSION_FILE, 1059);
+    return result;
 }
