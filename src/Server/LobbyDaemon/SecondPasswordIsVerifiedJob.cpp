@@ -160,7 +160,7 @@ bool SecondPasswordIsVerifiedJob::requestIsVerified()
     JOB_LOG(Log::LT_ERROR, 150, L"[job], np not available", L"");
     _gamed->SendSecondPasswordIsVerifiedFail(_gametid, _pcid, 7);
     if (tran != nullptr)
-        tran->~NPTransaction();
+        tran->~NPLobbyJobTransaction();
     Memory::_Manager[2]->Free(tran, kFile, 152);
     return false;
 }

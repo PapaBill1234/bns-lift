@@ -160,7 +160,7 @@ bool TakeAccountTimeBasedPlayRewardJob::init(TakeAccountTimeBasedPlayRewardReqPa
                                                        _requestTimeUTC, 6, 0);
         return false;
     }
-    if (!ContentsRuleConfig::Config->_useTimeBasedPlaySchedule)
+    if (!ContentsRuleConfig::GetContentsRuleConfig()->GetUseTimeBasedPlaySchedule())
     {
         JOB_LOG(Log::LT_ERROR, 134, L"[job], contents-rule-config, use-time-based-play-schedule is off", L"");
         sendFail(7, 0);
@@ -194,7 +194,7 @@ bool TakeAccountTimeBasedPlayRewardJob::takeAccountTimeBasedPlayRewardReq()
         JOB_LOG(Log::LT_ERROR, 169, L"[job], req fail; send fail", L"");
         _gamed->SendTakeAccountTimeBasedPlayRewardFail(_gameTid, _pcdbid, _scheduleNumber, _targetType, _playTime,
                                                        _requestTimeUTC, 2, 0);
-        tran->~NPTransaction();
+        tran->~NPLobbyJobTransaction();
         Memory::_Manager[2]->Free(tran, kFile, 171);
         return false;
     }

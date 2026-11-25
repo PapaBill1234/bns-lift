@@ -92,6 +92,10 @@ public:
     bool SendRequestPromotionStampGetPromotionPolicy(NPTransaction*, int);  // 0xd1f00
     bool SendRequestPromotionStampGetUserPromotionStatus(NPTransaction*, id128 const&, int, short, wchar_t const*);  // 0xd1f90
     bool SendRequestPromotionStampAttendPromotionSecured(NPTransaction*, id128 const&, int, short, wchar_t const*, short, long long);  // 0xd20d0
+    // PDB inline methods (no RVA). DepositMileageJob.cpp defines the bodies. They are inlined in DepositMileageJob::depositReq
+    // (0x4a3e0) and DepositMileageJob::depositAck (0x4aa40).
+    inline bool SendRequestPresenceMessage(NPTransaction*, id128 const&, id128 const&, wchar_t const*, wchar_t const*);
+    inline bool SendRequestVirtualCurrencyDeposit(NPTransaction*, id128 const&, short, long long, char*, int, long long, bool, int, char*, unsigned long, wchar_t*);
 };
 
 // PDB NPLobbyJobTransaction (sizeof 0x18, NPTransaction base). Same form as SmartCouponDaemon NPJobTransaction.
