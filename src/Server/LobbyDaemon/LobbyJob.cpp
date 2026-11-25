@@ -108,7 +108,9 @@ LobbyJob::Result LobbyJob::execute(int task, void* param)
         transit(GetDefinition()->fin);
     int const state = _state;
     LeaveCriticalSection(&_lock.CS);
-    return state == GetDefinition()->fin ? JOB_FIN : JOB_DONE;
+    if (state == GetDefinition()->fin)
+        return JOB_FIN;
+    return JOB_DONE;
 }
 
 // 0xc1990
@@ -126,7 +128,9 @@ LobbyJob::Result LobbyJob::resume(int state, int task, void* /*param*/)
         transit(GetDefinition()->fin);
     int const now = _state;
     LeaveCriticalSection(&_lock.CS);
-    return now == GetDefinition()->fin ? JOB_FIN : JOB_DONE;
+    if (now == GetDefinition()->fin)
+        return JOB_FIN;
+    return JOB_DONE;
 }
 
 // 0xc1a60
