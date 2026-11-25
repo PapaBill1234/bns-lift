@@ -213,16 +213,10 @@ bool GradeService::IsActivated(int gameGradeKey, long long now) const
         return false;
 
     Grade const* grade = it->second;
-    if (grade != nullptr
-        && grade->_gameGradeKey > 0
-        && grade->_gradeId > 0
-        && grade->_gradeCount > 0
-        && grade->_activation
-        && grade->_effectiveTo >= now)
-    {
-        return true;
-    }
-    return false;
+    // LIFT: the original tests IsValid, then returns IsActivated (setge at the end of 0x542e0).
+    if (grade == nullptr || !grade->IsValid(now))
+        return false;
+    return grade->IsActivated(now);
 }
 
 // 0x54390

@@ -19,6 +19,13 @@ class Grade
 {
 public:
     bool FetchGame(FragmentPacket*) const;  // 0x53370
+    // PDB: IsValid and IsActivated, type 0x4D0F (bool (__int64) const). No out-of-line copy: inlined in
+    // GradeService::IsActivated (0x542e0). The bodies follow its compare order (HR 0x542e0, 0x544d0).
+    bool IsValid(long long now) const
+    {
+        return _gameGradeKey > 0 && _gradeId > 0 && _gradeCount > 0 && (!_activation || _effectiveTo >= now);
+    }
+    bool IsActivated(long long now) const { return _activation && _effectiveTo >= now; }
 
     int _gameGradeKey;
     int _gradeId;
