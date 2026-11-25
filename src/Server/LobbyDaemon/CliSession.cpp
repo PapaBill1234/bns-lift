@@ -353,21 +353,39 @@ void CliSession::leave()
 }
 
 // 0x35cf0
-Character* CliSession::getCharacter(unsigned long long)
+Character* CliSession::getCharacter(unsigned long long pcid)
 {
-    LIFT_STUB(0x35cf0);
+    if (pcid == 0)
+        return nullptr;
+    for (std::vector<Character*, StlAllocator<Character*, 2> >::iterator it = _characters.begin(); it != _characters.end(); ++it)
+    {
+        if (*it != nullptr && (*it)->_db.pcid == pcid)
+            return *it;
+    }
+    return nullptr;
 }
 
 // 0x35d30
-void CliSession::removeCharacter(unsigned long long)
+void CliSession::removeCharacter(unsigned long long pcid)
 {
-    LIFT_STUB(0x35d30);
+    if (pcid == 0)
+        return;
+    for (std::vector<Character*, StlAllocator<Character*, 2> >::iterator it = _characters.begin(); it != _characters.end(); ++it)
+    {
+        if (*it != nullptr && (*it)->_db.pcid == pcid)
+        {
+            _characters.erase(it);
+            return;
+        }
+    }
 }
 
 // 0x35d90
 Character* CliSession::getPlayingCharacter()
 {
-    LIFT_STUB(0x35d90);
+    if (_presence == nullptr || _presence->GetKind() != Presence::GameWorld)
+        return nullptr;
+    return getCharacter(static_cast<GameWorldPresence*>(_presence)->_pcid);
 }
 
 // 0x35e20
@@ -1185,11 +1203,11 @@ void CliSession::onPcCafeChargeStop()
 }
 
 // 0x3a3f0
-// LIFT: not lifted in card ld-13 (0x3a3f0). The body calls _lgate->addReferenceCount(false, L"CliSession.cpp", 3212).
-// LobbyGateChannel has no PDB base (RefCntObject) in LobbyGateChannel.h yet.
-AnonymousLobbyGatePresence::AnonymousLobbyGatePresence(LobbyGateChannel*, unsigned long long)
+AnonymousLobbyGatePresence::AnonymousLobbyGatePresence(LobbyGateChannel* lgate, unsigned long long gatekey)
+    : _lgate(lgate), _gatekey(gatekey)
 {
-    LIFT_STUB(0x3a3f0);
+    if (lgate != nullptr)
+        lgate->addReferenceCount(false, L"CliSession.cpp", 3212);
 }
 
 // 0x3a450 (scalar deleting destructor)

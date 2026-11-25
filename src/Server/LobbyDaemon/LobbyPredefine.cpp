@@ -37,9 +37,38 @@ char GetLobbyGateKickReason(int reason)
 }
 
 // 0x96500
-char GetGameWorldKickReason(int)
+// LIFT: owned by gap-25-misc. KickJob::worldKickReq (0x87010) calls it. Lifted so that worldKickReq is not noreturn.
+char GetGameWorldKickReason(int reason)
 {
-    LIFT_STUB(0x96500);
+    switch (reason)
+    {
+    case 1:
+        return 1;
+    case 2:
+        return 2;
+    case 3:
+        return 3;
+    case 4:
+        return 4;
+    case 5:
+        return 5;
+    case 6:
+        return 6;
+    case 7:
+        return 7;
+    case 8:
+        return 8;
+    case 9:
+        return 9;
+    case 10:
+        return 10;
+    case 11:
+        return 11;
+    case 12:
+        return 12;
+    default:
+        return 0;
+    }
 }
 
 // 0x96580

@@ -6,6 +6,9 @@
 
 namespace StsMsgLib
 {
+// LIFT: NPChannelBase.h (SmartCouponDaemon PDB) defines the same base types with the same layout and enum values.
+// A TU that includes both headers must include NPChannelBase.h first. Then this header skips its copy.
+#ifndef LIFT_STSMSG_BASE_TYPES
 // PDB enum ECommand (include/pdb/LobbyDaemon/types.h). VS2010 does not accept an opaque enum declaration,
 // so the full enum is here.
 enum ECommand : int {
@@ -259,12 +262,14 @@ struct _StsMsgInfo
     EMessageType msgType;
 };
 static_assert(sizeof(_StsMsgInfo) == 0x8, "sizeof StsMsgLib::_StsMsgInfo");
+#endif  // LIFT_STSMSG_BASE_TYPES
 
 struct _StsMsgInfoNotify : public _StsMsgInfo
 {
 };
 static_assert(sizeof(_StsMsgInfoNotify) == 0x8, "sizeof StsMsgLib::_StsMsgInfoNotify");
 
+#ifndef LIFT_STSMSG_BASE_TYPES
 struct _StsMsgInfoResponse : public _StsMsgInfo
 {
     struct _StsMsgBanInfo
@@ -298,6 +303,7 @@ struct _StsMsgResponse : public _StsMsg
     _StsMsgInfoResponse msgInfo;
 };
 static_assert(sizeof(_StsMsgResponse) == 0x60, "sizeof StsMsgLib::_StsMsgResponse");
+#endif  // LIFT_STSMSG_BASE_TYPES
 
 struct UserBan
 {

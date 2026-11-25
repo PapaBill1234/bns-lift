@@ -532,6 +532,8 @@ static_assert(sizeof(GameServiceLocation) == 0x30, "sizeof GameServiceLocation")
 class GameWorldPresence : public Presence
 {
 public:
+    friend class KickJob;  // LIFT: access helper; KickJob::worldKickReq (0x87010) reads _wid, _pcid and _gamekey.
+
     virtual ~GameWorldPresence();  // 0x329e0 (scalar deleting destructor)
     virtual Kind GetKind() const;  // 0xe51f0 (folded)
     virtual bool IsEqual(Presence const*) const;  // 0x3adf0
@@ -543,6 +545,8 @@ public:
     virtual void NotifyChangedGradeLevel(CliSession*, StsMsgLib::_StsMsgNotifyGradeNotifyScoreChanged const&);  // 0x3b290
 
 private:
+    friend class CliSession;  // LIFT: access helper; getPlayingCharacter reads _pcid.
+
     short _wid;
     unsigned long long _pcid;
     unsigned long long _gamekey;
@@ -553,6 +557,8 @@ static_assert(sizeof(GameWorldPresence) == 0x20, "sizeof GameWorldPresence");
 class LobbyGatePresence : public Presence
 {
 public:
+    // LIFT: the PDB ctor LobbyGatePresence(short) has no body. It is inlined (StartCliSessionWlobbyTokenJob::start 0x77910).
+    explicit LobbyGatePresence(short gatewid) : _gatewid(gatewid), _node(nullptr) {}
     virtual ~LobbyGatePresence();  // 0x3a710 (scalar deleting destructor)
     virtual Kind GetKind() const;  // 0x99980
     virtual bool IsEqual(Presence const*) const;  // 0x3a760

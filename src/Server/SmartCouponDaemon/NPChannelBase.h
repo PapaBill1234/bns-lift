@@ -390,6 +390,8 @@ struct _StsMsgResponse : public _StsMsg
     _StsMsgInfoResponse msgInfo;
 };
 static_assert(sizeof(_StsMsgResponse) == 0x60, "sizeof StsMsgLib::_StsMsgResponse");
+// LIFT: tells LobbyDaemon/StsMsgGrade.h that the StsMsgLib base types are already defined.
+#define LIFT_STSMSG_BASE_TYPES 1
 static_assert(offsetof(_StsMsgResponse, msgInfo.bComplete) == 0x14, "bComplete");
 static_assert(offsetof(_StsMsgResponse, msgInfo.errInfo.nStatusCode) == 0x20, "nStatusCode");
 static_assert(offsetof(_StsMsgResponse, msgInfo.errInfo.pwszReason) == 0x28, "pwszReason");

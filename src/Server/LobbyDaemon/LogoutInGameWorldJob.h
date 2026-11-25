@@ -27,6 +27,7 @@ public:
     short _wid;
 
     static ObjPool _pool;  // LIFT: no definition yet (like CliSession::_pool).
+    static LobbyJobDef _def;  // 0x201b58
 };
 static_assert(sizeof(LogoutInGameWorldJob) == 0x60, "sizeof LogoutInGameWorldJob");
 static_assert(offsetof(LogoutInGameWorldJob, _wid) == 0x58, "LogoutInGameWorldJob::_wid");
