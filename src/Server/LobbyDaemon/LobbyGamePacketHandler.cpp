@@ -524,7 +524,9 @@ static __forceinline bool HandleShowcaseOk(SharedChannel* channel, Packet const*
     unsigned long long tid = 0;
     if (packet->Decompose(&pdr, 1, &tid) == 0)
     {
-        Log::Write(Log::LT_ERROR, HANDLER_FILE, line1, decomposeFail1, LgpChannelId(channel), tid, 0);
+        // LIFT: the original reads the showcase size here too (null after the first decompose, so 0).
+        int size = showcaseData.size != nullptr ? *showcaseData.size : 0;
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, line1, decomposeFail1, LgpChannelId(channel), tid, size);
         return true;
     }
     if (packet->Decompose(&pdr, &showcaseData) == 0)
