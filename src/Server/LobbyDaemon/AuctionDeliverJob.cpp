@@ -6,19 +6,18 @@
 // 0x12230
 RefCntPoolObj::~RefCntPoolObj()
 {
-    LIFT_STUB(0x12230);
 }
 
 // 0x12270
 LobbyJob::~LobbyJob()
 {
-    LIFT_STUB(0x12270);
+    // The CriticalSection dtor of _lock and the RefCntPoolObj dtor run here.
 }
 
 // 0x122b0
-bool LobbyJob::dispatch_work(int, void*)
+bool LobbyJob::dispatch_work(int task, void* param)
 {
-    LIFT_STUB(0x122b0);
+    return work(task, param);
 }
 
 // 0x12300

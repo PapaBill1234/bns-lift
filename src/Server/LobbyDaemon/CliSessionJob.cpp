@@ -1,5 +1,6 @@
 // CliSessionJob.obj (LobbyDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
 #include "CliSessionJob.h"
+#include "CliSession.h"
 #include "LiftStub.h"
 
 // 0x3bef0
@@ -15,7 +16,12 @@ CliSessionJob::~CliSessionJob()
 }
 
 // 0x3c010
-bool CliSessionJob::dispatch_work(int, void*)
+bool CliSessionJob::dispatch_work(int task, void* param)
 {
-    LIFT_STUB(0x3c010);
+    // The job works under the lock of its owner session.
+    CliSession* const owner = _owner;
+    EnterCriticalSection(&owner->_lock.CS);
+    bool const result = work(task, param);
+    LeaveCriticalSection(&owner->_lock.CS);
+    return result;
 }

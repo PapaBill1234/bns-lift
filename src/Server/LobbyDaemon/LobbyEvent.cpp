@@ -2,6 +2,7 @@
 #include "LobbyEvent.h"
 #include "FragmentPacket.h"
 #include "LiftStub.h"
+#include "NPServiceChannel.h"
 #include "Memory.h"
 #include "Session.h"
 #include "SharedChannel.h"
@@ -74,13 +75,28 @@ bool SharedChannelFragmentPacketHandleEvent::HandleEvent(EventContext*, unsigned
 // 0xbbad0
 NPLobbyMessageHandleEvent::~NPLobbyMessageHandleEvent()
 {
-    LIFT_STUB(0xbbad0);
+    if (_channel != nullptr)
+        _channel->removeReferenceCount(L"LobbyEvent.cpp", 82);
+    if (_tran != nullptr)
+    {
+        _tran->~NPTransaction();
+        Memory::_Manager[Memory::DYNAMIC]->Free(_tran, L"LobbyEvent.cpp", 84);
+        _tran = nullptr;
+    }
 }
 
 // 0xbbb60
 bool NPLobbyMessageHandleEvent::HandleEvent(EventContext*, unsigned long)
 {
-    LIFT_STUB(0xbbb60);
+    if (_channel != nullptr && _msg != nullptr)
+    {
+        if (_handler != nullptr)
+            _handler(_channel, _msg, _tran);
+        if (_msg != nullptr)
+            _channel->_sts->ReleaseStsMsg(_msg);
+    }
+    removeReferenceCount(L"LobbyEvent.cpp", 93);
+    return true;
 }
 
 // LIFT: card 24 adds this constructor (card 6 module). The null check is safe: the original inlines it in 0x64420 after its own session null check.
@@ -95,13 +111,24 @@ PacketHandleEvent::PacketHandleEvent(Session const* session, Packet const* packe
 // 0xbbbe0
 PacketHandleEvent::~PacketHandleEvent()
 {
-    LIFT_STUB(0xbbbe0);
+    if (_packet != nullptr)
+    {
+        const_cast<Packet*>(_packet)->Clear();
+        Memory::_Manager[Memory::DYNAMIC]->Free(const_cast<Packet*>(_packet), L"LobbyEvent.cpp", 112);
+    }
+    if (_session != nullptr)
+        const_cast<Session*>(_session)->removeReferenceCount(L"LobbyEvent.cpp", 114);
 }
 
 // 0xbbc60
 bool PacketHandleEvent::HandleEvent(EventContext*, unsigned long)
 {
-    LIFT_STUB(0xbbc60);
+    // LIFT: the PDB type of _handler is bool (*)(Session const*, Packet const*). The lift keeps void* (PostOfficeChannel.cpp gives it).
+    bool (*const handler)(Session const*, Packet const*) = reinterpret_cast<bool (*)(Session const*, Packet const*)>(_handler);
+    if (handler != nullptr && _session != nullptr && _packet != nullptr)
+        handler(_session, _packet);
+    removeReferenceCount(L"LobbyEvent.cpp", 120);
+    return true;
 }
 
 // 0xbbcf0

@@ -47,12 +47,26 @@ public:
     bool SendRequestPromotionStampAttendPromotionSecured(NPTransaction*, id128 const&, int, short, wchar_t const*, short, long long);  // 0xd20d0
 };
 
-class NPLobbyJobTransaction
+// PDB NPLobbyJobTransaction (sizeof 0x18, NPTransaction base). Same form as SmartCouponDaemon NPJobTransaction.
+class NPLobbyJobTransaction : public NPTransaction
 {
 public:
+    // LIFT: the constructor is not in the PDB. Expire resets the members to this state.
+    NPLobbyJobTransaction() : _jobid(0), _state(-1), _task(0) {}
+    virtual ~NPLobbyJobTransaction() {}  // scalar deleting destructor 0xd2240 (folded with NPTransaction)
+    virtual int GetKind() const { return 1; }  // 0xe3ec0 (folded)
     virtual void Expire();  // 0xd2250
     NPTransaction* Set(LobbyJob*, int);  // 0xd22c0
+    unsigned long long GetJobId() const { return _jobid; }  // PDB inline
+    int GetJobState() const { return _state; }  // PDB inline
+
+    unsigned long long _jobid;
+    int _state;
+    int _task;
 };
+static_assert(sizeof(NPLobbyJobTransaction) == 0x18, "sizeof NPLobbyJobTransaction");
+static_assert(offsetof(NPLobbyJobTransaction, _jobid) == 0x08, "NPLobbyJobTransaction::_jobid");
+static_assert(offsetof(NPLobbyJobTransaction, _task) == 0x14, "NPLobbyJobTransaction::_task");
 
 class NPServiceChannelManager
 {

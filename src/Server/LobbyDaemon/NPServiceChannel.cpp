@@ -1,6 +1,9 @@
 // NPServiceChannel.obj (LobbyDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
 #include "NPServiceChannel.h"
 #include "LiftStub.h"
+#include "LobbyDaemon.h"
+#include "LobbyJob.h"
+#include "Log.h"
 
 // 0xcfba0
 bool NPServiceChannelManager::Initialize(unsigned int, unsigned long, unsigned short, long)
@@ -209,11 +212,22 @@ bool NPGameServiceChannel::SendRequestPromotionStampAttendPromotionSecured(NPTra
 // 0xd2250
 void NPLobbyJobTransaction::Expire()
 {
-    LIFT_STUB(0xd2250);
+    if (!LobbyDaemon::_instance->_jobMgr->ResumeW(_jobid, _state, _task, nullptr))
+        Log::Write(Log::LT_ERROR, L"NPServiceChannel.cpp", 909,
+                   L"[np], expire np lobby-job transaction fail; execute job fail, tid:0x%I64X, state:%d, task:%d",
+                   _jobid, _state, _task);
 }
 
 // 0xd22c0
-NPTransaction* NPLobbyJobTransaction::Set(LobbyJob*, int)
+NPTransaction* NPLobbyJobTransaction::Set(LobbyJob* job, int task)
 {
-    LIFT_STUB(0xd22c0);
+    if (job == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, L"NPServiceChannel.cpp", 915, L"[np], set np lobby-job transaction fail; invalid parameter");
+        return nullptr;
+    }
+    _jobid = job->_id;
+    _state = job->_state;
+    _task = task;
+    return this;
 }
