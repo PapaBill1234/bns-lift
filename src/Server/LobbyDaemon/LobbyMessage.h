@@ -74,3 +74,25 @@ public:
     virtual void Dispatch(PcCafeMileage* acceptor);  // 0x2fa90
 };
 static_assert(sizeof(CliSessionStopPcCafeChargeMessage) == 0x10, "sizeof CliSessionStopPcCafeChargeMessage");
+
+// PDB class CliSessionEnterWorldMessage (size 0x10). GameServiceLocation::OnEnter (0x3b3d0) sends it.
+// LIFT: /OPT:ICF folds both Dispatch bodies into 0x2fad0 (same code as CliSessionStartPcCafeChargeMessage).
+class CliSessionEnterWorldMessage : public CliSessionMessage
+{
+public:
+    explicit CliSessionEnterWorldMessage(CliSession* cs) : CliSessionMessage(cs) {}
+    virtual void Dispatch(PcCafeMileage* acceptor);  // 0x2fad0 (folded)
+    virtual void Dispatch(MembershipMileage* acceptor);  // 0x2fad0 (folded)
+};
+static_assert(sizeof(CliSessionEnterWorldMessage) == 0x10, "sizeof CliSessionEnterWorldMessage");
+
+// PDB class CliSessionLeaveWorldMessage (size 0x10). GameServiceLocation::OnLeave (0x3b540) sends it.
+// LIFT: /OPT:ICF folds both Dispatch bodies into 0x2fa90 (same code as CliSessionStopPcCafeChargeMessage).
+class CliSessionLeaveWorldMessage : public CliSessionMessage
+{
+public:
+    explicit CliSessionLeaveWorldMessage(CliSession* cs) : CliSessionMessage(cs) {}
+    virtual void Dispatch(PcCafeMileage* acceptor);  // 0x2fa90 (folded)
+    virtual void Dispatch(MembershipMileage* acceptor);  // 0x2fa90 (folded)
+};
+static_assert(sizeof(CliSessionLeaveWorldMessage) == 0x10, "sizeof CliSessionLeaveWorldMessage");

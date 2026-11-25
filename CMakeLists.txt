@@ -410,6 +410,7 @@ add_library(lift_lobbydaemon STATIC
   src/Server/LobbyDaemon/CliSessionJob.cpp
   src/Server/LobbyDaemon/CliSessionManager.cpp
   src/Server/LobbyDaemon/CliSessionTable.cpp
+  src/Server/LobbyDaemon/ContentsRuleConfigDefinition.cpp
   src/Server/LobbyDaemon/CreateCharacterJob.cpp
   src/Server/LobbyDaemon/CreateInitialUserNameJob.cpp
   src/Server/LobbyDaemon/DeleteCharacterJob.cpp

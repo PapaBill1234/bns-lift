@@ -5,7 +5,9 @@
 #include "GamedChannel.h"
 #include "AlertSender.h"
 #include "Connection.h"
+#include "CliSessionManager.h"
 #include "FragmentPacket.h"
+#include "GameWorld.h"
 #include "LiftStub.h"
 #include "LobbyDaemon.h"
 #include "Log.h"
@@ -248,10 +250,40 @@ bool GamedChannelManager::OnConnect(Session const* session, bool) const
 }
 
 // 0x80790
-void GamedChannelManager::OnClose(Session const*, bool) const
+void GamedChannelManager::OnClose(Session const* session, bool) const
 {
-    // Not done: needs LobbyDaemon::_instance->_gameWorldRegistry and ->_clisessionMgr (LobbyDaemon layout, cards ld-15/ld-20).
-    LIFT_STUB(0x80790);
+    Channel* channel = session->GetChannel();
+    if (channel != nullptr)
+    {
+        SharedChannel* shared = static_cast<SharedChannel::RawChannel*>(channel)->_owner;
+        if (shared != nullptr)
+        {
+            short wid = 0;
+            Log::Write(Log::LT_ERROR, GAMED_FILE, 113, L"[gamed], gamed channel closed, wid:%d",
+                       shared->_rawChannel != nullptr ? static_cast<int>(static_cast<short>(shared->_rawChannel->GetId())) : 0);
+            if (shared->_rawChannel != nullptr)
+                wid = static_cast<short>(shared->_rawChannel->GetId());
+            const_cast<GamedChannelManager*>(this)->Remove(wid);
+            if (wid != 0)
+            {
+                GameWorld* world = LobbyDaemon::_instance->_gameWorldRegistry->Get(wid);
+                if (world != nullptr)
+                    world->_live = false;
+                LobbyDaemon::_instance->_clisessionMgr->OnCloseGamedChannel(wid);
+            }
+        }
+        else
+        {
+            Log::Write(Log::LT_ERROR, GAMED_FILE, 118,
+                       L"== CRASH == [gamed], gamed channel closed exception; raw-channel has no shared-channel, channel-id:%I64d",
+                       channel->GetId());
+            AlertSender::Write(GAMED_FILE, 118,
+                               L"== CRASH == [gamed], gamed channel closed exception; raw-channel has no shared-channel, channel-id:%I64d",
+                               channel->GetId());
+        }
+        channel->removeReferenceCount(SESSION_FILE, 1059);
+    }
+    Log::Write(Log::LT_ERROR, GAMED_FILE, 130, L"[gamed], session closed, session-id:0x%I64X", session->_id);
 }
 
 // 0x80980

@@ -41,6 +41,8 @@ private:
 
     // ❓ Not in the PDB. WaitQueueList::Pop (0xdca20) calls the private updateWaitAvg.
     friend class WaitQueueList;
+    // ❓ Not in the PDB. GameWorldCluster::enterUser (0x4dd90) reads _waitAvg (+80) and Size() of each queue.
+    friend class GameWorldCluster;
 };
 
 class WaitQueueList
@@ -68,11 +70,21 @@ private:
     WaitQueue _waitQueue[WaitQueue::MAX_WAIT_QUEUE_TYPE];  // +0
     int _maxWaitingPlayer;                                 // +264
     int _currentWaitingPlayer;                             // +268
+
+    // ❓ Not in the PDB. GameWorldCluster::enterUser (0x4dd90) reads and writes the members.
+    friend class GameWorldCluster;
 };
 
 // LIFT: WaitQueueInfo and WaitInfo are PDB structs (sizes 0x8 and 0x2C). Used by LobbyGateChannel::SendStartWaitNotify (0xbd6e0).
 struct WaitQueueInfo
 {
+    // PDB method WaitQueueInfo::Init (no RVA, inlined in GameServiceLocation::Enter 0x3b6f0).
+    void Init()
+    {
+        queueType = WaitQueue::WAIT_QUEUE_TYPE_NONE;
+        waitingPlayerCount = 0;
+    }
+
     WaitQueue::Type queueType;
     short waitingPlayerCount;
 };
@@ -82,6 +94,18 @@ static_assert(offsetof(WaitQueueInfo, waitingPlayerCount) == 0x4, "WaitQueueInfo
 
 struct WaitInfo
 {
+    // PDB method WaitInfo::Init (no RVA, inlined in GameServiceLocation::Enter 0x3b6f0).
+    // LIFT: the original does not set waitQueueInfoCount here.
+    void Init()
+    {
+        pos = WaitQueue::INVALID_POS;
+        turn = 0;
+        avg = 0;
+        queueType = WaitQueue::WAIT_QUEUE_TYPE_NONE;
+        for (int i = 0; i < 3; ++i)
+            waitQueueInfo[i].Init();
+    }
+
     short pos;
     int turn;
     long avg;

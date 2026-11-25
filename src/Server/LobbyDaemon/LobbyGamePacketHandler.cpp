@@ -13,6 +13,7 @@
 #include "Connection.h"
 #include "GameWorld.h"
 #include "GamedChannel.h"
+#include "InfoGateChannel.h"
 #include "LobbyConfig.h"
 #include "LobbyDaemon.h"
 #include "Log.h"
@@ -1771,15 +1772,55 @@ bool HandleLobbyGame_SecondPasswordIsVerifiedReq(SharedChannel*, Packet const*)
 }
 
 // 0x92280
-bool HandleLobbyGame_AuctionEscrowOk(SharedChannel*, Packet const*)
+bool HandleLobbyGame_AuctionEscrowOk(SharedChannel* channel, Packet const* packet)
 {
-    LIFT_STUB(0x92280);
+    PacketDecomposer pdr;
+    SetupDecomposer(&pdr, "hq", 2);
+    unsigned long long tid = 0;
+    if (packet->Decompose(&pdr, 1, &tid) == 0)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 2418,
+                   L"[gamed], handle auction escrow ok fail; decompose fail, wid:%d, tid:0x%I64X", LgpWid(channel), tid);
+        return true;
+    }
+    // LIFT: the task id 131 has no PDB name. ❓
+    if (!LobbyDaemon::_instance->_jobMgr->ExecuteW(tid, 131, nullptr))
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 2423,
+                   L"[gamed], handle auction escrow ok fail; execute job fail, wid:%d, tid:0x%I64X", LgpWid(channel), tid);
+        return true;
+    }
+    Log::Write(Log::LT_DEBUG, HANDLER_FILE, 2427, L"[gamed], handle auction escrow ok ok, wid:%d, tid:0x%I64X",
+               LgpWid(channel), tid);
+    return true;
 }
 
 // 0x92400
-bool HandleLobbyGame_AuctionEscrowFail(SharedChannel*, Packet const*)
+bool HandleLobbyGame_AuctionEscrowFail(SharedChannel* channel, Packet const* packet)
 {
-    LIFT_STUB(0x92400);
+    PacketDecomposer pdr;
+    SetupDecomposer(&pdr, "hqE", 3);
+    unsigned long long tid = 0;
+    short reason = 0;
+    if (packet->Decompose(&pdr, 2, &tid, &reason) == 0)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 2446,
+                   L"[gamed], handle auction escrow fail fail; decompose fail, wid:%d, tid:0x%I64X, reason:%d",
+                   LgpWid(channel), tid, static_cast<int>(reason));
+        return true;
+    }
+    // LIFT: the task id 132 has no PDB name. ❓
+    if (!LobbyDaemon::_instance->_jobMgr->ExecuteW(tid, 132, &reason))
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 2451,
+                   L"[gamed], handle auction escrow fail fail; execute job fail, wid:%d, tid:0x%I64X, reason:%d",
+                   LgpWid(channel), tid, static_cast<int>(reason));
+        return true;
+    }
+    Log::Write(Log::LT_DEBUG, HANDLER_FILE, 2455,
+               L"[gamed], handle auction escrow fail ok, wid:%d, tid:0x%I64X, reason:%d", LgpWid(channel), tid,
+               static_cast<int>(reason));
+    return true;
 }
 
 // 0x926a0
@@ -1789,9 +1830,41 @@ bool HandleLobbyGame_AuctionBidReq(SharedChannel*, Packet const*)
 }
 
 // 0x92ca0
-bool HandleLobbyGame_GetGradeListReq(SharedChannel*, Packet const*)
+bool HandleLobbyGame_GetGradeListReq(SharedChannel* sharedChannel, Packet const* packet)
 {
-    LIFT_STUB(0x92ca0);
+    GamedChannel* const channel = static_cast<GamedChannel*>(sharedChannel);
+    PacketDecomposer pdr;
+    SetupDecomposer(&pdr, "hqQqi", 5);
+    unsigned long long gameTid = 0;
+    char locationHint = 0;
+    unsigned long long pcid = 0;
+    int reqRevision = 0;
+    if (packet->Decompose(&pdr, 4, &gameTid, &locationHint, &pcid, &reqRevision) == 0)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 2520,
+                   L"[gamed], handle get grade list req fail; decompose fail, wid:%d, game-tid:0x%I64X, location-hint:%d, pcid:0x%I64X, req-revision:%d",
+                   LgpWid(channel), gameTid, static_cast<int>(locationHint), pcid, reqRevision);
+        return true;
+    }
+    // LIFT: the original does not check channel for null after the decompose (0x92ca0).
+    short wid = channel->_rawChannel != nullptr ? static_cast<short>(channel->_rawChannel->GetId()) : 0;
+    CliSession* cs = LobbyDaemon::_instance->_clisessionMgr->Select_index_pcid(wid, pcid);
+    if (cs == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 2526,
+                   L"[gamed], handle get grade list req fail; no such session, wid:%d, game-tid:0x%I64X, location-hint:%d, pcid:0x%I64X, req-revision:%d",
+                   channel->_rawChannel != nullptr ? static_cast<int>(static_cast<short>(channel->_rawChannel->GetId())) : 0,
+                   gameTid, static_cast<int>(locationHint), pcid, reqRevision);
+        channel->SendGetGradeListFail(gameTid, locationHint, pcid, 5);
+        return true;
+    }
+    cs->HandleGameGetGradeList(channel, gameTid, locationHint, pcid, reqRevision);
+    Log::Write(Log::LT_DEBUG, HANDLER_FILE, 2533,
+               L"[gamed], handle get grade list req ok, wid:%d, game-tid:0x%I64X, location-hint:%d, pcid:0x%I64X, req-revision:%d",
+               channel->_rawChannel != nullptr ? static_cast<int>(static_cast<short>(channel->_rawChannel->GetId())) : 0,
+               gameTid, static_cast<int>(locationHint), pcid, reqRevision);
+    cs->removeReferenceCount(HANDLER_FILE, 2535);
+    return true;
 }
 
 // 0x92f00
@@ -1807,9 +1880,31 @@ bool HandleLobbyGame_DepositGameMileageReq(SharedChannel*, Packet const*)
 }
 
 // 0x94780
-bool HandleLobbyGame_BoastEventInWorldNotify(SharedChannel*, Packet const*)
+bool HandleLobbyGame_BoastEventInWorldNotify(SharedChannel* channel, Packet const* packet)
 {
-    LIFT_STUB(0x94780);
+    short cmd = 0;
+    short worldClusterId = 0;
+    short boastEventDataId = 0;
+    wchar_t pcName[40];
+    pcName[0] = 0;
+    if (packet->Decompose("hhsh", &cmd, &worldClusterId, pcName, 33, &boastEventDataId) == 0)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 2880, L"[gamed], handle boast event in world notify fail; decompose fail");
+        return true;
+    }
+    InfoGateChannelManager* infogatechmgr = LobbyDaemon::_instance->_infogatechmgr;
+    if (infogatechmgr == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 2887,
+                   L"[gamed], handle boast event in world notify fail; info-gate channel manager not available, channel-id:%I64d, world-cluster-id:%d, pc-name:%s, boast-event-dataId:%d",
+                   LgpChannelId(channel), static_cast<int>(worldClusterId), pcName, static_cast<int>(boastEventDataId));
+        return true;
+    }
+    infogatechmgr->BroadcastBoastEventInWorldNotify(worldClusterId, pcName, boastEventDataId);
+    Log::Write(Log::LT_DEBUG, HANDLER_FILE, 2893,
+               L"[gamed], handle boast event in world notify ok, channel-id:%I64d, world-cluster-id:%d, pc-name:%s, boast-event-dataId:%d",
+               LgpChannelId(channel), static_cast<int>(worldClusterId), pcName, static_cast<int>(boastEventDataId));
+    return true;
 }
 
 // 0x94910
@@ -1819,9 +1914,83 @@ bool HandleLobbyGame_TakeAccountTimeBasedPlayRewardReq(SharedChannel*, Packet co
 }
 
 // 0x94df0
-bool HandleLobbyGame_UpdateAccountExpReq(SharedChannel*, Packet const*)
+bool HandleLobbyGame_UpdateAccountExpReq(SharedChannel* sharedChannel, Packet const* packet)
 {
-    LIFT_STUB(0x94df0);
+    GamedChannel* const channel = static_cast<GamedChannel*>(sharedChannel);
+
+    // LIFT: inlined RepeatPacketDecomposer setup. The command is skipped (index 1, offset 2).
+    RepeatPacketDecomposer rpd;
+    rpd.format = "hqqqqiq";
+    rpd.len = 7;
+    rpd.index = 1;
+    rpd.offset = 2;
+    rpd.top = -1;
+
+    unsigned long long gametid = 0;
+    unsigned long long pcid = 0;
+    unsigned long long clikey = 0;
+    GameAccountExpInfo::ExpInfo accExpInfo;
+    memset(&accExpInfo, 0, sizeof(accExpInfo));
+
+    if (packet->Decompose(&rpd, 3, &gametid, &pcid, &clikey) == 0)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 2965,
+                   L"[gamed], handle update account-exp fail; decompose fail, channel-id:%I64d, game-tid:0x%I64X, pcid:0x%I64X, cli-key:0x%I64X",
+                   LgpChannelId(channel), gametid, pcid, clikey);
+        return true;
+    }
+    if (packet->Decompose(&rpd, 3, &accExpInfo.exp, &accExpInfo.expQuotaPerDay, &accExpInfo.lastUpdateTime) == 0)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 2970,
+                   L"[gamed], handle update account-exp fail; decompose(AccountExpInfo) fail, channel-id:%I64d, game-tid:0x%I64X, pcid:0x%I64X, cli-key:0x%I64X",
+                   LgpChannelId(channel), gametid, pcid, clikey);
+        return true;
+    }
+    // LIFT: the original does not check channel for null after the decompose (0x94df0).
+    unsigned long long channelId = 0;
+    short wid = channel->_rawChannel != nullptr ? static_cast<short>(channel->_rawChannel->GetId()) : 0;
+    CliSession* cs = LobbyDaemon::_instance->_clisessionMgr->Select_index_pcid(wid, pcid);
+    if (cs == nullptr)
+    {
+        if (channel->_rawChannel != nullptr)
+            channelId = channel->_rawChannel->GetId();
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 2977,
+                   L"[gamed], handle update account-exp fail; no such cli-session, channel-id:%I64d, game-tid:0x%I64X, pcid:0x%I64X, cli-key:0x%I64X",
+                   channelId, gametid, pcid, clikey);
+        channel->SendUpdateAccountExpFail(gametid, pcid, 5);
+        return true;
+    }
+    if (clikey != cs->_clikey)
+    {
+        if (channel->_rawChannel != nullptr)
+            channelId = channel->_rawChannel->GetId();
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 2984,
+                   L"[gamed], handle update account-exp fail; cli-key mismatch, found-cli-key:0x%I64X, channel-id:%I64d, game-tid:0x%I64X, pcid:0x%I64X, cli-key:0x%I64X",
+                   cs->_clikey, channelId, gametid, pcid, clikey);
+        channel->SendUpdateAccountExpFail(gametid, pcid, 5);
+        cs->removeReferenceCount(HANDLER_FILE, 2986);
+        return true;
+    }
+    if (!cs->UpdateAccountExp(pcid, accExpInfo))
+    {
+        int error = TLobbyError;
+        if (channel->_rawChannel != nullptr)
+            channelId = channel->_rawChannel->GetId();
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 2993,
+                   L"[gamed], handle update account-exp fail; update fail, error:%s, channel-id:%I64d, game-tid:0x%I64X, pcid:0x%I64X, cli-key:0x%I64X",
+                   LobbyErrorText(error), channelId, gametid, pcid, clikey);
+        channel->SendUpdateAccountExpFail(gametid, pcid, UpdateFailCode(error));
+        cs->removeReferenceCount(HANDLER_FILE, 3007);
+        return true;
+    }
+    channel->SendUpdateAccountExpOk(gametid, pcid);
+    if (channel->_rawChannel != nullptr)
+        channelId = channel->_rawChannel->GetId();
+    Log::Write(Log::LT_DEBUG, HANDLER_FILE, 3013,
+               L"[gamed], handle update account-exp ok, channel-id:%I64d, game-tid:0x%I64X, pcid:0x%I64X, cli-key:0x%I64X",
+               channelId, gametid, pcid, clikey);
+    cs->removeReferenceCount(HANDLER_FILE, 3015);
+    return true;
 }
 
 // 0x951f0

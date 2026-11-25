@@ -206,6 +206,9 @@ public:
     virtual void Accept(LobbyMessage*);  // 0x60660
 
 private:
+    // LIFT: access helper. No PDB in the set has friend records. GameServiceLocation::OnEnter (0x3b3d0) and OnLeave
+    // (0x3b540) walk _mileages.
+    friend class GameServiceLocation;
     std::vector<Mileage*> _mileages;
     int* _limitedIdList;
     int* _limitedSlotList;

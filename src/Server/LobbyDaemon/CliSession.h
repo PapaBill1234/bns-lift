@@ -522,6 +522,9 @@ private:
     WaitQueue::Type _waitQueueType;
     ChargeApplyType _chargeApplyType;
     StopPlayTimerEvent* _reservedStopPlay;
+
+    // PDB static member: static __declspec(thread) WaitInfo _waitResult (S_GTHREAD32, TLS +0x10).
+    // LIFT: not declared. A new TLS variable reorders the LTCG TLS block (see CliSession.cpp).
 };
 static_assert(sizeof(GameServiceLocation) == 0x30, "sizeof GameServiceLocation");
 
