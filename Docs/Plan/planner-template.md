@@ -6,9 +6,11 @@ Repo: bns-lift (PRIVATE). You are a planner card. You do not lift code. You writ
 | --- | --- |
 | Server | {SERVER} |
 | Slug | {SLUG} |
-| IDA database | `/home/ubuntu/Documents/Codex/private-project/ida/lift/{SERVER}/{SERVER}.exe` |
-| PDB | `/home/ubuntu/Documents/Codex/private-project/Service_348_8349/Service/{SERVER}/bin/{SERVER}.pdb` |
+| IDA database | `<work-root>/ida/lift/{SERVER}/{SERVER}.exe` |
+| PDB | `<work-root>/Service_348_8349/Service/{SERVER}/bin/{SERVER}.pdb` |
 | Dep of your first card | `{PREV_DEP}` |
+
+`<work-root>` is the private work directory (see "Path placeholders" in `Docs/Plan/plan.md`). Write `<work-root>`, not an absolute path, in the cards.
 
 Read `Docs/Plan/plan.md` ("Lift method", "Server order", "Planner chain") first. Read the handoffs in `Docs/Plan/handoffs/` for the state of `src/common/`.
 

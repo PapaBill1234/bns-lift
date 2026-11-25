@@ -1,6 +1,6 @@
 # lift-lobbygate-4: LobbyGate lift: LobbyGate app modules, full exe
 
-Repo: bns-lift (PRIVATE). IDA database: `/home/ubuntu/Documents/Codex/private-project/ida/lift/LobbyGate/LobbyGate.exe`. PDB: `/home/ubuntu/Documents/Codex/private-project/Service_348_8349/Service/LobbyGate/bin/LobbyGate.pdb`.
+Repo: bns-lift (PRIVATE). IDA database: `<work-root>/ida/lift/LobbyGate/LobbyGate.exe`. PDB: `<work-root>/Service_348_8349/Service/LobbyGate/bin/LobbyGate.pdb`.
 Read `Docs/Plan/plan.md` "Lift method" first. Read the handoffs of the earlier lift cards (CacheGate, SmartCouponDaemon, LobbyGate) for the state of `src/common/`.
 
 ## Modules (in `src/LobbyGate/`, one `.cpp` + `.h` per PDB module)

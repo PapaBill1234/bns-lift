@@ -1,6 +1,6 @@
 # lift-parity-lg-4: LobbyGate handlers and LobbyGate modules
 
-Repo: bns-lift (PUBLIC). Never commit binaries, PDBs, IDA databases or abuse notes. IDA only when the pseudocode and funcdiff are not enough (`/home/ubuntu/Documents/Codex/private-project/ida/lift/LobbyGate/LobbyGate.exe`).
+Repo: bns-lift (PUBLIC). Never commit binaries, PDBs, IDA databases or abuse notes. IDA only when the pseudocode and funcdiff are not enough (`<work-root>/ida/lift/LobbyGate/LobbyGate.exe`).
 
 ## Goal
 LobbyGate reaches 90 % (666 MATCH), or the handoff gives the cause of each DIFF function that is left.

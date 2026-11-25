@@ -1,6 +1,6 @@
 # lift-parity-lg-1: parity of LobbyGate: the exe-only code
 
-Repo: bns-lift (PRIVATE). IDA only when the pseudocode and funcdiff are not enough (`/home/ubuntu/Documents/Codex/private-project/ida/lift/LobbyGate/LobbyGate.exe`).
+Repo: bns-lift (PRIVATE). IDA only when the pseudocode and funcdiff are not enough (`<work-root>/ida/lift/LobbyGate/LobbyGate.exe`).
 
 ## Goal
 The code of LobbyGate that is not shared compiles to the same code as the original. LobbyGate reaches 90 % parity.

@@ -1,6 +1,6 @@
 # lift-parity-consts-3: constants and refs with no known cause (shared)
 
-Repo: bns-lift (PRIVATE). IDA only when the pseudocode and funcdiff are not enough (`/home/ubuntu/Documents/Codex/private-project/ida/lift/CacheGate/CacheGate.exe`).
+Repo: bns-lift (PRIVATE). IDA only when the pseudocode and funcdiff are not enough (`<work-root>/ida/lift/CacheGate/CacheGate.exe`).
 
 ## Goal
 Find the cause of the shared constant and ref DIFFs. Fix the shared functions first.

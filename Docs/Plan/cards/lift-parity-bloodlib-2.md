@@ -1,6 +1,6 @@
 # lift-parity-bloodlib-2: shared BloodLib DIFF functions that are left
 
-Repo: bns-lift (PRIVATE). IDA only when the pseudocode and funcdiff are not enough (`/home/ubuntu/Documents/Codex/private-project/ida/lift/CacheGate/CacheGate.exe`).
+Repo: bns-lift (PRIVATE). IDA only when the pseudocode and funcdiff are not enough (`<work-root>/ida/lift/CacheGate/CacheGate.exe`).
 
 ## Goal
 The shared library (BloodLib, Shared, Packet) gets near 99 % parity (`tools/parity_shared.py`).

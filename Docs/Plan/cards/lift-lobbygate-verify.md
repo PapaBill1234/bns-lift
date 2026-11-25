@@ -1,15 +1,15 @@
 # lift-lobbygate-verify: run the lifted LobbyGate under Wine and compare packet logs
 
-Repo: bns-lift (PRIVATE). No IDA unless a difference needs it (`/home/ubuntu/Documents/Codex/private-project/ida/lift/LobbyGate/LobbyGate.exe`).
+Repo: bns-lift (PRIVATE). No IDA unless a difference needs it (`<work-root>/ida/lift/LobbyGate/LobbyGate.exe`).
 
 ## Goal
 The lifted LobbyGate starts under Wine and sends the same packets as the original 2019 + PDB LobbyGate for the same input.
 
 ## Facts
-- Original exe and config: `/home/ubuntu/Documents/Codex/private-project/Service_348_8349/Service/LobbyGate/bin/` (`LobbyGate.exe`, `lobbygate.config.xml`, `bns.common.config.xml`, `ContentsRule.lobbygate.config.xml`). Do not use `LobbyGate2019.exe` (other PDB GUID). Do not print config values that are passwords or keys. Write `keyhere`.
+- Original exe and config: `<work-root>/Service_348_8349/Service/LobbyGate/bin/` (`LobbyGate.exe`, `lobbygate.config.xml`, `bns.common.config.xml`, `ContentsRule.lobbygate.config.xml`). Do not use `LobbyGate2019.exe` (other PDB GUID). Do not print config values that are passwords or keys. Write `keyhere`.
 - The exe loads `XmlReader_sv64.dll`, `bsConsole_sv64.dll` and `dbghelp.dll` at run time. Copy them from the same folder next to both exes.
 - Peers: LobbyDaemon (LobbyDChannel) and game clients (Client). The exe has no ODBC import.
-- Packet log tools: `/home/ubuntu/Documents/Codex/bns-wine/pktlog/` (`patch_import.py`, `pkldump.py`, `pktcover.py`). Read their usage lines only.
+- Packet log tools: `<bns-wine>/pktlog/` (`patch_import.py`, `pkldump.py`, `pktcover.py`). Read their usage lines only.
 - The Wine server set in `bns-wine/` is the 381 set. The 2019 + PDB LobbyGate can have a different protocol to its peers ❓.
 - `tools/verify/` holds scripts from `lift-cg-verify` and `lift-smartcoupondaemon-verify` (`replay.py`, `run_*.sh`, `compare_*.sh`). Reuse them. Do not change their CacheGate or SmartCouponDaemon behavior.
 

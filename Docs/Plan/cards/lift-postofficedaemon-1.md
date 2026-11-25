@@ -1,6 +1,6 @@
 # lift-postofficedaemon-1: PostOfficeDaemon lift: common delta, move Db, FragmentPacket and ThreadFreePacketPump to common
 
-Repo: bns-lift (PRIVATE). IDA database: `/home/ubuntu/Documents/Codex/private-project/ida/lift/PostOfficeDaemon/PostOfficeDaemon.exe`. PDB: `/home/ubuntu/Documents/Codex/private-project/Service_348_8349/Service/PostOfficeDaemon/bin/PostOfficeDaemon.pdb`.
+Repo: bns-lift (PRIVATE). IDA database: `<work-root>/ida/lift/PostOfficeDaemon/PostOfficeDaemon.exe`. PDB: `<work-root>/Service_348_8349/Service/PostOfficeDaemon/bin/PostOfficeDaemon.pdb`.
 Read `Docs/Plan/plan.md` "Lift method" first. Read the handoffs of the earlier lift cards (CacheGate, SmartCouponDaemon, LobbyGate) for the state of `src/common/`.
 
 ## Modules (in `src/common/`)

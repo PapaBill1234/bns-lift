@@ -3,8 +3,8 @@
 | Item | Value |
 | --- | --- |
 | Source build | LobbyDaemon 2019 + PDB (VS2010 SP1) |
-| Exe | `/home/ubuntu/Documents/Codex/private-project/ida/lift/LobbyDaemon/LobbyDaemon.exe` |
-| PDB | `/home/ubuntu/Documents/Codex/private-project/ida/lift/LobbyDaemon/LobbyDaemon.pdb` |
+| Exe | `<work-root>/ida/lift/LobbyDaemon/LobbyDaemon.exe` |
+| PDB | `<work-root>/ida/lift/LobbyDaemon/LobbyDaemon.pdb` |
 | Pseudocode: `GamedChannel` | `~/.cache/bns-lift/hr/LobbyDaemon/GamedChannel.c` |
 | Pseudocode: `InfoGateChannel` | `~/.cache/bns-lift/hr/LobbyDaemon/InfoGateChannel.c` |
 | Pseudocode: `LobbyInfoGatePacketHandler` | `~/.cache/bns-lift/hr/LobbyDaemon/LobbyInfoGatePacketHandler.c` |

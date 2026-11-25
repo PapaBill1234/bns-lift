@@ -1,6 +1,6 @@
 # lift-smartcoupondaemon-5: SmartCouponDaemon lift: startup fixes and stub bodies
 
-Repo: bns-lift (PRIVATE). IDA database: `/home/ubuntu/Documents/Codex/private-project/ida/lift/SmartCouponDaemon/SmartCouponDaemon.exe`. PDB: `/home/ubuntu/Documents/Codex/private-project/Service_348_8349/Service/SmartCouponDaemon/bin/SmartCouponDaemon.pdb`.
+Repo: bns-lift (PRIVATE). IDA database: `<work-root>/ida/lift/SmartCouponDaemon/SmartCouponDaemon.exe`. PDB: `<work-root>/Service_348_8349/Service/SmartCouponDaemon/bin/SmartCouponDaemon.pdb`.
 Read `Docs/Plan/plan.md` "Lift method" first. Read `Docs/Plan/handoffs/lift-smartcoupondaemon-4.md` and `Docs/Plan/handoffs/lift-smartcoupondaemon-verify.md`. Read `Docs/Verify/SmartCouponDaemon.md` "Differences" and "Next steps".
 
 ## Facts

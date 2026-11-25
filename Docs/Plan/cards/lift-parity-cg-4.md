@@ -1,6 +1,6 @@
 # lift-parity-cg-4: CacheGate CacheDList, CacheD and handlers toward 95 %
 
-Repo: bns-lift (PUBLIC). Never commit binaries, PDBs, IDA databases or abuse notes. IDA only when the pseudocode and funcdiff are not enough (`/home/ubuntu/Documents/Codex/private-project/ida/lift/CacheGate/CacheGate.exe`).
+Repo: bns-lift (PUBLIC). Never commit binaries, PDBs, IDA databases or abuse notes. IDA only when the pseudocode and funcdiff are not enough (`<work-root>/ida/lift/CacheGate/CacheGate.exe`).
 
 ## Goal
 CacheGate moves toward 95 % (467 MATCH), or the handoff gives the cause of each DIFF function that is left.

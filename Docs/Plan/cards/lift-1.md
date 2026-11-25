@@ -1,7 +1,7 @@
 # lift-1: PDB type generator and VS2010 STL subset
 
-Repo: bns-lift (PRIVATE). IDA database: `/home/ubuntu/Documents/Codex/private-project/ida/lift/CacheGate/CacheGate.exe` (only for checks of layouts).
-PDB: `/home/ubuntu/Documents/Codex/private-project/Service_348_8349/Service/CacheGate/bin/CacheGate.pdb`.
+Repo: bns-lift (PRIVATE). IDA database: `<work-root>/ida/lift/CacheGate/CacheGate.exe` (only for checks of layouts).
+PDB: `<work-root>/Service_348_8349/Service/CacheGate/bin/CacheGate.pdb`.
 
 ## Goal
 1. A generator that writes C++ headers for the types in a server PDB.

@@ -1,6 +1,6 @@
 # lift-parity-ehstate-4: EH state -2 with ::new and the global placement delete
 
-Repo: bns-lift (PUBLIC). Never commit binaries, PDBs, IDA databases or abuse notes. IDA only when the pseudocode and funcdiff are not enough (`/home/ubuntu/Documents/Codex/private-project/ida/lift/PostOfficeDaemon/PostOfficeDaemon.exe`).
+Repo: bns-lift (PUBLIC). Never commit binaries, PDBs, IDA databases or abuse notes. IDA only when the pseudocode and funcdiff are not enough (`<work-root>/ida/lift/PostOfficeDaemon/PostOfficeDaemon.exe`).
 
 ## Goal
 The functions with the EH state const `0xfffffffffffffffe` DIFF are MATCH, or the handoff gives the cause of each.

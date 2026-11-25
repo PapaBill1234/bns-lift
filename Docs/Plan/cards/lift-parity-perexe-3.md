@@ -1,6 +1,6 @@
 # lift-parity-perexe-3: per-exe build define, per-exe inline choice
 
-Repo: bns-lift (PRIVATE). IDA only when the pseudocode and funcdiff are not enough (`/home/ubuntu/Documents/Codex/private-project/ida/lift/CacheGate/CacheGate.exe`).
+Repo: bns-lift (PRIVATE). IDA only when the pseudocode and funcdiff are not enough (`<work-root>/ida/lift/CacheGate/CacheGate.exe`).
 
 ## Goal
 Shared functions that the original compiles in a different form per exe get MATCH in each exe.

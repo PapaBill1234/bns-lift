@@ -106,5 +106,5 @@ No key or secret is logged.
 ## Environment
 
 The worktree had no ignored `vendor/zstd/src`. The first `tools/parity.sh` failed on all 5 links (`ZSTD_*` unresolved).
-The source was copied from `/home/ubuntu/Documents/Codex/private-project/bns-lift/vendor/zstd/src` (bb6eaf64). It is not tracked.
+The source was copied from `<lift-root>/vendor/zstd/src` (bb6eaf64). It is not tracked.
 `vendor/zstd` is unchanged.

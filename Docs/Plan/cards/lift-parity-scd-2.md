@@ -1,6 +1,6 @@
 # lift-parity-scd-2: SmartCouponDaemon: handler inline depth and SmartCouponDB
 
-Repo: bns-lift (PRIVATE). IDA only when the pseudocode and funcdiff are not enough (`/home/ubuntu/Documents/Codex/private-project/ida/lift/SmartCouponDaemon/SmartCouponDaemon.exe`).
+Repo: bns-lift (PRIVATE). IDA only when the pseudocode and funcdiff are not enough (`<work-root>/ida/lift/SmartCouponDaemon/SmartCouponDaemon.exe`).
 
 ## Goal
 The exe-only code of SmartCouponDaemon compiles to the same code as the original. SmartCouponDaemon gets near 90 % parity.

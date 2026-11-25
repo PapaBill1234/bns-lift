@@ -1,6 +1,6 @@
 # lift-parity-scd-1: parity of SmartCouponDaemon: the exe-only code
 
-Repo: bns-lift (PRIVATE). IDA only when the pseudocode and funcdiff are not enough (`/home/ubuntu/Documents/Codex/private-project/ida/lift/SmartCouponDaemon/SmartCouponDaemon.exe`).
+Repo: bns-lift (PRIVATE). IDA only when the pseudocode and funcdiff are not enough (`<work-root>/ida/lift/SmartCouponDaemon/SmartCouponDaemon.exe`).
 
 ## Goal
 The code of SmartCouponDaemon that is not shared compiles to the same code as the original. SmartCouponDaemon reaches 90 % parity.
