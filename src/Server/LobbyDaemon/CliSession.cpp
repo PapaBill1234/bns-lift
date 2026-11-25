@@ -2,19 +2,25 @@
 // ld-2 lifts part 1. ld-7 lifts part 2. A stub is not a lift.
 #include <string.h>
 #include <wchar.h>
+#include <new>
+#include "AccountInventoryChannel.h"
 #include "Character.h"
 #include "CliSession.h"
 #include "CliSessionTable.h"
+#include "ContentsRuleConfigDefinition.h"
 #include "FragmentPacket.h"
+#include "GameTimeSchedule.h"
 #include "GameWorld.h"
 #include "GamedChannel.h"
 #include "LobbyDaemon.h"
+#include "LobbyConfig.h"
 #include "LobbyDB.h"
 #include "LobbyEvent.h"
 #include "LobbyGateChannel.h"
 #include "LobbyMessage.h"
 #include "LobbyPredefine.h"
 #include "Mileage.h"
+#include "NPServiceChannel.h"
 #include "LobbyService.h"
 #include "PcCafe.h"
 #include "AlertSender.h"
@@ -77,9 +83,9 @@ CliSession::CliSession()
 }
 
 // 0x32b60
+// LIFT: the body is the inlined ~CliSessionMessage (release _cs). The base dtor does it.
 CliSessionStopPcCafeChargeMessage::~CliSessionStopPcCafeChargeMessage()
 {
-    LIFT_STUB(0x32b60);
 }
 
 // 0x32bb0
@@ -218,7 +224,43 @@ bool CliSession::login(id128 const&, wchar_t const*, char, wchar_t const*)
 // 0x34750
 bool CliSession::logout()
 {
-    LIFT_STUB(0x34750);
+    if (_reservedStopPlay != nullptr)
+    {
+        if (LobbyDaemon::_instance->RemoveTimer(_reservedStopPlay))
+            _reservedStopPlay->removeReferenceCount(L"CliSession.cpp", 876);
+        _reservedStopPlay = nullptr;
+    }
+    releaseScheduledEndTime();
+    if (_login)
+    {
+        int dbrtn = 0;
+        LobbyDB::UpdateLastLogout(dbrtn, _acb._id, _acb._dbfield.botScore);
+        _table->Delete_index_account(_acb._id);
+        AccountInventoryChannel* accountInventoryChannel = LobbyDaemon::_instance->_accountInventoryChannel;
+        if (accountInventoryChannel != nullptr)
+            accountInventoryChannel->SendLogoutNotify(_acb._id);
+        _authProviderCodeSize = 0;
+        _externalAccountKeySize = 0;
+        _externalAccountNameSize = 0;
+        _externalAccountDataSize = 0;
+        memset(_authProviderCode, 0, sizeof(_authProviderCode));
+        memset(_externalAccountKey, 0, sizeof(_externalAccountKey));
+        memset(_externalAccountName, 0, sizeof(_externalAccountName));
+        memset(_externalAccountData, 0, sizeof(_externalAccountData));
+        _login = false;
+        Log::Write(Log::LT_DEBUG, L"CliSession.cpp", 909, L"[cs], logout ok, cli-key:0x%I64X, cli-state:%d.%d", _clikey,
+                   static_cast<unsigned int>(_state) >> 16, _state & 0xFFFF);
+    }
+    if (_npLogin)
+    {
+        NPGameServiceChannel* gameServChannel = LobbyDaemon::_instance->_npServchmgr->_gameServChannel;
+        if (gameServChannel != nullptr)
+            gameServChannel->SendRequestPresenceLogout(_acb._userid);
+        _npLogin = false;
+        Log::Write(Log::LT_DEBUG, L"CliSession.cpp", 921, L"[cs], logout from np, cli-key:0x%I64X, cli-state:%d.%d",
+                   _clikey, static_cast<unsigned int>(_state) >> 16, _state & 0xFFFF);
+    }
+    return true;
 }
 
 // 0x349a0
@@ -408,15 +450,40 @@ void CliSession::setChargeKey(wchar_t const* chargeKey)
 }
 
 // 0x35eb0
-void CliSession::completeRequestChargeStop(bool)
+void CliSession::completeRequestChargeStop(bool ok)
 {
-    LIFT_STUB(0x35eb0);
+    if (_chargeStopRequestTxnId == 0)
+        return;
+    NPGameServiceChannel* gameServChannel = LobbyDaemon::_instance->_npServchmgr->_gameServChannel;
+    if (gameServChannel != nullptr)
+    {
+        if (ok)
+            gameServChannel->SendResponseChargeRequestStopOk(_chargeStopRequestTxnId);
+        else
+            gameServChannel->SendResponseChargeRequestStopFail(_chargeStopRequestTxnId, L"ErrBadData", 4);
+    }
+    Log::Write(Log::LT_DEBUG, L"CliSession.cpp", 1517,
+               L"[cs], requested stop charge complete, txn-id:%u, cli-key:0x%I64X, cli-state:%d.%d",
+               _chargeStopRequestTxnId, _clikey, static_cast<unsigned int>(_state) >> 16, _state & 0xFFFF);
+    _chargeStopRequestTxnId = 0;
 }
 
 // 0x35fc0
 void CliSession::cleanupCharge()
 {
-    LIFT_STUB(0x35fc0);
+    if (_chargeKey != nullptr)
+    {
+        Log::Write(Log::LT_DEBUG, L"CliSession.cpp", 1527,
+                   L"[cs], cleanup unhandled charge-key; force to stop, charge-key:%s, cli-key:0x%I64X, cli-state:%d.%d",
+                   _chargeKey, _clikey, static_cast<unsigned int>(_state) >> 16, _state & 0xFFFF);
+        NPGameServiceChannel* gameServChannel = LobbyDaemon::_instance->_npServchmgr->_gameServChannel;
+        if (gameServChannel != nullptr)
+            gameServChannel->SendRequestChargeStop(nullptr, _acb._userid, _ipv4, _chargeKey);
+        setChargeKey(nullptr);
+        if (_pcCafeCharged)
+            onPcCafeChargeStop();
+    }
+    completeRequestChargeStop(true);
 }
 
 #pragma comment(linker, "/INCLUDE:?NotifyChangedGrade@CliSession@@QEAA_NAEBU_StsMsgNotifyGradeNotifyGradeChanged@StsMsgLib@@@Z") // LIFT: keep until the caller is lifted (0x360a0).
@@ -456,9 +523,84 @@ bool CliSession::NotifyChangedGradeLevel(StsMsgLib::_StsMsgNotifyGradeNotifyScor
 }
 
 // 0x36240
-void CliSession::HandleGameGetGradeList(GamedChannel*, unsigned long long, char, unsigned long long, int) const
+void CliSession::HandleGameGetGradeList(GamedChannel* gamed, unsigned long long gameTid, char locationHint,
+                                        unsigned long long pcid, int reqRevision) const
 {
-    LIFT_STUB(0x36240);
+    if (gamed == nullptr)
+    {
+        // LIFT: the original tests this for null before it reads _state and _clikey. 0x36240
+        CliSession const* cs = this;
+        unsigned int state = (cs != nullptr) ? static_cast<unsigned int>(cs->_state) : 0;
+        Log::Write(Log::LT_ERROR, L"CliSession.cpp", 1653,
+                   L"[cs], handle game get grade list fail; invalid parameter, cli-key:0x%I64X, cli-state:%d.%d, wid:%d, "
+                   L"game-tid:0x%I64X, location-hint:%d, pcid:0x%I64X, req-revision:%d",
+                   (cs != nullptr) ? cs->_clikey : 0ULL, state >> 16, state & 0xFFFF, 0, gameTid,
+                   static_cast<int>(locationHint), pcid, reqRevision);
+        return;
+    }
+    CriticalSection& lock = const_cast<CriticalSection&>(_lock);
+    lock.Enter();
+    int revision = static_cast<int>(_gradeService._revision);
+    if (revision > reqRevision)
+    {
+        FragmentPacket fp(93, "hiqQqiiiiiiCiiQiqq;");
+        fp.packet.Allocate(&fp.composer);
+        if (fp.Compose(4, gameTid, static_cast<int>(locationHint), pcid, revision) == 0)
+        {
+            Log::Write(Log::LT_ERROR, L"CliSession.cpp", 1669,
+                       L"[cs], handle game get grade list fail; compose key fail, cli-key:0x%I64X, cli-state:%d.%d, "
+                       L"wid:%d, game-tid:0x%I64X, location-hint:%d, pcid:0x%I64X, req-revision:%d",
+                       _clikey, static_cast<unsigned int>(_state) >> 16, _state & 0xFFFF,
+                       gamed->_rawChannel != nullptr ? static_cast<int>(gamed->_rawChannel->GetId()) : 0, gameTid,
+                       static_cast<int>(locationHint), pcid, reqRevision);
+            gamed->SendGetGradeListFail(gameTid, locationHint, pcid, 2);
+            lock.Leave();
+            return;
+        }
+        if (!_gradeService.FetchGradeLevel(&fp))
+        {
+            Log::Write(Log::LT_ERROR, L"CliSession.cpp", 1677,
+                       L"[cs], handle game get grade list fail; compose grade level fail, cli-key:0x%I64X, "
+                       L"cli-state:%d.%d, wid:%d, game-tid:0x%I64X, location-hint:%d, pcid:0x%I64X, req-revision:%d",
+                       _clikey, static_cast<unsigned int>(_state) >> 16, _state & 0xFFFF,
+                       gamed->_rawChannel != nullptr ? static_cast<int>(gamed->_rawChannel->GetId()) : 0, gameTid,
+                       static_cast<int>(locationHint), pcid, reqRevision);
+            gamed->SendGetGradeListFail(gameTid, locationHint, pcid, 2);
+            lock.Leave();
+            return;
+        }
+        if (!_gradeService.FetchGameGradeList(&fp))
+        {
+            Log::Write(Log::LT_ERROR, L"CliSession.cpp", 1684,
+                       L"[cs], handle game get grade list fail; compose list fail, cli-key:0x%I64X, cli-state:%d.%d, "
+                       L"wid:%d, game-tid:0x%I64X, location-hint:%d, pcid:0x%I64X, req-revision:%d",
+                       _clikey, static_cast<unsigned int>(_state) >> 16, _state & 0xFFFF,
+                       gamed->_rawChannel != nullptr ? static_cast<int>(gamed->_rawChannel->GetId()) : 0, gameTid,
+                       static_cast<int>(locationHint), pcid, reqRevision);
+            gamed->SendGetGradeListFail(gameTid, locationHint, pcid, 2);
+            lock.Leave();
+            return;
+        }
+        if (fp.packet.Splitter != nullptr)
+            fp.packet.Splitter->Finalize(fp.packet.CurHeader);
+        gamed->Send(&fp.packet);
+    }
+    else if (revision == reqRevision)
+    {
+        gamed->SendGetGradeListFail(gameTid, locationHint, pcid, 89);
+    }
+    else
+    {
+        Log::Write(Log::LT_ERROR, L"CliSession.cpp", 1702,
+                   L"[cs], handle game get grade list fail; req-revision is larger than current revision, "
+                   L"revision:%d, cli-key:0x%I64X, cli-state:%d.%d, wid:%d, game-tid:0x%I64X, location-hint:%d, "
+                   L"pcid:0x%I64X, req-revision:%d",
+                   revision, _clikey, static_cast<unsigned int>(_state) >> 16, _state & 0xFFFF,
+                   gamed->_rawChannel != nullptr ? static_cast<int>(gamed->_rawChannel->GetId()) : 0, gameTid,
+                   static_cast<int>(locationHint), pcid, reqRevision);
+        gamed->SendGetGradeListFail(gameTid, locationHint, pcid, 90);
+    }
+    lock.Leave();
 }
 
 #pragma comment(linker, "/INCLUDE:?setContentBans@CliSession@@QEAAXPEAU_StsMsgResponseListUserBans@StsMsgLib@@@Z") // LIFT: keep until the caller is lifted (0x366e0).
@@ -699,15 +841,35 @@ bool CliSession::addRenameUserService(RenameUserService* serviceEntry)
 }
 
 // 0x37890
-void CliSession::setScheduledEndTime(GameTimeScheduleNode*)
+void CliSession::setScheduledEndTime(GameTimeScheduleNode* node)
 {
-    LIFT_STUB(0x37890);
+    if (_scheduledEndTime != nullptr)
+    {
+        Log::Write(Log::LT_ERROR, L"CliSession.cpp", 2168,
+                   L"== CRASH == [cs], set scheduled end time exception; already exists, cli-key:0x%I64X, "
+                   L"cli-state:%d.%d",
+                   _clikey, static_cast<unsigned int>(_state) >> 16, _state & 0xFFFF);
+        AlertSender::Write(L"CliSession.cpp", 2168,
+                           L"== CRASH == [cs], set scheduled end time exception; already exists, cli-key:0x%I64X, "
+                           L"cli-state:%d.%d",
+                           _clikey, static_cast<unsigned int>(_state) >> 16, _state & 0xFFFF);
+        releaseScheduledEndTime();
+    }
+    _scheduledEndTime = node;
+    node->addReferenceCount(false, L"CliSession.cpp", 2172);
 }
 
 // 0x37950
 void CliSession::releaseScheduledEndTime()
 {
-    LIFT_STUB(0x37950);
+    if (_scheduledEndTime != nullptr)
+    {
+        GameTimeScheduler* gameTimeScheduler = LobbyDaemon::_instance->_gameTimeScheduler;
+        if (gameTimeScheduler != nullptr)
+            gameTimeScheduler->Unschedule(this, _scheduledEndTime);
+        _scheduledEndTime->removeReferenceCount(L"CliSession.cpp", 2189);
+        _scheduledEndTime = nullptr;
+    }
 }
 
 #pragma comment(linker, "/INCLUDE:?FetchCharacterInfoList@CliSession@@QEBA?AW4ErrCode@1@PEAVFragmentPacket@@@Z") // LIFT: keep until the caller is lifted (0x379b0).
@@ -1004,22 +1166,117 @@ bool CliSession::UpdateCharacterLevel(unsigned long long pcid, short level)
 }
 
 // 0x38500
-bool CliSession::UpdateAccountData(unsigned long long, int, TimeBasedPlayInfoList&)
+bool CliSession::UpdateAccountData(unsigned long long pcid, int botScore, TimeBasedPlayInfoList& playTime)
 {
-    LIFT_STUB(0x38500);
+    if (pcid == 0 || botScore < -1)
+    {
+        // LIFT: the original tests this for null before it reads _state and _clikey. 0x38500
+        CliSession const* cs = this;
+        unsigned int state = (cs != nullptr) ? static_cast<unsigned int>(cs->_state) : 0;
+        Log::Write(Log::LT_ERROR, L"CliSession.cpp", 2457,
+                   L"[cs], update account info fail; invalid parameter, pcid:0x%I64X, botScore:%d, cli-key:0x%I64X, "
+                   L"cli-state:%d.%d",
+                   pcid, botScore, (cs != nullptr) ? cs->_clikey : 0ULL, state >> 16, state & 0xFFFF);
+        TLobbyError = LOBERR_INVALID_PARAMETER;
+        return false;
+    }
+    bool result = true;
+    _lock.Enter();
+    if (botScore != -1)
+        _acb._dbfield.botScore = botScore;
+    if (ContentsRuleConfig::Config->GetUseTimeBasedPlaySchedule())
+    {
+        _acb._timeBasedPlayInfoList.SetPlayInfoFromGame(playTime);
+        int dbrtn = 0;
+        if (!LobbyDB::UpdateGameAccountTimeBasedPlayInfo(dbrtn, _acb._userid, _acb._timeBasedPlayInfoList))
+        {
+            result = false;
+            TLobbyError = dbrtn != 0 ? LOBERR_DB_FAIL : LOBERR_SYSTEM;
+        }
+    }
+    _lock.Leave();
+    return result;
 }
 
 // 0x38930
-bool CliSession::UpdateAccountExp(unsigned long long, GameAccountExpInfo::ExpInfo&)
+bool CliSession::UpdateAccountExp(unsigned long long pcid, GameAccountExpInfo::ExpInfo& info)
 {
-    LIFT_STUB(0x38930);
+    if (!ContentsRuleConfig::Config->GetEnableAccountContents())
+        return true;
+    if (info.exp == -1)
+        return true;
+    if (pcid == 0 || info.exp < 0 || info.expQuotaPerDay < 0 || info.lastUpdateTime < 0)
+    {
+        // LIFT: the original tests this for null before it reads _state and _clikey. 0x38930
+        CliSession const* cs = this;
+        unsigned int state = (cs != nullptr) ? static_cast<unsigned int>(cs->_state) : 0;
+        Log::Write(Log::LT_ERROR, L"CliSession.cpp", 2566,
+                   L"[cs], update account-exp fail; invalid parameter, pcid:0x%I64X, exp:%I64d, quota:%d, "
+                   L"lastUpdateTime:%I64d, cli-key:0x%I64X, cli-state:%d.%d",
+                   pcid, info.exp, info.expQuotaPerDay, info.lastUpdateTime, (cs != nullptr) ? cs->_clikey : 0ULL,
+                   state >> 16, state & 0xFFFF);
+        TLobbyError = LOBERR_INVALID_PARAMETER;
+        return false;
+    }
+    bool result = true;
+    _lock.Enter();
+    _acb._accountExp._info = info;
+    int dbrtn = 0;
+    if (!LobbyDB::UpdateGameAccountExpInfo(dbrtn, _acb._userid, _acb._accountExp._info))
+    {
+        result = false;
+        TLobbyError = dbrtn != 0 ? LOBERR_DB_FAIL : LOBERR_SYSTEM;
+    }
+    _lock.Leave();
+    if (result)
+    {
+        // LIFT: the original tests this for null before it reads _state and _clikey. 0x38930
+        CliSession const* cs = this;
+        unsigned int state = (cs != nullptr) ? static_cast<unsigned int>(cs->_state) : 0;
+        Log::Write(Log::LT_DEBUG, L"CliSession.cpp", 2594,
+                   L"[cs], update account-exp; pcid:0x%I64X, exp:%I64d, quota:%d, lastUpdateTime:%I64d, "
+                   L"cli-key:0x%I64X, cli-state:%d.%d",
+                   pcid, info.exp, info.expQuotaPerDay, info.lastUpdateTime, (cs != nullptr) ? cs->_clikey : 0ULL,
+                   state >> 16, state & 0xFFFF);
+    }
+    return result;
 }
 
 // 0x38b50
-bool CliSession::UpdateAccountContentQuota(unsigned long long,
-                                           std::vector<AccountContentQuota, StlAllocator<AccountContentQuota, 2> > const&)
+bool CliSession::UpdateAccountContentQuota(unsigned long long pcid,
+                                           std::vector<AccountContentQuota, StlAllocator<AccountContentQuota, 2> > const& quotaList)
 {
-    LIFT_STUB(0x38b50);
+    if (pcid == 0)
+    {
+        // LIFT: the original tests this for null before it reads _state and _clikey. 0x38b50
+        CliSession const* cs = this;
+        unsigned int state = (cs != nullptr) ? static_cast<unsigned int>(cs->_state) : 0;
+        Log::Write(Log::LT_ERROR, L"CliSession.cpp", 2604,
+                   L"[cs], update account-content-quota fail; invalid parameter, pcid:0x%I64X, cli-key:0x%I64X, "
+                   L"cli-state:%d.%d",
+                   pcid, (cs != nullptr) ? cs->_clikey : 0ULL, state >> 16, state & 0xFFFF);
+        TLobbyError = LOBERR_INVALID_PARAMETER;
+        return false;
+    }
+    bool result = true;
+    _lock.Enter();
+    int dbrtn = 0;
+    if (!LobbyDB::UpdateGameAccountContentQuota(dbrtn, _acb._userid, quotaList))
+    {
+        result = false;
+        TLobbyError = dbrtn != 0 ? LOBERR_DB_FAIL : LOBERR_SYSTEM;
+    }
+    _lock.Leave();
+    if (result)
+    {
+        // LIFT: the original tests this for null before it reads _state and _clikey. 0x38b50
+        CliSession const* cs = this;
+        unsigned int state = (cs != nullptr) ? static_cast<unsigned int>(cs->_state) : 0;
+        Log::Write(Log::LT_DEBUG, L"CliSession.cpp", 2630,
+                   L"[cs], update account-content-quota; pcid:0x%I64X, cli-key:0x%I64X, cli-state:%d.%d",
+                   pcid, (cs != nullptr) ? cs->_clikey : 0ULL, state >> 16, state & 0xFFFF);
+    }
+    return result;
 }
 
 // 0x38cc0
@@ -1030,9 +1287,86 @@ bool CliSession::UpdateAccountRecycleTime(unsigned long long,
 }
 
 // 0x38670
-bool CliSession::UpdateTimeBasedPlayReward(unsigned long long, int, char, short, UserPromotionReward&, long long)
+bool CliSession::UpdateTimeBasedPlayReward(unsigned long long pcid, int scheduleNumber, char targetType,
+                                           short acknowledgedPlayTime, UserPromotionReward& rewards,
+                                           long long lastUpdateTimeUTC)
 {
-    LIFT_STUB(0x38670);
+    if (pcid == 0)
+    {
+        // LIFT: the original tests this for null before it reads _state and _clikey. 0x38670
+        CliSession const* cs = this;
+        unsigned int state = (cs != nullptr) ? static_cast<unsigned int>(cs->_state) : 0;
+        Log::Write(Log::LT_ERROR, L"CliSession.cpp", 2497,
+                   L"[cs], update time based play reward fail; invalid parameter, pcid:0x%I64X, count:%d, "
+                   L"cli-key:0x%I64X, cli-state:%d.%d",
+                   pcid, rewards.rewardCount, (cs != nullptr) ? cs->_clikey : 0ULL, state >> 16, state & 0xFFFF);
+        TLobbyError = LOBERR_INVALID_PARAMETER;
+        return false;
+    }
+    // One bit per rule for each reward slot.
+    unsigned char rewardList[4];
+    memset(rewardList, 0, sizeof(rewardList));
+    if (rewards.rewardCount > 0)
+    {
+        TimeBasedPlaySeasonSchedule::Data const* data = nullptr;
+        for (int i = 0; i < 2; ++i)
+        {
+            if (LobbyDaemon::_instance->_timeBasedPlaySeasonSchedule._scheduleData[i].scheduleNumber == scheduleNumber)
+            {
+                data = &LobbyDaemon::_instance->_timeBasedPlaySeasonSchedule._scheduleData[i];
+                break;
+            }
+        }
+        if (data == nullptr)
+        {
+            // LIFT: the original tests this for null before it reads _state and _clikey. 0x38670
+            CliSession const* cs = this;
+            unsigned int state = (cs != nullptr) ? static_cast<unsigned int>(cs->_state) : 0;
+            Log::Write(Log::LT_ERROR, L"CliSession.cpp", 2512,
+                       L"[cs], update time based play reward fail; cannot found schedule, pcid:0x%I64X, "
+                       L"promotion-id:%d, cli-key:0x%I64X, cli-state:%d.%d",
+                       pcid, scheduleNumber, (cs != nullptr) ? cs->_clikey : 0ULL, state >> 16, state & 0xFFFF);
+            TLobbyError = LOBERR_NOT_FOUND;
+            return false;
+        }
+        for (int i = 0; i < rewards.rewardCount; ++i)
+        {
+            char slot = 0;
+            unsigned int rule = 0;
+            for (; rule < 6; ++rule)
+            {
+                for (char j = 0; j < 4; ++j)
+                {
+                    if (rewards.rewardPolicyId[i] == data->rule[rule].rewardList[j].id)
+                    {
+                        slot = j;
+                        goto found;
+                    }
+                }
+            }
+            // LIFT: no rule has the reward. The original shifts by (char)-1; the x64 shl masks the count to 31, so
+            // the byte gets no bit. ❓
+            rule = static_cast<unsigned char>(-1);
+        found:
+            rewardList[slot] |= static_cast<unsigned char>(1 << (rule & 31));
+        }
+    }
+    _lock.Enter();
+    if (static_cast<unsigned char>(targetType) <= 1)
+    {
+        TimeBasedPlayInfo& info = _acb._timeBasedPlayInfoList._timeBasedPlayInfo[targetType];
+        info.acknowledgedPlayTime = acknowledgedPlayTime;
+        info.duration = info.duration < 60 * acknowledgedPlayTime ? 60 * acknowledgedPlayTime : info.duration;
+        if (lastUpdateTimeUTC != 0)
+            info.lastUpdateTimeUTC = lastUpdateTimeUTC;
+    }
+    for (unsigned char k = 0; k < 4; ++k)
+    {
+        if (static_cast<unsigned char>(targetType) <= 1)
+            _acb._timeBasedPlayInfoList._timeBasedPlayInfo[targetType].rewardList[k] |= rewardList[k];
+    }
+    _lock.Leave();
+    return true;
 }
 
 // 0x392c0
@@ -1042,11 +1376,49 @@ bool CliSession::NotifyGoodsInventoryChangedAlongPresence(GoodsInventoryChangedN
 }
 
 // 0x39820
-// LIFT: not lifted in card ld-13 (0x39820). The body uses LobbyDaemon::_instance->GlobalTimerQueue and _config.
-// The LobbyDaemon layout belongs to cards ld-15 and ld-20.
-bool CliSession::ReserveStopPlay(bool, int, int)
+bool CliSession::ReserveStopPlay(bool logout, int stopPlayReason, int kickReason)
 {
-    LIFT_STUB(0x39820);
+    bool result = false;
+    _lock.Enter();
+    ServiceLocation* srvloc = _srvloc;
+    if (_reservedStopPlay != nullptr)
+    {
+        TLobbyError = LOBERR_STOP_PLAY_ALREADY_RESERVED;
+    }
+    else if (_state != 0x40000)
+    {
+        TLobbyError = LOBERR_INVALID_STATE;
+    }
+    else if (srvloc == nullptr)
+    {
+        TLobbyError = LOBERR_SYSTEM;
+    }
+    else
+    {
+        void* mem = Memory::_Manager[2]->Alloc(sizeof(StopPlayTimerEvent), L"CliSession.cpp", 2912);
+        StopPlayTimerEvent* event = mem != nullptr ? ::new (mem) StopPlayTimerEvent(_clikey, kickReason) : nullptr;
+        if (logout)
+        {
+            _reservedStopPlay = event;
+        }
+        else if (!srvloc->ReserveStopPlay(this, event))
+        {
+            TLobbyError = LOBERR_STOP_PLAY_ALREADY_RESERVED;
+            event->removeReferenceCount(L"CliSession.cpp", 2932);
+            _lock.Leave();
+            return false;
+        }
+        result = true;
+        LobbyDaemon::_instance->AddTimer(LobbyDaemon::_instance->_config->_stopPlayGameWorldTimeout, event);
+        srvloc->NotifyStopPlay(this, stopPlayReason);
+        Log::Write(Log::LT_DEBUG, L"CliSession.cpp", 2929,
+                   L"[cs], stop play reserved, event:%p, logout:%s, stop-play-reason:%d, kick-reason:%d, "
+                   L"cli-key:0x%I64X, cli-state:%d.%d",
+                   event, logout ? L"yes" : L"no", stopPlayReason, kickReason, _clikey,
+                   static_cast<unsigned int>(_state) >> 16, _state & 0xFFFF);
+    }
+    _lock.Leave();
+    return result;
 }
 
 // 0x39a70
@@ -1119,19 +1491,71 @@ bool CliSession::OnChargeStopRequested(unsigned int txnid)
 }
 
 // 0x39cc0
-// LIFT: not lifted in card ld-13 (0x39cc0). The body uses LobbyDaemon::_instance->_gamedchmgr.
-// The LobbyDaemon layout belongs to cards ld-15 and ld-20.
-bool CliSession::ApplyNewChargeItem(wchar_t const*, long, unsigned int, short)
+bool CliSession::ApplyNewChargeItem(wchar_t const* chargeKey, long remainPlayTime, unsigned int itemId, short reservations)
 {
-    LIFT_STUB(0x39cc0);
+    _lock.Enter();
+    if (_state != 0x40000)
+    {
+        TLobbyError = LOBERR_INVALID_SESSION_STATE;
+    }
+    else if (_chargeKey == nullptr)
+    {
+        TLobbyError = LOBERR_CHARGE_NOT_STARTED;
+    }
+    else
+    {
+        Log::Write(Log::LT_DEBUG, L"CliSession.cpp", 2994,
+                   L"[cs], new charge key applied, charge-key:%s, remain-play-time:%d(sec), item-id:%u, "
+                   L"reservations:%d, cli-key:0x%I64X, cli-state:%d.%d",
+                   chargeKey, remainPlayTime, itemId, static_cast<int>(reservations), _clikey,
+                   static_cast<unsigned int>(_state) >> 16, _state & 0xFFFF);
+        setChargeKey(chargeKey);
+        GameServiceLocation* location = (_srvloc != nullptr && _srvloc->GetKind() == ServiceLocation::KIND_GAMEWORLD)
+                                            ? static_cast<GameServiceLocation*>(_srvloc)
+                                            : nullptr;
+        if (location != nullptr)
+        {
+            GamedChannel* gamed = LobbyDaemon::_instance->_gamedchmgr->Acquire(location->_wid);
+            if (gamed != nullptr)
+            {
+                gamed->SendApplyNewChargeItemNotify(location->_pcid, chargeKey, remainPlayTime, itemId, reservations);
+                gamed->removeReferenceCount(L"CliSession.cpp", 3006);
+            }
+        }
+    }
+    _lock.Leave();
+    return true;
 }
 
 // 0x39e50
-// LIFT: not lifted in card ld-13 (0x39e50). The body uses LobbyDaemon::_instance->_gamedchmgr.
-// The LobbyDaemon layout belongs to cards ld-15 and ld-20.
-bool CliSession::NotifyChargeRemainTime(long, short, unsigned int)
+bool CliSession::NotifyChargeRemainTime(long remainPlayTime, short reservations, unsigned int itemId)
 {
-    LIFT_STUB(0x39e50);
+    _lock.Enter();
+    if (_state != 0x40000)
+    {
+        TLobbyError = LOBERR_INVALID_SESSION_STATE;
+    }
+    else if (_chargeKey == nullptr)
+    {
+        TLobbyError = LOBERR_CHARGE_NOT_STARTED;
+    }
+    else
+    {
+        GameServiceLocation* location = (_srvloc != nullptr && _srvloc->GetKind() == ServiceLocation::KIND_GAMEWORLD)
+                                            ? static_cast<GameServiceLocation*>(_srvloc)
+                                            : nullptr;
+        if (location != nullptr)
+        {
+            GamedChannel* gamed = LobbyDaemon::_instance->_gamedchmgr->Acquire(location->_wid);
+            if (gamed != nullptr)
+            {
+                gamed->SendUpdateChargeRemainTimeNotify(location->_pcid, remainPlayTime, reservations, itemId);
+                gamed->removeReferenceCount(L"CliSession.cpp", 3041);
+            }
+        }
+    }
+    _lock.Leave();
+    return true;
 }
 
 // 0x39f70
@@ -1191,19 +1615,46 @@ void CliSession::setPcCafe(PcCafe* pcCafe)
 }
 
 // 0x3a190
-// LIFT: not lifted in card ld-13 (0x3a190). The body uses LobbyDaemon::_instance->_mileageManager.
-// The LobbyDaemon layout belongs to cards ld-15 and ld-20.
 void CliSession::onPcCafeChargeStart()
 {
-    LIFT_STUB(0x3a190);
+    _pcCafeCharged = true;
+    Log::Write(Log::LT_DEBUG, L"CliSession.cpp", 3174,
+               L"[cs], start pc-cafe charge, pc-cafe:%p, cli-key:0x%I64X, cli-state:%d.%d", _pcCafe, _clikey,
+               static_cast<unsigned int>(_state) >> 16, _state & 0xFFFF);
+    if (_pcCafe != nullptr)
+        return;
+    MileageManager* mileageManager = LobbyDaemon::_instance->_mileageManager;
+    if (mileageManager == nullptr)
+        return;
+    CliSessionStartPcCafeChargeMessage message(this);
+    // LIFT: MileagePolicy::mileageType 1 is the PC cafe mileage (see GameServiceLocation::OnEnter). ❓
+    for (std::vector<Mileage*>::iterator it = mileageManager->_mileages.begin(); it != mileageManager->_mileages.end(); ++it)
+    {
+        if (*it != nullptr && (*it)->_config.policy.mileageType == 1)
+            (*it)->Accept(&message);
+    }
 }
 
 // 0x3a2c0
-// LIFT: not lifted in card ld-13 (0x3a2c0). The body uses LobbyDaemon::_instance->_mileageManager.
-// The LobbyDaemon layout belongs to cards ld-15 and ld-20.
 void CliSession::onPcCafeChargeStop()
 {
-    LIFT_STUB(0x3a2c0);
+    if (_pcCafe == nullptr)
+    {
+        MileageManager* mileageManager = LobbyDaemon::_instance->_mileageManager;
+        if (mileageManager != nullptr)
+        {
+            CliSessionStopPcCafeChargeMessage message(this);
+            for (std::vector<Mileage*>::iterator it = mileageManager->_mileages.begin(); it != mileageManager->_mileages.end(); ++it)
+            {
+                if (*it != nullptr && (*it)->_config.policy.mileageType == 1)
+                    (*it)->Accept(&message);
+            }
+        }
+    }
+    _pcCafeCharged = false;
+    Log::Write(Log::LT_DEBUG, L"CliSession.cpp", 3201,
+               L"[cs], stop pc-cafe charge, pc-cafe:%p, cli-key:0x%I64X, cli-state:%d.%d", _pcCafe, _clikey,
+               static_cast<unsigned int>(_state) >> 16, _state & 0xFFFF);
 }
 
 // 0x3a3f0

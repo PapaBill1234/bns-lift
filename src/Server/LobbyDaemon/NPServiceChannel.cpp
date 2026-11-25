@@ -845,6 +845,15 @@ bool NPGameServiceChannel::SendResponseChargeRequestStopFail(unsigned int txnid,
     return SendMsg(&msg, false, nullptr);
 }
 
+// LIFT: no PDB symbol. CliSession::completeRequestChargeStop (0x35eb0) has this body inline (cmd 0xB58, the txn id,
+// no error). The name follows SendResponseChargeRequestStopFail. ❓
+bool NPGameServiceChannel::SendResponseChargeRequestStopOk(unsigned int txnid)
+{
+    _StsMsgResponseChargeRequestStop msg;
+    npInitResponse(msg, COMMAND_SRV_CHARGE_REQUEST_STOP, txnid);
+    return SendMsg(&msg, false, nullptr);
+}
+
 // 0xd1390
 bool NPGameServiceChannel::SendRequestListUserLastPresences(NPTransaction* t, id128 const& portalAccountId)
 {

@@ -17,6 +17,7 @@ class GameTimeScheduleNode : public RefCntListNode
 {
 private:
     friend struct GameTimeScheduleNodeLayoutCheck;  // LIFT: checks the private PDB offsets.
+    friend class GameTimeScheduler;  // LIFT: access helper; Unschedule reads _queueIndex.
 
     unsigned long long _clikey;  // +0x30
     int _queueIndex;  // +0x38
@@ -40,6 +41,7 @@ public:
 
 private:
     friend struct GameTimeQueueLayoutCheck;  // LIFT: checks the private PDB offsets.
+    friend class GameTimeScheduler;  // LIFT: access helper; Unschedule uses _lock and _queue.
 
     int _index;  // +0x0
     bool _block;  // +0x4

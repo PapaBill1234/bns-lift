@@ -115,8 +115,24 @@ void CliSessionGradeChangedMessage::Dispatch(MembershipMileage* acceptor)
 }
 
 // 0x2fb60
-// LIFT: Not done. It needs the PcCafeMileage layout (_slotId, Mileage base), which lift-lobbydaemon-5 owns and main does not have yet (0x2fb60).
-void CliSessionMileageInterimDepositMessage::Dispatch(PcCafeMileage*)
+void CliSessionMileageInterimDepositMessage::Dispatch(PcCafeMileage* acceptor)
 {
-    LIFT_STUB(0x2fb60);
+    if (acceptor == nullptr)
+        return;
+    if (_cs == nullptr || sessionId == 0)
+        return;
+    MileageSlot* slot = _cs->_mileageSlot;
+    if (slot == nullptr)
+        return;
+    int slotId = acceptor->_slotId;
+    if (slotId < 0 || slotId >= slot->_size)
+        return;
+    MileageSession* session = slot->_sessions[acceptor->_slotId];
+    if (session == nullptr || session->_id != sessionId)
+        return;
+    // Stop the running session and start a new one at the stop time. This makes the interim deposit.
+    long long stopTime = 0;
+    long long now = _time64(nullptr);
+    acceptor->Stop(_cs, now, &stopTime);
+    acceptor->Start(_cs, stopTime > 0 ? stopTime : now);
 }

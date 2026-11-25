@@ -242,6 +242,8 @@ public:
     static void operator delete(void*) {}
 
 protected:
+    friend class CliSessionMileageInterimDepositMessage;  // LIFT: access helper; Dispatch (0x2fb60) reads _id.
+
     unsigned long long _id;
     Mileage* _owner;
     long long _startTime;

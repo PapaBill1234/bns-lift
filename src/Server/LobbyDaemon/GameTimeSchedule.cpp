@@ -2,6 +2,9 @@
 // A stub is not a lift. Each stub has a LIFT note with the reason.
 #include <string.h>
 #include "GameTimeSchedule.h"
+#include "AlertSender.h"
+#include "CliSession.h"
+#include "Log.h"
 #include "LiftStub.h"
 
 // 0x4b8e0
@@ -113,9 +116,31 @@ bool GameTimeScheduler::Schedule(CliSession*, IDEV612_TimeTable const&, long lon
 }
 
 // 0x4c6a0
-// LIFT: not lifted in card ld-4 (0x4c6a0). The body reads CliSession::_clikey (card ld-2) and calls
-// RefCntList::Remove (layout in card ld-3).
-void GameTimeScheduler::Unschedule(CliSession*, GameTimeScheduleNode*)
+void GameTimeScheduler::Unschedule(CliSession* cs, GameTimeScheduleNode* node)
 {
-    LIFT_STUB(0x4c6a0);
+    if (cs == nullptr || node == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, L"GameTimeSchedule.cpp", 403,
+            L"== CRASH == [game-time], unschedule fail; invalid parameter, cli-session:%p, node:%p", cs, node);
+        AlertSender::Write(L"GameTimeSchedule.cpp", 403,
+            L"== CRASH == [game-time], unschedule fail; invalid parameter, cli-session:%p, node:%p", cs, node);
+        return;
+    }
+    int index = node->_queueIndex;
+    if (index < 0 || index >= static_cast<int>(sizeof(_queues) / sizeof(_queues[0])))
+    {
+        Log::Write(Log::LT_ERROR, L"GameTimeSchedule.cpp", 410,
+            L"== CRASH == [game-time], unschedule fail; queue index out of range, index:%d, cli-key:0x%I64X",
+            index, cs->_clikey);
+        AlertSender::Write(L"GameTimeSchedule.cpp", 410,
+            L"== CRASH == [game-time], unschedule fail; queue index out of range, index:%d, cli-key:0x%I64X",
+            index, cs->_clikey);
+        return;
+    }
+    GameTimeQueue& queue = _queues[index];
+    queue._lock.Enter();
+    queue._queue.Remove(node);
+    queue._lock.Leave();
+    Log::Write(Log::LT_DEBUG, L"GameTimeSchedule.cpp", 415,
+        L"[game-time], unschedule ok, index:%d, cli-key:0x%I64X", index, cs->_clikey);
 }

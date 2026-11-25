@@ -77,6 +77,7 @@ public:
     bool SendRequestChargeStop(NPTransaction*, id128 const&, unsigned long, wchar_t const*);  // 0xd1110
     bool SendRequestChargeAbandon(NPTransaction*, id128 const&, wchar_t const*);  // 0xd1230
     bool SendResponseChargeRequestStopFail(unsigned int, wchar_t const*, int);  // 0xd1310
+    bool SendResponseChargeRequestStopOk(unsigned int);  // LIFT: no PDB symbol; inline in 0x35eb0. ❓
     bool SendRequestListUserLastPresences(NPTransaction*, id128 const&);  // 0xd1390
     bool SendRequestGradeListAllGrades(NPTransaction*, id128 const&);  // 0xd1410
     bool SendRequestGradeActivateGrade(NPTransaction*, id128 const&, int, int);  // 0xd1510

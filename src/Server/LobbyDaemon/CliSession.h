@@ -103,6 +103,18 @@ static_assert(sizeof(TimeBasedPlayInfo) == 0x20, "sizeof TimeBasedPlayInfo");
 static_assert(offsetof(TimeBasedPlayInfo, rewardList) == 0x18, "TimeBasedPlayInfo::rewardList");
 static_assert(offsetof(TimeBasedPlayInfo, acknowledgedPlayTime) == 0x1C, "TimeBasedPlayInfo::acknowledgedPlayTime");
 
+// PDB struct UserPromotionReward (size 0x128). The PDB module is not known. ❓
+// LIFT: the element types come from the sizes (192 = 24 x 8, 96 = 24 x 4). ❓ The PDB ctor is not declared.
+struct UserPromotionReward
+{
+    long long userPromotionRewardId[24];
+    int rewardPolicyId[24];
+    int rewardCount;
+};
+static_assert(offsetof(UserPromotionReward, rewardPolicyId) == 0xC0, "UserPromotionReward::rewardPolicyId");
+static_assert(offsetof(UserPromotionReward, rewardCount) == 0x120, "UserPromotionReward::rewardCount");
+static_assert(sizeof(UserPromotionReward) == 0x128, "sizeof UserPromotionReward");
+
 class Role
 {
 public:
@@ -527,6 +539,8 @@ public:
     virtual void NotifyStopPlay(CliSession*, int);  // 0x3bda0
 
 private:
+    friend class CliSession;  // LIFT: access helper; ApplyNewChargeItem and NotifyChargeRemainTime read _pcid.
+
     unsigned long long _pcid;
     short _waitPos;
     WaitQueue::Type _waitQueueType;

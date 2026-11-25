@@ -90,12 +90,29 @@ bool RenameCharacterService::Setup(LobbyService::DB* sedb, DB* db)
 }
 
 // 0x6c330
-// LIFT: 0x6f000, 0x6fc10 and 0x70900 call this stub first. /LTCG sees that the stub does not return, so it
-// removes the rest of each caller, and /OPT:ICF folds the three callers into one body. Their funcdiff score
-// stays 0.0 until 0x6c330 is lifted (Not done in lift-lobbydaemon-6). noinline does not stop this.
-bool LobbyService::Fetch(CliSession*, FragmentPacket*) const
+bool LobbyService::Fetch(CliSession* owner, FragmentPacket* fp) const
 {
-    LIFT_STUB(0x6c330);
+    if (owner != nullptr && fp != nullptr)
+    {
+        if (fp->FreeSize() < sizeof(_db.serviceId) + sizeof(_db.serviceType) + sizeof(_db.itemInstanceId))
+            fp->packet.Allocate(&fp->composer);
+        if (fp->Compose(3, _db.serviceId, static_cast<int>(_db.serviceType), _db.itemInstanceId) == 0)
+        {
+            Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 58,
+                L"[lobby-service], fetch fail; compose fail, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+                _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            return false;
+        }
+        return true;
+    }
+    LobbyService const* s = this;  // LIFT: The original tests this for null before it reads _db for the log arguments.
+    Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 43,
+        L"== CRASH == [lobby-service], fetch fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+        LOBBY_SERVICE_DB_LOG_ARGS(s));
+    AlertSender::Write(L"LobbyService.cpp", 43,
+        L"== CRASH == [lobby-service], fetch fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+        LOBBY_SERVICE_DB_LOG_ARGS(s));
+    return false;
 }
 
 // 0x6c550
