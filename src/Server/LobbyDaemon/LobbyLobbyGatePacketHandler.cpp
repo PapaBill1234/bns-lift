@@ -1,4 +1,5 @@
 // LobbyLobbyGatePacketHandler.obj (LobbyDaemon PDB, 2019 + PDB). A function with LIFT_STUB is not a lift.
+#include <new>
 #include <winsock2.h>
 #include <windows.h>
 #include "LobbyLobbyGatePacketHandler.h"
@@ -8,11 +9,14 @@
 #include "LiftStub.h"
 #include "LobbyDaemon.h"
 #include "LobbyGateChannel.h"
+#include "LobbyJob.h"
 #include "Log.h"
+#include "ObjectPool.h"
 #include "Packet.h"
 #include "PacketUtil.h"
 #include "SharedChannel.h"
 #include "StringUtil.h"
+#include "TryEnterGameWorldJob.h"
 #include <time.h>
 
 extern wchar_t const* LobbyErrorDesc[28];  // LIFT: PDB public LobbyErrorDesc (.data 0003:2032), defined in LobbyGamePacketHandler.cpp (placeholder, owner module not found).
@@ -66,9 +70,73 @@ bool HandleLobbyLobbyGate_LogoutNotify(SharedChannel*, Packet const*)
 }
 
 // 0xc48b0
-bool HandleLobbyLobbyGate_GetEnterWorldTokenReq(SharedChannel*, Packet const*)
+bool HandleLobbyLobbyGate_GetEnterWorldTokenReq(SharedChannel* channel, Packet const* packet)
 {
-    LIFT_STUB(0xc48b0);
+    // LIFT: the PDB signature has SharedChannel*; the pseudocode types it as LobbyGateChannel*.
+    LobbyGateChannel* gate = static_cast<LobbyGateChannel*>(channel);
+    short cmd = 0;
+    unsigned long long clikey = 0;
+    id128 slotid = ID128_GUID_ZERO;  // LIFT: the original loads the zero id from ID128_GUID_ZERO.
+    if (packet->Decompose("hqo", &cmd, &clikey, &slotid) == 0)
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyLobbyGatePacketHandler.cpp", 542,
+                   L"[lobby-gate], handle get enter world token fail; decompose fail, gate-wid:%d, cli-key:0x%I64X, slot-id:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
+                   gate != nullptr ? static_cast<int>(gate->GetWid()) : 0, clikey,
+                   slotid.guid.id1, slotid.guid.id2, slotid.guid.id3,
+                   slotid.guid.id4[0], slotid.guid.id4[1], slotid.guid.id4[2], slotid.guid.id4[3],
+                   slotid.guid.id4[4], slotid.guid.id4[5], slotid.guid.id4[6], slotid.guid.id4[7]);
+        return true;
+    }
+    CliSession* cliSession = LobbyDaemon::_instance->_clisessionMgr->Select(clikey);
+    if (cliSession == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyLobbyGatePacketHandler.cpp", 553,
+                   L"[lobby-gate], handle get enter world token fail; no such cli-session, gate-wid:%d, cli-key:0x%I64X, slot-id:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
+                   gate != nullptr ? static_cast<int>(gate->GetWid()) : 0, clikey,
+                   slotid.guid.id1, slotid.guid.id2, slotid.guid.id3,
+                   slotid.guid.id4[0], slotid.guid.id4[1], slotid.guid.id4[2], slotid.guid.id4[3],
+                   slotid.guid.id4[4], slotid.guid.id4[5], slotid.guid.id4[6], slotid.guid.id4[7]);
+        gate->SendGetEnterWorldTokenFail(clikey, 4);
+        return true;
+    }
+    TryEnterGameWorldJob* job = new (TryEnterGameWorldJob::_pool.Checkout(L"LobbyLobbyGatePacketHandler.cpp", 558))
+        TryEnterGameWorldJob(cliSession);
+    if (!job->Initialize(gate, slotid))
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyLobbyGatePacketHandler.cpp", 561,
+                   L"[lobby-gate], handle get enter world token fail; initialize job fail, gate-wid:%d, cli-key:0x%I64X, slot-id:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
+                   gate != nullptr ? static_cast<int>(gate->GetWid()) : 0, clikey,
+                   slotid.guid.id1, slotid.guid.id2, slotid.guid.id3,
+                   slotid.guid.id4[0], slotid.guid.id4[1], slotid.guid.id4[2], slotid.guid.id4[3],
+                   slotid.guid.id4[4], slotid.guid.id4[5], slotid.guid.id4[6], slotid.guid.id4[7]);
+        gate->SendGetEnterWorldTokenFail(clikey, 6);
+        job->removeReferenceCount(L"LobbyLobbyGatePacketHandler.cpp", 563);
+        cliSession->removeReferenceCount(L"LobbyLobbyGatePacketHandler.cpp", 564);
+        return true;
+    }
+    LobbyJobManager* jobMgr = LobbyDaemon::_instance->_jobMgr;
+    if (!jobMgr->Register(job))
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyLobbyGatePacketHandler.cpp", 569,
+                   L"[lobby-gate], handle get enter world token fail; start job fail, gate-wid:%d, cli-key:0x%I64X, slot-id:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
+                   gate != nullptr ? static_cast<int>(gate->GetWid()) : 0, clikey,
+                   slotid.guid.id1, slotid.guid.id2, slotid.guid.id3,
+                   slotid.guid.id4[0], slotid.guid.id4[1], slotid.guid.id4[2], slotid.guid.id4[3],
+                   slotid.guid.id4[4], slotid.guid.id4[5], slotid.guid.id4[6], slotid.guid.id4[7]);
+        job->removeReferenceCount(L"LobbyLobbyGatePacketHandler.cpp", 570);
+        cliSession->removeReferenceCount(L"LobbyLobbyGatePacketHandler.cpp", 571);
+        return true;
+    }
+    jobMgr->Execute(job, 13, nullptr);
+    Log::Write(Log::LT_DEBUG, L"LobbyLobbyGatePacketHandler.cpp", 575,
+               L"[lobby-gate], handle get enter world token ok, gate-wid:%d, cli-key:0x%I64X, slot-id:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
+               gate != nullptr ? static_cast<int>(gate->GetWid()) : 0, clikey,
+               slotid.guid.id1, slotid.guid.id2, slotid.guid.id3,
+               slotid.guid.id4[0], slotid.guid.id4[1], slotid.guid.id4[2], slotid.guid.id4[3],
+               slotid.guid.id4[4], slotid.guid.id4[5], slotid.guid.id4[6], slotid.guid.id4[7]);
+    job->removeReferenceCount(L"LobbyLobbyGatePacketHandler.cpp", 577);
+    cliSession->removeReferenceCount(L"LobbyLobbyGatePacketHandler.cpp", 578);
+    return true;
 }
 
 // 0xc4df0

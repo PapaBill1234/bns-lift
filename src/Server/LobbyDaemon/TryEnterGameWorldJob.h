@@ -1,5 +1,5 @@
 // TryEnterGameWorldJob.obj (LobbyDaemon PDB, 2019 + PDB). Layouts from tools/pdbcls.py LobbyDaemon <Class>.
-// LIFT: header layouts only (fix7). The function bodies are still LIFT_STUB.
+// LIFT: gap-25 lifts part 1 of the bodies (TryEnterGameWorldJob.cpp). Part 2 is still LIFT_STUB.
 #pragma once
 #include <stddef.h>
 #include "CliSessionJob.h"
