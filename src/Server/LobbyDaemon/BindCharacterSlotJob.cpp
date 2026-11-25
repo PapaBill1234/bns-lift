@@ -267,13 +267,8 @@ bool BindCharacterSlotJob::bindCharacterSlot()
                 GUID_ARGS(_slotId), _pcId);
         _lgate->SendBindCharacterSlotFail(_owner->_clikey, _slotId, _pcId, 5);
     }
-    else if (_owner->BindCharacterSlot(_pcId, _slotId))
-    {
-        BIND_LOG(Log::LT_DEBUG, 261, L"[job], bind character slot ok");
-        id128 slot = _slotId;
-        _lgate->Send("hqoq", 58, _owner->_clikey, &slot, _pcId);
-    }
-    else
+    // The original lays out the bind fail path before the ok path (0x182ea).
+    else if (!_owner->BindCharacterSlot(_pcId, _slotId))
     {
         short reason;
         switch (TLobbyError)
@@ -295,6 +290,12 @@ bool BindCharacterSlotJob::bindCharacterSlot()
             break;
         }
         _lgate->SendBindCharacterSlotFail(_owner->_clikey, _slotId, _pcId, reason);
+    }
+    else
+    {
+        BIND_LOG(Log::LT_DEBUG, 261, L"[job], bind character slot ok");
+        id128 slot = _slotId;
+        _lgate->Send("hqoq", 58, _owner->_clikey, &slot, _pcId);
     }
     transit(FIN);
     return true;

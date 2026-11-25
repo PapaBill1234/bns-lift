@@ -201,8 +201,7 @@ AddSlotJob::AddSlotJob(CliSession* owner)
     : CliSessionJob(owner), _tran(nullptr), _lgate(nullptr), _acciv(nullptr), _labelId(0), _itemInstanceId(0),
       _itemDataId(0), _serviceId(0)
 {
-    _slotId.id[0] = 0;
-    _slotId.id[1] = 0;
+    _slotId = ID128_GUID_ZERO;  // the original loads the 2 qwords of ID128_GUID_ZERO (0xd2fb)
 }
 
 // 0xd340
@@ -518,24 +517,28 @@ bool AddSlotJob::checkSlotCapacityAck(void* param)
         transit(FIN);
         return true;
     }
+    // The error and overflow paths share one Fail send in the original (0xeb26), so both set a reason.
+    short reason;
     if (!IsSuccess(res))
     {
         JOB_LOG(Log::LT_ERROR, 428, L"[job], response slot list error",
                 L", np-tid:%u, cmd:%d, type:%d, status-code:%u, reason:%s, error-code:%d", NP_LOG_ARGS(res));
-        _lgate->SendAddSlotWithAccountInventoryItemFail(_owner->_clikey, _labelId, _itemInstanceId, 1);
-        transit(FIN);
-        return true;
+        reason = 1;
     }
-    JOB_LOG(Log::LT_DEBUG, 436, L"[job], response slot list",
-            L", slot-count:%d, np-tid:%u, cmd:%d, type:%d, status-code:%u, reason:%s, error-code:%d", res->nCount,
-            NP_LOG_ARGS(res));
-    if (res->nCount < static_cast<unsigned int>(LobbyDaemon::_instance->_config->_maxSlotCount))
+    else
     {
-        transit(REGISTER_SERVICE_ENTRY);
-        return true;
+        JOB_LOG(Log::LT_DEBUG, 436, L"[job], response slot list",
+                L", slot-count:%d, np-tid:%u, cmd:%d, type:%d, status-code:%u, reason:%s, error-code:%d",
+                res->nCount, NP_LOG_ARGS(res));
+        if (res->nCount < static_cast<unsigned int>(LobbyDaemon::_instance->_config->_maxSlotCount))
+        {
+            transit(REGISTER_SERVICE_ENTRY);
+            return true;
+        }
+        JOB_LOG(Log::LT_ERROR, 439, L"[job], slot list overflow", L"");
+        reason = 207;
     }
-    JOB_LOG(Log::LT_ERROR, 439, L"[job], slot list overflow", L"");
-    _lgate->SendAddSlotWithAccountInventoryItemFail(_owner->_clikey, _labelId, _itemInstanceId, 207);
+    _lgate->SendAddSlotWithAccountInventoryItemFail(_owner->_clikey, _labelId, _itemInstanceId, reason);
     transit(FIN);
     return true;
 }
