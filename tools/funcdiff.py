@@ -13,7 +13,9 @@ because clang-cl and VS2010 give different code. It compares 3 signals that do n
           original never calls from this function is expanded to the callee's calls (the original
           inlined it; we build with /Ob0). Folded (ICF) names count as one name.
   refs    strings and named data (vftables, globals) that the function reads by address
-  consts  immediate values (not stack frame sizes)
+  consts  immediate values (not stack frame sizes). An immediate is an address only when a base
+          relocation (.reloc) covers its bytes; then it is a ref (its name). Any other immediate is
+          a value, also when it is in [0x10000, SizeOfImage).
 
 Status: MATCH = all 3 equal. Score = mean similarity of the 3 lists (0..100).
 Needs: capstone, pefile (for example: uv pip install capstone pefile).
@@ -143,6 +145,14 @@ class Image:
             narrow, wide = sorted(code[i].operands[1].imm for i in offsets)
             if wide - narrow == 32 and self.tls.get(wide) == "__ip_addr_string_w__":
                 self.tls.setdefault(narrow, "__ip_addr_string_a__")
+
+    def relocs(self):
+        """RVAs of the base relocations (.reloc). Type 0 (ABSOLUTE) is block padding. Cached."""
+        if getattr(self, "_relocs", None) is None:
+            self.pe.parse_data_directories(directories=[pefile.DIRECTORY_ENTRY["IMAGE_DIRECTORY_ENTRY_BASERELOC"]])
+            self._relocs = {e.rva for b in getattr(self.pe, "DIRECTORY_ENTRY_BASERELOC", []) for e in b.entries
+                            if e.type}
+        return self._relocs
 
     def data_below(self, t, span=0x40):
         """The nearest named symbol below t in a writable section, at most span bytes away."""
@@ -314,8 +324,14 @@ def signals(img, rva, size, alias):
                 if idx in tls_offsets and v in img.tls:
                     refs.append("tls:" + img.tls[v])
                     continue
-                if 0x10000 <= v < img.size:
-                    continue                       # an RVA (try tables, image-base addressing)
+                if ins.imm_size and ins.address + ins.imm_offset in img.relocs():
+                    # An address: a base relocation covers the bytes of the immediate. The value is a VA.
+                    # Any other immediate is a number, also in [0x10000, SizeOfImage) (cmp eax,0x40000).
+                    t = (v - img.base) & 0xFFFFFFFFFFFFFFFF if v >= img.base else v
+                    n = target_name(t) or field_name(t) or "<data>"
+                    if n not in NOISE:
+                        refs.append(n)
+                    continue
                 if ins.mnemonic == "mov" and v in img.tls and is_tls_index(insns, idx):
                     refs.append("tls:" + img.tls[v])      # noise fix 6: .tls offset of a thread variable
                     continue
