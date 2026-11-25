@@ -90,7 +90,7 @@ void LobbyGateChannel::SendInitSessionWithNPTokenOk(unsigned long long gatekey, 
     p.IsFragmentPacket = false;
     p.FragmentPacketCmd = 0;
     p.Allocate();
-    if (0 == p.Compose("hqqoo", 7, gatekey, clikey, nptoken, portalAccountId))
+    if (0 != p.Compose("hqqoo", 7, gatekey, clikey, nptoken, portalAccountId))
         Send(&p);
 }
 
@@ -1172,7 +1172,7 @@ void LobbyGateChannel::SendChangeUserNameWithAccountInventoryItemOk(unsigned lon
     p.IsFragmentPacket = false;
     p.FragmentPacketCmd = 0;
     p.Allocate();
-    if (0 != p.Compose("hqsqqi", 98, clikey, newUserName, labelId, itemInstanceId, itemDataId))
+    if (0 == p.Compose("hqsqqi", 98, clikey, newUserName, labelId, itemInstanceId, itemDataId))
         Log::Write(Log::LT_ERROR, L"LobbyGateChannel.cpp", 812,
                    L"[lobby-gate], send change-user-name-with-account-inventory-item-ok fail; compose fail, cli-key:0x%I64X", clikey);
     else
@@ -1208,7 +1208,7 @@ void LobbyGateChannel::SendExtendJumpingCharacterCreationQuotaWithAccountInvento
     p.IsFragmentPacket = false;
     p.FragmentPacketCmd = 0;
     p.Allocate();
-    if (0 == p.Compose("hqqqi", 101, clikey, labelId, itemInstanceId, remainQuota))
+    if (0 != p.Compose("hqqqi", 101, clikey, labelId, itemInstanceId, remainQuota))
         Send(&p);
 }
 
@@ -1244,7 +1244,7 @@ void LobbyGateChannel::SendCreateInitialUserNameOk(unsigned long long clikey, wc
     p.IsFragmentPacket = false;
     p.FragmentPacketCmd = 0;
     p.Allocate();
-    if (0 != p.Compose("hqs", 104, clikey, newUserName))
+    if (0 == p.Compose("hqs", 104, clikey, newUserName))
         Log::Write(Log::LT_ERROR, L"LobbyGateChannel.cpp", 874,
                    L"[lobby-gate], send create-initial-user-name-ok fail; compose fail, cli-key:0x%I64X, new-user-name:%s", clikey, newUserName);
     else
