@@ -61,7 +61,7 @@ LobbyJobStateDef const StateDef[] = {{0, L"INIT"},
                                      {7, L"FIN"}};  // 0x12e240
 }
 
-LobbyJobDef ChangeCharacterSexJob::_def = {41, StateDef, 7, L"ChangeCharacterSexJob"};  // 0x201f80
+LobbyJobDef ChangeCharacterSexJob::_def = {40, StateDef, 7, L"ChangeCharacterSexJob"};  // 0x201f80
 // LIFT: ChangeCharacterSexJob::_pool has no definition. The LobbyDaemon ObjectPool module is not in lift_lobbydaemon
 // (see CliSession.cpp).
 
@@ -79,24 +79,23 @@ void ChangeCharacterSexJob::deallocate_me(void*, wchar_t const*, int)
 }
 
 // 0x22ac0
+// The original copies ID128_GUID_ZERO into _slotid between the channel pointers and _labelId.
 ChangeCharacterSexJob::ChangeCharacterSexJob(CliSession* owner)
-    : CliSessionJob(owner), _tran(nullptr), _lgate(nullptr), _acciv(nullptr), _gamed(nullptr), _labelId(0),
+    : CliSessionJob(owner), _tran(nullptr), _lgate(nullptr), _acciv(nullptr), _gamed(nullptr), _slotid(ID128_GUID_ZERO), _labelId(0),
       _itemInstanceId(0), _newSex(0), _makingData(nullptr), _makingDataSize(0), _itemDataId(0),
       _serviceId(0)
 {
-    _slotid.id[0] = 0;
-    _slotid.id[1] = 0;
 }
 
 // 0x22b60 (scalar deleting destructor 0x22b40)
 ChangeCharacterSexJob::~ChangeCharacterSexJob()
 {
     if (_tran != nullptr)
-        _tran->removeReferenceCount(kFile, 93);
+        _tran->removeReferenceCount(kFile, 94);
     if (_lgate != nullptr)
-        _lgate->removeReferenceCount(kFile, 95);
+        _lgate->removeReferenceCount(kFile, 96);
     if (_gamed != nullptr)
-        _gamed->removeReferenceCount(kFile, 97);
+        _gamed->removeReferenceCount(kFile, 98);
     if (_makingData != nullptr)
     {
         Memory::_Manager[2]->Free(_makingData, kFile, 100);
@@ -345,7 +344,7 @@ bool ChangeCharacterSexJob::checkAccountInventoryItemOk(void* param)
 {
     _acciv->TRecv(_tran);
     RetrieveSingleWarehouseItemOkParam* const ok = static_cast<RetrieveSingleWarehouseItemOkParam*>(param);
-    short reason;
+    short reason = 0;
     if (ok == nullptr)
     {
         JOB_CRASH(344, L"== CRASH == [job], invalid param");
@@ -373,15 +372,16 @@ bool ChangeCharacterSexJob::checkAccountInventoryItemOk(void* param)
             JOB_LOG(Log::LT_ERROR, 371, L"[job], unusable item", L"");
             reason = 182;
         }
-        else
-        {
-            transit(REGISTER_SERVICE_ENTRY);
-            return true;
-        }
     }
-    _lgate->SendChangeCharacterSexWithAccountInventoryItemFail(_owner->_clikey, _slotid, _labelId, _itemInstanceId,
-                                                                reason);
-    transit(FIN);
+    // The original has one transit call: the next state is in a register.
+    int next = REGISTER_SERVICE_ENTRY;
+    if (reason != 0)
+    {
+        _lgate->SendChangeCharacterSexWithAccountInventoryItemFail(_owner->_clikey, _slotid, _labelId, _itemInstanceId,
+                                                                    reason);
+        next = FIN;
+    }
+    transit(next);
     return true;
 }
 
@@ -511,8 +511,8 @@ bool ChangeCharacterSexJob::tryConsumeAccountInventoryItemOk(void*)
     JOB_LOG(Log::LT_DEBUG, 526, L"[job], ok recv", L"");
     ChangeCharacterSexService* const service =
         static_cast<ChangeCharacterSexService*>(_owner->getLobbyServiceByType(_serviceId, 7));
-    int line;
-    wchar_t const* msg;
+    int line = -1;
+    wchar_t const* msg = nullptr;
     if (service == nullptr)
     {
         line = 531;
@@ -526,13 +526,17 @@ bool ChangeCharacterSexJob::tryConsumeAccountInventoryItemOk(void*)
     else
     {
         JOB_LOG(Log::LT_DEBUG, 547, L"[job], try consume item ok", L"");
-        transit(CHANGE_CHARACTER_SEX);
-        return true;
     }
-    JOB_LOGV(Log::LT_ERROR, line, msg);
-    _lgate->SendChangeCharacterSexWithAccountInventoryItemFail(_owner->_clikey, _slotid, _labelId, _itemInstanceId, 185);
-    releasePcServiceStatus();
-    transit(FIN);
+    // The original has one transit call: the next state is in a register.
+    int next = CHANGE_CHARACTER_SEX;
+    if (msg != nullptr)
+    {
+        JOB_LOGV(Log::LT_ERROR, line, msg);
+        _lgate->SendChangeCharacterSexWithAccountInventoryItemFail(_owner->_clikey, _slotid, _labelId, _itemInstanceId, 185);
+        releasePcServiceStatus();
+        next = FIN;
+    }
+    transit(next);
     return true;
 }
 
@@ -693,8 +697,8 @@ bool ChangeCharacterSexJob::finConsumeAccountInventoryItemOk(void*)
     _acciv->TRecv(_tran);
     JOB_LOG(Log::LT_DEBUG, 731, L"[job], ok recv", L"");
     ChangeCharacterSexService* const service = static_cast<ChangeCharacterSexService*>(_owner->getLobbyService(_serviceId));
-    int line;
-    wchar_t const* msg;
+    int line = -1;
+    wchar_t const* msg = nullptr;
     if (service == nullptr)
     {
         line = 736;
@@ -708,13 +712,17 @@ bool ChangeCharacterSexJob::finConsumeAccountInventoryItemOk(void*)
     else
     {
         JOB_LOG(Log::LT_DEBUG, 752, L"[job], set service-entry as 'consume item fin' ok", L"");
-        transit(FIN_SERVICE_ENTRY);
-        return true;
     }
-    JOB_LOGV(Log::LT_ERROR, line, msg);
-    _lgate->SendChangeCharacterSexWithAccountInventoryItemFail(_owner->_clikey, _slotid, _labelId, _itemInstanceId, 185);
-    releasePcServiceStatus();
-    transit(FIN);
+    // The original has one transit call: the next state is in a register.
+    int next = FIN_SERVICE_ENTRY;
+    if (msg != nullptr)
+    {
+        JOB_LOGV(Log::LT_ERROR, line, msg);
+        _lgate->SendChangeCharacterSexWithAccountInventoryItemFail(_owner->_clikey, _slotid, _labelId, _itemInstanceId, 185);
+        releasePcServiceStatus();
+        next = FIN;
+    }
+    transit(next);
     return true;
 }
 

@@ -79,13 +79,12 @@ void ChangeCharacterRaceJob::deallocate_me(void*, wchar_t const*, int)
 }
 
 // 0x1eaa0
+// The original copies ID128_GUID_ZERO into _slotid between the channel pointers and _labelId.
 ChangeCharacterRaceJob::ChangeCharacterRaceJob(CliSession* owner)
-    : CliSessionJob(owner), _tran(nullptr), _lgate(nullptr), _acciv(nullptr), _gamed(nullptr), _labelId(0),
+    : CliSessionJob(owner), _tran(nullptr), _lgate(nullptr), _acciv(nullptr), _gamed(nullptr), _slotid(ID128_GUID_ZERO), _labelId(0),
       _itemInstanceId(0), _newRace(0), _newSex(0), _makingData(nullptr), _makingDataSize(0), _itemDataId(0),
       _serviceId(0)
 {
-    _slotid.id[0] = 0;
-    _slotid.id[1] = 0;
 }
 
 // 0x1eb40 (scalar deleting destructor 0x1eb20)
@@ -347,7 +346,7 @@ bool ChangeCharacterRaceJob::checkAccountInventoryItemOk(void* param)
 {
     _acciv->TRecv(_tran);
     RetrieveSingleWarehouseItemOkParam* const ok = static_cast<RetrieveSingleWarehouseItemOkParam*>(param);
-    short reason;
+    short reason = 0;
     if (ok == nullptr)
     {
         JOB_CRASH(346, L"== CRASH == [job], invalid param");
@@ -375,15 +374,16 @@ bool ChangeCharacterRaceJob::checkAccountInventoryItemOk(void* param)
             JOB_LOG(Log::LT_ERROR, 373, L"[job], unusable item", L"");
             reason = 189;
         }
-        else
-        {
-            transit(REGISTER_SERVICE_ENTRY);
-            return true;
-        }
     }
-    _lgate->SendChangeCharacterRaceWithAccountInventoryItemFail(_owner->_clikey, _slotid, _labelId, _itemInstanceId,
-                                                                reason);
-    transit(FIN);
+    // The original has one transit call: the next state is in a register.
+    int next = REGISTER_SERVICE_ENTRY;
+    if (reason != 0)
+    {
+        _lgate->SendChangeCharacterRaceWithAccountInventoryItemFail(_owner->_clikey, _slotid, _labelId, _itemInstanceId,
+                                                                    reason);
+        next = FIN;
+    }
+    transit(next);
     return true;
 }
 
@@ -513,8 +513,8 @@ bool ChangeCharacterRaceJob::tryConsumeAccountInventoryItemOk(void*)
     JOB_LOG(Log::LT_DEBUG, 528, L"[job], ok recv", L"");
     ChangeCharacterRaceService* const service =
         static_cast<ChangeCharacterRaceService*>(_owner->getLobbyServiceByType(_serviceId, 8));
-    int line;
-    wchar_t const* msg;
+    int line = 0;
+    wchar_t const* msg = nullptr;
     if (service == nullptr)
     {
         line = 533;
@@ -528,13 +528,17 @@ bool ChangeCharacterRaceJob::tryConsumeAccountInventoryItemOk(void*)
     else
     {
         JOB_LOG(Log::LT_DEBUG, 549, L"[job], try consume item ok", L"");
-        transit(CHANGE_CHARACTER_RACE);
-        return true;
     }
-    JOB_LOGV(Log::LT_ERROR, line, msg);
-    _lgate->SendChangeCharacterRaceWithAccountInventoryItemFail(_owner->_clikey, _slotid, _labelId, _itemInstanceId, 192);
-    releasePcServiceStatus();
-    transit(FIN);
+    // The original has one transit call: the next state is in a register.
+    int next = CHANGE_CHARACTER_RACE;
+    if (msg != nullptr)
+    {
+        JOB_LOGV(Log::LT_ERROR, line, msg);
+        _lgate->SendChangeCharacterRaceWithAccountInventoryItemFail(_owner->_clikey, _slotid, _labelId, _itemInstanceId, 192);
+        releasePcServiceStatus();
+        next = FIN;
+    }
+    transit(next);
     return true;
 }
 
@@ -695,8 +699,8 @@ bool ChangeCharacterRaceJob::finConsumeAccountInventoryItemOk(void*)
     _acciv->TRecv(_tran);
     JOB_LOG(Log::LT_DEBUG, 733, L"[job], ok recv", L"");
     ChangeCharacterRaceService* const service = static_cast<ChangeCharacterRaceService*>(_owner->getLobbyService(_serviceId));
-    int line;
-    wchar_t const* msg;
+    int line = 0;
+    wchar_t const* msg = nullptr;
     if (service == nullptr)
     {
         line = 738;
@@ -710,13 +714,17 @@ bool ChangeCharacterRaceJob::finConsumeAccountInventoryItemOk(void*)
     else
     {
         JOB_LOG(Log::LT_DEBUG, 754, L"[job], set service-entry as 'consume item fin' ok", L"");
-        transit(FIN_SERVICE_ENTRY);
-        return true;
     }
-    JOB_LOGV(Log::LT_ERROR, line, msg);
-    _lgate->SendChangeCharacterRaceWithAccountInventoryItemFail(_owner->_clikey, _slotid, _labelId, _itemInstanceId, 192);
-    releasePcServiceStatus();
-    transit(FIN);
+    // The original has one transit call: the next state is in a register.
+    int next = FIN_SERVICE_ENTRY;
+    if (msg != nullptr)
+    {
+        JOB_LOGV(Log::LT_ERROR, line, msg);
+        _lgate->SendChangeCharacterRaceWithAccountInventoryItemFail(_owner->_clikey, _slotid, _labelId, _itemInstanceId, 192);
+        releasePcServiceStatus();
+        next = FIN;
+    }
+    transit(next);
     return true;
 }
 
