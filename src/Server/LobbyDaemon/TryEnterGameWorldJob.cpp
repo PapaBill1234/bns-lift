@@ -172,11 +172,10 @@ void* TryEnterGameWorldJob::_vtbl()
 
 // 0x7b920
 TryEnterGameWorldJob::TryEnterGameWorldJob(CliSession* owner)
-    : CliSessionJob(owner), _tran(nullptr), _lgate(nullptr), _gamed(nullptr), _pcid(0), _belongingWorld(0),
-      _chargeApplyType(CHARGEAPPLYTYPE_INVALID)
+    : CliSessionJob(owner), _tran(nullptr), _lgate(nullptr), _gamed(nullptr), _slotid(ID128_ID_ZERO), _pcid(0),
+      _belongingWorld(0), _chargeApplyType(CHARGEAPPLYTYPE_INVALID)
 {
-    _slotid.id[0] = 0;
-    _slotid.id[1] = 0;
+    // LIFT: _slotid copies ID128_ID_ZERO (0x14012d870). The HR shows zero stores; the disassembly loads the global.
 }
 
 // 0x7b9a0
@@ -202,7 +201,8 @@ TryEnterGameWorldJob::~TryEnterGameWorldJob()
 // 0x7ba40
 bool TryEnterGameWorldJob::Initialize(LobbyGateChannel* lgate, id128 const& slotid)
 {
-    if (lgate != nullptr && (slotid.id[0] != 0 || slotid.id[1] != 0))
+    // LIFT: compare with ID128_ID_ZERO (0x14012d870), as the disassembly loads it.
+    if (lgate != nullptr && (slotid.id[0] != ID128_ID_ZERO.id[0] || slotid.id[1] != ID128_ID_ZERO.id[1]))
     {
         _lgate = lgate;
         _slotid = slotid;

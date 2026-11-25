@@ -76,7 +76,7 @@ bool HandleLobbyLobbyGate_GetEnterWorldTokenReq(SharedChannel* channel, Packet c
     LobbyGateChannel* gate = static_cast<LobbyGateChannel*>(channel);
     short cmd = 0;
     unsigned long long clikey = 0;
-    id128 slotid = ID128_GUID_ZERO;  // LIFT: the original loads the zero id from ID128_GUID_ZERO.
+    id128 slotid = ID128_ID_ZERO;  // LIFT: the original loads the zero id from ID128_ID_ZERO (0x14012d870).
     if (packet->Decompose("hqo", &cmd, &clikey, &slotid) == 0)
     {
         Log::Write(Log::LT_ERROR, L"LobbyLobbyGatePacketHandler.cpp", 542,
@@ -99,7 +99,8 @@ bool HandleLobbyLobbyGate_GetEnterWorldTokenReq(SharedChannel* channel, Packet c
         gate->SendGetEnterWorldTokenFail(clikey, 4);
         return true;
     }
-    TryEnterGameWorldJob* job = new (TryEnterGameWorldJob::_pool.Checkout(L"LobbyLobbyGatePacketHandler.cpp", 558))
+    // LIFT: global placement new. The original has an EH state for the matching placement delete.
+    TryEnterGameWorldJob* job = ::new (TryEnterGameWorldJob::_pool.Checkout(L"LobbyLobbyGatePacketHandler.cpp", 558))
         TryEnterGameWorldJob(cliSession);
     if (!job->Initialize(gate, slotid))
     {
