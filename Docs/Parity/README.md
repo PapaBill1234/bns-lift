@@ -42,6 +42,7 @@ No new daemon work starts before the 4 exes reach the target. This phase is a te
 - Parity % = MATCH / (paired functions + functions only in the original).
 - MATCH = the calls, the data refs and the constants of a function are equal (`tools/funcdiff.py`).
 - A function that the original has and our exe does not have counts as a miss. Inlined code is a miss when the original did not inline it.
+- EXCLUDED = funcdiff says MATCH, but a review rejected the function and the operator excluded it (no honest source fix). An excluded function is not a MATCH. It gets no credit and does not count in parity %. The list is `excluded.tsv` (columns: exe, symbol, reason, card, proof_digest). `tools/parity.sh --accept` writes it into `baseline/` with status `EXCLUDED`. `progress.tsv` and the README table show MATCH without it and a separate excluded count. An old baseline with status `MATCH` for a listed symbol is read as `EXCLUDED`.
 
 ## Measure
 ```
@@ -78,6 +79,7 @@ Cost: high uses about 1.4× the tokens of medium. Do not use `xhigh` or `max`. C
 | Never change `baseline/` or `progress.tsv`. The runner changes them. | The gate compares with the committed baseline. |
 | No exe may lose MATCH functions. | Shared code is in all 4 exes. A fix for one exe can break another. |
 | A MATCH → DIFF change needs a line in `allow-worse.txt`: `<EXE> <function> \| <reason>`. | Only when a shared fix wins more than it loses. Give the counts. |
+| Cards never edit `excluded.tsv`. The lander adds a row only with an operator exclude receipt (engine `integrate.py exclude`) and its proof digest. | An exclude must be on record. It must never raise MATCH. |
 | Change `tools/funcdiff.py` only in a tooling card. Prove each normalization in `noise.md`. | A looser tool hides real differences. |
 | Keep the original logic. Change only the source form: inline or not, the header or the `.cpp`, the order of calls, the types, the STL call. | Parity of the code, not new behaviour. |
 | Write each fix pattern in `lessons.md` with one example (function, before, after). | The GameDaemon lift uses these patterns. |
