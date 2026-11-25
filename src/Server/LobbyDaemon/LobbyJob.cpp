@@ -319,6 +319,9 @@ LobbyJob* LobbyJobManager::find(unsigned long long jobid)
     if (it != jobs.end())
     {
         job = it->second;
+        // LIFT: the PDB name of the callee is addReferenceCount(bool, wchar_t const*, int) (rva 0xb9e0). LTCG removed
+        // ignoreHistory: the body homes file from rdx and line from r8 (PDB regrel offsets 104 and 112). The original
+        // call passes L"LobbyJob.cpp" in rdx and 328 in r8, the same as this call. See RefCntObject.h.
         job->addReferenceCount(kFile, 328);
     }
     LeaveCriticalSection(&_lock[slot].CS);
