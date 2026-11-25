@@ -18,6 +18,7 @@ class GameWorldRegistry;
 class GameWorldReporter;
 class Packet;
 class Session;
+class SharedChannel;
 struct WaitInfo;
 
 class GameWorld
@@ -137,6 +138,8 @@ public:
     void Update();  // 0x4f330
     // LIFT: access helper. ServiceOpenNotify (0x88cd0) has Get (0x4e8b0) inlined and reads _worlds, _min and _size.
     friend bool HandleLobbyGame_ServiceOpenNotify(Session const*, Packet const*);
+    // LIFT: access helper. TryRegisterGuildReq (0x8d590) has Get (0x4e8b0) inlined too.
+    friend bool HandleLobbyGame_TryRegisterGuildReq(SharedChannel*, Packet const*);
 private:
     GameWorldCluster* getGameWorldCluster(short);  // 0x4ebf0
     bool addGameWorldCluster(GameWorldCluster*);  // 0x4ec90

@@ -142,3 +142,8 @@ bool AbandonChargeJob::expireChargeAbandon()
 {
     LIFT_STUB(0x5b10);
 }
+
+// LIFT: AbandonChargeJob::_pool (.data RVA 0x2037b0). Dynamic initializer 0x11d850, atexit destructor 0x11e7c0. The original static data
+// holds id 1, objsize sizeof(AbandonChargeJob) and desc L"AbandonChargeJob".
+#include "ObjectPool.h"
+ObjPool AbandonChargeJob::_pool(1, sizeof(AbandonChargeJob), L"AbandonChargeJob");

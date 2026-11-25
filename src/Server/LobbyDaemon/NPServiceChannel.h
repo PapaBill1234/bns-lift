@@ -37,6 +37,8 @@ struct _StsMsgRequestFriendSendMessage : public _StsMsgRequest
             char* pszKey;
             wchar_t* pwszValue;
         };
+        // LIFT: PDB inline constructor. HandleLobbyGame_FriendMessageNotify (0x90f70) shows the zeroing.
+        Contents() : pFields(nullptr), nFieldCount(0) {}
         Field* pFields;
         int nFieldCount;
     };

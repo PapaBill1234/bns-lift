@@ -181,3 +181,13 @@ bool UpgradeJumpingCharacterStateJob::upgradeJumpingCharacterState()
 {
     LIFT_STUB(0x2d9c0);
 }
+
+// LIFT: ExtendJumpingCharacterCreationQuotaJob::_pool (.data RVA 0x2040a0). Dynamic initializer 0x11dc60, atexit destructor 0x11eb00. The original static data
+// holds id 1, objsize sizeof(ExtendJumpingCharacterCreationQuotaJob) and desc L"ExtendJumpingCharacterCreationQuotaJob".
+#include "ObjectPool.h"
+ObjPool ExtendJumpingCharacterCreationQuotaJob::_pool(1, sizeof(ExtendJumpingCharacterCreationQuotaJob), L"ExtendJumpingCharacterCreationQuotaJob");
+
+// LIFT: UpgradeJumpingCharacterStateJob::_pool (.data RVA 0x204150). Dynamic initializer 0x11dcb0, atexit destructor 0x11eb40. The original static data
+// holds id 1, objsize sizeof(UpgradeJumpingCharacterStateJob) and desc L"UpgradeJumpingCharacterStateJob".
+#include "ObjectPool.h"
+ObjPool UpgradeJumpingCharacterStateJob::_pool(1, sizeof(UpgradeJumpingCharacterStateJob), L"UpgradeJumpingCharacterStateJob");

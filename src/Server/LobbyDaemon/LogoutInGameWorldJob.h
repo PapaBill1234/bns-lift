@@ -26,7 +26,7 @@ private:
 public:
     short _wid;
 
-    static ObjPool _pool;  // LIFT: no definition yet (like CliSession::_pool).
+    static ObjPool _pool;  // LIFT: defined in the .cpp (gap-26).
     static LobbyJobDef _def;  // 0x201b58
 };
 static_assert(sizeof(LogoutInGameWorldJob) == 0x60, "sizeof LogoutInGameWorldJob");

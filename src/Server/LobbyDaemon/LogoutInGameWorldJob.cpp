@@ -130,3 +130,8 @@ bool LogoutInGameWorldJob::logout()
     transit(2);
     return true;
 }
+
+// LIFT: LogoutInGameWorldJob::_pool (.data RVA 0x204af0). Dynamic initializer 0x11e110, atexit destructor 0x11eec0. The original static data
+// holds id 1, objsize sizeof(LogoutInGameWorldJob) and desc L"LogoutInGameWorldJob".
+#include "ObjectPool.h"
+ObjPool LogoutInGameWorldJob::_pool(1, sizeof(LogoutInGameWorldJob), L"LogoutInGameWorldJob");

@@ -52,7 +52,7 @@ private:
     char _actionIndex;  // +0x71
 
 public:
-    static ObjPool _pool;
+    static ObjPool _pool;  // LIFT: defined in the .cpp (gap-26).
     static LobbyJobDef _def;
 
     friend struct SecondPasswordIsVerifiedJobLayoutCheck;

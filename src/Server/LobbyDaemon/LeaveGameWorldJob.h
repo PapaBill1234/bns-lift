@@ -36,7 +36,7 @@ public:
     unsigned long long _pcid;
     unsigned long long _leaveWorldTokenKey;
 
-    static ObjPool _pool;  // LIFT: no definition yet (like CliSession::_pool).
+    static ObjPool _pool;  // LIFT: defined in the .cpp (gap-26).
     static LobbyJobDef _def;
 };
 static_assert(sizeof(LeaveGameWorldJob) == 0x78, "sizeof LeaveGameWorldJob");

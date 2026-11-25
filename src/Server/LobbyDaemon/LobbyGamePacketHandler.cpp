@@ -42,6 +42,10 @@
 #include "LobbyDB.h"
 #include "RefCntObject.h"
 #include "StlMemory.h"
+#include "RuleSet.h"
+#include "ExtendJumpingCharacterCreationQuotaJob.h"
+#include "SecondPasswordGetStatusJob.h"
+#include "SecondPasswordIsVerifiedJob.h"
 #include "LiftStub.h"
 
 // LIFT: the handler table (LobbyGamePacketLobbySideHandlerList) is a null placeholder (ld-18). The handlers have no lifted caller. Keep them until the table is lifted.
@@ -549,16 +553,197 @@ static __forceinline bool HandleShowcaseOk(SharedChannel* channel, Packet const*
 }
 
 
-// 0x89270
-bool HandleLobbyGame_EnterWorldReq(SharedChannel*, Packet const*)
+// LIFT: inlined form of LobbyDaemon::GetAddressStringWForLogs (0x9f3c0) in the fail logs of 0x89270. Not a PDB name.
+static __forceinline wchar_t const* LgpAddressStringWForLogs(unsigned long addr)
 {
-    LIFT_STUB(0x89270);
+    if (LobbyDaemon::_instance != nullptr)
+    {
+        LobbyConfig const* const config = LobbyDaemon::_instance->_config;
+        if (config != nullptr && !config->_allowClientIPAddressInLogs)
+            addr = 0;
+    }
+    return Network::GetAddressStringW(addr);
 }
 
-// 0x899a0
-bool HandleLobbyGame_LeaveWorldReq(SharedChannel*, Packet const*)
+#pragma comment(linker, "/INCLUDE:?HandleLobbyGame_EnterWorldReq@@YA_NPEAVSharedChannel@@PEBVPacket@@@Z")   // LIFT: keep until the caller is lifted (0x89270)
+// 0x89270
+bool HandleLobbyGame_EnterWorldReq(SharedChannel* sharedChannel, Packet const* packet)
 {
-    LIFT_STUB(0x899a0);
+    GamedChannel* channel = static_cast<GamedChannel*>(sharedChannel);
+    short cmd = 0;
+    unsigned long long gametid = 0;
+    unsigned long long clikey = 0;
+    unsigned long long tokenkey = 0;
+    unsigned long addr = 0;
+
+    if (packet->Decompose("hqqqi", &cmd, &gametid, &clikey, &tokenkey, &addr) == 0)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 320,
+                   L"[gamed], handle enter world req fail; decompose fail,channel-id:%I64d, game-tid:0x%I64X, cli-key:0x%I64X, token:0x%I64d, ip-address:%s",
+                   LgpChannelId(channel), gametid, clikey, tokenkey, LgpAddressStringWForLogs(addr));
+        return true;
+    }
+    bool expired = false;  // LIFT: the original leaves it unset. Verify sets it.
+    LobbyToken* token = LobbyDaemon::_instance->_tokenDesk->Verify(LobbyToken::TOKEN_ENTER_GAME_WORLD, tokenkey, clikey,
+                                                                   addr, expired);
+    if (token == nullptr)
+    {
+        short reason;
+        if (expired)
+        {
+            Log::Write(Log::LT_ERROR, HANDLER_FILE, 329,
+                       L"[gamed], handle enter world req fail; expired token, channel-id:%I64d, game-tid:0x%I64X, cli-key:0x%I64X, token:0x%I64d, ip-address:%s",
+                       LgpChannelId(channel), gametid, clikey, tokenkey, LgpAddressStringWForLogs(addr));
+            reason = 16;
+        }
+        else
+        {
+            Log::Write(Log::LT_ERROR, HANDLER_FILE, 333,
+                       L"[gamed], handle enter world req fail; token verification fail, channel-id:%I64d, game-tid:0x%I64X, cli-key:0x%I64X, token:0x%I64d, ip-address:%s",
+                       LgpChannelId(channel), gametid, clikey, tokenkey, LgpAddressStringWForLogs(addr));
+            reason = 15;
+        }
+        channel->SendEnterWorldFail(gametid, reason);
+        return true;
+    }
+    // LIFT: Verify gives TOKEN_ENTER_GAME_WORLD tokens only. The original reads the EnterGameWorldToken members (+0x48, +0x50) without a check.
+    EnterGameWorldToken* const enterToken = static_cast<EnterGameWorldToken*>(token);
+    // LIFT: inlined LobbyToken::AcquireCliSession (LobbyToken.cpp line 44). The friend declaration in LobbyToken.h gives the access.
+    CliSession* const acquired = token->_clisession;
+    if (acquired != nullptr)
+        acquired->addReferenceCount(false, L"LobbyToken.cpp", 44);
+    CliSession* const cliSession = token->_clisession;
+    int line;
+    if (cliSession == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 342,
+                   L"== CRASH == [gamed], handle enter world req fail; token has no cli-session, channel-id:%I64d, game-tid:0x%I64X, cli-key:0x%I64X, token:0x%I64d, ip-address:%s",
+                   LgpChannelId(channel), gametid, clikey, tokenkey, LgpAddressStringWForLogs(addr));
+        AlertSender::Write(HANDLER_FILE, 342,
+                           L"== CRASH == [gamed], handle enter world req fail; token has no cli-session, channel-id:%I64d, game-tid:0x%I64X, cli-key:0x%I64X, token:0x%I64d, ip-address:%s",
+                           LgpChannelId(channel), gametid, clikey, tokenkey, LgpAddressStringWForLogs(addr));
+        channel->SendEnterWorldFail(gametid, 2);
+        line = 344;
+    }
+    else if (enterToken->_targetGameWorld != static_cast<short>(LgpChannelId(channel)))
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 349,
+                   L"[gamed], handle enter world req fail; not target world, channel-id:%I64d, game-tid:0x%I64X, cli-key:0x%I64X, token:0x%I64d, ip-address:%s",
+                   LgpChannelId(channel), gametid, clikey, tokenkey, LobbyDaemon::GetAddressStringWForLogs(addr));
+        channel->SendEnterWorldFail(gametid, 17);
+        token->Expire();
+        cliSession->removeReferenceCount(HANDLER_FILE, 357);
+        line = 358;
+    }
+    else
+    {
+        EnterGameWorldJob* job = new (EnterGameWorldJob::_pool.Checkout(HANDLER_FILE, 362)) EnterGameWorldJob(cliSession);
+        if (!job->Initialize(channel, gametid, enterToken->_targetPcid))
+        {
+            Log::Write(Log::LT_ERROR, HANDLER_FILE, 364,
+                       L"[gamed], handle enter world req fail; initialize job fail, channel-id:%I64d, game-tid:0x%I64X, cli-key:0x%I64X, token:0x%I64d, ip-address:%s",
+                       LgpChannelId(channel), gametid, clikey, tokenkey, LobbyDaemon::GetAddressStringWForLogs(addr));
+            channel->SendEnterWorldFail(gametid, 4);
+            token->Expire();
+            job->removeReferenceCount(HANDLER_FILE, 372);
+            cliSession->removeReferenceCount(HANDLER_FILE, 373);
+            line = 374;
+        }
+        else if (!LobbyDaemon::_instance->_jobMgr->Start(job, 117, nullptr))
+        {
+            Log::Write(Log::LT_ERROR, HANDLER_FILE, 379,
+                       L"[gamed], handle enter world req fail; start job fail, channel-id:%I64d, game-tid:0x%I64X, cli-key:0x%I64X, token:0x%I64d, ip-address:%s",
+                       LgpChannelId(channel), gametid, clikey, tokenkey, LobbyDaemon::GetAddressStringWForLogs(addr));
+            channel->SendEnterWorldFail(gametid, 2);
+            token->Expire();
+            job->removeReferenceCount(HANDLER_FILE, 387);
+            cliSession->removeReferenceCount(HANDLER_FILE, 388);
+            line = 389;
+        }
+        else
+        {
+            Log::Write(Log::LT_DEBUG, HANDLER_FILE, 393,
+                       L"[gamed], handle enter world req ok, channel-id:%I64d, game-tid:0x%I64X, cli-key:0x%I64X, token:0x%I64d, ip-address:%s",
+                       LgpChannelId(channel), gametid, clikey, tokenkey, LobbyDaemon::GetAddressStringWForLogs(addr));
+            job->removeReferenceCount(HANDLER_FILE, 395);
+            cliSession->removeReferenceCount(HANDLER_FILE, 396);
+            line = 397;
+        }
+    }
+    token->removeReferenceCount(HANDLER_FILE, line);
+    return true;
+}
+
+#pragma comment(linker, "/INCLUDE:?HandleLobbyGame_LeaveWorldReq@@YA_NPEAVSharedChannel@@PEBVPacket@@@Z")   // LIFT: keep until the caller is lifted (0x899a0)
+// 0x899a0
+bool HandleLobbyGame_LeaveWorldReq(SharedChannel* sharedChannel, Packet const* packet)
+{
+    GamedChannel* channel = static_cast<GamedChannel*>(sharedChannel);
+    short cmd = 0;
+    unsigned long long gametid = 0;
+    unsigned long long pcid = 0;
+    unsigned long long clikey = 0;
+
+    if (packet->Decompose("hqqq", &cmd, &gametid, &pcid, &clikey) == 0)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 418,
+                   L"[gamed], handle leave world req fail; decompose fail, channel-id:%I64d, game-tid:0x%I64X, pcid:0x%I64X, cli-key:0x%I64X",
+                   LgpChannelId(channel), gametid, pcid, clikey);
+        return true;
+    }
+    short wid = static_cast<short>(LgpChannelId(channel));
+    CliSession* cliSession = LobbyDaemon::_instance->_clisessionMgr->Select_index_pcid(wid, pcid);
+    if (cliSession == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 424,
+                   L"[gamed], handle leave world req fail; no such cli-session, channel-id:%I64d, game-tid:0x%I64X, pcid:0x%I64X, cli-key:0x%I64X",
+                   LgpChannelId(channel), gametid, pcid, clikey);
+        channel->SendLeaveWorldFail(gametid, 5);
+        return true;
+    }
+    int line;
+    if (cliSession->_clikey != clikey)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 430,
+                   L"[gamed], handle leave world req fail; clikey mismatch, clisession-cli-key:0x%I64X, channel-id:%I64d, game-tid:0x%I64X, pcid:0x%I64X, cli-key:0x%I64X",
+                   cliSession->_clikey, LgpChannelId(channel), gametid, pcid, clikey);
+        channel->SendLeaveWorldFail(gametid, 5);
+        line = 432;
+    }
+    else
+    {
+        LeaveGameWorldJob* job = new (LeaveGameWorldJob::_pool.Checkout(HANDLER_FILE, 436)) LeaveGameWorldJob(cliSession);
+        if (!job->Initialize(channel, gametid, pcid))
+        {
+            Log::Write(Log::LT_ERROR, HANDLER_FILE, 438,
+                       L"[gamed], handle leave world req fail; initialize job fail, channel-id:%I64d, game-tid:0x%I64X, pcid:0x%I64X, cli-key:0x%I64X",
+                       LgpChannelId(channel), gametid, pcid, clikey);
+            // LIFT: the original sends an enter-world fail here (not a leave-world fail). Kept as in the original.
+            channel->SendEnterWorldFail(gametid, 4);
+            job->removeReferenceCount(HANDLER_FILE, 440);
+            line = 441;
+        }
+        else if (!LobbyDaemon::_instance->_jobMgr->Start(job, 119, nullptr))
+        {
+            Log::Write(Log::LT_ERROR, HANDLER_FILE, 446,
+                       L"[gamed], handle leave world req fail; start job fail, channel-id:%I64d, game-tid:0x%I64X, pcid:0x%I64X, cli-key:0x%I64X",
+                       LgpChannelId(channel), gametid, pcid, clikey);
+            // LIFT: the original sends an enter-world fail here (not a leave-world fail). Kept as in the original.
+            channel->SendEnterWorldFail(gametid, 2);
+            job->removeReferenceCount(HANDLER_FILE, 448);
+            line = 449;
+        }
+        else
+        {
+            Log::Write(Log::LT_DEBUG, HANDLER_FILE, 453,
+                       L"[gamed], handle leave world req ok, channel-id:%I64d, game-tid:0x%I64X, pcid:0x%I64X, cli-key:0x%I64X",
+                       LgpChannelId(channel), gametid, pcid, clikey);
+            job->removeReferenceCount(HANDLER_FILE, 455);
+            line = 456;
+        }
+    }
+    cliSession->removeReferenceCount(HANDLER_FILE, line);
+    return true;
 }
 
 // 0x89d90
@@ -617,10 +802,69 @@ bool HandleLobbyGame_UpdateBotScoreNotify(SharedChannel* channel, Packet const* 
     return true;
 }
 
+#pragma comment(linker, "/INCLUDE:?HandleLobbyGame_LogoutNotify@@YA_NPEAVSharedChannel@@PEBVPacket@@@Z")   // LIFT: keep until the caller is lifted (0x8a060)
 // 0x8a060
-bool HandleLobbyGame_LogoutNotify(SharedChannel*, Packet const*)
+bool HandleLobbyGame_LogoutNotify(SharedChannel* channel, Packet const* packet)
 {
-    LIFT_STUB(0x8a060);
+    short cmd = 0;
+    unsigned long long pcid = 0;
+    unsigned long long clikey = 0;
+
+    if (packet->Decompose("hqq", &cmd, &pcid, &clikey) == 0)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 522,
+                   L"[gamed], handle logout notify fail; decompose fail, channel-id:%I64d, pcid:0x%I64X, cli-key:0x%I64X",
+                   LgpChannelId(channel), pcid, clikey);
+        return true;
+    }
+    short wid = static_cast<short>(LgpChannelId(channel));
+    CliSession* cliSession = LobbyDaemon::_instance->_clisessionMgr->Select_index_pcid(wid, pcid);
+    if (cliSession == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 528,
+                   L"[gamed], handle logout notify fail; no such cli-session, channel-id:%I64d, pcid:0x%I64X, cli-key:0x%I64X",
+                   LgpChannelId(channel), pcid, clikey);
+        return true;
+    }
+    int line;
+    if (cliSession->_clikey != clikey)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 533,
+                   L"[gamed], handle logout notify fail; cli-key mismatch, found-cli-key:0x%I64X, channel-id:%I64d, pcid:0x%I64X, cli-key:0x%I64X",
+                   cliSession->_clikey, LgpChannelId(channel), pcid, clikey);
+        line = 534;
+    }
+    else
+    {
+        LogoutInGameWorldJob* job =
+            new (LogoutInGameWorldJob::_pool.Checkout(HANDLER_FILE, 538)) LogoutInGameWorldJob(cliSession);
+        if (!job->Initialize(static_cast<short>(LgpChannelId(channel))))
+        {
+            Log::Write(Log::LT_ERROR, HANDLER_FILE, 540,
+                       L"[gamed], handle logout notify fail; init job fail, channel-id:%I64d, pcid:0x%I64X, cli-key:0x%I64X",
+                       LgpChannelId(channel), pcid, clikey);
+            job->removeReferenceCount(HANDLER_FILE, 541);
+            line = 542;
+        }
+        else if (!LobbyDaemon::_instance->_jobMgr->Start(job, 118, nullptr))
+        {
+            Log::Write(Log::LT_ERROR, HANDLER_FILE, 547,
+                       L"[gamed], handle logout notify fail; start job fail, channel-id:%I64d, pcid:0x%I64X, cli-key:0x%I64X",
+                       LgpChannelId(channel), pcid, clikey);
+            job->removeReferenceCount(HANDLER_FILE, 548);
+            line = 549;
+        }
+        else
+        {
+            Log::Write(Log::LT_DEBUG, HANDLER_FILE, 553,
+                       L"[gamed], handle logout notify ok, channel-id:%I64d, pcid:0x%I64X, cli-key:0x%I64X",
+                       LgpChannelId(channel), pcid, clikey);
+            job->removeReferenceCount(HANDLER_FILE, 555);
+            line = 556;
+        }
+    }
+    cliSession->removeReferenceCount(HANDLER_FILE, line);
+    return true;
 }
 
 // 0x8a400
@@ -839,22 +1083,212 @@ bool HandleLobbyGame_RestoreCharacterFail(SharedChannel* channel, Packet const* 
     return true;
 }
 
+#pragma comment(linker, "/INCLUDE:?HandleLobbyGame_StartChargeReq@@YA_NPEAVSharedChannel@@PEBVPacket@@@Z")   // LIFT: keep until the caller is lifted (0x8b5b0)
 // 0x8b5b0
-bool HandleLobbyGame_StartChargeReq(SharedChannel*, Packet const*)
+bool HandleLobbyGame_StartChargeReq(SharedChannel* sharedChannel, Packet const* packet)
 {
-    LIFT_STUB(0x8b5b0);
+    GamedChannel* channel = static_cast<GamedChannel*>(sharedChannel);
+    short cmd = 0;
+    unsigned long long tid = 0;
+    unsigned long long pcid = 0;
+    unsigned long long clikey = 0;
+
+    if (packet->Decompose("hqqq", &cmd, &tid, &pcid, &clikey) == 0)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 800,
+                   L"[gamed], handle start charge request fail; decompose fail, wid:%d, tid:0x%I64X, pcid:0x%I64X, cli-key:0x%I64X",
+                   LgpWid(channel), tid, pcid, clikey);
+        return true;
+    }
+    short wid = static_cast<short>(LgpChannelId(channel));
+    CliSession* cliSession = LobbyDaemon::_instance->_clisessionMgr->Select_index_pcid(wid, pcid);
+    if (cliSession == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 806,
+                   L"[gamed], handle start charge request fail; no such cli-session, wid:%d, tid:0x%I64X, pcid:0x%I64X, cli-key:0x%I64X",
+                   LgpWid(channel), tid, pcid, clikey);
+        channel->SendStartChargeFail(tid, 5);
+        return true;
+    }
+    int line;
+    if (cliSession->_clikey != clikey)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 812,
+                   L"[gamed], handle start charge request fail; cli-key mismatch, found-cli-key:0x%I64X, wid:%d, tid:0x%I64X, pcid:0x%I64X, cli-key:0x%I64X",
+                   cliSession->_clikey, LgpWid(channel), tid, pcid, clikey);
+        channel->SendStartChargeFail(tid, 5);
+        line = 814;
+    }
+    else
+    {
+        StartChargeJob* job = new (StartChargeJob::_pool.Checkout(HANDLER_FILE, 818)) StartChargeJob(cliSession);
+        if (!job->Initialize(channel, tid, pcid))
+        {
+            Log::Write(Log::LT_ERROR, HANDLER_FILE, 820,
+                       L"[gamed], handle start charge request fail; init job fail, wid:%d, tid:0x%I64X, pcid:0x%I64X, cli-key:0x%I64X",
+                       LgpWid(channel), tid, pcid, clikey);
+            channel->SendStartChargeFail(tid, 2);
+            job->removeReferenceCount(HANDLER_FILE, 822);
+            line = 823;
+        }
+        else if (!LobbyDaemon::_instance->_jobMgr->Start(job, 120, nullptr))
+        {
+            Log::Write(Log::LT_ERROR, HANDLER_FILE, 828,
+                       L"[gamed], handle start charge request fail; start job fail, wid:%d, tid:0x%I64X, pcid:0x%I64X, cli-key:0x%I64X",
+                       LgpWid(channel), tid, pcid, clikey);
+            channel->SendStartChargeFail(tid, 2);
+            job->removeReferenceCount(HANDLER_FILE, 830);
+            line = 831;
+        }
+        else
+        {
+            Log::Write(Log::LT_DEBUG, HANDLER_FILE, 835,
+                       L"[gamed], handle start charge request ok, wid:%d, tid:0x%I64X, pcid:0x%I64X, cli-key:0x%I64X",
+                       LgpWid(channel), tid, pcid, clikey);
+            job->removeReferenceCount(HANDLER_FILE, 837);
+            line = 838;
+        }
+    }
+    cliSession->removeReferenceCount(HANDLER_FILE, line);
+    return true;
 }
 
+#pragma comment(linker, "/INCLUDE:?HandleLobbyGame_StopChargeReq@@YA_NPEAVSharedChannel@@PEBVPacket@@@Z")   // LIFT: keep until the caller is lifted (0x8b9b0)
 // 0x8b9b0
-bool HandleLobbyGame_StopChargeReq(SharedChannel*, Packet const*)
+bool HandleLobbyGame_StopChargeReq(SharedChannel* sharedChannel, Packet const* packet)
 {
-    LIFT_STUB(0x8b9b0);
+    GamedChannel* channel = static_cast<GamedChannel*>(sharedChannel);
+    short cmd = 0;
+    unsigned long long tid = 0;
+    unsigned long long pcid = 0;
+    unsigned long long clikey = 0;
+    wchar_t chargeKey[65];
+    chargeKey[0] = 0;
+
+    if (packet->Decompose("hqqqs", &cmd, &tid, &pcid, &clikey, chargeKey, 65) == 0)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 860,
+                   L"[gamed], handle stop charge request fail; decompose fail, wid:%d, tid:0x%I64X, pcid:0x%I64X, cli-key:0x%I64X, charge-key:%s",
+                   LgpWid(channel), tid, pcid, clikey, chargeKey);
+        return true;
+    }
+    short wid = static_cast<short>(LgpChannelId(channel));
+    CliSession* cliSession = LobbyDaemon::_instance->_clisessionMgr->Select_index_pcid(wid, pcid);
+    if (cliSession == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 866,
+                   L"[gamed], handle stop charge request fail; no such cli-session, wid:%d, tid:0x%I64X, pcid:0x%I64X, cli-key:0x%I64X, charge-key:%s",
+                   LgpWid(channel), tid, pcid, clikey, chargeKey);
+        channel->SendStopChargeFail(tid, 5);
+        return true;
+    }
+    int line;
+    if (cliSession->_clikey != clikey)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 872,
+                   L"[gamed], handle stop charge request fail; cli-key mismatch, found-cli-key:0x%I64X, wid:%d, tid:0x%I64X, pcid:0x%I64X, cli-key:0x%I64X, charge-key:%s",
+                   cliSession->_clikey, LgpWid(channel), tid, pcid, clikey, chargeKey);
+        channel->SendStopChargeFail(tid, 5);
+        line = 874;
+    }
+    else
+    {
+        StopChargeJob* job = new (StopChargeJob::_pool.Checkout(HANDLER_FILE, 878)) StopChargeJob(cliSession);
+        if (!job->Initialize(channel, tid, pcid, chargeKey))
+        {
+            Log::Write(Log::LT_ERROR, HANDLER_FILE, 880,
+                       L"[gamed], handle stop charge request fail; init job fail, wid:%d, tid:0x%I64X, pcid:0x%I64X, cli-key:0x%I64X, charge-key:%s",
+                       LgpWid(channel), tid, pcid, clikey, chargeKey);
+            channel->SendStopChargeFail(tid, 2);
+            job->removeReferenceCount(HANDLER_FILE, 882);
+            line = 883;
+        }
+        else if (!LobbyDaemon::_instance->_jobMgr->Start(job, 121, nullptr))
+        {
+            Log::Write(Log::LT_ERROR, HANDLER_FILE, 888,
+                       L"[gamed], handle stop charge request fail; start job fail, wid:%d, tid:0x%I64X, pcid:0x%I64X, cli-key:0x%I64X, charge-key:%s",
+                       LgpWid(channel), tid, pcid, clikey, chargeKey);
+            channel->SendStopChargeFail(tid, 2);
+            job->removeReferenceCount(HANDLER_FILE, 890);
+            line = 891;
+        }
+        else
+        {
+            Log::Write(Log::LT_DEBUG, HANDLER_FILE, 895,
+                       L"[gamed], handle stop charge request ok, wid:%d, tid:0x%I64X, pcid:0x%I64X, cli-key:0x%I64X, charge-key:%s",
+                       LgpWid(channel), tid, pcid, clikey, chargeKey);
+            job->removeReferenceCount(HANDLER_FILE, 897);
+            line = 898;
+        }
+    }
+    cliSession->removeReferenceCount(HANDLER_FILE, line);
+    return true;
 }
 
+#pragma comment(linker, "/INCLUDE:?HandleLobbyGame_AbandonChargeNotify@@YA_NPEAVSharedChannel@@PEBVPacket@@@Z")   // LIFT: keep until the caller is lifted (0x8be60)
 // 0x8be60
-bool HandleLobbyGame_AbandonChargeNotify(SharedChannel*, Packet const*)
+bool HandleLobbyGame_AbandonChargeNotify(SharedChannel* channel, Packet const* packet)
 {
-    LIFT_STUB(0x8be60);
+    short cmd = 0;
+    unsigned long long pcid = 0;
+    unsigned long long clikey = 0;
+    wchar_t chargeKey[65];
+    chargeKey[0] = 0;
+
+    if (packet->Decompose("hqqs", &cmd, &pcid, &clikey, chargeKey, 65) == 0)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 919,
+                   L"[gamed], handle abandon charge req fail; decompose fail, wid:%d, pcid:0x%I64X, cli-key:0x%I64X, charge-key:%s",
+                   LgpWid(channel), pcid, clikey, chargeKey);
+        return true;
+    }
+    short wid = static_cast<short>(LgpChannelId(channel));
+    CliSession* cliSession = LobbyDaemon::_instance->_clisessionMgr->Select_index_pcid(wid, pcid);
+    if (cliSession == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 925,
+                   L"[gamed], handle abandon charge req fail; no such cli-session, wid:%d, pcid:0x%I64X, cli-key:0x%I64X, charge-key:%s",
+                   LgpWid(channel), pcid, clikey, chargeKey);
+        return true;
+    }
+    int line;
+    if (cliSession->_clikey != clikey)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 930,
+                   L"[gamed], handle abandon charge req fail; cli-key mismatch, found-cli-key:0x%I64X, wid:%d, pcid:0x%I64X, cli-key:0x%I64X, charge-key:%s",
+                   cliSession->_clikey, LgpWid(channel), pcid, clikey, chargeKey);
+        line = 931;
+    }
+    else
+    {
+        AbandonChargeJob* job = new (AbandonChargeJob::_pool.Checkout(HANDLER_FILE, 935)) AbandonChargeJob(cliSession);
+        if (!job->Initialize(pcid, chargeKey))
+        {
+            Log::Write(Log::LT_ERROR, HANDLER_FILE, 937,
+                       L"[gamed], handle abandon charge req fail; init job fail, wid:%d, pcid:0x%I64X, cli-key:0x%I64X, charge-key:%s",
+                       LgpWid(channel), pcid, clikey, chargeKey);
+            job->removeReferenceCount(HANDLER_FILE, 938);
+            line = 939;
+        }
+        else if (!LobbyDaemon::_instance->_jobMgr->Start(job, 122, nullptr))
+        {
+            Log::Write(Log::LT_ERROR, HANDLER_FILE, 944,
+                       L"[gamed], handle abandon charge req fail; start job fail, wid:%d, pcid:0x%I64X, cli-key:0x%I64X, charge-key:%s",
+                       LgpWid(channel), pcid, clikey, chargeKey);
+            job->removeReferenceCount(HANDLER_FILE, 945);
+            line = 946;
+        }
+        else
+        {
+            Log::Write(Log::LT_DEBUG, HANDLER_FILE, 950,
+                       L"[gamed], handle abandon charge req ok, wid:%d, pcid:0x%I64X, cli-key:0x%I64X, charge-key:%s",
+                       LgpWid(channel), pcid, clikey, chargeKey);
+            job->removeReferenceCount(HANDLER_FILE, 952);
+            line = 953;
+        }
+    }
+    cliSession->removeReferenceCount(HANDLER_FILE, line);
+    return true;
 }
 
 // 0x8c250
@@ -1128,10 +1562,120 @@ bool HandleLobbyGame_UpdateAccountDataReq(SharedChannel* sharedChannel, Packet c
     return true;
 }
 
+#pragma comment(linker, "/INCLUDE:?HandleLobbyGame_TryRegisterGuildReq@@YA_NPEAVSharedChannel@@PEBVPacket@@@Z")   // LIFT: keep until the caller is lifted (0x8d590)
 // 0x8d590
-bool HandleLobbyGame_TryRegisterGuildReq(SharedChannel*, Packet const*)
+bool HandleLobbyGame_TryRegisterGuildReq(SharedChannel* sharedChannel, Packet const* packet)
 {
-    LIFT_STUB(0x8d590);
+    GamedChannel* channel = static_cast<GamedChannel*>(sharedChannel);
+    short cmd = 0;
+    unsigned long long gametid = 0;
+    char guildtype = 0;
+    wchar_t guildname[33];
+    guildname[0] = 0;
+    if (packet->Decompose("hqcs", &cmd, &gametid, &guildtype, guildname, 33) == 0)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1234, L"[gamed], handle try register guild req fail; decompose fail");
+        return true;
+    }
+    short wid = 0;
+    if (channel->_rawChannel != nullptr)
+        wid = static_cast<short>(channel->_rawChannel->GetId());
+    // LIFT: GameWorldRegistry::Get (0x4e8b0) is inlined here.
+    GameWorldRegistry* registry = LobbyDaemon::_instance->_gameWorldRegistry;
+    int index = wid - registry->_min;
+    GameWorld* world = nullptr;
+    if (index < 0 || index >= registry->_size)
+    {
+        Log::Write(Log::LT_ERROR, L"GameWorld.cpp", 761, L"[game-world-registry], get fail; wid out of range, wid:%d",
+                   static_cast<int>(wid));
+    }
+    else
+    {
+        world = registry->_worlds[index];
+    }
+    unsigned long long channelId = 0;
+    if (world == nullptr)
+    {
+        if (channel->_rawChannel != nullptr)
+            channelId = channel->_rawChannel->GetId();
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1240,
+                   L"[gamed], handle try register guild req fail; not registered world, channel-id:%I64d, game-tid:0x%I64X, "
+                   L"guild-type:%d, guild-name:%s",
+                   channelId, gametid, static_cast<int>(guildtype), guildname);
+        channel->SendTryRegisterGuildFail(gametid, 2);
+        return true;
+    }
+    LobbyConfig const* config = LobbyDaemon::_instance->_config;
+    // LIFT: the original checks the name pointer for null before RuleSet::CheckName. The check is inlined. ❓ No PDB name.
+    int result = RuleSet::CHECKNAME_INVALID_PARAMTER;
+    if (guildname != nullptr)
+    {
+        result = RuleSet::CheckName(LobbyDaemon::_instance->_localeset, guildname, config->_allowedGuildNameLenMin,
+                                    config->_allowedGuildNameLenMax, config->_allowedGuildNameSpaceAmount,
+                                    config->_enableNumericForGuildName, config->_forceSentenceCaseForGuildName,
+                                    config->_enableMultilingualGuildName, config->_forbiddenCharactersForGuildName);
+    }
+    if (result != RuleSet::CHECKNAME_OK)
+    {
+        if (channel->_rawChannel != nullptr)
+            channelId = channel->_rawChannel->GetId();
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1257,
+                   L"[gamed], handle try register guild req fail; check name fail, error:%d, channel-id:%I64d, "
+                   L"game-tid:0x%I64X, guild-type:%d, guild-name:%s",
+                   result, channelId, gametid, static_cast<int>(guildtype), guildname);
+        short failCode;
+        if (result == RuleSet::CHECKNAME_INVALID_PARAMTER)
+            failCode = 4;
+        else if (result > RuleSet::CHECKNAME_INVALID_PARAMTER && result <= RuleSet::CHECKNAME_MULTILINGUAL)
+            failCode = 47;
+        else if (result == RuleSet::CHECKNAME_FORBIDDEN)
+            failCode = 48;
+        else
+            failCode = 2;
+        channel->SendTryRegisterGuildFail(gametid, failCode);
+        return true;
+    }
+    int dbrtn = 0;
+    unsigned long long guildid = 0;
+    short worldWid = world->GetWid();
+    short clusterId = world->GetDB().clusterId;
+    bool dbOk = false;
+    if (clusterId == 0)
+    {
+        // LIFT: inlined invalid-parameter check of LobbyDB::TryGuildRegistration.
+        Log::Write(Log::LT_ERROR, LOBBYDB_FILE, 2211, L"[lobbydb], try guild registration fail; invalid parameter");
+    }
+    else
+    {
+        // LIFT: the PDB type has an unnamed int (6th) parameter. LTCG removed it in the original, so the value is unknown. ❓
+        dbOk = LobbyDB::TryGuildRegistration(dbrtn, clusterId, worldWid, guildtype, guildname, 0, &guildid);
+    }
+    if (!dbOk)
+    {
+        if (channel->_rawChannel != nullptr)
+            channelId = channel->_rawChannel->GetId();
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1288,
+                   L"[gamed], handle try register guild req fail; db reg. fail, dbrtn:%d, channel-id:%I64d, "
+                   L"game-tid:0x%I64X, guild-type:%d, guild-name:%s",
+                   dbrtn, channelId, gametid, static_cast<int>(guildtype), guildname);
+        short failCode;
+        if (dbrtn == 1)
+            failCode = 3;
+        else if (dbrtn > 1 && dbrtn <= 3)
+            failCode = 49;
+        else
+            failCode = 2;
+        channel->SendTryRegisterGuildFail(gametid, failCode);
+        return true;
+    }
+    channel->SendTryRegisterGuildOk(gametid, guildid);
+    if (channel->_rawChannel != nullptr)
+        channelId = channel->_rawChannel->GetId();
+    Log::Write(Log::LT_DEBUG, HANDLER_FILE, 1308,
+               L"[gamed], handle try register guild req ok, guild-id:0x%I64X, channel-id:%I64d, game-tid:0x%I64X, "
+               L"guild-type:%d, guild-name:%s",
+               guildid, channelId, gametid, static_cast<int>(guildtype), guildname);
+    return true;
 }
 
 #pragma comment(linker, "/INCLUDE:?HandleLobbyGame_FinishRegisterGuildNotify@@YA_NPEAVSharedChannel@@PEBVPacket@@@Z")   // LIFT: keep until the caller is lifted (0x8d9a0)
@@ -1212,10 +1756,88 @@ bool HandleLobbyGame_CancelRegisterGuildNotify(SharedChannel* sharedChannel, Pac
     return true;
 }
 
+#pragma comment(linker, "/INCLUDE:?HandleLobbyGame_TryRenameGuildReq@@YA_NPEAVSharedChannel@@PEBVPacket@@@Z")   // LIFT: keep until the caller is lifted (0x8dc80)
 // 0x8dc80
-bool HandleLobbyGame_TryRenameGuildReq(SharedChannel*, Packet const*)
+bool HandleLobbyGame_TryRenameGuildReq(SharedChannel* sharedChannel, Packet const* packet)
 {
-    LIFT_STUB(0x8dc80);
+    GamedChannel* channel = static_cast<GamedChannel*>(sharedChannel);
+    short cmd = 0;
+    unsigned long long tid = 0;
+    unsigned long long guildId = 0;
+    char renameGuildType = 0;
+    wchar_t newGuildName[33];
+    if (packet->Decompose("hqqcs", &cmd, &tid, &guildId, &renameGuildType, newGuildName, 33) == 0)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1389,
+                   L"[gamed], rename-guild; handle try rename guild req fail; decompose fail");
+        return true;
+    }
+    LobbyConfig const* config = LobbyDaemon::_instance->_config;
+    // LIFT: the original checks the name pointer for null before RuleSet::CheckName. The check is inlined. ❓ No PDB name.
+    int result = RuleSet::CHECKNAME_INVALID_PARAMTER;
+    if (newGuildName != nullptr)
+    {
+        result = RuleSet::CheckName(LobbyDaemon::_instance->_localeset, newGuildName, config->_allowedGuildNameLenMin,
+                                    config->_allowedGuildNameLenMax, config->_allowedGuildNameSpaceAmount,
+                                    config->_enableNumericForGuildName, config->_forceSentenceCaseForGuildName,
+                                    config->_enableMultilingualGuildName, config->_forbiddenCharactersForGuildName);
+    }
+    if (result != RuleSet::CHECKNAME_OK)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1405,
+                   L"[gamed], rename-guild; handle try rename guild req fail; check name fail, error:%d, "
+                   L"channel-id:%I64d, game-tid:0x%I64X, guild-id:0x%I64X, rename-guild-type:%d, new-guild-name:%s",
+                   result, LgpChannelId(channel), tid, guildId, static_cast<int>(renameGuildType), newGuildName);
+        short failCode;
+        if (result == RuleSet::CHECKNAME_INVALID_PARAMTER)
+            failCode = 4;
+        else if (result > RuleSet::CHECKNAME_INVALID_PARAMTER && result <= RuleSet::CHECKNAME_MULTILINGUAL)
+            failCode = 50;
+        else if (result == RuleSet::CHECKNAME_FORBIDDEN)
+            failCode = 51;
+        else
+            failCode = 2;
+        channel->SendTryRenameGuildFail(tid, guildId, renameGuildType, failCode);
+        return true;
+    }
+    int dbrtn = 0;
+    unsigned long long renameKey = 0;
+    bool dbOk = false;
+    if (guildId == 0)
+    {
+        // LIFT: inlined invalid-parameter check of LobbyDB::TryRenameGuild.
+        Log::Write(Log::LT_ERROR, LOBBYDB_FILE, 2471, L"[lobbydb], rename-guild; try rename guild; invalid parameter");
+    }
+    else
+    {
+        // LIFT: the PDB type has an unnamed int (5th) parameter. LTCG removed it in the original, so the value is unknown. ❓
+        dbOk = LobbyDB::TryRenameGuild(dbrtn, guildId, renameGuildType, newGuildName, 0,
+                                       LobbyDaemon::_instance->_config->_guildNameReuseLimitDuration, &renameKey);
+    }
+    if (!dbOk)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1436,
+                   L"[gamed], rename-guild; handle try rename guild req fail; db rename fail, dbrtn:%d, "
+                   L"channel-id:%I64d, game-tid:0x%I64X, guild-id:0x%I64X, rename-guild-type:%d, new-guild-name:%s",
+                   dbrtn, LgpChannelId(channel), tid, guildId, static_cast<int>(renameGuildType), newGuildName);
+        short failCode;
+        if (dbrtn == 1)
+            failCode = 3;
+        else if (dbrtn > 1 && dbrtn <= 3)
+            failCode = 52;
+        else if (dbrtn == 4)
+            failCode = 53;
+        else
+            failCode = 2;
+        channel->SendTryRenameGuildFail(tid, guildId, renameGuildType, failCode);
+        return true;
+    }
+    channel->SendTryRenameGuildOk(tid, guildId, renameGuildType, renameKey);
+    Log::Write(Log::LT_DEBUG, HANDLER_FILE, 1459,
+               L"[gamed], rename-guild; handle try rename guild req ok, channel-id:%I64d, game-tid:0x%I64X, "
+               L"guild-id:0x%I64X, rename-guild-type:%d, new-guild-name:%s, guild-rename-key:0x%I64X",
+               LgpChannelId(channel), tid, guildId, static_cast<int>(renameGuildType), newGuildName, renameKey);
+    return true;
 }
 
 #pragma comment(linker, "/INCLUDE:?HandleLobbyGame_FinishRenameGuildNotify@@YA_NPEAVSharedChannel@@PEBVPacket@@@Z")   // LIFT: keep until the caller is lifted (0x8e010)
@@ -1538,25 +2160,209 @@ bool HandleLobbyGame_RenameCharacterFail(SharedChannel* channel, Packet const* p
     return true;
 }
 
+#pragma comment(linker, "/INCLUDE:?HandleLobbyGame_ExtendJumpingCharacterCreationQuotaWithAccountInventoryItemReq@@YA_NPEAVSharedChannel@@PEBVPacket@@@Z")   // LIFT: keep until the caller is lifted (0x8fb00)
 // 0x8fb00
-// LIFT: the body needs ExtendJumpingCharacterCreationQuotaJob::_pool (.data 0x2040a0) and ObjPool::Checkout (0x628c0). The LobbyDaemon ObjectPool module is not lifted. ❓
-bool HandleLobbyGame_ExtendJumpingCharacterCreationQuotaWithAccountInventoryItemReq(SharedChannel*, Packet const*)
+bool HandleLobbyGame_ExtendJumpingCharacterCreationQuotaWithAccountInventoryItemReq(SharedChannel* sharedChannel,
+                                                                                     Packet const* packet)
 {
-    LIFT_STUB(0x8fb00);
+    GamedChannel* channel = static_cast<GamedChannel*>(sharedChannel);
+    short cmd = 0;
+    unsigned long long pcid = 0;
+    unsigned long long clikey = 0;
+    ExtendJumpingCharacterCreationQuotaWithAccountInventoryItemReqParam param;
+    memset(&param, 0, sizeof(param));
+
+    if (packet->Decompose("hqqqqqi", &cmd, &param.gamedTid, &pcid, &clikey, &param.labelId, &param.itemInstanceId,
+                          &param.itemDataId) == 0)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1859,
+                   L"[gamed], handle extend-jumping-character-creation-quota req fail; decompose fail, wid:%d, game-tid:0x%I64X, pcid:0x%I64X, label-id:0x%I64X, item-instance-id:0x%I64X, item-data-id:%u",
+                   LgpWid(channel), param.gamedTid, pcid, param.labelId, param.itemInstanceId, param.itemDataId);
+        return true;
+    }
+    short wid = static_cast<short>(LgpChannelId(channel));
+    CliSession* cliSession = LobbyDaemon::_instance->_clisessionMgr->Select_index_pcid(wid, pcid);
+    if (cliSession == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1866,
+                   L"[gamed], handle extend-jumping-character-creation-quota req fail; no such cli-session, wid:%d, game-tid:0x%I64X, pcid:0x%I64X, label-id:0x%I64X, item-instance-id:0x%I64X, item-data-id:%u",
+                   LgpWid(channel), param.gamedTid, pcid, param.labelId, param.itemInstanceId, param.itemDataId);
+        channel->SendExtendJumpingCharacterCreationQuotaWithAccountInventoryItemFail(param.gamedTid, 5);
+        return true;
+    }
+    int line;
+    if (clikey != cliSession->_clikey)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1873,
+                   L"[gamed], handle extend-jumping-character-creation-quota req fail; cli-key mismatch, found-cli-key:0x%I64X, wid:%d, game-tid:0x%I64X, pcid:0x%I64X, label-id:0x%I64X, item-instance-id:0x%I64X, item-data-id:%u",
+                   cliSession->_clikey, LgpWid(channel), param.gamedTid, pcid, param.labelId, param.itemInstanceId,
+                   param.itemDataId);
+        channel->SendExtendJumpingCharacterCreationQuotaWithAccountInventoryItemFail(param.gamedTid, 5);
+        line = 1875;
+    }
+    else
+    {
+        param.gamed = channel;
+        ExtendJumpingCharacterCreationQuotaJob* job =
+            new (ExtendJumpingCharacterCreationQuotaJob::_pool.Checkout(HANDLER_FILE, 1881))
+                ExtendJumpingCharacterCreationQuotaJob(cliSession);
+        LobbyJobManager* const jobMgr = LobbyDaemon::_instance->_jobMgr;
+        if (!jobMgr->Register(job))
+        {
+            Log::Write(Log::LT_ERROR, HANDLER_FILE, 1884,
+                       L"[gamed], handle extend-jumping-character-creation-quota req fail; start job fail, wid:%d, game-tid:0x%I64X, pcid:0x%I64X, label-id:0x%I64X, item-instance-id:0x%I64X, item-data-id:%u",
+                       LgpWid(channel), param.gamedTid, pcid, param.labelId, param.itemInstanceId, param.itemDataId);
+            channel->SendExtendJumpingCharacterCreationQuotaWithAccountInventoryItemFail(param.gamedTid, 2);
+            job->removeReferenceCount(HANDLER_FILE, 1886);
+            line = 1887;
+        }
+        else
+        {
+            // LIFT: LobbyJobManager::Execute (0xc2020) is inlined here. ❓ task 30 has no PDB name.
+            jobMgr->Execute(job, 30, &param);
+            Log::Write(Log::LT_DEBUG, HANDLER_FILE, 1891,
+                       L"[gamed], handle extend-jumping-character-creation-quota req ok, cli-key:0x%I64X, wid:%d, game-tid:0x%I64X, pcid:0x%I64X, label-id:0x%I64X, item-instance-id:0x%I64X, item-data-id:%u",
+                       clikey, LgpWid(channel), param.gamedTid, pcid, param.labelId, param.itemInstanceId,
+                       param.itemDataId);
+            job->removeReferenceCount(HANDLER_FILE, 1893);
+            line = 1894;
+        }
+    }
+    cliSession->removeReferenceCount(HANDLER_FILE, line);
+    return true;
 }
 
+#pragma comment(linker, "/INCLUDE:?HandleLobbyGame_UpgradeJumpingCharacterStateWithCreationQuotaReq@@YA_NPEAVSharedChannel@@PEBVPacket@@@Z")   // LIFT: keep until the caller is lifted (0x8ffc0)
 // 0x8ffc0
-// LIFT: the body needs UpgradeJumpingCharacterStateJob::_pool (0x204150) and ObjPool::Checkout (0x628c0). The LobbyDaemon ObjectPool module is not lifted.
-bool HandleLobbyGame_UpgradeJumpingCharacterStateWithCreationQuotaReq(SharedChannel*, Packet const*)
+bool HandleLobbyGame_UpgradeJumpingCharacterStateWithCreationQuotaReq(SharedChannel* sharedChannel, Packet const* packet)
 {
-    LIFT_STUB(0x8ffc0);
+    GamedChannel* channel = static_cast<GamedChannel*>(sharedChannel);
+    short cmd = 0;
+    unsigned long long clikey = 0;
+    UpgradeJumpingCharacterStateReqParam param;
+    memset(&param, 0, sizeof(param));
+    param.consumeCreationQuota = true;
+
+    if (packet->Decompose("hqqq", &cmd, &param.gamedTid, &param.pcId, &clikey) == 0)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1920,
+                   L"[gamed], handle upgrade-jumping-character-state req fail; decompose fail, wid:%d, game-tid:0x%I64X, pcid:0x%I64X",
+                   LgpWid(channel), param.gamedTid, param.pcId);
+        return true;
+    }
+    short wid = static_cast<short>(LgpChannelId(channel));
+    CliSession* cliSession = LobbyDaemon::_instance->_clisessionMgr->Select_index_pcid(wid, param.pcId);
+    if (cliSession == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1927,
+                   L"[gamed], handle upgrade-jumping-character-state req fail; no such cli-session, wid:%d, game-tid:0x%I64X, pcid:0x%I64X",
+                   LgpWid(channel), param.gamedTid, param.pcId);
+        channel->SendUpgradeJumpingCharacterStateWithCreationQuotaFail(param.gamedTid, 5);
+        return true;
+    }
+    int line;
+    if (clikey != cliSession->_clikey)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1934,
+                   L"[gamed], handle upgrade-jumping-character-state req fail; cli-key mismatch, found-cli-key:0x%I64X, wid:%d, game-tid:0x%I64X, pcid:0x%I64X",
+                   cliSession->_clikey, LgpWid(channel), param.gamedTid, param.pcId);
+        channel->SendUpgradeJumpingCharacterStateWithCreationQuotaFail(param.gamedTid, 5);
+        line = 1936;
+    }
+    else
+    {
+        param.gamed = channel;
+        UpgradeJumpingCharacterStateJob* job =
+            new (UpgradeJumpingCharacterStateJob::_pool.Checkout(HANDLER_FILE, 1942)) UpgradeJumpingCharacterStateJob(cliSession);
+        LobbyJobManager* const jobMgr = LobbyDaemon::_instance->_jobMgr;
+        if (!jobMgr->Register(job))
+        {
+            Log::Write(Log::LT_ERROR, HANDLER_FILE, 1945,
+                       L"[gamed], handle upgrade-jumping-character-state req fail; start job fail, wid:%d, game-tid:0x%I64X, pcid:0x%I64X",
+                       LgpWid(channel), param.gamedTid, param.pcId);
+            channel->SendUpgradeJumpingCharacterStateWithCreationQuotaFail(param.gamedTid, 2);
+            job->removeReferenceCount(HANDLER_FILE, 1947);
+            line = 1948;
+        }
+        else
+        {
+            // LIFT: LobbyJobManager::Execute (0xc2020) is inlined here. ❓ task 142 has no PDB name.
+            jobMgr->Execute(job, 142, &param);
+            Log::Write(Log::LT_DEBUG, HANDLER_FILE, 1952,
+                       L"[gamed], handle upgrade-jumping-character-state req ok, wid:%d, game-tid:0x%I64X, pcid:0x%I64X",
+                       LgpWid(channel), param.gamedTid, param.pcId);
+            job->removeReferenceCount(HANDLER_FILE, 1954);
+            line = 1955;
+        }
+    }
+    cliSession->removeReferenceCount(HANDLER_FILE, line);
+    return true;
 }
 
+#pragma comment(linker, "/INCLUDE:?HandleLobbyGame_UpdateJumpingCharacterStateReq@@YA_NPEAVSharedChannel@@PEBVPacket@@@Z")   // LIFT: keep until the caller is lifted (0x903d0)
 // 0x903d0
-// LIFT: the body needs UpgradeJumpingCharacterStateJob::_pool (0x204150) and ObjPool::Checkout (0x628c0). The LobbyDaemon ObjectPool module is not lifted.
-bool HandleLobbyGame_UpdateJumpingCharacterStateReq(SharedChannel*, Packet const*)
+bool HandleLobbyGame_UpdateJumpingCharacterStateReq(SharedChannel* sharedChannel, Packet const* packet)
 {
-    LIFT_STUB(0x903d0);
+    GamedChannel* channel = static_cast<GamedChannel*>(sharedChannel);
+    short cmd = 0;
+    unsigned long long clikey = 0;
+    UpgradeJumpingCharacterStateReqParam param;
+    memset(&param, 0, sizeof(param));
+
+    if (packet->Decompose("hqqq", &cmd, &param.gamedTid, &param.pcId, &clikey) == 0)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1983,
+                   L"[gamed], handle update-jumping-character-state req fail; decompose fail, wid:%d, game-tid:0x%I64X, pcid:0x%I64X",
+                   LgpWid(channel), param.gamedTid, param.pcId);
+        return true;
+    }
+    short wid = static_cast<short>(LgpChannelId(channel));
+    CliSession* cliSession = LobbyDaemon::_instance->_clisessionMgr->Select_index_pcid(wid, param.pcId);
+    if (cliSession == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1990,
+                   L"[gamed], handle update-jumping-character-state req fail; no such cli-session, wid:%d, game-tid:0x%I64X, pcid:0x%I64X",
+                   LgpWid(channel), param.gamedTid, param.pcId);
+        channel->SendUpdateJumpingCharacterStateFail(param.gamedTid, 5);
+        return true;
+    }
+    int line;
+    if (clikey != cliSession->_clikey)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 1997,
+                   L"[gamed], handle update-jumping-character-state req fail; cli-key mismatch, found-cli-key:0x%I64X, wid:%d, game-tid:0x%I64X, pcid:0x%I64X",
+                   cliSession->_clikey, LgpWid(channel), param.gamedTid, param.pcId);
+        channel->SendUpdateJumpingCharacterStateFail(param.gamedTid, 5);
+        line = 1999;
+    }
+    else
+    {
+        param.gamed = channel;
+        UpgradeJumpingCharacterStateJob* job =
+            new (UpgradeJumpingCharacterStateJob::_pool.Checkout(HANDLER_FILE, 2005)) UpgradeJumpingCharacterStateJob(cliSession);
+        LobbyJobManager* const jobMgr = LobbyDaemon::_instance->_jobMgr;
+        if (!jobMgr->Register(job))
+        {
+            Log::Write(Log::LT_ERROR, HANDLER_FILE, 2008,
+                       L"[gamed], handle update-jumping-character-state req fail; start job fail, wid:%d, game-tid:0x%I64X, pcid:0x%I64X",
+                       LgpWid(channel), param.gamedTid, param.pcId);
+            channel->SendUpdateJumpingCharacterStateFail(param.gamedTid, 2);
+            job->removeReferenceCount(HANDLER_FILE, 2010);
+            line = 2011;
+        }
+        else
+        {
+            // LIFT: LobbyJobManager::Execute (0xc2020) is inlined here. ❓ task 142 has no PDB name.
+            jobMgr->Execute(job, 142, &param);
+            Log::Write(Log::LT_DEBUG, HANDLER_FILE, 2015,
+                       L"[gamed], handle update-jumping-character-state req ok, wid:%d, game-tid:0x%I64X, pcid:0x%I64X",
+                       LgpWid(channel), param.gamedTid, param.pcId);
+            job->removeReferenceCount(HANDLER_FILE, 2017);
+            line = 2018;
+        }
+    }
+    cliSession->removeReferenceCount(HANDLER_FILE, line);
+    return true;
 }
 
 #pragma comment(linker, "/INCLUDE:?HandleLobbyGame_SetAppDataNotify@@YA_NPEAVSharedChannel@@PEBVPacket@@@Z")   // LIFT: keep until the caller is lifted (0x907e0)
@@ -1755,22 +2561,359 @@ bool HandleLobbyGame_SetAppDataNotify(SharedChannel* channel, Packet const* pack
     return true;
 }
 
+#pragma comment(linker, "/INCLUDE:?HandleLobbyGame_FriendMessageNotify@@YA_NPEAVSharedChannel@@PEBVPacket@@@Z")   // LIFT: keep until the caller is lifted (0x90f70)
 // 0x90f70
-bool HandleLobbyGame_FriendMessageNotify(SharedChannel*, Packet const*)
+bool HandleLobbyGame_FriendMessageNotify(SharedChannel* channel, Packet const* packet)
 {
-    LIFT_STUB(0x90f70);
+    // LIFT: inlined RepeatPacketDecomposer setup. The command is skipped (index 1, offset 2).
+    Packet::VarStr varKey = {nullptr, nullptr};
+    RepeatPacketDecomposer pdr;
+    pdr.format = "hqsCss;";
+    pdr.len = 7;
+    pdr.index = 1;
+    pdr.offset = 2;
+    pdr.top = -1;
+    unsigned long long pcid = 0;
+    StsMsgLib::_StsMsgRequestFriendSendMessage::Contents contents;
+
+    if (packet->Decompose(&pdr, 1, &pcid) == 0)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 2164,
+                   L"[gamed], handle friend-message notify fail; decompose pc-id fail, channel-id:%I64d, pcid:0x%I64X, "
+                   L"message-name:%s",
+                   LgpChannelId(channel), pcid, L"N/A");
+        return true;
+    }
+    if (!LobbyDaemon::_instance->_config->_enableFriendMessageNotification)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 2170,
+                   L"[gamed], handle friend-message notify fail; configuration disabled, channel-id:%I64d, pcid:0x%I64X, "
+                   L"message-name:%s",
+                   LgpChannelId(channel), pcid, L"N/A");
+        return true;
+    }
+    if (packet->Decompose(&pdr, &varKey) == 0)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 2176,
+                   L"[gamed], handle friend-message notify fail; decompose message-name fail, channel-id:%I64d, "
+                   L"pcid:0x%I64X, message-name:%s",
+                   LgpChannelId(channel), pcid, L"N/A");
+        return true;
+    }
+    if (*varKey.len <= 0)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 2182,
+                   L"[gamed], handle friend-message notify fail; invalid message-name length, length:%d, "
+                   L"channel-id:%I64d, pcid:0x%I64X, message-name:%s",
+                   static_cast<int>(*varKey.len), LgpChannelId(channel), pcid, L"N/A");
+        return true;
+    }
+    wchar_t* messageName = static_cast<wchar_t*>(
+        Memory::_Manager[2]->AllocZero(2LL * (*varKey.len + 1), HANDLER_FILE, 2186));
+    wcsncpy(messageName, varKey.str, *varKey.len);
+
+    // LIFT: inlined repeat count read of PacketUtil.cpp (assert at line 241). The count is kept in a 16-bit value.
+    if (packet == nullptr)
+        assertCrash(L"source\\PacketUtil.cpp", "source\\PacketUtil.cpp", 241);
+    short const count = static_cast<short>(pdr.PushRepeatCount(
+        reinterpret_cast<char const*>(packet->CurHeader + 1) + pdr.offset,
+        static_cast<unsigned short>(packet->CurHeader->size - 2) - pdr.offset));
+    contents.nFieldCount = count;
+    bool decomposed = true;
+    if (count > 0)
+    {
+        contents.pFields = static_cast<StsMsgLib::_StsMsgRequestFriendSendMessage::Contents::Field*>(
+            Memory::_Manager[2]->AllocZero(16LL * count, HANDLER_FILE, 2192));
+        for (int i = 0; i < contents.nFieldCount; ++i)
+        {
+            Packet::VarStr varValue = {nullptr, nullptr};
+            varKey.len = nullptr;
+            varKey.str = nullptr;
+            wchar_t const* name = messageName != nullptr ? messageName : L"N/A";
+            if (packet->Decompose(&pdr, &varKey) == 0)
+            {
+                Log::Write(Log::LT_ERROR, HANDLER_FILE, 2201,
+                           L"[gamed], handle friend-message notify fail; decompose key fail, key-index:%d, "
+                           L"channel-id:%I64d, pcid:0x%I64X, message-name:%s",
+                           i, LgpChannelId(channel), pcid, name);
+                decomposed = false;
+                break;
+            }
+            if (packet->Decompose(&pdr, &varValue) == 0)
+            {
+                Log::Write(Log::LT_ERROR, HANDLER_FILE, 2207,
+                           L"[gamed], handle friend-message notify fail; decompose value fail, value-index:%d, "
+                           L"channel-id:%I64d, pcid:0x%I64X, message-name:%s",
+                           i, LgpChannelId(channel), pcid, name);
+                decomposed = false;
+                break;
+            }
+            if (*varKey.len <= 0)
+            {
+                Log::Write(Log::LT_ERROR, HANDLER_FILE, 2213,
+                           L"[gamed], handle friend-message notify fail; invalid key length, key-index:%d, "
+                           L"key-length:%d, channel-id:%I64d, pcid:0x%I64X, message-name:%s",
+                           i, static_cast<int>(*varKey.len), LgpChannelId(channel), pcid, name);
+                decomposed = false;
+                break;
+            }
+            if (*varValue.len < 0)
+            {
+                Log::Write(Log::LT_ERROR, HANDLER_FILE, 2219,
+                           L"[gamed], handle friend-message notify fail; invalid value length, value-index:%d, "
+                           L"value-length:%d, channel-id:%I64d, pcid:0x%I64X, message-name:%s",
+                           i, static_cast<int>(*varValue.len), LgpChannelId(channel), pcid, name);
+                decomposed = false;
+                break;
+            }
+            StsMsgLib::_StsMsgRequestFriendSendMessage::Contents::Field* field = &contents.pFields[i];
+            field->pszKey = static_cast<char*>(Memory::_Manager[2]->AllocZero(*varKey.len + 1, HANDLER_FILE, 2223));
+            field->pwszValue = static_cast<wchar_t*>(
+                Memory::_Manager[2]->AllocZero(2LL * (*varValue.len + 1), HANDLER_FILE, 2224));
+            String::UnicodeToMultibyte(field->pszKey, *varKey.len + 1, varKey.str);
+            wcsncpy(field->pwszValue, varValue.str, *varValue.len);
+            // LIFT: inlined decrement of the repeat count of RepeatPacketDecomposer.
+            pdr.index = pdr.start[pdr.top] + 1;
+            --pdr.counts[pdr.top];
+        }
+    }
+
+    if (decomposed)
+    {
+        // LIFT: inlined end of repeat of PacketUtil.cpp (assert at line 248: the repeat format must start with 'C').
+        if (pdr.top < 0 || pdr.format[pdr.start[pdr.top]] != 'C')
+            assertCrash(L"source\\PacketUtil.cpp", "source\\PacketUtil.cpp", 248);
+        static_cast<PacketFormatIterator&>(pdr).skipRepeatFormat();  // LIFT: virtual call as in the original (0x90f70)
+        --pdr.top;
+
+        // LIFT: the original tests only the raw channel here, not the shared channel (0x90f70).
+        short const wid = channel->_rawChannel == nullptr ? 0 : static_cast<short>(channel->_rawChannel->GetId());
+        CliSession* const cliSession = LobbyDaemon::_instance->_clisessionMgr->Select_index_pcid(wid, pcid);
+        wchar_t const* const name = messageName != nullptr ? messageName : L"N/A";
+        if (cliSession == nullptr)
+        {
+            Log::Write(Log::LT_ERROR, HANDLER_FILE, 2237,
+                       L"[gamed], handle friend-message notify fail; cli-session not found, channel-id:%I64d, "
+                       L"pcid:0x%I64X, message-name:%s",
+                       LgpChannelId(channel), pcid, name);
+        }
+        else
+        {
+            // LIFT: the "levelup" message carries the new character level. The lobby updates its copy of the level.
+            if (wcscmp(messageName, L"levelup") == 0 && contents.nFieldCount > 0)
+            {
+                for (int i = 0; i < contents.nFieldCount; ++i)
+                {
+                    char const* key = contents.pFields[i].pszKey;
+                    wchar_t const* value = contents.pFields[i].pwszValue;
+                    if (key == nullptr || value == nullptr || strcmp(key, "level") != 0)
+                        continue;
+                    int const length = static_cast<int>(wcslen(value));
+                    if (length < 3)
+                    {
+                        Log::Write(Log::LT_ERROR, HANDLER_FILE, 2263,
+                                   L"[gamed], handle friend-message notify exception; update character level fail; "
+                                   L"invalid value length, value:%s, channel-id:%I64d, pcid:0x%I64X, message-name:%s",
+                                   value, LgpChannelId(channel), pcid, name);
+                        continue;
+                    }
+                    wchar_t const* dot = wcsrchr(value, L'.');
+                    if (dot == nullptr || value + length - dot < 2)
+                    {
+                        Log::Write(Log::LT_ERROR, HANDLER_FILE, 2258,
+                                   L"[gamed], handle friend-message notify exception; update character level fail; "
+                                   L"failed to find level segment, value:%s, channel-id:%I64d, pcid:0x%I64X, "
+                                   L"message-name:%s",
+                                   value, LgpChannelId(channel), pcid, name);
+                        continue;
+                    }
+                    short const level = static_cast<short>(_wtoi(dot + 1));
+                    if (!cliSession->UpdateCharacterLevel(pcid, level))
+                    {
+                        Log::Write(Log::LT_ERROR, HANDLER_FILE, 2253,
+                                   L"[gamed], handle friend-message notify exception; update character level fail; "
+                                   L"failed to update level, error:%s, value:%s, channel-id:%I64d, pcid:0x%I64X, "
+                                   L"message-name:%s",
+                                   LobbyErrorText(TLobbyError), value, LgpChannelId(channel), pcid, name);
+                    }
+                }
+            }
+            NPGameServiceChannel* const gameServChannel = LobbyDaemon::_instance->_npServchmgr->_gameServChannel;
+            if (gameServChannel == nullptr)
+            {
+                Log::Write(Log::LT_ERROR, HANDLER_FILE, 2272,
+                           L"[gamed], handle friend-message notify fail; np N/A, channel-id:%I64d, pcid:0x%I64X, "
+                           L"message-name:%s",
+                           LgpChannelId(channel), pcid, name);
+            }
+            else
+            {
+                LobbyConfig const* const config = LobbyDaemon::_instance->_config;
+                // LIFT: LTCG removed the parameters t, scope and scopeId in the original. The callee uses
+                // no transaction, the scope L"all" and no scope id.
+                if (gameServChannel->SendRequestFriendSendMessage(nullptr, cliSession->_acb._id,
+                                                                  config->_friendMessageRecipientAppIdList,
+                                                                  config->_friendMessageRecipientAppIdCount, L"all",
+                                                                  nullptr, messageName, contents))
+                {
+                    Log::Write(Log::LT_DEBUG, HANDLER_FILE, 2286,
+                               L"[gamed], handle friend-message notify ok, cli-key:0x%I64X, channel-id:%I64d, "
+                               L"pcid:0x%I64X, message-name:%s",
+                               cliSession->_clikey, LgpChannelId(channel), pcid, name);
+                }
+                else
+                {
+                    Log::Write(Log::LT_ERROR, HANDLER_FILE, 2282,
+                               L"[gamed], handle friend-message notify fail; send to np fail, cli-key:0x%I64X, "
+                               L"channel-id:%I64d, pcid:0x%I64X, message-name:%s",
+                               cliSession->_clikey, LgpChannelId(channel), pcid, name);
+                }
+            }
+            cliSession->removeReferenceCount(HANDLER_FILE, 2291);
+        }
+    }
+
+    // LIFT: free the key and value copies. The unused entries are zero (AllocZero).
+    if (contents.pFields != nullptr)
+    {
+        for (int i = 0; i < contents.nFieldCount; ++i)
+        {
+            if (contents.pFields[i].pszKey != nullptr)
+            {
+                Memory::_Manager[2]->Free(contents.pFields[i].pszKey, HANDLER_FILE, 2298);
+                contents.pFields[i].pszKey = nullptr;
+            }
+            if (contents.pFields[i].pwszValue != nullptr)
+            {
+                Memory::_Manager[2]->Free(contents.pFields[i].pwszValue, HANDLER_FILE, 2300);
+                contents.pFields[i].pwszValue = nullptr;
+            }
+        }
+        Memory::_Manager[2]->Free(contents.pFields, HANDLER_FILE, 2303);
+    }
+    if (messageName != nullptr)
+        Memory::_Manager[2]->Free(messageName, HANDLER_FILE, 2307);
+    return true;
 }
 
+#pragma comment(linker, "/INCLUDE:?HandleLobbyGame_SecondPasswordGetStatusReq@@YA_NPEAVSharedChannel@@PEBVPacket@@@Z")   // LIFT: keep until the caller is lifted (0x91ab0)
 // 0x91ab0
-bool HandleLobbyGame_SecondPasswordGetStatusReq(SharedChannel*, Packet const*)
+bool HandleLobbyGame_SecondPasswordGetStatusReq(SharedChannel* sharedChannel, Packet const* packet)
 {
-    LIFT_STUB(0x91ab0);
+    GamedChannel* const channel = static_cast<GamedChannel*>(sharedChannel);
+    short cmd = 0;
+    GameSecondPasswordGetStatusReqParam param;
+    memset(&param, 0, sizeof(param));
+    if (packet->Decompose("hqqc", &cmd, &param.gametid, &param.pcid, &param.type) == 0)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 2327,
+                   L"[gamed], handle second-password-get-status request fail; decompose fail, wid:%d, game-tid:0x%I64X, pcid:0x%I64X, "
+                   L"2ndpwd-type:%d",
+                   LgpWid(channel), param.gametid, param.pcid, static_cast<int>(param.type));
+        return true;
+    }
+    param.gamed = channel;
+    // LIFT: the original does not check channel for null after the decompose (0x91ab0).
+    short const wid = channel->_rawChannel != nullptr ? static_cast<short>(channel->_rawChannel->GetId()) : 0;
+    CliSession* const cliSession = LobbyDaemon::_instance->_clisessionMgr->Select_index_pcid(wid, param.pcid);
+    if (cliSession == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 2336,
+                   L"[gamed], handle second-password-get-status request fail; no such cli-session, wid:%d, game-tid:0x%I64X, "
+                   L"pcid:0x%I64X, 2ndpwd-type:%d",
+                   channel->_rawChannel != nullptr ? static_cast<int>(static_cast<short>(channel->_rawChannel->GetId())) : 0,
+                   param.gametid, param.pcid, static_cast<int>(param.type));
+        channel->SendSecondPasswordGetStatusFail(param.gametid, param.pcid, 5);
+        return true;
+    }
+    LobbyJob* const job = new (SecondPasswordGetStatusJob::_pool.Checkout(HANDLER_FILE, 2341)) SecondPasswordGetStatusJob(cliSession);
+    LobbyJobManager* const jobMgr = LobbyDaemon::_instance->_jobMgr;
+    int line;
+    if (!jobMgr->Register(job))
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 2344,
+                   L"[gamed], handle second-password-get-status request fail; start job fail, wid:%d, game-tid:0x%I64X, "
+                   L"pcid:0x%I64X, 2ndpwd-type:%d",
+                   channel->_rawChannel != nullptr ? static_cast<int>(static_cast<short>(channel->_rawChannel->GetId())) : 0,
+                   param.gametid, param.pcid, static_cast<int>(param.type));
+        channel->SendSecondPasswordGetStatusFail(param.gametid, param.pcid, 2);
+        // LIFT: the original releases the job without a null check. Checkout gives null only when memory runs out.
+        job->removeReferenceCount(HANDLER_FILE, 2346);
+        line = 2347;
+    }
+    else
+    {
+        // LIFT: LobbyJobManager::Execute (0xc2020) is inlined in the original. The task id has no PDB name. ❓
+        jobMgr->Execute(job, 129, &param);
+        Log::Write(Log::LT_DEBUG, HANDLER_FILE, 2351,
+                   L"[gamed], handle second-password-get-status request ok, wid:%d, game-tid:0x%I64X, pcid:0x%I64X, 2ndpwd-type:%d",
+                   channel->_rawChannel != nullptr ? static_cast<int>(static_cast<short>(channel->_rawChannel->GetId())) : 0,
+                   param.gametid, param.pcid, static_cast<int>(param.type));
+        job->removeReferenceCount(HANDLER_FILE, 2353);
+        line = 2354;
+    }
+    cliSession->removeReferenceCount(HANDLER_FILE, line);
+    return true;
 }
 
+#pragma comment(linker, "/INCLUDE:?HandleLobbyGame_SecondPasswordIsVerifiedReq@@YA_NPEAVSharedChannel@@PEBVPacket@@@Z")   // LIFT: keep until the caller is lifted (0x91e80)
 // 0x91e80
-bool HandleLobbyGame_SecondPasswordIsVerifiedReq(SharedChannel*, Packet const*)
+bool HandleLobbyGame_SecondPasswordIsVerifiedReq(SharedChannel* sharedChannel, Packet const* packet)
 {
-    LIFT_STUB(0x91e80);
+    GamedChannel* const channel = static_cast<GamedChannel*>(sharedChannel);
+    short cmd = 0;
+    GameSecondPasswordIsVerifiedReqParam param;
+    memset(&param, 0, sizeof(param));
+    if (packet->Decompose("hqqcQ", &cmd, &param.gametid, &param.pcid, &param.type, &param.actionIndex) == 0)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 2373,
+                   L"[gamed], handle second-password-is-verified request fail; decompose fail, wid:%d, game-tid:0x%I64X, pcid:0x%I64X, "
+                   L"2ndpwd-type:%d, 2ndpwd-action-index:%d",
+                   LgpWid(channel), param.gametid, param.pcid, static_cast<int>(param.type), static_cast<int>(param.actionIndex));
+        return true;
+    }
+    param.gamed = channel;
+    // LIFT: the original does not check channel for null after the decompose (0x91e80).
+    short const wid = channel->_rawChannel != nullptr ? static_cast<short>(channel->_rawChannel->GetId()) : 0;
+    CliSession* const cliSession = LobbyDaemon::_instance->_clisessionMgr->Select_index_pcid(wid, param.pcid);
+    if (cliSession == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 2382,
+                   L"[gamed], handle second-password-is-verified request fail; no such cli-session, wid:%d, game-tid:0x%I64X, "
+                   L"pcid:0x%I64X, 2ndpwd-type:%d, 2ndpwd-action-index:%d",
+                   channel->_rawChannel != nullptr ? static_cast<int>(static_cast<short>(channel->_rawChannel->GetId())) : 0,
+                   param.gametid, param.pcid, static_cast<int>(param.type), static_cast<int>(param.actionIndex));
+        channel->SendSecondPasswordIsVerifiedFail(param.gametid, param.pcid, 5);
+        return true;
+    }
+    LobbyJob* const job = new (SecondPasswordIsVerifiedJob::_pool.Checkout(HANDLER_FILE, 2387)) SecondPasswordIsVerifiedJob(cliSession);
+    LobbyJobManager* const jobMgr = LobbyDaemon::_instance->_jobMgr;
+    int line;
+    if (!jobMgr->Register(job))
+    {
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 2390,
+                   L"[gamed], handle second-password-is-verified request fail; start job fail, wid:%d, game-tid:0x%I64X, "
+                   L"pcid:0x%I64X, 2ndpwd-type:%d, 2ndpwd-action-index:%d",
+                   channel->_rawChannel != nullptr ? static_cast<int>(static_cast<short>(channel->_rawChannel->GetId())) : 0,
+                   param.gametid, param.pcid, static_cast<int>(param.type), static_cast<int>(param.actionIndex));
+        channel->SendSecondPasswordIsVerifiedFail(param.gametid, param.pcid, 2);
+        // LIFT: the original releases the job without a null check. Checkout gives null only when memory runs out.
+        job->removeReferenceCount(HANDLER_FILE, 2392);
+        line = 2393;
+    }
+    else
+    {
+        // LIFT: LobbyJobManager::Execute (0xc2020) is inlined in the original. The task id has no PDB name. ❓
+        jobMgr->Execute(job, 130, &param);
+        Log::Write(Log::LT_DEBUG, HANDLER_FILE, 2397,
+                   L"[gamed], handle second-password-is-verified request ok, wid:%d, game-tid:0x%I64X, pcid:0x%I64X, 2ndpwd-type:%d, 2ndpwd-action-index:%d",
+                   channel->_rawChannel != nullptr ? static_cast<int>(static_cast<short>(channel->_rawChannel->GetId())) : 0,
+                   param.gametid, param.pcid, static_cast<int>(param.type), static_cast<int>(param.actionIndex));
+        job->removeReferenceCount(HANDLER_FILE, 2399);
+        line = 2400;
+    }
+    cliSession->removeReferenceCount(HANDLER_FILE, line);
+    return true;
 }
 
 // 0x92280

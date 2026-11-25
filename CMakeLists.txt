@@ -450,6 +450,7 @@ add_library(lift_lobbydaemon STATIC
   src/Server/LobbyDaemon/LobbyLocale.cpp
   src/Server/LobbyDaemon/LobbyManagePacketHandler.cpp
   src/Server/LobbyDaemon/LobbyMessage.cpp
+  src/Server/LobbyDaemon/LobbyObjectPool.cpp
   src/Server/LobbyDaemon/LobbyPerfMonitor.cpp
   src/Server/LobbyDaemon/LobbyPredefine.cpp
   src/Server/LobbyDaemon/LobbyService.cpp

@@ -37,7 +37,7 @@ public:
     unsigned long long _gametid;
     unsigned long long _pcid;
 
-    static ObjPool _pool;
+    static ObjPool _pool;  // LIFT: defined in the .cpp (gap-26).
     static LobbyJobDef _def;
 };
 static_assert(sizeof(StartChargeJob) == 0x70, "sizeof StartChargeJob");

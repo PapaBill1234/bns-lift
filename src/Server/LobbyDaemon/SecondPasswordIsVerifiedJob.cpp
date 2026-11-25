@@ -218,3 +218,8 @@ bool SecondPasswordIsVerifiedJob::expireIsVerified()
     transit(FIN);
     return true;
 }
+
+// LIFT: SecondPasswordIsVerifiedJob::_pool (.data RVA 0x204db0). Dynamic initializer 0x11e250, atexit destructor 0x11efc0. The original static data
+// holds id 1, objsize sizeof(SecondPasswordIsVerifiedJob) and desc L"SecondPasswordIsVerifiedJob".
+#include "ObjectPool.h"
+ObjPool SecondPasswordIsVerifiedJob::_pool(1, sizeof(SecondPasswordIsVerifiedJob), L"SecondPasswordIsVerifiedJob");

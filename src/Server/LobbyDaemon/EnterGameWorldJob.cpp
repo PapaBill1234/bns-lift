@@ -108,3 +108,8 @@ bool EnterGameWorldJob::enterGameWorld()
 {
     LIFT_STUB(0x85240);
 }
+
+// LIFT: EnterGameWorldJob::_pool (.data RVA 0x205330). Dynamic initializer 0x11e4d0, atexit destructor 0x11f1c0. The original static data
+// holds id 1, objsize sizeof(EnterGameWorldJob) and desc L"EnterGameWorldJob".
+#include "ObjectPool.h"
+ObjPool EnterGameWorldJob::_pool(1, sizeof(EnterGameWorldJob), L"EnterGameWorldJob");

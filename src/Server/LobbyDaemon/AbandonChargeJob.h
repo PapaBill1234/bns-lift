@@ -37,7 +37,7 @@ public:
     unsigned long long _pcid;
     wchar_t _chargeKey[65];
 
-    static ObjPool _pool;
+    static ObjPool _pool;  // LIFT: defined in the .cpp (gap-26).
     static LobbyJobDef _def;
 };
 static_assert(sizeof(AbandonChargeJob) == 0xF0, "sizeof AbandonChargeJob");

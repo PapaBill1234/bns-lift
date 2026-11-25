@@ -182,3 +182,8 @@ bool LeaveGameWorldJob::leaveGameWorld()
     transit(FIN);
     return true;
 }
+
+// LIFT: LeaveGameWorldJob::_pool (.data RVA 0x205490). Dynamic initializer 0x11e570, atexit destructor 0x11f240. The original static data
+// holds id 1, objsize sizeof(LeaveGameWorldJob) and desc L"LeaveGameWorldJob".
+#include "ObjectPool.h"
+ObjPool LeaveGameWorldJob::_pool(1, sizeof(LeaveGameWorldJob), L"LeaveGameWorldJob");

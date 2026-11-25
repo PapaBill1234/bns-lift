@@ -12,6 +12,35 @@ class ObjPool;
 class CliSession;
 struct LobbyJobDef;
 
+// PDB layout (tools/pdbcls.py LobbyDaemon ExtendJumpingCharacterCreationQuotaWithAccountInventoryItemReqParam, sizeof 0x30).
+// LIFT: the task parameter of ExtendJumpingCharacterCreationQuotaJob (task 30). The packet handler 0x8fb00 fills it (gap-26).
+struct ExtendJumpingCharacterCreationQuotaWithAccountInventoryItemReqParam
+{
+    LobbyGateChannel* lgate;
+    GamedChannel* gamed;
+    unsigned long long gamedTid;
+    unsigned long long labelId;
+    unsigned long long itemInstanceId;
+    unsigned int itemDataId;
+};
+static_assert(sizeof(ExtendJumpingCharacterCreationQuotaWithAccountInventoryItemReqParam) == 0x30,
+              "sizeof ExtendJumpingCharacterCreationQuotaWithAccountInventoryItemReqParam");
+static_assert(offsetof(ExtendJumpingCharacterCreationQuotaWithAccountInventoryItemReqParam, itemDataId) == 0x28,
+              "ExtendJumpingCharacterCreationQuotaWithAccountInventoryItemReqParam::itemDataId");
+
+// PDB layout (tools/pdbcls.py LobbyDaemon UpgradeJumpingCharacterStateReqParam, sizeof 0x20).
+// LIFT: the task parameter of UpgradeJumpingCharacterStateJob (task 142). The packet handlers 0x8ffc0 and 0x903d0 fill it (gap-26).
+struct UpgradeJumpingCharacterStateReqParam
+{
+    GamedChannel* gamed;
+    unsigned long long gamedTid;
+    unsigned long long pcId;
+    bool consumeCreationQuota;
+};
+static_assert(sizeof(UpgradeJumpingCharacterStateReqParam) == 0x20, "sizeof UpgradeJumpingCharacterStateReqParam");
+static_assert(offsetof(UpgradeJumpingCharacterStateReqParam, consumeCreationQuota) == 0x18,
+              "UpgradeJumpingCharacterStateReqParam::consumeCreationQuota");
+
 // LIFT: PDB layout (sizeof 0xa0, CliSessionJob base). Layout from tools/pdbcls.py LobbyDaemon ExtendJumpingCharacterCreationQuotaJob.
 class ExtendJumpingCharacterCreationQuotaJob : public CliSessionJob
 {

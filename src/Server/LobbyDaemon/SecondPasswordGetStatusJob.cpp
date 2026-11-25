@@ -222,3 +222,8 @@ bool SecondPasswordGetStatusJob::expireGetStatus()
     transit(FIN);
     return true;
 }
+
+// LIFT: SecondPasswordGetStatusJob::_pool (.data RVA 0x204d00). Dynamic initializer 0x11e200, atexit destructor 0x11ef80. The original static data
+// holds id 1, objsize sizeof(SecondPasswordGetStatusJob) and desc L"SecondPasswordGetStatusJob".
+#include "ObjectPool.h"
+ObjPool SecondPasswordGetStatusJob::_pool(1, sizeof(SecondPasswordGetStatusJob), L"SecondPasswordGetStatusJob");

@@ -197,3 +197,8 @@ bool StopChargeJob::expireChargeStop()
     transit(FIN);
     return true;
 }
+
+// LIFT: StopChargeJob::_pool (.data RVA 0x205070). Dynamic initializer 0x11e390, atexit destructor 0x11f0c0. The original static data
+// holds id 1, objsize sizeof(StopChargeJob) and desc L"StopChargeJob".
+#include "ObjectPool.h"
+ObjPool StopChargeJob::_pool(1, sizeof(StopChargeJob), L"StopChargeJob");

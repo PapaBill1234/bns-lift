@@ -49,7 +49,7 @@ private:
     char _type;  // +0x70
 
 public:
-    static ObjPool _pool;
+    static ObjPool _pool;  // LIFT: defined in the .cpp (gap-26).
     static LobbyJobDef _def;
 
     friend struct SecondPasswordGetStatusJobLayoutCheck;
