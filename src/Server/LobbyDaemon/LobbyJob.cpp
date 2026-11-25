@@ -96,37 +96,37 @@ bool LobbyJob::transit(int state)
 }
 
 // 0xc18d0
-bool LobbyJob::execute(int task, void* param)
+LobbyJob::Result LobbyJob::execute(int task, void* param)
 {
     EnterCriticalSection(&_lock.CS);
     if (_state == GetDefinition()->fin)
     {
         LeaveCriticalSection(&_lock.CS);
-        return false;
+        return JOB_DONE;
     }
     if (!dispatch_work(task, param) && _state != GetDefinition()->fin)
         transit(GetDefinition()->fin);
     int const state = _state;
     LeaveCriticalSection(&_lock.CS);
-    return state == GetDefinition()->fin;
+    return state == GetDefinition()->fin ? JOB_FIN : JOB_DONE;
 }
 
 // 0xc1990
-bool LobbyJob::resume(int state, int task, void* /*param*/)
+LobbyJob::Result LobbyJob::resume(int state, int task, void* /*param*/)
 {
     EnterCriticalSection(&_lock.CS);
     int const cur = _state;
     if (cur == GetDefinition()->fin || cur != state)
     {
         LeaveCriticalSection(&_lock.CS);
-        return false;
+        return JOB_DONE;
     }
     // The original passes nullptr, not param.
     if (!dispatch_work(task, nullptr) && _state != GetDefinition()->fin)
         transit(GetDefinition()->fin);
     int const now = _state;
     LeaveCriticalSection(&_lock.CS);
-    return now == GetDefinition()->fin;
+    return now == GetDefinition()->fin ? JOB_FIN : JOB_DONE;
 }
 
 // 0xc1a60
@@ -233,7 +233,7 @@ void LobbyJobManager::Execute(LobbyJob* job, int task, void* param)
         AlertSender::Write(kFile, 209, L"== CRASH == [job-mgr], execute fail; null job");
         return;
     }
-    if (job->execute(task, param))
+    if (job->execute(task, param) == LobbyJob::JOB_FIN)
         remove(job->_id);
 }
 
@@ -260,7 +260,7 @@ bool LobbyJobManager::ResumeW(unsigned long long jobid, int state, int task, voi
         Log::Write(Log::LT_ERROR, kFile, 246, L"[job-mgr], resume fail; no such job, tid:0x%I64X", jobid);
         return false;
     }
-    if (job->resume(state, task, param))
+    if (job->resume(state, task, param) == LobbyJob::JOB_FIN)
         remove(job->_id);
     job->removeReferenceCount(kFile, 252);
     return true;
