@@ -6,8 +6,8 @@ Repo: bns-lift (PRIVATE). You are a planner card. You do not lift code. You writ
 | --- | --- |
 | Server | MarketDealerDaemon |
 | Slug | marketdealerdaemon |
-| IDA database | `/home/ubuntu/Documents/Codex/private-project/ida/lift/MarketDealerDaemon/MarketDealerDaemon.exe` |
-| PDB | `/home/ubuntu/Documents/Codex/private-project/Service_348_8349/Service/MarketDealerDaemon/bin/MarketDealerDaemon.pdb` |
+| IDA database | `<work-root>/ida/lift/MarketDealerDaemon/MarketDealerDaemon.exe` |
+| PDB | `<work-root>/Service_348_8349/Service/MarketDealerDaemon/bin/MarketDealerDaemon.pdb` |
 | Dep of your first card | `lift-postofficedaemon-5` |
 
 Read `Docs/Plan/plan.md` ("Lift method", "Server order", "Planner chain") first. Read the handoffs in `Docs/Plan/handoffs/` for the state of `src/common/`.

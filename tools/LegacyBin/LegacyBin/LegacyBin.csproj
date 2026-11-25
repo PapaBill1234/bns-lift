@@ -19,26 +19,22 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
     <PackageReference Include="System.Resources.Extensions" Version="8.0.0" />
+    <!-- Upstream DLLs come from NuGet (byte-identical to the DLLs of upstream LegacyBin; see ORIGIN.md).
+         ExcludeAssets="runtime": no copy to the output; Program.cs loads the embedded copies. -->
+    <PackageReference Include="DotNetZip" Version="1.13.8" GeneratePathProperty="true" ExcludeAssets="runtime" />
+    <PackageReference Include="MaterialSkin.2" Version="2.1.3" GeneratePathProperty="true" ExcludeAssets="runtime" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LegacyBin.Core\LegacyBin.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="DotNetZip">
-      <HintPath>DotNetZip.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="MaterialSkin">
-      <HintPath>Resources\MaterialSkin.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.Web.Extensions" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\DotNetZip.dll" LogicalName="LegacyBin.Resources.DotNetZip.dll" />
-    <EmbeddedResource Include="Resources\MaterialSkin.dll" LogicalName="LegacyBin.Resources.MaterialSkin.dll" />
+    <EmbeddedResource Include="$(PkgDotNetZip)\lib\net40\DotNetZip.dll" LogicalName="LegacyBin.Resources.DotNetZip.dll" />
+    <EmbeddedResource Include="$(PkgMaterialSkin_2)\lib\net461\MaterialSkin.dll" LogicalName="LegacyBin.Resources.MaterialSkin.dll" />
     <None Remove="docs\**" />
   </ItemGroup>
 </Project>

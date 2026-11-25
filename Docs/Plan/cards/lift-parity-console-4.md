@@ -1,6 +1,6 @@
 # lift-parity-console-4: PipeConsole, CrashHandler, service console and config
 
-Repo: bns-lift (PUBLIC). Never commit binaries, PDBs, IDA databases or abuse notes. IDA only when the pseudocode and funcdiff are not enough (`/home/ubuntu/Documents/Codex/private-project/ida/lift/SmartCouponDaemon/SmartCouponDaemon.exe`).
+Repo: bns-lift (PUBLIC). Never commit binaries, PDBs, IDA databases or abuse notes. IDA only when the pseudocode and funcdiff are not enough (`<work-root>/ida/lift/SmartCouponDaemon/SmartCouponDaemon.exe`).
 
 ## Goal
 The DIFF functions of the console and config files are MATCH, or the handoff gives the cause of each.

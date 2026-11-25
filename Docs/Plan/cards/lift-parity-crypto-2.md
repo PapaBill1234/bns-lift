@@ -1,6 +1,6 @@
 # lift-parity-crypto-2: BloodCrypto compile flags, crypto misses and crypto consts
 
-Repo: bns-lift (PRIVATE). IDA only when the pseudocode and funcdiff are not enough (`/home/ubuntu/Documents/Codex/private-project/ida/lift/LobbyGate/LobbyGate.exe`).
+Repo: bns-lift (PRIVATE). IDA only when the pseudocode and funcdiff are not enough (`<work-root>/ida/lift/LobbyGate/LobbyGate.exe`).
 
 ## Goal
 The crypto code compiles to the same code as the original in each exe. The crypto misses and the crypto const DIFF go away.

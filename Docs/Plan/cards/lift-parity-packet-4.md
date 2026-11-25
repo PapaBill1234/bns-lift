@@ -1,6 +1,6 @@
 # lift-parity-packet-4: PacketBuffer, FragmentPacket and ToPacket
 
-Repo: bns-lift (PUBLIC). Never commit binaries, PDBs, IDA databases or abuse notes. IDA only when the pseudocode and funcdiff are not enough (`/home/ubuntu/Documents/Codex/private-project/ida/lift/LobbyGate/LobbyGate.exe`).
+Repo: bns-lift (PUBLIC). Never commit binaries, PDBs, IDA databases or abuse notes. IDA only when the pseudocode and funcdiff are not enough (`<work-root>/ida/lift/LobbyGate/LobbyGate.exe`).
 
 ## Goal
 The DIFF functions of the packet files are MATCH, or the handoff gives the cause of each.

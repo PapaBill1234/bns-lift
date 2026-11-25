@@ -1,6 +1,6 @@
 # lift-parity-pod-2: PostOfficeDaemon: patterns 47 and 49 again, block order
 
-Repo: bns-lift (PRIVATE). IDA only when the pseudocode and funcdiff are not enough (`/home/ubuntu/Documents/Codex/private-project/ida/lift/PostOfficeDaemon/PostOfficeDaemon.exe`).
+Repo: bns-lift (PRIVATE). IDA only when the pseudocode and funcdiff are not enough (`<work-root>/ida/lift/PostOfficeDaemon/PostOfficeDaemon.exe`).
 
 ## Goal
 The exe-only code of PostOfficeDaemon gets the fixes that tool noise stopped in round 1. PostOfficeDaemon gets near 90 % parity.

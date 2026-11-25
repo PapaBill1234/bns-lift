@@ -12,6 +12,16 @@ Lift the 2019 + PDB server executables to C++ source that compiles again. Then c
 | 4. Add | Functions that are in 381 but not in 2019 + PDB | A packet log from the 381 server set is covered. |
 | 5. Modernise | Clean code, tests, then optional Rust | Phase 2 and 3 checks still pass. |
 
+### Path placeholders
+
+The cards and handoffs use these placeholders:
+
+| Placeholder | Meaning |
+| --- | --- |
+| `<lift-root>` | The root of this repo. |
+| `<work-root>` | The private work directory with the IDA databases (`ida/lift/`) and the original server files (`Service_348_8349/`). It is not in this repo. |
+| `<bns-wine>` | The private Wine test directory (packet log tools in `pktlog/`). It is not in this repo. |
+
 ## Rules
 
 - This repo is PRIVATE. The code comes from NCSoft binaries. Never push it to a public repo (slopemulator).

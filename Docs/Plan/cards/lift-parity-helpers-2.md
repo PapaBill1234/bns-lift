@@ -1,6 +1,6 @@
 # lift-parity-helpers-2: lift helpers and handler form in LobbyGate and PostOfficeDaemon
 
-Repo: bns-lift (PRIVATE). IDA only when the pseudocode and funcdiff are not enough (`/home/ubuntu/Documents/Codex/private-project/ida/lift/PostOfficeDaemon/PostOfficeDaemon.exe`).
+Repo: bns-lift (PRIVATE). IDA only when the pseudocode and funcdiff are not enough (`<work-root>/ida/lift/PostOfficeDaemon/PostOfficeDaemon.exe`).
 
 ## Goal
 The lift helpers that the original inlines are inlined in our exe too. The handlers of LobbyGate and PostOfficeDaemon have the same calls and refs as the original.

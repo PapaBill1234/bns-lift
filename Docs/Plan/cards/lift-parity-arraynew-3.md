@@ -1,6 +1,6 @@
 # lift-parity-arraynew-3: placement array new and eh vector constructor iterator
 
-Repo: bns-lift (PRIVATE). IDA only when the pseudocode and funcdiff are not enough (`/home/ubuntu/Documents/Codex/private-project/ida/lift/LobbyGate/LobbyGate.exe`).
+Repo: bns-lift (PRIVATE). IDA only when the pseudocode and funcdiff are not enough (`<work-root>/ida/lift/LobbyGate/LobbyGate.exe`).
 
 ## Goal
 The functions that make or delete object arrays get MATCH (pattern of `lift-parity-scd-2`).

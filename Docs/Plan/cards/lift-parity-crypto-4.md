@@ -1,6 +1,6 @@
 # lift-parity-crypto-4: crypto DIFFs in the lifted crypto library
 
-Repo: bns-lift (PUBLIC). Never commit binaries, PDBs, IDA databases or abuse notes. IDA only when the pseudocode and funcdiff are not enough (`/home/ubuntu/Documents/Codex/private-project/ida/lift/LobbyGate/LobbyGate.exe`).
+Repo: bns-lift (PUBLIC). Never commit binaries, PDBs, IDA databases or abuse notes. IDA only when the pseudocode and funcdiff are not enough (`<work-root>/ida/lift/LobbyGate/LobbyGate.exe`).
 
 ## Goal
 The shared crypto functions and the LG crypto functions are MATCH, or the handoff gives the cause of each.

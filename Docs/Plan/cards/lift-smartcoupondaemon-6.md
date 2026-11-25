@@ -1,6 +1,6 @@
 # lift-smartcoupondaemon-6: SmartCouponDaemon lift: OpenPort 0x1A8B0, RefCntObject fault, last handlers
 
-Repo: bns-lift (PRIVATE). IDA database: `/home/ubuntu/Documents/Codex/private-project/ida/lift/SmartCouponDaemon/SmartCouponDaemon.exe`. PDB: `/home/ubuntu/Documents/Codex/private-project/Service_348_8349/Service/SmartCouponDaemon/bin/SmartCouponDaemon.pdb`.
+Repo: bns-lift (PRIVATE). IDA database: `<work-root>/ida/lift/SmartCouponDaemon/SmartCouponDaemon.exe`. PDB: `<work-root>/Service_348_8349/Service/SmartCouponDaemon/bin/SmartCouponDaemon.pdb`.
 Read `Docs/Plan/plan.md` "Lift method" first. Read `Docs/Plan/handoffs/lift-smartcoupondaemon-5.md` and `Docs/Plan/handoffs/lift-smartcoupondaemon-verify-2.md`.
 
 ## Facts

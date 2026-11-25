@@ -6,8 +6,8 @@ Repo: bns-lift (PRIVATE). You are a planner card. You do not lift code. You writ
 | --- | --- |
 | Server | InfoGateDaemon |
 | Slug | infogatedaemon |
-| IDA database | `/home/ubuntu/Documents/Codex/private-project/ida/lift/InfoGateDaemon/InfoGateDaemon.exe` |
-| PDB | `/home/ubuntu/Documents/Codex/private-project/Service_348_8349/Service/InfoGateDaemon/bin/InfoGateDaemon.pdb` |
+| IDA database | `<work-root>/ida/lift/InfoGateDaemon/InfoGateDaemon.exe` |
+| PDB | `<work-root>/Service_348_8349/Service/InfoGateDaemon/bin/InfoGateDaemon.pdb` |
 | Dep of your first card | `lift-marketdealerdaemon-15` |
 
 Read `Docs/Plan/plan.md` ("Lift method", "Server order", "Planner chain") first. Read the handoffs in `Docs/Plan/handoffs/` for the state of `src/common/`.

@@ -74,6 +74,7 @@ dotnet build LegacyBin.sln -c Release
 
 The GUI targets .NET Framework 4.8 (SDK-style project, builds in VS 2019+ or with `dotnet build` on any OS).
 `LegacyBin.Core` is `netstandard2.0`, the CLI is `net8.0`.
+The restore gets `DotNetZip` 1.13.8 and `MaterialSkin.2` 2.1.3 from NuGet (see `../ORIGIN.md`). Do not commit DLLs.
 
 ## Usage
 

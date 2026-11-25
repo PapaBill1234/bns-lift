@@ -1,6 +1,6 @@
 # lift-smartcoupondaemon-verify-3: run the lifted SmartCouponDaemon again after the OpenPort fix
 
-Repo: bns-lift (PRIVATE). No IDA unless a difference needs it (`/home/ubuntu/Documents/Codex/private-project/ida/lift/SmartCouponDaemon/SmartCouponDaemon.exe`).
+Repo: bns-lift (PRIVATE). No IDA unless a difference needs it (`<work-root>/ida/lift/SmartCouponDaemon/SmartCouponDaemon.exe`).
 Read `Docs/Verify/SmartCouponDaemon.md` and `Docs/Plan/handoffs/lift-smartcoupondaemon-6.md` and `Docs/Plan/handoffs/lift-smartcoupondaemon-verify-2.md` first.
 
 ## Goal

@@ -6,8 +6,8 @@ Repo: bns-lift (PRIVATE). You are a planner card. You do not lift code. You writ
 | --- | --- |
 | Server | SmartCouponDaemon |
 | Slug | smartcoupondaemon |
-| IDA database | `/home/ubuntu/Documents/Codex/private-project/ida/lift/SmartCouponDaemon/SmartCouponDaemon.exe` |
-| PDB | `/home/ubuntu/Documents/Codex/private-project/Service_348_8349/Service/SmartCouponDaemon/bin/SmartCouponDaemon.pdb` |
+| IDA database | `<work-root>/ida/lift/SmartCouponDaemon/SmartCouponDaemon.exe` |
+| PDB | `<work-root>/Service_348_8349/Service/SmartCouponDaemon/bin/SmartCouponDaemon.pdb` |
 | Dep of your first card | `lift-cg-5` |
 
 Read `Docs/Plan/plan.md` ("Lift method", "Server order", "Planner chain") first. Read the handoffs in `Docs/Plan/handoffs/` for the state of `src/common/`.

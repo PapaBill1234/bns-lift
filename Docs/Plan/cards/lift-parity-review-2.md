@@ -1,6 +1,6 @@
 # lift-parity-review-2: parity review: measure, write the lessons, plan the next round
 
-Repo: bns-lift (PRIVATE). IDA only when the pseudocode and funcdiff are not enough (`/home/ubuntu/Documents/Codex/private-project/ida/lift/CacheGate/CacheGate.exe`).
+Repo: bns-lift (PRIVATE). IDA only when the pseudocode and funcdiff are not enough (`<work-root>/ida/lift/CacheGate/CacheGate.exe`).
 
 ## Goal
 We know what worked in round 2. The next round of parity cards is queued if an exe is below 90 %, or a 90+ round is queued.

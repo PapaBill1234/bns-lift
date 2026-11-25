@@ -1,6 +1,6 @@
 # lift-parity-handlers-3: packet handler form in all 4 exes
 
-Repo: bns-lift (PRIVATE). IDA only when the pseudocode and funcdiff are not enough (`/home/ubuntu/Documents/Codex/private-project/ida/lift/CacheGate/CacheGate.exe`).
+Repo: bns-lift (PRIVATE). IDA only when the pseudocode and funcdiff are not enough (`<work-root>/ida/lift/CacheGate/CacheGate.exe`).
 
 ## Goal
 The packet handlers and the send functions get MATCH in each exe.

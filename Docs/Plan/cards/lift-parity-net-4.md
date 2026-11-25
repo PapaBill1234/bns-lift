@@ -1,6 +1,6 @@
 # lift-parity-net-4: BloodLib network: Session, IoWorker, Network, send buffer
 
-Repo: bns-lift (PUBLIC). Never commit binaries, PDBs, IDA databases or abuse notes. IDA only when the pseudocode and funcdiff are not enough (`/home/ubuntu/Documents/Codex/private-project/ida/lift/CacheGate/CacheGate.exe`).
+Repo: bns-lift (PUBLIC). Never commit binaries, PDBs, IDA databases or abuse notes. IDA only when the pseudocode and funcdiff are not enough (`<work-root>/ida/lift/CacheGate/CacheGate.exe`).
 
 ## Goal
 The DIFF functions of the BloodLib network files are MATCH, or the handoff gives the cause of each.

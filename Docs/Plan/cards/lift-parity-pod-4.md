@@ -1,6 +1,6 @@
 # lift-parity-pod-4: POD DB loaders, relay handlers, WorldConfigManager
 
-Repo: bns-lift (PUBLIC). Never commit binaries, PDBs, IDA databases or abuse notes. IDA only when the pseudocode and funcdiff are not enough (`/home/ubuntu/Documents/Codex/private-project/ida/lift/PostOfficeDaemon/PostOfficeDaemon.exe`).
+Repo: bns-lift (PUBLIC). Never commit binaries, PDBs, IDA databases or abuse notes. IDA only when the pseudocode and funcdiff are not enough (`<work-root>/ida/lift/PostOfficeDaemon/PostOfficeDaemon.exe`).
 
 ## Goal
 PostOfficeDaemon reaches 90 % (684 MATCH), or the handoff gives the cause of each DIFF function that is left.

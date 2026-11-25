@@ -1,6 +1,6 @@
 # lift-parity-0: parity tooling: make funcdiff exact, list the misses, triage all DIFF functions
 
-Repo: bns-lift (PRIVATE). IDA only when the pseudocode and funcdiff are not enough (`/home/ubuntu/Documents/Codex/private-project/ida/lift/CacheGate/CacheGate.exe`).
+Repo: bns-lift (PRIVATE). IDA only when the pseudocode and funcdiff are not enough (`<work-root>/ida/lift/CacheGate/CacheGate.exe`).
 
 ## Goal
 The parity number is true. Each DIFF function and each miss has a cause class. The fix cards after this card use the triage.

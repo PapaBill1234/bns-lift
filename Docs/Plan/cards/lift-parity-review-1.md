@@ -1,6 +1,6 @@
 # lift-parity-review-1: parity review: measure, write the lessons, plan the next round
 
-Repo: bns-lift (PRIVATE). IDA only when the pseudocode and funcdiff are not enough (`/home/ubuntu/Documents/Codex/private-project/ida/lift/CacheGate/CacheGate.exe`).
+Repo: bns-lift (PRIVATE). IDA only when the pseudocode and funcdiff are not enough (`<work-root>/ida/lift/CacheGate/CacheGate.exe`).
 
 ## Goal
 We know what works. The next round of parity cards is queued if an exe is below 90 %. The lift rules for GameDaemon have the lessons.
@@ -14,7 +14,7 @@ We know what works. The next round of parity cards is queued if an exe is below 
 - `Docs/Parity/progress.tsv` has one row per accepted card.
 - The runner adds the rows of `Docs/Plan/queue/lift-parity-review-1.tsv` to the queue after this card. The columns are: id, kind, model, crate, paths, deps, turns, status, title. Use kind `lift`, crate `-`, turns `150`, status `ready`. Each id must start with `lift-parity-`. Choose the model of each card by the table "Model per card" in `Docs/Parity/README.md`: the second stall check of an exe, a review that writes `rules-proposal.md`, a lift plan card or a bug judgement card = `opus:high`; any other review, a first stall check or a card for DIFF functions with no known cause = `opus`; a card that applies a known pattern = `sonnet:high`; a docs or housekeeping card = `sonnet:medium`.
 - Read the handoffs `Docs/Plan/handoffs/lift-parity-*.md`.
-- An older review lists behaviour differences that a past port of SmartCouponDaemon missed: `/home/ubuntu/Documents/Codex/private-project/bns-server/Docs/Reviews/rev-small-348.md` (about 7k tokens). Read only sections 2, 3 and 5 (lines 64-125 and 185-219). The review calls the 2019 + PDB build "348". It is about a Rust port, not this lift. Use it for miss classes only. Do not copy Rust paths or code.
+- An older review lists behaviour differences that a past port of SmartCouponDaemon missed: `<work-root>/bns-server/Docs/Reviews/rev-small-348.md` (about 7k tokens). Read only sections 2, 3 and 5 (lines 64-125 and 185-219). The review calls the 2019 + PDB build "348". It is about a Rust port, not this lift. Use it for miss classes only. Do not copy Rust paths or code.
 
 ## Tasks
 1. Run `tools/gate.sh` and `tools/parity.sh`. Write the parity of each exe and the change since the start.

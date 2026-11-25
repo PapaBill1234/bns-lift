@@ -1,6 +1,6 @@
 # lift-smartcoupondaemon-3: SmartCouponDaemon lift: RSA crypto (common), NP channel, object pool
 
-Repo: bns-lift (PRIVATE). IDA database: `/home/ubuntu/Documents/Codex/private-project/ida/lift/SmartCouponDaemon/SmartCouponDaemon.exe`. PDB: `/home/ubuntu/Documents/Codex/private-project/Service_348_8349/Service/SmartCouponDaemon/bin/SmartCouponDaemon.pdb`.
+Repo: bns-lift (PRIVATE). IDA database: `<work-root>/ida/lift/SmartCouponDaemon/SmartCouponDaemon.exe`. PDB: `<work-root>/Service_348_8349/Service/SmartCouponDaemon/bin/SmartCouponDaemon.pdb`.
 Read `Docs/Plan/plan.md` "Lift method" first. Read the handoffs of the earlier lift cards for the state of `src/common/`.
 
 ## Modules (one `.cpp` + `.h` per PDB module)

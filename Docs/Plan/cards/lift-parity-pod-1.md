@@ -1,6 +1,6 @@
 # lift-parity-pod-1: parity of PostOfficeDaemon: the exe-only code
 
-Repo: bns-lift (PRIVATE). IDA only when the pseudocode and funcdiff are not enough (`/home/ubuntu/Documents/Codex/private-project/ida/lift/PostOfficeDaemon/PostOfficeDaemon.exe`).
+Repo: bns-lift (PRIVATE). IDA only when the pseudocode and funcdiff are not enough (`<work-root>/ida/lift/PostOfficeDaemon/PostOfficeDaemon.exe`).
 
 ## Goal
 The code of PostOfficeDaemon that is not shared compiles to the same code as the original. PostOfficeDaemon reaches 90 % parity.

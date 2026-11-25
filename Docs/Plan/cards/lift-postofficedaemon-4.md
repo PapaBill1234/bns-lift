@@ -1,6 +1,6 @@
 # lift-postofficedaemon-4: PostOfficeDaemon lift: post context, post relays, CacheEconomy handler
 
-Repo: bns-lift (PRIVATE). IDA database: `/home/ubuntu/Documents/Codex/private-project/ida/lift/PostOfficeDaemon/PostOfficeDaemon.exe`. PDB: `/home/ubuntu/Documents/Codex/private-project/Service_348_8349/Service/PostOfficeDaemon/bin/PostOfficeDaemon.pdb`.
+Repo: bns-lift (PRIVATE). IDA database: `<work-root>/ida/lift/PostOfficeDaemon/PostOfficeDaemon.exe`. PDB: `<work-root>/Service_348_8349/Service/PostOfficeDaemon/bin/PostOfficeDaemon.pdb`.
 Read `Docs/Plan/plan.md` "Lift method" first. Read the handoffs of `lift-postofficedaemon-1` to `-3`.
 
 ## Modules (in `src/PostOfficeDaemon/`, one `.cpp` + `.h` per PDB module)

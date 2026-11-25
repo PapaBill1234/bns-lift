@@ -7,8 +7,8 @@ Repo: bns-lift (public). This card is the record of the LobbyDaemon planner. The
 | Server | LobbyDaemon |
 | Slug | lobbydaemon |
 | Source build | LobbyDaemon 2019 + PDB (VS2010 SP1) |
-| Exe | `/home/ubuntu/Documents/Codex/private-project/ida/lift/LobbyDaemon/LobbyDaemon.exe` |
-| PDB | `/home/ubuntu/Documents/Codex/private-project/ida/lift/LobbyDaemon/LobbyDaemon.pdb` |
+| Exe | `<work-root>/ida/lift/LobbyDaemon/LobbyDaemon.exe` |
+| PDB | `<work-root>/ida/lift/LobbyDaemon/LobbyDaemon.pdb` |
 | Pseudocode index | `~/.cache/bns-lift/hr/LobbyDaemon/index.tsv` |
 | Dep of the first card | `-` (no earlier LobbyDaemon card) |
 | Lift cards | 59 (`lift-lobbydaemon-0` to `lift-lobbydaemon-58`) |

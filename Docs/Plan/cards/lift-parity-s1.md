@@ -1,6 +1,6 @@
 # lift-parity-s1: parity of shared code: memory managers, Daemon, threads, timers, console, crash handler
 
-Repo: bns-lift (PRIVATE). IDA only when the pseudocode and funcdiff are not enough (`/home/ubuntu/Documents/Codex/private-project/ida/lift/CacheGate/CacheGate.exe`).
+Repo: bns-lift (PRIVATE). IDA only when the pseudocode and funcdiff are not enough (`<work-root>/ida/lift/CacheGate/CacheGate.exe`).
 
 ## Goal
 The shared base code compiles to the same code as the original in all 4 exes.

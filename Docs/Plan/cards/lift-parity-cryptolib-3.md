@@ -1,6 +1,6 @@
 # lift-parity-cryptolib-3: lift the callers in the closed crypto libraries
 
-Repo: bns-lift (PRIVATE). IDA: `/home/ubuntu/Documents/Codex/private-project/ida/lift/LobbyGate/LobbyGate.exe` (open only this copy).
+Repo: bns-lift (PRIVATE). IDA: `<work-root>/ida/lift/LobbyGate/LobbyGate.exe` (open only this copy).
 
 ## Goal
 The crypto functions that the original links from `BloodPacketCrypt64.lib` and `BloodCert64.lib` are in our exes (LG, SCD, POD).
