@@ -583,27 +583,35 @@ __declspec(noinline) void PipeConsole::disconnectAndReconnect(PipeInstance& pipe
 }
 
 // 0x15d90
+// LIFT: lift helper name, not in any PDB. The original SetInvalidInfo (CacheGate 0x15d90) has the key search
+// in place twice: once in the add branch and once in the remove branch.
+static inline PipeConsole::ItemNode* findInvalidNode(PipeConsole::ItemList& list, wchar_t const* keyString)
+{
+    for (PipeConsole::ItemNode* node = list._head._next; node != &list._tail; node = node->_next)
+    {
+        if (wcscmp(node->_key, keyString) == 0)
+            return node;
+    }
+    return nullptr;
+}
+
 void PipeConsole::SetInvalidInfo(wchar_t const* keyString, bool isInvalid)
 {
     _lock.Enter();
-    ItemNode* node = _invalid._head._next;
-    for (; node != &_invalid._tail; node = node->_next)
-    {
-        if (wcscmp(node->_key, keyString) == 0)
-            break;
-    }
-    if (node == &_invalid._tail)
-        node = nullptr;
     if (isInvalid)
     {
-        if (node == nullptr)
+        if (findInvalidNode(_invalid, keyString) == nullptr)
             addNode(_invalid, keyString, L"");
     }
-    else if (node != nullptr)
+    else
     {
-        node->_next->_prev = node->_prev;
-        node->_prev->_next = node->_next;
-        Memory::_Manager[2]->Free(node, PIPE_CONSOLE_FILE, 837);
+        ItemNode* node = findInvalidNode(_invalid, keyString);
+        if (node != nullptr)
+        {
+            node->_next->_prev = node->_prev;
+            node->_prev->_next = node->_next;
+            Memory::_Manager[2]->Free(node, PIPE_CONSOLE_FILE, 837);
+        }
     }
     _lock.Leave();
 }
