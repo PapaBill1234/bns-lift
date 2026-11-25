@@ -1,5 +1,6 @@
 // NPServiceChannel.obj (LobbyDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
 #include "NPServiceChannel.h"
+#include "AlertSender.h"
 #include "LiftStub.h"
 #include "LobbyDaemon.h"
 #include "LobbyJob.h"
@@ -33,6 +34,40 @@ bool NPGameServiceChannel::SendRequestConsumeGameToken(NPTransaction*, id128 con
 bool NPGameServiceChannel::SendRequestAuthChangeMyUserNameIncomplete(NPTransaction*, id128 const&, wchar_t const*, wchar_t const*, wchar_t const*)
 {
     LIFT_STUB(0xd0370);
+}
+
+namespace StsMsgLib
+{
+// PDB StsMsgLib::_StsMsgRequestSlotListSlots (sizeof 0x28).
+struct _StsMsgRequestSlotListSlots : public _StsMsgRequest
+{
+    void* pUserId;  // PDB _GUID*
+    wchar_t* pwszSlotType;
+};
+static_assert(sizeof(_StsMsgRequestSlotListSlots) == 0x28, "sizeof StsMsgLib::_StsMsgRequestSlotListSlots");
+static_assert(offsetof(_StsMsgRequestSlotListSlots, pUserId) == 0x18, "_StsMsgRequestSlotListSlots::pUserId");
+static_assert(offsetof(_StsMsgRequestSlotListSlots, pwszSlotType) == 0x20, "_StsMsgRequestSlotListSlots::pwszSlotType");
+}  // namespace StsMsgLib
+
+// PDB inline: the binary has no body. StartCliSessionWnpTokenJob::listSlotsReq (0xd47e0) has it inline.
+// LIFT: defined here, not in the header. LTCG inlines it into its only caller.
+bool NPGameServiceChannel::SendRequestSlotListSlots(NPTransaction* t, id128 const& userId, wchar_t const* slotType)
+{
+    if (t == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, L"NPServiceChannel.cpp", 246,
+                   L"== CRASH == [np], send request slot list slots fail; null transaction");
+        AlertSender::Write(L"NPServiceChannel.cpp", 246,
+                           L"== CRASH == [np], send request slot list slots fail; null transaction");
+        return false;
+    }
+    StsMsgLib::_StsMsgRequestSlotListSlots msg;
+    msg.msgInfo.eCmd = StsMsgLib::COMMAND_COMMON_SLOT_LIST_SLOTS;
+    msg.msgInfo.msgType = StsMsgLib::MESSAGE_TYPE_REQUEST;
+    msg.msgInfo.nTxnId = 0;
+    msg.pUserId = const_cast<id128*>(&userId);
+    msg.pwszSlotType = const_cast<wchar_t*>(slotType);
+    return SendMsg(&msg, true, t);
 }
 
 // 0xd03d0

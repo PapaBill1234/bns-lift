@@ -16,6 +16,7 @@ class NPGameServiceChannel : public NPChannel
 public:
     bool SendRequestConsumeGameToken(NPTransaction*, id128 const&, id128 const&, unsigned long);  // 0xd0220
     bool SendRequestAuthChangeMyUserNameIncomplete(NPTransaction*, id128 const&, wchar_t const*, wchar_t const*, wchar_t const*);  // 0xd0370
+    bool SendRequestSlotListSlots(NPTransaction*, id128 const&, wchar_t const*);  // PDB inline (no body in the binary)
     bool SendRequestSlotGetSlot(NPTransaction*, id128 const&, id128 const&);  // 0xd03d0
     bool SendRequestSlotCreateActivitySlots(NPTransaction*, id128 const&, wchar_t const*, unsigned long long, int, wchar_t const*);  // 0xd0450
     bool SendRequestSlotSetActivitySlotData(NPTransaction*, id128 const&, id128 const&, unsigned long long);  // 0xd0560
@@ -54,6 +55,9 @@ public:
     // LIFT: the constructor is not in the PDB. Expire resets the members to this state.
     NPLobbyJobTransaction() : _jobid(0), _state(-1), _task(0) {}
     virtual ~NPLobbyJobTransaction() {}  // scalar deleting destructor 0xd2240 (folded with NPTransaction)
+    // LIFT: the original global operator delete(void*) (0x32b50) is empty. The callers do "delete p;" and then
+    // Memory::_Manager[2]->Free(p, ...). This empty class operator delete keeps that shape (see CliSession.h).
+    static void operator delete(void*) {}
     virtual int GetKind() const { return 1; }  // 0xe3ec0 (folded)
     virtual void Expire();  // 0xd2250
     NPTransaction* Set(LobbyJob*, int);  // 0xd22c0

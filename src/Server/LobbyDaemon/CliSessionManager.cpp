@@ -6,10 +6,11 @@
 // 0x3c080
 LobbyJobDef const* InitCliSessionWnpTokenJob::GetDefinition() const
 {
-    LIFT_STUB(0x3c080);
+    return &_def;
 }
 
 // 0x3c090
+// LIFT: Not done. The body calls _pool.Checkin. ObjPool is not in lift_lobbydaemon.
 void InitCliSessionWnpTokenJob::deallocate_me(void*, wchar_t const*, int)
 {
     LIFT_STUB(0x3c090);
