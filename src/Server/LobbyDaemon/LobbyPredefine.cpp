@@ -3,9 +3,37 @@
 #include "LiftStub.h"
 
 // 0x96480
-char GetLobbyGateKickReason(int)
+// LIFT: not in the gap-03 ID list. LobbyGatePresence::Kick (0x3ac20) calls it. Lifted so that Kick is not noreturn.
+// The values map the kick reason to the lobby-gate kick reason (9 is skipped).
+char GetLobbyGateKickReason(int reason)
 {
-    LIFT_STUB(0x96480);
+    switch (reason)
+    {
+    case 1:
+        return 1;
+    case 2:
+        return 2;
+    case 3:
+        return 3;
+    case 4:
+        return 4;
+    case 5:
+        return 5;
+    case 6:
+        return 6;
+    case 7:
+        return 7;
+    case 8:
+        return 8;
+    case 10:
+        return 9;
+    case 11:
+        return 10;
+    case 12:
+        return 11;
+    default:
+        return 0;
+    }
 }
 
 // 0x96500

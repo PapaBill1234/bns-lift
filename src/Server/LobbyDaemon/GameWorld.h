@@ -57,6 +57,10 @@ public:
     // LIFT: access helper. No PDB in the set has friend records. The handlers read and write _live (HelloReq 0x88260, ServiceOpenNotify 0x88cd0).
     friend bool HandleLobbyGame_HelloReq(Session const*, Packet const*);
     friend bool HandleLobbyGame_ServiceOpenNotify(Session const*, Packet const*);
+    // LIFT: access helper. No PDB in the set has friend records. GameServiceLocation::OnEnter (0x3b3d0) and OnLeave
+    // (0x3b540) change _playingUserCount. Leave (0x3b9a0) reads _cluster. GamedChannelManager::OnClose (0x80790) writes _live.
+    friend class GameServiceLocation;
+    friend class GamedChannelManager;
 private:
     mutable SRWLOCK _infolock;
     DB _db;
@@ -99,6 +103,8 @@ public:
     short GetClusterId() const { return _db.clusterId; }
 private:
     friend class GameWorld;
+    // LIFT: access helper. No PDB in the set has friend records. GameServiceLocation::Leave (0x3b9a0) calls giveupWait and leaveUser.
+    friend class GameServiceLocation;
     bool enterUser(GameWorld*, CliSession*, bool&, WaitInfo&);  // 0x4dd90
     bool leaveUser(GameWorld*, CliSession*);  // 0x4e080
     bool giveupWait(GameWorld*, unsigned long long, WaitQueue::Type const&, short const&);  // 0x4e310

@@ -3,11 +3,15 @@
 #include "GameWorld.h"
 #include "Character.h"
 #include "CliSession.h"
+#include "ContentsRuleConfigDefinition.h"
 #include "Daemon.h"
+#include "LobbyConfig.h"
+#include "LobbyDaemon.h"
 #include "FragmentPacket.h"
 #include "LiftStub.h"
 #include "Log.h"
 #include <string.h>
+#include <time.h>
 #include <wchar.h>
 
 #if !defined(__clang__)
@@ -291,9 +295,85 @@ long long GameWorldCluster::UpdateCounters()
 }
 
 // 0x4dd90
-bool GameWorldCluster::enterUser(GameWorld*, CliSession*, bool&, WaitInfo&)
+bool GameWorldCluster::enterUser(GameWorld* world, CliSession* cs, bool& wait, WaitInfo& waitinfo)
 {
-    LIFT_STUB(0x4dd90);
+    short wid = 0;
+    bool ok = false;
+    int entranceCount = 0;
+    wait = false;
+    WaitQueue::Type type = WaitQueue::WAIT_QUEUE_TYPE_NORMAL;
+    if (LobbyDaemon::_instance->_config->_useGradePriorityQueue)
+    {
+        long long now = _time64(nullptr);
+        type = static_cast<WaitQueue::Type>(
+            !cs->_gradeService.IsActivated(LobbyDaemon::_instance->_config->_gradePriorityQueueGameGradeKey, now));
+    }
+    // LIFT: the original reads ContentsRuleConfig::Config without a null check. LoadContentsRuleConfig (0x297d0) sets it at start.
+    ContentsRuleConfig* rule = ContentsRuleConfig::GetContentsRuleConfig();
+    if (rule->GetUseBotPriorityQueue() && cs->_acb._dbfield.botScore >= rule->GetMinBotScoreToApplyBotPriorityQueue() &&
+        !cs->_acb._dbfield.botScoreIgnore)
+    {
+        type = WaitQueue::WAIT_QUEUE_TYPE_BOT;
+    }
+    _lock.Enter();
+    if (_currentEntranceCount < _db.maxPlayerCount || cs->_auth._table.field[Authority::OP_ENTER_GAMEWORLD_ON_FULL])
+    {
+        entranceCount = ++_currentEntranceCount;
+        ok = true;
+    }
+    else if (_waitQueueList._currentWaitingPlayer < _waitQueueList._maxWaitingPlayer &&
+             _waitQueueList._waitQueue[type].Add(cs->_clikey, waitinfo.pos, waitinfo.turn))
+    {
+        ++_waitQueueList._currentWaitingPlayer;
+        waitinfo.queueType = type;
+        waitinfo.waitQueueInfoCount = 0;
+        waitinfo.avg = static_cast<long>(_waitQueueList._waitQueue[type]._waitAvg);
+        if (LobbyDaemon::_instance->_config->_useGradePriorityQueue)
+        {
+            for (WaitQueue::Type t = WaitQueue::WAIT_QUEUE_TYPE_VIP; t < WaitQueue::MAX_WAIT_QUEUE_TYPE;
+                 t = static_cast<WaitQueue::Type>(t + 1))
+            {
+                if (t != WaitQueue::WAIT_QUEUE_TYPE_BOT)
+                {
+                    waitinfo.waitQueueInfo[waitinfo.waitQueueInfoCount].queueType = t;
+                    waitinfo.waitQueueInfo[waitinfo.waitQueueInfoCount++].waitingPlayerCount =
+                        static_cast<short>(_waitQueueList._waitQueue[t].Size());
+                }
+            }
+        }
+        ok = true;
+        wait = true;
+    }
+    _lock.Leave();
+    if (ok)
+    {
+        if (wait)
+        {
+            if (world != nullptr)
+                wid = world->GetWid();
+            Log::Write(Log::LT_DEBUG, L"GameWorld.cpp", 593,
+                L"[game-world-cluster], enter user ok; in wait queue, entrance-count:%d, cli-key:0x%I64X, wait-pos:%d, wait-turn:%d, avg-wait-time:%d(msec), world-cluster-id:%d, wid:%d",
+                entranceCount, cs->_clikey, waitinfo.pos, waitinfo.turn, waitinfo.avg, _db.clusterId, wid);
+        }
+        else
+        {
+            if (world != nullptr)
+                wid = world->GetWid();
+            Log::Write(Log::LT_DEBUG, L"GameWorld.cpp", 589,
+                L"[game-world-cluster], enter user ok, entrance-count:%d, cli-key:0x%I64X, world-cluster-id:%d, wid:%d",
+                entranceCount, cs->_clikey, _db.clusterId, wid);
+        }
+    }
+    else
+    {
+        if (world != nullptr)
+            wid = world->GetWid();
+        Log::Write(Log::LT_DEBUG, L"GameWorld.cpp", 599,
+            L"[game-world-cluster], enter user fail; world full, cli-key:0x%I64X, world-cluster-id:%d, wid:%d",
+            cs->_clikey, _db.clusterId, wid);
+        TLobbyError = LOBERR_GAMEWORLD_FULL;
+    }
+    return ok;
 }
 
 // 0x4e080

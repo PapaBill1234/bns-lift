@@ -6,9 +6,15 @@
 #include "CliSession.h"
 #include "CliSessionTable.h"
 #include "FragmentPacket.h"
+#include "GameWorld.h"
+#include "GamedChannel.h"
+#include "LobbyDaemon.h"
 #include "LobbyDB.h"
+#include "LobbyEvent.h"
 #include "LobbyGateChannel.h"
 #include "LobbyMessage.h"
+#include "LobbyPredefine.h"
+#include "Mileage.h"
 #include "LobbyService.h"
 #include "PcCafe.h"
 #include "AlertSender.h"
@@ -20,6 +26,12 @@
 // PDB public ?TLobbyError@@3W4LobbyError@@A. enter (0x359c0) writes it at TLS +0x60.
 // LIFT: the PDB module of TLobbyError is not known. ❓ CliSession.obj is a guess.
 __declspec(thread) LobbyError TLobbyError;
+
+// PDB static GameServiceLocation::_waitResult (S_GTHREAD32, TLS +0x10, type WaitInfo). Enter (0x3b6f0) uses it.
+// LIFT: not defined. A new __declspec(thread) variable changes the order of the whole TLS block in the
+// VS2010 LTCG link (PacketBufferAllocator::_Local moves from TLS +0x58 to after NPChannel::_buffer).
+// That changes the TLS offset constant in 107 LobbyDaemon functions. Enter uses a local WaitInfo:
+// the value is scratch data for one call, so the behavior is the same. See the gap-03 handoff.
 
 // PDB global GRoleAuthorityTable (.data rva 0x201d70, 32 bytes). Data from LobbyDaemon.exe (2019 + PDB).
 // LIFT: the PDB module of GRoleAuthorityTable is not known ([globals]). ❓ CliSession.obj is a guess.
@@ -1181,10 +1193,10 @@ AnonymousLobbyGatePresence::AnonymousLobbyGatePresence(LobbyGateChannel*, unsign
 }
 
 // 0x3a450 (scalar deleting destructor)
-// LIFT: declared in ld-13 with the PDB layout of AnonymousLobbyGatePresence. Not in batch 1.
 AnonymousLobbyGatePresence::~AnonymousLobbyGatePresence()
 {
-    LIFT_STUB(0x3a450);
+    if (_lgate != nullptr)
+        _lgate->removeReferenceCount(L"CliSession.cpp", 3218);
 }
 
 // 0xe3ec0 (folded)
@@ -1209,18 +1221,30 @@ bool AnonymousLobbyGatePresence::IsEqual(Presence const* presence) const
 }
 
 // 0x3a530
-// LIFT: not lifted in card ld-13 (0x3a530). The body reads _lgate->_rawChannel->GetId().
-// LobbyGateChannel has no PDB base (with _rawChannel) in LobbyGateChannel.h yet.
-bool AnonymousLobbyGatePresence::OnSet(CliSessionTable*, CliSession*)
+bool AnonymousLobbyGatePresence::OnSet(CliSessionTable* table, CliSession* owner)
 {
-    LIFT_STUB(0x3a530);
+    if (_lgate == nullptr || table == nullptr || owner == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, L"CliSession.cpp", 3240,
+                   L"== CRASH == [cs], on set anonymous lobby-gate presence fail; invalid paramter, lgate:%p, table:%p, owner:%p",
+                   _lgate, table, owner);
+        AlertSender::Write(L"CliSession.cpp", 3240,
+                           L"== CRASH == [cs], on set anonymous lobby-gate presence fail; invalid paramter, lgate:%p, table:%p, owner:%p",
+                           _lgate, table, owner);
+        return false;
+    }
+    short gatewid = _lgate->_rawChannel != nullptr ? static_cast<short>(_lgate->_rawChannel->GetId()) : 0;
+    return table->Insert_index_gatekey(gatewid, _gatekey, owner);
 }
 
 // 0x3a600
-// LIFT: not lifted in card ld-13 (0x3a600). Same reason as OnSet 0x3a530 (_lgate->_rawChannel->GetId()).
-void AnonymousLobbyGatePresence::OnUnset(CliSessionTable*, CliSession*)
+void AnonymousLobbyGatePresence::OnUnset(CliSessionTable* table, CliSession*)
 {
-    LIFT_STUB(0x3a600);
+    if (table != nullptr && _lgate != nullptr)
+    {
+        short gatewid = _lgate->_rawChannel != nullptr ? static_cast<short>(_lgate->_rawChannel->GetId()) : 0;
+        table->Delete_index_gatekey(gatewid, _gatekey);
+    }
 }
 
 // 0x3a650
@@ -1248,10 +1272,10 @@ void AnonymousLobbyGatePresence::Kick(CliSession* owner, int)
 }
 
 // 0x3a710 (scalar deleting destructor)
-// LIFT: declared in ld-13 with the PDB layout of LobbyGatePresence. Not in batch 2.
 LobbyGatePresence::~LobbyGatePresence()
 {
-    LIFT_STUB(0x3a710);
+    if (_node != nullptr)
+        _node->removeReferenceCount(L"CliSession.cpp", 3287);
 }
 
 // 0x99980
@@ -1367,39 +1391,65 @@ void LobbyGatePresence::OnUnset(CliSessionTable* table, CliSession* owner)
 }
 
 // 0x3abc0
-// LIFT: not lifted in card ld-13 (0x3abc0). The body uses LobbyDaemon::_instance->_lgatechmgr and
-// removeReferenceCount on LobbyGateChannel. LobbyDaemon.h and LobbyGateChannel.h have no PDB layout yet.
-void LobbyGatePresence::Close(CliSession*)
+void LobbyGatePresence::Close(CliSession* owner)
 {
-    LIFT_STUB(0x3abc0);
+    if (owner == nullptr)
+        return;
+    LobbyGateChannel* lgate = LobbyDaemon::_instance->_lgatechmgr->Acquire(_gatewid);
+    if (lgate != nullptr)
+    {
+        lgate->SendCloseSessionNotify(owner->_clikey);
+        lgate->removeReferenceCount(L"CliSession.cpp", 3360);
+    }
 }
 
 // 0x3ac20
-// LIFT: not lifted in card ld-13 (0x3ac20). Same reason as Close 0x3abc0.
-void LobbyGatePresence::Kick(CliSession*, int)
+void LobbyGatePresence::Kick(CliSession* owner, int reason)
 {
-    LIFT_STUB(0x3ac20);
+    if (owner == nullptr)
+        return;
+    LobbyGateChannel* lgate = LobbyDaemon::_instance->_lgatechmgr->Acquire(_gatewid);
+    if (lgate != nullptr)
+    {
+        lgate->SendKickNotify(owner->_clikey, GetLobbyGateKickReason(reason));
+        lgate->removeReferenceCount(L"CliSession.cpp", 3371);
+    }
 }
 
 // 0x3aca0
-// LIFT: not lifted in card ld-13 (0x3aca0). Same reason as Close 0x3abc0.
-void LobbyGatePresence::NotifyChangedGrade(CliSession*, StsMsgLib::_StsMsgNotifyGradeNotifyGradeChanged const&)
+void LobbyGatePresence::NotifyChangedGrade(CliSession* owner, StsMsgLib::_StsMsgNotifyGradeNotifyGradeChanged const& changed)
 {
-    LIFT_STUB(0x3aca0);
+    if (owner == nullptr)
+        return;
+    LobbyGateChannel* lgate = LobbyDaemon::_instance->_lgatechmgr->Acquire(_gatewid);
+    if (lgate != nullptr)
+    {
+        lgate->SendChangedGradeNotify(owner->_clikey, _wtoi(changed.GameGradeKey), changed.nGradeId, changed.bActivation,
+                                      changed.nGradeCount, changed.tTotalEffectiveFrom, changed.tTotalEffectiveTo,
+                                      changed.pwszReason);
+        lgate->removeReferenceCount(L"CliSession.cpp", 3383);
+    }
 }
 
 // 0x3ad60
-// LIFT: not lifted in card ld-13 (0x3ad60). Same reason as Close 0x3abc0.
-void LobbyGatePresence::NotifyChangedGradeLevel(CliSession*, StsMsgLib::_StsMsgNotifyGradeNotifyScoreChanged const&)
+void LobbyGatePresence::NotifyChangedGradeLevel(CliSession* owner, StsMsgLib::_StsMsgNotifyGradeNotifyScoreChanged const& changed)
 {
-    LIFT_STUB(0x3ad60);
+    if (owner == nullptr)
+        return;
+    LobbyGateChannel* lgate = LobbyDaemon::_instance->_lgatechmgr->Acquire(_gatewid);
+    if (lgate != nullptr)
+    {
+        lgate->SendChangedGradeLevelNotify(owner->_clikey, changed.nLevelId, changed.nAccumulateGradeScore,
+                                           changed.nMinimumLevelScore, changed.nMaximumLevelScore,
+                                           changed.nMaximumGradeScore);
+        lgate->removeReferenceCount(L"CliSession.cpp", 3394);
+    }
 }
 
 // 0x329e0 (scalar deleting destructor)
-// LIFT: declared in ld-13 with the PDB layout of GameWorldPresence. Not in batch 2.
+// LIFT: the body is empty. The original only resets the vtable (the class operator delete is empty).
 GameWorldPresence::~GameWorldPresence()
 {
-    LIFT_STUB(0x329e0);
 }
 
 // 0xe51f0 (folded)
@@ -1480,11 +1530,16 @@ void GameWorldPresence::OnUnset(CliSessionTable* table, CliSession* owner)
 }
 
 // 0x3b0c0
-// LIFT: not lifted in card ld-13 (0x3b0c0). The body uses LobbyDaemon::_instance->_gamedchmgr.
-// LobbyDaemon.h has no PDB layout yet.
-void GameWorldPresence::Close(CliSession*)
+void GameWorldPresence::Close(CliSession* owner)
 {
-    LIFT_STUB(0x3b0c0);
+    if (owner == nullptr)
+        return;
+    GamedChannel* gamed = LobbyDaemon::_instance->_gamedchmgr->Acquire(_wid);
+    if (gamed != nullptr)
+    {
+        gamed->SendCloseSessionNotify(owner->_clikey);
+        gamed->removeReferenceCount(L"CliSession.cpp", 3476);
+    }
 }
 
 // 0x3b120
@@ -1504,25 +1559,45 @@ void GameWorldPresence::Kick(CliSession* owner, int)
 }
 
 // 0x3b1c0
-// LIFT: not lifted in card ld-13 (0x3b1c0). Same reason as Close 0x3b0c0.
-void GameWorldPresence::NotifyChangedGrade(CliSession*, StsMsgLib::_StsMsgNotifyGradeNotifyGradeChanged const&)
+void GameWorldPresence::NotifyChangedGrade(CliSession* owner, StsMsgLib::_StsMsgNotifyGradeNotifyGradeChanged const& changed)
 {
-    LIFT_STUB(0x3b1c0);
+    if (owner == nullptr)
+        return;
+    GamedChannel* gamed = LobbyDaemon::_instance->_gamedchmgr->Acquire(_wid);
+    if (gamed != nullptr)
+    {
+        gamed->SendChangedGradeNotify(_pcid, owner->_gradeService._revision, _wtoi(changed.GameGradeKey),
+                                      changed.nGradeId, changed.bActivation, changed.nGradeCount,
+                                      changed.tTotalEffectiveFrom, changed.tTotalEffectiveTo, changed.pwszReason);
+        gamed->removeReferenceCount(L"CliSession.cpp", 3493);
+    }
 }
 
 // 0x3b290
-// LIFT: not lifted in card ld-13 (0x3b290). Same reason as Close 0x3b0c0.
-void GameWorldPresence::NotifyChangedGradeLevel(CliSession*, StsMsgLib::_StsMsgNotifyGradeNotifyScoreChanged const&)
+void GameWorldPresence::NotifyChangedGradeLevel(CliSession* owner, StsMsgLib::_StsMsgNotifyGradeNotifyScoreChanged const& changed)
 {
-    LIFT_STUB(0x3b290);
+    if (owner == nullptr)
+        return;
+    GamedChannel* gamed = LobbyDaemon::_instance->_gamedchmgr->Acquire(_wid);
+    if (gamed != nullptr)
+    {
+        gamed->SendChangedGradeLevelNotify(_pcid, owner->_gradeService._revision, changed.nLevelId,
+                                           changed.nAccumulateGradeScore, changed.nMinimumLevelScore,
+                                           changed.nMaximumLevelScore, changed.nMaximumGradeScore);
+        gamed->removeReferenceCount(L"CliSession.cpp", 3504);
+    }
 }
 
 // 0x3b360
-// LIFT: not lifted in card ld-13 (0x3b360). The body uses LobbyDaemon::_instance->GlobalTimerQueue.
-// LobbyDaemon.h has no PDB layout yet.
+// LIFT: not in the gap-03 ID list. Lifted with OnLeave (0x3b540), which has the same release of the reserved event.
 GameServiceLocation::~GameServiceLocation()
 {
-    LIFT_STUB(0x3b360);
+    if (_reservedStopPlay != nullptr)
+    {
+        if (LobbyDaemon::_instance->RemoveTimer(_reservedStopPlay))
+            _reservedStopPlay->removeReferenceCount(L"CliSession.cpp", 3526);
+        _reservedStopPlay = nullptr;
+    }
 }
 
 // 0x5a0a0 (folded)
@@ -1533,35 +1608,141 @@ ServiceLocation::Kind GameServiceLocation::GetKind() const
 }
 
 // 0x3b3d0
-// LIFT: not lifted in card ld-13 (0x3b3d0). The body uses LobbyDaemon::_instance->_gameWorldRegistry and _mileageManager.
-// LobbyDaemon.h has no PDB layout yet.
-void GameServiceLocation::OnEnter(CliSession*)
+void GameServiceLocation::OnEnter(CliSession* owner)
 {
-    LIFT_STUB(0x3b3d0);
+    GameWorld* world = LobbyDaemon::_instance->_gameWorldRegistry->Get(_wid);
+    if (world != nullptr)
+        InterlockedIncrement(reinterpret_cast<long volatile*>(&world->_playingUserCount));
+    MileageManager* mileageManager = LobbyDaemon::_instance->_mileageManager;
+    if (mileageManager == nullptr)
+        return;
+    CliSessionEnterWorldMessage message(owner);
+    // LIFT: MileagePolicy::mileageType 2 is the membership mileage and 1 is the PC cafe mileage. No PDB enum. ❓
+    for (std::vector<Mileage*>::iterator it = mileageManager->_mileages.begin(); it != mileageManager->_mileages.end(); ++it)
+    {
+        if (*it != nullptr && (*it)->_config.policy.mileageType == 2)
+            (*it)->Accept(&message);
+    }
+    if (owner->_pcCafe != nullptr)
+    {
+        for (std::vector<Mileage*>::iterator it = mileageManager->_mileages.begin(); it != mileageManager->_mileages.end(); ++it)
+        {
+            if (*it != nullptr && (*it)->_config.policy.mileageType == 1)
+                (*it)->Accept(&message);
+        }
+    }
 }
 
 // 0x3b540
-// LIFT: not lifted in card ld-13 (0x3b540). The body uses LobbyDaemon::_instance->_gameWorldRegistry, GlobalTimerQueue and _mileageManager.
-// LobbyDaemon.h has no PDB layout yet.
-void GameServiceLocation::OnLeave(CliSession*)
+void GameServiceLocation::OnLeave(CliSession* owner)
 {
-    LIFT_STUB(0x3b540);
+    GameWorld* world = LobbyDaemon::_instance->_gameWorldRegistry->Get(_wid);
+    if (world != nullptr)
+        InterlockedDecrement(reinterpret_cast<long volatile*>(&world->_playingUserCount));
+    if (_reservedStopPlay != nullptr)
+    {
+        if (LobbyDaemon::_instance->RemoveTimer(_reservedStopPlay))
+            _reservedStopPlay->removeReferenceCount(L"CliSession.cpp", 3566);
+        _reservedStopPlay = nullptr;
+    }
+    MileageManager* mileageManager = LobbyDaemon::_instance->_mileageManager;
+    if (mileageManager == nullptr)
+        return;
+    CliSessionLeaveWorldMessage message(owner);
+    for (std::vector<Mileage*>::iterator it = mileageManager->_mileages.begin(); it != mileageManager->_mileages.end(); ++it)
+    {
+        if (*it != nullptr && (*it)->_config.policy.mileageType == 2)
+            (*it)->Accept(&message);
+    }
+    if (owner->_pcCafe != nullptr)
+    {
+        for (std::vector<Mileage*>::iterator it = mileageManager->_mileages.begin(); it != mileageManager->_mileages.end(); ++it)
+        {
+            if (*it != nullptr && (*it)->_config.policy.mileageType == 1)
+                (*it)->Accept(&message);
+        }
+    }
 }
 
 // 0x3b6f0
-// LIFT: not lifted in card ld-13 (0x3b6f0). The body uses LobbyDaemon::_instance->_gameWorldRegistry.
-// LobbyDaemon.h has no PDB layout yet.
-bool GameServiceLocation::Enter(CliSession*)
+bool GameServiceLocation::Enter(CliSession* owner)
 {
-    LIFT_STUB(0x3b6f0);
+    if (owner == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, L"CliSession.cpp", 3584,
+                   L"[wr], enter game service location fail; invalid parameter, wid:%d", _wid);
+        TLobbyError = LOBERR_INVALID_PARAMETER;
+        return false;
+    }
+    if (_wid == 0)
+    {
+        Log::Write(Log::LT_ERROR, L"CliSession.cpp", 3590,
+                   L"[wr], enter game service location fail; invalid wid, wid:%d, cli-key:0x%I64X, cli-state:%d.%d",
+                   _wid, owner->_clikey, static_cast<unsigned int>(owner->_state) >> 16, owner->_state & 0xFFFF);
+        TLobbyError = LOBERR_NOT_INITAILIZED;
+        return false;
+    }
+    GameWorld* world = LobbyDaemon::_instance->_gameWorldRegistry->Get(_wid);
+    if (world == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, L"CliSession.cpp", 3597,
+                   L"[wr], enter game service location fail; unknown game-world, wid:%d, cli-key:0x%I64X, cli-state:%d.%d",
+                   _wid, owner->_clikey, static_cast<unsigned int>(owner->_state) >> 16, owner->_state & 0xFFFF);
+        TLobbyError = LOBERR_GAMEWORLD_NOT_FOUND;
+        return false;
+    }
+    bool wait = false;
+    WaitInfo waitResult;  // LIFT: original uses the TLS static _waitResult (see the top of this file).
+    waitResult.Init();
+    if (!world->EnterUser(owner, wait, waitResult))
+    {
+        Log::Write(Log::LT_ERROR, L"CliSession.cpp", 3606,
+                   L"[wr], enter game service location fail, enter game-world fail, wid:%d, cli-key:0x%I64X, cli-state:%d.%d",
+                   _wid, owner->_clikey, static_cast<unsigned int>(owner->_state) >> 16, owner->_state & 0xFFFF);
+        return false;
+    }
+    if (wait)
+    {
+        _waitQueueType = waitResult.queueType;
+        _waitPos = waitResult.pos;
+        Log::Write(Log::LT_DEBUG, L"CliSession.cpp", 3616,
+                   L"[wr], enter game service location ok; wait, wid:%d, cli-key:0x%I64X, cli-state:%d.%d",
+                   _wid, owner->_clikey, static_cast<unsigned int>(owner->_state) >> 16, owner->_state & 0xFFFF);
+    }
+    else
+    {
+        Log::Write(Log::LT_DEBUG, L"CliSession.cpp", 3611,
+                   L"[wr], enter game service location ok, wid:%d, cli-key:0x%I64X, cli-state:%d.%d",
+                   _wid, owner->_clikey, static_cast<unsigned int>(owner->_state) >> 16, owner->_state & 0xFFFF);
+    }
+    return true;
 }
 
 // 0x3b9a0
-// LIFT: not lifted in card ld-13 (0x3b9a0). The body uses LobbyDaemon::_instance->_gameWorldRegistry.
-// LobbyDaemon.h has no PDB layout yet.
-bool GameServiceLocation::Leave(CliSession*)
+bool GameServiceLocation::Leave(CliSession* owner)
 {
-    LIFT_STUB(0x3b9a0);
+    if (owner == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, L"CliSession.cpp", 3625,
+                   L"[wr], leave game service location fail; invalid parameter, wid:%d", _wid);
+        TLobbyError = LOBERR_INVALID_PARAMETER;
+        return false;
+    }
+    GameWorld* world = LobbyDaemon::_instance->_gameWorldRegistry->Get(_wid);
+    if (world == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, L"CliSession.cpp", 3632,
+                   L"[wr], leave game service location fail; unknown game-world, wid:%d, cli-key:0x%I64X, cli-state:%d.%d",
+                   _wid, owner->_clikey, static_cast<unsigned int>(owner->_state) >> 16, owner->_state & 0xFFFF);
+        TLobbyError = LOBERR_GAMEWORLD_NOT_FOUND;
+        return false;
+    }
+    if (_waitPos == WaitQueue::INVALID_POS || !world->_cluster->giveupWait(world, owner->_clikey, _waitQueueType, _waitPos))
+        world->_cluster->leaveUser(world, owner);
+    Log::Write(Log::LT_DEBUG, L"CliSession.cpp", 3650,
+               L"[wr], leave game service location ok, wid:%d, cli-key:0x%I64X, cli-state:%d.%d",
+               _wid, owner->_clikey, static_cast<unsigned int>(owner->_state) >> 16, owner->_state & 0xFFFF);
+    return true;
 }
 
 // 0x3bb60
@@ -1618,9 +1799,20 @@ bool GameServiceLocation::TimeoutStopPlay(CliSession* owner, StopPlayTimerEvent*
 }
 
 // 0x3bda0
-// LIFT: not lifted in card ld-13 (0x3bda0). The body uses LobbyDaemon::_instance->_gamedchmgr.
-// LobbyDaemon.h has no PDB layout yet.
-void GameServiceLocation::NotifyStopPlay(CliSession*, int)
+void GameServiceLocation::NotifyStopPlay(CliSession* owner, int reason)
 {
-    LIFT_STUB(0x3bda0);
+    if (owner == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, L"CliSession.cpp", 3695,
+                   L"== CRASH == [wr], notify stop play fail; invalid parameter, owner:%p, reason:%d", owner, reason);
+        AlertSender::Write(L"CliSession.cpp", 3695,
+                           L"== CRASH == [wr], notify stop play fail; invalid parameter, owner:%p, reason:%d", owner, reason);
+        return;
+    }
+    GamedChannel* gamed = LobbyDaemon::_instance->_gamedchmgr->Acquire(_wid);
+    if (gamed != nullptr)
+    {
+        gamed->SendStopPlayNotify(_pcid, static_cast<short>(reason));
+        gamed->removeReferenceCount(L"CliSession.cpp", 3702);
+    }
 }

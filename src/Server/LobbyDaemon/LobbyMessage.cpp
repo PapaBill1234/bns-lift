@@ -64,6 +64,46 @@ void CliSessionStartPcCafeChargeMessage::Dispatch(PcCafeMileage* acceptor)
     }
 }
 
+// 0x2fad0 (folded)
+void CliSessionEnterWorldMessage::Dispatch(PcCafeMileage* acceptor)
+{
+    if (acceptor != nullptr)
+    {
+        long long now = _time64(nullptr);
+        acceptor->Start(_cs, now);
+    }
+}
+
+// 0x2fad0 (folded)
+void CliSessionEnterWorldMessage::Dispatch(MembershipMileage* acceptor)
+{
+    if (acceptor != nullptr)
+    {
+        long long now = _time64(nullptr);
+        acceptor->Start(_cs, now);
+    }
+}
+
+// 0x2fa90 (folded)
+void CliSessionLeaveWorldMessage::Dispatch(PcCafeMileage* acceptor)
+{
+    if (acceptor != nullptr)
+    {
+        long long now = _time64(nullptr);
+        acceptor->Stop(_cs, now, nullptr);
+    }
+}
+
+// 0x2fa90 (folded)
+void CliSessionLeaveWorldMessage::Dispatch(MembershipMileage* acceptor)
+{
+    if (acceptor != nullptr)
+    {
+        long long now = _time64(nullptr);
+        acceptor->Stop(_cs, now, nullptr);
+    }
+}
+
 // 0x2fb10
 void CliSessionGradeChangedMessage::Dispatch(MembershipMileage* acceptor)
 {
