@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <wchar.h>
+#include <new>
 #include "NPServiceChannel.h"
 #include "AlertSender.h"
 #include "BnsCommonConfigDefinition.h"
@@ -19,6 +20,9 @@
 #include "Memory.h"
 #include "MemoryManager.h"
 #include "Log.h"
+#include "LobbyEvent.h"
+#include "Network.h"
+#include "NPLobbyMessageHandler.h"
 #include "PipeConsole.h"
 #include "StringUtil.h"
 
@@ -313,10 +317,78 @@ unsigned int _StsMsgResponse::GetTransactionId() { return msgInfo.nTxnId; }
 EMessageType _StsMsgResponse::GetMessageType() { return msgInfo.msgType; }
 }  // namespace StsMsgLib
 
-// 0xcfba0
-bool NPServiceChannelManager::Initialize(unsigned int, unsigned long, unsigned short, long)
+// 0xcfac0
+void NPGameServiceChannelCmdDispatcher(unsigned int nTxnId, ECommand& eCmd)
 {
-    LIFT_STUB(0xcfba0);
+    NPGameServiceChannel* gameServChannel = LobbyDaemon::_instance->_npServchmgr->_gameServChannel;
+    if (gameServChannel == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, NPSERVICECHANNEL_FILE, 38,
+                   L"[np], [np-game-service-channel], dispatch command fail; no channel exists, txn-id:%u", nTxnId);
+        return;
+    }
+    NPTransactionRegistry* tranRegistry = gameServChannel->_tranRegistry;
+    if (tranRegistry == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, NPSERVICECHANNEL_FILE, 44,
+                   L"== CRASH == [np], [np-gameservch-tran-reg], not ready to dispatch command");
+        AlertSender::Write(NPSERVICECHANNEL_FILE, 44,
+                           L"== CRASH == [np], [np-gameservch-tran-reg], not ready to dispatch command");
+        return;
+    }
+    NPTransactionRegistry::Item item;
+    if (!tranRegistry->Find(nTxnId, &item))
+        Log::Write(Log::LT_ERROR, NPSERVICECHANNEL_FILE, 50,
+                   L"[np], [np-gameservch-tran-reg], dispatch command fail; not found, txn-id:%u", nTxnId);
+    else
+        eCmd = item.cmd;
+}
+
+// 0xcfba0
+// LIFT: the PDB has no register for portId and timeout. LTCG put the constants of the caller
+// LobbyDaemon::startNPChannel (0x9f010: port id 2, timeout 5) into the body. The source keeps the parameters.
+bool NPServiceChannelManager::Initialize(unsigned int portId, unsigned long ip, unsigned short portNo, long timeout)
+{
+    if (_init)
+    {
+        Log::Write(Log::LT_ERROR, NPSERVICECHANNEL_FILE, 80, L"[np-servch-mgr], initialize fail; already initailized");
+        return false;
+    }
+    // LIFT: inlined PipeConsole::SetInvalidInfo(L"NP game-service disconnected", true), as in the original.
+    PipeConsole* const pipeConsole = LobbyDaemon::_instance->pipeConsole;
+    if (pipeConsole != nullptr)
+    {
+        pipeConsole->_lock.Enter();
+        PipeConsole::ItemNode* node = pipeConsole->_invalid._head._next;
+        while (node != &pipeConsole->_invalid._tail)
+        {
+            if (wcscmp(node->_key, L"NP game-service disconnected") == 0)
+                break;
+            node = node->_next;
+        }
+        if (node == &pipeConsole->_invalid._tail || node == nullptr)
+            PipeConsole::addNode(pipeConsole->_invalid, L"NP game-service disconnected", L"");
+        pipeConsole->_lock.Leave();
+    }
+    void* mem = Memory::_Manager[2]->Alloc(sizeof(NPGameServiceChannel), NPSERVICECHANNEL_FILE, 86);
+    _gameServChannel = mem ? new (mem) NPGameServiceChannel() : nullptr;
+    if (!_gameServChannel->Initialize(this, NPGameServiceChannelCmdDispatcher))
+    {
+        Log::Write(Log::LT_ERROR, NPSERVICECHANNEL_FILE, 89,
+                   L"[np-servch-mgr], initialize fail; init game-service channel fail");
+        return false;
+    }
+    if (!_gameServChannel->Connect(0, portId, ip, portNo, timeout, true))
+    {
+        Log::Write(Log::LT_ERROR, NPSERVICECHANNEL_FILE, 94,
+                   L"[np-servch-mgr], initialize fail; connect game service channel fail");
+        return false;
+    }
+    _init = true;
+    Log::Write(Log::LT_DEBUG, NPSERVICECHANNEL_FILE, 100,
+               L"[np-servch-mgr], initialize ok, port-id:%d, ip:%s, port:%d, timeout:%d(sec)", portId,
+               Network::GetAddressStringW(ip), portNo, timeout);
+    return true;
 }
 
 // 0xcfdb0
@@ -371,15 +443,61 @@ bool NPServiceChannelManager::OnConnect(NPChannel* channel, bool firstConnected)
 }
 
 // 0xcff70
-bool NPServiceChannelManager::OnClose(NPChannel*, bool) const
+bool NPServiceChannelManager::OnClose(NPChannel* channel, bool) const
 {
-    LIFT_STUB(0xcff70);
+    unsigned long long id =
+        (channel != nullptr && channel->_rawChannel != nullptr) ? channel->_rawChannel->GetId() : 0;
+    Log::Write(Log::LT_ERROR, NPSERVICECHANNEL_FILE, 141, L"[np], game-service channel closed, channel-id:%I64d", id);
+    if (channel->_tranRegistry != nullptr)
+    {
+        std::vector<void*, StlAllocator<void*, 2> > tranlist;
+        channel->_tranRegistry->ReleaseAll(tranlist);
+        for (auto it = tranlist.begin(); it != tranlist.end(); ++it)
+        {
+            NPTransaction* tran = static_cast<NPTransaction*>(*it);
+            if (tran != nullptr)
+            {
+                tran->Expire();
+                tran->~NPTransaction();
+                Memory::_Manager[2]->Free(tran, NPSERVICECHANNEL_FILE, 152);
+            }
+        }
+    }
+    // LIFT: inlined PipeConsole::SetInvalidInfo(L"NP game-service disconnected", true), as in the original.
+    PipeConsole* const pipeConsole = LobbyDaemon::_instance->pipeConsole;
+    if (pipeConsole != nullptr)
+    {
+        pipeConsole->_lock.Enter();
+        PipeConsole::ItemNode* node = pipeConsole->_invalid._head._next;
+        while (node != &pipeConsole->_invalid._tail)
+        {
+            if (wcscmp(node->_key, L"NP game-service disconnected") == 0)
+                break;
+            node = node->_next;
+        }
+        if (node == &pipeConsole->_invalid._tail || node == nullptr)
+            PipeConsole::addNode(pipeConsole->_invalid, L"NP game-service disconnected", L"");
+        pipeConsole->_lock.Leave();
+    }
+    return true;
 }
 
 // 0xd0100
-bool NPServiceChannelManager::HandleMessage(NPChannel*, _StsMsg*, void*) const
+bool NPServiceChannelManager::HandleMessage(NPChannel* channel, _StsMsg* msg, void* context) const
 {
-    LIFT_STUB(0xd0100);
+    if (channel == nullptr || msg == nullptr)
+        return false;
+    bool (*handler)(NPChannel*, _StsMsg*, NPTransaction*) = DispatchNPLobbyMessageHandler(msg->GetCommand());
+    if (handler == nullptr)
+    {
+        channel->_sts->ReleaseStsMsg(msg);
+        return false;
+    }
+    void* mem = Memory::_Manager[2]->Alloc(sizeof(NPLobbyMessageHandleEvent), NPSERVICECHANNEL_FILE, 173);
+    NPLobbyMessageHandleEvent* event =
+        mem ? new (mem) NPLobbyMessageHandleEvent(channel, msg, static_cast<NPTransaction*>(context), handler) : nullptr;
+    PostQueuedCompletionStatus(Network::iocpHandle(), 0, reinterpret_cast<ULONG_PTR>(event), nullptr);
+    return true;
 }
 
 // 0xd0220

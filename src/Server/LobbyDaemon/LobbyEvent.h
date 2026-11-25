@@ -20,6 +20,9 @@ struct _StsMsg;
 class NPLobbyMessageHandleEvent : public DynamicEventObject
 {
 public:
+    // LIFT: PDB constructor (LF_ARGLIST 0x4EA5). It has no RVA: NPServiceChannelManager::HandleMessage (0xd0100) inlines it.
+    NPLobbyMessageHandleEvent(NPChannel*, StsMsgLib::_StsMsg*, NPTransaction*,
+                              bool (*)(NPChannel*, StsMsgLib::_StsMsg*, NPTransaction*));
     virtual ~NPLobbyMessageHandleEvent();  // 0xbbad0
     virtual unsigned int EventId() const { return 0; }  // 0x5a0a0 (folded)
     virtual bool HandleEvent(EventContext*, unsigned long);  // 0xbbb60

@@ -122,6 +122,7 @@ private:
     friend class PostOfficeChannel;  // LIFT: friend; inlined private access: PostOfficeChannel::Connect (LobbyDaemon 0x639f0) uses _invalid and addNode.
     friend class PostOfficeSessionHandler;  // LIFT: friend; inlined private access: PostOfficeSessionHandler::OnClose (LobbyDaemon 0x642e0) uses _invalid and addNode.
     friend class PostOfficeDaemon;  // LIFT: initNetwork (PostOfficeDaemon 0x135e0) inlines SetInvalidInfo.
+    friend class NPServiceChannelManager;  // LIFT: friend; inlined private access: Initialize and OnClose (LobbyDaemon 0xcfba0, 0xcff70) call addNode.
     friend class LobbyGateReloadInvalidRestoreTimer;  // LIFT: friend; inlined private access: restoreInvalid (LobbyGate 0x127a0) uses _invalid.
 };
 static_assert(sizeof(PipeConsole) == 0x10AA8, "sizeof PipeConsole");

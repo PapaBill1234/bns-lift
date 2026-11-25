@@ -72,6 +72,15 @@ bool SharedChannelFragmentPacketHandleEvent::HandleEvent(EventContext*, unsigned
     return true;
 }
 
+// LobbyEvent.cpp line 77 (no RVA: inlined in NPServiceChannelManager::HandleMessage 0xd0100)
+NPLobbyMessageHandleEvent::NPLobbyMessageHandleEvent(NPChannel* channel, StsMsgLib::_StsMsg* msg, NPTransaction* tran,
+                                                     bool (*handler)(NPChannel*, StsMsgLib::_StsMsg*, NPTransaction*))
+    : _channel(channel), _msg(msg), _tran(tran), _handler(handler)
+{
+    if (channel != nullptr)
+        channel->addReferenceCount(false, L"LobbyEvent.cpp", 77);
+}
+
 // 0xbbad0
 NPLobbyMessageHandleEvent::~NPLobbyMessageHandleEvent()
 {
