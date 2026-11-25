@@ -150,12 +150,10 @@ void DepositMileageJob::deallocate_me(void*, wchar_t const*, int)
 
 // 0x49ba0
 DepositMileageJob::DepositMileageJob(Callback* callback)
-    : _requestLocation(0), _requestType(0), _requestId(0), _virtualCurrencyId(0), _virtualCurrencyAmount(0),
+    : _requestLocation(0), _requestType(0), _requestId(0), _userId(ID128_GUID_ZERO), _virtualCurrencyId(0), _virtualCurrencyAmount(0),
       _virtualCurrencyExpireTime(0), _requestCode(0), _depositReasonCode(0), _refundable(false), _notification(false),
       _pcDbId(0), _requestSubId(0), _locationHint(0), _pcRace(0), _pcSex(0), _pcJob(0), _callback(callback)
 {
-    _userId.id[0] = 0;
-    _userId.id[1] = 0;
     _depositReason[0] = 0;
     _notificationName[0] = 0;
     _notificationContent[0] = 0;
