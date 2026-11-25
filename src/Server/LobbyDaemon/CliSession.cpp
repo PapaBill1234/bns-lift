@@ -458,7 +458,11 @@ void CliSession::completeRequestChargeStop(bool ok)
     if (gameServChannel != nullptr)
     {
         if (ok)
-            gameServChannel->SendResponseChargeRequestStopOk(_chargeStopRequestTxnId);
+        {
+            StsMsgLib::_StsMsgResponseChargeRequestStop msg;
+            npInitResponse(msg, StsMsgLib::COMMAND_SRV_CHARGE_REQUEST_STOP, _chargeStopRequestTxnId);
+            gameServChannel->SendMsg(&msg, false, nullptr);
+        }
         else
             gameServChannel->SendResponseChargeRequestStopFail(_chargeStopRequestTxnId, L"ErrBadData", 4);
     }
@@ -1106,7 +1110,10 @@ bool CliSession::UpdateCharacterData(unsigned long long pcid, short level, char*
         }
         else
         {
-            TLobbyError = dbrtn != 0 ? LOBERR_DB_FAIL : LOBERR_SYSTEM;
+            if (dbrtn != 0)
+                TLobbyError = LOBERR_DB_FAIL;
+            else
+                TLobbyError = LOBERR_SYSTEM;
         }
     }
     else
@@ -1154,7 +1161,10 @@ bool CliSession::UpdateCharacterLevel(unsigned long long pcid, short level)
         }
         else
         {
-            TLobbyError = dbrtn != 0 ? LOBERR_DB_FAIL : LOBERR_SYSTEM;
+            if (dbrtn != 0)
+                TLobbyError = LOBERR_DB_FAIL;
+            else
+                TLobbyError = LOBERR_SYSTEM;
         }
     }
     else
@@ -1191,7 +1201,10 @@ bool CliSession::UpdateAccountData(unsigned long long pcid, int botScore, TimeBa
         if (!LobbyDB::UpdateGameAccountTimeBasedPlayInfo(dbrtn, _acb._userid, _acb._timeBasedPlayInfoList))
         {
             result = false;
-            TLobbyError = dbrtn != 0 ? LOBERR_DB_FAIL : LOBERR_SYSTEM;
+            if (dbrtn != 0)
+                TLobbyError = LOBERR_DB_FAIL;
+            else
+                TLobbyError = LOBERR_SYSTEM;
         }
     }
     _lock.Leave();
@@ -1225,7 +1238,10 @@ bool CliSession::UpdateAccountExp(unsigned long long pcid, GameAccountExpInfo::E
     if (!LobbyDB::UpdateGameAccountExpInfo(dbrtn, _acb._userid, _acb._accountExp._info))
     {
         result = false;
-        TLobbyError = dbrtn != 0 ? LOBERR_DB_FAIL : LOBERR_SYSTEM;
+        if (dbrtn != 0)
+            TLobbyError = LOBERR_DB_FAIL;
+        else
+            TLobbyError = LOBERR_SYSTEM;
     }
     _lock.Leave();
     if (result)
@@ -1264,7 +1280,10 @@ bool CliSession::UpdateAccountContentQuota(unsigned long long pcid,
     if (!LobbyDB::UpdateGameAccountContentQuota(dbrtn, _acb._userid, quotaList))
     {
         result = false;
-        TLobbyError = dbrtn != 0 ? LOBERR_DB_FAIL : LOBERR_SYSTEM;
+        if (dbrtn != 0)
+            TLobbyError = LOBERR_DB_FAIL;
+        else
+            TLobbyError = LOBERR_SYSTEM;
     }
     _lock.Leave();
     if (result)
@@ -1332,7 +1351,7 @@ bool CliSession::UpdateTimeBasedPlayReward(unsigned long long pcid, int schedule
         for (int i = 0; i < rewards.rewardCount; ++i)
         {
             char slot = 0;
-            unsigned int rule = 0;
+            int rule = 0;
             for (; rule < 6; ++rule)
             {
                 for (char j = 0; j < 4; ++j)
@@ -1344,11 +1363,11 @@ bool CliSession::UpdateTimeBasedPlayReward(unsigned long long pcid, int schedule
                     }
                 }
             }
-            // LIFT: no rule has the reward. The original shifts by (char)-1; the x64 shl masks the count to 31, so
-            // the byte gets no bit. ❓
-            rule = static_cast<unsigned char>(-1);
+            // LIFT: no rule has the reward. The original shifts by -1 (0x38670). The x64 shl masks the count to 31,
+            // so slot 0 gets no bit (1 << 31 does not fit in the byte). ❓
+            rule = -1;
         found:
-            rewardList[slot] |= static_cast<unsigned char>(1 << (rule & 31));
+            rewardList[slot] |= 1 << rule;
         }
     }
     _lock.Enter();
@@ -1405,8 +1424,7 @@ bool CliSession::ReserveStopPlay(bool logout, int stopPlayReason, int kickReason
         {
             TLobbyError = LOBERR_STOP_PLAY_ALREADY_RESERVED;
             event->removeReferenceCount(L"CliSession.cpp", 2932);
-            _lock.Leave();
-            return false;
+            goto done;  // LIFT: the original has one LeaveCriticalSection for all paths. 0x39820
         }
         result = true;
         LobbyDaemon::_instance->AddTimer(LobbyDaemon::_instance->_config->_stopPlayGameWorldTimeout, event);
@@ -1417,6 +1435,7 @@ bool CliSession::ReserveStopPlay(bool logout, int stopPlayReason, int kickReason
                    event, logout ? L"yes" : L"no", stopPlayReason, kickReason, _clikey,
                    static_cast<unsigned int>(_state) >> 16, _state & 0xFFFF);
     }
+done:
     _lock.Leave();
     return result;
 }

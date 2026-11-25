@@ -54,20 +54,6 @@ inline void npAddressStringA(unsigned long address, char (&out)[32])
     strcpy_s(out, 32, buffer);
 }
 
-// LIFT: inlined ctor _StsMsgResponse(ECommand, unsigned int) (PDB, no own body).
-inline void npInitResponse(_StsMsgResponse& msg, ECommand cmd, unsigned int txnId)
-{
-    msg.msgInfo.msgType = MESSAGE_TYPE_RESPONSE;
-    msg.msgInfo.bComplete = false;
-    msg.msgInfo.errInfo.pszErr = nullptr;
-    msg.msgInfo.errInfo.nStatusCode = 0;
-    msg.msgInfo.errInfo.pwszReason = nullptr;
-    msg.msgInfo.errInfo.nErrorCode = 0;
-    msg.msgInfo.errInfo.banInfo.nBanId = 0;
-    memset(&msg.msgInfo.errInfo.banInfo.tEffectiveFrom, 0, 28);  // tEffectiveFrom .. nBanReasonCode
-    msg.msgInfo.eCmd = cmd;
-    msg.msgInfo.nTxnId = txnId;
-}
 
 inline void npInitRequest(_StsMsgRequest& msg, ECommand cmd)
 {
@@ -288,11 +274,6 @@ struct _StsMsgResponseLogOutUser : public _StsMsgResponse
     EError eError;
 };
 static_assert(sizeof(_StsMsgResponseLogOutUser) == 0x68, "sizeof _StsMsgResponseLogOutUser");
-
-struct _StsMsgResponseChargeRequestStop : public _StsMsgResponse
-{
-};
-static_assert(sizeof(_StsMsgResponseChargeRequestStop) == 0x60, "sizeof _StsMsgResponseChargeRequestStop");
 
 struct _StsMsgResponseGameAuctionEscrow : public _StsMsgResponse
 {
@@ -842,15 +823,6 @@ bool NPGameServiceChannel::SendResponseChargeRequestStopFail(unsigned int txnid,
     msg.msgInfo.errInfo.nStatusCode = 400;
     msg.msgInfo.errInfo.pwszReason = reason != nullptr ? reason : nullptr;
     msg.msgInfo.errInfo.nErrorCode = netError;
-    return SendMsg(&msg, false, nullptr);
-}
-
-// LIFT: no PDB symbol. CliSession::completeRequestChargeStop (0x35eb0) has this body inline (cmd 0xB58, the txn id,
-// no error). The name follows SendResponseChargeRequestStopFail. ❓
-bool NPGameServiceChannel::SendResponseChargeRequestStopOk(unsigned int txnid)
-{
-    _StsMsgResponseChargeRequestStop msg;
-    npInitResponse(msg, COMMAND_SRV_CHARGE_REQUEST_STOP, txnid);
     return SendMsg(&msg, false, nullptr);
 }
 

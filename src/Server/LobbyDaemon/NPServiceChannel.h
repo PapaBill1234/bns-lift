@@ -1,6 +1,7 @@
 // NPServiceChannel.obj (LobbyDaemon PDB, 2019 + PDB). Class layouts from the PDB.
 #pragma once
 #include <stddef.h>
+#include <string.h>
 
 class LobbyJob;
 class NPChannel;
@@ -57,6 +58,30 @@ static_assert(offsetof(_StsMsgRequestFriendSendMessage, pwszMessageName) == 0x40
 static_assert(offsetof(_StsMsgRequestFriendSendMessage, contents) == 0x48, "_StsMsgRequestFriendSendMessage::contents");
 }  // namespace StsMsgLib
 
+// PDB StsMsgLib::_StsMsgResponseChargeRequestStop. CliSession::completeRequestChargeStop (0x35eb0) builds it inline.
+namespace StsMsgLib
+{
+struct _StsMsgResponseChargeRequestStop : public _StsMsgResponse
+{
+};
+static_assert(sizeof(_StsMsgResponseChargeRequestStop) == 0x60, "sizeof _StsMsgResponseChargeRequestStop");
+}  // namespace StsMsgLib
+
+// LIFT: inlined ctor _StsMsgResponse(ECommand, unsigned int) (PDB, no own body).
+inline void npInitResponse(StsMsgLib::_StsMsgResponse& msg, StsMsgLib::ECommand cmd, unsigned int txnId)
+{
+    msg.msgInfo.msgType = StsMsgLib::MESSAGE_TYPE_RESPONSE;
+    msg.msgInfo.bComplete = false;
+    msg.msgInfo.errInfo.pszErr = nullptr;
+    msg.msgInfo.errInfo.nStatusCode = 0;
+    msg.msgInfo.errInfo.pwszReason = nullptr;
+    msg.msgInfo.errInfo.nErrorCode = 0;
+    msg.msgInfo.errInfo.banInfo.nBanId = 0;
+    memset(&msg.msgInfo.errInfo.banInfo.tEffectiveFrom, 0, 28);  // tEffectiveFrom .. nBanReasonCode
+    msg.msgInfo.eCmd = cmd;
+    msg.msgInfo.nTxnId = txnId;
+}
+
 // PDB NPGameServiceChannel (sizeof 0x40, NPChannel base, no own members).
 class NPGameServiceChannel : public NPChannel
 {
@@ -77,7 +102,6 @@ public:
     bool SendRequestChargeStop(NPTransaction*, id128 const&, unsigned long, wchar_t const*);  // 0xd1110
     bool SendRequestChargeAbandon(NPTransaction*, id128 const&, wchar_t const*);  // 0xd1230
     bool SendResponseChargeRequestStopFail(unsigned int, wchar_t const*, int);  // 0xd1310
-    bool SendResponseChargeRequestStopOk(unsigned int);  // LIFT: no PDB symbol; inline in 0x35eb0. ❓
     bool SendRequestListUserLastPresences(NPTransaction*, id128 const&);  // 0xd1390
     bool SendRequestGradeListAllGrades(NPTransaction*, id128 const&);  // 0xd1410
     bool SendRequestGradeActivateGrade(NPTransaction*, id128 const&, int, int);  // 0xd1510
