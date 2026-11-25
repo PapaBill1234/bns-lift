@@ -7,6 +7,7 @@ Usage: tools/pdbcls.py <Server> <name or regex> [...]
   The output gives bases, members (offset, type), methods (access, static, virtual, slot) and enumerators.
 The tool reads the TPI stream with the parser of pdb2h.py. It caches the parsed records.
 """
+import hashlib
 import os
 import pickle
 import re
@@ -23,8 +24,10 @@ MPROP = {0: "", 1: "virtual", 2: "static", 3: "friend", 4: "virtual", 5: "virtua
 
 class Db:
     def __init__(self, server):
-        cache = os.path.join(pdbq.CACHE, server + ".tpi.pkl")
         pdb = os.path.join(pdbq.ida_dir(), server, server + ".pdb")
+        # Same key as pdbq.dump: two PDBs with one server name (two builds, two IDA dirs) get two cache files.
+        tag = hashlib.sha1(os.path.abspath(pdb).encode("utf-8", "surrogateescape")).hexdigest()[:8]
+        cache = os.path.join(pdbq.CACHE, "%s.%s.tpi.pkl" % (server, tag))
         if os.path.exists(cache) and os.path.getmtime(cache) > os.path.getmtime(pdb):
             self.recs = pickle.load(open(cache, "rb"))
         else:
@@ -33,7 +36,10 @@ class Db:
                 for key in ("fields", "methods"):
                     if r.get(key):
                         r[key] = [dict(x) for x in r[key]]
-            pickle.dump(self.recs, open(cache, "wb"))
+            os.makedirs(pdbq.CACHE, exist_ok=True)
+            with open(cache + ".%d.tmp" % os.getpid(), "wb") as f:   # shared cache: write, then rename
+                pickle.dump(self.recs, f)
+            os.replace(cache + ".%d.tmp" % os.getpid(), cache)
         self.defs = {}
         for ti, r in self.recs.items():
             if r["leaf"] in P.UDT_LEAVES + (P.LF_ENUM,) and not r.get("prop", 0) & P.PROP_FWDREF:
