@@ -20,6 +20,10 @@ public:
 
     LobbyService() : _db() {}
     virtual ~LobbyService() {}
+    // LIFT: the original global operator delete(void*) (0x32b50) is empty. The callers do "delete p;" and then
+    // Memory::_Manager[2]->Free(p, ...) (ChangeCharacterRaceJob::finServiceEntry 0x225e0). This empty class operator
+    // delete keeps that shape and frees the memory only once (in Free).
+    static void operator delete(void*) {}
     virtual bool Fetch(CliSession*, FragmentPacket*) const;  // 0x6c330
     virtual bool IsServiceTarget(id128 const&);  // 0xefb20
     virtual bool IsServiceTarget(Character*) { return false; }  // 0xefb20 (folded)
@@ -165,6 +169,9 @@ class RenameUserService : public LobbyService
 {
 public:
     RenameUserService() : _oldUserName(), _newUserName() {}
+    // LIFT: PDB RenameUserService::Setup(LobbyService::DB*). It has no own RVA. Inlined in
+    // ChangeUserNameJob::changeUserName (0x27f70).
+    bool Setup(LobbyService::DB* sedb) { return setup(sedb); }
     virtual bool Fetch(CliSession*, FragmentPacket*) const override;  // 0x6ec40
     bool Start(CliSession*, wchar_t const*, wchar_t const*);  // 0x6ece0
     bool Finish(CliSession*, unsigned long long, unsigned int);  // 0x6edf0

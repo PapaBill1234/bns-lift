@@ -198,6 +198,10 @@ public:
             _table.field[i] |= table.field[i];
     }
 
+    // LIFT: PDB inline Authority::Authorize(Authority::Operation). It has no own RVA. Inlined in
+    // ChangeCharacterRaceJob::init (0x1ed90): the code reads _table.field[op].
+    bool Authorize(Operation op) const { return _table.field[op]; }
+
     Table _table;
 };
 static_assert(sizeof(Authority) == 0x4, "sizeof Authority");
@@ -389,6 +393,9 @@ public:
     Character* getCharacter(unsigned long long);  // 0x35cf0
     void removeCharacter(unsigned long long);  // 0x35d30
     Character* getPlayingCharacter();  // 0x35d90
+    // LIFT: PDB inline method. It has no own RVA. The body (end of this file) comes from the inlined code in
+    // CancelWaitCharacterDeletionJob (0x18b40, 0x196f0).
+    inline Character* getCharacterInSlot(id128 slotid);
     void setChargeKey(wchar_t const* chargeKey);  // 0x35e20
     void completeRequestChargeStop(bool);  // 0x35eb0
     void cleanupCharge();  // 0x35fc0
@@ -404,6 +411,9 @@ public:
     void removeLobbyService(unsigned long long);  // 0x37530
     LobbyService* getLobbyServiceByType(unsigned long long, int);  // 0x37670
     LobbyService* queryLobbyService(Character*);  // 0x376b0
+    // LIFT: PDB inline method. It has no own RVA. The body (end of this file) comes from the inlined code in
+    // ChangeCharacterRaceJob::finConsumeAccountInventoryItemOk (0x21f80) and ::finServiceEntry (0x225e0).
+    inline LobbyService* getLobbyService(unsigned long long serviceId);
     bool addRenameUserService(RenameUserService*);  // 0x37790
     void setScheduledEndTime(GameTimeScheduleNode*);  // 0x37890
     void releaseScheduledEndTime();  // 0x37950
@@ -575,3 +585,35 @@ private:
 };
 static_assert(sizeof(LobbyGatePresence) == 0x18, "sizeof LobbyGatePresence");
 
+
+// LIFT: body of the PDB inline CliSession::getCharacterInSlot(id128). From the inlined code in
+// CancelWaitCharacterDeletionJob::init (0x18b40) and ::restore (0x196f0): a zero slot id gives no character.
+#include "Character.h"
+inline Character* CliSession::getCharacterInSlot(id128 slotid)
+{
+    if (slotid.id[0] == 0 && slotid.id[1] == 0)
+        return nullptr;
+    for (std::vector<Character*, StlAllocator<Character*, 2> >::const_iterator i = _characters.begin();
+         i != _characters.end(); ++i)
+    {
+        Character* pc = *i;
+        if (pc != nullptr && pc->_db.slotid.id[0] == slotid.id[0] && pc->_db.slotid.id[1] == slotid.id[1])
+            return pc;
+    }
+    return nullptr;
+}
+
+// LIFT: body of the PDB inline CliSession::getLobbyService(unsigned long long). From the inlined code in
+// ChangeCharacterRaceJob::finConsumeAccountInventoryItemOk (0x21f80) and ::finServiceEntry (0x225e0).
+#include "LobbyService.h"
+inline LobbyService* CliSession::getLobbyService(unsigned long long serviceId)
+{
+    for (std::vector<LobbyService*, StlAllocator<LobbyService*, 2> >::iterator i = _serviceEntries.begin();
+         i != _serviceEntries.end(); ++i)
+    {
+        LobbyService* serviceEntry = *i;
+        if (serviceEntry != nullptr && serviceEntry->GetDB().serviceId == serviceId)
+            return serviceEntry;
+    }
+    return nullptr;
+}

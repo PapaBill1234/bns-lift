@@ -52,6 +52,8 @@ public:
     bool EnterUser(CliSession*, bool&, WaitInfo&);  // 0x4cf40
     bool PermitCharacterManagement(CliSession*, bool);  // 0x4d120
     DB const& GetDB() const { return _db; }
+    // LIFT: PDB inline GameWorld::IsLive(). It has no own RVA. Inlined in ChangeCharacterRaceJob::init (0x1ed90).
+    bool IsLive() const { return _live; }
     int GetPlayingUserCount() const { return _playingUserCount; }
     int GetQuickpassUserCount() const { return _quickPassPlayingUserCount; }
     // LIFT: access helper. No PDB in the set has friend records. The handlers read and write _live (HelloReq 0x88260, ServiceOpenNotify 0x88cd0).

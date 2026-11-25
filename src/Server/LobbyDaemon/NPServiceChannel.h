@@ -11,6 +11,51 @@ union id128;
 // LIFT: NPChannel is the real class of NPChannelBase.h (SendMsg 0x3ac0 is defined in NPChannel2.cpp). No local copy: one definition only.
 #include "NPChannelBase.h"
 
+// LIFT: PDB StsMsgLib request types that LobbyDaemon builds. Layouts from tools/pdbcls.py LobbyDaemon. The base
+// _StsMsgRequest comes from NPChannelBase.h.
+namespace StsMsgLib
+{
+struct _StsMsgRequestAuthChangeMyUserNameIncomplete : public _StsMsgRequest
+{
+    id128 const* pUserId;
+    wchar_t const* pwszUserNameOld;
+    wchar_t const* pwszUserNameNew;
+    bool bSkipCheckPassword;
+    wchar_t const* pwszPasswordHash;
+};
+static_assert(sizeof(_StsMsgRequestAuthChangeMyUserNameIncomplete) == 0x40, "sizeof _StsMsgRequestAuthChangeMyUserNameIncomplete");
+static_assert(offsetof(_StsMsgRequestAuthChangeMyUserNameIncomplete, pUserId) == 0x18, "_StsMsgRequestAuthChangeMyUserNameIncomplete::pUserId");
+static_assert(offsetof(_StsMsgRequestAuthChangeMyUserNameIncomplete, bSkipCheckPassword) == 0x30, "_StsMsgRequestAuthChangeMyUserNameIncomplete::bSkipCheckPassword");
+static_assert(offsetof(_StsMsgRequestAuthChangeMyUserNameIncomplete, pwszPasswordHash) == 0x38, "_StsMsgRequestAuthChangeMyUserNameIncomplete::pwszPasswordHash");
+
+struct _StsMsgRequestFriendSendMessage : public _StsMsgRequest
+{
+    struct Contents
+    {
+        struct Field
+        {
+            char* pszKey;
+            wchar_t* pwszValue;
+        };
+        Field* pFields;
+        int nFieldCount;
+    };
+    id128 const* pUserId;
+    id128* pAppIds;
+    int nAppIdCount;
+    wchar_t const* pwszScope;
+    id128* pScopeId;
+    wchar_t const* pwszMessageName;
+    Contents contents;
+};
+static_assert(sizeof(_StsMsgRequestFriendSendMessage) == 0x58, "sizeof _StsMsgRequestFriendSendMessage");
+static_assert(offsetof(_StsMsgRequestFriendSendMessage, pAppIds) == 0x20, "_StsMsgRequestFriendSendMessage::pAppIds");
+static_assert(offsetof(_StsMsgRequestFriendSendMessage, nAppIdCount) == 0x28, "_StsMsgRequestFriendSendMessage::nAppIdCount");
+static_assert(offsetof(_StsMsgRequestFriendSendMessage, pwszScope) == 0x30, "_StsMsgRequestFriendSendMessage::pwszScope");
+static_assert(offsetof(_StsMsgRequestFriendSendMessage, pwszMessageName) == 0x40, "_StsMsgRequestFriendSendMessage::pwszMessageName");
+static_assert(offsetof(_StsMsgRequestFriendSendMessage, contents) == 0x48, "_StsMsgRequestFriendSendMessage::contents");
+}  // namespace StsMsgLib
+
 class NPGameServiceChannel : public NPChannel
 {
 public:
@@ -23,6 +68,7 @@ public:
     bool SendRequestPresenceLogin(NPTransaction*, wchar_t const*, wchar_t const*, wchar_t const*, id128 const&, unsigned long);  // 0xd0650
     bool SendRequestPresenceLogout(id128 const&);  // 0xd0800
     bool SendRequestPresenceKick(NPTransaction*, id128 const&, id128 const&, bool);  // 0xd09b0
+    bool SendRequestFriendSendMessage(NPTransaction*, id128 const&, id128*, int, wchar_t const*, id128*, wchar_t const*, StsMsgLib::_StsMsgRequestFriendSendMessage::Contents const&);  // 0xd0a00
     bool SendResponseGateLogoutUser(unsigned int, int);  // 0xd0e20
     bool SendRequestChargeGetInfo(NPTransaction*, id128 const&, unsigned long);  // 0xd0e90
     bool SendRequestChargeStart(NPTransaction*, id128 const&, unsigned long, short, unsigned int);  // 0xd0fc0

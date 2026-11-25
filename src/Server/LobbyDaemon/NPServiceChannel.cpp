@@ -2,6 +2,9 @@
 #include "NPServiceChannel.h"
 #include "AlertSender.h"
 #include "LiftStub.h"
+#include "Memory.h"
+#include "MemoryManager.h"
+#include "StringUtil.h"
 #include "LobbyDaemon.h"
 #include "LobbyJob.h"
 #include "Log.h"
@@ -31,9 +34,21 @@ bool NPGameServiceChannel::SendRequestConsumeGameToken(NPTransaction*, id128 con
 }
 
 // 0xd0370
-bool NPGameServiceChannel::SendRequestAuthChangeMyUserNameIncomplete(NPTransaction*, id128 const&, wchar_t const*, wchar_t const*, wchar_t const*)
+// LIFT: LTCG folds the constant password hash L"dummy" (the only caller passes it) into the body. The PDB signature
+// keeps the parameter. The body uses the constant, as the binary does.
+bool NPGameServiceChannel::SendRequestAuthChangeMyUserNameIncomplete(NPTransaction* t, id128 const& portalAccountId, wchar_t const* userNameOld, wchar_t const* userNameNew, wchar_t const* passwordHash)
 {
-    LIFT_STUB(0xd0370);
+    (void)passwordHash;
+    StsMsgLib::_StsMsgRequestAuthChangeMyUserNameIncomplete msg;
+    msg.msgInfo.eCmd = StsMsgLib::COMMAND_SRV_AUTH_CHANGE_MY_USER_NAME_INCOMPLETE;
+    msg.msgInfo.msgType = StsMsgLib::MESSAGE_TYPE_REQUEST;
+    msg.msgInfo.nTxnId = 0;
+    msg.pUserId = &portalAccountId;
+    msg.pwszUserNameOld = userNameOld;
+    msg.pwszUserNameNew = userNameNew;
+    msg.bSkipCheckPassword = true;
+    msg.pwszPasswordHash = L"dummy";
+    return SendMsg(&msg, true, t);
 }
 
 namespace StsMsgLib
@@ -104,6 +119,40 @@ bool NPGameServiceChannel::SendRequestPresenceLogout(id128 const&)
 bool NPGameServiceChannel::SendRequestPresenceKick(NPTransaction*, id128 const&, id128 const&, bool)
 {
     LIFT_STUB(0xd09b0);
+}
+
+// 0xd0a00
+// LIFT: the only caller (RenameCharacterJob::sendFriendMessageToNP 0x6bc50) passes a null transaction, the scope
+// L"all" and a null scope id. LTCG folds these constants into the body. The body uses the parameters.
+bool NPGameServiceChannel::SendRequestFriendSendMessage(NPTransaction* t, id128 const& portalAccountId, id128* destAppIdList, int destAppIdCount, wchar_t const* scope, id128* scopeId, wchar_t const* messageName, StsMsgLib::_StsMsgRequestFriendSendMessage::Contents const& contents)
+{
+    StsMsgLib::_StsMsgRequestFriendSendMessage msg;
+    msg.msgInfo.eCmd = StsMsgLib::COMMAND_SRV_FRIEND_SEND_MESSAGE;
+    msg.msgInfo.msgType = StsMsgLib::MESSAGE_TYPE_REQUEST;
+    msg.msgInfo.nTxnId = 0;
+    msg.pAppIds = nullptr;
+    msg.nAppIdCount = 0;
+    msg.pwszScope = nullptr;
+    msg.pScopeId = nullptr;
+    msg.pwszMessageName = nullptr;
+    msg.contents.pFields = nullptr;
+    msg.contents.nFieldCount = 0;
+    msg.pUserId = &portalAccountId;
+    if (destAppIdList != nullptr && destAppIdCount > 0)
+    {
+        msg.pAppIds = static_cast<id128*>(Memory::_Manager[2]->AllocZero(sizeof(id128) * destAppIdCount, L"NPServiceChannel.cpp", 405));
+        msg.nAppIdCount = destAppIdCount;
+        for (int i = 0; i < destAppIdCount; ++i)
+            msg.pAppIds[i].guid = destAppIdList[i].guid;
+    }
+    msg.pwszScope = scope;
+    msg.pScopeId = scopeId;
+    msg.pwszMessageName = messageName;
+    msg.contents = contents;
+    bool const result = SendMsg(&msg, true, t);
+    if (msg.pAppIds != nullptr)
+        Memory::_Manager[2]->Free(msg.pAppIds, L"NPServiceChannel.cpp", 418);
+    return result;
 }
 
 // 0xd0e20

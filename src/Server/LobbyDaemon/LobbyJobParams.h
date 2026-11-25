@@ -2,9 +2,11 @@
 // LIFT: the PDB has these as public structs without a home header. This header holds the layouts that lift-lobbydaemon-16 needs.
 #pragma once
 #include <stddef.h>
+#include "StringUtil.h"
 
 struct Goods;
 struct LobbyServiceItem;
+class LobbyGateChannel;
 
 struct WorldKickFailParam
 {
@@ -82,3 +84,42 @@ static_assert(sizeof(RetrieveLobbyServiceItemListOkParam) == 0x18, "sizeof Retri
 static_assert(offsetof(RetrieveLobbyServiceItemListOkParam, searchCount) == 0x0, "RetrieveLobbyServiceItemListOkParam::searchCount");
 static_assert(offsetof(RetrieveLobbyServiceItemListOkParam, items) == 0x8, "RetrieveLobbyServiceItemListOkParam::items");
 static_assert(offsetof(RetrieveLobbyServiceItemListOkParam, itemCount) == 0x10, "RetrieveLobbyServiceItemListOkParam::itemCount");
+
+// LIFT: gap-11. LobbyGamePacketHandler fills a local of this type for RenameCharacterJob::init (0x66e70).
+struct RenameCharacterWithAccountInventoryItemReqParam
+{
+    LobbyGateChannel* lgate;
+    id128 slotid;
+    wchar_t newName[33];
+    unsigned long long labelId;
+    unsigned long long itemInstanceId;
+    unsigned int itemDataId;
+};
+static_assert(sizeof(RenameCharacterWithAccountInventoryItemReqParam) == 0x78, "sizeof RenameCharacterWithAccountInventoryItemReqParam");
+static_assert(offsetof(RenameCharacterWithAccountInventoryItemReqParam, slotid) == 0x8, "RenameCharacterWithAccountInventoryItemReqParam::slotid");
+static_assert(offsetof(RenameCharacterWithAccountInventoryItemReqParam, newName) == 0x18, "RenameCharacterWithAccountInventoryItemReqParam::newName");
+static_assert(offsetof(RenameCharacterWithAccountInventoryItemReqParam, labelId) == 0x60, "RenameCharacterWithAccountInventoryItemReqParam::labelId");
+static_assert(offsetof(RenameCharacterWithAccountInventoryItemReqParam, itemDataId) == 0x70, "RenameCharacterWithAccountInventoryItemReqParam::itemDataId");
+
+// LIFT: gap-11. LobbyGamePacketHandler fills a local of this type for ChangeUserNameJob::init (0x26c80).
+struct ChangeUserNameWithAccountInventoryItemReqParam
+{
+    LobbyGateChannel* lgate;
+    wchar_t newUserName[65];
+    unsigned long long labelId;
+    unsigned long long itemInstanceId;
+    unsigned int itemDataId;
+};
+static_assert(sizeof(ChangeUserNameWithAccountInventoryItemReqParam) == 0xA8, "sizeof ChangeUserNameWithAccountInventoryItemReqParam");
+static_assert(offsetof(ChangeUserNameWithAccountInventoryItemReqParam, newUserName) == 0x8, "ChangeUserNameWithAccountInventoryItemReqParam::newUserName");
+static_assert(offsetof(ChangeUserNameWithAccountInventoryItemReqParam, labelId) == 0x90, "ChangeUserNameWithAccountInventoryItemReqParam::labelId");
+static_assert(offsetof(ChangeUserNameWithAccountInventoryItemReqParam, itemDataId) == 0xA0, "ChangeUserNameWithAccountInventoryItemReqParam::itemDataId");
+
+// LIFT: gap-11. LobbyGamePacketHandler fills a local of this type for CreateInitialUserNameJob::init (0x2fe20).
+struct CreateInitialUserNameReqParam
+{
+    LobbyGateChannel* lgate;
+    wchar_t newUserName[65];
+};
+static_assert(sizeof(CreateInitialUserNameReqParam) == 0x90, "sizeof CreateInitialUserNameReqParam");
+static_assert(offsetof(CreateInitialUserNameReqParam, newUserName) == 0x8, "CreateInitialUserNameReqParam::newUserName");

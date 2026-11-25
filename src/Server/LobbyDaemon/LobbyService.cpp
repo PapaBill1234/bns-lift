@@ -8,6 +8,7 @@
 #include "LobbyDB.h"
 #include "Log.h"
 #include "StringUtil.h"
+#include <wchar.h>
 
 // LIFT: Shared note for 0x6f1b0 to 0x71350 (45 log calls). The original Start, ConsumeItemTried, TaskDone,
 // ConsumeItemFinished and Finish logs write "cli-key:0x%I64X" with owner->_clikey. The client session key
@@ -208,33 +209,196 @@ bool RenameCharacterService::IsServiceTarget(Character*)
 }
 
 // 0x6e190
-bool RenameCharacterService::Start(CliSession*, unsigned int, wchar_t const*, int)
+bool RenameCharacterService::Start(CliSession* owner, unsigned int itemDataId, wchar_t const* newName, int reuseLimitDurationInSec)
 {
-    LIFT_STUB(0x6e190);
+    // LIFT: 0x6e190. The original also logs owner->_clikey. This lift does not log the client session key.
+    if (owner == nullptr || newName == nullptr)
+    {
+        RenameCharacterService const* s = this;  // LIFT: The original tests this for null before it reads _db for the log arguments.
+        Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 574,
+            L"[lobby-service], start fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
+        TLobbyError = LOBERR_INVALID_PARAMETER;
+        return false;
+    }
+    if (_db.serviceState != 0)
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 581,
+            L"[lobby-service], start fail; invalid state, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+            _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+        TLobbyError = LOBERR_INVALID_STATE;
+        return false;
+    }
+    wchar_t tempNewName[33] = {0};
+    wcscpy_s(tempNewName, 33, newName);
+    int dbrtn = 0;
+    if (LobbyDB::TryCharacterRenameService(dbrtn, owner->_acb._id, _dbRenameCharacterService.pcid, _db.itemInstanceId, itemDataId,
+                                           tempNewName, sizeof(tempNewName), reuseLimitDurationInSec, &_db.serviceId))
+    {
+        _db.serviceState = 1;
+        Log::Write(Log::LT_DEBUG, L"LobbyService.cpp", 615,
+            L"[lobby-service], register ok, new-name:%s, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+            newName, _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+        return true;
+    }
+    Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 595,
+        L"[lobby-service], start fail; db error, dbrtn:%d, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+        dbrtn, _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+    if (dbrtn == 2)
+        TLobbyError = LOBERR_NAME_DUPLICATED;
+    else if (dbrtn == 3)
+        TLobbyError = LOBERR_NAME_LIMITED;
+    else
+        TLobbyError = LOBERR_SYSTEM;
+    return false;
 }
 
 // 0x6e440
-bool RenameCharacterService::ConsumeItemTried(CliSession*)
+bool RenameCharacterService::ConsumeItemTried(CliSession* owner)
 {
-    LIFT_STUB(0x6e440);
+    // LIFT: 0x6e440. The original also logs owner->_clikey. This lift does not log the client session key.
+    if (owner == nullptr)
+    {
+        RenameCharacterService const* s = this;  // LIFT: The original tests this for null before it reads _db for the log arguments.
+        Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 624,
+            L"== CRASH == [lobby-service], consume-item-tried fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
+        AlertSender::Write(L"LobbyService.cpp", 624,
+            L"== CRASH == [lobby-service], consume-item-tried fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
+        return false;
+    }
+    if (_db.serviceState == 1)
+    {
+        int dbrtn = 0;
+        if (LobbyDB::UpdateLobbyServiceStateToItemConsumptionTryState_CharacterRenameService(dbrtn, _db.serviceId, owner->_acb._id))
+        {
+            _db.serviceState = 2;
+            Log::Write(Log::LT_DEBUG, L"LobbyService.cpp", 643,
+                L"[lobby-service], consume-item-tried ok, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+                _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            return true;
+        }
+        Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 637,
+            L"[lobby-service], consume-item-tried fail; db error, dbrtn:%d, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+            dbrtn, _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+        return false;
+    }
+    Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 630,
+        L"[lobby-service], consume-item-tried fail; invalid state, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+        _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+    return false;
 }
 
 // 0x6e640
-bool RenameCharacterService::TaskDone(CliSession*)
+bool RenameCharacterService::TaskDone(CliSession* owner)
 {
-    LIFT_STUB(0x6e640);
+    // LIFT: 0x6e640. The original also logs owner->_clikey. This lift does not log the client session key.
+    if (owner == nullptr)
+    {
+        RenameCharacterService const* s = this;  // LIFT: The original tests this for null before it reads _db for the log arguments.
+        Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 652,
+            L"== CRASH == [lobby-service], task done fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
+        AlertSender::Write(L"LobbyService.cpp", 652,
+            L"== CRASH == [lobby-service], task done fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
+        return false;
+    }
+    if (_db.serviceState == 2)
+    {
+        int dbrtn = 0;
+        if (LobbyDB::UpdateLobbyServiceStateToTaskDoneState_CharacterRenameService(dbrtn, _db.serviceId, owner->_acb._id))
+        {
+            _db.serviceState = 3;
+            Log::Write(Log::LT_DEBUG, L"LobbyService.cpp", 671,
+                L"[lobby-service], task done ok, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+                _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            return true;
+        }
+        Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 665,
+            L"[lobby-service], task done fail; db error, dbrtn:%d, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+            dbrtn, _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+        return false;
+    }
+    Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 658,
+        L"[lobby-service], task done fail; invalid state, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+        _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+    return false;
 }
 
 // 0x6e840
-bool RenameCharacterService::ConsumeItemFinished(CliSession*)
+bool RenameCharacterService::ConsumeItemFinished(CliSession* owner)
 {
-    LIFT_STUB(0x6e840);
+    // LIFT: 0x6e840. The original also logs owner->_clikey. This lift does not log the client session key.
+    if (owner == nullptr)
+    {
+        RenameCharacterService const* s = this;  // LIFT: The original tests this for null before it reads _db for the log arguments.
+        Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 680,
+            L"== CRASH == [lobby-service], consume-item-finished fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
+        AlertSender::Write(L"LobbyService.cpp", 680,
+            L"== CRASH == [lobby-service], consume-item-finished fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
+        return false;
+    }
+    if (_db.serviceState == 3)
+    {
+        int dbrtn = 0;
+        if (LobbyDB::UpdateLobbyServiceStateToItemConsumptionFinishState_CharacterRenameService(dbrtn, _db.serviceId, owner->_acb._id))
+        {
+            _db.serviceState = 4;
+            Log::Write(Log::LT_DEBUG, L"LobbyService.cpp", 699,
+                L"[lobby-service], consume-item-finished ok, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+                _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            return true;
+        }
+        Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 693,
+            L"[lobby-service], consume-item-finished fail; db error, dbrtn:%d, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+            dbrtn, _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+        return false;
+    }
+    Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 686,
+        L"[lobby-service], consume-item-finished fail; invalid state, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+        _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+    return false;
 }
 
 // 0x6ea40
-bool RenameCharacterService::Finish(CliSession*)
+bool RenameCharacterService::Finish(CliSession* owner)
 {
-    LIFT_STUB(0x6ea40);
+    // LIFT: 0x6ea40. The original also logs owner->_clikey. This lift does not log the client session key.
+    if (owner == nullptr)
+    {
+        RenameCharacterService const* s = this;  // LIFT: The original tests this for null before it reads _db for the log arguments.
+        Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 708,
+            L"== CRASH == [lobby-service], finish fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
+        AlertSender::Write(L"LobbyService.cpp", 708,
+            L"== CRASH == [lobby-service], finish fail; invalid param, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
+        return false;
+    }
+    if (_db.serviceState == 4)
+    {
+        int dbrtn = 0;
+        if (LobbyDB::FinishCharacterRenameService(dbrtn, _db.serviceId, owner->_acb._id))
+        {
+            _db.serviceState = 5;
+            Log::Write(Log::LT_DEBUG, L"LobbyService.cpp", 727,
+                L"[lobby-service], finish ok, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+                _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+            return true;
+        }
+        Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 721,
+            L"[lobby-service], finish fail; db error, dbrtn:%d, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+            dbrtn, _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+        return false;
+    }
+    Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 714,
+        L"[lobby-service], finish fail; invalid state, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+        _db.serviceId, _db.serviceType, _db.serviceState, _db.itemInstanceId);
+    return false;
 }
 
 // 0x6ec40
@@ -254,9 +418,23 @@ bool RenameUserService::Fetch(CliSession* owner, FragmentPacket*) const
 }
 
 // 0x6ece0
-bool RenameUserService::Start(CliSession*, wchar_t const*, wchar_t const*)
+// LTCG drops the unused owner parameter in the original.
+bool RenameUserService::Start(CliSession*, wchar_t const* oldUserName, wchar_t const* newUserName)
 {
-    LIFT_STUB(0x6ece0);
+    if (oldUserName == nullptr || oldUserName[0] == 0 || newUserName == nullptr || newUserName[0] == 0)
+    {
+        RenameUserService const* s = this;  // LIFT: The original tests this for null before it reads _db for the log arguments.
+        Log::Write(Log::LT_ERROR, L"LobbyService.cpp", 760,
+            L"[lobby-service], start rename user service fail; invalid param, old-user-name:%s, new-user-name:%s, lobby-service-id:0x%I64X, type:%d, state:%d, item-instance-id:0x%I64X",
+            oldUserName != nullptr ? oldUserName : L"(null)", newUserName != nullptr ? newUserName : L"(null)",
+            LOBBY_SERVICE_DB_LOG_ARGS(s));
+        return false;
+    }
+    _db.serviceId = static_cast<unsigned long long>(-1);
+    _db.serviceState = 1;
+    wcscpy_s(_oldUserName, 65, oldUserName);
+    wcscpy_s(_newUserName, 65, newUserName);
+    return true;
 }
 
 // 0x6edf0
