@@ -587,11 +587,12 @@ static_assert(sizeof(LobbyGatePresence) == 0x18, "sizeof LobbyGatePresence");
 
 
 // LIFT: body of the PDB inline CliSession::getCharacterInSlot(id128). From the inlined code in
-// CancelWaitCharacterDeletionJob::init (0x18b40) and ::restore (0x196f0): a zero slot id gives no character.
+// CancelWaitCharacterDeletionJob::init (0x18b40) and ::restore (0x196f0): a zero slot id (compare with
+// ID128_ID_ZERO, as the original does) gives no character.
 #include "Character.h"
 inline Character* CliSession::getCharacterInSlot(id128 slotid)
 {
-    if (slotid.id[0] == 0 && slotid.id[1] == 0)
+    if (slotid.id[0] == ID128_ID_ZERO.id[0] && slotid.id[1] == ID128_ID_ZERO.id[1])
         return nullptr;
     for (std::vector<Character*, StlAllocator<Character*, 2> >::const_iterator i = _characters.begin();
          i != _characters.end(); ++i)

@@ -98,7 +98,7 @@ RecoverPcJob::~RecoverPcJob()
 // 0x65040
 bool RecoverPcJob::Initialize(LobbyGateChannel* lgate, id128 const& slotid)
 {
-    if (lgate == nullptr || (slotid.id[0] == 0 && slotid.id[1] == 0))
+    if (lgate == nullptr || (slotid.id[0] == ID128_ID_ZERO.id[0] && slotid.id[1] == ID128_ID_ZERO.id[1]))
     {
         JOB_LOG(Log::LT_ERROR, 90, L"[job], invalid parameter",
                 L", lgate:%p, slot-id:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X", lgate, SLOTID_ARGS(slotid));
@@ -148,7 +148,7 @@ bool RecoverPcJob::init()
     // original copies _slotid to the stack (by-value parameter).
     Character* pc = nullptr;
     id128 const slotid = _slotid;
-    if (slotid.id[0] != 0 || slotid.id[1] != 0)
+    if (slotid.id[0] != ID128_ID_ZERO.id[0] || slotid.id[1] != ID128_ID_ZERO.id[1])
     {
         for (std::vector<Character*, StlAllocator<Character*, 2> >::const_iterator i = _owner->_characters.begin();
              i != _owner->_characters.end(); ++i)

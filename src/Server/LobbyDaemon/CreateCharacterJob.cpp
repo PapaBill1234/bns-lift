@@ -272,7 +272,7 @@ bool CreateCharacterJob::init(int task, void* param)
         goto initfail;
     }
 
-    if (req->lgate == nullptr || (req->slotid.id[0] == 0 && req->slotid.id[1] == 0) || req->wid == 0 ||
+    if (req->lgate == nullptr || (req->slotid.id[0] == ID128_ID_ZERO.id[0] && req->slotid.id[1] == ID128_ID_ZERO.id[1]) || req->wid == 0 ||
         wcslen(req->characterName) == 0 || req->characterMakeDataSize == 0)
     {
         JOB_LOG(Log::LT_ERROR, 172, L"[job], invalid parameter", REQ_FMT, REQ_ARGS(req));

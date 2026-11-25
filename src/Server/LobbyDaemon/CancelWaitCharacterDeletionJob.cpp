@@ -129,17 +129,14 @@ bool CancelWaitCharacterDeletionJob::work(int task, void* param)
         result = restore();
     if (_state == RESTORE_GAMEWORLD)
     {
-        switch (task)
-        {
-        case 0:
+        if (task == 0)
             return restoreCharacterReq();
-        case 111:
+        else if (task == 111)
             return restoreCharacterOk();
-        case 112:
+        else if (task == 112)
             return restoreCharacterFail(static_cast<short*>(param));
-        case 113:
+        else if (task == 113)
             return restoreCharacterExpire();
-        }
     }
     return result;
 }
@@ -159,7 +156,7 @@ bool CancelWaitCharacterDeletionJob::init(CancelWaitCharacterDeletionReqParam* p
         transit(FIN);
         return true;
     }
-    if (param->lgate == nullptr || (param->slotid.id[0] == 0 && param->slotid.id[1] == 0))
+    if (param->lgate == nullptr || (param->slotid.id[0] == ID128_ID_ZERO.id[0] && param->slotid.id[1] == ID128_ID_ZERO.id[1]))
     {
         JOB_LOG(Log::LT_ERROR, 147, L"[job], invalid parameter", L", gate-wid:%d, slot-id:" SLOTID_FMT,
                 GATE_WID(param->lgate), SLOTID_ARGS(param->slotid));

@@ -296,7 +296,7 @@ bool DeleteCharacterJob::init(int task, void* param)
         return true;
     }
     DeleteCharacterReqParam* const p = static_cast<DeleteCharacterReqParam*>(param);
-    if (p->lgate == nullptr || (p->slotid.id[0] == 0 && p->slotid.id[1] == 0))
+    if (p->lgate == nullptr || (p->slotid.id[0] == ID128_ID_ZERO.id[0] && p->slotid.id[1] == ID128_ID_ZERO.id[1]))
     {
         JOB_LOG(Log::LT_ERROR, 215, L"[job], invalid parameter", L", gate-wid:%d, slot-id:" SLOTID_FMT,
                 GATE_WID(p->lgate), SLOTID_ARGS(p->slotid));
@@ -485,15 +485,15 @@ bool DeleteCharacterJob::checkSecondPasswordStatusResponse(void* param)
 bool DeleteCharacterJob::checkSecondPasswordStatusExpire()
 {
     JOB_LOG(Log::LT_ERROR, 388, L"[job], get status expired", L"");
-    if (_owner->_state == 0x20000)  // CSS_LOBBY
+    if (_owner->_state != 0x20000)  // CSS_LOBBY
     {
-        _lgate->SendDeleteCharacterFail(_owner->_clikey, _slotid, Character::CLIENTSTATE_UNKNOWN, 7);
-        transit(FIN);
-        return true;
+        JOB_LOG(Log::LT_ERROR, 392, L"[job], invalid cli-session state", L"");
+        _lgate->SendDeleteCharacterFail(_owner->_clikey, _slotid, Character::CLIENTSTATE_UNKNOWN, 5);
+        return false;
     }
-    JOB_LOG(Log::LT_ERROR, 392, L"[job], invalid cli-session state", L"");
-    _lgate->SendDeleteCharacterFail(_owner->_clikey, _slotid, Character::CLIENTSTATE_UNKNOWN, 5);
-    return false;
+    _lgate->SendDeleteCharacterFail(_owner->_clikey, _slotid, Character::CLIENTSTATE_UNKNOWN, 7);
+    transit(FIN);
+    return true;
 }
 
 // 0x46ed0
@@ -587,15 +587,15 @@ bool DeleteCharacterJob::checkSecondPasswordVerifiedResponse(void* param)
 bool DeleteCharacterJob::checkSecondPasswordVerifiedExpire()
 {
     JOB_LOG(Log::LT_ERROR, 486, L"[job], expired", L"");
-    if (_owner->_state == 0x20000)  // CSS_LOBBY
+    if (_owner->_state != 0x20000)  // CSS_LOBBY
     {
-        _lgate->SendDeleteCharacterFail(_owner->_clikey, _slotid, Character::CLIENTSTATE_UNKNOWN, 7);
-        transit(FIN);
-        return true;
+        JOB_LOG(Log::LT_ERROR, 490, L"[job], invalid session state", L"");
+        _lgate->SendDeleteCharacterFail(_owner->_clikey, _slotid, Character::CLIENTSTATE_UNKNOWN, 5);
+        return false;
     }
-    JOB_LOG(Log::LT_ERROR, 490, L"[job], invalid session state", L"");
-    _lgate->SendDeleteCharacterFail(_owner->_clikey, _slotid, Character::CLIENTSTATE_UNKNOWN, 5);
-    return false;
+    _lgate->SendDeleteCharacterFail(_owner->_clikey, _slotid, Character::CLIENTSTATE_UNKNOWN, 7);
+    transit(FIN);
+    return true;
 }
 
 // 0x47710
