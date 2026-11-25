@@ -123,3 +123,48 @@ struct CreateInitialUserNameReqParam
 };
 static_assert(sizeof(CreateInitialUserNameReqParam) == 0x90, "sizeof CreateInitialUserNameReqParam");
 static_assert(offsetof(CreateInitialUserNameReqParam, newUserName) == 0x8, "CreateInitialUserNameReqParam::newUserName");
+
+// LIFT: gap-09. PDB CancelWaitCharacterDeletionReqParam (type 0x5276, sizeof 0x18). The task parameter of
+// TASK_CANCEL_WAIT_CHARACTER_DELETION_REQ (12). HandleLobbyLobbyGate_CancelWaitCharacterDeletionReq (0xc67e0) fills it.
+#include "StringUtil.h"
+class LobbyGateChannel;
+struct CancelWaitCharacterDeletionReqParam
+{
+    LobbyGateChannel* lgate;
+    id128 slotid;
+};
+static_assert(sizeof(CancelWaitCharacterDeletionReqParam) == 0x18, "sizeof CancelWaitCharacterDeletionReqParam");
+static_assert(offsetof(CancelWaitCharacterDeletionReqParam, lgate) == 0x0, "CancelWaitCharacterDeletionReqParam::lgate");
+static_assert(offsetof(CancelWaitCharacterDeletionReqParam, slotid) == 0x8, "CancelWaitCharacterDeletionReqParam::slotid");
+
+// LIFT: gap-09. PDB CreateCharacterReqParam (sizeof 0x160). The task parameter of TASK_CREATE_CHARACTER_REQ (10).
+// HandleLobbyLobbyGate_CreateCharacterReq (0xc5b10) fills it. CreateCharacterJob::init (0x41b10) reads it.
+struct CreateCharacterReqParam
+{
+    LobbyGateChannel* lgate;
+    id128 slotid;
+    short wid;
+    wchar_t characterName[33];
+    char characterMakeData[256];
+    short characterMakeDataSize;
+    bool jumpingCharacter;
+};
+static_assert(sizeof(CreateCharacterReqParam) == 0x160, "sizeof CreateCharacterReqParam");
+static_assert(offsetof(CreateCharacterReqParam, lgate) == 0x0, "CreateCharacterReqParam::lgate");
+static_assert(offsetof(CreateCharacterReqParam, slotid) == 0x8, "CreateCharacterReqParam::slotid");
+static_assert(offsetof(CreateCharacterReqParam, wid) == 0x18, "CreateCharacterReqParam::wid");
+static_assert(offsetof(CreateCharacterReqParam, characterName) == 0x1A, "CreateCharacterReqParam::characterName");
+static_assert(offsetof(CreateCharacterReqParam, characterMakeData) == 0x5C, "CreateCharacterReqParam::characterMakeData");
+static_assert(offsetof(CreateCharacterReqParam, characterMakeDataSize) == 0x15C, "CreateCharacterReqParam::characterMakeDataSize");
+static_assert(offsetof(CreateCharacterReqParam, jumpingCharacter) == 0x15E, "CreateCharacterReqParam::jumpingCharacter");
+
+// LIFT: gap-09. PDB DeleteCharacterReqParam (sizeof 0x18). The task parameter of TASK_DELETE_CHARACTER_REQ (11).
+// DeleteCharacterJob::init (0x453a0) reads it. StringUtil.h (id128) and class LobbyGateChannel are declared above.
+struct DeleteCharacterReqParam
+{
+    LobbyGateChannel* lgate;
+    id128 slotid;
+};
+static_assert(sizeof(DeleteCharacterReqParam) == 0x18, "sizeof DeleteCharacterReqParam");
+static_assert(offsetof(DeleteCharacterReqParam, lgate) == 0x0, "DeleteCharacterReqParam::lgate");
+static_assert(offsetof(DeleteCharacterReqParam, slotid) == 0x8, "DeleteCharacterReqParam::slotid");
