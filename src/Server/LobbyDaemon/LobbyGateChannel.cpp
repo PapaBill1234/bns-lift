@@ -976,18 +976,11 @@ void LobbyGateChannel::SendGetLobbyServiceItemInfoFail(unsigned long long clikey
 }
 
 // 0xbf3c0
-void LobbyGateChannel::SendGetServiceEntryListFail(unsigned long long clikey, short reason)
+// LIFT: stub again (gap-int-1 repair 1). The lifted body (c2f26e1) gives je where the original has jne + jmp.
+// The 18 other "hqE" Fail senders have the same shape. Find the source cause first, then lift it again.
+void LobbyGateChannel::SendGetServiceEntryListFail(unsigned long long, short)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
-    p.Allocate();
-    if (0 != p.Compose("hqE", 81, clikey, static_cast<int>(reason)))
-        Send(&p);
+    LIFT_STUB(0xbf3c0);
 }
 
 // 0xbf490
