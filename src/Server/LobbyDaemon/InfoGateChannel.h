@@ -40,7 +40,10 @@ static_assert(sizeof(InfoGateChannel) == 0x28, "sizeof InfoGateChannel");
 class InfoGateChannelManager : public SessionHandler
 {
 public:
+    InfoGateChannelManager() {}  // LIFT: PDB inline ctor. Inlined in LobbyDaemon::initNetwork (0x9d520).
     virtual ~InfoGateChannelManager();  // 0x2ea70
+    // LIFT: PDB inline Initialize(short, short). Inlined in LobbyDaemon::initNetwork (0x9d520).
+    bool Initialize(short idmin, short idmax);
     bool Add(InfoGateChannel*);  // 0x2eb50
     void Remove(short);  // 0x2ec10
     InfoGateChannel* Acquire(short);  // 0x2ed20

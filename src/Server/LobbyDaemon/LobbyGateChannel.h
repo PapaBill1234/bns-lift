@@ -105,7 +105,10 @@ static_assert(offsetof(LobbyGateChannel, _isMobileGate) == 0x21, "LobbyGateChann
 class LobbyGateChannelManager : public SessionHandler
 {
 public:
+    LobbyGateChannelManager() {}  // LIFT: PDB inline ctor. Inlined in LobbyDaemon::initNetwork (0x9d520).
     virtual ~LobbyGateChannelManager();  // 0xc0aa0
+    // LIFT: PDB inline Initialize(short, short). Inlined in LobbyDaemon::initNetwork (0x9d520).
+    bool Initialize(short idmin, short idmax);
     bool Add(LobbyGateChannel*);  // 0xc0b80
     void Remove(short);  // 0xc0c40
     LobbyGateChannel* Acquire(short);  // 0xc0d50

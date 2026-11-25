@@ -1347,6 +1347,17 @@ void LobbyGateChannel::SendChangedGradeLevelNotify(unsigned long long clikey, in
         Send(&p);
 }
 
+// LIFT: PDB inline (no own RVA). Inlined in LobbyDaemon::initNetwork (0x9d520).
+bool LobbyGateChannelManager::Initialize(short idmin, short idmax)
+{
+    if (!_channels.Initialize(idmin, idmax))
+    {
+        Log::Write(Log::LT_ERROR, LOBBYGATE_FILE, 993, L"[lobby-gate], initialize fail; init channel list fail");
+        return false;
+    }
+    return true;
+}
+
 // 0xc0aa0
 LobbyGateChannelManager::~LobbyGateChannelManager()
 {

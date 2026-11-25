@@ -55,6 +55,8 @@ static_assert(offsetof(SharedChannel, _rawChannel) == 0x18, "SharedChannel::_raw
 class SharedChannelList
 {
 public:
+    // LIFT: PDB inline ctor. The manager ctors inline it in LobbyDaemon::initNetwork (0x9d520): 4 zero stores.
+    SharedChannelList() : _channels(nullptr), _idmin(0), _idsize(0), _size(0) {}
     ~SharedChannelList();                                                       // 0x4D20 (LobbyDaemon)
     bool Initialize(unsigned long long idmin, unsigned long long idmax);         // 0x4D60 (LobbyDaemon)
     bool Set(SharedChannel* channel);                                           // 0x4E20 (LobbyDaemon)

@@ -20,3 +20,6 @@ struct LobbyManagePacketHandlerDef
     bool fragment;
 };
 static_assert(sizeof(LobbyManagePacketHandlerDef) == 0x10, "sizeof LobbyManagePacketHandlerDef");
+
+// PDB global (LobbyDaemon .data rva 0x202530, 17 entries). Defined in LobbyManagePacketHandler.cpp.
+extern LobbyManagePacketHandlerDef LobbyManagePacketLobbySideHandlerList[17];

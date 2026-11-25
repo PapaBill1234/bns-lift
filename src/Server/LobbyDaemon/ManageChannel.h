@@ -1,6 +1,5 @@
 // ManageChannel.obj (LobbyDaemon PDB, 2019 + PDB). Layouts from tools/pdbcls.py LobbyDaemon <Class>.
-// LIFT: header layouts only (fix7). The function bodies are still LIFT_STUB.
-// LIFT: the PDB ctors and the virtual dtors have no own symbol in the lift scope. They are not declared.
+// LIFT: the virtual dtors have no own symbol in the lift scope. They are not declared.
 #pragma once
 #include <stddef.h>
 #include "Channel.h"
@@ -12,7 +11,10 @@ class Session;
 class ManageChannel : public Channel
 {
 public:
+    // LIFT: PDB ManageChannel(unsigned short const). Inlined in HandleLobbyManage_HelloReq (0x587d0).
+    explicit ManageChannel(unsigned short const manageWid) : _manageWid(manageWid) {}
     virtual unsigned long long GetId();  // 0x58770
+    unsigned short const GetManageWid() const { return _manageWid; }  // LIFT: PDB inline (no RVA)
     static void SendKickOk(Session const*, unsigned long long);  // 0x5b630
     static void SendKickFail(Session const*, unsigned long long, short);  // 0x5b760
     static void SendCleanupGameAccountIdIndexOk(Session const*, unsigned long long);  // 0x5b8a0

@@ -14,6 +14,12 @@
 #include "FragmentPacket.h"
 #include "GameWorld.h"
 #include "InfoGateChannel.h"
+#include "AccountInventoryChannel.h"
+#include "GamedChannel.h"
+#include "LobbyGateChannel.h"
+#include "ManageChannel.h"
+#include "PacketBufferHandler.h"
+#include "PostOfficeChannel.h"
 #include "LobbyConfig.h"
 #include "LiftStub.h"
 #include "Log.h"
@@ -690,7 +696,141 @@ bool LobbyDaemon::initialize()
 // 0x9d520
 bool LobbyDaemon::initNetwork()
 {
-    LIFT_STUB(0x9d520);
+    // LIFT: LTCG dropped the handler argument; 0x9d520 passes ecx = worker thread count only.
+    if (!Network::Initialize(FailedEventObjectHandler, _config->_workerThreadCount))
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1684, L"[lobbygate], init network fail");
+        return false;
+    }
+
+    // LIFT: the OpenPort bools are constant (LTCG removed them): accept off, recv on, nagle off. OpenPort stores
+    // _enableAccept = 0 and _enableRecv = 1 (SmartCouponDaemon::initNetwork passes the same values).
+    {
+        RawPacketBufferHandler pbh;
+        int const maxNPSessionCount = _config->_maxNPSessionCount;
+        unsigned int const maxSession = maxNPSessionCount <= 0 ? 0 : maxNPSessionCount + 1;
+        if (!Network::OpenPort(2, 0, 2, NPChannel::_sessionHandler, &pbh, maxSession, false, true, false))
+        {
+            Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1702, L"[lobby], setup np port fail");
+            return false;
+        }
+        Log::Write(Log::LT_NOTICE, L"LobbyDaemon.cpp", 1706, L"[lobby], setup np port ok");
+    }
+
+    if (_config->_useAccountInventory)
+    {
+        void* mem = Memory::_Manager[2]->Alloc(sizeof(AccountInventorySessionHandler), L"LobbyDaemon.cpp", 1714);
+        _accountInventorySessionHandler = mem != nullptr ? ::new (mem) AccountInventorySessionHandler : nullptr;
+        TrustedPacketBufferHandler pbh;
+        // BUG: 0x9d520 the original tests _accountInventoryMaxSessionCount but uses _maxNPSessionCount + 1. Kept for parity.
+        unsigned int const maxSession =
+            _config->_accountInventoryMaxSessionCount <= 0 ? 0 : _config->_maxNPSessionCount + 1;
+        if (!Network::OpenPort(3, 0, 2, _accountInventorySessionHandler, &pbh, maxSession, false, true, false))
+        {
+            Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1727, L"[lobby], setup account inventory port fail");
+            return false;
+        }
+        Log::Write(Log::LT_NOTICE, L"LobbyDaemon.cpp", 1731, L"[lobby], setup account inventory port ok");
+    }
+
+    if (_config->_enableAuctionEscrowService)
+    {
+        void* mem = Memory::_Manager[2]->Alloc(sizeof(PostOfficeSessionHandler), L"LobbyDaemon.cpp", 1738);
+        _postOfficeSessionHandler = mem != nullptr ? ::new (mem) PostOfficeSessionHandler : nullptr;
+        TrustedPacketBufferHandler pbh;
+        if (!Network::OpenPort(7, 0, 2, _postOfficeSessionHandler, &pbh, _config->_maxPostOfficeSessionCount, false, true,
+                               false))
+        {
+            Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1744, L"[lobby], setup post-office port fail");
+            return false;
+        }
+        Log::Write(Log::LT_NOTICE, L"LobbyDaemon.cpp", 1748, L"[lobby], setup post-office port ok");
+    }
+
+    {
+        TrustedPacketBufferHandler pbh;
+        void* mem = Memory::_Manager[2]->Alloc(sizeof(LobbyGateChannelManager), L"LobbyDaemon.cpp", 1756);
+        _lgatechmgr = mem != nullptr ? ::new (mem) LobbyGateChannelManager : nullptr;
+        // BUG: 0x9d520 the original does not check the manager for nullptr when the alloc fails (also below).
+        if (!_lgatechmgr->Initialize(static_cast<short>(_config->_reservedMinLobbyGateWidRange),
+                                     static_cast<short>(_config->_reservedMaxLobbyGateWidRange)))
+        {
+            Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1759,
+                       L"[lobby], setup lobby-gate port fail; init lobby-gate channel manager fail");
+            return false;
+        }
+        int const maxLobbyGateSessionCount = _config->_maxLobbyGateSessionCount;
+        unsigned int const maxSession = maxLobbyGateSessionCount <= 0 ? 0 : maxLobbyGateSessionCount + 1;
+        if (!Network::OpenPort(4, static_cast<unsigned short>(_config->_lobbyGatePort), 2, _lgatechmgr, &pbh, maxSession,
+                               false, true, false))
+        {
+            Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1772, L"[lobby], setup lobby-gate port fail.");
+            return false;
+        }
+        Log::Write(Log::LT_NOTICE, L"LobbyDaemon.cpp", 1776, L"[lobby], setup lobby-gate port ok");
+    }
+
+    if (_config->_useInfoGate)
+    {
+        TrustedPacketBufferHandler pbh;
+        void* mem = Memory::_Manager[2]->Alloc(sizeof(InfoGateChannelManager), L"LobbyDaemon.cpp", 1783);
+        _infogatechmgr = mem != nullptr ? ::new (mem) InfoGateChannelManager : nullptr;
+        if (!_infogatechmgr->Initialize(static_cast<short>(_config->_reservedMinInfoGateWidRange),
+                                        static_cast<short>(_config->_reservedMaxInfoGateWidRange)))
+        {
+            Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1786,
+                       L"[lobby], setup info-gate port fail; init info-gate channel manager fail");
+            return false;
+        }
+        int const maxInfoGateSessionCount = _config->_maxInfoGateSessionCount;
+        unsigned int const maxSession = maxInfoGateSessionCount <= 0 ? 0 : maxInfoGateSessionCount + 1;
+        if (!Network::OpenPort(6, static_cast<unsigned short>(_config->_infoGatePort), 2, _infogatechmgr, &pbh, maxSession,
+                               false, true, false))
+        {
+            Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1799, L"[lobby], setup info-gate port fail.");
+            return false;
+        }
+        Log::Write(Log::LT_NOTICE, L"LobbyDaemon.cpp", 1803, L"[lobby], setup info-gate port ok");
+    }
+
+    {
+        TrustedPacketBufferHandler pbh;
+        void* mem = Memory::_Manager[2]->Alloc(sizeof(GamedChannelManager), L"LobbyDaemon.cpp", 1811);
+        _gamedchmgr = mem != nullptr ? ::new (mem) GamedChannelManager : nullptr;
+        if (!_gamedchmgr->Initialize(static_cast<short>(_config->_reservedMinGameWorldWidRange),
+                                     static_cast<short>(_config->_reservedMaxGameWorldWidRange)))
+        {
+            Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1814, L"[lobby], setup gamed port fail; init gamed channel manager fail");
+            return false;
+        }
+        int const maxGameWorldSessionCount = _config->_maxGameWorldSessionCount;
+        unsigned int const maxSession = maxGameWorldSessionCount <= 0 ? 0 : maxGameWorldSessionCount + 1;
+        if (!Network::OpenPort(5, static_cast<unsigned short>(_config->_worldPort), 2, _gamedchmgr, &pbh, maxSession, false,
+                               true, false))
+        {
+            Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1827, L"[lobby], setup gamed port fail.");
+            return false;
+        }
+        Log::Write(Log::LT_NOTICE, L"LobbyDaemon.cpp", 1831, L"[lobby], setup gamed port ok");
+    }
+
+    {
+        TrustedPacketBufferHandler pbh;
+        void* mem = Memory::_Manager[2]->Alloc(sizeof(ManageSessionHandler), L"LobbyDaemon.cpp", 1839);
+        _manageSessionHandler = mem != nullptr ? ::new (mem) ManageSessionHandler : nullptr;
+        int const maxManageSessionCount = _config->_maxManageSessionCount;
+        unsigned int const maxSession = maxManageSessionCount <= 0 ? 0 : maxManageSessionCount + 1;
+        if (!Network::OpenPort(1, static_cast<unsigned short>(_config->_managePort), 3, _manageSessionHandler, &pbh,
+                               maxSession, false, true, false))
+        {
+            Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1850, L"[lobby], setup manage port fail.");
+            return false;
+        }
+        Log::Write(Log::LT_NOTICE, L"LobbyDaemon.cpp", 1854, L"[lobby], setup manage port ok");
+    }
+
+    Log::Write(Log::LT_NOTICE, L"LobbyDaemon.cpp", 1857, L"[lobby], init network ok");
+    return true;
 }
 
 // 0x9dca0

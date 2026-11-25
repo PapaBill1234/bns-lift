@@ -84,7 +84,10 @@ static_assert(sizeof(GamedChannel) == 0x30, "sizeof GamedChannel");
 class GamedChannelManager : public SessionHandler
 {
 public:
+    GamedChannelManager() {}  // LIFT: PDB inline ctor. Inlined in LobbyDaemon::initNetwork (0x9d520).
     virtual ~GamedChannelManager();  // 0x80300
+    // LIFT: PDB inline Initialize(short, short). Inlined in LobbyDaemon::initNetwork (0x9d520).
+    bool Initialize(short idmin, short idmax);
     bool Add(GamedChannel* channel);  // 0x803e0
     void Remove(short wid);  // 0x804a0
     GamedChannel* Acquire(short wid);  // 0x805b0

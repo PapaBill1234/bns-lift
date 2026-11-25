@@ -99,6 +99,17 @@ void InfoGateChannel::SendGetWorldInfoListFail(short reason)
         Send(&p);
 }
 
+// LIFT: PDB inline (no own RVA). Inlined in LobbyDaemon::initNetwork (0x9d520).
+bool InfoGateChannelManager::Initialize(short idmin, short idmax)
+{
+    if (!_channels.Initialize(idmin, idmax))
+    {
+        Log::Write(Log::LT_ERROR, INFOGATE_FILE, 89, L"[infogate], initialize fail; init channel list fail");
+        return false;
+    }
+    return true;
+}
+
 // 0x2ea70
 InfoGateChannelManager::~InfoGateChannelManager()
 {
