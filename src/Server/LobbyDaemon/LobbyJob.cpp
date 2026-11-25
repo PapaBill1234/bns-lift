@@ -66,23 +66,24 @@ bool LobbyJob::transit(int state)
         AlertSender::Write(kFile, 19, L"== CRASH == [job], transit fail; no definition, tid:0x%I64X", _id);
         return false;
     }
+    // LIFT: the fail logs call GetState (HR 0xc1710 loads _state before the GetDefinition call).
     if (state <= 0 || state > def->fin)
     {
         Log::Write(Log::LT_ERROR, kFile, 24,
                    L"== CRASH == [job], transit fail; state out of range, to:%d, tid:0x%I64X, type:%d, state:%d",
-                   state, _id, GetDefinition()->type, _state);
+                   state, _id, GetDefinition()->type, GetState());
         AlertSender::Write(kFile, 24,
                            L"== CRASH == [job], transit fail; state out of range, to:%d, tid:0x%I64X, type:%d, state:%d",
-                           state, _id, GetDefinition()->type, _state);
+                           state, _id, GetDefinition()->type, GetState());
     }
     else if (state < _state)
     {
         Log::Write(Log::LT_ERROR, kFile, 30,
                    L"== CRASH == [job], transit fail; roll back not allowed, to:%d, tid:0x%I64X, type:%d, state:%d",
-                   state, _id, GetDefinition()->type, _state);
+                   state, _id, GetDefinition()->type, GetState());
         AlertSender::Write(kFile, 30,
                            L"== CRASH == [job], transit fail; roll back not allowed, to:%d, tid:0x%I64X, type:%d, state:%d",
-                           state, _id, GetDefinition()->type, _state);
+                           state, _id, GetDefinition()->type, GetState());
     }
     else
     {

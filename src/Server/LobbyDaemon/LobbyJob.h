@@ -53,6 +53,7 @@ public:
 
     // LIFT: constructor not in the PDB. Inlined in CliSessionJob::CliSessionJob (0x3bef0): _id, _state and _lastState are set to zero.
     LobbyJob() : _id(0), _state(0), _lastState(0) {}
+    int GetState() const { return _state; }  // PDB inline (type 0x4814)
     virtual LobbyJobDef const* GetDefinition() const = 0;  // slot 4
     virtual ~LobbyJob();  // 0x12270
 protected:
