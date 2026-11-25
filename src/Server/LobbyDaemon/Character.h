@@ -110,6 +110,9 @@ public:
     bool StartGameWorldPlay(unsigned long ipv4);                  // 0x326c0
     bool EndGameWorldPlay();                                      // 0x32800
     void SetSlotId(id128 const& slotid);                          // 0x328f0
+    // LIFT: PDB inline Character::SetServiceStatus(bool). It has no own RVA. Inlined in
+    // ChangeCharacterRaceJob::registerServiceEntry (0x203b0) and releasePcServiceStatus (0x229a0).
+    inline void SetServiceStatus(bool status);
 
     DB _db;
     char _right;
@@ -136,3 +139,13 @@ static_assert(offsetof(Character::DB, state) == 0x84, "Character::DB::state");
 static_assert(offsetof(Character::DB, block) == 0x88, "Character::DB::block");
 static_assert(sizeof(Character::SlotAttribute) == 0x4, "sizeof Character::SlotAttribute");
 static_assert(sizeof(Character::Status) == 0x1, "sizeof Character::Status");
+
+// LIFT: body of the PDB inline Character::SetServiceStatus(bool). From the inlined code in
+// ChangeCharacterRaceJob::registerServiceEntry (0x203b0) and releasePcServiceStatus (0x229a0).
+#include "Log.h"
+inline void Character::SetServiceStatus(bool status)
+{
+    _status.in_service = status;
+    Log::Write(Log::LT_DEBUG, L"Character.cpp", 590, L"[pc], set service status, status:%s, pcid:0x%I64X",
+               status ? L"yes" : L"no", _db.pcid);
+}
