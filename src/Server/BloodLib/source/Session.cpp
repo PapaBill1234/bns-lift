@@ -745,7 +745,7 @@ bool Session::handlePacket()
 {
     // ~Packet() calls Clear() on each return (0xF750 has one unwind state).
     // 0xF750 sets Splitter and IsFragmentPacket, then zeroes 28 bytes from FragmentPacketCmd (inline).
-    Packet packet = {nullptr, false};
+    Packet packet;
     unsigned int offset = 0;
     while (_minPacketSize <= _recvBuffer->_recvdSize - offset)
     {
@@ -848,7 +848,7 @@ void Session::SendV(char const* format, char* args) const
     Session* self = const_cast<Session*>(this);
     if (format == nullptr)
         SESSION_ASSERT_CRASH(SESSION_FILE, "source\\Session.cpp", 1153);
-    Packet packet = {nullptr, false};
+    Packet packet;
     PacketBuffer* buffer = PacketBufferAllocator::_Local->allocate();
     packet.ListTail = buffer;
     packet.ListHead = buffer;

@@ -37,6 +37,12 @@ public:
         wchar_t* str;
     };
 
+    // PDB: public ctor Packet::Packet(PacketSplitter*), inlined at each use (the originals zero the 6 fields before
+    // Packet::Allocate). LIFT: without it `Packet p;` leaves Splitter and ListHead uninitialized and Allocate reads them.
+    explicit Packet(PacketSplitter* splitter = nullptr)
+        : Splitter(splitter), IsFragmentPacket(false), FragmentPacketCmd(0), CurHeader(nullptr), ListHead(nullptr), ListTail(nullptr)
+    {
+    }
     ~Packet();
     void Clear();
     char const* Allocate();

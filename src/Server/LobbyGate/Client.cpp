@@ -627,7 +627,7 @@ __declspec(noinline) void ClientManager::BroadcastAnnounceNotify(wchar_t const* 
         return;
     }
     // LIFT: inlined Packet constructor (0x62c0): zero fill, then one buffer from the thread pool.
-    Packet packet = {nullptr, false};
+    Packet packet;
     packet.ListTail = PacketBufferAllocator::_Local->allocate();
     packet.ListHead = packet.ListTail;
     packet.CurHeader = reinterpret_cast<Packet::Header*>(&packet.ListTail->Buffer[8]);
