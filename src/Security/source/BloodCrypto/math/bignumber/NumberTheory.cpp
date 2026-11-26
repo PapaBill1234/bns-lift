@@ -440,15 +440,19 @@ __declspec(noinline)
 bool BigInteger::IsPrime() const
 {
     unsigned int r;
-    for (int i = 0; i < 256; ++i)
+    // LIFT: LG 0x561a0 counts the first loop with an unsigned index (inc, cmp 0x100, jb) and ends the second loop with a
+    // signed pointer compare (jl): unsigned index first, int index second.
+    for (unsigned int i = 0; i < 256; ++i)
     {
-        Divide(this, primes[i], 0, &r);
+        // LIFT: LG 0x561a0 tests `this` before each Divide call (Hex-Rays: if (a1 != nullptr) Divide(...)).
+        if (this != nullptr)
+            Divide(this, primes[i], 0, &r);
         if (r == 0)
             return false;
     }
-    for (unsigned int const* p = primes; p < primes + 8; ++p)
+    for (int i = 0; i < 8; ++i)
     {
-        if (!isPrimeMR(this, *p))
+        if (!isPrimeMR(this, primes[i]))
             return false;
     }
     return true;

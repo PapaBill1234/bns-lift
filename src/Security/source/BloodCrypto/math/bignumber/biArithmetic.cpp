@@ -543,6 +543,12 @@ void BigInteger::Divide(BigInteger const* a, BigInteger const* b, BigInteger* qu
     }
 }
 
+// LIFT: the original keeps the `a == 0` test (LG 0x59020 tests rcx first). The address in a selectany COMDAT constant stops
+// LTCG from removing it (all lift callers pass a non-null a).
+typedef void (*BigIntegerDivideFn)(BigInteger const*, BigInteger const*, BigInteger*, BigInteger*);
+extern BigIntegerDivideFn const BigIntegerDivideRef;
+__declspec(selectany) extern BigIntegerDivideFn const BigIntegerDivideRef = &BigInteger::Divide;
+
 // 0x59ab0 (LobbyGate)
 // LIFT: LTCG removed quot. The binary gets rem in r8 (0x59AB4, 0x59ABA). The only call (0x561D2)
 // passes rcx = a, edx = b, r8 = &rem. The code uses only rem.
