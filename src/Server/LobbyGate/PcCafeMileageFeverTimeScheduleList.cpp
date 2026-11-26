@@ -44,11 +44,12 @@ bool PcCafeMileageFeverTimeScheduleList::Set(bool enablePcCafeMileage, bool enab
                         info->repeatStartTime, info->repeatDuration, static_cast<int>(info->daysOfWeek)) == 0)
             return false;
         // Inlined FragmentPacket::IncRepeatCount (0x3840).
+        long long subTop = _fp.composer.subTop;  // 0x15fe2: subTop is read before start[top].
         int next = _fp.composer.start[_fp.composer.top] + 1;
-        if (_fp.composer.subTop < 0)
-            _fp.composer.index = next;
+        if (subTop >= 0)  // 0x15ff2: the sub[] store is the fall-through block.
+            _fp.composer.sub[subTop].index = next;
         else
-            _fp.composer.sub[_fp.composer.subTop].index = next;
+            _fp.composer.index = next;
         ++*_fp.composer.counts[_fp.composer.top];
     }
     _fp.composer.PopRepeatCount();
