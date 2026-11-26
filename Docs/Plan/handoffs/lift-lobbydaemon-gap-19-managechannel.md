@@ -66,7 +66,7 @@ Merge note: if gap-17 also adds these ctors or `Initialize`, keep one copy.
 | `gate_fast.sh` (fresh clone of `e5d9fe2`) | rc 0, gate ok, parity ok, 478 s |
 | `strict.py` (5 exes, `cfg` level) | no FAIL; LobbyDaemon cfg 594 -> 666 (841 -> 940 paired); LobbyGate cfg 515 -> 516; others same |
 | `proof.py --base 7b92217 --candidate e5d9fe2` | verdict `review`; 0 lost, 0 strict regress, 0 cfg regress, 0 reasons; 45 credited, 38 review items |
-| `review.py run` (ledger `/data/parity-v2/gap/review-19/ledger.sqlite`) | 14 accept, 24 reject (22 precheck, 2 model), 0 park; 79,354 tokens |
+| `review.py run` (local review ledger) | 14 accept, 24 reject (22 precheck, 2 model), 0 park; 79,354 tokens |
 | `integrate.check_proof` (dry) | REFUSED: reject receipts and no operator exclude receipt |
 
 ## MATCH
