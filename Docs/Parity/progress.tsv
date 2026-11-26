@@ -89,3 +89,4 @@ date	card	parity (MATCH/total per exe)
 2026-11-26	lift-parity-shared-5	CacheGate 457/491 93.1%; LobbyGate 662/739 89.6%; SmartCouponDaemon 630/669 94.2%; PostOfficeDaemon 695/759 91.6%; LobbyDaemon 1024/2204 46.5% excluded 127
 2026-11-26	lift-parity-lg-5a	CacheGate 457/491 93.1%; LobbyGate 676/739 91.5%; SmartCouponDaemon 630/669 94.2%; PostOfficeDaemon 695/759 91.6%; LobbyDaemon 1024/2204 46.5% excluded 127
 2026-11-26	lift-parity-lg-5b	CacheGate 457/491 93.1%; LobbyGate 688/739 93.1%; SmartCouponDaemon 630/669 94.2%; PostOfficeDaemon 695/759 91.6%; LobbyDaemon 1024/2204 46.5% excluded 127
+2026-11-26	lift-parity-pod-5a	CacheGate 457/491 93.1%; LobbyGate 688/739 93.1%; SmartCouponDaemon 630/669 94.2%; PostOfficeDaemon 706/759 93.0%; LobbyDaemon 1024/2204 46.5% excluded 127
