@@ -67,8 +67,9 @@ bool ManagementSessionHandler::PacketHandler(Session const* session, Packet cons
                    MODULE_NAME, L"ManagementSessionHandler::PacketHandler", session->_id,
                    static_cast<unsigned int>(session->_id >> 32), static_cast<unsigned int>(session->_id));
         _snwprintf_s(failReason, 0x101, _TRUNCATE, L"failed to decompose command");
+        goto $_ERROR;
     }
-    else
+
     {
         int index = 1;
         for (; index < 16; ++index)
@@ -77,26 +78,33 @@ bool ManagementSessionHandler::PacketHandler(Session const* session, Packet cons
                 break;
         }
 
-        int line;
+        // LIFT: 0x10d00 the PDB lines 61-69 and the label $_ERROR give a goto form. The handler tail call is the last block.
         if (index == 16)
         {
-            line = 61;
+            Log::Write(Log::LT_ERROR, MANAGEMENT_SESSION_FILE, 61,
+                       L"[%s], %s; invalid packet command of management session, command:%s, session:0x%I64X, portId:%u, "
+                       L"sessionIndex:%u",
+                       MODULE_NAME, L"ManagementSessionHandler::PacketHandler", command, session->_id,
+                       static_cast<unsigned int>(session->_id >> 32), static_cast<unsigned int>(session->_id));
+            _snwprintf_s(failReason, 0x101, _TRUNCATE, L"invalid packet command");
+            goto $_ERROR;
         }
-        else
+
+        Daemon::PacketHandler const handler = PostOfficeManagementPacketServerSideHandlerList[index];
+        if (handler == nullptr)
         {
-            Daemon::PacketHandler const handler = PostOfficeManagementPacketServerSideHandlerList[index];
-            if (handler != nullptr)
-                return handler(session, packet);
-            line = 68;
+            Log::Write(Log::LT_ERROR, MANAGEMENT_SESSION_FILE, 68,
+                       L"[%s], %s; invalid packet command of management session, command:%s, session:0x%I64X, portId:%u, "
+                       L"sessionIndex:%u",
+                       MODULE_NAME, L"ManagementSessionHandler::PacketHandler", command, session->_id,
+                       static_cast<unsigned int>(session->_id >> 32), static_cast<unsigned int>(session->_id));
+            _snwprintf_s(failReason, 0x101, _TRUNCATE, L"invalid packet command");
+            goto $_ERROR;
         }
-        Log::Write(Log::LT_ERROR, MANAGEMENT_SESSION_FILE, line,
-                   L"[%s], %s; invalid packet command of management session, command:%s, session:0x%I64X, portId:%u, "
-                   L"sessionIndex:%u",
-                   MODULE_NAME, L"ManagementSessionHandler::PacketHandler", command, session->_id,
-                   static_cast<unsigned int>(session->_id >> 32), static_cast<unsigned int>(session->_id));
-        _snwprintf_s(failReason, 0x101, _TRUNCATE, L"invalid packet command");
+        return handler(session, packet);
     }
 
+$_ERROR:
     // LIFT: Packet constructor, inlined (0x10d00): the fields are set one by one.
     Packet reply;
     reply.CurHeader = nullptr;

@@ -77,19 +77,19 @@ bool AgentSessionHandler::OnConnect(Session const* session, bool firstConnected)
 // 0x3820
 void AgentSessionHandler::OnClose(Session const* session, bool tryReconnect) const
 {
-    unsigned long long const sessionId = session->_id;
     AgentChannel* const channel = static_cast<AgentChannel*>(session->GetChannel());
     if (channel == nullptr)
     {
         Log::Write(Log::LT_NOTICE, AGENT_CHANNEL_FILE, 143,
                    L"[%s], %s; closed connection with unknown agent session, sessionId:0x%I64X, portId:%u, sessionIndex:%u",
-                   MODULE_NAME, L"AgentSessionHandler::OnClose", sessionId,
-                   static_cast<unsigned int>(sessionId >> 32), static_cast<unsigned int>(sessionId));
+                   MODULE_NAME, L"AgentSessionHandler::OnClose", session->_id,
+                   static_cast<unsigned int>(session->_id >> 32), static_cast<unsigned int>(session->_id));
         return;
     }
 
-    unsigned short const agentWid = channel->_agentWid;
+    // LIFT: 0x3820 PDB lines 126-127: the type test comes before the agentWid read. session->_id is read again at each use (A26).
     bool const isPostAgent = channel->_connectionType == 1;
+    unsigned short const agentWid = channel->_agentWid;
     if (isPostAgent)
     {
         // LIFT: inlined AgentChannelManager release (log line 98). The name is not in the PDB.
@@ -108,13 +108,13 @@ void AgentSessionHandler::OnClose(Session const* session, bool tryReconnect) con
     if (isPostAgent)
         Log::Write(Log::LT_NOTICE, AGENT_CHANNEL_FILE, 136,
                    L"[%s], %s; closed connection with post agent session, agentWid:%u, sessionId:0x%I64X, portId:%u, sessionIndex:%u",
-                   MODULE_NAME, L"AgentSessionHandler::OnClose", static_cast<unsigned int>(agentWid), sessionId,
-                   static_cast<unsigned int>(sessionId >> 32), static_cast<unsigned int>(sessionId));
+                   MODULE_NAME, L"AgentSessionHandler::OnClose", static_cast<unsigned int>(agentWid), session->_id,
+                   static_cast<unsigned int>(session->_id >> 32), static_cast<unsigned int>(session->_id));
     else
         Log::Write(Log::LT_NOTICE, AGENT_CHANNEL_FILE, 139,
                    L"[%s], %s; closed connection with client agent session, agentWid:%u, sessionId:0x%I64X, portId:%u, sessionIndex:%u",
-                   MODULE_NAME, L"AgentSessionHandler::OnClose", static_cast<unsigned int>(agentWid), sessionId,
-                   static_cast<unsigned int>(sessionId >> 32), static_cast<unsigned int>(sessionId));
+                   MODULE_NAME, L"AgentSessionHandler::OnClose", static_cast<unsigned int>(agentWid), session->_id,
+                   static_cast<unsigned int>(session->_id >> 32), static_cast<unsigned int>(session->_id));
 }
 
 // 0x3a00
