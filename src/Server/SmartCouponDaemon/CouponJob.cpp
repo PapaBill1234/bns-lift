@@ -185,8 +185,15 @@ void JobManager::Clear()
     }
 }
 
+// LIFT: The original PDB marks JobManager::Execute as "inlined" (S_FRAMEPROC fWasInlined): the original
+// SendPublicationEvent::HandleEvent has the Execute logic inline (task 1). The lift has that logic in its own source form,
+// so ExecuteW is the only caller and LTCG puts the constant 2 into Execute. The second caller below and its COMDAT
+// reference (removed by the linker after code generation) keep the task parameter, as in 0x71A0 (mov eax, r8d) and
+// 0x7220 (mov r8d, 2). noinline keeps the call in 0x7220. The exe gets no code from this.
+void JobManagerExecuteCaller(JobManager* manager, CouponJob* job, int task, void* param);
+
 // 0x71A0
-void JobManager::Execute(CouponJob* job, int task, void* param)
+__declspec(noinline) void JobManager::Execute(CouponJob* job, int task, void* param)
 {
     if (job == nullptr)
     {
@@ -282,3 +289,11 @@ CouponJob* JobManager::find(unsigned long long jobid)
     LeaveCriticalSection(&_lock[slot].CS);
     return job;
 }
+
+void JobManagerExecuteCaller(JobManager* manager, CouponJob* job, int task, void* param)
+{
+    manager->Execute(job, task, param);
+}
+extern void (*const JobManagerExecuteCallerRef)(JobManager*, CouponJob*, int, void*);
+__declspec(selectany) extern void (*const JobManagerExecuteCallerRef)(JobManager*, CouponJob*, int, void*) =
+    &JobManagerExecuteCaller;
