@@ -78,37 +78,37 @@ bool CouponJob::transit(int state)
 }
 
 // 0x6B50
-bool CouponJob::execute(int task, void* param)
+CouponJob::Result CouponJob::execute(int task, void* param)
 {
     EnterCriticalSection(&_lock.CS);
     if (_state == GetDefinition()->fin)
     {
         LeaveCriticalSection(&_lock.CS);
-        return false;
+        return JOB_DONE;
     }
     if (!dispatch_work(task, param) && _state != GetDefinition()->fin)
         transit(GetDefinition()->fin);
     int const state = _state;
     LeaveCriticalSection(&_lock.CS);
-    return state == GetDefinition()->fin;
+    return state == GetDefinition()->fin ? JOB_FIN : JOB_DONE;
 }
 
 // 0x6C10
-bool CouponJob::resume(int state, int task, void* /*param*/)
+CouponJob::Result CouponJob::resume(int state, int task, void* /*param*/)
 {
     EnterCriticalSection(&_lock.CS);
     int const cur = _state;
     if (cur == GetDefinition()->fin || cur != state)
     {
         LeaveCriticalSection(&_lock.CS);
-        return false;
+        return JOB_DONE;
     }
     // The original passes nullptr, not param.
     if (!dispatch_work(task, nullptr) && _state != GetDefinition()->fin)
         transit(GetDefinition()->fin);
     int const now = _state;
     LeaveCriticalSection(&_lock.CS);
-    return now == GetDefinition()->fin;
+    return now == GetDefinition()->fin ? JOB_FIN : JOB_DONE;
 }
 
 // 0x6CE0
@@ -201,7 +201,7 @@ __declspec(noinline) void JobManager::Execute(CouponJob* job, int task, void* pa
         AlertSender::Write(kFile, 206, L"== CRASH == [job-mgr], execute fail; null job");
         return;
     }
-    if (job->execute(task, param))
+    if (job->execute(task, param) == CouponJob::JOB_FIN)
         remove(job->_id);
 }
 
@@ -229,7 +229,7 @@ bool JobManager::ResumeW(unsigned long long jobid, int state, int task)
         return false;
     }
     // BUG: 0x72B0 the param argument of resume is an uninitialized register (r9). resume does not use it.
-    if (job->resume(state, task, nullptr))
+    if (job->resume(state, task, nullptr) == CouponJob::JOB_FIN)
         remove(job->_id);
     job->removeReferenceCount(kFile, 249);
     return true;

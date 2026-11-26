@@ -40,9 +40,17 @@ public:
     virtual bool work(int, void*) = 0;                // slot 6
     virtual ~CouponJob();
 
+    // PDB: ?execute@CouponJob@@IEAA?AW4Result@1@HPEAX@Z and ?resume@...@@IEAA?AW4Result@1@HHPEAX@Z return Result.
+    // JobManager::Execute (0x71A0) tests the result with `cmp eax, 1` (JOB_FIN).
+    enum Result : int
+    {
+        JOB_DONE = 0x0,
+        JOB_FIN = 0x1,
+    };
+
     bool transit(int state);                          // 0x6990
-    bool execute(int task, void* param);              // 0x6B50
-    bool resume(int state, int task, void* param);    // 0x6C10
+    Result execute(int task, void* param);            // 0x6B50
+    Result resume(int state, int task, void* param);  // 0x6C10
 
     unsigned long long _id;
     int _state;

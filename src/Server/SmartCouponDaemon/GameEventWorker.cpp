@@ -470,7 +470,7 @@ bool SendPublicationEvent::HandleEvent(EventContext*, unsigned long)
             Log::Write(Log::LT_ERROR, L"CouponJob.cpp", 206, L"== CRASH == [job-mgr], execute fail; null job");
             AlertSender::Write(L"CouponJob.cpp", 206, L"== CRASH == [job-mgr], execute fail; null job");
         }
-        else if (job->execute(1, nullptr))
+        else if (job->execute(1, nullptr) == CouponJob::JOB_FIN)
         {
             jobMgr->remove(job->_id);
         }
