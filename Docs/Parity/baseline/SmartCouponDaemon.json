@@ -2277,9 +2277,9 @@
 "ObjPool::Finalize": {
 "calls": 100,
 "consts": 100,
-"refs": 97,
-"score": 99.0,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "ObjPool::Initialize": {
 "calls": 100,
@@ -2291,9 +2291,9 @@
 "ObjPool::ObjPool": {
 "calls": 100,
 "consts": 100,
-"refs": 97,
-"score": 99.0,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "ObjPoolTimer::Add": {
 "calls": 100,
