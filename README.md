@@ -22,16 +22,16 @@ This repo is public. Do not commit binaries, keys, PDBs or IDA databases.
 ## Parity
 
 <!-- parity:start -->
-Last update: card `lift-lobbydaemon-v2b-pod-01` (2026-11-26). Tool: `tools/parity.sh` (VS2010 /GL /LTCG build vs original, funcdiff).
+Last update: card `lift-lobbydaemon-v2b-wmain-01` (2026-11-26). Tool: `tools/parity.sh` (VS2010 /GL /LTCG build vs original, funcdiff).
 
 | Exe | Parity | MATCH | DIFF | Excluded | Only in original | Total | Mean score | Start | Change | Level |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| CacheGate | **94.3 %** | 463 | 26 | 0 | 2 | 491 | 99.5 | 44.0 % | +50.3 | 90 % ✅ |
+| CacheGate | **94.5 %** | 464 | 26 | 0 | 1 | 491 | 99.6 | 44.0 % | +50.5 | 90 % ✅ |
 | LobbyGate | **93.1 %** | 688 | 49 | 0 | 2 | 739 | 99.4 | 37.9 % | +55.2 | 90 % ✅ |
-| SmartCouponDaemon | **94.6 %** | 633 | 34 | 0 | 2 | 669 | 99.6 | 33.6 % | +61.0 | 90 % ✅ |
+| SmartCouponDaemon | **94.9 %** | 635 | 33 | 0 | 1 | 669 | 99.6 | 33.6 % | +61.3 | 90 % ✅ |
 | PostOfficeDaemon | **94.3 %** | 716 | 41 | 0 | 2 | 759 | 99.5 | 34.5 % | +59.8 | 90 % ✅ |
 | LobbyDaemon | **46.5 %** | 1024 | 300 | 127 | 753 | 2204 | 97.2 | 2.2 % | +44.2 | below 90 % |
-| **First 4** | **94.1 %** | 2500 | | | | 2658 | | 37.0 % | +57.1 | 90 % ✅ |
+| **First 4** | **94.2 %** | 2503 | | | | 2658 | | 37.0 % | +57.2 | 90 % ✅ |
 
 | Shared library (functions in 2+ exes) | Parity | MATCH in each exe | DIFF in 1+ exe | Total | Goal |
 | --- | ---: | ---: | ---: | ---: | --- |
@@ -135,4 +135,5 @@ First 4 and shared library: CacheGate, LobbyGate, SmartCouponDaemon, PostOfficeD
 | `lift-parity-pod-5b` | 93.1 % | 93.1 % | 94.2 % | 93.8 % | 46.5 % |
 | `lift-parity-cgscd-5` | 94.3 % | 93.1 % | 94.6 % | 93.8 % | 46.5 % |
 | `lift-lobbydaemon-v2b-pod-01` | 94.3 % | 93.1 % | 94.6 % | 94.3 % | 46.5 % |
+| `lift-lobbydaemon-v2b-wmain-01` | 94.5 % | 93.1 % | 94.9 % | 94.3 % | 46.5 % |
 <!-- parity:end -->

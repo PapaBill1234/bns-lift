@@ -4656,10 +4656,17 @@
 },
 "wmain": {
 "calls": 100,
-"consts": 0,
+"consts": 100,
 "refs": 100,
-"score": 66.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
+},
+"wmain$dtor$0": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "wmainCRTStartup": {
 "calls": 100,
