@@ -1,5 +1,5 @@
 // ExtendJumpingCharacterCreationQuotaJob.obj (LobbyDaemon PDB, 2019 + PDB). Layouts from tools/pdbcls.py LobbyDaemon <Class>.
-// LIFT: header layouts only (fix7). The function bodies are still LIFT_STUB.
+// LIFT: ExtendJumpingCharacterCreationQuotaJob is lifted (gap-23). UpgradeJumpingCharacterStateJob bodies are still LIFT_STUB.
 #pragma once
 #include <stddef.h>
 #include "CliSessionJob.h"

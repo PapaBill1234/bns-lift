@@ -1,10 +1,12 @@
 // LobbyLobbyGatePacketHandler.obj (LobbyDaemon PDB, 2019 + PDB). A function with LIFT_STUB is not a lift.
 #include <new>
+#include <string.h>
 #include <winsock2.h>
 #include <windows.h>
 #include "LobbyLobbyGatePacketHandler.h"
 #include "CliSession.h"
 #include "CliSessionManager.h"
+#include "ExtendJumpingCharacterCreationQuotaJob.h"
 #include "FragmentPacket.h"
 #include "LiftStub.h"
 #include "LobbyDaemon.h"
@@ -450,9 +452,57 @@ bool HandleLobbyLobbyGate_ChangeUserNameWithAccountInventoryItemReq(SharedChanne
 }
 
 // 0xcac70
-bool HandleLobbyLobbyGate_ExtendJumpingCharacterCreationQuotaWithAccountInventoryItemReq(SharedChannel*, Packet const*)
+bool HandleLobbyLobbyGate_ExtendJumpingCharacterCreationQuotaWithAccountInventoryItemReq(SharedChannel* channel, Packet const* packet)
 {
-    LIFT_STUB(0xcac70);
+    // LIFT: the PDB signature has SharedChannel*; the pseudocode types it as LobbyGateChannel* (LobbyGateChannel derives from SharedChannel).
+    LobbyGateChannel* gate = static_cast<LobbyGateChannel*>(channel);
+    short cmd = 0;
+    unsigned long long clikey = 0;
+    ExtendJumpingCharacterCreationQuotaWithAccountInventoryItemReqParam param;
+    memset(&param, 0, sizeof(param));
+    if (packet->Decompose("hqqqi", &cmd, &clikey, &param.labelId, &param.itemInstanceId, &param.itemDataId) == 0)
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyLobbyGatePacketHandler.cpp", 1754,
+                   L"[lobby-gate], handle extend-jumping-character-creation-quota-with-account-inventory-item req fail; decompose fail,"
+                   L" cli-key:0x%I64X, label-id:0x%I64X, item-instance-id:0x%I64X, item-data-id:%u",
+                   clikey, param.labelId, param.itemInstanceId, param.itemDataId);
+        return true;
+    }
+    CliSession* cliSession = LobbyDaemon::_instance->_clisessionMgr->Select(clikey);
+    if (cliSession == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyLobbyGatePacketHandler.cpp", 1761,
+                   L"[lobby-gate], handle extend-jumping-character-creation-quota-with-account-inventory-item req fail; no such cli-s"
+                   L"ession, cli-key:0x%I64X, label-id:0x%I64X, item-instance-id:0x%I64X, item-data-id:%u",
+                   clikey, param.labelId, param.itemInstanceId, param.itemDataId);
+        gate->SendExtendJumpingCharacterCreationQuotaWithAccountInventoryItemFail(clikey, param.labelId, param.itemInstanceId, 4);
+        return true;
+    }
+    param.lgate = gate;
+    void* mem = ExtendJumpingCharacterCreationQuotaJob::_pool.Checkout(L"LobbyLobbyGatePacketHandler.cpp", 1768);
+    ExtendJumpingCharacterCreationQuotaJob* job =
+        mem != nullptr ? new (mem) ExtendJumpingCharacterCreationQuotaJob(cliSession) : nullptr;
+    LobbyJobManager* jobMgr = LobbyDaemon::_instance->_jobMgr;
+    if (!jobMgr->Register(job))
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyLobbyGatePacketHandler.cpp", 1771,
+                   L"[lobby-gate], handle extend-jumping-character-creation-quota-with-account-inventory-item req fail; start job f"
+                   L"ail, cli-key:0x%I64X, label-id:0x%I64X, item-instance-id:0x%I64X, item-data-id:%u",
+                   clikey, param.labelId, param.itemInstanceId, param.itemDataId);
+        gate->SendExtendJumpingCharacterCreationQuotaWithAccountInventoryItemFail(clikey, param.labelId, param.itemInstanceId, 2);
+        job->removeReferenceCount(L"LobbyLobbyGatePacketHandler.cpp", 1773);
+        cliSession->removeReferenceCount(L"LobbyLobbyGatePacketHandler.cpp", 1774);
+        return true;
+    }
+    // LTCG inlines LobbyJobManager::Execute (0xc2020) here.
+    jobMgr->Execute(job, 30, &param);
+    Log::Write(Log::LT_DEBUG, L"LobbyLobbyGatePacketHandler.cpp", 1778,
+               L"[lobby-gate], handle extend-jumping-character-creation-quota-with-account-inventory-item req ok, cli-key:0x%I6"
+               L"4X, label-id:0x%I64X, item-instance-id:0x%I64X, item-data-id:%u",
+               clikey, param.labelId, param.itemInstanceId, param.itemDataId);
+    job->removeReferenceCount(L"LobbyLobbyGatePacketHandler.cpp", 1780);
+    cliSession->removeReferenceCount(L"LobbyLobbyGatePacketHandler.cpp", 1781);
+    return true;
 }
 
 // 0xcafd0

@@ -407,6 +407,13 @@ public:
     bool fetchContentBans(FragmentPacket*);  // 0x36df0
     bool fetchAccountContentQuotaList(FragmentPacket*);  // 0x36fa0
     bool fetchAccountRecycleTimeList(FragmentPacket*);  // 0x371b0
+    // LIFT: PDB nested tag type (size 1). It selects the queryLobbyService overload for the extend quota service.
+    struct QueryExtendJumpingCharacterCreationQuotaService
+    {
+    };
+    // LIFT: PDB inline method. It has no own RVA. The body (ExtendJumpingCharacterCreationQuotaJob.cpp) comes from
+    // the inlined code in ExtendJumpingCharacterCreationQuotaJob::init (0x2a6a0) and ::registerServiceEntry (0x2b990).
+    inline LobbyService* queryLobbyService(QueryExtendJumpingCharacterCreationQuotaService const&);
     bool addLobbyService(LobbyService*);  // 0x373a0
     void removeLobbyService(unsigned long long);  // 0x37530
     LobbyService* getLobbyServiceByType(unsigned long long, int);  // 0x37670
