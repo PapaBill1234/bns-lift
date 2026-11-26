@@ -42,7 +42,7 @@ Scope additions:
 | Check | Result |
 | --- | --- |
 | `pilot.py gate` (32 card IDs, REF `main-build-l72ddWL0`, NOREF `noref-build-WRTRM74v`, both `ede938a`) | 32 of 32 clear (0 of 32 before); eligible pool 264 -> 304 |
-| `gate_fast.sh` (fresh clone of `ede938a`, `/data/parity-v2/gap/full-11`) | rc 0, parity ok, 456 s |
+| `gate_fast.sh` (fresh clone of `ede938a`) | rc 0, parity ok, 456 s |
 | `strict.py` (5 exes, `cfg` level) | no FAIL; 0 strict regress, 0 cfg regress (LobbyDaemon cfg 594 -> 596, LobbyGate 515 -> 516) |
 | `proof.py --base e68e5d0 --candidate ede938a` | verdict `pass`; 0 lost MATCH, 0 strict regress, 0 cfg regress, 0 review items |
 | `review.py run` | not run: the proof has 0 review items |
