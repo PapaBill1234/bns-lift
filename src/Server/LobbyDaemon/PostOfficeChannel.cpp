@@ -103,13 +103,7 @@ bool PostOfficeChannel::Connect(unsigned long long id, unsigned int portId, unsi
 // 0x63ba0
 bool PostOfficeChannel::SendHelloReq()
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     // LIFT: the third argument and the last argument are 64-bit zero stores in the binary (0x63c1b, 0x63c2c).
     if (0 == p.Compose("hhhhhQ", 1, 15, 0LL, 10, static_cast<int>(static_cast<short>(LobbyDaemon::_instance->_config->_worldId)), 0LL))

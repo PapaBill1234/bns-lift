@@ -45,13 +45,7 @@ wchar_t const* const CHANNEL_H_FILE =
 // 0x2e6d0
 void InfoGateChannel::SendAuthTokenOk(unsigned long long tid, unsigned long long clikey, id128 const& infoGateToken)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("hqqo", 5, tid, clikey, infoGateToken))
         Log::Write(Log::LT_ERROR, INFOGATE_FILE, 29,
@@ -64,13 +58,7 @@ void InfoGateChannel::SendAuthTokenOk(unsigned long long tid, unsigned long long
 // 0x2e870
 void InfoGateChannel::SendAuthTokenFail(unsigned long long tid, unsigned long long clikey, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("hqqE", 6, tid, clikey, static_cast<int>(reason)))
         Log::Write(Log::LT_ERROR, INFOGATE_FILE, 42,
@@ -84,13 +72,7 @@ void InfoGateChannel::SendAuthTokenFail(unsigned long long tid, unsigned long lo
 void InfoGateChannel::SendGetWorldInfoListFail(short reason)
 {
     // LIFT: the original composes the constant 2 for both the packet and the log (reason is not used).
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("hh", 9, 2))
         Log::Write(Log::LT_ERROR, INFOGATE_FILE, 62,
@@ -218,13 +200,7 @@ void InfoGateChannelManager::BroadcastBoastEventInWorldNotify(short worldCluster
                    L"[infogate], broadcast boast event in world notify fail; invalid parameter");
         return;
     }
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("hhsh", 10, static_cast<unsigned int>(worldClusterId), pcName, static_cast<int>(boastEventDataId)))
     {

@@ -50,15 +50,9 @@ class FragmentPacketConcatenater : public PacketConcatenateBuffer
 {
 public:
     // LIFT: The constructor is inlined (Clone 0x2870, __pump_fragment_packet 0x1bc0). The original builds the base,
-    // then relayPacket (Packet::Packet(PacketSplitter*) store order), then sets Command and TotalSize.
-    FragmentPacketConcatenater()
+    // then relayPacket through Packet::Packet(PacketSplitter*), then sets Command and TotalSize.
+    FragmentPacketConcatenater() : relayPacket(nullptr)
     {
-        relayPacket.CurHeader = nullptr;
-        relayPacket.Splitter = nullptr;
-        relayPacket.ListHead = nullptr;
-        relayPacket.ListTail = nullptr;
-        relayPacket.IsFragmentPacket = false;
-        relayPacket.FragmentPacketCmd = 0;
         Command = 0;
         TotalSize = 0;
     }

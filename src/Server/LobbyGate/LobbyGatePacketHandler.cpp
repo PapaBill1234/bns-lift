@@ -117,13 +117,7 @@ bool HandleLobbyGate_PingReq(Session const* session, Packet const* packet)
 // 0x142e0
 bool HandleLobbyGate_ContentsRuleListReq(Session* session, Packet const* packet)
 {
-    Packet sendPacket;  // LIFT: inlined constructor (separate stores, no memset)
-    sendPacket.Splitter = nullptr;
-    sendPacket.IsFragmentPacket = false;
-    sendPacket.FragmentPacketCmd = 0;
-    sendPacket.CurHeader = nullptr;
-    sendPacket.ListHead = nullptr;
-    sendPacket.ListTail = nullptr;
+    Packet sendPacket;
     long long* extraData = static_cast<long long*>(session->_extraData);
     long long lastSendTime = extraData != nullptr ? *extraData : 0;
     long long now = static_cast<long long>(GetTickCount64()) - Daemon::Instance->StartSystemTick64;
@@ -179,12 +173,6 @@ bool HandleLobbyGate_HelloReq(Session* session, Packet* packet)
     // LIFT: 0x14470 inlined constructor (separate stores, no memset). The destructor clears the packet on each
     // exit (one Packet::Clear call per exit in the original), so there is no explicit Clear call.
     Packet reply;
-    reply.Splitter = nullptr;
-    reply.IsFragmentPacket = false;
-    reply.FragmentPacketCmd = 0;
-    reply.CurHeader = nullptr;
-    reply.ListHead = nullptr;
-    reply.ListTail = nullptr;
     reply.Allocate();
     reply.Compose("hb", 2, 0);  // 0x145bc: r9d = 0. The binary also writes r12 to the 5th slot. "hb" does not read it.
     if (handshakeDataSize <= 0)
@@ -338,13 +326,7 @@ bool HandleLobbyGate_BypassPacket(Client* client, Packet const* packet)
         return false;
     }
 
-    Packet p;  // LIFT: inlined constructor (separate stores, no memset)
-    p.Splitter = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
-    p.CurHeader = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
+    Packet p;
     p.Allocate();
     if (p.Compose("hq", static_cast<int>(cmd), cliKey) == 0)
     {

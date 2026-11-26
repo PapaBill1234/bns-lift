@@ -234,13 +234,7 @@ bool HandleLobbyLobbyGate_GetCharacterInfoReq(SharedChannel* channel, Packet con
         gate->SendGetCharacterInfoFail(clikey, slotid, 4);
         return true;
     }
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     PacketComposer pcr;  // LIFT: inlined constructor (PDB PacketComposer(char const*, int))
     pcr.format = nullptr;
     pcr.len = 0;

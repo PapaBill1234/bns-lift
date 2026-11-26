@@ -99,15 +99,9 @@ static_assert(sizeof(PacketConcatenater) == 0x8, "sizeof PacketConcatenater");
 class SendFragmentPacketConcatenater : public PacketConcatenater
 {
 public:
-    // LIFT: The constructor is inlined (Clone 0x1220, HandleCacheGateFragmentRelay 0x5880). Packet has no constructor.
+    // LIFT: The constructor is inlined (Clone 0x1220, HandleCacheGateFragmentRelay 0x5880). The Packet ctor zeroes _packet.
     SendFragmentPacketConcatenater()
     {
-        _packet.Splitter = nullptr;
-        _packet.IsFragmentPacket = false;
-        _packet.FragmentPacketCmd = 0;
-        _packet.CurHeader = nullptr;
-        _packet.ListHead = nullptr;
-        _packet.ListTail = nullptr;
     }
     virtual ~SendFragmentPacketConcatenater();                   // 0x11C0 (slot 4)
     virtual void Clear();                                        // 0x1200

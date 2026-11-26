@@ -65,13 +65,7 @@ bool AccountInventoryChannel::Connect(unsigned long long, unsigned int, unsigned
 // 0x66b0
 bool AccountInventoryChannel::SendHelloReq(short version, short wid, short internalPort)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     // LIFT: internalPort is not used in the binary (r9w is never read).
     if (0 == p.Compose("hhhh", 1, 9, static_cast<int>(version), static_cast<int>(wid)))
@@ -86,13 +80,7 @@ bool AccountInventoryChannel::SendHelloReq(short version, short wid, short inter
 // 0x67b0
 bool AccountInventoryChannel::SendLoginNotify(id128 const& account)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("ho", 36, account))
     {
@@ -106,13 +94,7 @@ bool AccountInventoryChannel::SendLoginNotify(id128 const& account)
 // 0x68a0
 bool AccountInventoryChannel::SendLogoutNotify(id128 const& account)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("ho", 35, account))
     {
@@ -133,13 +115,7 @@ bool AccountInventoryChannel::SendGetGoodsCountReq(TransactionChannel::Transacti
         return false;
     }
 
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("hqo", 4, t->GetTid(), account))
     {
@@ -160,13 +136,7 @@ bool AccountInventoryChannel::SendListGoodsReq(TransactionChannel::Transaction* 
         return false;
     }
 
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("hqoc", 7, t->GetTid(), account, static_cast<int>(languageCode)))
     {
@@ -187,13 +157,7 @@ bool AccountInventoryChannel::SendTakeGoodsReq(TransactionChannel::Transaction* 
         return false;
     }
 
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("hqoq", 10, t->GetTid(), account, goodsId))
     {
@@ -214,13 +178,7 @@ bool AccountInventoryChannel::SendRetrieveLobbyServiceItemListReq(TransactionCha
         return false;
     }
 
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("hqoQq", 13, t->GetTid(), account, static_cast<int>(searchType), searchKey))
     {
@@ -241,13 +199,7 @@ bool AccountInventoryChannel::SendRetrieveSingleWarehouseItemReq(TransactionChan
         return false;
     }
 
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("hqqoq", 16, t->GetTid(), itemInstanceId, account, ownerPcId))
     {
@@ -268,13 +220,7 @@ bool AccountInventoryChannel::SendTryWarehouseItemConsumptionReq(TransactionChan
         return false;
     }
 
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("hqqqo", 19, t->GetTid(), labelId, itemInstanceId, account))
     {
@@ -296,13 +242,7 @@ bool AccountInventoryChannel::SendFinishWarehouseItemConsumptionReq(TransactionC
         return false;
     }
 
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("hqqqoE", 22, t->GetTid(), labelId, itemInstanceId, account, 0))
     {
@@ -323,13 +263,7 @@ bool AccountInventoryChannel::SendConsumeWarehouseItemReq(TransactionChannel::Tr
         return false;
     }
 
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("hqqqo", 28, t->GetTid(), labelId, itemInstanceId, account))
     {
@@ -350,13 +284,7 @@ bool AccountInventoryChannel::SendRetrieveCharacterGoodsCountReq(TransactionChan
         return false;
     }
 
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("hqoq", 31, t->GetTid(), account, characterId))
     {

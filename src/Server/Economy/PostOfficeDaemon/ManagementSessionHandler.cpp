@@ -107,12 +107,6 @@ bool ManagementSessionHandler::PacketHandler(Session const* session, Packet cons
 $_ERROR:
     // LIFT: Packet constructor, inlined (0x10d00): the fields are set one by one.
     Packet reply;
-    reply.CurHeader = nullptr;
-    reply.Splitter = nullptr;
-    reply.ListHead = nullptr;
-    reply.ListTail = nullptr;
-    reply.IsFragmentPacket = false;
-    reply.FragmentPacketCmd = 0;
     reply.Allocate();
     SendTextReply(session, &reply, command, failReason);
     return false;

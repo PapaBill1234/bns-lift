@@ -133,12 +133,6 @@ void FragmentPacketSplitter::Clear()
 // 0x2420
 FragmentPacket::FragmentPacket(short command, char const* format)
 {
-    packet.CurHeader = nullptr;
-    packet.Splitter = nullptr;
-    packet.ListHead = nullptr;
-    packet.ListTail = nullptr;
-    packet.IsFragmentPacket = false;
-    packet.FragmentPacketCmd = 0;
     // LIFT: RepeatPacketComposer has no constructor in common; the inline one sets these fields.
     composer.format = nullptr;
     composer.len = 0;

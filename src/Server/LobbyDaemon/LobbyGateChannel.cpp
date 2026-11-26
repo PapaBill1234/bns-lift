@@ -82,13 +82,7 @@ wchar_t const* const SESSION_FILE = L"source\\Session.cpp";
 // 0xbbe90
 void LobbyGateChannel::SendInitSessionWithNPTokenOk(unsigned long long gatekey, unsigned long long clikey, id128 nptoken, id128 portalAccountId)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqqoo", 7, gatekey, clikey, nptoken, portalAccountId))
         Send(&p);
@@ -97,13 +91,7 @@ void LobbyGateChannel::SendInitSessionWithNPTokenOk(unsigned long long gatekey, 
 // 0xbbfb0
 void LobbyGateChannel::SendInitSessionWithNPTokenFail(unsigned long long gatekey, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqE", 8, gatekey, static_cast<int>(reason)))
         Send(&p);
@@ -112,13 +100,7 @@ void LobbyGateChannel::SendInitSessionWithNPTokenFail(unsigned long long gatekey
 // 0xbc080
 void LobbyGateChannel::SendInitSessionWithLobbyTokenOk(unsigned long long gatekey, unsigned long long clikey)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqq", 13, gatekey, clikey))
         Send(&p);
@@ -127,13 +109,7 @@ void LobbyGateChannel::SendInitSessionWithLobbyTokenOk(unsigned long long gateke
 // 0xbc150
 void LobbyGateChannel::SendInitSessionWithLobbyTokenFail(unsigned long long gatekey, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqE", 14, gatekey, static_cast<int>(reason)))
         Send(&p);
@@ -198,13 +174,7 @@ void LobbyGateChannel::SendStartSessionWithNPTokenOk(unsigned long long clikey, 
 // 0xbc540
 void LobbyGateChannel::SendStartSessionWithNPTokenFail(unsigned long long clikey, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqE", 11, clikey, static_cast<int>(reason)))
         Send(&p);
@@ -266,13 +236,7 @@ void LobbyGateChannel::SendStartSessionWithLobbyTokenOk(unsigned long long clike
 // 0xbc8f0
 void LobbyGateChannel::SendStartSessionWithLobbyTokenFail(unsigned long long clikey, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqE", 17, clikey, static_cast<int>(reason)))
         Send(&p);
@@ -281,13 +245,7 @@ void LobbyGateChannel::SendStartSessionWithLobbyTokenFail(unsigned long long cli
 // 0xbc9c0
 void LobbyGateChannel::SendCloseAnonymousSessionNotify(unsigned long long gatekey)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hq", 20, gatekey))
         Send(&p);
@@ -296,13 +254,7 @@ void LobbyGateChannel::SendCloseAnonymousSessionNotify(unsigned long long gateke
 // 0xbca80
 void LobbyGateChannel::SendCloseSessionNotify(unsigned long long clikey)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hq", 21, clikey))
         Send(&p);
@@ -311,13 +263,7 @@ void LobbyGateChannel::SendCloseSessionNotify(unsigned long long clikey)
 // 0xbcb40
 void LobbyGateChannel::SendKickNotify(unsigned long long clikey, char reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqQ", 22, clikey, static_cast<int>(reason)))
         Send(&p);
@@ -326,13 +272,7 @@ void LobbyGateChannel::SendKickNotify(unsigned long long clikey, char reason)
 // 0xbcc10
 void LobbyGateChannel::SendGetCharacterInfoListFail(unsigned long long clikey, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqE", 37, clikey, static_cast<int>(reason)))
         Send(&p);
@@ -341,13 +281,7 @@ void LobbyGateChannel::SendGetCharacterInfoListFail(unsigned long long clikey, s
 // 0xbcce0
 void LobbyGateChannel::SendGetCharacterInfoFail(unsigned long long clikey, id128 const& slotid, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     id128 slot = slotid;
     if (0 != p.Compose("hqoE", 40, clikey, &slot, static_cast<int>(reason)))
@@ -357,13 +291,7 @@ void LobbyGateChannel::SendGetCharacterInfoFail(unsigned long long clikey, id128
 // 0xbcdd0
 void LobbyGateChannel::SendCreateCharacterOk(unsigned long long clikey, unsigned long long pcId, id128 const& slotid, short wid, wchar_t const* characterName, char* showcaseData, short showcaseDataSize, long long lastPlayEndDate, char jumpingCharacterState, long long deleteRemainTime, int)  // LIFT: the last int is unused in the binary
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     id128 slot = slotid;
     if (0 != p.Compose("hqqohsbqQQii", 45, clikey, pcId, &slot, static_cast<int>(wid), characterName, showcaseData, static_cast<int>(showcaseDataSize), lastPlayEndDate, 1, static_cast<int>(jumpingCharacterState), 0, static_cast<int>(deleteRemainTime)))
@@ -373,13 +301,7 @@ void LobbyGateChannel::SendCreateCharacterOk(unsigned long long clikey, unsigned
 // 0xbcf40
 void LobbyGateChannel::SendCreateCharacterFail(unsigned long long clikey, id128 const& slotid, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     id128 slot = slotid;
     if (0 != p.Compose("hqoE", 46, clikey, &slot, static_cast<int>(reason)))
@@ -389,13 +311,7 @@ void LobbyGateChannel::SendCreateCharacterFail(unsigned long long clikey, id128 
 // 0xbd030
 void LobbyGateChannel::SendDeleteCharacterOk(unsigned long long clikey, id128 const& slotid, char deleteActionType, long deleteRemainTime)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     id128 slot = slotid;
     if (0 != p.Compose("hqoQi", 48, clikey, &slot, static_cast<int>(deleteActionType), static_cast<int>(deleteRemainTime)))
@@ -405,13 +321,7 @@ void LobbyGateChannel::SendDeleteCharacterOk(unsigned long long clikey, id128 co
 // 0xbd130
 void LobbyGateChannel::SendDeleteCharacterFail(unsigned long long clikey, id128 const& slotid, Character::ClientState state, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     id128 slot = slotid;
     char stateCode = 0;
@@ -428,13 +338,7 @@ void LobbyGateChannel::SendDeleteCharacterFail(unsigned long long clikey, id128 
 // 0xbd250
 void LobbyGateChannel::SendCancelWaitCharacterDeletionOk(unsigned long long clikey, id128 const& slotid)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     id128 slot = slotid;
     if (0 != p.Compose("hqo", 52, clikey, &slot))
@@ -444,13 +348,7 @@ void LobbyGateChannel::SendCancelWaitCharacterDeletionOk(unsigned long long clik
 // 0xbd330
 void LobbyGateChannel::SendCancelWaitCharacterDeletionFail(unsigned long long clikey, id128 const& slotid, Character::ClientState state, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     id128 slot = slotid;
     char stateCode = 0;
@@ -467,13 +365,7 @@ void LobbyGateChannel::SendCancelWaitCharacterDeletionFail(unsigned long long cl
 // 0xbd450
 void LobbyGateChannel::SendEndWaitCharacterDeletionNotify(unsigned long long clikey, id128 const& slotid)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     id128 slot = slotid;
     if (0 != p.Compose("hqo", 50, clikey, &slot))
@@ -483,13 +375,7 @@ void LobbyGateChannel::SendEndWaitCharacterDeletionNotify(unsigned long long cli
 // 0xbd530
 void LobbyGateChannel::SendGetEnterWorldTokenFail(unsigned long long clikey, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqE", 26, clikey, static_cast<int>(reason)))
         Send(&p);
@@ -498,13 +384,7 @@ void LobbyGateChannel::SendGetEnterWorldTokenFail(unsigned long long clikey, sho
 // 0xbd600
 void LobbyGateChannel::SendGetEnterWorldTokenOk(unsigned long long clikey, unsigned long long token, short worldId)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqqh", 25, clikey, token, static_cast<int>(worldId)))
         Send(&p);
@@ -520,13 +400,7 @@ void LobbyGateChannel::SendStartWaitNotify(unsigned long long clikey, WaitInfo c
     rpc.SetFormat("hqiiCch;", 0);
     rpc.top = -1;
     rpc.subTop = -1;
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (p.Compose(&rpc, 1, 27) == 0)
         return;
@@ -556,13 +430,7 @@ void LobbyGateChannel::SendGetWaitInfoOk(unsigned long long clikey, WaitInfo con
     rpc.SetFormat("hqiiCch;", 0);
     rpc.top = -1;
     rpc.subTop = -1;
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (p.Compose(&rpc, 1, 29) == 0)
         return;
@@ -585,13 +453,7 @@ void LobbyGateChannel::SendGetWaitInfoOk(unsigned long long clikey, WaitInfo con
 // 0xbdca0
 void LobbyGateChannel::SendGetWaitInfoFail(unsigned long long clikey, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqE", 30, clikey, static_cast<int>(reason)))
         Send(&p);
@@ -600,13 +462,7 @@ void LobbyGateChannel::SendGetWaitInfoFail(unsigned long long clikey, short reas
 // 0xbdd70
 void LobbyGateChannel::SendGiveupWaitOk(unsigned long long clikey)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hq", 32, clikey))
         Send(&p);
@@ -615,13 +471,7 @@ void LobbyGateChannel::SendGiveupWaitOk(unsigned long long clikey)
 // 0xbde30
 void LobbyGateChannel::SendGiveupWaitFail(unsigned long long clikey, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqE", 33, clikey, static_cast<int>(reason)))
         Send(&p);
@@ -630,13 +480,7 @@ void LobbyGateChannel::SendGiveupWaitFail(unsigned long long clikey, short reaso
 // 0xbdf00
 void LobbyGateChannel::SendEndWaitNotify(unsigned long long clikey, unsigned long long token)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqq", 34, clikey, token))
         Send(&p);
@@ -645,13 +489,7 @@ void LobbyGateChannel::SendEndWaitNotify(unsigned long long clikey, unsigned lon
 // 0xbdfd0
 void LobbyGateChannel::SendGetChargeInfoOk(unsigned long long clikey, char chargeBaseType, char personalInfo, long remainPlayTime, short reservations, char valueType, unsigned int itemId, char computationBasis, char pcCafeInfo, char ipKind)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqQQihQiQQQ", 61, clikey, static_cast<int>(chargeBaseType), static_cast<int>(personalInfo), static_cast<int>(remainPlayTime), static_cast<int>(reservations), static_cast<int>(valueType), itemId, static_cast<int>(computationBasis), static_cast<int>(pcCafeInfo), static_cast<int>(ipKind)))
         Send(&p);
@@ -660,13 +498,7 @@ void LobbyGateChannel::SendGetChargeInfoOk(unsigned long long clikey, char charg
 // 0xbe120
 void LobbyGateChannel::SendGetChargeInfoFail(unsigned long long clikey, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqE", 62, clikey, static_cast<int>(reason)))
         Send(&p);
@@ -675,13 +507,7 @@ void LobbyGateChannel::SendGetChargeInfoFail(unsigned long long clikey, short re
 // 0xbe1f0
 void LobbyGateChannel::SendRecoverCharacterOk(unsigned long long clikey, id128 const& slotid)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     id128 slot = slotid;
     if (0 != p.Compose("hqo", 55, clikey, &slot))
@@ -691,13 +517,7 @@ void LobbyGateChannel::SendRecoverCharacterOk(unsigned long long clikey, id128 c
 // 0xbe2d0
 void LobbyGateChannel::SendRecoverCharacterFail(unsigned long long clikey, id128 const& slotid, Character::ClientState state, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     id128 slot = slotid;
     char stateCode = 0;
@@ -714,13 +534,7 @@ void LobbyGateChannel::SendRecoverCharacterFail(unsigned long long clikey, id128
 // 0xbe3f0
 void LobbyGateChannel::SendBindCharacterSlotFail(unsigned long long clikey, id128 const& slotid, unsigned long long pcId, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     id128 slot = slotid;
     if (0 != p.Compose("hqoqE", 59, clikey, &slot, pcId, static_cast<int>(reason)))
@@ -730,13 +544,7 @@ void LobbyGateChannel::SendBindCharacterSlotFail(unsigned long long clikey, id12
 // 0xbe4f0
 void LobbyGateChannel::SendAccountInventoryNotify(unsigned long long clikey, char notificationType, unsigned long long goodsItemInsIdMin)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqQq", 63, clikey, static_cast<int>(notificationType), goodsItemInsIdMin))
         Send(&p);
@@ -745,13 +553,7 @@ void LobbyGateChannel::SendAccountInventoryNotify(unsigned long long clikey, cha
 // 0xbe5d0
 void LobbyGateChannel::SendGetGoodsCountOk(unsigned long long clikey, int count)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqi", 65, clikey, count))
         Send(&p);
@@ -760,13 +562,7 @@ void LobbyGateChannel::SendGetGoodsCountOk(unsigned long long clikey, int count)
 // 0xbe6a0
 void LobbyGateChannel::SendGetGoodsCountFail(unsigned long long clikey, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqE", 66, clikey, static_cast<int>(reason)))
         Send(&p);
@@ -810,13 +606,7 @@ void LobbyGateChannel::SendListGoodsOk(unsigned long long clikey, Goods* goodsLi
 // 0xbe980
 void LobbyGateChannel::SendListGoodsFail(unsigned long long clikey, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqE", 69, clikey, static_cast<int>(reason)))
         Send(&p);
@@ -872,13 +662,7 @@ void LobbyGateChannel::SendTakeGoodsOk(unsigned long long clikey, unsigned long 
 // 0xbed00
 void LobbyGateChannel::SendTakeGoodsFail(unsigned long long clikey, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqE", 72, clikey, static_cast<int>(reason)))
         Send(&p);
@@ -927,13 +711,7 @@ void LobbyGateChannel::SendListLobbyServiceItemInfoOk(unsigned long long clikey,
 // 0xbf080
 void LobbyGateChannel::SendListLobbyServiceItemInfoFail(unsigned long long clikey, char searchType, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqQE", 75, clikey, static_cast<int>(searchType), static_cast<int>(reason)))
         Send(&p);
@@ -947,13 +725,7 @@ void LobbyGateChannel::SendGetLobbyServiceItemInfoOk(unsigned long long clikey, 
     pcr.len = 0;
     pcr.index = 0;
     pcr.SetFormat("hqqqqiQ", 0);
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose(&pcr, 2, 77, clikey) &&
         0 != p.Compose(&pcr, 5, item.ownerPcId, item.instanceId, item.labelId, item.dataId, static_cast<int>(item.state)))
@@ -963,13 +735,7 @@ void LobbyGateChannel::SendGetLobbyServiceItemInfoOk(unsigned long long clikey, 
 // 0xbf2e0
 void LobbyGateChannel::SendGetLobbyServiceItemInfoFail(unsigned long long clikey, unsigned long long itemInstanceId, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqqE", 78, clikey, itemInstanceId, static_cast<int>(reason)))
         Send(&p);
@@ -988,13 +754,7 @@ void LobbyGateChannel::SendChangeCharacterAppearanceWithAccountInventoryItemOk(u
 {
     if (newShowcaseData == nullptr || newShowcaseDataSize < 0)
         return;
-    Packet packet;  // LIFT: inlined constructor
-    packet.CurHeader = nullptr;
-    packet.Splitter = nullptr;
-    packet.ListHead = nullptr;
-    packet.ListTail = nullptr;
-    packet.IsFragmentPacket = false;
-    packet.FragmentPacketCmd = 0;
+    Packet packet;
     packet.Allocate();
     id128 slot = slotid;
     if (0 != packet.Compose("hqobqq", 83, clikey, &slot, newShowcaseData, static_cast<int>(newShowcaseDataSize), labelId, itemInstanceId))
@@ -1004,13 +764,7 @@ void LobbyGateChannel::SendChangeCharacterAppearanceWithAccountInventoryItemOk(u
 // 0xbf5a0
 void LobbyGateChannel::SendChangeCharacterAppearanceWithAccountInventoryItemFail(unsigned long long clikey, id128 const& slotid, unsigned long long labelId, unsigned long long itemInstanceId, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     id128 slot = slotid;
     if (0 != p.Compose("hqoqqE", 84, clikey, &slot, labelId, itemInstanceId, static_cast<int>(reason)))
@@ -1022,13 +776,7 @@ void LobbyGateChannel::SendChangeCharacterSexWithAccountInventoryItemOk(unsigned
 {
     if (newShowcaseData == nullptr || newShowcaseDataSize < 0)
         return;
-    Packet packet;  // LIFT: inlined constructor
-    packet.CurHeader = nullptr;
-    packet.Splitter = nullptr;
-    packet.ListHead = nullptr;
-    packet.ListTail = nullptr;
-    packet.IsFragmentPacket = false;
-    packet.FragmentPacketCmd = 0;
+    Packet packet;
     packet.Allocate();
     id128 slot = slotid;
     if (0 != packet.Compose("hqobqq", 86, clikey, &slot, newShowcaseData, static_cast<int>(newShowcaseDataSize), labelId, itemInstanceId))
@@ -1038,13 +786,7 @@ void LobbyGateChannel::SendChangeCharacterSexWithAccountInventoryItemOk(unsigned
 // 0xbf7c0
 void LobbyGateChannel::SendChangeCharacterSexWithAccountInventoryItemFail(unsigned long long clikey, id128 const& slotid, unsigned long long labelId, unsigned long long itemInstanceId, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     id128 slot = slotid;
     if (0 != p.Compose("hqoqqE", 87, clikey, &slot, labelId, itemInstanceId, static_cast<int>(reason)))
@@ -1056,13 +798,7 @@ void LobbyGateChannel::SendChangeCharacterRaceWithAccountInventoryItemOk(unsigne
 {
     if (newShowcaseData == nullptr || newShowcaseDataSize < 0)
         return;
-    Packet packet;  // LIFT: inlined constructor
-    packet.CurHeader = nullptr;
-    packet.Splitter = nullptr;
-    packet.ListHead = nullptr;
-    packet.ListTail = nullptr;
-    packet.IsFragmentPacket = false;
-    packet.FragmentPacketCmd = 0;
+    Packet packet;
     packet.Allocate();
     id128 slot = slotid;
     if (0 != packet.Compose("hqobqq", 89, clikey, &slot, newShowcaseData, static_cast<int>(newShowcaseDataSize), labelId, itemInstanceId))
@@ -1072,13 +808,7 @@ void LobbyGateChannel::SendChangeCharacterRaceWithAccountInventoryItemOk(unsigne
 // 0xbf9e0
 void LobbyGateChannel::SendChangeCharacterRaceWithAccountInventoryItemFail(unsigned long long clikey, id128 const& slotid, unsigned long long labelId, unsigned long long itemInstanceId, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     id128 slot = slotid;
     if (0 != p.Compose("hqoqqE", 90, clikey, &slot, labelId, itemInstanceId, static_cast<int>(reason)))
@@ -1088,13 +818,7 @@ void LobbyGateChannel::SendChangeCharacterRaceWithAccountInventoryItemFail(unsig
 // 0xbfaf0
 void LobbyGateChannel::SendRenameCharacterWithAccountInventoryItemOk(unsigned long long clikey, id128 const& slotid, wchar_t const* newName, unsigned long long labelId, unsigned long long itemInstanceId)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     id128 slot = slotid;
     if (0 != p.Compose("hqosqq", 92, clikey, &slot, newName, labelId, itemInstanceId))
@@ -1104,13 +828,7 @@ void LobbyGateChannel::SendRenameCharacterWithAccountInventoryItemOk(unsigned lo
 // 0xbfc00
 void LobbyGateChannel::SendRenameCharacterWithAccountInventoryItemFail(unsigned long long clikey, id128 const& slotid, unsigned long long labelId, unsigned long long itemInstanceId, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     id128 slot = slotid;
     if (0 != p.Compose("hqoqqE", 93, clikey, &slot, labelId, itemInstanceId, static_cast<int>(reason)))
@@ -1120,13 +838,7 @@ void LobbyGateChannel::SendRenameCharacterWithAccountInventoryItemFail(unsigned 
 // 0xbfd10
 void LobbyGateChannel::SendAddSlotWithAccountInventoryItemOk(unsigned long long clikey, unsigned long long labelId, unsigned long long itemInstanceId, id128 const& slotid)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     id128 slot = slotid;
     if (0 != p.Compose("hqqqo", 95, clikey, labelId, itemInstanceId, &slot))
@@ -1136,13 +848,7 @@ void LobbyGateChannel::SendAddSlotWithAccountInventoryItemOk(unsigned long long 
 // 0xbfe10
 void LobbyGateChannel::SendAddSlotWithAccountInventoryItemFail(unsigned long long clikey, unsigned long long labelId, unsigned long long itemInstanceId, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqqqE", 96, clikey, labelId, itemInstanceId, static_cast<int>(reason)))
         Send(&p);
@@ -1157,13 +863,7 @@ void LobbyGateChannel::SendChangeUserNameWithAccountInventoryItemOk(unsigned lon
                    L"[lobby-gate], send change-user-name-with-account-inventory-item-ok fail; null new-user-name, cli-key:0x%I64X", clikey);
         return;
     }
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("hqsqqi", 98, clikey, newUserName, labelId, itemInstanceId, itemDataId))
         Log::Write(Log::LT_ERROR, L"LobbyGateChannel.cpp", 812,
@@ -1175,13 +875,7 @@ void LobbyGateChannel::SendChangeUserNameWithAccountInventoryItemOk(unsigned lon
 // 0xc0050
 void LobbyGateChannel::SendChangeUserNameWithAccountInventoryItemFail(unsigned long long clikey, unsigned long long labelId, unsigned long long itemInstanceId, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("hqqqE", 99, clikey, labelId, itemInstanceId, static_cast<int>(reason)))
         Log::Write(Log::LT_ERROR, L"LobbyGateChannel.cpp", 827,
@@ -1193,13 +887,7 @@ void LobbyGateChannel::SendChangeUserNameWithAccountInventoryItemFail(unsigned l
 // 0xc0160
 void LobbyGateChannel::SendExtendJumpingCharacterCreationQuotaWithAccountInventoryItemOk(unsigned long long clikey, unsigned long long labelId, unsigned long long itemInstanceId, int remainQuota)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqqqi", 101, clikey, labelId, itemInstanceId, remainQuota))
         Send(&p);
@@ -1208,13 +896,7 @@ void LobbyGateChannel::SendExtendJumpingCharacterCreationQuotaWithAccountInvento
 // 0xc0250
 void LobbyGateChannel::SendExtendJumpingCharacterCreationQuotaWithAccountInventoryItemFail(unsigned long long clikey, unsigned long long labelId, unsigned long long itemInstanceId, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqqqE", 102, clikey, labelId, itemInstanceId, static_cast<int>(reason)))
         Send(&p);
@@ -1229,13 +911,7 @@ void LobbyGateChannel::SendCreateInitialUserNameOk(unsigned long long clikey, wc
                    L"[lobby-gate], send create-initial-user-name-ok fail; null new-user-name, cli-key:0x%I64X", clikey);
         return;
     }
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("hqs", 104, clikey, newUserName))
         Log::Write(Log::LT_ERROR, L"LobbyGateChannel.cpp", 874,
@@ -1247,13 +923,7 @@ void LobbyGateChannel::SendCreateInitialUserNameOk(unsigned long long clikey, wc
 // 0xc0460
 void LobbyGateChannel::SendCreateInitialUserNameFail(unsigned long long clikey, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     // LIFT: the original log text says "ok" in the fail function (0xc0460, line 891). Kept as is.
     if (0 == p.Compose("hqE", 105, clikey, static_cast<int>(reason)))
@@ -1266,13 +936,7 @@ void LobbyGateChannel::SendCreateInitialUserNameFail(unsigned long long clikey, 
 // 0xc0550
 void LobbyGateChannel::SendActivateGradeOk(unsigned long long clikey, int gameGradeKey, int gradeId, long long effectiveFrom, long long effectiveTo)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("hqiiqq", 107, clikey, gameGradeKey, gradeId, effectiveFrom, effectiveTo))
         Log::Write(Log::LT_ERROR, L"LobbyGateChannel.cpp", 904,
@@ -1285,13 +949,7 @@ void LobbyGateChannel::SendActivateGradeOk(unsigned long long clikey, int gameGr
 // 0xc0670
 void LobbyGateChannel::SendActivateGradeFail(unsigned long long clikey, int keyType, int key, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("hqQiE", 108, clikey, keyType, key, static_cast<int>(reason)))
         Log::Write(Log::LT_ERROR, L"LobbyGateChannel.cpp", 917,
@@ -1304,13 +962,7 @@ void LobbyGateChannel::SendActivateGradeFail(unsigned long long clikey, int keyT
 // 0xc0790
 void LobbyGateChannel::SendChangedGradeNotify(unsigned long long clikey, int gameGradeKey, int gradeId, bool activation, int gradeCount, long long totalEffectiveFrom, long long totalEffectiveTo, wchar_t const* reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     // LIFT: The binary compares the reason text with the five known names. Other text (and null or empty text) gives 0.
     char reasonCode = 0;
@@ -1335,13 +987,7 @@ void LobbyGateChannel::SendChangedGradeNotify(unsigned long long clikey, int gam
 // 0xc0970
 void LobbyGateChannel::SendChangedGradeLevelNotify(unsigned long long clikey, int levelId, int accumulateGradeScore, int minimumLevelScore, int maximumLevelScore, int maximumGradeScore)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqiiiii", 110, clikey, levelId, accumulateGradeScore, minimumLevelScore, maximumLevelScore, maximumGradeScore))
         Send(&p);
@@ -1460,13 +1106,7 @@ LobbyGateChannel* LobbyGateChannelManager::Acquire(short wid)
 // 0xc0e20
 void LobbyGateChannelManager::BroadcastAnnounceNotify(wchar_t const* message)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("hs", 5, message))
     {

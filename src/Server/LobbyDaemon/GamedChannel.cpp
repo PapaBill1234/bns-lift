@@ -395,13 +395,7 @@ bool GamedChannelManager::PacketHandler(Session const* session, Packet const* pa
 // 0x80d50
 void GamedChannel::SendStopPlayNotify(unsigned long long pcid, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqQ", 19, pcid, static_cast<int>(reason)))
         Send(&p);
@@ -422,13 +416,7 @@ bool GamedChannel::SendCreateCharacterReq(TransactionChannel::Transaction* t, un
         return false;
     }
 
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("hqqobisbQh", 20, t->GetTid(), pcid, gameAccountId, externalInfoData,
                   static_cast<int>(externalInfoSize), ipaddress, characterName, characterCreationData,
@@ -454,13 +442,7 @@ bool GamedChannel::SendDeleteCharacterReq(TransactionChannel::Transaction* t, un
         return false;
     }
 
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("hqqbi", 23, t->GetTid(), pcid, externalInfoData, static_cast<int>(externalInfoSize), ipaddress))
     {
@@ -482,13 +464,7 @@ bool GamedChannel::SendRestoreCharacterReq(TransactionChannel::Transaction* t, u
         return false;
     }
 
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("hqq", 26, t->GetTid(), pcid))
     {
@@ -502,13 +478,7 @@ bool GamedChannel::SendRestoreCharacterReq(TransactionChannel::Transaction* t, u
 // 0x81320
 void GamedChannel::SendDeleteCharacterCompleteNotify(unsigned long long pcid)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hq", 29, pcid))
         Send(&p);
@@ -517,13 +487,7 @@ void GamedChannel::SendDeleteCharacterCompleteNotify(unsigned long long pcid)
 // 0x813e0
 void GamedChannel::SendCloseSessionNotify(unsigned long long clikey)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hq", 13, clikey))
         Send(&p);
@@ -540,13 +504,7 @@ bool GamedChannel::SendKickReq(TransactionChannel::Transaction* t, unsigned long
         return false;
     }
 
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("hqqqqQ", 14, t->GetTid(), pcid, clikey, gamekey, static_cast<int>(reason)))
     {
@@ -560,13 +518,7 @@ bool GamedChannel::SendKickReq(TransactionChannel::Transaction* t, unsigned long
 // 0x81620
 void GamedChannel::SendEnterWorldFail(unsigned long long tid, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqE", 7, tid, static_cast<int>(reason)))
         Send(&p);
@@ -575,13 +527,7 @@ void GamedChannel::SendEnterWorldFail(unsigned long long tid, short reason)
 // 0x816f0
 void GamedChannel::SendLeaveWorldOk(unsigned long long tid, unsigned long long token)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqq", 9, tid, token))
         Send(&p);
@@ -590,13 +536,7 @@ void GamedChannel::SendLeaveWorldOk(unsigned long long tid, unsigned long long t
 // 0x817c0
 void GamedChannel::SendLeaveWorldFail(unsigned long long tid, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqE", 10, tid, static_cast<int>(reason)))
         Send(&p);
@@ -605,13 +545,7 @@ void GamedChannel::SendLeaveWorldFail(unsigned long long tid, short reason)
 // 0x81890
 void GamedChannel::SendUpdateCharacterDataOk(unsigned long long tid)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hq", 40, tid))
         Send(&p);
@@ -620,13 +554,7 @@ void GamedChannel::SendUpdateCharacterDataOk(unsigned long long tid)
 // 0x81950
 void GamedChannel::SendUpdateCharacterDataFail(unsigned long long tid, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqE", 41, tid, static_cast<int>(reason)))
         Send(&p);
@@ -635,13 +563,7 @@ void GamedChannel::SendUpdateCharacterDataFail(unsigned long long tid, short rea
 // 0x81a20
 void GamedChannel::SendUpdateAccountDataOk(unsigned long long tid)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hq", 43, tid))
         Send(&p);
@@ -650,13 +572,7 @@ void GamedChannel::SendUpdateAccountDataOk(unsigned long long tid)
 // 0x81ae0
 void GamedChannel::SendUpdateAccountDataFail(unsigned long long tid, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqE", 44, tid, static_cast<int>(reason)))
         Send(&p);
@@ -665,13 +581,7 @@ void GamedChannel::SendUpdateAccountDataFail(unsigned long long tid, short reaso
 // 0x81bb0
 void GamedChannel::SendTryRegisterGuildOk(unsigned long long tid, unsigned long long guildid)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqq", 46, tid, guildid))
         Send(&p);
@@ -680,13 +590,7 @@ void GamedChannel::SendTryRegisterGuildOk(unsigned long long tid, unsigned long 
 // 0x81c80
 void GamedChannel::SendTryRegisterGuildFail(unsigned long long tid, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqE", 47, tid, static_cast<int>(reason)))
         Send(&p);
@@ -695,13 +599,7 @@ void GamedChannel::SendTryRegisterGuildFail(unsigned long long tid, short reason
 // 0x81d50
 void GamedChannel::SendTryRenameGuildOk(unsigned long long tid, unsigned long long guildId, char renameGuildType, unsigned long long renamekey)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqqcq", 51, tid, guildId, static_cast<int>(renameGuildType), renamekey))
         Send(&p);
@@ -710,13 +608,7 @@ void GamedChannel::SendTryRenameGuildOk(unsigned long long tid, unsigned long lo
 // 0x81e40
 void GamedChannel::SendTryRenameGuildFail(unsigned long long tid, unsigned long long guildId, char renameGuildType, short failReason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqqcE", 52, tid, guildId, static_cast<int>(renameGuildType), static_cast<int>(failReason)))
         Send(&p);
@@ -775,13 +667,7 @@ void GamedChannel::SendAccountInventoryNotify(unsigned long long pcid, char noti
 // 0x821f0
 void GamedChannel::SendStartChargeOk(unsigned long long tid, wchar_t* chargeKey, long remainPlayTime, char chargeBaseType, unsigned int itemId, short reservations)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqsiQih", 31, tid, chargeKey, static_cast<int>(remainPlayTime), static_cast<int>(chargeBaseType), itemId, static_cast<int>(reservations)))
         Send(&p);
@@ -790,13 +676,7 @@ void GamedChannel::SendStartChargeOk(unsigned long long tid, wchar_t* chargeKey,
 // 0x82300
 void GamedChannel::SendStartChargeFail(unsigned long long tid, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqE", 32, tid, static_cast<int>(reason)))
         Send(&p);
@@ -805,13 +685,7 @@ void GamedChannel::SendStartChargeFail(unsigned long long tid, short reason)
 // 0x823d0
 void GamedChannel::SendStopChargeOk(unsigned long long tid)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hq", 34, tid))
         Send(&p);
@@ -820,13 +694,7 @@ void GamedChannel::SendStopChargeOk(unsigned long long tid)
 // 0x82490
 void GamedChannel::SendStopChargeFail(unsigned long long tid, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqE", 35, tid, static_cast<int>(reason)))
         Send(&p);
@@ -835,13 +703,7 @@ void GamedChannel::SendStopChargeFail(unsigned long long tid, short reason)
 // 0x82560
 void GamedChannel::SendUpdateChargeRemainTimeNotify(unsigned long long pcid, long remainPlayTime, short reservations, unsigned int itemId)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqihi", 36, pcid, static_cast<int>(remainPlayTime), static_cast<int>(reservations), itemId))
         Send(&p);
@@ -850,13 +712,7 @@ void GamedChannel::SendUpdateChargeRemainTimeNotify(unsigned long long pcid, lon
 // 0x82650
 void GamedChannel::SendApplyNewChargeItemNotify(unsigned long long pcid, wchar_t const* chargeKey, long remainPlayTime, unsigned int itemId, short reservations)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqsiih", 37, pcid, chargeKey, static_cast<int>(remainPlayTime), itemId, static_cast<int>(reservations)))
         Send(&p);
@@ -884,13 +740,7 @@ bool GamedChannel::SendChangeCharacterAppearanceReq(TransactionChannel::Transact
         return false;
     }
 
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (p.Compose("hqqqbb", 57, t->GetTid(), serviceId, pcid, showcaseData, static_cast<int>(showcaseDataSize), makingData, static_cast<int>(makingDataSize)) == 0)
     {
@@ -923,13 +773,7 @@ bool GamedChannel::SendChangeCharacterSexReq(TransactionChannel::Transaction* t,
         return false;
     }
 
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("hqqqcbb", 60, t->GetTid(), serviceId, pcid, static_cast<int>(newSex), showcaseData, static_cast<int>(showcaseDataSize), makingData, static_cast<int>(makingDataSize)))
     {
@@ -962,13 +806,7 @@ bool GamedChannel::SendChangeCharacterRaceReq(TransactionChannel::Transaction* t
         return false;
     }
 
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("hqqqccbb", 63, t->GetTid(), serviceId, pcid, static_cast<int>(newRace), static_cast<int>(newSex), showcaseData, static_cast<int>(showcaseDataSize), makingData, static_cast<int>(makingDataSize)))
     {
@@ -1001,13 +839,7 @@ bool GamedChannel::SendRenameCharacterReq(TransactionChannel::Transaction* t, un
         return false;
     }
 
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("hqqqss", 66, t->GetTid(), serviceId, pcid, oldName, newName))
     {
@@ -1021,13 +853,7 @@ bool GamedChannel::SendRenameCharacterReq(TransactionChannel::Transaction* t, un
 // 0x82f70
 void GamedChannel::SendExtendJumpingCharacterCreationQuotaWithAccountInventoryItemOk(unsigned long long tid, int remainQuota)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("hqi", 70, tid, remainQuota))
         Log::Write(Log::LT_ERROR, GAMED_FILE, 679,
@@ -1039,13 +865,7 @@ void GamedChannel::SendExtendJumpingCharacterCreationQuotaWithAccountInventoryIt
 // 0x83060
 void GamedChannel::SendExtendJumpingCharacterCreationQuotaWithAccountInventoryItemFail(unsigned long long tid, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("hqE", 71, tid, static_cast<int>(reason)))
         Log::Write(Log::LT_ERROR, GAMED_FILE, 693,
@@ -1057,13 +877,7 @@ void GamedChannel::SendExtendJumpingCharacterCreationQuotaWithAccountInventoryIt
 // 0x83150
 void GamedChannel::SendUpgradeJumpingCharacterStateWithCreationQuotaOk(unsigned long long tid, char jumpingCharacterState, int remainQuota)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("hqQi", 73, tid, static_cast<int>(jumpingCharacterState), remainQuota))
         Log::Write(Log::LT_ERROR, GAMED_FILE, 707,
@@ -1075,13 +889,7 @@ void GamedChannel::SendUpgradeJumpingCharacterStateWithCreationQuotaOk(unsigned 
 // 0x83250
 void GamedChannel::SendUpgradeJumpingCharacterStateWithCreationQuotaFail(unsigned long long tid, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("hqE", 74, tid, static_cast<int>(reason)))
         Log::Write(Log::LT_ERROR, GAMED_FILE, 721,
@@ -1093,13 +901,7 @@ void GamedChannel::SendUpgradeJumpingCharacterStateWithCreationQuotaFail(unsigne
 // 0x83340
 void GamedChannel::SendUpdateJumpingCharacterStateOk(unsigned long long tid, char jumpingCharacterState)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("hqQ", 76, tid, static_cast<int>(jumpingCharacterState)))
         Log::Write(Log::LT_ERROR, GAMED_FILE, 735,
@@ -1111,13 +913,7 @@ void GamedChannel::SendUpdateJumpingCharacterStateOk(unsigned long long tid, cha
 // 0x83430
 void GamedChannel::SendUpdateJumpingCharacterStateFail(unsigned long long tid, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("hqE", 77, tid, static_cast<int>(reason)))
         Log::Write(Log::LT_ERROR, GAMED_FILE, 749,
@@ -1129,13 +925,7 @@ void GamedChannel::SendUpdateJumpingCharacterStateFail(unsigned long long tid, s
 // 0x83520
 void GamedChannel::SendSecondPasswordGetStatusOk(unsigned long long tid, unsigned long long pcid, char blockStatus, int authFailLimitCount, int authFailCount, long long blockedUntil, long long deleteAt, long long actionMask)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("hqqQiiqqq", 81, tid, pcid, static_cast<int>(blockStatus), authFailLimitCount, authFailCount, blockedUntil, deleteAt, actionMask))
         Log::Write(Log::LT_ERROR, GAMED_FILE, 764,
@@ -1147,13 +937,7 @@ void GamedChannel::SendSecondPasswordGetStatusOk(unsigned long long tid, unsigne
 // 0x83670
 void GamedChannel::SendSecondPasswordGetStatusFail(unsigned long long tid, unsigned long long pcid, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("hqqE", 82, tid, pcid, static_cast<int>(reason)))
         Log::Write(Log::LT_ERROR, GAMED_FILE, 778,
@@ -1165,13 +949,7 @@ void GamedChannel::SendSecondPasswordGetStatusFail(unsigned long long tid, unsig
 // 0x83770
 void GamedChannel::SendSecondPasswordIsVerifiedOk(unsigned long long tid, unsigned long long pcid)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("hqq", 84, tid, pcid))
         Log::Write(Log::LT_ERROR, GAMED_FILE, 792,
@@ -1183,13 +961,7 @@ void GamedChannel::SendSecondPasswordIsVerifiedOk(unsigned long long tid, unsign
 // 0x83860
 void GamedChannel::SendSecondPasswordIsVerifiedFail(unsigned long long tid, unsigned long long pcid, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("hqqE", 85, tid, pcid, static_cast<int>(reason)))
         Log::Write(Log::LT_ERROR, GAMED_FILE, 806,
@@ -1210,13 +982,7 @@ bool GamedChannel::SendAuctionEscrowReq(TransactionChannel::Transaction* t, unsi
         return false;
     }
 
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("hqqqoq", 86, t->GetTid(), pcid, money, auctionId, escrowId))
     {
@@ -1230,13 +996,7 @@ bool GamedChannel::SendAuctionEscrowReq(TransactionChannel::Transaction* t, unsi
 // 0x83b00
 void GamedChannel::SendGetGradeListFail(unsigned long long tid, char locationHint, unsigned long long pcid, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("hqQqE", 94, tid, static_cast<int>(locationHint), pcid, static_cast<int>(reason)))
         Log::Write(Log::LT_ERROR, GAMED_FILE, 842,
@@ -1249,13 +1009,7 @@ void GamedChannel::SendGetGradeListFail(unsigned long long tid, char locationHin
 // 0x83c20
 void GamedChannel::SendActivateGradeOk(unsigned long long tid, unsigned long long pcid, int gameGradeKey, int gradeId, long long effectiveFrom, long long effectiveTo)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("hqqiiqq", 98, tid, pcid, gameGradeKey, gradeId, effectiveFrom, effectiveTo))
         Log::Write(Log::LT_ERROR, GAMED_FILE, 855,
@@ -1268,13 +1022,7 @@ void GamedChannel::SendActivateGradeOk(unsigned long long tid, unsigned long lon
 // 0x83d60
 void GamedChannel::SendActivateGradeFail(unsigned long long tid, unsigned long long pcid, int keyType, int key, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("hqqQiE", 99, tid, pcid, keyType, key, static_cast<int>(reason)))
         Log::Write(Log::LT_ERROR, GAMED_FILE, 868,
@@ -1287,13 +1035,7 @@ void GamedChannel::SendActivateGradeFail(unsigned long long tid, unsigned long l
 // 0x83ea0
 void GamedChannel::SendChangedGradeNotify(unsigned long long pcid, int revision, int gameGradeKey, int gradeId, bool activation, int gradeCount, long long totalEffectiveFrom, long long totalEffectiveTo, wchar_t const* reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     // LIFT: The binary compares the reason text with the five known names. Other text (and null or empty text) gives 0.
     char reasonCode = 0;
@@ -1318,13 +1060,7 @@ void GamedChannel::SendChangedGradeNotify(unsigned long long pcid, int revision,
 // 0x84090
 void GamedChannel::SendChangedGradeLevelNotify(unsigned long long pcid, int revision, int levelId, int accumulateGradeScore, int minimumLevelScore, int maximumLevelScore, int maximumGradeScore)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqiiiiii", 96, pcid, revision, levelId, accumulateGradeScore, minimumLevelScore, maximumLevelScore, maximumGradeScore))
         Send(&p);
@@ -1333,13 +1069,7 @@ void GamedChannel::SendChangedGradeLevelNotify(unsigned long long pcid, int revi
 // 0x841a0
 void GamedChannel::SendDepositGameMileageOk(unsigned long long tid, char locationHint, char depositType, unsigned long long requestId, unsigned long long externalKey, unsigned long long pcid, id128 const& userId, unsigned long long receiptId, short virtualCurrencyId, long long virtualCurrencyAmount, int errorInfo)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqQQqqqoqhqi", 101, tid, static_cast<int>(locationHint), static_cast<int>(depositType), requestId, externalKey, pcid, userId, receiptId, static_cast<int>(virtualCurrencyId), virtualCurrencyAmount, errorInfo))
         Send(&p);
@@ -1348,13 +1078,7 @@ void GamedChannel::SendDepositGameMileageOk(unsigned long long tid, char locatio
 // 0x84310
 void GamedChannel::SendDepositGameMileageFail(unsigned long long tid, char locationHint, char depositType, unsigned long long requestId, unsigned long long externalKey, unsigned long long pcid, id128 const& userId, short failReason, int errorInfo)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqQQqqqoEi", 102, tid, static_cast<int>(locationHint), static_cast<int>(depositType), requestId, externalKey, pcid, userId, static_cast<int>(failReason), errorInfo))
         Send(&p);
@@ -1363,13 +1087,7 @@ void GamedChannel::SendDepositGameMileageFail(unsigned long long tid, char locat
 // 0x84460
 void GamedChannel::SendAuctionBidOk(unsigned long long pcId, id128& auctionId)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("hqo", 90, pcId, auctionId))
         Log::Write(Log::LT_ERROR, GAMED_FILE, 986,
@@ -1382,13 +1100,7 @@ void GamedChannel::SendAuctionBidOk(unsigned long long pcId, id128& auctionId)
 // 0x845f0
 void GamedChannel::SendAuctionBidFail(unsigned long long pcId, id128& auctionId, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("hqoE", 91, pcId, auctionId, static_cast<int>(reason)))
         Log::Write(Log::LT_ERROR, GAMED_FILE, 1000,
@@ -1401,13 +1113,7 @@ void GamedChannel::SendAuctionBidFail(unsigned long long pcId, id128& auctionId,
 // 0x84790
 void GamedChannel::SendTakeAccountTimeBasedPlayRewardFail(unsigned long long tid, unsigned long long pcid, int schedule, char targetType, short playTime, long long requestTime, short failReason, int errorInfo)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 == p.Compose("hqqiQhqEi", 106, tid, pcid, schedule, static_cast<int>(targetType), static_cast<int>(playTime), requestTime, static_cast<int>(failReason), errorInfo))
         Log::Write(Log::LT_ERROR, GAMED_FILE, 1015,
@@ -1420,13 +1126,7 @@ void GamedChannel::SendTakeAccountTimeBasedPlayRewardFail(unsigned long long tid
 // 0x848f0
 void GamedChannel::SendUpdateAccountExpOk(unsigned long long tid, unsigned long long pcid)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqq", 108, tid, pcid))
         Send(&p);
@@ -1435,13 +1135,7 @@ void GamedChannel::SendUpdateAccountExpOk(unsigned long long tid, unsigned long 
 // 0x849c0
 void GamedChannel::SendUpdateAccountExpFail(unsigned long long tid, unsigned long long pcid, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqqE", 109, tid, pcid, static_cast<int>(reason)))
         Send(&p);
@@ -1450,13 +1144,7 @@ void GamedChannel::SendUpdateAccountExpFail(unsigned long long tid, unsigned lon
 // 0x84aa0
 void GamedChannel::SendUpdateAccountContentQuotaOk(unsigned long long tid, unsigned long long pcid)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqq", 111, tid, pcid))
         Send(&p);
@@ -1465,13 +1153,7 @@ void GamedChannel::SendUpdateAccountContentQuotaOk(unsigned long long tid, unsig
 // 0x84b70
 void GamedChannel::SendUpdateAccountContentQuotaFail(unsigned long long tid, unsigned long long pcid, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqqE", 112, tid, pcid, static_cast<int>(reason)))
         Send(&p);
@@ -1480,13 +1162,7 @@ void GamedChannel::SendUpdateAccountContentQuotaFail(unsigned long long tid, uns
 // 0x84c50
 void GamedChannel::SendUpdateAccountRecycleTimeOk(unsigned long long tid, unsigned long long pcid)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqq", 114, tid, pcid))
         Send(&p);
@@ -1495,13 +1171,7 @@ void GamedChannel::SendUpdateAccountRecycleTimeOk(unsigned long long tid, unsign
 // 0x84d20
 void GamedChannel::SendUpdateAccountRecycleTimeFail(unsigned long long tid, unsigned long long pcid, short reason)
 {
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (0 != p.Compose("hqqE", 115, tid, pcid, static_cast<int>(reason)))
         Send(&p);

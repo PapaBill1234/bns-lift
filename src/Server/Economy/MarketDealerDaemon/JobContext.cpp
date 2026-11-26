@@ -716,12 +716,6 @@ bool RetrieveBidRankStatusJob::ReplySuccess(Session const*& session) const
 
     // LIFT: Packet has no constructor. The original sets all fields to zero (inlined).
     Packet replyPacket;
-    replyPacket.Splitter = nullptr;
-    replyPacket.IsFragmentPacket = false;
-    replyPacket.FragmentPacketCmd = 0;
-    replyPacket.CurHeader = nullptr;
-    replyPacket.ListHead = nullptr;
-    replyPacket.ListTail = nullptr;
     // LIFT: inlined RepeatPacketComposer setup.
     RepeatPacketComposer rpc;
     rpc.format = "hqhqCqQ;";
@@ -3823,12 +3817,6 @@ bool RetrieveReservationListJob::ReplySuccess(Session const*& session) const
 
     // LIFT: Packet has no constructor. The original sets all fields to zero (inlined).
     Packet replyPacket;
-    replyPacket.Splitter = nullptr;
-    replyPacket.IsFragmentPacket = false;
-    replyPacket.FragmentPacketCmd = 0;
-    replyPacket.CurHeader = nullptr;
-    replyPacket.ListHead = nullptr;
-    replyPacket.ListTail = nullptr;
     // LIFT: inlined RepeatPacketComposer setup.
     RepeatPacketComposer rpc;
     rpc.format = "hqhqCQqq;";

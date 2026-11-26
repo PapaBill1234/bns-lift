@@ -344,13 +344,7 @@ void TakeAccountTimeBasedPlayRewardJob::sendOk(UserPromotionReward& rewards, sho
     rpc.SetFormat("hqqiQhqhCQiqqihcccc;Cqi;", 0);
     rpc.top = -1;
     rpc.subTop = -1;
-    Packet p;  // LIFT: inlined constructor
-    p.CurHeader = nullptr;
-    p.Splitter = nullptr;
-    p.ListHead = nullptr;
-    p.ListTail = nullptr;
-    p.IsFragmentPacket = false;
-    p.FragmentPacketCmd = 0;
+    Packet p;
     p.Allocate();
     if (p.Compose(&rpc, 8, 105, _gameTid, _pcdbid, _scheduleNumber, static_cast<int>(_targetType), _playTime,
                   _requestTimeUTC, static_cast<int>(deliveryFailCount)) == 0)
