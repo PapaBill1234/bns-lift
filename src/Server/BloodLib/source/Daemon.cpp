@@ -167,7 +167,7 @@ static Console* makeConsole()
 }
 
 // 0xa690
-void BloodDaemonMain(int argc, wchar_t** argv)
+void BloodDaemonMain(int argc, wchar_t* argv[])
 {
     SysInfo::Get();
     CrashHandler::Initialize(0, false);  // LIFT: LTCG folded the arguments; callee writes rcx and edx first (LobbyGate 0x1cbc8, call 0x1dc63)

@@ -32,7 +32,8 @@ enum RUN_MODE  // LIFT: The PDB enum has no name (0x304D).
 extern RUN_MODE RunMode;                       // 0x5a148
 extern volatile int CONFIG_DIR_OPTION_LEN;  // 0x593c0 (value 6)
 
-void BloodDaemonMain(int argc, wchar_t** argv);  // 0xa690
+// LIFT: array parameter. The original symbol is ?BloodDaemonMain@@YAXHQEAPEA_W@Z (Q = array parameter); the PDB type drops it.
+void BloodDaemonMain(int argc, wchar_t* argv[]);  // 0xa690
 
 class Daemon
 {
