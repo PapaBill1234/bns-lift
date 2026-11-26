@@ -22,20 +22,20 @@ This repo is public. Do not commit binaries, keys, PDBs or IDA databases.
 ## Parity
 
 <!-- parity:start -->
-Last update: card `lift-lobbydaemon-v2b-merge-03c` (2026-11-26). Tool: `tools/parity.sh` (VS2010 /GL /LTCG build vs original, funcdiff).
+Last update: card `lift-lobbydaemon-v2b2-m28` (2026-11-26). Tool: `tools/parity.sh` (VS2010 /GL /LTCG build vs original, funcdiff).
 
 | Exe | Parity | MATCH | DIFF | Excluded | Only in original | Total | Mean score | Start | Change | Level |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| CacheGate | **94.9 %** | 466 | 25 | 0 | 0 | 491 | 99.6 | 44.0 % | +50.9 | 90 % ✅ |
+| CacheGate | **95.1 %** | 467 | 24 | 0 | 0 | 491 | 99.6 | 44.0 % | +51.1 | 95 % ✅ |
 | LobbyGate | **93.2 %** | 689 | 49 | 0 | 1 | 739 | 99.4 | 37.9 % | +55.3 | 90 % ✅ |
-| SmartCouponDaemon | **95.1 %** | 636 | 33 | 0 | 0 | 669 | 99.6 | 33.6 % | +61.4 | 95 % ✅ |
-| PostOfficeDaemon | **94.9 %** | 720 | 38 | 0 | 1 | 759 | 99.6 | 34.5 % | +60.3 | 90 % ✅ |
+| SmartCouponDaemon | **95.2 %** | 637 | 32 | 0 | 0 | 669 | 99.6 | 33.6 % | +61.6 | 95 % ✅ |
+| PostOfficeDaemon | **95.0 %** | 721 | 37 | 0 | 1 | 759 | 99.6 | 34.5 % | +60.5 | 90 % ✅ |
 | LobbyDaemon | **46.5 %** | 1024 | 301 | 127 | 752 | 2204 | 97.2 | 2.2 % | +44.2 | below 90 % |
-| **First 4** | **94.5 %** | 2511 | | | | 2658 | | 37.0 % | +57.5 | 90 % ✅ |
+| **First 4** | **94.6 %** | 2514 | | | | 2658 | | 37.0 % | +57.6 | 90 % ✅ |
 
 | Shared library (functions in 2+ exes) | Parity | MATCH in each exe | DIFF in 1+ exe | Total | Goal |
 | --- | ---: | ---: | ---: | ---: | --- |
-| BloodLib, Shared, Packet, CRT | **94.6 %** | 521 | 30 | 551 | 99 % |
+| BloodLib, Shared, Packet, CRT | **94.7 %** | 522 | 29 | 551 | 99 % |
 
 First 4 and shared library: CacheGate, LobbyGate, SmartCouponDaemon, PostOfficeDaemon. LobbyDaemon: lift in progress; most functions are still stubs (only in original). Goal: 95 % per exe, 99 % preferred. Shared library: 99 % preferred. MATCH never holds excluded symbols (review rejected, no honest source fix: [Docs/Parity/excluded.tsv](Docs/Parity/excluded.tsv)); they are in the column Excluded (127 now). Rules: [Docs/Parity/README.md](Docs/Parity/README.md). History: [Docs/Parity/progress.tsv](Docs/Parity/progress.tsv).
 
@@ -140,4 +140,5 @@ First 4 and shared library: CacheGate, LobbyGate, SmartCouponDaemon, PostOfficeD
 | `lift-lobbydaemon-v2b-merge-01` | 94.7 % | 93.1 % | 94.9 % | 94.3 % | 46.5 % |
 | `lift-lobbydaemon-v2b-merge-02` | 94.7 % | 93.1 % | 94.9 % | 94.6 % | 46.5 % |
 | `lift-lobbydaemon-v2b-merge-03c` | 94.9 % | 93.2 % | 95.1 % | 94.9 % | 46.5 % |
+| `lift-lobbydaemon-v2b2-m28` | 95.1 % | 93.2 % | 95.2 % | 95.0 % | 46.5 % |
 <!-- parity:end -->

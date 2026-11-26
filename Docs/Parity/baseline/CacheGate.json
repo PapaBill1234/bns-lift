@@ -1750,11 +1750,11 @@
 "status": "MATCH"
 },
 "PipeConsole::SetInvalidInfo": {
-"calls": 89,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 96.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "PipeConsole::addNode": {
 "calls": 100,

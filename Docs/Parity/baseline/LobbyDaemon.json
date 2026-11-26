@@ -7338,10 +7338,10 @@
 "status": "MATCH"
 },
 "PipeConsole::SetInvalidInfo": {
-"calls": 100,
+"calls": 89,
 "consts": 100,
 "refs": 80,
-"score": 93.3,
+"score": 89.6,
 "status": "DIFF"
 },
 "PipeConsole::addNode": {
