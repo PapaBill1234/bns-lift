@@ -51,6 +51,20 @@ bool ThreadManager::Initialize(unsigned int maxThreadCount)
     return true;
 }
 
+// LIFT: The original PDB marks ThreadManager::Initialize as "inlined" (S_FRAMEPROC fWasInlined), but the exe has no
+// inlined copy (only 0x12d50 and 0x12dd0 use the Thread.cpp string). So a second caller existed at compile time and the
+// linker removed it (/OPT:REF). Its source is not known. With Daemon::Start as the only caller, LTCG puts the constant 128
+// into Initialize. This caller and its COMDAT reference (removed by the linker after code generation) keep the
+// parameter, as in 0x12dd0 (mov [rcx], edx; shl rdx, 3) and 0xad50 (mov edx, 0x80; call). noinline keeps the call in
+// 0xad50. The exe gets no code from this.
+void ThreadManagerInitializeCaller(ThreadManager* manager, unsigned int maxThreadCount)
+{
+    manager->Initialize(maxThreadCount);
+}
+extern void (*const ThreadManagerInitializeCallerRef)(ThreadManager*, unsigned int);
+__declspec(selectany) extern void (*const ThreadManagerInitializeCallerRef)(ThreadManager*, unsigned int) =
+    &ThreadManagerInitializeCaller;
+
 // 0x12e40
 // BUG: 0x12e40 threadId is never written.
 bool ThreadManager::StartThread(Thread* thread, unsigned long long* threadId)

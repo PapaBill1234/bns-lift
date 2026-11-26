@@ -40,7 +40,7 @@ class ThreadManager
 public:
     ThreadManager() : _maxThreadCount(0), _runningThreadCount(0), _threads(nullptr), _threadHandles(nullptr), _now(_time64(nullptr)) {}  // LIFT: inlined in Daemon::Start (0xad50)
     ~ThreadManager();
-    bool Initialize(unsigned int maxThreadCount);
+    __declspec(noinline) bool Initialize(unsigned int maxThreadCount);  // LIFT: see Thread.cpp ThreadManagerInitializeCaller
     bool StartThread(Thread* thread, unsigned long long* threadId);
     bool StopThread(unsigned long long threadId, long waitTime, bool forceTerminate, bool remove);
     void StopAll(long waitTime, bool forceTerminate);
