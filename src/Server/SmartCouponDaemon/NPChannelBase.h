@@ -484,8 +484,20 @@ static_assert(sizeof(NPTransactionRegistry) == 0x58, "sizeof NPTransactionRegist
 class NPTransaction
 {
 public:
+    // PDB nested enum NPTransaction::Kind. The value 1 has a different name in each exe:
+    // SmartCouponDaemon KIND_TRANJOB, LobbyDaemon KIND_LOBBYJOB (LobbyDaemon/NPServiceChannel.h sets the macro).
+    enum Kind
+    {
+        KIND_INVALID = 0,
+#ifdef NPTRANSACTION_KIND_LOBBYJOB
+        KIND_LOBBYJOB = 1,
+#else
+        KIND_TRANJOB = 1,
+#endif
+        KIND_MAX = 2
+    };
     virtual ~NPTransaction() {}
-    virtual int GetKind() const = 0;
+    virtual Kind GetKind() const = 0;
     virtual void Expire() = 0;
 };
 
@@ -494,7 +506,7 @@ class NPJobTransaction : public NPTransaction
 public:
     NPJobTransaction() : _jobid(0), _state(-1), _task(0) {}  // LIFT: inlined in SendRequestEventNoti (0xFF10)
     virtual ~NPJobTransaction() {}
-    virtual int GetKind() const { return 1; }  // 0x231F0
+    virtual Kind GetKind() const { return static_cast<Kind>(1); }  // 0x231F0 (KIND_TRANJOB)
     virtual void Expire();                     // 0xFE70
 
     unsigned long long _jobid;

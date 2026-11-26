@@ -9,6 +9,7 @@ class NPTransaction;
 union id128;
 
 // LIFT: NPChannel is the real class of NPChannelBase.h (SendMsg 0x3ac0 is defined in NPChannel2.cpp). No local copy: one definition only.
+#define NPTRANSACTION_KIND_LOBBYJOB  // PDB enumerator name of NPTransaction::Kind value 1 in LobbyDaemon
 #include "NPChannelBase.h"
 
 // LIFT: PDB StsMsgLib request types that LobbyDaemon builds. Layouts from tools/pdbcls.py LobbyDaemon. The base
@@ -135,7 +136,7 @@ public:
     // LIFT: the original global operator delete(void*) (0x32b50) is empty. The callers do "delete p;" and then
     // Memory::_Manager[2]->Free(p, ...). This empty class operator delete keeps that shape (see CliSession.h).
     static void operator delete(void*) {}
-    virtual int GetKind() const { return 1; }  // 0xe3ec0 (folded)
+    virtual Kind GetKind() const { return KIND_LOBBYJOB; }  // 0xe3ec0 (folded)
     virtual void Expire();  // 0xd2250
     NPTransaction* Set(LobbyJob*, int);  // 0xd22c0
     unsigned long long GetJobId() const { return _jobid; }  // PDB inline

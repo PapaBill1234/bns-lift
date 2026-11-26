@@ -32,7 +32,6 @@
 #include "Memory.h"
 #include "Network.h"
 #include "MemoryManager.h"
-#include "NPChannelBase.h"
 #include "Mileage.h"
 #include "NPServiceChannel.h"
 #include "Packet.h"
