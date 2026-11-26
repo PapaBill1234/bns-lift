@@ -33,9 +33,11 @@ void SmartCouponObjPoolMemoryAllocator::Free(void*, wchar_t const*, int)
 
 // 0x1180
 ObjPool::ObjPool(unsigned long long id, int objsize, wchar_t const* desc)
-    : _id(id), _objsize(objsize), _desc(desc), _alloc(nullptr), _vtbl(nullptr), _timeToWait(0), _total(0)
+    : _id(id), _objsize(objsize), _desc(desc), _vtbl(nullptr), _timeToWait(0), _total(0)
 {
     // LIFT: Stack, CriticalSection, Queue, CriticalSection ctors run in member order.
+    // LIFT: The original (SCD 0x1180) does not store _alloc (+0x20). Each SCD pool is a static object, so _alloc is
+    // zero before the ctor runs.
 }
 
 // 0x1210
