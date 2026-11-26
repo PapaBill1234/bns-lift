@@ -34,18 +34,25 @@ void aes128TableSetupEncKey(unsigned int* rk, unsigned char const* key, int keyc
 // 0x385c0
 void aes128TableSetupDecKey(unsigned int* rk, unsigned int const* encKey)
 {
-    for (int r = 0; r <= 10; ++r)
+    // LIFT: 0x385c0 copies the round keys in reverse order and reads the key bytes from memory.
+    for (int i = 0, j = 40; i <= 40; i += 4, j -= 4)
     {
-        for (int j = 0; j < 4; ++j)
-            rk[4 * r + j] = encKey[4 * (10 - r) + j];
+        rk[i + 0] = encKey[j + 0];
+        rk[i + 1] = encKey[j + 1];
+        rk[i + 2] = encKey[j + 2];
+        rk[i + 3] = encKey[j + 3];
     }
-    for (int i = 4; i < 40; ++i)
+    for (int r = 1; r < 10; ++r)
     {
-        unsigned int w = rk[i];
-        rk[i] = TE(D_precalc_sbox0, (unsigned char)TE(E_precalc_sbox4, B0(w)))
-              ^ TE(D_precalc_sbox1, (unsigned char)TE(E_precalc_sbox4, B1(w)))
-              ^ TE(D_precalc_sbox2, (unsigned char)TE(E_precalc_sbox4, B2(w)))
-              ^ TE(D_precalc_sbox3, (unsigned char)TE(E_precalc_sbox4, B3(w)));
+        rk += 4;
+        for (int j = 0; j < 4; ++j)
+        {
+            unsigned char const* w = reinterpret_cast<unsigned char const*>(&rk[j]);
+            rk[j] = TE(D_precalc_sbox0, (unsigned char)TE(E_precalc_sbox4, w[0]))
+                  ^ TE(D_precalc_sbox1, (unsigned char)TE(E_precalc_sbox4, w[1]))
+                  ^ TE(D_precalc_sbox2, (unsigned char)TE(E_precalc_sbox4, w[2]))
+                  ^ TE(D_precalc_sbox3, (unsigned char)TE(E_precalc_sbox4, w[3]));
+        }
     }
 }
 
