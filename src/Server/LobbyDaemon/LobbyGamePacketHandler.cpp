@@ -2207,16 +2207,8 @@ bool HandleLobbyGame_ExtendJumpingCharacterCreationQuotaWithAccountInventoryItem
             new (ExtendJumpingCharacterCreationQuotaJob::_pool.Checkout(HANDLER_FILE, 1881))
                 ExtendJumpingCharacterCreationQuotaJob(cliSession);
         LobbyJobManager* const jobMgr = LobbyDaemon::_instance->_jobMgr;
-        if (!jobMgr->Register(job))
-        {
-            Log::Write(Log::LT_ERROR, HANDLER_FILE, 1884,
-                       L"[gamed], handle extend-jumping-character-creation-quota req fail; start job fail, wid:%d, game-tid:0x%I64X, pcid:0x%I64X, label-id:0x%I64X, item-instance-id:0x%I64X, item-data-id:%u",
-                       LgpWid(channel), param.gamedTid, pcid, param.labelId, param.itemInstanceId, param.itemDataId);
-            channel->SendExtendJumpingCharacterCreationQuotaWithAccountInventoryItemFail(param.gamedTid, 2);
-            job->removeReferenceCount(HANDLER_FILE, 1886);
-            line = 1887;
-        }
-        else
+        // LIFT: the success path comes first, as in the original.
+        if (jobMgr->Register(job))
         {
             // LIFT: LobbyJobManager::Execute (0xc2020) is inlined here. ❓ task 30 has no PDB name.
             jobMgr->Execute(job, 30, &param);
@@ -2226,6 +2218,15 @@ bool HandleLobbyGame_ExtendJumpingCharacterCreationQuotaWithAccountInventoryItem
                        param.itemDataId);
             job->removeReferenceCount(HANDLER_FILE, 1893);
             line = 1894;
+        }
+        else
+        {
+            Log::Write(Log::LT_ERROR, HANDLER_FILE, 1884,
+                       L"[gamed], handle extend-jumping-character-creation-quota req fail; start job fail, wid:%d, game-tid:0x%I64X, pcid:0x%I64X, label-id:0x%I64X, item-instance-id:0x%I64X, item-data-id:%u",
+                       LgpWid(channel), param.gamedTid, pcid, param.labelId, param.itemInstanceId, param.itemDataId);
+            channel->SendExtendJumpingCharacterCreationQuotaWithAccountInventoryItemFail(param.gamedTid, 2);
+            job->removeReferenceCount(HANDLER_FILE, 1886);
+            line = 1887;
         }
     }
     cliSession->removeReferenceCount(HANDLER_FILE, line);
@@ -2275,16 +2276,8 @@ bool HandleLobbyGame_UpgradeJumpingCharacterStateWithCreationQuotaReq(SharedChan
         UpgradeJumpingCharacterStateJob* job =
             new (UpgradeJumpingCharacterStateJob::_pool.Checkout(HANDLER_FILE, 1942)) UpgradeJumpingCharacterStateJob(cliSession);
         LobbyJobManager* const jobMgr = LobbyDaemon::_instance->_jobMgr;
-        if (!jobMgr->Register(job))
-        {
-            Log::Write(Log::LT_ERROR, HANDLER_FILE, 1945,
-                       L"[gamed], handle upgrade-jumping-character-state req fail; start job fail, wid:%d, game-tid:0x%I64X, pcid:0x%I64X",
-                       LgpWid(channel), param.gamedTid, param.pcId);
-            channel->SendUpgradeJumpingCharacterStateWithCreationQuotaFail(param.gamedTid, 2);
-            job->removeReferenceCount(HANDLER_FILE, 1947);
-            line = 1948;
-        }
-        else
+        // LIFT: the success path comes first, as in the original.
+        if (jobMgr->Register(job))
         {
             // LIFT: LobbyJobManager::Execute (0xc2020) is inlined here. ❓ task 142 has no PDB name.
             jobMgr->Execute(job, 142, &param);
@@ -2293,6 +2286,15 @@ bool HandleLobbyGame_UpgradeJumpingCharacterStateWithCreationQuotaReq(SharedChan
                        LgpWid(channel), param.gamedTid, param.pcId);
             job->removeReferenceCount(HANDLER_FILE, 1954);
             line = 1955;
+        }
+        else
+        {
+            Log::Write(Log::LT_ERROR, HANDLER_FILE, 1945,
+                       L"[gamed], handle upgrade-jumping-character-state req fail; start job fail, wid:%d, game-tid:0x%I64X, pcid:0x%I64X",
+                       LgpWid(channel), param.gamedTid, param.pcId);
+            channel->SendUpgradeJumpingCharacterStateWithCreationQuotaFail(param.gamedTid, 2);
+            job->removeReferenceCount(HANDLER_FILE, 1947);
+            line = 1948;
         }
     }
     cliSession->removeReferenceCount(HANDLER_FILE, line);
@@ -2341,16 +2343,8 @@ bool HandleLobbyGame_UpdateJumpingCharacterStateReq(SharedChannel* sharedChannel
         UpgradeJumpingCharacterStateJob* job =
             new (UpgradeJumpingCharacterStateJob::_pool.Checkout(HANDLER_FILE, 2005)) UpgradeJumpingCharacterStateJob(cliSession);
         LobbyJobManager* const jobMgr = LobbyDaemon::_instance->_jobMgr;
-        if (!jobMgr->Register(job))
-        {
-            Log::Write(Log::LT_ERROR, HANDLER_FILE, 2008,
-                       L"[gamed], handle update-jumping-character-state req fail; start job fail, wid:%d, game-tid:0x%I64X, pcid:0x%I64X",
-                       LgpWid(channel), param.gamedTid, param.pcId);
-            channel->SendUpdateJumpingCharacterStateFail(param.gamedTid, 2);
-            job->removeReferenceCount(HANDLER_FILE, 2010);
-            line = 2011;
-        }
-        else
+        // LIFT: the success path comes first, as in the original.
+        if (jobMgr->Register(job))
         {
             // LIFT: LobbyJobManager::Execute (0xc2020) is inlined here. ❓ task 142 has no PDB name.
             jobMgr->Execute(job, 142, &param);
@@ -2359,6 +2353,15 @@ bool HandleLobbyGame_UpdateJumpingCharacterStateReq(SharedChannel* sharedChannel
                        LgpWid(channel), param.gamedTid, param.pcId);
             job->removeReferenceCount(HANDLER_FILE, 2017);
             line = 2018;
+        }
+        else
+        {
+            Log::Write(Log::LT_ERROR, HANDLER_FILE, 2008,
+                       L"[gamed], handle update-jumping-character-state req fail; start job fail, wid:%d, game-tid:0x%I64X, pcid:0x%I64X",
+                       LgpWid(channel), param.gamedTid, param.pcId);
+            channel->SendUpdateJumpingCharacterStateFail(param.gamedTid, 2);
+            job->removeReferenceCount(HANDLER_FILE, 2010);
+            line = 2011;
         }
     }
     cliSession->removeReferenceCount(HANDLER_FILE, line);
@@ -2829,7 +2832,19 @@ bool HandleLobbyGame_SecondPasswordGetStatusReq(SharedChannel* sharedChannel, Pa
     LobbyJob* const job = new (SecondPasswordGetStatusJob::_pool.Checkout(HANDLER_FILE, 2341)) SecondPasswordGetStatusJob(cliSession);
     LobbyJobManager* const jobMgr = LobbyDaemon::_instance->_jobMgr;
     int line;
-    if (!jobMgr->Register(job))
+    // LIFT: the success path comes first, as in the original.
+    if (jobMgr->Register(job))
+    {
+        // LIFT: LobbyJobManager::Execute (0xc2020) is inlined in the original. The task id has no PDB name. ❓
+        jobMgr->Execute(job, 129, &param);
+        Log::Write(Log::LT_DEBUG, HANDLER_FILE, 2351,
+                   L"[gamed], handle second-password-get-status request ok, wid:%d, game-tid:0x%I64X, pcid:0x%I64X, 2ndpwd-type:%d",
+                   channel->_rawChannel != nullptr ? static_cast<int>(static_cast<short>(channel->_rawChannel->GetId())) : 0,
+                   param.gametid, param.pcid, static_cast<int>(param.type));
+        job->removeReferenceCount(HANDLER_FILE, 2353);
+        line = 2354;
+    }
+    else
     {
         Log::Write(Log::LT_ERROR, HANDLER_FILE, 2344,
                    L"[gamed], handle second-password-get-status request fail; start job fail, wid:%d, game-tid:0x%I64X, "
@@ -2840,17 +2855,6 @@ bool HandleLobbyGame_SecondPasswordGetStatusReq(SharedChannel* sharedChannel, Pa
         // LIFT: the original releases the job without a null check. Checkout gives null only when memory runs out.
         job->removeReferenceCount(HANDLER_FILE, 2346);
         line = 2347;
-    }
-    else
-    {
-        // LIFT: LobbyJobManager::Execute (0xc2020) is inlined in the original. The task id has no PDB name. ❓
-        jobMgr->Execute(job, 129, &param);
-        Log::Write(Log::LT_DEBUG, HANDLER_FILE, 2351,
-                   L"[gamed], handle second-password-get-status request ok, wid:%d, game-tid:0x%I64X, pcid:0x%I64X, 2ndpwd-type:%d",
-                   channel->_rawChannel != nullptr ? static_cast<int>(static_cast<short>(channel->_rawChannel->GetId())) : 0,
-                   param.gametid, param.pcid, static_cast<int>(param.type));
-        job->removeReferenceCount(HANDLER_FILE, 2353);
-        line = 2354;
     }
     cliSession->removeReferenceCount(HANDLER_FILE, line);
     return true;
@@ -2889,7 +2893,19 @@ bool HandleLobbyGame_SecondPasswordIsVerifiedReq(SharedChannel* sharedChannel, P
     LobbyJob* const job = new (SecondPasswordIsVerifiedJob::_pool.Checkout(HANDLER_FILE, 2387)) SecondPasswordIsVerifiedJob(cliSession);
     LobbyJobManager* const jobMgr = LobbyDaemon::_instance->_jobMgr;
     int line;
-    if (!jobMgr->Register(job))
+    // LIFT: the success path comes first, as in the original.
+    if (jobMgr->Register(job))
+    {
+        // LIFT: LobbyJobManager::Execute (0xc2020) is inlined in the original. The task id has no PDB name. ❓
+        jobMgr->Execute(job, 130, &param);
+        Log::Write(Log::LT_DEBUG, HANDLER_FILE, 2397,
+                   L"[gamed], handle second-password-is-verified request ok, wid:%d, game-tid:0x%I64X, pcid:0x%I64X, 2ndpwd-type:%d, 2ndpwd-action-index:%d",
+                   channel->_rawChannel != nullptr ? static_cast<int>(static_cast<short>(channel->_rawChannel->GetId())) : 0,
+                   param.gametid, param.pcid, static_cast<int>(param.type), static_cast<int>(param.actionIndex));
+        job->removeReferenceCount(HANDLER_FILE, 2399);
+        line = 2400;
+    }
+    else
     {
         Log::Write(Log::LT_ERROR, HANDLER_FILE, 2390,
                    L"[gamed], handle second-password-is-verified request fail; start job fail, wid:%d, game-tid:0x%I64X, "
@@ -2900,17 +2916,6 @@ bool HandleLobbyGame_SecondPasswordIsVerifiedReq(SharedChannel* sharedChannel, P
         // LIFT: the original releases the job without a null check. Checkout gives null only when memory runs out.
         job->removeReferenceCount(HANDLER_FILE, 2392);
         line = 2393;
-    }
-    else
-    {
-        // LIFT: LobbyJobManager::Execute (0xc2020) is inlined in the original. The task id has no PDB name. ❓
-        jobMgr->Execute(job, 130, &param);
-        Log::Write(Log::LT_DEBUG, HANDLER_FILE, 2397,
-                   L"[gamed], handle second-password-is-verified request ok, wid:%d, game-tid:0x%I64X, pcid:0x%I64X, 2ndpwd-type:%d, 2ndpwd-action-index:%d",
-                   channel->_rawChannel != nullptr ? static_cast<int>(static_cast<short>(channel->_rawChannel->GetId())) : 0,
-                   param.gametid, param.pcid, static_cast<int>(param.type), static_cast<int>(param.actionIndex));
-        job->removeReferenceCount(HANDLER_FILE, 2399);
-        line = 2400;
     }
     cliSession->removeReferenceCount(HANDLER_FILE, line);
     return true;
