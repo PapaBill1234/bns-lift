@@ -19,6 +19,7 @@ public:
     bool MakeSession(unsigned int portId, unsigned long ip, unsigned short portNo, long timeout, bool reconnect);  // 0x10450
     void Close();                                                      // 0x10810
     bool Send(Packet const* packet);                                   // 0x21720 (LobbyGate)
+    bool Send(Packet const* packet, Session const* session);           // 0x2c160 (PostOfficeDaemon)
     bool Send(char const* format, ...);                                // 0x216C0 (LobbyGate)
 
 protected:

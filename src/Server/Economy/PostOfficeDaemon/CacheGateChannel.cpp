@@ -171,9 +171,9 @@ bool CacheGateChannel::SendFragmentRelayRequest(RelayContext const* const relayC
 
         if (packet.packet.Splitter != nullptr)
             packet.packet.Splitter->Finalize(packet.packet.CurHeader);
-        // BUG: 0x71e0 the session reference from GetSession is not released.
-        if (GetSession() != nullptr)
-            Send(&packet.packet);
+        Session const* const session = GetSession();
+        if (session != nullptr)
+            Send(&packet.packet, session);
         return true;
     }
 

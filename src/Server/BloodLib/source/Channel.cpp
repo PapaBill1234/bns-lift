@@ -291,3 +291,20 @@ __declspec(noinline) bool Channel::Send(Packet const* packet)
     session->removeReferenceCount(LOBBYGATE_CHANNEL_HEADER_FILE, 52);
     return true;
 }
+
+// 0x2c160 (PostOfficeDaemon)
+// LIFT: The PDB names this function Channel::Send (type bool (Packet const*)), but its record has a `session` symbol in
+// the 3rd argument slot (rsp+64), and the code reads the session from r8. The caller CacheGateChannel::SendFragmentRelayRequest
+// (0x71e0) calls GetSession, tests it for null and passes it in r8. SendRelayRequest (0x7000) and
+// WorldChannel::SendRelayResponse (0x1e570) have the full Send body inline. noinline keeps the call in 0x71e0.
+// The other exes do not call it; the linker drops it there. The clang-cl build has no LIFT_EXE_* define, so the
+// definition is not conditional.
+#if defined(LIFT_EXE_POD)
+__declspec(noinline)
+#endif
+bool Channel::Send(Packet const* packet, Session const* session)
+{
+    session->Send(packet);
+    const_cast<Session*>(session)->removeReferenceCount(LOBBYGATE_CHANNEL_HEADER_FILE, 52);
+    return true;
+}
