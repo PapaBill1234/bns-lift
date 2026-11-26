@@ -2203,6 +2203,157 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"ExtendJumpingCharacterCreationQuotaJob::ExtendJumpingCharacterCreationQuotaJob": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ExtendJumpingCharacterCreationQuotaJob::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ExtendJumpingCharacterCreationQuotaJob::checkAccountInventoryItem": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ExtendJumpingCharacterCreationQuotaJob::checkAccountInventoryItemFail": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"ExtendJumpingCharacterCreationQuotaJob::checkAccountInventoryItemOk": {
+"calls": 95,
+"consts": 100,
+"refs": 100,
+"score": 98.2,
+"status": "DIFF"
+},
+"ExtendJumpingCharacterCreationQuotaJob::checkAccountInventoryItemTimeout": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ExtendJumpingCharacterCreationQuotaJob::extendJumpingCharacterCreationQuota": {
+"calls": 88,
+"consts": 100,
+"refs": 100,
+"score": 95.8,
+"status": "DIFF"
+},
+"ExtendJumpingCharacterCreationQuotaJob::finConsumeAccountInventoryItem": {
+"calls": 100,
+"consts": 91,
+"refs": 100,
+"score": 97.0,
+"status": "DIFF"
+},
+"ExtendJumpingCharacterCreationQuotaJob::finConsumeAccountInventoryItemFail": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"ExtendJumpingCharacterCreationQuotaJob::finConsumeAccountInventoryItemOk": {
+"calls": 96,
+"consts": 95,
+"refs": 100,
+"score": 96.9,
+"status": "DIFF"
+},
+"ExtendJumpingCharacterCreationQuotaJob::finConsumeAccountInventoryItemTimeout": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ExtendJumpingCharacterCreationQuotaJob::finServiceEntry": {
+"calls": 96,
+"consts": 100,
+"refs": 100,
+"score": 98.8,
+"status": "DIFF"
+},
+"ExtendJumpingCharacterCreationQuotaJob::init": {
+"calls": 65,
+"consts": 100,
+"refs": 100,
+"score": 88.3,
+"status": "DIFF"
+},
+"ExtendJumpingCharacterCreationQuotaJob::registerServiceEntry": {
+"calls": 81,
+"consts": 100,
+"refs": 100,
+"score": 93.7,
+"status": "DIFF"
+},
+"ExtendJumpingCharacterCreationQuotaJob::sendFailReason": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"ExtendJumpingCharacterCreationQuotaJob::tryConsumeAccountInventoryItem": {
+"calls": 100,
+"consts": 91,
+"refs": 100,
+"score": 97.0,
+"status": "DIFF"
+},
+"ExtendJumpingCharacterCreationQuotaJob::tryConsumeAccountInventoryItemFail": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"ExtendJumpingCharacterCreationQuotaJob::tryConsumeAccountInventoryItemOk": {
+"calls": 96,
+"consts": 95,
+"refs": 100,
+"score": 97.1,
+"status": "DIFF"
+},
+"ExtendJumpingCharacterCreationQuotaJob::tryConsumeAccountInventoryItemTimeout": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ExtendJumpingCharacterCreationQuotaJob::work": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ExtendJumpingCharacterCreationQuotaJob::~ExtendJumpingCharacterCreationQuotaJob": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "ExtendJumpingCharacterCreationQuotaService::ConsumeItemFinished": {
 "calls": 60,
 "consts": 67,
@@ -3617,11 +3768,12 @@
 "status": "DIFF"
 },
 "HandleLobbyGame_ExtendJumpingCharacterCreationQuotaWithAccountInventoryItemReq": {
-"calls": 97,
+"calls": 100,
 "consts": 100,
-"refs": 98,
-"score": 98.3,
-"status": "DIFF"
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
 },
 "HandleLobbyGame_FinishRegisterGuildNotify": {
 "calls": 100,
@@ -3834,6 +3986,13 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"HandleLobbyLobbyGate_ExtendJumpingCharacterCreationQuotaWithAccountInventoryItemReq": {
+"calls": 88,
+"consts": 100,
+"refs": 100,
+"score": 96.2,
+"status": "DIFF"
 },
 "HandleLobbyLobbyGate_GetCharacterInfoListReq": {
 "calls": 87,
@@ -5191,6 +5350,22 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"LobbyGateChannel::SendExtendJumpingCharacterCreationQuotaWithAccountInventoryItemFail": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"LobbyGateChannel::SendExtendJumpingCharacterCreationQuotaWithAccountInventoryItemOk": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
 },
 "LobbyGateChannel::SendGetCharacterInfoFail": {
 "calls": 100,
