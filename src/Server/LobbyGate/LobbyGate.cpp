@@ -136,7 +136,8 @@ unsigned int LobbyGateReloadInvalidRestoreTimer::TimerClass() const
 }
 
 // 0x128b0
-extern "C" int __cdecl wmain(int argc, wchar_t** argv)
+// LIFT: no extern "C". cl /EHsc gives an extern "C" function no EH state; the original wmain 0x128b0 has state -2. The name wmain stays unmangled.
+int __cdecl wmain(int argc, wchar_t** argv)
 {
     LobbyGate daemon;
     LobbyGate::_instance = &daemon;
