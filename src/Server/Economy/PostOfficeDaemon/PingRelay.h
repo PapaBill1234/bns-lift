@@ -25,7 +25,8 @@ class PingRelayResponse : public RelayResponse
 {
 public:
     // PDB ctor (ResultState, short const) with default arguments. 0x5120 stores (1, 0) and _pingSeq 0.
-    PingRelayResponse(ResultState resultState = RESULTSTATE_SUCCESS, short const failReason = 0)
+    // LIFT: 0x4ed0 stores 0 (RESULTSTATE_INVALID) in the inline default ctor of _response.
+    PingRelayResponse(ResultState resultState = RESULTSTATE_INVALID, short const failReason = 0)
         : RelayResponse(resultState, failReason), _pingSeq(0) {}
     virtual ~PingRelayResponse() {}  // 0x4ce0 (inline)
 

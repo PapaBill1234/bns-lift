@@ -645,10 +645,14 @@ CacheGateChannel* PostOfficeDaemon::checkCacheGateServiceState()
 {
     CacheGateChannelManager* const manager = _cachegateChannelManager;
     // Inlined CacheGateChannelManager::GetCacheGateChannel. LIFT: the PDB type record has this public method. It has no body (inlined).
+    // 0x14930 reads _cachegateChannel again after addReferenceCount.
+    CacheGateChannel* cachegateChannel = nullptr;
     manager->_lock.Enter();
-    CacheGateChannel* const cachegateChannel = manager->_cachegateChannel;
-    if (cachegateChannel != nullptr)
-        cachegateChannel->addReferenceCount(false, L"CacheGateChannel.cpp", 168);
+    if (manager->_cachegateChannel != nullptr)
+    {
+        manager->_cachegateChannel->addReferenceCount(false, L"CacheGateChannel.cpp", 168);
+        cachegateChannel = manager->_cachegateChannel;
+    }
     manager->_lock.Leave();
     if (cachegateChannel == nullptr)
     {
