@@ -13,11 +13,11 @@ This repo is public. Do not commit binaries, keys, PDBs or IDA databases.
 | Item | State |
 | --- | --- |
 | First 4 exes | 91.7 % parity. 3 of 4 are above 90 %. LobbyGate is at 89.0 %. |
-| LobbyDaemon | Lift in progress: 764 MATCH (34.7 %), 35 excluded MATCH not counted. Most of the other functions are still `LIFT_STUB` bodies. |
+| LobbyDaemon | Lift in progress: 765 MATCH (34.7 %), 35 excluded MATCH not counted. Most of the other functions are still `LIFT_STUB` bodies. |
 | Method | Gap cards. Each card lifts the PDB class layout and the stub bodies of one class or job group. |
-| Last landed | Gap card 10 (account jobs: second password, mileage, NP schedule, play reward; +0 MATCH, NOREF gain only) and fix-pdb-layout (the gate now runs `tools/pdb_layout.py`). Before: gap cards 11, 09, 07, 08 and 19, honest totals and a public-clean tools pass. 0 lost in all 5 exes. |
+| Last landed | Gap card 16 (game world wait jobs, +1 MATCH: CliSession::getCharacter), gap card 10 (account jobs, +0 MATCH) and fix-pdb-layout (the gate now runs `tools/pdb_layout.py`). Before: gap cards 11, 09, 07, 08 and 19. 0 lost in all 5 exes. |
 | Checks per landing | Full VS2010 build of all 5 exes, funcdiff against the original, 0 lost MATCH, 0 strict regress. A model review checks each new MATCH without a strict full proof. |
-| Next | Gap cards 16, 14, 12, 26, 15 and 25, then the other job cards. |
+| Next | Gap cards 14, 12, 26, 15 and 25, then the other job cards. |
 
 ## Parity
 
