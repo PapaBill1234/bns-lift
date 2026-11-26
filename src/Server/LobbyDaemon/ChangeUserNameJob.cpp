@@ -56,8 +56,12 @@ LobbyJobStateDef const StateDef[] = {{0, L"INIT"},
 }
 
 LobbyJobDef ChangeUserNameJob::_def = {37, StateDef, 5, L"ChangeUserNameJob"};  // 0x201f60
-// LIFT: ChangeUserNameJob::_pool has no definition. The LobbyDaemon ObjectPool module is not in lift_lobbydaemon
-// (see CliSession.cpp).
+
+#include "ObjectPoolLobbyDaemon.h"
+
+// .data 0x203ff0, dynamic init 0x11dc10, atexit dtor 0x11eac0.
+// The exe .data holds id 1, objsize 0x110, desc L"ChangeUserNameJob".
+ObjPool ChangeUserNameJob::_pool(1, 0x110, L"ChangeUserNameJob");
 
 // 0x26990
 LobbyJobDef const* ChangeUserNameJob::GetDefinition() const

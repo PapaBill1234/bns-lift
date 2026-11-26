@@ -19,7 +19,6 @@
 #include "Memory.h"
 #include "MemoryManager.h"
 #include "NPServiceChannel.h"
-#include "ObjectPool.h"
 #include "TransactionChannel.h"
 
 static wchar_t const kFile[] = L"TryEnterGameWorldJob.cpp";
@@ -147,6 +146,11 @@ LobbyJobStateDef const StateDef[] = {{0, L"INIT"},
 
 LobbyJobDef TryEnterGameWorldJob::_def = {8, StateDef, 8, L"TryEnterGameWorldJob"};  // 0x201930
 ObjPool TryEnterGameWorldJob::_pool(1, sizeof(TryEnterGameWorldJob), L"TryEnterGameWorldJob");  // 0x205280
+
+#include "ObjectPoolLobbyDaemon.h"
+
+// .data 0x205280, dynamic init 0x11e480, atexit dtor 0x11f180.
+// The exe .data holds id 1, objsize 0x90, desc L"TryEnterGameWorldJob".
 
 // 0x7b840
 LobbyJobDef const* TryEnterGameWorldJob::GetDefinition() const

@@ -29,8 +29,12 @@ LobbyJobStateDef const StateDef[] = {{0, L"INIT"}, {1, L"GET_CHARGE_INFO"}, {2, 
 }
 
 LobbyJobDef GetChargeInfoJob::_def = {19, StateDef, 2, L"GetChargeInfoJob"};  // 0x201cd0
-// LIFT: GetChargeInfoJob::_pool (0x204620: id 1, size 0x68) has no definition. The LobbyDaemon ObjectPool module is
-// not in lift_lobbydaemon (see CliSession.cpp).
+
+#include "ObjectPoolLobbyDaemon.h"
+
+// .data 0x204620, dynamic init 0x11dee0, atexit dtor 0x11ed00.
+// The exe .data holds id 1, objsize 0x68, desc L"GetChargeInfoJob".
+ObjPool GetChargeInfoJob::_pool(1, 0x68, L"GetChargeInfoJob");
 
 // 0x50550
 LobbyJobDef const* GetChargeInfoJob::GetDefinition() const

@@ -132,8 +132,21 @@ LobbyJobStateDef const StateDef[] = {{0, L"INIT"}, {1, L"DEPOSIT"}, {2, L"FIN"}}
 }
 
 LobbyJobDef DepositMileageJob::_def = {38, StateDef, 2, L"DepositMileageJob"};  // 0x201d10
-// LIFT: DepositMileageJob::_pool (0x2044c0) has no definition. The LobbyDaemon ObjectPool module is not in
-// lift_lobbydaemon (see CliSession.cpp).
+
+#include "ObjectPoolLobbyDaemon.h"
+
+// .data 0x2044c0, dynamic init 0x11de40, atexit dtor 0x11ec80.
+// The exe .data holds id 1, objsize 0x600, desc L"DepositMileageJob".
+ObjPool DepositMileageJob::_pool(1, 0x600, L"DepositMileageJob");
+
+// LIFT: no RVA. LTCG inlined it into LobbyDaemon::initialize (0x9b300). The original constructs a job on the stack
+// and returns its vfptr. It does not run the destructor.
+void* DepositMileageJob::_vtbl()
+{
+    char buf[sizeof(DepositMileageJob)];
+    DepositMileageJob* job = ::new (buf) DepositMileageJob(nullptr);
+    return *reinterpret_cast<void**>(job);
+}
 
 // 0x49b40
 LobbyJobDef const* DepositMileageJob::GetDefinition() const

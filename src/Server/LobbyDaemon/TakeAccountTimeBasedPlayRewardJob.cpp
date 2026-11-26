@@ -76,8 +76,12 @@ LobbyJobStateDef const StateDef[] = {{0, L"INIT"}, {1, L"TAKE_ACCOUNT_TIME_BASED
 }
 
 LobbyJobDef TakeAccountTimeBasedPlayRewardJob::_def = {45, StateDef, 2, L"TakeAccountTimeBasedPlayRewardJob"};  // 0x201970
-// LIFT: TakeAccountTimeBasedPlayRewardJob::_pool (0x205120) has no definition. The LobbyDaemon ObjectPool module is not
-// in lift_lobbydaemon (see CliSession.cpp).
+
+#include "ObjectPoolLobbyDaemon.h"
+
+// .data 0x205120, dynamic init 0x11e3e0, atexit dtor 0x11f100.
+// The exe .data holds id 1, objsize 0x90, desc L"TakeAccountTimeBasedPlayRewardJob".
+ObjPool TakeAccountTimeBasedPlayRewardJob::_pool(1, 0x90, L"TakeAccountTimeBasedPlayRewardJob");
 
 // 0x788a0
 LobbyJobDef const* TakeAccountTimeBasedPlayRewardJob::GetDefinition() const

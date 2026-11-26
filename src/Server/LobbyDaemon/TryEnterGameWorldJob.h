@@ -76,7 +76,7 @@ private:
     ChargeAppplyType _chargeApplyType;  // +0x8c
 
 public:
-    static ObjPool _pool;
+    static ObjPool _pool;  // .data 0x205280
     static LobbyJobDef _def;
 };
 static_assert(sizeof(TryEnterGameWorldJob) == 0x90, "sizeof TryEnterGameWorldJob");

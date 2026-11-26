@@ -28,7 +28,12 @@ LobbyJobStateDef const StateDef[] = {{0, L"INIT"}, {1, L"ABANDON_CHARGE"}, {2, L
 }
 
 LobbyJobDef AbandonChargeJob::_def = {18, StateDef, 2, L"AbandonChargeJob"};  // 0x2020e0
-// LIFT: AbandonChargeJob::_pool (0x2037b0: id 1, size 0xf0) is defined at the end of this file (gap-26, LobbyObjectPool.cpp).
+// LIFT: AbandonChargeJob::_pool (0x2037b0: id 1, size 0xf0) is defined at the end of this file (gap-26).
+
+#include "ObjectPoolLobbyDaemon.h"
+
+// .data 0x2037b0, dynamic init 0x11d850, atexit dtor 0x11e7c0.
+// The exe .data holds id 1, objsize 0xf0, desc L"AbandonChargeJob".
 
 // 0x4f70
 LobbyJobDef const* AbandonChargeJob::GetDefinition() const
@@ -144,5 +149,4 @@ bool AbandonChargeJob::expireChargeAbandon()
 
 // LIFT: AbandonChargeJob::_pool (.data RVA 0x2037b0). Dynamic initializer 0x11d850, atexit destructor 0x11e7c0. The original static data
 // holds id 1, objsize sizeof(AbandonChargeJob) and desc L"AbandonChargeJob".
-#include "ObjectPool.h"
 ObjPool AbandonChargeJob::_pool(1, sizeof(AbandonChargeJob), L"AbandonChargeJob");

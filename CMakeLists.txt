@@ -436,6 +436,7 @@ add_library(lift_lobbydaemon STATIC
   src/Server/LobbyDaemon/ListLobbyServiceItemJob.cpp
   src/Server/LobbyDaemon/LobbyCharacterDeletionScheduler.cpp
   src/Server/LobbyDaemon/LobbyConfig.cpp
+  src/Server/LobbyDaemon/LobbyConfigDef.cpp
   src/Server/LobbyDaemon/LobbyDB.cpp
   src/Server/LobbyDaemon/LobbyDaemon.cpp
   src/Server/LobbyDaemon/LobbyEvent.cpp
@@ -450,7 +451,6 @@ add_library(lift_lobbydaemon STATIC
   src/Server/LobbyDaemon/LobbyLocale.cpp
   src/Server/LobbyDaemon/LobbyManagePacketHandler.cpp
   src/Server/LobbyDaemon/LobbyMessage.cpp
-  src/Server/LobbyDaemon/LobbyObjectPool.cpp
   src/Server/LobbyDaemon/LobbyPerfMonitor.cpp
   src/Server/LobbyDaemon/LobbyPredefine.cpp
   src/Server/LobbyDaemon/LobbyService.cpp
@@ -465,6 +465,7 @@ add_library(lift_lobbydaemon STATIC
   src/Server/LobbyDaemon/MileageDailyLimit.cpp
   src/Server/LobbyDaemon/NPLobbyMessageHandler.cpp
   src/Server/LobbyDaemon/NPServiceChannel.cpp
+  src/Server/LobbyDaemon/ObjectPoolLobbyDaemon.cpp
   src/Server/LobbyDaemon/PcCafe.cpp
   src/Server/LobbyDaemon/PcCafeMileage.cpp
   src/Server/LobbyDaemon/PostOfficeChannel.cpp

@@ -73,7 +73,8 @@ private:
     unsigned long long _serviceId;  // +0xa8
 
 public:
-    static ObjPool _pool;
+    static ObjPool _pool;  // .data 0x203de0
+    static void* _vtbl();  // LIFT: PDB declares it; no RVA (inlined in LobbyDaemon::initialize 0x9b300)
     static LobbyJobDef _def;
 };
 static_assert(sizeof(ChangeCharacterAppearanceJob) == 0xb0, "sizeof ChangeCharacterAppearanceJob");

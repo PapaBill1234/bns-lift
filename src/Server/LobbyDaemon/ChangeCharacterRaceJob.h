@@ -60,6 +60,7 @@ public:
         FIN = 7,
     };
 
+    static void* _vtbl();  // LIFT: PDB declares it; no RVA (inlined in LobbyDaemon::initialize 0x9b300)
     virtual LobbyJobDef const* GetDefinition() const;  // 0x1ea40
     ChangeCharacterRaceJob(CliSession*);  // 0x1eaa0
     virtual ~ChangeCharacterRaceJob();  // 0x1eb40

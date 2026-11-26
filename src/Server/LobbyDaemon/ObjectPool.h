@@ -1,9 +1,13 @@
 // ObjectPool.obj (SmartCouponDaemon PDB). Layouts from include/pdb/SmartCouponDaemon/types.h.
 // The source file is "..\LobbyDaemon\ObjectPool.cpp" (log strings).
+// LIFT: ObjectPoolLobbyDaemon.h defines LIFT_OBJPOOL_LOBBYDAEMON. Then this header gives the
+// LobbyDaemon form: the ObjPool ctor, the dtor and the Stack/Queue ctors are inline (no PDB
+// symbol), and GObjPoolMemAlloc has the type LobbyObjPoolMemAllocator*.
 #pragma once
 #include <stddef.h>
 #include <vector>
 #include "Lock.h"
+#include "SysInfo.h"
 #include "TimerQueue.h"
 
 class ObjPoolMemoryAllocator
@@ -33,6 +37,31 @@ public:
 };
 static_assert(sizeof(SmartCouponObjPoolMemoryAllocator) == 0x50, "sizeof SmartCouponObjPoolMemoryAllocator");
 
+#ifdef LIFT_OBJPOOL_LOBBYDAEMON
+// LobbyDaemon PDB. Layout: include/pdb/LobbyDaemon/types.h (sizeof 0x50).
+// LIFT: moved here from LobbyDaemon.h, so that ObjectPool.cpp sees the complete type.
+class LobbyObjPoolMemAllocator : public ObjPoolMemoryAllocator
+{
+public:
+    // LIFT: Inlined in LobbyDaemon::initialize (0x9b300).
+    LobbyObjPoolMemAllocator()
+        : _systemAllocationGranularity(SysInfo::MemnoryAllocationGranularity()), _alignment(16), _mem(nullptr),
+          _end(nullptr)
+    {
+    }
+    virtual void* Alloc(unsigned long long, wchar_t const*, int);  // 0x99260
+    // LIFT: Free has no LD RVA in the index (❓ folded with an empty function). It does nothing.
+    virtual void Free(void*, wchar_t const*, int) {}
+
+    CriticalSection _lock;
+    unsigned long long const _systemAllocationGranularity;
+    unsigned long long const _alignment;
+    unsigned char* _mem;
+    unsigned char* _end;
+};
+static_assert(sizeof(LobbyObjPoolMemAllocator) == 0x50, "sizeof LobbyObjPoolMemAllocator");
+#endif
+
 class ObjPool
 {
 public:
@@ -48,6 +77,9 @@ public:
 
     struct Stack  // PDB type 0x1EFA, field list 0x1EF9
     {
+#ifdef LIFT_OBJPOOL_LOBBYDAEMON
+        Stack() : _head(nullptr), _size(0) {}  // LIFT: LobbyDaemon PDB ObjPool::Stack::Stack (inline)
+#endif
         Node* _head;
         int _size;
     };
@@ -55,14 +87,27 @@ public:
 
     struct Queue  // PDB type 0x1EEF, field list 0x1EEE. This exe does not use it.
     {
+#ifdef LIFT_OBJPOOL_LOBBYDAEMON
+        Queue() : _head(nullptr), _tail(nullptr), _size(0) {}  // LIFT: LobbyDaemon PDB ObjPool::Queue::Queue (inline)
+#endif
         Node* _head;
         Node* _tail;
         int _size;
     };
     static_assert(sizeof(Queue) == 0x18, "sizeof ObjPool::Queue");
 
+#ifdef LIFT_OBJPOOL_LOBBYDAEMON
+    // LIFT: LobbyDaemon has no out-of-line ctor or dtor. The _pool dynamic initializers only
+    // run the CriticalSection ctors; the other members are static .data.
+    ObjPool(unsigned long long id, int objsize, wchar_t const* desc)
+        : _id(id), _objsize(objsize), _desc(desc), _alloc(nullptr), _vtbl(nullptr), _timeToWait(0), _total(0)
+    {
+    }
+    virtual ~ObjPool() {}
+#else
     ObjPool(unsigned long long id, int objsize, wchar_t const* desc);  // 0x1180
     virtual ~ObjPool();                                                 // 0x1210
+#endif
 
     bool Initialize(void* vtbl, int initialPoolCapacity, long timeToWait);  // 0x1250
     void Finalize();                                                       // 0x1490
@@ -110,5 +155,10 @@ public:
 };
 static_assert(sizeof(ObjPoolTimer) == 0x68, "sizeof ObjPoolTimer");
 
+#ifdef LIFT_OBJPOOL_LOBBYDAEMON
+extern LobbyObjPoolMemAllocator* GObjPoolMemAlloc;  // LobbyDaemon rva 0x2095D8
+extern ObjPoolTimer* GObjPoolTimer;                  // LobbyDaemon rva 0x2095E0
+#else
 extern SmartCouponObjPoolMemoryAllocator* GObjPoolMemAlloc;  // rva 0x84B18
 extern ObjPoolTimer* GObjPoolTimer;                           // rva 0x84B20
+#endif

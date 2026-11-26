@@ -73,8 +73,21 @@ LobbyJobStateDef const StateDef[] = {{0, L"INIT"},
 }
 
 LobbyJobDef RenameCharacterJob::_def = {28, StateDef, 7, L"RenameCharacterJob"};  // 0x201a78
-// LIFT: RenameCharacterJob::_pool has no definition. The LobbyDaemon ObjectPool module is not in lift_lobbydaemon
-// (see CliSession.cpp).
+
+#include "ObjectPoolLobbyDaemon.h"
+
+// .data 0x204c50, dynamic init 0x11e1b0, atexit dtor 0x11ef40.
+// The exe .data holds id 1, objsize 0x138, desc L"RenameCharacterJob".
+ObjPool RenameCharacterJob::_pool(1, 0x138, L"RenameCharacterJob");
+
+// LIFT: no RVA. LTCG inlined it into LobbyDaemon::initialize (0x9b300). The original constructs a job on the stack
+// and returns its vfptr. It does not run the destructor.
+void* RenameCharacterJob::_vtbl()
+{
+    char buf[sizeof(RenameCharacterJob)];
+    RenameCharacterJob* job = ::new (buf) RenameCharacterJob(nullptr);
+    return *reinterpret_cast<void**>(job);
+}
 
 // 0x66ae0
 LobbyJobDef const* RenameCharacterJob::GetDefinition() const

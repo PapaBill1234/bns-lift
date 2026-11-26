@@ -129,8 +129,12 @@ LobbyJobStateDef const StateDef[] = {{0, L"INIT"},
 }
 
 LobbyJobDef DeleteCharacterJob::_def = {6, StateDef, 7, L"DeleteCharacterJob"};  // 0x201d30
-// LIFT: DeleteCharacterJob::_pool (0x204410) has no definition. The LobbyDaemon ObjectPool module is not in
-// lift_lobbydaemon (see CliSession.cpp).
+
+#include "ObjectPoolLobbyDaemon.h"
+
+// .data 0x204410, dynamic init 0x11ddf0, atexit dtor 0x11ec40.
+// The exe .data holds id 1, objsize 0x90, desc L"DeleteCharacterJob".
+ObjPool DeleteCharacterJob::_pool(1, 0x90, L"DeleteCharacterJob");
 
 // 0x45040
 LobbyJobDef const* DeleteCharacterJob::GetDefinition() const

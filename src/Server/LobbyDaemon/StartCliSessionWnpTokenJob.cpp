@@ -2,6 +2,8 @@
 // LIFT: the functions that still have LIFT_STUB bodies are not done (gap-13 and later cards).
 #include <new>
 #include <stdlib.h>
+#include <string.h>
+#include <time.h>
 #include <wchar.h>
 #include <winsock2.h>
 #include <windows.h>
@@ -12,13 +14,21 @@
 #include "AlertSender.h"
 #include "BnsCommonConfigDefinition.h"
 #include "CliSession.h"
+#include "CliSessionManager.h"
+#include "GameTimeSchedule.h"
+#include "KickJob.h"
 #include "LiftStub.h"
+#include "LobbyConfig.h"
 #include "LobbyDaemon.h"
 #include "LobbyGateChannel.h"
 #include "Log.h"
 #include "Memory.h"
 #include "MemoryManager.h"
 #include "NPServiceChannel.h"
+#include "ObjectPoolLobbyDaemon.h"
+
+// PDB public LobbyErrorDesc (28 entries). LobbyGamePacketHandler.cpp has the placeholder definition. ❓
+extern wchar_t const* LobbyErrorDesc[28];
 
 static wchar_t const kFile[] = L"StartCliSessionWnpTokenJob.cpp";
 
@@ -65,8 +75,18 @@ LobbyJobStateDef const StateDef[] = {{0, L"INIT"},
 }
 
 LobbyJobDef StartCliSessionWnpTokenJob::_def = {2, StateDef, 16, L"StartCliSessionWnpTokenJob"};  // 0x201248
-// LIFT: StartCliSessionWnpTokenJob::_pool (0x2056b0) has no definition. The LobbyDaemon ObjectPool module is not in
-// lift_lobbydaemon (see CliSession.cpp).
+// .data 0x2056b0, dynamic init 0x11e660, atexit dtor 0x11f300.
+// The exe .data holds id 1, objsize 0x1e0, desc L"StartCliSessionWnpTokenJob".
+ObjPool StartCliSessionWnpTokenJob::_pool(1, sizeof(StartCliSessionWnpTokenJob), L"StartCliSessionWnpTokenJob");
+
+// LIFT: no RVA. LTCG inlined it into LobbyDaemon::initialize (0x9b300). The original constructs a job on the stack
+// and returns its vfptr. It does not run the destructor.
+void* StartCliSessionWnpTokenJob::_vtbl()
+{
+    char buf[sizeof(StartCliSessionWnpTokenJob)];
+    StartCliSessionWnpTokenJob* job = ::new (buf) StartCliSessionWnpTokenJob(nullptr);
+    return *reinterpret_cast<void**>(job);
+}
 
 // 0xd2340
 LobbyJobDef const* StartCliSessionWnpTokenJob::GetDefinition() const
@@ -794,9 +814,117 @@ bool StartCliSessionWnpTokenJob::getUserPromotionStatusExpire()
 }
 
 // 0xdb950
+// The last step: log in the account, load it from the DB, schedule the game time and send the start result.
+// LIFT: CliSession::login has a char argument ("right") that LTCG removed. Its body writes 1 to the DB field right. ❓
 bool StartCliSessionWnpTokenJob::loginAccount()
 {
-    LIFT_STUB(0xdb950);
+    if (!_owner->login(_gameAccountId, _gameAccountName, 1, _userName))
+    {
+        JOB_LOG(Log::LT_ERROR, 1716, L"[job], login fail", L"");
+        _lgate->SendStartSessionWithNPTokenFail(_owner->_clikey, 16);
+        _owner->_state = 0x60000;
+        _owner->finalize();
+
+        // Kick the other session that has the same game account.
+        CliSession* duplicated = LobbyDaemon::_instance->_clisessionMgr->Select_index_account(_gameAccountId);
+        if (duplicated != nullptr)
+        {
+            void* mem = KickJob::_pool.Checkout(kFile, 1724);
+            KickJob* job = mem != nullptr ? new (mem) KickJob(duplicated, 1, nullptr) : nullptr;
+            if (LobbyDaemon::_instance->_jobMgr->Postpone(job, 1, nullptr))
+            {
+                JOB_LOG(Log::LT_DEBUG, 1726, L"[job], kick duplicated account",
+                        L", game-account-id:%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X, duplicated-cli-key:0x%I64X",
+                        _gameAccountId.guid.id1, _gameAccountId.guid.id2, _gameAccountId.guid.id3,
+                        _gameAccountId.guid.id4[0], _gameAccountId.guid.id4[1], _gameAccountId.guid.id4[2],
+                        _gameAccountId.guid.id4[3], _gameAccountId.guid.id4[4], _gameAccountId.guid.id4[5],
+                        _gameAccountId.guid.id4[6], _gameAccountId.guid.id4[7], duplicated->_clikey);
+            }
+            else
+            {
+                JOB_LOG(Log::LT_ERROR, 1728, L"[job], kick duplicated account fail; postpone kick job fail", L"");
+            }
+            job->removeReferenceCount(kFile, 1729);
+            duplicated->removeReferenceCount(kFile, 1730);
+        }
+        return false;
+    }
+
+    if (!_owner->loadDB())
+    {
+        JOB_LOG(Log::LT_ERROR, 1736, L"[job], load db fail", L"");
+        _lgate->SendStartSessionWithNPTokenFail(_owner->_clikey, 16);
+        _owner->_state = 0x60000;
+        _owner->finalize();
+        return false;
+    }
+
+    unsigned long infoGatePubAddr = 0;
+    unsigned short infoGatePubPort = 0;
+    LobbyConfig const* config = LobbyDaemon::_instance->_config;
+    if (config->_useInfoGate)
+    {
+        infoGatePubAddr = config->_infoGatePubAddr;
+        infoGatePubPort = static_cast<unsigned short>(config->_infoGatePubPort);
+    }
+    bool enableGrade = config->_useGrade;
+    bool teen = _owner->_teen;
+
+    long long closestEndTime = 0;
+    GameTimeScheduler* gameTimeScheduler = LobbyDaemon::_instance->_gameTimeScheduler;
+    if (gameTimeScheduler != nullptr && _gameTimeSchedule != nullptr)
+    {
+        if (gameTimeScheduler->Schedule(_owner, *_gameTimeSchedule, &closestEndTime))
+        {
+            tm tmClosest;
+            memset(&tmClosest, 0, sizeof(tmClosest));
+            _localtime64_s(&tmClosest, &closestEndTime);
+            JOB_LOG(Log::LT_DEBUG, 1767, L"[job], closest-end-time scheduled",
+                    L", at:%I64d, closestEndTime:%04d-%02d-%02d %02d:%02d:%02d", closestEndTime,
+                    tmClosest.tm_year + 1900, tmClosest.tm_mon + 1, tmClosest.tm_mday, tmClosest.tm_hour,
+                    tmClosest.tm_min, tmClosest.tm_sec);
+        }
+        else
+        {
+            int error = TLobbyError;
+            if (error != LOBERR_GAME_TIME_SCHEDULE_NO_NEED_TO_SCHEDULE)
+            {
+                JOB_LOG(Log::LT_ERROR, 1774, L"[job], schedule game-time-schedule fail", L", loberr:%s",
+                        static_cast<unsigned int>(error) >= LOBERR_MAX ? L"LOBERR_UNDEFINED" : LobbyErrorDesc[error]);
+                short failCode = 2;
+                if (error == LOBERR_GAME_TIME_SCHEDULE_IN_SCHEDULED_BLOCK_TIME)
+                    failCode = 18;
+                _lgate->SendStartSessionWithNPTokenFail(_owner->_clikey, failCode);
+                _owner->_state = 0x60000;
+                _owner->finalize();
+                return false;
+            }
+        }
+    }
+
+    _owner->_closestEndTime = closestEndTime;
+    int remainJumpingCharacterCreationQuota = _owner->_jumpingCharacterCreationQuota._db.creationQuota -
+                                              _owner->_jumpingCharacterCreationQuota._db.creationCount;
+    if (LobbyDaemon::_instance->_config->_enableInitialUserName && checkIntialUserName(_userName))
+    {
+        _owner->_state = 0x10003;
+        JOB_LOG(Log::LT_DEBUG, 1798, L"[job], start cli-session ok; initial user-name", L"");
+        _lgate->SendStartSessionWithNPTokenOk(_owner->_clikey, 1, _owner->_infoGateToken, infoGatePubAddr,
+                                              infoGatePubPort, enableGrade, _owner->_gradeService, teen,
+                                              closestEndTime, remainJumpingCharacterCreationQuota,
+                                              _owner->_acb._accountExp);
+    }
+    else
+    {
+        _lgate->SendStartSessionWithNPTokenOk(_owner->_clikey, 0, _owner->_infoGateToken, infoGatePubAddr,
+                                              infoGatePubPort, enableGrade, _owner->_gradeService, teen,
+                                              closestEndTime, remainJumpingCharacterCreationQuota,
+                                              _owner->_acb._accountExp);
+        _owner->_state = 0x20000;
+        JOB_LOG(Log::LT_DEBUG, 1828, L"[job], start cli-session ok", L"");
+    }
+    transit(FIN);
+    return true;
 }
 
 // 0xdc310

@@ -62,8 +62,21 @@ LobbyJobStateDef const StateDef[] = {{0, L"INIT"},
 }
 
 LobbyJobDef ChangeCharacterSexJob::_def = {40, StateDef, 7, L"ChangeCharacterSexJob"};  // 0x201f80
-// LIFT: ChangeCharacterSexJob::_pool has no definition. The LobbyDaemon ObjectPool module is not in lift_lobbydaemon
-// (see CliSession.cpp).
+
+#include "ObjectPoolLobbyDaemon.h"
+
+// .data 0x203f40, dynamic init 0x11dbc0, atexit dtor 0x11ea80.
+// The exe .data holds id 1, objsize 0xb8, desc L"ChangeCharacterSexJob".
+ObjPool ChangeCharacterSexJob::_pool(1, 0xb8, L"ChangeCharacterSexJob");
+
+// LIFT: no RVA. LTCG inlined it into LobbyDaemon::initialize (0x9b300). The original constructs a job on the stack
+// and returns its vfptr. It does not run the destructor.
+void* ChangeCharacterSexJob::_vtbl()
+{
+    char buf[sizeof(ChangeCharacterSexJob)];
+    ChangeCharacterSexJob* job = ::new (buf) ChangeCharacterSexJob(nullptr);
+    return *reinterpret_cast<void**>(job);
+}
 
 // 0x22a60
 LobbyJobDef const* ChangeCharacterSexJob::GetDefinition() const

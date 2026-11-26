@@ -5,8 +5,9 @@
 #include "Daemon.h"
 #include "Lock.h"
 #include "LobbyLocale.h"
-#include "ObjectPool.h"
+#include "ObjectPoolLobbyDaemon.h"
 #include "StlMemory.h"
+#include "../../External/BannedWordFilter/STLMemory.h"
 #include "TimerQueue.h"
 
 struct EventContext;
@@ -40,13 +41,14 @@ class PostOfficeSessionHandler;
 class SystemPerfMonitor;
 class TencentUIC;
 
-class BannedWordFilterMemoryAllocator
+class BannedWordFilterMemoryAllocator : public BannedWordFilterMemoryManager
 {
 public:
     virtual void* Alloc(unsigned long long, wchar_t const*, int);  // 0x99380
     virtual void* Realloc(void*, unsigned long long, wchar_t const*, int);  // 0x99390
     virtual void Free(void*, wchar_t const*, int);  // 0x993b0
 };
+extern BannedWordFilterMemoryAllocator BannedWordFilterMemoryAllocatorInstance;  // PDB global, rva 0x2056A0.
 
 // Layout: include/pdb/LobbyDaemon/types.h (sizeof 0x50).
 class CoolDown : public Timer
@@ -276,21 +278,7 @@ public:
 };
 static_assert(sizeof(ServiceItems) == 0x100, "sizeof ServiceItems");
 
-// Layout: include/pdb/LobbyDaemon/types.h (sizeof 0x50).
-class LobbyObjPoolMemAllocator : public ObjPoolMemoryAllocator
-{
-public:
-    virtual void* Alloc(unsigned long long, wchar_t const*, int);  // 0x99260
-    // LIFT: Free has no LD RVA in the index (❓ folded with an empty function). It does nothing.
-    virtual void Free(void*, wchar_t const*, int) {}
-
-    CriticalSection _lock;
-    unsigned long long const _systemAllocationGranularity;
-    unsigned long long const _alignment;
-    unsigned char* _mem;
-    unsigned char* _end;
-};
-static_assert(sizeof(LobbyObjPoolMemAllocator) == 0x50, "sizeof LobbyObjPoolMemAllocator");
+// LIFT: LobbyObjPoolMemAllocator is declared in ObjectPool.h (LobbyDaemon form).
 
 // Layout: include/pdb/LobbyDaemon/types.h (sizeof 0x40).
 class LobbydReloadInvalidRestoreTimer : public Timer

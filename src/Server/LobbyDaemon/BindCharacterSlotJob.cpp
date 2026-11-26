@@ -71,8 +71,12 @@ LobbyJobStateDef const StateDef[] = {{0, L"INIT"}, {2, L"BIND_CHARACTER_SLOT"}, 
 }
 
 LobbyJobDef BindCharacterSlotJob::_def = {42, StateDef, 3, L"BindCharacterSlotJob"};  // 0x202000
-// LIFT: BindCharacterSlotJob::_pool has no definition. The LobbyDaemon ObjectPool module is not in lift_lobbydaemon
-// (see CliSession.cpp).
+
+#include "ObjectPoolLobbyDaemon.h"
+
+// .data 0x203c80, dynamic init 0x11da80, atexit dtor 0x11e980.
+// The exe .data holds id 1, objsize 0x78, desc L"BindCharacterSlotJob".
+ObjPool BindCharacterSlotJob::_pool(1, 0x78, L"BindCharacterSlotJob");
 
 // 0x16e90
 LobbyJobDef const* BindCharacterSlotJob::GetDefinition() const

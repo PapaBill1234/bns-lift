@@ -3,6 +3,12 @@
 #include <wchar.h>
 #include <wctype.h>
 
+// rva 0x201BB0. The strings are from the exe.
+wchar_t const* const LanguageTypeStr[LobbyLocale::LANGUAGE_MAX] = {
+    L"default", L"korean", L"english", L"japanese", L"chineses", L"chineset",
+    L"russian", L"french", L"german", L"thai", L"vietnamese", L"bportuguese",
+};
+
 // LIFT: Character tables have no PDB names (0x161450, 0x1615d0, 0x161b80, 0x161bd0).
 static const LobbyLocale::ThaiCharType ThaiCharTypes[0x60] =
 {

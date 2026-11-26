@@ -7,6 +7,9 @@
 class MembershipMileage : public Mileage
 {
 public:
+    // LIFT: inline in MileageManager::Initialize (0x5f5a0).
+    explicit MembershipMileage(int slotId)
+        : Mileage(slotId), _mileageGameGradeKey(0), _baseGameGradeKey(0), _boostGameGradeKey(0) {}
     virtual void Accept(LobbyMessage*);  // 0x5bff0
     virtual bool Initialize(MileageConfig const&, long long);  // 0x5c040
     virtual bool Start(CliSession*, long long);  // 0x5c300

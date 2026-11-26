@@ -97,7 +97,7 @@ private:
     unsigned long long _serviceId;  // +0x98
 
 public:
-    static ObjPool _pool;
+    static ObjPool _pool;  // .data 0x2040a0
     static LobbyJobDef _def;
 };
 static_assert(sizeof(ExtendJumpingCharacterCreationQuotaJob) == 0xa0, "sizeof ExtendJumpingCharacterCreationQuotaJob");
@@ -145,7 +145,7 @@ private:
     bool _consumeCreationQuota;  // +0x79
 
 public:
-    static ObjPool _pool;
+    static ObjPool _pool;  // .data 0x204150
     static LobbyJobDef _def;
 };
 static_assert(sizeof(UpgradeJumpingCharacterStateJob) == 0x80, "sizeof UpgradeJumpingCharacterStateJob");

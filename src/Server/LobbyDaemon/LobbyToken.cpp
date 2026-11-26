@@ -39,9 +39,9 @@ void LobbyToken::Expire()
 }
 
 // 0x96c30
-LobbyTokenDesk::LobbyTokenDesk(long, unsigned long long (__cdecl*)(void))
+LobbyTokenDesk::LobbyTokenDesk(long tokenLifeTime, unsigned long long (__cdecl* keygen)(void))
+    : _tokenLifeTime(tokenLifeTime), _keygen(keygen)
 {
-    LIFT_STUB(0x96c30);
 }
 
 // 0x96d70

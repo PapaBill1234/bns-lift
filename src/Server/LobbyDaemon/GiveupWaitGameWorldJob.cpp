@@ -28,8 +28,12 @@ LobbyJobStateDef const StateDef[] = {{0, L"INIT"}, {1, L"GIVEUP_WAIT"}, {2, L"FI
 }
 
 LobbyJobDef GiveupWaitGameWorldJob::_def = {10, StateDef, 2, L"GiveupWaitGameWorldJob"};  // 0x201c70
-// LIFT: GiveupWaitGameWorldJob::_pool has no definition. The LobbyDaemon ObjectPool module is not in lift_lobbydaemon
-// (see CliSession.cpp).
+
+#include "ObjectPoolLobbyDaemon.h"
+
+// .data 0x204830, dynamic init 0x11dfd0, atexit dtor 0x11edc0.
+// The exe .data holds id 1, objsize 0x60, desc L"GiveupWaitGameWorldJob".
+ObjPool GiveupWaitGameWorldJob::_pool(1, 0x60, L"GiveupWaitGameWorldJob");
 
 // 0x52cf0
 LobbyJobDef const* GiveupWaitGameWorldJob::GetDefinition() const

@@ -1,10 +1,11 @@
 // GameTimeSchedule.obj (LobbyDaemon PDB, 2019 + PDB). Layouts from tools/pdbcls.py LobbyDaemon <Class>.
-// LIFT: header layouts only (fix7). The function bodies are still LIFT_STUB.
-// LIFT: PDB methods with no own symbol in the lift scope (SetIndex, Remove, Initialize, Stop, TimerClass, TimerId,
-// the GameTimeScheduleNode ctors and dtor) are not declared. GameTimeScheduler stays abstract (Timer pure methods).
+// LIFT: PDB inline methods that the lifted bodies use are defined here (GameTimeScheduleNode ctor, dtor, GetClikey,
+// GetQueueIndex; GameTimeQueue::Remove). Other PDB methods with no own symbol in the lift scope (SetIndex, Initialize,
+// Stop, TimerClass, TimerId) are not declared. GameTimeScheduler stays abstract (Timer pure methods).
 #pragma once
 #include <stddef.h>
 #include "Lock.h"
+#include "Log.h"
 #include "RefCntList.h"
 #include "TimerQueue.h"
 
@@ -15,6 +16,13 @@ class IDEV612_TimeTable;
 // LIFT: PDB layout (sizeof 0x40, RefCntListNode base).
 class GameTimeScheduleNode : public RefCntListNode
 {
+public:
+    // LIFT: PDB inline ctor. Inlined in GameTimeScheduler::Schedule (0x4c390).
+    GameTimeScheduleNode(unsigned long long clikey, int queueIndex) : _clikey(clikey), _queueIndex(queueIndex) {}
+    virtual ~GameTimeScheduleNode() {}  // LIFT: PDB virtual dtor (scalar deleting dtor 0x61030).
+    unsigned long long GetClikey() const { return _clikey; }  // LIFT: PDB inline.
+    int GetQueueIndex() const { return _queueIndex; }  // LIFT: PDB inline.
+
 private:
     friend struct GameTimeScheduleNodeLayoutCheck;  // LIFT: checks the private PDB offsets.
     friend class GameTimeScheduler;  // LIFT: access helper; Unschedule reads _queueIndex.
@@ -35,9 +43,17 @@ class GameTimeQueue
 public:
     GameTimeQueue();  // 0x4b9a0
     ~GameTimeQueue();  // 0x4b9e0
+    void SetIndex(int index) { _index = index; }  // LIFT: PDB inline. Inlined in LobbyDaemon::initialize (0x9b300).
     bool Pushback(GameTimeScheduleNode*);  // 0x4ba80
     void Block();  // 0x4bb80
     void Release();  // 0x4bf90
+    // LIFT: PDB inline. Inlined in GameTimeScheduler::Unschedule (0x4c6a0).
+    void Remove(GameTimeScheduleNode* node)
+    {
+        _lock.Enter();
+        _queue.Remove(node);
+        _lock.Leave();
+    }
 
 private:
     friend struct GameTimeQueueLayoutCheck;  // LIFT: checks the private PDB offsets.
@@ -63,8 +79,18 @@ class GameTimeScheduler : public Timer
 public:
     GameTimeScheduler();  // 0x4c020
     virtual ~GameTimeScheduler();  // 0x4c0e0
+    // LIFT: PDB method with no own symbol. LTCG inlines it in LobbyDaemon::initialize (0x9b300).
+    bool Initialize()
+    {
+        for (int i = 0; i < 168; ++i)
+            _queues[i].SetIndex(i);
+        Log::Write(Log::LT_DEBUG, L"GameTimeSchedule.cpp", 263, L"[game-time], init scheduler ok");
+        return true;
+    }
     bool Start();  // 0x4c150
     virtual bool HandleEvent(EventContext*, unsigned long);  // 0x4c2e0
+    virtual unsigned int TimerClass() const { return 0; }  // LIFT: vftable 0x1597b0 slot 6 is 0x5a0a0 (folded).
+    virtual unsigned long long TimerId() const { return 0; }  // LIFT: vftable 0x1597b0 slot 7 is 0x5a0a0 (folded).
     bool Schedule(CliSession*, IDEV612_TimeTable const&, long long*);  // 0x4c390
     void Unschedule(CliSession*, GameTimeScheduleNode*);  // 0x4c6a0
 

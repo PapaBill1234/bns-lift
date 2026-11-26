@@ -36,6 +36,7 @@ public:
     };
 
     RenameCharacterJob(CliSession* owner);  // 0x66b40
+    static void* _vtbl();  // LIFT: PDB declares it; no RVA (inlined in LobbyDaemon::initialize 0x9b300)
     virtual ~RenameCharacterJob();  // 0x66c50
     virtual LobbyJobDef const* GetDefinition() const;  // 0x66ae0
 private:

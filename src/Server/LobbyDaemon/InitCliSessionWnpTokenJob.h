@@ -27,7 +27,7 @@ private:
     bool init(int, void*);  // 0x981c0
 
 public:
-    static ObjPool _pool;
+    static ObjPool _pool;  // .data 0x2055f0
     static LobbyJobDef _def;
 };
 static_assert(sizeof(InitCliSessionWnpTokenJob) == 0x58, "sizeof InitCliSessionWnpTokenJob");

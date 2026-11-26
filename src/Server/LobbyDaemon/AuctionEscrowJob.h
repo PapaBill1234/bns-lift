@@ -41,7 +41,7 @@ private:
     GamedChannel* _gamed;  // +0x78
 
 public:
-    static ObjPool _pool;
+    static ObjPool _pool;  // .data 0x203b20
     static LobbyJobDef _def;
 };
 static_assert(sizeof(AuctionEscrowJob) == 0x80, "sizeof AuctionEscrowJob");

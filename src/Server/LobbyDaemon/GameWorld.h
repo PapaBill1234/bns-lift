@@ -83,6 +83,11 @@ public:
     bool SetCurrentPlayerCount(unsigned __int64 value) { return setU64(3, value); }
     bool SetMaxWaitingCount(unsigned __int64 value) { return setU64(4, value); }
     bool SetCurrentWaitingCount(unsigned __int64 value) { return setU64(5, value); }
+    // LIFT: inlined in GameWorldCluster::Setup (0x4d510).
+    bool Create(wchar_t const* name) { return create(&ID, name); }
+    bool SetWorldClusterId(unsigned __int64 value) { return setU64(1, value); }
+private:
+    static GUID const ID;  // 0x201ae0
 };
 
 class GameWorldCluster
@@ -102,12 +107,15 @@ public:
 
     GameWorldCluster();  // 0x4d390
     ~GameWorldCluster();  // 0x4d440
+    bool Setup(DB*);  // 0x4d510
     long long UpdateCounters();  // 0x4dc70
     short GetClusterId() const { return _db.clusterId; }
 private:
     friend class GameWorld;
     // LIFT: access helper. No PDB in the set has friend records. GameServiceLocation::Leave (0x3b9a0) calls giveupWait and leaveUser.
     friend class GameServiceLocation;
+    // LIFT: access helper. No PDB in the set has friend records. GameWorldRegistry::Setup (0x4ed00) calls addGameWorld.
+    friend class GameWorldRegistry;
     bool enterUser(GameWorld*, CliSession*, bool&, WaitInfo&);  // 0x4dd90
     bool leaveUser(GameWorld*, CliSession*);  // 0x4e080
     bool giveupWait(GameWorld*, unsigned long long, WaitQueue::Type const&, short const&);  // 0x4e310

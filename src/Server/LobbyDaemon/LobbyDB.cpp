@@ -2790,9 +2790,62 @@ bool LobbyDB::UpdateGameAccountContentQuota(int& dbrtn, id128 const& gameAccount
 }
 
 // 0xa95f0
-bool LobbyDB::LoadRandomStoreInitializationSchedule(int&, RandomStoreInitializationSchedule*)
+bool LobbyDB::LoadRandomStoreInitializationSchedule(int& dbrtn, RandomStoreInitializationSchedule* out)
 {
-    LIFT_STUB(0xa95f0);
+    // PDB local enum LobbyDB::LoadRandomStoreInitializationSchedule::__l8::Param. ParamDesc (0x207f50) holds the names.
+    enum Param
+    {
+        PARAM_RETURN = 0,
+        PARAM_CURRENT_SCHEDULE_NUMBER = 1,
+        PARAM_SLOT_COUNT_INIT_SCHEDULE_NUMBER = 2,
+        PARAM_PREMIUM_DRAW_COUNT_INIT_SCHEDULE_NUMBER = 3,
+        PARAM_MAX = 4
+    };
+    static wchar_t const* const ParamDesc[PARAM_MAX] = {
+        L"PARAM_RETURN", L"PARAM_CURRENT_SCHEDULE_NUMBER", L"PARAM_SLOT_COUNT_INIT_SCHEDULE_NUMBER",
+        L"PARAM_PREMIUM_DRAW_COUNT_INIT_SCHEDULE_NUMBER"};
+    wchar_t const* const query = L"{?=CALL dbo.usp_LoadRandomStoreInitializationSchedule(?,?,?)}";
+
+    AutoDbTran tran(1);
+    if (tran.Tran == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, LOBBYDB_FILE, 3479,
+                   L"[lobbydb], load random store initialization schedule fail; get tran fail");
+        return false;
+    }
+    if (!tran.Tran->Prepare(const_cast<wchar_t*>(query)))
+    {
+        Log::Write(Log::LT_ERROR, LOBBYDB_FILE, 3485,
+                   L"[lobbydb], load random store initialization schedule fail; failed to prepare sql, query:%s", query);
+        return false;
+    }
+    dbrtn = 0;
+    int param = PARAM_RETURN;
+    unsigned long long paramlen[PARAM_MAX];
+    memset(paramlen, 0, sizeof(paramlen));
+    if (!tran.Tran->BindParam(1, SQL_PARAM_OUTPUT, &dbrtn, 0, 0, SQL_INTEGER, SQL_C_SLONG, &paramlen[0]) ||
+        (param = PARAM_CURRENT_SCHEDULE_NUMBER,
+         !tran.Tran->BindParam(2, SQL_PARAM_OUTPUT, &out->scheduleNumber, 0, 0, SQL_BIGINT, SQL_C_UBIGINT,
+                               &paramlen[1])) ||
+        (param = PARAM_SLOT_COUNT_INIT_SCHEDULE_NUMBER,
+         !tran.Tran->BindParam(3, SQL_PARAM_OUTPUT, &out->slotCountInitScheduleNumber, 0, 0, SQL_BIGINT,
+                               SQL_C_UBIGINT, &paramlen[2])) ||
+        (param = PARAM_PREMIUM_DRAW_COUNT_INIT_SCHEDULE_NUMBER,
+         !tran.Tran->BindParam(4, SQL_PARAM_OUTPUT, &out->premiumDrawCountInitScheduleNumber, 0, 0, SQL_BIGINT,
+                               SQL_C_UBIGINT, &paramlen[3])))
+    {
+        Log::Write(Log::LT_ERROR, LOBBYDB_FILE, 3531,
+                   L"[lobbydb], load random store initialization schedule fail; bind parameter fail, param:%s",
+                   ParamDesc[param]);
+        return false;
+    }
+    if (!tran.Tran->Execute())
+    {
+        Log::Write(Log::LT_ERROR, LOBBYDB_FILE, 3518,
+                   L"[lobbydb], load random store initialization schedule fail; execute fail, dbrtn:%d", dbrtn);
+        return false;
+    }
+    return dbrtn == 0;
 }
 
 // 0xaa1d0

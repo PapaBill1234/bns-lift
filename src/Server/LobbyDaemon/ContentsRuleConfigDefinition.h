@@ -1,10 +1,47 @@
 // ContentsRuleConfigDefinition.obj (LobbyDaemon PDB, 2019 + PDB). Layout from the LobbyDaemon PDB (class 0x5345, size 0x18).
 // LIFT: the LobbyGate class of the same name has a different layout (size 0x30). See src/Server/LobbyGate.
-// This header has only the layout, the static data and the inline getters. The loaders are not lifted.
+// The loaders on the LobbyDaemon::initialize path are lifted. Reload, UpdateReloadedVariable and CompareMatch are not.
 #pragma once
 #include <stddef.h>
+#include "DaemonConfig.h"
 
-class ContentsRuleConfigLoad;
+// PDB: ContentsRuleConfig::_Def (rva 0x205c40) and _DefReload (rva 0x205bd0) have rows of 0x38 bytes.
+// 0x205c40 - 0x205bd0 = 0x70 = 2 rows. Dump (0x29c30) steps 7 qwords per row.
+// The XmlCfgDefLocal of the common code (PDB 0x24D7) has sizeof 0x40 (it has refOffset).
+// LIFT: the name ContentsRuleXmlCfgDefLocal keeps the 0x38 row apart from the common XmlCfgDefLocal (as in LobbyGate).
+struct ContentsRuleXmlCfgDefLocal
+{
+    unsigned long long offset;
+    wchar_t const* name;
+    int type;
+    int defType;
+    void const* minValue;
+    void const* maxValue;
+    bool reload;
+    void const* defaultValue;
+};
+static_assert(sizeof(ContentsRuleXmlCfgDefLocal) == 0x38, "sizeof ContentsRuleXmlCfgDefLocal");
+
+// PDB class 0x5326, size 0x10.
+class ContentsRuleConfigLoad
+{
+public:
+    static ContentsRuleConfigLoad* Load();  // 0x29690
+
+    static XmlCfgDef const _Def[7];  // rva 0x205ab0
+
+    int _dummyData;                           // +0
+    bool _useBotPriorityQueue;                // +4
+    int _minBotScoreToApplyBotPriorityQueue;  // +8
+    bool _useTimeBasedPlaySchedule;           // +12
+    bool _enablePlayWarrior;                  // +13
+    bool _enableAccountContents;              // +14
+    bool _enableGuildJoinRenewal;             // +15
+};
+static_assert(sizeof(ContentsRuleConfigLoad) == 0x10, "sizeof ContentsRuleConfigLoad");
+static_assert(offsetof(ContentsRuleConfigLoad, _minBotScoreToApplyBotPriorityQueue) == 0x8,
+              "ContentsRuleConfigLoad::_minBotScoreToApplyBotPriorityQueue");
+static_assert(offsetof(ContentsRuleConfigLoad, _enableGuildJoinRenewal) == 0xF, "ContentsRuleConfigLoad::_enableGuildJoinRenewal");
 
 // LobbyDaemon PDB: sizeof 8. The LobbyGate class of the same name is empty (sizeof 1). See src/Server/LobbyGate.
 class ContentsRuleConfigReload
@@ -24,8 +61,21 @@ class ContentsRuleConfig
 public:
     // PDB inline static method (no RVA). GameWorldCluster::enterUser (0x4dd90) reads Config directly.
     static ContentsRuleConfig* GetContentsRuleConfig() { return Config; }
-    static bool LoadContentsRuleConfig();  // 0x297d0 (not lifted)
-    static void Dump();                    // 0x29c30 (not lifted)
+    static bool LoadContentsRuleConfig();  // 0x297d0
+    static void Dump();                    // 0x29c30
+
+    // PDB inline constructor (no RVA). LoadContentsRuleConfig (0x297d0) writes the zeros after Alloc.
+    ContentsRuleConfig()
+        : _NEXT(nullptr),
+          _dummyData(0),
+          _useBotPriorityQueue(false),
+          _minBotScoreToApplyBotPriorityQueue(0),
+          _useTimeBasedPlaySchedule(false),
+          _enablePlayWarrior(false),
+          _enableAccountContents(false),
+          _enableGuildJoinRenewal(false)
+    {
+    }
 
     ContentsRuleConfig* _NEXT;  // +0
 
@@ -44,6 +94,11 @@ private:
     static ContentsRuleConfig* ConfigOlds;          // rva 0x2095a0
     static int ConfigReloadCount;                   // rva 0x2095a8
     static long long ConfigLastReloadTime;          // rva 0x2095b0
+    static ContentsRuleXmlCfgDefLocal const _Def[7];  // rva 0x205c40
+
+    static bool CheckMinMaxBoundary(void const* const loaded, ContentsRuleXmlCfgDefLocal const* defList,
+                                    XmlCfgDef const* loadDefList, int defCount);  // 0x29e30
+    bool UpdateAllVariable(ContentsRuleConfigLoad const* const loaded);          // 0x29fa0
 
     int _dummyData;                           // +8
     bool _useBotPriorityQueue;                // +12

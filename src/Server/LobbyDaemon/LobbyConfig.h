@@ -1,7 +1,9 @@
 // LobbyConfig.obj (LobbyDaemon PDB, 2019 + PDB).
-// LIFT: the field layout is from include/pdb/LobbyDaemon/types.h (sizeof 0x298). The XML table _Def is not here yet.
+// LIFT: the field layout is from include/pdb/LobbyDaemon/types.h (sizeof 0x298). The XML table _Def is in LobbyConfigDef.cpp.
 #pragma once
 #include <stddef.h>
+#include <string.h>
+#include "DaemonConfig.h"
 
 union id128;
 
@@ -27,6 +29,14 @@ public:
         int len;
     };
 
+    // LIFT: inline. LobbyDaemon::initialize (0x9b300) has the memset and the store of nullptr.
+    void ClearCertInfo() const
+    {
+        memset(_certFile, 0, strlen(_certFile));
+        const_cast<LobbyConfig*>(this)->_certFile = nullptr;
+    }
+    // LIFT: inline. LobbyDaemon::initialize (0x9b300) calls DaemonConfig::Dump (0xe3c00) with only rcx = this.
+    void Dump() const { DaemonConfig::Dump(L"config", this, _Def, 167); }
     bool Check() const;  // 0x98980
     void Reload();  // 0x990f0
 
@@ -181,6 +191,9 @@ public:
     int _teenAgeBoundary;
     bool _enableNpRecvCompletionLog;
     bool _allowClientIPAddressInLogs;
+
+private:
+    static XmlCfgDef const _Def[167];  // rva 0x205DD0. The PDB type has no count.
 };
 static_assert(sizeof(LobbyConfig) == 0x298, "sizeof LobbyConfig");
 static_assert(offsetof(LobbyConfig, _rootPath) == 0x0, "LobbyConfig::_rootPath");

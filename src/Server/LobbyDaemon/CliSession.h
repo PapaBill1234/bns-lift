@@ -9,7 +9,7 @@
 #include "RefCntPoolObj.h"
 #include "GradeService.h"
 #include "Lock.h"
-#include "ObjectPool.h"
+#include "ObjectPoolLobbyDaemon.h"
 #include "StlMemory.h"
 #include "StringUtil.h"
 #include "WaitQueue.h"
@@ -487,7 +487,8 @@ public:
     LobbyService* _renameUserServiceEntry;
     CriticalSection _lock;
 
-    static ObjPool _pool;  // .data RVA 0x2042b0, dynamic init 0x11dd50, atexit dtor 0x11ebc0
+    static ObjPool _pool;  // .data 0x2042b0
+    static void* _vtbl();  // LIFT: PDB declares it; no RVA (inlined in LobbyDaemon::initialize 0x9b300)
 };
 static_assert(offsetof(CliSession, _state) == 0x18, "CliSession::_state");
 static_assert(offsetof(CliSession, _acb) == 0x30, "CliSession::_acb");

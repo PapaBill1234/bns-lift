@@ -1,6 +1,21 @@
 // ChangeCharacterAppearanceJob.obj (LobbyDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
+#include <new>
 #include "ChangeCharacterAppearanceJob.h"
 #include "LiftStub.h"
+#include "ObjectPoolLobbyDaemon.h"
+
+// .data 0x203de0, dynamic init 0x11db20, atexit dtor 0x11ea00.
+// The exe .data holds id 1, objsize 0xb0, desc L"ChangeCharacterAppearanceJob".
+ObjPool ChangeCharacterAppearanceJob::_pool(1, sizeof(ChangeCharacterAppearanceJob), L"ChangeCharacterAppearanceJob");
+
+// LIFT: no RVA. LTCG inlined it into LobbyDaemon::initialize (0x9b300). The original constructs a job on the stack
+// and returns its vfptr. It does not run the destructor.
+void* ChangeCharacterAppearanceJob::_vtbl()
+{
+    char buf[sizeof(ChangeCharacterAppearanceJob)];
+    ChangeCharacterAppearanceJob* job = ::new (buf) ChangeCharacterAppearanceJob(nullptr);
+    return *reinterpret_cast<void**>(job);
+}
 
 // 0x1ab60
 LobbyJobDef const* ChangeCharacterAppearanceJob::GetDefinition() const

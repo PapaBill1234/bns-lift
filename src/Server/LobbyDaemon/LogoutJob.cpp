@@ -38,8 +38,12 @@ LobbyJobStateDef const StateDef[] = {{0, L"INIT"}, {1, L"LOGOUT"}, {2, L"FIN"}};
 }
 
 LobbyJobDef LogoutJob::_def = {3, StateDef, 2, L"LogoutJob"};  // 0x2017d0
-// LIFT: LogoutJob::_pool (0x205540) has no definition. The LobbyDaemon ObjectPool module is not in lift_lobbydaemon
-// (see CliSession.cpp).
+
+#include "ObjectPoolLobbyDaemon.h"
+
+// .data 0x205540, dynamic init 0x11e5c0, atexit dtor 0x11f280.
+// The exe .data holds id 1, objsize 0x70, desc L"LogoutJob".
+ObjPool LogoutJob::_pool(1, 0x70, L"LogoutJob");
 
 // 0x97a10
 LobbyJobDef const* LogoutJob::GetDefinition() const

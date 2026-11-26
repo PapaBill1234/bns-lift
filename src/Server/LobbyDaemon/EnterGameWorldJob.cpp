@@ -29,6 +29,11 @@ LobbyJobStateDef const StateDef[] = {{0, L"INIT"}, {1, L"ENTER_GAME_WORLD"}, {2,
 
 LobbyJobDef EnterGameWorldJob::_def = {11, StateDef, 2, L"EnterGameWorldJob"};  // 0x201910
 
+#include "ObjectPoolLobbyDaemon.h"
+
+// .data 0x205330, dynamic init 0x11e4d0, atexit dtor 0x11f1c0.
+// The exe .data holds id 1, objsize 0x70, desc L"EnterGameWorldJob".
+
 // 0x84e00
 LobbyJobDef const* EnterGameWorldJob::GetDefinition() const
 {
@@ -111,5 +116,4 @@ bool EnterGameWorldJob::enterGameWorld()
 
 // LIFT: EnterGameWorldJob::_pool (.data RVA 0x205330). Dynamic initializer 0x11e4d0, atexit destructor 0x11f1c0. The original static data
 // holds id 1, objsize sizeof(EnterGameWorldJob) and desc L"EnterGameWorldJob".
-#include "ObjectPool.h"
 ObjPool EnterGameWorldJob::_pool(1, sizeof(EnterGameWorldJob), L"EnterGameWorldJob");

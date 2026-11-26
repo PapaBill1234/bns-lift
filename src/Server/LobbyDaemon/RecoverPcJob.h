@@ -4,6 +4,7 @@
 #include "CliSessionJob.h"
 #include "StringUtil.h"
 
+class ObjPool;
 class Character;
 class CliSession;
 class GamedChannel;

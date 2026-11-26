@@ -1,7 +1,14 @@
 // Mileage.obj (LobbyDaemon PDB, 2019 + PDB).
+// LIFT: the original Memory.h (line 181) gives its own placement array new and delete. This stops <new> from giving them.
+#define __PLACEMENT_VEC_NEW_INLINE
 #include "PlacementNew.h"
 #include "Mileage.h"
+#include "AlertSender.h"
+#include "CliSession.h"
 #include "Daemon.h"
+#include "LobbyDB.h"
+#include "MembershipMileage.h"
+#include "PcCafeMileage.h"
 #include "LiftStub.h"
 #include "LobbyMessage.h"
 #include "Log.h"
@@ -11,6 +18,30 @@
 #if defined(__clang__)
 #include "crt_cpp_overload.h"
 #endif
+
+// PDB S_GTHREAD32 (void*). Defined in CliSessionTable.cpp.
+extern __declspec(thread) void* __delv_buf__;
+
+// LIFT: inlined in MileageManager::Initialize 0x5f5a0. Same form as CliSessionTable.cpp and LobbyJob.cpp.
+inline void __cdecl operator delete[](void* p)
+{
+    __delv_buf__ = p;
+}
+
+inline void* __cdecl operator new[](size_t, void* buf) throw()
+{
+    return buf;
+}
+
+inline void __cdecl operator delete[](void*, void*)
+{
+    Log::Write(Log::LT_ERROR,
+               L"e:\\dailybuild02\\lobbydaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\bloodlib\\include\\Memory.h",
+               181, L"== CRASH == [memory], DO NOT USE THIS DEL OPERATOR");
+    AlertSender::Write(
+        L"e:\\dailybuild02\\lobbydaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\bloodlib\\include\\Memory.h",
+        181, L"== CRASH == [memory], DO NOT USE THIS DEL OPERATOR");
+}
 
 #pragma comment(linker, "/INCLUDE:??$swprintf_s@$0CAB@@@YAHAEAY0CAB@_WPEB_WZZ")  // LIFT: keep until the caller is lifted (0x614d0)
 template int __cdecl swprintf_s<513>(wchar_t (&)[513], wchar_t const*, ...);
@@ -145,9 +176,108 @@ MileageManager::~MileageManager()
 }
 
 // 0x5f5a0
-bool MileageManager::Initialize(long long)
+bool MileageManager::Initialize(long long scheduleTo)
 {
-    LIFT_STUB(0x5f5a0);
+    if (scheduleTo <= 0)
+    {
+        Log::Write(Log::LT_ERROR, L"Mileage.cpp", 966,
+            L"[mileage], init mileage manager fail; invalid parameter, schedule-to:%d", scheduleTo);
+        TLobbyError = LOBERR_INVALID_PARAMETER;
+        return false;
+    }
+    MileageConfig* configs = nullptr;
+    MileageInfo** mileageList = nullptr;
+    int mileageCount = 0;
+    int dbrtn = 0;
+    if (!LobbyDB::LoadMileage(dbrtn, mileageList, mileageCount))
+    {
+        Log::Write(Log::LT_ERROR, L"Mileage.cpp", 979,
+            L"[mileage], init mileage manager fail; load mileage fail, dbrtn:%d", dbrtn);
+        TLobbyError = LOBERR_DB_FAIL;
+        return false;
+    }
+    bool result = false;
+    if (mileageList != nullptr)
+    {
+        // The count is in the 8 bytes in front of the array.
+        configs = new (Memory::_Manager[2]->Alloc(sizeof(MileageConfig) * mileageCount + 8, L"Mileage.cpp", 985))
+            MileageConfig[mileageCount];
+        // BUG: 0x5f5a0 does not free mileageList and its records. The lift keeps the original behavior.
+        for (int i = 0; i < mileageCount; ++i)
+            memcpy(&configs[i].mileage, mileageList[i], sizeof(MileageInfo));
+        _limitedIdList = static_cast<int*>(
+            Memory::_Manager[2]->AllocZero(sizeof(int) * mileageCount, L"Mileage.cpp", 989));
+        _limitedSlotList = static_cast<int*>(
+            Memory::_Manager[2]->AllocZero(sizeof(int) * mileageCount, L"Mileage.cpp", 990));
+        _limitedCount = 0;
+        for (int i = 0; i < mileageCount; ++i)
+        {
+            MileageConfig& config = configs[i];
+            dbrtn = 0;
+            if (!LobbyDB::LoadMileagePolicy(dbrtn, config.mileage.policyId, config.policy, config.policyConditions,
+                                            config.policyConditionCount) ||
+                config.policy.id <= 0)
+            {
+                Log::Write(Log::LT_ERROR, L"Mileage.cpp", 1008,
+                    L"[mileage], init mileage manager fail; load policy fail, dbrtn:%d, mileage-id:%d, policy-id:%d",
+                    dbrtn, config.mileage.id, config.mileage.policyId);
+                TLobbyError = LOBERR_DB_FAIL;
+                goto cleanup;
+            }
+            dbrtn = 0;
+            if (!LobbyDB::LoadMileageFeverTime(dbrtn, config.mileage.id, scheduleTo, config.fevers, config.feverCount))
+            {
+                Log::Write(Log::LT_ERROR, L"Mileage.cpp", 1023,
+                    L"[mileage], init mileage manager fail; load fever time fail, dbrtn:%d, mileage-id:%d", dbrtn,
+                    config.mileage.id);
+                TLobbyError = LOBERR_DB_FAIL;
+                goto cleanup;
+            }
+            Mileage* mileage;
+            if (config.policy.mileageType == 1)
+            {
+                void* mem = Memory::_Manager[2]->Alloc(sizeof(PcCafeMileage), L"Mileage.cpp", 1033);
+                mileage = mem != nullptr ? ::new (mem) PcCafeMileage(i) : nullptr;
+            }
+            else if (config.policy.mileageType == 2)
+            {
+                void* mem = Memory::_Manager[2]->Alloc(sizeof(MembershipMileage), L"Mileage.cpp", 1036);
+                mileage = mem != nullptr ? ::new (mem) MembershipMileage(i) : nullptr;
+            }
+            else
+            {
+                Log::Write(Log::LT_ERROR, L"Mileage.cpp", 1042,
+                    L"== CRASH == [mileage], init mileage manager fail; invalid mileage type, mileage-id:%d, mileage-type:%d",
+                    config.mileage.id, config.policy.mileageType);
+                AlertSender::Write(L"Mileage.cpp", 1042,
+                    L"== CRASH == [mileage], init mileage manager fail; invalid mileage type, mileage-id:%d, mileage-type:%d",
+                    config.mileage.id, config.policy.mileageType);
+                goto cleanup;
+            }
+            if (!mileage->Initialize(config, scheduleTo))
+            {
+                delete mileage;
+                Memory::_Manager[2]->Free(mileage, L"Mileage.cpp", 1047);
+                goto cleanup;
+            }
+            if (config.mileage.accumulateMinuteLimitPerDay > 0)
+            {
+                _limitedIdList[_limitedCount] = config.mileage.id;
+                _limitedSlotList[_limitedCount++] = i;
+            }
+            _mileages.push_back(mileage);
+        }
+    }
+    Log::Write(Log::LT_DEBUG, L"Mileage.cpp", 1064, L"[mileage], init mileage manager ok, mileage-count:%d",
+        mileageCount);
+    result = true;
+cleanup:
+    if (configs != nullptr)
+    {
+        delete[] configs;
+        Memory::_Manager[2]->Free(__delv_buf__, L"Mileage.cpp", 1068);
+    }
+    return result;
 }
 
 // 0x5fc30
@@ -159,7 +289,7 @@ MileageSlot* MileageManager::CreateSlot(id128 const&, unsigned long long)
 #pragma comment(linker, "/INCLUDE:?Accept@MileageManager@@UEAAXPEAVLobbyMessage@@@Z")  // LIFT: keep until the caller is lifted (0x60660)
 void MileageManager::Accept(LobbyMessage* message)
 {
-    for (std::vector<Mileage*>::iterator it = _mileages.begin(); it != _mileages.end(); ++it)
+    for (std::vector<Mileage*, StlAllocator<Mileage*, 2> >::iterator it = _mileages.begin(); it != _mileages.end(); ++it)
     {
         if (*it != nullptr)
             (*it)->Accept(message);

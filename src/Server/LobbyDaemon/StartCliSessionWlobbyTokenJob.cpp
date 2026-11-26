@@ -83,8 +83,12 @@ LobbyJobStateDef const StateDef[] = {
 }
 
 LobbyJobDef StartCliSessionWlobbyTokenJob::_def = {15, StateDef, 4, L"StartCliSessionWlobbyTokenJob"};  // 0x2019b0
-// LIFT: StartCliSessionWlobbyTokenJob::_pool has no definition. The LobbyDaemon ObjectPool module is not in
-// lift_lobbydaemon (see CliSession.cpp).
+
+#include "ObjectPoolLobbyDaemon.h"
+
+// .data 0x204fc0, dynamic init 0x11e340, atexit dtor 0x11f080.
+// The exe .data holds id 1, objsize 0x60, desc L"StartCliSessionWlobbyTokenJob".
+ObjPool StartCliSessionWlobbyTokenJob::_pool(1, 0x60, L"StartCliSessionWlobbyTokenJob");
 
 // 0x76250
 LobbyJobDef const* StartCliSessionWlobbyTokenJob::GetDefinition() const

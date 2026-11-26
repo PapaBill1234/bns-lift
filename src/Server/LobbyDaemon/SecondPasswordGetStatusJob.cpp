@@ -60,8 +60,11 @@ LobbyJobStateDef const StateDef[] = {{0, L"INIT"}, {1, L"GET_STATUS"}, {2, L"FIN
 }
 
 LobbyJobDef SecondPasswordGetStatusJob::_def = {29, StateDef, 2, L"SecondPasswordGetStatusJob"};  // 0x201a30
-// LIFT: SecondPasswordGetStatusJob::_pool (0x204d00) has no definition. The LobbyDaemon ObjectPool module is not in
-// lift_lobbydaemon (see CliSession.cpp).
+
+#include "ObjectPoolLobbyDaemon.h"
+
+// .data 0x204d00, dynamic init 0x11e200, atexit dtor 0x11ef80.
+// The exe .data holds id 1, objsize 0x78, desc L"SecondPasswordGetStatusJob".
 
 // 0x71550
 LobbyJobDef const* SecondPasswordGetStatusJob::GetDefinition() const
@@ -225,5 +228,4 @@ bool SecondPasswordGetStatusJob::expireGetStatus()
 
 // LIFT: SecondPasswordGetStatusJob::_pool (.data RVA 0x204d00). Dynamic initializer 0x11e200, atexit destructor 0x11ef80. The original static data
 // holds id 1, objsize sizeof(SecondPasswordGetStatusJob) and desc L"SecondPasswordGetStatusJob".
-#include "ObjectPool.h"
 ObjPool SecondPasswordGetStatusJob::_pool(1, sizeof(SecondPasswordGetStatusJob), L"SecondPasswordGetStatusJob");

@@ -1,6 +1,12 @@
 // AuctionBidJob.obj (LobbyDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
 #include "AuctionBidJob.h"
 #include "LiftStub.h"
+#include "ObjectPoolLobbyDaemon.h"
+
+// .data 0x2039c0, dynamic init 0x11d940, atexit dtor 0x11e880.
+// The exe .data holds id 1, objsize 0x88, desc L"ActivateGradeJob".
+// LIFT: the desc is not "AuctionBidJob" in the original. Keep it.
+ObjPool AuctionBidJob::_pool(1, sizeof(AuctionBidJob), L"ActivateGradeJob");
 
 // 0x110d0
 LobbyJobDef const* AuctionBidJob::GetDefinition() const

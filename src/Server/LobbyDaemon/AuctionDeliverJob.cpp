@@ -1,7 +1,22 @@
 // AuctionDeliverJob.obj (LobbyDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
+#include <new>
 #include "AuctionDeliverJob.h"
 #include "LobbyJob.h"
 #include "LiftStub.h"
+#include "ObjectPoolLobbyDaemon.h"
+
+// .data 0x203a70, dynamic init 0x11d990, atexit dtor 0x11e8c0.
+// The exe .data holds id 1, objsize 0xd8, desc L"AuctionDeliverJob".
+ObjPool AuctionDeliverJob::_pool(1, sizeof(AuctionDeliverJob), L"AuctionDeliverJob");
+
+// LIFT: no RVA. LTCG inlined it into LobbyDaemon::initialize (0x9b300). The original constructs a job on the stack
+// and returns its vfptr. It does not run the destructor.
+void* AuctionDeliverJob::_vtbl()
+{
+    char buf[sizeof(AuctionDeliverJob)];
+    AuctionDeliverJob* job = ::new (buf) AuctionDeliverJob();
+    return *reinterpret_cast<void**>(job);
+}
 
 // 0x12230
 RefCntPoolObj::~RefCntPoolObj()

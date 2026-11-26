@@ -11,7 +11,7 @@
 #include "LobbyGateChannel.h"
 #include "LobbyJob.h"
 #include "Log.h"
-#include "ObjectPool.h"
+#include "ObjectPoolLobbyDaemon.h"
 #include "Packet.h"
 #include "PacketUtil.h"
 #include "SharedChannel.h"

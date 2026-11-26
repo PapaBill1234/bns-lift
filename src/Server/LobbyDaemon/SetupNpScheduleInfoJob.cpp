@@ -50,8 +50,21 @@ LobbyJobStateDef const StateDef[] = {{0, L"INIT_SETUP_NP_SCHEDULE_INFO"},
 }
 
 LobbyJobDef SetupNpScheduleInfoJob::_def = {44, StateDef, 4, L"SetupNpScheduleInfoJob"};  // 0x2019f0
-// LIFT: SetupNpScheduleInfoJob::_pool (0x204e60) has no definition. The LobbyDaemon ObjectPool module is not in
-// lift_lobbydaemon (see CliSession.cpp).
+
+#include "ObjectPoolLobbyDaemon.h"
+
+// .data 0x204e60, dynamic init 0x11e2a0, atexit dtor 0x11f000.
+// The exe .data holds id 1, objsize 0xb8, desc L"SetupNpScheduleInfoJob".
+ObjPool SetupNpScheduleInfoJob::_pool(1, 0xb8, L"SetupNpScheduleInfoJob");
+
+// LIFT: no RVA. LTCG inlined it into LobbyDaemon::initialize (0x9b300). The original constructs a job on the stack
+// and returns its vfptr. It does not run the destructor.
+void* SetupNpScheduleInfoJob::_vtbl()
+{
+    char buf[sizeof(SetupNpScheduleInfoJob)];
+    SetupNpScheduleInfoJob* job = ::new (buf) SetupNpScheduleInfoJob();
+    return *reinterpret_cast<void**>(job);
+}
 
 // 0x72cf0
 LobbyJobDef const* SetupNpScheduleInfoJob::GetDefinition() const

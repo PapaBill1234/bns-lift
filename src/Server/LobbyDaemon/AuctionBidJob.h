@@ -41,7 +41,7 @@ private:
     long long _bidPrice;  // +0x80
 
 public:
-    static ObjPool _pool;
+    static ObjPool _pool;  // .data 0x2039c0
     static LobbyJobDef _def;
 };
 static_assert(sizeof(AuctionBidJob) == 0x88, "sizeof AuctionBidJob");

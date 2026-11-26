@@ -1,5 +1,6 @@
 // CliSession.obj (LobbyDaemon PDB, 2019 + PDB). Source: hr/LobbyDaemon/CliSession.c.
 // ld-2 lifts part 1. ld-7 lifts part 2. A stub is not a lift.
+#include <new>
 #include <string.h>
 #include <wchar.h>
 #include <new>
@@ -29,6 +30,7 @@
 #include "Log.h"
 #include "Memory.h"
 #include "LiftStub.h"
+#include "ObjectPoolLobbyDaemon.h"
 
 // PDB public ?TLobbyError@@3W4LobbyError@@A. enter (0x359c0) writes it at TLS +0x60.
 // LIFT: the PDB module of TLobbyError is not known. ❓ CliSession.obj is a guess.
@@ -64,10 +66,18 @@ ServiceLocation::~ServiceLocation()
 {
 }
 
-// LIFT: CliSession::_pool (.data RVA 0x2042b0) has no definition yet. Its dynamic init (0x11dd50) and atexit dtor
-// (0x11ebc0) are Not done in card ld-13. The original arguments are id 1, objsize 0x8d0 and desc L"CliSession".
-// ObjectPool.cpp is the SmartCouponDaemon form and is not in lift_lobbydaemon. A definition here does not link in the
-// VS2010 build (no ObjPool::ObjPool, ObjPool::~ObjPool). Define it when the LobbyDaemon ObjectPool module is lifted.
+// .data 0x2042b0, dynamic init 0x11dd50, atexit dtor 0x11ebc0.
+// The exe .data holds id 1, objsize 0x8d0, desc L"CliSession".
+ObjPool CliSession::_pool(1, sizeof(CliSession), L"CliSession");
+
+// LIFT: no RVA. LTCG inlined it into LobbyDaemon::initialize (0x9b300). The original constructs a job on the stack
+// and returns its vfptr. It does not run the destructor.
+void* CliSession::_vtbl()
+{
+    char buf[sizeof(CliSession)];
+    CliSession* job = ::new (buf) CliSession();
+    return *reinterpret_cast<void**>(job);
+}
 
 // 0x329f0
 void CliSession::deallocate_me(void*, wchar_t const*, int)
@@ -1648,7 +1658,7 @@ void CliSession::onPcCafeChargeStart()
         return;
     CliSessionStartPcCafeChargeMessage message(this);
     // LIFT: MileagePolicy::mileageType 1 is the PC cafe mileage (see GameServiceLocation::OnEnter). ❓
-    for (std::vector<Mileage*>::iterator it = mileageManager->_mileages.begin(); it != mileageManager->_mileages.end(); ++it)
+    for (std::vector<Mileage*, StlAllocator<Mileage*, 2> >::iterator it = mileageManager->_mileages.begin(); it != mileageManager->_mileages.end(); ++it)
     {
         if (*it != nullptr && (*it)->_config.policy.mileageType == 1)
             (*it)->Accept(&message);
@@ -1664,7 +1674,7 @@ void CliSession::onPcCafeChargeStop()
         if (mileageManager != nullptr)
         {
             CliSessionStopPcCafeChargeMessage message(this);
-            for (std::vector<Mileage*>::iterator it = mileageManager->_mileages.begin(); it != mileageManager->_mileages.end(); ++it)
+            for (std::vector<Mileage*, StlAllocator<Mileage*, 2> >::iterator it = mileageManager->_mileages.begin(); it != mileageManager->_mileages.end(); ++it)
             {
                 if (*it != nullptr && (*it)->_config.policy.mileageType == 1)
                     (*it)->Accept(&message);
@@ -2111,14 +2121,14 @@ void GameServiceLocation::OnEnter(CliSession* owner)
         return;
     CliSessionEnterWorldMessage message(owner);
     // LIFT: MileagePolicy::mileageType 2 is the membership mileage and 1 is the PC cafe mileage. No PDB enum. ❓
-    for (std::vector<Mileage*>::iterator it = mileageManager->_mileages.begin(); it != mileageManager->_mileages.end(); ++it)
+    for (std::vector<Mileage*, StlAllocator<Mileage*, 2> >::iterator it = mileageManager->_mileages.begin(); it != mileageManager->_mileages.end(); ++it)
     {
         if (*it != nullptr && (*it)->_config.policy.mileageType == 2)
             (*it)->Accept(&message);
     }
     if (owner->_pcCafe != nullptr)
     {
-        for (std::vector<Mileage*>::iterator it = mileageManager->_mileages.begin(); it != mileageManager->_mileages.end(); ++it)
+        for (std::vector<Mileage*, StlAllocator<Mileage*, 2> >::iterator it = mileageManager->_mileages.begin(); it != mileageManager->_mileages.end(); ++it)
         {
             if (*it != nullptr && (*it)->_config.policy.mileageType == 1)
                 (*it)->Accept(&message);
@@ -2142,14 +2152,14 @@ void GameServiceLocation::OnLeave(CliSession* owner)
     if (mileageManager == nullptr)
         return;
     CliSessionLeaveWorldMessage message(owner);
-    for (std::vector<Mileage*>::iterator it = mileageManager->_mileages.begin(); it != mileageManager->_mileages.end(); ++it)
+    for (std::vector<Mileage*, StlAllocator<Mileage*, 2> >::iterator it = mileageManager->_mileages.begin(); it != mileageManager->_mileages.end(); ++it)
     {
         if (*it != nullptr && (*it)->_config.policy.mileageType == 2)
             (*it)->Accept(&message);
     }
     if (owner->_pcCafe != nullptr)
     {
-        for (std::vector<Mileage*>::iterator it = mileageManager->_mileages.begin(); it != mileageManager->_mileages.end(); ++it)
+        for (std::vector<Mileage*, StlAllocator<Mileage*, 2> >::iterator it = mileageManager->_mileages.begin(); it != mileageManager->_mileages.end(); ++it)
         {
             if (*it != nullptr && (*it)->_config.policy.mileageType == 1)
                 (*it)->Accept(&message);

@@ -45,8 +45,12 @@ LobbyJobStateDef const StateDef[] = {{0, L"INIT"}, {1, L"END_WAIT"}, {2, L"FIN"}
 }
 
 LobbyJobDef EndWaitGameWorldJob::_def = {9, StateDef, 2, L"EndWaitGameWorldJob"};  // 0x201cf0
-// LIFT: EndWaitGameWorldJob::_pool has no definition. The LobbyDaemon ObjectPool module is not in lift_lobbydaemon
-// (see CliSession.cpp).
+
+#include "ObjectPoolLobbyDaemon.h"
+
+// .data 0x204570, dynamic init 0x11de90, atexit dtor 0x11ecc0.
+// The exe .data holds id 1, objsize 0x60, desc L"EndWaitGameWorldJob".
+ObjPool EndWaitGameWorldJob::_pool(1, 0x60, L"EndWaitGameWorldJob");
 
 // 0x4afe0
 LobbyJobDef const* EndWaitGameWorldJob::GetDefinition() const

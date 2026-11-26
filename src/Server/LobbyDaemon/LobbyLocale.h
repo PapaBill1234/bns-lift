@@ -1,5 +1,10 @@
 // LobbyLocale.obj (LobbyDaemon PDB, 2019 + PDB).
 #pragma once
+#include <new>
+#include <wchar.h>
+#include "Log.h"
+#include "Memory.h"
+#include "MemoryManager.h"
 
 struct LobbyLocaleSet;
 
@@ -86,6 +91,10 @@ public:
         VIETTONEMARK_TYPE_COUNT
     };
 
+    // LIFT: inline. LobbyDaemon::initialize (0x9b300) has the wcscmp loop over LanguageTypeStr.
+    static int GetLanguageType(wchar_t const* str);
+    // LIFT: inline. LobbyDaemon::initialize (0x9b300) has the range check (line 126) and the Alloc (line 130).
+    static LobbyLocale* CreateLocale(int language);
     bool IsAllowedChar(wchar_t, bool, wchar_t const*);  // 0x57ab0
     static int GetLanguageTypeOfChar(wchar_t);  // 0x57d20
     static bool IsMonolingualString(wchar_t const*, int, LobbyLocaleSet const&);  // 0x57eb0
@@ -100,7 +109,7 @@ public:
 
 private:
     LobbyLocale();
-    LobbyLocale(int);
+    LobbyLocale(int language) : _language(language) {}
     int _language;
 };
 
@@ -110,6 +119,33 @@ struct LobbyLocaleSet
     int count;
     bool languages[LobbyLocale::LANGUAGE_MAX];
 };
+
+// PDB data, rva 0x201BB0 (LobbyLocale.obj).
+extern wchar_t const* const LanguageTypeStr[LobbyLocale::LANGUAGE_MAX];
+
+inline int LobbyLocale::GetLanguageType(wchar_t const* str)
+{
+    for (int i = 0; i < LANGUAGE_MAX; ++i)
+    {
+        if (wcscmp(str, LanguageTypeStr[i]) == 0)
+            return i;
+    }
+    return LANGUAGE_default;
+}
+
+inline LobbyLocale* LobbyLocale::CreateLocale(int language)
+{
+    if (language < 0 || language >= LANGUAGE_MAX)
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyLocale.cpp", 126, L"[locale], create locale fail; unknown language type, language:%d",
+                   language);
+        return nullptr;
+    }
+    void* mem = Memory::_Manager[2]->Alloc(sizeof(LobbyLocale), L"LobbyLocale.cpp", 130);
+    if (mem == nullptr)
+        return nullptr;
+    return new (mem) LobbyLocale(language);
+}
 
 static_assert(sizeof(LobbyLocale) == 4, "sizeof LobbyLocale");
 static_assert(sizeof(LobbyLocale::ThaiCell) == 6, "sizeof LobbyLocale::ThaiCell");

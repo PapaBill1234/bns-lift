@@ -1,8 +1,14 @@
 // ObjectPool.obj (SmartCouponDaemon PDB). Source file: "..\LobbyDaemon\ObjectPool.cpp".
 // LTCG put the one pool (EventNotiJob::_pool) into each body. This lift uses `this`.
 // LIFT: SmartCouponDaemon build path of StlMemory.h (from the HR strings).
+// ObjectPoolLobbyDaemon.cpp sets the LobbyDaemon path and file literal before it includes this file.
+#ifndef LIFT_STLMEMORY_FILE
 #define LIFT_STLMEMORY_FILE \
     L"e:\\dailybuild02\\smartcoupondaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\bloodlib\\include\\StlMemory.h"
+#endif
+#ifndef LIFT_OBJPOOL_FILE
+#define LIFT_OBJPOOL_FILE L"..\\LobbyDaemon\\ObjectPool.cpp"
+#endif
 #include "ObjectPool.h"
 
 #include <windows.h>
@@ -11,7 +17,7 @@
 #include "Daemon.h"
 #include "Log.h"
 
-static wchar_t const* const kObjPoolFile = L"..\\LobbyDaemon\\ObjectPool.cpp";
+static wchar_t const* const kObjPoolFile = LIFT_OBJPOOL_FILE;
 static unsigned long long const kObjPoolGuard = 0xB10D1C2FB10D1C2FULL;
 
 static wchar_t const* descOf(ObjPool const* pool)  // LIFT: inlined helper
@@ -19,6 +25,7 @@ static wchar_t const* descOf(ObjPool const* pool)  // LIFT: inlined helper
     return pool->_desc != nullptr ? pool->_desc : L"null";
 }
 
+#ifndef LIFT_OBJPOOL_LOBBYDAEMON
 // 0x14AA0 (folded empty function)
 void SmartCouponObjPoolMemoryAllocator::Free(void*, wchar_t const*, int)
 {
@@ -39,6 +46,7 @@ ObjPool::ObjPool(unsigned long long id, int objsize, wchar_t const* desc)
 ObjPool::~ObjPool()
 {
 }
+#endif  // LIFT_OBJPOOL_LOBBYDAEMON
 
 // 0x1250
 bool ObjPool::Initialize(void* vtbl, int initialPoolCapacity, long timeToWait)

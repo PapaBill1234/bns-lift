@@ -55,6 +55,11 @@ short gamedWid(GamedChannel const* gamed)
 
 LobbyJobDef LeaveGameWorldJob::_def = {13, StateDef, 2, L"LeaveGameWorldJob"};  // 0x2018d0
 
+#include "ObjectPoolLobbyDaemon.h"
+
+// .data 0x205490, dynamic init 0x11e570, atexit dtor 0x11f240.
+// The exe .data holds id 1, objsize 0x78, desc L"LeaveGameWorldJob".
+
 // 0x877b0
 LobbyJobDef const* LeaveGameWorldJob::GetDefinition() const
 {
@@ -185,5 +190,4 @@ bool LeaveGameWorldJob::leaveGameWorld()
 
 // LIFT: LeaveGameWorldJob::_pool (.data RVA 0x205490). Dynamic initializer 0x11e570, atexit destructor 0x11f240. The original static data
 // holds id 1, objsize sizeof(LeaveGameWorldJob) and desc L"LeaveGameWorldJob".
-#include "ObjectPool.h"
 ObjPool LeaveGameWorldJob::_pool(1, sizeof(LeaveGameWorldJob), L"LeaveGameWorldJob");

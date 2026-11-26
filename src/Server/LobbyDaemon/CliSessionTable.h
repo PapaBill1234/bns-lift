@@ -47,6 +47,14 @@ public:
         unsigned long long gatekey;
     };
 
+    // LIFT: PDB inline ctor (2 overloads in the PDB). Inlined in LobbyDaemon::initialize (0x9b300, line 1587).
+    explicit CliSessionTable(unsigned long long (*clikeygen)())
+        : _clikeygen(reinterpret_cast<void*>(clikeygen)), _size(0), _clikeyMod(0), _accountMod(0), _minGatewid(0),
+          _sizeGatewid(0), _minGamewid(0), _sizeGamewid(0), _lock(nullptr), _table(nullptr), _lock_index_gatekey(nullptr),
+          _index_gatekey(nullptr), _lock_index_gate(nullptr), _index_gate(nullptr), _lock_index_account(nullptr),
+          _index_account(nullptr), _lock_index_pcid(nullptr), _index_pcid(nullptr)
+    {
+    }
     virtual ~CliSessionTable();  // 0x3d0a0
     bool Initialize(int clikeyMod, int accountMod, short minGatewid, short maxGatewid, short minGamewid,
                     short maxGamewid);  // 0x3d940

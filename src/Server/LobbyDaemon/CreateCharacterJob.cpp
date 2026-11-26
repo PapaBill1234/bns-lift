@@ -148,8 +148,21 @@ void RollbackReservedQuota(CliSession* owner, bool jumpingCharacter)
 }  // namespace
 
 LobbyJobDef CreateCharacterJob::_def = {5, StateDef, 3, L"CreateCharacterJob"};  // 0x201d50
-// LIFT: CreateCharacterJob::_pool has no definition. The LobbyDaemon ObjectPool module is not in lift_lobbydaemon
-// (see CliSession.cpp). The dynamic initializer is at 0x11dda0.
+
+#include "ObjectPoolLobbyDaemon.h"
+
+// .data 0x204360, dynamic init 0x11dda0, atexit dtor 0x11ec00.
+// The exe .data holds id 1, objsize 0xb0, desc L"CreateCharacterJob".
+ObjPool CreateCharacterJob::_pool(1, 0xb0, L"CreateCharacterJob");
+
+// LIFT: no RVA. LTCG inlined it into LobbyDaemon::initialize (0x9b300). The original constructs a job on the stack
+// and returns its vfptr. It does not run the destructor.
+void* CreateCharacterJob::_vtbl()
+{
+    char buf[sizeof(CreateCharacterJob)];
+    CreateCharacterJob* job = ::new (buf) CreateCharacterJob(nullptr);
+    return *reinterpret_cast<void**>(job);
+}
 
 // 0x41840
 LobbyJobDef const* CreateCharacterJob::GetDefinition() const

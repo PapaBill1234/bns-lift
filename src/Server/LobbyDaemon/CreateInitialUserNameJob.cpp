@@ -38,8 +38,12 @@ LobbyJobStateDef const StateDef[] = {{0, L"INIT"}, {1, L"CHANGE_USER_NAME"}, {2,
 }
 
 LobbyJobDef CreateInitialUserNameJob::_def = {31, StateDef, 2, L"CreateInitialUserNameJob"};  // 0x201eb8
-// LIFT: CreateInitialUserNameJob::_pool has no definition. The LobbyDaemon ObjectPool module is not in
-// lift_lobbydaemon (see CliSession.cpp).
+
+#include "ObjectPoolLobbyDaemon.h"
+
+// .data 0x204200, dynamic init 0x11dd00, atexit dtor 0x11eb80.
+// The exe .data holds id 1, objsize 0x68, desc L"CreateInitialUserNameJob".
+ObjPool CreateInitialUserNameJob::_pool(1, 0x68, L"CreateInitialUserNameJob");
 
 // 0x2fc20
 LobbyJobDef const* CreateInitialUserNameJob::GetDefinition() const

@@ -33,7 +33,7 @@
 #include "LobbyJob.h"
 #include "LobbyJobParams.h"
 #include "LobbyToken.h"
-#include "ObjectPool.h"
+#include "ObjectPoolLobbyDaemon.h"
 #include "PacketBuffer.h"
 #include "PacketUtil.h"
 #include "Session.h"

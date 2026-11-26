@@ -41,7 +41,8 @@ private:
     unsigned long long _deliveryId;  // +0x70
 
 public:
-    static ObjPool _pool;
+    static ObjPool _pool;  // .data 0x203bd0
+    static void* _vtbl();  // LIFT: PDB declares it; no RVA (inlined in LobbyDaemon::initialize 0x9b300)
     static LobbyJobDef _def;
 };
 static_assert(sizeof(AuctionRollbackEscrowJob) == 0x78, "sizeof AuctionRollbackEscrowJob");

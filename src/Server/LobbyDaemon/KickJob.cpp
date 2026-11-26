@@ -48,8 +48,12 @@ LobbyJobStateDef const StateDef[] = {{0, L"INIT"},           {1, L"KICK"},     {
 }
 
 LobbyJobDef KickJob::_def = {4, StateDef, 5, L"KickJob"};  // 0x2018f0
-// LIFT: KickJob::_pool has no definition. The LobbyDaemon ObjectPool module is not in lift_lobbydaemon
-// (see CliSession.cpp).
+
+#include "ObjectPoolLobbyDaemon.h"
+
+// .data 0x2053e0, dynamic init 0x11e520, atexit dtor 0x11f200.
+// The exe .data holds id 1, objsize 0x80, desc L"KickJob".
+ObjPool KickJob::_pool(1, 0x80, L"KickJob");
 
 // 0x861a0
 LobbyJobDef const* KickJob::GetDefinition() const

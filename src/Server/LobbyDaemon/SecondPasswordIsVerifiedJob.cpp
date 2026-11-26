@@ -43,8 +43,11 @@ LobbyJobStateDef const StateDef[] = {{0, L"INIT"}, {1, L"IS_VERIFIED"}, {2, L"FI
 }
 
 LobbyJobDef SecondPasswordIsVerifiedJob::_def = {30, StateDef, 2, L"SecondPasswordIsVerifiedJob"};  // 0x201a10
-// LIFT: SecondPasswordIsVerifiedJob::_pool (0x204db0) has no definition. The LobbyDaemon ObjectPool module is not in
-// lift_lobbydaemon (see CliSession.cpp).
+
+#include "ObjectPoolLobbyDaemon.h"
+
+// .data 0x204db0, dynamic init 0x11e250, atexit dtor 0x11efc0.
+// The exe .data holds id 1, objsize 0x78, desc L"SecondPasswordIsVerifiedJob".
 
 // 0x72110
 LobbyJobDef const* SecondPasswordIsVerifiedJob::GetDefinition() const
@@ -221,5 +224,4 @@ bool SecondPasswordIsVerifiedJob::expireIsVerified()
 
 // LIFT: SecondPasswordIsVerifiedJob::_pool (.data RVA 0x204db0). Dynamic initializer 0x11e250, atexit destructor 0x11efc0. The original static data
 // holds id 1, objsize sizeof(SecondPasswordIsVerifiedJob) and desc L"SecondPasswordIsVerifiedJob".
-#include "ObjectPool.h"
 ObjPool SecondPasswordIsVerifiedJob::_pool(1, sizeof(SecondPasswordIsVerifiedJob), L"SecondPasswordIsVerifiedJob");

@@ -139,7 +139,15 @@ public:
         int _countofSectionsInUnitTime;
     };
 
+    // LIFT: the PDB ctor Mileage(int) is inline in MileageManager::Initialize (0x5f5a0).
+    explicit Mileage(int slotId) : _slotId(slotId), _unitTime(0), _fevers(nullptr), _feverCount(0)
+    {
+        _effectiveAccumulateSection.start = 0;
+        _effectiveAccumulateSection.end = 0;
+    }
     virtual ~Mileage();  // 0x5d8a0
+    // LIFT: the original deleting destructor does not free storage. MileageManager::Initialize (0x5f5a0) frees it.
+    static void operator delete(void*) {}
     virtual bool Initialize(MileageConfig const&, long long);  // 0x5d940
     virtual bool Start(CliSession*, long long) = 0;
     virtual bool Stop(CliSession*, long long, long long*) = 0;
@@ -215,6 +223,8 @@ static_assert(sizeof(MileageInterimDepositTimer) == 0x80, "sizeof MileageInterim
 class MileageManager : public LobbyMessageAcceptor
 {
 public:
+    // LIFT: PDB inline ctor. Inlined in LobbyDaemon::initialize (0x9b300, line 1632).
+    MileageManager() : _limitedIdList(nullptr), _limitedSlotList(nullptr), _limitedCount(0) {}
     virtual ~MileageManager();  // 0x5f480
     bool Initialize(long long);  // 0x5f5a0
     MileageSlot* CreateSlot(id128 const&, unsigned long long);  // 0x5fc30
@@ -225,7 +235,7 @@ private:
     // (0x3b540) walk _mileages.
     friend class GameServiceLocation;
     friend class CliSession;  // LIFT: access helper; onPcCafeChargeStart (0x3a190) and onPcCafeChargeStop (0x3a2c0) walk _mileages.
-    std::vector<Mileage*> _mileages;
+    std::vector<Mileage*, StlAllocator<Mileage*, 2> > _mileages;  // PDB type (gap-17)
     int* _limitedIdList;
     int* _limitedSlotList;
     int _limitedCount;

@@ -26,7 +26,14 @@ public:
 class BannedWordFilterMemory
 {
 public:
-    static bool SetupMemoryManager(BannedWordFilterMemoryManager* const memoryManager);
+    // LIFT: inline. LobbyDaemon::initialize (0x9b300) has the test and the store.
+    static bool SetupMemoryManager(BannedWordFilterMemoryManager* const memoryManager)
+    {
+        if (_memoryManager != NULL)
+            return false;
+        _memoryManager = memoryManager;
+        return true;
+    }
     static BannedWordFilterMemoryManager* Memory() { return _memoryManager; }
 
 private:

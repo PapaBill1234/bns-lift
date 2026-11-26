@@ -65,8 +65,12 @@ LobbyJobStateDef const StateDef[] = {{0, L"INIT"}, {1, L"ACTIVATE_GRADE"}, {2, L
 }
 
 LobbyJobDef ActivateGradeJob::_def = {32, StateDef, 2, L"ActivateGradeJob"};  // 0x2020c0
-// LIFT: ActivateGradeJob::_pool (0x203860: id 1, size 0x80) has no definition. The LobbyDaemon ObjectPool module is
-// not in lift_lobbydaemon (see CliSession.cpp).
+
+#include "ObjectPoolLobbyDaemon.h"
+
+// .data 0x203860, dynamic init 0x11d8a0, atexit dtor 0x11e800.
+// The exe .data holds id 1, objsize 0x80, desc L"ActivateGradeJob".
+ObjPool ActivateGradeJob::_pool(1, 0x80, L"ActivateGradeJob");
 
 // 0xbac0
 LobbyJobDef const* ActivateGradeJob::GetDefinition() const

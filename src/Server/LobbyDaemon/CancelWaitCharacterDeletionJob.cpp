@@ -61,8 +61,12 @@ LobbyJobStateDef const StateDef[] = {{0, L"INIT"}, {1, L"RESTORE_LOBBY"}, {2, L"
 }
 
 LobbyJobDef CancelWaitCharacterDeletionJob::_def = {7, StateDef, 3, L"CancelWaitCharacterDeletionJob"};  // 0x201fe0
-// LIFT: CancelWaitCharacterDeletionJob::_pool (0x203d30) has no definition. The LobbyDaemon ObjectPool module is not
-// in lift_lobbydaemon (see CliSession.cpp).
+
+#include "ObjectPoolLobbyDaemon.h"
+
+// .data 0x203d30, dynamic init 0x11dad0, atexit dtor 0x11e9c0.
+// The exe .data holds id 1, objsize 0x80, desc L"CancelWaitCharacterDeletionJob".
+ObjPool CancelWaitCharacterDeletionJob::_pool(1, 0x80, L"CancelWaitCharacterDeletionJob");
 
 // 0x18890
 LobbyJobDef const* CancelWaitCharacterDeletionJob::GetDefinition() const

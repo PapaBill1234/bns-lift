@@ -7,6 +7,8 @@
 class CliSessionManager : public CliSessionTable
 {
 public:
+    // LIFT: PDB inline ctor. Inlined in LobbyDaemon::initialize (0x9b300, line 1587).
+    explicit CliSessionManager(unsigned long long (*clikeygen)()) : CliSessionTable(clikeygen) {}
     void OnCloseLobbyGateChannel(short);  // 0x3cbd0
     void OnCloseGamedChannel(short);  // 0x3cdd0
 };

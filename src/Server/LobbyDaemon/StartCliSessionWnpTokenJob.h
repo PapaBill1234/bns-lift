@@ -35,7 +35,6 @@ public:
         FIN = 16
     };
 
-    // LIFT: the PDB has static _vtbl(). The binary has no body for it. It is not declared here.
     virtual LobbyJobDef const* GetDefinition() const;  // 0xd2340
     StartCliSessionWnpTokenJob(CliSession*);  // 0xd23a0
     virtual ~StartCliSessionWnpTokenJob();  // 0xd24a0
@@ -101,7 +100,8 @@ private:
     int _timeBasedPromotionIds[2];  // +0x1D8
 
 public:
-    static ObjPool _pool;
+    static ObjPool _pool;  // .data 0x2056b0
+    static void* _vtbl();  // LIFT: PDB declares it; no RVA (inlined in LobbyDaemon::initialize 0x9b300)
     static LobbyJobDef _def;
 
     friend struct StartCliSessionWnpTokenJobLayoutCheck;

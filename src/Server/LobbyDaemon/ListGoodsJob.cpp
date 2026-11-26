@@ -34,8 +34,12 @@ LobbyJobStateDef const StateDef[] = {{0, L"INIT"}, {1, L"LIST_GOODS"}, {2, L"FIN
 }
 
 LobbyJobDef ListGoodsJob::_def = {22, StateDef, 2, L"ListGoodsJob"};  // 0x201c30
-// LIFT: ListGoodsJob::_pool (0x204990) has no definition. The LobbyDaemon ObjectPool module is not in lift_lobbydaemon
-// (see CliSession.cpp).
+
+#include "ObjectPoolLobbyDaemon.h"
+
+// .data 0x204990, dynamic init 0x11e070, atexit dtor 0x11ee40.
+// The exe .data holds id 1, objsize 0x78, desc L"ListGoodsJob".
+ObjPool ListGoodsJob::_pool(1, 0x78, L"ListGoodsJob");
 
 // 0x54ee0
 LobbyJobDef const* ListGoodsJob::GetDefinition() const

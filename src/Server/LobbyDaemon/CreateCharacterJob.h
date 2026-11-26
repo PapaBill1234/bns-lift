@@ -4,6 +4,7 @@
 #include "CliSessionJob.h"
 #include "StringUtil.h"
 
+class ObjPool;
 class CliSession;
 class GamedChannel;
 class LobbyGateChannel;
@@ -25,6 +26,7 @@ public:
     };
 
     CreateCharacterJob(CliSession* owner);  // 0x418a0
+    static void* _vtbl();  // LIFT: PDB declares it; no RVA (inlined in LobbyDaemon::initialize 0x9b300)
     virtual ~CreateCharacterJob();  // 0x41940
     virtual LobbyJobDef const* GetDefinition() const;  // 0x41840
 private:

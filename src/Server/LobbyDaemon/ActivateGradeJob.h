@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include "CliSessionJob.h"
 
+class ObjPool;
 class CliSession;
 class GamedChannel;
 class LobbyGateChannel;

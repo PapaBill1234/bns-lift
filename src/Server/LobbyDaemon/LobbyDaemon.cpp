@@ -39,10 +39,116 @@
 #include "PipeConsole.h"
 #include "RefCntObject.h"
 #include "Session.h"
+#include "AbandonChargeJob.h"
+#include "ActivateGradeJob.h"
+#include "AddSlotJob.h"
+#include "AuctionBidJob.h"
+#include "AuctionDeliverJob.h"
+#include "AuctionEscrowJob.h"
+#include "AuctionRollbackEscrowJob.h"
+#include "BLDaemonInfo.h"
+#include "BindCharacterSlotJob.h"
+#include "CancelWaitCharacterDeletionJob.h"
+#include "ChangeCharacterAppearanceJob.h"
+#include "ChangeCharacterRaceJob.h"
+#include "ChangeCharacterSexJob.h"
+#include "ChangeUserNameJob.h"
+#include "ContentsRuleConfigDefinition.h"
+#include "CreateCharacterJob.h"
+#include "CreateInitialUserNameJob.h"
+#include "DeleteCharacterJob.h"
+#include "DepositMileageJob.h"
+#include "EndWaitGameWorldJob.h"
+#include "EnterGameWorldJob.h"
+#include "ExtendJumpingCharacterCreationQuotaJob.h"
+#include "GameTimeSchedule.h"
+#include "GetChargeInfoJob.h"
+#include "GetGoodsCountJob.h"
+#include "GetLobbyServiceItemJob.h"
+#include "GiveupWaitGameWorldJob.h"
+#include "InitCliSessionWlobbyTokenJob.h"
+#include "InitCliSessionWnpTokenJob.h"
+#include "KickJob.h"
+#include "LeaveGameWorldJob.h"
+#include "ListGoodsJob.h"
+#include "ListLobbyServiceItemJob.h"
+#include "LobbyCharacterDeletionScheduler.h"
+#include "LobbyDB.h"
+#include "LobbyJob.h"
+#include "LobbyLocale.h"
+#include "LobbyPerfMonitor.h"
+#include "LobbyStats.h"
+#include "LobbyTick.h"
+#include "LobbyToken.h"
+#include "LogoutInGameWorldJob.h"
+#include "LogoutJob.h"
+#include "Mileage.h"
+#include "RecoverPcJob.h"
+#include "RenameCharacterJob.h"
+#include "SecondPasswordGetStatusJob.h"
+#include "SecondPasswordIsVerifiedJob.h"
+#include "SetupNpScheduleInfoJob.h"
+#include "StartChargeJob.h"
+#include "StartCliSessionWlobbyTokenJob.h"
+#include "StartCliSessionWnpTokenJob.h"
+#include "StopChargeJob.h"
+#include "TakeAccountTimeBasedPlayRewardJob.h"
+#include "TakeGoodsJob.h"
+#include "TencentUIC.h"
+#include "TryEnterGameWorldJob.h"
+#include "Db.h"
+#include "SysInfo.h"
+#include "PerfCounterProvider.h"
+#include "BnsCommonConfigDefinition.h"
+#include <stdio.h>
 
 LobbyDaemon* LobbyDaemon::_instance = nullptr;  // PDB static member (file-scope data in the original).
-ObjPoolTimer* GObjPoolTimer = nullptr;           // rva 0x2095E0; LIFT: LobbyDaemon::initialize (0x9b300, line 1534) sets it
 CoolDown* GCoolDown = nullptr;                  // PDB global.
+LobbyObjPoolMemAllocator* GObjPoolMemAlloc = nullptr;  // PDB global, rva 0x2095D8. initialize (0x9b300) sets it.
+ObjPoolTimer* GObjPoolTimer = nullptr;                 // PDB global, rva 0x2095E0. initialize (0x9b300) sets it.
+BannedWordFilterMemoryAllocator BannedWordFilterMemoryAllocatorInstance;  // PDB global, rva 0x2056A0.
+extern wchar_t const* LobbyErrorDesc[28];  // LIFT: PDB public LobbyErrorDesc. LobbyGamePacketHandler.cpp has the definition.
+
+// LIFT: PDB globals of the LobbyDaemon perf counter sets. The values are from the exe data at each rva.
+// ❓ The PDB module of these globals is not known. They are here because initialize (0x9b300) is the only user.
+GUID const LobbyDaemonProviderGuid = {0x0374222d, 0x2e11, 0x4bb7, {0xa2, 0x51, 0xa3, 0xa5, 0x8c, 0x32, 0x5d, 0x1b}};  // rva 0x201B20
+
+struct
+{
+    BL_PERF_COUNTERSET_INFO CounterSet;
+    BL_PERF_COUNTER_INFO Counter0;
+    BL_PERF_COUNTER_INFO Counter1;
+} LobbyDaemonSystemInfo = {  // rva 0x2077F0
+    {{0xcc569971, 0x85f5, 0x43f2, {0xb8, 0xc7, 0x74, 0xd8, 0x51, 0xdd, 0x57, 0xd9}},
+     {0x0374222d, 0x2e11, 0x4bb7, {0xa2, 0x51, 0xa3, 0xa5, 0x8c, 0x32, 0x5d, 0x1b}}, 2, 2},
+    {1, 0x10100, 0, 8, 100, 0, 0},
+    {2, 0x10100, 0, 8, 100, 0, 0},
+};
+
+struct
+{
+    BL_PERF_COUNTERSET_INFO CounterSet;
+    BL_PERF_COUNTER_INFO Counter0;
+    BL_PERF_COUNTER_INFO Counter1;
+    BL_PERF_COUNTER_INFO Counter2;
+    BL_PERF_COUNTER_INFO Counter3;
+    BL_PERF_COUNTER_INFO Counter4;
+} LobbyDaemonWorldClusterInfo = {  // rva 0x207860
+    {{0xefab60a9, 0xe55e, 0x4a49, {0xb5, 0xcf, 0x93, 0xb3, 0x50, 0x5c, 0xfc, 0xe2}},
+     {0x0374222d, 0x2e11, 0x4bb7, {0xa2, 0x51, 0xa3, 0xa5, 0x8c, 0x32, 0x5d, 0x1b}}, 5, 2},
+    {1, 0x10100, 0, 8, 100, 0, 0},
+    {2, 0x10100, 0, 8, 100, 0, 0},
+    {3, 0x10100, 0, 8, 100, 0, 0},
+    {4, 0x10100, 0, 8, 100, 0, 0},
+    {5, 0x10100, 0, 8, 100, 0, 0},
+};
+
+BL_PERF_COUNTERSET_INFO_LIST LobbyDaemonPerfCounterSetInfoList[2] = {  // rva 0x201B30
+    {&LobbyDaemonSystemInfo.CounterSet, sizeof(LobbyDaemonSystemInfo)},
+    {&LobbyDaemonWorldClusterInfo.CounterSet, sizeof(LobbyDaemonWorldClusterInfo)},
+};
+BL_PERF_COUNTERSET_INFO_LIST* LobbyDaemonPerfCounterSetInfoListPtr = LobbyDaemonPerfCounterSetInfoList;  // rva 0x201B50
+int const LobbyDaemonPerfCounterSetTotal = 2;  // rva 0x201A74
 
 // LIFT: strings from LobbyDaemon.exe (UTF-16 literals). The order follows the PDB enum ReloadInvalidReason.
 // The order was verified against the LobbyDaemon exe table at rva 0x201268.
@@ -88,7 +194,6 @@ wchar_t const* LobbyDaemon::Descriptions()
     return L"Blade&Soul Lobby Daemon";
 }
 
-#pragma comment(linker, "/INCLUDE:?Alloc@LobbyObjPoolMemAllocator@@UEAAPEAX_KPEB_WH@Z")  // LIFT: keep until the caller is lifted (0x99260)
 // 0x99260
 void* LobbyObjPoolMemAllocator::Alloc(unsigned long long size, wchar_t const*, int)
 {
@@ -128,7 +233,7 @@ void BannedWordFilterMemoryAllocator::Free(void* ptr, wchar_t const* file, int l
     Memory::_Manager[2]->Free(ptr, file, line);
 }
 
-#pragma comment(linker, "/INCLUDE:?GenerateClikey@@YA_KXZ")  // LIFT: keep until the caller is lifted (0x993c0)
+#pragma comment(linker, "/INCLUDE:?GenerateClikey@@YA_KXZ")  // LIFT: keep until the caller is lifted (0x993c0); the readers of the stored pointer are still stubs.
 // 0x993c0
 unsigned long long GenerateClikey()
 {
@@ -144,7 +249,7 @@ unsigned long long GenerateClikey()
     return static_cast<unsigned long long>(result);
 }
 
-#pragma comment(linker, "/INCLUDE:?GenerateJobid@@YA_KXZ")  // LIFT: keep until the caller is lifted (0x99410)
+#pragma comment(linker, "/INCLUDE:?GenerateJobid@@YA_KXZ")  // LIFT: keep until the caller is lifted (0x99410); the readers of the stored pointer are still stubs.
 // 0x99410
 unsigned long long GenerateJobid()
 {
@@ -160,7 +265,7 @@ unsigned long long GenerateJobid()
     return static_cast<unsigned long long>(result);
 }
 
-#pragma comment(linker, "/INCLUDE:?GenerateLobbyTokenkey@@YA_KXZ")  // LIFT: keep until the caller is lifted (0x99460)
+#pragma comment(linker, "/INCLUDE:?GenerateLobbyTokenkey@@YA_KXZ")  // LIFT: keep until the caller is lifted (0x99460); the readers of the stored pointer are still stubs.
 // 0x99460
 unsigned long long GenerateLobbyTokenkey()
 {
@@ -176,7 +281,6 @@ unsigned long long GenerateLobbyTokenkey()
     return static_cast<unsigned long long>(result);
 }
 
-#pragma comment(linker, "/INCLUDE:?GameWorldReporterListener@@YAXPEAVGameWorldReporter@@@Z")  // LIFT: keep until the caller is lifted (0x994b0)
 // 0x994b0
 void GameWorldReporterListener(GameWorldReporter* reporter)
 {
@@ -372,7 +476,6 @@ void LobbydReloadInvalidRestoreTimer::restoreInvalid()
     _isExecuted = true;
 }
 
-#pragma comment(linker, "/INCLUDE:?Add@ServiceItems@@QEAA_NW4ServiceItemType@LobbyDaemon@@PEB_W@Z")  // LIFT: keep until the caller is lifted (0x99ac0)
 // 0x99ac0
 bool ServiceItems::Add(LobbyDaemon::ServiceItemType type, wchar_t const* idListString)
 {
@@ -698,7 +801,483 @@ bool LobbyDaemon::initLog()
 // 0x9b300
 bool LobbyDaemon::initialize()
 {
-    LIFT_STUB(0x9b300);
+    if (!BnsCommonConfig::LoadBnsCommonConfig())
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1212, L"[lobbydaemon], initialize, failed to initialize bns common config");
+        Sleep(3000);
+        return false;
+    }
+    if (!ContentsRuleConfig::LoadContentsRuleConfig())
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1220,
+                   L"[lobbydaemon], initialize, failed to initialize contents rule config");
+        Sleep(3000);
+        return false;
+    }
+
+    wchar_t wdsn[1024];
+    char dsn[1024];
+    char buffer[1008];  // LIFT: frame +0x13f0 to +0x17e0 of 0x9b300.
+    FILE* fp = nullptr;
+    int error;
+    // LIFT: the HR converts buffer directly into wdsn. ❓ The original source can have a step between fread and the
+    // conversion (the frame has dsn and a size local of 1024). That step is not in this build.
+    char* const certFile = _config->_certFile;
+    _time64(nullptr);
+    if (certFile == nullptr)
+    {
+        error = 2;
+    }
+    else if (fopen_s(&fp, certFile, "rb") != 0 || fp == nullptr ||  // LIFT: mode "rb" at .rdata 0x1e18d0
+             static_cast<int>(fread(buffer, 1, 1000, fp)) <= 0)
+    {
+        error = 3;  // BUG: 0x9b300 fp is not closed when fread fails.
+    }
+    else
+    {
+        error = 0;
+        fclose(fp);
+    }
+    if (error != 0)
+    {
+        _config->ClearCertInfo();  // BUG: 0x9b300 strlen of a null pointer when error is 2.
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1241, L"[lobby], cannot execute, error:%d", error);
+        return false;
+    }
+    wdsn[1023] = L'\0';
+    MultiByteToWideChar(CP_ACP, 0, buffer, -1, wdsn, 1023);
+    memset(dsn, 0, sizeof(dsn));
+
+    if (!_config->_allowClientIPAddressInLogs)
+    {
+        Log::Write(Log::LT_DEBUG, L"LobbyDaemon.cpp", 1250, L"[lobbydd], client ip address in logs is not allowed");
+        Daemon::Instance->allowClientIPAddressInLogs = false;
+    }
+    _config->Dump();
+    BnsCommonConfig::Dump();
+    ContentsRuleConfig::Dump();
+
+    if (!_config->Check())
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1262, L"[lobby], check configuration fail");
+        return false;
+    }
+    if (!Db::Initialize(1, wdsn))
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1280, L"[lobby], initialize db fail");
+        return false;
+    }
+    Log::Write(Log::LT_NOTICE, L"LobbyDaemon.cpp", 1283, L"[lobby], initialize Lobby D/B ok");
+
+    // Locale set.
+    int const languagesLength = static_cast<int>(wcslen(_config->_supportLanguages)) + 1;
+    wchar_t* const languages =
+        static_cast<wchar_t*>(Memory::_Manager[2]->AllocZero(2 * languagesLength, L"LobbyDaemon.cpp", 1290));
+    wcscpy_s(languages, languagesLength, _config->_supportLanguages);
+    wchar_t seps[2];  // ❓ array size
+    wcscpy(seps, L";");
+    wchar_t* next = nullptr;
+    int count = 0;
+    for (wchar_t* token = wcstok_s(languages, seps, &next); token != nullptr; token = wcstok_s(nullptr, seps, &next))
+        ++count;
+    if (count <= 0)
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1307, L"[lobby], initialize locale set fail; no support language exists");
+        Memory::_Manager[2]->Free(languages, L"LobbyDaemon.cpp", 1308);
+        return false;
+    }
+    _localeset.count = count;
+    _localeset.locales =
+        static_cast<LobbyLocale**>(Memory::_Manager[2]->AllocZero(sizeof(LobbyLocale*) * count, L"LobbyDaemon.cpp", 1313));
+    wcscpy_s(languages, languagesLength, _config->_supportLanguages);
+    next = nullptr;
+    int index = 0;
+    for (wchar_t* token = wcstok_s(languages, seps, &next); token != nullptr; token = wcstok_s(nullptr, seps, &next))
+    {
+        int const language = LobbyLocale::GetLanguageType(token);
+        LobbyLocale* const locale = LobbyLocale::CreateLocale(language);
+        if (locale == nullptr)
+        {
+            Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1324,
+                       L"[lobby], initialize locale set fail; invalid locale parameter, language:%s", token);
+            Memory::_Manager[2]->Free(languages, L"LobbyDaemon.cpp", 1325);
+            return false;
+        }
+        _localeset.locales[index++] = locale;
+        _localeset.languages[language] = true;
+        Log::Write(Log::LT_NOTICE, L"LobbyDaemon.cpp", 1332, L"[lobby], create locale ok, languages:%s", token);
+    }
+    Memory::_Manager[2]->Free(languages, L"LobbyDaemon.cpp", 1336);
+    Log::Write(Log::LT_NOTICE, L"LobbyDaemon.cpp", 1337, L"[lobby], initialize locale set ok");
+
+    // Service items.
+    _serviceItems = ::new (Memory::_Manager[2]->Alloc(sizeof(ServiceItems), L"LobbyDaemon.cpp", 1344)) ServiceItems();
+    if (!_serviceItems->Add(SERVICEITEMTYPE_CHANGE_CHARACTER_APPEARANCE, _config->_itemDataIdsForChangeCharacterAppearance))
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1348,
+                   L"[lobby], initialize service items fail; add change-character-appearance item fail");
+        return false;
+    }
+    if (!_serviceItems->Add(SERVICEITEMTYPE_RENAME_CHARACTER, _config->_itemDataIdsForRenameCharacter))
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1354,
+                   L"[lobby], initialize service items fail; add rename-character item fail");
+        return false;
+    }
+    if (!_serviceItems->Add(SERVICEITEMTYPE_ADD_SLOT, _config->_itemDataIdsForAddSlot))
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1360, L"[lobby], initialize service items fail; add add-slot item fail");
+        return false;
+    }
+    if (!_serviceItems->Add(SERVICEITEMTYPE_CHANGE_USER_NAME, _config->_itemDataIdsForChangeUserName))
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1366, L"[lobby], initialize service items fail; add change-user item fail");
+        return false;
+    }
+    if (!_serviceItems->Add(SERVICEITEMTYPE_EXTEND_JUMPING_CHARACTER_CREATION_QUOTA,
+                            _config->_itemDataIdsForExtendJumpingCharacterCreationQuota))
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1372,
+                   L"[lobby], initialize service items fail; add extend-jumping-character-creation-quota item fail");
+        return false;
+    }
+    if (!_serviceItems->Add(SERVICEITEMTYPE_CHANGE_CHARACTER_SEX, _config->_itemDataIdsForChangeCharacterSex))
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1378,
+                   L"[lobby], initialize service items fail; add change-character-sex item fail");
+        return false;
+    }
+    if (!_serviceItems->Add(SERVICEITEMTYPE_CHANGE_CHARACTER_RACE, _config->_itemDataIdsForChangeCharacterRace))
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1384,
+                   L"[lobby], initialize service items fail; add change-character-race item fail");
+        return false;
+    }
+    if (!_serviceItems->Add(SERVICEITEMTYPE_RENAME_CHARACTER_BY_SYSTEM, _config->_itemDataIdsForRenameCharacterBySystem))
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1390,
+                   L"[lobby], initialize service items fail; add rename-character-by-sytem item fail");
+        return false;
+    }
+
+    _tick = ::new (Memory::_Manager[2]->Alloc(sizeof(LobbyTick), L"LobbyDaemon.cpp", 1398)) LobbyTick(_config->_timerInterval);
+
+    // Daemon list files.
+    wchar_t lobbyGateListFilePath[260] = {0};
+    wchar_t gamedListFilePath[260] = {0};
+    wchar_t infoGateListFilePath[260] = {0};
+    if (_wmakepath_s(lobbyGateListFilePath, 260, nullptr, _config->_configPath, L"lobby-gated-list.config.xml", nullptr) != 0)
+    {
+        Log::Write(L"LobbyDaemon.cpp", 1408, GetLastError(),
+                   L"[lobby], failed to make lobby-gate list file path, configPath:%s, configFileName:%s",
+                   _config->_configPath, L"lobby-gated-list.config.xml");
+        return false;
+    }
+    if (_wmakepath_s(gamedListFilePath, 260, nullptr, _config->_configPath, L"gamed-list.config.xml", nullptr) != 0)
+    {
+        Log::Write(L"LobbyDaemon.cpp", 1412, GetLastError(),
+                   L"[lobby], failed to make gamed list file path, configPath:%s, configFileName:%s", _config->_configPath,
+                   L"gamed-list.config.xml");
+        return false;
+    }
+    if (_wmakepath_s(infoGateListFilePath, 260, nullptr, _config->_configPath, L"infogate-list.config.xml", nullptr) != 0)
+    {
+        Log::Write(L"LobbyDaemon.cpp", 1416, GetLastError(),
+                   L"[lobby], failed to make info-gate list file path, configPath:%s, configFileName:%s",
+                   _config->_configPath, L"infogate-list.config.xml");
+        return false;
+    }
+    _daemonInfoTable =
+        ::new (Memory::_Manager[2]->Alloc(sizeof(BLDaemonInfoTable), L"LobbyDaemon.cpp", 1420)) BLDaemonInfoTable();
+    if (!_daemonInfoTable->Load(lobbyGateListFilePath))
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1422, L"[lobby], setup lobby-gate list fail, filePath:%s",
+                   lobbyGateListFilePath);
+        return false;
+    }
+    if (!_daemonInfoTable->Load(gamedListFilePath))
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1426, L"[lobby], setup gamed list fail, filePath:%s", gamedListFilePath);
+        return false;
+    }
+    if (_config->_useInfoGate && !_daemonInfoTable->Load(infoGateListFilePath))
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1433, L"[lobby], setup info-gate list fail, filePath:%s",
+                   infoGateListFilePath);
+        return false;
+    }
+
+    // Perf monitor.
+    if (_config->_usePerfMonitor)
+    {
+        if (!PerfCounterProvider::Initialize(LobbyDaemonProviderGuid, LobbyDaemonPerfCounterSetInfoList,
+                                             LobbyDaemonPerfCounterSetTotal))
+        {
+            Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1447, L"[lobby] init perf counter provider fail");
+            return false;
+        }
+        _systemPerfMon =
+            ::new (Memory::_Manager[2]->Alloc(sizeof(SystemPerfMonitor), L"LobbyDaemon.cpp", 1451)) SystemPerfMonitor();
+        if (!_systemPerfMon->Initialize())
+        {
+            _systemPerfMon->removeReferenceCount(L"LobbyDaemon.cpp", 1454);
+            _systemPerfMon = nullptr;
+            Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1456, L"[lobby], init system perf monitor fail");
+            return false;
+        }
+    }
+
+    // Game world registry and reporter.
+    _gameWorldRegistry =
+        ::new (Memory::_Manager[2]->Alloc(sizeof(GameWorldRegistry), L"LobbyDaemon.cpp", 1465)) GameWorldRegistry();
+    if (!_gameWorldRegistry->Setup(static_cast<short>(_config->_reservedMinGameWorldWidRange),
+                                   static_cast<short>(_config->_reservedMaxGameWorldWidRange)))
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1467, L"[lobby], setup world registry fail");
+        return false;
+    }
+    _gameWorldReporter =
+        ::new (Memory::_Manager[2]->Alloc(sizeof(GameWorldReporter), L"LobbyDaemon.cpp", 1471)) GameWorldReporter();
+    if (!_gameWorldReporter->Initialize(GameWorldReporterListener, _gameWorldRegistry, _config->_worldInfoListUpdatePeriod))
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1473, L"[lobby], setup world reporter fail");
+        return false;
+    }
+    _gameWorldReporter->WriteReport();
+
+    // Banned word filter.
+    _bannedWordFilter =
+        ::new (Memory::_Manager[2]->Alloc(sizeof(BannedWordFilterLib), L"LobbyDaemon.cpp", 1483)) BannedWordFilterLib();
+    if (!_bannedWordFilter->Initialize(&BannedWordFilterMemoryAllocatorInstance))
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1485, L"[lobby], init banned-word-filter fail");
+        return false;
+    }
+    Log::Write(Log::LT_NOTICE, L"LobbyDaemon.cpp", 1488, L"[lobby], init banned-word-filter ok");
+    wchar_t filterFilePath[260] = {0};
+    if (_wmakepath_s(filterFilePath, 260, nullptr, _config->_dataPath, L"BnSFilterName.txt", nullptr) != 0)
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1492,
+                   L"[lobby], failed to make banned word filter file path, dataPath:%s, filterFileName:%s", _config->_dataPath,
+                   L"BnSFilterName.txt");
+        return false;
+    }
+    if (!_bannedWordFilter->LoadNameFilterFile(filterFilePath))
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1496, L"[lobby], load banned-word-filter resource fail, path:%s",
+                   filterFilePath);
+        return false;
+    }
+    Log::Write(Log::LT_NOTICE, L"LobbyDaemon.cpp", 1499, L"[lobby], load banned-word-filter resource ok, path:%s",
+               filterFilePath);
+
+    if (_config->_waitCharacterDeletion)
+    {
+        _charaterDeletionScheduler = ::new (Memory::_Manager[2]->Alloc(sizeof(LobbyCharacterDeletionScheduler),
+                                                                      L"LobbyDaemon.cpp", 1506)) LobbyCharacterDeletionScheduler();
+    }
+    if (_config->_enableGameTimeSchedule)
+    {
+        _gameTimeScheduler =
+            ::new (Memory::_Manager[2]->Alloc(sizeof(GameTimeScheduler), L"LobbyDaemon.cpp", 1512)) GameTimeScheduler();
+        _gameTimeScheduler->Initialize();
+    }
+    if (_config->_exportLobbyStatsFilePeriod > 0)
+    {
+        _stats = ::new (Memory::_Manager[2]->Alloc(sizeof(LobbyStats), L"LobbyDaemon.cpp", 1521)) LobbyStats();
+        if (!_stats->Initialize(_config->_exportLobbyStatsFilePath, L"lobby", L"stats", 1000 * _config->_exportLobbyStatsFilePeriod))
+        {
+            Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1523, L"[lobby], init lobby stats fail, path:%s, period:%d(sec)",
+                       _config->_exportLobbyStatsFilePath, _config->_exportLobbyStatsFilePeriod);
+            return false;
+        }
+        Log::Write(Log::LT_NOTICE, L"LobbyDaemon.cpp", 1526, L"[lobby], init lobby stats ok, path:%s, period:%d(sec)",
+                   _config->_exportLobbyStatsFilePath, _config->_exportLobbyStatsFilePeriod);
+    }
+
+    // Object pools.
+    GObjPoolMemAlloc =
+        ::new (Memory::_Manager[1]->Alloc(sizeof(LobbyObjPoolMemAllocator), L"LobbyDaemon.cpp", 1533)) LobbyObjPoolMemAllocator();
+    GObjPoolTimer = ::new (Memory::_Manager[2]->Alloc(sizeof(ObjPoolTimer), L"LobbyDaemon.cpp", 1534)) ObjPoolTimer();
+    CliSession::_pool.Initialize(CliSession::_vtbl(), _config->_initCliSessionCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&CliSession::_pool);
+    InitCliSessionWnpTokenJob::_pool.Initialize(InitCliSessionWnpTokenJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&InitCliSessionWnpTokenJob::_pool);
+    StartCliSessionWnpTokenJob::_pool.Initialize(StartCliSessionWnpTokenJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&StartCliSessionWnpTokenJob::_pool);
+    LogoutJob::_pool.Initialize(LogoutJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&LogoutJob::_pool);
+    KickJob::_pool.Initialize(KickJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&KickJob::_pool);
+    CreateCharacterJob::_pool.Initialize(CreateCharacterJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&CreateCharacterJob::_pool);
+    DeleteCharacterJob::_pool.Initialize(DeleteCharacterJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&DeleteCharacterJob::_pool);
+    TryEnterGameWorldJob::_pool.Initialize(TryEnterGameWorldJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&TryEnterGameWorldJob::_pool);
+    EnterGameWorldJob::_pool.Initialize(EnterGameWorldJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&EnterGameWorldJob::_pool);
+    LeaveGameWorldJob::_pool.Initialize(LeaveGameWorldJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&LeaveGameWorldJob::_pool);
+    LogoutInGameWorldJob::_pool.Initialize(LogoutInGameWorldJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&LogoutInGameWorldJob::_pool);
+    InitCliSessionWlobbyTokenJob::_pool.Initialize(InitCliSessionWlobbyTokenJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&InitCliSessionWlobbyTokenJob::_pool);
+    StartCliSessionWlobbyTokenJob::_pool.Initialize(StartCliSessionWlobbyTokenJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&StartCliSessionWlobbyTokenJob::_pool);
+    EndWaitGameWorldJob::_pool.Initialize(EndWaitGameWorldJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&EndWaitGameWorldJob::_pool);
+    GiveupWaitGameWorldJob::_pool.Initialize(GiveupWaitGameWorldJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&GiveupWaitGameWorldJob::_pool);
+    CancelWaitCharacterDeletionJob::_pool.Initialize(CancelWaitCharacterDeletionJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&CancelWaitCharacterDeletionJob::_pool);
+    AbandonChargeJob::_pool.Initialize(AbandonChargeJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&AbandonChargeJob::_pool);
+    GetChargeInfoJob::_pool.Initialize(GetChargeInfoJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&GetChargeInfoJob::_pool);
+    StartChargeJob::_pool.Initialize(StartChargeJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&StartChargeJob::_pool);
+    StopChargeJob::_pool.Initialize(StopChargeJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&StopChargeJob::_pool);
+    RecoverPcJob::_pool.Initialize(RecoverPcJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&RecoverPcJob::_pool);
+    GetGoodsCountJob::_pool.Initialize(GetGoodsCountJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&GetGoodsCountJob::_pool);
+    ListGoodsJob::_pool.Initialize(ListGoodsJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&ListGoodsJob::_pool);
+    ListLobbyServiceItemJob::_pool.Initialize(ListLobbyServiceItemJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&ListLobbyServiceItemJob::_pool);
+    TakeGoodsJob::_pool.Initialize(TakeGoodsJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&TakeGoodsJob::_pool);
+    GetLobbyServiceItemJob::_pool.Initialize(GetLobbyServiceItemJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&GetLobbyServiceItemJob::_pool);
+    ChangeCharacterAppearanceJob::_pool.Initialize(ChangeCharacterAppearanceJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&ChangeCharacterAppearanceJob::_pool);
+    ChangeCharacterSexJob::_pool.Initialize(ChangeCharacterSexJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&ChangeCharacterSexJob::_pool);
+    ChangeCharacterRaceJob::_pool.Initialize(ChangeCharacterRaceJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&ChangeCharacterRaceJob::_pool);
+    RenameCharacterJob::_pool.Initialize(RenameCharacterJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&RenameCharacterJob::_pool);
+    AddSlotJob::_pool.Initialize(AddSlotJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&AddSlotJob::_pool);
+    SecondPasswordGetStatusJob::_pool.Initialize(SecondPasswordGetStatusJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&SecondPasswordGetStatusJob::_pool);
+    SecondPasswordIsVerifiedJob::_pool.Initialize(SecondPasswordIsVerifiedJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&SecondPasswordIsVerifiedJob::_pool);
+    CreateInitialUserNameJob::_pool.Initialize(CreateInitialUserNameJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&CreateInitialUserNameJob::_pool);
+    ActivateGradeJob::_pool.Initialize(ActivateGradeJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&ActivateGradeJob::_pool);
+    AuctionEscrowJob::_pool.Initialize(AuctionEscrowJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&AuctionEscrowJob::_pool);
+    AuctionRollbackEscrowJob::_pool.Initialize(AuctionRollbackEscrowJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&AuctionRollbackEscrowJob::_pool);
+    AuctionDeliverJob::_pool.Initialize(AuctionDeliverJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&AuctionDeliverJob::_pool);
+    AuctionBidJob::_pool.Initialize(AuctionBidJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&AuctionBidJob::_pool);
+    ChangeUserNameJob::_pool.Initialize(ChangeUserNameJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&ChangeUserNameJob::_pool);
+    DepositMileageJob::_pool.Initialize(DepositMileageJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&DepositMileageJob::_pool);
+    ExtendJumpingCharacterCreationQuotaJob::_pool.Initialize(ExtendJumpingCharacterCreationQuotaJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&ExtendJumpingCharacterCreationQuotaJob::_pool);
+    UpgradeJumpingCharacterStateJob::_pool.Initialize(UpgradeJumpingCharacterStateJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&UpgradeJumpingCharacterStateJob::_pool);
+    BindCharacterSlotJob::_pool.Initialize(BindCharacterSlotJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&BindCharacterSlotJob::_pool);
+    SetupNpScheduleInfoJob::_pool.Initialize(SetupNpScheduleInfoJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&SetupNpScheduleInfoJob::_pool);
+    TakeAccountTimeBasedPlayRewardJob::_pool.Initialize(TakeAccountTimeBasedPlayRewardJob::_vtbl(), _config->_initLobbyJobCount, _config->_reuseWaitTime);
+    GObjPoolTimer->Add(&TakeAccountTimeBasedPlayRewardJob::_pool);
+    // Cli-session manager, job manager and lobby-token desk.
+    _clisessionMgr = ::new (Memory::_Manager[2]->Alloc(sizeof(CliSessionManager), L"LobbyDaemon.cpp", 1587))
+        CliSessionManager(GenerateClikey);
+    int accountHashCount = _config->_accountHashCount;
+    if (accountHashCount <= 0)
+        accountHashCount = 2 * SysInfo::ProcessorCount();
+    int cliSessionHashCount = _config->_cliSessionHashCount;
+    if (cliSessionHashCount <= 0)
+        cliSessionHashCount = 2 * SysInfo::ProcessorCount();
+    if (!_clisessionMgr->Initialize(cliSessionHashCount, accountHashCount,
+                                    static_cast<short>(_config->_reservedMinLobbyGateWidRange),
+                                    static_cast<short>(_config->_reservedMaxLobbyGateWidRange),
+                                    static_cast<short>(_config->_reservedMinGameWorldWidRange),
+                                    static_cast<short>(_config->_reservedMaxGameWorldWidRange)))
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1594, L"[lobby], initialize cli-session manager fail");
+        return false;
+    }
+    _jobMgr = ::new (Memory::_Manager[2]->Alloc(sizeof(LobbyJobManager), L"LobbyDaemon.cpp", 1603)) LobbyJobManager(GenerateJobid);
+    int lobbyJobHashCount = _config->_lobbyJobHashCount;
+    if (lobbyJobHashCount <= 0)
+        lobbyJobHashCount = 2 * SysInfo::ProcessorCount();
+    if (!_jobMgr->Initialize(lobbyJobHashCount))
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1605, L"[lobby], initialize job manager fail");
+        return false;
+    }
+    _tokenDesk = ::new (Memory::_Manager[2]->Alloc(sizeof(LobbyTokenDesk), L"LobbyDaemon.cpp", 1613))
+        LobbyTokenDesk(_config->_lobbyTokenLifeTime, GenerateLobbyTokenkey);
+    if (!_tick->Add(_tokenDesk))
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1615, L"[lobby], add lobby-token-desk to tick fail");
+        return false;
+    }
+
+    // Random store initialization schedule.
+    int dbrtnLoadRandomStoreInitializationSchedule = 0;
+    if (!LobbyDB::LoadRandomStoreInitializationSchedule(dbrtnLoadRandomStoreInitializationSchedule,
+                                                        &_currentRandomStoreInitSchedule))
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1625, L"[lobby], load random store initialization schedule fail, dbrtn:%d, ",
+                   dbrtnLoadRandomStoreInitializationSchedule);
+        return false;
+    }
+    Log::Write(Log::LT_DEBUG, L"LobbyDaemon.cpp", 1628,
+               L"[lobby], load current random-store-initialization-schedule ok, schedule-number:%I64u, "
+               L"slot-count-init-schedule-number:%I64u, premium-draw-count-init-schedule-number:%I64u",
+               _currentRandomStoreInitSchedule.scheduleNumber, _currentRandomStoreInitSchedule.slotCountInitScheduleNumber,
+               _currentRandomStoreInitSchedule.premiumDrawCountInitScheduleNumber);
+
+    // Mileage.
+    if (_config->_enableMileage)
+    {
+        _mileageManager = ::new (Memory::_Manager[2]->Alloc(sizeof(MileageManager), L"LobbyDaemon.cpp", 1632)) MileageManager();
+        if (!_mileageManager->Initialize(_time64(nullptr) + 604800LL * _config->_mileageScheduleWeekCount))
+        {
+            int const lobbyError = static_cast<int>(TLobbyError);
+            Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1637, L"[lobby], init mileage manager fail, error:%s",
+                       static_cast<unsigned int>(lobbyError) >= 28 ? L"LOBERR_UNDEFINED" : LobbyErrorDesc[lobbyError]);
+            return false;
+        }
+        Log::Write(Log::LT_NOTICE, L"LobbyDaemon.cpp", 1640, L"[lobby], init mileage promotion manager ok");
+        _mileageInterimDepositTimer = ::new (Memory::_Manager[2]->Alloc(sizeof(MileageInterimDepositTimer),
+                                                                       L"LobbyDaemon.cpp", 1643))
+            MileageInterimDepositTimer(60000 * _config->_mileageDepositPeriod);
+        if (!_tick->Add(_mileageInterimDepositTimer))
+        {
+            Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1646, L"[lobby], add mileage interim deposit timer to tick fail");
+            return false;
+        }
+        Log::Write(Log::LT_NOTICE, L"LobbyDaemon.cpp", 1649, L"[lobby], setup mileage interim deposit timer ok");
+    }
+
+    // NP channel and Tencent UIC.
+    if (!NPChannel::Setup(BnsCommonConfig::Config->_npProgramId, BnsCommonConfig::Config->_npGameCode))
+    {
+        Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1661, L"[lobby], setup np-channel failed");
+        return false;
+    }
+    NPChannel::_recvCompletionLog = _config->_enableNpRecvCompletionLog;
+    if (!_config->_tencentUICEnable)
+        return true;
+    _tencentUIC = ::new (Memory::_Manager[2]->Alloc(sizeof(TencentUIC), L"LobbyDaemon.cpp", 1669)) TencentUIC();
+    if (_tencentUIC->Initialize(_config->_tencentUICConfigFile))
+        return true;
+    Log::Write(Log::LT_ERROR, L"LobbyDaemon.cpp", 1671, L"[lobby], tencent uic initilize failed");
+    return false;
 }
 
 // 0x9d520

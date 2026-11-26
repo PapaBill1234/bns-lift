@@ -49,7 +49,12 @@ LobbyJobStateDef const StateDef[] = {{0, L"INIT"}, {1, L"START_CHARGE"}, {2, L"F
 }
 
 LobbyJobDef StartChargeJob::_def = {16, StateDef, 2, L"StartChargeJob"};  // 0x2019d0
-// LIFT: StartChargeJob::_pool (0x204f10: id 1, size 0x70) is defined at the end of this file (gap-26, LobbyObjectPool.cpp).
+// LIFT: StartChargeJob::_pool (0x204f10: id 1, size 0x70) is defined at the end of this file (gap-26).
+
+#include "ObjectPoolLobbyDaemon.h"
+
+// .data 0x204f10, dynamic init 0x11e2f0, atexit dtor 0x11f040.
+// The exe .data holds id 1, objsize 0x70, desc L"StartChargeJob".
 
 // 0x75570
 LobbyJobDef const* StartChargeJob::GetDefinition() const
@@ -245,5 +250,4 @@ bool StartChargeJob::expireStartCharge()
 
 // LIFT: StartChargeJob::_pool (.data RVA 0x204f10). Dynamic initializer 0x11e2f0, atexit destructor 0x11f040. The original static data
 // holds id 1, objsize sizeof(StartChargeJob) and desc L"StartChargeJob".
-#include "ObjectPool.h"
 ObjPool StartChargeJob::_pool(1, sizeof(StartChargeJob), L"StartChargeJob");

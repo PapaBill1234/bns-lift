@@ -43,8 +43,12 @@ LobbyJobStateDef const StateDef[] = {{0, L"INIT"}, {1, L"RESTORE_GAMEWORLD_PC"},
 }
 
 LobbyJobDef RecoverPcJob::_def = {20, StateDef, 2, L"RecoverPcJob"};  // 0x201a98
-// LIFT: RecoverPcJob::_pool (0x204ba0) has no definition. The LobbyDaemon ObjectPool module is not in lift_lobbydaemon
-// (see CliSession.cpp).
+
+#include "ObjectPoolLobbyDaemon.h"
+
+// .data 0x204ba0, dynamic init 0x11e160, atexit dtor 0x11ef00.
+// The exe .data holds id 1, objsize 0x88, desc L"RecoverPcJob".
+ObjPool RecoverPcJob::_pool(1, 0x88, L"RecoverPcJob");
 
 // 0x64e50
 LobbyJobDef const* RecoverPcJob::GetDefinition() const

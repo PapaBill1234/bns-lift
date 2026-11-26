@@ -2,6 +2,7 @@
 #include <new>
 #include "InitCliSessionWnpTokenJob.h"
 #include "LiftStub.h"
+#include "ObjectPoolLobbyDaemon.h"
 
 namespace
 {
@@ -9,8 +10,9 @@ LobbyJobStateDef const StateDef[] = {{0, L"INIT"}, {1, L"FIN"}};  // 0x12da30
 }
 
 LobbyJobDef InitCliSessionWnpTokenJob::_def = {1, StateDef, 1, L"InitCliSessionWnpTokenJob"};  // 0x2017b0
-// LIFT: InitCliSessionWnpTokenJob::_pool (0x2055f0) has no definition. The LobbyDaemon ObjectPool module is not in
-// lift_lobbydaemon (see CliSession.cpp).
+// .data 0x2055f0, dynamic init 0x11e610, atexit dtor 0x11f2c0.
+// The exe .data holds id 1, objsize 0x58, desc L"InitCliSessionWnpTokenJob".
+ObjPool InitCliSessionWnpTokenJob::_pool(1, sizeof(InitCliSessionWnpTokenJob), L"InitCliSessionWnpTokenJob");
 
 // 0x98120
 // The original constructs a job on the stack (null owner) and returns its vfptr. It does not run the destructor.

@@ -39,6 +39,11 @@ LobbyJobStateDef const StateDef[] = {{0, L"INIT"}, {1, L"LOGOUT"}, {2, L"FIN"}};
 
 LobbyJobDef LogoutInGameWorldJob::_def = {12, StateDef, 2, L"LogoutInGameWorldJob"};  // 0x201b58
 
+#include "ObjectPoolLobbyDaemon.h"
+
+// .data 0x204af0, dynamic init 0x11e110, atexit dtor 0x11eec0.
+// The exe .data holds id 1, objsize 0x60, desc L"LogoutInGameWorldJob".
+
 // 0x5aa80
 LobbyJobDef const* LogoutInGameWorldJob::GetDefinition() const
 {
@@ -133,5 +138,4 @@ bool LogoutInGameWorldJob::logout()
 
 // LIFT: LogoutInGameWorldJob::_pool (.data RVA 0x204af0). Dynamic initializer 0x11e110, atexit destructor 0x11eec0. The original static data
 // holds id 1, objsize sizeof(LogoutInGameWorldJob) and desc L"LogoutInGameWorldJob".
-#include "ObjectPool.h"
 ObjPool LogoutInGameWorldJob::_pool(1, sizeof(LogoutInGameWorldJob), L"LogoutInGameWorldJob");

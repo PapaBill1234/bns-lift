@@ -171,8 +171,12 @@ AddSlotService* FindAddSlotServiceEntry(CliSession* owner, unsigned long long se
 }  // namespace
 
 LobbyJobDef AddSlotJob::_def = {27, StateDef, 8, L"AddSlotJob"};  // 0x2020a0
-// LIFT: AddSlotJob::_pool has no definition. The LobbyDaemon ObjectPool module is not in lift_lobbydaemon
-// (see CliSession.cpp).
+
+#include "ObjectPoolLobbyDaemon.h"
+
+// .data 0x203910, dynamic init 0x11d8f0, atexit dtor 0x11e840.
+// The exe .data holds id 1, objsize 0xa0, desc L"AddSlotJob".
+ObjPool AddSlotJob::_pool(1, 0xa0, L"AddSlotJob");
 
 // 0xd1e0
 LobbyJobDef const* AddSlotJob::GetDefinition() const

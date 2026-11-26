@@ -1,6 +1,11 @@
 // LobbyPredefine.obj (LobbyDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
 #include "LobbyPredefine.h"
 #include "LiftStub.h"
+#include "CliSession.h"
+#include <wchar.h>
+#include <string.h>
+#include <windows.h>
+#include <objbase.h>
 
 // 0x96480
 // LIFT: not in the gap-03 ID list. LobbyGatePresence::Kick (0x3ac20) calls it. Lifted so that Kick is not noreturn.
@@ -72,9 +77,26 @@ char GetGameWorldKickReason(int reason)
 }
 
 // 0x96580
-bool GetId128FromGuidString(wchar_t const*, id128*)
+// LIFT: gap-17 scope addition. LobbyConfig::Check (0x98980) calls it on the success path.
+bool GetId128FromGuidString(wchar_t const* guidstr, id128* out)
 {
-    LIFT_STUB(0x96580);
+    if (guidstr != nullptr && wcslen(guidstr) == 36)
+    {
+        wchar_t clsidstr[40] = L"{";
+        wcscat_s(clsidstr, 39, guidstr);
+        wcscat_s(clsidstr, 39, L"}");
+        GUID clsid;
+        if (CLSIDFromString(clsidstr, &clsid) != S_OK)
+        {
+            TLobbyError = LOBERR_SYSTEM;
+            return false;
+        }
+        if (out != nullptr)
+            memcpy(out, &clsid, sizeof(GUID));
+        return true;
+    }
+    TLobbyError = LOBERR_INVALID_PARAMETER;
+    return false;
 }
 
 // 0x966a0

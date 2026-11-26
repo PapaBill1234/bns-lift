@@ -5,10 +5,19 @@
 #include "CliSession.h"
 #include "Daemon.h"
 #include "FragmentPacket.h"
+#include "AlertSender.h"
 #include "LiftStub.h"
+#include "LobbyConfig.h"
+#include "LobbyDaemon.h"
+#include "LobbyDB.h"
+#include "Network.h"
 #include "Log.h"
+#if defined(__clang__)
+#include "crt_cpp_overload.h"
+#endif
 #include <string.h>
 #include <wchar.h>
+#include <stdio.h>
 
 #if !defined(__clang__)
 #pragma comment(linker, "/INCLUDE:??0GameWorld@@QEAA@XZ")  // LIFT: keep until the caller is lifted (0x4c820).
@@ -265,6 +274,55 @@ GameWorldCluster::~GameWorldCluster()
 {
 }
 
+// 0x201ae0
+GUID const WorldClusterCounterSet::ID = {0xefab60a9, 0xe55e, 0x4a49, {0xb5, 0xcf, 0x93, 0xb3, 0x50, 0x5c, 0xfc, 0xe2}};
+
+// 0x4d510
+// LIFT: gap-17 scope addition. GameWorldRegistry::Setup (0x4ed00) calls it on the success path.
+bool GameWorldCluster::Setup(DB* db)
+{
+    if (db == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, L"GameWorld.cpp", 345, L"[game-world-cluster], setup fail; invalid paramter");
+        return false;
+    }
+    // LIFT: the original has GetInternalAddress and GetPublicAddress inlined. They copy into two thread-local
+    // wchar_t[32] buffers (TLS +0xfae0 and +0xfb20; the PDB gives no names). A new __declspec(thread) variable
+    // reorders the LTCG TLS block (see CliSession.cpp). The text is only for the log line, so local buffers are used.
+    wchar_t internalAddress[32];
+    internalAddress[0] = L'\0';
+    wcsncpy(internalAddress, Network::GetAddressStringW(db->internal_IPv4), 32);
+    wchar_t publicAddress[32];
+    publicAddress[0] = L'\0';
+    wcsncpy(publicAddress, Network::GetAddressStringW(db->pub_IPv4), 32);
+    Log::Write(Log::LT_DEBUG, L"GameWorld.cpp", 349,
+        L"[game-world-cluster], setup to, world-cluster-id:%d, public-ip:%s, internal-ip:%s, public-port:%d, mobile-port:%d, max-player-count:%d, max-waiting-count:%d",
+        db->clusterId, publicAddress, internalAddress, db->pub_port, db->mobile_port, db->maxPlayerCount,
+        db->maxWaitingCount);
+    _db = *db;
+    _currentEntranceCount = 0;
+    if (!_waitQueueList.Init(_db.maxWaitingCount))
+    {
+        Log::Write(Log::LT_ERROR, L"GameWorld.cpp", 356,
+            L"[game-world-cluster], setup fail; init wait queue fail, world-cluster-id:%d", _db.clusterId);
+        return false;
+    }
+    if (LobbyDaemon::_instance->_config->_usePerfMonitor)
+    {
+        wchar_t name[128];
+        swprintf_s(name, L"cluster%d_%d", _db.clusterId, GetCurrentProcessId());
+        if (!_counterSet.Create(name))
+        {
+            Log::Write(Log::LT_ERROR, L"GameWorld.cpp", 366,
+                L"[game-world-cluster], cannot create world cluster counterset, world-cluster-id:%d", _db.clusterId);
+        }
+        _counterSet.SetWorldClusterId(_db.clusterId);
+        UpdateCounters();
+    }
+    Log::Write(Log::LT_DEBUG, L"GameWorld.cpp", 373, L"[game-world-cluster], setup ok, world-cluster-id:%d", _db.clusterId);
+    return true;
+}
+
 // 0x4dc70
 long long GameWorldCluster::UpdateCounters()
 {
@@ -495,9 +553,159 @@ bool GameWorldRegistry::addGameWorldCluster(GameWorldCluster* cluster)
 }
 
 // 0x4ed00
-bool GameWorldRegistry::Setup(short, short)
+bool GameWorldRegistry::Setup(short minWid, short maxWid)
 {
-    LIFT_STUB(0x4ed00);
+    if (_worlds != nullptr)
+    {
+        Log::Write(Log::LT_ERROR, L"GameWorld.cpp", 891, L"[game-world-registry], setup fail; already setup");
+        return false;
+    }
+    if (minWid <= 0 || maxWid <= 0 || minWid > maxWid)
+    {
+        Log::Write(Log::LT_ERROR, L"GameWorld.cpp", 896,
+            L"[game-world-registry], setup fail; invalid id range, min:%d, max:%d", minWid, maxWid);
+        return false;
+    }
+
+    {
+        GameWorldCluster::DB** loads = nullptr;
+        int loadCount = 0;
+        int dbrtn = 0;
+        if (!LobbyDB::LoadGameWorldCluster(dbrtn, loads, loadCount))
+        {
+            Log::Write(Log::LT_ERROR, L"GameWorld.cpp", 907,
+                L"[game-world-registry], setup fail; load game-world-cluster fail, dbrtn:%d", dbrtn);
+            return false;
+        }
+        if (loads == nullptr)
+        {
+            Log::Write(Log::LT_ERROR, L"GameWorld.cpp", 912,
+                L"[game-world-registry], setup fail; game-world-cluster not exists");
+            return false;
+        }
+        for (GameWorldCluster::DB** it = loads; it != loads + loadCount; ++it)
+        {
+            GameWorldCluster::DB* db = *it;
+            if (db == nullptr)
+                continue;
+            void* mem = Memory::_Manager[2]->Alloc(sizeof(GameWorldCluster), L"GameWorld.cpp", 919);
+            GameWorldCluster* cluster = mem != nullptr ? ::new (mem) GameWorldCluster : nullptr;
+            if (cluster->Setup(db))
+            {
+                if (addGameWorldCluster(cluster))
+                {
+                    Log::Write(Log::LT_DEBUG, L"GameWorld.cpp", 922,
+                        L"[game-world-registry], setup game-world-cluster ok, world-cluster-id:%d", db->clusterId);
+                }
+                else
+                {
+                    Log::Write(Log::LT_ERROR, L"GameWorld.cpp", 925,
+                        L"== CRASH == [game-world-registry], setup game-world-cluster exception; duplicated, world-cluster-id:%d",
+                        db->clusterId);
+                    AlertSender::Write(L"GameWorld.cpp", 925,
+                        L"== CRASH == [game-world-registry], setup game-world-cluster exception; duplicated, world-cluster-id:%d",
+                        db->clusterId);
+                    if (cluster != nullptr)
+                        cluster->~GameWorldCluster();
+                    Memory::_Manager[2]->Free(cluster, L"GameWorld.cpp", 926);
+                }
+            }
+            else
+            {
+                Log::Write(Log::LT_ERROR, L"GameWorld.cpp", 930,
+                    L"[game-world-registry], setup game-world-cluster exception; setup fail, world-cluster-id:%d",
+                    db->clusterId);
+                if (cluster != nullptr)
+                    cluster->~GameWorldCluster();
+                Memory::_Manager[2]->Free(cluster, L"GameWorld.cpp", 931);
+            }
+            Memory::_Manager[2]->Free(db, L"GameWorld.cpp", 933);
+        }
+        Memory::_Manager[2]->Free(loads, L"GameWorld.cpp", 937);
+    }
+
+    int count = 0;
+    GameWorld::DB** loads = nullptr;
+    int loadcount = 0;
+    int dbrtn = 0;
+    if (!LobbyDB::LoadGameWorld(dbrtn, loads, loadcount))
+    {
+        Log::Write(Log::LT_ERROR, L"GameWorld.cpp", 948,
+            L"[game-world-registry], setup fail; load from db fail, dbrtn:%d", dbrtn);
+        return false;
+    }
+    _min = minWid;
+    _size = maxWid - minWid + 1;
+    _worlds = static_cast<GameWorld**>(
+        Memory::_Manager[2]->AllocZero(sizeof(GameWorld*) * _size, L"GameWorld.cpp", 954));
+    if (loads != nullptr)
+    {
+        for (GameWorld::DB** it = loads; it != loads + loadcount; ++it)
+        {
+            GameWorld::DB* db = *it;
+            if (db == nullptr)
+                continue;
+            if (db->wid < minWid || db->wid > maxWid)
+            {
+                Log::Write(Log::LT_ERROR, L"GameWorld.cpp", 964,
+                    L"[game-world-registry], setup game-world exception; game-world id is out of range, wid:%d, allowed-range:[%d, %d]",
+                    db->wid, minWid, maxWid);
+                continue;
+            }
+            GameWorldCluster* cluster = getGameWorldCluster(db->clusterId);
+            if (cluster == nullptr)
+            {
+                Log::Write(Log::LT_ERROR, L"GameWorld.cpp", 970,
+                    L"[game-world-registry], setup game-world exception; game-world-cluster not exists, wid:%d, world-cluster-id:%d",
+                    db->wid, db->clusterId);
+                continue;
+            }
+            void* mem = Memory::_Manager[2]->Alloc(sizeof(GameWorld), L"GameWorld.cpp", 974);
+            GameWorld* world = mem != nullptr ? ::new (mem) GameWorld : nullptr;
+            if (world->Setup(db, cluster))
+            {
+                GameWorld*& slot = _worlds[world->GetDB().wid - _min];
+                if (slot == nullptr)
+                {
+                    slot = world;
+                    cluster->addGameWorld(world);
+                    ++count;
+                    Log::Write(Log::LT_DEBUG, L"GameWorld.cpp", 981, L"[game-world-registry], setup game-world ok, wid:%d",
+                        db->wid);
+                }
+                else
+                {
+                    Log::Write(Log::LT_ERROR, L"GameWorld.cpp", 984,
+                        L"== CRASH == [game-world-registry], setup exception; game-world id duplicated");
+                    AlertSender::Write(L"GameWorld.cpp", 984,
+                        L"== CRASH == [game-world-registry], setup exception; game-world id duplicated");
+                    delete world;
+                    Memory::_Manager[2]->Free(world, L"GameWorld.cpp", 985);
+                }
+            }
+            else
+            {
+                Log::Write(Log::LT_ERROR, L"GameWorld.cpp", 990,
+                    L"[game-world-registry], setup exception; setup game-world fail");
+                if (world != nullptr)
+                    delete world;
+                Memory::_Manager[2]->Free(world, L"GameWorld.cpp", 991);
+            }
+        }
+    }
+    Log::Write(Log::LT_NOTICE, L"GameWorld.cpp", 997,
+        L"[game-world-registry], setup ok, game-world-cluster-count:%d, game-world-count:%d, reserved-range:[%d, %d]",
+        _clusterList.size(), count, minWid, maxWid);
+    if (loads != nullptr)
+    {
+        for (GameWorld::DB** it = loads; it != loads + loadcount; ++it)
+        {
+            if (*it != nullptr)
+                Memory::_Manager[2]->Free(*it, L"GameWorld.cpp", 1003);
+        }
+        Memory::_Manager[2]->Free(loads, L"GameWorld.cpp", 1005);
+    }
+    return true;
 }
 
 // 0x4f330
