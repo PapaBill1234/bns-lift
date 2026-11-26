@@ -1,4 +1,6 @@
 // WindowConsole.obj (CacheGate PDB).
+// 0x17090: the placement new expressions have EH cleanup (the global placement delete, lessons A14).
+#include "PlacementNew.h"
 #include "WindowConsole.h"
 #include "Daemon.h"
 #include "Log.h"
@@ -20,11 +22,7 @@ WinMsgHandler::WinMsgHandler(WindowConsole* console)
     _console = console;
     // 0x17090: the event pointer stays in a register. CreateEventW stores through it (no reload of _initEvent).
     void* memory = BASE_MEMORY_MANAGER.Alloc(sizeof(SystemEvent), WINDOW_CONSOLE_FILE, 44);
-    SystemEvent* initEvent;
-    if (memory != nullptr)
-        initEvent = new (memory) SystemEvent();
-    else
-        initEvent = nullptr;
+    SystemEvent* initEvent = (memory != nullptr) ? ::new (memory) SystemEvent() : nullptr;
     _initEvent = initEvent;
     initEvent->Event = CreateEventW(nullptr, FALSE, FALSE, nullptr);
 }
@@ -190,13 +188,14 @@ bool WindowConsole::Open()
 
     // 0x17090 loads the vtable before the two Name calls and reloads `this` after them.
     // The arguments are evaluated from right to left: the first Name call gives the title.
-    if (!_consoleWindow.console->Initialize(nullptr, Daemon::Instance->Name(), Daemon::Instance->Name(), nullptr,
+    // The vtable comes from the tested local (loaded before the Name calls).
+    if (!console->Initialize(nullptr, Daemon::Instance->Name(), Daemon::Instance->Name(), nullptr,
                                             (void*)WindowConsoleOnClose, &_reloadHandler, &_shutdownHandler,
                                             nullptr, &_endSessionHandler))
         return false;
 
     void* memory = BASE_MEMORY_MANAGER.Alloc(sizeof(WinMsgHandler), WINDOW_CONSOLE_FILE, 157);
-    WinMsgHandler* handler = (memory != nullptr) ? new (memory) WinMsgHandler(this) : nullptr;
+    WinMsgHandler* handler = (memory != nullptr) ? ::new (memory) WinMsgHandler(this) : nullptr;
     _messageHandler = handler;
     // LIFT: LTCG folded threadId. The call (0x17325) sets no r8. StartThread (0x12E40) writes r8
     // at 0x12E5F before it reads it.

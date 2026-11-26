@@ -64,3 +64,28 @@ Function: `WindowConsole::Open` (CG 0x17090, LG 0x2b880, SCD 0x26c70, POD 0x346e
 
 - `src/Server/BloodLib/source/WindowConsole.cpp`
 - `Docs/Plan/handoffs/lift-lobbydaemon-v2b2-wco.md`
+
+# Handoff: lift-lobbydaemon-v2b2-wco (session 3 of 4)
+
+## What I changed
+
+Function: `WindowConsole::Open` (CG 0x17090, LG 0x2b880, SCD 0x26c70, POD 0x346e0).
+
+1. `WindowConsole.cpp` includes `PlacementNew.h` first. The 2 placement new expressions use `::new`
+   (`WinMsgHandler` at line 157, `SystemEvent` at line 44). This is the lessons A14 form (EH cleanup with the global placement delete).
+   Evidence: after the `WinMsgHandler` allocation the original stores the pointer to 2 stack slots (`mov qword ptr [rsp+N], rax` twice).
+   The lift stores it once. The pseudocode shows an extra `-2` argument slot (EH state). The `SystemEvent` merge
+   (`mov s4, rax` / `jmp` / `mov s4, s3`) can also come from the EH new-expression form.
+2. The `SystemEvent` allocation is now a ternary: `memory ? ::new (memory) SystemEvent() : nullptr`, kept in a local.
+3. The `Initialize` call uses the tested local `console` (vtable source) in place of `_consoleWindow.console`.
+   Evidence: the original loads the vtable from the tested register before the Name calls.
+
+## Not done (if the build shows that the diff stays)
+
+`WindowConsole::Open` (all 4 exes): the causes of session 2 stay open (zero register CSE, early return block layout, LG `xor r8d, r8d`).
+Forms tried in total: session 1 forms 1 to 3, the lead test p11, session 2 form 1, and session 3 forms 1 to 3.
+
+## Files changed (session 3)
+
+- `src/Server/BloodLib/source/WindowConsole.cpp`
+- `Docs/Plan/handoffs/lift-lobbydaemon-v2b2-wco.md`
