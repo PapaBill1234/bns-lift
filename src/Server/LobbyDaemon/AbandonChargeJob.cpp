@@ -28,8 +28,7 @@ LobbyJobStateDef const StateDef[] = {{0, L"INIT"}, {1, L"ABANDON_CHARGE"}, {2, L
 }
 
 LobbyJobDef AbandonChargeJob::_def = {18, StateDef, 2, L"AbandonChargeJob"};  // 0x2020e0
-// LIFT: AbandonChargeJob::_pool (0x2037b0: id 1, size 0xf0) has no definition. The LobbyDaemon ObjectPool module is
-// not in lift_lobbydaemon (see CliSession.cpp).
+// LIFT: AbandonChargeJob::_pool (0x2037b0: id 1, size 0xf0) is defined at the end of this file (gap-26, LobbyObjectPool.cpp).
 
 // 0x4f70
 LobbyJobDef const* AbandonChargeJob::GetDefinition() const

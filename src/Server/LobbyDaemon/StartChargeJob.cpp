@@ -49,8 +49,7 @@ LobbyJobStateDef const StateDef[] = {{0, L"INIT"}, {1, L"START_CHARGE"}, {2, L"F
 }
 
 LobbyJobDef StartChargeJob::_def = {16, StateDef, 2, L"StartChargeJob"};  // 0x2019d0
-// LIFT: StartChargeJob::_pool (0x204f10: id 1, size 0x70) has no definition. The LobbyDaemon ObjectPool module is not
-// in lift_lobbydaemon (see CliSession.cpp).
+// LIFT: StartChargeJob::_pool (0x204f10: id 1, size 0x70) is defined at the end of this file (gap-26, LobbyObjectPool.cpp).
 
 // 0x75570
 LobbyJobDef const* StartChargeJob::GetDefinition() const

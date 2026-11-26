@@ -33,9 +33,10 @@ void* ExtendJumpingCharacterCreationQuotaJob::_vtbl()
 }
 
 // 0x2a440
-ExtendJumpingCharacterCreationQuotaJob::ExtendJumpingCharacterCreationQuotaJob(CliSession* owner) : CliSessionJob(owner)  // LIFT: base init only (fix7 layout)
+ExtendJumpingCharacterCreationQuotaJob::ExtendJumpingCharacterCreationQuotaJob(CliSession* owner)
+    : CliSessionJob(owner), _tran(nullptr), _lgate(nullptr), _gamed(nullptr), _gamedTid(0), _acciv(nullptr), _labelId(0),
+      _itemInstanceId(0), _itemDataId(0), _serviceId(0)
 {
-    LIFT_STUB(0x2a440);
 }
 
 // 0x2a4c0
@@ -159,9 +160,9 @@ void* UpgradeJumpingCharacterStateJob::_vtbl()
 }
 
 // 0x2d4c0
-UpgradeJumpingCharacterStateJob::UpgradeJumpingCharacterStateJob(CliSession* owner) : CliSessionJob(owner)  // LIFT: base init only (fix7 layout)
+UpgradeJumpingCharacterStateJob::UpgradeJumpingCharacterStateJob(CliSession* owner)
+    : CliSessionJob(owner), _gamed(nullptr), _gamedTid(0), _wid(0), _pcId(0), _jumpingCharacterState(0), _consumeCreationQuota(false)
 {
-    LIFT_STUB(0x2d4c0);
 }
 
 // 0x2d550

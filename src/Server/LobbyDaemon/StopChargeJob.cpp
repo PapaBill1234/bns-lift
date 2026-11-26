@@ -30,8 +30,7 @@ LobbyJobStateDef const StateDef[] = {{0, L"INIT"}, {1, L"STOP_CHARGE"}, {2, L"FI
 }
 
 LobbyJobDef StopChargeJob::_def = {17, StateDef, 2, L"StopChargeJob"};  // 0x201990
-// LIFT: StopChargeJob::_pool (0x205070: id 1, size 0xf8) has no definition. The LobbyDaemon ObjectPool module is not
-// in lift_lobbydaemon (see CliSession.cpp).
+// LIFT: StopChargeJob::_pool (0x205070: id 1, size 0xf8) is defined at the end of this file (gap-26, LobbyObjectPool.cpp).
 
 // 0x77c90
 LobbyJobDef const* StopChargeJob::GetDefinition() const
