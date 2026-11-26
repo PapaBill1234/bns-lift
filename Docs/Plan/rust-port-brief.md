@@ -55,7 +55,7 @@ The lead may change these ideas with a reason in `ARCHITECTURE.md`.
 1. Make the worktree. Run `cargo new --lib` for the workspace members.
 2. Write `ARCHITECTURE.md`: crates, data flow diagram, shard model, message types, error rules.
 3. Write the shared contracts as code: the `Service` trait of a sans-IO core, the event and action types, the packet `Codec` trait, the session id type. Make them compile.
-4. Commit to `rust/main`.
+4. Commit to `main` of bns-rust-emulator.
 
 ## Step 2: launch 10 agents
 
