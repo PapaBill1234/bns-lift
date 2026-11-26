@@ -111,7 +111,95 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Aes128::BlockSize": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Aes128::Cleanup": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Aes128::Decrypt": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Aes128::EncSize": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Aes128::Encrypt": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Aes128::GetType": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Aes128::Setup": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Aes128NI_Decrypt": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"Aes128NI_Encrypt": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"Aes128NI_Setup": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"Aes128Table_Decrypt": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Aes128Table_Encrypt": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"Aes128Table_Setup": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -307,7 +395,71 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"BaseRefCntObj::deallocate_me": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BaseRefCntObj::~BaseRefCntObj": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "BloodDaemonMain": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Blowfish::BlockSize": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Blowfish::Cleanup": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Blowfish::Decrypt": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Blowfish::EncSize": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Blowfish::Encrypt": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"Blowfish::GetType": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Blowfish::Setup": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -664,6 +816,14 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"CliSessionTable::Delete_index_account": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
 "CliSessionTable::Delete_index_gate": {
 "calls": 100,
 "consts": 100,
@@ -706,6 +866,14 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"CliSessionTable::Select_index_account": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
 "CliSessionTable::Select_index_gate": {
 "calls": 100,
 "consts": 100,
@@ -726,6 +894,14 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"Connection::Accept": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
 },
 "Connection::AsyncConnect": {
 "calls": 100,
@@ -859,6 +1035,44 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"Crypto::Destroy": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Crypto::Initialize": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"Ctr::Decrypt": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Ctr::Encrypt": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"Ctr::Setup": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
 },
 "Daemon::Cooldown": {
 "calls": 100,
@@ -2078,6 +2292,13 @@
 "score": 60.0,
 "status": "DIFF"
 },
+"GrowingBuffer::grow": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "HandleLobbyGame_CancelRegisterGuildNotify": {
 "calls": 100,
 "consts": 100,
@@ -2323,6 +2544,27 @@
 "score": 80.4,
 "status": "DIFF"
 },
+"HandleLobbyManage_CleanupGameAccountIdIndexReq": {
+"calls": 55,
+"consts": 100,
+"refs": 100,
+"score": 84.8,
+"status": "DIFF"
+},
+"HandleLobbyManage_CleanupPcidIndexReq": {
+"calls": 57,
+"consts": 100,
+"refs": 100,
+"score": 85.7,
+"status": "DIFF"
+},
+"HandleLobbyManage_HelloReq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "HandlePostOfficeHelloFail": {
 "calls": 100,
 "consts": 100,
@@ -2485,6 +2727,41 @@
 "status": "MATCH"
 },
 "InitSymbol": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"IoWorker::Initialize": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"IoWorker::Name": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"IoWorker::run": {
+"calls": 69,
+"consts": 88,
+"refs": 97,
+"score": 84.9,
+"status": "DIFF"
+},
+"IoWorker::stop": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"IoWorker::yield": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -2855,6 +3132,14 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"LobbyDaemon::initNetwork": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
 "LobbyDaemon::setArgument": {
 "calls": 100,
 "consts": 100,
@@ -3148,6 +3433,49 @@
 "refs": 82,
 "score": 81.6,
 "status": "DIFF"
+},
+"LobbyGateChannelManager::OnAccept": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyGateChannelManager::OnClose": {
+"calls": 88,
+"consts": 89,
+"refs": 90,
+"score": 89.0,
+"status": "DIFF"
+},
+"LobbyGateChannelManager::OnConnect": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"LobbyGateChannelManager::PacketHandler": {
+"calls": 96,
+"consts": 100,
+"refs": 100,
+"score": 98.8,
+"status": "DIFF"
+},
+"LobbyGateChannelManager::Remove": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyGateChannelManager::~LobbyGateChannelManager": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "LobbyGatePresence::IsEqual": {
 "calls": 100,
@@ -3555,6 +3883,69 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"ManageChannel::GetId": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ManageChannel::SendCleanupGameAccountIdIndexFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ManageChannel::SendCleanupGameAccountIdIndexOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ManageChannel::SendCleanupPcidIndexFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ManageChannel::SendCleanupPcidIndexOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ManageSessionHandler::OnAccept": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ManageSessionHandler::OnClose": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ManageSessionHandler::OnConnect": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ManageSessionHandler::PacketHandler": {
+"calls": 79,
+"consts": 100,
+"refs": 100,
+"score": 93.0,
+"status": "DIFF"
+},
 "MembershipMileage::Accept": {
 "calls": 100,
 "consts": 100,
@@ -3674,12 +4065,26 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Network::Initialize": {
+"calls": 91,
+"consts": 83,
+"refs": 94,
+"score": 89.3,
+"status": "DIFF"
+},
 "Network::Network": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"Network::OpenPort [?OpenPort@Network@@SA_NIGHPEBVSessionHandler@@PEBVPacketBufferHandler@@I_N22@Z]": {
+"calls": 100,
+"consts": 100,
+"refs": 94,
+"score": 97.9,
+"status": "DIFF"
 },
 "Network::ReconnectSession": {
 "calls": 100,
@@ -3689,6 +4094,21 @@
 "status": "MATCH"
 },
 "Network::initInstance": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Network::initWorkerThread": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"Network::initializeSocketInterface": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -3989,6 +4409,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"PagePoolMemoryManager::~PagePoolMemoryManager": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "PipeCommandProcess::Name": {
 "calls": 100,
 "consts": 100,
@@ -4157,6 +4584,28 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Port::Clear": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Port::Initialize": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"Port::MakeNewSession [?MakeNewSession@Port@@IEAAPEAVSession@@PEA_KKGH@Z]": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Port::MakeNewSession [?MakeNewSession@Port@@IEAA_NKGPEAVChannel@@J_N1PEAPEAVSession@@@Z]": {
 "calls": 100,
 "consts": 100,
@@ -4178,12 +4627,64 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Port::clearPool": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Port::makeSession": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"PortListener::Clear": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PortListener::HandleEvent": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PortListener::HandleFailedEvent": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"PortListener::Initialize": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"PortListener::accept": {
+"calls": 90,
+"consts": 100,
+"refs": 100,
+"score": 96.7,
+"status": "DIFF"
+},
+"PortListener::asyncAccept": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
 },
 "PostOfficeChannel::Connect": {
 "calls": 100,
@@ -4228,6 +4729,71 @@
 "status": "MATCH"
 },
 "PostOfficeSessionHandler::PacketHandler": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Prng::Initialize": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"Prng::addEntropy": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Prng::setSeed": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RawPacketBufferHandler::AllocSize": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RawPacketBufferHandler::Clone": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"RawPacketBufferHandler::Destroy": {
+"calls": 50,
+"consts": 100,
+"refs": 77,
+"score": 75.6,
+"status": "DIFF"
+},
+"RawPacketBufferHandler::ToBuffer": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RawPacketBufferHandler::ToPacket": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RawPacketBufferHandler::~RawPacketBufferHandler": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -4409,6 +4975,14 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Ripemd160::Digest": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
 "Section<__int64>::Intersect<__int64,std::vector,StlAllocator<Section<__int64>,2> >": {
 "calls": 100,
 "consts": 100,
@@ -4422,6 +4996,14 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"Session::Accept": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
 },
 "Session::Connect": {
 "calls": 100,
@@ -4443,6 +5025,13 @@
 "refs": 97,
 "score": 98.5,
 "status": "DIFF"
+},
+"Session::HandleFailedEvent": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Session::Recv": {
 "calls": 100,
@@ -4584,6 +5173,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"SessionPool::Initialize": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "SessionPool::MakeSession": {
 "calls": 100,
 "consts": 100,
@@ -4598,12 +5194,26 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"SessionPool::SessionPool": {
+"calls": 100,
+"consts": 100,
+"refs": 75,
+"score": 91.7,
+"status": "DIFF"
+},
 "SessionPool::addToPool": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"SessionPool::~SessionPool": {
+"calls": 100,
+"consts": 100,
+"refs": 88,
+"score": 95.8,
+"status": "DIFF"
 },
 "SessionSendBuffer::Add": {
 "calls": 100,
@@ -4718,6 +5328,13 @@
 "status": "MATCH"
 },
 "SharedChannelFragmentPacketHandleEvent::~SharedChannelFragmentPacketHandleEvent": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"SharedChannelList::Initialize": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -5193,6 +5810,36 @@
 "score": 65.6,
 "status": "DIFF"
 },
+"TrustedPacketBufferHandler::Clone": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"TrustedPacketBufferHandler::Destroy": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TrustedPacketBufferHandler::ToBuffer": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TrustedPacketBufferHandler::ToPacket": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
 "WaitQueue::Remove": {
 "calls": 100,
 "consts": 50,
@@ -5445,6 +6092,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"ZSTD_CCtx_resetParameters": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "ZSTD_DUBT_findBestMatch": {
 "calls": 100,
 "consts": 100,
@@ -5613,6 +6267,20 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"ZSTD_cpuid": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_createCCtx_advanced": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "ZSTD_downscaleStat": {
 "calls": 100,
 "consts": 100,
@@ -5767,7 +6435,56 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"aes128TableDecrypt": {
+"calls": 100,
+"consts": 60,
+"refs": 50,
+"score": 70.0,
+"status": "DIFF"
+},
+"aes128TableEncrypt": {
+"calls": 100,
+"consts": 60,
+"refs": 50,
+"score": 70.0,
+"status": "DIFF"
+},
+"aes128TableSetupDecKey": {
+"calls": 100,
+"consts": 75,
+"refs": 100,
+"score": 91.7,
+"status": "DIFF"
+},
+"aes128TableSetupEncKey": {
+"calls": 100,
+"consts": 67,
+"refs": 100,
+"score": 88.9,
+"status": "DIFF"
+},
 "atexit": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"decrypt": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"encrypt": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"hash": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
