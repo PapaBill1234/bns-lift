@@ -1,6 +1,7 @@
 // RefCntObject.obj (CacheGate PDB). Layouts from include/pdb/CacheGate/types.h.
 #pragma once
 #include <stddef.h>
+#include "MemoryManager.h"
 
 class RefCntObject;
 
@@ -85,6 +86,14 @@ class BaseRefCntObj : public RefCntObject
 {
 public:
     virtual ~BaseRefCntObj();
+    // PDB: public static operator new(unsigned __int64, wchar_t const*, int); inlined (no rva).
+    // The matching delete is RefCntObject::operator delete(void*, wchar_t const*, int): the EH cleanup
+    // `Port::Initialize'::`1'::dtor$0 (CacheGate 0x3a920) calls it when the constructor throws.
+    // LIFT: throw() gives the null test after the call, as in the original Port::Initialize.
+    static void* operator new(size_t size, wchar_t const* file, int line) throw()
+    {
+        return BASE_MEMORY_MANAGER.Alloc(size, file, line);
+    }
 protected:
     virtual void deallocate_me(void* ptr, wchar_t const* file, int line);
 };
