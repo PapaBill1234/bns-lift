@@ -364,17 +364,17 @@
 "status": "DIFF"
 },
 "CacheDList::LoadCachedListConfigFile": {
-"calls": 97,
+"calls": 98,
 "consts": 100,
 "refs": 98,
-"score": 98.5,
+"score": 98.8,
 "status": "DIFF"
 },
 "CacheDList::MakeSessionAll": {
-"calls": 89,
+"calls": 94,
 "consts": 100,
 "refs": 100,
-"score": 96.3,
+"score": 98.0,
 "status": "DIFF"
 },
 "CacheDList::RemoveSessionAll": {

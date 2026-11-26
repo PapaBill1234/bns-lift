@@ -1442,10 +1442,10 @@
 "status": "DIFF"
 },
 "HandleSmartCoupon_HelloReq": {
-"calls": 97,
+"calls": 99,
 "consts": 93,
-"refs": 98,
-"score": 96.1,
+"refs": 99,
+"score": 96.9,
 "status": "DIFF"
 },
 "HeapMemoryManager::Alloc": {
@@ -1939,10 +1939,10 @@
 "status": "MATCH"
 },
 "NPChannel::SendMsg": {
-"calls": 94,
-"consts": 90,
-"refs": 87,
-"score": 90.1,
+"calls": 100,
+"consts": 86,
+"refs": 85,
+"score": 90.3,
 "status": "DIFF"
 },
 "NPChannel::Setup": {

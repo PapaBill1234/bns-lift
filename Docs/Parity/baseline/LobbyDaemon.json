@@ -6572,10 +6572,10 @@
 "status": "MATCH"
 },
 "NPChannel::SendMsg": {
-"calls": 76,
-"consts": 85,
-"refs": 84,
-"score": 81.8,
+"calls": 84,
+"consts": 72,
+"refs": 83,
+"score": 79.6,
 "status": "DIFF"
 },
 "NPChannel::checkLibError": {
@@ -6632,10 +6632,10 @@
 "status": "EXCLUDED"
 },
 "NPGameServiceChannel::SendRequestFriendSendMessage": {
-"calls": 74,
+"calls": 81,
 "consts": 42,
 "refs": 36,
-"score": 50.7,
+"score": 53.3,
 "status": "DIFF"
 },
 "NPGameServiceChannel::SendRequestGradeListAllGrades": {

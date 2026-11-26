@@ -758,8 +758,8 @@
 "ClientSessionTimerJob::HandleEvent": {
 "calls": 100,
 "consts": 94,
-"refs": 96,
-"score": 96.8,
+"refs": 100,
+"score": 98.0,
 "status": "DIFF"
 },
 "ClientSessionTimerJob::TimerClass": {
@@ -1477,10 +1477,10 @@
 "status": "MATCH"
 },
 "GateKeyManager::MakeGateKey": {
-"calls": 89,
+"calls": 94,
 "consts": 100,
 "refs": 94,
-"score": 94.3,
+"score": 96.2,
 "status": "DIFF"
 },
 "GateKeyManager::RemoveGateKey": {
@@ -1624,10 +1624,10 @@
 "status": "MATCH"
 },
 "HandleLobbyGate_HelloReq": {
-"calls": 91,
-"consts": 89,
+"calls": 100,
+"consts": 82,
 "refs": 100,
-"score": 93.3,
+"score": 94.1,
 "status": "DIFF"
 },
 "HandleLobbyGate_LoginWithLobbyTokenReq": {
@@ -1708,10 +1708,10 @@
 "status": "MATCH"
 },
 "HandleLobbyLobbyGate_HelloOk": {
-"calls": 92,
-"consts": 92,
-"refs": 78,
-"score": 87.3,
+"calls": 100,
+"consts": 100,
+"refs": 98,
+"score": 99.3,
 "status": "DIFF"
 },
 "HandleLobbyLobbyGate_InitSessionWithLobbyTokenFail": {
@@ -2121,10 +2121,10 @@
 "status": "MATCH"
 },
 "LobbyGate::reload": {
-"calls": 73,
-"consts": 92,
+"calls": 78,
+"consts": 100,
 "refs": 97,
-"score": 87.1,
+"score": 91.5,
 "status": "DIFF"
 },
 "LobbyGate::setArgument": {
