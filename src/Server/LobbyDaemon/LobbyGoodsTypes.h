@@ -3,7 +3,22 @@
 #include <stddef.h>
 
 class FragmentPacket;
-struct GoodsItem;
+
+// LIFT: gap-24. AccountInventoryLobbyPacketHandler fills an array of this type in HandleAccountInventoryLobby_ListGoodsOk (0x8d00).
+struct GoodsItem
+{
+public:
+    unsigned int itemNumber;
+    int itemAmount;
+    unsigned int itemDataId;
+    char* customizedItemAttribute_1;
+    int customizedItemAttribute_1_Size;
+    char* customizedItemAttribute_2;
+    int customizedItemAttribute_2_Size;
+};
+static_assert(sizeof(GoodsItem) == 0x30, "sizeof GoodsItem");
+static_assert(offsetof(GoodsItem, customizedItemAttribute_1) == 0x10, "GoodsItem::customizedItemAttribute_1");
+static_assert(offsetof(GoodsItem, customizedItemAttribute_2) == 0x20, "GoodsItem::customizedItemAttribute_2");
 
 struct Goods
 {
@@ -42,3 +57,23 @@ public:
 static_assert(sizeof(LobbyServiceItem) == 0x20, "sizeof LobbyServiceItem");
 static_assert(offsetof(LobbyServiceItem, dataId) == 0x18, "LobbyServiceItem::dataId");
 static_assert(offsetof(LobbyServiceItem, state) == 0x1C, "LobbyServiceItem::state");
+
+struct CharacterInventoryItem;
+
+// LIFT: gap-24. HandleAccountInventoryLobby_GoodsInventoryChangedNotify (0xb510) fills a local of this type for
+// CliSession::NotifyGoodsInventoryChangedAlongPresence (0x392c0).
+struct GoodsInventoryChangedNotifyParam
+{
+    char changedActionType;
+    CharacterInventoryItem* items;
+    int itemCount;
+    char itemRemain;
+    unsigned long long goodsLabelIdMin;
+    unsigned long long goodsItemInsIdMin;
+};
+static_assert(sizeof(GoodsInventoryChangedNotifyParam) == 0x28, "sizeof GoodsInventoryChangedNotifyParam");
+static_assert(offsetof(GoodsInventoryChangedNotifyParam, items) == 0x8, "GoodsInventoryChangedNotifyParam::items");
+static_assert(offsetof(GoodsInventoryChangedNotifyParam, itemCount) == 0x10, "GoodsInventoryChangedNotifyParam::itemCount");
+static_assert(offsetof(GoodsInventoryChangedNotifyParam, itemRemain) == 0x14, "GoodsInventoryChangedNotifyParam::itemRemain");
+static_assert(offsetof(GoodsInventoryChangedNotifyParam, goodsLabelIdMin) == 0x18, "GoodsInventoryChangedNotifyParam::goodsLabelIdMin");
+static_assert(offsetof(GoodsInventoryChangedNotifyParam, goodsItemInsIdMin) == 0x20, "GoodsInventoryChangedNotifyParam::goodsItemInsIdMin");

@@ -5,6 +5,7 @@
 #include <windows.h>
 #include <new>
 #include "AccountInventoryChannel.h"
+#include "AccountInventoryLobbyPacketHandler.h"
 #include "AlertSender.h"
 #include "Connection.h"
 #include "Daemon.h"
@@ -48,20 +49,6 @@ wchar_t const* const ACCOUNT_INVENTORY_FILE = L"AccountInventoryChannel.cpp";
 wchar_t const* const SESSION_FILE = L"source\\Session.cpp";
 
 }
-
-// PDB AccountInventoryLobbyPacketHandlerDef (sizeof 16).
-struct AccountInventoryLobbyPacketHandlerDef
-{
-    void* handler;
-    bool auth;
-    bool fragment;
-};
-static_assert(sizeof(AccountInventoryLobbyPacketHandlerDef) == 0x10, "sizeof AccountInventoryLobbyPacketHandlerDef");
-
-// PDB global (37 entries). No lifted module owns the table yet.
-// LIFT: ld-18 defines it with null entries so that LobbyDaemon.exe links. The handler card fills it and then removes this
-// definition. ❓ The original entries (handler, auth, fragment) are not read.
-AccountInventoryLobbyPacketHandlerDef AccountInventoryLobbyPacketLobbySideHandlerList[37];
 
 // The game-account-id log arguments: id1 id2 id3 id4[0..7] (format %08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X).
 // LIFT: lift-only macro. It writes the guid fields as the original call sites do for the %08X-%04X-... log text (0x82f0 and the send functions).

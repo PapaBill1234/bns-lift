@@ -390,6 +390,7 @@ add_library(lift_lobbydaemon STATIC
   src/Server/LobbyDaemon/AccountInventory.cpp  # LIFT: Goods::Fetch (0x6010) stub; no card owns the module, SendListGoodsOk (0xbe770) calls it
   src/Server/LobbyDaemon/AccountInventoryChannel.cpp
   src/Server/LobbyDaemon/AccountInventoryLobbyPacketHandler.cpp
+  src/Server/LobbyDaemon/AccountInventoryLobbyPacketLobbySideHandlerList.cpp
   src/Server/LobbyDaemon/ActivateGradeJob.cpp
   src/Server/LobbyDaemon/AddSlotJob.cpp
   src/Server/LobbyDaemon/AuctionBidJob.cpp

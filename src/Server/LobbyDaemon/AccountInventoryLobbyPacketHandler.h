@@ -1,5 +1,4 @@
-// AccountInventoryLobbyPacketHandler.obj (LobbyDaemon PDB, 2019 + PDB). Wave 0: declarations of the stubbed functions only.
-// LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
+// AccountInventoryLobbyPacketHandler.obj (LobbyDaemon PDB, 2019 + PDB).
 #pragma once
 
 class FragmentPacketConcatenater;
@@ -29,3 +28,15 @@ bool HandleAccountInventoryLobby_ConsumeWarehouseItemFail(SharedChannel*, Packet
 bool HandleAccountInventoryLobby_RetrieveCharacterGoodsCountOk(SharedChannel*, Packet const*);  // 0xb0c0
 bool HandleAccountInventoryLobby_RetrieveCharacterGoodsCountFail(SharedChannel*, Packet const*);  // 0xb310
 bool HandleAccountInventoryLobby_GoodsInventoryChangedNotify(SharedChannel*, FragmentPacketConcatenater*);  // 0xb510
+
+// PDB AccountInventoryLobbyPacketHandlerDef (sizeof 16).
+struct AccountInventoryLobbyPacketHandlerDef
+{
+    void* handler;
+    bool auth;
+    bool fragment;
+};
+static_assert(sizeof(AccountInventoryLobbyPacketHandlerDef) == 0x10, "sizeof AccountInventoryLobbyPacketHandlerDef");
+
+// PDB global at .data rva 0x203520 (37 entries). AccountInventoryLobbyPacketLobbySideHandlerList.cpp has the definition.
+extern AccountInventoryLobbyPacketHandlerDef AccountInventoryLobbyPacketLobbySideHandlerList[37];
