@@ -13,12 +13,28 @@ triage, the instruction diffs and the Not-done reports of the batch authors. No 
 
 | Exe | Open | A | B | C |
 | --- | ---: | ---: | ---: | ---: |
-| CG | 24 | 7 | 17 | 0 |
-| LG | 50 | 19 | 31 | 0 |
-| SCD | 32 | 10 | 22 | 0 |
-| POD | 38 | 16 | 22 | 0 |
+| CG | 16 | 16 | 0 | 0 |
+| LG | 42 | 42 | 0 | 0 |
+| SCD | 20 | 20 | 0 | 0 |
+| POD | 29 | 29 | 0 | 0 |
 
 ## CacheGate (CG)
+
+### `0x2660` `CacheDList::Initialize` DIFF
+
+- Score: 93.3 (calls 100, refs 100, consts 80). Proof level: A.
+- Evidence (main 8af60dd, `-` original, `+` lift): orig 42 insns, lift 45 insns, 7 changed hunks; first divergence: `+mov qword ptr [rsp+N], rsi`.
+- Reason: `0x2660` CacheDList::Initialize (93.3 on main): the Hex-Rays text of the original is `v3 = Alloc(32); if (v3) { v3->_Mysize = 0; head = Alloc(48, StlMemory.h, 0x3c); ... } else v3 = nullptr; _cachedMap = v3; return v3 != nullptr;`. This is the inlined VS2010 `std::map` ctor in a placement new. The lift has the same statements, calls and constants (calls 100, refs 100). The diff is only register allocation: the lift keeps 0 in a callee-saved register (rsi: extra save and restore) and makes 0x3c and 0x30 with `lea r9d, [rsi+0x3c]` and `lea edx, [rsi+0x30]`; the original stores an immediate 0, loads `mov r9d, 0x3c` and makes 0x30 as `lea edx, [r9-0xc]`, and sets the null result with `xor`. The map ctor code comes from the VS2010 STL headers, so the source cannot change its store order. Forms tried: (1) two statements (Alloc, then `mem ? new (mem) CacheDMap() : nullptr`) in batch 1 (lessons.md line 398), (2) one placement-new expression (main, batch 1 author lift-lobbydaemon-v2b-cg-01 round 1, dac1f10): 93.3 both. Level A.
+- Tried: see the reason (lead note CacheGate-2660).
+- Earlier record: `lessons.md` lines 398.
+
+### `0x27d0` `CacheDList::MakeSessionAll` DIFF
+
+- Score: 98.0 (calls 94, refs 100, consts 100). Proof level: A.
+- Evidence (main 8af60dd, `-` original, `+` lift): orig 86 insns, lift 85 insns, 7 changed hunks; first divergence: `+movzx s4d, word ptr [s2+N]` / `+call Network::GetAddressStringW` / `-movzx s3d, word ptr [s2+N]`.
+- Reason: `0x27d0` CacheDList::MakeSessionAll (98.0 on main): the original has one `Network::GetAddressStringW` call in each branch of `if (connected)` (2 calls), and both branches jump to one merged `Log::Write` tail. The lift has the same statements, calls and constants (refs 100, consts 100). VS2010 LTCG hoists the two equal calls above the branch in the lift (1 call), so the lift keeps `_id` in a new callee-saved register; the remaining hunks are the loop-head `nop` alignment that moves with the shorter code. The hoist decision is in the optimizer, not in the source: the original source must have two calls, and the lift already has two. Forms tried: (1) two full `Log::Write` statements with the call in each argument list (aff8bac, batch 1 base), (2) a call in each branch with one shared `Log::Write` (batch 1 author lift-lobbydaemon-v2b-cg-01 round 1, dac1f10, main now); both DIFF, the call is hoisted in both. Level A.
+- Tried: see the reason (lead note CacheGate-27d0).
+- Earlier record: `lessons.md` lines 522.
 
 ### `0x2b20` `CacheDList::LoadCachedListConfigFile` DIFF
 
@@ -66,6 +82,22 @@ triage, the instruction diffs and the Not-done reports of the batch authors. No 
 - Tried: see the reason (v2b-cg-01).
 - Earlier record: `lessons.md` lines 438, 439.
 
+### `0xd2c0` `Network::OpenPort` DIFF
+
+- Score: 98.9 (calls 100, refs 97, consts 100). Proof level: A.
+- Evidence (main 8af60dd, `-` original, `+` lift): orig 171 insns, lift 171 insns, 11 changed hunks; first divergence: `-test ecx, ecx` / `-jne L` / `+cmp ecx, 1`.
+- Reason: `0xd2c0` Network::OpenPort (98.9 on main): the lift has the same calls, refs and asserts. The hunks are codegen only: (1) the id assert is `test ecx, ecx; jne` in the original and `cmp ecx, 1; jae` in the lift (LTCG keeps only the lower bound of `id < 1 || id > 24`); (2) the inlined `Port::Port` stores `_iocpHandle` after the lock init and `_listener` before `_sessionList` in the original; (3) the EH-state spill `mov [rsp+N], rbx` and the `[rsp+N], rax` copy are placed differently; (4) the original compares `_portNumber` with a zero register, the lift with an immediate. All of these follow the LTCG scheduler and register allocator. Forms tried: (a) `id == 0 || id > 24` (q p15 d1a2b95, results/ql-11.out: 98.9 -> 90.8, SCD 0x1a8b0 lost MATCH), (b) `Port()` body assignments in the original store order (q v2b2-port 0e8f709, results/ql-port.out: no score change in CG, LG, SCD, POD), (c) main form (member init list). Batch 1: the assert constant propagation was tried too (lessons.md line 523). Level A.
+- Tried: see the reason (lead note CacheGate-d2c0).
+- Earlier record: `lessons.md` lines 101, 447, 503, 523.
+
+### `0xf1c0` `Session::HandleEvent` DIFF
+
+- Score: 98.5 (calls 98, refs 97, consts 100). Proof level: A.
+- Evidence (main 8af60dd, `-` original, `+` lift): orig 242 insns, lift 246 insns, 28 changed hunks; first divergence: `+lea rdx, [L"source\Session.cpp"]` / `-lea rdx, [L"source\Session.cpp"]`.
+- Reason: `0xf1c0` Session::HandleEvent: the open differences are a compiler tail merge and instruction scheduling. The original merges the line-838 `Log::Write` into the shared 785/824 call (`mov r8d, 0x346; jmp L`); the 838 call has 6 arguments and the 824 call has 7. The lift gives the 838 block its own call. In the line-785 block the original stores the stack arguments before the `lea r9`/`lea rdx`/`mov r8d`/`xor ecx` loads; the lift does the reverse. Cause: cross-jumping and epilogue tail duplication select which of the 838 and 854 blocks (same end) merges; the source has no control of this choice. Forms tried (batch 1, lessons.md B lines 400 and 415; batch 2 card v2b2-shev, 2 rounds, no_gain): `goto` to one tail (98.5 -> 97.1); one common log call (98.5); `if (!result) { 854 } return true;` (97.4: the merge moves to the 854 block); a double `_connectContext` read, the `IdleStateTable::Pos` union split and the `_id` load before `WSAGetLastError` (these 3 agree with the original, score 98.7, no MATCH). Same diff in CG, LG, SCD and POD.
+- Tried: see the reason (lead note CacheGate-f1c0).
+- Earlier record: `lessons.md` lines 400, 415, 522, 571.
+
 ### `0x10950` `ClientSideDaemonChannel::~ClientSideDaemonChannel` DIFF
 
 - Score: 88.8 (calls 80, refs 94, consts 92). Proof level: A.
@@ -73,126 +105,79 @@ triage, the instruction diffs and the Not-done reports of the batch authors. No 
 - Reason: The original calls `RefCntHistory::add` out of line. The lift inlines it. Lessons B: a global `noinline` on `RefCntHistory::add` lost MATCH in other functions. No per-function form is allowed. Cause: inlining decision.
 - Tried: see the reason (v2b-cg-01).
 
-### `0x2660` `CacheDList::Initialize` DIFF
-
-- Score: 93.3 (calls 100, refs 100, consts 80). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 42 insns, lift 45 insns, 7 changed hunks; first divergence: `+mov qword ptr [rsp+N], rsi`.
-- Reason: constant_sharing (original keeps 0x3c in one register: store the fields in the original order and type).
-- Earlier record: `lessons.md` lines 398.
-
-### `0x27d0` `CacheDList::MakeSessionAll` DIFF
-
-- Score: 98.0 (calls 94, refs 100, consts 100). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 86 insns, lift 85 insns, 7 changed hunks; first divergence: `+movzx s4d, word ptr [s2+N]` / `+call Network::GetAddressStringW` / `-movzx s3d, word ptr [s2+N]`.
-- Reason: instruction_order (move the call statements into the original order (Network::GetAddressStringW)).
-- Earlier record: `lessons.md` lines 522.
-
-### `0xad50` `Daemon::Start` DIFF
-
-- Score: 97.0 (calls 100, refs 100, consts 91). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 121 insns, lift 120 insns, 1 changed hunks; first divergence: `-mov edx, 0x80`.
-- Reason: constant (LTCG may move constant args into the callee: look at the callee first; fix only if the source misses an argument (constant 0x80 in the original, none in the lift)).
-- Earlier record: `lessons.md` lines 56, 513.
-
-### `0xd2c0` `Network::OpenPort` DIFF
-
-- Score: 98.9 (calls 100, refs 97, consts 100). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 171 insns, lift 171 insns, 11 changed hunks; first divergence: `-test ecx, ecx` / `-jne L` / `+cmp ecx, 1`.
-- Reason: not referenced in ours (dropped or inlined).
-- Earlier record: `lessons.md` lines 101, 447, 503, 523.
-
-### `0xdf80` `Session::Session` DIFF
-
-- Score: 95.2 (calls 100, refs 86, consts 100). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 68 insns, lift 67 insns, 3 changed hunks; first divergence: `+mov dword ptr [rcx + 8], 0xa` / `-mov dword ptr [rcx + 8], 0xa`.
-- Reason: wrong callee: memory manager.
-- Earlier record: `lessons.md` lines 37, 43, 63, 85, 104, 107.
-
-### `0xf1c0` `Session::HandleEvent` DIFF
-
-- Score: 98.5 (calls 98, refs 97, consts 100). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 242 insns, lift 246 insns, 28 changed hunks; first divergence: `+lea rdx, [L"source\Session.cpp"]` / `-lea rdx, [L"source\Session.cpp"]`.
-- Reason: branch_inversion (swap if/else (invert the condition at the first divergence)).
-- Earlier record: `lessons.md` lines 400, 415, 522, 571.
-
-### `0x12dd0` `ThreadManager::Initialize` DIFF
-
-- Score: 88.9 (calls 100, refs 100, consts 67). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 30 insns, lift 29 insns, 4 changed hunks; first divergence: `-mov dword ptr [rcx], edx` / `+mov dword ptr [rcx], 0x80` / `-mov edx, edx`.
-- Reason: inlined but should not be.
-- Earlier record: `lessons.md` lines 513.
-
 ### `0x14ad0` `PipeCommandProcess::processCommand` DIFF
 
-- Score: 96.3 (calls 100, refs 100, consts 89). Proof level: B.
+- Score: 96.3 (calls 100, refs 100, consts 89). Proof level: A.
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 68 insns, lift 51 insns, 11 changed hunks; first divergence: `-nop word ptr [rax + rax]` / `-mov r8, qword ptr [s0 + 0x10]` / `-test r8, r8`.
-- Reason: constant (LTCG may move constant args into the callee: look at the callee first; fix only if the source misses an argument (constant -1 in the original, none in the lift)).
+- Reason: `0x14ad0` PipeCommandProcess::processCommand: calls, refs and string constants are equal; only the code form of the inline `wcscmp` differs. The original keeps the -1/0/1 value of each compare (`xor eax,eax; repe cmpsw; je L; sbb eax,eax; sbb eax,-1; L: test eax,eax; jne`) and has a loop-alignment `nop` at the loop head. The VS2010 build folds `wcscmp(...) == 0` into `repe cmpsw; jne` at every compare. Cause: an optimizer decision of the original build that the source does not control. Evidence: the LD reference GamedChannel::SendChangedGradeNotify (0x83ea0, MATCH) has 5 plain `wcscmp(...) == 0` compares and the `sbb` form only on the last one; the lift processCommand bodies fold also the last compare, so no compare position rule explains the original. Forms tried (batch 1 and batch 2 card v2b2-pcmd, 2 rounds, no_gain): `!wcscmp(...)`; `int r = wcscmp(...); if (r == 0)`; 2 more spellings (lessons.md B line 437); separate `if` statements with `continue`/`goto done` and `argv[0]` in a local; a file-static inline compare helper in the else-if chain (PipeConsole::processCommand went 97.0 -> 89.8). A command table with a switch adds a table and a loop that the original does not have. Same diff in CG, LG, SCD, POD and LD.
+- Tried: see the reason (lead note CacheGate-14ad0).
 - Earlier record: `lessons.md` lines 388, 437, 506, 527.
 
 ### `0x14fa0` `PipeConsole::processCommand` DIFF
 
-- Score: 97.0 (calls 100, refs 100, consts 91). Proof level: B.
+- Score: 97.0 (calls 100, refs 100, consts 91). Proof level: A.
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 134 insns, lift 109 insns, 11 changed hunks; first divergence: `-mov rdx, qword ptr [rax]` / `+mov rax, qword ptr [rax]`.
-- Reason: constant (LTCG may move constant args into the callee: look at the callee first; fix only if the source misses an argument (constant -1 in the original, none in the lift)).
+- Reason: `0x14fa0` PipeConsole::processCommand: calls, refs and string constants are equal; only the code form of the inline `wcscmp` differs. The original keeps the -1/0/1 value of each compare (`xor eax,eax; repe cmpsw; je L; sbb eax,eax; sbb eax,-1; L: test eax,eax; jne`) and has a loop-alignment `nop` at the loop head. The VS2010 build folds `wcscmp(...) == 0` into `repe cmpsw; jne` at every compare. Cause: an optimizer decision of the original build that the source does not control. Evidence: the LD reference GamedChannel::SendChangedGradeNotify (0x83ea0, MATCH) has 5 plain `wcscmp(...) == 0` compares and the `sbb` form only on the last one; the lift processCommand bodies fold also the last compare, so no compare position rule explains the original. Forms tried (batch 1 and batch 2 card v2b2-pcmd, 2 rounds, no_gain): `!wcscmp(...)`; `int r = wcscmp(...); if (r == 0)`; 2 more spellings (lessons.md B line 437); separate `if` statements with `continue`/`goto done` and `argv[0]` in a local; a file-static inline compare helper in the else-if chain (PipeConsole::processCommand went 97.0 -> 89.8). A command table with a switch adds a table and a loop that the original does not have. Same diff in CG, LG, SCD, POD and LD.
+- Tried: see the reason (lead note CacheGate-14fa0).
 - Earlier record: `lessons.md` lines 437, 506, 527.
 
 ### `0x157b0` `PipeConsole::run` DIFF
 
-- Score: 96.3 (calls 89, refs 100, consts 100). Proof level: B.
+- Score: 96.3 (calls 89, refs 100, consts 100). Proof level: A.
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 183 insns, lift 168 insns, 32 changed hunks; first divergence: `-push rbx` / `-push r13` / `-push r15`.
-- Reason: instruction_order (move the call statements into the original order (Log::Write)).
+- Reason: `0x157b0` PipeConsole::run (86.5 on main 3d1253a; same body in CG 0x157b0, LG 0x29fc0, SCD 0x253e0, POD 0x32dd0): the diff is register allocation and address CSE. The original keeps `i*0x4038` in a register and adds `this + 0x9a8 + off` at each field use (`cmp dword ptr [s4 + s0 + 0x9dc], s1d`). The lift computes one base pointer (`lea s4, [rax + s0 + 0x9a8]`) for every source form. Calls, refs and consts are equal. Forms tried: label place; `switch` and `if` chain (lessons B); signed index with a reference (lead p13); signed index with `_pipe[i]` at each use and per-site reconnect calls (author round 1); `int` result with `movsxd` after the call, no `- WAIT_OBJECT_0`, one `reconnect:` label (part 2); 64-bit index and a `broken = &_pipe[i]` pointer to one shared call (part 3). Card v2b2-pcrun: 2 rounds, no_gain (results/v2b2-pcrun.author.log). Level A.
+- Tried: see the reason (lead note CacheGate-157b0).
 - Earlier record: `lessons.md` lines 394, 412, 514.
-
-### `0x17090` `WindowConsole::Open` DIFF
-
-- Score: 95.2 (calls 100, refs 100, consts 86). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 146 insns, lift 143 insns, 22 changed hunks; first divergence: `-xor al, al` / `-mov byte ptr [s1+N], 1` / `+mov byte ptr [s1], 1`.
-- Reason: constant (use constant 0xc0 as the original (lift has 0x30); check enum/type width).
-- Earlier record: `lessons.md` lines 514.
 
 ### `0x19ac0` `IoWorker::run` DIFF
 
-- Score: 84.9 (calls 69, refs 97, consts 88). Proof level: B.
+- Score: 84.9 (calls 69, refs 97, consts 88). Proof level: A.
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 190 insns, lift 181 insns, 9 changed hunks; first divergence: `-mov ecx, 0x30` / `+mov ecx, 0x18` / `-mov ecx, dword ptr [s4 + 0x30]`.
-- Reason: branch_inversion (swap if/else (invert the condition at the first divergence)).
+- Reason: `0x19ac0` IoWorker::run: the first difference is a TLS slot offset. Original `mov ecx, 0x30`, lift `mov ecx, 0x18` (first divergence in tools/d.py, base build 666b998). The original TLS slots of `IoWorker::WorkerId`/`IoWorker::ZstdCCtx` are 16/48 (llvm-pdbutil THREAD32 records, section 0005); the lift slots are 8/24 in all 4 exes (tools/tls.sh). Cause: the LTCG code generator sets the order of the `__declspec(thread)` variables; the defining objs have the ltcg flag in S_COMPILE3. The same 2 adjacent BloodLib variables have different slots in each original exe (CG 16/48, LG 20/48, SCD 16/56, POD 24/56), so no single source declaration order gives them. Same cause and evidence as proof LobbyGate-5cf0 (batch 2). The offset is in a register that the function uses again, so funcdiff does not normalize it. Other differences (not the blocker): the Daemon state check (original signed `test/js; cmp 2; jle`, lift unsigned `cmp 2; jbe`) and the place of the !result block. Tried (batch 2): PDB check of all TLS records in the 4 exes; the TLS order is not a source choice.
+- Tried: see the reason (lead note CacheGate-19ac0).
 - Earlier record: `lessons.md` lines 527.
-
-### `0x1a1a0` `StaticPageMemoryManager::Initialize` DIFF
-
-- Score: 96.3 (calls 100, refs 89, consts 100). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 30 insns, lift 31 insns, 5 changed hunks; first divergence: `-je L` / `-lea rax, [rdx + 0x800]` / `-mov qword ptr [rcx + 8], rdx`.
-- Reason: ref order differs.
-- Earlier record: `lessons.md` lines 513.
 
 ### `0x38370` `aes128TableSetupEncKey` DIFF
 
-- Score: 88.9 (calls 100, refs 100, consts 67). Proof level: B.
+- Score: 97.0 (calls 100, refs 100, consts 91). Proof level: A.
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 159 insns, lift 182 insns, 15 changed hunks; first divergence: `-push rdi` / `+mov qword ptr [rsp+N], rdi` / `+push r14`.
-- Reason: hiword (use the HIWORD/LOWORD macro (shift and word forms as the original)).
+- Reason: `0x38370` aes128TableSetupEncKey (97.0 after card aes, all 5 exes; POD diff on lead q build 88f6dab): the source statements, the 5x unroll and all memory reads are equal (`movzx byte ptr [rk+13..15]`, same table reads, same stores). The rest is register allocation of the unrolled loop: the original saves one more callee-saved register (`push r13`) and keeps the 5th round value in it (`s4d`), the lift uses r9d. The Rcon base register has a different bias (`xor r10d, [s1+N]` with a positive offset in the original; `[s1 - 8]`, `[s1]` in the lift), because LTCG picks a different induction variable for `Rcon[i]`. Forms tried: shifts from the register for all bytes (base, 88.9); `for (;;)` with `if (++i == 10) return` and all bytes through a pointer (author round 1, 79.8, unroll lost); counted `for` loop with byte 0 from the register and bytes 1..3 from memory (author round 2, 97.0, landed 3d1253a). Level A.
+- Tried: see the reason (lead note CacheGate-38370).
 - Earlier record: `lessons.md` lines 512.
-
-### `0x385c0` `aes128TableSetupDecKey` DIFF
-
-- Score: 91.7 (calls 100, refs 100, consts 75). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 75 insns, lift 103 insns, 8 changed hunks; first divergence: `+mov qword ptr [rsp+N], rbx` / `+lea r9, [rdx + 0xa8]` / `-add rdx, 0xa8`.
-- Reason: constant (use constant 0xa8 as the original (lift has 0xa0); check enum/type width).
-- Earlier record: `lessons.md` lines 512.
-
-### `0x38790` `aes128TableEncrypt` DIFF
-
-- Score: 70.0 (calls 100, refs 50, consts 60). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 311 insns, lift 171 insns, 17 changed hunks; first divergence: `-push r14` / `-push r15` / `-mov eax, dword ptr [r8]`.
-- Reason: hiword (use the HIWORD/LOWORD macro (shift and word forms as the original)).
-- Earlier record: `lessons.md` lines 402, 512.
-
-### `0x38d10` `aes128TableDecrypt` DIFF
-
-- Score: 70.0 (calls 100, refs 50, consts 60). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 311 insns, lift 171 insns, 19 changed hunks; first divergence: `-push r14` / `-push r15` / `-mov eax, dword ptr [r8]`.
-- Reason: hiword (use the HIWORD/LOWORD macro (shift and word forms as the original)).
-- Earlier record: `lessons.md` lines 402, 512.
 
 ## LobbyGate (LG)
+
+### `0x25d0` `FragmentPacketConcatenater::Add` DIFF
+
+- Score: 87.4 (calls 73, refs 94, consts 95). Proof level: A.
+- Evidence (main 8af60dd, `-` original, `+` lift): orig 105 insns, lift 113 insns, 17 changed hunks; first divergence: `-mov qword ptr [rsp+N], rbp` / `-mov qword ptr [rsp+N], rsi` / `+mov byte ptr [r8], 0`.
+- Reason: `0x25d0` FragmentPacketConcatenater::Add (main 87.4; LG 0x25d0 and POD 0x1460 have the same code): the block order and the single `Log::Write` tail are fixed in the fpc author rounds (score 98.4, results/ql-t3.out). The open hunk is a dead `add rax, 4` in the original (orig insn 9): the original computes a pointer 4 bytes after the header and never uses it. The lift build drops the dead sum in every source form we tried. Forms tried: (1) 3 pointer forms for the header pointer (lessons.md packet-4 line 451), (2) one `Log::Write` exit (lessons.md, 98.4), (3) card v2b2-fpc round 1 (header local before `*completed = false`, shared `*completed = true` block: 98.4), (4) card v2b2-fpc round 2 (block order 185, 189, 197, 201, 209, 217, 223 from the log line numbers; q branch v2b2-t3 7e1dfcd: 98.4, no change). The item is on the lessons.md round-4 stop list. Level A.
+- Tried: see the reason (lead note LobbyGate-25d0).
+- Earlier record: `lessons.md` lines 451, 507.
+
+### `0x2870` `FragmentPacketConcatenater::Clone` DIFF
+
+- Score: 93.3 (calls 100, refs 100, consts 80). Proof level: A.
+- Evidence (main 8af60dd, `-` original, `+` lift): orig 39 insns, lift 39 insns, 7 changed hunks; first divergence: `-mov qword ptr [rsp+N], 0xfffffffffffffffe` / `-jne L` / `+je L`.
+- Reason: `0x2870` FragmentPacketConcatenater::Clone (main 93.3; LG `0x2870` and POD `0x1700`, same code): BLOCKED, cause known. The original builds `relayPacket` through the PDB constructor `Packet::Packet(PacketSplitter*)`, so it sets the EH state -2 at insn 1 (consts 80). The lift `Packet` has no constructor (card v2b2-fpc handoff, rounds 1 and 2). The constructor comes with card pkt3 (lead clone branch v2b2-pkt3 2252cc7). pkt3 waits for the operator decision on engine issue E-R4-ratio (ENGINE-ISSUES.md, B-fpc-clone). Forms tried: (1) main form, (2) fpc author rounds 1 and 2 (no constructor: no gain), (3) pkt3 with the constructor (blocked by E-R4-ratio, not measured on main). Next step after pkt3 lands: `relayPacket(nullptr)` in the init list of the FragmentPacketConcatenater constructor, then one check. Level A (blocked).
+- Tried: see the reason (lead note LobbyGate-2870).
+- Earlier record: `lessons.md` lines 516.
+
+### `0x37f0` `FragmentPacket::StartRepeat` DIFF
+
+- Score: 93.3 (calls 100, refs 100, consts 80). Proof level: A.
+- Evidence (main 8af60dd, `-` original, `+` lift): orig 21 insns, lift 18 insns, 8 changed hunks; first divergence: `-mov qword ptr [rsp+N], rbx` / `-push rdi` / `+push rbx`.
+- Reason: `0x37f0` FragmentPacket::StartRepeat (93.3 on main): the Hex-Rays text of the original is `if (CurHeader == nullptr || (unsigned short)(4000 - CurHeader->size) < 2) Packet::Allocate(&packet, &composer); PushRepeatCount(&composer, &packet);`. The lift source has the same statements and the same calls (calls 100, refs 100). The diff is only codegen: the original saves rbx and rdi but uses only rdi, it loads `CurHeader` before `mov rdi, rcx`, it uses `movsx` + 32-bit `sub` (lift: 16-bit `sub ax, word ptr`), and it passes `rcx+8` from rcx (lift: from the saved register). The unused rbx save is the trace of an inlined callee: `FragmentPacket::FreeSize` (0x38a0) has the same expression, and the original keeps it as a function for `ContentsRuleConfig::MakeListPacket` (call at 0x8b1a) but inlines it here. VS2010 has no per-call-site inline control, so the lift cannot inline FreeSize in StartRepeat and keep the call at 0x8b1a (the lift needs `noinline` on FreeSize for LG). Forms tried: (1) main form (expression in FragmentPacket.cpp), (2) in-class inline body with a `freeSize` local (q branch v2b2-sr, results/ql-sr.out: no score change in LG and LD). Level A.
+- Tried: see the reason (lead note LobbyGate-37f0).
+- Earlier record: `lessons.md` lines 450, 507, 881, 883.
+
+### `0x3ec0` `GateKeyManager::MakeGateKey` DIFF
+
+- Score: 96.2 (calls 94, refs 94, consts 100). Proof level: A.
+- Evidence (main 8af60dd, `-` original, `+` lift): orig 168 insns, lift 176 insns, 13 changed hunks; first divergence: `+mov qword ptr [rsp+N], r15`.
+- Reason: `0x3ec0` GateKeyManager::MakeGateKey (main 96.2): on the fail path the original calls the GateKeyEntry destructor out of line (`mov rcx, s4` / `call 0x3e80`, PDB name `GateKeyEntry::scalar deleting destructor`, the body is the plain destructor: removeReferenceCount "Client.cpp" 57, then 2 zero stores). The lift puts the destructor inline there. The other LG callers of the destructor in the original put it inline: GateKeyManager::Finalize (MATCH on main) and ClientSessionTimerJob::HandleEvent. This is an inline choice per call site. VS2010 has no source control for one call site. `__declspec(noinline)` on `~GateKeyEntry` (q branch v2b2-t6 5f802ca, results/ql-t6b.out) moves MakeGateKey to 98.1 (6 hunks: the call target name and register choice in the inlined `std::map::find`), but GateKeyManager::Finalize goes from MATCH to DIFF 97.4 and ClientSessionTimerJob::HandleEvent from 98.0 to 93.6. Forms tried: (1) main form (explicit `entry->~GateKeyEntry()` then `Memory::_Manager[2]->Free`, 13 hunks), (2) noinline destructor (t6b, loses 1 MATCH). Same cause as LG FragmentPacket::StartRepeat 0x37f0 (one callee, inline at some sites and called at others). Level A.
+- Tried: see the reason (lead note LobbyGate-3ec0).
+- Earlier record: `lessons.md` lines 536.
 
 ### `0x4500` `Client::SendGetCharacterInfoListOk` DIFF
 
@@ -205,8 +190,8 @@ triage, the instruction diffs and the Not-done reports of the batch authors. No 
 
 - Score: 95.2 (calls 100, refs 100, consts 86). Proof level: A.
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 156 insns, lift 156 insns, 2 changed hunks; first divergence: `-mov s2d, 0x18` / `+mov s2d, 0x10`.
-- Reason: **LG 0x5cf0 `ClientManager::Finalize`**, the constant 0x18 vs 0x10. Cause: TLS layout. The register holds the TLS offset of `__delv_buf__` (original +0x18, lift +0x10). A new or moved `__declspec(thread)` variable changes the TLS block of all exes. Not tried. The loop change above can still raise the score.
-- Tried: see the reason (v2b-lg-01c).
+- Reason: `0x5cf0` ClientManager::Finalize: the only difference is the TLS offset of `__delv_buf__` in a register (original `mov s2d, 0x18`, lift `mov s2d, 0x10`). The register is also used in the loop, so funcdiff does not normalize it as a TLS-only offset. Cause: the LTCG code generator chooses the order of the `__declspec(thread)` variables. Evidence (llvm-pdbutil dump -globals -symbols, TLS section 0005 offsets): the original objs that define them (Session.obj, prng.obj) have the `ltcg` flag in S_COMPILE3. The same BloodLib variables have a different relative order in each original exe: `IoWorker::WorkerId`/`IoWorker::ZstdCCtx` (adjacent in IoWorkerThread.cpp) are at CG 16/48, LG 20/48, SCD 16/56, POD 24/56; `Thread::Current` is before `ZstdCCtx` in CG, SCD and POD but after it in LG; `__delv_buf__` is at CG 56, LG 24, SCD 32, POD 16. A fixed source declaration order cannot give 4 different orders of the same shared objects, so no source form sets the TLS slot of `__delv_buf__`. Original LG: _Instance 8, Thread_LastCryptError 16, WorkerId 20, __delv_buf__ 24, LogBufferAllocator::_Local 32, PacketBufferAllocator::_Local 40, ZstdCCtx 48, Thread::Current 56, __ip_addr_string_w__ 96. Lift LG (8af60dd): WorkerId 8, __delv_buf__ 16, Thread_LastCryptError 24, ZstdCCtx 32, __ip_addr_string_a__ 40, _Instance 72, PacketBufferAllocator::_Local 80, LogBufferAllocator::_Local 88, Thread::Current 96, __ip_addr_string_w__ 112. Tried (batch 2): the PDB check of all TLS definitions in the 4 exes (tools/tls.sh); no source form controls the LTCG data order. Same class as LG 0x127a0 and 0x8ef0 (LTCG data layout).
+- Tried: see the reason (lead note LobbyGate-5cf0).
 - Earlier record: `lessons.md` lines 515.
 
 ### `0x6fa0` `ClientSessionTimerJob::HandleEvent` DIFF
@@ -215,6 +200,14 @@ triage, the instruction diffs and the Not-done reports of the batch authors. No 
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 112 insns, lift 106 insns, 8 changed hunks; first divergence: `-cmp edx, 1` / `-jge L` / `-cmp edx, 3`.
 - Reason: `0x6fa0` ClientSessionTimerJob::HandleEvent: after merge-02 the second range test (client.cpp:1145) is in the lift. The residue: the original passes `edx = 0` to `Session::Close(bool)` at both sites (0x70bd, 0x712b); the lift LTCG build drops the constant argument. The original LobbyGate has only these 2 callers of Session::Close (0x18350), both with 0, and still keeps the argument. Same cause as `LobbyGate::AddJobTimer` 0x12bf0 (LTCG argument propagation in the lift build only).
 - Tried: see the reason (lead note LobbyGate-6fa0).
+
+### `0x8600` `ContentsRuleConfig::Dump` DIFF
+
+- Score: 99.2 (calls 100, refs 98, consts 100). Proof level: A.
+- Evidence (main 8af60dd, `-` original, `+` lift): orig 105 insns, lift 103 insns, 17 changed hunks; first divergence: `+xor ecx, ecx` / `+mov qword ptr [r11 - 0x18], rcx` / `+mov dword ptr [rsp+N], 0x48`.
+- Reason: `0x8600` ContentsRuleConfig::Dump (main 99.2; calls 100, consts 100): cause = zero register CSE. The original puts 0 in a callee-saved register (`xor s4d, s4d`) at the start and uses it for all zero stores of the Log::Write arguments, for `lea ecx, [s4 + 3]` (log type 3), `cmp s4w, word ptr [rcx]` and `cmp byte ptr [s0 + rax], s4b`. The lift uses immediates (`mov ecx, 3`, `cmp word ptr [rcx], 0`) and `xor ecx, ecx` for the stores. The same register choice shows in CacheGate 0x2660 CacheDList::Initialize (proof note CacheGate-2660). No source form selects a register for a constant. The loop form is a second, small part: Hex-Rays gives `for (i = 13; i != 0; --i)` with a pointer to `_Def[0].name` (`lea s1, [ContentsRuleConfig::_Def+0x8]`, 64-bit `dec s3`). Forms tried: (1) main form (`for (int i = 0; i < ROW_COUNT; ++i)`, 17 hunks), (2) `size_t` index (q branch v2b2-t2 2939ae8, results/ql-t2.out: 98.7, worse), (3) down-counter with a row pointer (q branch v2b2-t4 e207415, results/ql-t4.out: the down-counter shows, 16 hunks, 98.7, worse: the zero register CSE stays). LD `ContentsRuleConfig::Dump` has the same code and cause. Level A.
+- Tried: see the reason (lead note LobbyGate-8600).
+- Earlier record: `lessons.md` lines 97.
 
 ### `0x8ef0` `ContentsRuleConfig::CheckMinMaxBoundary` DIFF
 
@@ -308,12 +301,60 @@ triage, the instruction diffs and the Not-done reports of the batch authors. No 
 - Reason: `0x14470` HandleLobbyGate_HelloReq: the original tests `reply.CurHeader` two times (0x14620 body pointer, 0x14631 free size; Hex-Rays v6 and v7) and computes the size in 32 bits (`sub esi, eax; movzx eax, si`). The VS2010 lift build joins the two tests into one branch (jump threading) and computes in 16 bits (`sub si, ax`). funcdiff gives MATCH 100.0 with the constant-first tests, but the review precheck P2_cc finds the flipped jump (index 7: original `je`, build `jne`), so the form is not accepted. Tried (lead, merge-03b and merge-03d): the ternary in the handler; `GetFreeBody()` plus `Packet::FreeSize()` as a header inline (PDB packet.h:63). Both forms give the joined test. Constant-first tests `0 == Decompose(...)`, `58 != packetVersion`, `0 >= handshakeDataSize` are needed for the zero register and are kept for a later try.
 - Tried: see the reason (lead note LobbyGate-14470).
 
+### `0x186e0` `Session::HandleEvent` DIFF
+
+- Score: 98.5 (calls 98, refs 97, consts 100). Proof level: A.
+- Evidence (main 8af60dd, `-` original, `+` lift): orig 242 insns, lift 246 insns, 28 changed hunks; first divergence: `+lea rdx, [L"source\Session.cpp"]` / `-lea rdx, [L"source\Session.cpp"]`.
+- Reason: `0x186e0` Session::HandleEvent: the open differences are a compiler tail merge and instruction scheduling. The original merges the line-838 `Log::Write` into the shared 785/824 call (`mov r8d, 0x346; jmp L`); the 838 call has 6 arguments and the 824 call has 7. The lift gives the 838 block its own call. In the line-785 block the original stores the stack arguments before the `lea r9`/`lea rdx`/`mov r8d`/`xor ecx` loads; the lift does the reverse. Cause: cross-jumping and epilogue tail duplication select which of the 838 and 854 blocks (same end) merges; the source has no control of this choice. Forms tried (batch 1, lessons.md B lines 400 and 415; batch 2 card v2b2-shev, 2 rounds, no_gain): `goto` to one tail (98.5 -> 97.1); one common log call (98.5); `if (!result) { 854 } return true;` (97.4: the merge moves to the 854 block); a double `_connectContext` read, the `IdleStateTable::Pos` union split and the `_id` load before `WSAGetLastError` (these 3 agree with the original, score 98.7, no MATCH). Same diff in CG, LG, SCD and POD.
+- Tried: see the reason (lead note LobbyGate-186e0).
+- Earlier record: `lessons.md` lines 400, 415, 522, 571.
+
+### `0x19da0` `AlertSender::init` DIFF
+
+- Score: 99.1 (calls 100, refs 97, consts 100). Proof level: A.
+- Evidence (main 8af60dd, `-` original, `+` lift): orig 85 insns, lift 81 insns, 20 changed hunks; first divergence: `-mov eax, 0x12` / `+mov edx, 0x12` / `+lea rcx, [rsp+N]`.
+- Reason: `0x19da0` AlertSender::init (main 99.1): the original tests the address of the local `Daemon::Version` before the call `Daemon::LoadVersion(&ver, _version, 64)`: `lea rax, [rsp+N]` / `test rax, rax` / `je L`. VS2010 folds the test of a local address in every source form we tried, so the lift has no test and loads the call arguments in another order (20 hunks). `Daemon::Version` has no methods in the LG PDB (LobbyGate.types.txt 0x23E8: members `version`, `unit` only), so a null-checked placement new with a constructor is not possible. Forms tried: (1) main form (direct call with `&ver`), (2) `Daemon::Version* verPtr = &ver; if (verPtr != nullptr) LoadVersion(verPtr, ...)` (q branch v2b2-t3 dbd1cd9, results/ql-t3.out: funcdiff signal MATCH 100.0, but tools/d.py still 20 hunks: the compiler folds the test). (3) direct `if (&ver != nullptr)` (q branch v2b2-t5 794a320, results/ql-t5.out: d.py 20 hunks, test folded), (4) inline helper `LoadVersionIfSet(Daemon::Version*, ...)` with the null test inside (q branch v2b2-t6 5f802ca, results/ql-t6b.out: no score change, d.py 20 hunks). The same kept test of a stack address shows in LG Dh::getValue 0x55d80 (see LobbyGate-55d80). Level A.
+- Tried: see the reason (lead note LobbyGate-19da0).
+- Earlier record: `lessons.md` lines 288, 623.
+
+### `0x1bce0` `PacketConcatenateBuffer::Decompose` DIFF
+
+- Score: 95.2 (calls 100, refs 100, consts 86). Proof level: A.
+- Evidence (main 8af60dd, `-` original, `+` lift): orig 76 insns, lift 72 insns, 6 changed hunks; first divergence: `-mov qword ptr [rsp+N], rsi`.
+- Reason: `0x1bce0` PacketConcatenateBuffer::Decompose(VarData*) (main 95.2): calls, refs and the statement order are the same as the Hex-Rays text of the original. The diff is codegen only. (1) Register choice: the original keeps `offset` in ecx and `size` in r8, the lift uses edx and r10. (2) After `inc dword ptr [s1 + 0x3c]` (`++decomposer.index`), the original loads `[s1 + 0x40]` (offset) and `[s1 + 8]` (buffer) again and adds them. The lift keeps `lea r9, [rdx + rax]` from the length read. The two reads use the same base register and other offsets than the index store, so the lift compiler proves that the store does not alias them. The original treats the store as an alias barrier. A source form with one `this` cannot give a second base pointer, and the PDB has only the one member function. Forms tried: (1) main form (`++decomposer.index; char* p = &buffer[decomposer.offset];`), (1b) read buffer and offset again after `++index` (2 tries, lessons.md packet-4 line 452: VS2010 does CSE on the pointer), (2) success block as the fall-through with the checks in one `if` (q branch v2b2-t3 081f119, results/ql-t3.out: no score change, tools/d.py 10 hunks). Level A.
+- Tried: see the reason (lead note LobbyGate-1bce0).
+- Earlier record: `lessons.md` lines 35, 287, 367, 369, 452, 504.
+
+### `0x20500` `Network::OpenPort` DIFF
+
+- Score: 98.9 (calls 100, refs 97, consts 100). Proof level: A.
+- Evidence (main 8af60dd, `-` original, `+` lift): orig 171 insns, lift 171 insns, 11 changed hunks; first divergence: `-test ecx, ecx` / `-jne L` / `+cmp ecx, 1`.
+- Reason: `0x20500` Network::OpenPort (98.9 on main): the lift has the same calls, refs and asserts. The hunks are codegen only: (1) the id assert is `test ecx, ecx; jne` in the original and `cmp ecx, 1; jae` in the lift (LTCG keeps only the lower bound of `id < 1 || id > 24`); (2) the inlined `Port::Port` stores `_iocpHandle` after the lock init and `_listener` before `_sessionList` in the original; (3) the EH-state spill `mov [rsp+N], rbx` and the `[rsp+N], rax` copy are placed differently; (4) the original compares `_portNumber` with a zero register, the lift with an immediate. All of these follow the LTCG scheduler and register allocator. Forms tried: (a) `id == 0 || id > 24` (q p15 d1a2b95, results/ql-11.out: 98.9 -> 90.8, SCD 0x1a8b0 lost MATCH), (b) `Port()` body assignments in the original store order (q v2b2-port 0e8f709, results/ql-port.out: no score change in CG, LG, SCD, POD), (c) main form (member init list). Batch 1: the assert constant propagation was tried too (lessons.md line 523). Level A.
+- Tried: see the reason (lead note LobbyGate-20500).
+- Earlier record: `lessons.md` lines 101, 447, 503, 523.
+
 ### `0x23000` `BroadcastCrypt::Initialize` DIFF
 
 - Score: 95.2 (calls 100, refs 100, consts 86). Proof level: A.
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 189 insns, lift 178 insns, 32 changed hunks; first divergence: `-mov qword ptr [rsp+N], rsi` / `+push rsi` / `+push r12`.
 - Reason: `0x23000` BroadcastCrypt::Initialize: the original passes the constant 2 in a register to `InstanceSize` and to `Create` (the crypto mode). The lift LTCG build removes the constant argument and the callee uses 2 directly. The PDB types keep the parameter, so the source form is the PDB form. Same cause as LobbyGate::AddJobTimer `0x12bf0` and Session::Close `0x6fa0` (LTCG constant propagation; ENGINE-ISSUES 10). Tried (lead, merge-03b): the size test with signed `/16*16` (orig `cdq; and edx, 0xf`) gave 95.2 -> 94.9, so it was dropped.
 - Tried: see the reason (lead note LobbyGate-23000).
+
+### `0x29250` `PipeCommandProcess::processCommand` DIFF
+
+- Score: 96.3 (calls 100, refs 100, consts 89). Proof level: A.
+- Evidence (main 8af60dd, `-` original, `+` lift): orig 68 insns, lift 51 insns, 11 changed hunks; first divergence: `-nop word ptr [rax + rax]` / `-mov r8, qword ptr [s0 + 0x10]` / `-test r8, r8`.
+- Reason: `0x29250` PipeCommandProcess::processCommand: calls, refs and string constants are equal; only the code form of the inline `wcscmp` differs. The original keeps the -1/0/1 value of each compare (`xor eax,eax; repe cmpsw; je L; sbb eax,eax; sbb eax,-1; L: test eax,eax; jne`) and has a loop-alignment `nop` at the loop head. The VS2010 build folds `wcscmp(...) == 0` into `repe cmpsw; jne` at every compare. Cause: an optimizer decision of the original build that the source does not control. Evidence: the LD reference GamedChannel::SendChangedGradeNotify (0x83ea0, MATCH) has 5 plain `wcscmp(...) == 0` compares and the `sbb` form only on the last one; the lift processCommand bodies fold also the last compare, so no compare position rule explains the original. Forms tried (batch 1 and batch 2 card v2b2-pcmd, 2 rounds, no_gain): `!wcscmp(...)`; `int r = wcscmp(...); if (r == 0)`; 2 more spellings (lessons.md B line 437); separate `if` statements with `continue`/`goto done` and `argv[0]` in a local; a file-static inline compare helper in the else-if chain (PipeConsole::processCommand went 97.0 -> 89.8). A command table with a switch adds a table and a loop that the original does not have. Same diff in CG, LG, SCD, POD and LD.
+- Tried: see the reason (lead note LobbyGate-29250).
+- Earlier record: `lessons.md` lines 388, 437, 506, 527.
+
+### `0x29730` `PipeConsole::processCommand` DIFF
+
+- Score: 97.0 (calls 100, refs 100, consts 91). Proof level: A.
+- Evidence (main 8af60dd, `-` original, `+` lift): orig 134 insns, lift 109 insns, 11 changed hunks; first divergence: `-mov rdx, qword ptr [rax]` / `+mov rax, qword ptr [rax]`.
+- Reason: `0x29730` PipeConsole::processCommand: calls, refs and string constants are equal; only the code form of the inline `wcscmp` differs. The original keeps the -1/0/1 value of each compare (`xor eax,eax; repe cmpsw; je L; sbb eax,eax; sbb eax,-1; L: test eax,eax; jne`) and has a loop-alignment `nop` at the loop head. The VS2010 build folds `wcscmp(...) == 0` into `repe cmpsw; jne` at every compare. Cause: an optimizer decision of the original build that the source does not control. Evidence: the LD reference GamedChannel::SendChangedGradeNotify (0x83ea0, MATCH) has 5 plain `wcscmp(...) == 0` compares and the `sbb` form only on the last one; the lift processCommand bodies fold also the last compare, so no compare position rule explains the original. Forms tried (batch 1 and batch 2 card v2b2-pcmd, 2 rounds, no_gain): `!wcscmp(...)`; `int r = wcscmp(...); if (r == 0)`; 2 more spellings (lessons.md B line 437); separate `if` statements with `continue`/`goto done` and `argv[0]` in a local; a file-static inline compare helper in the else-if chain (PipeConsole::processCommand went 97.0 -> 89.8). A command table with a switch adds a table and a loop that the original does not have. Same diff in CG, LG, SCD, POD and LD.
+- Tried: see the reason (lead note LobbyGate-29730).
+- Earlier record: `lessons.md` lines 437, 506, 527.
 
 ### `0x29920` `PipeConsole::checkFrozenThread` DIFF
 
@@ -322,230 +363,109 @@ triage, the instruction diffs and the Not-done reports of the batch authors. No 
 - Reason: `0x29920` PipeConsole::checkFrozenThread: the LG original inlines `PipeConsole::addNode` (AllocZero 0x218, line 842, two wcsncpy_s, list link) into this function, but keeps the out-of-line `addNode` (0x2a6d0) for the other callers. The CG, SCD and POD originals call `addNode` here (CG 0x15190 size 818; LG 946, LD 946). The source is one BloodLib file for all exes (PDB lines 841-859), so this is an LTCG inline decision of the LG/LD link. The lift keeps `__declspec(noinline)` on `addNode` for the 3 other exes. Tried: `addNode` without noinline in LG only (lessons.md line 443): `LobbyD::Hello` 91.5 -> 78.9 and `OnClose` 93.8 -> 81.7; reverted. A hand copy of the node insert in LG only is not the original source form.
 - Tried: see the reason (lead note LobbyGate-29920).
 
-### `0x55150` `Crypto::InstanceSize` DIFF
-
-- Score: 44.4 (calls 100, refs 0, consts 33). Proof level: A.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 17 insns, lift 2 insns, 2 changed hunks; first divergence: `-lea rdx, [<data>]` / `-movsxd rax, ecx` / `-movzx eax, byte ptr [rdx + rax + 0x551a4]`.
-- Reason: `0x55150` Crypto::InstanceSize (44.4) and `0x55200` Crypto::Create (34.0): the original keeps the full `switch` over `Crypto::Type` (5 cases, jump table). The lift build has `mov eax, 0x170; ret` only. The only original caller (`BroadcastCrypt::Initialize`, Security.obj) passes the constant 2, the same as the lift. The PDB shows that Crypto.obj and Security.obj are both LTCG objects (`S_COMPILE3 flags = ltcg`), so a build without `/GL` is not the original form. The original LTCG did not propagate the constant; the lift LTCG does. Tried: round 3 out-of-line pairing (lessons.md:108); per-object `/GL` check (this note). No source form found.
-- Tried: see the reason (lead note LobbyGate-55150).
-- Earlier record: `lessons.md` lines 108, 520.
-
-### `0x25d0` `FragmentPacketConcatenater::Add` DIFF
-
-- Score: 87.4 (calls 73, refs 94, consts 95). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 105 insns, lift 113 insns, 17 changed hunks; first divergence: `-mov qword ptr [rsp+N], rbp` / `-mov qword ptr [rsp+N], rsi` / `+mov byte ptr [r8], 0`.
-- Reason: instruction_order (move the call statements into the original order (Log::Write)).
-- Earlier record: `lessons.md` lines 451, 507.
-
-### `0x2870` `FragmentPacketConcatenater::Clone` DIFF
-
-- Score: 93.3 (calls 100, refs 100, consts 80). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 39 insns, lift 39 insns, 7 changed hunks; first divergence: `-mov qword ptr [rsp+N], 0xfffffffffffffffe` / `-jne L` / `+je L`.
-- Reason: constant (LTCG may move constant args into the callee: look at the callee first; fix only if the source misses an argument (constant 0xfffffffffffffffe in the original, none in the lift)).
-- Earlier record: `lessons.md` lines 516.
-
-### `0x37f0` `FragmentPacket::StartRepeat` DIFF
-
-- Score: 93.3 (calls 100, refs 100, consts 80). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 21 insns, lift 18 insns, 8 changed hunks; first divergence: `-mov qword ptr [rsp+N], rbx` / `-push rdi` / `+push rbx`.
-- Reason: constant (LTCG may move constant args into the callee: look at the callee first; fix only if the source misses an argument (constant 8 in the original, none in the lift)).
-- Earlier record: `lessons.md` lines 450, 507, 881, 883.
-
-### `0x3ec0` `GateKeyManager::MakeGateKey` DIFF
-
-- Score: 96.2 (calls 94, refs 94, consts 100). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 168 insns, lift 176 insns, 13 changed hunks; first divergence: `+mov qword ptr [rsp+N], r15`.
-- Reason: branch_inversion (swap if/else (invert the condition at the first divergence)).
-- Earlier record: `lessons.md` lines 536.
-
-### `0x8600` `ContentsRuleConfig::Dump` DIFF
-
-- Score: 99.2 (calls 100, refs 98, consts 100). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 105 insns, lift 103 insns, 17 changed hunks; first divergence: `+xor ecx, ecx` / `+mov qword ptr [r11 - 0x18], rcx` / `+mov dword ptr [rsp+N], 0x48`.
-- Reason: inlined but should not be.
-- Earlier record: `lessons.md` lines 97.
-
-### `0x17480` `Session::Session` DIFF
-
-- Score: 95.2 (calls 100, refs 86, consts 100). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 68 insns, lift 67 insns, 3 changed hunks; first divergence: `+mov dword ptr [rcx + 8], 0xa` / `-mov dword ptr [rcx + 8], 0xa`.
-- Reason: wrong callee: memory manager.
-- Earlier record: `lessons.md` lines 37, 43, 63, 85, 104, 107.
-
-### `0x186e0` `Session::HandleEvent` DIFF
-
-- Score: 98.5 (calls 98, refs 97, consts 100). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 242 insns, lift 246 insns, 28 changed hunks; first divergence: `+lea rdx, [L"source\Session.cpp"]` / `-lea rdx, [L"source\Session.cpp"]`.
-- Reason: branch_inversion (swap if/else (invert the condition at the first divergence)).
-- Earlier record: `lessons.md` lines 400, 415, 522, 571.
-
-### `0x19da0` `AlertSender::init` DIFF
-
-- Score: 99.1 (calls 100, refs 97, consts 100). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 85 insns, lift 81 insns, 20 changed hunks; first divergence: `-mov eax, 0x12` / `+mov edx, 0x12` / `+lea rcx, [rsp+N]`.
-- Reason: data_ref (reference the same global/string as the original ([<data>])).
-- Earlier record: `lessons.md` lines 288, 623.
-
-### `0x1bce0` `PacketConcatenateBuffer::Decompose` DIFF
-
-- Score: 95.2 (calls 100, refs 100, consts 86). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 76 insns, lift 72 insns, 6 changed hunks; first divergence: `-mov qword ptr [rsp+N], rsi`.
-- Reason: not referenced in ours (dropped or inlined).
-- Earlier record: `lessons.md` lines 35, 287, 367, 369, 452, 504.
-
-### `0x1e2e0` `Daemon::Start` DIFF
-
-- Score: 97.0 (calls 100, refs 100, consts 91). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 121 insns, lift 120 insns, 1 changed hunks; first divergence: `-mov edx, 0x80`.
-- Reason: constant (LTCG may move constant args into the callee: look at the callee first; fix only if the source misses an argument (constant 0x80 in the original, none in the lift)).
-- Earlier record: `lessons.md` lines 56, 513.
-
-### `0x20500` `Network::OpenPort` DIFF
-
-- Score: 98.9 (calls 100, refs 97, consts 100). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 171 insns, lift 171 insns, 11 changed hunks; first divergence: `-test ecx, ecx` / `-jne L` / `+cmp ecx, 1`.
-- Reason: not referenced in ours (dropped or inlined).
-- Earlier record: `lessons.md` lines 101, 447, 503, 523.
-
-### `0x26c90` `StaticPageMemoryManager::Initialize` DIFF
-
-- Score: 96.3 (calls 100, refs 89, consts 100). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 30 insns, lift 31 insns, 5 changed hunks; first divergence: `-je L` / `-lea rax, [rdx + 0x800]` / `-mov qword ptr [rcx + 8], rdx`.
-- Reason: ref order differs.
-- Earlier record: `lessons.md` lines 513.
-
-### `0x27560` `ThreadManager::Initialize` DIFF
-
-- Score: 88.9 (calls 100, refs 100, consts 67). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 30 insns, lift 29 insns, 4 changed hunks; first divergence: `-mov dword ptr [rcx], edx` / `+mov dword ptr [rcx], 0x80` / `-mov edx, edx`.
-- Reason: inlined but should not be.
-- Earlier record: `lessons.md` lines 513.
-
-### `0x29250` `PipeCommandProcess::processCommand` DIFF
-
-- Score: 96.3 (calls 100, refs 100, consts 89). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 68 insns, lift 51 insns, 11 changed hunks; first divergence: `-nop word ptr [rax + rax]` / `-mov r8, qword ptr [s0 + 0x10]` / `-test r8, r8`.
-- Reason: constant (LTCG may move constant args into the callee: look at the callee first; fix only if the source misses an argument (constant -1 in the original, none in the lift)).
-- Earlier record: `lessons.md` lines 388, 437, 506, 527.
-
-### `0x29730` `PipeConsole::processCommand` DIFF
-
-- Score: 97.0 (calls 100, refs 100, consts 91). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 134 insns, lift 109 insns, 11 changed hunks; first divergence: `-mov rdx, qword ptr [rax]` / `+mov rax, qword ptr [rax]`.
-- Reason: constant (LTCG may move constant args into the callee: look at the callee first; fix only if the source misses an argument (constant -1 in the original, none in the lift)).
-- Earlier record: `lessons.md` lines 437, 506, 527.
-
 ### `0x29fc0` `PipeConsole::run` DIFF
 
-- Score: 96.3 (calls 89, refs 100, consts 100). Proof level: B.
+- Score: 96.3 (calls 89, refs 100, consts 100). Proof level: A.
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 183 insns, lift 168 insns, 32 changed hunks; first divergence: `-push rbx` / `-push r13` / `-push r15`.
-- Reason: instruction_order (move the call statements into the original order (Log::Write)).
+- Reason: `0x29fc0` PipeConsole::run (86.5 on main 3d1253a; same body in CG 0x157b0, LG 0x29fc0, SCD 0x253e0, POD 0x32dd0): the diff is register allocation and address CSE. The original keeps `i*0x4038` in a register and adds `this + 0x9a8 + off` at each field use (`cmp dword ptr [s4 + s0 + 0x9dc], s1d`). The lift computes one base pointer (`lea s4, [rax + s0 + 0x9a8]`) for every source form. Calls, refs and consts are equal. Forms tried: label place; `switch` and `if` chain (lessons B); signed index with a reference (lead p13); signed index with `_pipe[i]` at each use and per-site reconnect calls (author round 1); `int` result with `movsxd` after the call, no `- WAIT_OBJECT_0`, one `reconnect:` label (part 2); 64-bit index and a `broken = &_pipe[i]` pointer to one shared call (part 3). Card v2b2-pcrun: 2 rounds, no_gain (results/v2b2-pcrun.author.log). Level A.
+- Tried: see the reason (lead note LobbyGate-29fc0).
 - Earlier record: `lessons.md` lines 394, 412, 514.
 
 ### `0x2b880` `WindowConsole::Open` DIFF
 
-- Score: 92.5 (calls 100, refs 92, consts 86). Proof level: B.
+- Score: 97.2 (calls 100, refs 92, consts 100). Proof level: A.
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 147 insns, lift 143 insns, 23 changed hunks; first divergence: `-xor al, al` / `-mov byte ptr [s1+N], 1` / `+mov byte ptr [s1], 1`.
-- Reason: data_ref (reference the same global/string as the original ([ClientPacketBufferHandler::Initialize])).
+- Reason: `0x2b880` WindowConsole::Open (97.2 after card wco c6eff35; CG, SCD and POD are MATCH with the same source): 2 LG-only causes. (1) The inlined `Thread` constructor (in the WinMsgHandler constructor) stores the members in the order +8, byte +0x28, +0x18, +0x10, +0x20 in LG. The lift stores them in member order (+8, +0x10, +0x18, +0x20, +0x28), and this order gives the MATCH in the other 3 exes. One shared source cannot give 2 store orders: the order is LTCG scheduling per exe. (2) LG sets `xor r8d, r8d` (threadId = nullptr) before `ThreadManager::StartThread`. The body does not read threadId, so the lift LTCG drops the argument. A selectany COMDAT member-function pointer to StartThread in LG (q branch v2b2-t4 5a80979) removes this hunk, but the 4 store-order hunks stay (results/ql-t4.out: no score change), and it changes the LG AlertSender::init signals without an insn change (the review rejects that). Forms tried: card wco rounds 1-2 (author-handoffs, Name calls, SystemEvent placement new, local Event store), p11, the StartThread selectany pointer. Level A.
+- Tried: see the reason (lead note LobbyGate-2b880).
 - Earlier record: `lessons.md` lines 514.
 
 ### `0x2fe80` `ZSTD_compressBegin_internal` DIFF
 
-- Score: 98.8 (calls 96, refs 100, consts 100). Proof level: B.
+- Score: 98.8 (calls 96, refs 100, consts 100). Proof level: A.
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 408 insns, lift 425 insns, 84 changed hunks.
-- Reason: extra_call (remove or inline the call to ZSTD_compress_insertDictionary (original inlines or omits it)).
+- Reason: `0x2fe80` ZSTD_compressBegin_internal (98.8 on main): upstream zstd code, not lifted. The lift builds upstream zstd `bb6eaf64` (vendor/zstd/README.md). With this commit all zstd functions are MATCH in CG, SCD and POD, and all but this one in LG. Cause: the LG original inlines `ZSTD_compress_insertDictionary` into this function (LTCG inline choice on the LG call graph); the lift LG keeps the call (calls 96). The prologue hunks follow from it (the original keeps r8/r9/rcx in callee-saved registers, the lift spills them for the call). The lift must not edit upstream source, and VS2010 has no per-exe or per-call-site inline control for a C function in a shared static library (a `__forceinline` edit changes all 4 exes, where the call is MATCH now). Forms tried (batch lift-parity-s3, README): v1.3.5 (DIFF in zstd_opt.c and more), ac4f7ead (3 `ZSTD_litLengthContribution` calls, the original has 4), bb6eaf64 (best: only this function DIFF). Level A.
+- Tried: see the reason (lead note LobbyGate-2fe80).
 - Earlier record: `lessons.md` lines 515.
 
 ### `0x30c20` `IoWorker::run` DIFF
 
-- Score: 84.9 (calls 69, refs 97, consts 88). Proof level: B.
+- Score: 84.9 (calls 69, refs 97, consts 88). Proof level: A.
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 190 insns, lift 181 insns, 10 changed hunks; first divergence: `-mov s2d, 0x14` / `+mov s2d, 8` / `-mov ecx, 0x30`.
-- Reason: branch_inversion (swap if/else (invert the condition at the first divergence)).
+- Reason: `0x30c20` IoWorker::run: the first difference is a TLS slot offset. Original `mov s2d, 0x14`, lift `mov ecx, 0x20` (first divergence in tools/d.py, base build 666b998). The original TLS slots of `IoWorker::WorkerId`/`IoWorker::ZstdCCtx` are 20/48 (llvm-pdbutil THREAD32 records, section 0005); the lift slots are 8/24 in all 4 exes (tools/tls.sh). Cause: the LTCG code generator sets the order of the `__declspec(thread)` variables; the defining objs have the ltcg flag in S_COMPILE3. The same 2 adjacent BloodLib variables have different slots in each original exe (CG 16/48, LG 20/48, SCD 16/56, POD 24/56), so no single source declaration order gives them. Same cause and evidence as proof LobbyGate-5cf0 (batch 2). The offset is in a register that the function uses again, so funcdiff does not normalize it. Other differences (not the blocker): the Daemon state check (original signed `test/js; cmp 2; jle`, lift unsigned `cmp 2; jbe`) and the place of the !result block. Tried (batch 2): PDB check of all TLS records in the 4 exes; the TLS order is not a source choice.
+- Tried: see the reason (lead note LobbyGate-30c20).
 - Earlier record: `lessons.md` lines 527.
 
 ### `0x52de0` `Rsa::decrypt` DIFF
 
-- Score: 91.7 (calls 95, refs 80, consts 100). Proof level: B.
+- Score: 91.7 (calls 95, refs 80, consts 100). Proof level: A.
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 205 insns, lift 200 insns, 25 changed hunks; first divergence: `-mov r10d, dword ptr [rcx + 0x1c]` / `+movsxd rdx, dword ptr [s5]`.
-- Reason: not referenced in ours (dropped or inlined).
+- Reason: `0x52de0` Rsa::decrypt (91.7): blocker = the zero fill of the block buffer. The original keeps a byte loop (`mov byte ptr [rax], 0; inc; inc; cmp; jl`); the lift build gets `call memset` (a call difference, so no MATCH while it stays). Forms tried (lessons.md crypto-4 and card v2b2-rsa, 2 rounds, no_gain): index loop, pointer byte loop, `while (c < blockSize)` with a hoisted size, the buffer at function scope; VS2010 makes `memset` from each. Not tried: a bound from an out-of-line getter; the PDB has no type records for `OaepEncoder`, so the getter has no PDB name (not allowed). Other differences (not the blocker): the inline `BigInteger::Set` size check (original `test; js; cmp 0x200; ja`, lift only `cmp; ja`; the fix is in `BigInteger::Set`, outside the card) and the frame slots of `m`/`r` (compiler frame layout). Handoff: author-handoffs/lift-lobbydaemon-v2b2-rsa.md.
+- Tried: see the reason (lead note LobbyGate-52de0).
 - Earlier record: `lessons.md` lines 434, 507, 519.
+
+### `0x55150` `Crypto::InstanceSize` DIFF
+
+- Score: 44.4 (calls 100, refs 0, consts 33). Proof level: A.
+- Evidence (main 8af60dd, `-` original, `+` lift): orig 17 insns, lift 2 insns, 2 changed hunks; first divergence: `-lea rdx, [<data>]` / `-movsxd rax, ecx` / `-movzx eax, byte ptr [rdx + rax + 0x551a4]`.
+- Reason: `0x55150` Crypto::InstanceSize (44.4 on main) and `0x55200` Crypto::Create (34.0): the original keeps the full `switch` over `Crypto::Type`. It has a byte index table for types 0..80 (0x551a4) and a jump table with 6 entries (0x5518c), and it has NO range check before the table read (`movsxd rax, ecx; movzx eax, byte ptr [rdx+rax+0x551a4]`). Index 0 = types 0, 1, 4, 5, 14, 32, 33, 34, 65; index 5 = all other types without a size. Entries 0 and 5 go to the same `or eax, -1; ret`. So the source has two separate groups that return -1, and the default group (index 5) is reachable code. Cause: the lift LTCG puts the constant 2 of the only caller (BroadcastCrypt::Initialize) into the callee. With a second caller kept by a selectany COMDAT reference (removed by the linker after code generation) the switch stays, but VS2010 then emits `cmp ecx, 0x50; ja default`. A VS2010 switch has no range check only with `default: __assume(0)`, and then the default jump table entry is 0x0, so the default group is not reachable: a behavior change for the types of index 5 (they return -1 in the original). Forms tried (batch 2 quick loop q v2b2-tm2): COMDAT second caller (InstanceSize 44.4 -> 97.0, Create 34.0 -> 73.8); + the 9 explicit `case ...: return -1` (index 0 group); + `default: __assume(0)` (InstanceSize MATCH, Create 75.9, but jump table entry 5 = 0x0: REJECTED, behavior change). Batch 1: out-of-line pairing (lessons.md:108), per-object `/GL` check (both objects are LTCG in the PDB). No source form gives a reachable default without the range check. Evidence: tools/d.py LobbyGate 0x55150; results/ql-cry.out, results/ql-cry2.out.
+- Tried: see the reason (lead note LobbyGate-55150).
+- Earlier record: `lessons.md` lines 108, 520.
 
 ### `0x55200` `Crypto::Create` DIFF
 
-- Score: 34.0 (calls 29, refs 40, consts 33). Proof level: B.
+- Score: 34.0 (calls 29, refs 40, consts 33). Proof level: A.
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 104 insns, lift 27 insns, 8 changed hunks; first divergence: `-mov qword ptr [rsp+N], rbx` / `-push rdi` / `+push rbx`.
-- Reason: inlined but should not be.
+- Reason: `0x55200` Crypto::Create (34.0 on main) and `0x55150` Crypto::InstanceSize (44.4): the original keeps the full `switch` over `Crypto::Type`. It has a byte index table for types 0..80 (0x551a4) and a jump table with 6 entries (0x5518c), and it has NO range check before the table read (`movsxd rax, ecx; movzx eax, byte ptr [rdx+rax+0x551a4]`). Index 0 = types 0, 1, 4, 5, 14, 32, 33, 34, 65; index 5 = all other types without a size. Entries 0 and 5 go to the same `or eax, -1; ret`. So the source has two separate groups that return -1, and the default group (index 5) is reachable code. Cause: the lift LTCG puts the constant 2 of the only caller (BroadcastCrypt::Initialize) into the callee. With a second caller kept by a selectany COMDAT reference (removed by the linker after code generation) the switch stays, but VS2010 then emits `cmp ecx, 0x50; ja default`. A VS2010 switch has no range check only with `default: __assume(0)`, and then the default jump table entry is 0x0, so the default group is not reachable: a behavior change for the types of index 5 (they return -1 in the original). Forms tried (batch 2 quick loop q v2b2-tm2): COMDAT second caller (InstanceSize 44.4 -> 97.0, Create 34.0 -> 73.8); + the 9 explicit `case ...: return -1` (index 0 group); + `default: __assume(0)` (InstanceSize MATCH, Create 75.9, but jump table entry 5 = 0x0: REJECTED, behavior change). Batch 1: out-of-line pairing (lessons.md:108), per-object `/GL` check (both objects are LTCG in the PDB). No source form gives a reachable default without the range check. Evidence: tools/d.py LobbyGate 0x55150; results/ql-cry.out, results/ql-cry2.out.
+- Tried: see the reason (lead note LobbyGate-55200).
 - Earlier record: `lessons.md` lines 74, 520.
 
 ### `0x55d80` `Dh::getValue` DIFF
 
-- Score: 98.0 (calls 100, refs 100, consts 94). Proof level: B.
+- Score: 98.0 (calls 100, refs 100, consts 94). Proof level: A.
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 90 insns, lift 86 insns, 7 changed hunks; first divergence: `-add eax, eax`.
-- Reason: not referenced in ours (dropped or inlined).
+- Reason: `0x55d80` Dh::getValue (main 98.0): Hex-Rays of the original shows `if (&v12 == -576 || v7 > 1024 || !CryptoKey::generateBigNumber(v7, &pbuf, &ps)) return 0;`. `&v12 + 576` is the stack buffer that goes to generateBigNumber. The original keeps a null test of a stack address (`lea rax, [rsp+N]` / `test rax, rax` / `je L`). VS2010 folds this test in every source form we tried, so the lift has no test. The folded test changes the order of the later code: the `&_p` load goes before the bits test, and the result block is in another place (5 to 7 hunks with tools/d.py). Forms tried: (1) main form (`half > 1024 || !generateBigNumber(...)`, 7 hunks), (2) direct `&count == nullptr || half > 8 * count` with a `bits2` local (q branch v2b2-t5 794a320, results/ql-t5.out: funcdiff signal MATCH 100.0, d.py 5 hunks, test folded), (3) inline helper `CryptoKey::generateIfSet` with `out == nullptr || bits > 8 * *size`, and the result branches in the other order (q branch v2b2-t6 5f802ca, results/ql-t6b.out: signal MATCH, d.py 6 hunks, test folded). The same cause shows in LG AlertSender::init 0x19da0 (test of `&ver`). Level A.
+- Tried: see the reason (lead note LobbyGate-55d80).
 - Earlier record: `lessons.md` lines 521.
-
-### `0x561a0` `BigInteger::IsPrime` DIFF
-
-- Score: 82.2 (calls 100, refs 80, consts 67). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 39 insns, lift 37 insns, 5 changed hunks; first divergence: `-xor s2d, s2d` / `+lea s2, [lnz]` / `-test s1, s1`.
-- Reason: not referenced in ours (dropped or inlined).
-- Earlier record: `lessons.md` lines 108, 521.
 
 ### `0x56230` `BigInteger::InvMod` DIFF
 
-- Score: 89.7 (calls 85, refs 100, consts 84). Proof level: B.
+- Score: 89.7 (calls 85, refs 100, consts 84). Proof level: A.
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 832 insns, lift 717 insns, 100 changed hunks.
-- Reason: not referenced in ours (dropped or inlined).
+- Reason: `0x56230` BigInteger::InvMod (89.7): cause = LTCG inline choice of `RightShift`. The original puts `RightShift(x, 1)` inline in `invMod` (6 copies) and `InvMod` (4 copies), and then calls `Sub`/`Add`/`Set` out of line (inline budget used up). It keeps a call of `RightShift` in `LeftShift` (tail jump LG 0x59bca), `Divide` (LG 0x59020) and `isPrimeMR` (LG 0x57190). Evidence: the original lines `shr dword ptr [s0+N], 1` / `shl eax, 0x1f` / `add dword ptr [rcx - 4], eax` and the out-of-line `Sub`/`Add`/`Set` calls (author card v2b2-bigi, handoff in author-handoffs/). No allowed source form gives inline copies in only the shift-by-1 callers. Forms tried: `noinline` on `RightShift` (base); no `noinline` with `RightShift` first (lessons B, crypto-4: `LeftShift` loses its MATCH); no `noinline` with `LeftShift` first as in the original (card v2b2-bigi round 2: gain 0, `LeftShift` loss); `#pragma inline_depth(0)` on `LeftShift` (no gain). Rejected: `__forceinline` (inline in all callers, the original calls it in 3), an extra inline copy without a PDB name (not allowed), `noinline` on `Add`/`Sub` (the original has them inline in the halving loops). Card result: no_gain after 2 rounds (2.03M tokens).
+- Tried: see the reason (lead note LobbyGate-56230).
 - Earlier record: `lessons.md` lines 518.
 
 ### `0x57190` `BigInteger::isPrimeMR` DIFF
 
-- Score: 88.4 (calls 81, refs 100, consts 84). Proof level: B.
+- Score: 88.4 (calls 81, refs 100, consts 84). Proof level: A.
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 250 insns, lift 323 insns, 42 changed hunks; first divergence: `-lea s0, [rax - 0xbb8]` / `+push r14` / `+push r15`.
-- Reason: not referenced in ours (dropped or inlined).
+- Reason: `0x57190` BigInteger::isPrimeMR (main 88.4): the LG original calls `BigInteger::absCompare` (body 0x56140) 5 times in isPrimeMR (Hex-Rays: 5 `BigInteger::absCompare(&v24)` calls after the sign and bits tests). The LG original puts absCompare inline in its other callers (expMod, montgomeryReduce, both MATCH on main). The lift puts absCompare inline in all callers, so isPrimeMR has 82 more insns (332 against 250), 2 more callee-saved pushes (r14, r15) and a larger frame (0xbc8 against 0xbb8). This is an inline choice per call site. Forms tried: (1) main form (88.4), (2) author ipm round 1: inline value constructor for `b` and `one`, `n != 0` test before Sub (90.0), (3) author ipm round 2: `__declspec(noinline)` on absCompare for LG only (isPrimeMR 98.2, but LG expMod and montgomeryReduce lose MATCH: card parked lost_match, results/v2b2-ipm.result.json), (4) round 1 form + `#pragma inline_depth(1)` around isPrimeMR, so that absCompare in isEqual is depth 2 (q branch v2b2-t7 92ac2cb, results/ql-t7.out: 90.0, d.py 41 hunks: LTCG does not use the pragma). Same cause as LG 0x37f0 and LG 0x3ec0. Level A.
+- Tried: see the reason (lead note LobbyGate-57190).
 - Earlier record: `lessons.md` lines 521.
 
 ### `0x575f0` `BigInteger::invMod` DIFF
 
-- Score: 83.1 (calls 59, refs 100, consts 90). Proof level: B.
+- Score: 83.1 (calls 59, refs 100, consts 90). Proof level: A.
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 927 insns, lift 1265 insns, 121 changed hunks.
-- Reason: not referenced in ours (dropped or inlined).
+- Reason: `0x575f0` BigInteger::invMod (83.1): cause = LTCG inline choice of `RightShift`. The original puts `RightShift(x, 1)` inline in `invMod` (6 copies) and `InvMod` (4 copies), and then calls `Sub`/`Add`/`Set` out of line (inline budget used up). It keeps a call of `RightShift` in `LeftShift` (tail jump LG 0x59bca), `Divide` (LG 0x59020) and `isPrimeMR` (LG 0x57190). Evidence: the original lines `shr dword ptr [s0+N], 1` / `shl eax, 0x1f` / `add dword ptr [rcx - 4], eax` and the out-of-line `Sub`/`Add`/`Set` calls (author card v2b2-bigi, handoff in author-handoffs/). No allowed source form gives inline copies in only the shift-by-1 callers. Forms tried: `noinline` on `RightShift` (base); no `noinline` with `RightShift` first (lessons B, crypto-4: `LeftShift` loses its MATCH); no `noinline` with `LeftShift` first as in the original (card v2b2-bigi round 2: gain 0, `LeftShift` loss); `#pragma inline_depth(0)` on `LeftShift` (no gain). Rejected: `__forceinline` (inline in all callers, the original calls it in 3), an extra inline copy without a PDB name (not allowed), `noinline` on `Add`/`Sub` (the original has them inline in the halving loops). Card result: no_gain after 2 rounds (2.03M tokens).
+- Tried: see the reason (lead note LobbyGate-575f0).
 - Earlier record: `lessons.md` lines 431, 518.
 
 ### `0x59020` `BigInteger::Divide` DIFF
 
-- Score: 76.7 (calls 75, refs 67, consts 89). Proof level: B.
+- Score: 84.4 (calls 94, refs 67, consts 92). Proof level: A.
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 683 insns, lift 672 insns, 107 changed hunks.
-- Reason: not referenced in ours (dropped or inlined).
+- Reason: `0x59020` BigInteger::Divide (main 84.4; LG `0x59020`, SCD `0x4b7e0`, POD `0x590d0`, one shared source): the best form is 97.7 with no MATCH. Author card v2b2-div (2 rounds, no_gain, results/v2b2-div.result.json, handoff Docs/Plan/handoffs/lift-lobbydaemon-v2b2-div.md) moved the score from 84.4 to 97.7. It repeated the special-case stores, used the original `norm` branch order, added an inline copy constructor (memcpy 0x200), set `#pragma inline_depth(0)`, wrote absCompare, leftShiftDigit and Add inline, used zero-first ternaries, kept qhat in a register and did a load, decrement and store of the quotient digit (683 against 683 insns, 88 hunks with tools/d.py). Lead fix try t8 (q branch v2b2-t8 979474f, results/ql-t8.out): the 4 digit-shift copies are pointer down-counters, as in Hex-Rays (`*p = p[-shift]; --p; while (--c != 0)`). Result: 74 hunks (687 insns), still 97.7. The remaining hunks are not statements. They are: (1) block placement of the special cases (the original merges the memset and Set tails of the `a->bits == 0`, `b == 0` and `|a| < |b|` blocks, and the lift keeps a copy per block), (2) the `while (x.bits >= y.bits)` loop: the original keeps the test at the top with a `jmp` back after `Sub`, and the lift rotates the loop (test copy at the bottom), (3) the load order of `y.bits % 32` against the q stores, (4) callee-saved register choice and stack offsets (x, y, t3, q, t1, t2 order). VS2010 decides tail merge, loop rotation and scheduling. We found no source form that controls them. Forms tried: main form, author rounds 1 and 2 (the forms listed above), lead t8 pointer loops. Level A.
+- Tried: see the reason (lead note LobbyGate-59020).
 - Earlier record: `lessons.md` lines 331, 518.
 
 ### `0x5b0c0` `aes128TableSetupEncKey` DIFF
 
-- Score: 88.9 (calls 100, refs 100, consts 67). Proof level: B.
+- Score: 97.0 (calls 100, refs 100, consts 91). Proof level: A.
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 159 insns, lift 182 insns, 15 changed hunks; first divergence: `-push rdi` / `+mov qword ptr [rsp+N], rdi` / `+push r14`.
-- Reason: hiword (use the HIWORD/LOWORD macro (shift and word forms as the original)).
+- Reason: `0x5b0c0` aes128TableSetupEncKey (97.0 after card aes, all 5 exes; POD diff on lead q build 88f6dab): the source statements, the 5x unroll and all memory reads are equal (`movzx byte ptr [rk+13..15]`, same table reads, same stores). The rest is register allocation of the unrolled loop: the original saves one more callee-saved register (`push r13`) and keeps the 5th round value in it (`s4d`), the lift uses r9d. The Rcon base register has a different bias (`xor r10d, [s1+N]` with a positive offset in the original; `[s1 - 8]`, `[s1]` in the lift), because LTCG picks a different induction variable for `Rcon[i]`. Forms tried: shifts from the register for all bytes (base, 88.9); `for (;;)` with `if (++i == 10) return` and all bytes through a pointer (author round 1, 79.8, unroll lost); counted `for` loop with byte 0 from the register and bytes 1..3 from memory (author round 2, 97.0, landed 3d1253a). Level A.
+- Tried: see the reason (lead note LobbyGate-5b0c0).
 - Earlier record: `lessons.md` lines 512.
-
-### `0x5b310` `aes128TableSetupDecKey` DIFF
-
-- Score: 91.7 (calls 100, refs 100, consts 75). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 75 insns, lift 103 insns, 8 changed hunks; first divergence: `+mov qword ptr [rsp+N], rbx` / `+lea r9, [rdx + 0xa8]` / `-add rdx, 0xa8`.
-- Reason: constant (use constant 0xa8 as the original (lift has 0xa0); check enum/type width).
-- Earlier record: `lessons.md` lines 512.
-
-### `0x5b4e0` `aes128TableEncrypt` DIFF
-
-- Score: 70.0 (calls 100, refs 50, consts 60). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 311 insns, lift 171 insns, 17 changed hunks; first divergence: `-push r14` / `-push r15` / `-mov eax, dword ptr [r8]`.
-- Reason: hiword (use the HIWORD/LOWORD macro (shift and word forms as the original)).
-- Earlier record: `lessons.md` lines 402, 512.
-
-### `0x5ba60` `aes128TableDecrypt` DIFF
-
-- Score: 70.0 (calls 100, refs 50, consts 60). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 311 insns, lift 171 insns, 19 changed hunks; first divergence: `-push r14` / `-push r15` / `-mov eax, dword ptr [r8]`.
-- Reason: hiword (use the HIWORD/LOWORD macro (shift and word forms as the original)).
-- Earlier record: `lessons.md` lines 402, 512.
 
 ## SmartCouponDaemon (SCD)
 
@@ -563,21 +483,6 @@ triage, the instruction diffs and the Not-done reports of the batch authors. No 
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 241 insns, lift 209 insns, 36 changed hunks; first divergence: `-mov qword ptr [rsp+N], rdx` / `-mov qword ptr [rsp+N], rcx` / `-push rbp`.
 - Reason: `0x53d0` NPChannel::SendMsg: OPEN (examined, no proof). No MakeCrash call in the original (llvm-objdump 0x1400053d0-0x1400057d0; the triage hint is wrong). Differences: (1) TLS layout: the original reads the send buffer at TLS+0x40 and the PacketBuffer pool at TLS+0x28; the lift at TLS+0xa0 and +0x50 (order of the thread-local data). (2) The original inlined `Packet::Add` gives 53 more instructions in the copy loop (memcpy 0x140051b52). Next try: the order of the `__declspec(thread)` definitions, and `Packet::Add` with the size test of the original.
 - Tried: see the reason (lead note SmartCouponDaemon-53d0).
-
-### `0x71a0` `JobManager::Execute` DIFF
-
-- Score: 88.9 (calls 100, refs 100, consts 67). Proof level: A.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 33 insns, lift 31 insns, 3 changed hunks; first divergence: `-mov eax, r8d`.
-- Reason: `JobManager::Execute` 0x71a0 (88.9) and `JobManager::ExecuteW` 0x7220 (93.3). Cause: in the lift, `Execute` has one caller (`ExecuteW`, task 2). LTCG moves the constant 2 into `Execute` (`mov edx, 2`). The original keeps the task argument (`mov eax, r8d`), and `ExecuteW` passes `mov r8d, 2`. The original has a second use of the `Execute` logic in `SendPublicationEvent::HandleEvent` (task 1), but the compiler inlined it there. Form tried (round 1): call `jobMgr->Execute(job, 1, nullptr)` from `SendPublicationEvent::HandleEvent`. Result: the build did not inline the call, and `SendPublicationEvent::HandleEvent` lost its MATCH. Reverted. Stop list item; the batch lead must decide if the cross-TU inline is reachable. The `cmp eax, 1` / `jne` test after `CouponJob::execute` in 0x71a0 suggests a return type of `int` in the original against `bool` in the lift. Not examined.
-- Tried: see the reason (v2b-scd-01b).
-- Earlier record: `lessons.md` lines 514.
-
-### `0x7220` `JobManager::ExecuteW` DIFF
-
-- Score: 93.3 (calls 100, refs 100, consts 80). Proof level: A.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 36 insns, lift 35 insns, 1 changed hunks; first divergence: `-mov r9, s0` / `-mov r8d, 2` / `+mov r8, s0`.
-- Reason: `JobManager::Execute` 0x71a0 (88.9) and `JobManager::ExecuteW` 0x7220 (93.3). Cause: in the lift, `Execute` has one caller (`ExecuteW`, task 2). LTCG moves the constant 2 into `Execute` (`mov edx, 2`). The original keeps the task argument (`mov eax, r8d`), and `ExecuteW` passes `mov r8d, 2`. The original has a second use of the `Execute` logic in `SendPublicationEvent::HandleEvent` (task 1), but the compiler inlined it there. Form tried (round 1): call `jobMgr->Execute(job, 1, nullptr)` from `SendPublicationEvent::HandleEvent`. Result: the build did not inline the call, and `SendPublicationEvent::HandleEvent` lost its MATCH. Reverted. Stop list item; the batch lead must decide if the cross-TU inline is reachable. The `cmp eax, 1` / `jne` test after `CouponJob::execute` in 0x71a0 suggests a return type of `int` in the original against `bool` in the lift. Not examined.
-- Tried: see the reason (v2b-scd-01b).
 
 ### `0x7dc0` `HandleSmartCoupon_HelloReq` DIFF
 
@@ -616,6 +521,14 @@ triage, the instruction diffs and the Not-done reports of the batch authors. No 
 - Reason: `RetryCouponPublicationEvent::HandleEvent` 0xc2f0 (97.5). Cause: the original reads the posted `SendPublicationEvent` object after `PostQueuedCompletionStatus` for the line 459 log (`mov eax, dword ptr [s6 + 0x30]`, `mov rax, qword ptr [s6 + 0x18]`). Another thread can free the object at that time (use after free race). When `Alloc` fails, the read is a null dereference. The lift reads the same values from `this`. This is a safety rule: we do not reproduce the bug. The other hunks follow from this register use. No form tried.
 - Tried: see the reason (v2b-scd-01b).
 
+### `0x150e0` `SmartCouponDaemon::initialize` DIFF
+
+- Score: 95.1 (calls 92, refs 97, consts 96). Proof level: A.
+- Evidence (main 8af60dd, `-` original, `+` lift): orig 289 insns, lift 256 insns, 36 changed hunks; first divergence: `+mov rax, rsp` / `-mov eax, 0x10e0` / `-call __chkstk`.
+- Reason: `0x150e0` SmartCouponDaemon::initialize (95.1 after author round 1): cause = binary patch in the original. After `fclose` the original sets up the arguments of a cert-decode call (`rcx` = `_time64` result, `rdx` = Buffer, `r8d` = fread result, `r9` = dsn, 2 stack arguments with the addresses of `dsnSize` and one more local), but the call is replaced by `jmp L` + 3 `nop`, and the code after it is dead. A second patch makes the `MultiByteToWideChar` input `lea r8, [edx]` + 4 `nop` (Hex-Rays: `(LPCCH)(unsigned int)Buffer`). The entry stores (dword 0x400, byte 0), the `memset(dsn, 0, 0x400)` and the 0x10e0 frame with `__chkstk` exist only because the erased call took the addresses of the locals. With the call in the source the lift has 1 extra call; without it VS2010 removes the stores, the memset and the array (frame < 4096, no `__chkstk`). The only other escape is a fake global/volatile store (not allowed). Forms tried: main; author card v2b2-scdi round 1 (`_certFile` load before `_time64`, `int` fread result: 95.1), round 2 (analysis). Handoff: author-handoffs/lift-lobbydaemon-v2b2-scdi.md. Level A.
+- Tried: see the reason (lead note SmartCouponDaemon-150e0).
+- Earlier record: `lessons.md` lines 457, 508.
+
 ### `0x1a0d0` `DaemonConfig::Dump` DIFF
 
 - Score: 97.9 (calls 100, refs 94, consts 100). Proof level: A.
@@ -624,161 +537,111 @@ triage, the instruction diffs and the Not-done reports of the batch authors. No 
 - Tried: see the reason (v2b-scd-01a).
 - Earlier record: `lessons.md` lines 438, 439.
 
-### `0x1180` `ObjPool::ObjPool` DIFF
-
-- Score: 99.0 (calls 100, refs 97, consts 100). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 24 insns, lift 25 insns, 3 changed hunks; first divergence: `+mov qword ptr [EventNotiJob::_pool+0x20], s0` / `+mov qword ptr [EventNotiJob::_pool+0x18], rax`.
-- Reason: data_ref (reference the same global/string as the original ([EventNotiJob::_pool+0x20])).
-- Earlier record: `lessons.md` lines 417, 681, 682, 1073, 1152, 1246.
-
-### `0x1490` `ObjPool::Finalize` DIFF
-
-- Score: 99.0 (calls 100, refs 97, consts 100). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 42 insns, lift 46 insns, 6 changed hunks; first divergence: `+mov r11, qword ptr [EventNotiJob::_pool+0x38]` / `-mov rdx, qword ptr [EventNotiJob::_pool+0x38]` / `-test rdx, rdx`.
-- Reason: data_ref (reference the same global/string as the original ([EventNotiJob::_pool+0x38])).
-- Earlier record: `lessons.md` lines 515, 682.
-
-### `0x150e0` `SmartCouponDaemon::initialize` DIFF
-
-- Score: 95.1 (calls 92, refs 97, consts 96). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 289 insns, lift 256 insns, 36 changed hunks; first divergence: `+mov rax, rsp` / `-mov eax, 0x10e0` / `-call __chkstk`.
-- Reason: instruction_order (move the call statements into the original order (Log::Write)).
-- Earlier record: `lessons.md` lines 457, 508.
-
-### `0x16df0` `Daemon::Start` DIFF
-
-- Score: 97.0 (calls 100, refs 100, consts 91). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 121 insns, lift 120 insns, 1 changed hunks; first divergence: `-mov edx, 0x80`.
-- Reason: constant (LTCG may move constant args into the callee: look at the callee first; fix only if the source misses an argument (constant 0x80 in the original, none in the lift)).
-- Earlier record: `lessons.md` lines 56, 513.
-
-### `0x1b930` `Session::Session` DIFF
-
-- Score: 95.2 (calls 100, refs 86, consts 100). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 68 insns, lift 67 insns, 3 changed hunks; first divergence: `+mov dword ptr [rcx + 8], 0xa` / `-mov dword ptr [rcx + 8], 0xa`.
-- Reason: wrong callee: memory manager.
-- Earlier record: `lessons.md` lines 37, 43, 63, 85, 104, 107.
-
 ### `0x1bf20` `Session::Connect` DIFF
 
-- Score: 98.0 (calls 100, refs 100, consts 94). Proof level: B.
+- Score: 98.0 (calls 100, refs 100, consts 94). Proof level: A.
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 145 insns, lift 139 insns, 32 changed hunks; first divergence: `-mov rax, qword ptr [s3+N]` / `+mov rax, qword ptr [s3 + 0xb8]` / `+mov qword ptr [rsp+N], r13`.
-- Reason: hiword (use the HIWORD/LOWORD macro (shift and word forms as the original)).
+- Reason: `0x1bf20` Session::Connect (main 98.0; CG, LG and POD Session::Connect are MATCH with the same BloodLib source): 2 SCD-only causes. (1) Store order: SCD stores the Session members in the order +0x74 (0), +0x50 (3), +0x54 (option), and the inlined `ReconnectTimer` constructor in the order byte +0x34, +0x28, ..., +8 (tag 0x1020a), +0x38 (session id). The lift stores in source order (+0x50, +0x74, +0x54; +0x38, +8, ..., +0x28, +0x34), and this order gives the MATCH in the other 3 exes. One shared source cannot give 2 store orders: the order is LTCG scheduling per exe. (2) Register choice: the original keeps `this` in another callee-saved register (d.py shows its offsets as frame offsets). The `reconnect ? 2 : 1` part is fixed by form (3) below. Forms tried: (1) main form (constant option; 32 hunks), (2) lead card scd f18c34f (Connect uses reconnect), (3) lead card scd3 caaa2ff (`_option = reconnect ? 2 : 1` and LG Hello passes true; q branch v2b2-t3 fbc92f7, results/ql-t3.out: the reconnect read now matches, 26 hunks, all store order and register choice, no score change, LG Connect stays MATCH). Level A.
+- Tried: see the reason (lead note SmartCouponDaemon-1bf20).
 - Earlier record: `lessons.md` lines 37, 523.
 
 ### `0x1cb40` `Session::HandleEvent` DIFF
 
-- Score: 98.5 (calls 98, refs 97, consts 100). Proof level: B.
+- Score: 98.5 (calls 98, refs 97, consts 100). Proof level: A.
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 242 insns, lift 246 insns, 28 changed hunks; first divergence: `+lea rdx, [L"source\Session.cpp"]` / `-lea rdx, [L"source\Session.cpp"]`.
-- Reason: branch_inversion (swap if/else (invert the condition at the first divergence)).
+- Reason: `0x1cb40` Session::HandleEvent: the open differences are a compiler tail merge and instruction scheduling. The original merges the line-838 `Log::Write` into the shared 785/824 call (`mov r8d, 0x346; jmp L`); the 838 call has 6 arguments and the 824 call has 7. The lift gives the 838 block its own call. In the line-785 block the original stores the stack arguments before the `lea r9`/`lea rdx`/`mov r8d`/`xor ecx` loads; the lift does the reverse. Cause: cross-jumping and epilogue tail duplication select which of the 838 and 854 blocks (same end) merges; the source has no control of this choice. Forms tried (batch 1, lessons.md B lines 400 and 415; batch 2 card v2b2-shev, 2 rounds, no_gain): `goto` to one tail (98.5 -> 97.1); one common log call (98.5); `if (!result) { 854 } return true;` (97.4: the merge moves to the 854 block); a double `_connectContext` read, the `IdleStateTable::Pos` union split and the `_id` load before `WSAGetLastError` (these 3 agree with the original, score 98.7, no MATCH). Same diff in CG, LG, SCD and POD.
+- Tried: see the reason (lead note SmartCouponDaemon-1cb40).
 - Earlier record: `lessons.md` lines 400, 415, 522, 571.
-
-### `0x1f7b0` `ThreadManager::Initialize` DIFF
-
-- Score: 88.9 (calls 100, refs 100, consts 67). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 30 insns, lift 29 insns, 4 changed hunks; first divergence: `-mov dword ptr [rcx], edx` / `+mov dword ptr [rcx], 0x80` / `-mov edx, edx`.
-- Reason: inlined but should not be.
-- Earlier record: `lessons.md` lines 513.
 
 ### `0x24600` `PipeCommandProcess::processCommand` DIFF
 
-- Score: 96.3 (calls 100, refs 100, consts 89). Proof level: B.
+- Score: 96.3 (calls 100, refs 100, consts 89). Proof level: A.
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 68 insns, lift 51 insns, 11 changed hunks; first divergence: `-nop word ptr [rax + rax]` / `-mov r8, qword ptr [s0 + 0x10]` / `-test r8, r8`.
-- Reason: constant (LTCG may move constant args into the callee: look at the callee first; fix only if the source misses an argument (constant -1 in the original, none in the lift)).
+- Reason: `0x24600` PipeCommandProcess::processCommand: calls, refs and string constants are equal; only the code form of the inline `wcscmp` differs. The original keeps the -1/0/1 value of each compare (`xor eax,eax; repe cmpsw; je L; sbb eax,eax; sbb eax,-1; L: test eax,eax; jne`) and has a loop-alignment `nop` at the loop head. The VS2010 build folds `wcscmp(...) == 0` into `repe cmpsw; jne` at every compare. Cause: an optimizer decision of the original build that the source does not control. Evidence: the LD reference GamedChannel::SendChangedGradeNotify (0x83ea0, MATCH) has 5 plain `wcscmp(...) == 0` compares and the `sbb` form only on the last one; the lift processCommand bodies fold also the last compare, so no compare position rule explains the original. Forms tried (batch 1 and batch 2 card v2b2-pcmd, 2 rounds, no_gain): `!wcscmp(...)`; `int r = wcscmp(...); if (r == 0)`; 2 more spellings (lessons.md B line 437); separate `if` statements with `continue`/`goto done` and `argv[0]` in a local; a file-static inline compare helper in the else-if chain (PipeConsole::processCommand went 97.0 -> 89.8). A command table with a switch adds a table and a loop that the original does not have. Same diff in CG, LG, SCD, POD and LD.
+- Tried: see the reason (lead note SmartCouponDaemon-24600).
 - Earlier record: `lessons.md` lines 388, 437, 506, 527.
 
 ### `0x24ad0` `PipeConsole::processCommand` DIFF
 
-- Score: 97.0 (calls 100, refs 100, consts 91). Proof level: B.
+- Score: 97.0 (calls 100, refs 100, consts 91). Proof level: A.
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 134 insns, lift 109 insns, 11 changed hunks; first divergence: `-mov rdx, qword ptr [rax]` / `+mov rax, qword ptr [rax]`.
-- Reason: constant (LTCG may move constant args into the callee: look at the callee first; fix only if the source misses an argument (constant -1 in the original, none in the lift)).
+- Reason: `0x24ad0` PipeConsole::processCommand: calls, refs and string constants are equal; only the code form of the inline `wcscmp` differs. The original keeps the -1/0/1 value of each compare (`xor eax,eax; repe cmpsw; je L; sbb eax,eax; sbb eax,-1; L: test eax,eax; jne`) and has a loop-alignment `nop` at the loop head. The VS2010 build folds `wcscmp(...) == 0` into `repe cmpsw; jne` at every compare. Cause: an optimizer decision of the original build that the source does not control. Evidence: the LD reference GamedChannel::SendChangedGradeNotify (0x83ea0, MATCH) has 5 plain `wcscmp(...) == 0` compares and the `sbb` form only on the last one; the lift processCommand bodies fold also the last compare, so no compare position rule explains the original. Forms tried (batch 1 and batch 2 card v2b2-pcmd, 2 rounds, no_gain): `!wcscmp(...)`; `int r = wcscmp(...); if (r == 0)`; 2 more spellings (lessons.md B line 437); separate `if` statements with `continue`/`goto done` and `argv[0]` in a local; a file-static inline compare helper in the else-if chain (PipeConsole::processCommand went 97.0 -> 89.8). A command table with a switch adds a table and a loop that the original does not have. Same diff in CG, LG, SCD, POD and LD.
+- Tried: see the reason (lead note SmartCouponDaemon-24ad0).
 - Earlier record: `lessons.md` lines 437, 506, 527.
 
 ### `0x253e0` `PipeConsole::run` DIFF
 
-- Score: 96.3 (calls 89, refs 100, consts 100). Proof level: B.
+- Score: 96.3 (calls 89, refs 100, consts 100). Proof level: A.
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 183 insns, lift 168 insns, 32 changed hunks; first divergence: `-push rbx` / `-push r13` / `-push r15`.
-- Reason: instruction_order (move the call statements into the original order (Log::Write)).
+- Reason: `0x253e0` PipeConsole::run (86.5 on main 3d1253a; same body in CG 0x157b0, LG 0x29fc0, SCD 0x253e0, POD 0x32dd0): the diff is register allocation and address CSE. The original keeps `i*0x4038` in a register and adds `this + 0x9a8 + off` at each field use (`cmp dword ptr [s4 + s0 + 0x9dc], s1d`). The lift computes one base pointer (`lea s4, [rax + s0 + 0x9a8]`) for every source form. Calls, refs and consts are equal. Forms tried: label place; `switch` and `if` chain (lessons B); signed index with a reference (lead p13); signed index with `_pipe[i]` at each use and per-site reconnect calls (author round 1); `int` result with `movsxd` after the call, no `- WAIT_OBJECT_0`, one `reconnect:` label (part 2); 64-bit index and a `broken = &_pipe[i]` pointer to one shared call (part 3). Card v2b2-pcrun: 2 rounds, no_gain (results/v2b2-pcrun.author.log). Level A.
+- Tried: see the reason (lead note SmartCouponDaemon-253e0).
 - Earlier record: `lessons.md` lines 394, 412, 514.
-
-### `0x26c70` `WindowConsole::Open` DIFF
-
-- Score: 95.2 (calls 100, refs 100, consts 86). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 146 insns, lift 143 insns, 22 changed hunks; first divergence: `-xor al, al` / `-mov byte ptr [s1+N], 1` / `+mov byte ptr [s1], 1`.
-- Reason: constant (use constant 0xc0 as the original (lift has 0x30); check enum/type width).
-- Earlier record: `lessons.md` lines 514.
-
-### `0x28420` `StaticPageMemoryManager::Initialize` DIFF
-
-- Score: 96.3 (calls 100, refs 89, consts 100). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 30 insns, lift 31 insns, 5 changed hunks; first divergence: `-je L` / `-lea rax, [rdx + 0x800]` / `-mov qword ptr [rcx + 8], rdx`.
-- Reason: ref order differs.
-- Earlier record: `lessons.md` lines 513.
 
 ### `0x29cc0` `IoWorker::run` DIFF
 
-- Score: 84.9 (calls 69, refs 97, consts 88). Proof level: B.
+- Score: 84.9 (calls 69, refs 97, consts 88). Proof level: A.
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 190 insns, lift 181 insns, 10 changed hunks; first divergence: `-mov s2d, 0x10` / `+mov s2d, 8` / `-mov ecx, 0x38`.
-- Reason: branch_inversion (swap if/else (invert the condition at the first divergence)).
+- Reason: `0x29cc0` IoWorker::run: the first difference is a TLS slot offset. Original `mov s2d, 0x10`, lift `mov ecx, 0x18` (first divergence in tools/d.py, base build 666b998). The original TLS slots of `IoWorker::WorkerId`/`IoWorker::ZstdCCtx` are 16/56 (llvm-pdbutil THREAD32 records, section 0005); the lift slots are 8/24 in all 4 exes (tools/tls.sh). Cause: the LTCG code generator sets the order of the `__declspec(thread)` variables; the defining objs have the ltcg flag in S_COMPILE3. The same 2 adjacent BloodLib variables have different slots in each original exe (CG 16/48, LG 20/48, SCD 16/56, POD 24/56), so no single source declaration order gives them. Same cause and evidence as proof LobbyGate-5cf0 (batch 2). The offset is in a register that the function uses again, so funcdiff does not normalize it. Other differences (not the blocker): the Daemon state check (original signed `test/js; cmp 2; jle`, lift unsigned `cmp 2; jbe`) and the place of the !result block. Tried (batch 2): PDB check of all TLS records in the 4 exes; the TLS order is not a source choice.
+- Tried: see the reason (lead note SmartCouponDaemon-29cc0).
 - Earlier record: `lessons.md` lines 527.
 
 ### `0x46b20` `Rsa::decrypt` DIFF
 
-- Score: 91.7 (calls 95, refs 80, consts 100). Proof level: B.
+- Score: 91.7 (calls 95, refs 80, consts 100). Proof level: A.
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 205 insns, lift 200 insns, 25 changed hunks; first divergence: `-mov r10d, dword ptr [rcx + 0x1c]` / `+movsxd rdx, dword ptr [s5]`.
-- Reason: not referenced in ours (dropped or inlined).
+- Reason: `0x46b20` Rsa::decrypt (91.7): blocker = the zero fill of the block buffer. The original keeps a byte loop (`mov byte ptr [rax], 0; inc; inc; cmp; jl`); the lift build gets `call memset` (a call difference, so no MATCH while it stays). Forms tried (lessons.md crypto-4 and card v2b2-rsa, 2 rounds, no_gain): index loop, pointer byte loop, `while (c < blockSize)` with a hoisted size, the buffer at function scope; VS2010 makes `memset` from each. Not tried: a bound from an out-of-line getter; the PDB has no type records for `OaepEncoder`, so the getter has no PDB name (not allowed). Other differences (not the blocker): the inline `BigInteger::Set` size check (original `test; js; cmp 0x200; ja`, lift only `cmp; ja`; the fix is in `BigInteger::Set`, outside the card) and the frame slots of `m`/`r` (compiler frame layout). Handoff: author-handoffs/lift-lobbydaemon-v2b2-rsa.md.
+- Tried: see the reason (lead note SmartCouponDaemon-46b20).
 - Earlier record: `lessons.md` lines 434, 507, 519.
 
 ### `0x48f10` `BigInteger::InvMod` DIFF
 
-- Score: 89.7 (calls 85, refs 100, consts 84). Proof level: B.
+- Score: 89.7 (calls 85, refs 100, consts 84). Proof level: A.
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 832 insns, lift 717 insns, 100 changed hunks.
-- Reason: not referenced in ours (dropped or inlined).
+- Reason: `0x48f10` BigInteger::InvMod (89.7): cause = LTCG inline choice of `RightShift`. The original puts `RightShift(x, 1)` inline in `invMod` (6 copies) and `InvMod` (4 copies), and then calls `Sub`/`Add`/`Set` out of line (inline budget used up). It keeps a call of `RightShift` in `LeftShift` (tail jump LG 0x59bca), `Divide` (LG 0x59020) and `isPrimeMR` (LG 0x57190). Evidence: the original lines `shr dword ptr [s0+N], 1` / `shl eax, 0x1f` / `add dword ptr [rcx - 4], eax` and the out-of-line `Sub`/`Add`/`Set` calls (author card v2b2-bigi, handoff in author-handoffs/). No allowed source form gives inline copies in only the shift-by-1 callers. Forms tried: `noinline` on `RightShift` (base); no `noinline` with `RightShift` first (lessons B, crypto-4: `LeftShift` loses its MATCH); no `noinline` with `LeftShift` first as in the original (card v2b2-bigi round 2: gain 0, `LeftShift` loss); `#pragma inline_depth(0)` on `LeftShift` (no gain). Rejected: `__forceinline` (inline in all callers, the original calls it in 3), an extra inline copy without a PDB name (not allowed), `noinline` on `Add`/`Sub` (the original has them inline in the halving loops). Card result: no_gain after 2 rounds (2.03M tokens).
+- Tried: see the reason (lead note SmartCouponDaemon-48f10).
 - Earlier record: `lessons.md` lines 518.
 
 ### `0x49db0` `BigInteger::invMod` DIFF
 
-- Score: 83.1 (calls 59, refs 100, consts 90). Proof level: B.
+- Score: 83.1 (calls 59, refs 100, consts 90). Proof level: A.
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 927 insns, lift 1265 insns, 121 changed hunks.
-- Reason: not referenced in ours (dropped or inlined).
+- Reason: `0x49db0` BigInteger::invMod (83.1): cause = LTCG inline choice of `RightShift`. The original puts `RightShift(x, 1)` inline in `invMod` (6 copies) and `InvMod` (4 copies), and then calls `Sub`/`Add`/`Set` out of line (inline budget used up). It keeps a call of `RightShift` in `LeftShift` (tail jump LG 0x59bca), `Divide` (LG 0x59020) and `isPrimeMR` (LG 0x57190). Evidence: the original lines `shr dword ptr [s0+N], 1` / `shl eax, 0x1f` / `add dword ptr [rcx - 4], eax` and the out-of-line `Sub`/`Add`/`Set` calls (author card v2b2-bigi, handoff in author-handoffs/). No allowed source form gives inline copies in only the shift-by-1 callers. Forms tried: `noinline` on `RightShift` (base); no `noinline` with `RightShift` first (lessons B, crypto-4: `LeftShift` loses its MATCH); no `noinline` with `LeftShift` first as in the original (card v2b2-bigi round 2: gain 0, `LeftShift` loss); `#pragma inline_depth(0)` on `LeftShift` (no gain). Rejected: `__forceinline` (inline in all callers, the original calls it in 3), an extra inline copy without a PDB name (not allowed), `noinline` on `Add`/`Sub` (the original has them inline in the halving loops). Card result: no_gain after 2 rounds (2.03M tokens).
+- Tried: see the reason (lead note SmartCouponDaemon-49db0).
 - Earlier record: `lessons.md` lines 431, 518.
 
 ### `0x4b7e0` `BigInteger::Divide` DIFF
 
-- Score: 76.7 (calls 75, refs 67, consts 89). Proof level: B.
+- Score: 84.4 (calls 94, refs 67, consts 92). Proof level: A.
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 683 insns, lift 672 insns, 107 changed hunks.
-- Reason: not referenced in ours (dropped or inlined).
+- Reason: `0x4b7e0` BigInteger::Divide (main 84.4; LG `0x59020`, SCD `0x4b7e0`, POD `0x590d0`, one shared source): the best form is 97.7 with no MATCH. Author card v2b2-div (2 rounds, no_gain, results/v2b2-div.result.json, handoff Docs/Plan/handoffs/lift-lobbydaemon-v2b2-div.md) moved the score from 84.4 to 97.7. It repeated the special-case stores, used the original `norm` branch order, added an inline copy constructor (memcpy 0x200), set `#pragma inline_depth(0)`, wrote absCompare, leftShiftDigit and Add inline, used zero-first ternaries, kept qhat in a register and did a load, decrement and store of the quotient digit (683 against 683 insns, 88 hunks with tools/d.py). Lead fix try t8 (q branch v2b2-t8 979474f, results/ql-t8.out): the 4 digit-shift copies are pointer down-counters, as in Hex-Rays (`*p = p[-shift]; --p; while (--c != 0)`). Result: 74 hunks (687 insns), still 97.7. The remaining hunks are not statements. They are: (1) block placement of the special cases (the original merges the memset and Set tails of the `a->bits == 0`, `b == 0` and `|a| < |b|` blocks, and the lift keeps a copy per block), (2) the `while (x.bits >= y.bits)` loop: the original keeps the test at the top with a `jmp` back after `Sub`, and the lift rotates the loop (test copy at the bottom), (3) the load order of `y.bits % 32` against the q stores, (4) callee-saved register choice and stack offsets (x, y, t3, q, t1, t2 order). VS2010 decides tail merge, loop rotation and scheduling. We found no source form that controls them. Forms tried: main form, author rounds 1 and 2 (the forms listed above), lead t8 pointer loops. Level A.
+- Tried: see the reason (lead note SmartCouponDaemon-4b7e0).
 - Earlier record: `lessons.md` lines 331, 518.
 
 ### `0x4d5c0` `aes128TableSetupEncKey` DIFF
 
-- Score: 88.9 (calls 100, refs 100, consts 67). Proof level: B.
+- Score: 97.0 (calls 100, refs 100, consts 91). Proof level: A.
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 159 insns, lift 182 insns, 15 changed hunks; first divergence: `-push rdi` / `+mov qword ptr [rsp+N], rdi` / `+push r14`.
-- Reason: hiword (use the HIWORD/LOWORD macro (shift and word forms as the original)).
+- Reason: `0x4d5c0` aes128TableSetupEncKey (97.0 after card aes, all 5 exes; POD diff on lead q build 88f6dab): the source statements, the 5x unroll and all memory reads are equal (`movzx byte ptr [rk+13..15]`, same table reads, same stores). The rest is register allocation of the unrolled loop: the original saves one more callee-saved register (`push r13`) and keeps the 5th round value in it (`s4d`), the lift uses r9d. The Rcon base register has a different bias (`xor r10d, [s1+N]` with a positive offset in the original; `[s1 - 8]`, `[s1]` in the lift), because LTCG picks a different induction variable for `Rcon[i]`. Forms tried: shifts from the register for all bytes (base, 88.9); `for (;;)` with `if (++i == 10) return` and all bytes through a pointer (author round 1, 79.8, unroll lost); counted `for` loop with byte 0 from the register and bytes 1..3 from memory (author round 2, 97.0, landed 3d1253a). Level A.
+- Tried: see the reason (lead note SmartCouponDaemon-4d5c0).
 - Earlier record: `lessons.md` lines 512.
-
-### `0x4d810` `aes128TableSetupDecKey` DIFF
-
-- Score: 91.7 (calls 100, refs 100, consts 75). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 75 insns, lift 103 insns, 8 changed hunks; first divergence: `+mov qword ptr [rsp+N], rbx` / `+lea r9, [rdx + 0xa8]` / `-add rdx, 0xa8`.
-- Reason: constant (use constant 0xa8 as the original (lift has 0xa0); check enum/type width).
-- Earlier record: `lessons.md` lines 512.
-
-### `0x4d9e0` `aes128TableEncrypt` DIFF
-
-- Score: 70.0 (calls 100, refs 50, consts 60). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 311 insns, lift 171 insns, 17 changed hunks; first divergence: `-push r14` / `-push r15` / `-mov eax, dword ptr [r8]`.
-- Reason: hiword (use the HIWORD/LOWORD macro (shift and word forms as the original)).
-- Earlier record: `lessons.md` lines 402, 512.
-
-### `0x4df60` `aes128TableDecrypt` DIFF
-
-- Score: 70.0 (calls 100, refs 50, consts 60). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 311 insns, lift 171 insns, 19 changed hunks; first divergence: `-push r14` / `-push r15` / `-mov eax, dword ptr [r8]`.
-- Reason: hiword (use the HIWORD/LOWORD macro (shift and word forms as the original)).
-- Earlier record: `lessons.md` lines 402, 512.
 
 ## PostOfficeDaemon (POD)
+
+### `0x1460` `FragmentPacketConcatenater::Add` DIFF
+
+- Score: 87.4 (calls 73, refs 94, consts 95). Proof level: A.
+- Evidence (main 8af60dd, `-` original, `+` lift): orig 105 insns, lift 113 insns, 17 changed hunks; first divergence: `-mov qword ptr [rsp+N], rbp` / `-mov qword ptr [rsp+N], rsi` / `+mov byte ptr [r8], 0`.
+- Reason: `0x1460` FragmentPacketConcatenater::Add (main 87.4; LG 0x25d0 and POD 0x1460 have the same code): the block order and the single `Log::Write` tail are fixed in the fpc author rounds (score 98.4, results/ql-t3.out). The open hunk is a dead `add rax, 4` in the original (orig insn 9): the original computes a pointer 4 bytes after the header and never uses it. The lift build drops the dead sum in every source form we tried. Forms tried: (1) 3 pointer forms for the header pointer (lessons.md packet-4 line 451), (2) one `Log::Write` exit (lessons.md, 98.4), (3) card v2b2-fpc round 1 (header local before `*completed = false`, shared `*completed = true` block: 98.4), (4) card v2b2-fpc round 2 (block order 185, 189, 197, 201, 209, 217, 223 from the log line numbers; q branch v2b2-t3 7e1dfcd: 98.4, no change). The item is on the lessons.md round-4 stop list. Level A.
+- Tried: see the reason (lead note PostOfficeDaemon-1460).
+- Earlier record: `lessons.md` lines 451, 507.
+
+### `0x1700` `FragmentPacketConcatenater::Clone` DIFF
+
+- Score: 93.3 (calls 100, refs 100, consts 80). Proof level: A.
+- Evidence (main 8af60dd, `-` original, `+` lift): orig 39 insns, lift 39 insns, 7 changed hunks; first divergence: `-mov qword ptr [rsp+N], 0xfffffffffffffffe` / `-jne L` / `+je L`.
+- Reason: `0x1700` FragmentPacketConcatenater::Clone (main 93.3; LG `0x2870` and POD `0x1700`, same code): BLOCKED, cause known. The original builds `relayPacket` through the PDB constructor `Packet::Packet(PacketSplitter*)`, so it sets the EH state -2 at insn 1 (consts 80). The lift `Packet` has no constructor (card v2b2-fpc handoff, rounds 1 and 2). The constructor comes with card pkt3 (lead clone branch v2b2-pkt3 2252cc7). pkt3 waits for the operator decision on engine issue E-R4-ratio (ENGINE-ISSUES.md, B-fpc-clone). Forms tried: (1) main form, (2) fpc author rounds 1 and 2 (no constructor: no gain), (3) pkt3 with the constructor (blocked by E-R4-ratio, not measured on main). Next step after pkt3 lands: `relayPacket(nullptr)` in the init list of the FragmentPacketConcatenater constructor, then one check. Level A (blocked).
+- Tried: see the reason (lead note PostOfficeDaemon-1700).
+- Earlier record: `lessons.md` lines 516.
 
 ### `0x4ed0` `PingGenerator::sendPing` DIFF
 
@@ -886,6 +749,22 @@ triage, the instruction diffs and the Not-done reports of the batch authors. No 
 - Reason: Miss. The caller is not found in this round.
 - Tried: see the reason (v2b-pod-01).
 
+### `0x28ab0` `Network::OpenPort` DIFF
+
+- Score: 97.9 (calls 100, refs 94, consts 100). Proof level: A.
+- Evidence (main 8af60dd, `-` original, `+` lift): orig 179 insns, lift 179 insns, 12 changed hunks; first divergence: `-test ecx, ecx` / `-jne L` / `+cmp ecx, 1`.
+- Reason: `0x28ab0` Network::OpenPort (97.9 on main): the lift has the same calls, refs and asserts. The hunks are codegen only: (1) the id assert is `test ecx, ecx; jne` in the original and `cmp ecx, 1; jae` in the lift (LTCG keeps only the lower bound of `id < 1 || id > 24`); (2) the inlined `Port::Port` stores `_iocpHandle` after the lock init and `_listener` before `_sessionList` in the original; (3) the EH-state spill `mov [rsp+N], rbx` and the `[rsp+N], rax` copy are placed differently; (4) the original compares `_portNumber` with a zero register, the lift with an immediate. All of these follow the LTCG scheduler and register allocator. Forms tried: (a) `id == 0 || id > 24` (q p15 d1a2b95, results/ql-11.out: 98.9 -> 90.8, SCD 0x1a8b0 lost MATCH), (b) `Port()` body assignments in the original store order (q v2b2-port 0e8f709, results/ql-port.out: no score change in CG, LG, SCD, POD), (c) main form (member init list). Batch 1: the assert constant propagation was tried too (lessons.md line 523). Level A.
+- Tried: see the reason (lead note PostOfficeDaemon-28ab0).
+- Earlier record: `lessons.md` lines 101, 447, 503, 523.
+
+### `0x2abe0` `Session::HandleEvent` DIFF
+
+- Score: 98.5 (calls 98, refs 97, consts 100). Proof level: A.
+- Evidence (main 8af60dd, `-` original, `+` lift): orig 242 insns, lift 246 insns, 28 changed hunks; first divergence: `+lea rdx, [L"source\Session.cpp"]` / `-lea rdx, [L"source\Session.cpp"]`.
+- Reason: `0x2abe0` Session::HandleEvent: the open differences are a compiler tail merge and instruction scheduling. The original merges the line-838 `Log::Write` into the shared 785/824 call (`mov r8d, 0x346; jmp L`); the 838 call has 6 arguments and the 824 call has 7. The lift gives the 838 block its own call. In the line-785 block the original stores the stack arguments before the `lea r9`/`lea rdx`/`mov r8d`/`xor ecx` loads; the lift does the reverse. Cause: cross-jumping and epilogue tail duplication select which of the 838 and 854 blocks (same end) merges; the source has no control of this choice. Forms tried (batch 1, lessons.md B lines 400 and 415; batch 2 card v2b2-shev, 2 rounds, no_gain): `goto` to one tail (98.5 -> 97.1); one common log call (98.5); `if (!result) { 854 } return true;` (97.4: the merge moves to the 854 block); a double `_connectContext` read, the `IdleStateTable::Pos` union split and the `_id` load before `WSAGetLastError` (these 3 agree with the original, score 98.7, no MATCH). Same diff in CG, LG, SCD and POD.
+- Tried: see the reason (lead note PostOfficeDaemon-2abe0).
+- Earlier record: `lessons.md` lines 400, 415, 522, 571.
+
 ### `0x2f850` `parseHexInt` DIFF
 
 - Score: 97.4 (calls 100, refs 100, consts 92). Proof level: A.
@@ -900,157 +779,75 @@ triage, the instruction diffs and the Not-done reports of the batch authors. No 
 - Reason: BloodLib `PacketBuffer.cpp` (shared by all exes). The original has an early `begin < end` test that returns -1. A change can break the other exes. Not tried.
 - Tried: see the reason (v2b-pod-01).
 
-### `0x1460` `FragmentPacketConcatenater::Add` DIFF
-
-- Score: 87.4 (calls 73, refs 94, consts 95). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 105 insns, lift 113 insns, 17 changed hunks; first divergence: `-mov qword ptr [rsp+N], rbp` / `-mov qword ptr [rsp+N], rsi` / `+mov byte ptr [r8], 0`.
-- Reason: instruction_order (move the call statements into the original order (Log::Write)).
-- Earlier record: `lessons.md` lines 451, 507.
-
-### `0x1700` `FragmentPacketConcatenater::Clone` DIFF
-
-- Score: 93.3 (calls 100, refs 100, consts 80). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 39 insns, lift 39 insns, 7 changed hunks; first divergence: `-mov qword ptr [rsp+N], 0xfffffffffffffffe` / `-jne L` / `+je L`.
-- Reason: constant (LTCG may move constant args into the callee: look at the callee first; fix only if the source misses an argument (constant 0xfffffffffffffffe in the original, none in the lift)).
-- Earlier record: `lessons.md` lines 516.
-
-### `0x26610` `Daemon::Start` DIFF
-
-- Score: 97.0 (calls 100, refs 100, consts 91). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 121 insns, lift 120 insns, 1 changed hunks; first divergence: `-mov edx, 0x80`.
-- Reason: constant (LTCG may move constant args into the callee: look at the callee first; fix only if the source misses an argument (constant 0x80 in the original, none in the lift)).
-- Earlier record: `lessons.md` lines 56, 513.
-
-### `0x28ab0` `Network::OpenPort` DIFF
-
-- Score: 97.9 (calls 100, refs 94, consts 100). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 179 insns, lift 179 insns, 12 changed hunks; first divergence: `-test ecx, ecx` / `-jne L` / `+cmp ecx, 1`.
-- Reason: not referenced in ours (dropped or inlined).
-- Earlier record: `lessons.md` lines 101, 447, 503, 523.
-
-### `0x29a00` `Session::Session` DIFF
-
-- Score: 95.2 (calls 100, refs 86, consts 100). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 68 insns, lift 67 insns, 3 changed hunks; first divergence: `+mov dword ptr [rcx + 8], 0xa` / `-mov dword ptr [rcx + 8], 0xa`.
-- Reason: wrong callee: memory manager.
-- Earlier record: `lessons.md` lines 37, 43, 63, 85, 104, 107.
-
-### `0x2abe0` `Session::HandleEvent` DIFF
-
-- Score: 98.5 (calls 98, refs 97, consts 100). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 242 insns, lift 246 insns, 28 changed hunks; first divergence: `+lea rdx, [L"source\Session.cpp"]` / `-lea rdx, [L"source\Session.cpp"]`.
-- Reason: branch_inversion (swap if/else (invert the condition at the first divergence)).
-- Earlier record: `lessons.md` lines 400, 415, 522, 571.
-
-### `0x2c160` `Channel::Send` DIFF
-
-- Score: 97.0 (calls 91, refs 100, consts 100). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 27 insns, lift 35 insns, 5 changed hunks; first divergence: `-mov s0, r8` / `-mov r8, qword ptr [r8 + 0x120]` / `-mov s1, rdx`.
-- Reason: inlined but should not be.
-- Earlier record: `lessons.md` lines 255, 1108, 1109, 1135, 1223.
-
-### `0x30420` `ThreadManager::Initialize` DIFF
-
-- Score: 88.9 (calls 100, refs 100, consts 67). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 30 insns, lift 29 insns, 4 changed hunks; first divergence: `-mov dword ptr [rcx], edx` / `+mov dword ptr [rcx], 0x80` / `-mov edx, edx`.
-- Reason: inlined but should not be.
-- Earlier record: `lessons.md` lines 513.
-
 ### `0x320f0` `PipeCommandProcess::processCommand` DIFF
 
-- Score: 96.3 (calls 100, refs 100, consts 89). Proof level: B.
+- Score: 96.3 (calls 100, refs 100, consts 89). Proof level: A.
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 68 insns, lift 51 insns, 11 changed hunks; first divergence: `-nop word ptr [rax + rax]` / `-mov r8, qword ptr [s0 + 0x10]` / `-test r8, r8`.
-- Reason: constant (LTCG may move constant args into the callee: look at the callee first; fix only if the source misses an argument (constant -1 in the original, none in the lift)).
+- Reason: `0x320f0` PipeCommandProcess::processCommand: calls, refs and string constants are equal; only the code form of the inline `wcscmp` differs. The original keeps the -1/0/1 value of each compare (`xor eax,eax; repe cmpsw; je L; sbb eax,eax; sbb eax,-1; L: test eax,eax; jne`) and has a loop-alignment `nop` at the loop head. The VS2010 build folds `wcscmp(...) == 0` into `repe cmpsw; jne` at every compare. Cause: an optimizer decision of the original build that the source does not control. Evidence: the LD reference GamedChannel::SendChangedGradeNotify (0x83ea0, MATCH) has 5 plain `wcscmp(...) == 0` compares and the `sbb` form only on the last one; the lift processCommand bodies fold also the last compare, so no compare position rule explains the original. Forms tried (batch 1 and batch 2 card v2b2-pcmd, 2 rounds, no_gain): `!wcscmp(...)`; `int r = wcscmp(...); if (r == 0)`; 2 more spellings (lessons.md B line 437); separate `if` statements with `continue`/`goto done` and `argv[0]` in a local; a file-static inline compare helper in the else-if chain (PipeConsole::processCommand went 97.0 -> 89.8). A command table with a switch adds a table and a loop that the original does not have. Same diff in CG, LG, SCD, POD and LD.
+- Tried: see the reason (lead note PostOfficeDaemon-320f0).
 - Earlier record: `lessons.md` lines 388, 437, 506, 527.
 
 ### `0x325c0` `PipeConsole::processCommand` DIFF
 
-- Score: 97.0 (calls 100, refs 100, consts 91). Proof level: B.
+- Score: 97.0 (calls 100, refs 100, consts 91). Proof level: A.
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 134 insns, lift 109 insns, 11 changed hunks; first divergence: `-mov rdx, qword ptr [rax]` / `+mov rax, qword ptr [rax]`.
-- Reason: constant (LTCG may move constant args into the callee: look at the callee first; fix only if the source misses an argument (constant -1 in the original, none in the lift)).
+- Reason: `0x325c0` PipeConsole::processCommand: calls, refs and string constants are equal; only the code form of the inline `wcscmp` differs. The original keeps the -1/0/1 value of each compare (`xor eax,eax; repe cmpsw; je L; sbb eax,eax; sbb eax,-1; L: test eax,eax; jne`) and has a loop-alignment `nop` at the loop head. The VS2010 build folds `wcscmp(...) == 0` into `repe cmpsw; jne` at every compare. Cause: an optimizer decision of the original build that the source does not control. Evidence: the LD reference GamedChannel::SendChangedGradeNotify (0x83ea0, MATCH) has 5 plain `wcscmp(...) == 0` compares and the `sbb` form only on the last one; the lift processCommand bodies fold also the last compare, so no compare position rule explains the original. Forms tried (batch 1 and batch 2 card v2b2-pcmd, 2 rounds, no_gain): `!wcscmp(...)`; `int r = wcscmp(...); if (r == 0)`; 2 more spellings (lessons.md B line 437); separate `if` statements with `continue`/`goto done` and `argv[0]` in a local; a file-static inline compare helper in the else-if chain (PipeConsole::processCommand went 97.0 -> 89.8). A command table with a switch adds a table and a loop that the original does not have. Same diff in CG, LG, SCD, POD and LD.
+- Tried: see the reason (lead note PostOfficeDaemon-325c0).
 - Earlier record: `lessons.md` lines 437, 506, 527.
 
 ### `0x32dd0` `PipeConsole::run` DIFF
 
-- Score: 96.3 (calls 89, refs 100, consts 100). Proof level: B.
+- Score: 96.3 (calls 89, refs 100, consts 100). Proof level: A.
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 183 insns, lift 168 insns, 32 changed hunks; first divergence: `-push rbx` / `-push r13` / `-push r15`.
-- Reason: instruction_order (move the call statements into the original order (Log::Write)).
+- Reason: `0x32dd0` PipeConsole::run (86.5 on main 3d1253a; same body in CG 0x157b0, LG 0x29fc0, SCD 0x253e0, POD 0x32dd0): the diff is register allocation and address CSE. The original keeps `i*0x4038` in a register and adds `this + 0x9a8 + off` at each field use (`cmp dword ptr [s4 + s0 + 0x9dc], s1d`). The lift computes one base pointer (`lea s4, [rax + s0 + 0x9a8]`) for every source form. Calls, refs and consts are equal. Forms tried: label place; `switch` and `if` chain (lessons B); signed index with a reference (lead p13); signed index with `_pipe[i]` at each use and per-site reconnect calls (author round 1); `int` result with `movsxd` after the call, no `- WAIT_OBJECT_0`, one `reconnect:` label (part 2); 64-bit index and a `broken = &_pipe[i]` pointer to one shared call (part 3). Card v2b2-pcrun: 2 rounds, no_gain (results/v2b2-pcrun.author.log). Level A.
+- Tried: see the reason (lead note PostOfficeDaemon-32dd0).
 - Earlier record: `lessons.md` lines 394, 412, 514.
-
-### `0x346e0` `WindowConsole::Open` DIFF
-
-- Score: 95.2 (calls 100, refs 100, consts 86). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 146 insns, lift 143 insns, 22 changed hunks; first divergence: `-xor al, al` / `-mov byte ptr [s1+N], 1` / `+mov byte ptr [s1], 1`.
-- Reason: constant (use constant 0xc0 as the original (lift has 0x30); check enum/type width).
-- Earlier record: `lessons.md` lines 514.
 
 ### `0x370e0` `IoWorker::run` DIFF
 
-- Score: 84.9 (calls 69, refs 97, consts 88). Proof level: B.
+- Score: 84.9 (calls 69, refs 97, consts 88). Proof level: A.
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 190 insns, lift 181 insns, 10 changed hunks; first divergence: `-mov s2d, 0x18` / `+mov s2d, 8` / `-mov ecx, 0x38`.
-- Reason: branch_inversion (swap if/else (invert the condition at the first divergence)).
+- Reason: `0x370e0` IoWorker::run: the first difference is a TLS slot offset. Original `mov s2d, 0x18`, lift `mov ecx, 0x18` (first divergence in tools/d.py, base build 666b998). The original TLS slots of `IoWorker::WorkerId`/`IoWorker::ZstdCCtx` are 24/56 (llvm-pdbutil THREAD32 records, section 0005); the lift slots are 8/24 in all 4 exes (tools/tls.sh). Cause: the LTCG code generator sets the order of the `__declspec(thread)` variables; the defining objs have the ltcg flag in S_COMPILE3. The same 2 adjacent BloodLib variables have different slots in each original exe (CG 16/48, LG 20/48, SCD 16/56, POD 24/56), so no single source declaration order gives them. Same cause and evidence as proof LobbyGate-5cf0 (batch 2). The offset is in a register that the function uses again, so funcdiff does not normalize it. Other differences (not the blocker): the Daemon state check (original signed `test/js; cmp 2; jle`, lift unsigned `cmp 2; jbe`) and the place of the !result block. Tried (batch 2): PDB check of all TLS records in the 4 exes; the TLS order is not a source choice.
+- Tried: see the reason (lead note PostOfficeDaemon-370e0).
 - Earlier record: `lessons.md` lines 527.
-
-### `0x37800` `StaticPageMemoryManager::Initialize` DIFF
-
-- Score: 96.3 (calls 100, refs 89, consts 100). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 30 insns, lift 31 insns, 5 changed hunks; first divergence: `-je L` / `-lea rax, [rdx + 0x800]` / `-mov qword ptr [rcx + 8], rdx`.
-- Reason: ref order differs.
-- Earlier record: `lessons.md` lines 513.
 
 ### `0x54420` `Rsa::decrypt` DIFF
 
-- Score: 91.7 (calls 95, refs 80, consts 100). Proof level: B.
+- Score: 91.7 (calls 95, refs 80, consts 100). Proof level: A.
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 205 insns, lift 200 insns, 25 changed hunks; first divergence: `-mov r10d, dword ptr [rcx + 0x1c]` / `+movsxd rdx, dword ptr [s5]`.
-- Reason: not referenced in ours (dropped or inlined).
+- Reason: `0x54420` Rsa::decrypt (91.7): blocker = the zero fill of the block buffer. The original keeps a byte loop (`mov byte ptr [rax], 0; inc; inc; cmp; jl`); the lift build gets `call memset` (a call difference, so no MATCH while it stays). Forms tried (lessons.md crypto-4 and card v2b2-rsa, 2 rounds, no_gain): index loop, pointer byte loop, `while (c < blockSize)` with a hoisted size, the buffer at function scope; VS2010 makes `memset` from each. Not tried: a bound from an out-of-line getter; the PDB has no type records for `OaepEncoder`, so the getter has no PDB name (not allowed). Other differences (not the blocker): the inline `BigInteger::Set` size check (original `test; js; cmp 0x200; ja`, lift only `cmp; ja`; the fix is in `BigInteger::Set`, outside the card) and the frame slots of `m`/`r` (compiler frame layout). Handoff: author-handoffs/lift-lobbydaemon-v2b2-rsa.md.
+- Tried: see the reason (lead note PostOfficeDaemon-54420).
 - Earlier record: `lessons.md` lines 434, 507, 519.
 
 ### `0x56800` `BigInteger::InvMod` DIFF
 
-- Score: 89.7 (calls 85, refs 100, consts 84). Proof level: B.
+- Score: 89.7 (calls 85, refs 100, consts 84). Proof level: A.
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 832 insns, lift 717 insns, 100 changed hunks.
-- Reason: not referenced in ours (dropped or inlined).
+- Reason: `0x56800` BigInteger::InvMod (89.7): cause = LTCG inline choice of `RightShift`. The original puts `RightShift(x, 1)` inline in `invMod` (6 copies) and `InvMod` (4 copies), and then calls `Sub`/`Add`/`Set` out of line (inline budget used up). It keeps a call of `RightShift` in `LeftShift` (tail jump LG 0x59bca), `Divide` (LG 0x59020) and `isPrimeMR` (LG 0x57190). Evidence: the original lines `shr dword ptr [s0+N], 1` / `shl eax, 0x1f` / `add dword ptr [rcx - 4], eax` and the out-of-line `Sub`/`Add`/`Set` calls (author card v2b2-bigi, handoff in author-handoffs/). No allowed source form gives inline copies in only the shift-by-1 callers. Forms tried: `noinline` on `RightShift` (base); no `noinline` with `RightShift` first (lessons B, crypto-4: `LeftShift` loses its MATCH); no `noinline` with `LeftShift` first as in the original (card v2b2-bigi round 2: gain 0, `LeftShift` loss); `#pragma inline_depth(0)` on `LeftShift` (no gain). Rejected: `__forceinline` (inline in all callers, the original calls it in 3), an extra inline copy without a PDB name (not allowed), `noinline` on `Add`/`Sub` (the original has them inline in the halving loops). Card result: no_gain after 2 rounds (2.03M tokens).
+- Tried: see the reason (lead note PostOfficeDaemon-56800).
 - Earlier record: `lessons.md` lines 518.
 
 ### `0x576a0` `BigInteger::invMod` DIFF
 
-- Score: 83.1 (calls 59, refs 100, consts 90). Proof level: B.
+- Score: 83.1 (calls 59, refs 100, consts 90). Proof level: A.
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 927 insns, lift 1265 insns, 121 changed hunks.
-- Reason: not referenced in ours (dropped or inlined).
+- Reason: `0x576a0` BigInteger::invMod (83.1): cause = LTCG inline choice of `RightShift`. The original puts `RightShift(x, 1)` inline in `invMod` (6 copies) and `InvMod` (4 copies), and then calls `Sub`/`Add`/`Set` out of line (inline budget used up). It keeps a call of `RightShift` in `LeftShift` (tail jump LG 0x59bca), `Divide` (LG 0x59020) and `isPrimeMR` (LG 0x57190). Evidence: the original lines `shr dword ptr [s0+N], 1` / `shl eax, 0x1f` / `add dword ptr [rcx - 4], eax` and the out-of-line `Sub`/`Add`/`Set` calls (author card v2b2-bigi, handoff in author-handoffs/). No allowed source form gives inline copies in only the shift-by-1 callers. Forms tried: `noinline` on `RightShift` (base); no `noinline` with `RightShift` first (lessons B, crypto-4: `LeftShift` loses its MATCH); no `noinline` with `LeftShift` first as in the original (card v2b2-bigi round 2: gain 0, `LeftShift` loss); `#pragma inline_depth(0)` on `LeftShift` (no gain). Rejected: `__forceinline` (inline in all callers, the original calls it in 3), an extra inline copy without a PDB name (not allowed), `noinline` on `Add`/`Sub` (the original has them inline in the halving loops). Card result: no_gain after 2 rounds (2.03M tokens).
+- Tried: see the reason (lead note PostOfficeDaemon-576a0).
 - Earlier record: `lessons.md` lines 431, 518.
 
 ### `0x590d0` `BigInteger::Divide` DIFF
 
-- Score: 76.7 (calls 75, refs 67, consts 89). Proof level: B.
+- Score: 84.4 (calls 94, refs 67, consts 92). Proof level: A.
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 683 insns, lift 672 insns, 107 changed hunks.
-- Reason: not referenced in ours (dropped or inlined).
+- Reason: `0x590d0` BigInteger::Divide (main 84.4; LG `0x59020`, SCD `0x4b7e0`, POD `0x590d0`, one shared source): the best form is 97.7 with no MATCH. Author card v2b2-div (2 rounds, no_gain, results/v2b2-div.result.json, handoff Docs/Plan/handoffs/lift-lobbydaemon-v2b2-div.md) moved the score from 84.4 to 97.7. It repeated the special-case stores, used the original `norm` branch order, added an inline copy constructor (memcpy 0x200), set `#pragma inline_depth(0)`, wrote absCompare, leftShiftDigit and Add inline, used zero-first ternaries, kept qhat in a register and did a load, decrement and store of the quotient digit (683 against 683 insns, 88 hunks with tools/d.py). Lead fix try t8 (q branch v2b2-t8 979474f, results/ql-t8.out): the 4 digit-shift copies are pointer down-counters, as in Hex-Rays (`*p = p[-shift]; --p; while (--c != 0)`). Result: 74 hunks (687 insns), still 97.7. The remaining hunks are not statements. They are: (1) block placement of the special cases (the original merges the memset and Set tails of the `a->bits == 0`, `b == 0` and `|a| < |b|` blocks, and the lift keeps a copy per block), (2) the `while (x.bits >= y.bits)` loop: the original keeps the test at the top with a `jmp` back after `Sub`, and the lift rotates the loop (test copy at the bottom), (3) the load order of `y.bits % 32` against the q stores, (4) callee-saved register choice and stack offsets (x, y, t3, q, t1, t2 order). VS2010 decides tail merge, loop rotation and scheduling. We found no source form that controls them. Forms tried: main form, author rounds 1 and 2 (the forms listed above), lead t8 pointer loops. Level A.
+- Tried: see the reason (lead note PostOfficeDaemon-590d0).
 - Earlier record: `lessons.md` lines 331, 518.
 
 ### `0x5aeb0` `aes128TableSetupEncKey` DIFF
 
-- Score: 88.9 (calls 100, refs 100, consts 67). Proof level: B.
+- Score: 97.0 (calls 100, refs 100, consts 91). Proof level: A.
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 159 insns, lift 182 insns, 15 changed hunks; first divergence: `-push rdi` / `+mov qword ptr [rsp+N], rdi` / `+push r14`.
-- Reason: hiword (use the HIWORD/LOWORD macro (shift and word forms as the original)).
+- Reason: `0x5aeb0` aes128TableSetupEncKey (97.0 after card aes, all 5 exes; POD diff on lead q build 88f6dab): the source statements, the 5x unroll and all memory reads are equal (`movzx byte ptr [rk+13..15]`, same table reads, same stores). The rest is register allocation of the unrolled loop: the original saves one more callee-saved register (`push r13`) and keeps the 5th round value in it (`s4d`), the lift uses r9d. The Rcon base register has a different bias (`xor r10d, [s1+N]` with a positive offset in the original; `[s1 - 8]`, `[s1]` in the lift), because LTCG picks a different induction variable for `Rcon[i]`. Forms tried: shifts from the register for all bytes (base, 88.9); `for (;;)` with `if (++i == 10) return` and all bytes through a pointer (author round 1, 79.8, unroll lost); counted `for` loop with byte 0 from the register and bytes 1..3 from memory (author round 2, 97.0, landed 3d1253a). Level A.
+- Tried: see the reason (lead note PostOfficeDaemon-5aeb0).
 - Earlier record: `lessons.md` lines 512.
-
-### `0x5b100` `aes128TableSetupDecKey` DIFF
-
-- Score: 91.7 (calls 100, refs 100, consts 75). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 75 insns, lift 103 insns, 8 changed hunks; first divergence: `+mov qword ptr [rsp+N], rbx` / `+lea r9, [rdx + 0xa8]` / `-add rdx, 0xa8`.
-- Reason: constant (use constant 0xa8 as the original (lift has 0xa0); check enum/type width).
-- Earlier record: `lessons.md` lines 512.
-
-### `0x5b2d0` `aes128TableEncrypt` DIFF
-
-- Score: 70.0 (calls 100, refs 50, consts 60). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 311 insns, lift 171 insns, 17 changed hunks; first divergence: `-push r14` / `-push r15` / `-mov eax, dword ptr [r8]`.
-- Reason: hiword (use the HIWORD/LOWORD macro (shift and word forms as the original)).
-- Earlier record: `lessons.md` lines 402, 512.
-
-### `0x5b850` `aes128TableDecrypt` DIFF
-
-- Score: 70.0 (calls 100, refs 50, consts 60). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 311 insns, lift 171 insns, 19 changed hunks; first divergence: `-push r14` / `-push r15` / `-mov eax, dword ptr [r8]`.
-- Reason: hiword (use the HIWORD/LOWORD macro (shift and word forms as the original)).
-- Earlier record: `lessons.md` lines 402, 512.
 
