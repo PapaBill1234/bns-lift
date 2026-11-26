@@ -9,7 +9,9 @@
 #include <time.h>
 #include <wchar.h>
 #include <new>
+#if defined(__clang__)
 #include <crt_cpp_overload.h>  // The Wine headers do not have swprintf_s<N>. VS2010 has it.
+#endif
 
 #include "AlertSender.h"
 #include "BnsCommonConfigDefinition.h"

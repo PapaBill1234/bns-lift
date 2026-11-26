@@ -5,7 +5,7 @@ Exe: LG (LobbyGate). Base: `6824f3d`. The driver builds and runs the proof. This
 ## Lifted (source changes)
 
 1. `LobbyGate::reload` (0x13770)
-   - The time string uses the template `swprintf_s<128>` (2-argument form, array destination). The file now includes `crt_cpp_overload.h`.
+   - The time string uses the template `swprintf_s<128>` (2-argument form, array destination). The file now includes `crt_cpp_overload.h` only under `__clang__`, the same as `Daemon.cpp`. The VS2010 build does not have this header. VS2010 gives the template from `stdio.h`. Round 2 added the guard after the VS2010 build failed with error C1083.
    - The inlined `SetRunningInfo(L"bns common config reload succeed", nullptr)` uses `wcscmp` against the literal. The original has an inline `repe cmpsw` with count 33. The old lift called `wcsncmp`.
    - Both inlined list searches use the null-tested find form (same form as CacheD::Initialize, CacheGate 0x2430).
 2. `LobbyGateReloadInvalidRestoreTimer::restoreInvalid` (0x127a0)
