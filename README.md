@@ -22,22 +22,22 @@ This repo is public. Do not commit binaries, keys, PDBs or IDA databases.
 ## Parity
 
 <!-- parity:start -->
-Last update: card `fix3b-ids-12-17` (2026-11-26). Tool: `tools/parity.sh` (VS2010 /GL /LTCG build vs original, funcdiff).
+Last update: card `tools-honest-totals` (2026-11-26). Tool: `tools/parity.sh` (VS2010 /GL /LTCG build vs original, funcdiff).
 
-| Exe | Parity | MATCH | DIFF | Only in original | Total | Mean score | Start | Change | Level |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| CacheGate | **92.9 %** | 456 | 32 | 3 | 491 | 99.3 | 44.0 % | +48.9 | 90 % ✅ |
-| LobbyGate | **89.0 %** | 658 | 78 | 3 | 739 | 98.9 | 37.9 % | +51.2 | below 90 % |
-| SmartCouponDaemon | **94.2 %** | 630 | 37 | 2 | 669 | 99.5 | 33.6 % | +60.5 | 90 % ✅ |
-| PostOfficeDaemon | **91.4 %** | 694 | 60 | 5 | 759 | 99.1 | 34.5 % | +56.9 | 90 % ✅ |
-| LobbyDaemon | **30.8 %** | 679 | 162 | 1363 | 2204 | 96.5 | 2.2 % | +28.6 | below 90 % |
-| **First 4** | **91.7 %** | 2438 | | | 2658 | | 37.0 % | +54.7 | 90 % ✅ |
+| Exe | Parity | MATCH | DIFF | Excluded | Only in original | Total | Mean score | Start | Change | Level |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| CacheGate | **92.9 %** | 456 | 32 | 0 | 3 | 491 | 99.3 | 44.0 % | +48.9 | 90 % ✅ |
+| LobbyGate | **89.0 %** | 658 | 78 | 0 | 3 | 739 | 98.9 | 37.9 % | +51.2 | below 90 % |
+| SmartCouponDaemon | **94.2 %** | 630 | 37 | 0 | 2 | 669 | 99.5 | 33.6 % | +60.5 | 90 % ✅ |
+| PostOfficeDaemon | **91.4 %** | 694 | 60 | 0 | 5 | 759 | 99.1 | 34.5 % | +56.9 | 90 % ✅ |
+| LobbyDaemon | **30.8 %** | 679 | 162 | 0 | 1363 | 2204 | 96.5 | 2.2 % | +28.6 | below 90 % |
+| **First 4** | **91.7 %** | 2438 | | | | 2658 | | 37.0 % | +54.7 | 90 % ✅ |
 
 | Shared library (functions in 2+ exes) | Parity | MATCH in each exe | DIFF in 1+ exe | Total | Goal |
 | --- | ---: | ---: | ---: | ---: | --- |
 | BloodLib, Shared, Packet, CRT | **94.0 %** | 516 | 33 | 549 | 99 % |
 
-First 4 and shared library: CacheGate, LobbyGate, SmartCouponDaemon, PostOfficeDaemon. LobbyDaemon: lift in progress; most functions are still stubs (only in original). Goal: 95 % per exe, 99 % preferred. Shared library: 99 % preferred. Rules: [Docs/Parity/README.md](Docs/Parity/README.md). History: [Docs/Parity/progress.tsv](Docs/Parity/progress.tsv).
+First 4 and shared library: CacheGate, LobbyGate, SmartCouponDaemon, PostOfficeDaemon. LobbyDaemon: lift in progress; most functions are still stubs (only in original). Goal: 95 % per exe, 99 % preferred. Shared library: 99 % preferred. MATCH never holds excluded symbols (review rejected, no honest source fix: [Docs/Parity/excluded.tsv](Docs/Parity/excluded.tsv)); they are in the column Excluded (0 now). Rules: [Docs/Parity/README.md](Docs/Parity/README.md). History: [Docs/Parity/progress.tsv](Docs/Parity/progress.tsv).
 
 | Card | CacheGate | LobbyGate | SmartCouponDaemon | PostOfficeDaemon | LobbyDaemon |
 | --- | ---: | ---: | ---: | ---: | ---: |
@@ -106,4 +106,5 @@ First 4 and shared library: CacheGate, LobbyGate, SmartCouponDaemon, PostOfficeD
 | `lift-lobbydaemon-gap-06-job-goods` | 92.9 % | 89.0 % | 94.2 % | 91.4 % | 30.6 % |
 | `tools-pdbq-pdbcls-funcdiff-imm` | 92.9 % | 89.0 % | 94.2 % | 91.4 % | 30.7 % |
 | `fix3b-ids-12-17` | 92.9 % | 89.0 % | 94.2 % | 91.4 % | 30.8 % |
+| `tools-honest-totals` | 92.9 % | 89.0 % | 94.2 % | 91.4 % | 30.8 % |
 <!-- parity:end -->
