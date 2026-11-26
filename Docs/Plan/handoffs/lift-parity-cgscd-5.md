@@ -25,10 +25,10 @@ Note: The task text asks for a section "## cgscd-5" in `Docs/Parity/lessons.md`.
 | CacheDList::clear | 61.1 | MATCH | while loop with `it++;` as a separate statement. | 1 |
 | CacheDList::RemoveSessionAll | 85.7 | MATCH | The same while/`it++;` form. | 1 |
 | CacheD::Verify | 91.7 | MATCH | Two field tests with separate exits. | 1 |
-| CacheD::Initialize | 93.3 | MATCH | Inlined SetInvalidInfo: take the list by reference, walk to `&list._tail`, `wcscmp` with break. | 1 |
-| CacheDChannel::onClose | 97.4 | MATCH | The same list-reference form, `if (node == &list._tail)`. | 1 |
+| CacheD::Initialize | 93.3 | MATCH | Inlined SetInvalidInfo in the SetRunningInfo form (LG 0x2A5A0): list by reference, `node = nullptr`, `node = item; break;`, `if (node == nullptr)`. Repair 3: 66/66 instructions, `test r9, r9` as in 0x2430. | 1 |
+| CacheDChannel::onClose | 97.4 | MATCH | The same SetRunningInfo form. Log-macro id form `session != nullptr ? session->_id : 0ULL` (A31): the id load comes before GetId as in 0x3e40. Repair 3: `test r9, r9` as in the original. 118/120 instructions: the original also saves r12 (register allocation only, see the `// LIFT:` note). | 1 |
 | SendRetryCouponPublicationOk | 96.3 | MATCH | Inlined Session::Send form (buffer in a local, `list[1]`, Enter/send/Leave). The ternary `session != nullptr ? session->_id : 0` for the log id. | 1 |
-| NPServiceChannelManager::HandleMessage | 92.3 | MATCH | Dispatch as a `switch` (two signed compares). The NPMsgHandleEvent ctor out of line, with the addReferenceCount (line 141) in the body. | 1 |
+| NPServiceChannelManager::HandleMessage | 92.3 | MATCH | Dispatch as a `switch` (two signed compares). The NPMsgHandleEvent ctor out of line, with the addReferenceCount (line 141) in the body. Repair 3: explicit null test `mem != nullptr ? new (mem) ... : nullptr` (`// LIFT:` note, 0x10700, CWG 1748). MATCH holds. | 1 |
 | SendRequestEventNoti | 95.2 | MATCH | Branch order from the PDB lines: the event-noti path is the fall-through (line 91). | 1 |
 | HandleCacheGateHello | 87.2 | 94.1 | Order from PDB lines 42 to 69 (add path, duplicate path, hello ok). Correct error codes. Kept with count 0 because of the behaviour fix (see below). | 0 |
 
@@ -84,4 +84,19 @@ All other count-0 tries are reverted. The code in the diff agrees with the "Work
 - Repair 2 (after the reverts): gate ok, parity ok. CG 462, LG 658, SCD 633, POD 694, LD 1024. MATCH -> DIFF 0 in each exe.
 - In a worktree, set `LIFT_IDA_DIR=~/Documents/Codex/private-project/ida/lift`. Without it, `tools/pdbq.py` stops the gate.
 
-Turns: 280 (build) + repair 2
+## Repair 3
+| Problem from the skeptic | Fix | Result |
+| --- | --- | --- |
+| onClose: no null test on the found node (false MATCH) | SetRunningInfo form (`node = nullptr`, `node = item; break;`, `if (node == nullptr)`). Log-macro id form for the 3 logs. | MATCH. `test r9, r9` present. 118/120 instructions (r12 save in the original only). |
+| CacheD::Initialize: no null test (false MATCH) | The same SetRunningInfo form. | MATCH. 66/66 instructions, the same instruction text as 0x2430. |
+| HandleMessage: placement new with no null test | `void* mem = Alloc(...); ev = mem != nullptr ? new (mem) ... : nullptr;` with a `// LIFT:` note (0x10700, CWG 1748). | MATCH. The build keeps `test rax, rax; je` before the ctor. |
+
+Tries in repair 3 with no gain, all reverted:
+| Function | Try | Result |
+| --- | --- | --- |
+| CacheDChannel::onClose | Call `PipeConsole::SetInvalidInfo` (0x15d90) direct. | LTCG does not inline it (84 instructions). Reverted. |
+| CacheDChannel::onClose | Full inlined SetInvalidInfo body with `bool isInvalid = true` and the remove branch. | Still 118 instructions. Reverted. |
+
+- Gate after repair 3: gate ok, parity ok. CG 462, LG 658, SCD 633, POD 694, LD 1024. MATCH -> DIFF 0 in each exe.
+
+Turns: 280 (build) + repair 2 + repair 3

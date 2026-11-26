@@ -93,15 +93,20 @@ void CacheDChannel::onClose(Session const* session, bool tryReconnect, bool clos
     {
         PipeConsole* console = CacheGate::_instance->pipeConsole;
         console->_lock.Enter();
+        // LIFT: 0x3e40 the loop end goes to addNode with no null test. Only the match path tests the node
+        // (`test r9, r9`). Same form as PipeConsole::SetRunningInfo (LG 0x2A5A0). The original also saves
+        // r12 here (120 instructions, ours 118). That is register allocation only.
         PipeConsole::ItemList& list = console->_invalid;
-        PipeConsole::ItemNode* node = list._head._next;
-        while (node != &list._tail)
+        PipeConsole::ItemNode* node = nullptr;
+        for (PipeConsole::ItemNode* item = list._head._next; item != &list._tail; item = item->_next)
         {
-            if (wcscmp(node->_key, cached->_daemonInvalidInfoKey) == 0)
+            if (wcscmp(item->_key, cached->_daemonInvalidInfoKey) == 0)
+            {
+                node = item;
                 break;
-            node = node->_next;
+            }
         }
-        if (node == &list._tail)
+        if (node == nullptr)
             PipeConsole::addNode(list, cached->_daemonInvalidInfoKey, L"");  // LIFT: LTCG folded valueString. addNode (0x15ED0) does not read r8 and copies L"" (0x3B700).
         console->_lock.Leave();
     }
@@ -113,18 +118,20 @@ void CacheDChannel::onClose(Session const* session, bool tryReconnect, bool clos
         cached->_lock.Leave();
     }
 
+    // LIFT: 0x3e40 loads session->_id before the GetId call in each log.
+    // The log-macro id form (lessons A31) gives that order.
     if (tryReconnect)
     {
         Log::Write(Log::LT_DEBUG, CACHED_CHANNEL_FILE, 107, L"Session(%I64X), Cached channel(%I64X) trying to reconnect",
-                   session->_id, cached->GetId());
+                   session != nullptr ? session->_id : 0ULL, cached->GetId());
     }
     else
     {
-        Log::Write(Log::LT_DEBUG, CACHED_CHANNEL_FILE, 110, L"Session(%I64X), Cached channel(%I64X) closed", session->_id,
-                   cached->GetId());
+        Log::Write(Log::LT_DEBUG, CACHED_CHANNEL_FILE, 110, L"Session(%I64X), Cached channel(%I64X) closed",
+                   session != nullptr ? session->_id : 0ULL, cached->GetId());
         if (closeAll)
             Log::Write(Log::LT_DEBUG, CACHED_CHANNEL_FILE, 113, L"Session(%I64X), Cached channel(%I64X) closed(All)",
-                       session->_id, cached->GetId());
+                       session != nullptr ? session->_id : 0ULL, cached->GetId());
     }
 
     // Inlined Session::ReleaseChannel.

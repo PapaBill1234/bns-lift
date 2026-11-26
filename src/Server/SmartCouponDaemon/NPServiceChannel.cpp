@@ -246,8 +246,12 @@ bool NPServiceChannelManager::HandleMessage(NPChannel* channel, _StsMsg* msg, vo
         channel->_sts->ReleaseStsMsg(msg);
         return false;
     }
-    NPMsgHandleEvent* ev = new (Memory::_Manager[2]->Alloc(sizeof(NPMsgHandleEvent), NPSERVICECHANNEL_FILE, 284))
-        NPMsgHandleEvent(channel, msg, static_cast<NPTransaction*>(context), handler);
+    // LIFT: 0x10700 tests the Alloc result and skips the ctor (and its addReferenceCount, line 141) on null.
+    // Keep the explicit test: clang-cl in C++17 can drop it for a reserved placement new (CWG 1748).
+    void* mem = Memory::_Manager[2]->Alloc(sizeof(NPMsgHandleEvent), NPSERVICECHANNEL_FILE, 284);
+    NPMsgHandleEvent* ev = mem != nullptr
+                               ? new (mem) NPMsgHandleEvent(channel, msg, static_cast<NPTransaction*>(context), handler)
+                               : nullptr;
     PostQueuedCompletionStatus(Network::iocpHandle(), 0, reinterpret_cast<ULONG_PTR>(ev), nullptr);
     return true;
 }

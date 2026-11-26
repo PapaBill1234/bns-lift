@@ -64,15 +64,19 @@ void CacheD::Initialize(unsigned short id, unsigned long addr, unsigned short po
     {
         PipeConsole* console = CacheGate::_instance->pipeConsole;
         console->_lock.Enter();
+        // LIFT: 0x2430 the loop end goes to addNode with no null test. Only the match path tests the node
+        // (`test r9, r9`). Same form as PipeConsole::SetRunningInfo (LG 0x2A5A0).
         PipeConsole::ItemList& list = console->_invalid;
-        PipeConsole::ItemNode* item = list._head._next;
-        while (item != &list._tail)
+        PipeConsole::ItemNode* node = nullptr;
+        for (PipeConsole::ItemNode* item = list._head._next; item != &list._tail; item = item->_next)
         {
             if (wcscmp(item->_key, _daemonInvalidInfoKey) == 0)
+            {
+                node = item;
                 break;
-            item = item->_next;
+            }
         }
-        if (item == &list._tail)
+        if (node == nullptr)
             PipeConsole::addNode(list, _daemonInvalidInfoKey, L"");  // LIFT: LTCG folded valueString. addNode (0x15ED0) does not read r8 and copies L"" (0x3B700).
         console->_lock.Leave();
     }
