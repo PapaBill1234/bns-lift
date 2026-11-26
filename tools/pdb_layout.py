@@ -18,6 +18,7 @@ Rules:
   - If the PDB has no member list for the class, the script does not check it.
     --nopdb prints these classes. Their invented names must have `// ❓`.
   - Bit fields and members of classes with virtual bases are not checked.
+  - If a server PDB is not in the IDA dir, the script prints this and does not check the classes of its target.
 """
 import collections
 import glob
@@ -43,13 +44,18 @@ TARGET_PDB = {
     "PostOfficeDaemon": "PostOfficeDaemon", "lift_postofficedaemon": "PostOfficeDaemon",
     "SmartCouponDaemon": "SmartCouponDaemon", "lift_smartcoupondaemon": "SmartCouponDaemon",
     "LobbyDaemon": "LobbyDaemon", "lift_lobbydaemon": "LobbyDaemon",
+    "lift_marketdealerdaemon": "MarketDealerDaemon",
 }
 SKIP_TARGETS = {"lift_selftest", "lift_zstd"}
 
 
 # ---------------------------------------------------------------- PDB side (resymc)
+def pdb_path(server):
+    return os.path.join(pdbq.ida_dir(), server, server + ".pdb")
+
+
 def resym_dump(server):
-    pdb = os.path.join(pdbq.ida_dir(), server, server + ".pdb")
+    pdb = pdb_path(server)
     out = os.path.join(CACHE, server + ".h")
     if os.path.exists(out) and os.path.getmtime(out) >= os.path.getmtime(pdb):
         return out
@@ -184,7 +190,14 @@ def main():
         dumps = list(ex.map(clang_dump, entries))
 
     own = own_names()
-    servers = sorted(set(TARGET_PDB.values()))
+    # A server PDB that is not in the IDA dir (for example the gate sandbox mounts only some PDBs):
+    # the script says so and does not check the classes of its target.
+    servers = []
+    for s in sorted(set(TARGET_PDB.values())):
+        if os.path.exists(pdb_path(s)):
+            servers.append(s)
+        else:
+            print("pdb_layout: %s not found; the %s classes are not checked" % (pdb_path(s), s))
     pdb = {s: pdb_types(s) for s in servers}
 
     def pdb_variants(srvs, name):
@@ -200,7 +213,7 @@ def main():
             base = name.split("::")[-1].split("<")[0]
             if base not in own or "anonymous" in name or "(lambda" in name or name.startswith("std::"):
                 continue
-            if (tgt, name) in seen or vbase:
+            if (tgt, name) in seen or vbase or (tgt in TARGET_PDB and TARGET_PDB[tgt] not in servers):
                 continue
             seen.add((tgt, name))
             variants = pdb_variants([TARGET_PDB[tgt]] if tgt in TARGET_PDB else servers, name)
