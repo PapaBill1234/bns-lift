@@ -145,14 +145,21 @@ bool HandleSmartCoupon_HelloReq(Session const* session, Packet const* packet)
         Log::Write(Log::LT_ERROR, DAEMONPACKETHANDLER_FILE, 89,
                    L"register world fail, session already exists, old-session:0x%016I64X", oldSession->_id);
         void* mem = Memory::_Manager[2]->Alloc(sizeof(DChannel), DAEMONPACKETHANDLER_FILE, 92);
-        DChannel* newDaemon = nullptr;
+        DChannel* newDaemon;
+        // LIFT: orig 0x7dc0 reads port and addr first and sets null in an own else block.
         if (mem != nullptr)
         {
+            unsigned short port = daemon->_port;
+            unsigned long addr = daemon->_addr;
             GameEventDaemonId newId;
-            newId._type = daemon->_daemonId._type;
             newId._wid = daemon->_daemonId._wid;
             newId._reserved = 0;
-            newDaemon = new (mem) DChannel(newId, daemon->_addr, daemon->_port);
+            newId._type = daemon->_daemonId._type;
+            newDaemon = new (mem) DChannel(newId, addr, port);
+        }
+        else
+        {
+            newDaemon = nullptr;
         }
         // BUG: 0x81BD the old daemon is passed to ReplaceDaemon, not newDaemon.
         if (!SmartCouponDaemon::_instance->_daemonChannelMgr->ReplaceDaemon(daemon))

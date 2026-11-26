@@ -18,6 +18,18 @@
 namespace
 {
 wchar_t const* const GAME_EVENT_CONFIG_FILE = L"..\\Shared\\CouponGameEventConfig.cpp";  // LIFT: No PDB symbol. The binary uses the literal.
+
+// LIFT: inlined in 0x2c80. The index of the daemon name in SmartCouponDaemonTypeDesc; 0 (none) for an unknown name.
+inline unsigned int findDaemonType(wchar_t const* daemonName)
+{
+    wchar_t const* const* desc = SmartCouponDaemonTypeDesc;
+    for (unsigned int daemonType = 0; daemonType < 2; ++daemonType, ++desc)
+    {
+        if (_wcsicmp(*desc, daemonName) == 0)
+            return daemonType;
+    }
+    return 0;
+}
 }
 
 // LIFT: Inlined in each fail path: write the start log to the console, then wait 5 seconds.
@@ -112,25 +124,18 @@ bool GameEventConfig::SetupGameEventListFromXml(wchar_t const* xml)
         }
 
         XmlElement const* root = doc->Root();
-        if (root == nullptr)
-            return true;
-
+        // LIFT: orig 0x2c80 runs the loop under a root test and shares the last "return true".
+        if (root != nullptr)
+        {
         for (XmlElement const* i = root->FirstChildElement(); i != nullptr; i = i->NextElement())
         {
             if (!i->ToXmlNode()->IsValid())
                 break;
 
             // LIFT: orig 0x2c80 reads the name once and steps the table pointer by 8 in the loop.
-            wchar_t const* daemonName = i->Name();
-            unsigned int daemonType = 0;
-            wchar_t const* const* desc = SmartCouponDaemonTypeDesc;
-            for (; daemonType < 2; ++daemonType, ++desc)
-            {
-                if (_wcsicmp(*desc, daemonName) == 0)
-                    break;
-            }
+            unsigned int daemonType = findDaemonType(i->Name());
             // LIFT: orig 0x2c80 puts the unknown-daemon block (186) after the event loop.
-            if (daemonType < 2 && daemonType != 0)
+            if (daemonType != 0)
             {
                 for (XmlElement const* c = i->FirstChildElement(); c != nullptr; c = c->NextElement())
                 {
@@ -153,8 +158,9 @@ bool GameEventConfig::SetupGameEventListFromXml(wchar_t const* xml)
                             {
                                 wcscpy_s(info->name, 260, name);
                                 info->eventType = static_cast<char>(_wtoi(type));
+                                int enableCmp = _wcsicmp(L"true", enable);  // LIFT: orig stores daemonType after the call
                                 info->daemonType = static_cast<unsigned char>(daemonType);
-                                info->enable = _wcsicmp(L"true", enable) == 0;
+                                info->enable = enableCmp == 0;
                             }
                             else
                             {
@@ -163,8 +169,9 @@ bool GameEventConfig::SetupGameEventListFromXml(wchar_t const* xml)
                                 info->id = eventId;
                                 wcscpy_s(info->name, 260, name);
                                 info->eventType = static_cast<char>(_wtoi(type));
+                                int enableCmp = _wcsicmp(L"true", enable);  // LIFT: orig stores daemonType after the call
                                 info->daemonType = static_cast<unsigned char>(daemonType);
-                                info->enable = _wcsicmp(L"true", enable) == 0;
+                                info->enable = enableCmp == 0;
                                 addGameEventInfo(info);
                             }
                         }
@@ -189,6 +196,7 @@ bool GameEventConfig::SetupGameEventListFromXml(wchar_t const* xml)
                            L"[game-event-cfg], setup game-event-list exception, unknown element '%s', line:%d", i->Name(),
                            i->LineNumber());
             }
+        }
         }
         return true;
     }

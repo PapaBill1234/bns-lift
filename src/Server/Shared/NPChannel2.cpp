@@ -461,8 +461,7 @@ __declspec(noinline) bool NPChannel::SendMsg(_StsMsg* msg, bool response, void* 
     {
         Packet p;
         zeroPacket(&p);
-        unsigned char const* data = buffer.pData;
-        unsigned int remain = buffer.nLen;
+        // LIFT: orig 0x53D0 inlines Packet::Add (with the line 287 assert) and steps buffer itself.
         do
         {
             PacketBuffer* prev = p.ListTail;
@@ -474,15 +473,11 @@ __declspec(noinline) bool NPChannel::SendMsg(_StsMsg* msg, bool response, void* 
             p.ListTail = pb;
             p.CurHeader = reinterpret_cast<Packet::Header*>(&pb->Buffer[8]);
             p.CurHeader->size = 2;
-            unsigned int n = remain < 3998 ? remain : 3998;
-            if (static_cast<short>(n) > 0)
-            {
-                memcpy(reinterpret_cast<char*>(p.CurHeader) + p.CurHeader->size, data, n);
-                p.CurHeader->size = static_cast<short>(p.CurHeader->size + n);
-            }
-            data += n;
-            remain -= n;
-        } while (remain != 0);
+            unsigned int n = buffer.nLen < 3998 ? buffer.nLen : 3998;
+            p.Add(buffer.pData, static_cast<short>(n));
+            buffer.pData += n;
+            buffer.nLen -= n;
+        } while (buffer.nLen != 0);
 
         if (_rawChannel != nullptr)
         {
@@ -506,7 +501,7 @@ __declspec(noinline) bool NPChannel::SendMsg(_StsMsg* msg, bool response, void* 
         }
         Log::Write(Log::LT_DEBUG, NPCHANNEL_FILE, 472, L"[np], sts msg sent, np-tid:%d, cmd:%d, type:%d",
                    msg->GetTransactionId(), msg->GetCommand(), msg->GetMessageType());
-        p.Clear();
+        // LIFT: orig 0x53D0 has one Packet::Clear call, from ~Packet at the end of the scope.
     }
     else
     {

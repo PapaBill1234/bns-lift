@@ -173,35 +173,37 @@ __declspec(noinline) void DaemonConfig::Dump(wchar_t const* name, void const* co
                 Log::Write(Log::LT_DEBUG, file, 132, L"[%s], ==== %s ====", name, def.desc);
             continue;
         }
-        void const* field = base + def.offset;
+        // LIFT: orig 0x1a0d0 reads def.offset again in each case (no field pointer before the switch).
         switch (def.type)
         {
         case XmlCfgDef::CFG_INT:
-            Log::Write(Log::LT_DEBUG, file, 141, L"[%s], %s : %d", name, def.name, *static_cast<int const*>(field));
+            Log::Write(Log::LT_DEBUG, file, 141, L"[%s], %s : %d", name, def.name,
+                       *reinterpret_cast<int const*>(base + def.offset));
             break;
         case XmlCfgDef::CFG_INT64:
             Log::Write(Log::LT_DEBUG, file, 142, L"[%s], %s : %I64d", name, def.name,
-                       *static_cast<long long const*>(field));
+                       *reinterpret_cast<long long const*>(base + def.offset));
             break;
         case XmlCfgDef::CFG_FLOAT:
             Log::Write(Log::LT_DEBUG, file, 143, L"[%s], %s : %f", name, def.name,
-                       static_cast<double>(*static_cast<float const*>(field)));
+                       static_cast<double>(*reinterpret_cast<float const*>(base + def.offset)));
             break;
         case XmlCfgDef::CFG_BOOL:
             Log::Write(Log::LT_DEBUG, file, 144, L"[%s], %s : %s", name, def.name,
-                       *static_cast<bool const*>(field) ? L"yes" : L"no");
+                       *reinterpret_cast<bool const*>(base + def.offset) ? L"yes" : L"no");
             break;
         case XmlCfgDef::CFG_IP:
         {
-            unsigned long long address = *static_cast<unsigned long long const*>(field);
-            wchar_t const* text = address != 0 ? Network::GetAddressStringW(static_cast<unsigned long>(address)) : L"N/A";
+            unsigned long long address = *reinterpret_cast<unsigned long long const*>(base + def.offset);
+            // LIFT: orig 0x1a0d0 puts the "N/A" path first.
+            wchar_t const* text = address == 0 ? L"N/A" : Network::GetAddressStringW(static_cast<unsigned long>(address));
             Log::Write(Log::LT_DEBUG, file, 148, L"[%s], %s : %s", name, def.name, text);
             break;
         }
         case XmlCfgDef::CFG_STR:
         case XmlCfgDef::CFG_DIR:
         {
-            wchar_t const* text = *static_cast<wchar_t const* const*>(field);
+            wchar_t const* text = *reinterpret_cast<wchar_t const* const*>(base + def.offset);
             if (text == nullptr || *text == 0)
                 text = L"N/A";
             Log::Write(Log::LT_DEBUG, file, 156, L"[%s], %s : %s", name, def.name, text);
@@ -210,7 +212,7 @@ __declspec(noinline) void DaemonConfig::Dump(wchar_t const* name, void const* co
         case XmlCfgDef::CFG_ANSI:
         {
             temp[0] = 0;
-            char const* text = *static_cast<char const* const*>(field);
+            char const* text = *reinterpret_cast<char const* const*>(base + def.offset);
             if (text == nullptr || *text == 0)
                 text = "N/A";
             temp[1023] = 0;

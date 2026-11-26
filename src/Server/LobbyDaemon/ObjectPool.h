@@ -77,9 +77,7 @@ public:
 
     struct Stack  // PDB type 0x1EFA, field list 0x1EF9
     {
-#ifdef LIFT_OBJPOOL_LOBBYDAEMON
-        Stack() : _head(nullptr), _size(0) {}  // LIFT: LobbyDaemon PDB ObjPool::Stack::Stack (inline)
-#endif
+        Stack() : _head(nullptr), _size(0) {}  // LIFT: PDB ObjPool::Stack::Stack (inline, LD and SCD)
         Node* _head;
         int _size;
     };
@@ -87,9 +85,7 @@ public:
 
     struct Queue  // PDB type 0x1EEF, field list 0x1EEE. This exe does not use it.
     {
-#ifdef LIFT_OBJPOOL_LOBBYDAEMON
-        Queue() : _head(nullptr), _tail(nullptr), _size(0) {}  // LIFT: LobbyDaemon PDB ObjPool::Queue::Queue (inline)
-#endif
+        Queue() : _head(nullptr), _tail(nullptr), _size(0) {}  // LIFT: PDB ObjPool::Queue::Queue (inline, LD and SCD)
         Node* _head;
         Node* _tail;
         int _size;

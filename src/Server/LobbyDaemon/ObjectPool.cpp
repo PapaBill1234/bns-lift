@@ -35,11 +35,7 @@ void SmartCouponObjPoolMemoryAllocator::Free(void*, wchar_t const*, int)
 ObjPool::ObjPool(unsigned long long id, int objsize, wchar_t const* desc)
     : _id(id), _objsize(objsize), _desc(desc), _alloc(nullptr), _vtbl(nullptr), _timeToWait(0), _total(0)
 {
-    _pool._head = nullptr;
-    _pool._size = 0;
-    _wait._head = nullptr;
-    _wait._tail = nullptr;
-    _wait._size = 0;
+    // LIFT: Stack, CriticalSection, Queue, CriticalSection ctors run in member order.
 }
 
 // 0x1210
@@ -98,11 +94,14 @@ void ObjPool::Finalize()
                L"[objpool], finalized, total-count:%d, object-count:%d, id:%d(%s), obj-size:%d", _total,
                _pool._size, _id, descOf(this), _objsize);
     _lock.Enter();
-    while (_pool._head != nullptr)
+    for (;;)
     {
         Node* node = _pool._head;
+        if (node == nullptr)
+            break;
+        Node* next = node->next;
         --_pool._size;
-        _pool._head = node->next;
+        _pool._head = next;
         node->next = nullptr;
         _alloc->Free(node, kObjPoolFile, 195);
     }
