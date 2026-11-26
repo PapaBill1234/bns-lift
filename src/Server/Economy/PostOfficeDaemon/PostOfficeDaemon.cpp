@@ -613,6 +613,8 @@ bool PostOfficeDaemon::startTimer()
 // 0x147d0
 CacheGateChannel* PostOfficeDaemon::checkDestinationServiceState(unsigned short destinationWid)
 {
+    // LIFT: 0x147d0 loads _instance once at the top (rbx) and uses it for both calls.
+    PostOfficeDaemon* const daemon = _instance;
     if (destinationWid == 0)
     {
         Log::Write(Log::LT_ERROR, kFile, 548, L"== CRASH == [%s], %s; invalid parameter, destinationWid:%u", MODULE_NAME,
@@ -622,7 +624,7 @@ CacheGateChannel* PostOfficeDaemon::checkDestinationServiceState(unsigned short 
         return nullptr;
     }
     // Inlined CachedWatchdogManager::IsServiceAvailable(destinationWid). LIFT: name from the log string 0x71d90
-    CachedWatchdog* const cachedWatchdog = _instance->_cachedWatchdogManager->getCachedWatchdog(destinationWid);
+    CachedWatchdog* const cachedWatchdog = daemon->_cachedWatchdogManager->getCachedWatchdog(destinationWid);
     if (cachedWatchdog == nullptr)
     {
         Log::Write(Log::LT_ERROR, L"CachedWatchdog.cpp", 226,
@@ -635,7 +637,7 @@ CacheGateChannel* PostOfficeDaemon::checkDestinationServiceState(unsigned short 
                    L"PostOfficeDaemon::checkDestinationServiceState", destinationWid);
         return nullptr;
     }
-    return _instance->checkCacheGateServiceState();
+    return daemon->checkCacheGateServiceState();
 }
 
 // 0x14930

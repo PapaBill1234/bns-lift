@@ -74,7 +74,7 @@ bool PingGenerator::HandleEvent(EventContext* context, unsigned long bytes)
 // 0x4ed0
 bool PingGenerator::sendPing()
 {
-    CacheGateChannel* const channel = PostOfficeDaemon::_instance->checkCacheGateServiceState();
+    CacheGateChannel* const channel = PostOfficeDaemon::CheckCacheGateServiceState();
     if (channel == nullptr)
     {
         Log::Write(Log::LT_ERROR, PING_GENERATOR_FILE, 49, L"[%s], %s; cannot send ping relay request, wid:%u",

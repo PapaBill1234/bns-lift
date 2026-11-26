@@ -82,6 +82,10 @@ public:
 
     static void FailedEventObjectHandler(EventObject* eventObject);  // 0x12fe0
 
+    // PDB: public static `Instance` and `CheckCacheGateServiceState` (no body: inline); `_instance` is private.
+    // LIFT: callers use them. LTCG IPA then keeps `this` as an argument of checkCacheGateServiceState (0x14930).
+    static PostOfficeDaemon* Instance() { return _instance; }
+    static CacheGateChannel* CheckCacheGateServiceState() { return Instance()->checkCacheGateServiceState(); }
     CacheGateChannel* checkCacheGateServiceState();                                         // 0x14930
     static CacheGateChannel* checkDestinationServiceState(unsigned short destinationWid);  // 0x147d0
 
