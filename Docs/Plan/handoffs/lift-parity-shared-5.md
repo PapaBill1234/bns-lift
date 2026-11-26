@@ -6,13 +6,13 @@ Branch: `slice/lift-parity-shared-5`. Base: main 8778485. Not merged. Not pushed
 
 | Exe | Before (main) | After | Gain |
 | --- | --- | --- | --- |
-| CacheGate | 456 | 458 | +2 |
-| LobbyGate | 658 | 663 | +5 |
-| SmartCouponDaemon | 630 | 631 | +1 |
-| PostOfficeDaemon | 694 | 696 | +2 |
+| CacheGate | 456 | 457 | +1 |
+| LobbyGate | 658 | 662 | +4 |
+| SmartCouponDaemon | 630 | 630 | 0 |
+| PostOfficeDaemon | 694 | 695 | +1 |
 | LobbyDaemon | 1024 | 1024 | 0 |
 
-Total: +10 MATCH. No MATCH lost. `tools/gate.sh`: gate ok. `tools/parity.sh`: parity ok (last run after repair 2).
+Total: +6 MATCH. No MATCH lost. `tools/gate.sh`: gate ok. `tools/parity.sh`: parity ok (last run after repair 3).
 
 Gate needs `LIFT_IDA_DIR=<private>/ida/lift` in a worktree. Without it, gate.sh stops with "ida/lift not found".
 
@@ -22,14 +22,12 @@ Gate needs `LIFT_IDA_DIR=<private>/ida/lift` in a worktree. Without it, gate.sh 
 | --- | --- | --- |
 | 3b8b27f | `Dh::~Dh` (no `CryptoKey` dtor), `Dh::Process` switch, `BroadcastCrypt::clear` compare chain | LG +3 |
 | 4fb423a | `IdleWatcher::run` uses a local `SystemEvent` | LG +1 |
-| a6525a2 | `BaseRefCntObj::operator new(size_t, wchar_t const*, int)`, used in `Port::Initialize` | +1 in each exe (4) |
+| a6525a2 | `BaseRefCntObj::operator new(size_t, wchar_t const*, int)`, used in `Port::Initialize` | +1 in each exe (4); reverted in ca22efe (repair 3) |
 | e3f19d9 | PDB parameter types: `Packet::Concatenate(char const*, short, ...)`, `Packet::Decompose(unsigned int, int, ...)` | CG +1, POD +1 |
 
-Scope note: a6525a2 changes 2 lines in `src/Server/BloodLib/source/Port.cpp`. That file is not in the card file list.
-The miss `RefCntObject::operator delete` has its only call site there (the unwind funclet of `Port::Initialize`).
-The change is in its own commit. The integrator can drop it if another card conflicts on `Port.cpp`.
-
-Repair 2 check (2026-11-26): no round-5 card lists `Port.cpp`. No round-5 branch (cgscd-5, lg-5a, lg-5b, pod-5a, pod-5b) changes `Port.cpp` against main. There is no conflict now. The integrator must check again before the merge. The reviewer can add `Port.cpp` to the card file list.
+Scope note: a6525a2 changed 2 lines in `src/Server/BloodLib/source/Port.cpp`. That file is not in the card file list.
+Repair 3 reverted a6525a2 (commit ca22efe). The card file list was not changed by a reviewer, and the card says to change only the files in "Files". Loss: -1 MATCH in each of 4 exes.
+The fix is ready for a later card that owns `Port.cpp`. See "Deferred fix" below.
 
 ## Repair 2
 
@@ -37,6 +35,24 @@ Repair 2 check (2026-11-26): no round-5 card lists `Port.cpp`. No round-5 branch
 | --- | --- | --- |
 | POD `Packet::Decompose(unsigned int, int, ...)`: with `unsigned int offset`, VS2010 emitted `cmp ebx,eax; jb` (unsigned). The original (POD 0x1400220fb) has `cmp ebx,eax; jl` (signed). The MATCH hid a logic change. | Keep the PDB type `unsigned int`. Test `static_cast<int>(offset) >= CurHeader->size - 2` with `// LIFT: signed compare (PostOfficeDaemon 0x220fb: cmp ebx,eax; jl)`. | llvm-objdump of our POD at 0x140017574: `cmp ebx,eax; jl`. Still MATCH. POD 696 (no loss). |
 | `Port.cpp` outside the card file list (a6525a2). | No conflict found (see scope note). Commit kept. | +1 in each of 4 exes kept. |
+
+## Repair 3
+
+| Problem | Fix | Result |
+| --- | --- | --- |
+| `IdleWatcher::run` local name `event` is not the PDB name. The PDB (LG rva 0x24FF0) names it `e` (type `SystemEvent`, 0x245D). | Rename the local to `e`. | LG `IdleWatcher::run` still MATCH. |
+| `Port.cpp` is outside the card file list (a6525a2). No reviewer changed the card. | Revert a6525a2 (ca22efe). | -1 MATCH in CG, LG, SCD, POD. |
+| `BroadcastCrypt::clear`: funcdiff MATCH, but the branch form differs. | Note in the Worked table. No code change. | Information only. |
+
+## Deferred fix (RefCntObject::operator delete miss, needs Port.cpp)
+
+The owner of `Port.cpp` can apply this. Expected gain: +1 MATCH in each of 4 exes.
+
+| File | Change |
+| --- | --- |
+| `include/RefCntObject.h` | In `BaseRefCntObj`: `static void* operator new(size_t size, wchar_t const* file, int line);` (PDB type 0x2FCA). |
+| `source/RefCntObject.cpp` | Body `return BASE_MEMORY_MANAGER.Alloc(size, file, line);` with `// LIFT: no address. LTCG inlines it in Port::Initialize (CacheGate 0x18cb9).` |
+| `source/Port.cpp` | `_pool = new (PORT_FILE, 243) SessionPool(_id);` with `// LIFT: class operator new of BaseRefCntObj. The unwind funclet calls RefCntObject::operator delete (CacheGate 0x3a920).` |
 
 ## Lessons
 
@@ -48,9 +64,9 @@ The card says: do not edit `Docs/Parity/lessons.md`. The review merges these tab
 | --- | --- | --- | --- |
 | LG `Dh::~Dh`: remove the declared `virtual ~CryptoKey() {}`. The original stores only `??_7Dh`, no base vtable store at the end. | 66.7 | MATCH | 1 |
 | LG `Dh::Process`: `switch (_state)` with case 0, case 1, default `return false`, then `_state = -1` (test plus dec chain, 0x5598d). | 77.8 | MATCH | 1 |
-| LG `BroadcastCrypt::clear`: compare chain `type == 0 \|\| (type-1 != 0 && (type-2 == 0 \|\| (unsigned)(type-3) <= 1))`, same form as `Session::deallocateCrypt`. A switch gave a range compare. | 85.7 | MATCH | 1 |
-| LG `IdleWatcher::run`: local `SystemEvent event;` before `LogBufferAllocator::Initialize`. Its inline dtor closes the handle. This gives EH state -2 and funclet dtor$0 (0x60430). | 96.3 | MATCH | 1 |
-| `RefCntObject::operator delete` (miss, all 4 exes): `BaseRefCntObj` has a PDB `static operator new` (type 0x2FCA). Write `_pool = new (PORT_FILE, 243) SessionPool(_id);`. VS2010 then calls the matching class placement delete in the unwind funclet (CG 0x3a920). | miss | MATCH | 4 |
+| LG `BroadcastCrypt::clear`: compare chain `type == 0 \|\| (type-1 != 0 && (type-2 == 0 \|\| (unsigned)(type-3) <= 1))`, same form as `Session::deallocateCrypt`. A switch gave a range compare. funcdiff MATCH; orig dec/jne for types 3-4, ours cmp 1/ja (same logic). | 85.7 | MATCH | 1 |
+| LG `IdleWatcher::run`: local `SystemEvent e;` (PDB name) before `LogBufferAllocator::Initialize`. Its inline dtor closes the handle. This gives EH state -2 and funclet dtor$0 (0x60430). | 96.3 | MATCH | 1 |
+| `RefCntObject::operator delete` (miss, all 4 exes): `BaseRefCntObj` has a PDB `static operator new` (type 0x2FCA). Write `_pool = new (PORT_FILE, 243) SessionPool(_id);`. VS2010 then calls the matching class placement delete in the unwind funclet (CG 0x3a920). Reverted in repair 3 (Port.cpp out of scope); see Deferred fix. | miss | MATCH | 4 |
 | CG `Packet::Concatenate` (miss): PDB mangled name has `F` (short), ours had `G` (unsigned short). Signed test `size < 0 \|\| size > 4000` (0x74de: `test si,si; js; cmp 0xfa0; jle`). | miss | MATCH | 1 |
 | POD `Packet::Decompose(unsigned int, int, char const*, ...)` (miss): PDB mangled name has `I` (unsigned int) for the first parameter. Keep the signed test with `static_cast<int>(offset)` (orig 0x220fb `jl`). funcdiff does not see `jb` against `jl`: check the branch with llvm-objdump. | miss | MATCH | 1 |
 
@@ -97,4 +113,4 @@ Apply it together with a `.tls` order fix. Then `IoWorker::run` should MATCH in 
 
 ## Turns
 
-Turns: 140 (estimate, 2 context windows).
+Turns: 146 (estimate, 3 context windows).

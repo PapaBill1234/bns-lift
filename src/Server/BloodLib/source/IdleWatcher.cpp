@@ -109,14 +109,14 @@ void IdleStateTable::scan()
 void IdleWatcher::run()
 {
     // LIFT: local SystemEvent (LobbyGate 0x24ff0). The unwind funclet dtor$0 (0x60430) calls SystemEvent::~SystemEvent.
-    SystemEvent event;
+    SystemEvent e;
     LogBufferAllocator::Initialize();
     Log::Write(Log::LT_DEBUG, IDLEWATCHER_FILE, 226, L"[idlewatcher], idle watcher start");  // 0x25038, 4 arguments
-    event.Event = CreateEventW(nullptr, FALSE, FALSE, nullptr);
+    e.Event = CreateEventW(nullptr, FALSE, FALSE, nullptr);
     while (_run)
     {
-        if (event.Event != nullptr)
-            WaitForSingleObject(event.Event, 5000);
+        if (e.Event != nullptr)
+            WaitForSingleObject(e.Event, 5000);
         _lastExecuted = _threadManager->_now;
         if (!_run)
             break;
