@@ -595,10 +595,10 @@
 "status": "MATCH"
 },
 "Client::SendGetCharacterInfoListOk": {
-"calls": 98,
+"calls": 100,
 "consts": 97,
 "refs": 100,
-"score": 98.3,
+"score": 99.0,
 "status": "DIFF"
 },
 "Client::SendGetServiceEntryListOk": {
@@ -616,18 +616,18 @@
 "status": "MATCH"
 },
 "Client::SendListLobbyServiceItemInfoOk": {
-"calls": 97,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 98.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Client::SendTakeGoodsOk": {
-"calls": 97,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 98.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "ClientManager::AcquireClient": {
 "calls": 100,
@@ -644,11 +644,11 @@
 "status": "MATCH"
 },
 "ClientManager::BroadcastAnnounceNotify": {
-"calls": 93,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 97.8,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "ClientManager::DisconnectAll": {
 "calls": 100,
@@ -728,11 +728,11 @@
 "status": "MATCH"
 },
 "ClientSessionHandler::OnClose": {
-"calls": 95,
+"calls": 100,
 "consts": 100,
-"refs": 98,
-"score": 97.7,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "ClientSessionHandler::OnConnect": {
 "calls": 100,
@@ -842,8 +842,8 @@
 "ContentsRuleConfig::CheckMinMaxBoundary": {
 "calls": 100,
 "consts": 100,
-"refs": 80,
-"score": 93.3,
+"refs": 88,
+"score": 95.8,
 "status": "DIFF"
 },
 "ContentsRuleConfig::ConvPacketElement": {
@@ -868,25 +868,25 @@
 "status": "DIFF"
 },
 "ContentsRuleConfig::LoadContentsRuleConfig": {
-"calls": 90,
+"calls": 100,
 "consts": 100,
-"refs": 91,
-"score": 93.6,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "ContentsRuleConfig::MakeListPacket": {
 "calls": 100,
-"consts": 64,
-"refs": 97,
-"score": 86.9,
-"status": "DIFF"
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "ContentsRuleConfig::UpdateAllVariable": {
 "calls": 100,
-"consts": 73,
-"refs": 73,
-"score": 81.8,
-"status": "DIFF"
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "ContentsRuleConfigLoad::Load": {
 "calls": 100,
@@ -2037,11 +2037,11 @@
 "status": "MATCH"
 },
 "LobbyGate::FailedEventObjectHandler": {
-"calls": 80,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 93.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "LobbyGate::GetTimerInterval": {
 "calls": 100,
@@ -2066,10 +2066,10 @@
 },
 "LobbyGate::PrintDependency": {
 "calls": 100,
-"consts": 75,
+"consts": 100,
 "refs": 100,
-"score": 91.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "LobbyGate::ServiceName": {
 "calls": 100,
@@ -2829,10 +2829,10 @@
 },
 "PcCafeMileageFeverTimeScheduleList::Set": {
 "calls": 100,
-"consts": 95,
+"consts": 100,
 "refs": 100,
-"score": 98.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "PcCafeMileageFeverTimeScheduleListManager::SetPcCafeMileageFeverTimeScheduleList": {
 "calls": 100,
@@ -5132,10 +5132,17 @@
 },
 "wmain": {
 "calls": 100,
-"consts": 0,
+"consts": 100,
 "refs": 100,
-"score": 66.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
+},
+"wmain$dtor$0": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "wmainCRTStartup": {
 "calls": 100,
