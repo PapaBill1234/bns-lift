@@ -890,10 +890,7 @@ short ClientSessionHandler::SwitchCmdLobbyGateToLobbyDaemon(short lobbyGateCmd)
 // 0x6fa0
 bool ClientSessionTimerJob::HandleEvent(EventContext* context, unsigned long numOfBytes)
 {
-    // LIFT: 0x6fca (client.cpp:1145) the original has a second range test after the first one (1136).
-    // BUG: 0x6fa0 the second test can never be true (`&&` where `||` is meant). It has no effect; the first test holds.
-    if (_key != 0 && _timerReason > TR_NONE && _timerReason < TR_MAX &&
-        !(_timerReason < TR_KICK && _timerReason > TR_CLOSE))
+    if (_key != 0 && _timerReason > TR_NONE && _timerReason < TR_MAX)
     {
         GateKeyManager* gatekeyManager = LobbyGate::_instance->_gatekeyManager;
         if (gatekeyManager == nullptr)
