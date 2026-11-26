@@ -308,3 +308,11 @@ bool Channel::Send(Packet const* packet, Session const* session)
     const_cast<Session*>(session)->removeReferenceCount(LOBBYGATE_CHANNEL_HEADER_FILE, 52);
     return true;
 }
+#if defined(LIFT_EXE_POD)
+// LIFT: The original keeps `this` in rcx, the packet in rdx and the session in r8, although the body does not read
+// `this`. Without a taken address LTCG drops the unused `this` and moves the arguments one register down. The
+// address in a selectany COMDAT constant keeps the member function convention.
+typedef bool (Channel::*ChannelSendWithSession)(Packet const*, Session const*);
+extern ChannelSendWithSession const ChannelSendWithSessionRef;
+__declspec(selectany) extern ChannelSendWithSession const ChannelSendWithSessionRef = &Channel::Send;
+#endif
