@@ -25,6 +25,7 @@
 #include "PcCafe.h"
 #include "AlertSender.h"
 #include "StsMsgGrade.h"
+#include "TakeAccountTimeBasedPlayRewardJob.h"  // UserPromotionReward (one copy, gap-10)
 #include "Log.h"
 #include "Memory.h"
 #include "LiftStub.h"
