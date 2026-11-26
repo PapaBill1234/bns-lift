@@ -162,11 +162,12 @@ bool HandleLobbyLobbyGate_HelloOk(Session const* session, Packet* packet)
     worldCount = pcb->decomposer.PushRepeatCount(&pcb->buffer[pcb->decomposer.offset], pcb->size - pcb->decomposer.offset);
     if (worldCount > 0)
     {
-        worldList = static_cast<WorldInfo*>(LD_ALLOCZERO(68 * worldCount, 89));
+        // LIFT: 64-bit size and a size_t name length (original: movsx of the count, imul rdx by 0x44, qword 0x11).
+        worldList = static_cast<WorldInfo*>(LD_ALLOCZERO(sizeof(WorldInfo) * worldCount, 89));
         for (int i = 0; i < worldCount; ++i)
         {
             WorldInfo& w = worldList[i];
-            if (!pcb->Decompose(17, &w.worldId, &w.worldClusterId, w.worldName, 17, &w.worldType, &w.playType,
+            if (!pcb->Decompose(17, &w.worldId, &w.worldClusterId, w.worldName, _countof(w.worldName), &w.worldType, &w.playType,
                                 &w.publicAddress, &w.internalAddress, &w.publicPort, &w.mobilePort, &w.worldScore,
                                 &w.worldLive, &w.entrance, &w.characterCreation,
                                 &w.characterCreationLimitedOnNewAccount, &w.recommend, &w.brandnew, &w.crowdness))
