@@ -176,7 +176,8 @@ StaticPageMemoryManager::~StaticPageMemoryManager()
 
 // 0x1a1a0
 // LTCG gave a copy with size 2048 and allocated 584. This is the generic form.
-bool StaticPageMemoryManager::Initialize(void* page, unsigned long long size, unsigned long long allocated,
+// LIFT: noinline. Session::Session (0xdf80) calls it out of line with the address in r8.
+__declspec(noinline) bool StaticPageMemoryManager::Initialize(void* page, unsigned long long size, unsigned long long allocated,
                                          MemoryManager const* additional)
 {
     if (page == nullptr)
