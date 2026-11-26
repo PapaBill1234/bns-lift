@@ -728,6 +728,14 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"CliSession::ApplyNewChargeItem": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
 "CliSession::BindCharacterSlot": {
 "calls": 78,
 "consts": 100,
@@ -770,6 +778,14 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"CliSession::NotifyChargeRemainTime": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
 },
 "CliSession::OnChargeStopRequested": {
 "calls": 100,
@@ -1518,6 +1534,13 @@
 "consts": 100,
 "refs": 71,
 "score": 90.5,
+"status": "DIFF"
+},
+"DispatchNPLobbyMessageHandler": {
+"calls": 100,
+"consts": 100,
+"refs": 92,
+"score": 97.3,
 "status": "DIFF"
 },
 "DumpRegister": {
@@ -2930,12 +2953,308 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Handle_CommonGrade_GetLevel": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Handle_CommonGrade_ListAllGrades": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Handle_CommonGrade_ListGrades": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Handle_CommonPres_UserInfo": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Handle_CommonSecondPassword_GetStatus": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Handle_CommonSlot_GetSlot": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Handle_CommonSlot_ListSlots": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Handle_SrvAuction_Bid": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Handle_SrvAuth_ChangeMyUserNameIncomplete": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Handle_SrvAuth_ConsumeGameToken": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Handle_SrvAuth_GetUserNameChangeableIncomplete": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Handle_SrvAuth_IsUserNameChangeableIncomplete": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Handle_SrvCharge_Abandon": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Handle_SrvCharge_GetInfo": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Handle_SrvCharge_NotifyApplyNewChargeItem": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"Handle_SrvCharge_NotifyRemainTime": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
 "Handle_SrvCharge_RequestStop": {
 "calls": 100,
 "consts": 100,
 "refs": 98,
 "score": 99.3,
 "status": "DIFF"
+},
+"Handle_SrvCharge_Start": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Handle_SrvCharge_Stop": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Handle_SrvContentBan_ListUserBans": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Handle_SrvFriend_SendMessage": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Handle_SrvGameAccount_ListUserLastPresences": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Handle_SrvGameTime_GetGameTime": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Handle_SrvGate_RegisterService": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Handle_SrvGrade_ActivateGrade": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Handle_SrvGrade_NotifyGradeChanged": {
+"calls": 100,
+"consts": 92,
+"refs": 92,
+"score": 94.9,
+"status": "DIFF"
+},
+"Handle_SrvGrade_NotifyScoreChanged": {
+"calls": 100,
+"consts": 92,
+"refs": 87,
+"score": 93.1,
+"status": "DIFF"
+},
+"Handle_SrvPres_GetUserInfo": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Handle_SrvPres_Kick": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Handle_SrvPres_Login": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Handle_SrvPres_Logout": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Handle_SrvPres_Message": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Handle_SrvPres_SetAppData": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Handle_SrvProfile_GetUserProfile": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Handle_SrvPromotionStamp_AttendPromotionSecured": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Handle_SrvPromotionStamp_GetPromotionPolicy": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Handle_SrvPromotionStamp_GetUserPromotionStatus": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Handle_SrvPromotionStamp_ListCurrentPromotions": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Handle_SrvRMS_Inquiry": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Handle_SrvSecondPassword_IsVerified": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Handle_SrvSlot_CreateSlots": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Handle_SrvSlot_SetData": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Handle_SrvVirtualCurrency_Deposit": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "HeapMemoryManager::Alloc": {
 "calls": 100,
@@ -4658,6 +4977,21 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"NPLobbyMessageHandleEvent::HandleEvent": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"NPLobbyMessageHandleEvent::~NPLobbyMessageHandleEvent": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
 "NPMsgHelper::LocaleHourToUTCTime": {
 "calls": 100,
 "consts": 100,
@@ -4687,11 +5021,11 @@
 "status": "MATCH"
 },
 "NPServiceChannelManager::HandleMessage": {
-"calls": 25,
-"consts": 50,
-"refs": 0,
-"score": 25.0,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "NPServiceChannelManager::Initialize": {
 "calls": 100,
