@@ -65,3 +65,4 @@ date	card	parity (MATCH/total per exe)
 2026-11-26	tools-pdbq-pdbcls-funcdiff-imm	CacheGate 456/491 92.9%; LobbyGate 658/739 89.0%; SmartCouponDaemon 630/669 94.2%; PostOfficeDaemon 694/759 91.4%; LobbyDaemon 677/2204 30.7%
 2026-11-26	fix3b-ids-12-17	CacheGate 456/491 92.9%; LobbyGate 658/739 89.0%; SmartCouponDaemon 630/669 94.2%; PostOfficeDaemon 694/759 91.4%; LobbyDaemon 679/2204 30.8%
 2026-11-26	tools-honest-totals	CacheGate 456/491 92.9%; LobbyGate 658/739 89.0%; SmartCouponDaemon 630/669 94.2%; PostOfficeDaemon 694/759 91.4%; LobbyDaemon 679/2204 30.8%
+2026-11-26	tools-public-clean	CacheGate 456/491 92.9%; LobbyGate 658/739 89.0%; SmartCouponDaemon 630/669 94.2%; PostOfficeDaemon 694/759 91.4%; LobbyDaemon 679/2204 30.8%
