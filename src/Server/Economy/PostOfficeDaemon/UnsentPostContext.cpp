@@ -165,34 +165,35 @@ bool UnsentPostContextManager::initContextManager(WorldConfigList const* worldCo
 // 0xcae0
 bool UnsentPostContextManager::updateWorldList(WorldConfigList const* worldConfigList)
 {
-    CriticalSection* const lock = &_reloadLock;
-    UNSENT_LOCK_ENTER(lock);
-    for (WorldConfigList::Container::const_iterator it = worldConfigList->_configList.begin();
-         it != worldConfigList->_configList.end(); ++it)
+    // LIFT: 0xcae0 has EH state -2 and one Lock.h line-122 assert per exit. The AutoCS object
+    // lives in an inner scope; its destructor does the leave at each exit.
     {
-        unsigned short const wid = it->first;
-        int const bucketIndex = wid / ARRAY_SIZE;
-        int const worldIndex = wid % ARRAY_SIZE;
-        if (bucketIndex >= BUCKET_COUNT)
+        AutoCS lock(&_reloadLock);
+        for (WorldConfigList::Container::const_iterator it = worldConfigList->_configList.begin();
+             it != worldConfigList->_configList.end(); ++it)
         {
-            Log::Write(Log::LT_ERROR, UNSENT_POST_CONTEXT_FILE, 198,
-                       L"[%s], %s; wid out of range, wid:%u, bucketIndex:%d, bucketCount:%d", MODULE_NAME,
-                       L"UnsentPostContextManager::updateWorldList", wid, bucketIndex, BUCKET_COUNT);
-            UNSENT_LOCK_LEAVE_RETURN(lock, false);
-        }
-        if (_containerList[bucketIndex] == nullptr)
-            _containerList[bucketIndex] = static_cast<UnsentPostContextList**>(Memory::_Manager[2]->AllocZero(
-                sizeof(UnsentPostContextList*) * ARRAY_SIZE, UNSENT_POST_CONTEXT_FILE, 203));
-        if (_containerList[bucketIndex][worldIndex] == nullptr && !addUnsentPostContextList(wid, bucketIndex, worldIndex))
-        {
-            UNSENT_POST_CONTEXT_CRASH(
-                208, L"== CRASH == [%s], %s; failed to add unsent post context list, wid:%u, bucketIndex:%d, worldIndex:%d",
-                MODULE_NAME, L"UnsentPostContextManager::updateWorldList", wid, bucketIndex, worldIndex);
-            UNSENT_LOCK_LEAVE_RETURN(lock, false);
+            unsigned short const wid = it->first;
+            int const bucketIndex = wid / ARRAY_SIZE;
+            int const worldIndex = wid % ARRAY_SIZE;
+            if (bucketIndex >= BUCKET_COUNT)
+            {
+                Log::Write(Log::LT_ERROR, UNSENT_POST_CONTEXT_FILE, 198,
+                           L"[%s], %s; wid out of range, wid:%u, bucketIndex:%d, bucketCount:%d", MODULE_NAME,
+                           L"UnsentPostContextManager::updateWorldList", wid, bucketIndex, BUCKET_COUNT);
+                return false;
+            }
+            if (_containerList[bucketIndex] == nullptr)
+                _containerList[bucketIndex] = static_cast<UnsentPostContextList**>(Memory::_Manager[2]->AllocZero(
+                    sizeof(UnsentPostContextList*) * ARRAY_SIZE, UNSENT_POST_CONTEXT_FILE, 203));
+            if (_containerList[bucketIndex][worldIndex] == nullptr && !addUnsentPostContextList(wid, bucketIndex, worldIndex))
+            {
+                UNSENT_POST_CONTEXT_CRASH(
+                    208, L"== CRASH == [%s], %s; failed to add unsent post context list, wid:%u, bucketIndex:%d, worldIndex:%d",
+                    MODULE_NAME, L"UnsentPostContextManager::updateWorldList", wid, bucketIndex, worldIndex);
+                return false;
+            }
         }
     }
-    UNSENT_LOCK_ASSERT(lock, 122);
-    LeaveCriticalSection(&lock->CS);
     Log::Write(Log::LT_DEBUG, UNSENT_POST_CONTEXT_FILE, 215,
                L"[%s], %s; succeeded to update world list of unsent post context manager", MODULE_NAME,
                L"UnsentPostContextManager::updateWorldList");

@@ -61,9 +61,13 @@ public:
         POSTEVENT_PACKET_PUMP_EVENT = 0x82
     };
     // Inline constructor. The binary writes it in wmain (0x12ca0).
-    PostOfficeDaemon() : _config(nullptr), _serviceWid(0)
+    // LIFT: 0x12ca0 stores the 11 manager pointers one by one, then calls memset for _sessionHandler only.
+    PostOfficeDaemon()
+        : _config(nullptr), _serviceWid(0), _worldConfigManager(nullptr), _cachedWatchdogManager(nullptr),
+          _agentChannelManager(nullptr), _worldChannelManager(nullptr), _cachegateChannelManager(nullptr),
+          _postContextManager(nullptr), _relayContextManager(nullptr), _relayTimeContextManager(nullptr),
+          _unsentPostContextManager(nullptr), _relayTimeoutChecker(nullptr), _unsentPostChecker(nullptr)
     {
-        memset(&_worldConfigManager, 0, 88);
         memset(_sessionHandler, 0, sizeof(_sessionHandler));
     }
     virtual ~PostOfficeDaemon();  // 0x12dd0

@@ -20,6 +20,8 @@
 #include "WorldConfig.h"
 #include "PostOfficeServicePacketCommand.h"
 
+extern __declspec(thread) void* __delv_buf__;  // PDB thread variable, defined in PostContext.cpp.
+
 namespace
 {
 wchar_t const* const WORLD_PACKET_HANDLER_FILE = L"WorldPacketHandler.cpp";  // LIFT: No PDB symbol. The binary uses the literal.
@@ -633,7 +635,9 @@ bool HandlePostOfficeServiceRegisterPostReq(Session const* session, Packet const
                    L"[%s], %s; cannot send deliver post relay request, recipientWid:%u, postId:0x%I64X",
                    MODULE_NAME, L"HandlePostOfficeServiceRegisterPostReq",
                    static_cast<unsigned int>(recipientWid), postId);
-        Memory::_Manager[2]->Free(attachedItemList, WORLD_PACKET_HANDLER_FILE, 469);
+        // LIFT: 0x20720 line 469 is the inlined delete[] form; it stores the pointer in __delv_buf__ (A16).
+        __delv_buf__ = attachedItemList;
+        Memory::_Manager[2]->Free(__delv_buf__, WORLD_PACKET_HANDLER_FILE, 469);
         if (!PostOfficeDaemon::_instance->_unsentPostContextManager->RegisterUnsentPost(recipientWid, postId, false))
             Log::Write(Log::LT_ERROR, WORLD_PACKET_HANDLER_FILE, 472,
                        L"[%s], %s; exception occurred; failed to register unsent post, recipientWid:%u, postId:0x%I64X",
@@ -652,7 +656,10 @@ $_ERROR:
     if (pcb != nullptr)
         pcb->Clear();
     if (attachedItemList != nullptr)
-        Memory::_Manager[2]->Free(attachedItemList, WORLD_PACKET_HANDLER_FILE, 486);
+    {
+        __delv_buf__ = attachedItemList;
+        Memory::_Manager[2]->Free(__delv_buf__, WORLD_PACKET_HANDLER_FILE, 486);
+    }
     Log::Write(Log::LT_DEBUG, WORLD_PACKET_HANDLER_FILE, 488, L"[%s], %s; <END PACKET HANDLER>",
                MODULE_NAME, L"HandlePostOfficeServiceRegisterPostReq");
     return true;

@@ -66,6 +66,7 @@ bool WorldConfigManager::initConfigManager()
 // 0xdb30
 bool WorldConfigManager::updateWorldList(WorldConfigList const* worldConfigList)
 {
+    // LIFT: 0xdb30 has no explicit Leave; the AutoCS destructor leaves at each return.
     AutoCS lock(&_reloadLock);
     for (WorldConfigList::Container::const_iterator it = worldConfigList->_configList.begin();
          it != worldConfigList->_configList.end(); ++it)
@@ -78,7 +79,6 @@ bool WorldConfigManager::updateWorldList(WorldConfigList const* worldConfigList)
             Log::Write(Log::LT_ERROR, WORLD_CONFIG_FILE, 107,
                        L"[%s], %s; wid out of range, wid:%u, bucketIndex:%d, bucketCount:%d", MODULE_NAME,
                        L"WorldConfigManager::updateWorldList", wid, bucketIndex, BUCKET_COUNT);
-            lock.Leave();
             return false;
         }
         int worldIndex = wid - ARRAY_SIZE * bucketIndex;
@@ -94,8 +94,7 @@ bool WorldConfigManager::updateWorldList(WorldConfigList const* worldConfigList)
                                    L"worldIndex:%d, ipAddr:%s, port:%u",
                                    MODULE_NAME, L"WorldConfigManager::updateWorldList", wid, bucketIndex, worldIndex,
                                    Network::GetAddressStringW(worldConfig->_ipAddress), worldConfig->_port);
-                lock.Leave();
-                return false;
+                    return false;
             }
         }
         else if (!addWorldConfig(wid, bucketIndex, worldIndex, worldConfig))
@@ -105,11 +104,9 @@ bool WorldConfigManager::updateWorldList(WorldConfigList const* worldConfigList)
                                L"worldIndex:%d, ipAddr:%s, port:%u",
                                MODULE_NAME, L"WorldConfigManager::updateWorldList", wid, bucketIndex, worldIndex,
                                Network::GetAddressStringW(worldConfig->_ipAddress), worldConfig->_port);
-            lock.Leave();
             return false;
         }
     }
-    lock.Leave();
     return true;
 }
 

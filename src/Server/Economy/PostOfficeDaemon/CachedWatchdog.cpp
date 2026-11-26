@@ -157,35 +157,37 @@ bool CachedWatchdogManager::initWatchdogManager(WorldConfigList const* worldConf
 // 0x4310
 bool CachedWatchdogManager::updateWorldList(WorldConfigList const* worldConfigList)
 {
-    AutoCS lock(&_reloadLock);
-    for (WorldConfigList::Container::const_iterator it = worldConfigList->_configList.begin();
-         it != worldConfigList->_configList.end(); ++it)
+    // LIFT: 0x4310 the AutoCS object lives in an inner scope; its destructor leaves at each exit (one Lock.h line-122 assert each).
     {
-        unsigned short const wid = it->first;
-        int const bucketIndex = wid / ARRAY_SIZE;
-        int const worldIndex = wid % ARRAY_SIZE;
-        if (bucketIndex >= BUCKET_COUNT)
+        AutoCS lock(&_reloadLock);
+        for (WorldConfigList::Container::const_iterator it = worldConfigList->_configList.begin();
+             it != worldConfigList->_configList.end(); ++it)
         {
-            Log::Write(Log::LT_ERROR, CACHED_WATCHDOG_FILE, 147,
-                       L"[%s], %s; wid out of range, wid:%u, bucketIndex:%d, bucketCount:%d", MODULE_NAME,
-                       L"CachedWatchdogManager::updateWorldList", wid, bucketIndex, BUCKET_COUNT);
-            return false;
-        }
+            unsigned short const wid = it->first;
+            int const bucketIndex = wid / ARRAY_SIZE;
+            int const worldIndex = wid % ARRAY_SIZE;
+            if (bucketIndex >= BUCKET_COUNT)
+            {
+                Log::Write(Log::LT_ERROR, CACHED_WATCHDOG_FILE, 147,
+                           L"[%s], %s; wid out of range, wid:%u, bucketIndex:%d, bucketCount:%d", MODULE_NAME,
+                           L"CachedWatchdogManager::updateWorldList", wid, bucketIndex, BUCKET_COUNT);
+                return false;
+            }
 
-        if (_containerList[bucketIndex] == nullptr)
-            _containerList[bucketIndex] = static_cast<CachedWatchdog**>(
-                Memory::_Manager[2]->AllocZero(sizeof(CachedWatchdog*) * ARRAY_SIZE, CACHED_WATCHDOG_FILE, 152));
+            if (_containerList[bucketIndex] == nullptr)
+                _containerList[bucketIndex] = static_cast<CachedWatchdog**>(
+                    Memory::_Manager[2]->AllocZero(sizeof(CachedWatchdog*) * ARRAY_SIZE, CACHED_WATCHDOG_FILE, 152));
 
-        if (_containerList[bucketIndex][worldIndex] == nullptr && !addCachedWatchdog(wid, bucketIndex, worldIndex))
-        {
-            CACHED_WATCHDOG_CRASH(157,
-                                  L"== CRASH == [%s], %s; failed to add cached watchdog, wid:%u, bucketIndex:%d, worldIndex:%d",
-                                  MODULE_NAME, L"CachedWatchdogManager::updateWorldList", wid, bucketIndex,
-                                  worldIndex);
-            return false;
+            if (_containerList[bucketIndex][worldIndex] == nullptr && !addCachedWatchdog(wid, bucketIndex, worldIndex))
+            {
+                CACHED_WATCHDOG_CRASH(157,
+                                      L"== CRASH == [%s], %s; failed to add cached watchdog, wid:%u, bucketIndex:%d, worldIndex:%d",
+                                      MODULE_NAME, L"CachedWatchdogManager::updateWorldList", wid, bucketIndex,
+                                      worldIndex);
+                return false;
+            }
         }
     }
-    lock.Leave();
 
     Log::Write(Log::LT_DEBUG, CACHED_WATCHDOG_FILE, 164,
                L"[%s], %s; succeeded to update world list of cached watchdog manager", MODULE_NAME,
