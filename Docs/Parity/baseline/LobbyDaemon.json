@@ -319,11 +319,12 @@
 "status": "MATCH"
 },
 "BLDaemonInfoTable::Clear": {
-"calls": 40,
-"consts": 67,
-"refs": 67,
-"score": 57.8,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
 },
 "BLDaemonInfoTable::Find": {
 "calls": 100,
@@ -663,11 +664,12 @@
 "status": "DIFF"
 },
 "CliSession::FetchServiceEntryList": {
-"calls": 94,
+"calls": 100,
 "consts": 100,
+"raw_status": "MATCH",
 "refs": 100,
-"score": 98.0,
-"status": "DIFF"
+"score": 100.0,
+"status": "EXCLUDED"
 },
 "CliSession::NotifyChangedGrade": {
 "calls": 57,
@@ -1691,11 +1693,11 @@
 "status": "MATCH"
 },
 "GameWorldRegistry::EnumerateCluster": {
-"calls": 57,
-"consts": 0,
+"calls": 100,
+"consts": 100,
 "refs": 100,
-"score": 52.4,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "GameWorldRegistry::FetchWorldInfoList": {
 "calls": 100,
@@ -1740,11 +1742,11 @@
 "status": "MATCH"
 },
 "GameWorldRegistry::~GameWorldRegistry": {
-"calls": 91,
+"calls": 100,
 "consts": 100,
-"refs": 91,
-"score": 93.9,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "GameWorldReport::GetPacket": {
 "calls": 100,
@@ -2290,6 +2292,13 @@
 "consts": 80,
 "refs": 0,
 "score": 60.0,
+"status": "DIFF"
+},
+"GradeService::FetchGradeLevel": {
+"calls": 100,
+"consts": 86,
+"refs": 67,
+"score": 84.1,
 "status": "DIFF"
 },
 "GrowingBuffer::grow": {
@@ -3393,10 +3402,10 @@
 "status": "MATCH"
 },
 "LobbyGateChannel::SendStartSessionWithLobbyTokenOk": {
-"calls": 51,
-"consts": 84,
-"refs": 60,
-"score": 65.1,
+"calls": 57,
+"consts": 89,
+"refs": 67,
+"score": 70.7,
 "status": "DIFF"
 },
 "LobbyGateChannel::SendStartSessionWithNPTokenFail": {
@@ -3407,10 +3416,10 @@
 "status": "MATCH"
 },
 "LobbyGateChannel::SendStartSessionWithNPTokenOk": {
-"calls": 51,
+"calls": 57,
 "consts": 90,
-"refs": 75,
-"score": 72.0,
+"refs": 86,
+"score": 77.4,
 "status": "DIFF"
 },
 "LobbyGateChannel::SendStartWaitNotify": {
@@ -3779,11 +3788,11 @@
 "status": "MATCH"
 },
 "Log::WriteV": {
-"calls": 86,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 95.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Log::run": {
 "calls": 100,
@@ -3875,6 +3884,14 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"LogMedia::LogMedia": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
 },
 "LogMedia::Write": {
 "calls": 100,
@@ -4773,11 +4790,11 @@
 "status": "EXCLUDED"
 },
 "RawPacketBufferHandler::Destroy": {
-"calls": 50,
+"calls": 100,
 "consts": 100,
-"refs": 77,
-"score": 75.6,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "RawPacketBufferHandler::ToBuffer": {
 "calls": 100,
@@ -5103,6 +5120,14 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Session::deallocateCrypt": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
 "Session::deallocate_me": {
 "calls": 100,
 "consts": 100,
@@ -5160,11 +5185,12 @@
 "status": "MATCH"
 },
 "Session::~Session": {
-"calls": 69,
-"consts": 89,
-"refs": 80,
-"score": 79.4,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
 },
 "SessionHandler::~SessionHandler": {
 "calls": 100,
@@ -5552,11 +5578,11 @@
 "status": "MATCH"
 },
 "TextConsole::TextConsole": {
-"calls": 80,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 93.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "TextConsole::Write": {
 "calls": 100,
@@ -5804,11 +5830,11 @@
 "status": "DIFF"
 },
 "TransactionChannel::~TransactionChannel": {
-"calls": 50,
-"consts": 80,
-"refs": 67,
-"score": 65.6,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "TrustedPacketBufferHandler::Clone": {
 "calls": 100,
@@ -6002,11 +6028,12 @@
 "status": "MATCH"
 },
 "WindowConsole::WindowConsole": {
-"calls": 0,
+"calls": 100,
 "consts": 100,
+"raw_status": "MATCH",
 "refs": 100,
-"score": 66.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "EXCLUDED"
 },
 "WindowConsole::Write": {
 "calls": 100,
@@ -6121,53 +6148,57 @@
 "status": "MATCH"
 },
 "ZSTD_compressBlock_btlazy2": {
-"calls": 67,
-"consts": 86,
+"calls": 100,
+"consts": 100,
 "refs": 100,
-"score": 84.1,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "ZSTD_compressBlock_btlazy2_extDict": {
-"calls": 96,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 98.6,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "ZSTD_compressBlock_btopt": {
-"calls": 98,
+"calls": 100,
 "consts": 100,
-"refs": 86,
-"score": 94.7,
-"status": "DIFF"
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
 },
 "ZSTD_compressBlock_btopt_extDict": {
-"calls": 97,
+"calls": 100,
 "consts": 100,
-"refs": 86,
-"score": 94.2,
-"status": "DIFF"
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
 },
 "ZSTD_compressBlock_btultra": {
-"calls": 98,
-"consts": 98,
-"refs": 86,
-"score": 94.1,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
 },
 "ZSTD_compressBlock_btultra_extDict": {
-"calls": 97,
-"consts": 98,
-"refs": 86,
-"score": 93.6,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
 },
 "ZSTD_compressBlock_doubleFast": {
-"calls": 94,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 97.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "ZSTD_compressBlock_doubleFast_extDict": {
 "calls": 100,
@@ -6177,25 +6208,25 @@
 "status": "MATCH"
 },
 "ZSTD_compressBlock_doubleFast_extDict_generic": {
-"calls": 92,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 97.4,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "ZSTD_compressBlock_fast": {
-"calls": 62,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 87.5,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "ZSTD_compressBlock_fast_dictMatchState": {
-"calls": 90,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 96.8,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "ZSTD_compressBlock_fast_extDict": {
 "calls": 100,
@@ -6205,53 +6236,53 @@
 "status": "MATCH"
 },
 "ZSTD_compressBlock_fast_extDict_generic": {
-"calls": 95,
-"consts": 56,
+"calls": 100,
+"consts": 100,
 "refs": 100,
-"score": 83.6,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "ZSTD_compressBlock_greedy": {
-"calls": 67,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 88.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "ZSTD_compressBlock_greedy_extDict": {
-"calls": 91,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 97.0,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "ZSTD_compressBlock_lazy": {
-"calls": 67,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 88.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "ZSTD_compressBlock_lazy2": {
-"calls": 67,
-"consts": 86,
+"calls": 100,
+"consts": 100,
 "refs": 100,
-"score": 84.1,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "ZSTD_compressBlock_lazy2_extDict": {
-"calls": 96,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 98.6,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "ZSTD_compressBlock_lazy_extDict": {
-"calls": 94,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 98.0,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "ZSTD_count": {
 "calls": 100,
@@ -6289,6 +6320,13 @@
 "status": "MATCH"
 },
 "ZSTD_freeCDict": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_fullLiteralsCost_cached": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -6337,6 +6375,20 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"ZSTD_litLengthPrice": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_rawLiteralsCost": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "ZSTD_readMINMATCH": {
 "calls": 100,
 "consts": 100,
@@ -6345,11 +6397,18 @@
 "status": "MATCH"
 },
 "ZSTD_rescaleFreqs": {
-"calls": 92,
-"consts": 96,
+"calls": 100,
+"consts": 100,
 "refs": 100,
-"score": 96.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_setBasePrices": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "ZSTD_storeSeq": {
 "calls": 100,
@@ -6492,11 +6551,11 @@
 "status": "MATCH"
 },
 "makeConsole": {
-"calls": 88,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 95.8,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "makeDirectory": {
 "calls": 100,
