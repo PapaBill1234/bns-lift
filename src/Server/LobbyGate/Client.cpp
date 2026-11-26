@@ -221,10 +221,10 @@ long long GateKeyManager::MakeGateKey(Session* session)
     int index = static_cast<int>(gateKey % _hashCount);
     int sessionIndex = static_cast<int>(session->_id % static_cast<unsigned long long>(_hashCount));
 
-    void* mem = Memory::_Manager[2]->Alloc(sizeof(GateKeyEntry), CLIENT_FILE, 149);
-    if (mem == nullptr)
+    // LIFT: placement new with throw(). The orig tests the result of the new expression for null (HR 0x3ec0).
+    GateKeyEntry* entry = new (Memory::_Manager[2]->Alloc(sizeof(GateKeyEntry), CLIENT_FILE, 149)) GateKeyEntry(session);
+    if (entry == nullptr)
         return 0;
-    GateKeyEntry* entry = new (mem) GateKeyEntry(session);
 
     // Orig inserts non-const std::pair values; the sgk lock stays held in the fail path (HR 0x3ec0).
     _gkLock[index].Enter();
@@ -232,29 +232,36 @@ long long GateKeyManager::MakeGateKey(Session* session)
     _gkLock[index].Leave();
     if (!inserted)
     {
-        entry->~GateKeyEntry();
+        // LIFT: ~GateKeyEntry written out. The orig inlines it here and calls 0x3e80 in the second fail path.
+        if (entry->_session != nullptr)
+        {
+            entry->_session->removeReferenceCount(CLIENT_FILE, 57);
+            entry->_session = nullptr;
+            entry->_cliKey = 0;
+        }
         Memory::_Manager[2]->Free(entry, CLIENT_FILE, 159);
         return 0;
     }
 
     _sgkLock[sessionIndex].Enter();
-    if (_sgkMap[sessionIndex]
-            .insert(std::pair<long long, long long>(static_cast<long long>(session->_id), gateKey))
-            .second)
+    if (!_sgkMap[sessionIndex]
+             .insert(std::pair<long long, long long>(static_cast<long long>(session->_id), gateKey))
+             .second)
     {
+        // LIFT: the orig puts the fail block first (jne to the success block at the end).
+        _gkLock[index].Enter();
+        GateKeyManager::GKEMapType::iterator it = _gkMap[index].find(gateKey);
+        if (it != _gkMap[index].end())
+            _gkMap[index].erase(it);
+        _gkLock[index].Leave();
+        entry->~GateKeyEntry();
+        Memory::_Manager[2]->Free(entry, CLIENT_FILE, 180);
         _sgkLock[sessionIndex].Leave();
-        return gateKey;
+        return 0;
     }
 
-    _gkLock[index].Enter();
-    GateKeyManager::GKEMapType::iterator it = _gkMap[index].find(gateKey);
-    if (it != _gkMap[index].end())
-        _gkMap[index].erase(it);
-    _gkLock[index].Leave();
-    entry->~GateKeyEntry();
-    Memory::_Manager[2]->Free(entry, CLIENT_FILE, 180);
     _sgkLock[sessionIndex].Leave();
-    return 0;
+    return gateKey;
 }
 
 // 0x4170
@@ -327,32 +334,45 @@ bool Client::SendGetCharacterInfoListOk(long long now, short timeZoneBias, Chara
     fp.StartRepeat();
     for (int i = 0; i < characterCount; ++i)
     {
+        // LIFT: HR 0x4500 leaves the loop at the first failed Compose and runs one fail block after the loop.
         CharacterInfo const& info = characterList[i];
-        bool ok = true;
         reserveFragment(fp, 8);
-        ok = ok && fp.Compose(1, info.pcId) != 0;
-        id128 slotId = info.slotId;
-        if (ok) reserveFragment(fp, 16);
-        ok = ok && fp.Compose(1, &slotId) != 0;
-        if (ok) reserveFragment(fp, 2);
-        ok = ok && fp.Compose(1, static_cast<int>(info.worldId)) != 0;
-        if (ok) reserveFragment(fp, 0x44);
-        ok = ok && fp.Compose(1, info.characterName) != 0;
-        if (ok) reserveFragment(fp, info.characterDataSize + 2);
+        if (fp.Compose(1, info.pcId) == 0)
+            goto composeFail;
+        reserveFragment(fp, 16);
+        {
+            id128 slotId = info.slotId;
+            if (fp.Compose(1, &slotId) == 0)
+                goto composeFail;
+        }
+        reserveFragment(fp, 2);
+        if (fp.Compose(1, static_cast<int>(info.worldId)) == 0)
+            goto composeFail;
+        reserveFragment(fp, 0x44);
+        if (fp.Compose(1, info.characterName) == 0)
+            goto composeFail;
+        reserveFragment(fp, info.characterDataSize + 2);
         // 0x4861: r9d = size (+0x5C), r8 = data (+0x60). rdi = info + 0x18.
-        ok = ok && fp.Compose(1, info.characterData, info.characterDataSize) != 0;
-        if (ok) reserveFragment(fp, 8);
-        ok = ok && fp.Compose(1, info.lastPlayEndDate) != 0;
-        if (ok) reserveFragment(fp, 1);
-        ok = ok && fp.Compose(1, static_cast<int>(info.state)) != 0;
-        if (ok) reserveFragment(fp, 1);
-        ok = ok && fp.Compose(1, static_cast<int>(info.jumpingCharacterState)) != 0;
-        if (ok) reserveFragment(fp, 4);
-        ok = ok && fp.Compose(1, info.deleteRemainTime) != 0;
-        if (!ok)
-            return failSend(this, session, fp, cmd, 471, L"[channel], 0x%.16I64X, %I64d, send fail, compose fail, cmd:%d");
+        if (fp.Compose(1, info.characterData, info.characterDataSize) == 0)
+            goto composeFail;
+        reserveFragment(fp, 8);
+        if (fp.Compose(1, info.lastPlayEndDate) == 0)
+            goto composeFail;
+        reserveFragment(fp, 1);
+        if (fp.Compose(1, static_cast<int>(info.state)) == 0)
+            goto composeFail;
+        reserveFragment(fp, 1);
+        if (fp.Compose(1, static_cast<int>(info.jumpingCharacterState)) == 0)
+            goto composeFail;
+        reserveFragment(fp, 4);
+        if (fp.Compose(1, info.deleteRemainTime) == 0)
+            goto composeFail;
         fp.IncRepeatCount();
     }
+    goto composeDone;
+composeFail:
+    return failSend(this, session, fp, cmd, 471, L"[channel], 0x%.16I64X, %I64d, send fail, compose fail, cmd:%d");
+composeDone:
     finalizeFragment(fp);
     // Inlined send path A: encrypt the first buffer and send it under the session lock.
     fp.packet.ListHead->encrypt(session->_currentCrypt, session->_security3rd);
@@ -503,16 +523,19 @@ void ClientManager::Finalize()
         for (int i = 0; i < _hashCount; ++i)
         {
             _cliLock[i].Enter();
-            for (ClientManager::CliMapType::iterator it = _cliMap[i].begin(); it != _cliMap[i].end(); ++it)
+            // LIFT: the orig keeps &_cliMap[i] and it->second in registers (HR 0x5cf0 v5, second).
+            ClientManager::CliMapType& cliMap = _cliMap[i];
+            for (ClientManager::CliMapType::iterator it = cliMap.begin(); it != cliMap.end(); ++it)
             {
-                if (it->second != nullptr)
+                Client* client = it->second;
+                if (client != nullptr)
                 {
                     // 0x5d84 calls vtable +0x28 (slot 5, Channel::RemoveSession 0x214d0) with edx = 0 and r8d = 0.
-                    it->second->RemoveSession(nullptr, false);
-                    it->second->removeReferenceCount(CLIENT_FILE, 702);
+                    client->RemoveSession(nullptr, false);
+                    client->removeReferenceCount(CLIENT_FILE, 702);
                 }
             }
-            _cliMap[i].clear();
+            cliMap.clear();
             _cliLock[i].Leave();
         }
         delete[] _cliMap;

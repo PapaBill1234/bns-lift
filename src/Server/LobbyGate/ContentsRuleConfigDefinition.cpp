@@ -257,29 +257,29 @@ __declspec(noinline) void ContentsRuleConfig::Dump()
     char const* base = reinterpret_cast<char const*>(config);
     for (int i = 0; i < ROW_COUNT; ++i)
     {
+        // LIFT: LG 0x8600 reads def.offset again in each case (no common field pointer before the switch).
         ContentsRuleXmlCfgDefLocal const& def = _Def[i];
-        char const* field = base + def.offset;
         switch (def.type)
         {
         case XmlCfgDef::CFG_INT:
             Log::Write(Log::LT_NOTICE, FILE_NAME, 356, L"[%s], %s : %d", CONTENTS_RULE_CONFIG_MODULENAME, def.name,
-                       *reinterpret_cast<int const*>(field));
+                       *reinterpret_cast<int const*>(base + def.offset));
             break;
         case XmlCfgDef::CFG_INT64:
             Log::Write(Log::LT_NOTICE, FILE_NAME, 357, L"[%s], %s : %I64d", CONTENTS_RULE_CONFIG_MODULENAME, def.name,
-                       *reinterpret_cast<long long const*>(field));
+                       *reinterpret_cast<long long const*>(base + def.offset));
             break;
         case XmlCfgDef::CFG_FLOAT:
             Log::Write(Log::LT_NOTICE, FILE_NAME, 358, L"[%s], %s : %f", CONTENTS_RULE_CONFIG_MODULENAME, def.name,
-                       static_cast<double>(*reinterpret_cast<float const*>(field)));
+                       static_cast<double>(*reinterpret_cast<float const*>(base + def.offset)));
             break;
         case XmlCfgDef::CFG_BOOL:
             Log::Write(Log::LT_NOTICE, FILE_NAME, 359, L"[%s], %s : %s", CONTENTS_RULE_CONFIG_MODULENAME, def.name,
-                       *field != 0 ? L"yes" : L"no");
+                       base[def.offset] != 0 ? L"yes" : L"no");
             break;
         case XmlCfgDef::CFG_STR:
         {
-            wchar_t const* value = reinterpret_cast<wchar_t const*>(field);
+            wchar_t const* value = reinterpret_cast<wchar_t const*>(base + def.offset);
             if (value == nullptr || *value == 0)
                 value = L"N/A";
             Log::Write(Log::LT_NOTICE, FILE_NAME, 363, L"[%s], %s : %s", CONTENTS_RULE_CONFIG_MODULENAME, def.name, value);
