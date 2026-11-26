@@ -138,8 +138,10 @@ bool RetrieveCharacterInfoRelayContext::ComposeRequestPacket(Packet& packet) con
 bool RetrieveCharacterInfoRelayContext::ComposeResponsePacket(Packet& packet) const
 {
     // PDB lines (0x1e230): one switch on the result state; the failure cases come first in the code, the crash case is the default.
+    // LIFT: the original reads the result state once (edi) and logs that register in the crash case.
+    RelayResponse::ResultState const resultState = static_cast<RelayResponse::ResultState>(_response._resultState);
     unsigned long long const relayTid = _economyHeader._relayTid;
-    switch (_response._resultState)
+    switch (resultState)
     {
     case RelayResponse::RESULTSTATE_SUCCESS:
     {
@@ -163,7 +165,7 @@ bool RetrieveCharacterInfoRelayContext::ComposeResponsePacket(Packet& packet) co
     case RelayResponse::RESULTSTATE_RELAY_ERROR:
     case RelayResponse::RESULTSTATE_RELAY_TIMEOUT:
     {
-        int const failReason = convertFailReason(static_cast<RelayResponse::ResultState>(_response._resultState), _response._failReason);
+        int const failReason = convertFailReason(resultState, _response._failReason);
         bool const composed = 0 < packet.Compose("hqE", 6, _request._gameTid, failReason);
         if (!composed)
         {
@@ -184,7 +186,7 @@ bool RetrieveCharacterInfoRelayContext::ComposeResponsePacket(Packet& packet) co
                                             L"== CRASH == [%s], %s; invalid response result state, relayTid:0x%I64X, resultState:%d",
                                             MODULE_NAME,
                                             L"RetrieveCharacterInfoRelayContext::ComposeResponsePacket", relayTid,
-                                            _response._resultState);
+                                            resultState);
         return false;
     }
     return true;
