@@ -11,9 +11,15 @@
 #include "Daemon.h"
 
 // The path is per exe project. RefCntObject<Exe>.cpp wrappers set it (lesson 30).
+// LIFT: LobbyDaemon builds this file itself (no wrapper): per-exe path (LIFT_EXE_LD, pseudocode of LobbyDaemon).
 #ifndef REFCNT_HEADER
+#if defined(LIFT_EXE_LD)
+#define REFCNT_HEADER \
+    L"e:\\dailybuild02\\lobbydaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\bloodlib\\include\\RefCntObject.h"
+#else
 #define REFCNT_HEADER \
     L"e:\\dailybuild02\\cachegate-common-0.0.348\\depot\\branch\\348nc\\program\\server\\bloodlib\\include\\RefCntObject.h"
+#endif
 #endif
 // LIFT: the SCD orig (0x6890 addReferenceCount, 0x1020 ~RefCntObject) has the upper case path in these 2 functions.
 // They come from other .obj files (CouponJob, ObjectPool) with a different case of the include path.

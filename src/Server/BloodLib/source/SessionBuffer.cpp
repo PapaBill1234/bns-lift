@@ -200,6 +200,8 @@ void SessionSendBuffer::increaseBuffer(SendBufferList* bufferList)
 #define SESSIONBUFFER_REFCNT_EXE L"smartcoupondaemon"
 #elif defined(LIFT_EXE_POD)
 #define SESSIONBUFFER_REFCNT_EXE L"postofficedaemon"
+#elif defined(LIFT_EXE_LD)
+#define SESSIONBUFFER_REFCNT_EXE L"lobbydaemon"
 #else
 #define SESSIONBUFFER_REFCNT_EXE L"cachegate"
 #endif

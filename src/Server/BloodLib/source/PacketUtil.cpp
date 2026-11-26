@@ -14,8 +14,13 @@ static wchar_t const PACKETUTIL_FILE[] = L"source\\PacketUtil.cpp";
 // LIFT: each exe has its own build path for include\PacketUtil.h. A wrapper .cpp (PacketUtilLobbyGate.cpp,
 // PacketUtilPostOfficeDaemon.cpp) can define LIFT_PACKETUTIL_H_PATH before it includes this file. The default is CacheGate.
 #ifndef LIFT_PACKETUTIL_H_PATH
+#if defined(LIFT_EXE_LD)  // LIFT: LobbyDaemon builds this file itself (pseudocode of LobbyDaemon).
+#define LIFT_PACKETUTIL_H_PATH \
+    "e:\\dailybuild02\\lobbydaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\bloodlib\\include\\PacketUtil.h"
+#else
 #define LIFT_PACKETUTIL_H_PATH \
     "e:\\dailybuild02\\cachegate-common-0.0.348\\depot\\branch\\348nc\\program\\server\\bloodlib\\include\\PacketUtil.h"
+#endif
 #endif
 #define LIFT_WIDEN2(x) L##x
 #define LIFT_WIDEN(x) LIFT_WIDEN2(x)
