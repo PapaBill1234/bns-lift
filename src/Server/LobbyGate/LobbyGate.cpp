@@ -238,10 +238,17 @@ long LobbyGate::GetTimerMaxTime()
 // 0x12cf0
 void LobbyGate::FailedEventObjectHandler(EventObject* eventObject)
 {
-    unsigned int const id = eventObject->EventId();
-    if (id != 3 && id != 5)
-        Log::Write(Log::LT_DEBUG, kFile, 196, L"[lobbygate], unknown event object id, id: %d, object: %p", id,
-                   eventObject);
+    // 0x12cf0: the original calls EventId again for the log argument.
+    switch (eventObject->EventId())
+    {
+    case 3:
+    case 5:
+        break;
+    default:
+        Log::Write(Log::LT_DEBUG, kFile, 196, L"[lobbygate], unknown event object id, id: %d, object: %p",
+                   eventObject->EventId(), eventObject);
+        break;
+    }
 }
 
 // 0x12d40
