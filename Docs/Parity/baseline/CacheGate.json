@@ -295,10 +295,10 @@
 },
 "CacheD::Initialize": {
 "calls": 100,
-"consts": 80,
+"consts": 100,
 "refs": 100,
-"score": 93.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "CacheD::TryConnect": {
 "calls": 100,
@@ -308,11 +308,11 @@
 "status": "MATCH"
 },
 "CacheD::Verify": {
-"calls": 75,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 91.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "CacheDChannel::PacketHandler": {
 "calls": 100,
@@ -323,10 +323,10 @@
 },
 "CacheDChannel::onClose": {
 "calls": 100,
-"consts": 92,
+"consts": 100,
 "refs": 100,
-"score": 97.4,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "CacheDChannel::onConnect": {
 "calls": 100,
@@ -378,11 +378,11 @@
 "status": "DIFF"
 },
 "CacheDList::RemoveSessionAll": {
-"calls": 91,
-"consts": 89,
-"refs": 77,
-"score": 85.7,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "CacheDList::add": {
 "calls": 100,
@@ -399,11 +399,11 @@
 "status": "MATCH"
 },
 "CacheDList::clear": {
-"calls": 67,
-"consts": 67,
-"refs": 50,
-"score": 61.1,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "CacheDList::del": {
 "calls": 100,
@@ -644,11 +644,11 @@
 "status": "MATCH"
 },
 "ClientManager::~ClientManager": {
-"calls": 80,
+"calls": 100,
 "consts": 100,
-"refs": 86,
-"score": 88.6,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "ClientSideDaemonChannel::getSession": {
 "calls": 100,
@@ -1057,10 +1057,10 @@
 "status": "DIFF"
 },
 "HandleCacheGateHello": {
-"calls": 88,
-"consts": 76,
+"calls": 98,
+"consts": 87,
 "refs": 98,
-"score": 87.2,
+"score": 94.1,
 "status": "DIFF"
 },
 "HandleCacheGateHelloFail": {

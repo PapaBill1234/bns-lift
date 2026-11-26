@@ -1870,10 +1870,10 @@
 },
 "ManagerChannel::SendRetryCouponPublicationOk": {
 "calls": 100,
-"consts": 89,
+"consts": 100,
 "refs": 100,
-"score": 96.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "ManagerSessionHandler::OnAccept": {
 "calls": 100,
@@ -2037,11 +2037,11 @@
 "status": "MATCH"
 },
 "NPServiceChannel::SendRequestEventNoti": {
-"calls": 86,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 95.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "NPServiceChannelCmdDispatcher": {
 "calls": 100,
@@ -2052,10 +2052,10 @@
 },
 "NPServiceChannelManager::HandleMessage": {
 "calls": 100,
-"consts": 77,
+"consts": 100,
 "refs": 100,
-"score": 92.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "NPServiceChannelManager::Initialize": {
 "calls": 100,
