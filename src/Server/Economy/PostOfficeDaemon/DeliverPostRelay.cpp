@@ -27,8 +27,9 @@ void DeliverPostRelayContext::initResponse(RelayResponse* const response)
 }
 
 // 0xfb80
-DeliverPostRelayContext::DeliverPostRelayContext(EconomyHeader const& economyHeader, PostContext* const postContext)
-    : RelayContext(economyHeader), _postContext(postContext)
+DeliverPostRelayContext::DeliverPostRelayContext(EconomyHeader const& economyHeader,
+                                                 DeliverPostRelayRequest const& request, PostContext* const postContext)
+    : RelayContext(economyHeader), _request(request), _postContext(postContext)
 {
     _response._resultState = RelayResponse::RESULTSTATE_INVALID;
     _response._failReason = 0;
@@ -81,8 +82,9 @@ bool DeliverPostRelayContext::processRelayRequest(Channel* const channel) const
     }
 
     unsigned long long const relayTid = _economyHeader._relayTid;
-    // LIFT: LTCG folded economyFormat (PDB offset 0). The call (0xFD88) sets only rcx and rdx. The callee (0x71E0) does not read r8.
-    if (!static_cast<CacheGateChannel*>(channel)->SendFragmentRelayRequest(this, nullptr))
+    // LTCG folds economyFormat (PDB offset 0): the call (0xFD88) sets only rcx and rdx. The callee 0x7410 refs the literal and
+    // its length 0x1e (strncat_s count) and logs it at line 91.
+    if (!static_cast<CacheGateChannel*>(channel)->SendFragmentRelayRequest(this, "hhhqqccqqochqosshqsssCQQqihqs;"))
     {
         Log::Write(Log::LT_ERROR, DELIVER_POST_RELAY_FILE, 56, L"[%s], %s; failed to send deliver post relay request, relayTid:0x%I64X",
                    MODULE_NAME, L"DeliverPostRelayContext::processRelayRequest", relayTid);
@@ -103,71 +105,73 @@ bool DeliverPostRelayContext::processRelayResponse() const
     int const resultState = _response._resultState;
     bool needRegister = false;
 
-    AutoCS autoLock(&_postContext->_lock);
-    char const postStatus = _postContext->_postInfo._postStatus;
-    if (postStatus != 3)
+    // LIFT: 0xfe00 leaves the lock at the end of a block scope (4 Lock.h sites), not with AutoCS::Leave.
     {
-        Log::Write(Log::LT_ERROR, DELIVER_POST_RELAY_FILE, 77,
-                   L"[%s], %s; invalid post status, relayTid:0x%I64X, postId:0x%I64X, postStatus:%d",
-                   MODULE_NAME, L"DeliverPostRelayContext::processRelayResponse", relayTid, postId,
-                   static_cast<int>(postStatus));
-        return false;
-    }
-
-    int dbRetValue;
-    switch (resultState)
-    {
-    case RelayResponse::RESULTSTATE_SUCCESS:
-        dbRetValue = 0;
-        if (!PostOfficeDB::UpdateStatusToDeliverySuccess(&dbRetValue, postId))
+        AutoCS autoLock(&_postContext->_lock);
+        char const postStatus = _postContext->_postInfo._postStatus;
+        if (postStatus != 3)
         {
-            Log::Write(Log::LT_ERROR, DELIVER_POST_RELAY_FILE, 86,
-                       L"[%s], %s; exception occurred; failed to update post status [delivery success status], dbRetValue:%d, relayTid:0x%I64X, postId:0x%I64X",
-                       MODULE_NAME, L"DeliverPostRelayContext::processRelayResponse", dbRetValue, relayTid, postId);
+            Log::Write(Log::LT_ERROR, DELIVER_POST_RELAY_FILE, 77,
+                       L"[%s], %s; invalid post status, relayTid:0x%I64X, postId:0x%I64X, postStatus:%d",
+                       MODULE_NAME, L"DeliverPostRelayContext::processRelayResponse", relayTid, postId,
+                       static_cast<int>(postStatus));
+            return false;
         }
-        _postContext->_postInfo._postStatus = 4;
-        break;
 
-    case RelayResponse::RESULTSTATE_FAILURE:
-        dbRetValue = 0;
-        if (_response._failReason == 18)
+        int dbRetValue;
+        switch (resultState)
         {
+        case RelayResponse::RESULTSTATE_SUCCESS:
+            dbRetValue = 0;
             if (!PostOfficeDB::UpdateStatusToDeliverySuccess(&dbRetValue, postId))
             {
-                Log::Write(Log::LT_ERROR, DELIVER_POST_RELAY_FILE, 99,
-                           L"[%s], %s; exception occurred; failed to update post status [incomplete delivery status], dbRetValue:%d, relayTid:0x%I64X, postId:0x%I64X",
-                           MODULE_NAME, L"DeliverPostRelayContext::processRelayResponse", dbRetValue, relayTid,
-                           postId);
+                Log::Write(Log::LT_ERROR, DELIVER_POST_RELAY_FILE, 86,
+                           L"[%s], %s; exception occurred; failed to update post status [delivery success status], dbRetValue:%d, relayTid:0x%I64X, postId:0x%I64X",
+                           MODULE_NAME, L"DeliverPostRelayContext::processRelayResponse", dbRetValue, relayTid, postId);
             }
-            _postContext->_postInfo._postStatus = 6;
-        }
-        else
-        {
-            if (!PostOfficeDB::UpdateStatusToDeliveryFailure(&dbRetValue, postId))
+            _postContext->_postInfo._postStatus = 4;
+            break;
+
+        case RelayResponse::RESULTSTATE_FAILURE:
+            dbRetValue = 0;
+            if (_response._failReason == 18)
             {
-                Log::Write(Log::LT_ERROR, DELIVER_POST_RELAY_FILE, 108,
-                           L"[%s], %s; exception occurred; failed to update post status [delivery failure status], dbRetValue:%d, relayTid:0x%I64X, postId:0x%I64X",
-                           MODULE_NAME, L"DeliverPostRelayContext::processRelayResponse", dbRetValue, relayTid,
-                           postId);
+                if (!PostOfficeDB::UpdateStatusToDeliverySuccess(&dbRetValue, postId))
+                {
+                    Log::Write(Log::LT_ERROR, DELIVER_POST_RELAY_FILE, 99,
+                               L"[%s], %s; exception occurred; failed to update post status [incomplete delivery status], dbRetValue:%d, relayTid:0x%I64X, postId:0x%I64X",
+                               MODULE_NAME, L"DeliverPostRelayContext::processRelayResponse", dbRetValue, relayTid,
+                               postId);
+                }
+                _postContext->_postInfo._postStatus = 6;
             }
-            _postContext->_postInfo._postStatus = 5;
+            else
+            {
+                if (!PostOfficeDB::UpdateStatusToDeliveryFailure(&dbRetValue, postId))
+                {
+                    Log::Write(Log::LT_ERROR, DELIVER_POST_RELAY_FILE, 108,
+                               L"[%s], %s; exception occurred; failed to update post status [delivery failure status], dbRetValue:%d, relayTid:0x%I64X, postId:0x%I64X",
+                               MODULE_NAME, L"DeliverPostRelayContext::processRelayResponse", dbRetValue, relayTid,
+                               postId);
+                }
+                _postContext->_postInfo._postStatus = 5;
+            }
+            break;
+
+        case RelayResponse::RESULTSTATE_RELAY_ERROR:
+        case RelayResponse::RESULTSTATE_RELAY_TIMEOUT:
+            _postContext->_postInfo._postStatus = 1;
+            needRegister = true;
+            break;
+
+        default:
+            DELIVER_POST_RELAY_CRASH(125,
+                                     L"== CRASH == [%s], %s; invalid response result state, relayTid:0x%I64X, postId:0x%I64X, resultState:%d",
+                                     MODULE_NAME, L"DeliverPostRelayContext::processRelayResponse", relayTid, postId,
+                                     resultState);
+            return false;
         }
-        break;
-
-    case RelayResponse::RESULTSTATE_RELAY_ERROR:
-    case RelayResponse::RESULTSTATE_RELAY_TIMEOUT:
-        _postContext->_postInfo._postStatus = 1;
-        needRegister = true;
-        break;
-
-    default:
-        DELIVER_POST_RELAY_CRASH(125,
-                                 L"== CRASH == [%s], %s; invalid response result state, relayTid:0x%I64X, postId:0x%I64X, resultState:%d",
-                                 MODULE_NAME, L"DeliverPostRelayContext::processRelayResponse", relayTid, postId,
-                                 resultState);
-        return false;
     }
-    autoLock.Leave();
 
     if (!PostOfficeDaemon::_instance->_postContextManager->RemoveContext(postId))
     {

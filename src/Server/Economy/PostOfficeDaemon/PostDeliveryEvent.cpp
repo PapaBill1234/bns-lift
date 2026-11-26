@@ -112,39 +112,44 @@ bool PostDeliveryEvent::HandleEvent(EventContext* context, unsigned long param)
 // 0x108c0
 bool PostDeliveryEvent::deliverPost(unsigned short recipientWid, long long postId)
 {
+    // LIFT: 0x108c0 tests the valid status first and builds an empty DeliverPostRelayRequest on the stack (EH state, vtable ref);
+    // each return path then leaves the lock at its own Lock.h site.
+    DeliverPostRelayContext* relayContext = nullptr;
     AutoCS autoLock(&_postContext->_lock);
 
     char const postStatus = _postContext->_postInfo._postStatus;
-    if (postStatus != 1 && postStatus != 2)
+    if (postStatus == 1 || postStatus == 2)
+    {
+        unsigned long long relayTid = InterlockedIncrement64(reinterpret_cast<LONGLONG volatile*>(&RelayContextManager::_idSeed));
+        if (relayTid == 0)
+            relayTid = InterlockedIncrement64(reinterpret_cast<LONGLONG volatile*>(&RelayContextManager::_idSeed));
+
+        EconomyHeader economyHeader;
+        economyHeader._fromWid = PostOfficeDaemon::_instance->_serviceWid;
+        economyHeader._toWid = recipientWid;
+        economyHeader._relayTid = relayTid;
+        DeliverPostRelayRequest request;
+
+        void* const memory = Memory::_Manager[2]->Alloc(sizeof(DeliverPostRelayContext), POST_DELIVERY_EVENT_FILE, 107);
+        if (memory != nullptr)
+            relayContext = ::new (memory) DeliverPostRelayContext(economyHeader, request, _postContext);
+
+        // BUG: 0x108c0 relayContext can be null here (Alloc failed); the call does not check it.
+        if (!relayContext->ProcessRelayRequest(_cachegateChannel))
+        {
+            Log::Write(Log::LT_ERROR, POST_DELIVERY_EVENT_FILE, 110, L"[%s], %s; failed to send deliver post relay request, relayTid:0x%I64X",
+                       MODULE_NAME, L"PostDeliveryEvent::deliverPost", relayTid);
+            relayContext->removeReferenceCount(POST_DELIVERY_EVENT_FILE, 111);
+            return false;
+        }
+        relayContext->removeReferenceCount(POST_DELIVERY_EVENT_FILE, 115);
+        _postContext->_postInfo._postStatus = 3;
+        return true;
+    }
+    else
     {
         Log::Write(Log::LT_ERROR, POST_DELIVERY_EVENT_FILE, 98, L"[%s], %s; invalid post status, postId:0x%I64X, postStatus:%d",
                    MODULE_NAME, L"PostDeliveryEvent::deliverPost", postId, static_cast<int>(postStatus));
         return false;
     }
-
-    unsigned long long relayTid = InterlockedIncrement64(reinterpret_cast<LONGLONG volatile*>(&RelayContextManager::_idSeed));
-    if (relayTid == 0)
-        relayTid = InterlockedIncrement64(reinterpret_cast<LONGLONG volatile*>(&RelayContextManager::_idSeed));
-
-    EconomyHeader economyHeader;
-    economyHeader._fromWid = PostOfficeDaemon::_instance->_serviceWid;
-    economyHeader._toWid = recipientWid;
-    economyHeader._relayTid = relayTid;
-
-    void* const memory = Memory::_Manager[2]->Alloc(sizeof(DeliverPostRelayContext), POST_DELIVERY_EVENT_FILE, 107);
-    DeliverPostRelayContext* const relayContext =
-        memory != nullptr ? ::new (memory) DeliverPostRelayContext(economyHeader, _postContext) : nullptr;
-
-    // BUG: 0x108c0 relayContext can be null here (Alloc failed); the call does not check it.
-    if (relayContext->ProcessRelayRequest(_cachegateChannel))
-    {
-        relayContext->removeReferenceCount(POST_DELIVERY_EVENT_FILE, 115);
-        _postContext->_postInfo._postStatus = 3;
-        return true;
-    }
-
-    Log::Write(Log::LT_ERROR, POST_DELIVERY_EVENT_FILE, 110, L"[%s], %s; failed to send deliver post relay request, relayTid:0x%I64X",
-               MODULE_NAME, L"PostDeliveryEvent::deliverPost", relayTid);
-    relayContext->removeReferenceCount(POST_DELIVERY_EVENT_FILE, 111);
-    return false;
 }

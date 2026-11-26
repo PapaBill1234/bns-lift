@@ -135,57 +135,57 @@ bool CacheGateChannel::SendRelayRequest(RelayContext const* const relayContext)
         return false;
     }
 
-    Packet packet = {};  // LIFT: inlined constructor
+    Packet packet;
+    memset(static_cast<void*>(&packet), 0, sizeof(packet));
     packet.Allocate();
-    if (composeRelayHeader(packet, relayContext->MakeRelayHeader()) && relayContext->ComposeRequestPacket(packet))
+    if (!composeRelayHeader(packet, relayContext->MakeRelayHeader()))
+        return false;
+    if (!relayContext->ComposeRequestPacket(packet))
+        return false;
+
+    Session const* const session = GetSession();
+    if (session != nullptr)
     {
-        Session const* const session = GetSession();
-        if (session != nullptr)
-        {
-            session->Send(&packet);
-            const_cast<Session*>(session)->removeReferenceCount(CHANNEL_HEADER_FILE, 52);
-        }
-        packet.Clear();
-        return true;
+        session->Send(&packet);
+        const_cast<Session*>(session)->removeReferenceCount(CHANNEL_HEADER_FILE, 52);
     }
-    packet.Clear();
-    return false;
+    return true;
 }
 
 // 0x71e0
 bool CacheGateChannel::SendFragmentRelayRequest(RelayContext const* const relayContext, char const* const economyFormat)
 {
-    if (relayContext == nullptr)
+    // The null test jumps to the crash block at the end (0x7220 je 0x737a, PDB lines 63-64 after line 85).
+    if (relayContext != nullptr)
     {
-        Log::Write(Log::LT_ERROR, CACHEGATE_CHANNEL_FILE, 63,
-                   L"== CRASH == [%s], %s; invalid parameter, relayContext:0x%p, economyFormat:0x%p",
-                   MODULE_NAME, L"CacheGateChannel::SendFragmentRelayRequest",
-                   static_cast<RelayContext*>(nullptr), economyFormat);
-        AlertSender::Write(CACHEGATE_CHANNEL_FILE, 63,
-                           L"== CRASH == [%s], %s; invalid parameter, relayContext:0x%p, economyFormat:0x%p",
-                           MODULE_NAME, L"CacheGateChannel::SendFragmentRelayRequest",
-                           static_cast<RelayContext*>(nullptr), economyFormat);
-        return false;
+        char relayFormat[256] = "hihhqhq";
+        if (!combineFragmentRelayFormat(relayFormat, sizeof(relayFormat), economyFormat))
+            return false;
+
+        FragmentPacket packet(9, relayFormat);
+        packet.packet.Allocate(&packet.composer);  // 0x72e4 (PDB line 73)
+        if (!composeRelayHeader(packet, relayContext->MakeRelayHeader()))
+            return false;
+        if (!relayContext->ComposeRequestPacket(packet))
+            return false;
+
+        if (packet.packet.Splitter != nullptr)
+            packet.packet.Splitter->Finalize(packet.packet.CurHeader);
+        // BUG: 0x71e0 the session reference from GetSession is not released.
+        if (GetSession() != nullptr)
+            Send(&packet.packet);
+        return true;
     }
 
-    char relayFormat[256] = "hihhqhq";
-    if (!combineFragmentRelayFormat(relayFormat, sizeof(relayFormat), economyFormat))
-        return false;
-
-    FragmentPacket packet(9, relayFormat);
-    if (!composeRelayHeader(packet, relayContext->MakeRelayHeader()) || !relayContext->ComposeRequestPacket(packet))
-    {
-        packet.packet.Clear();
-        return false;
-    }
-
-    if (packet.packet.Splitter != nullptr)
-        packet.packet.Splitter->Finalize(packet.packet.CurHeader);
-    // BUG: 0x71e0 the session reference from GetSession is not released.
-    if (GetSession() != nullptr)
-        Send(&packet.packet);
-    packet.packet.Clear();
-    return true;
+    Log::Write(Log::LT_ERROR, CACHEGATE_CHANNEL_FILE, 63,
+               L"== CRASH == [%s], %s; invalid parameter, relayContext:0x%p, economyFormat:0x%p",
+               MODULE_NAME, L"CacheGateChannel::SendFragmentRelayRequest",
+               static_cast<RelayContext*>(nullptr), economyFormat);
+    AlertSender::Write(CACHEGATE_CHANNEL_FILE, 63,
+                       L"== CRASH == [%s], %s; invalid parameter, relayContext:0x%p, economyFormat:0x%p",
+                       MODULE_NAME, L"CacheGateChannel::SendFragmentRelayRequest",
+                       static_cast<RelayContext*>(nullptr), economyFormat);
+    return false;
 }
 
 // 0x7740

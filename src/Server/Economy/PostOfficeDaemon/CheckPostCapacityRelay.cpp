@@ -136,21 +136,32 @@ bool CheckPostCapacityRelayContext::ComposeRequestPacket(Packet& packet) const
 // 0x9570
 bool CheckPostCapacityRelayContext::ComposeResponsePacket(Packet& packet) const
 {
-    int const resultState = _response._resultState;
+    // PDB lines (0x9570): one switch on the result state; the failure cases come first in the code, the crash case is the default.
     unsigned long long const relayTid = _economyHeader._relayTid;
-    if (resultState != RelayResponse::RESULTSTATE_SUCCESS)
+    switch (_response._resultState)
     {
-        if (resultState <= RelayResponse::RESULTSTATE_SUCCESS || resultState > RelayResponse::RESULTSTATE_RELAY_TIMEOUT)
+    case RelayResponse::RESULTSTATE_SUCCESS:
+    {
+        bool const composed = 0 < packet.Compose("hq", 8, _request._gameTid);
+        if (!composed)
         {
-            CHECK_POST_CAPACITY_RELAY_CRASH(127,
-                                            L"== CRASH == [%s], %s; invalid response result state, relayTid:0x%I64X, resultState:%d",
-                                            MODULE_NAME, L"CheckPostCapacityRelayContext::ComposeResponsePacket",
-                                            relayTid, resultState);
+            Log::Write(Log::LT_ERROR, CHECK_POST_CAPACITY_RELAY_FILE, 106,
+                       L"[%s], %s; failed to compose check post capacity success response packet, gameTid:0x%I64X",
+                       MODULE_NAME, L"CheckPostCapacityRelayContext::ComposeResponsePacket",
+                       _request._gameTid);
             return false;
         }
-
-        int const failReason = convertFailReason(static_cast<RelayResponse::ResultState>(resultState), _response._failReason);
-        bool const composed = packet.Compose("hqE", 9, _request._gameTid, failReason) != 0;
+        Log::Write(Log::LT_DEBUG, CHECK_POST_CAPACITY_RELAY_FILE, 109,
+                   L"[%s], %s; composed check post capacity success response packet, gameTid:0x%I64X",
+                   MODULE_NAME, L"CheckPostCapacityRelayContext::ComposeResponsePacket", _request._gameTid);
+    }
+    break;
+    case RelayResponse::RESULTSTATE_FAILURE:
+    case RelayResponse::RESULTSTATE_RELAY_ERROR:
+    case RelayResponse::RESULTSTATE_RELAY_TIMEOUT:
+    {
+        int const failReason = convertFailReason(static_cast<RelayResponse::ResultState>(_response._resultState), _response._failReason);
+        bool const composed = 0 < packet.Compose("hqE", 9, _request._gameTid, failReason);
         if (!composed)
         {
             Log::Write(Log::LT_ERROR, CHECK_POST_CAPACITY_RELAY_FILE, 120,
@@ -164,20 +175,13 @@ bool CheckPostCapacityRelayContext::ComposeResponsePacket(Packet& packet) const
                    MODULE_NAME, L"CheckPostCapacityRelayContext::ComposeResponsePacket", _request._gameTid,
                    failReason);
     }
-    else
-    {
-        bool const composed = packet.Compose("hq", 8, _request._gameTid) != 0;
-        if (!composed)
-        {
-            Log::Write(Log::LT_ERROR, CHECK_POST_CAPACITY_RELAY_FILE, 106,
-                       L"[%s], %s; failed to compose check post capacity success response packet, gameTid:0x%I64X",
-                       MODULE_NAME, L"CheckPostCapacityRelayContext::ComposeResponsePacket",
-                       _request._gameTid);
-            return false;
-        }
-        Log::Write(Log::LT_DEBUG, CHECK_POST_CAPACITY_RELAY_FILE, 109,
-                   L"[%s], %s; composed check post capacity success response packet, gameTid:0x%I64X",
-                   MODULE_NAME, L"CheckPostCapacityRelayContext::ComposeResponsePacket", _request._gameTid);
+    break;
+    default:
+        CHECK_POST_CAPACITY_RELAY_CRASH(127,
+                                        L"== CRASH == [%s], %s; invalid response result state, relayTid:0x%I64X, resultState:%d",
+                                        MODULE_NAME, L"CheckPostCapacityRelayContext::ComposeResponsePacket",
+                                        relayTid, _response._resultState);
+        return false;
     }
     return true;
 }

@@ -8,6 +8,8 @@
 #include "Packet.h"
 #include "PacketUtil.h"
 #include "PostOfficeDaemon.h"
+#include "PingRelay.h"
+#include "WorldPacketHandler.h"
 #include "RelayContext.h"
 #include "Session.h"
 #include "ThreadFreePacketPump.h"
@@ -94,9 +96,8 @@ bool HandleCacheGateRelay(Session const* session, Packet const* packet)
     relayHeader._hint = 0;
     relayHeader._reserved = 0;
 
-    int endLine = 109;
-    if (packet->Decompose("hhhqhqh", &cachegateCmd, &relayHeader._fromWid, &relayHeader._toWid, &relayHeader._relayTid,
-                          &relayHeader._hint, &relayHeader._reserved, &economyCmd) == 0)
+    if (0 == packet->Decompose("hhhqhqh", &cachegateCmd, &relayHeader._fromWid, &relayHeader._toWid, &relayHeader._relayTid,
+                               &relayHeader._hint, &relayHeader._reserved, &economyCmd))
     {
         Log::Write(Log::LT_ERROR, CGPH_FILE, 86, L"[%s], %s; failed to decompose packet", MODULE_NAME, func);
     }
@@ -116,19 +117,20 @@ bool HandleCacheGateRelay(Session const* session, Packet const* packet)
         {
             // BUG: 0x8070 economyCmd - 1024 has no bounds check before the table read.
             Daemon::PacketHandler const handler = CacheEconomyPacketClientSideHandlerList[economyCmd - ECONOMY_CMD_BASE];
-            if (handler != nullptr)
-            {
-                handler(session, packet);
-                endLine = 105;
-            }
-            else
+            if (handler == nullptr)
             {
                 Log::Write(Log::LT_ERROR, CGPH_FILE, 99, L"[%s], %s; invalid cache economy packet command, command:%d",
                            MODULE_NAME, func, static_cast<int>(economyCmd));
             }
+            else
+            {
+                handler(session, packet);
+                logEnd(105, func);
+                return true;
+            }
         }
     }
-    logEnd(endLine, func);
+    logEnd(109, func);
     return true;
 }
 
@@ -149,7 +151,6 @@ bool HandleCacheGateFragmentRelay(Session const* session, Packet const* packet)
     relayHeader._reserved = 0;
     pcb->decomposer.SetFormat("hihhqhqh", 2);
 
-    int endLine = 181;
     if (!pcb->Decompose(6, &relayHeader._fromWid, &relayHeader._toWid, &relayHeader._relayTid, &relayHeader._hint,
                         &relayHeader._reserved, &economyCmd))
     {
@@ -173,24 +174,27 @@ bool HandleCacheGateFragmentRelay(Session const* session, Packet const* packet)
         {
             // BUG: 0x82c0 economyCmd - 1024 has no bounds check before the table read.
             Daemon::PacketHandler const handler = CacheEconomyPacketClientSideHandlerList[economyCmd - ECONOMY_CMD_BASE];
-            if (handler != nullptr)
-            {
-                handler(session, packet);
-                endLine = 174;
-            }
-            else
+            if (handler == nullptr)
             {
                 Log::Write(Log::LT_ERROR, CGPH_FILE, 168, L"[%s], %s; invalid cache economy packet command, command:%d",
                            MODULE_NAME, func, static_cast<int>(economyCmd));
                 pcb->Clear();
             }
+            else
+            {
+                handler(session, packet);
+                logEnd(174, func);
+                return true;
+            }
         }
     }
-    logEnd(endLine, func);
+    logEnd(181, func);
     return true;
 }
 
 // 0x8540
+// LIFT: 0x8540 PDB lines 202-284: each hint case has its own typed response, its own ProcessRelayResponse call and a goto to one
+// shared error tail ($_ERROR: removeReferenceCount line 282). The early exits go to one shared end log (line 284).
 bool HandleCacheGateRelayFail(Session const* session, Packet const* packet)
 {
     wchar_t const* const func = L"HandleCacheGateRelayFail";
@@ -204,13 +208,15 @@ bool HandleCacheGateRelayFail(Session const* session, Packet const* packet)
     relayHeader._hint = 0;
     relayHeader._reserved = 0;
     short relayFailReason = 0;
+    unsigned short serviceWid;
+    unsigned long long relayTid;
+    RelayContext* relayContext;
 
     if (packet->Decompose("hhhqhqE", &cachegateCmd, &relayHeader._fromWid, &relayHeader._toWid, &relayHeader._relayTid,
                           &relayHeader._hint, &relayHeader._reserved, &relayFailReason) == 0)
     {
         Log::Write(Log::LT_ERROR, CGPH_FILE, 202, L"[%s], %s; failed to decompose packet", MODULE_NAME, func);
-        logEnd(284, func);
-        return true;
+        goto $_END;
     }
 
     Log::Write(Log::LT_DEBUG, CGPH_FILE, 205,
@@ -218,80 +224,91 @@ bool HandleCacheGateRelayFail(Session const* session, Packet const* packet)
                MODULE_NAME, func, static_cast<unsigned int>(relayHeader._fromWid),
                static_cast<unsigned int>(relayHeader._toWid), relayHeader._relayTid,
                static_cast<unsigned int>(relayHeader._hint), relayHeader._reserved, static_cast<int>(relayFailReason));
-    unsigned short const serviceWid = PostOfficeDaemon::_instance->_serviceWid;
+    serviceWid = PostOfficeDaemon::_instance->_serviceWid;
     if (serviceWid != relayHeader._toWid)
     {
         logInvalidDestination(209, func, serviceWid, relayHeader);
-        logEnd(284, func);
-        return true;
+        goto $_END;
     }
 
-    unsigned long long const relayTid = relayHeader._relayTid;
-    RelayContext* const relayContext = PostOfficeDaemon::_instance->_relayContextManager->GetContext(relayTid);
+    relayTid = relayHeader._relayTid;
+    relayContext = PostOfficeDaemon::_instance->_relayContextManager->GetContext(relayTid);
     if (relayContext == nullptr)
     {
         Log::Write(Log::LT_ERROR, CGPH_FILE, 216, L"[%s], %s; no such relay context, relayTid:0x%I64X, relayContext:0x%p",
                    MODULE_NAME, func, relayTid, static_cast<void*>(nullptr));
-        logEnd(284, func);
-        return true;
+        goto $_END;
     }
 
-    int errorLine = 0;
-    wchar_t const* errorText = nullptr;
-    wchar_t const* failText = nullptr;
-    int failLine = 0;
     switch (relayHeader._hint)
     {
     case CacheEconomy_PingReqCmd:
-        errorLine = 224;
-        errorText = L"[%s], %s; ping relay error, relayTid:0x%I64X, relayFailReason:%d";
-        failLine = 229;
-        failText = L"[%s], %s; failed to process ping relay error response, relayTid:0x%I64X";
-        break;
+    {
+        Log::Write(Log::LT_ERROR, CGPH_FILE, 224, L"[%s], %s; ping relay error, relayTid:0x%I64X, relayFailReason:%d", MODULE_NAME, func, relayTid,
+                   static_cast<int>(relayFailReason));
+        PingRelayResponse response(RelayResponse::RESULTSTATE_RELAY_ERROR, relayFailReason);
+        if (!relayContext->ProcessRelayResponse(&response))
+        {
+            Log::Write(Log::LT_ERROR, CGPH_FILE, 229, L"[%s], %s; failed to process ping relay error response, relayTid:0x%I64X", MODULE_NAME, func, relayTid);
+            goto $_ERROR;
+        }
+    }
+    break;
     case CacheEconomy_RetrieveCharacterInfoReqCmd:
-        errorLine = 236;
-        errorText = L"[%s], %s; retrieve character info relay error, relayTid:0x%I64X, relayFailReason:%d";
-        failLine = 241;
-        failText = L"[%s], %s; failed to process retrieve character info relay error response, relayTid:0x%I64X";
-        break;
+    {
+        Log::Write(Log::LT_ERROR, CGPH_FILE, 236, L"[%s], %s; retrieve character info relay error, relayTid:0x%I64X, relayFailReason:%d", MODULE_NAME, func, relayTid,
+                   static_cast<int>(relayFailReason));
+        RetrieveCharacterInfoRelayResponse response(RelayResponse::RESULTSTATE_RELAY_ERROR, relayFailReason);
+        if (!relayContext->ProcessRelayResponse(&response))
+        {
+            Log::Write(Log::LT_ERROR, CGPH_FILE, 241, L"[%s], %s; failed to process retrieve character info relay error response, relayTid:0x%I64X", MODULE_NAME, func, relayTid);
+            goto $_ERROR;
+        }
+    }
+    break;
     case CacheEconomy_CheckPostCapacityReqCmd:
-        errorLine = 248;
-        errorText = L"[%s], %s; check post capacity relay error, relayTid:0x%I64X, relayFailReason:%d";
-        failLine = 253;
-        failText = L"[%s], %s; failed to process check post capacity relay error response, relayTid:0x%I64X";
-        break;
+    {
+        Log::Write(Log::LT_ERROR, CGPH_FILE, 248, L"[%s], %s; check post capacity relay error, relayTid:0x%I64X, relayFailReason:%d", MODULE_NAME, func, relayTid,
+                   static_cast<int>(relayFailReason));
+        CheckPostCapacityRelayResponse response(RelayResponse::RESULTSTATE_RELAY_ERROR, relayFailReason);
+        if (!relayContext->ProcessRelayResponse(&response))
+        {
+            Log::Write(Log::LT_ERROR, CGPH_FILE, 253, L"[%s], %s; failed to process check post capacity relay error response, relayTid:0x%I64X", MODULE_NAME, func, relayTid);
+            goto $_ERROR;
+        }
+    }
+    break;
     case CacheEconomy_DeliverPostReqCmd:
-        errorLine = 260;
-        errorText = L"[%s], %s; deliver post relay error, relayTid:0x%I64X, relayFailReason:%d";
-        failLine = 265;
-        failText = L"[%s], %s; failed to process deliver post relay error response, relayTid:0x%I64X";
-        break;
+    {
+        Log::Write(Log::LT_ERROR, CGPH_FILE, 260, L"[%s], %s; deliver post relay error, relayTid:0x%I64X, relayFailReason:%d", MODULE_NAME, func, relayTid,
+                   static_cast<int>(relayFailReason));
+        DeliverPostRelayResponse response(RelayResponse::RESULTSTATE_RELAY_ERROR, relayFailReason);
+        if (!relayContext->ProcessRelayResponse(&response))
+        {
+            Log::Write(Log::LT_ERROR, CGPH_FILE, 265, L"[%s], %s; failed to process deliver post relay error response, relayTid:0x%I64X", MODULE_NAME, func, relayTid);
+            goto $_ERROR;
+        }
+    }
+    break;
     default:
         Log::Write(Log::LT_ERROR, CGPH_FILE, 271, L"[%s], %s; invalid request packet command, command:%d", MODULE_NAME, func,
                    static_cast<int>(static_cast<short>(relayHeader._hint)));
-        relayContext->removeReferenceCount(CGPH_FILE, 282);
-        logEnd(284, func);
-        return true;
-    }
-
-    // The original has one case body for each hint. All case bodies are the same except the text.
-    Log::Write(Log::LT_ERROR, CGPH_FILE, errorLine, errorText, MODULE_NAME, func, relayTid, static_cast<int>(relayFailReason));
-    DeliverPostRelayResponse response;  // All 4 hint cases store vftable 0x8CA20 (DeliverPostRelayResponse, 0x87E7).
-    response._resultState = RelayResponse::RESULTSTATE_RELAY_ERROR;
-    response._failReason = relayFailReason;
-    if (!relayContext->ProcessRelayResponse(&response))
-    {
-        Log::Write(Log::LT_ERROR, CGPH_FILE, failLine, failText, MODULE_NAME, func, relayTid);
-        relayContext->removeReferenceCount(CGPH_FILE, 282);
-        logEnd(284, func);
-        return true;
+        goto $_ERROR;
     }
     relayContext->removeReferenceCount(CGPH_FILE, 275);
     logEnd(277, func);
     return true;
+
+$_ERROR:
+    relayContext->removeReferenceCount(CGPH_FILE, 282);
+$_END:
+    logEnd(284, func);
+    return true;
 }
 
 // 0x8a60
+// LIFT: 0x8a60 PDB lines 307-389: each hint case has its own typed response, its own ProcessRelayResponse call and a goto to one
+// shared error tail ($_ERROR: removeReferenceCount line 387). The early exits go to one shared end log (line 389).
 bool HandleCacheGateRelayInvalid(Session const* session, Packet const* packet)
 {
     wchar_t const* const func = L"HandleCacheGateRelayInvalid";
@@ -306,13 +323,15 @@ bool HandleCacheGateRelayInvalid(Session const* session, Packet const* packet)
     relayHeader._reserved = 0;
     unsigned short toWid = 0;
     short relayInvalidReason = 0;
+    unsigned short serviceWid;
+    unsigned long long relayTid;
+    RelayContext* relayContext;
 
     if (packet->Decompose("hhhqhqhh", &cachegateCmd, &relayHeader._fromWid, &relayHeader._toWid, &relayHeader._relayTid,
                           &relayHeader._hint, &relayHeader._reserved, &toWid, &relayInvalidReason) == 0)
     {
         Log::Write(Log::LT_ERROR, CGPH_FILE, 307, L"[%s], %s; failed to decompose packet", MODULE_NAME, func);
-        logEnd(389, func);
-        return true;
+        goto $_END;
     }
 
     Log::Write(Log::LT_DEBUG, CGPH_FILE, 310,
@@ -321,76 +340,85 @@ bool HandleCacheGateRelayInvalid(Session const* session, Packet const* packet)
                static_cast<unsigned int>(relayHeader._toWid), relayHeader._relayTid,
                static_cast<unsigned int>(relayHeader._hint), relayHeader._reserved, static_cast<unsigned int>(toWid),
                static_cast<int>(relayInvalidReason));
-    unsigned short const serviceWid = PostOfficeDaemon::_instance->_serviceWid;
+    serviceWid = PostOfficeDaemon::_instance->_serviceWid;
     if (serviceWid != relayHeader._toWid)
     {
         logInvalidDestination(314, func, serviceWid, relayHeader);
-        logEnd(389, func);
-        return true;
+        goto $_END;
     }
 
-    unsigned long long const relayTid = relayHeader._relayTid;
-    RelayContext* const relayContext = PostOfficeDaemon::_instance->_relayContextManager->GetContext(relayTid);
+    relayTid = relayHeader._relayTid;
+    relayContext = PostOfficeDaemon::_instance->_relayContextManager->GetContext(relayTid);
     if (relayContext == nullptr)
     {
         Log::Write(Log::LT_ERROR, CGPH_FILE, 321, L"[%s], %s; no such relay context, relayTid:0x%I64X, relayContext:0x%p",
                    MODULE_NAME, func, relayTid, static_cast<void*>(nullptr));
-        logEnd(389, func);
-        return true;
+        goto $_END;
     }
 
-    int errorLine = 0;
-    wchar_t const* errorText = nullptr;
-    wchar_t const* failText = nullptr;
-    int failLine = 0;
     switch (relayHeader._hint)
     {
     case CacheEconomy_PingReqCmd:
-        errorLine = 329;
-        errorText = L"[%s], %s; invalid ping relay, relayTid:0x%I64X, relayFailReason:%d";
-        failLine = 334;
-        failText = L"[%s], %s; failed to process ping relay error response, relayTid:0x%I64X";
-        break;
+    {
+        Log::Write(Log::LT_ERROR, CGPH_FILE, 329, L"[%s], %s; invalid ping relay, relayTid:0x%I64X, relayFailReason:%d", MODULE_NAME, func, relayTid,
+                   static_cast<int>(relayInvalidReason));
+        PingRelayResponse response(RelayResponse::RESULTSTATE_RELAY_ERROR, relayInvalidReason);
+        if (!relayContext->ProcessRelayResponse(&response))
+        {
+            Log::Write(Log::LT_ERROR, CGPH_FILE, 334, L"[%s], %s; failed to process ping relay error response, relayTid:0x%I64X", MODULE_NAME, func, relayTid);
+            goto $_ERROR;
+        }
+    }
+    break;
     case CacheEconomy_RetrieveCharacterInfoReqCmd:
-        errorLine = 341;
-        errorText = L"[%s], %s; invalid retrieve character info relay, relayTid:0x%I64X, relayFailReason:%d";
-        failLine = 346;
-        failText = L"[%s], %s; failed to process retrieve character info relay error response, relayTid:0x%I64X";
-        break;
+    {
+        Log::Write(Log::LT_ERROR, CGPH_FILE, 341, L"[%s], %s; invalid retrieve character info relay, relayTid:0x%I64X, relayFailReason:%d", MODULE_NAME, func, relayTid,
+                   static_cast<int>(relayInvalidReason));
+        RetrieveCharacterInfoRelayResponse response(RelayResponse::RESULTSTATE_RELAY_ERROR, relayInvalidReason);
+        if (!relayContext->ProcessRelayResponse(&response))
+        {
+            Log::Write(Log::LT_ERROR, CGPH_FILE, 346, L"[%s], %s; failed to process retrieve character info relay error response, relayTid:0x%I64X", MODULE_NAME, func, relayTid);
+            goto $_ERROR;
+        }
+    }
+    break;
     case CacheEconomy_CheckPostCapacityReqCmd:
-        errorLine = 353;
-        errorText = L"[%s], %s; invalid check post capacity relay, relayTid:0x%I64X, relayFailReason:%d";
-        failLine = 358;
-        failText = L"[%s], %s; failed to process check post capacity relay error response, relayTid:0x%I64X";
-        break;
+    {
+        Log::Write(Log::LT_ERROR, CGPH_FILE, 353, L"[%s], %s; invalid check post capacity relay, relayTid:0x%I64X, relayFailReason:%d", MODULE_NAME, func, relayTid,
+                   static_cast<int>(relayInvalidReason));
+        CheckPostCapacityRelayResponse response(RelayResponse::RESULTSTATE_RELAY_ERROR, relayInvalidReason);
+        if (!relayContext->ProcessRelayResponse(&response))
+        {
+            Log::Write(Log::LT_ERROR, CGPH_FILE, 358, L"[%s], %s; failed to process check post capacity relay error response, relayTid:0x%I64X", MODULE_NAME, func, relayTid);
+            goto $_ERROR;
+        }
+    }
+    break;
     case CacheEconomy_DeliverPostReqCmd:
-        errorLine = 365;
-        errorText = L"[%s], %s; invalid deliver post relay, relayTid:0x%I64X, relayFailReason:%d";
-        failLine = 370;
-        failText = L"[%s], %s; failed to process deliver post relay error response, relayTid:0x%I64X";
-        break;
+    {
+        Log::Write(Log::LT_ERROR, CGPH_FILE, 365, L"[%s], %s; invalid deliver post relay, relayTid:0x%I64X, relayFailReason:%d", MODULE_NAME, func, relayTid,
+                   static_cast<int>(relayInvalidReason));
+        DeliverPostRelayResponse response(RelayResponse::RESULTSTATE_RELAY_ERROR, relayInvalidReason);
+        if (!relayContext->ProcessRelayResponse(&response))
+        {
+            Log::Write(Log::LT_ERROR, CGPH_FILE, 370, L"[%s], %s; failed to process deliver post relay error response, relayTid:0x%I64X", MODULE_NAME, func, relayTid);
+            goto $_ERROR;
+        }
+    }
+    break;
     default:
         Log::Write(Log::LT_ERROR, CGPH_FILE, 376, L"[%s], %s; invalid request packet command, command:%d", MODULE_NAME, func,
                    static_cast<int>(relayHeader._hint));
-        relayContext->removeReferenceCount(CGPH_FILE, 387);
-        logEnd(389, func);
-        return true;
-    }
-
-    Log::Write(Log::LT_ERROR, CGPH_FILE, errorLine, errorText, MODULE_NAME, func, relayTid,
-               static_cast<int>(relayInvalidReason));
-    DeliverPostRelayResponse response;  // All 4 hint cases store vftable 0x8CA20 (DeliverPostRelayResponse).
-    response._resultState = RelayResponse::RESULTSTATE_RELAY_ERROR;
-    response._failReason = relayInvalidReason;
-    if (!relayContext->ProcessRelayResponse(&response))
-    {
-        Log::Write(Log::LT_ERROR, CGPH_FILE, failLine, failText, MODULE_NAME, func, relayTid);
-        relayContext->removeReferenceCount(CGPH_FILE, 387);
-        logEnd(389, func);
-        return true;
+        goto $_ERROR;
     }
     relayContext->removeReferenceCount(CGPH_FILE, 380);
     logEnd(382, func);
+    return true;
+
+$_ERROR:
+    relayContext->removeReferenceCount(CGPH_FILE, 387);
+$_END:
+    logEnd(389, func);
     return true;
 }
 

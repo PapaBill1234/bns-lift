@@ -72,8 +72,9 @@ void RelayTimeoutChecker::checkRelayTimeout()
     for (int index = 0; index < manager->_bucketCount; ++index)
     {
         manager->_lockList[index].Enter();
-        RelayTimeContextManager::Container& container = manager->_containerList[index];
-        for (RelayTimeContextManager::Container::iterator it = container.begin(); it != container.end(); ++it)
+        // LIFT: 0x1d830 reads manager->_containerList again for each end() test; a cached container reference adds a register.
+        for (RelayTimeContextManager::Container::iterator it = manager->_containerList[index].begin();
+             it != manager->_containerList[index].end(); ++it)
         {
             if (it->first._relayLimitTime >= currentTime)
                 break;
@@ -87,15 +88,15 @@ void RelayTimeoutChecker::checkRelayTimeout()
             }
             else if (!relayTimeContext->_disuse)
             {
-                if (occurTimeoutEvent(relayTimeContext->_relayTid, relayTimeContext->_relayContext))
-                {
-                    relayTimeContext->_disuse = true;
-                }
-                else
+                if (!occurTimeoutEvent(relayTimeContext->_relayTid, relayTimeContext->_relayContext))
                 {
                     Log::Write(Log::LT_ERROR, RELAY_TIMEOUT_CHECKER_FILE, 69,
                                L"[%s], %s; failed to occur relay timeout event, relayTid:0x%I64X",
                                MODULE_NAME, L"RelayTimeoutChecker::checkRelayTimeout", relayTimeContext->_relayTid);
+                }
+                else
+                {
+                    relayTimeContext->_disuse = true;
                 }
             }
         }

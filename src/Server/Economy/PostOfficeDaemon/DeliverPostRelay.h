@@ -29,7 +29,8 @@ static_assert(sizeof(DeliverPostRelayResponse) == 0x10, "sizeof DeliverPostRelay
 class DeliverPostRelayContext : public RelayContext
 {
 public:
-    DeliverPostRelayContext(EconomyHeader const& economyHeader, PostContext* const postContext);  // 0xfb80
+    DeliverPostRelayContext(EconomyHeader const& economyHeader, DeliverPostRelayRequest const& request,
+                            PostContext* const postContext);  // 0xfb80
     virtual ~DeliverPostRelayContext();                                // 0xfc70
 
     virtual unsigned short const GetRequestWid() const;            // LIFT: folded with 0xfb40 (PingGenerator.cpp)
