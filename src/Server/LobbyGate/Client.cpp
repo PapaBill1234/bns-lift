@@ -613,17 +613,16 @@ __declspec(noinline) void ClientManager::BroadcastAnnounceNotify(wchar_t const* 
     {
         Log::Write(Log::LT_ERROR, CLIENT_FILE, 806,
                    L"[client session handler], broadcast announce notify fail; compose fail, message:%s", message);
+        return;
     }
-    else if (broadcast(&packet))
-    {
-        Log::Write(Log::LT_DEBUG, CLIENT_FILE, 816,
-                   L"[client session handler], broadcast announce notify ok, message:%s", message);
-    }
-    else
+    if (!broadcast(&packet))
     {
         Log::Write(Log::LT_ERROR, CLIENT_FILE, 812,
                    L"[client session handler], broadcast announce notify fail; broadcast fail, message:%s", message);
+        return;
     }
+    Log::Write(Log::LT_DEBUG, CLIENT_FILE, 816, L"[client session handler], broadcast announce notify ok, message:%s",
+               message);
 }
 
 // 0x6410
