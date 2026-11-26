@@ -3656,9 +3656,9 @@
 "Session::Session [??0Session@@IEAA@IPEBVPacketBufferHandler@@@Z]": {
 "calls": 100,
 "consts": 100,
-"refs": 86,
-"score": 95.2,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Session::Session [??0Session@@IEAA@XZ]": {
 "calls": 100,
@@ -3873,9 +3873,9 @@
 "StaticPageMemoryManager::Initialize [?Initialize@StaticPageMemoryManager@@QEAA_NPEAX_K1PEBVMemoryManager@@@Z]": {
 "calls": 100,
 "consts": 100,
-"refs": 89,
-"score": 96.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "StaticPageMemoryManager::Initialize [?Initialize@StaticPageMemoryManager@@UEAA_NPEBX_K@Z]": {
 "calls": 100,
@@ -5104,10 +5104,10 @@
 },
 "aes128TableSetupDecKey": {
 "calls": 100,
-"consts": 75,
+"consts": 100,
 "refs": 100,
-"score": 91.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "aes128TableSetupEncKey": {
 "calls": 100,
