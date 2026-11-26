@@ -15,7 +15,8 @@ public:
     virtual bool Start(unsigned char const* in, int inSize, unsigned char* out, int* outSize) = 0;
     virtual bool Process(unsigned char const* in, int inSize, unsigned char* out, int* outSize) = 0;
     virtual bool GetKey(unsigned char* out, int* size) const = 0;
-    virtual ~CryptoKey() {}
+    // LIFT: no declared destructor. Dh::~Dh (LobbyGate 0x555a0) stores only ??_7Dh, no base vtable store at the end.
+    // The virtual ~Dh() takes the last slot (6) of the Dh vtable.
 
     static bool Initialize();
 

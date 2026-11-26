@@ -176,13 +176,18 @@ bool Dh::Start(unsigned char const* in, int inSize, unsigned char* out, int* out
 // 0x55980
 bool Dh::Process(unsigned char const* in, int inSize, unsigned char* out, int* outSize)
 {
-    if (_state == 0)
+    // LIFT: switch on _state (LobbyGate 0x5598d: test, dec chain).
+    switch (_state)
     {
+    case 0:
         if (!setupFactors(in, inSize) || !getValue(out, outSize))
             return false;
-    }
-    else if (_state != 1 || in == 0 || inSize <= 0 || !_y.Set(1, in, inSize))
-    {
+        break;
+    case 1:
+        if (in == 0 || inSize <= 0 || !_y.Set(1, in, inSize))
+            return false;
+        break;
+    default:
         return false;
     }
     _state = -1;

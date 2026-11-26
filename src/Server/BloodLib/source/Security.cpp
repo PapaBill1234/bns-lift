@@ -31,9 +31,11 @@ static wchar_t const SECURITY_FILE[] = L"source\\Security.cpp";
 // Inlined destroy of a PacketCrypt. The types 0, 2, 3 and 4 call the destructor (slot 7, flag 0).
 static inline void destroyCrypt(PacketCrypt* crypt)  // LIFT: lift helper name, not in any PDB
 {
+    // LIFT: compare chain as in Session::deallocateCrypt (LG 0x194c0). LG 0x232f0: v == 0, v - 1, v - 2, v - 3, v - 4.
     int type = crypt->GetType();
-    if (type == PacketCrypt::NO_CRYPT || type == PacketCrypt::HANDSHAKE_CRYPT ||
-        type == PacketCrypt::SESSION_CRYPT || type == PacketCrypt::BROADCAST_CRYPT)
+    int rest1;
+    int rest2;
+    if (type == 0 || ((rest1 = type - 1) != 0 && ((rest2 = rest1 - 1) == 0 || static_cast<unsigned int>(rest2 - 1) <= 1)))
         crypt->~PacketCrypt();
 }
 
