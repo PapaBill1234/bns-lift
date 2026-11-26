@@ -778,6 +778,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"CliSession::ReserveStopPlay": {
+"calls": 88,
+"consts": 95,
+"refs": 96,
+"score": 92.9,
+"status": "DIFF"
+},
 "CliSession::TimeoutStopPlay": {
 "calls": 100,
 "consts": 100,
@@ -2922,6 +2929,13 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"Handle_SrvCharge_RequestStop": {
+"calls": 100,
+"consts": 100,
+"refs": 98,
+"score": 99.3,
+"status": "DIFF"
 },
 "HeapMemoryManager::Alloc": {
 "calls": 100,
