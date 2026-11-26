@@ -132,7 +132,8 @@ __declspec(noinline) unsigned short Packet::Decompose(unsigned int offset, int n
 {
     va_list args;
     va_start(args, format);
-    if (format == nullptr || CurHeader == nullptr || offset >= CurHeader->size - 2)
+    // LIFT: signed compare (PostOfficeDaemon 0x220fb: cmp ebx,eax; jl)
+    if (format == nullptr || CurHeader == nullptr || static_cast<int>(offset) >= CurHeader->size - 2)
         PACKET_ASSERT_CRASH(472);
     unsigned short size = PacketBuffer::Decompose(reinterpret_cast<char const*>(CurHeader + 1) + offset,
                                                   CurHeader->size - offset - 2, format,

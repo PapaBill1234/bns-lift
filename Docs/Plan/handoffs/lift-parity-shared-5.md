@@ -12,7 +12,9 @@ Branch: `slice/lift-parity-shared-5`. Base: main 8778485. Not merged. Not pushed
 | PostOfficeDaemon | 694 | 696 | +2 |
 | LobbyDaemon | 1024 | 1024 | 0 |
 
-Total: +10 MATCH. No MATCH lost. `tools/gate.sh`: gate ok. `tools/parity.sh`: parity ok (last run after e3f19d9).
+Total: +10 MATCH. No MATCH lost. `tools/gate.sh`: gate ok. `tools/parity.sh`: parity ok (last run after repair 2).
+
+Gate needs `LIFT_IDA_DIR=<private>/ida/lift` in a worktree. Without it, gate.sh stops with "ida/lift not found".
 
 ## Commits
 
@@ -26,6 +28,15 @@ Total: +10 MATCH. No MATCH lost. `tools/gate.sh`: gate ok. `tools/parity.sh`: pa
 Scope note: a6525a2 changes 2 lines in `src/Server/BloodLib/source/Port.cpp`. That file is not in the card file list.
 The miss `RefCntObject::operator delete` has its only call site there (the unwind funclet of `Port::Initialize`).
 The change is in its own commit. The integrator can drop it if another card conflicts on `Port.cpp`.
+
+Repair 2 check (2026-11-26): no round-5 card lists `Port.cpp`. No round-5 branch (cgscd-5, lg-5a, lg-5b, pod-5a, pod-5b) changes `Port.cpp` against main. There is no conflict now. The integrator must check again before the merge. The reviewer can add `Port.cpp` to the card file list.
+
+## Repair 2
+
+| Problem | Fix | Result |
+| --- | --- | --- |
+| POD `Packet::Decompose(unsigned int, int, ...)`: with `unsigned int offset`, VS2010 emitted `cmp ebx,eax; jb` (unsigned). The original (POD 0x1400220fb) has `cmp ebx,eax; jl` (signed). The MATCH hid a logic change. | Keep the PDB type `unsigned int`. Test `static_cast<int>(offset) >= CurHeader->size - 2` with `// LIFT: signed compare (PostOfficeDaemon 0x220fb: cmp ebx,eax; jl)`. | llvm-objdump of our POD at 0x140017574: `cmp ebx,eax; jl`. Still MATCH. POD 696 (no loss). |
+| `Port.cpp` outside the card file list (a6525a2). | No conflict found (see scope note). Commit kept. | +1 in each of 4 exes kept. |
 
 ## Lessons
 
@@ -41,7 +52,7 @@ The card says: do not edit `Docs/Parity/lessons.md`. The review merges these tab
 | LG `IdleWatcher::run`: local `SystemEvent event;` before `LogBufferAllocator::Initialize`. Its inline dtor closes the handle. This gives EH state -2 and funclet dtor$0 (0x60430). | 96.3 | MATCH | 1 |
 | `RefCntObject::operator delete` (miss, all 4 exes): `BaseRefCntObj` has a PDB `static operator new` (type 0x2FCA). Write `_pool = new (PORT_FILE, 243) SessionPool(_id);`. VS2010 then calls the matching class placement delete in the unwind funclet (CG 0x3a920). | miss | MATCH | 4 |
 | CG `Packet::Concatenate` (miss): PDB mangled name has `F` (short), ours had `G` (unsigned short). Signed test `size < 0 \|\| size > 4000` (0x74de: `test si,si; js; cmp 0xfa0; jle`). | miss | MATCH | 1 |
-| POD `Packet::Decompose(unsigned int, int, char const*, ...)` (miss): PDB mangled name has `I` (unsigned int) for the first parameter. | miss | MATCH | 1 |
+| POD `Packet::Decompose(unsigned int, int, char const*, ...)` (miss): PDB mangled name has `I` (unsigned int) for the first parameter. Keep the signed test with `static_cast<int>(offset)` (orig 0x220fb `jl`). funcdiff does not see `jb` against `jl`: check the branch with llvm-objdump. | miss | MATCH | 1 |
 
 Pattern: for a miss, compare the mangled names first (`Image.mangled` in `tools/funcdiff.py`). A type mismatch in one parameter gives a miss, not a DIFF.
 
