@@ -13,6 +13,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"AbandonChargeJob::_vtbl": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "AbandonChargeJob::init": {
 "calls": 100,
 "consts": 100,
@@ -333,6 +340,22 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"AnonymousLobbyGatePresence::OnSet": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"AnonymousLobbyGatePresence::OnUnset": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
 "AuctionEscrow::GetDeliveryPostMessage": {
 "calls": 76,
 "consts": 94,
@@ -417,6 +440,28 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"BannedWordFilterLoader::CreateFileBuffer": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BannedWordFilterLoader::InitBannedWordFilterLoader": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BannedWordFilterLoader::LoadNameFilter": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
 },
 "BannedWordFilterMemoryAllocator::Alloc": {
 "calls": 100,
@@ -510,7 +555,120 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"BnsCommonConfig::CheckMinMaxBoundary": {
+"calls": 100,
+"consts": 88,
+"refs": 53,
+"score": 80.3,
+"status": "DIFF"
+},
+"BnsCommonConfig::Dump": {
+"calls": 100,
+"consts": 100,
+"refs": 87,
+"score": 95.6,
+"status": "DIFF"
+},
+"BnsCommonConfig::LoadBnsCommonConfig": {
+"calls": 100,
+"consts": 95,
+"refs": 74,
+"score": 89.8,
+"status": "DIFF"
+},
+"BnsCommonConfig::UpdateAllVariable": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BnsCommonConfigLoad::Load": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"BoundedList::Init": {
+"calls": 100,
+"consts": 67,
+"refs": 100,
+"score": 88.9,
+"status": "DIFF"
+},
 "BoundedList::Remove": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CancelWaitCharacterDeletionJob::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CancelWaitCharacterDeletionJob::_vtbl": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CancelWaitCharacterDeletionJob::init": {
+"calls": 95,
+"consts": 100,
+"refs": 100,
+"score": 98.3,
+"status": "DIFF"
+},
+"CancelWaitCharacterDeletionJob::restore": {
+"calls": 86,
+"consts": 100,
+"refs": 100,
+"score": 95.2,
+"status": "DIFF"
+},
+"CancelWaitCharacterDeletionJob::restoreCharacterExpire": {
+"calls": 100,
+"consts": 88,
+"refs": 100,
+"score": 95.8,
+"status": "DIFF"
+},
+"CancelWaitCharacterDeletionJob::restoreCharacterFail": {
+"calls": 96,
+"consts": 89,
+"refs": 100,
+"score": 95.1,
+"status": "DIFF"
+},
+"CancelWaitCharacterDeletionJob::restoreCharacterOk": {
+"calls": 100,
+"consts": 91,
+"refs": 100,
+"score": 97.0,
+"status": "DIFF"
+},
+"CancelWaitCharacterDeletionJob::restoreCharacterReq": {
+"calls": 96,
+"consts": 91,
+"refs": 100,
+"score": 95.7,
+"status": "DIFF"
+},
+"CancelWaitCharacterDeletionJob::work": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CancelWaitCharacterDeletionJob::~CancelWaitCharacterDeletionJob": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -657,6 +815,20 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Character::CancelCreation": {
+"calls": 89,
+"consts": 91,
+"refs": 77,
+"score": 85.6,
+"status": "DIFF"
+},
+"Character::CancelDeletion": {
+"calls": 89,
+"consts": 93,
+"refs": 77,
+"score": 86.4,
+"status": "DIFF"
+},
 "Character::EndGameWorldPlay": {
 "calls": 83,
 "consts": 100,
@@ -677,6 +849,20 @@
 "consts": 100,
 "refs": 100,
 "score": 76.7,
+"status": "DIFF"
+},
+"Character::FinishCreation": {
+"calls": 95,
+"consts": 96,
+"refs": 92,
+"score": 94.2,
+"status": "DIFF"
+},
+"Character::FinishDeletion": {
+"calls": 89,
+"consts": 92,
+"refs": 89,
+"score": 90.0,
 "status": "DIFF"
 },
 "Character::FinishRestore": {
@@ -721,6 +907,27 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Character::TryCreation": {
+"calls": 100,
+"consts": 95,
+"refs": 89,
+"score": 94.7,
+"status": "DIFF"
+},
+"Character::TryDeletion": {
+"calls": 92,
+"consts": 96,
+"refs": 86,
+"score": 91.3,
+"status": "DIFF"
+},
+"Character::TryRestore": {
+"calls": 91,
+"consts": 95,
+"refs": 82,
+"score": 89.3,
+"status": "DIFF"
+},
 "CharacterCosmesisService::Setup": {
 "calls": 100,
 "consts": 100,
@@ -742,6 +949,13 @@
 "refs": 100,
 "score": 92.6,
 "status": "DIFF"
+},
+"CliSession::CliSession [??0CliSession@@AEAA@XZ]": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "CliSession::FetchCharacterInfo": {
 "calls": 100,
@@ -795,10 +1009,10 @@
 "status": "MATCH"
 },
 "CliSession::ReserveStopPlay": {
-"calls": 88,
-"consts": 95,
-"refs": 96,
-"score": 92.9,
+"calls": 75,
+"consts": 100,
+"refs": 100,
+"score": 91.7,
 "status": "DIFF"
 },
 "CliSession::TimeoutStopPlay": {
@@ -900,6 +1114,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"CliSession::kickPresence": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "CliSession::leave": {
 "calls": 100,
 "consts": 100,
@@ -935,6 +1156,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"CliSession::removeCharacter": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "CliSession::removeLobbyService": {
 "calls": 100,
 "consts": 100,
@@ -964,6 +1192,13 @@
 "status": "MATCH"
 },
 "CliSession::setPcCafeCode": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CliSession::setPresence": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -1055,6 +1290,14 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"CliSessionTable::Delete_index_gatekey": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
 "CliSessionTable::Delete_index_pcid": {
 "calls": 100,
 "consts": 100,
@@ -1068,6 +1311,14 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"CliSessionTable::Insert_index_gatekey": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
 },
 "CliSessionTable::Insert_index_pcid": {
 "calls": 100,
@@ -1183,6 +1434,43 @@
 "score": 97.4,
 "status": "DIFF"
 },
+"ContentsRuleConfig::CheckMinMaxBoundary": {
+"calls": 100,
+"consts": 100,
+"refs": 67,
+"score": 88.9,
+"status": "DIFF"
+},
+"ContentsRuleConfig::Dump": {
+"calls": 100,
+"consts": 100,
+"refs": 98,
+"score": 99.2,
+"status": "DIFF"
+},
+"ContentsRuleConfig::LoadContentsRuleConfig": {
+"calls": 91,
+"consts": 95,
+"refs": 89,
+"score": 91.4,
+"status": "DIFF"
+},
+"ContentsRuleConfig::UpdateAllVariable": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"ContentsRuleConfigLoad::Load": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
 "CoolDown::HandleEvent": {
 "calls": 100,
 "consts": 100,
@@ -1247,6 +1535,83 @@
 "status": "MATCH"
 },
 "CrashHandler::handleCrash": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CreateCharacterJob::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CreateCharacterJob::createCharacterExpire": {
+"calls": 67,
+"consts": 90,
+"refs": 86,
+"score": 80.8,
+"status": "DIFF"
+},
+"CreateCharacterJob::createCharacterFail": {
+"calls": 80,
+"consts": 92,
+"refs": 94,
+"score": 88.9,
+"status": "DIFF"
+},
+"CreateCharacterJob::createCharacterOk": {
+"calls": 79,
+"consts": 97,
+"refs": 100,
+"score": 91.9,
+"status": "DIFF"
+},
+"CreateCharacterJob::expireGetSlot": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CreateCharacterJob::init": {
+"calls": 97,
+"consts": 88,
+"refs": 96,
+"score": 93.5,
+"status": "DIFF"
+},
+"CreateCharacterJob::reqGetSlot": {
+"calls": 93,
+"consts": 94,
+"refs": 89,
+"score": 92.1,
+"status": "DIFF"
+},
+"CreateCharacterJob::responseGetSlot": {
+"calls": 95,
+"consts": 97,
+"refs": 100,
+"score": 97.3,
+"status": "DIFF"
+},
+"CreateCharacterJob::tryCreateCharacter": {
+"calls": 82,
+"consts": 88,
+"refs": 95,
+"score": 88.1,
+"status": "DIFF"
+},
+"CreateCharacterJob::work": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CreateCharacterJob::~CreateCharacterJob": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -1389,6 +1754,28 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"DaemonConfig::AllocConfig": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DaemonConfig::Dump": {
+"calls": 100,
+"consts": 100,
+"refs": 94,
+"score": 97.9,
+"status": "DIFF"
+},
+"DaemonConfig::Load": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
 "Db::AllocTransaction": {
 "calls": 100,
 "consts": 100,
@@ -1402,6 +1789,14 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"Db::Initialize": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
 },
 "Db::Log": {
 "calls": 100,
@@ -1418,6 +1813,13 @@
 "status": "MATCH"
 },
 "Db::errorLog": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Db::initEnv": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -1536,6 +1938,157 @@
 "score": 90.5,
 "status": "DIFF"
 },
+"DeleteCharacterJob::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DeleteCharacterJob::_vtbl": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DeleteCharacterJob::checkSecondPasswordStatus": {
+"calls": 100,
+"consts": 95,
+"refs": 100,
+"score": 98.4,
+"status": "DIFF"
+},
+"DeleteCharacterJob::checkSecondPasswordStatusExpire": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"DeleteCharacterJob::checkSecondPasswordStatusResponse": {
+"calls": 90,
+"consts": 100,
+"refs": 94,
+"score": 94.7,
+"status": "DIFF"
+},
+"DeleteCharacterJob::checkSecondPasswordVerified": {
+"calls": 100,
+"consts": 95,
+"refs": 100,
+"score": 98.4,
+"status": "DIFF"
+},
+"DeleteCharacterJob::checkSecondPasswordVerifiedExpire": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"DeleteCharacterJob::checkSecondPasswordVerifiedResponse": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"DeleteCharacterJob::deleteExpire": {
+"calls": 100,
+"consts": 88,
+"refs": 100,
+"score": 95.8,
+"status": "DIFF"
+},
+"DeleteCharacterJob::deleteFail": {
+"calls": 100,
+"consts": 94,
+"refs": 100,
+"score": 98.1,
+"status": "DIFF"
+},
+"DeleteCharacterJob::deleteOk": {
+"calls": 100,
+"consts": 75,
+"refs": 100,
+"score": 91.7,
+"status": "DIFF"
+},
+"DeleteCharacterJob::deleteReq": {
+"calls": 97,
+"consts": 84,
+"refs": 100,
+"score": 93.7,
+"status": "DIFF"
+},
+"DeleteCharacterJob::directDelete": {
+"calls": 89,
+"consts": 84,
+"refs": 91,
+"score": 88.0,
+"status": "DIFF"
+},
+"DeleteCharacterJob::getCharacterGoodsCountExpire": {
+"calls": 100,
+"consts": 88,
+"refs": 100,
+"score": 95.8,
+"status": "DIFF"
+},
+"DeleteCharacterJob::getCharacterGoodsCountFail": {
+"calls": 90,
+"consts": 100,
+"refs": 100,
+"score": 96.7,
+"status": "DIFF"
+},
+"DeleteCharacterJob::getCharacterGoodsCountOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DeleteCharacterJob::getCharacterGoodsReq": {
+"calls": 100,
+"consts": 91,
+"refs": 100,
+"score": 97.0,
+"status": "DIFF"
+},
+"DeleteCharacterJob::init": {
+"calls": 90,
+"consts": 98,
+"refs": 99,
+"score": 95.8,
+"status": "DIFF"
+},
+"DeleteCharacterJob::scheduleDelete": {
+"calls": 95,
+"consts": 88,
+"refs": 100,
+"score": 94.2,
+"status": "DIFF"
+},
+"DeleteCharacterJob::work": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"DeleteCharacterJob::~DeleteCharacterJob": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "DispatchNPLobbyMessageHandler": {
 "calls": 100,
 "consts": 100,
@@ -1577,6 +2130,71 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"EndWaitGameWorldJob::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"EndWaitGameWorldJob::_vtbl": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"EndWaitGameWorldJob::endWait": {
+"calls": 94,
+"consts": 96,
+"refs": 100,
+"score": 96.5,
+"status": "DIFF"
+},
+"EndWaitGameWorldJob::init": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"EndWaitGameWorldJob::work": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"EnterGameWorldJob::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"EnterGameWorldJob::_vtbl": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"EnterGameWorldJob::init": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"EnterGameWorldJob::work": {
+"calls": 50,
+"consts": 100,
+"refs": 100,
+"score": 83.3,
+"status": "DIFF"
 },
 "ExceptionCodeString": {
 "calls": 100,
@@ -1796,6 +2414,20 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"GameAccount::GameAccount": {
+"calls": 100,
+"consts": 100,
+"refs": 67,
+"score": 88.9,
+"status": "DIFF"
+},
+"GameAccount::~GameAccount": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "GameServiceLocation::ReserveStopPlay": {
 "calls": 100,
 "consts": 100,
@@ -1810,12 +2442,70 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"GameTimeQueue::Block": {
+"calls": 83,
+"consts": 87,
+"refs": 66,
+"score": 78.5,
+"status": "DIFF"
+},
+"GameTimeQueue::GameTimeQueue": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GameTimeQueue::Release": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GameTimeQueue::~GameTimeQueue": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GameTimeScheduler::GameTimeScheduler": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GameTimeScheduler::HandleEvent": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GameTimeScheduler::Start": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
 "GameTimeScheduler::Unschedule": {
 "calls": 100,
-"consts": 75,
+"consts": 100,
+"raw_status": "MATCH",
 "refs": 100,
-"score": 91.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"GameTimeScheduler::~GameTimeScheduler": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "GameWorld::EnterUser": {
 "calls": 90,
@@ -1879,6 +2569,13 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"GameWorldCluster::Setup": {
+"calls": 100,
+"consts": 83,
+"refs": 100,
+"score": 94.4,
+"status": "DIFF"
 },
 "GameWorldCluster::UpdateCounters": {
 "calls": 100,
@@ -1965,6 +2662,13 @@
 "status": "MATCH"
 },
 "GameWorldRegistry::Get": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GameWorldRegistry::Setup": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -2517,6 +3221,233 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"GetChargeInfoJob::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GetChargeInfoJob::_vtbl": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GetChargeInfoJob::expireChargeGetInfo": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GetChargeInfoJob::init": {
+"calls": 89,
+"consts": 100,
+"refs": 91,
+"score": 93.3,
+"status": "DIFF"
+},
+"GetChargeInfoJob::requestChargeGetInfo": {
+"calls": 96,
+"consts": 89,
+"refs": 92,
+"score": 92.4,
+"status": "DIFF"
+},
+"GetChargeInfoJob::work": {
+"calls": 75,
+"consts": 100,
+"refs": 100,
+"score": 91.7,
+"status": "DIFF"
+},
+"GetGameWorldKickReason": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"GetGoodsCountJob::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GetGoodsCountJob::_vtbl": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GetGoodsCountJob::getGoodsCountFail": {
+"calls": 90,
+"consts": 100,
+"refs": 100,
+"score": 96.7,
+"status": "DIFF"
+},
+"GetGoodsCountJob::getGoodsCountOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GetGoodsCountJob::getGoodsCountReq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GetGoodsCountJob::getGoodsCountTimeout": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GetGoodsCountJob::init": {
+"calls": 92,
+"consts": 100,
+"refs": 100,
+"score": 97.2,
+"status": "DIFF"
+},
+"GetGoodsCountJob::work": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GetGoodsCountJob::~GetGoodsCountJob": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GetId128FromGuidString": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"GetLobbyGateKickReason": {
+"calls": 100,
+"consts": 95,
+"refs": 100,
+"score": 98.4,
+"status": "DIFF"
+},
+"GetLobbyServiceItemJob::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GetLobbyServiceItemJob::_vtbl": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GetLobbyServiceItemJob::getLobbyServiceItemFail": {
+"calls": 90,
+"consts": 93,
+"refs": 100,
+"score": 94.4,
+"status": "DIFF"
+},
+"GetLobbyServiceItemJob::getLobbyServiceItemOk": {
+"calls": 96,
+"consts": 100,
+"refs": 100,
+"score": 98.6,
+"status": "DIFF"
+},
+"GetLobbyServiceItemJob::getLobbyServiceItemReq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GetLobbyServiceItemJob::getLobbyServiceItemTimeout": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GetLobbyServiceItemJob::init": {
+"calls": 92,
+"consts": 100,
+"refs": 100,
+"score": 97.2,
+"status": "DIFF"
+},
+"GetLobbyServiceItemJob::work": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GetLobbyServiceItemJob::~GetLobbyServiceItemJob": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GiveupWaitGameWorldJob::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GiveupWaitGameWorldJob::_vtbl": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GiveupWaitGameWorldJob::giveupWait": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GiveupWaitGameWorldJob::init": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"GiveupWaitGameWorldJob::work": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Grade::FetchGame": {
 "calls": 100,
 "consts": 75,
@@ -2543,6 +3474,34 @@
 "consts": 86,
 "refs": 67,
 "score": 84.1,
+"status": "DIFF"
+},
+"GradeService::GradeService [??0GradeService@@QEAA@XZ]": {
+"calls": 100,
+"consts": 0,
+"refs": 50,
+"score": 50.0,
+"status": "DIFF"
+},
+"GradeService::SetGradeLevel": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GradeService::SetGradeList": {
+"calls": 86,
+"consts": 100,
+"refs": 100,
+"score": 95.2,
+"status": "DIFF"
+},
+"GradeService::clearGradeList": {
+"calls": 50,
+"consts": 100,
+"refs": 100,
+"score": 83.3,
 "status": "DIFF"
 },
 "GrowingBuffer::grow": {
@@ -3389,6 +4348,56 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"InitCliSessionWlobbyTokenJob::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"InitCliSessionWlobbyTokenJob::_vtbl": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"InitCliSessionWlobbyTokenJob::init": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"InitCliSessionWlobbyTokenJob::initOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"InitCliSessionWlobbyTokenJob::work": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"InitCliSessionWnpTokenJob::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"InitCliSessionWnpTokenJob::work": {
+"calls": 0,
+"consts": 100,
+"refs": 100,
+"score": 66.7,
+"status": "DIFF"
+},
 "InitSymbol": {
 "calls": 100,
 "consts": 100,
@@ -3438,6 +4447,77 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"KickJob::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"KickJob::_vtbl": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"KickJob::init": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"KickJob::kick": {
+"calls": 92,
+"consts": 100,
+"refs": 100,
+"score": 97.2,
+"status": "DIFF"
+},
+"KickJob::work": {
+"calls": 70,
+"consts": 83,
+"refs": 100,
+"score": 84.4,
+"status": "DIFF"
+},
+"KickJob::worldKickExpire": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"KickJob::worldKickFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"KickJob::worldKickOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"KickJob::worldKickReq": {
+"calls": 86,
+"consts": 100,
+"refs": 100,
+"score": 95.2,
+"status": "DIFF"
+},
+"KickJob::~KickJob": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "LeaveGameWorldJob::GetDefinition": {
 "calls": 100,
 "consts": 100,
@@ -3452,6 +4532,13 @@
 "refs": 100,
 "score": 100.0,
 "status": "EXCLUDED"
+},
+"LeaveGameWorldJob::_vtbl": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "LeaveGameWorldJob::init": {
 "calls": 100,
@@ -3481,6 +4568,143 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"ListGoodsJob::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ListGoodsJob::_vtbl": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ListGoodsJob::init": {
+"calls": 92,
+"consts": 100,
+"refs": 100,
+"score": 97.2,
+"status": "DIFF"
+},
+"ListGoodsJob::listGoodsFail": {
+"calls": 90,
+"consts": 100,
+"refs": 100,
+"score": 96.7,
+"status": "DIFF"
+},
+"ListGoodsJob::listGoodsOk": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"ListGoodsJob::listGoodsReq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ListGoodsJob::listGoodsTimeout": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ListGoodsJob::work": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ListGoodsJob::~ListGoodsJob": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ListLobbyServiceItemJob::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ListLobbyServiceItemJob::_vtbl": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ListLobbyServiceItemJob::init": {
+"calls": 92,
+"consts": 100,
+"refs": 100,
+"score": 97.2,
+"status": "DIFF"
+},
+"ListLobbyServiceItemJob::listLobbyServiceItemFail": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"ListLobbyServiceItemJob::listLobbyServiceItemOk": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"ListLobbyServiceItemJob::listLobbyServiceItemReq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ListLobbyServiceItemJob::listLobbyServiceItemTimeout": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ListLobbyServiceItemJob::work": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ListLobbyServiceItemJob::~ListLobbyServiceItemJob": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyConfig::Check": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
 },
 "LobbyDB::BindCharacterSlot": {
 "calls": 100,
@@ -3840,11 +5064,18 @@
 "score": 100.0,
 "status": "EXCLUDED"
 },
+"LobbyDaemon::initialize": {
+"calls": 78,
+"consts": 88,
+"refs": 80,
+"score": 82.3,
+"status": "DIFF"
+},
 "LobbyDaemon::onStart": {
-"calls": 83,
-"consts": 93,
-"refs": 96,
-"score": 90.4,
+"calls": 89,
+"consts": 94,
+"refs": 97,
+"score": 93.2,
 "status": "DIFF"
 },
 "LobbyDaemon::setArgument": {
@@ -3888,6 +5119,22 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"LobbyGateChannel::SendChangedGradeLevelNotify": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"LobbyGateChannel::SendChangedGradeNotify": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
 },
 "LobbyGateChannel::SendCloseAnonymousSessionNotify": {
 "calls": 100,
@@ -4001,6 +5248,21 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"LobbyGateChannel::SendGetLobbyServiceItemInfoFail": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"LobbyGateChannel::SendGetLobbyServiceItemInfoOk": {
+"calls": 92,
+"consts": 91,
+"refs": 86,
+"score": 89.6,
+"status": "DIFF"
+},
 "LobbyGateChannel::SendGetWaitInfoFail": {
 "calls": 100,
 "consts": 100,
@@ -4078,6 +5340,14 @@
 "score": 64.3,
 "status": "DIFF"
 },
+"LobbyGateChannel::SendListLobbyServiceItemInfoFail": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
 "LobbyGateChannel::SendListLobbyServiceItemInfoOk": {
 "calls": 60,
 "consts": 100,
@@ -4148,6 +5418,13 @@
 "score": 81.6,
 "status": "DIFF"
 },
+"LobbyGateChannelManager::Acquire": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "LobbyGateChannelManager::OnAccept": {
 "calls": 100,
 "consts": 100,
@@ -4191,7 +5468,35 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"LobbyGatePresence::Close": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "LobbyGatePresence::IsEqual": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyGatePresence::Kick": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyGatePresence::NotifyChangedGrade": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyGatePresence::NotifyChangedGradeLevel": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -4313,6 +5618,13 @@
 "status": "MATCH"
 },
 "LobbyJobTransaction::GetTid": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyJobTransaction::Set": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -4692,6 +6004,13 @@
 "score": 100.0,
 "status": "EXCLUDED"
 },
+"LogoutInGameWorldJob::_vtbl": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "LogoutInGameWorldJob::init": {
 "calls": 100,
 "consts": 100,
@@ -4714,6 +6033,35 @@
 "refs": 100,
 "score": 100.0,
 "status": "EXCLUDED"
+},
+"LogoutJob::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LogoutJob::init": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"LogoutJob::logout": {
+"calls": 76,
+"consts": 75,
+"refs": 100,
+"score": 83.8,
+"status": "DIFF"
+},
+"LogoutJob::work": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "ManageChannel::GetId": {
 "calls": 100,
@@ -4928,12 +6276,34 @@
 "score": 100.0,
 "status": "EXCLUDED"
 },
+"NPGameServiceChannel::SendRequestConsumeGameToken": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
 "NPGameServiceChannel::SendRequestFriendSendMessage": {
 "calls": 74,
 "consts": 42,
 "refs": 36,
 "score": 50.7,
 "status": "DIFF"
+},
+"NPGameServiceChannel::SendRequestGradeListAllGrades": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"NPGameServiceChannel::SendRequestListUserLastPresences": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "NPGameServiceChannel::SendRequestPresenceKick": {
 "calls": 100,
@@ -4942,6 +6312,14 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"NPGameServiceChannel::SendRequestPresenceLogin": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
 "NPGameServiceChannel::SendRequestPresenceLogout": {
 "calls": 100,
 "consts": 100,
@@ -4949,7 +6327,28 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"NPGameServiceChannel::SendRequestProfileGetUserProfile": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"NPGameServiceChannel::SendRequestSlotCreateActivitySlots": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "NPGameServiceChannel::SendRequestSlotGetSlot": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"NPGameServiceChannel::SendRequestSlotSetActivitySlotData": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -5163,7 +6562,43 @@
 "score": 100.0,
 "status": "EXCLUDED"
 },
+"ObjPool::Initialize": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ObjPoolTimer::Add": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ObjPoolTimer::HandleEvent": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "ObjPoolTimer::Start": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ObjPoolTimer::process": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"ObjPoolTimer::~ObjPoolTimer": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -5463,6 +6898,20 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"PerfCounterProvider::loadLibrary": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PerfCounterProvider::setCounterSetInfo": {
+"calls": 100,
+"consts": 100,
+"refs": 92,
+"score": 97.4,
+"status": "DIFF"
 },
 "PipeCommandProcess::Name": {
 "calls": 100,
@@ -5783,6 +7232,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Presence::~Presence": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Prng::Initialize": {
 "calls": 100,
 "consts": 100,
@@ -5849,6 +7305,77 @@
 "status": "MATCH"
 },
 "ReconnectTimer::HandleEvent": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RecoverPcJob::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RecoverPcJob::__restoreStuckPc": {
+"calls": 96,
+"consts": 100,
+"refs": 95,
+"score": 97.1,
+"status": "DIFF"
+},
+"RecoverPcJob::_vtbl": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RecoverPcJob::init": {
+"calls": 71,
+"consts": 92,
+"refs": 90,
+"score": 84.2,
+"status": "DIFF"
+},
+"RecoverPcJob::restoreGameWorldPcExpired": {
+"calls": 55,
+"consts": 75,
+"refs": 67,
+"score": 65.4,
+"status": "DIFF"
+},
+"RecoverPcJob::restoreGameWorldPcFail": {
+"calls": 85,
+"consts": 96,
+"refs": 100,
+"score": 93.7,
+"status": "DIFF"
+},
+"RecoverPcJob::restoreGameWorldPcOk": {
+"calls": 82,
+"consts": 88,
+"refs": 91,
+"score": 87.1,
+"status": "DIFF"
+},
+"RecoverPcJob::restoreGameWorldPcReq": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"RecoverPcJob::work": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RecoverPcJob::~RecoverPcJob": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -5926,6 +7453,13 @@
 "status": "DIFF"
 },
 "RefCntPoolObj::operator delete": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RefCntPoolObj::~RefCntPoolObj": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -6547,6 +8081,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"StartChargeJob::_vtbl": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "StartChargeJob::expireStartCharge": {
 "calls": 100,
 "consts": 100,
@@ -6583,6 +8124,211 @@
 "refs": 100,
 "score": 100.0,
 "status": "EXCLUDED"
+},
+"StartCliSessionWlobbyTokenJob::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"StartCliSessionWlobbyTokenJob::_vtbl": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"StartCliSessionWlobbyTokenJob::getGradeLevelExpire": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"StartCliSessionWlobbyTokenJob::getGradeLevelReq": {
+"calls": 95,
+"consts": 91,
+"refs": 89,
+"score": 91.5,
+"status": "DIFF"
+},
+"StartCliSessionWlobbyTokenJob::getGradeLevelResponse": {
+"calls": 95,
+"consts": 100,
+"refs": 100,
+"score": 98.3,
+"status": "DIFF"
+},
+"StartCliSessionWlobbyTokenJob::init": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"StartCliSessionWlobbyTokenJob::listAllGradesExpire": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"StartCliSessionWlobbyTokenJob::listAllGradesReq": {
+"calls": 76,
+"consts": 96,
+"refs": 92,
+"score": 87.9,
+"status": "DIFF"
+},
+"StartCliSessionWlobbyTokenJob::listAllGradesResponse": {
+"calls": 95,
+"consts": 100,
+"refs": 100,
+"score": 98.3,
+"status": "DIFF"
+},
+"StartCliSessionWlobbyTokenJob::start": {
+"calls": 100,
+"consts": 96,
+"refs": 100,
+"score": 98.7,
+"status": "DIFF"
+},
+"StartCliSessionWlobbyTokenJob::work": {
+"calls": 50,
+"consts": 83,
+"refs": 100,
+"score": 77.8,
+"status": "DIFF"
+},
+"StartCliSessionWnpTokenJob::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"StartCliSessionWnpTokenJob::StartCliSessionWnpTokenJob": {
+"calls": 100,
+"consts": 100,
+"refs": 43,
+"score": 81.0,
+"status": "DIFF"
+},
+"StartCliSessionWnpTokenJob::consumeToken": {
+"calls": 97,
+"consts": 95,
+"refs": 92,
+"score": 94.5,
+"status": "DIFF"
+},
+"StartCliSessionWnpTokenJob::consumeTokenExpire": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"StartCliSessionWnpTokenJob::createSlotsExpire": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"StartCliSessionWnpTokenJob::createSlotsReq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"StartCliSessionWnpTokenJob::getUserProfileReq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"StartCliSessionWnpTokenJob::listSlotsExpire": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"StartCliSessionWnpTokenJob::listSlotsReq": {
+"calls": 100,
+"consts": 92,
+"refs": 82,
+"score": 91.3,
+"status": "DIFF"
+},
+"StartCliSessionWnpTokenJob::listUserLastPresencesExpire": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"StartCliSessionWnpTokenJob::listUserLastPresencesReq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"StartCliSessionWnpTokenJob::presenceLoginExpire": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"StartCliSessionWnpTokenJob::presenceLoginReq": {
+"calls": 97,
+"consts": 95,
+"refs": 92,
+"score": 94.7,
+"status": "DIFF"
+},
+"StartCliSessionWnpTokenJob::setSlotDataExpire": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"StartCliSessionWnpTokenJob::setSlotDataReq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"StartCliSessionWnpTokenJob::setSlotDataResponse": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"StartCliSessionWnpTokenJob::work": {
+"calls": 34,
+"consts": 100,
+"refs": 100,
+"score": 78.0,
+"status": "DIFF"
+},
+"StartCliSessionWnpTokenJob::~StartCliSessionWnpTokenJob": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "StaticPageMemoryManager::Alloc": {
 "calls": 100,
@@ -6668,6 +8414,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"StopChargeJob::_vtbl": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "StopChargeJob::expireChargeStop": {
 "calls": 100,
 "consts": 100,
@@ -6711,6 +8464,14 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"String::GetId128FromGuidString": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
 },
 "String::UnicodeToMultibyte": {
 "calls": 100,
@@ -6776,6 +8537,70 @@
 "status": "MATCH"
 },
 "SystemPerfMonitor::~SystemPerfMonitor": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TakeGoodsJob::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TakeGoodsJob::_vtbl": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TakeGoodsJob::init": {
+"calls": 93,
+"consts": 100,
+"refs": 100,
+"score": 97.6,
+"status": "DIFF"
+},
+"TakeGoodsJob::takeGoodsFail": {
+"calls": 78,
+"consts": 100,
+"refs": 100,
+"score": 92.6,
+"status": "DIFF"
+},
+"TakeGoodsJob::takeGoodsOk": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"TakeGoodsJob::takeGoodsReq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TakeGoodsJob::takeGoodsTimeout": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TakeGoodsJob::work": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TakeGoodsJob::~TakeGoodsJob": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -7127,6 +8952,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"TryEnterGameWorldJob::_vtbl": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "TryEnterGameWorldJob::checkSecondPasswordStatus": {
 "calls": 100,
 "consts": 96,
@@ -7274,6 +9106,13 @@
 "status": "MATCH"
 },
 "WaitQueue::~WaitQueue": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WaitQueueList::Init": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -8020,6 +9859,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"swprintf_s<33>": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "swprintf_s<513>": {
 "calls": 100,
 "consts": 100,
@@ -8035,6 +9881,13 @@
 "status": "MATCH"
 },
 "swprintf_s<64>": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"swprintf_s<780>": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
