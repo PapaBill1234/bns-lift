@@ -64,15 +64,16 @@ void CacheD::Initialize(unsigned short id, unsigned long addr, unsigned short po
     {
         PipeConsole* console = CacheGate::_instance->pipeConsole;
         console->_lock.Enter();
-        PipeConsole::ItemNode* node = console->_invalid._head._next;
-        while (node != &console->_invalid._tail)
+        PipeConsole::ItemList& list = console->_invalid;
+        PipeConsole::ItemNode* item = list._head._next;
+        while (item != &list._tail)
         {
-            if (wcscmp(node->_key, _daemonInvalidInfoKey) == 0)
+            if (wcscmp(item->_key, _daemonInvalidInfoKey) == 0)
                 break;
-            node = node->_next;
+            item = item->_next;
         }
-        if (node == &console->_invalid._tail)
-            PipeConsole::addNode(console->_invalid, _daemonInvalidInfoKey, L"");  // LIFT: LTCG folded valueString. addNode (0x15ED0) does not read r8 and copies L"" (0x3B700).
+        if (item == &list._tail)
+            PipeConsole::addNode(list, _daemonInvalidInfoKey, L"");  // LIFT: LTCG folded valueString. addNode (0x15ED0) does not read r8 and copies L"" (0x3B700).
         console->_lock.Leave();
     }
 }
@@ -81,15 +82,21 @@ void CacheD::Initialize(unsigned short id, unsigned long addr, unsigned short po
 int CacheD::Verify(Session const* session)
 {
     _lock.Enter();
-    if (_addr == session->_connection->_ip && _port == session->_connection->_portNumber)
+    // PDB lines 73 to 80: one test per field, each with its own exit.
+    if (_addr != session->_connection->_ip)
     {
-        if (_session == nullptr)
-            SetSession(session);
         _lock.Leave();
-        return 0;
+        return 2;
     }
+    if (_port != session->_connection->_portNumber)
+    {
+        _lock.Leave();
+        return 2;
+    }
+    if (_session == nullptr)
+        SetSession(session);
     _lock.Leave();
-    return 2;
+    return 0;
 }
 
 // 0x25c0
@@ -106,8 +113,8 @@ CacheDList::~CacheDList()
 // 0x2660
 bool CacheDList::Initialize()
 {
-    void* buffer = Memory::_Manager[2]->Alloc(sizeof(CacheDMap), CACHED_FILE, 130);
-    _cachedMap = buffer != nullptr ? new (buffer) CacheDMap() : nullptr;
+    // The placement new tests the memory for null itself (PDB line 130).
+    _cachedMap = new (Memory::_Manager[2]->Alloc(sizeof(CacheDMap), CACHED_FILE, 130)) CacheDMap();
     return _cachedMap != nullptr;
 }
 
@@ -130,7 +137,8 @@ CacheD* CacheDList::Find(unsigned short id)
 bool CacheDList::MakeSessionAll()
 {
     _lock.Enter();
-    for (CacheDMap::iterator it = _cachedMap->begin(); it != _cachedMap->end(); ++it)
+    CacheDMap::iterator it = _cachedMap->begin();
+    while (it != _cachedMap->end())
     {
         CacheD* cached = it->second;
         if (cached != nullptr)
@@ -150,6 +158,7 @@ bool CacheDList::MakeSessionAll()
         {
             Log::Write(Log::LT_DEBUG, CACHED_FILE, 175, L"[cached list], MakeSessionAll connect fail");
         }
+        it++;  // PDB line 177: post-increment on its own line.
     }
     _lock.Leave();
     return true;
@@ -159,19 +168,22 @@ bool CacheDList::MakeSessionAll()
 void CacheDList::RemoveSessionAll()
 {
     _lock.Enter();
-    for (CacheDMap::iterator it = _cachedMap->begin(); it != _cachedMap->end(); ++it)
+    CacheDMap::iterator it = _cachedMap->begin();
+    while (it != _cachedMap->end())
     {
         CacheD* cached = it->second;
-        if (cached == nullptr)
-            continue;
-        Session* session = const_cast<Session*>(cached->GetSession());
-        if (session != nullptr)
+        if (cached != nullptr)
         {
-            session->StopReconnect();
-            session->removeReferenceCount(CHANNEL_HEADER_FILE, 52);
+            Session* session = const_cast<Session*>(cached->GetSession());
+            if (session != nullptr)
+            {
+                session->StopReconnect();
+                session->removeReferenceCount(CHANNEL_HEADER_FILE, 52);
+            }
+            cached->Close();
+            cached->removeReferenceCount(CACHED_FILE, 204);
         }
-        cached->Close();
-        cached->removeReferenceCount(CACHED_FILE, 204);
+        it++;  // PDB line 207: post-increment on its own line.
     }
     _cachedMap->clear();
     _lock.Leave();
@@ -229,7 +241,7 @@ bool CacheDList::LoadCachedListConfigFile(wchar_t const* fileName, bool reload)
                             {
                                 XmlElement const* element = node->ToXmlElement();
                                 // An element that is not "cached" stops the load with failure.
-                                if (element == nullptr || wcsncmp(element->Name(), L"cached", 7) != 0)
+                                if (element == nullptr || wcscmp(element->Name(), L"cached") != 0)  // 0x2d48: rep cmpsw, 7 characters
                                 {
                                     result = false;
                                     break;
@@ -423,10 +435,12 @@ bool CacheDList::del(unsigned short id)
 void CacheDList::clear()
 {
     _lock.Enter();
-    for (CacheDMap::iterator it = _cachedMap->begin(); it != _cachedMap->end(); ++it)
+    CacheDMap::iterator it = _cachedMap->begin();
+    while (it != _cachedMap->end())
     {
         if (it->second != nullptr)
             it->second->removeReferenceCount(CACHED_FILE, 472);
+        it++;
     }
     _cachedMap->clear();
     _lock.Leave();

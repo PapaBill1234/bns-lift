@@ -19,12 +19,15 @@ ClientManager::~ClientManager()
     if (_clientMap != nullptr)
     {
         ReleaseAllSession();
-        _clientMap->~SessionMap();
+        // PDB line 19 holds the null test, the destructor and Free (0x5d86).
+        if (_clientMap != nullptr)
+            _clientMap->~SessionMap();
         Memory::_Manager[2]->Free(_clientMap, CLIENT_MANAGER_FILE, 19);
     }
     if (_idIndexMap != nullptr)
     {
-        _idIndexMap->~IndexMap();
+        if (_idIndexMap != nullptr)
+            _idIndexMap->~IndexMap();
         Memory::_Manager[2]->Free(_idIndexMap, CLIENT_MANAGER_FILE, 23);
     }
 }

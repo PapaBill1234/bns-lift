@@ -21,7 +21,6 @@
 using namespace StsMsgLib;
 
 static wchar_t const NPSERVICECHANNEL_FILE[] = L"NPServiceChannel.cpp";
-static wchar_t const NPMESSAGEHANDLER_FILE[] = L"NPMessageHandler.cpp";
 
 // 0xFD80
 void NPServiceChannelCmdDispatcher(unsigned int id, ECommand& eCmd)
@@ -84,7 +83,28 @@ bool NPServiceChannel::SendRequestEventNoti(CouponJob* job, id128 const* gameAcc
 
     void* mem;
     NPJobTransaction* tran;
-    if (SmartCouponDaemon::_instance->_config->_npRewardChangeoverEnable)
+    // PDB line 91: the event-noti path comes first (0x1005c).
+    if (!SmartCouponDaemon::_instance->_config->_npRewardChangeoverEnable)
+    {
+        _StsMsgRequestRewardBrokerEventNoti msg;
+        msg.msgInfo.eCmd = COMMAND_SRV_REWARDBROKER_EVENT_NOTI;
+        msg.msgInfo.msgType = MESSAGE_TYPE_REQUEST;
+        msg.msgInfo.nTxnId = 0;
+        msg.pUserId = const_cast<id128*>(gameAccountId);
+        msg.nNotiType = 1;
+        msg.nEventId = couponEventId;
+        msg.nRequestKey = publicationId;
+        msg.pwszRequestDesc = nullptr;
+
+        mem = Memory::_Manager[2]->Alloc(sizeof(NPJobTransaction), NPSERVICECHANNEL_FILE, 99);
+        // BUG: 0xFF10 the result of Alloc is not checked.
+        tran = new (mem) NPJobTransaction();
+        tran->_jobid = job->_id;
+        tran->_state = job->_state;
+        tran->_task = 2;
+        return SendMsg(&msg, true, tran);
+    }
+    else
     {
         char strEventId[51] = {0};
         sprintf_s(strEventId, sizeof(strEventId), "%d", couponEventId);
@@ -108,24 +128,13 @@ bool NPServiceChannel::SendRequestEventNoti(CouponJob* job, id128 const* gameAcc
         tran->_task = 2;
         return SendMsg(&msg, true, tran);
     }
+}
 
-    _StsMsgRequestRewardBrokerEventNoti msg;
-    msg.msgInfo.eCmd = COMMAND_SRV_REWARDBROKER_EVENT_NOTI;
-    msg.msgInfo.msgType = MESSAGE_TYPE_REQUEST;
-    msg.msgInfo.nTxnId = 0;
-    msg.pUserId = const_cast<id128*>(gameAccountId);
-    msg.nNotiType = 1;
-    msg.nEventId = couponEventId;
-    msg.nRequestKey = publicationId;
-    msg.pwszRequestDesc = nullptr;
-
-    mem = Memory::_Manager[2]->Alloc(sizeof(NPJobTransaction), NPSERVICECHANNEL_FILE, 99);
-    // BUG: 0xFF10 the result of Alloc is not checked.
-    tran = new (mem) NPJobTransaction();
-    tran->_jobid = job->_id;
-    tran->_state = job->_state;
-    tran->_task = 2;
-    return SendMsg(&msg, true, tran);
+// LIFT: inlined in NPServiceChannelManager::HandleMessage (0x10700).
+NPMsgHandleEvent::NPMsgHandleEvent(NPChannel* channel, _StsMsg* msg, NPTransaction* tran, NPServiceMessageHandler handler)
+    : _channel(channel), _msg(msg), _tran(tran), _handler(handler)
+{
+    _channel->addReferenceCount(false, NPSERVICECHANNEL_FILE, 141);
 }
 
 // 0x10230
@@ -231,19 +240,14 @@ bool NPServiceChannelManager::HandleMessage(NPChannel* channel, _StsMsg* msg, vo
 {
     if (channel == nullptr || msg == nullptr)
         return false;
-    ECommand cmd = msg->GetCommand();
-    if (cmd < COMMAND_SRV_REWARDBROKER_EVENT_NOTI || cmd > COMMAND_SRV_REWARD_REQUEST_REWARD_FOR_EVENT)
+    NPServiceMessageHandler handler = DispatchNPMessageHandler(msg->GetCommand());
+    if (handler == nullptr)
     {
-        Log::Write(Log::LT_ERROR, NPMESSAGEHANDLER_FILE, 36, L"[np], DispatchNPMessageHandler, invalid command, cmd:%d",
-                   cmd);
         channel->_sts->ReleaseStsMsg(msg);
         return false;
     }
-    void* mem = Memory::_Manager[2]->Alloc(sizeof(NPMsgHandleEvent), NPSERVICECHANNEL_FILE, 284);
-    NPMsgHandleEvent* ev =
-        mem ? new (mem) NPMsgHandleEvent(channel, msg, static_cast<NPTransaction*>(context), NPHandlerEventNoti)
-            : nullptr;
-    channel->addReferenceCount(false, NPSERVICECHANNEL_FILE, 141);
+    NPMsgHandleEvent* ev = new (Memory::_Manager[2]->Alloc(sizeof(NPMsgHandleEvent), NPSERVICECHANNEL_FILE, 284))
+        NPMsgHandleEvent(channel, msg, static_cast<NPTransaction*>(context), handler);
     PostQueuedCompletionStatus(Network::iocpHandle(), 0, reinterpret_cast<ULONG_PTR>(ev), nullptr);
     return true;
 }

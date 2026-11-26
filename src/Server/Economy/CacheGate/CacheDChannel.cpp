@@ -93,15 +93,16 @@ void CacheDChannel::onClose(Session const* session, bool tryReconnect, bool clos
     {
         PipeConsole* console = CacheGate::_instance->pipeConsole;
         console->_lock.Enter();
-        PipeConsole::ItemNode* node = console->_invalid._head._next;
-        while (node != &console->_invalid._tail)
+        PipeConsole::ItemList& list = console->_invalid;
+        PipeConsole::ItemNode* node = list._head._next;
+        while (node != &list._tail)
         {
             if (wcscmp(node->_key, cached->_daemonInvalidInfoKey) == 0)
                 break;
             node = node->_next;
         }
-        if (node == &console->_invalid._tail || node == nullptr)
-            PipeConsole::addNode(console->_invalid, cached->_daemonInvalidInfoKey, L"");  // LIFT: LTCG folded valueString. addNode (0x15ED0) does not read r8 and copies L"" (0x3B700).
+        if (node == &list._tail)
+            PipeConsole::addNode(list, cached->_daemonInvalidInfoKey, L"");  // LIFT: LTCG folded valueString. addNode (0x15ED0) does not read r8 and copies L"" (0x3B700).
         console->_lock.Leave();
     }
 

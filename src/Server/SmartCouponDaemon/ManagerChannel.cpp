@@ -159,13 +159,16 @@ void ManagerChannel::SendRetryCouponPublicationOk(Session* session, long long ti
     {
         Log::Write(Log::LT_ERROR, MANAGERCHANNEL_FILE, 113,
                    L"[manager-ch], 0x%.16I64X, %I64d, send retry coupon publication ok; compose packet fail; compose fail",
-                   session->_id, GetId());
+                   session != nullptr ? session->_id : 0ULL, GetId());  // 0xec33: the same id form as line 120.
         return;
     }
-    PacketBuffer const* buffer = p.ListHead;
-    p.ListHead->encrypt(session->_currentCrypt, session->_security3rd);
+    // Inlined Session::Send(Packet const*): 0xec84 keeps the buffer in rbx.
+    PacketBuffer* buffer = p.ListHead;
+    buffer->encrypt(session->_currentCrypt, session->_security3rd);
+    PacketBuffer const* list[1];
+    list[0] = buffer;
     session->_lock.Enter();
-    session->send(&buffer, 1);  // LIFT: inlined send
+    session->send(list, 1);
     session->_lock.Leave();
 }
 

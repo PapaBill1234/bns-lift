@@ -19,11 +19,9 @@ typedef bool (*NPServiceMessageHandler)(NPChannel*, StsMsgLib::_StsMsg*, NPTrans
 class NPMsgHandleEvent : public DynamicEventObject
 {
 public:
-    // LIFT: Inlined in NPServiceChannelManager::HandleMessage (0x10700).
-    NPMsgHandleEvent(NPChannel* channel, StsMsgLib::_StsMsg* msg, NPTransaction* tran, NPServiceMessageHandler handler)
-        : _channel(channel), _msg(msg), _tran(tran), _handler(handler)
-    {
-    }
+    // LIFT: Inlined in NPServiceChannelManager::HandleMessage (0x10700). The body adds the channel reference
+    // (NPServiceChannel.cpp line 141, 0x107c5).
+    NPMsgHandleEvent(NPChannel* channel, StsMsgLib::_StsMsg* msg, NPTransaction* tran, NPServiceMessageHandler handler);
     virtual ~NPMsgHandleEvent();                                   // 0x10230
     virtual unsigned int EventId() const { return 0; }             // LIFT: xor eax, eax at 0x1d7a0
     virtual bool HandleEvent(EventContext* ctx, unsigned long);    // 0x102C0
@@ -53,5 +51,8 @@ static_assert(sizeof(NPServiceChannelManager) == 0x18, "sizeof NPServiceChannelM
 
 void NPServiceChannelCmdDispatcher(unsigned int id, StsMsgLib::ECommand& eCmd);            // 0xFD80
 bool NPHandlerEventNoti(NPChannel* channel, StsMsgLib::_StsMsg* msg, NPTransaction* tran);  // 0xFBC0
+// ❓ Name from the log text "DispatchNPMessageHandler" (NPMessageHandler.cpp line 36). The PDB has no symbol,
+// because the function is inlined in NPServiceChannelManager::HandleMessage (0x10700, PDB line 278).
+NPServiceMessageHandler DispatchNPMessageHandler(StsMsgLib::ECommand cmd);
 
 // LIFT: NPMsgHelper is in NPChannelBase.h. LobbyDaemon.cpp uses it and has its own NPServiceChannelManager.

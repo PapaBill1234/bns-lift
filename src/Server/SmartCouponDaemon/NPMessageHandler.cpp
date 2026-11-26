@@ -43,3 +43,18 @@ bool NPHandlerEventNoti(NPChannel* channel, _StsMsg* msg, NPTransaction* tran)
                reason, res->msgInfo.errInfo.nErrorCode);
     return true;
 }
+
+// ❓ Inlined in NPServiceChannelManager::HandleMessage (0x10700). LIFT: A switch gives the two signed compares at 0x10745. A range test gives lea/ja.
+NPServiceMessageHandler DispatchNPMessageHandler(ECommand cmd)
+{
+    switch (cmd)
+    {
+    case COMMAND_SRV_REWARDBROKER_EVENT_NOTI:
+    case COMMAND_SRV_REWARD_REQUEST_REWARD_FOR_EVENT:
+        return NPHandlerEventNoti;
+    default:
+        Log::Write(Log::LT_ERROR, NPMESSAGEHANDLER_FILE, 36, L"[np], DispatchNPMessageHandler, invalid command, cmd:%d",
+                   cmd);
+        return nullptr;
+    }
+}

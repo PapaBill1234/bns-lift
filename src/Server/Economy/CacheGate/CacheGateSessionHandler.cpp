@@ -112,7 +112,7 @@ bool HandleCacheGateHello(Session const* session, Packet const* packet)
     unsigned long ip = session->_connection->_ip;
     if (packetVersion != 4)
     {
-        session->Send("hE", CacheGate_HelloFailCmd);  // BUG: 0x4C00 the format has an error code, but no error code is given.
+        session->Send("hE", CacheGate_HelloFailCmd, CACHEGATE_HELLOFAIL_INVALID_PACKET_VERSION);
         Log::Write(Log::LT_ERROR, HANDLER_FILE, 31,
                    L"[cg], Hello Recv, Missmatch CurrPacketVersion:%d, RecvPacketVersion:%d, wid:%d, ipAddress:%s",
                    4, packetVersion, wid, Network::GetAddressStringW(ip));
@@ -127,30 +127,35 @@ bool HandleCacheGateHello(Session const* session, Packet const* packet)
         return false;
     }
 
+    // PDB lines 42 to 69: the add path, then the duplicate path, then the hello ok path.
     Session* current = CacheGate::_instance->_clientManager->GetSession(wid);
     if (current == nullptr)
     {
-        if (CacheGate::_instance->_clientManager->AddSession(wid, session))
+        if (!CacheGate::_instance->_clientManager->AddSession(wid, session))
         {
-            session->Send("h", CacheGate_HelloOkCmd);
-            Log::Write(Log::LT_DEBUG, HANDLER_FILE, 68, L"[cg], HelloOK Send, sessionId:0x%.16I64X, wid:%d, ipAddress:%s",
-                       session->_id, wid, Network::GetAddressStringW(ip));
-            return true;
+            current = CacheGate::_instance->_clientManager->GetSession(wid);
+            if (current != nullptr)
+                current->Close(false);
+            session->Send("hE", CacheGate_HelloFailCmd, CACHEGATE_SYSTEM_ERROR);
+            Log::Write(Log::LT_ERROR, HANDLER_FILE, 52, L"[cg], client add session fail, wid:%d, ipAddress:%s", wid,
+                       Network::GetAddressStringW(ip));
+            return false;
         }
-        current = CacheGate::_instance->_clientManager->GetSession(wid);
-        if (current != nullptr)
-            current->Close(false);
-        session->Send("hE", CacheGate_HelloFailCmd);  // BUG: 0x4C00 the format has an error code, but no error code is given.
-        Log::Write(Log::LT_ERROR, HANDLER_FILE, 52, L"[cg], client add session fail, wid:%d, ipAddress:%s", wid,
-                   Network::GetAddressStringW(ip));
+    }
+    else
+    {
+        current->Close(false);
+        session->Send("hE", CacheGate_HelloFailCmd, CACHEGATE_HELLOFAIL_DUPLICATE_SERVER_ID);
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 63,
+                   L"[cg], Hello Recv, Duplicate ServerID:%d, CurrSessionId:0x%.16I64X, NewSessionId:0x%.16I64X", wid,
+                   current->_id, session->_id);
         return false;
     }
-    current->Close(false);
-    session->Send("hE", CacheGate_HelloFailCmd);  // BUG: 0x4C00 the format has an error code, but no error code is given.
-    Log::Write(Log::LT_ERROR, HANDLER_FILE, 63,
-               L"[cg], Hello Recv, Duplicate ServerID:%d, CurrSessionId:0x%.16I64X, NewSessionId:0x%.16I64X", wid,
-               current->_id, session->_id);
-    return false;
+
+    session->Send("h", CacheGate_HelloOkCmd);
+    Log::Write(Log::LT_DEBUG, HANDLER_FILE, 68, L"[cg], HelloOK Send, sessionId:0x%.16I64X, wid:%d, ipAddress:%s",
+               session->_id, wid, Network::GetAddressStringW(ip));
+    return true;
 }
 
 // 0x4f20
