@@ -69,7 +69,9 @@ protected:
 
 public:
     // The const methods change the count. The PDB type is int.
-    mutable long volatile ConnectedSessionCount;
+    // LIFT: PDB type int (not volatile). A volatile member keeps the dead DaemonChannel vftable store in inlined
+    // constructors (CacheGate wmain 0x4180). The Interlocked calls cast the address.
+    mutable int ConnectedSessionCount;
 };
 static_assert(sizeof(DaemonChannel) == 0x10, "sizeof DaemonChannel");
 static_assert(offsetof(DaemonChannel, ConnectedSessionCount) == 0x8, "DaemonChannel::ConnectedSessionCount");

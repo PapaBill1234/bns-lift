@@ -191,7 +191,7 @@ bool DaemonChannel::OnAccept(Session const* session) const
     bool result = const_cast<DaemonChannel*>(this)->onAccept(session);
     if (result)
     {
-        _InterlockedIncrement(&ConnectedSessionCount);
+        _InterlockedIncrement(reinterpret_cast<long volatile*>(&ConnectedSessionCount));
         return true;
     }
     return result;
@@ -203,7 +203,7 @@ bool DaemonChannel::OnConnect(Session const* session, bool firstConnected) const
     bool result = const_cast<DaemonChannel*>(this)->onConnect(session, firstConnected);
     if (result)
     {
-        _InterlockedIncrement(&ConnectedSessionCount);
+        _InterlockedIncrement(reinterpret_cast<long volatile*>(&ConnectedSessionCount));
         return true;
     }
     return result;
@@ -212,7 +212,7 @@ bool DaemonChannel::OnConnect(Session const* session, bool firstConnected) const
 // 0x10910
 void DaemonChannel::OnClose(Session const* session, bool tryReconnect) const
 {
-    bool closeAll = _InterlockedDecrement(&ConnectedSessionCount) <= 0;
+    bool closeAll = _InterlockedDecrement(reinterpret_cast<long volatile*>(&ConnectedSessionCount)) <= 0;
     const_cast<DaemonChannel*>(this)->onClose(session, tryReconnect, closeAll);
 }
 
