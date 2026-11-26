@@ -887,14 +887,15 @@ bool ClientSessionTimerJob::HandleEvent(EventContext* context, unsigned long num
             }
             else if (entry->_cliKey != 0)
             {
-                ClientManager* clientManager = LobbyGate::_instance->_clientManager;
-                Client* client = clientManager->AcquireClient(entry->_cliKey);
+                // LIFT: 0x6fa0 keeps cliKey in a register and reads _instance->_clientManager again for RemoveClient.
+                long long const cliKey = entry->_cliKey;
+                Client* client = LobbyGate::_instance->_clientManager->AcquireClient(cliKey);
                 if (client != nullptr)
                 {
                     Session* session = const_cast<Session*>(client->GetSession());
                     if (session != nullptr)
                     {
-                        clientManager->RemoveClient(entry->_cliKey);
+                        LobbyGate::_instance->_clientManager->RemoveClient(cliKey);
                         session->Close(false);
                         session->removeReferenceCount(CLIENT_FILE, 1179);
                     }

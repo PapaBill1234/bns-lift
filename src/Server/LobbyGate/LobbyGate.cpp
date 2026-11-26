@@ -9,6 +9,7 @@
 #include <time.h>
 #include <wchar.h>
 #include <new>
+#include <crt_cpp_overload.h>  // The Wine headers do not have swprintf_s<N>. VS2010 has it.
 
 #include "AlertSender.h"
 #include "BnsCommonConfigDefinition.h"
@@ -107,17 +108,24 @@ void LobbyGateReloadInvalidRestoreTimer::restoreInvalid()
         if (pipeConsole == nullptr)
             continue;
         // Inlined PipeConsole::SetInvalidInfo(reason, false).
+        // LIFT: 0x127a0 the loop end goes to Leave with no null test. Only the match path tests the node
+        // (`test r10, r10`). Same form as CacheD::Initialize (CacheGate 0x2430).
         pipeConsole->_lock.Enter();
-        for (PipeConsole::ItemNode* node = pipeConsole->_invalid._head._next; node != &pipeConsole->_invalid._tail;
-             node = node->_next)
+        PipeConsole::ItemNode* node = nullptr;
+        for (PipeConsole::ItemNode* item = pipeConsole->_invalid._head._next; item != &pipeConsole->_invalid._tail;
+             item = item->_next)
         {
-            if (wcscmp(node->_key, reason) == 0)
+            if (wcscmp(item->_key, reason) == 0)
             {
-                node->_next->_prev = node->_prev;
-                node->_prev->_next = node->_next;
-                Memory::_Manager[2]->Free(node, L"source\\PipeConsole.cpp", 837);  // 0x12876: r8 = L"source\\PipeConsole.cpp", r9d = 837.
+                node = item;
                 break;
             }
+        }
+        if (node != nullptr)
+        {
+            node->_next->_prev = node->_prev;
+            node->_prev->_next = node->_next;
+            Memory::_Manager[2]->Free(node, L"source\\PipeConsole.cpp", 837);  // 0x12876: r8 = L"source\\PipeConsole.cpp", r9d = 837.
         }
         pipeConsole->_lock.Leave();
     }
@@ -199,25 +207,18 @@ void LobbyGate::PrintDependency()
 // 0x12bf0
 void LobbyGate::AddJobTimer(unsigned long long gateKey, char reason)
 {
-    if (_config->_closeTimeout <= 0)
-        return;
-    void* const mem = Memory::_Manager[2]->Alloc(sizeof(ClientSessionTimerJob), kFile, 171);
-    ClientSessionTimerJob* timer = nullptr;
-    if (mem != nullptr)
+    // LIFT: 0x12bf0 one exit path (the original has no early return). The PDB ctor sets _key and _timerReason.
+    if (_config->_closeTimeout > 0)
     {
-        timer = new (mem) ClientSessionTimerJob();
-        timer->StartTick = 0;
-        timer->next = nullptr;
-        timer->prev = nullptr;
-        timer->SlotIndex = -1;
-        timer->InLtq = false;
-        timer->_timerReason = static_cast<ClientSessionTimerJob::TimerReason>(reason);
-        timer->_key = gateKey;
-    }
-    if (!AddTimer(_config->_closeTimeout, timer))
-    {
-        // BUG: 0x12bf0 timer is not checked for null.
-        timer->removeReferenceCount(kFile, 173);
+        void* const mem = Memory::_Manager[2]->Alloc(sizeof(ClientSessionTimerJob), kFile, 171);
+        ClientSessionTimerJob* const timer =
+            mem != nullptr ? new (mem) ClientSessionTimerJob(gateKey, static_cast<ClientSessionTimerJob::TimerReason>(reason))
+                           : nullptr;
+        if (!AddTimer(_config->_closeTimeout, timer))
+        {
+            // BUG: 0x12bf0 timer is not checked for null.
+            timer->removeReferenceCount(kFile, 173);
+        }
     }
 }
 
@@ -511,7 +512,8 @@ bool LobbyGate::reload(wchar_t** argv, int argc)
     SYSTEMTIME tm;
     wchar_t timeStr[128];
     GetLocalTime(&tm);
-    swprintf_s(timeStr, 128, L" at %04d-%02d-%02d %02d:%02d:%02d", tm.wYear, tm.wMonth, tm.wDay, tm.wHour, tm.wMinute,
+    // LIFT: 0x13770 calls the template swprintf_s<128> (2-argument form with an array destination).
+    swprintf_s(timeStr, L" at %04d-%02d-%02d %02d:%02d:%02d", tm.wYear, tm.wMonth, tm.wDay, tm.wHour, tm.wMinute,
                tm.wSecond);
 
     bool isChanged = false;
@@ -539,17 +541,24 @@ bool LobbyGate::reload(wchar_t** argv, int argc)
         if (pc != nullptr)
         {
             // Inlined PipeConsole::SetRunningInfo(L"bns common config reload succeed", nullptr).
+            // LIFT: 0x13770 inline `repe cmpsw` with count 33 against the literal is wcscmp (lessons). Only the
+            // match path tests the node for null (null-tested find form).
             pc->_lock.Enter();
-            for (PipeConsole::ItemNode* node = pc->_running._head._next; node != &pc->_running._tail;
-                 node = node->_next)
+            PipeConsole::ItemNode* node = nullptr;
+            for (PipeConsole::ItemNode* item = pc->_running._head._next; item != &pc->_running._tail;
+                 item = item->_next)
             {
-                if (wcsncmp(node->_key, L"bns common config reload succeed", 33) == 0)
+                if (wcscmp(item->_key, L"bns common config reload succeed") == 0)
                 {
-                    node->_next->_prev = node->_prev;
-                    node->_prev->_next = node->_next;
-                    Memory::_Manager[2]->Free(node, L"source\\PipeConsole.cpp", 837);  // 0x13940: r8 = L"source\\PipeConsole.cpp", r9d = 837.
+                    node = item;
                     break;
                 }
+            }
+            if (node != nullptr)
+            {
+                node->_next->_prev = node->_prev;
+                node->_prev->_next = node->_next;
+                Memory::_Manager[2]->Free(node, L"source\\PipeConsole.cpp", 837);  // 0x13940: r8 = L"source\\PipeConsole.cpp", r9d = 837.
             }
             pc->_lock.Leave();
         }
@@ -561,10 +570,17 @@ bool LobbyGate::reload(wchar_t** argv, int argc)
         {
             // Inlined PipeConsole::SetInvalidInfo(reason, true).
             pc->_lock.Enter();
-            PipeConsole::ItemNode* node = pc->_invalid._head._next;
-            while (node != &pc->_invalid._tail && wcscmp(node->_key, reason) != 0)
-                node = node->_next;
-            if (node == &pc->_invalid._tail)
+            PipeConsole::ItemNode* node = nullptr;
+            for (PipeConsole::ItemNode* item = pc->_invalid._head._next; item != &pc->_invalid._tail;
+                 item = item->_next)
+            {
+                if (wcscmp(item->_key, reason) == 0)
+                {
+                    node = item;
+                    break;
+                }
+            }
+            if (node == nullptr)
                 PipeConsole::addNode(pc->_invalid, reason, L"");  // 0x139d6: valueString (0x1400627d8) is L"".
             pc->_lock.Leave();
         }

@@ -176,7 +176,15 @@ bool HandleLobbyGate_HelloReq(Session* session, Packet* packet)
         return false;
     }
 
-    Packet reply = {};  // LIFT: inlined constructor
+    // LIFT: 0x14470 inlined constructor (separate stores, no memset). The destructor clears the packet on each
+    // exit (one Packet::Clear call per exit in the original), so there is no explicit Clear call.
+    Packet reply;
+    reply.Splitter = nullptr;
+    reply.IsFragmentPacket = false;
+    reply.FragmentPacketCmd = 0;
+    reply.CurHeader = nullptr;
+    reply.ListHead = nullptr;
+    reply.ListTail = nullptr;
     reply.Allocate();
     reply.Compose("hb", 2, 0);  // 0x145bc: r9d = 0. The binary also writes r12 to the 5th slot. "hb" does not read it.
     if (handshakeDataSize <= 0)
@@ -184,7 +192,6 @@ bool HandleLobbyGate_HelloReq(Session* session, Packet* packet)
         Log::Write(Log::LT_ERROR, HANDLER_FILE, 87, L"[lobbygate], Session(%I64X), helloreq, Invalid handshake data",
                    session->_id);
         session->FailHandshake();
-        reply.Clear();
         return false;
     }
     unsigned char* body = reinterpret_cast<unsigned char*>(const_cast<char*>(reply.GetFreeBody()));
@@ -195,7 +202,6 @@ bool HandleLobbyGate_HelloReq(Session* session, Packet* packet)
         Log::Write(Log::LT_ERROR, HANDLER_FILE, 103, L"[lobbygate], Session(%I64X), helloreq, SetHandshakeParameter fail",
                    session->_id);
         session->FailHandshake();
-        reply.Clear();
         return false;
     }
     reinterpret_cast<short*>(body)[-1] = static_cast<short>(bufferSize);
@@ -208,7 +214,6 @@ bool HandleLobbyGate_HelloReq(Session* session, Packet* packet)
     session->_lock.Leave();
     if (session->_cryptMode == 3)
         session->completeHandshake();
-    reply.Clear();
     return true;
 }
 

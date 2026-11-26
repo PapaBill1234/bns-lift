@@ -177,6 +177,8 @@ public:
         TR_MAX = 4,
     };
 
+    // PDB ClientSessionTimerJob(unsigned long long, TimerReason). Inlined in LobbyGate::AddJobTimer (0x12bf0).
+    ClientSessionTimerJob(unsigned long long key, TimerReason reason) : _key(key), _timerReason(reason) {}
     virtual ~ClientSessionTimerJob();                                    // 0x13bb0 (folded with Timer)
     virtual unsigned int TimerClass() const;                             // later card
     virtual unsigned long long TimerId() const;                          // 0x27fc0 (LobbyGate.obj, later card)
