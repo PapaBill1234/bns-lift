@@ -22,10 +22,10 @@
 "status": "EXCLUDED"
 },
 "AbandonChargeJob::requestChargeAbandon": {
-"calls": 33,
-"consts": 50,
-"refs": 40,
-"score": 41.1,
+"calls": 95,
+"consts": 94,
+"refs": 91,
+"score": 93.3,
 "status": "DIFF"
 },
 "AbandonChargeJob::work": {
@@ -33,6 +33,13 @@
 "consts": 100,
 "refs": 100,
 "score": 83.3,
+"status": "DIFF"
+},
+"AccountInventoryChannel::Connect": {
+"calls": 0,
+"consts": 0,
+"refs": 0,
+"score": 0.0,
 "status": "DIFF"
 },
 "AccountInventoryChannel::SendConsumeWarehouseItemReq": {
@@ -2591,10 +2598,10 @@
 "status": "DIFF"
 },
 "HandleLobbyGame_NPPresenceKickReq": {
-"calls": 62,
-"consts": 67,
-"refs": 69,
-"score": 65.8,
+"calls": 85,
+"consts": 100,
+"refs": 93,
+"score": 92.6,
 "status": "DIFF"
 },
 "HandleLobbyGame_RenameCharacterFail": {
@@ -3407,7 +3414,21 @@
 "score": 100.0,
 "status": "EXCLUDED"
 },
+"LobbyDaemon::onStart": {
+"calls": 83,
+"consts": 93,
+"refs": 96,
+"score": 90.4,
+"status": "DIFF"
+},
 "LobbyDaemon::setArgument": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyDaemon::startNPChannel": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -4026,13 +4047,6 @@
 "score": 100.0,
 "status": "MATCH"
 },
-"LobbyToken::Expire": {
-"calls": 0,
-"consts": 0,
-"refs": 0,
-"score": 0.0,
-"status": "DIFF"
-},
 "LobbyToken::LobbyToken": {
 "calls": 100,
 "consts": 100,
@@ -4415,6 +4429,20 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"NPChannel::Connect": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"NPChannel::Initialize": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "NPChannel::SendMsg": {
 "calls": 76,
 "consts": 85,
@@ -4429,12 +4457,71 @@
 "score": 100.0,
 "status": "MATCH"
 },
-"NPGameServiceChannel::SendRequestFriendSendMessage": {
-"calls": 76,
-"consts": 88,
-"refs": 86,
-"score": 83.2,
+"NPChannel::~NPChannel": {
+"calls": 100,
+"consts": 100,
+"refs": 83,
+"score": 94.4,
 "status": "DIFF"
+},
+"NPGameServiceChannel::SendRequestChargeAbandon": {
+"calls": 100,
+"consts": 80,
+"refs": 100,
+"score": 93.3,
+"status": "DIFF"
+},
+"NPGameServiceChannel::SendRequestChargeGetInfo": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"NPGameServiceChannel::SendRequestChargeStart": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"NPGameServiceChannel::SendRequestChargeStop": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"NPGameServiceChannel::SendRequestFriendSendMessage": {
+"calls": 74,
+"consts": 42,
+"refs": 36,
+"score": 50.7,
+"status": "DIFF"
+},
+"NPGameServiceChannel::SendRequestPresenceKick": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"NPGameServiceChannel::SendRequestSlotGetSlot": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"NPGameServiceChannelCmdDispatcher": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "NPLobbyJobTransaction::Expire": {
 "calls": 100,
@@ -4450,7 +4537,78 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"NPPing::HandleEvent": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"NPPing::TimerClass": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"NPPing::TimerId": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"NPServiceChannelManager::HandleMessage": {
+"calls": 25,
+"consts": 50,
+"refs": 0,
+"score": 25.0,
+"status": "DIFF"
+},
+"NPServiceChannelManager::Initialize": {
+"calls": 100,
+"consts": 100,
+"refs": 96,
+"score": 98.8,
+"status": "DIFF"
+},
+"NPServiceChannelManager::OnClose": {
+"calls": 100,
+"consts": 100,
+"refs": 95,
+"score": 98.2,
+"status": "DIFF"
+},
+"NPServiceChannelManager::OnConnect": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"NPTransactionRegistry::Find": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"NPTransactionRegistry::NPTransactionRegistry": {
+"calls": 100,
+"consts": 100,
+"refs": 67,
+"score": 88.9,
+"status": "DIFF"
+},
 "NPTransactionRegistry::Register": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"NPTransactionRegistry::ReleaseAll": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -4472,6 +4630,13 @@
 "status": "DIFF"
 },
 "Network::Network": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Network::OpenPort [?OpenPort@Network@@SA_NI@Z]": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -4535,6 +4700,13 @@
 "refs": 100,
 "score": 100.0,
 "status": "EXCLUDED"
+},
+"ObjPoolTimer::Start": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Packet::Add": {
 "calls": 100,
@@ -5929,10 +6101,10 @@
 "status": "EXCLUDED"
 },
 "StartChargeJob::requestStartCharge": {
-"calls": 33,
-"consts": 60,
-"refs": 55,
-"score": 49.3,
+"calls": 100,
+"consts": 92,
+"refs": 100,
+"score": 97.4,
 "status": "DIFF"
 },
 "StartChargeJob::responseStartCharge": {
@@ -6049,10 +6221,10 @@
 "status": "DIFF"
 },
 "StopChargeJob::requestChargeStop": {
-"calls": 36,
-"consts": 55,
-"refs": 46,
-"score": 45.7,
+"calls": 94,
+"consts": 86,
+"refs": 89,
+"score": 89.6,
 "status": "DIFF"
 },
 "StopChargeJob::responseChargeStop": {
@@ -6560,17 +6732,17 @@
 "status": "DIFF"
 },
 "TryEnterGameWorldJob::requestChargeGetInfo": {
-"calls": 56,
-"consts": 74,
-"refs": 60,
-"score": 63.1,
+"calls": 96,
+"consts": 91,
+"refs": 92,
+"score": 93.1,
 "status": "DIFF"
 },
 "TryEnterGameWorldJob::requestGetSlot": {
-"calls": 56,
-"consts": 74,
-"refs": 60,
-"score": 63.1,
+"calls": 96,
+"consts": 96,
+"refs": 92,
+"score": 94.7,
 "status": "DIFF"
 },
 "TryEnterGameWorldJob::responseGetSlot": {
