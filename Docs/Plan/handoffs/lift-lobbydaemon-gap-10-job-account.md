@@ -50,9 +50,9 @@ Not done:
 | --- | --- |
 | NOREF build `fe2fb70` (`g10/builds/main/noref-build-Dchmnihz`) | 1246 paired, 999 MATCH (base 1205 / 973), lost 0 |
 | REF build `fe2fb70` (`g10/builds/main/main-build-XrDjmXOZ`) | 841 paired, 674 MATCH (no change) |
-| `pilot.py gate` (35 IDs, `/data/parity-v2/gap/gate-gap10.json`) | 35 of 35 clear (before: 0 of 35); eligible pool 264 -> 301 |
+| `pilot.py gate` (35 IDs) | 35 of 35 clear (before: 0 of 35); eligible pool 264 -> 301 |
 | `gate_fast.sh` on a fresh clone of `fe2fb70` | rc 0, "parity ok"; REF MATCH per exe unchanged |
-| strict (cfg), `/data/parity-v2/gap/full-10-strict` vs `base-06/strict` | no regress; LobbyGate cfg 515 -> 516; LobbyDaemon cc 515 -> 517, cfg 594 -> 596 |
+| strict (cfg), card build vs base build | no regress; LobbyGate cfg 515 -> 516; LobbyDaemon cc 515 -> 517, cfg 594 -> 596 |
 | `proof.py --base e68e5d0 --candidate fe2fb70` | pass; lost 0, strict_regress 0, cfg_regress 0, reasons 0, review 0; `integrate.check_proof` dry run PASS |
 
 ## Card IDs that DIFF (NOREF)
