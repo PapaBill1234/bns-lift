@@ -658,12 +658,26 @@
 "score": 76.7,
 "status": "DIFF"
 },
+"Character::FinishRestore": {
+"calls": 89,
+"consts": 93,
+"refs": 77,
+"score": 86.4,
+"status": "DIFF"
+},
 "Character::GetClientState": {
 "calls": 100,
 "consts": 67,
 "refs": 100,
 "score": 88.9,
 "status": "DIFF"
+},
+"Character::IsPlayable": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Character::SetLevel": {
 "calls": 100,
@@ -2411,8 +2425,8 @@
 "HandleLobbyGame_AbandonChargeNotify": {
 "calls": 100,
 "consts": 97,
-"refs": 98,
-"score": 98.2,
+"refs": 100,
+"score": 99.0,
 "status": "DIFF"
 },
 "HandleLobbyGame_CancelRegisterGuildNotify": {
@@ -2516,8 +2530,8 @@
 "HandleLobbyGame_ExtendJumpingCharacterCreationQuotaWithAccountInventoryItemReq": {
 "calls": 97,
 "consts": 100,
-"refs": 95,
-"score": 97.5,
+"refs": 98,
+"score": 98.3,
 "status": "DIFF"
 },
 "HandleLobbyGame_FinishRegisterGuildNotify": {
@@ -2565,15 +2579,15 @@
 "HandleLobbyGame_LeaveWorldReq": {
 "calls": 100,
 "consts": 97,
-"refs": 98,
-"score": 98.3,
+"refs": 100,
+"score": 99.1,
 "status": "DIFF"
 },
 "HandleLobbyGame_LogoutNotify": {
 "calls": 100,
 "consts": 97,
-"refs": 98,
-"score": 98.1,
+"refs": 100,
+"score": 98.9,
 "status": "DIFF"
 },
 "HandleLobbyGame_NPPresenceKickReq": {
@@ -2614,16 +2628,18 @@
 "HandleLobbyGame_SecondPasswordGetStatusReq": {
 "calls": 100,
 "consts": 100,
-"refs": 98,
-"score": 99.2,
-"status": "DIFF"
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
 },
 "HandleLobbyGame_SecondPasswordIsVerifiedReq": {
 "calls": 100,
 "consts": 100,
-"refs": 98,
-"score": 99.2,
-"status": "DIFF"
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
 },
 "HandleLobbyGame_ServiceOpenNotify": {
 "calls": 100,
@@ -2642,15 +2658,15 @@
 "HandleLobbyGame_StartChargeReq": {
 "calls": 100,
 "consts": 97,
-"refs": 98,
-"score": 98.3,
+"refs": 100,
+"score": 99.0,
 "status": "DIFF"
 },
 "HandleLobbyGame_StopChargeReq": {
 "calls": 100,
 "consts": 97,
-"refs": 98,
-"score": 98.3,
+"refs": 100,
+"score": 99.1,
 "status": "DIFF"
 },
 "HandleLobbyGame_TryRegisterGuildReq": {
@@ -2691,15 +2707,15 @@
 "HandleLobbyGame_UpdateJumpingCharacterStateReq": {
 "calls": 97,
 "consts": 100,
-"refs": 95,
-"score": 97.5,
+"refs": 98,
+"score": 98.3,
 "status": "DIFF"
 },
 "HandleLobbyGame_UpgradeJumpingCharacterStateWithCreationQuotaReq": {
 "calls": 97,
 "consts": 100,
-"refs": 95,
-"score": 97.5,
+"refs": 98,
+"score": 98.3,
 "status": "DIFF"
 },
 "HandleLobbyInfoGate_AuthTokenReq": {
@@ -2743,6 +2759,13 @@
 "refs": 97,
 "score": 96.5,
 "status": "DIFF"
+},
+"HandleLobbyLobbyGate_GetEnterWorldTokenReq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "HandleLobbyLobbyGate_GetServiceEntryListReq": {
 "calls": 69,
@@ -3835,6 +3858,20 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"LobbyJobTransaction::Expire": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyJobTransaction::GetTid": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "LobbyLocale::GetLanguageTypeOfChar": {
 "calls": 100,
 "consts": 98,
@@ -4484,12 +4521,20 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"ObjPool::Checkin": {
+"calls": 100,
+"consts": 100,
+"refs": 53,
+"score": 84.4,
+"status": "DIFF"
+},
 "ObjPool::Checkout": {
 "calls": 100,
 "consts": 100,
-"refs": 80,
-"score": 93.3,
-"status": "DIFF"
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
 },
 "Packet::Add": {
 "calls": 100,
@@ -6375,6 +6420,13 @@
 "score": 93.0,
 "status": "DIFF"
 },
+"TransactionChannel::Manager::remove": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "TransactionChannel::TSend": {
 "calls": 0,
 "consts": 0,
@@ -6418,6 +6470,159 @@
 "refs": 100,
 "score": 100.0,
 "status": "EXCLUDED"
+},
+"TryEnterGameWorldJob::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TryEnterGameWorldJob::Initialize": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TryEnterGameWorldJob::TryEnterGameWorldJob": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TryEnterGameWorldJob::checkSecondPasswordStatus": {
+"calls": 100,
+"consts": 96,
+"refs": 100,
+"score": 98.6,
+"status": "DIFF"
+},
+"TryEnterGameWorldJob::checkSecondPasswordStatusExpire": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"TryEnterGameWorldJob::checkSecondPasswordStatusResponse": {
+"calls": 88,
+"consts": 100,
+"refs": 100,
+"score": 96.1,
+"status": "DIFF"
+},
+"TryEnterGameWorldJob::checkSecondPasswordVerified": {
+"calls": 100,
+"consts": 96,
+"refs": 100,
+"score": 98.6,
+"status": "DIFF"
+},
+"TryEnterGameWorldJob::checkSecondPasswordVerifiedExpire": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"TryEnterGameWorldJob::checkSecondPasswordVerifiedResponse": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"TryEnterGameWorldJob::deallocate_me": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
+"TryEnterGameWorldJob::expireGetSlot": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"TryEnterGameWorldJob::init": {
+"calls": 90,
+"consts": 100,
+"refs": 100,
+"score": 96.6,
+"status": "DIFF"
+},
+"TryEnterGameWorldJob::requestChargeGetInfo": {
+"calls": 56,
+"consts": 74,
+"refs": 60,
+"score": 63.1,
+"status": "DIFF"
+},
+"TryEnterGameWorldJob::requestGetSlot": {
+"calls": 56,
+"consts": 74,
+"refs": 60,
+"score": 63.1,
+"status": "DIFF"
+},
+"TryEnterGameWorldJob::responseGetSlot": {
+"calls": 87,
+"consts": 100,
+"refs": 100,
+"score": 95.7,
+"status": "DIFF"
+},
+"TryEnterGameWorldJob::restorePcExpired": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TryEnterGameWorldJob::restorePcFail": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"TryEnterGameWorldJob::restorePcOk": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"TryEnterGameWorldJob::restorePcReq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TryEnterGameWorldJob::work": {
+"calls": 79,
+"consts": 100,
+"refs": 100,
+"score": 93.0,
+"status": "DIFF"
+},
+"TryEnterGameWorldJob::~TryEnterGameWorldJob": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "WaitQueue::Remove": {
 "calls": 100,
