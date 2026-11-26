@@ -97,6 +97,29 @@ __forceinline PostContext* MakePostContext(PostInfo const& postInfo, AttachedIte
 }
 }  // namespace
 
+// LIFT: no PDB name. The DbTransaction::BindCol body (Db.cpp:286, POD 0x2d010) inlined at the 17 post column binds.
+// The original then merges the 17 statmentErrorLog tails and the 17 "Not initialized" logs into one site each (0x15fa0).
+__forceinline bool BindColInline(DbTransaction* const tran, unsigned int index, void* buffer, long long bufferSize,
+                                 unsigned int varType, unsigned long long* result)
+{
+    if (tran->StmtHandle == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, L"source\\Db.cpp", 286, L"DbTransaction::BindCol(), Not initialized");
+        return false;
+    }
+    *result = static_cast<unsigned long long>(SQL_NTS);
+    SQLRETURN const bindRet = SQLBindCol(tran->StmtHandle, static_cast<SQLUSMALLINT>(index),
+                                         static_cast<SQLSMALLINT>(varType), buffer, bufferSize,
+                                         reinterpret_cast<SQLLEN*>(result));
+    if (SQL_SUCCESS == bindRet || SQL_SUCCESS_WITH_INFO == bindRet)
+    {
+        tran->BoundCol = true;
+        return true;
+    }
+    tran->statmentErrorLog(L"SQLBindCol(%d, %d, %d, %p, %p)", index, varType, buffer, bufferSize, result);
+    return false;
+}
+
 // LIFT: bind macros, no PDB name. The loaders zero the length arrays after Prepare, set SQL_NTS for the text columns,
 // and bind the 17 post columns inline (DB_BIND_COL_NI). The 70 item columns use DbTransaction::BindCol (0x14e50).
 #define POST_ZERO_ROW()                                                  \
@@ -114,8 +137,9 @@ __forceinline PostContext* MakePostContext(PostInfo const& postInfo, AttachedIte
     for (int i = 0; i < kMaxAttachedItem; ++i) \
     ZeroItem(attachedItemInfo[i])
 
-#define POST_BIND(index, buffer, bufferSize, varType) \
-    DB_BIND_COL_NI(t, index, buffer, bufferSize, varType, &postLen[(index) - 1], NOT_INIT, BIND_ERROR)
+#define POST_BIND(index, buffer, bufferSize, varType)                                \
+    if (!BindColInline(t, index, buffer, bufferSize, varType, &postLen[(index) - 1])) \
+    goto BIND_ERROR
 
 #define POST_BIND_COLUMNS()                                                                                \
     POST_BIND(1, &postInfo._postId, 0, SQL_C_SBIGINT);                                                     \
@@ -156,8 +180,6 @@ __forceinline PostContext* MakePostContext(PostInfo const& postInfo, AttachedIte
     }
 
 #define POST_BIND_TAIL(bindLine)                                                                       \
-NOT_INIT:                                                                                              \
-    Log::Write(Log::LT_ERROR, L"source\\Db.cpp", 286, L"DbTransaction::BindCol(), Not initialized"); \
 BIND_ERROR:                                                                                            \
     Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, bindLine, FAIL_BIND, MODULE_NAME, fn);                \
     return false
@@ -301,7 +323,6 @@ bool PostOfficeDB::LoadSinglePost(int* dbRetValue, long long postId)
         return false;
     }
     {
-        ClearRow(postInfo, attachedItemInfo);
         int const result = t->Fetch(0);  // LIFT: folded. edx is not set at the call. Fetch 0x2d350 does not read it.
         if (result == -1)
         {
@@ -554,7 +575,6 @@ bool PostOfficeDB::LoadRetryReadySinglePost(int* dbRetValue, long long postId, l
         return false;
     }
     {
-        ClearRow(postInfo, attachedItemInfo);
         int const result = t->Fetch(0);  // LIFT: folded. edx is not set at the call. Fetch 0x2d350 does not read it.
         if (result == -1)
         {
@@ -573,24 +593,27 @@ bool PostOfficeDB::LoadRetryReadySinglePost(int* dbRetValue, long long postId, l
             return false;
 
         PostContext* const postContext = MakePostContext(postInfo, attachedItemInfo, itemLen, 590, 602);
-        PostOfficeDaemon* const daemon = PostOfficeDaemon::_instance;
-        if (!daemon->_postContextManager->AddContext(postContext))
+        // LIFT: 0x18010 reads PostOfficeDaemon::_instance once for AddContext and once for the register and remove calls; the failed register block comes first.
+        if (!PostOfficeDaemon::_instance->_postContextManager->AddContext(postContext))
         {
             Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 608, FAIL_ADD_EXISTS, MODULE_NAME, fn, postInfo._postId);
             postContext->removeReferenceCount(POSTOFFICEDB_FILE, 609);
             return false;
         }
         postContext->removeReferenceCount(POSTOFFICEDB_FILE, 613);
-        if (daemon->_unsentPostContextManager->RegisterUnsentPost(postInfo._recipientWid, postInfo._postId, true))
-            return true;
-        Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 616, FAIL_REGISTER_UNSENT, MODULE_NAME, fn,
-                   static_cast<unsigned int>(postInfo._recipientWid), postInfo._postId);
-        if (!daemon->_postContextManager->RemoveContext(postInfo._postId))
+        PostOfficeDaemon* const daemon = PostOfficeDaemon::_instance;
+        if (!daemon->_unsentPostContextManager->RegisterUnsentPost(postInfo._recipientWid, postInfo._postId, true))
         {
-            Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 619, FAIL_REMOVE_CRASH, MODULE_NAME, fn, postInfo._postId);
-            AlertSender::Write(POSTOFFICEDB_FILE, 619, FAIL_REMOVE_CRASH, MODULE_NAME, fn, postInfo._postId);
+            Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 616, FAIL_REGISTER_UNSENT, MODULE_NAME, fn,
+                       static_cast<unsigned int>(postInfo._recipientWid), postInfo._postId);
+            if (!daemon->_postContextManager->RemoveContext(postInfo._postId))
+            {
+                Log::Write(Log::LT_ERROR, POSTOFFICEDB_FILE, 619, FAIL_REMOVE_CRASH, MODULE_NAME, fn, postInfo._postId);
+                AlertSender::Write(POSTOFFICEDB_FILE, 619, FAIL_REMOVE_CRASH, MODULE_NAME, fn, postInfo._postId);
+            }
+            return false;
         }
-        return false;
+        return true;
     }
 
     POST_BIND_TAIL(628);
