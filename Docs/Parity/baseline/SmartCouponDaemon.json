@@ -189,10 +189,10 @@
 "status": "MATCH"
 },
 "BigInteger::Divide": {
-"calls": 75,
-"consts": 89,
+"calls": 94,
+"consts": 92,
 "refs": 67,
-"score": 76.7,
+"score": 84.4,
 "status": "DIFF"
 },
 "BigInteger::InvMod": {

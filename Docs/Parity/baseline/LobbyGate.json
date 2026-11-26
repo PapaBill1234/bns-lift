@@ -189,10 +189,10 @@
 "status": "MATCH"
 },
 "BigInteger::Divide [?Divide@BigInteger@@SAXPEBV1@0PEAV1@1@Z]": {
-"calls": 75,
-"consts": 89,
+"calls": 94,
+"consts": 92,
 "refs": 67,
-"score": 76.7,
+"score": 84.4,
 "status": "DIFF"
 },
 "BigInteger::Divide [?Divide@BigInteger@@SAXPEBV1@IPEAV1@PEAI@Z]": {
@@ -218,10 +218,10 @@
 },
 "BigInteger::IsPrime": {
 "calls": 100,
-"consts": 67,
-"refs": 80,
-"score": 82.2,
-"status": "DIFF"
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "BigInteger::LeftShift": {
 "calls": 100,
