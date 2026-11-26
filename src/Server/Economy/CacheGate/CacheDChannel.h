@@ -9,15 +9,8 @@ class Packet;
 class CacheDChannel : public ClientSideDaemonChannel
 {
 public:
-    // LIFT: The constructor is inlined in wmain (0x4180). It sets the fields to 0.
-    CacheDChannel()
-    {
-        PortId = 0;
-        ServerIp = 0;
-        ServerPort = 0;
-        SessionSize = 0;
-        session = nullptr;
-    }
+    // LIFT: The constructor is inlined in wmain (0x4180). The ClientSideDaemonChannel constructor sets the fields to 0.
+    CacheDChannel() {}
     virtual ~CacheDChannel();                                                    // 0x3C70
     virtual bool PacketHandler(Session const* session, Packet const* packet) const;  // 0x4150
 

@@ -77,6 +77,9 @@ static_assert(offsetof(DaemonChannel, ConnectedSessionCount) == 0x8, "DaemonChan
 class ClientSideDaemonChannel : public DaemonChannel
 {
 public:
+    // LIFT: inlined in CacheGate wmain (0x4180). The original stores all 6 fields before the CacheDChannel vftable,
+    // so the base constructor sets them (the compiler then drops the base vftable stores).
+    ClientSideDaemonChannel() : PortId(0), ServerIp(0), ServerPort(0), SessionSize(0), session(nullptr) {}
     virtual ~ClientSideDaemonChannel();                  // 0x10950
 
 protected:
