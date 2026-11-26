@@ -43,7 +43,7 @@ public:
     unsigned short Compose(char const* format, ...);
     void AddSize(short size);
     unsigned short Decompose(char const* format, ...) const;
-    unsigned short Decompose(int offset, int n, char const* format, ...) const; // 0x220D0 (PostOfficeDaemon)
+    unsigned short Decompose(unsigned int offset, int n, char const* format, ...) const; // 0x220D0 (PostOfficeDaemon)
     unsigned short ComposeText(char const* format, ...);         // 0x21EB0 (PostOfficeDaemon)
     unsigned short DecomposeText(char const* format, ...) const; // 0x22220 (PostOfficeDaemon)
     char const* Allocate(PacketComposer* pcr);
@@ -54,7 +54,7 @@ public:
     void Encrypt(PacketCrypt* crypt);
     void Finalize(PacketCrypt* crypt);
     void Concatenate(Packet const* packet, PacketConcatenateHandler const* concatHandler);           // 0x7300 (CacheGate)
-    void Concatenate(char const* buffer, unsigned short size, PacketConcatenateHandler const* concatHandler);  // 0x7470 (CacheGate)
+    void Concatenate(char const* buffer, short size, PacketConcatenateHandler const* concatHandler);           // 0x7470 (CacheGate), PDB size is short
     unsigned short Decompose(PacketDecomposer* pdr, int n, ...) const;                                // 0x75B0 (CacheGate)
     unsigned short Decompose(PacketDecomposer* pdr, VarStr* str) const;                               // 0xde970 (LobbyDaemon)
     unsigned short Decompose(PacketDecomposer* pdr, VarData* data) const;                             // 0xdeab0 (LobbyDaemon)

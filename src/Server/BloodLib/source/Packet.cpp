@@ -128,7 +128,7 @@ __declspec(noinline) unsigned short Packet::Decompose(char const* format, ...) c
 
 // 0x220D0 (PostOfficeDaemon)
 // LIFT: noinline. The orig calls it out of line from the CacheEconomyPacketHandler handlers.
-__declspec(noinline) unsigned short Packet::Decompose(int offset, int n, char const* format, ...) const
+__declspec(noinline) unsigned short Packet::Decompose(unsigned int offset, int n, char const* format, ...) const
 {
     va_list args;
     va_start(args, format);
@@ -348,11 +348,11 @@ void Packet::Concatenate(Packet const* packet, PacketConcatenateHandler const* c
 }
 
 // 0x7470 (CacheGate)
-void Packet::Concatenate(char const* buffer, unsigned short size, PacketConcatenateHandler const* concatHandler)
+void Packet::Concatenate(char const* buffer, short size, PacketConcatenateHandler const* concatHandler)
 {
     if (buffer == nullptr)
         PACKET_ASSERT_CRASH(440);
-    if (size > 4000)
+    if (size < 0 || size > 4000)  // LIFT: signed tests (CacheGate 0x74de: test si, si; js; cmp 0xfa0; jle)
         PACKET_ASSERT_CRASH(441);
     PacketBuffer* pktbuf = PacketBufferAllocator::_Local->allocate();
     if (ListHead != nullptr)
@@ -361,7 +361,7 @@ void Packet::Concatenate(char const* buffer, unsigned short size, PacketConcaten
         ListHead = pktbuf;
     Header* header = reinterpret_cast<Header*>(&pktbuf->Buffer[8]);
     ListTail = pktbuf;
-    memcpy(&pktbuf->Buffer[8], buffer, static_cast<short>(size));
+    memcpy(&pktbuf->Buffer[8], buffer, size);
     if (CurHeader == nullptr)
         CurHeader = header;
 }
