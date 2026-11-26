@@ -22,7 +22,7 @@ This repo is public. Do not commit binaries, keys, PDBs or IDA databases.
 ## Parity
 
 <!-- parity:start -->
-Last update: card `lift-lobbydaemon-gap-11` (2026-11-26). Tool: `tools/parity.sh` (VS2010 /GL /LTCG build vs original, funcdiff).
+Last update: card `lift-lobbydaemon-gap-09` (2026-11-26). Tool: `tools/parity.sh` (VS2010 /GL /LTCG build vs original, funcdiff).
 
 | Exe | Parity | MATCH | DIFF | Excluded | Only in original | Total | Mean score | Start | Change | Level |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
@@ -30,14 +30,14 @@ Last update: card `lift-lobbydaemon-gap-11` (2026-11-26). Tool: `tools/parity.sh
 | LobbyGate | **89.0 %** | 658 | 78 | 0 | 3 | 739 | 98.9 | 37.9 % | +51.2 | below 90 % |
 | SmartCouponDaemon | **94.2 %** | 630 | 37 | 0 | 2 | 669 | 99.5 | 33.6 % | +60.5 | 90 % ✅ |
 | PostOfficeDaemon | **91.4 %** | 694 | 60 | 0 | 5 | 759 | 99.1 | 34.5 % | +56.9 | 90 % ✅ |
-| LobbyDaemon | **34.7 %** | 764 | 150 | 34 | 1256 | 2204 | 97.1 | 2.2 % | +32.4 | below 90 % |
+| LobbyDaemon | **34.7 %** | 764 | 150 | 35 | 1255 | 2204 | 97.1 | 2.2 % | +32.4 | below 90 % |
 | **First 4** | **91.7 %** | 2438 | | | | 2658 | | 37.0 % | +54.7 | 90 % ✅ |
 
 | Shared library (functions in 2+ exes) | Parity | MATCH in each exe | DIFF in 1+ exe | Total | Goal |
 | --- | ---: | ---: | ---: | ---: | --- |
 | BloodLib, Shared, Packet, CRT | **94.0 %** | 516 | 33 | 549 | 99 % |
 
-First 4 and shared library: CacheGate, LobbyGate, SmartCouponDaemon, PostOfficeDaemon. LobbyDaemon: lift in progress; most functions are still stubs (only in original). Goal: 95 % per exe, 99 % preferred. Shared library: 99 % preferred. MATCH never holds excluded symbols (review rejected, no honest source fix: [Docs/Parity/excluded.tsv](Docs/Parity/excluded.tsv)); they are in the column Excluded (34 now). Rules: [Docs/Parity/README.md](Docs/Parity/README.md). History: [Docs/Parity/progress.tsv](Docs/Parity/progress.tsv).
+First 4 and shared library: CacheGate, LobbyGate, SmartCouponDaemon, PostOfficeDaemon. LobbyDaemon: lift in progress; most functions are still stubs (only in original). Goal: 95 % per exe, 99 % preferred. Shared library: 99 % preferred. MATCH never holds excluded symbols (review rejected, no honest source fix: [Docs/Parity/excluded.tsv](Docs/Parity/excluded.tsv)); they are in the column Excluded (35 now). Rules: [Docs/Parity/README.md](Docs/Parity/README.md). History: [Docs/Parity/progress.tsv](Docs/Parity/progress.tsv).
 
 | Card | CacheGate | LobbyGate | SmartCouponDaemon | PostOfficeDaemon | LobbyDaemon |
 | --- | ---: | ---: | ---: | ---: | ---: |
@@ -112,4 +112,5 @@ First 4 and shared library: CacheGate, LobbyGate, SmartCouponDaemon, PostOfficeD
 | `lift-lobbydaemon-gap-08-job-session` | 92.9 % | 89.0 % | 94.2 % | 91.4 % | 30.9 % |
 | `lift-lobbydaemon-gap-19` | 92.9 % | 89.0 % | 94.2 % | 91.4 % | 33.5 % |
 | `lift-lobbydaemon-gap-11` | 92.9 % | 89.0 % | 94.2 % | 91.4 % | 34.7 % |
+| `lift-lobbydaemon-gap-09` | 92.9 % | 89.0 % | 94.2 % | 91.4 % | 34.7 % |
 <!-- parity:end -->

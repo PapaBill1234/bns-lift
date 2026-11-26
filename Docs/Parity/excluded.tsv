@@ -33,3 +33,4 @@ LobbyDaemon	ZSTD_compressBlock_btopt	review park: bundle over 16k tokens	lift-lo
 LobbyDaemon	ZSTD_compressBlock_btopt_extDict	review park: bundle over 16k tokens	lift-lobbydaemon-gap-11	f966015db27dcf987a30ccdeaaccb4e10bcebb057aca113c39d786400f2f3dee
 LobbyDaemon	ZSTD_compressBlock_btultra	review park: bundle over 16k tokens	lift-lobbydaemon-gap-11	f966015db27dcf987a30ccdeaaccb4e10bcebb057aca113c39d786400f2f3dee
 LobbyDaemon	ZSTD_compressBlock_btultra_extDict	review park: bundle over 16k tokens	lift-lobbydaemon-gap-11	f966015db27dcf987a30ccdeaaccb4e10bcebb057aca113c39d786400f2f3dee
+LobbyDaemon	Character::FetchCharacterInfo [?FetchCharacterInfo@Character@@QEBA_NPEAVFragmentPacket@@@Z]	review reject: precheck: P2_cc {"build": "jne", "index": 6, "original": "je"}	lift-lobbydaemon-gap-09	d4a129a76623bbc5c0135dd10e00c654b3ea4643f360983cf84e8fa17468572c

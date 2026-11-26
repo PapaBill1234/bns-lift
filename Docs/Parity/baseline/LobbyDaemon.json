@@ -601,17 +601,25 @@
 "status": "MATCH"
 },
 "Character::FetchCharacterInfo [?FetchCharacterInfo@Character@@QEBA_NPEAVFragmentPacket@@@Z]": {
-"calls": 97,
+"calls": 100,
 "consts": 100,
+"raw_status": "MATCH",
 "refs": 100,
-"score": 99.0,
-"status": "DIFF"
+"score": 100.0,
+"status": "EXCLUDED"
 },
 "Character::FetchCharacterInfo [?FetchCharacterInfo@Character@@QEBA_NPEAVPacket@@PEAVPacketComposer@@@Z]": {
-"calls": 21,
+"calls": 30,
 "consts": 100,
 "refs": 100,
-"score": 73.7,
+"score": 76.7,
+"status": "DIFF"
+},
+"Character::GetClientState": {
+"calls": 100,
+"consts": 67,
+"refs": 100,
+"score": 88.9,
 "status": "DIFF"
 },
 "Character::SetLevel": {
