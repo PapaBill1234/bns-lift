@@ -322,8 +322,8 @@ bool Client::SendGetCharacterInfoListOk(long long now, short timeZoneBias, Chara
         return false;
 
     FragmentPacket fp(cmd, "hiqhCqohsbqQQi;");
-    fp.Compose(2, now, static_cast<int>(timeZoneBias));
     reserveFragment(fp, 2);
+    fp.Compose(2, now, static_cast<int>(timeZoneBias));
     fp.StartRepeat();
     for (int i = 0; i < characterCount; ++i)
     {
@@ -403,9 +403,9 @@ bool Client::SendTakeGoodsOk(unsigned long long goodsId, LobbyServiceItem const*
         return false;
 
     FragmentPacket fp(cmd, "hiqCqqqiQ;");
+    reserveFragment(fp, 2);
     if (fp.Compose(1, goodsId) == 0)
         return failSend(this, session, fp, cmd, 538, L"[channel], 0x%.16I64X, %I64d, compose goods-id fail, send fail, cmd:%d");
-    reserveFragment(fp, 2);
     fp.StartRepeat();
     for (int i = 0; i < itemCount; ++i)
     {
@@ -431,9 +431,9 @@ bool Client::SendListLobbyServiceItemInfoOk(char searchType, unsigned int search
         return false;
 
     FragmentPacket fp(cmd, "hiQiCqqqiQ;");
+    reserveFragment(fp, 2);
     if (fp.Compose(2, static_cast<int>(searchType), searchCount) == 0)
         return failSend(this, session, fp, cmd, 587, L"[channel], 0x%.16I64X, %I64d, compose fail, cmd:%d");
-    reserveFragment(fp, 2);
     fp.StartRepeat();
     for (int i = 0; i < itemCount; ++i)
     {
@@ -696,6 +696,7 @@ bool ClientSessionHandler::OnConnect(Session const* session, bool firstConnected
 }
 
 // 0x68b0
+#pragma inline_depth(0)
 void ClientSessionHandler::OnClose(Session const* session, bool tryReconnect) const
 {
     Session* s = const_cast<Session*>(session);
@@ -731,7 +732,13 @@ void ClientSessionHandler::OnClose(Session const* session, bool tryReconnect) co
         GateKeyEntry* entry = LobbyGate::_instance->_gatekeyManager->RemoveGateKey(gateKey);
         if (entry != nullptr)
         {
-            entry->~GateKeyEntry();
+            // LIFT: ~GateKeyEntry written out; the orig inlines it at 0x68b0 here and calls 0x3e80 in the anonymous branch.
+            if (entry->_session != nullptr)
+            {
+                entry->_session->removeReferenceCount(CLIENT_FILE, 57);
+                entry->_session = nullptr;
+                entry->_cliKey = 0;
+            }
             Memory::_Manager[2]->Free(entry, CLIENT_FILE, 983);
         }
         client->removeReferenceCount(SESSION_FILE, 1059);
@@ -758,6 +765,7 @@ void ClientSessionHandler::OnClose(Session const* session, bool tryReconnect) co
                    gateKey);
     }
 }
+#pragma inline_depth()
 
 // 0x6b70
 bool ClientSessionHandler::PacketHandler(Session const* session, Packet const* packet) const
