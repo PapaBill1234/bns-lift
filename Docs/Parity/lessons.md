@@ -1298,3 +1298,13 @@ What failed or is blocked:
 Build facts:
 - A new worktree has no ignored `vendor/zstd/src`. All 5 exes then fail with `ZSTD_*` unresolved. Copy it from another worktree (`bb6eaf64`) and run `tools/gate.sh` again.
 - A lifted handler can pull a neighbour into the link and pair it (`CliSessionTable::Select`). On main this neighbour is already MATCH, so the card adds +0 MATCH there.
+
+## lg-5a
+What worked:
+- `OnConnect`/`OnClose` MATCH: an inline `repe cmpsw` against a literal (count = length + 1) is `wcscmp(p, L"literal") == 0`. Do not write the loop by hand.
+- `LobbyD::Hello` MATCH: two Leave calls in the original mean one Leave in each branch after the call.
+- `StartSessionWith*TokenOk` 88.7/89.5 -> 97.3/96.7: `#pragma inline_depth(0)` keeps the `FragmentPacket` ctor, `Allocate` and `PopRepeatCount` out of line; `__forceinline` helpers still inline. Compose-fail branch first.
+
+What failed:
+- `StartSessionWith*TokenOk`: under `inline_depth(0)` the `~FragmentPacket` call is shared; the original has one inlined `Packet::Clear` per exit. No MATCH.
+- `HelloOk` 99.3, `HelloReq` 94.1: score only (register choice). Reverted. `CloseSessionNotify` success-first: worse.
