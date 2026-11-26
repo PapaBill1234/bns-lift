@@ -190,8 +190,8 @@ bool Port::Initialize(unsigned int id, unsigned short portNumber, unsigned int m
         PORT_ASSERT_CRASH(239);
         break;
     }
-    void* memory = BASE_MEMORY_MANAGER.Alloc(sizeof(SessionPool), PORT_FILE, 243);
-    _pool = memory != nullptr ? ::new (memory) SessionPool(_id) : nullptr;
+    // LIFT: class operator new of BaseRefCntObj. The unwind funclet calls RefCntObject::operator delete (CacheGate 0x3a920).
+    _pool = new (PORT_FILE, 243) SessionPool(_id);
     _pool->Initialize(_maxSession, prepareRatio, false);
     _unusedSessionIndex = 1;
     _sessionList = static_cast<Session**>(

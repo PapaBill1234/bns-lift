@@ -85,6 +85,9 @@ class BaseRefCntObj : public RefCntObject
 {
 public:
     virtual ~BaseRefCntObj();
+    // PDB: public static operator new (type 0x2FCA). No out-of-line copy: LTCG inlines it (CacheGate 0x18cb9).
+    // The matching placement delete is RefCntObject::operator delete(void*, wchar_t const*, int) (CacheGate 0x3a93d).
+    static void* operator new(size_t size, wchar_t const* file, int line);
 protected:
     virtual void deallocate_me(void* ptr, wchar_t const* file, int line);
 };
