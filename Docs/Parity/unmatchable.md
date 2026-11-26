@@ -13,10 +13,10 @@ triage, the instruction diffs and the Not-done reports of the batch authors. No 
 
 | Exe | Open | A | B | C |
 | --- | ---: | ---: | ---: | ---: |
-| CG | 25 | 7 | 18 | 0 |
+| CG | 24 | 7 | 17 | 0 |
 | LG | 50 | 19 | 31 | 0 |
-| SCD | 33 | 10 | 23 | 0 |
-| POD | 39 | 16 | 23 | 0 |
+| SCD | 32 | 10 | 22 | 0 |
+| POD | 38 | 16 | 22 | 0 |
 
 ## CacheGate (CG)
 
@@ -142,13 +142,6 @@ triage, the instruction diffs and the Not-done reports of the batch authors. No 
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 183 insns, lift 168 insns, 32 changed hunks; first divergence: `-push rbx` / `-push r13` / `-push r15`.
 - Reason: instruction_order (move the call statements into the original order (Log::Write)).
 - Earlier record: `lessons.md` lines 394, 412, 514.
-
-### `0x15d90` `PipeConsole::SetInvalidInfo` DIFF
-
-- Score: 96.3 (calls 89, refs 100, consts 100). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 87 insns, lift 65 insns, 4 changed hunks; first divergence: `-test s2b, s2b` / `-je L` / `-mov r9, qword ptr [s1 + 0x60]`.
-- Reason: not inlined but should be, or extra function.
-- Earlier record: `lessons.md` lines 92, 393, 411, 514.
 
 ### `0x17090` `WindowConsole::Open` DIFF
 
@@ -708,13 +701,6 @@ triage, the instruction diffs and the Not-done reports of the batch authors. No 
 - Reason: instruction_order (move the call statements into the original order (Log::Write)).
 - Earlier record: `lessons.md` lines 394, 412, 514.
 
-### `0x259c0` `PipeConsole::SetInvalidInfo` DIFF
-
-- Score: 96.3 (calls 89, refs 100, consts 100). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 87 insns, lift 65 insns, 4 changed hunks; first divergence: `-test s2b, s2b` / `-je L` / `-mov r9, qword ptr [s1 + 0x60]`.
-- Reason: not inlined but should be, or extra function.
-- Earlier record: `lessons.md` lines 92, 393, 411, 514.
-
 ### `0x26c70` `WindowConsole::Open` DIFF
 
 - Score: 95.2 (calls 100, refs 100, consts 86). Proof level: B.
@@ -990,13 +976,6 @@ triage, the instruction diffs and the Not-done reports of the batch authors. No 
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 183 insns, lift 168 insns, 32 changed hunks; first divergence: `-push rbx` / `-push r13` / `-push r15`.
 - Reason: instruction_order (move the call statements into the original order (Log::Write)).
 - Earlier record: `lessons.md` lines 394, 412, 514.
-
-### `0x333b0` `PipeConsole::SetInvalidInfo` DIFF
-
-- Score: 96.3 (calls 89, refs 100, consts 100). Proof level: B.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 87 insns, lift 65 insns, 4 changed hunks; first divergence: `-test s2b, s2b` / `-je L` / `-mov r9, qword ptr [s1 + 0x60]`.
-- Reason: not inlined but should be, or extra function.
-- Earlier record: `lessons.md` lines 92, 393, 411, 514.
 
 ### `0x346e0` `WindowConsole::Open` DIFF
 
