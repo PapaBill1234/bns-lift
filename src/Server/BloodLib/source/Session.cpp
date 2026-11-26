@@ -118,7 +118,8 @@ Session::Session(unsigned int portId, PacketBufferHandler const* bufferHandler)
     clear();
     // LTCG folded size and used into StaticPageMemoryManager::Initialize (LobbyGate 0x26c90):
     // size 0x800 (0x26c99) and used 0x248 (crash log 0x26cbe).
-    _allocator.Initialize(this, 2048, 0x248, &BaseMemoryManager::_Instance);
+    // LIFT: Instance() (PDB name) and not &_Instance: LTCG IPA keeps the address as an argument (r8 at 0xdf80).
+    _allocator.Initialize(this, 2048, 0x248, BaseMemoryManager::Instance());
     if (bufferHandler != nullptr)
     {
         if (bufferHandler->AllocSize() != 0)

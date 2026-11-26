@@ -47,6 +47,8 @@ static_assert(sizeof(HeapMemoryManager) == 0x10, "sizeof HeapMemoryManager");
 class BaseMemoryManager : public HeapMemoryManager
 {
 public:
+    // PDB (CacheGate): public static `Instance`, returns `const BaseMemoryManager*`.
+    static BaseMemoryManager const* Instance() { return &_Instance; }
     static BaseMemoryManager _Instance;
 };
 static_assert(sizeof(BaseMemoryManager) == 0x10, "sizeof BaseMemoryManager");
