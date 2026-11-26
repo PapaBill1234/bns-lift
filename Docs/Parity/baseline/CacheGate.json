@@ -3411,9 +3411,9 @@
 "wmain": {
 "calls": 100,
 "consts": 100,
-"refs": 86,
-"score": 95.2,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "wmain$dtor$0": {
 "calls": 100,
