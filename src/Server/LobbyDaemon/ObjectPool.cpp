@@ -96,17 +96,9 @@ void ObjPool::Finalize()
                L"[objpool], finalized, total-count:%d, object-count:%d, id:%d(%s), obj-size:%d", _total,
                _pool._size, _id, descOf(this), _objsize);
     _lock.Enter();
-    for (;;)
-    {
-        Node* node = _pool._head;
-        if (node == nullptr)
-            break;
-        Node* next = node->next;
-        --_pool._size;
-        _pool._head = next;
-        node->next = nullptr;
+    Node* node;
+    while ((node = _pool.Pop()) != nullptr)
         _alloc->Free(node, kObjPoolFile, 195);
-    }
     _lock.Leave();
     _total = 0;
 }

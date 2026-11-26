@@ -78,6 +78,18 @@ public:
     struct Stack  // PDB type 0x1EFA, field list 0x1EF9
     {
         Stack() : _head(nullptr), _size(0) {}  // LIFT: PDB ObjPool::Stack::Stack (inline, LD and SCD)
+        // PDB ObjPool::Stack::Pop (inline). SCD 0x1490 (Finalize) keeps the loop test at the top.
+        Node* Pop()
+        {
+            Node* node = _head;
+            if (node == nullptr)
+                return nullptr;
+            Node* next = node->next;
+            --_size;
+            _head = next;
+            node->next = nullptr;
+            return node;
+        }
         Node* _head;
         int _size;
     };
