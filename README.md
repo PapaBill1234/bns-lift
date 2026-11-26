@@ -15,9 +15,9 @@ This repo is public. Do not commit binaries, keys, PDBs or IDA databases.
 | First 4 exes | 91.7 % parity. 3 of 4 are above 90 %. LobbyGate is at 89.0 %. |
 | LobbyDaemon | Lift in progress: 898 MATCH (40.7 %), 64 excluded MATCH not counted. Most of the other functions are still `LIFT_STUB` bodies. |
 | Method | Gap cards. Each card lifts the PDB class layout and the stub bodies of one class or job group. |
-| Last landed | Gap card 15 (CliSession logout, charge, account and pc-cafe bodies, +16 MATCH; 3 review rejects excluded), 04 (NP game service channel and LobbyDaemon startup, +17 MATCH; 4 review rejects excluded), 25 (TryEnterGameWorldJob part 1, +68 MATCH; 9 review rejects excluded), 26 (LobbyGamePacketHandler part 1, +32 MATCH; 13 review rejects excluded) and 12, 14, 10, 16. 0 lost in all 5 exes. |
+| Last landed | lift-misc-a (Handle_SrvCharge_RequestStop, +0 MATCH), gap card 15 (CliSession logout, charge, account and pc-cafe bodies, +16 MATCH; 3 review rejects excluded), 04 (NP game service channel and LobbyDaemon startup, +17 MATCH; 4 review rejects excluded), 25 (+68 MATCH; 9 review rejects excluded), 26 (+32 MATCH; 13 review rejects excluded) and 12, 14, 10, 16. 0 lost in all 5 exes. |
 | Checks per landing | Full VS2010 build of all 5 exes, funcdiff against the original, 0 lost MATCH, 0 strict regress. A model review checks each new MATCH without a strict full proof. |
-| Next | lift-misc-a (Handle_SrvCharge_RequestStop), then gap cards 20, 17, 23 and 24. |
+| Next | Gap cards 20 (NPLobbyMessageHandler), 17, 23 and 24. |
 
 ## Parity
 
