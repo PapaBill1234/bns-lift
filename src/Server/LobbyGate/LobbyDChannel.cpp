@@ -371,10 +371,7 @@ bool LobbyD::SendInitSessionWithNPTokenReq(unsigned long long gateKey, id128 con
     if (session == nullptr || !isConnected(session))
         return failNotConnected(session, cmd, 328);
 
-    Packet packet;  // LIFT: inlined constructor (0xad20): two stores and a 28-byte memset
-    packet.Splitter = nullptr;
-    packet.IsFragmentPacket = false;
-    memset(&packet.FragmentPacketCmd, 0, 28);
+    Packet packet;
     packet.Allocate();
     id128 portalCopy = *portalAccountId;
     id128 npCopy = *npToken;
@@ -411,10 +408,7 @@ bool LobbyD::SendStartSessionWithNPTokenReq(unsigned long long cliKey, id128 con
     if (session == nullptr || !isConnected(session))
         return failNotConnected(session, cmd, 360);
 
-    Packet packet;  // LIFT: inlined constructor (0xad20): two stores and a 28-byte memset
-    packet.Splitter = nullptr;
-    packet.IsFragmentPacket = false;
-    memset(&packet.FragmentPacketCmd, 0, 28);
+    Packet packet;
     packet.Allocate();
     id128 portalCopy = *portalAccountId;
     id128 npCopy = *npToken;
@@ -452,10 +446,7 @@ bool LobbyD::SendInitSessionWithLobbyTokenReq(unsigned long long gateKey, unsign
     if (session == nullptr || !isConnected(session))
         return failNotConnected(session, cmd, 392);
 
-    Packet packet;  // LIFT: inlined constructor (0xad20): two stores and a 28-byte memset
-    packet.Splitter = nullptr;
-    packet.IsFragmentPacket = false;
-    memset(&packet.FragmentPacketCmd, 0, 28);
+    Packet packet;
     packet.Allocate();
     if (packet.Compose("hqqqi", static_cast<int>(cmd), gateKey, cliKey, lobbyToken, ipAddress) == 0)
         return failCompose(session, packet, cmd, 402);
@@ -484,10 +475,7 @@ bool LobbyD::SendStartSessionWithLobbyTokenReq(unsigned long long cliKey)
     if (session == nullptr || !isConnected(session))
         return failNotConnected(session, cmd, 424);
 
-    Packet packet;  // LIFT: inlined constructor (0xad20): two stores and a 28-byte memset
-    packet.Splitter = nullptr;
-    packet.IsFragmentPacket = false;
-    memset(&packet.FragmentPacketCmd, 0, 28);
+    Packet packet;
     packet.Allocate();
     if (packet.Compose("hq", static_cast<int>(cmd), cliKey) == 0)
         return failCompose(session, packet, cmd, 434);
@@ -512,10 +500,7 @@ bool LobbyD::SendLostAnonymousConnectionNotify(unsigned long long gateKey)
     if (session == nullptr || !isConnected(session))
         return failNotConnected(session, cmd, 453);
 
-    Packet packet;  // LIFT: inlined constructor (0xad20): two stores and a 28-byte memset
-    packet.Splitter = nullptr;
-    packet.IsFragmentPacket = false;
-    memset(&packet.FragmentPacketCmd, 0, 28);
+    Packet packet;
     packet.Allocate();
     if (packet.Compose("hq", static_cast<int>(cmd), gateKey) == 0)
         return failCompose(session, packet, cmd, 463);
@@ -540,10 +525,7 @@ bool LobbyD::SendLostConnectionNotify(unsigned long long cliKey)
     if (session == nullptr || !isConnected(session))
         return failNotConnected(session, cmd, 482);
 
-    Packet packet;  // LIFT: inlined constructor (0xad20): two stores and a 28-byte memset
-    packet.Splitter = nullptr;
-    packet.IsFragmentPacket = false;
-    memset(&packet.FragmentPacketCmd, 0, 28);
+    Packet packet;
     packet.Allocate();
     if (packet.Compose("hq", static_cast<int>(cmd), cliKey) == 0)
         return failCompose(session, packet, cmd, 492);

@@ -208,9 +208,6 @@ bool HandleLobbyGame_HelloReq(Session const* session, Packet const* packet)
     rpc.top = -1;
     rpc.subTop = -1;
     Packet p;
-    p.Splitter = nullptr;
-    p.IsFragmentPacket = false;
-    memset(&p.FragmentPacketCmd, 0, 28);
     p.Allocate();
     if (p.Compose(&rpc, 1, 2) == 0)
     {
@@ -342,9 +339,6 @@ bool HandleLobbyGame_NPPresenceKickReq(SharedChannel* channel, Packet const* pac
     char targetApp = -1;
     char force = 0;
     Packet p;
-    p.Splitter = nullptr;
-    p.IsFragmentPacket = false;
-    memset(&p.FragmentPacketCmd, 0, 28);
     if (packet->Decompose("hqQQ", &cmd, &pcdbid, &targetApp, &force) == 0)
     {
         Log::Write(Log::LT_ERROR, L"LobbyGamePacketHandler.cpp", 247,
