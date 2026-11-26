@@ -9,6 +9,7 @@
 #include "LogBuffer.h"
 #include "Network.h"
 #include "Port.h"
+#include "Lock.h"
 
 static wchar_t const IDLEWATCHER_FILE[] = L"source\\IdleWatcher.cpp";
 
@@ -107,13 +108,15 @@ void IdleStateTable::scan()
 // 0x24FF0
 void IdleWatcher::run()
 {
+    // LIFT: local SystemEvent (LobbyGate 0x24ff0). The unwind funclet dtor$0 (0x60430) calls SystemEvent::~SystemEvent.
+    SystemEvent event;
     LogBufferAllocator::Initialize();
     Log::Write(Log::LT_DEBUG, IDLEWATCHER_FILE, 226, L"[idlewatcher], idle watcher start");  // 0x25038, 4 arguments
-    HANDLE event = CreateEventW(nullptr, FALSE, FALSE, nullptr);
+    event.Event = CreateEventW(nullptr, FALSE, FALSE, nullptr);
     while (_run)
     {
-        if (event != nullptr)
-            WaitForSingleObject(event, 5000);
+        if (event.Event != nullptr)
+            WaitForSingleObject(event.Event, 5000);
         _lastExecuted = _threadManager->_now;
         if (!_run)
             break;
@@ -123,6 +126,4 @@ void IdleWatcher::run()
                 _table[i]->scan();
         }
     }
-    if (event != nullptr)
-        CloseHandle(event);
 }
