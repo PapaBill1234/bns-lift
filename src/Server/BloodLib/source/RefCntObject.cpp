@@ -188,12 +188,6 @@ BaseRefCntObj::~BaseRefCntObj()
 {
 }
 
-// LIFT: no address. LTCG inlines it in Port::Initialize (CacheGate 0x18cb9).
-void* BaseRefCntObj::operator new(size_t size, wchar_t const* file, int line)
-{
-    return BASE_MEMORY_MANAGER.Alloc(size, file, line);
-}
-
 // 0x18460
 void BaseRefCntObj::deallocate_me(void* ptr, wchar_t const* file, int line)
 {
