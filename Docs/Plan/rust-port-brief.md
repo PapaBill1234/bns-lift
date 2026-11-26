@@ -81,3 +81,16 @@ Each agent:
 5. Write a short report to `Docs/Plan/handoffs/rust-port-1.md`: done, left, next Rust step (see the 10 % rule in `modernize.md`).
 
 The parity wave in the desktop app does not use `rust/`. Do not stop it.
+
+## Style handover (owner order, 2026-11-26)
+
+Opus will continue this code later. It must copy the Fable style exactly. So:
+
+1. The lead writes `rust/STYLE.md` in step 1, before the agents start. Content:
+   - Code style rules with a short good and bad example for each rule.
+   - The design choices and WHY for each (shards, sans-IO cores, zero-copy codec, error types, naming, module layout, tests).
+   - A "how to port one C++ function" recipe, step by step, with one worked example from the lift.
+   - A checklist that a reviewer runs on a new change.
+2. Each agent adds to `rust/STYLE.md` (own section per crate): the choices it made, why, and patterns that a later agent must copy.
+3. In step 3 the lead merges the sections into one clean document. It removes conflicts and gives one rule for each case.
+4. Test: the document must be enough for an Opus agent with no other context to port a new function in the same style.
