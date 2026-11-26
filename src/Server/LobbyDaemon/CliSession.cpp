@@ -357,12 +357,16 @@ Character* CliSession::getCharacter(unsigned long long pcid)
 {
     if (pcid == 0)
         return nullptr;
+    Character* found = nullptr;
     for (std::vector<Character*, StlAllocator<Character*, 2> >::iterator it = _characters.begin(); it != _characters.end(); ++it)
     {
         if (*it != nullptr && (*it)->_db.pcid == pcid)
-            return *it;
+        {
+            found = *it;
+            break;
+        }
     }
-    return nullptr;
+    return found;
 }
 
 // 0x35d30
