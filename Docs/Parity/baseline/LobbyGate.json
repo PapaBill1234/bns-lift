@@ -512,17 +512,17 @@
 },
 "BroadcastCrypt::Initialize": {
 "calls": 100,
-"consts": 87,
+"consts": 86,
 "refs": 100,
-"score": 95.6,
+"score": 95.2,
 "status": "DIFF"
 },
 "BroadcastCrypt::clear": {
 "calls": 100,
-"consts": 57,
+"consts": 100,
 "refs": 100,
-"score": 85.7,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "BroadcastCrypt::~BroadcastCrypt": {
 "calls": 100,
@@ -1183,11 +1183,11 @@
 "status": "MATCH"
 },
 "Dh::Process": {
-"calls": 67,
-"consts": 67,
+"calls": 100,
+"consts": 100,
 "refs": 100,
-"score": 77.8,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Dh::Setup": {
 "calls": 100,
@@ -1227,9 +1227,9 @@
 "Dh::~Dh": {
 "calls": 100,
 "consts": 100,
-"refs": 0,
-"score": 66.7,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "DumpRegister": {
 "calls": 100,
@@ -1870,10 +1870,10 @@
 },
 "IdleWatcher::run": {
 "calls": 100,
-"consts": 89,
+"consts": 100,
 "refs": 100,
-"score": 96.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "InitSymbol": {
 "calls": 100,

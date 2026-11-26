@@ -1525,6 +1525,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Packet::Concatenate [?Concatenate@Packet@@QEAAXPEBDFPEBVPacketConcatenateHandler@@@Z]": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Packet::Concatenate [?Concatenate@Packet@@QEAAXPEBV1@PEBVPacketConcatenateHandler@@@Z]": {
 "calls": 100,
 "consts": 100,

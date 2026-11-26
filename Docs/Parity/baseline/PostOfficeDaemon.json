@@ -2274,6 +2274,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Packet::Decompose [?Decompose@Packet@@QEBAGIHPEBDZZ]": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Packet::Decompose [?Decompose@Packet@@QEBAGPEBDZZ]": {
 "calls": 100,
 "consts": 100,
