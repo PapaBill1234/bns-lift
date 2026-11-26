@@ -192,10 +192,8 @@ void LobbyGate::PrintDependency()
     wprintf(L"lib xmlreader %s.0\n", L"15");
     wprintf(L"security cert %d.0\n", 6);
     wprintf(L"config bns-common-config %d\n", 2);
-    // BUG: 0x12b60 the format has two %d but the call gives one argument.
-    wprintf(L"config contents-rule-client %d.%d\n", 65);
-    // BUG: 0x12b60 the format has two %d but the call gives one argument.
-    wprintf(L"config contents-rule-server %d.%d\n", 72);
+    wprintf(L"config contents-rule-client %d.%d\n", 65, 0);  // 0x12bc0: r8d = 0 (minor version).
+    wprintf(L"config contents-rule-server %d.%d\n", 72, 0);  // 0x12bd4: r8d = 0.
 }
 
 // 0x12bf0
