@@ -180,23 +180,24 @@ StaticPageMemoryManager::~StaticPageMemoryManager()
 __declspec(noinline) bool StaticPageMemoryManager::Initialize(void* page, unsigned long long size, unsigned long long allocated,
                                          MemoryManager const* additional)
 {
-    if (page == nullptr)
+    // LIFT: 0x1a1a0 has the success path first (je to the error path); the error log passes page as 0.
+    if (page != nullptr)
     {
-        Log::Write(Log::LT_ERROR, L"source\\MemoryManager.cpp", 334,
-                   L"== CRASH == [memory], static page memory manager initialization failed, page: %p, size: %d, "
-                   L"allocated: %d",
-                   page, size, allocated);
-        AlertSender::Write(L"source\\MemoryManager.cpp", 334,
-                           L"== CRASH == [memory], static page memory manager initialization failed, page: %p, "
-                           L"size: %d, allocated: %d",
-                           page, size, allocated);
-        return false;
+        _start = static_cast<unsigned char*>(page);
+        _additional = additional;
+        _end = _start + size;
+        _current = _start + ((allocated + 15) & ~15ULL);
+        return true;
     }
-    _start = static_cast<unsigned char*>(page);
-    _additional = additional;
-    _end = _start + size;
-    _current = _start + ((allocated + 15) & ~15ULL);
-    return true;
+    Log::Write(Log::LT_ERROR, L"source\\MemoryManager.cpp", 334,
+               L"== CRASH == [memory], static page memory manager initialization failed, page: %p, size: %d, "
+               L"allocated: %d",
+               page, size, allocated);
+    AlertSender::Write(L"source\\MemoryManager.cpp", 334,
+                       L"== CRASH == [memory], static page memory manager initialization failed, page: %p, "
+                       L"size: %d, allocated: %d",
+                       page, size, allocated);
+    return false;
 }
 
 // 0x1a240
