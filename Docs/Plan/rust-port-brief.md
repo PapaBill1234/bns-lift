@@ -8,7 +8,7 @@ You are the lead. You run in the Claude Code CLI. Read `Docs/Plan/modernize.md` 
 
 | Rule | Detail |
 | --- | --- |
-| Public repo | `bns-lift` is public. No binaries, PDBs, IDA databases, keys, passwords or abuse notes. Write `keyhere` for a key. |
+| Secrets | No binaries, PDBs, IDA databases, keys, passwords or abuse notes. Write `keyhere` for a key. |
 | Source of logic | The C++ lift in `src/` (2019 + PDB). Port only code that exists there now. Do not invent game logic. |
 | Names | PDB names only, in Rust case (`OnClose` → `on_close`). Keep the PDB name in a doc comment. |
 | Parity | The client sees the same packets, order, codes and timing. Internals are modern. Keep all server safety checks. Fix bugs marked `// BUG:`; write the fix reason. |
@@ -21,10 +21,18 @@ You are the lead. You run in the Claude Code CLI. Read `Docs/Plan/modernize.md` 
 
 ## Place
 
-- Workspace: `rust/` in bns-lift.
-- Lead worktree: `/home/ubuntu/Documents/Codex/bns-wt/rust-port`, branch `rust/main`, from `origin/main`.
-- Each agent: own worktree `/home/ubuntu/Documents/Codex/bns-wt/rust-<crate>`, branch `rust/<crate>`, from `rust/main` after step 1.
-- Reuse ideas from `~/Documents/Codex/private-project/bns-server/` (old Rust port for build 381). Do not copy its `secrets/` or logs.
+Owner order, 2026-11-26: the Rust code lives in a NEW PRIVATE repo, `bns-rust-emulator`. Not in bns-lift.
+
+| Item | Value |
+| --- | --- |
+| Repo | GitHub `PapaBill1234/bns-rust-emulator` (private). Local: `/home/ubuntu/Documents/Codex/private-project/bns-rust-emulator` (remote `origin` is set, no commits yet). |
+| Workspace | Cargo workspace at the repo root. |
+| Lead branch | `main` in the local clone. |
+| Agent worktrees | `/home/ubuntu/Documents/Codex/bns-wt/rust-<crate>`, branch `crate/<crate>`, from `main` after step 1. |
+| C++ source | bns-lift `src/`. Read only. Do not commit to bns-lift. |
+| Old Rust work | `~/Documents/Codex/private-project/bns-server/` (build 381). Ideas only. Do not copy its `secrets/` or logs. |
+
+Even as a private repo: no binaries, PDBs, IDA databases, keys or passwords.
 
 ## Architecture goal
 
@@ -40,12 +48,12 @@ Design for 100 000 concurrent clients on one host. The target is clean design, n
 | One I/O layer for Linux (epoll or io_uring) and Windows (IOCP), behind one trait. | Same core code on both systems. |
 | Host crates: `host-headless` (service, config, structured logs, metrics) and later `host-gui`. | Headless first; GUI is a thin view. |
 
-The lead may change these ideas with a reason in `rust/ARCHITECTURE.md`.
+The lead may change these ideas with a reason in `ARCHITECTURE.md`.
 
 ## Step 1: lead writes the foundation (before agents)
 
 1. Make the worktree. Run `cargo new --lib` for the workspace members.
-2. Write `rust/ARCHITECTURE.md`: crates, data flow diagram, shard model, message types, error rules.
+2. Write `ARCHITECTURE.md`: crates, data flow diagram, shard model, message types, error rules.
 3. Write the shared contracts as code: the `Service` trait of a sans-IO core, the event and action types, the packet `Codec` trait, the session id type. Make them compile.
 4. Commit to `rust/main`.
 
@@ -67,7 +75,7 @@ Use the Agent tool with `model: "fable"` and `isolation` off (each agent makes i
 | 10 | `host-headless` + `loadsim` | Service main per exe, config, logs, metrics. A load simulator that runs 100 000 fake sessions against a core. A packet-replay harness for later C++ comparison. | none (new) |
 
 Each agent:
-1. Reads this brief, `rust/ARCHITECTURE.md` and its C++ source.
+1. Reads this brief, `ARCHITECTURE.md` and its C++ source.
 2. Ports only its crate. It asks the lead (in its final report) for any contract change; it does not edit other crates.
 3. Writes unit tests. Cores get event-in, action-out tests from the C++ logic.
 4. Commits on its branch. Final report: what is ported, what is left, contract change requests, test count.
@@ -75,22 +83,22 @@ Each agent:
 ## Step 3: lead integrates
 
 1. Review each branch. Reject code that breaks a rule above.
-2. Merge into `rust/main` one at a time. Keep the build green.
-3. Run `loadsim` with 100 000 sessions. Write the result (memory per session, p99 latency) in `rust/BENCH.md`.
-4. Merge `rust/main` into bns-lift `main` and push. Use `git pull --rebase` first; the parity wave also pushes to `main`.
-5. Write a short report to `Docs/Plan/handoffs/rust-port-1.md`: done, left, next Rust step (see the 10 % rule in `modernize.md`).
+2. Merge into `main` one at a time. Keep the build green.
+3. Run `loadsim` with 100 000 sessions. Write the result (memory per session, p99 latency) in `BENCH.md`.
+4. Push `main` of bns-rust-emulator to GitHub.
+5. Write a short report to `docs/handoffs/rust-port-1.md` in bns-rust-emulator: done, left, next Rust step (see the 10 % rule in `modernize.md`).
 
-The parity wave in the desktop app does not use `rust/`. Do not stop it.
+The parity wave in the desktop app works in bns-lift. Do not stop it.
 
 ## Style handover (owner order, 2026-11-26)
 
 Opus will continue this code later. It must copy the Fable style exactly. So:
 
-1. The lead writes `rust/STYLE.md` in step 1, before the agents start. Content:
+1. The lead writes `STYLE.md` in step 1, before the agents start. Content:
    - Code style rules with a short good and bad example for each rule.
    - The design choices and WHY for each (shards, sans-IO cores, zero-copy codec, error types, naming, module layout, tests).
    - A "how to port one C++ function" recipe, step by step, with one worked example from the lift.
    - A checklist that a reviewer runs on a new change.
-2. Each agent adds to `rust/STYLE.md` (own section per crate): the choices it made, why, and patterns that a later agent must copy.
+2. Each agent adds to `STYLE.md` (own section per crate): the choices it made, why, and patterns that a later agent must copy.
 3. In step 3 the lead merges the sections into one clean document. It removes conflicts and gives one rule for each case.
 4. Test: the document must be enough for an Opus agent with no other context to port a new function in the same style.
