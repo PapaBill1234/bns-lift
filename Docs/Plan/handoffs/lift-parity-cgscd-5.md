@@ -30,16 +30,16 @@ Note: The task text asks for a section "## cgscd-5" in `Docs/Parity/lessons.md`.
 | SendRetryCouponPublicationOk | 96.3 | MATCH | Inlined Session::Send form (buffer in a local, `list[1]`, Enter/send/Leave). The ternary `session != nullptr ? session->_id : 0` for the log id. | 1 |
 | NPServiceChannelManager::HandleMessage | 92.3 | MATCH | Dispatch as a `switch` (two signed compares). The NPMsgHandleEvent ctor out of line, with the addReferenceCount (line 141) in the body. | 1 |
 | SendRequestEventNoti | 95.2 | MATCH | Branch order from the PDB lines: the event-noti path is the fall-through (line 91). | 1 |
-| CacheDList::LoadCachedListConfigFile | 98.5 | 98.8 | `wcscmp(element->Name(), L"cached")` gives the `rep cmpsw` at 0x2d48. | 0 |
-| HandleCacheGateHello | 87.2 | 94.1 | Order from PDB lines 42 to 69 (add path, duplicate path, hello ok). Correct error codes. | 0 |
+| HandleCacheGateHello | 87.2 | 94.1 | Order from PDB lines 42 to 69 (add path, duplicate path, hello ok). Correct error codes. Kept with count 0 because of the behaviour fix (see below). | 0 |
 
 ### Failed
 | Function | Before | After | Try | Count |
 | --- | ---: | ---: | --- | ---: |
 | NPServiceChannelManager::HandleMessage | 92.3 | 84.1 | Dispatch as a range `if` (gives `lea`/`ja`). Replaced by the switch. | 0 |
+| CacheDList::LoadCachedListConfigFile | 98.5 | 98.8 | `wcscmp(element->Name(), L"cached")` for the `rep cmpsw` at 0x2d48. No MATCH. Reverted (repair 2) to the `wcsncmp` form on main. | 0 |
 | CacheDList::LoadCachedListConfigFile | 98.8 | 99.1 | for/continue/goto loop from PDB lines 266 to 347, and an else-if chain. No MATCH. Reverted to keep the source simple. | 0 |
-| CacheDList::Initialize | 93.3 | 93.3 | 3 forms. Register allocation. | 0 |
-| CacheDList::MakeSessionAll | 96.3 | 96.3 | 3 forms. TryConnect inline and hoist. | 0 |
+| CacheDList::Initialize | 93.3 | 93.3 | 3 forms, including a placement new without the null test. Register allocation. Reverted (repair 2) to the main form with the explicit null test. Reason: clang-cl C++17 can treat a null result from a reserved placement new as UB (CWG 1748). | 0 |
+| CacheDList::MakeSessionAll | 96.3 | 96.3 | 3 forms, including a while loop with `it++;`. TryConnect inline and hoist. Reverted (repair 2) to the for loop on main. | 0 |
 | HandleCacheGateHelloFail | 97.4 | 97.4 | 2 forms. The zero stays in edi. | 0 |
 | DaemonPacketHandler (SCD) | - | - | `<= 0` decompose test, errorCode order, GetChannel call, channel-id ternary. No change. | 0 |
 
@@ -54,7 +54,7 @@ Note: The task text asks for a section "## cgscd-5" in `Docs/Parity/lessons.md`.
 | CG | CacheDList::MakeSessionAll | 96.3 | calls 89 | The original does not inline TryConnect. A non-inlined call gives MATCH, but that only fools funcdiff. I rejected it. | 3 tries. |
 | CG | HandleCacheGateHelloFail | 97.4 | consts 92 | The zero stays in edi. | 2 tries, no new idea. |
 | CG | HandleCacheGateRelay | 98.4 | consts 95 | Register allocation. | Not tried. |
-| CG | CacheDList::LoadCachedListConfigFile | 98.8 | calls 98, refs 98 | The original has two removeReferenceCount call sites (0x2f83 for lines 296/308, 0x3032 for 316/329). Our build merges all four. | 3 tries. |
+| CG | CacheDList::LoadCachedListConfigFile | 98.5 | calls 98, refs 98 | The original has two removeReferenceCount call sites (0x2f83 for lines 296/308, 0x3032 for 316/329). Our build merges all four. | 3 tries. |
 | SCD | wmain | 66.7 | consts 0 | EH state table (A14). | Not tried. |
 | SCD | BigInteger::Divide, invMod, InvMod; Rsa::decrypt | 76.7-91.7 | calls, refs | Crypto (shared stop list). | Stop list. |
 | SCD | NPChannel::SendMsg | 90.1 | calls 94, refs 87 | Source in Shared/. | Out of scope. |
@@ -72,7 +72,16 @@ The shared DIFF functions (aes128*, IoWorker::run, ThreadManager, Session::Sessi
 ## ❓
 - `DispatchNPMessageHandler`: the name comes from the log text (NPMessageHandler.cpp line 36). The PDB has no symbol for it.
 
+## Kept changes with count 0
+| Function | Why it stays |
+| --- | --- |
+| HandleCacheGateHello | Behaviour fix: correct error codes from the original. |
+
+All other count-0 tries are reverted. The code in the diff agrees with the "Worked" table.
+
 ## Gate result
 - `tools/gate.sh`: gate ok. `tools/parity.sh`: parity ok, MATCH -> DIFF 0 in each of the 5 exes.
+- Repair 2 (after the reverts): gate ok, parity ok. CG 462, LG 658, SCD 633, POD 694, LD 1024. MATCH -> DIFF 0 in each exe.
+- In a worktree, set `LIFT_IDA_DIR=~/Documents/Codex/private-project/ida/lift`. Without it, `tools/pdbq.py` stops the gate.
 
-Turns: 280
+Turns: 280 (build) + repair 2

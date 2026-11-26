@@ -113,8 +113,8 @@ CacheDList::~CacheDList()
 // 0x2660
 bool CacheDList::Initialize()
 {
-    // The placement new tests the memory for null itself (PDB line 130).
-    _cachedMap = new (Memory::_Manager[2]->Alloc(sizeof(CacheDMap), CACHED_FILE, 130)) CacheDMap();
+    void* buffer = Memory::_Manager[2]->Alloc(sizeof(CacheDMap), CACHED_FILE, 130);
+    _cachedMap = buffer != nullptr ? new (buffer) CacheDMap() : nullptr;
     return _cachedMap != nullptr;
 }
 
@@ -137,8 +137,7 @@ CacheD* CacheDList::Find(unsigned short id)
 bool CacheDList::MakeSessionAll()
 {
     _lock.Enter();
-    CacheDMap::iterator it = _cachedMap->begin();
-    while (it != _cachedMap->end())
+    for (CacheDMap::iterator it = _cachedMap->begin(); it != _cachedMap->end(); ++it)
     {
         CacheD* cached = it->second;
         if (cached != nullptr)
@@ -158,7 +157,6 @@ bool CacheDList::MakeSessionAll()
         {
             Log::Write(Log::LT_DEBUG, CACHED_FILE, 175, L"[cached list], MakeSessionAll connect fail");
         }
-        it++;  // PDB line 177: post-increment on its own line.
     }
     _lock.Leave();
     return true;
@@ -241,7 +239,7 @@ bool CacheDList::LoadCachedListConfigFile(wchar_t const* fileName, bool reload)
                             {
                                 XmlElement const* element = node->ToXmlElement();
                                 // An element that is not "cached" stops the load with failure.
-                                if (element == nullptr || wcscmp(element->Name(), L"cached") != 0)  // 0x2d48: rep cmpsw, 7 characters
+                                if (element == nullptr || wcsncmp(element->Name(), L"cached", 7) != 0)
                                 {
                                     result = false;
                                     break;
