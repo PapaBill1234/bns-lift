@@ -1660,10 +1660,10 @@
 },
 "HandlePostOfficeHelloReq": {
 "calls": 100,
-"consts": 93,
+"consts": 100,
 "refs": 100,
-"score": 97.8,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "HandlePostOfficeManagementHelloReq": {
 "calls": 100,
@@ -3234,6 +3234,13 @@
 "status": "MATCH"
 },
 "RefCntObject::deallocate_object": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RefCntObject::operator delete": {
 "calls": 100,
 "consts": 100,
 "refs": 100,

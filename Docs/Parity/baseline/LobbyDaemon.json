@@ -7799,6 +7799,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"RefCntObject::operator delete": {
+"calls": 100,
+"consts": 100,
+"refs": 50,
+"score": 83.3,
+"status": "DIFF"
+},
 "RefCntObject::removeReferenceCount": {
 "calls": 100,
 "consts": 100,

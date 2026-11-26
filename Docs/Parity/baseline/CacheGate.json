@@ -2022,6 +2022,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"RefCntObject::operator delete": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "RefCntObject::removeReferenceCount": {
 "calls": 100,
 "consts": 100,

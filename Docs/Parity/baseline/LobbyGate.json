@@ -2121,10 +2121,10 @@
 "status": "MATCH"
 },
 "LobbyGate::reload": {
-"calls": 78,
+"calls": 93,
 "consts": 100,
 "refs": 97,
-"score": 91.5,
+"score": 96.4,
 "status": "DIFF"
 },
 "LobbyGate::setArgument": {
@@ -3199,6 +3199,13 @@
 "status": "MATCH"
 },
 "RefCntObject::deallocate_object": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RefCntObject::operator delete": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
