@@ -735,11 +735,11 @@
 "status": "MATCH"
 },
 "Channel::Send": {
-"calls": 91,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 97.0,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Channel::SetSession": {
 "calls": 100,
