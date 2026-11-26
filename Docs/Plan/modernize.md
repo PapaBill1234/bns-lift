@@ -62,3 +62,16 @@ The parity engine needs a new target type for this: a packet-replay gate in plac
 
 - `bns-server/` has Rust work for LobbyGate and LobbyDaemon (381). Reuse its `proto` and `net` parts when they pass the packet replay.
 - Packets: 381 client decides. Logic: 2019 + PDB.
+
+## Client target (owner change, 2026-11-26)
+
+The Rust servers speak the packets of the 2016 client (KR 0.0.167.5864, the client C++ lift), not the 381 client.
+
+| Layer | Source |
+| --- | --- |
+| Client wire format | 2016 client (167). One `ClientDialect` seam in the Rust `proto` crate. |
+| Server ↔ server packets | 2019 + PDB lift (the client does not see them). |
+| Server logic | 2019 + PDB lift, no change. |
+| 2019 content (classes, skills, dungeons, raids, maps) | Later: converted into the 2016 datafile. The MODERN client build gets ready for it now. |
+
+This C++ lift does not change. It stays the logic oracle for the 2019 + PDB servers.
