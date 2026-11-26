@@ -137,11 +137,11 @@ bool RetrieveCharacterInfoRelayContext::ComposeRequestPacket(Packet& packet) con
 // 0x1e230
 bool RetrieveCharacterInfoRelayContext::ComposeResponsePacket(Packet& packet) const
 {
-    // 0x1e230 reads the result state once (edi); success first, then a signed range test (1 < state <= 4) for the
-    // failure path; the crash path is the else branch.
-    int const resultState = _response._resultState;
+    // PDB lines (0x1e230): one switch on the result state; the failure cases come first in the code, the crash case is the default.
     unsigned long long const relayTid = _economyHeader._relayTid;
-    if (resultState == RelayResponse::RESULTSTATE_SUCCESS)
+    switch (_response._resultState)
+    {
+    case RelayResponse::RESULTSTATE_SUCCESS:
     {
         long long const resultPcId = _response._resultPcId;
         long long const gameTid = _request._gameTid;
@@ -158,9 +158,12 @@ bool RetrieveCharacterInfoRelayContext::ComposeResponsePacket(Packet& packet) co
                    MODULE_NAME, L"RetrieveCharacterInfoRelayContext::ComposeResponsePacket", gameTid,
                    resultPcId);
     }
-    else if (RelayResponse::RESULTSTATE_SUCCESS < resultState && resultState <= RelayResponse::RESULTSTATE_RELAY_TIMEOUT)
+    break;
+    case RelayResponse::RESULTSTATE_FAILURE:
+    case RelayResponse::RESULTSTATE_RELAY_ERROR:
+    case RelayResponse::RESULTSTATE_RELAY_TIMEOUT:
     {
-        int const failReason = convertFailReason(static_cast<RelayResponse::ResultState>(resultState), _response._failReason);
+        int const failReason = convertFailReason(static_cast<RelayResponse::ResultState>(_response._resultState), _response._failReason);
         bool const composed = 0 < packet.Compose("hqE", 6, _request._gameTid, failReason);
         if (!composed)
         {
@@ -175,13 +178,13 @@ bool RetrieveCharacterInfoRelayContext::ComposeResponsePacket(Packet& packet) co
                    MODULE_NAME, L"RetrieveCharacterInfoRelayContext::ComposeResponsePacket",
                    _request._gameTid, failReason);
     }
-    else
-    {
+    break;
+    default:
         RETRIEVE_CHARACTER_INFO_RELAY_CRASH(128,
                                             L"== CRASH == [%s], %s; invalid response result state, relayTid:0x%I64X, resultState:%d",
                                             MODULE_NAME,
                                             L"RetrieveCharacterInfoRelayContext::ComposeResponsePacket", relayTid,
-                                            resultState);
+                                            _response._resultState);
         return false;
     }
     return true;
