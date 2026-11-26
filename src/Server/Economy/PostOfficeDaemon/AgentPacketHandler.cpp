@@ -71,7 +71,8 @@ bool HandlePostOfficeHelloReq(Session const* session, Packet const* packet)
         failReason = 4;
         goto $_ERROR;
     }
-    if (postofficePacketVersion != 15 || economyCommonPacketVersion != 10)
+    // LIFT: 0x1a6f0 keeps 15 and 10 in registers (mov edx, 0xf; lea s6d, [rdx - 5]): constant-first tests.
+    if (15 != postofficePacketVersion || 10 != economyCommonPacketVersion)
     {
         Log::Write(Log::LT_ERROR, AGENT_PACKET_HANDLER_FILE, 73,
                    L"[%s], %s; invalid packet version, my postoffice-packet-version:%d, client version:%d, my economy-common-packet-version:%d, client version:%d",
