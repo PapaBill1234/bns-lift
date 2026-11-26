@@ -107,3 +107,15 @@ Source: `lessons.md` (review-3 numbers), `review-3.md`, the round 3 handoffs and
 | P9 | Choose the branch direction (failure first or success first) per function from the original block order. Measure each change. There is no default direction. | R11 | A2: failure-first gave +5 in POD management handlers and -2.5 in `PingRelayContext`; success-first lowered `loadWorldConfigFile`. |
 | P10 | Write the PacketHandler of a session handler in one form: `pCmd` pointer, reads at each use, inline `GetChannel` where the original inlines it, one `result` return. | R14 | A23 (5). |
 | P11 | A card names its lessons sections and its function list. A card that lists more than about 30 functions is split. | N11 | review-3 section 4: consts-3 and handlers-3 stopped by turn budget with many "not tried" items. |
+
+## 6. Changes from round 4 (lift-parity-review-4, 2026-11-26)
+
+| Id | Proposed rule | Replaces or adds to | Evidence |
+| --- | --- | --- | --- |
+| P12 | Read the PDB line map of the original function (`tools/pdbq.py <EXE> lines`) before a source change. The line numbers give the number of statements, the exits and the block order. | adds to P1 (PDB facts first) | A29 (11): every win of console-4. Packet-4 got 10 MATCH from the log line order (A2). |
+| P13 | Call a getter, read a global and read a field again at each use when the original loads them again. Do not cache them in a local. | adds to R11 | A25 (`OaepEncoder` +9), A26 (6), A31 (3). |
+| P14 | Write log arguments in the log-macro form of the original (`p ? p->_id : 0`, -1 for unknown values). | new | A31 (3), SCD `EventNotiJob`. |
+| P15 | `noinline` or `inline_depth` on one helper changes the inline choice in each caller. Measure all callers in all exes after the change. | adds to P2 | crypto-4: `RightShift` `noinline` must stay for the `LeftShift` tail jump. |
+| P16 | Measure a data-layout win again after each merge with main. A change of a global elsewhere can remove it. | new | console-4: SCD `LOCALHOST_IP` +1 on the old base, 0 after the merge. |
+| P17 | Parallel cards in one round touch disjoint files and write their lessons in the handoff. The review merges the lessons into `lessons.md`. | changes P11 | Round 5 plan (review-4 section 6). |
+| P18 | Before a `// BUG:` mark or a per-exe form, compare the same function and its callers in all exes. Check for LTCG constant folding first. | adds to P7 | A29: `PipeConsole::addNode` was one source in all 4 exes. |
