@@ -121,9 +121,9 @@
 "AgentSessionHandler::OnClose": {
 "calls": 100,
 "consts": 100,
-"refs": 93,
-"score": 97.6,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "AgentSessionHandler::OnConnect": {
 "calls": 100,
@@ -700,11 +700,11 @@
 "status": "MATCH"
 },
 "CachedWatchdogManager::updateWorldList": {
-"calls": 94,
+"calls": 100,
 "consts": 100,
-"refs": 93,
-"score": 95.5,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Channel::Close": {
 "calls": 100,
@@ -1696,8 +1696,8 @@
 "HandlePostOfficeRegisterPostReq": {
 "calls": 98,
 "consts": 99,
-"refs": 97,
-"score": 98.0,
+"refs": 98,
+"score": 98.4,
 "status": "DIFF"
 },
 "HandlePostOfficeServiceCheckPostCapacityReq": {
@@ -1717,8 +1717,8 @@
 "HandlePostOfficeServiceRegisterPostReq": {
 "calls": 97,
 "consts": 99,
-"refs": 91,
-"score": 95.6,
+"refs": 92,
+"score": 96.0,
 "status": "DIFF"
 },
 "HandlePostOfficeServiceRetrieveCharacterInfoReq": {
@@ -2079,11 +2079,11 @@
 "status": "MATCH"
 },
 "ManagementSessionHandler::PacketHandler": {
-"calls": 93,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 97.8,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "MaskGenerator::generate": {
 "calls": 100,
@@ -2920,10 +2920,10 @@
 },
 "PostInfo::CheckValidityPostData": {
 "calls": 100,
-"consts": 73,
+"consts": 100,
 "refs": 100,
-"score": 90.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "PostInfo::PostInfo": {
 "calls": 100,
@@ -4340,18 +4340,18 @@
 "status": "MATCH"
 },
 "UnsentPostContextManager::initContextManager": {
-"calls": 85,
-"consts": 94,
+"calls": 100,
+"consts": 100,
 "refs": 100,
-"score": 92.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "UnsentPostContextManager::updateWorldList": {
-"calls": 77,
-"consts": 94,
+"calls": 100,
+"consts": 100,
 "refs": 100,
-"score": 90.5,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "WinMsgHandler::Name": {
 "calls": 100,
@@ -4634,10 +4634,10 @@
 "status": "MATCH"
 },
 "WorldConfigManager::loadWorldConfigFile": {
-"calls": 84,
+"calls": 100,
 "consts": 100,
 "refs": 98,
-"score": 94.3,
+"score": 99.5,
 "status": "DIFF"
 },
 "WorldConfigManager::setWorldConfigFilePath": {
@@ -4662,10 +4662,10 @@
 "status": "MATCH"
 },
 "WorldConfigManager::updateWorldList": {
-"calls": 69,
+"calls": 75,
 "consts": 86,
-"refs": 86,
-"score": 80.2,
+"refs": 96,
+"score": 85.6,
 "status": "DIFF"
 },
 "WorldConfigManager::writeConfigString": {
@@ -5271,10 +5271,10 @@
 "status": "MATCH"
 },
 "wmain": {
-"calls": 89,
+"calls": 100,
 "consts": 67,
 "refs": 100,
-"score": 85.2,
+"score": 88.9,
 "status": "DIFF"
 },
 "wmainCRTStartup": {
