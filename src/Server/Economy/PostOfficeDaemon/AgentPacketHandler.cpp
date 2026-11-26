@@ -42,8 +42,9 @@ bool HandlePostOfficeHelloReq(Session const* session, Packet const* packet)
     void* memory = nullptr;
     AgentChannel* channel = nullptr;
 
-    if (packet->Decompose("hhhhhQ", &cmd, &postofficePacketVersion, &postofficeAgentPacketVersion,
-                          &economyCommonPacketVersion, &agentWid, &connectionType) == 0)
+    // The original compares the result with a zero register (cmp reg, ax; jb): an unsigned "0 < result" test.
+    if (!(0 < packet->Decompose("hhhhhQ", &cmd, &postofficePacketVersion, &postofficeAgentPacketVersion,
+                                &economyCommonPacketVersion, &agentWid, &connectionType)))
     {
         Log::Write(Log::LT_ERROR, AGENT_PACKET_HANDLER_FILE, 56, L"[%s], %s; failed to decompose packet",
                    MODULE_NAME, L"HandlePostOfficeHelloReq");
@@ -58,14 +59,15 @@ bool HandlePostOfficeHelloReq(Session const* session, Packet const* packet)
     if (connectionType != 0)
     {
         // 0x1a829-0x1a896: type 1 writes line 80 (0x50), other types write line 65 (0x41). Both give failReason 4.
-        if (connectionType == 1)
-            Log::Write(Log::LT_ERROR, AGENT_PACKET_HANDLER_FILE, 80,
-                       L"[%s], %s; invalid connection type, agentWid:%u, connectionType:%d", MODULE_NAME,
-                       L"HandlePostOfficeHelloReq", static_cast<unsigned int>(agentWid), 1);
-        else
+        // The original tests "== 1" with a jump to the line 80 block; the line 65 block falls through.
+        if (connectionType != 1)
             Log::Write(Log::LT_ERROR, AGENT_PACKET_HANDLER_FILE, 65,
                        L"[%s], %s; invalid connection type, connectionType:%d", MODULE_NAME,
                        L"HandlePostOfficeHelloReq", static_cast<int>(connectionType));
+        else
+            Log::Write(Log::LT_ERROR, AGENT_PACKET_HANDLER_FILE, 80,
+                       L"[%s], %s; invalid connection type, agentWid:%u, connectionType:%d", MODULE_NAME,
+                       L"HandlePostOfficeHelloReq", static_cast<unsigned int>(agentWid), 1);
         failReason = 4;
         goto $_ERROR;
     }

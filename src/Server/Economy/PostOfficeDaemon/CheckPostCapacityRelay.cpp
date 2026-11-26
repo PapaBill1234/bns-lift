@@ -136,11 +136,11 @@ bool CheckPostCapacityRelayContext::ComposeRequestPacket(Packet& packet) const
 // 0x9570
 bool CheckPostCapacityRelayContext::ComposeResponsePacket(Packet& packet) const
 {
-    // PDB lines (0x9570): one switch on the result state; the failure cases come first in the code, the crash case is the default.
+    // 0x9570 reads the result state once (edi); success first, then a signed range test (1 < state <= 4) for the
+    // failure path; the crash path is the else branch.
+    int const resultState = _response._resultState;
     unsigned long long const relayTid = _economyHeader._relayTid;
-    switch (_response._resultState)
-    {
-    case RelayResponse::RESULTSTATE_SUCCESS:
+    if (resultState == RelayResponse::RESULTSTATE_SUCCESS)
     {
         bool const composed = 0 < packet.Compose("hq", 8, _request._gameTid);
         if (!composed)
@@ -155,12 +155,9 @@ bool CheckPostCapacityRelayContext::ComposeResponsePacket(Packet& packet) const
                    L"[%s], %s; composed check post capacity success response packet, gameTid:0x%I64X",
                    MODULE_NAME, L"CheckPostCapacityRelayContext::ComposeResponsePacket", _request._gameTid);
     }
-    break;
-    case RelayResponse::RESULTSTATE_FAILURE:
-    case RelayResponse::RESULTSTATE_RELAY_ERROR:
-    case RelayResponse::RESULTSTATE_RELAY_TIMEOUT:
+    else if (RelayResponse::RESULTSTATE_SUCCESS < resultState && resultState <= RelayResponse::RESULTSTATE_RELAY_TIMEOUT)
     {
-        int const failReason = convertFailReason(static_cast<RelayResponse::ResultState>(_response._resultState), _response._failReason);
+        int const failReason = convertFailReason(static_cast<RelayResponse::ResultState>(resultState), _response._failReason);
         bool const composed = 0 < packet.Compose("hqE", 9, _request._gameTid, failReason);
         if (!composed)
         {
@@ -175,12 +172,12 @@ bool CheckPostCapacityRelayContext::ComposeResponsePacket(Packet& packet) const
                    MODULE_NAME, L"CheckPostCapacityRelayContext::ComposeResponsePacket", _request._gameTid,
                    failReason);
     }
-    break;
-    default:
+    else
+    {
         CHECK_POST_CAPACITY_RELAY_CRASH(127,
                                         L"== CRASH == [%s], %s; invalid response result state, relayTid:0x%I64X, resultState:%d",
                                         MODULE_NAME, L"CheckPostCapacityRelayContext::ComposeResponsePacket",
-                                        relayTid, _response._resultState);
+                                        relayTid, resultState);
         return false;
     }
     return true;

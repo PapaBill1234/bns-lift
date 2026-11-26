@@ -141,7 +141,9 @@ bool PostOfficeDaemon::setArgument(int /*argc*/, wchar_t const** /*argv*/)
 }
 
 // 0x12ca0
-extern "C" int __cdecl wmain(int argc, wchar_t** argv)
+// LIFT: no extern "C" (as LobbyGate 0x128b0). cl /EHsc gives an extern "C" function no EH state; the original wmain
+// 0x12ca0 has state -2 and the funclet wmain$dtor$0. The name wmain stays unmangled.
+int __cdecl wmain(int argc, wchar_t** argv)
 {
     PostOfficeDaemon daemonInstance;
     PostOfficeDaemon::_instance = &daemonInstance;
