@@ -26,3 +26,41 @@ Function: `WindowConsole::Open` (CG 0x17090, LG 0x2b880, SCD 0x26c70, POD 0x346e
 
 - `src/Server/BloodLib/source/WindowConsole.cpp`
 - `Docs/Plan/handoffs/lift-lobbydaemon-v2b2-wco.md`
+
+# Handoff: lift-lobbydaemon-v2b2-wco (session 2 of 4)
+
+## What I changed
+
+Function: `WindowConsole::Open` (CG 0x17090, LG 0x2b880, SCD 0x26c70, POD 0x346e0).
+
+1. The console check reads `_consoleWindow.console` into a local `console` and tests the local.
+   The `Initialize` call still uses `_consoleWindow.console` as `this`.
+   Evidence: the original has `mov s4, qword ptr [s0 + 0xc0]; test s4, s4; je L; mov s4, qword ptr [s4]`.
+   The base lift has `cmp qword ptr [s0 + 0xc0], s4` (compare with the zero register).
+   This form is new. It adds to the session 1 forms. The driver build gives the result.
+
+## Checks that I did
+
+- `Thread::Thread` store order: the original `PipeConsole::PipeConsole`, `Log::Log` and the inlined `IoWorker` ctor
+  store `_id`, `_run`, `_lastExecuted`, `_threadManager` in the same order as `WinMsgHandler` in `WindowConsole::Open`.
+  `PipeConsole::PipeConsole` is MATCH in the baseline with the present `Thread()` form.
+  Thus the store order comes from instruction scheduling, not from source order. I did not change `Thread.h`.
+- Constant evidence: the triage hint "0xc0 vs 0x30" comes from the reload of `_initEvent` (`[s5 + 0x30]`) after `CreateEventW`.
+  The session 1 local `initEvent` form targets it.
+
+## Not done (if the build shows that the diff stays)
+
+`WindowConsole::Open` (all 4 exes). Causes and evidence:
+
+- Zero register: the original makes the zero register (`xor s3d, s3d`) after the `Name` calls and uses `cmp qword ptr [s0 + 0xb8], 0`.
+  The lift keeps one callee-saved zero register from the `_consoleWindow` reset to the end. Cause: register allocation and constant CSE
+  (the same class as `EventNotiJob::finalize` and `JobManager::Execute` in the lessons stop list).
+- Early `return false` block (`xor al, al; jmp L` at insn 20): block layout. No source form is known.
+- LG 0x2b880 only: the original sets `xor r8d, r8d` before `ThreadManager::StartThread`. CG, SCD and POD do not.
+  The source is shared, so one form cannot give both. Cause: LTCG constant propagation per exe.
+- Forms tried in total: session 1 forms 1 to 3, the batch lead test p11, and form 1 of this session.
+
+## Files changed (session 2)
+
+- `src/Server/BloodLib/source/WindowConsole.cpp`
+- `Docs/Plan/handoffs/lift-lobbydaemon-v2b2-wco.md`

@@ -183,7 +183,9 @@ bool WindowConsole::Open()
     }
     if (_consoleWindow.module == nullptr)
         return false;
-    if (_consoleWindow.console == nullptr)
+    // 0x17090 loads the console pointer into a register and tests it (`mov s4, [s0+0xc0]; test s4, s4`).
+    ConsoleWindow* console = _consoleWindow.console;
+    if (console == nullptr)
         return false;
 
     // 0x17090 loads the vtable before the two Name calls and reloads `this` after them.
