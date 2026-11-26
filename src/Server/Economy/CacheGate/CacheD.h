@@ -49,7 +49,8 @@ public:
         CacheDMap;  // PDB CacheDList::CacheDMap
 
     // LIFT: The constructor is inlined in the CacheGate constructor.
-    CacheDList() : _capacity(0), _cachedMap(nullptr) {}
+    // LIFT: the original does not set _capacity (no store in wmain 0x4180). Nothing reads _capacity.
+    CacheDList() : _cachedMap(nullptr) {}
     ~CacheDList();                                                             // 0x25C0
 
     bool Initialize();                                                         // 0x2660
