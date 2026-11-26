@@ -520,23 +520,9 @@ bool LobbyGate::reload(wchar_t** argv, int argc)
 
     bool isChanged = false;
     Log::Write(Log::LT_NOTICE, kFile, 492, L"[lobbygate], bns common config reloading...");
-    if (BnsCommonConfig::ReloadBnsCommonConfig(isChanged))
-    {
-        if (isChanged)
-        {
-            BnsCommonConfig::Dump();
-            Log::Write(Log::LT_NOTICE, kFile, 511, L"[lobbygate], bns common config reload complete, done");
-        }
-        else
-        {
-            Log::Write(Log::LT_NOTICE, kFile, 506, L"[lobbygate], bns common config reload complete, not changed");
-        }
-        if (pipeConsole != nullptr)
-            pipeConsole->SetRunningInfo(LobbyGateReloadInvalidRestoreTimer::INVALID_REASON_STR[2], nullptr);
-        if (pipeConsole != nullptr)
-            pipeConsole->SetRunningInfo(L"bns common config reload succeed", timeStr);
-    }
-    else
+    // LIFT: PDB lines of 0x13770: the fail branch (495-502) comes before the success branch (504-514),
+    // and the "not changed" log (506) comes before Dump (510).
+    if (!BnsCommonConfig::ReloadBnsCommonConfig(isChanged))
     {
         Log::Write(Log::LT_ERROR, kFile, 495, L"[scd], bns common config reload fail");
         PipeConsole* pc = pipeConsole;
@@ -590,6 +576,22 @@ bool LobbyGate::reload(wchar_t** argv, int argc)
         Timer* const timer = mem ? new (mem) LobbyGateReloadInvalidRestoreTimer() : nullptr;
         _restoreReloadTimer = timer;
         AddTimer(60000, timer);
+    }
+    else
+    {
+        if (!isChanged)
+        {
+            Log::Write(Log::LT_NOTICE, kFile, 506, L"[lobbygate], bns common config reload complete, not changed");
+        }
+        else
+        {
+            BnsCommonConfig::Dump();
+            Log::Write(Log::LT_NOTICE, kFile, 511, L"[lobbygate], bns common config reload complete, done");
+        }
+        if (pipeConsole != nullptr)
+            pipeConsole->SetRunningInfo(LobbyGateReloadInvalidRestoreTimer::INVALID_REASON_STR[2], nullptr);
+        if (pipeConsole != nullptr)
+            pipeConsole->SetRunningInfo(L"bns common config reload succeed", timeStr);
     }
 
     Log::Write(Log::LT_NOTICE, kFile, 519, L"[lobbygate], contents rule config reloading...");
