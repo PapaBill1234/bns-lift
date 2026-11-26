@@ -24,34 +24,6 @@ static wchar_t const* const MODULE_NAME = L"unsent post context";  // PDB MODULE
         AlertSender::Write(UNSENT_POST_CONTEXT_FILE, line, fmt, __VA_ARGS__);         \
     } while (0)
 
-// LIFT: Lock.h line 113 and 122 asserts. The original inlines AutoCS::AutoCS and AutoCS::Leave here
-// and has no call to AutoCS::~AutoCS (0xc6d0, 0xcae0). A local AutoCS object adds one dtor call per exit.
-#define UNSENT_LOCK_H_WIDE L"e:\\dailybuild02\\postofficedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\bloodlib\\include\\Lock.h"
-#define UNSENT_LOCK_H_NARROW "e:\\dailybuild02\\postofficedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\bloodlib\\include\\Lock.h"
-#define UNSENT_LOCK_ASSERT(cs, line)                                                    \
-    do                                                                                  \
-    {                                                                                   \
-        if ((cs) == nullptr)                                                            \
-        {                                                                               \
-            Log::Write(Log::LT_ERROR, UNSENT_LOCK_H_WIDE, line, L"== CRASH == ASSERT CRASH");  \
-            AlertSender::Write(UNSENT_LOCK_H_WIDE, line, L"== CRASH == ASSERT CRASH");  \
-            CrashHandler::MakeCrash(UNSENT_LOCK_H_NARROW, line, L"");                   \
-        }                                                                               \
-    } while (0)
-#define UNSENT_LOCK_ENTER(cs)           \
-    do                                  \
-    {                                   \
-        UNSENT_LOCK_ASSERT(cs, 113);    \
-        EnterCriticalSection(&(cs)->CS); \
-    } while (0)
-#define UNSENT_LOCK_LEAVE_RETURN(cs, value) \
-    do                                      \
-    {                                       \
-        UNSENT_LOCK_ASSERT(cs, 122);        \
-        LeaveCriticalSection(&(cs)->CS);    \
-        return value;                       \
-    } while (0)
-
 // 0xc3b0
 bool UnsentPostContextList::pushUnsentPostContext(long long const postId, bool const hasPostContext)
 {
@@ -125,8 +97,8 @@ UnsentPostContext* UnsentPostContextList::popUnsentPostContext()
 // 0xc6d0
 bool UnsentPostContextManager::initContextManager(WorldConfigList const* worldConfigList)
 {
-    CriticalSection* const lock = &_reloadLock;
-    UNSENT_LOCK_ENTER(lock);
+    // LIFT: 0xc6d0 has EH state -2; the AutoCS destructor leaves at each return (A26 line order 169 before 174).
+    AutoCS lock(&_reloadLock);
     for (WorldConfigList::Container::const_iterator it = worldConfigList->_configList.begin();
          it != worldConfigList->_configList.end(); ++it)
     {
@@ -138,28 +110,31 @@ bool UnsentPostContextManager::initContextManager(WorldConfigList const* worldCo
             Log::Write(Log::LT_ERROR, UNSENT_POST_CONTEXT_FILE, 159,
                        L"[%s], %s; wid out of range, wid:%u, bucketIndex:%d, bucketCount:%d", MODULE_NAME,
                        L"UnsentPostContextManager::initContextManager", wid, bucketIndex, BUCKET_COUNT);
-            UNSENT_LOCK_LEAVE_RETURN(lock, false);
+            return false;
         }
         if (_containerList[bucketIndex] == nullptr)
             _containerList[bucketIndex] = static_cast<UnsentPostContextList**>(Memory::_Manager[2]->AllocZero(
                 sizeof(UnsentPostContextList*) * ARRAY_SIZE, UNSENT_POST_CONTEXT_FILE, 164));
-        if (_containerList[bucketIndex][worldIndex] != nullptr)
+        if (_containerList[bucketIndex][worldIndex] == nullptr)
+        {
+            if (!addUnsentPostContextList(wid, bucketIndex, worldIndex))
+            {
+                UNSENT_POST_CONTEXT_CRASH(
+                    169, L"== CRASH == [%s], %s; failed to add unsent post context list, wid:%u, bucketIndex:%d, worldIndex:%d",
+                    MODULE_NAME, L"UnsentPostContextManager::initContextManager", wid, bucketIndex, worldIndex);
+                return false;
+            }
+        }
+        else
         {
             Log::Write(Log::LT_ERROR, UNSENT_POST_CONTEXT_FILE, 174,
                        L"[%s], %s; unsent post context list already exists, wid:%u, bucketIndex:%d, worldIndex:%d",
                        MODULE_NAME, L"UnsentPostContextManager::initContextManager", wid, bucketIndex,
                        worldIndex);
-            UNSENT_LOCK_LEAVE_RETURN(lock, false);
-        }
-        if (!addUnsentPostContextList(wid, bucketIndex, worldIndex))
-        {
-            UNSENT_POST_CONTEXT_CRASH(
-                169, L"== CRASH == [%s], %s; failed to add unsent post context list, wid:%u, bucketIndex:%d, worldIndex:%d",
-                MODULE_NAME, L"UnsentPostContextManager::initContextManager", wid, bucketIndex, worldIndex);
-            UNSENT_LOCK_LEAVE_RETURN(lock, false);
+            return false;
         }
     }
-    UNSENT_LOCK_LEAVE_RETURN(lock, true);
+    return true;
 }
 
 // 0xcae0
