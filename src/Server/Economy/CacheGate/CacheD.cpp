@@ -248,8 +248,9 @@ bool CacheDList::LoadCachedListConfigFile(wchar_t const* fileName, bool reload)
                     }
                     else
                     {
+                        // LIFT: 0x2b20 has two reader->Close(doc) sites (Hex-Rays LABEL_40 and the loop end). Only the
+                        // loop end sets the result to true.
                         XmlNode const* node = rootNode->FirstChild();
-                        result = true;
                         while (node != nullptr && node->IsValid())
                         {
                             if (node->Type() == 1)
@@ -258,8 +259,8 @@ bool CacheDList::LoadCachedListConfigFile(wchar_t const* fileName, bool reload)
                                 // An element that is not "cached" stops the load with failure.
                                 if (element == nullptr || wcscmp(element->Name(), L"cached") != 0)
                                 {
-                                    result = false;
-                                    break;
+                                    reader->Close(doc);
+                                    goto leave;  // The result stays false.
                                 }
                                 unsigned short wid = static_cast<unsigned short>(_wtoi(element->Attribute(L"wid")));
                                 char ipText[32];
@@ -319,9 +320,11 @@ bool CacheDList::LoadCachedListConfigFile(wchar_t const* fileName, bool reload)
                             node = node->Next();
                         }
                         reader->Close(doc);
+                        result = true;
                     }
                 }
             }
+        leave:
             _lock.Leave();
             if (reader != nullptr)
                 destroyReader(reader);
