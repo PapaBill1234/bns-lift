@@ -117,8 +117,8 @@ CacheDList::~CacheDList()
 // 0x2660
 bool CacheDList::Initialize()
 {
-    void* buffer = Memory::_Manager[2]->Alloc(sizeof(CacheDMap), CACHED_FILE, 130);
-    _cachedMap = buffer != nullptr ? new (buffer) CacheDMap() : nullptr;
+    // LIFT: one placement-new expression. The throw() placement operator new gives the null test and the nullptr branch.
+    _cachedMap = ::new (Memory::_Manager[2]->Alloc(sizeof(CacheDMap), CACHED_FILE, 130)) CacheDMap();
     return _cachedMap != nullptr;
 }
 
@@ -150,12 +150,25 @@ bool CacheDList::MakeSessionAll()
             cached->_lock.Enter();
             bool connected = cached->MakeSession(2, cached->_addr, cached->_port, 0, true);  // LIFT: folded args
             cached->_lock.Leave();
+            // LIFT: one Log::Write with the line and format chosen in each branch (orig 0x27d0 has one merged tail).
+            unsigned long const addr = cached->_addr;
+            int const id = cached->_id;
+            wchar_t const* ipString;
+            wchar_t const* format;
+            int line;
             if (connected)
-                Log::Write(Log::LT_DEBUG, CACHED_FILE, 169, L"[cached list], connect, wid:%d, ipAddress:%s",
-                           cached->_id, Network::GetAddressStringW(cached->_addr));
+            {
+                ipString = Network::GetAddressStringW(addr);
+                format = L"[cached list], connect, wid:%d, ipAddress:%s";
+                line = 169;
+            }
             else
-                Log::Write(Log::LT_DEBUG, CACHED_FILE, 171, L"[cached list], try connect fail, wid:%d, ipAddress:%s",
-                           cached->_id, Network::GetAddressStringW(cached->_addr));
+            {
+                ipString = Network::GetAddressStringW(addr);
+                format = L"[cached list], try connect fail, wid:%d, ipAddress:%s";
+                line = 171;
+            }
+            Log::Write(Log::LT_DEBUG, CACHED_FILE, line, format, id, ipString);
         }
         else
         {
