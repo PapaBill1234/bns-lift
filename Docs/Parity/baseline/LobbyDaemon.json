@@ -1693,10 +1693,10 @@
 },
 "Daemon::Start": {
 "calls": 100,
-"consts": 91,
+"consts": 100,
 "refs": 100,
-"score": 97.0,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "Daemon::cooldown": {
 "calls": 100,
@@ -9089,10 +9089,10 @@
 },
 "ThreadManager::Initialize": {
 "calls": 100,
-"consts": 67,
+"consts": 100,
 "refs": 100,
-"score": 88.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "ThreadManager::StartThread": {
 "calls": 100,
