@@ -777,10 +777,10 @@
 "status": "MATCH"
 },
 "CheckPostCapacityRelayContext::ComposeResponsePacket": {
-"calls": 100,
-"consts": 83,
+"calls": 67,
+"consts": 73,
 "refs": 100,
-"score": 94.4,
+"score": 79.8,
 "status": "DIFF"
 },
 "CheckPostCapacityRelayContext::GetRequestWid": {
@@ -882,6 +882,13 @@
 "status": "MATCH"
 },
 "Console::Console": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Console::Flush": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -1653,9 +1660,9 @@
 },
 "HandlePostOfficeHelloReq": {
 "calls": 100,
-"consts": 87,
+"consts": 93,
 "refs": 100,
-"score": 95.6,
+"score": 97.8,
 "status": "DIFF"
 },
 "HandlePostOfficeManagementHelloReq": {
@@ -3458,10 +3465,10 @@
 "status": "MATCH"
 },
 "RetrieveCharacterInfoRelayContext::ComposeResponsePacket": {
-"calls": 100,
-"consts": 83,
+"calls": 59,
+"consts": 73,
 "refs": 100,
-"score": 94.4,
+"score": 77.2,
 "status": "DIFF"
 },
 "RetrieveCharacterInfoRelayContext::MakeRelayHeader": {
@@ -5166,11 +5173,11 @@
 "status": "MATCH"
 },
 "operator delete[]": {
-"calls": 0,
-"consts": 0,
-"refs": 0,
-"score": 0.0,
-"status": "DIFF"
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "os2i": {
 "calls": 100,
@@ -5272,10 +5279,17 @@
 },
 "wmain": {
 "calls": 100,
-"consts": 67,
+"consts": 100,
 "refs": 100,
-"score": 88.9,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
+},
+"wmain$dtor$0": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "wmainCRTStartup": {
 "calls": 100,
