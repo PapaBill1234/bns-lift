@@ -715,10 +715,10 @@
 "status": "MATCH"
 },
 "CliSession::UpdateCharacterData": {
-"calls": 77,
-"consts": 67,
+"calls": 100,
+"consts": 75,
 "refs": 100,
-"score": 81.2,
+"score": 91.7,
 "status": "DIFF"
 },
 "CliSession::UpdateCharacterLevel": {
@@ -743,6 +743,13 @@
 "status": "MATCH"
 },
 "CliSession::fetchContentBans": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CliSession::getCharacter": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
