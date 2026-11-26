@@ -80,6 +80,9 @@ public:
     void AddJobTimer(unsigned long long gateKey, char reason);  // 0x12bf0
     static void FailedEventObjectHandler(EventObject* eventObject);  // 0x12cf0
 
+    // PDB (LobbyGate): public static `Instance` returns `LobbyGate*`; `_instance` is private.
+    // LIFT: the AddJobTimer callers use Instance(). LTCG IPA then keeps `this` as an argument (0x12bf0).
+    static LobbyGate* Instance() { return _instance; }
     static LobbyGate* _instance;
 
     LobbyGateConfig const* _config;

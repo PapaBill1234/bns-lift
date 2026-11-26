@@ -1085,7 +1085,7 @@ bool HandleLobbyLobbyGate_CloseSessionNotify(Session const* session, Packet* pac
     }
     else
     {
-        LobbyGate::_instance->AddJobTimer(client->_gateKey, 3);
+        LobbyGate::Instance()->AddJobTimer(client->_gateKey, 3);
         client->removeReferenceCount(HANDLER_FILE, 1416);
         ch->removeReferenceCount(HANDLER_FILE, 1417);
     }
@@ -1145,7 +1145,7 @@ bool HandleLobbyLobbyGate_KickNotify(Session const* session, Packet* packet)
     sendSession->send(list, 1);
     sendSession->_lock.Leave();
     LD_DBG(1482, L"send ok, kicknotify, sessionId:0x%I64X, reason:%d", clientSession->_id, reason);
-    LobbyGate::_instance->AddJobTimer(client->_gateKey, 1);
+    LobbyGate::Instance()->AddJobTimer(client->_gateKey, 1);
     const_cast<Session*>(clientSession)->removeReferenceCount(CHANNEL_H_FILE, 52);
     client->removeReferenceCount(HANDLER_FILE, 1489);
     ch->removeReferenceCount(HANDLER_FILE, 1490);
