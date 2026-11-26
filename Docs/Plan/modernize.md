@@ -1,6 +1,6 @@
 # Modernize plan: C++ lift → Rust
 
-Owner goal, 2026-11-26. Status: plan only. Do not start before the gate in step 1.
+Owner goal, 2026-11-26. Status: plan only.
 
 ## Goal
 
@@ -18,25 +18,25 @@ Rust has no garbage collector. It frees memory by ownership (RAII). This gives m
 
 ## Order
 
+Owner decision, 2026-11-26: every exe gets the full C++ lift, GameDaemon too. The lift is the parity oracle. The Rust version grows with the lift: one Rust step at every 10 % of MATCH.
+
 ```
-1. C++ lift of the 5 exes to 95 % MATCH     (now)
-2. Rust port of the 5 exes                   (C++ lift = test oracle)
-3. GameDaemon: direct 2019 + PDB → Rust      (no full C++ lift)
+C++ lift  ──10%──20%──30%── ... ──95%
+              │    │    │          │
+Rust port   R10  R20  R30   ...  R95    (port the newly matched functions)
 ```
 
-| Step | Exes | Gate to start |
-| --- | --- | --- |
-| 1 | LobbyDaemon, CacheGate, LobbyGate, SmartCouponDaemon, PostOfficeDaemon | running |
-| 2 | the same 5 | the 4 small exes at 95 %; LobbyDaemon at its checkpoint |
-| 3 | GameDaemon | step 2 done for 1 exe, so that the method is proven |
+| Item | Rule |
+| --- | --- |
+| Trigger | The exe passes a new 10 % step of its counted MATCH. |
+| Scope | Port only the functions that reached MATCH since the last step. |
+| Gate | Packet replay and function tests pass for all ported code. Earlier steps stay green. |
+| Owner | A separate Rust card per step. It does not block the C++ lift. |
+| Exes | LobbyDaemon, CacheGate, LobbyGate, SmartCouponDaemon, PostOfficeDaemon, then GameDaemon. |
 
-## Why GameDaemon skips the full C++ lift
+Why: one large port at the end costs too much for GameDaemon. Small steps port code while the lift context is fresh, and each step is tested against the C++ code that just matched.
 
-GameDaemon is much larger than the 5 exes. A full C++ lift and then a Rust port pays twice for the same logic. For GameDaemon:
-
-1. Port each subsystem from 2019 + PDB straight to Rust.
-2. Lift to C++ only the hard functions that need a MATCH oracle (formulas, crypto, packet encode and decode).
-3. Test the Rust code against those C++ functions with the same inputs.
+The 4 small exes are already above 60 %. Their first Rust step covers all MATCH code up to the current 10 % step.
 
 ## Test method for the Rust port
 
