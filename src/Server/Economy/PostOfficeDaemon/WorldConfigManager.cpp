@@ -67,7 +67,7 @@ bool WorldConfigManager::initConfigManager()
 bool WorldConfigManager::updateWorldList(WorldConfigList const* worldConfigList)
 {
     // LIFT: 0xdb30 has no explicit Leave; the AutoCS destructor leaves at each return.
-    AutoCS lock(&_reloadLock);
+    AutoCS autoLock(&_reloadLock);
     for (WorldConfigList::Container::const_iterator it = worldConfigList->_configList.begin();
          it != worldConfigList->_configList.end(); ++it)
     {
@@ -227,82 +227,88 @@ bool WorldConfigManager::setWorldConfigFilePath()
 // 0xe5f0
 bool WorldConfigManager::loadWorldConfigFile(WorldConfigList* worldConfigList)
 {
+    // LIFT: 0xe5f0 puts the line-251 block after FreeLibrary, so the library check is the outer if/else.
     bool result = false;
     HMODULE library = LoadLibraryW(XML_READER_DLL);
-    if (library == nullptr)
+    if (library != nullptr)
+    {
+        XriGetInterfaceVersion getInterfaceVersion =
+            reinterpret_cast<XriGetInterfaceVersion>(GetProcAddress(library, "GetInterfaceVersion"));
+        GetProcAddress(library, "SetMemAllocator");
+        XriCreateFunc createXmlReader = reinterpret_cast<XriCreateFunc>(GetProcAddress(library, "CreateXmlReader"));
+        XriDestoryFunc destroyXmlReader =
+            reinterpret_cast<XriDestoryFunc>(GetProcAddress(library, "DestroyXmlReader"));
+        XmlReader const* reader = createXmlReader();
+        XmlDoc* doc = nullptr;
+        if (reader == nullptr)
+        {
+            Log::Write(Log::LT_ERROR, WORLD_CONFIG_FILE, 257, L"[%s], %s; failed to create xml reader", MODULE_NAME,
+                       L"WorldConfigManager::loadWorldConfigFile");
+        }
+        else
+        {
+            wchar_t const* version = getInterfaceVersion();
+            if (_wcsicmp(version, XML_READER_VERSION) != 0)
+            {
+                Log::Write(Log::LT_ERROR, WORLD_CONFIG_FILE, 263,
+                           L"[%s], %s; xml interface version mismatch, current-version:%s, load-version:%s",
+                           MODULE_NAME, L"WorldConfigManager::loadWorldConfigFile", XML_READER_VERSION, version);
+            }
+            else if (!reader->Initialize(nullptr, nullptr, false))
+            {
+                Log::Write(Log::LT_ERROR, WORLD_CONFIG_FILE, 268, L"[%s], %s; failed to initialize xml reader",
+                           MODULE_NAME, L"WorldConfigManager::loadWorldConfigFile");
+            }
+            else
+            {
+                doc = reader->Read(_filePath, static_cast<XmlPieceReader*>(nullptr));
+                if (doc == nullptr)
+                {
+                    Log::Write(Log::LT_ERROR, WORLD_CONFIG_FILE, 274,
+                               L"[%s], %s; failed to read world config xml file, filePath:%s", MODULE_NAME,
+                               L"WorldConfigManager::loadWorldConfigFile", _filePath);
+                }
+                else if (!setupWorldConfigList(doc, *worldConfigList))
+                {
+                    Log::Write(Log::LT_ERROR, WORLD_CONFIG_FILE, 279, L"[%s], %s; failed to setup world config list",
+                               MODULE_NAME, L"WorldConfigManager::loadWorldConfigFile");
+                }
+                else
+                {
+                    Log::Write(Log::LT_NOTICE, WORLD_CONFIG_FILE, 283,
+                               L"[%s], %s; completed to load world config from xml file, filePath:%s", MODULE_NAME,
+                               L"WorldConfigManager::loadWorldConfigFile", _filePath);
+                    result = true;
+                }
+            }
+        }
+        if (reader != nullptr)
+        {
+            if (doc != nullptr)
+                reader->Close(doc);
+            destroyXmlReader(reader);
+        }
+        FreeLibrary(library);
+    }
+    else
     {
         Log::Write(Log::LT_ERROR, WORLD_CONFIG_FILE, 251,
                    L"[%s], %s; failed to initialize xml reader interface, dll name:%s", MODULE_NAME,
                    L"WorldConfigManager::loadWorldConfigFile", XML_READER_DLL);
-        return false;
     }
-    XriGetInterfaceVersion getInterfaceVersion =
-        reinterpret_cast<XriGetInterfaceVersion>(GetProcAddress(library, "GetInterfaceVersion"));
-    GetProcAddress(library, "SetMemAllocator");
-    XriCreateFunc createXmlReader = reinterpret_cast<XriCreateFunc>(GetProcAddress(library, "CreateXmlReader"));
-    XriDestoryFunc destroyXmlReader =
-        reinterpret_cast<XriDestoryFunc>(GetProcAddress(library, "DestroyXmlReader"));
-    XmlReader const* reader = createXmlReader();
-    XmlDoc* doc = nullptr;
-    wchar_t const* version = reader != nullptr ? getInterfaceVersion() : nullptr;
-    if (reader == nullptr)
-    {
-        Log::Write(Log::LT_ERROR, WORLD_CONFIG_FILE, 257, L"[%s], %s; failed to create xml reader", MODULE_NAME,
-                   L"WorldConfigManager::loadWorldConfigFile");
-    }
-    else if (_wcsicmp(version, XML_READER_VERSION) != 0)
-    {
-        Log::Write(Log::LT_ERROR, WORLD_CONFIG_FILE, 263,
-                   L"[%s], %s; xml interface version mismatch, current-version:%s, load-version:%s", MODULE_NAME,
-                   L"WorldConfigManager::loadWorldConfigFile", XML_READER_VERSION, version);
-    }
-    else if (!reader->Initialize(nullptr, nullptr, false))
-    {
-        Log::Write(Log::LT_ERROR, WORLD_CONFIG_FILE, 268, L"[%s], %s; failed to initialize xml reader",
-                   MODULE_NAME, L"WorldConfigManager::loadWorldConfigFile");
-    }
-    else
-    {
-        doc = reader->Read(_filePath, static_cast<XmlPieceReader*>(nullptr));
-        if (doc == nullptr)
-        {
-            Log::Write(Log::LT_ERROR, WORLD_CONFIG_FILE, 274,
-                       L"[%s], %s; failed to read world config xml file, filePath:%s", MODULE_NAME,
-                       L"WorldConfigManager::loadWorldConfigFile", _filePath);
-        }
-        else if (setupWorldConfigList(doc, worldConfigList))
-        {
-            Log::Write(Log::LT_NOTICE, WORLD_CONFIG_FILE, 283,
-                       L"[%s], %s; completed to load world config from xml file, filePath:%s", MODULE_NAME,
-                       L"WorldConfigManager::loadWorldConfigFile", _filePath);
-            result = true;
-        }
-        else
-        {
-            Log::Write(Log::LT_ERROR, WORLD_CONFIG_FILE, 279, L"[%s], %s; failed to setup world config list",
-                       MODULE_NAME, L"WorldConfigManager::loadWorldConfigFile");
-        }
-    }
-    if (reader != nullptr)
-    {
-        if (doc != nullptr)
-            reader->Close(doc);
-        destroyXmlReader(reader);
-    }
-    FreeLibrary(library);
     return result;
 }
 
 // 0xe8c0
-bool WorldConfigManager::setupWorldConfigList(XmlDoc* xmlDoc, WorldConfigList* worldConfigList)
+bool WorldConfigManager::setupWorldConfigList(XmlDoc* const doc, WorldConfigList& worldConfigList)
 {
-    if (xmlDoc == nullptr)
+    if (doc == nullptr)
     {
         WORLD_CONFIG_CRASH(302, L"== CRASH == [%s], %s; invalid parameter, xml doc:0x%p", MODULE_NAME,
-                           L"WorldConfigManager::setupWorldConfigList", xmlDoc);
+                           L"WorldConfigManager::setupWorldConfigList", doc);
         return false;
     }
-    XmlElement* root = xmlDoc->Root();
+    XmlElement* root = doc->Root();
     if (root == nullptr)
     {
         Log::Write(Log::LT_ERROR, WORLD_CONFIG_FILE, 308, L"[%s], %s; root element is nothing", MODULE_NAME,
@@ -359,7 +365,7 @@ bool WorldConfigManager::setupWorldConfigList(XmlDoc* xmlDoc, WorldConfigList* w
             Memory::_Manager[2]->Free(worldConfig, WORLD_CONFIG_FILE, 341);
             return false;
         }
-        if (!worldConfigList->_configList.insert(std::pair<unsigned short, WorldConfig*>(worldConfig->_wid, worldConfig)).second)
+        if (!worldConfigList._configList.insert(std::pair<unsigned short, WorldConfig*>(worldConfig->_wid, worldConfig)).second)
         {
             Log::Write(Log::LT_ERROR, WORLD_CONFIG_FILE, 348, L"[%s], %s; failed to add world config, wid:%u",
                        MODULE_NAME, L"WorldConfigManager::setupWorldConfigList", worldConfig->_wid);

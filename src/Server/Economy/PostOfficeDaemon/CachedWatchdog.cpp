@@ -159,7 +159,7 @@ bool CachedWatchdogManager::updateWorldList(WorldConfigList const* worldConfigLi
 {
     // LIFT: 0x4310 the AutoCS object lives in an inner scope; its destructor leaves at each exit (one Lock.h line-122 assert each).
     {
-        AutoCS lock(&_reloadLock);
+        AutoCS autoLock(&_reloadLock);
         for (WorldConfigList::Container::const_iterator it = worldConfigList->_configList.begin();
              it != worldConfigList->_configList.end(); ++it)
         {

@@ -98,7 +98,7 @@ UnsentPostContext* UnsentPostContextList::popUnsentPostContext()
 bool UnsentPostContextManager::initContextManager(WorldConfigList const* worldConfigList)
 {
     // LIFT: 0xc6d0 has EH state -2; the AutoCS destructor leaves at each return (A26 line order 169 before 174).
-    AutoCS lock(&_reloadLock);
+    AutoCS autoLock(&_reloadLock);
     for (WorldConfigList::Container::const_iterator it = worldConfigList->_configList.begin();
          it != worldConfigList->_configList.end(); ++it)
     {
@@ -143,7 +143,7 @@ bool UnsentPostContextManager::updateWorldList(WorldConfigList const* worldConfi
     // LIFT: 0xcae0 has EH state -2 and one Lock.h line-122 assert per exit. The AutoCS object
     // lives in an inner scope; its destructor does the leave at each exit.
     {
-        AutoCS lock(&_reloadLock);
+        AutoCS autoLock(&_reloadLock);
         for (WorldConfigList::Container::const_iterator it = worldConfigList->_configList.begin();
              it != worldConfigList->_configList.end(); ++it)
         {

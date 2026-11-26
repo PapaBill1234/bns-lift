@@ -52,7 +52,7 @@ public:
     bool CheckWorldConfig(unsigned short wid, unsigned long ipAddr, unsigned short const port);  // 0xe430
     bool setWorldConfigFilePath();                                                  // 0xe560
     bool loadWorldConfigFile(WorldConfigList* worldConfigList);                     // 0xe5f0
-    static bool setupWorldConfigList(XmlDoc* xmlDoc, WorldConfigList* worldConfigList);  // 0xe8c0
+    bool setupWorldConfigList(XmlDoc* const doc, WorldConfigList& worldConfigList);  // 0xe8c0 (PDB: member, not static)
     static bool createWorldConfigFile(wchar_t const* const worldConfigFilePath);     // 0xede0
     static void writeSampleConfigFormat(void* fileHandle);                          // 0xef40
     static bool writeConfigString(void* fileHandle, wchar_t const* const configString);  // 0xeff0
