@@ -8,16 +8,16 @@ C++ lift of the 2019 + PDB BnS server executables.
 
 This repo is public. Do not commit binaries, keys, PDBs or IDA databases.
 
-## Status (2026-11-25)
+## Status (2026-11-26)
 
 | Item | State |
 | --- | --- |
 | First 4 exes | 91.7 % parity. 3 of 4 are above 90 %. LobbyGate is at 89.0 %. |
-| LobbyDaemon | Lift in progress: 674 MATCH (30.6 %). Most of the other functions are still `LIFT_STUB` bodies. |
+| LobbyDaemon | Lift in progress: 677 MATCH (30.7 %). Most of the other functions are still `LIFT_STUB` bodies. |
 | Method | Gap cards. Each card lifts the PDB class layout and the stub bodies of one class or job group. |
-| Last landed | Gap cards 01-03 (LobbyJob core, LobbyGate channel, presence) and the `addReferenceCount` PDB signature: +29 MATCH, 0 lost in all 5 exes. |
+| Last landed | PDB class layouts for 18 LobbyDaemon stub classes, gap cards 05 (charge jobs) and 06 (goods and lobby service item jobs), and a funcdiff rule fix: an immediate is an address only with a base relocation (+3 MATCH). 0 lost in all 5 exes. |
 | Checks per landing | Full VS2010 build of all 5 exes, funcdiff against the original, 0 lost MATCH, 0 strict regress. A model review checks each new MATCH without a strict full proof. |
-| Next | Gap cards 04 (NPGame service channel) and 05 (charge jobs), then the other job cards. |
+| Next | Gap cards 04 (NPGame service channel) and 15 (CliSession), then the other job cards. |
 
 ## Parity
 
