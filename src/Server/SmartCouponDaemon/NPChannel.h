@@ -53,10 +53,3 @@ static_assert(sizeof(NPServiceChannelManager) == 0x18, "sizeof NPServiceChannelM
 
 void NPServiceChannelCmdDispatcher(unsigned int id, StsMsgLib::ECommand& eCmd);            // 0xFD80
 bool NPHandlerEventNoti(NPChannel* channel, StsMsgLib::_StsMsg* msg, NPTransaction* tran);  // 0xFBC0
-
-// Size 1 (include/pdb/SmartCouponDaemon/types.h). Static members only.
-class NPMsgHelper
-{
-public:
-    static long long LocaleHourToUTCTime(int hour, long long const UTCTime, int const timeZoneSecond);  // 0x2BE0 (LobbyDaemon)
-};

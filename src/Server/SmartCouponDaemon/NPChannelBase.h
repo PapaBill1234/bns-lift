@@ -530,3 +530,10 @@ public:
     NPPing* _ping;
 };
 static_assert(sizeof(NPChannel) == 0x40, "sizeof NPChannel");
+
+// NPChannel.obj (..\Shared\NPChannel2.cpp). Size 1 (include/pdb/SmartCouponDaemon/types.h). Static members only.
+class NPMsgHelper
+{
+public:
+    static long long LocaleHourToUTCTime(int hour, long long const UTCTime, int const timeZoneSecond);  // 0x2BE0 (LobbyDaemon)
+};

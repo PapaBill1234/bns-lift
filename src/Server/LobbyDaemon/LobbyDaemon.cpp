@@ -26,7 +26,7 @@
 #include "Memory.h"
 #include "Network.h"
 #include "MemoryManager.h"
-#include "NPChannel.h"
+#include "NPChannelBase.h"
 #include "Packet.h"
 #include "PacketUtil.h"
 #include "PipeConsole.h"

@@ -12,7 +12,7 @@
 // msvcr100 export. The Wine msvcrt headers do not declare it.
 extern "C" __time64_t __cdecl _mkgmtime64(struct tm* tm);
 #include <new>
-#include "NPChannel.h"
+#include "NPChannelBase.h"
 #include "AlertSender.h"
 #include "Connection.h"
 #include "CrashHandler.h"

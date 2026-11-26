@@ -6,6 +6,19 @@
 
 class ContentsRuleConfigLoad;
 
+// LobbyDaemon PDB: sizeof 8. The LobbyGate class of the same name is empty (sizeof 1). See src/Server/LobbyGate.
+class ContentsRuleConfigReload
+{
+public:
+    static ContentsRuleConfigReload* Load();  // 0x29730 (not lifted)
+
+    bool _useBotPriorityQueue;
+    int _minBotScoreToApplyBotPriorityQueue;
+};
+static_assert(sizeof(ContentsRuleConfigReload) == 0x8, "sizeof ContentsRuleConfigReload");
+static_assert(offsetof(ContentsRuleConfigReload, _minBotScoreToApplyBotPriorityQueue) == 0x4,
+              "ContentsRuleConfigReload::_minBotScoreToApplyBotPriorityQueue");
+
 class ContentsRuleConfig
 {
 public:
