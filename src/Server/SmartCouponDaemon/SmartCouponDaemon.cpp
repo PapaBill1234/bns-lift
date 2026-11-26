@@ -140,7 +140,9 @@ unsigned long long GenerateJobid()
 }
 
 // 0x14b70
-extern "C" int __cdecl wmain(int argc, wchar_t** argv)
+// LIFT: no extern "C" (as LobbyGate 0x128b0 and PostOfficeDaemon 0x12ca0). cl /EHsc gives an extern "C" function no
+// EH state; the original wmain has state -2 and the funclet wmain$dtor$0. The name wmain stays unmangled.
+int __cdecl wmain(int argc, wchar_t** argv)
 {
     SmartCouponDaemon daemon;
     SmartCouponDaemon::_instance = &daemon;
