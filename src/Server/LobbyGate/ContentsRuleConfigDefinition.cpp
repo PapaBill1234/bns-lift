@@ -153,17 +153,21 @@ bool ContentsRuleConfig::LoadContentsRuleConfig()
         return false;
 
     void* memory = Memory::_Manager[2]->Alloc(sizeof(ContentsRuleConfig), FILE_NAME, 232);
-    Config = memory != nullptr ? new (memory) ContentsRuleConfig() : nullptr;
+    Config = new (memory) ContentsRuleConfig();  // placement new with throw(): the compiler tests for null.
     if (Config == nullptr)
         return false;
 
+    // LIFT: 0x82c0 has one shared error tail (Config = nullptr, Log::Write, return false). Each failure sets the line and text.
+    wchar_t const* message;
+    int line;
+    FragmentPacket* listPacket;
     ConfigNoReload = ContentsRuleConfigLoad::Load();
     if (ConfigNoReload == nullptr)
     {
         Memory::_Manager[2]->Free(Config, FILE_NAME, 239);
-        Config = nullptr;
-        Log::Write(Log::LT_ERROR, FILE_NAME, 241, L"[ContentsRuleConfig::LoadContentsRuleConfig], config file load failed");
-        return false;
+        message = L"[ContentsRuleConfig::LoadContentsRuleConfig], config file load failed";
+        line = 241;
+        goto fail;
     }
 
     if (!CheckMinMaxBoundary(ConfigNoReload, _Def, ContentsRuleConfigLoad::_Def, ROW_COUNT))
@@ -171,9 +175,9 @@ bool ContentsRuleConfig::LoadContentsRuleConfig()
         DaemonConfig::FreeConfig(ConfigNoReload);
         ConfigNoReload = nullptr;
         Memory::_Manager[2]->Free(Config, FILE_NAME, 249);
-        Config = nullptr;
-        Log::Write(Log::LT_ERROR, FILE_NAME, 251, L"[ContentsRuleConfig::LoadContentsRuleConfig], boundary check failed");
-        return false;
+        message = L"[ContentsRuleConfig::LoadContentsRuleConfig], boundary check failed";
+        line = 251;
+        goto fail;
     }
 
     if (!Config->UpdateAllVariable(ConfigNoReload))
@@ -181,24 +185,29 @@ bool ContentsRuleConfig::LoadContentsRuleConfig()
         DaemonConfig::FreeConfig(ConfigNoReload);
         ConfigNoReload = nullptr;
         Memory::_Manager[2]->Free(Config, FILE_NAME, 259);
-        Config = nullptr;
-        Log::Write(Log::LT_ERROR, FILE_NAME, 261, L"[ContentsRuleConfig::LoadContentsRuleConfig], variable update failed");
-        return false;
+        message = L"[ContentsRuleConfig::LoadContentsRuleConfig], variable update failed";
+        line = 261;
+        goto fail;
     }
 
-    FragmentPacket* listPacket = MakeListPacket(Config);
+    listPacket = MakeListPacket(Config);
     if (listPacket == nullptr)
     {
         DaemonConfig::FreeConfig(ConfigNoReload);
         ConfigNoReload = nullptr;
         Memory::_Manager[2]->Free(Config, FILE_NAME, 269);
-        Config = nullptr;
-        Log::Write(Log::LT_ERROR, FILE_NAME, 271, L"[ContentsRuleConfig::LoadContentsRuleConfig], packet make failed");
-        return false;
+        message = L"[ContentsRuleConfig::LoadContentsRuleConfig], packet make failed";
+        line = 271;
+        goto fail;
     }
 
     InterlockedExchangePointer(reinterpret_cast<void* volatile*>(&ListPacket), listPacket);
     return true;
+
+fail:
+    Config = nullptr;
+    Log::Write(Log::LT_ERROR, FILE_NAME, line, message);
+    return false;
 }
 
 // 0x84d0
@@ -319,13 +328,14 @@ FragmentPacket* ContentsRuleConfig::MakeListPacket(ContentsRuleConfig* config)
     (void)config;
     ContentsRuleConfig* current = Config;
 
-    void* memory = Memory::_Manager[2]->Alloc(sizeof(FragmentPacket), FILE_NAME, 0);
-    FragmentPacket* fp = memory != nullptr ? new (memory) FragmentPacket(107, "hihhiCb;") : nullptr;
+    void* memory = Memory::_Manager[2]->Alloc(sizeof(FragmentPacket), FILE_NAME, 373);  // 0x8851: r9d = 0x175
+    // LIFT: placement new with throw(). The compiler tests the result for null (0x8872).
+    FragmentPacket* fp = new (memory) FragmentPacket(107, "hihhiCb;");
     if (fp == nullptr)
         return nullptr;
 
-    char elementStr[264] = {0};
-    wchar_t elementWStr[264] = {0};
+    char elementStr[260] = {0};      // 0x88a4: memset 0x103 after the first byte
+    wchar_t elementWStr[260] = {0};  // memset 0x206 after the first wchar_t
 
     fp->packet.Allocate(&fp->composer);
     fp->Compose(3, 65, 0, ConfigReloadCount);  // 0x88d9: edx = 3, r8d = 65, r9d = 0, [rsp+20h] = ConfigReloadCount
@@ -340,7 +350,7 @@ FragmentPacket* ContentsRuleConfig::MakeListPacket(ContentsRuleConfig* config)
     addElement(fp, elementStr, elementWStr, length, false);
 
     char const* base = reinterpret_cast<char const*>(current);
-    for (int i = 0; i < ROW_COUNT; ++i)
+    for (unsigned int i = 0; i < ROW_COUNT; ++i)
     {
         ContentsRuleXmlCfgDefLocal const& def = _Def[i];
         char const* field = base + def.offset;
@@ -429,65 +439,52 @@ bool ContentsRuleConfig::ConvPacketElement(char* utf8Name, char* utf8Value, wcha
 bool ContentsRuleConfig::CheckMinMaxBoundary(void const* const loaded, ContentsRuleXmlCfgDefLocal const* defList,
                                              XmlCfgDef const* loadDefList, int defCount)
 {
-    // LIFT: LTCG folded the arguments. The only call (LoadContentsRuleConfig 0x8372) sets no argument register.
-    // The body reads ConfigNoReload and the two _Def tables. It stops at the address of
-    // LobbyGateConfig::_Def[0].defaultValue (the next table in .rdata). That is the same as 13 rows.
-    (void)loaded;
-    (void)defList;
-    (void)loadDefList;
-    (void)defCount;
-
-    ContentsRuleConfigLoad const* load = ConfigNoReload;
-    if (load == nullptr)
+    // LIFT: LTCG propagates the arguments of the only call (LoadContentsRuleConfig 0x8372). The body reads
+    // ConfigNoReload and the two _Def tables. The loop stops at the address &defList[defCount] (signed compare).
+    if (loaded == nullptr)
         return false;
 
-    char const* base = reinterpret_cast<char const*>(load);
+    char const* base = static_cast<char const*>(loaded);
     bool result = true;
-    for (int i = 0; i < ROW_COUNT; ++i)
+    for (int i = 0; i < defCount; ++i)
     {
-        ContentsRuleXmlCfgDefLocal const& def = _Def[i];
-        char const* field = base + ContentsRuleConfigLoad::_Def[i].offset;
+        ContentsRuleXmlCfgDefLocal const& def = defList[i];
         switch (def.type)
         {
         case XmlCfgDef::CFG_INT:
         {
-            int value = *reinterpret_cast<int const*>(field);
-            int minValue = *static_cast<int const*>(def.minValue);
-            int maxValue = *static_cast<int const*>(def.maxValue);
-            if (value < minValue || value > maxValue)
+            int value = *reinterpret_cast<int const*>(base + loadDefList[i].offset);
+            if (value < *static_cast<int const*>(def.minValue) || value > *static_cast<int const*>(def.maxValue))
             {
                 Log::Write(Log::LT_ERROR, FILE_NAME, 504,
                            L"[ContentsRuleConfig::CheckMinMaxBoundary], value outranged, name:%s, value:%d, min:%d, max:%d",
-                           def.name, value, minValue, maxValue);
+                           def.name, value, *static_cast<int const*>(def.minValue), *static_cast<int const*>(def.maxValue));
                 result = false;
             }
             break;
         }
         case XmlCfgDef::CFG_INT64:
         {
-            long long value = *reinterpret_cast<long long const*>(field);
-            long long minValue = *static_cast<long long const*>(def.minValue);
-            long long maxValue = *static_cast<long long const*>(def.maxValue);
-            if (value < minValue || value > maxValue)
+            long long value = *reinterpret_cast<long long const*>(base + loadDefList[i].offset);
+            if (value < *static_cast<long long const*>(def.minValue) || value > *static_cast<long long const*>(def.maxValue))
             {
                 Log::Write(Log::LT_ERROR, FILE_NAME, 512,
                            L"[ContentsRuleConfig::CheckMinMaxBoundary], value outranged, name:%s, value:%I64d, min:%I64d, max:%I64d",
-                           def.name, value, minValue, maxValue);
+                           def.name, value, *static_cast<long long const*>(def.minValue),
+                           *static_cast<long long const*>(def.maxValue));
                 result = false;
             }
             break;
         }
         case XmlCfgDef::CFG_FLOAT:
         {
-            float value = *reinterpret_cast<float const*>(field);
-            float minValue = *static_cast<float const*>(def.minValue);
-            float maxValue = *static_cast<float const*>(def.maxValue);
-            if (minValue > value || value > maxValue)
+            float value = *reinterpret_cast<float const*>(base + loadDefList[i].offset);
+            if (*static_cast<float const*>(def.minValue) > value || value > *static_cast<float const*>(def.maxValue))
             {
                 Log::Write(Log::LT_ERROR, FILE_NAME, 520,
                            L"[ContentsRuleConfig::CheckMinMaxBoundary], value outranged, name:%s, value:%f, min:%f, max:%f",
-                           def.name, static_cast<double>(value), static_cast<double>(minValue),
-                           static_cast<double>(maxValue));
+                           def.name, static_cast<double>(value), static_cast<double>(*static_cast<float const*>(def.minValue)),
+                           static_cast<double>(*static_cast<float const*>(def.maxValue)));
                 result = false;
             }
             break;
@@ -510,35 +507,36 @@ bool ContentsRuleConfig::UpdateAllVariable(ContentsRuleConfigLoad const* const l
     if (load == nullptr)
         return false;
 
-    char utf8Name[264] = {0};
-    char utf8Value[264] = {0};
+    char utf8Name[260] = {0};   // 0x9060: memset 0x103 after the first byte
+    char utf8Value[260] = {0};
     char* target = reinterpret_cast<char*>(config);
     char const* source = reinterpret_cast<char const*>(load);
-    for (int i = 0; i < ROW_COUNT; ++i)
+    // LIFT: 0x9060 reads the two offsets again in each case (no common field pointer).
+    for (unsigned int i = 0; i < ROW_COUNT; ++i)
     {
-        ContentsRuleXmlCfgDefLocal const& def = _Def[i];
-        char const* from = source + ContentsRuleConfigLoad::_Def[i].offset;
-        char* to = target + def.offset;
-        switch (def.type)
+        switch (_Def[i].type)
         {
         case XmlCfgDef::CFG_INT:
         case XmlCfgDef::CFG_FLOAT:
-            *reinterpret_cast<int*>(to) = *reinterpret_cast<int const*>(from);
+            *reinterpret_cast<int*>(target + _Def[i].offset) =
+                *reinterpret_cast<int const*>(source + ContentsRuleConfigLoad::_Def[i].offset);
             break;
         case XmlCfgDef::CFG_INT64:
-            *reinterpret_cast<long long*>(to) = *reinterpret_cast<long long const*>(from);
+            *reinterpret_cast<long long*>(target + _Def[i].offset) =
+                *reinterpret_cast<long long const*>(source + ContentsRuleConfigLoad::_Def[i].offset);
             break;
         case XmlCfgDef::CFG_BOOL:
-            *to = *from;
+            target[_Def[i].offset] = source[ContentsRuleConfigLoad::_Def[i].offset];
             break;
         case XmlCfgDef::CFG_STR:
         {
-            wchar_t const* value = *reinterpret_cast<wchar_t const* const*>(from);
+            wchar_t const* value =
+                *reinterpret_cast<wchar_t const* const*>(source + ContentsRuleConfigLoad::_Def[i].offset);
             if (value == nullptr)
                 value = L"";  // PDB: ??_C@_11LOCGONAA@ (rva 0x627d8)
-            if (def.name == nullptr || !ConvPacketElement(utf8Name, utf8Value, def.name, value))
+            if (_Def[i].name == nullptr || !ConvPacketElement(utf8Name, utf8Value, _Def[i].name, value))
                 return false;
-            wcscpy_s(reinterpret_cast<wchar_t*>(to), 260, value);
+            wcscpy_s(reinterpret_cast<wchar_t*>(target + _Def[i].offset), 260, value);
             break;
         }
         default:
