@@ -1,5 +1,6 @@
 // WorldChannel.obj (PostOfficeDaemon PDB). Source: .scratch/hr/WorldChannel.c
 // 0x1f4c0 is the std::map ctor (STL).
+#include "PlacementVecNew.h"
 #include <winsock2.h>
 #include <windows.h>
 #include <string.h>

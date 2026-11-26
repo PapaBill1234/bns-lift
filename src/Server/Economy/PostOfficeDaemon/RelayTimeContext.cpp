@@ -2,12 +2,23 @@
 // LIFT: PostOfficeDaemon build path of StlMemory.h, mixed case in this module (HR strings). Keeps the _Erase copies apart from the lower-case ones (no ICF fold).
 #define LIFT_STLMEMORY_FILE \
     L"E:\\DailyBuild02\\PostOfficeDaemon-Common-0.0.348\\depot\\Branch\\348NC\\Program\\Server\\BloodLib\\include\\StlMemory.h"
+#include "PlacementVecNew.h"
 #include "RelayTimeContext.h"
 #include <new>
 #include "Log.h"
 #include "AlertSender.h"
 #include "Memory.h"
 #include "RelayContext.h"
+
+#define LIFT_MEMORY_H_FILE_POD \
+    L"e:\\dailybuild02\\postofficedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\bloodlib\\include\\Memory.h"
+
+// 0xb040
+void __cdecl operator delete[](void*, void*)
+{
+    Log::Write(Log::LT_ERROR, LIFT_MEMORY_H_FILE_POD, 181, L"== CRASH == [memory], DO NOT USE THIS DEL OPERATOR");
+    AlertSender::Write(LIFT_MEMORY_H_FILE_POD, 181, L"== CRASH == [memory], DO NOT USE THIS DEL OPERATOR");
+}
 
 #define RELAY_TIME_CONTEXT_FILE L"RelayTimeContext.cpp"
 static wchar_t const* const MODULE_NAME = L"relaytime context";  // PDB MODULE_NAME

@@ -4,6 +4,7 @@
 // LIFT: PostOfficeDaemon build path of StlMemory.h, mixed case in this module (HR strings). Keeps the _Erase copies apart from the lower-case ones (no ICF fold).
 #define LIFT_STLMEMORY_FILE \
     L"E:\\DailyBuild02\\PostOfficeDaemon-Common-0.0.348\\depot\\Branch\\348NC\\Program\\Server\\BloodLib\\include\\StlMemory.h"
+#include "PlacementVecNew.h"
 #include "PostContext.h"
 #include <string.h>
 #include <wchar.h>

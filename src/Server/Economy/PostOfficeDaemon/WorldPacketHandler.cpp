@@ -1,4 +1,5 @@
 // WorldPacketHandler.obj (PostOfficeDaemon PDB). Source: .scratch/hr/WorldPacketHandler.c
+#include "PlacementVecNew.h"
 #include <winsock2.h>
 #include <windows.h>
 #include <string.h>
