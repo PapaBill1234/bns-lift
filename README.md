@@ -13,11 +13,11 @@ This repo is public. Do not commit binaries, keys, PDBs or IDA databases.
 | Item | State |
 | --- | --- |
 | First 4 exes | 91.7 % parity. 3 of 4 are above 90 %. LobbyGate is at 89.0 %. |
-| LobbyDaemon | Lift in progress: 739 MATCH (33.5 %), 24 excluded MATCH not counted. Most of the other functions are still `LIFT_STUB` bodies. |
+| LobbyDaemon | Lift in progress: 764 MATCH (34.7 %), 35 excluded MATCH not counted. Most of the other functions are still `LIFT_STUB` bodies. |
 | Method | Gap cards. Each card lifts the PDB class layout and the stub bodies of one class or job group. |
-| Last landed | PDB ids for fix 3b, honest totals (`Docs/Parity/excluded.tsv`), a public-clean tools pass, gap cards 07 (WNP jobs A), 08 (session jobs) and 19 (manage channel, +59 MATCH, 24 review rejects excluded). 0 lost in all 5 exes. |
+| Last landed | Gap cards 11 (rename and user-name jobs, +25 MATCH; 6 review rejects and 4 parked ZSTD items excluded) and 09 (character life jobs, +0 MATCH; 1 review reject excluded). Before: gap cards 07, 08 and 19, honest totals and a public-clean tools pass. 0 lost in all 5 exes. |
 | Checks per landing | Full VS2010 build of all 5 exes, funcdiff against the original, 0 lost MATCH, 0 strict regress. A model review checks each new MATCH without a strict full proof. |
-| Next | Gap cards 09 and 11 (wait for an operator decision on 4 parked ZSTD items), 04 and 15, then the other job cards. |
+| Next | Gap cards 04 and 15, then the other job cards. |
 
 ## Parity
 
