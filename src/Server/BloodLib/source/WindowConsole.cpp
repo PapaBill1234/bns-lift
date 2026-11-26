@@ -18,12 +18,15 @@ WindowConsole* WinMsgHandler::_console = nullptr;
 WinMsgHandler::WinMsgHandler(WindowConsole* console)
 {
     _console = console;
-    SystemEvent* initEvent = (SystemEvent*)BASE_MEMORY_MANAGER.Alloc(sizeof(SystemEvent),
-                                                                               WINDOW_CONSOLE_FILE, 44);
-    if (initEvent != nullptr)
-        initEvent = new (initEvent) SystemEvent();
+    // 0x17090: the event pointer stays in a register. CreateEventW stores through it (no reload of _initEvent).
+    void* memory = BASE_MEMORY_MANAGER.Alloc(sizeof(SystemEvent), WINDOW_CONSOLE_FILE, 44);
+    SystemEvent* initEvent;
+    if (memory != nullptr)
+        initEvent = new (memory) SystemEvent();
+    else
+        initEvent = nullptr;
     _initEvent = initEvent;
-    _initEvent->Event = CreateEventW(nullptr, FALSE, FALSE, nullptr);
+    initEvent->Event = CreateEventW(nullptr, FALSE, FALSE, nullptr);
 }
 
 // 0x16d50
@@ -178,13 +181,16 @@ bool WindowConsole::Open()
             (void (*)(ConsoleWindow*))GetProcAddress(_consoleWindow.module, "DestroyConsoleWindow");
         _consoleWindow.console = _consoleWindow.Create(_consoleWindow.module);
     }
-    if (_consoleWindow.module == nullptr || _consoleWindow.console == nullptr)
+    if (_consoleWindow.module == nullptr)
+        return false;
+    if (_consoleWindow.console == nullptr)
         return false;
 
-    wchar_t const* title = Daemon::Instance->Name();
-    wchar_t const* className = Daemon::Instance->Name();
-    if (!_consoleWindow.console->Initialize(nullptr, className, title, nullptr, (void*)WindowConsoleOnClose,
-                                            &_reloadHandler, &_shutdownHandler, nullptr, &_endSessionHandler))
+    // 0x17090 loads the vtable before the two Name calls and reloads `this` after them.
+    // The arguments are evaluated from right to left: the first Name call gives the title.
+    if (!_consoleWindow.console->Initialize(nullptr, Daemon::Instance->Name(), Daemon::Instance->Name(), nullptr,
+                                            (void*)WindowConsoleOnClose, &_reloadHandler, &_shutdownHandler,
+                                            nullptr, &_endSessionHandler))
         return false;
 
     void* memory = BASE_MEMORY_MANAGER.Alloc(sizeof(WinMsgHandler), WINDOW_CONSOLE_FILE, 157);
