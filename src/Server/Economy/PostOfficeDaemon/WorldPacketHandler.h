@@ -60,8 +60,10 @@ public:
     virtual bool processRelayTimeout();                            // 0x1e0b0
     virtual void initResponse(RelayResponse* const response);      // 0x1f770
 
-private:  // PDB: convertFailReason, _request and _response are private.
+private:  // PDB: convertFailReason is private (mangled name AEBA).
     short const convertFailReason(RelayResponse::ResultState const resultState, short const failReason) const;  // 0x1e410
+
+public:  // LIFT: PDB has _request and _response private; public for the offsetof static_asserts.
 
     RetrieveCharacterInfoRelayRequest _request;
     RetrieveCharacterInfoRelayResponse _response;
@@ -117,8 +119,10 @@ public:
     virtual bool processRelayTimeout();                            // 0x9400
     virtual void initResponse(RelayResponse* const response);      // 0x1f810
 
-private:  // PDB: convertFailReason, _request and _response are private.
+private:  // PDB: convertFailReason is private (mangled name AEBA).
     short const convertFailReason(RelayResponse::ResultState const resultState, short const failReason) const;  // 0x9740
+
+public:  // LIFT: PDB has _request and _response private; public for the offsetof static_asserts.
 
     CheckPostCapacityRelayRequest _request;
     CheckPostCapacityRelayResponse _response;
