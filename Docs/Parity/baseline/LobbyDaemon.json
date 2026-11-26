@@ -468,6 +468,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Character::SetShowcase": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Character::SetSlotId": {
 "calls": 100,
 "consts": 100,
@@ -546,10 +553,10 @@
 "status": "MATCH"
 },
 "CliSession::UpdateCharacterData": {
-"calls": 40,
-"consts": 50,
-"refs": 75,
-"score": 55.0,
+"calls": 77,
+"consts": 67,
+"refs": 100,
+"score": 81.2,
 "status": "DIFF"
 },
 "CliSession::UpdateCharacterLevel": {
