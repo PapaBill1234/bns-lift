@@ -3662,6 +3662,178 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"HandleAccountInventoryLobby_CancelWarehouseItemConsumptionFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleAccountInventoryLobby_CancelWarehouseItemConsumptionOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleAccountInventoryLobby_ConsumeWarehouseItemFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleAccountInventoryLobby_ConsumeWarehouseItemOk": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"HandleAccountInventoryLobby_FinishWarehouseItemConsumptionFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleAccountInventoryLobby_FinishWarehouseItemConsumptionOk": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"HandleAccountInventoryLobby_GetGoodsCountFail": {
+"calls": 100,
+"consts": 89,
+"refs": 100,
+"score": 96.3,
+"status": "DIFF"
+},
+"HandleAccountInventoryLobby_GetGoodsCountOk": {
+"calls": 100,
+"consts": 89,
+"refs": 100,
+"score": 96.3,
+"status": "DIFF"
+},
+"HandleAccountInventoryLobby_GoodsInventoryChangedNotify": {
+"calls": 76,
+"consts": 67,
+"refs": 65,
+"score": 69.0,
+"status": "DIFF"
+},
+"HandleAccountInventoryLobby_HelloFail": {
+"calls": 100,
+"consts": 67,
+"refs": 100,
+"score": 88.9,
+"status": "DIFF"
+},
+"HandleAccountInventoryLobby_HelloOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleAccountInventoryLobby_ListGoodsFail": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"HandleAccountInventoryLobby_ListGoodsOk": {
+"calls": 100,
+"consts": 97,
+"refs": 100,
+"score": 98.9,
+"status": "DIFF"
+},
+"HandleAccountInventoryLobby_RetrieveCharacterGoodsCountFail": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"HandleAccountInventoryLobby_RetrieveCharacterGoodsCountOk": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"HandleAccountInventoryLobby_RetrieveLobbyServiceItemListFail": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"HandleAccountInventoryLobby_RetrieveLobbyServiceItemListOk": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"HandleAccountInventoryLobby_RetrieveSingleWarehouseItemFail": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"HandleAccountInventoryLobby_RetrieveSingleWarehouseItemOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleAccountInventoryLobby_TakeGoodsFail": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"HandleAccountInventoryLobby_TakeGoodsOk": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
+"HandleAccountInventoryLobby_TryWarehouseItemConsumptionFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleAccountInventoryLobby_TryWarehouseItemConsumptionOk": {
+"calls": 100,
+"consts": 100,
+"raw_status": "MATCH",
+"refs": 100,
+"score": 100.0,
+"status": "EXCLUDED"
+},
 "HandleLobbyGame_AbandonChargeNotify": {
 "calls": 100,
 "consts": 97,
@@ -6969,6 +7141,20 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"PacketConcatenateBuffer::Decompose [?Decompose@PacketConcatenateBuffer@@QEAAGPEAUVarData@1@@Z]": {
+"calls": 100,
+"consts": 86,
+"refs": 100,
+"score": 95.2,
+"status": "DIFF"
+},
+"PacketConcatenateBuffer::Decompose [?Decompose@PacketConcatenateBuffer@@QEAA_NHZZ]": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "PacketConcatenateBuffer::copy": {
 "calls": 100,
 "consts": 100,
@@ -7726,6 +7912,13 @@
 "status": "MATCH"
 },
 "RepeatPacketComposer::skipRepeatFormat": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RepeatPacketDecomposer::PopRepeatCount": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
