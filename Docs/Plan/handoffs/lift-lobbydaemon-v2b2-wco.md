@@ -89,3 +89,32 @@ Forms tried in total: session 1 forms 1 to 3, the lead test p11, session 2 form 
 
 - `src/Server/BloodLib/source/WindowConsole.cpp`
 - `Docs/Plan/handoffs/lift-lobbydaemon-v2b2-wco.md`
+
+# Handoff: lift-lobbydaemon-v2b2-wco (session 4 of 4)
+
+## What I changed
+
+Function: `WindowConsole::Open` (CG 0x17090, LG 0x2b880, SCD 0x26c70, POD 0x346e0).
+
+1. The reset of `_consoleWindow` before `LoadLibraryW` is now `memset(&_consoleWindow, 0, sizeof(_consoleWindow))`.
+   Evidence: the original zeroes the 5 fields with a scratch `xor eax, eax`. It compares `module` with an immediate 0
+   (`cmp qword ptr [s0 + 0xb8], 0`). It makes its zero register (`xor s3d, s3d`) only after the `Name` calls.
+   The lift used one callee-saved zero register from the reset to the end. The memset intrinsic expands late,
+   so its zero is not shared with the later zero constants. This form is new.
+2. The `Initialize` call uses `_consoleWindow.console` as the object again (the session 2 form). The test still uses the local `console`.
+   Evidence: the original loads `this` again from `[s0 + 0xc0]` after the `Name` calls. The vtable comes from the tested register.
+   With the session 3 form (`console->Initialize`), `this` is the local, and the compiler does not load it again.
+
+## Not done (if the build shows that the diff stays)
+
+`WindowConsole::Open` (all 4 exes). Open causes:
+
+- Early `return false` block (`xor al, al; jmp L` at insn 20): block layout. No source form is known.
+- LG 0x2b880 only: `xor r8d, r8d` before `ThreadManager::StartThread`. The source is shared. Cause: LTCG constant propagation per exe.
+- Zero register: if form 1 does not remove the diff, the cause is register allocation and constant CSE.
+- Forms tried in total: session 1 forms 1 to 3, the lead test p11, session 2 form 1, session 3 forms 1 to 3, and session 4 forms 1 and 2.
+
+## Files changed (session 4)
+
+- `src/Server/BloodLib/source/WindowConsole.cpp`
+- `Docs/Plan/handoffs/lift-lobbydaemon-v2b2-wco.md`

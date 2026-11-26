@@ -10,6 +10,7 @@
 #include <new>
 #include <stdarg.h>
 #include <stdio.h>
+#include <string.h>
 #include <wchar.h>
 
 static wchar_t const* const WINDOW_CONSOLE_FILE = L"source\\WindowConsole.cpp";
@@ -163,11 +164,9 @@ bool WindowConsole::Open()
     _endSessionHandler.logoff = WindowConsoleOnLogoff;
     _endSessionHandler.shutdown = WindowConsoleOnShutdown;
 
-    _consoleWindow.module = nullptr;
-    _consoleWindow.console = nullptr;
-    _consoleWindow.GetInterfaceVersion = nullptr;
-    _consoleWindow.Create = nullptr;
-    _consoleWindow.Destroy = nullptr;
+    // 0x17090 zeroes the 5 fields with a scratch `xor eax, eax` and makes its zero register only after the Name calls.
+    // The memset intrinsic expands late, so its zero is not shared with the later zero constants.
+    memset(&_consoleWindow, 0, sizeof(_consoleWindow));
     _consoleWindow.module = LoadLibraryW((LPCWSTR)L"bsConsole_sv64.dll");
     if (_consoleWindow.module != nullptr)
     {
@@ -188,8 +187,8 @@ bool WindowConsole::Open()
 
     // 0x17090 loads the vtable before the two Name calls and reloads `this` after them.
     // The arguments are evaluated from right to left: the first Name call gives the title.
-    // The vtable comes from the tested local (loaded before the Name calls).
-    if (!console->Initialize(nullptr, Daemon::Instance->Name(), Daemon::Instance->Name(), nullptr,
+    // `this` is the member (reloaded after the Name calls). The vtable load is CSE'd with the tested local.
+    if (!_consoleWindow.console->Initialize(nullptr, Daemon::Instance->Name(), Daemon::Instance->Name(), nullptr,
                                             (void*)WindowConsoleOnClose, &_reloadHandler, &_shutdownHandler,
                                             nullptr, &_endSessionHandler))
         return false;
