@@ -145,20 +145,19 @@ bool RetrieveCharacterInfoRelayContext::ComposeResponsePacket(Packet& packet) co
     {
     case RelayResponse::RESULTSTATE_SUCCESS:
     {
-        long long const resultPcId = _response._resultPcId;
-        long long const gameTid = _request._gameTid;
+        // LIFT: 0x1e230 reads _gameTid and _resultPcId again after Compose for the log (Hex-Rays H21-H22).
         if (!(0 < packet.Compose("hqq", 5, _request._gameTid, _response._resultPcId)))
         {
             Log::Write(Log::LT_ERROR, RETRIEVE_CHARACTER_INFO_RELAY_FILE, 107,
                        L"[%s], %s; failed to compose retrieve character info success response packet, gameTid:0x%I64X, resultPcId:0x%I64X",
                        MODULE_NAME, L"RetrieveCharacterInfoRelayContext::ComposeResponsePacket",
-                       gameTid, resultPcId);
+                       _request._gameTid, _response._resultPcId);
             return false;
         }
         Log::Write(Log::LT_DEBUG, RETRIEVE_CHARACTER_INFO_RELAY_FILE, 110,
                    L"[%s], %s; composed retrieve character info success response packet, gameTid:0x%I64X, resultPcId:0x%I64X",
-                   MODULE_NAME, L"RetrieveCharacterInfoRelayContext::ComposeResponsePacket", gameTid,
-                   resultPcId);
+                   MODULE_NAME, L"RetrieveCharacterInfoRelayContext::ComposeResponsePacket", _request._gameTid,
+                   _response._resultPcId);
     }
     break;
     case RelayResponse::RESULTSTATE_FAILURE:
