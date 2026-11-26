@@ -5090,17 +5090,17 @@
 },
 "aes128TableDecrypt": {
 "calls": 100,
-"consts": 60,
-"refs": 50,
-"score": 70.0,
-"status": "DIFF"
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "aes128TableEncrypt": {
 "calls": 100,
-"consts": 60,
-"refs": 50,
-"score": 70.0,
-"status": "DIFF"
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "aes128TableSetupDecKey": {
 "calls": 100,
@@ -5111,9 +5111,9 @@
 },
 "aes128TableSetupEncKey": {
 "calls": 100,
-"consts": 67,
+"consts": 91,
 "refs": 100,
-"score": 88.9,
+"score": 97.0,
 "status": "DIFF"
 },
 "atexit": {
