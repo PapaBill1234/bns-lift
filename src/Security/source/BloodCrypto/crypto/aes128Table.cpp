@@ -18,21 +18,23 @@ void aes128TableSetupEncKey(unsigned int* rk, unsigned char const* key, int keyc
     // BUG: 0x38370 copies keycnt bytes. A key longer than 176 bytes writes past rk.
     memcpy(rk, key, keycnt);
     // LIFT: reference rijndaelKeySetupEnc loop. 0x38370 reads bytes 1..3 of rk[3] from memory
-    // and keeps rk[3] (the previous rk[7]) in a register, so the expression reads rk[3] directly.
+    // (movzx byte ptr [rk + 13..15]) and takes byte 0 from the register of the stored rk[7].
+    // The temp bytes are read through an unsigned char pointer (same idiom as SetupDecKey).
     int i = 0;
     for (;;)
     {
+        unsigned char const* temp = reinterpret_cast<unsigned char const*>(&rk[3]);
         rk[4] = rk[0]
-              ^ (TE(E_precalc_sbox4, B0(rk[3])) & 0xFF000000)
-              ^ (TE(E_precalc_sbox4, B3(rk[3])) & 0x00FF0000)
-              ^ (TE(E_precalc_sbox4, B2(rk[3])) & 0x0000FF00)
-              ^ (TE(E_precalc_sbox4, B1(rk[3])) & 0x000000FF)
+              ^ (TE(E_precalc_sbox4, temp[0]) & 0xFF000000)
+              ^ (TE(E_precalc_sbox4, temp[3]) & 0x00FF0000)
+              ^ (TE(E_precalc_sbox4, temp[2]) & 0x0000FF00)
+              ^ (TE(E_precalc_sbox4, temp[1]) & 0x000000FF)
               ^ (unsigned int)Rcon[i];
         rk[5] = rk[1] ^ rk[4];
         rk[6] = rk[2] ^ rk[5];
         rk[7] = rk[3] ^ rk[6];
         if (++i == 10)
-            break;
+            return;
         rk += 4;
     }
 }

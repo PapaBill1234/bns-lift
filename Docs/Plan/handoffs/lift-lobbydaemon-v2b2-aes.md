@@ -31,6 +31,27 @@ There are no Not done functions. The driver has not measured the results yet. If
 - Encrypt/Decrypt: the xor operand order in the loop. The original emits the terms in the order sbox3, sbox2, sbox1, sbox0, rk for Encrypt. It emits sbox1, sbox2, sbox3, sbox0, rk for Decrypt. The lift keeps the order `rk ^ T0 ^ T1 ^ T2 ^ T3`.
 - SetupEncKey: if byte 0 also comes from memory, try `(unsigned char)rk[3]` for byte 0.
 
+## Part 2 (this session)
+
+This session did not build. It had no measured insn diff of the part 1 forms. The evidence in the packet is from the base build (rolled form).
+
+### aes128TableSetupEncKey (CG 0x38370, LG 0x5b0c0): changed
+
+- The part 1 form read `rk[3]` as `unsigned int` and took bytes with shifts. MSVC forwards the stored `rk[7]` value, so that form keeps the shifts (`shr rax, 8; movzx`) of the base build.
+- The original reads bytes 1..3 with `movzx eax, byte ptr [s0 + 0..2]` (`s0 = rk + 13`). It takes byte 0 from `dl`/`al` of the stored `rk[7]`.
+- New form: `unsigned char const* temp = reinterpret_cast<unsigned char const*>(&rk[3]);` and the terms use `temp[0]`, `temp[3]`, `temp[2]`, `temp[1]`. This is the same byte-read idiom as SetupDecKey (MATCH).
+- The loop exit is now `if (++i == 10) return;` (reference form).
+- The original keeps 6 callee-saved registers (push rdi, r12, r13). The byte reads lower the register pressure. The base lift used 7.
+
+### aes128TableEncrypt and aes128TableDecrypt (CG 0x38790/0x38d10, LG 0x5b4e0/0x5ba60): no change
+
+- The part 1 form (p07 loop, 64-bit state) is not measured yet. This session kept it.
+- Logic check against the original: term sets, table offsets, final masks and the `rk` offsets agree.
+- Open items for the next round, when a measured diff exists:
+  - Loop shape. The original has `do { t-round; s-round; rk += 8; } while (--n)` with n = 4, and one t-round after the loop (`s5 = rk + 4`, `mov s6d, 4`). If the p07 break-in-the-middle loop does not give this shape, try the explicit form: `for (int r = 4; r != 0; --r) { t = ...; s = ...; rk += 8; }`, then the t-round and the final round.
+  - Term order. The original emits, for each word, the 3 foreign-state terms in descending state order, then the own-state term, then `rk`. This looks like a compiler order, not a source order.
+  - Store order. The original stores `out[1]`, `out[2]`, `out[0]`, `out[3]` after it computes all 4 words.
+
 ## Files changed
 
 - `src/Security/source/BloodCrypto/crypto/aes128Table.cpp`
