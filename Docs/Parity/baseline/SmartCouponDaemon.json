@@ -4054,10 +4054,10 @@
 },
 "WindowConsole::Open": {
 "calls": 100,
-"consts": 86,
+"consts": 100,
 "refs": 100,
-"score": 95.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "WindowConsole::SetState": {
 "calls": 100,

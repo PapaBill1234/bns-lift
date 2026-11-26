@@ -4250,9 +4250,9 @@
 },
 "WindowConsole::Open": {
 "calls": 100,
-"consts": 86,
+"consts": 100,
 "refs": 92,
-"score": 92.5,
+"score": 97.2,
 "status": "DIFF"
 },
 "WindowConsole::SetState": {
