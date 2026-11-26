@@ -3,9 +3,9 @@
 | Item | Value |
 | --- | --- |
 | Card | `design/parity-v2/gap-cards/gap-04-npgame.md` (private project) |
-| Branch | `gap-04-npgame` (scratch clone only, not pushed) |
-| Base | `eb68b2a` |
-| Code commit | `9f95268` |
+| Branch | `gap-04-npgame`, rebased on main `d90e32a` on 2026-11-26 |
+| Base | `eb68b2a` (first run), `d90e32a` (land) |
+| Code commits | senders + OnConnect, NPServiceChannelManager Initialize/OnClose/HandleMessage, onStart + startNPChannel, NPTransactionRegistry::Find |
 | Source | LobbyDaemon 2019 + PDB (VS2010 SP1), HR pseudocode. IDA was not opened. Packets: 381 client. |
 | Author and committer | `Claude <noreply@anthropic.com>` |
 
@@ -103,6 +103,43 @@ Status: funcdiff. "-" = not in the REF build (no caller, /OPT:REF).
 | Source | `return SendMsg(&msg, true, nullptr);` |
 | Status | Not changed. The parent decides: re-review, or accept as a REF-build artifact ❓. |
 
+## Startup work (second run)
+
+| Function | Address | Result |
+| --- | --- | --- |
+| `LobbyDaemon::onStart` | 0x9dca0 | Full body. All fail checks stay. BUG comments: the original does not check a null Alloc of AccountInventoryChannel and MileageBatchRetryDeposit. REF DIFF 90.4: LTCG treats the inlined stub callees as abort. |
+| `LobbyDaemon::startNPChannel` | 0x9f010 | Full body. REF MATCH. BUG comment: the original does not check the NPServiceChannelManager Alloc. |
+| `NPServiceChannelManager::Initialize`, `OnClose`, `HandleMessage` | 0xcfba0, 0xcff70, 0xd0100 | Lifted. OnConnect is now reachable in REF. |
+| `ObjPoolTimer::Start` | 0x62c80 | In `LobbyObjectPool.cpp` (LobbyDaemon form of ObjectPool.obj). `ObjectPool.cpp` is the SmartCouponDaemon form. |
+| `GObjPoolTimer` | rva 0x2095E0 | Global in `LobbyDaemon.cpp`. `initialize` (0x9b300) sets it. `initialize` is still a stub. |
+| `LobbyTick::Start`, `LobbyStats::Start`, `GameWorldReporter::Start` | inline | No PDB function. Bodies come from the onStart pseudocode. |
+| Constructors | - | `TransactionChannel()`, `AccountInventoryChannel(handler)` + virtual dtor, `PostOfficeChannel(handler)`, `NPServiceChannelManager()`. |
+| `MileageBatchRetryDeposit` | - | PDB layout (base `LobbyTick::Listener`, size 0x58), ctor, virtual dtor. `Tick` (0x61060) stays LIFT_STUB. |
+| `NPMsgHelper` | - | Moved from `SmartCouponDaemon/NPChannel.h` to `NPChannelBase.h`. |
+| `NPTransactionRegistry::Find` | LD 0x2d60, SC 0x4580 | Bug fix: returns true for a known id also when the item is null. Copies cmd and context by field. |
+
+onStart callees that are still LIFT_STUB (no gap card owns them):
+
+| Callee | Address |
+| --- | --- |
+| `GameTimeScheduler::Start` | 0x4c150 |
+| `LobbyDaemon::setupNpScheduleInfo` | 0x9f130 |
+| `AccountInventoryChannel::Connect` | 0x6500 |
+| `LobbyCharacterDeletionScheduler::Start` | 0x56780 |
+| `SystemPerfMonitor::Start` | 0x59e30 |
+| `MileageBatchRetryDeposit::Tick` | 0x61060 |
+
+First-run MATCH (base `eb68b2a`): LobbyDaemon REF 674 -> 687 (+13), NOREF 973 -> 1009, 0 lost in all 5 exes.
+Review of the second run: 2 accept (`NPChannel::Initialize`, `Network::OpenPort`), 3 reject (`SendRequestPresenceKick`, `NPPing::HandleEvent`, `NPServiceChannelManager::OnConnect`). The 3 rejects have the same cause: no `xor r9d,r9d` before `NPChannel::SendMsg`. Every live REF caller passes a null context, so LTCG folds it. The rejects clear only when a lifted LobbyJob caller passes a non-null transaction.
+
+## Rebase on main (2026-11-26)
+
+| File | Resolution |
+| --- | --- |
+| `NPServiceChannel.cpp` | Main keeps its `SendRequestAuthChangeMyUserNameIncomplete` and `SendRequestSlotListSlots` bodies. The gap-04 copy of the `_StsMsgRequestAuthChangeMyUserNameIncomplete` struct is removed (main declares it in `NPServiceChannel.h`). |
+| `LobbyObjectPool.cpp` | Main keeps the ObjPool bodies (gap-25, gap-26). gap-04 adds `ObjPoolTimer::Start`. One CMake source line. |
+| `LobbyDaemon.cpp`, `NPChannel.h`, `NPChannelBase.h` | Include lines and comments from both sides. |
+
 ## Open items
 
 | Item | Note |
@@ -111,4 +148,4 @@ Status: funcdiff. "-" = not in the REF build (no caller, /OPT:REF).
 | 3 DIFF card IDs | ChargeAbandon 93.3 (store order). EscrowFail 88.9 (original keeps a dead `memset` of escrowIdStr after LTCG removed the escrowId branch; the lift has no caller to reproduce this). DeliveryFail 95.2 (register choice). |
 | LIFT_STUB | `NPServiceChannelManager::Initialize`, `OnClose`, `HandleMessage` (0xd0100). Not card IDs. While Initialize is a stub, OnConnect is not reachable in REF. |
 | Proof review items | 22 items come from earlier cards (Docs/Parity baseline 645). All 22 accept. |
-| Merge | Not merged, not pushed. Merge is the parent's decision. |
+| Merge | Landed by the chain lander on 2026-11-26. Rejects that stay are excluded with receipts (`Docs/Parity/excluded.tsv`). |
