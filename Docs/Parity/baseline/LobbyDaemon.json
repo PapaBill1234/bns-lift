@@ -1934,9 +1934,9 @@
 "DelayedRelease::releaseNode": {
 "calls": 100,
 "consts": 100,
-"refs": 71,
-"score": 90.5,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "DeleteCharacterJob::GetDefinition": {
 "calls": 100,
@@ -6983,9 +6983,9 @@
 "Packet::Clear": {
 "calls": 100,
 "consts": 100,
-"refs": 67,
-"score": 88.9,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Packet::Compose [?Compose@Packet@@QEAAGPEAVPacketComposer@@HZZ]": {
 "calls": 100,
@@ -7214,9 +7214,9 @@
 "PacketFormatIterator::SetFormat": {
 "calls": 100,
 "consts": 100,
-"refs": 50,
-"score": 83.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "PacketFormatIterator::skipRepeatFormat": {
 "calls": 100,
@@ -7802,23 +7802,23 @@
 "RefCntObject::operator delete": {
 "calls": 100,
 "consts": 100,
-"refs": 50,
-"score": 83.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "RefCntObject::removeReferenceCount": {
 "calls": 100,
 "consts": 100,
-"refs": 50,
-"score": 83.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "RefCntObject::~RefCntObject": {
 "calls": 100,
 "consts": 100,
-"refs": 60,
-"score": 86.7,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "RefCntPoolObj::operator delete": {
 "calls": 100,
@@ -8312,9 +8312,9 @@
 "SessionSendBuffer::clearPacketBufferList": {
 "calls": 100,
 "consts": 100,
-"refs": 60,
-"score": 86.7,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "SessionSendBuffer::increaseBuffer": {
 "calls": 100,
