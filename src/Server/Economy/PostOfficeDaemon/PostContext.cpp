@@ -123,25 +123,28 @@ bool PostInfo::CheckValidityPostData()
         return false;
 
 #define POST_HAS_ACCOUNT_ID (_senderAccountId.id[0] != ID128_GUID_ZERO.id[0] || _senderAccountId.id[1] != ID128_GUID_ZERO.id[1])
-    switch (_senderServiceType)
+    // LIFT: 0x11290 compares the service type with 1, 2 and 7 in turn (consts 0x2, 0x7), so this is an if chain.
+    if (_senderServiceType == 1)
     {
-    case 1:
         if (_deliveryReason >= 3 || _postHint == 0 || _senderPcId != 0 || POST_HAS_ACCOUNT_ID || wcslen(_senderWorldName) != 0)
             return false;
         return wcslen(_senderName) == 0;
-    case 2:
+    }
+    if (_senderServiceType == 2)
+    {
         if (_deliveryReason >= 8 || _postHint == 0 || _senderPcId != 0 || POST_HAS_ACCOUNT_ID || wcslen(_senderWorldName) != 0 ||
             wcslen(_senderName) != 0 || wcslen(_postTitle) == 0)
             return false;
         return wcslen(_postMessage) != 0;
-    case 7:
+    }
+    if (_senderServiceType == 7)
+    {
         if (_deliveryReason >= 6 || _senderPcId != 0 || POST_HAS_ACCOUNT_ID || wcslen(_senderWorldName) != 0 ||
             wcslen(_senderName) != 0)
             return false;
         return wcslen(_postMessage) != 0;
-    default:
-        return true;
     }
+    return true;
 #undef POST_HAS_ACCOUNT_ID
 }
 
