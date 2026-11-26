@@ -777,11 +777,11 @@
 "status": "MATCH"
 },
 "CheckPostCapacityRelayContext::ComposeResponsePacket": {
-"calls": 67,
-"consts": 73,
+"calls": 100,
+"consts": 100,
 "refs": 100,
-"score": 79.8,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "CheckPostCapacityRelayContext::GetRequestWid": {
 "calls": 100,
@@ -3465,11 +3465,11 @@
 "status": "MATCH"
 },
 "RetrieveCharacterInfoRelayContext::ComposeResponsePacket": {
-"calls": 59,
-"consts": 73,
+"calls": 100,
+"consts": 100,
 "refs": 100,
-"score": 77.2,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "RetrieveCharacterInfoRelayContext::MakeRelayHeader": {
 "calls": 100,
