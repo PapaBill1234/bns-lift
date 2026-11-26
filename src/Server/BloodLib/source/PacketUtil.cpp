@@ -285,7 +285,7 @@ void RepeatPacketDecomposer::Reset()
 }
 
 // 0x1B820
-int RepeatPacketDecomposer::PopRepeatCount()
+short RepeatPacketDecomposer::PopRepeatCount()
 {
     if (top < 0 || format[start[top]] != 'C')
         PACKETUTIL_ASSERT_CRASH(248);
@@ -294,7 +294,7 @@ int RepeatPacketDecomposer::PopRepeatCount()
 }
 
 // 0x1B8B0
-int RepeatPacketDecomposer::PushRepeatCount(char const* buffer, int size)
+short RepeatPacketDecomposer::PushRepeatCount(char const* buffer, int size)
 {
     ++top;
     if (static_cast<unsigned int>(size) < 2)

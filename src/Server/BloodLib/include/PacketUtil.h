@@ -129,8 +129,8 @@ class RepeatPacketDecomposer : public PacketDecomposer
 public:
     virtual void Reset();
 
-    int PopRepeatCount();
-    int PushRepeatCount(char const* buffer, int size);
+    short PopRepeatCount();                                // PDB: short
+    short PushRepeatCount(char const* buffer, int size);   // PDB: short (callers sign-extend the count)
 
     short counts[3];
     int start[3];
