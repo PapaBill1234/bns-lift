@@ -39,9 +39,16 @@ public:
 
     // PDB: public ctor Packet::Packet(PacketSplitter*), inlined at each use (the originals zero the 6 fields before
     // Packet::Allocate). LIFT: without it `Packet p;` leaves Splitter and ListHead uninitialized and Allocate reads them.
+    // The original stores are in this order (LobbyDaemon 0x67b0: +0x10, +0x0, +0x18, +0x20, +0x8, +0xc; 136 of the
+    // 143 former manual zeroing blocks).
     explicit Packet(PacketSplitter* splitter = nullptr)
-        : Splitter(splitter), IsFragmentPacket(false), FragmentPacketCmd(0), CurHeader(nullptr), ListHead(nullptr), ListTail(nullptr)
     {
+        CurHeader = nullptr;
+        Splitter = splitter;
+        ListHead = nullptr;
+        ListTail = nullptr;
+        IsFragmentPacket = false;
+        FragmentPacketCmd = 0;
     }
     ~Packet();
     void Clear();
