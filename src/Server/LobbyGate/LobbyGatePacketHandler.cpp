@@ -117,7 +117,13 @@ bool HandleLobbyGate_PingReq(Session const* session, Packet const* packet)
 // 0x142e0
 bool HandleLobbyGate_ContentsRuleListReq(Session* session, Packet const* packet)
 {
-    Packet sendPacket = {};  // LIFT: inlined constructor
+    Packet sendPacket;  // LIFT: inlined constructor (separate stores, no memset)
+    sendPacket.Splitter = nullptr;
+    sendPacket.IsFragmentPacket = false;
+    sendPacket.FragmentPacketCmd = 0;
+    sendPacket.CurHeader = nullptr;
+    sendPacket.ListHead = nullptr;
+    sendPacket.ListTail = nullptr;
     long long* extraData = static_cast<long long*>(session->_extraData);
     long long lastSendTime = extraData != nullptr ? *extraData : 0;
     long long now = static_cast<long long>(GetTickCount64()) - Daemon::Instance->StartSystemTick64;
@@ -144,7 +150,6 @@ bool HandleLobbyGate_ContentsRuleListReq(Session* session, Packet const* packet)
         Log::Write(Log::LT_DEBUG, HANDLER_FILE, 52,
                    L"[lobbygate], sent LobbyGate_ContentsRuleListFail, SessionId:0x%I64X, reason:%d", session->_id, 234);
     }
-    sendPacket.Clear();
     return true;
 }
 
@@ -328,14 +333,19 @@ bool HandleLobbyGate_BypassPacket(Client* client, Packet const* packet)
         return false;
     }
 
-    Packet p = {};  // LIFT: inlined constructor
+    Packet p;  // LIFT: inlined constructor (separate stores, no memset)
+    p.Splitter = nullptr;
+    p.IsFragmentPacket = false;
+    p.FragmentPacketCmd = 0;
+    p.CurHeader = nullptr;
+    p.ListHead = nullptr;
+    p.ListTail = nullptr;
     p.Allocate();
     if (p.Compose("hq", static_cast<int>(cmd), cliKey) == 0)
     {
         Log::Write(Log::LT_ERROR, HANDLER_FILE, 241, L"[lobbygate], failed to compose packet, cliKey:0x%I64X, cmd:%d",
                    cliKey, static_cast<int>(cmd));
         session->removeReferenceCount(CHANNEL_H_FILE, 52);
-        p.Clear();
         return false;
     }
     Packet::Header const* header = packet->CurHeader;
@@ -357,7 +367,6 @@ bool HandleLobbyGate_BypassPacket(Client* client, Packet const* packet)
     Log::Write(Log::LT_DEBUG, HANDLER_FILE, 259, L"[lobbygate], send ok, cmd:%d, cliKey:0x%I64X", static_cast<int>(cmd),
                cliKey);
     session->removeReferenceCount(CHANNEL_H_FILE, 52);
-    p.Clear();
     return true;
 }
 
@@ -400,17 +409,17 @@ bool HandleLobbyGate_GetWorldInfoListReq(Client* client, Packet const* packet)
     }
     ReleaseSRWLockShared(&manager->_srwLock);
 
-    if (worldList != nullptr)
-    {
-        client->Send(&worldList->_fp.packet);
-        worldList->removeReferenceCount(HANDLER_FILE, 339);
-    }
-    else
+    if (worldList == nullptr)
     {
         // BUG: 0x15090 the format is split into two arguments.
         Log::Write(Log::LT_ERROR, HANDLER_FILE, 300, L"[lobbygate], fail to get world list, ",
                    L"GetWorldInfoListReq, cliKey:0x%I64X", cliKey);
         client->Send("hh", LobbyGate_GetWaitInfoFailCmd, LOBBYGATE_SYSTEM_ERROR);  // 0x15095: rbx = 0, thus r9d = 2.
+    }
+    else
+    {
+        client->Send(&worldList->_fp.packet);
+        worldList->removeReferenceCount(HANDLER_FILE, 339);
     }
     return true;
 }
@@ -430,7 +439,7 @@ bool HandleLobbyGate_GetPcCafeMileageFeverTimeScheduleListReq(Client* client, Pa
     if (lobbyD == nullptr)
     {
         // BUG: 0x15154 the format is split into two arguments.
-        Log::Write(Log::LT_ERROR, HANDLER_FILE, 363, L"[lobbygate], fail to get world list, invalid lobbyd channel, ",
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 363, L"[lobbygate], fail to get schedule list, invalid lobbyd channel, ",
                    L"GetPcCafeMileageFeverTimeScheduleListReq, cliKey:0x%I64X", cliKey);
         client->Send("hh", LobbyGate_GetPcCafeMileageFeverTimeScheduleListFailCmd, LOBBYGATE_SERVICE_NOT_AVAILABLE);  // 0x15193: r9d = 7. Both paths use this call.
         return true;
@@ -438,7 +447,7 @@ bool HandleLobbyGate_GetPcCafeMileageFeverTimeScheduleListReq(Client* client, Pa
     if (lobbyD->_state != 1)
     {
         // BUG: 0x15185 the format is split into two arguments.
-        Log::Write(Log::LT_ERROR, HANDLER_FILE, 370, L"[lobbygate], fail to get world list, service not avaliable, ",
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 370, L"[lobbygate], fail to get schedule list, service not avaliable, ",
                    L"GetPcCafeMileageFeverTimeScheduleListReq, cliKey:0x%I64X", cliKey);
         client->Send("hh", LobbyGate_GetPcCafeMileageFeverTimeScheduleListFailCmd, LOBBYGATE_SERVICE_NOT_AVAILABLE);  // 0x15193: r9d = 7. Both paths use this call.
         return true;
@@ -455,17 +464,17 @@ bool HandleLobbyGate_GetPcCafeMileageFeverTimeScheduleListReq(Client* client, Pa
     }
     ReleaseSRWLockShared(&manager->_srwLock);
 
-    if (scheduleList != nullptr)
+    if (scheduleList == nullptr)
     {
-        client->Send(&scheduleList->_fp.packet);
-        scheduleList->removeReferenceCount(HANDLER_FILE, 387);
+        // BUG: 0x15240 the format is split into two arguments.
+        Log::Write(Log::LT_ERROR, HANDLER_FILE, 378, L"[lobbygate], fail to get schedule list, ",
+                   L"GetPcCafeMileageFeverTimeScheduleListReq, cliKey:0x%I64X", cliKey);
+        client->Send("hh", LobbyGate_GetPcCafeMileageFeverTimeScheduleListFailCmd, LOBBYGATE_SYSTEM_ERROR);  // 0x15245: rbx = 0, thus r9d = 2.
     }
     else
     {
-        // BUG: 0x15240 the format is split into two arguments.
-        Log::Write(Log::LT_ERROR, HANDLER_FILE, 378, L"[lobbygate], fail to get world list, ",
-                   L"GetPcCafeMileageFeverTimeScheduleListReq, cliKey:0x%I64X", cliKey);
-        client->Send("hh", LobbyGate_GetPcCafeMileageFeverTimeScheduleListFailCmd, LOBBYGATE_SYSTEM_ERROR);  // 0x15245: rbx = 0, thus r9d = 2.
+        client->Send(&scheduleList->_fp.packet);
+        scheduleList->removeReferenceCount(HANDLER_FILE, 387);
     }
     return true;
 }

@@ -311,41 +311,45 @@ bool HandleLobbyLobbyGate_InitSessionWithNPTokenOk(Session const* session, Packe
     if (!packet->Decompose("hqqoo", &cmd, &gateKey, &cliKey, &npGameToken, &portalAccountId))
     {
         LD_ERR(375, L"decompose fail," INITNP_SUFFIX, INITNP_ARGS);
-        LobbyDHandlerRelease(ch);
+        ch->removeReferenceCount(HANDLER_FILE, 376);
         return false;
     }
     LD_DBG(380, L"recv ok, " INITNP_SUFFIX, INITNP_ARGS);
 
-    LobbyGate* gate = LobbyGate::_instance;
-    GateKeyEntry* e = gate->_gatekeyManager->GetGKEntry(gateKey);
+    GateKeyEntry* e = LobbyGate::_instance->_gatekeyManager->GetGKEntry(gateKey);
     if (e == nullptr)
     {
         LD_ERR(386, L"failed to find gatekey" INITNP_SUFFIX, INITNP_ARGS);
+        ch->removeReferenceCount(HANDLER_FILE, 387);
+        return true;
     }
-    else if (e->_session == nullptr)
+    Session* clientSession = e->_session;
+    if (clientSession != nullptr)
     {
-        LD_ERR(395, L"failed to get client session" INITNP_SUFFIX, INITNP_ARGS);
-    }
-    else if (!gate->_clientManager->AddClient(e->_session, gateKey, cliKey))
-    {
-        LD_ERR(404, L"failed to add clien in climgr" INITNP_SUFFIX, INITNP_ARGS);
-        e->_session->Send("hh", LobbyGate_LoginWithNPTokenFailCmd);  // BUG: 0xbe90 the format has two fields, but the reason is missing.
-    }
-    else
-    {
+        if (!LobbyGate::_instance->_clientManager->AddClient(clientSession, gateKey, cliKey))
+        {
+            LD_ERR(404, L"failed to add clien in climgr" INITNP_SUFFIX, INITNP_ARGS);
+            clientSession->Send("hh", LobbyGate_LoginWithNPTokenFailCmd, 2);
+            ch->removeReferenceCount(HANDLER_FILE, 406);
+            return true;
+        }
         e->_cliKey = cliKey;
-        if (!gate->_lobbyD->SendStartSessionWithNPTokenReq(cliKey, &npGameToken, &portalAccountId,
-                                                           e->_session->_connection->_ip))
+        if (!static_cast<LobbyD*>(ch)->SendStartSessionWithNPTokenReq(cliKey, &npGameToken, &portalAccountId,
+                                                                      clientSession->_connection->_ip))
         {
             LD_ERR(414, L"failed to SendStartSessionWithNPTokenReq" INITNP_SUFFIX, INITNP_ARGS);
-            e->_session->Send("hh", LobbyGate_LoginWithNPTokenFailCmd);  // BUG: 0xbe90 the format has two fields, but the reason is missing.
+            clientSession->Send("hh", LobbyGate_LoginWithNPTokenFailCmd, 2);
         }
+        ch->removeReferenceCount(HANDLER_FILE, 417);
+        return true;
     }
-    LobbyDHandlerRelease(ch);
+    LD_ERR(395, L"failed to get client session" INITNP_SUFFIX, INITNP_ARGS);
+    ch->removeReferenceCount(HANDLER_FILE, 396);
     return true;
 }
 
 // 0xca10
+#pragma inline_depth(0)
 bool HandleLobbyLobbyGate_InitSessionWithNPTokenFail(Session const* session, Packet* packet)
 {
     Channel* ch = LobbyDHandlerChannel(session, 427);
@@ -357,7 +361,7 @@ bool HandleLobbyLobbyGate_InitSessionWithNPTokenFail(Session const* session, Pac
     if (!packet->Decompose("hqE", &cmd, &gateKey, &failReason))
     {
         LD_ERR(442, L"decompose fail,InitSessionWithNPTokenFail, gateKey:0x%I64X, failReason:%d", gateKey, failReason);
-        LobbyDHandlerRelease(ch);
+        ch->removeReferenceCount(HANDLER_FILE, 443);
         return false;
     }
     LD_DBG(447, L"recv ok, InitSessionWithNPTokenFail, gateKey:0x%I64X, failReason:%d", gateKey, failReason);
@@ -380,9 +384,10 @@ bool HandleLobbyLobbyGate_InitSessionWithNPTokenFail(Session const* session, Pac
         e->~GateKeyEntry();
         LD_FREE(e, 464);
     }
-    LobbyDHandlerRelease(ch);
+    ch->removeReferenceCount(HANDLER_FILE, 468);
     return true;
 }
+#pragma inline_depth()
 
 #define SSNP_TEXT                                                                                            \
     L"StartSessionWithNPTokenOk, cliKey:0x%I64X, create-initial-user-name:%s, "                              \
@@ -590,6 +595,7 @@ cleanup:
 #undef SSNP_ARGS
 
 // 0xe810
+#pragma inline_depth(0)
 bool HandleLobbyLobbyGate_StartSessionWithNPTokenFail(Session const* session, Packet* packet)
 {
     Channel* ch = LobbyDHandlerChannel(session, 778);
@@ -606,16 +612,15 @@ bool HandleLobbyLobbyGate_StartSessionWithNPTokenFail(Session const* session, Pa
     }
     LD_DBG(798, L"recv ok, StartSessionWithNPTokenFail, cliKey:0x%I64X, failReason:%d", cliKey, failReason);
 
-    LobbyGate* gate = LobbyGate::_instance;
     long long gateKey = 0;
-    Client* client = gate->_clientManager->AcquireClient(cliKey);
+    Client* client = LobbyGate::_instance->_clientManager->AcquireClient(cliKey);
     if (client != nullptr)
     {
         gateKey = client->_gateKey;
         client->removeReferenceCount(HANDLER_FILE, 808);
-        gate->_clientManager->RemoveClient(cliKey);
+        LobbyGate::_instance->_clientManager->RemoveClient(cliKey);
     }
-    GateKeyEntry* e = gate->_gatekeyManager->RemoveGateKey(gateKey);
+    GateKeyEntry* e = LobbyGate::_instance->_gatekeyManager->RemoveGateKey(gateKey);
     if (e != nullptr)
     {
         if (e->_session != nullptr)
@@ -640,6 +645,7 @@ bool HandleLobbyLobbyGate_StartSessionWithNPTokenFail(Session const* session, Pa
     ch->removeReferenceCount(HANDLER_FILE, 846);
     return true;
 }
+#pragma inline_depth()
 
 #define INITLT_SUFFIX L"InitSessionWithLobbyTokenOk, gateKey:0x%I64X, cliKey:0x%I64X"
 
@@ -655,46 +661,49 @@ bool HandleLobbyLobbyGate_InitSessionWithLobbyTokenOk(Session const* session, Pa
     if (!packet->Decompose("hqq", &cmd, &gateKey, &cliKey))
     {
         LD_ERR(872, L"decompose fail," INITLT_SUFFIX, gateKey, cliKey);
-        LobbyDHandlerRelease(ch);
+        ch->removeReferenceCount(HANDLER_FILE, 873);
         return false;
     }
-    if (gateKey == 0 || cliKey == 0)
-    {
-        LD_ERR(879, L"invalid parameter, " INITLT_SUFFIX, gateKey, cliKey);
-    }
-    else
+    if (gateKey != 0 && cliKey != 0)
     {
         LD_DBG(884, L"recv ok, " INITLT_SUFFIX, gateKey, cliKey);
-        LobbyGate* gate = LobbyGate::_instance;
-        GateKeyEntry* e = gate->_gatekeyManager->GetGKEntry(gateKey);
+        GateKeyEntry* e = LobbyGate::_instance->_gatekeyManager->GetGKEntry(gateKey);
         if (e == nullptr)
         {
             LD_ERR(890, L"failed to find gatekey" INITLT_SUFFIX, gateKey, cliKey);
+            ch->removeReferenceCount(HANDLER_FILE, 891);
+            return true;
         }
-        else if (e->_session == nullptr)
+        Session* clientSession = e->_session;
+        if (clientSession != nullptr)
         {
-            LD_ERR(899, L"failed to get client session" INITLT_SUFFIX, gateKey, cliKey);
-        }
-        else if (!gate->_clientManager->AddClient(e->_session, gateKey, cliKey))
-        {
-            LD_ERR(907, L"failed to AddClient" INITLT_SUFFIX, gateKey, cliKey);
-            e->_session->Send("hh", LobbyGate_LoginWithLobbyTokenFailCmd);  // BUG: 0xeb30 the format has two fields, but the reason is missing.
-        }
-        else
-        {
+            if (!LobbyGate::_instance->_clientManager->AddClient(clientSession, gateKey, cliKey))
+            {
+                LD_ERR(907, L"failed to AddClient" INITLT_SUFFIX, gateKey, cliKey);
+                clientSession->Send("hh", LobbyGate_LoginWithLobbyTokenFailCmd, 2);
+                ch->removeReferenceCount(HANDLER_FILE, 909);
+                return true;
+            }
             e->_cliKey = cliKey;
-            if (!gate->_lobbyD->SendStartSessionWithLobbyTokenReq(cliKey))
+            if (!static_cast<LobbyD*>(ch)->SendStartSessionWithLobbyTokenReq(cliKey))
             {
                 LD_ERR(916, L"failed to SendStartSessionWithLobbyTokenReq" INITLT_SUFFIX, gateKey, cliKey);
-                e->_session->Send("hh", LobbyGate_LoginWithLobbyTokenFailCmd);  // BUG: 0xeb30 the format has two fields, but the reason is missing.
+                clientSession->Send("hh", LobbyGate_LoginWithLobbyTokenFailCmd, 2);
             }
+            ch->removeReferenceCount(HANDLER_FILE, 920);
+            return true;
         }
+        LD_ERR(899, L"failed to get client session" INITLT_SUFFIX, gateKey, cliKey);
+        ch->removeReferenceCount(HANDLER_FILE, 900);
+        return true;
     }
-    LobbyDHandlerRelease(ch);
+    LD_ERR(879, L"invalid parameter, " INITLT_SUFFIX, gateKey, cliKey);
+    ch->removeReferenceCount(HANDLER_FILE, 880);
     return true;
 }
 
 // 0xef10
+#pragma inline_depth(0)
 bool HandleLobbyLobbyGate_InitSessionWithLobbyTokenFail(Session const* session, Packet* packet)
 {
     Channel* ch = LobbyDHandlerChannel(session, 930);
@@ -741,6 +750,7 @@ bool HandleLobbyLobbyGate_InitSessionWithLobbyTokenFail(Session const* session, 
     ch->removeReferenceCount(HANDLER_FILE, 988);
     return true;
 }
+#pragma inline_depth()
 
 // 0xf230
 bool HandleLobbyLobbyGate_StartSessionWithLobbyTokenOk(Session const* session, Packet* packet)
@@ -967,6 +977,7 @@ cleanup:
 }
 
 // 0xffc0
+#pragma inline_depth(0)
 bool HandleLobbyLobbyGate_StartSessionWithLobbyTokenFail(Session const* session, Packet* packet)
 {
     Channel* ch = LobbyDHandlerChannel(session, 1289);
@@ -984,16 +995,15 @@ bool HandleLobbyLobbyGate_StartSessionWithLobbyTokenFail(Session const* session,
     }
     LD_DBG(1309, L"recv ok, StartSessionWithLobbyTokenFail, cliKey:0x%I64X, failReason:%d", cliKey, failReason);
 
-    LobbyGate* gate = LobbyGate::_instance;
     long long gateKey = 0;
-    Client* client = gate->_clientManager->AcquireClient(cliKey);
+    Client* client = LobbyGate::_instance->_clientManager->AcquireClient(cliKey);
     if (client != nullptr)
     {
         gateKey = client->_gateKey;
         client->removeReferenceCount(HANDLER_FILE, 1319);
-        gate->_clientManager->RemoveClient(cliKey);
+        LobbyGate::_instance->_clientManager->RemoveClient(cliKey);
     }
-    GateKeyEntry* e = gate->_gatekeyManager->RemoveGateKey(gateKey);
+    GateKeyEntry* e = LobbyGate::_instance->_gatekeyManager->RemoveGateKey(gateKey);
     if (e != nullptr)
     {
         if (e->_session != nullptr)
@@ -1009,6 +1019,7 @@ bool HandleLobbyLobbyGate_StartSessionWithLobbyTokenFail(Session const* session,
     ch->removeReferenceCount(HANDLER_FILE, 1338);
     return true;
 }
+#pragma inline_depth()
 
 // 0x102b0
 bool HandleLobbyLobbyGate_CloseAnonymousSessionNotify(Session const* session, Packet* packet)

@@ -360,14 +360,13 @@ bool LobbyD::hello()
     Session* session = const_cast<Session*>(GetSession());
     if (_helloEvent.Event != nullptr)
         ResetEvent(_helloEvent.Event);
-    LobbyGateConfig const* config = LobbyGate::_instance->_config;
     // BUG: 0x9d80 Send is called also when the session is null.
-    session->Send("hhhh", LobbyLobbyGate_HelloReqCmd, static_cast<int>(static_cast<short>(config->_predefinedWorldId)), 58,
-                  static_cast<int>(static_cast<short>(config->_internalPort)));
+    session->Send("hhhh", LobbyLobbyGate_HelloReqCmd, static_cast<int>(static_cast<short>(LobbyGate::_instance->_config->_predefinedWorldId)), 58,
+                  static_cast<int>(static_cast<short>(LobbyGate::_instance->_config->_internalPort)));
     Log::Write(Log::LT_DEBUG, LOBBYD_FILE, 315,
                L"[channel], 0x%.16I64X, send, cmd:%d, gate-wid:%d, lobbylobbygatepacket-version:%d, internal-port:%d",
-               session != nullptr ? session->_id : 0ULL, 1, config->_predefinedWorldId, 58,
-               static_cast<int>(static_cast<unsigned short>(config->_internalPort)));
+               session != nullptr ? session->_id : 0ULL, 1, LobbyGate::_instance->_config->_predefinedWorldId, 58,
+               static_cast<int>(static_cast<unsigned short>(LobbyGate::_instance->_config->_internalPort)));
     if (session != nullptr)
         session->removeReferenceCount(CHANNEL_H_FILE, 52);
     return true;
