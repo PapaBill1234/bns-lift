@@ -27,6 +27,12 @@ public:
             L"e:\\dailybuild02\\lobbydaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\lobbydaemon\\ObjectPool.h", 205,
             L"== CRASH == [poolobj], do not call 'delete' on PoolObj instance!!!");
     }
+#if defined(__clang__)
+    // LIFT: clang only (portable gate build). clang needs a usual operator delete for a virtual dtor. VS2010 has no
+    // such need: its deleting dtors call the global ::operator delete (the original calls 0x4f30 only from the
+    // EH unwind actions). This member keeps that behaviour. The PDB has no such member.
+    static void operator delete(void* p) { ::operator delete(p); }
+#endif
 
 private:
     // PDB: private and not defined. They hide the other forms.
