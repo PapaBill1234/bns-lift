@@ -256,7 +256,7 @@ bool CacheDList::LoadCachedListConfigFile(wchar_t const* fileName, bool reload)
                             {
                                 XmlElement const* element = node->ToXmlElement();
                                 // An element that is not "cached" stops the load with failure.
-                                if (element == nullptr || wcsncmp(element->Name(), L"cached", 7) != 0)
+                                if (element == nullptr || wcscmp(element->Name(), L"cached") != 0)
                                 {
                                     result = false;
                                     break;
