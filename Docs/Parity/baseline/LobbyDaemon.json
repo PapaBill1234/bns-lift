@@ -1421,11 +1421,11 @@
 "status": "MATCH"
 },
 "GameWorldCluster::addGameWorld": {
-"calls": 83,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 94.4,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "GameWorldCluster::giveupWait": {
 "calls": 100,
@@ -1575,11 +1575,11 @@
 "status": "MATCH"
 },
 "GameWorldReporterListener": {
-"calls": 89,
+"calls": 100,
 "consts": 100,
 "refs": 100,
-"score": 96.3,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "GamedChannel::SendAccountInventoryNotify": {
 "calls": 56,
