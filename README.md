@@ -13,11 +13,11 @@ This repo is public. Do not commit binaries, keys, PDBs or IDA databases.
 | Item | State |
 | --- | --- |
 | First 4 exes | 91.7 % parity. 3 of 4 are above 90 %. LobbyGate is at 89.0 %. |
-| LobbyDaemon | Lift in progress: 677 MATCH (30.7 %). Most of the other functions are still `LIFT_STUB` bodies. |
+| LobbyDaemon | Lift in progress: 739 MATCH (33.5 %), 24 excluded MATCH not counted. Most of the other functions are still `LIFT_STUB` bodies. |
 | Method | Gap cards. Each card lifts the PDB class layout and the stub bodies of one class or job group. |
-| Last landed | PDB class layouts for 18 LobbyDaemon stub classes, gap cards 05 (charge jobs) and 06 (goods and lobby service item jobs), and a funcdiff rule fix: an immediate is an address only with a base relocation (+3 MATCH). 0 lost in all 5 exes. |
+| Last landed | PDB ids for fix 3b, honest totals (`Docs/Parity/excluded.tsv`), a public-clean tools pass, gap cards 07 (WNP jobs A), 08 (session jobs) and 19 (manage channel, +59 MATCH, 24 review rejects excluded). 0 lost in all 5 exes. |
 | Checks per landing | Full VS2010 build of all 5 exes, funcdiff against the original, 0 lost MATCH, 0 strict regress. A model review checks each new MATCH without a strict full proof. |
-| Next | Gap cards 04 (NPGame service channel) and 15 (CliSession), then the other job cards. |
+| Next | Gap cards 09 and 11 (wait for an operator decision on 4 parked ZSTD items), 04 and 15, then the other job cards. |
 
 ## Parity
 
