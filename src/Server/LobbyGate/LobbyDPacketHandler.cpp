@@ -128,6 +128,14 @@ static __forceinline void LobbyDBroadcastReload(Session const* clientSession)  /
 }
 
 // 0xaf20
+// 0xaf20: each HelloOk error log passes this suffix text and the 4 values as arguments.
+// scheduleCount is still 0 at lines 113 and 124.
+#define HELLOOK_SUFFIX \
+    L"HelloOk, worldCount:%d, enablePcCafeMileage:%s, enablePcCafeMileageDeposit:%s, pcCafeMileageFeverTimeScheduleCount:%d"
+#define HELLOOK_ARGS                                                                                         \
+    worldCount, enablePcCafeMileage == 1 ? L"yes" : L"no", enablePcCafeMileageDeposit == 1 ? L"yes" : L"no", \
+        scheduleCount
+
 bool HandleLobbyLobbyGate_HelloOk(Session const* session, Packet* packet)
 {
     PacketConcatenateBuffer* pcb = reinterpret_cast<PacketConcatenateBuffer*>(packet);
@@ -135,11 +143,12 @@ bool HandleLobbyLobbyGate_HelloOk(Session const* session, Packet* packet)
     if (ch == nullptr)
         return false;
 
-    LobbyGate* gate = LobbyGate::_instance;
-    gate->_lobbyD->_state = 1;
+    // 0xaf20: the original uses the channel as the LobbyD object (no LobbyGate::_instance->_lobbyD load).
+    LobbyD* lobbyD = static_cast<LobbyD*>(ch);
+    lobbyD->_state = 1;
     LD_DBG(37, L"enable service");
-    if (gate->_lobbyD->_helloEvent.Event != nullptr)
-        SetEvent(gate->_lobbyD->_helloEvent.Event);
+    if (lobbyD->_helloEvent.Event != nullptr)
+        SetEvent(lobbyD->_helloEvent.Event);
 
     int worldCount = 0;
     WorldInfo* worldList = nullptr;
@@ -152,65 +161,69 @@ bool HandleLobbyLobbyGate_HelloOk(Session const* session, Packet* packet)
     pcb->decomposer.SetFormat("hiChhsQQiihhiQQQQQQQ;QQqCqqiQiic;", 2);
     worldCount = pcb->decomposer.PushRepeatCount(&pcb->buffer[pcb->decomposer.offset], pcb->size - pcb->decomposer.offset);
     if (worldCount > 0)
-        worldList = static_cast<WorldInfo*>(LD_ALLOCZERO(68 * worldCount, 89));
-    for (int i = 0; i < worldCount; ++i)
     {
-        WorldInfo& w = worldList[i];
-        if (!pcb->Decompose(17, &w.worldId, &w.worldClusterId, w.worldName, 17, &w.worldType, &w.playType,
-                            &w.publicAddress, &w.internalAddress, &w.publicPort, &w.mobilePort, &w.worldScore,
-                            &w.worldLive, &w.entrance, &w.characterCreation, &w.characterCreationLimitedOnNewAccount,
-                            &w.recommend, &w.brandnew, &w.crowdness))
+        worldList = static_cast<WorldInfo*>(LD_ALLOCZERO(68 * worldCount, 89));
+        for (int i = 0; i < worldCount; ++i)
         {
-            // BUG: 0xaf20 the suffix text is passed as an argument, not appended to the format.
-            LD_ERR(113, L"world-info decompose fail, ",
-                   L"HelloOk, worldCount:%d, enablePcCafeMileage:%s, enablePcCafeMileageDeposit:%s, "
-                   L"pcCafeMileageFeverTimeScheduleCount:%d");
-            goto fail;
+            WorldInfo& w = worldList[i];
+            if (!pcb->Decompose(17, &w.worldId, &w.worldClusterId, w.worldName, 17, &w.worldType, &w.playType,
+                                &w.publicAddress, &w.internalAddress, &w.publicPort, &w.mobilePort, &w.worldScore,
+                                &w.worldLive, &w.entrance, &w.characterCreation,
+                                &w.characterCreationLimitedOnNewAccount, &w.recommend, &w.brandnew, &w.crowdness))
+            {
+                // BUG: 0xaf20 the suffix text is passed as an argument, not appended to the format.
+                LD_ERR(113, L"world-info decompose fail, ", HELLOOK_SUFFIX, HELLOOK_ARGS);
+                goto fail;
+            }
+            LobbyDRepeatNext(pcb);
         }
-        LobbyDRepeatNext(pcb);
     }
     pcb->decomposer.PopRepeatCount();
 
     if (!pcb->Decompose(3, &enablePcCafeMileage, &enablePcCafeMileageDeposit, &pcCafeMileageSeasonExpireTime))
     {
-        LD_ERR(124, L"current-pc-cafe-mileage-season-expire-time decompose fail, ");
+        LD_ERR(124, L"current-pc-cafe-mileage-season-expire-time decompose fail, ", HELLOOK_SUFFIX, HELLOOK_ARGS);
         goto fail;
     }
 
     scheduleCount = pcb->decomposer.PushRepeatCount(&pcb->buffer[pcb->decomposer.offset], pcb->size - pcb->decomposer.offset);
     if (scheduleCount > 0)
+    {
         scheduleList = static_cast<PcCafeMileageFeverTimeScheduleInfo*>(
             LD_ALLOCZERO(sizeof(PcCafeMileageFeverTimeScheduleInfo) * scheduleCount, 130));
-    for (int i = 0; i < scheduleCount; ++i)
-    {
-        PcCafeMileageFeverTimeScheduleInfo& s = scheduleList[i];
-        if (!pcb->Decompose(7, &s.startTime, &s.endTime, &s.feverPoints, &s.repeatType, &s.repeatStartTime,
-                            &s.repeatDuration, &s.daysOfWeek))
+        for (int i = 0; i < scheduleCount; ++i)
         {
-            LD_ERR(143, L"pc-cafe-mileage-fever-time-schedule-info decompose fail, ");
-            goto fail;
+            PcCafeMileageFeverTimeScheduleInfo& s = scheduleList[i];
+            if (!pcb->Decompose(7, &s.startTime, &s.endTime, &s.feverPoints, &s.repeatType, &s.repeatStartTime,
+                                &s.repeatDuration, &s.daysOfWeek))
+            {
+                LD_ERR(143, L"pc-cafe-mileage-fever-time-schedule-info decompose fail, ", HELLOOK_SUFFIX,
+                       HELLOOK_ARGS);
+                goto fail;
+            }
+            LobbyDRepeatNext(pcb);
         }
-        LobbyDRepeatNext(pcb);
     }
     pcb->decomposer.PopRepeatCount();
 
     LD_DBG(152,
            L"recv ok, HelloOk, worldCount:%d, enablePcCafeMileage:%s, enablePcCafeMileageDeposit:%s, "
            L"pcCafeMileageFeverTimeScheduleCount:%d",
-           worldCount, enablePcCafeMileage == 1 ? L"yes" : L"no", enablePcCafeMileageDeposit == 1 ? L"yes" : L"no",
-           scheduleCount);
+           HELLOOK_ARGS);
 
-    if (!gate->_worldListManger->SetWorldList(worldList, worldCount))
+    if (!LobbyGate::_instance->_worldListManger->SetWorldList(worldList, worldCount))
     {
-        LD_ERR(158, L"setworldlist fail, ");
-        LD_FREE(worldList, 160);
+        LD_ERR(158, L"setworldlist fail, ", HELLOOK_SUFFIX, HELLOOK_ARGS);
+        if (worldList != nullptr)
+            LD_FREE(worldList, 160);
     }
-    if (!gate->_pcCafeMileageFeverTimeScheduleListManager->SetPcCafeMileageFeverTimeScheduleList(
+    if (!LobbyGate::_instance->_pcCafeMileageFeverTimeScheduleListManager->SetPcCafeMileageFeverTimeScheduleList(
             enablePcCafeMileage == 1, enablePcCafeMileageDeposit == 1, pcCafeMileageSeasonExpireTime, scheduleList,
             scheduleCount))
     {
-        LD_ERR(170, L"set pc-cafe-mileage-fever-time-schedule-list fail, ");
-        LD_FREE(scheduleList, 172);
+        LD_ERR(170, L"set pc-cafe-mileage-fever-time-schedule-list fail, ", HELLOOK_SUFFIX, HELLOOK_ARGS);
+        if (scheduleList != nullptr)
+            LD_FREE(scheduleList, 172);
     }
     pcb->Clear();
     LobbyDHandlerRelease(ch);
@@ -448,42 +461,47 @@ bool HandleLobbyLobbyGate_StartSessionWithNPTokenOk(Session const* session, Pack
     LD_DBG(555, L"recv ok, " SSNP_TEXT, SSNP_ARGS);
 
     gradeLevelCount = pcb->decomposer.PushRepeatCount(&pcb->buffer[pcb->decomposer.offset], pcb->size - pcb->decomposer.offset);
+    // 0xcd00: each decompose loop is in the "count > 0" block (the original tests the count twice).
     if (gradeLevelCount > 0)
-        gradeLevelList = static_cast<GradeLevelInfo*>(LD_ALLOCZERO(sizeof(GradeLevelInfo) * gradeLevelCount, 561));
-    for (int i = 0; i < gradeLevelCount; ++i)
     {
-        GradeLevelInfo& g = gradeLevelList[i];
-        if (!pcb->Decompose(5, &g.level, &g.score, &g.minLevelScore, &g.maxLevelScore, &g.maxGradeScore))
+        gradeLevelList = static_cast<GradeLevelInfo*>(LD_ALLOCZERO(sizeof(GradeLevelInfo) * gradeLevelCount, 561));
+        for (int i = 0; i < gradeLevelCount; ++i)
         {
-            LD_ERR(569, L"vipLevelInfo decompose fail," SSNP_TEXT, SSNP_ARGS);
-            goto cleanup;
+            GradeLevelInfo& g = gradeLevelList[i];
+            if (!pcb->Decompose(5, &g.level, &g.score, &g.minLevelScore, &g.maxLevelScore, &g.maxGradeScore))
+            {
+                LD_ERR(569, L"vipLevelInfo decompose fail," SSNP_TEXT, SSNP_ARGS);
+                goto cleanup;
+            }
+            LD_DBG(579,
+                   L"gradeLevelInfo recv ok, " SSNP_TEXT L", gradeLevelInfo level:%d, score:%d, min-level-score:%d, "
+                   L"max-level-score:%d, max-grade-score:%d",
+                   SSNP_ARGS, g.level, g.score, g.minLevelScore, g.maxLevelScore, g.maxGradeScore);
+            LobbyDRepeatNext(pcb);
         }
-        LD_DBG(579,
-               L"gradeLevelInfo recv ok, " SSNP_TEXT L", gradeLevelInfo level:%d, score:%d, min-level-score:%d, "
-               L"max-level-score:%d, max-grade-score:%d",
-               SSNP_ARGS, g.level, g.score, g.minLevelScore, g.maxLevelScore, g.maxGradeScore);
-        LobbyDRepeatNext(pcb);
     }
     pcb->decomposer.PopRepeatCount();
 
     gradeCount = pcb->decomposer.PushRepeatCount(&pcb->buffer[pcb->decomposer.offset], pcb->size - pcb->decomposer.offset);
     if (gradeCount > 0)
-        gradeList = static_cast<GradeInfo*>(LD_ALLOCZERO(sizeof(GradeInfo) * gradeCount, 590));
-    for (int i = 0; i < gradeCount; ++i)
     {
-        GradeInfo& g = gradeList[i];
-        if (!pcb->Decompose(6, &g.gameGradeKey, &g.gradeId, &g.activation, &g.gradeCount, &g.totalEffectiveFrom,
-                            &g.totalEffectiveTo))
+        gradeList = static_cast<GradeInfo*>(LD_ALLOCZERO(sizeof(GradeInfo) * gradeCount, 590));
+        for (int i = 0; i < gradeCount; ++i)
         {
-            LD_ERR(598, L"gradeInfo decompose fail," SSNP_TEXT, SSNP_ARGS);
-            goto cleanup;
+            GradeInfo& g = gradeList[i];
+            if (!pcb->Decompose(6, &g.gameGradeKey, &g.gradeId, &g.activation, &g.gradeCount, &g.totalEffectiveFrom,
+                                &g.totalEffectiveTo))
+            {
+                LD_ERR(598, L"gradeInfo decompose fail," SSNP_TEXT, SSNP_ARGS);
+                goto cleanup;
+            }
+            LD_DBG(609,
+                   L"gradeInfo recv ok, " SSNP_TEXT L", gradeInfo game-grade-key:%d, grade-id:%d, activation:%s, "
+                   L"grade-count:%d, total-effective-from:%I64d, total-effective-to:%I64d",
+                   SSNP_ARGS, g.gameGradeKey, g.gradeId, g.activation ? L"yes" : L"no", g.gradeCount,
+                   g.totalEffectiveFrom, g.totalEffectiveTo);
+            LobbyDRepeatNext(pcb);
         }
-        LD_DBG(609,
-               L"gradeInfo recv ok, " SSNP_TEXT L", gradeInfo game-grade-key:%d, grade-id:%d, activation:%s, "
-               L"grade-count:%d, total-effective-from:%I64d, total-effective-to:%I64d",
-               SSNP_ARGS, g.gameGradeKey, g.gradeId, g.activation ? L"yes" : L"no", g.gradeCount,
-               g.totalEffectiveFrom, g.totalEffectiveTo);
-        LobbyDRepeatNext(pcb);
     }
     pcb->decomposer.PopRepeatCount();
 
@@ -791,53 +809,58 @@ bool HandleLobbyLobbyGate_StartSessionWithLobbyTokenOk(Session const* session, P
            cliKey, remainJumpingCharacterCreationQuota);
 
     gradeLevelCount = pcb->decomposer.PushRepeatCount(&pcb->buffer[pcb->decomposer.offset], pcb->size - pcb->decomposer.offset);
+    // 0xf230: each decompose loop is in the "count > 0" block (the original tests the count twice).
     if (gradeLevelCount > 0)
-        gradeLevelList = static_cast<GradeLevelInfo*>(LD_ALLOCZERO(sizeof(GradeLevelInfo) * gradeLevelCount, 1076));
-    for (int i = 0; i < gradeLevelCount; ++i)
     {
-        GradeLevelInfo g = {};
-        if (!pcb->Decompose(5, &g.level, &g.score, &g.minLevelScore, &g.maxLevelScore, &g.maxGradeScore))
+        gradeLevelList = static_cast<GradeLevelInfo*>(LD_ALLOCZERO(sizeof(GradeLevelInfo) * gradeLevelCount, 1076));
+        for (int i = 0; i < gradeLevelCount; ++i)
         {
-            LD_ERR(1084,
-                   L"gradeLevelInfo decompose fail,StartSessionWithLobbyTokenOk, cliKey:0x%I64X, "
-                   L"remainJumpingCharacterCreationQuota:%d",
-                   cliKey, remainJumpingCharacterCreationQuota);
-            goto cleanup;
+            GradeLevelInfo g = {};
+            if (!pcb->Decompose(5, &g.level, &g.score, &g.minLevelScore, &g.maxLevelScore, &g.maxGradeScore))
+            {
+                LD_ERR(1084,
+                       L"gradeLevelInfo decompose fail,StartSessionWithLobbyTokenOk, cliKey:0x%I64X, "
+                       L"remainJumpingCharacterCreationQuota:%d",
+                       cliKey, remainJumpingCharacterCreationQuota);
+                goto cleanup;
+            }
+            gradeLevelList[i] = g;
+            LD_DBG(1094,
+                   L"gradeLevelInfo recv ok, StartSessionWithLobbyTokenOk, cliKey:0x%I64X, "
+                   L"remainJumpingCharacterCreationQuota:%d, vipLevelInfo level:%d, score:%d, min-level-score:%d, "
+                   L"max-level-score:%d, max-grade-score:%d",
+                   cliKey, remainJumpingCharacterCreationQuota, g.level, g.score, g.minLevelScore, g.maxLevelScore,
+                   g.maxGradeScore);
+            LobbyDRepeatNext(pcb);
         }
-        gradeLevelList[i] = g;
-        LD_DBG(1094,
-               L"gradeLevelInfo recv ok, StartSessionWithLobbyTokenOk, cliKey:0x%I64X, "
-               L"remainJumpingCharacterCreationQuota:%d, vipLevelInfo level:%d, score:%d, min-level-score:%d, "
-               L"max-level-score:%d, max-grade-score:%d",
-               cliKey, remainJumpingCharacterCreationQuota, g.level, g.score, g.minLevelScore, g.maxLevelScore,
-               g.maxGradeScore);
-        LobbyDRepeatNext(pcb);
     }
     pcb->decomposer.PopRepeatCount();
 
     gradeCount = pcb->decomposer.PushRepeatCount(&pcb->buffer[pcb->decomposer.offset], pcb->size - pcb->decomposer.offset);
     if (gradeCount > 0)
-        gradeList = static_cast<GradeInfo*>(LD_ALLOCZERO(sizeof(GradeInfo) * gradeCount, 1105));
-    for (int i = 0; i < gradeCount; ++i)
     {
-        GradeInfo g = {};
-        if (!pcb->Decompose(6, &g.gameGradeKey, &g.gradeId, &g.activation, &g.gradeCount, &g.totalEffectiveFrom,
-                            &g.totalEffectiveTo))
+        gradeList = static_cast<GradeInfo*>(LD_ALLOCZERO(sizeof(GradeInfo) * gradeCount, 1105));
+        for (int i = 0; i < gradeCount; ++i)
         {
-            LD_ERR(1113,
-                   L"vipLevelInfo decompose fail,StartSessionWithLobbyTokenOk, cliKey:0x%I64X, "
-                   L"remainJumpingCharacterCreationQuota:%d",
-                   cliKey, remainJumpingCharacterCreationQuota);
-            goto cleanup;
+            GradeInfo g = {};
+            if (!pcb->Decompose(6, &g.gameGradeKey, &g.gradeId, &g.activation, &g.gradeCount, &g.totalEffectiveFrom,
+                                &g.totalEffectiveTo))
+            {
+                LD_ERR(1113,
+                       L"vipLevelInfo decompose fail,StartSessionWithLobbyTokenOk, cliKey:0x%I64X, "
+                       L"remainJumpingCharacterCreationQuota:%d",
+                       cliKey, remainJumpingCharacterCreationQuota);
+                goto cleanup;
+            }
+            gradeList[i] = g;
+            LD_DBG(1124,
+                   L"gradeInfo recv ok, StartSessionWithLobbyTokenOk, cliKey:0x%I64X, "
+                   L"remainJumpingCharacterCreationQuota:%d, gradeInfo game-grade-key:%d, grade-id:%d, activation:%s, "
+                   L"grade-count:%d, total-effective-from:%I64d, total-effective-to:%I64d",
+                   cliKey, remainJumpingCharacterCreationQuota, g.gameGradeKey, g.gradeId,
+                   g.activation ? L"yes" : L"no", g.gradeCount, g.totalEffectiveFrom, g.totalEffectiveTo);
+            LobbyDRepeatNext(pcb);
         }
-        gradeList[i] = g;
-        LD_DBG(1124,
-               L"gradeInfo recv ok, StartSessionWithLobbyTokenOk, cliKey:0x%I64X, "
-               L"remainJumpingCharacterCreationQuota:%d, gradeInfo game-grade-key:%d, grade-id:%d, activation:%s, "
-               L"grade-count:%d, total-effective-from:%I64d, total-effective-to:%I64d",
-               cliKey, remainJumpingCharacterCreationQuota, g.gameGradeKey, g.gradeId, g.activation ? L"yes" : L"no",
-               g.gradeCount, g.totalEffectiveFrom, g.totalEffectiveTo);
-        LobbyDRepeatNext(pcb);
     }
     pcb->decomposer.PopRepeatCount();
 
@@ -1044,7 +1067,7 @@ bool HandleLobbyLobbyGate_CloseSessionNotify(Session const* session, Packet* pac
     Channel* ch = LobbyDHandlerChannel(session, 1383);
     if (ch == nullptr)
         return false;
-    short cmd = 0;
+    short cmd;  // 0x10440: the original does not set cmd before Decompose.
     long long cliKey = 0;
     if (!packet->Decompose("hq", &cmd, &cliKey))
     {
@@ -1074,9 +1097,9 @@ bool HandleLobbyLobbyGate_KickNotify(Session const* session, Packet* packet)
     Channel* ch = LobbyDHandlerChannel(session, 1428);
     if (ch == nullptr)
         return false;
-    short cmd = 0;
+    short cmd;  // 0x10660: the original does not set cmd before Decompose.
     long long cliKey = 0;
-    char reason = 0;
+    short reason = 0;  // 0x10660: movsx of a word (PDB local is 16-bit).
     if (!packet->Decompose("hqQ", &cmd, &cliKey, &reason))
     {
         LD_ERR(1443, L"decompose fail,KickNotify, cliKey:0x%I64X, reason:%d", cliKey, reason);
@@ -1109,7 +1132,13 @@ bool HandleLobbyLobbyGate_KickNotify(Session const* session, Packet* packet)
         ch->removeReferenceCount(HANDLER_FILE, 1476);
         return true;
     }
-    clientSession->Send(&p);
+    // 0x10660: Session::Send is inlined (encrypt, lock, send, unlock).
+    Session* const sendSession = const_cast<Session*>(clientSession);
+    p.ListHead->encrypt(sendSession->_currentCrypt, sendSession->_security3rd);
+    PacketBuffer const* list[1] = {p.ListHead};
+    sendSession->_lock.Enter();
+    sendSession->send(list, 1);
+    sendSession->_lock.Leave();
     LD_DBG(1482, L"send ok, kicknotify, sessionId:0x%I64X, reason:%d", clientSession->_id, reason);
     LobbyGate::_instance->AddJobTimer(client->_gateKey, 1);
     const_cast<Session*>(clientSession)->removeReferenceCount(CHANNEL_H_FILE, 52);
@@ -1445,7 +1474,7 @@ bool HandleLobbyLobbyGate_GetEnterWorldTokenOk(Session const* session, Packet* p
     Channel* ch = LobbyDHandlerChannel(session, 2083);
     if (ch == nullptr)
         return false;
-    short cmd = 0;
+    short cmd;  // 0x11ee0: the original does not set cmd before Decompose.
     long long cliKey = 0;
     long long lobbyToken = 0;
     short worldId = 0;
