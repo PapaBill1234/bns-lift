@@ -24,25 +24,14 @@ wchar_t const* const CHANNEL_H_FILE =
     L"E:\\DailyBuild02\\LobbyGate-Common-0.0.348\\depot\\Branch\\348NC\\Program\\Server\\BloodLib\\include\\Channel.h";
 wchar_t const* const DISCONNECTED_LOBBYD = L"disconnected lobbyd";
 
-// LIFT: Inlined search in PipeConsole::_invalid. The original compares 20 characters with an inline loop
-// (repe cmpsw, 0x9310, 0x94c0). __forceinline because the build uses /Ob0.
+// LIFT: Inlined search in PipeConsole::_invalid. The wcscmp with the literal gives the intrinsic repe cmpsw of
+// 20 characters (0x9310, 0x94c0). __forceinline because the build uses /Ob0.
 __forceinline PipeConsole::ItemNode* findDisconnectedNode(PipeConsole* console)
 {
     PipeConsole::ItemNode* node = console->_invalid._head._next;
     while (node != &console->_invalid._tail)
     {
-        wchar_t const* key = node->_key;
-        wchar_t const* text = DISCONNECTED_LOBBYD;
-        long count = 20;
-        bool equal;
-        do
-        {
-            if (count == 0)
-                break;
-            equal = *key++ == *text++;
-            --count;
-        } while (equal);
-        if (equal)
+        if (wcscmp(node->_key, L"disconnected lobbyd") == 0)
             return node;
         node = node->_next;
     }
@@ -334,14 +323,15 @@ bool LobbyD::Hello(LobbyDSessionHandler* handler, bool waitAck, unsigned int por
     // MakeSession 0x21300 uses portId 2 (0x21373). Session::Connect 0x17a70 uses timeout 5000 (0x17bfe) and does
     // not read reconnect. The binary always waits on the hello event, so waitAck is not read.
     (void)waitAck;
-    bool made = MakeSession(portId, ip, port, connectTimeout, reconnect);
-    if (handler != nullptr)
-        handler->_connlock.Leave();
-    if (!made)
+    if (!MakeSession(portId, ip, port, connectTimeout, reconnect))
     {
+        if (handler != nullptr)
+            handler->_connlock.Leave();
         Log::Write(Log::LT_ERROR, LOBBYD_FILE, 281, L"make session fail");
         return false;
     }
+    if (handler != nullptr)
+        handler->_connlock.Leave();
 
     if (_helloEvent.Event == nullptr || WaitForSingleObject(_helloEvent.Event, INFINITE) != 0)
     {

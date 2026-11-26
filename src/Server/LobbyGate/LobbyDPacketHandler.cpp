@@ -99,17 +99,32 @@ static __forceinline void LobbyDRepeatNext(PacketConcatenateBuffer* pcb)  // LIF
     --pcb->decomposer.counts[pcb->decomposer.top];
 }
 
-static __forceinline void LobbyDFpReserve(FragmentPacket& fp, int need)  // LIFT: lift helper name, not in any PDB
+static __forceinline void LobbyDFpFree(FragmentPacket& fp, unsigned short need)  // LIFT: lift helper name, not in any PDB
 {
-    if (4000 - fp.packet.CurHeader->size < need)
+    // Inlined FragmentPacket::FreeSize (0x38a0) check.
+    if (fp.packet.CurHeader == nullptr || static_cast<unsigned short>(4000 - fp.packet.CurHeader->size) < need)
         fp.packet.Allocate(&fp.composer);
+}
+
+static __forceinline void LobbyDFpRepeatNext(FragmentPacket& fp)  // LIFT: lift helper name, not in any PDB
+{
+    // Inlined FragmentPacket::IncRepeatCount (0x3840).
+    int next = fp.composer.start[fp.composer.top] + 1;
+    if (fp.composer.subTop < 0)
+        fp.composer.index = next;
+    else
+        fp.composer.sub[fp.composer.subTop].index = next;
+    ++*fp.composer.counts[fp.composer.top];
 }
 
 static __forceinline void LobbyDBroadcastReload(Session const* clientSession)  // LIFT: lift helper name, not in any PDB
 {
     long long const* extraData = static_cast<long long const*>(clientSession->_extraData);
     if (extraData != nullptr && *extraData > 0 && *extraData < ContentsRuleConfig::ConfigLastReloadTime)
+    {
         clientSession->Send("hi", LobbyGate_ContentsRuleReloadNotifyCmd, ContentsRuleConfig::ConfigReloadCount);
+        *const_cast<long long*>(extraData) = 0;  // 0xf230 and 0xcd00 clear the reload time after the notify.
+    }
 }
 
 // 0xaf20
@@ -398,6 +413,7 @@ bool HandleLobbyLobbyGate_InitSessionWithNPTokenFail(Session const* session, Pac
         closestEndTime, remainJumpingCharacterCreationQuota
 
 // 0xcd00
+#pragma inline_depth(0)
 bool HandleLobbyLobbyGate_StartSessionWithNPTokenOk(Session const* session, Packet* packet)
 {
     PacketConcatenateBuffer* pcb = reinterpret_cast<PacketConcatenateBuffer*>(packet);
@@ -497,87 +513,76 @@ bool HandleLobbyLobbyGate_StartSessionWithNPTokenOk(Session const* session, Pack
         Log::Write(Log::LT_DEBUG, HANDLER_FILE, 633, LDPFX L"sendLoginWithNPTokenOk", clientSession->_id,
                    static_cast<long long>(client->GetId()));
         FragmentPacket fp(4, "hiqQoihCiiiii;CiiQiqq;QqiqiqK");
-        bool ok = false;
-        int sessionLine = 751;
-        if (!fp.Compose(5, cliKey, createInitialUserName, &infoGateToken, infoGatePubAddr, infoGatePubPort))
+        fp.packet.Allocate(&fp.composer);
+        if (fp.Compose(5, cliKey, createInitialUserName, &infoGateToken, infoGatePubAddr, infoGatePubPort) == 0)
         {
             LD_ERR(644, L"client packet compose fail," SSNP_TEXT, SSNP_ARGS);
-            sessionLine = 645;
+            const_cast<Session*>(clientSession)->removeReferenceCount(HANDLER_FILE, 645);
         }
         else
         {
-            ok = true;
+            LobbyDFpFree(fp, 2);
             fp.composer.PushRepeatCount(&fp.packet);
-            for (int i = 0; ok && i < gradeLevelCount; ++i)
+            for (int i = 0; i < gradeLevelCount; ++i)
             {
-                GradeLevelInfo& g = gradeLevelList[i];
-                LobbyDFpReserve(fp, 0x14);
-                if (!fp.Compose(5, g.level, g.score, g.minLevelScore, g.maxLevelScore, g.maxGradeScore))
+                LobbyDFpFree(fp, 0x14);
+                if (fp.Compose(5, gradeLevelList[i].level, gradeLevelList[i].score, gradeLevelList[i].minLevelScore,
+                               gradeLevelList[i].maxLevelScore, gradeLevelList[i].maxGradeScore) == 0)
                 {
                     LD_ERR(666, L"gradelevelinfo compose fail," SSNP_TEXT, SSNP_ARGS);
-                    sessionLine = 667;
-                    ok = false;
+                    const_cast<Session*>(clientSession)->removeReferenceCount(HANDLER_FILE, 667);
+                    goto cleanup;
                 }
+                LobbyDFpRepeatNext(fp);
             }
-            if (ok)
+            fp.composer.PopRepeatCount();
+            LobbyDFpFree(fp, 2);
+            fp.composer.PushRepeatCount(&fp.packet);
+            for (int i = 0; i < gradeCount; ++i)
             {
-                fp.composer.PopRepeatCount();
-                fp.composer.PushRepeatCount(&fp.packet);
-            }
-            for (int i = 0; ok && i < gradeCount; ++i)
-            {
-                GradeInfo& g = gradeList[i];
-                LobbyDFpReserve(fp, 0x1D);
-                if (!fp.Compose(6, g.gameGradeKey, g.gradeId, g.activation, g.gradeCount, g.totalEffectiveFrom,
-                                g.totalEffectiveTo))
+                LobbyDFpFree(fp, 0x1D);
+                if (fp.Compose(6, gradeList[i].gameGradeKey, gradeList[i].gradeId, gradeList[i].activation == 1,
+                               gradeList[i].gradeCount, gradeList[i].totalEffectiveFrom,
+                               gradeList[i].totalEffectiveTo) == 0)
                 {
                     LD_ERR(698, L"gradeinfo compose fail," SSNP_TEXT, SSNP_ARGS);
-                    sessionLine = 699;
-                    ok = false;
+                    const_cast<Session*>(clientSession)->removeReferenceCount(HANDLER_FILE, 699);
+                    goto cleanup;
                 }
+                LobbyDFpRepeatNext(fp);
             }
-            if (ok)
+            fp.composer.PopRepeatCount();
+            LobbyDFpFree(fp, 0xD);
+            if (fp.Compose(3, teen, closestEndTime, remainJumpingCharacterCreationQuota) == 0)
             {
-                fp.composer.PopRepeatCount();
-                LobbyDFpReserve(fp, 0xD);
-                if (!fp.Compose(3, teen, closestEndTime, remainJumpingCharacterCreationQuota))
-                {
-                    LD_ERR(711, L"teen and closest-end-time and remain-jumping-character-creation-quota compose fail, "
-                                SSNP_TEXT, SSNP_ARGS);
-                    sessionLine = 712;
-                    ok = false;
-                }
+                LD_ERR(711, L"teen and closest-end-time and remain-jumping-character-creation-quota compose fail, "
+                            SSNP_TEXT, SSNP_ARGS);
+                const_cast<Session*>(clientSession)->removeReferenceCount(HANDLER_FILE, 712);
+                goto cleanup;
             }
-            if (ok)
+            LobbyDFpFree(fp, 0x14);
+            if (fp.Compose(3, acountExpInfo.exp, acountExpInfo.expQuotaPerDay, acountExpInfo.lastUpdateTime) == 0)
             {
-                LobbyDFpReserve(fp, 0x14);
-                if (!fp.Compose(3, acountExpInfo.exp, acountExpInfo.expQuotaPerDay, acountExpInfo.lastUpdateTime))
-                {
-                    LD_ERR(722, L"accountExpInfo compose fail, " SSNP_TEXT, SSNP_ARGS);
-                    sessionLine = 723;
-                    ok = false;
-                }
+                LD_ERR(722, L"accountExpInfo compose fail, " SSNP_TEXT, SSNP_ARGS);
+                const_cast<Session*>(clientSession)->removeReferenceCount(HANDLER_FILE, 723);
+                goto cleanup;
             }
-            if (ok)
+            unsigned short freeSize = fp.packet.CurHeader != nullptr ? 4000 - fp.packet.CurHeader->size : 0;
+            if (freeSize < static_cast<unsigned long long>(LobbyGate::_instance->_broadcastCrypt.size + 2LL))
+                fp.packet.Allocate(&fp.composer);
+            if (fp.Compose(1, LobbyGate::_instance->_broadcastCrypt.key, LobbyGate::_instance->_broadcastCrypt.size) == 0)
             {
-                LobbyGate* gate = LobbyGate::_instance;
-                if (!fp.Compose(1, gate->_broadcastCrypt.key, gate->_broadcastCrypt.size))
-                {
-                    LD_ERR(732, L"broadcastkey compose fail," SSNP_TEXT, SSNP_ARGS);
-                    sessionLine = 733;
-                    ok = false;
-                }
+                LD_ERR(732, L"broadcastkey compose fail," SSNP_TEXT, SSNP_ARGS);
+                const_cast<Session*>(clientSession)->removeReferenceCount(HANDLER_FILE, 733);
+                goto cleanup;
             }
-            if (ok)
-            {
+            if (fp.packet.Splitter != nullptr)
                 fp.packet.Splitter->Finalize(fp.packet.CurHeader);
-                clientSession->Send(&fp.packet);
-                client->_broadcast = true;
-                LobbyDBroadcastReload(clientSession);
-            }
+            clientSession->Send(&fp.packet);
+            client->_broadcast = true;
+            LobbyDBroadcastReload(clientSession);
+            const_cast<Session*>(clientSession)->removeReferenceCount(HANDLER_FILE, 751);
         }
-        const_cast<Session*>(clientSession)->removeReferenceCount(HANDLER_FILE, sessionLine);
-        fp.packet.Clear();
     }
 
 cleanup:
@@ -591,6 +596,7 @@ cleanup:
     ch->removeReferenceCount(HANDLER_FILE, 768);
     return true;
 }
+#pragma inline_depth()
 #undef SSNP_TEXT
 #undef SSNP_ARGS
 
@@ -753,6 +759,7 @@ bool HandleLobbyLobbyGate_InitSessionWithLobbyTokenFail(Session const* session, 
 #pragma inline_depth()
 
 // 0xf230
+#pragma inline_depth(0)
 bool HandleLobbyLobbyGate_StartSessionWithLobbyTokenOk(Session const* session, Packet* packet)
 {
     PacketConcatenateBuffer* pcb = reinterpret_cast<PacketConcatenateBuffer*>(packet);
@@ -864,104 +871,94 @@ bool HandleLobbyLobbyGate_StartSessionWithLobbyTokenOk(Session const* session, P
         Log::Write(Log::LT_DEBUG, HANDLER_FILE, 1149, LDPFX L"sendLoginWithLobbyTokenOk", clientSession->_id,
                    client->GetId());
         FragmentPacket fp(7, "hiqCiiiii;CiiQiqq;iqiqK");
-        bool ok = false;
-        int sessionLine = 1262;
-        if (!fp.Compose(1, cliKey))
+        fp.packet.Allocate(&fp.composer);
+        // BUG: 0xf8b1 the command 7 is given as the first value, so the client gets 7 as cliKey.
+        if (fp.Compose(1, 7, cliKey) == 0)
         {
             LD_ERR(1156,
                    L"client packet compose fail,StartSessionWithLobbyTokenOk, cliKey:0x%I64X, "
                    L"remainJumpingCharacterCreationQuota:%d",
                    cliKey, remainJumpingCharacterCreationQuota);
-            sessionLine = 1157;
+            const_cast<Session*>(clientSession)->removeReferenceCount(HANDLER_FILE, 1157);
         }
         else
         {
-            ok = true;
+            LobbyDFpFree(fp, 2);
             fp.composer.PushRepeatCount(&fp.packet);
-            for (int i = 0; ok && i < gradeLevelCount; ++i)
+            for (int i = 0; i < gradeLevelCount; ++i)
             {
-                GradeLevelInfo& g = gradeLevelList[i];
-                LobbyDFpReserve(fp, 0x14);
-                if (!fp.Compose(5, g.level, g.score, g.minLevelScore, g.maxLevelScore, g.maxGradeScore))
+                LobbyDFpFree(fp, 0x14);
+                if (fp.Compose(5, gradeLevelList[i].level, gradeLevelList[i].score, gradeLevelList[i].minLevelScore,
+                               gradeLevelList[i].maxLevelScore, gradeLevelList[i].maxGradeScore) == 0)
                 {
                     LD_ERR(1178,
                            L"gradelevelinfo compose fail,StartSessionWithLobbyTokenOk, cliKey:0x%I64X, "
                            L"remainJumpingCharacterCreationQuota:%d",
                            cliKey, remainJumpingCharacterCreationQuota);
-                    sessionLine = 1179;
-                    ok = false;
+                    const_cast<Session*>(clientSession)->removeReferenceCount(HANDLER_FILE, 1179);
+                    goto cleanup;
                 }
+                LobbyDFpRepeatNext(fp);
             }
-            if (ok)
+            fp.composer.PopRepeatCount();
+            LobbyDFpFree(fp, 2);
+            fp.composer.PushRepeatCount(&fp.packet);
+            for (int i = 0; i < gradeCount; ++i)
             {
-                fp.composer.PopRepeatCount();
-                fp.composer.PushRepeatCount(&fp.packet);
-            }
-            for (int i = 0; ok && i < gradeCount; ++i)
-            {
-                GradeInfo& g = gradeList[i];
-                LobbyDFpReserve(fp, 0x1D);
-                if (!fp.Compose(6, g.gameGradeKey, g.gradeId, g.activation, g.gradeCount, g.totalEffectiveFrom,
-                                g.totalEffectiveTo))
+                LobbyDFpFree(fp, 0x1D);
+                if (fp.Compose(6, gradeList[i].gameGradeKey, gradeList[i].gradeId, gradeList[i].activation == 1,
+                               gradeList[i].gradeCount, gradeList[i].totalEffectiveFrom,
+                               gradeList[i].totalEffectiveTo) == 0)
                 {
                     LD_ERR(1209,
                            L"gradeinfo compose fail,StartSessionWithLobbyTokenOk, cliKey:0x%I64X, "
                            L"remainJumpingCharacterCreationQuota:%d",
                            cliKey, remainJumpingCharacterCreationQuota);
-                    sessionLine = 1210;
-                    ok = false;
+                    const_cast<Session*>(clientSession)->removeReferenceCount(HANDLER_FILE, 1210);
+                    goto cleanup;
                 }
+                LobbyDFpRepeatNext(fp);
             }
-            if (ok)
+            fp.composer.PopRepeatCount();
+            LobbyDFpFree(fp, 4);
+            if (fp.Compose(1, remainJumpingCharacterCreationQuota) == 0)
             {
-                fp.composer.PopRepeatCount();
-                LobbyDFpReserve(fp, 4);
-                if (!fp.Compose(1, remainJumpingCharacterCreationQuota))
-                {
-                    LD_ERR(1222,
-                           L"remainJumpingCharacterCreationQuota compose fail,StartSessionWithLobbyTokenOk, "
-                           L"cliKey:0x%I64X, remainJumpingCharacterCreationQuota:%d",
-                           cliKey, remainJumpingCharacterCreationQuota);
-                    sessionLine = 1223;
-                    ok = false;
-                }
+                LD_ERR(1222,
+                       L"remainJumpingCharacterCreationQuota compose fail,StartSessionWithLobbyTokenOk, "
+                       L"cliKey:0x%I64X, remainJumpingCharacterCreationQuota:%d",
+                       cliKey, remainJumpingCharacterCreationQuota);
+                const_cast<Session*>(clientSession)->removeReferenceCount(HANDLER_FILE, 1223);
+                goto cleanup;
             }
-            if (ok)
+            LobbyDFpFree(fp, 0x14);
+            if (fp.Compose(3, acountExpInfo.exp, acountExpInfo.expQuotaPerDay, acountExpInfo.lastUpdateTime) == 0)
             {
-                LobbyDFpReserve(fp, 0x14);
-                if (!fp.Compose(3, acountExpInfo.exp, acountExpInfo.expQuotaPerDay, acountExpInfo.lastUpdateTime))
-                {
-                    LD_ERR(1233,
-                           L"accountExpInfo compose fail, StartSessionWithLobbyTokenOk, cliKey:0x%I64X, "
-                           L"remainJumpingCharacterCreationQuota:%d",
-                           cliKey, remainJumpingCharacterCreationQuota);
-                    sessionLine = 1234;
-                    ok = false;
-                }
+                LD_ERR(1233,
+                       L"accountExpInfo compose fail, StartSessionWithLobbyTokenOk, cliKey:0x%I64X, "
+                       L"remainJumpingCharacterCreationQuota:%d",
+                       cliKey, remainJumpingCharacterCreationQuota);
+                const_cast<Session*>(clientSession)->removeReferenceCount(HANDLER_FILE, 1234);
+                goto cleanup;
             }
-            if (ok)
+            unsigned short freeSize = fp.packet.CurHeader != nullptr ? 4000 - fp.packet.CurHeader->size : 0;
+            if (freeSize < static_cast<unsigned long long>(LobbyGate::_instance->_broadcastCrypt.size + 2LL))
+                fp.packet.Allocate(&fp.composer);
+            if (fp.Compose(1, LobbyGate::_instance->_broadcastCrypt.key, LobbyGate::_instance->_broadcastCrypt.size) == 0)
             {
-                LobbyGate* gate = LobbyGate::_instance;
-                if (!fp.Compose(1, gate->_broadcastCrypt.key, gate->_broadcastCrypt.size))
-                {
-                    LD_ERR(1243,
-                           L"broadcastkey compose fail,StartSessionWithLobbyTokenOk, cliKey:0x%I64X, "
-                           L"remainJumpingCharacterCreationQuota:%d",
-                           cliKey, remainJumpingCharacterCreationQuota);
-                    sessionLine = 1244;
-                    ok = false;
-                }
+                LD_ERR(1243,
+                       L"broadcastkey compose fail,StartSessionWithLobbyTokenOk, cliKey:0x%I64X, "
+                       L"remainJumpingCharacterCreationQuota:%d",
+                       cliKey, remainJumpingCharacterCreationQuota);
+                const_cast<Session*>(clientSession)->removeReferenceCount(HANDLER_FILE, 1244);
+                goto cleanup;
             }
-            if (ok)
-            {
+            if (fp.packet.Splitter != nullptr)
                 fp.packet.Splitter->Finalize(fp.packet.CurHeader);
-                clientSession->Send(&fp.packet);
-                client->_broadcast = true;
-                LobbyDBroadcastReload(clientSession);
-            }
+            clientSession->Send(&fp.packet);
+            client->_broadcast = true;
+            LobbyDBroadcastReload(clientSession);
+            const_cast<Session*>(clientSession)->removeReferenceCount(HANDLER_FILE, 1262);
         }
-        const_cast<Session*>(clientSession)->removeReferenceCount(HANDLER_FILE, sessionLine);
-        fp.packet.Clear();
     }
 
 cleanup:
@@ -975,6 +972,7 @@ cleanup:
     ch->removeReferenceCount(HANDLER_FILE, 1279);
     return true;
 }
+#pragma inline_depth()
 
 // 0xffc0
 #pragma inline_depth(0)
