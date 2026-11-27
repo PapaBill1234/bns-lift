@@ -31,6 +31,8 @@ Exe: GameDaemon (2019 + PDB). Round 1. Two sessions did the work (planned contex
 
 The driver builds and runs the gate and funcdiff after this session. This session did not record a result.
 
+Round 2: the round 1 gate build failed. The build log showed only a wine `XDG_RUNTIME_DIR` line. The missing object was `include_jsoncpp.cpp.obj`. Its cause: `jsoncpp.h` includes `<stack>` for `Json::Reader::nodes_`, and the VS2010 STL subset in `include/vs2010` had no `stack` header (the build uses `/X`). Round 2 adds `include/vs2010/stack` (`std::stack` over `deque`, size 0x30, the same form as `include/vs2010/queue`). This round did not change other code.
+
 ## Files changed
 
 - `src/Server/BloodLib/include/Channel.h`
@@ -53,4 +55,5 @@ The driver builds and runs the gate and funcdiff after this session. This sessio
 - `src/Server/GameDaemon/logarchivesession.h`
 - `src/Server/GameDaemon/jsoncpp.h`
 - `src/Server/GameDaemon/source_jsoncpp.cpp`
+- `include/vs2010/stack` (round 2)
 - `Docs/Plan/handoffs/lift-gamedaemon-gap-025-e25.md`
