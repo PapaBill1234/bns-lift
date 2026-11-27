@@ -20,13 +20,13 @@
 // 0x27f80
 bool __cdecl GameDaemon::IsArenaDaemon(void)
 {
-    return GamedInstance->config->_arenaEnabled && GamedInstance->config->_arenaId != 0;
+    return GamedInstance->config->_arenaEnabled && GamedInstance->config->_arenaId > 0u;  // LIFT: unsigned compare (jbe); PDB type int ❓ original form
 }
 
 // 0x27fb0
 bool __cdecl GameDaemon::IsArenaDungeonDaemon(void)
 {
-    return GamedInstance->config->_arenaEnabled && GamedInstance->config->_arenaId != 0 && GamedInstance->arenaAttraction == 2;
+    return GamedInstance->config->_arenaEnabled && GamedInstance->config->_arenaId > 0u && GamedInstance->arenaAttraction == 2;  // LIFT: unsigned compare (jbe)
 }
 
 // 0x971d0
@@ -51,7 +51,9 @@ bool __cdecl GameDaemon::InitializeRankingResult(void)
 bool __cdecl GameDaemon::SetEventReplyCacheHello(void)
 {
     void *event = GamedInstance->replyCacheHelloEvent.Event;
-    return event != nullptr && SetEvent(event) != FALSE;
+    if (event == nullptr)
+        return false;
+    return SetEvent(event) != FALSE;
 }
 
 // 0x1ee590
