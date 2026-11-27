@@ -1,4 +1,11 @@
 {
+"AcquiredSkill1::Version": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "ActSequenceLoader::ReadFromBuffer": {
 "calls": 100,
 "consts": 100,
@@ -42,6 +49,13 @@
 "status": "MATCH"
 },
 "ActivatedTeleport::TypeId": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"AirDashAction::getPriority": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -98,6 +112,20 @@
 "status": "MATCH"
 },
 "BIT_reloadDStream": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ChallengePartyAttractionState::GetTypeName": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ChallengePartyAttractionState::SetAttractionOption": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -419,6 +447,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"DrDataTableImpl::Setup": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "DrHeapMemory::Free": {
 "calls": 100,
 "consts": 100,
@@ -427,6 +462,20 @@
 "status": "MATCH"
 },
 "DrHeapMemory::Realloc": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DuelBotActionQueue::GetMovement": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DuelBotChallengeAttractionState::GetTypeName": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -881,12 +930,61 @@
 "score": 66.7,
 "status": "DIFF"
 },
+"NpcContribution::TotalDamage": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "PartyBattleResultTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
 "refs": 0,
 "score": 66.7,
 "status": "DIFF"
+},
+"PcPublicRaidState::GetAddScoreCount": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PcPublicRaidState::IncrementAddScoreCount": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PcPublicRaidState::IsEventAttendee": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PcPublicRaidState::ResetEventAttendee": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PcPublicRaidState::SetAddScoreCoolTime": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PcPublicRaidState::SetEventAttendee": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "PutItemIntoClosetTran::GetDefinition": {
 "calls": 100,
@@ -1288,6 +1386,13 @@
 "status": "DIFF"
 },
 "UpdateBidTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WarFieldAttractionState::GetTypeName": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
