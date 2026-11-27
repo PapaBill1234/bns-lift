@@ -1,40 +1,54 @@
-// duelbottrainingroomscore.cpp: duelbottrainingroomscore.h (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
+// duelbottrainingroomscore.cpp: duelbottrainingroomscore.h (GameDaemon PDB, 2019 + PDB).
 #include "duelbottrainingroomscore.h"
 #include "propertysync.h"
 #include "LiftStub.h"
 
+// LIFT: keep the lifted virtual functions until the callers are lifted (card lift-gamedaemon-gap-003-e3).
+#pragma comment(linker, "/INCLUDE:?Name@DuelBotTrainingRoomScore@@UEBAPEB_WXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?FieldMax@DuelBotTrainingRoomScore@@MEBAHXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?FieldDefine@DuelBotTrainingRoomScore@@MEBAPEBUDef@Field@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SyncMax@DuelBotTrainingRoomScore@@MEBAHXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SyncDefine@DuelBotTrainingRoomScore@@MEBAPEBUDef@SyncBuffer@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?TypeId@DuelBotTrainingRoomScore@@UEBA?BHXZ")  // LIFT: dead-strip keep (no live caller yet)
+
 // 0x197e0
 wchar_t const * __cdecl DuelBotTrainingRoomScore::Name(void) const
 {
-    LIFT_STUB(0x197e0);
+    return L"DuelBotTrainingRoomScore";
 }
 
 // 0x197f0
 int __cdecl DuelBotTrainingRoomScore::FieldMax(void) const
 {
-    LIFT_STUB(0x197f0);
+    return fieldMax;
 }
 
 // 0x19800
 ::Field::Def const * __cdecl DuelBotTrainingRoomScore::FieldDefine(void) const
 {
-    LIFT_STUB(0x19800);
+    return fieldDefine;
 }
 
 // 0x19810
 int __cdecl DuelBotTrainingRoomScore::SyncMax(void) const
 {
-    LIFT_STUB(0x19810);
+    return syncMax;
 }
 
 // 0x19820
 ::SyncBuffer::Def const * __cdecl DuelBotTrainingRoomScore::SyncDefine(void) const
 {
-    LIFT_STUB(0x19820);
+    return syncDefine;
 }
 
 // 0x1a050
 int const __cdecl DuelBotTrainingRoomScore::TypeId(void) const
 {
-    LIFT_STUB(0x1a050);
+    return 33;
 }
+
+// LIFT: definitions of the PDB static data members (set at start-up by Property::initInstance, a later wave).
+int DuelBotTrainingRoomScore::fieldMax;
+::Field::Def const * DuelBotTrainingRoomScore::fieldDefine;
+int DuelBotTrainingRoomScore::syncMax;
+::SyncBuffer::Def const * DuelBotTrainingRoomScore::syncDefine;

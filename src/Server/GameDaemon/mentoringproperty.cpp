@@ -1,7 +1,14 @@
-// mentoringproperty.cpp: mentoringproperty.h (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
+// mentoringproperty.cpp: mentoringproperty.h (GameDaemon PDB, 2019 + PDB).
 #include "mentoringproperty.h"
 #include "propertysync.h"
 #include "LiftStub.h"
+
+// LIFT: keep the lifted virtual functions until the callers are lifted (card lift-gamedaemon-gap-003-e3).
+#pragma comment(linker, "/INCLUDE:?Name@MentoringProperty@@UEBAPEB_WXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?FieldMax@MentoringProperty@@MEBAHXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?FieldDefine@MentoringProperty@@MEBAPEBUDef@Field@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SyncMax@MentoringProperty@@MEBAHXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SyncDefine@MentoringProperty@@MEBAPEBUDef@SyncBuffer@@XZ")  // LIFT: dead-strip keep (no live caller yet)
 
 // 0x19bd0
 __cdecl MentoringProperty::~MentoringProperty(void)
@@ -12,31 +19,37 @@ __cdecl MentoringProperty::~MentoringProperty(void)
 // 0x19be0
 wchar_t const * __cdecl MentoringProperty::Name(void) const
 {
-    LIFT_STUB(0x19be0);
+    return L"MentoringProperty";
 }
 
 // 0x19bf0
 int __cdecl MentoringProperty::FieldMax(void) const
 {
-    LIFT_STUB(0x19bf0);
+    return fieldMax;
 }
 
 // 0x19c00
 ::Field::Def const * __cdecl MentoringProperty::FieldDefine(void) const
 {
-    LIFT_STUB(0x19c00);
+    return fieldDefine;
 }
 
 // 0x19c10
 int __cdecl MentoringProperty::SyncMax(void) const
 {
-    LIFT_STUB(0x19c10);
+    return syncMax;
 }
 
 // 0x19c20
 ::SyncBuffer::Def const * __cdecl MentoringProperty::SyncDefine(void) const
 {
-    LIFT_STUB(0x19c20);
+    return syncDefine;
 }
 
-// 0x66ee00 MentoringProperty::TypeId: LIFT: no body in wave 0 (member of a class template).
+// 0x66ee00 ItemBase<AccessoryTrait>::GetFieldCount: LIFT: no body in wave 0 (member of a class template). Not done.
+
+// LIFT: definitions of the PDB static data members (set at start-up by Property::initInstance, a later wave).
+int MentoringProperty::fieldMax;
+::Field::Def const * MentoringProperty::fieldDefine;
+int MentoringProperty::syncMax;
+::SyncBuffer::Def const * MentoringProperty::syncDefine;

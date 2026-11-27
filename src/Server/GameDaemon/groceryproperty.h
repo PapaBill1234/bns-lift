@@ -14,5 +14,10 @@ protected:
     virtual ::Field::Def const * __cdecl FieldDefine(void) const;  // 0x19b70
     virtual int __cdecl SyncMax(void) const;  // 0x19b80
     virtual ::SyncBuffer::Def const * __cdecl SyncDefine(void) const;  // 0x19b90
+    // LIFT: PDB data members (protected static), see creatureproperty.h. ❓
+    static int fieldMax;
+    static ::Field::Def const * fieldDefine;
+    static int syncMax;
+    static ::SyncBuffer::Def const * syncDefine;
 };
 

@@ -1,7 +1,14 @@
-// questlist.cpp: questlist.h (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
+// questlist.cpp: questlist.h (GameDaemon PDB, 2019 + PDB).
 #include "questlist.h"
 #include "propertysync.h"
 #include "LiftStub.h"
+
+// LIFT: keep the lifted virtual functions until the callers are lifted (card lift-gamedaemon-gap-003-e3).
+#pragma comment(linker, "/INCLUDE:?Name@QuestList@@UEBAPEB_WXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?FieldMax@QuestList@@MEBAHXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?FieldDefine@QuestList@@MEBAPEBUDef@Field@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SyncMax@QuestList@@MEBAHXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SyncDefine@QuestList@@MEBAPEBUDef@SyncBuffer@@XZ")  // LIFT: dead-strip keep (no live caller yet)
 
 // 0x19c60
 __cdecl QuestList::~QuestList(void)
@@ -12,29 +19,35 @@ __cdecl QuestList::~QuestList(void)
 // 0x19c70
 wchar_t const * __cdecl QuestList::Name(void) const
 {
-    LIFT_STUB(0x19c70);
+    return L"QuestList";
 }
 
 // 0x19c80
 int __cdecl QuestList::FieldMax(void) const
 {
-    LIFT_STUB(0x19c80);
+    return fieldMax;
 }
 
 // 0x19c90
 ::Field::Def const * __cdecl QuestList::FieldDefine(void) const
 {
-    LIFT_STUB(0x19c90);
+    return fieldDefine;
 }
 
 // 0x19ca0
 int __cdecl QuestList::SyncMax(void) const
 {
-    LIFT_STUB(0x19ca0);
+    return syncMax;
 }
 
 // 0x19cb0
 ::SyncBuffer::Def const * __cdecl QuestList::SyncDefine(void) const
 {
-    LIFT_STUB(0x19cb0);
+    return syncDefine;
 }
+
+// LIFT: definitions of the PDB static data members (set at start-up by Property::initInstance, a later wave).
+int QuestList::fieldMax;
+::Field::Def const * QuestList::fieldDefine;
+int QuestList::syncMax;
+::SyncBuffer::Def const * QuestList::syncDefine;
