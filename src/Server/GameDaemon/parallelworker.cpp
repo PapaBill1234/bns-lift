@@ -44,7 +44,7 @@ bool __cdecl DrParallelWorkerManager::SetWorkerInitFunc(void (__cdecl *func)(voi
 int __cdecl DrParallelWorkerManager::Execute(void * args)
 {
     // 0 on success, -1 on failure.
-    return ::PostQueuedCompletionStatus(_iocpHandle, 0, (ULONG_PTR)args, NULL) ? 0 : -1;
+    return (::PostQueuedCompletionStatus(_iocpHandle, 0, (ULONG_PTR)args, NULL) != FALSE) - 1;  // LIFT: form (setne, lea -1)
 }
 
 // 0x6feb20

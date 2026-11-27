@@ -62,7 +62,7 @@ void __cdecl QuestTableImpl::GetTableSummary(::DrTableSummary &)
 // 0x6f86a0
 ::Quest const * __cdecl QuestTableImpl::GetQuest(unsigned short questId) const
 {
-    if (_questArray == nullptr || questId == 0 || questId > _maxQuestId)
+    if (_questArray == nullptr || !(1 <= questId && questId <= _maxQuestId))  // LIFT: range form (mov eax,1; cmp ax,dx)
         return nullptr;
     return _questArray[questId - 1];
 }

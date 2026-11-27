@@ -119,7 +119,7 @@ unsigned int __cdecl loadTableWorker(void * args)
         ::DrAliasMap * aliasmap;
     };
     LoadTableWorkerArgs * a = (LoadTableWorkerArgs *)args;
-    return a->binder->Execute(*a->table, *a->xmlreader, *a->elreader, *a->loaderdef, *a->aliasmap);
+    return a->binder->Execute(*a->table, *a->xmlreader, *a->elreader, *a->loaderdef, *a->aliasmap) ? 1 : 0;  // LIFT: bool to unsigned (setne)
 }
 
 // 0x6ebcd0
