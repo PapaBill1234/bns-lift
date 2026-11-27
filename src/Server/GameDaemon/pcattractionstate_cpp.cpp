@@ -19,5 +19,5 @@ bool __cdecl PcPublicRaidState::CheckAddScoreCoolTime(::Pc *pc, __int64 now, lon
     if (pc == nullptr)
         return false;
 
-    return static_cast<long>(now - _lastAddScoreTime) >= addScoreRecycleDuration;
+    return addScoreRecycleDuration <= static_cast<long>(now - _lastAddScoreTime) ? true : false;  // LIFT: form (cmp r9d,r8d; setle; no xor)
 }

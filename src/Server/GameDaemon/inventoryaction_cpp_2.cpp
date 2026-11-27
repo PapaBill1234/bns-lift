@@ -72,7 +72,15 @@ void __cdecl RepairWithCampfireAction::cancelAction(::Action::CancelReason, wcha
 // 0x51fa50
 bool __cdecl RepairWithCampfireAction::availableCancel(::CancelActionReason reason)
 {
-    return reason == CANCELACTIONREASON_USER_REQUEST || reason == CANCELACTIONREASON_MOVE || reason == CANCELACTIONREASON_ATTACKED;
+    switch (reason)  // LIFT: switch form (js, jle, jne)
+    {
+    case CANCELACTIONREASON_USER_REQUEST:
+    case CANCELACTIONREASON_MOVE:
+    case CANCELACTIONREASON_ATTACKED:
+        return true;
+    default:
+        return false;
+    }
 }
 
 // 0x51fa70
@@ -570,7 +578,14 @@ void __cdecl PutdownFieldItemAction::failAction(::Action::FailReason)
 // 0x52ed00
 bool __cdecl PutdownFieldItemAction::availableCancel(::CancelActionReason reason)
 {
-    return reason == CANCELACTIONREASON_USER_REQUEST || reason == CANCELACTIONREASON_MOVE;
+    switch (reason)  // LIFT: switch form (js, jg)
+    {
+    case CANCELACTIONREASON_USER_REQUEST:
+    case CANCELACTIONREASON_MOVE:
+        return true;
+    default:
+        return false;
+    }
 }
 
 // 0x52ed10

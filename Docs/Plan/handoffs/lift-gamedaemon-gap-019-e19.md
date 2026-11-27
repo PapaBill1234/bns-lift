@@ -72,3 +72,11 @@ The failAction bodies of 0x51bc40 to 0x52f720 do not read the PDB members of the
 - `src/Server/GameDaemon/inventoryaction_cpp_2.cpp`
 - `src/Server/GameDaemon/GameDaemonFwd.h`
 - `Docs/Plan/handoffs/lift-gamedaemon-gap-019-e19.md`
+
+## Lead repair
+
+| Function | Reject | Repair (VS2010 scratch compile: same bytes) |
+| --- | --- | --- |
+| `PutdownFieldItemAction::availableCancel` | P2_cc (je vs js) | `switch` with cases 0, 1 |
+| `RepairWithCampfireAction::availableCancel` | P2_cc (je vs js) | `switch` with cases 0, 1, 3 |
+| `PcPublicRaidState::CheckAddScoreCoolTime` | P2_cc (setge vs setle) | `duration <= elapsed ? true : false` |
