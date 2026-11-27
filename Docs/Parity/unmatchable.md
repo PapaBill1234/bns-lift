@@ -16,7 +16,7 @@ triage, the instruction diffs and the Not-done reports of the batch authors. No 
 | CG | 16 | 16 | 0 | 0 |
 | LG | 38 | 38 | 0 | 0 |
 | SCD | 20 | 20 | 0 | 0 |
-| POD | 28 | 28 | 0 | 0 |
+| POD | 26 | 26 | 0 | 0 |
 
 ## CacheGate (CG)
 
@@ -229,6 +229,7 @@ triage, the instruction diffs and the Not-done reports of the batch authors. No 
 - Reason: `HandleLobbyLobbyGate_CloseSessionNotify` 0x10440 and `HandleLobbyLobbyGate_KickNotify` 0x10660: the call to `LobbyGate::AddJobTimer`. Evidence: original `mov rdx, qword ptr [rax + 0x30]` / `mov rcx, qword ptr [LobbyGate::_instance]` / `mov r8b, 3`. Lift `mov rcx, qword ptr [rax + 0x30]` / `mov dl, 3`. The lift build drops the `this` argument of `AddJobTimer` (LTCG custom calling convention). The original keeps `this` in rcx. The same 2 callers exist in the original. The cause is not known. A source form was not tried in this round. Look at `LobbyGate::AddJobTimer` 0x12bf0 in the lift: it can be that LTCG sees that `this` is always `_instance`.
 - Tried: see the reason (v2b-lg-01a).
 - Update 2026-11-27: card v2b2-t9 (826f709, landed 41b4c0b) fixes the `AddJobTimer` `this` argument with a selectany member-pointer reference. KickNotify 0x10660 is MATCH. CloseSessionNotify stays DIFF, score 96.8 -> 97.8 on main 41b4c0b. The residue was not examined in this job. Level A.
+- Update 2026-11-27: card pkt3 (0ab6a80, landed 301a43f) replaces the t9 selectany reference and the manual KickNotify Packet init with `LobbyGate::Instance()` and the PDB Packet ctor. KickNotify 0x10660 and AddJobTimer 0x12bf0 stay MATCH.
 - Update 2026-11-27 (lead, q branch v2b2-t10): the residue on main 41b4c0b is 17 hunks of register allocation and block layout. (1) The original compares the Decompose result with a register that holds 0 (`cmp s3w, ax`; the same register gives `cliKey = 0`). The lift uses `test ax, ax`. (2) The original reads `session->_id` into the callee-saved `s3` after Decompose and again on the "failed to find cliKey" path. The lift reads it before each `Log::Write`. (3) The original loads `LobbyGate::_instance` into r11, the lift into rcx. (4) The tail blocks have a different order. Tried: a `sessionId` local after Decompose with a `decomposed == 0` test (17 -> 10 hunks), plus a `clientManager` local (the form that fixed 0x6fa0; 8 hunks). Causes (1), (2) and (4) stay, with no score change. Not landed (no MATCH gain).
 
 ### `0x11ee0` `HandleLobbyLobbyGate_GetEnterWorldTokenOk` DIFF
@@ -312,7 +313,7 @@ triage, the instruction diffs and the Not-done reports of the batch authors. No 
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 189 insns, lift 178 insns, 32 changed hunks; first divergence: `-mov qword ptr [rsp+N], rsi` / `+push rsi` / `+push r12`.
 - Reason: `0x23000` BroadcastCrypt::Initialize: the original passes the constant 2 in a register to `InstanceSize` and to `Create` (the crypto mode). The lift LTCG build removes the constant argument and the callee uses 2 directly. The PDB types keep the parameter, so the source form is the PDB form. Same cause as LobbyGate::AddJobTimer `0x12bf0` and Session::Close `0x6fa0` (LTCG constant propagation; ENGINE-ISSUES 10). Tried (lead, merge-03b): the size test with signed `/16*16` (orig `cdq; and edx, 0xf`) gave 95.2 -> 94.9, so it was dropped.
 - Tried: see the reason (lead note LobbyGate-23000).
-- Update 2026-11-27: 0x6fa0 and 0x12bf0 are MATCH since 41b4c0b (card v2b2-t9): a `__declspec(selectany)` member-pointer reference to the callee keeps the LTCG-dropped argument. This form was not tried for 0x23000.
+- Update 2026-11-27: 0x6fa0 and 0x12bf0 are MATCH since 41b4c0b (card v2b2-t9): a `__declspec(selectany)` member-pointer reference to the callee keeps the LTCG-dropped argument. This form was not tried for 0x23000. Since 301a43f (card pkt3), 0x12bf0 uses `LobbyGate::Instance()` (PDB name) instead; 0x6fa0 keeps the selectany form.
 
 ### `0x29250` `PipeCommandProcess::processCommand` DIFF
 
@@ -465,13 +466,13 @@ triage, the instruction diffs and the Not-done reports of the batch authors. No 
 - Reason: 0x7dc0 `HandleSmartCoupon_HelloReq`: if the `movzx eax, s4b` return and the `lea r8d, [s4 + 0x2f]` constants stay, the cause is register allocation (constant 1 in a callee-saved register).
 - Tried: see the reason (v2b-scd-01a).
 
-### `0x8360` `HandleSmartCoupon_GameEventByCharacterReq` DIFF
+### `0x8360` `HandleSmartCoupon_GameEventByCharacterReq` EXCLUDED
 
 - Score: 99.1 (calls 100, refs 100, consts 97). Proof level: A.
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 612 insns, lift 678 insns, 96 changed hunks.
 - Reason: `HandleSmartCoupon_GameEventByCharacterReq` 0x8360 (99.1). The evidence gives no instruction lines. The hint (constant 0x7b in one register) is not enough to find a source form. No change.
 - Tried: see the reason (v2b-scd-01b).
-- Update 2026-11-27 (S1 job): card pkt3 (`s1-pkt3` 77c6f21) gives funcdiff MATCH (PDB signature of `SmartCouponDB::RegisterGameEventLog`: references, `bool const`). Review precheck P2_cc rejects it: the original `cmp bx, ax; jb` (bx = 0) and the build `test ax, ax; jne` have the same condition; the register choice has no source control. See ENGINE-ISSUES.md E-P2-zero-cmp. Level A (blocked).
+- Update 2026-11-27: EXCLUDED (0 credit, not a MATCH). Card pkt3 (code 68c9079, landed 301a43f) gives funcdiff MATCH (PDB signature of `SmartCouponDB::RegisterGameEventLog`). Review precheck P2_cc rejects it: the original `cmp bx, ax; jb` (bx = 0) and the build `test ax, ax; jne` have the same condition; the register choice has no source control. Operator exclude receipt on proof 460ea2cd; row in `excluded.tsv`. Engine issue E-P2-zero-cmp stays open (a later engine fix can credit it).
 
 ### `0x8e80` `HandleSmartCoupon_GameEventByAccountReq` DIFF
 
@@ -610,15 +611,6 @@ triage, the instruction diffs and the Not-done reports of the batch authors. No 
 - Tried: see the reason (lead note PostOfficeDaemon-1460).
 - Earlier record: `lessons.md` lines 451, 507.
 
-### `0x4ed0` `PingGenerator::sendPing` DIFF
-
-- Score: 99.2 (calls 100, refs 98, consts 100). Proof level: A.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 128 insns, lift 127 insns, 8 changed hunks; first divergence: `-mov rcx, qword ptr [PostOfficeDaemon::_instance]`.
-- Reason: Stop list (lessons D): LTCG `this` propagation of `PostOfficeDaemon::_instance`. No new idea.
-- Tried: see the reason (v2b-pod-01).
-- Earlier record: `lessons.md` lines 506.
-- Update 2026-11-27 (S1 job): card pkt3 (S1 branch `s1-pkt3` 77c6f21: the PDB Packet constructor and the PDB signatures) gives funcdiff MATCH here and 0 lost functions. It cannot land: integrate refuses 2 review rejects in other exes (SCD `HandleSmartCoupon_GameEventByCharacterReq` precheck P2_cc, LD `AccountInventoryChannel::SendFinishWarehouseItemConsumptionReq` TSend stub arguments). See ENGINE-ISSUES.md E-P2-zero-cmp and E-TSend-stub-args. It waits for an operator decision. Level A (blocked).
-
 ### `0x71e0` `CacheGateChannel::SendFragmentRelayRequest` DIFF
 
 - Score: 88.5 (calls 88, refs 95, consts 83). Proof level: A.
@@ -663,15 +655,6 @@ triage, the instruction diffs and the Not-done reports of the batch authors. No 
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 176 insns, lift 103 insns, 15 changed hunks; first divergence: `-push r12` / `-push r13` / `-mov eax, 0x1060`.
 - Reason: The PDB locals are `wdsn` (wchar_t[1024], rsp+2128), `dsn` (char[1024], rsp+96), `dsnSize` (int = 1024, rsp+80) and `flag` (unsigned char = 0, rsp+64). The `_time64` result stays in a callee-saved register. PDB line 225 is one 191-byte statement (an inlined helper that reads the cert file), and lines 236-252 hold about 72 instructions that the lift does not have. The Hex-Rays text does not show them, so the use of `dsnSize`, `flag` and the time value is unknown. No source change.
 - Tried: see the reason (v2b-pod-01).
-
-### `0x14930` `PostOfficeDaemon::checkCacheGateServiceState` DIFF
-
-- Score: 98.4 (calls 100, refs 95, consts 100). Proof level: A.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 57 insns, lift 57 insns, 4 changed hunks; first divergence: `-mov s0, qword ptr [rcx + 0x840]` / `-xor s1d, s1d` / `+mov rax, qword ptr [PostOfficeDaemon::_instance]`.
-- Reason: Stop list (lessons D): LTCG `this` propagation. The original reads `[rcx+0x840]`; the lift reads `_instance`. No new idea.
-- Tried: see the reason (v2b-pod-01).
-- Earlier record: `lessons.md` lines 506.
-- Update 2026-11-27 (S1 job): card pkt3 (S1 branch `s1-pkt3` 77c6f21: the PDB Packet constructor and the PDB signatures) gives funcdiff MATCH here and 0 lost functions. It cannot land: integrate refuses 2 review rejects in other exes (SCD `HandleSmartCoupon_GameEventByCharacterReq` precheck P2_cc, LD `AccountInventoryChannel::SendFinishWarehouseItemConsumptionReq` TSend stub arguments). See ENGINE-ISSUES.md E-P2-zero-cmp and E-TSend-stub-args. It waits for an operator decision. Level A (blocked).
 
 ### `0x14e50` `PostOfficeDB::LoadPostList` DIFF
 
