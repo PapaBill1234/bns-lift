@@ -1,0 +1,541 @@
+{
+"AlertSender::AlertSender": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"AlertSender::Name": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"AlertSender::createSocket": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"AlertSender::fini": {
+"calls": 86,
+"consts": 50,
+"refs": 50,
+"score": 61.9,
+"status": "DIFF"
+},
+"AlertSender::run": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"AlertSender::sendRemain": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BIT_initDStream": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BIT_reloadDStream": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DrHeapMemory::Free": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DrHeapMemory::Realloc": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"FSE_buildDTable": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"FSE_count_simple": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"FSE_decompress_usingDTable": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"FSE_decompress_wksp": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"FSE_readNCount": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HUF_readStats": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HeapMemoryManager::Alloc": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HeapMemoryManager::AllocZero": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HeapMemoryManager::Initialize": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HeapMemoryManager::ReallocZero": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Thread::stop": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Thread::yield": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Thread::~Thread": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ThreadManager::StopThread": {
+"calls": 0,
+"consts": 67,
+"refs": 100,
+"score": 55.6,
+"status": "DIFF"
+},
+"ZSTD_BtFindBestMatch": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_BtFindBestMatch_extDict": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_BtFindBestMatch_selectMLS": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_BtFindBestMatch_selectMLS_extDict": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_DUBT_findBestMatch": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_HcFindBestMatch_extDict_selectMLS": {
+"calls": 47,
+"consts": 100,
+"refs": 100,
+"score": 82.4,
+"status": "DIFF"
+},
+"ZSTD_HcFindBestMatch_selectMLS": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_compressBlock_btlazy2": {
+"calls": 60,
+"consts": 86,
+"refs": 100,
+"score": 81.9,
+"status": "DIFF"
+},
+"ZSTD_compressBlock_btlazy2_extDict": {
+"calls": 96,
+"consts": 100,
+"refs": 100,
+"score": 98.6,
+"status": "DIFF"
+},
+"ZSTD_compressBlock_btopt": {
+"calls": 92,
+"consts": 98,
+"refs": 100,
+"score": 96.8,
+"status": "DIFF"
+},
+"ZSTD_compressBlock_btopt_extDict": {
+"calls": 78,
+"consts": 98,
+"refs": 100,
+"score": 92.0,
+"status": "DIFF"
+},
+"ZSTD_compressBlock_btultra": {
+"calls": 92,
+"consts": 98,
+"refs": 100,
+"score": 96.8,
+"status": "DIFF"
+},
+"ZSTD_compressBlock_btultra_extDict": {
+"calls": 78,
+"consts": 98,
+"refs": 100,
+"score": 92.0,
+"status": "DIFF"
+},
+"ZSTD_compressBlock_doubleFast": {
+"calls": 94,
+"consts": 100,
+"refs": 100,
+"score": 97.9,
+"status": "DIFF"
+},
+"ZSTD_compressBlock_doubleFast_extDict": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_compressBlock_doubleFast_extDict_generic": {
+"calls": 81,
+"consts": 100,
+"refs": 100,
+"score": 93.8,
+"status": "DIFF"
+},
+"ZSTD_compressBlock_fast": {
+"calls": 80,
+"consts": 100,
+"refs": 100,
+"score": 93.3,
+"status": "DIFF"
+},
+"ZSTD_compressBlock_fast_dictMatchState": {
+"calls": 85,
+"consts": 100,
+"refs": 100,
+"score": 94.9,
+"status": "DIFF"
+},
+"ZSTD_compressBlock_fast_extDict": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_compressBlock_fast_extDict_generic": {
+"calls": 91,
+"consts": 56,
+"refs": 100,
+"score": 82.2,
+"status": "DIFF"
+},
+"ZSTD_compressBlock_greedy": {
+"calls": 50,
+"consts": 100,
+"refs": 100,
+"score": 83.3,
+"status": "DIFF"
+},
+"ZSTD_compressBlock_greedy_extDict": {
+"calls": 91,
+"consts": 100,
+"refs": 100,
+"score": 97.0,
+"status": "DIFF"
+},
+"ZSTD_compressBlock_lazy": {
+"calls": 57,
+"consts": 100,
+"refs": 100,
+"score": 85.7,
+"status": "DIFF"
+},
+"ZSTD_compressBlock_lazy2": {
+"calls": 60,
+"consts": 86,
+"refs": 100,
+"score": 81.9,
+"status": "DIFF"
+},
+"ZSTD_compressBlock_lazy2_extDict": {
+"calls": 96,
+"consts": 100,
+"refs": 100,
+"score": 98.6,
+"status": "DIFF"
+},
+"ZSTD_compressBlock_lazy_extDict": {
+"calls": 94,
+"consts": 100,
+"refs": 100,
+"score": 98.0,
+"status": "DIFF"
+},
+"ZSTD_count": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_count_2segments": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_downscaleStat": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_hashPtr": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_insertAndFindFirstIndexHash3": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_insertAndFindFirstIndex_internal": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_insertBt1": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_insertDUBT1": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_litLengthContribution": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_readMINMATCH": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_rescaleFreqs": {
+"calls": 92,
+"consts": 96,
+"refs": 100,
+"score": 96.2,
+"status": "DIFF"
+},
+"ZSTD_storeSeq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_updateDUBT": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_updateRep": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZSTD_updateStats": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"_FindPESection": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"_IsNonwritableInCurrentImage": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"_IsNonwritableInCurrentImage$filt$0": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"_ValidateImageBase": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"_matherr": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"_onexit": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"_onexit$fin$0": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"atexit": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"pre_c_init": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"pre_cpp_init": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"wmain": {
+"calls": 0,
+"consts": 0,
+"refs": 100,
+"score": 33.3,
+"status": "DIFF"
+},
+"wmainCRTStartup": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+}
+}
