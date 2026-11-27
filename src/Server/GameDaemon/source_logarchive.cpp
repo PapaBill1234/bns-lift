@@ -2,9 +2,7 @@
 #include "logarchive.h"
 #include "LiftStub.h"
 
-#pragma comment(linker, "/INCLUDE:?IsUnsentFileExist@LogArchive@@IEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?isPingTimeExpired@LogArchive@@AEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?startupWinSockLib@LogArchive@@AEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
 
 // 0x694070
 __cdecl LogArchive::LogArchive(int)
@@ -51,20 +49,8 @@ bool __cdecl LogArchive::AccessLogServer(long)
 // 0x695070
 bool __cdecl LogArchive::IsUnsentFileExist(void)
 {
-    wchar_t searchFilePath[MAX_PATH] = { 0 };
-    swprintf_s(searchFilePath, MAX_PATH, L"%s\\*.unsent", _unsentPath);
-
-    WIN32_FIND_DATAW wfd;
-    HANDLE find = FindFirstFileW(searchFilePath, &wfd);
-    if (find == INVALID_HANDLE_VALUE)
-        return false;
-
-    if (!FindClose(find))
-    {
-        Log::Write(Log::LT_ERROR, L"source\\LogArchive.cpp", 464, L"== CRASH == [LogArchive], FindClose failed");
-        AlertSender::Write(L"source\\LogArchive.cpp", 464, L"== CRASH == [LogArchive], FindClose failed");
-    }
-    return true;
+    // LIFT: needs GameDaemon forms of Log::Write, LogBuffer and AlertSender::writev2 (shared card).
+    LIFT_STUB(0x695070);
 }
 
 // 0x695150
@@ -137,11 +123,7 @@ bool __cdecl LogArchive::pushPingReqPacket(void)
 // 0x695aa0
 bool __cdecl LogArchive::startupWinSockLib(void)
 {
-    WSADATA data;
-    int error = WSAStartup(MAKEWORD(2, 2), &data);
-    if (error == 0)
-        return true;
-
-    Log::Write(L"source\\LogArchive.cpp", 762, error, L"WSAStartup()");
-    return false;
+    // LIFT: needs GameDaemon forms of Log::Write and LogBuffer (shared card).
+    // Original block order: if (WSAStartup(...) != 0) { Log::Write(...); return false; } return true;
+    LIFT_STUB(0x695aa0);
 }

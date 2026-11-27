@@ -10,9 +10,7 @@ Exe: GameDaemon (2019 + PDB). Round 2.
 | `0x69dd40` | `StringBuilderW::AppendFormat` | `stringbuilder.cpp` |
 | `0x1dc1a0` | `SystemMultiEvent::~SystemMultiEvent` | `systemobject.cpp` |
 | `0x699170` | `Session::IsConnected` | `session.cpp` |
-| `0x695070` | `LogArchive::IsUnsentFileExist` | `source_logarchive.cpp` |
 | `0x695870` | `LogArchive::isPingTimeExpired` | `source_logarchive.cpp` |
-| `0x695aa0` | `LogArchive::startupWinSockLib` | `source_logarchive.cpp` |
 | `0x686920` | `destroy` (file-local) | `source_alertsender.cpp` |
 | `0x6761e0` | `Json::FastWriter::~FastWriter` | `include_jsoncpp.cpp` |
 | `0x118e0` | `Data::SlateScrollCache::~SlateScrollCache` | `nofile.cpp` |
@@ -40,6 +38,8 @@ Decisions:
 | `0x4bfee0` | `InventoryClientUpdate::~InventoryClientUpdate` | Same cause as `0x4bfa70`. It also needs the `FragmentPacket` layout (size 0xF8). |
 | `0x5b3750` | `FallDeathEffect::FallDeathEffect` | Needs the `InstantEffect` base layout, vtables and `GameObjectCounter::Instance`. These are not lifted yet. |
 | `0x6a84d0` | `Json::Exception::Exception` (copy) | Needs the base `std::exception`. No other lifted file links the CRT `std::exception` symbols (`??0exception@std@@`, `??1exception@std@@`). The round 4 gate failed after the lift added this base, with no error line. Round 5 removed the base and the lift to isolate the fault. The body is a `LIFT_STUB` again. |
+| `0x695070` | `LogArchive::IsUnsentFileExist` | Needs GameDaemon forms of `Log::Write`, `LogBuffer::Acquire`, `LogBuffer::deallocate_me` and `AlertSender::writev2` (shared card). The lift kept these shared functions alive in GameDaemon. The proof review rejected them (TLS offset, stack frame, `RefCntObject::addReferenceCount` argument). The body is a `LIFT_STUB` again. Its `/INCLUDE` pragma is removed. |
+| `0x695aa0` | `LogArchive::startupWinSockLib` | Needs GameDaemon forms of `Log::Write` and `LogBuffer` (shared card). Same cause as `0x695070`. The correct block order is in a `// LIFT:` note in the stub: `if (WSAStartup(...) != 0) { Log::Write(...); return false; } return true;`. The body is a `LIFT_STUB` again. Its `/INCLUDE` pragma is removed. |
 | `0x6eba80` | `LoadTableBinder::~LoadTableBinder` | Needs the base `DrDataReaderImpl::LoadFuncBinder`. It is not declared in the tree. The body is folded with `LoadTableMT_PostProcBinder`. |
 
 ## Files changed
@@ -61,3 +61,5 @@ The driver builds and runs the gate and funcdiff after this session. This sessio
 Round 3: the round 2 gate stopped with `XDG_RUNTIME_DIR is invalid or not set in the environment`. That message comes from the build host environment, not from a compiler. The build tree has no GameDaemon object logs and no `error C` line. This round checked each changed declaration against the shared headers (`Thread` 0x30 + `LogMedia` 0xB0 = 0xE0, `Connection::_socket`, `CriticalSection::Enter`/`Leave`, `MemoryManager::Free` const, `Log::Write` overloads, `StlMemory.h` `LIFT_STLMEMORY_FILE` guard) and found no compile fault. The code is not changed in round 3. Run the gate again with a valid `XDG_RUNTIME_DIR`.
 
 Round 5: the round 4 gate failed again with the same message and no error line. The `std::exception` base of `Json::Exception` was the only new CRT link dependency in the tree. Round 5 removed it and put `0x6a84d0` back to a `LIFT_STUB`. If the gate still fails, the cause is probably in `logarchive.h` (new bases `Thread` and `LogMedia` pull `Thread.cpp` and `LogMedia.cpp` objects into the link). Get the real compiler or linker line before the next change.
+
+Round 6: the proof review rejected 5 MATCH claims. `IsUnsentFileExist` and `startupWinSockLib` kept the shared `Log::Write`, `LogBuffer` and `AlertSender::writev2` alive in GameDaemon. These shared functions need a GameDaemon form. Both functions are `LIFT_STUB` bodies again, without `/INCLUDE` pragmas. The shared files are not changed. `startupWinSockLib` also calls `Log::Write`, so a lift with the correct block order still keeps the rejected shared functions alive.
