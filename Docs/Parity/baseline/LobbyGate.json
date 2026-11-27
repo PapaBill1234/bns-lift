@@ -757,10 +757,10 @@
 },
 "ClientSessionTimerJob::HandleEvent": {
 "calls": 100,
-"consts": 94,
+"consts": 100,
 "refs": 100,
-"score": 98.0,
-"status": "DIFF"
+"score": 100.0,
+"status": "MATCH"
 },
 "ClientSessionTimerJob::TimerClass": {
 "calls": 100,
@@ -1675,8 +1675,8 @@
 "HandleLobbyLobbyGate_CloseSessionNotify": {
 "calls": 93,
 "consts": 100,
-"refs": 97,
-"score": 96.8,
+"refs": 100,
+"score": 97.8,
 "status": "DIFF"
 },
 "HandleLobbyLobbyGate_GetCharacterInfoListOk": {
@@ -1745,9 +1745,9 @@
 "HandleLobbyLobbyGate_KickNotify": {
 "calls": 100,
 "consts": 100,
-"refs": 98,
-"score": 99.4,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "HandleLobbyLobbyGate_ListGoodsOk": {
 "calls": 100,
@@ -2025,9 +2025,9 @@
 "LobbyGate::AddJobTimer": {
 "calls": 100,
 "consts": 100,
-"refs": 89,
-"score": 96.3,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "LobbyGate::Descriptions": {
 "calls": 100,
