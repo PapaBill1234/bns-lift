@@ -8,16 +8,17 @@ C++ lift of the 2019 + PDB BnS server executables.
 
 This repo is public. Do not commit binaries, keys, PDBs or IDA databases.
 
-## Status (2026-11-26)
+## Status (2026-11-27)
 
 | Item | State |
 | --- | --- |
-| First 4 exes | 91.7 % parity. 3 of 4 are above 90 %. LobbyGate is at 89.0 %. |
-| LobbyDaemon | Lift in progress: 1151 MATCH (52.2 %), 127 excluded MATCH not counted. Most of the other functions are still `LIFT_STUB` bodies. |
+| First 4 exes | 96.2 % parity (2558 of 2658). All 4 are at their level: CacheGate, SmartCouponDaemon and PostOfficeDaemon above 95 %, LobbyGate 94.9 %. |
+| Open functions (first 4) | 100. Each has a written proof in [Docs/Parity/unmatchable.md](Docs/Parity/unmatchable.md) (level A). 0 at level B. |
+| LobbyDaemon | Lift in progress: 1038 counted MATCH (47.1 %), 128 excluded MATCH not counted. Most of the other functions are still `LIFT_STUB` bodies. |
 | Method | Gap cards. Each card lifts the PDB class layout and the stub bodies of one class or job group. |
-| Last landed | Gap card 24 (AccountInventoryLobbyPacketHandler, +20 MATCH; 11 review rejects excluded), 23 (ExtendJumpingCharacterCreationQuotaJob, +15 MATCH; 7 review rejects excluded), 17 (GameTimeQueue, LobbyDaemon::initialize and the LobbyDaemon ObjPool module, +173 MATCH; 40 review rejects excluded), 20 (NPLobbyMessageHandler part 1, +45 MATCH; 5 review rejects excluded), lift-misc-a (+0 MATCH), 15 (CliSession bodies, +16 MATCH; 3 review rejects excluded) and 04 (NP game service channel and LobbyDaemon startup, +17 MATCH; 4 review rejects excluded). 0 lost in all 5 exes. |
-| Checks per landing | Full VS2010 build of all 5 exes, funcdiff against the original, 0 lost MATCH, 0 strict regress. A model review checks each new MATCH without a strict full proof. |
-| Next | Engine switch (the gap-04 chain is on main). |
+| Last landed | pkt3 (packet helpers; PostOfficeDaemon +2; 2 review rejects excluded), t9 (LobbyGate HandleEvent, KickNotify, AddJobTimer; +3), fpc (FragmentPacketConcatenater::Clone; LobbyGate +1, PostOfficeDaemon +1). 0 lost in all 5 exes. |
+| Checks per landing | Full VS2010 build of all 5 exes, funcdiff against the original, 0 lost MATCH, 0 strict regress. Review v2 (prechecks P1-P5, P9 and a model review) checks each new MATCH without a strict full proof. |
+| Next | GameDaemon full lift: plan in `Docs/Plan/gamedaemon-lift.md` (in progress). |
 
 ## Parity
 
