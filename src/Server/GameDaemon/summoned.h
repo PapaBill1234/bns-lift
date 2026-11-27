@@ -3,9 +3,10 @@
 #pragma once
 #include "GameDaemonFwd.h"
 
-class Summoned
+class Summoned : private ::LiftBytes<0x1a00 - 8>  // LIFT: PDB base ControlledCreature and members +8 to +0x19FF are not declared yet
 {
 public:
+    enum SummonedState {};  // LIFT: PDB enumerators not declared yet
     virtual short __cdecl GetAttackHitValueModify(void);  // 0x455210
     virtual short __cdecl GetAttackCriticalValueModify(void);  // 0x455220
     virtual short __cdecl GetDefendCriticalValueModify(void);  // 0x455230
@@ -79,6 +80,15 @@ private:
 public:
     virtual void __cdecl StartCombat(void);  // 0x616f10
     virtual void __cdecl FinishCombat(void);  // 0x616f50
+private:
+    ::Pc *_master;  // +0x1A00
+    ::GameObjectTimer *_summonedStateTimer;  // +0x1A08
+    ::Summoned::SummonedState _summonedState;  // +0x1A10
+    int _summonerJobAbility;  // +0x1A14
+    bool _respawning;  // +0x1A18
+    bool _delayedDespawn;  // +0x1A19
+    long long _combatStartTime;  // +0x1A20
+    // LIFT: _history (RefCntHistory, +0x1A28) and _historyItems (+0x1A40) are not declared yet. PDB size is 0x2A40.
 };
 
 class SummonedEntry

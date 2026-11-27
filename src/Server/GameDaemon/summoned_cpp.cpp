@@ -6,6 +6,19 @@
 #include "zone.h"
 #include "LiftStub.h"
 
+#pragma comment(linker, "/INCLUDE:?Send@Summoned@@UEAAXPEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?Send@Summoned@@UEAAXPEBVPacketList@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SetCombatModeByAttack@Summoned@@UEAAX_NAEBVSourceLocation@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SetCombatModeByAttacked@Summoned@@UEAAXAEBVSourceLocation@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SetCombatModeByTargeted@Summoned@@UEAAXAEBVSourceLocation@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?ResetCombatModeByTargeted@Summoned@@UEAAXAEBVSourceLocation@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SetCombatModeByLink@Summoned@@UEAAXAEBVSourceLocation@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?ResetCombatModeByLink@Summoned@@UEAAXAEBVSourceLocation@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?ResetCombatMode@Summoned@@UEAAX_NAEBVSourceLocation@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?OnAttacked@Summoned@@UEAAXPEAVZone@@PEAVGameObject@@_KF@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?StartCombat@Summoned@@UEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?FinishCombat@Summoned@@UEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
+
 // 0x611190
 __cdecl Summoned::Summoned(void)
 {
@@ -55,15 +68,17 @@ void __cdecl Summoned::Send(char const *, ...)
 }
 
 // 0x611b20
-void __cdecl Summoned::Send(::Packet const *)
+void __cdecl Summoned::Send(::Packet const *packet)
 {
-    LIFT_STUB(0x611b20);
+    if (_master != nullptr)
+        _master->Send(packet);
 }
 
 // 0x611b50
-void __cdecl Summoned::Send(::PacketList const *)
+void __cdecl Summoned::Send(::PacketList const *packetList)
 {
-    LIFT_STUB(0x611b50);
+    if (_master != nullptr)
+        _master->Send(packetList);
 }
 
 // 0x611b80
@@ -79,45 +94,52 @@ void __cdecl Summoned::DespawnDelaying(void)
 }
 
 // 0x611d60
-void __cdecl Summoned::SetCombatModeByAttack(bool, ::SourceLocation const &)
+void __cdecl Summoned::SetCombatModeByAttack(bool combatEvent, ::SourceLocation const &srcLoc)
 {
-    LIFT_STUB(0x611d60);
+    if (_master != nullptr)
+        _master->SetCombatModeByAttack(combatEvent, srcLoc);
 }
 
 // 0x611d90
-void __cdecl Summoned::SetCombatModeByAttacked(::SourceLocation const &)
+void __cdecl Summoned::SetCombatModeByAttacked(::SourceLocation const &srcLoc)
 {
-    LIFT_STUB(0x611d90);
+    if (_master != nullptr)
+        _master->SetCombatModeByAttacked(srcLoc);
 }
 
 // 0x611dc0
-void __cdecl Summoned::SetCombatModeByTargeted(::SourceLocation const &)
+void __cdecl Summoned::SetCombatModeByTargeted(::SourceLocation const &srcLoc)
 {
-    LIFT_STUB(0x611dc0);
+    if (_master != nullptr)
+        _master->SetCombatModeByTargeted(srcLoc);
 }
 
 // 0x611df0
-void __cdecl Summoned::ResetCombatModeByTargeted(::SourceLocation const &)
+void __cdecl Summoned::ResetCombatModeByTargeted(::SourceLocation const &srcLoc)
 {
-    LIFT_STUB(0x611df0);
+    if (_master != nullptr)
+        _master->ResetCombatModeByTargeted(srcLoc);
 }
 
 // 0x611e20
-void __cdecl Summoned::SetCombatModeByLink(::SourceLocation const &)
+void __cdecl Summoned::SetCombatModeByLink(::SourceLocation const &srcLoc)
 {
-    LIFT_STUB(0x611e20);
+    if (_master != nullptr)
+        _master->SetCombatModeByLink(srcLoc);
 }
 
 // 0x611e50
-void __cdecl Summoned::ResetCombatModeByLink(::SourceLocation const &)
+void __cdecl Summoned::ResetCombatModeByLink(::SourceLocation const &srcLoc)
 {
-    LIFT_STUB(0x611e50);
+    if (_master != nullptr)
+        _master->ResetCombatModeByLink(srcLoc);
 }
 
 // 0x611e80
-void __cdecl Summoned::ResetCombatMode(bool, ::SourceLocation const &)
+void __cdecl Summoned::ResetCombatMode(bool force, ::SourceLocation const &srcLoc)
 {
-    LIFT_STUB(0x611e80);
+    if (_master != nullptr)
+        _master->ResetCombatMode(force, srcLoc);
 }
 
 // 0x611eb0
@@ -199,9 +221,10 @@ bool __cdecl Summoned::ApplySummonerJobAbility(::ChangedProperty *, ::Data::Summ
 }
 
 // 0x615250
-void __cdecl Summoned::OnAttacked(::Zone *, ::GameObject *, unsigned __int64, short)
+void __cdecl Summoned::OnAttacked(::Zone *zone, ::GameObject *attacker, unsigned __int64 skill, short hate)
 {
-    LIFT_STUB(0x615250);
+    if (_master != nullptr)
+        _master->OnAttacked(zone, attacker, skill, hate);
 }
 
 // 0x615280
@@ -279,11 +302,12 @@ bool __cdecl Summoned::changeMoveState(::CreatureMoveState, short, wchar_t *)
 // 0x616f10
 void __cdecl Summoned::StartCombat(void)
 {
-    LIFT_STUB(0x616f10);
+    if (_combatStartTime == 0)
+        _combatStartTime = GetTickCount64() - Daemon::Instance->StartSystemTick64;
 }
 
 // 0x616f50
 void __cdecl Summoned::FinishCombat(void)
 {
-    LIFT_STUB(0x616f50);
+    _combatStartTime = 0;
 }
