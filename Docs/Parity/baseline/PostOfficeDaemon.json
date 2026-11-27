@@ -2508,9 +2508,9 @@
 "PingGenerator::sendPing": {
 "calls": 100,
 "consts": 100,
-"refs": 98,
-"score": 99.2,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "PingRelayContext::ComposeRequestPacket": {
 "calls": 100,
@@ -3061,9 +3061,9 @@
 "PostOfficeDaemon::checkCacheGateServiceState": {
 "calls": 100,
 "consts": 100,
-"refs": 95,
-"score": 98.4,
-"status": "DIFF"
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "PostOfficeDaemon::checkDestinationServiceState": {
 "calls": 100,

@@ -1436,10 +1436,11 @@
 },
 "HandleSmartCoupon_GameEventByCharacterReq": {
 "calls": 100,
-"consts": 97,
+"consts": 100,
+"raw_status": "MATCH",
 "refs": 100,
-"score": 99.1,
-"status": "DIFF"
+"score": 100.0,
+"status": "EXCLUDED"
 },
 "HandleSmartCoupon_HelloReq": {
 "calls": 99,

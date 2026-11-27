@@ -58,10 +58,11 @@
 },
 "AccountInventoryChannel::SendFinishWarehouseItemConsumptionReq": {
 "calls": 100,
-"consts": 91,
+"consts": 100,
+"raw_status": "MATCH",
 "refs": 100,
-"score": 97.0,
-"status": "DIFF"
+"score": 100.0,
+"status": "EXCLUDED"
 },
 "AccountInventoryChannel::SendGetGoodsCountReq": {
 "calls": 100,
