@@ -1308,3 +1308,30 @@ What worked:
 What failed:
 - `StartSessionWith*TokenOk`: under `inline_depth(0)` the `~FragmentPacket` call is shared; the original has one inlined `Packet::Clear` per exit. No MATCH.
 - `HelloOk` 99.3, `HelloReq` 94.1: score only (register choice). Reverted. `CloseSessionNotify` success-first: worse.
+
+## gd-wave0 (GameDaemon cards 0a to 0e)
+What worked:
+- Split a new-exe card in two lanes: `tools/*` and Docs in the tools lane (0 new, 0 lost MATCH), `src/*` in the card lane. The card lane refuses pinned paths (`tools/*`, `Docs/Parity/*`, `cmake/*`, `*.cmake`, `vendor/*`).
+- Per-file TUs give the same codegen as one unity TU for GameDaemon (card 0d: equal MATCH sets on all paired functions). Keep the per-file skeleton.
+- A lifted leaf with no live caller is dropped by `/OPT:REF` (`wmain` is a stub). Keep it with `#pragma comment(linker, "/INCLUDE:<public name>")  // LIFT: dead-strip keep (no live caller yet)`. One pragma per leaf. Remove the pragma when a real caller lands.
+
+What failed or is blocked:
+- A pragma line without a `// LIFT:` note fails the public guard. With the note, the item goes to review (no automatic credit).
+- A new exe block in `CMakeLists.txt` plus a new `*.cmake` source list fails the card lane (CMake structure edit, pinned path). The first skeleton of a new exe needs an operator land.
+- Do not push to main while a check or land of a card is in flight. The land push then fails (non-fast-forward).
+- Rebase the card commit onto main yourself before the check. With an old base, cherry-pick only the card commits.
+- Wait for a long job with a background task and its notification. A `pgrep -f "<text>"` loop matches its own command line and never ends.
+
+Build facts:
+- First full GameDaemon build on the remote build host: 3:40 wall (563 objects, compile span 148 s, link tail 16 s, funcdiff 38 s). Local cold build (card 0d): 7:03; warm: 2:00.
+
+## gd-wave-e (GameDaemon easy-leaf cards E1 to E16)
+What worked:
+- A card with many stems needs a work order in the card: one stem at a time, a commit per stem, the first commit before turn 12, and no full read of `types.h`. Without it, the author read all stems first and its context split before the first edit (E12, E14).
+- Small form rejects (condition code or immediate): test the source forms on a scratch file with the VS2010 compiler (`cl /c /O2 /GR-`, then `llvm-objdump -d`). Then fix the card source by hand. Examples (E14): `(PostQueuedCompletionStatus(...) != FALSE) - 1` gives `setne; lea eax,[rcx-1]` (a `? 0 : -1` gives `neg; sbb`). `!(1 <= id && id <= max)` gives `mov eax,1; cmp ax,dx`. A `bool` result returned as `unsigned` needs `? 1 : 0` for `setne` (else `movzx`).
+- MSVC puts same-name virtual overloads in the vtable in reverse declaration order.
+
+What failed or is blocked:
+- A GameDaemon function that writes a crash log (`Log::Write`, `AlertSender::Write`) keeps the shared BloodLib log functions alive. Their shared form is not the GameDaemon form (`AlertSender::writev2` frame size, TLS offset of `LogBufferAllocator::_Local`, 3-arg `addReferenceCount` in `LogBuffer::Acquire`, store order in `LogMedia::Add`). The review rejects them. Until card `lift-gamedaemon-s2` lands, keep such callers as `LIFT_STUB` (E12, E16).
+- After a rebase of the card commits onto a newer main, the author driver guard still diffs against the old queue base and parks the card. Run the card check on the rebased commit instead.
+- A padded member (`char _x[N]`) that hides PDB members fails the layout check when its alignment is wrong. Declare the PDB members at their offsets, then pad the rest (E15).

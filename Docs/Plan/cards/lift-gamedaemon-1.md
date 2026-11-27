@@ -97,3 +97,35 @@ Write `Docs/Plan/handoffs/lift-gamedaemon-1.md`. List the functions that you lif
 - Each function in this card is lifted or is listed as "Not done" with its RVA.
 - CacheGate, LobbyGate, SmartCouponDaemon, PostOfficeDaemon and LobbyDaemon lose no MATCH functions.
 - The GameDaemon MATCH count does not decrease.
+
+## Status: closed (covered by card 0c shared code)
+
+Card 0c links the upstream zstd source for GameDaemon (`lift_common_gd`). No `LIFT_STUB` is left for these rows. State on the first full GameDaemon funcdiff (main `69967df`):
+
+| Function | RVA | GD state |
+| --- | --- | --- |
+| `ZSTD_loadDictionaryContent` | `0x6b5b90` | unpaired |
+| `ZSTD_loadZstdDictionary` | `0x6b5cb0` | unpaired |
+| `ZSTD_compressBegin_internal` | `0x6b6030` | unpaired |
+| `ZSTD_initCDict_internal` | `0x6b6a20` | unpaired |
+| `ZSTD_createCDict_advanced` | `0x6b6d40` | unpaired |
+| `ZSTD_createCDict` | `0x6b6f00` | unpaired |
+| `ZSTD_getCParams` | `0x6b7230` | unpaired |
+| `ZSTD_updateTree` | `0x6bf2c0` | unpaired |
+| `ZSTD_compressBlock_btopt` | `0x6bf3d0` | DIFF |
+| `ZSTD_compressBlock_btultra` | `0x6c1d60` | DIFF |
+| `ZSTD_compressBlock_btopt_extDict` | `0x6c4760` | DIFF |
+| `ZSTD_compressBlock_btultra_extDict` | `0x6c7aa0` | DIFF |
+| `FSE_writeNCount_generic` | `0x6cb0c0` | unpaired |
+| `FSE_readNCount` | `0x6d6670` | MATCH |
+| `HUF_readStats` | `0x6d69f0` | MATCH |
+| `XXH64_reset` | `0x6d6bb0` | unpaired |
+| `HUF_readCTable` | `0x6d7360` | unpaired |
+| `BIT_initDStream` | `0x6d96d0` | MATCH |
+| `BIT_reloadDStream` | `0x6d97f0` | MATCH |
+| `FSE_buildDTable` | `0x6d9890` | MATCH |
+| `FSE_decompress_usingDTable` | `0x6d9a70` | MATCH |
+| `FSE_decompress_wksp` | `0x6da270` | MATCH |
+
+- MATCH: 7. DIFF: 4. Unpaired: 11 (no live caller yet; they pair when callers land).
+- The 4 DIFF functions MATCH in 4 other exes with the same vendor source. Only the calls score is low. Cause (not verified): LTCG call and inline choices depend on the live call graph, and the GameDaemon call graph is mostly stubs now. Recheck after the W waves. Do not edit vendor code.
