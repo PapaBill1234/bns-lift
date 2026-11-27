@@ -57,3 +57,5 @@ Decisions:
 ## Gate and MATCH comparison
 
 The driver builds and runs the gate and funcdiff after this session. This session did not build.
+
+Round 3: the round 2 gate stopped with `XDG_RUNTIME_DIR is invalid or not set in the environment`. That message comes from the build host environment, not from a compiler. The build tree has no GameDaemon object logs and no `error C` line. This round checked each changed declaration against the shared headers (`Thread` 0x30 + `LogMedia` 0xB0 = 0xE0, `Connection::_socket`, `CriticalSection::Enter`/`Leave`, `MemoryManager::Free` const, `Log::Write` overloads, `StlMemory.h` `LIFT_STLMEMORY_FILE` guard) and found no compile fault. The code is not changed in round 3. Run the gate again with a valid `XDG_RUNTIME_DIR`.
