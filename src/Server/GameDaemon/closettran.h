@@ -7,6 +7,7 @@ class PutItemIntoClosetTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x80070
+    static ::GameTranDef _def;  // LIFT: PDB data PutItemIntoClosetTran::_def
 private:
     virtual bool __cdecl work(int, void *);  // 0x800c0
     bool __cdecl init(int, void *);  // 0x80120
@@ -18,6 +19,7 @@ class TakeItemFromClosetTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x80080
+    static ::GameTranDef _def;  // LIFT: PDB data TakeItemFromClosetTran::_def
 private:
     virtual bool __cdecl work(int, void *);  // 0x80aa0
     bool __cdecl init(int, void *);  // 0x80b00

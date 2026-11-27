@@ -7,6 +7,7 @@ class NPGetChannelPropertyTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x121970
+    static ::GameTranDef _def;  // LIFT: PDB data NPGetChannelPropertyTran::_def
     __cdecl NPGetChannelPropertyTran(void);  // 0x170690
 private:
     virtual bool __cdecl work(int, void *);  // 0x170730
@@ -17,6 +18,7 @@ class NPGroupInfoTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x121980
+    static ::GameTranDef _def;  // LIFT: PDB data NPGroupInfoTran::_def
 private:
     virtual bool __cdecl work(int, void *);  // 0x170a10
     bool __cdecl groupInfo(void *);  // 0x170a60
@@ -26,6 +28,7 @@ class NPRegisterServiceTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x121950
+    static ::GameTranDef _def;  // LIFT: PDB data NPRegisterServiceTran::_def
     __cdecl NPRegisterServiceTran(void);  // 0x16f530
 private:
     bool __cdecl init(int, void *);  // 0x16f5a0
@@ -39,6 +42,7 @@ class NPValidateGroupTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x121960
+    static ::GameTranDef _def;  // LIFT: PDB data NPValidateGroupTran::_def
 private:
     virtual bool __cdecl work(int, void *);  // 0x16fcc0
     bool __cdecl validateGroup(void *);  // 0x16fd10

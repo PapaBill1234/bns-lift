@@ -7,6 +7,7 @@ class DuelResultTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x180c80
+    static ::GameTranDef _def;  // LIFT: PDB data DuelResultTran::_def
     __cdecl DuelResultTran(::User *);  // 0x1b8520
 private:
     virtual bool __cdecl work(int, void *);  // 0x1b8590
@@ -21,6 +22,7 @@ class PartyBattleResultTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x180c70
+    static ::GameTranDef _def;  // LIFT: PDB data PartyBattleResultTran::_def
     __cdecl PartyBattleResultTran(::User *);  // 0x1b7610
 private:
     virtual bool __cdecl work(int, void *);  // 0x1b7680
@@ -35,6 +37,7 @@ class TimeAttackRecordResultTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x180c90
+    static ::GameTranDef _def;  // LIFT: PDB data TimeAttackRecordResultTran::_def
 private:
     virtual bool __cdecl work(int, void *);  // 0x1b9460
     bool __cdecl init(int, void *);  // 0x1b94e0

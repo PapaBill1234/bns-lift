@@ -16,6 +16,7 @@ class LeaveWorldTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x35fe0
+    static ::GameTranDef _def;  // LIFT: PDB data LeaveWorldTran::_def
     virtual __cdecl ~LeaveWorldTran(void);  // 0x13a500
 protected:
     virtual bool __cdecl init(int, void *);  // 0x13a640
@@ -45,6 +46,7 @@ class LogoutArenaTran
 public:
     __cdecl LogoutArenaTran(::User *);  // 0x36080
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x360f0
+    static ::GameTranDef _def;  // LIFT: PDB data LogoutArenaTran::_def
 private:
     virtual bool __cdecl init(int, void *);  // 0x13c7c0
     virtual bool __cdecl work(int, void *);  // 0x13c920
@@ -69,6 +71,7 @@ class ReturnToArenaLobbyTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x1397e0
+    static ::GameTranDef _def;  // LIFT: PDB data ReturnToArenaLobbyTran::_def
     __cdecl ReturnToArenaLobbyTran(::User *);  // 0x13d100
     virtual __cdecl ~ReturnToArenaLobbyTran(void);  // 0x13d230
 private:

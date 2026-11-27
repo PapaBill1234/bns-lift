@@ -5,5 +5,8 @@
 // 0x1d77b0
 ::GameTranDef const * __cdecl TakeAchievementRewardTran::GetDefinition(void) const
 {
-    LIFT_STUB(0x1d77b0);
+    return &TakeAchievementRewardTran::_def;
 }
+#pragma comment(linker, "/INCLUDE:?GetDefinition@TakeAchievementRewardTran@@UEBAPEBUGameTranDef@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+// LIFT: placeholder. The real _def needs the state tables of the class (a later card).
+::GameTranDef TakeAchievementRewardTran::_def;

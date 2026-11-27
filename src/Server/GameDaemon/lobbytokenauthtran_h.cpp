@@ -11,5 +11,8 @@ __cdecl EnterWorldOkParam::EnterWorldOkParam(void)
 // 0x13e270
 ::GameTranDef const * __cdecl LobbyTokenAuthTran::GetDefinition(void) const
 {
-    LIFT_STUB(0x13e270);
+    return &LobbyTokenAuthTran::_def;
 }
+#pragma comment(linker, "/INCLUDE:?GetDefinition@LobbyTokenAuthTran@@UEBAPEBUGameTranDef@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+// LIFT: placeholder. The real _def needs the state tables of the class (a later card).
+::GameTranDef LobbyTokenAuthTran::_def;

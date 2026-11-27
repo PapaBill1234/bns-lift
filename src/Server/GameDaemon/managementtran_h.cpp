@@ -5,11 +5,17 @@
 // 0x156b20
 ::GameTranDef const * __cdecl DepositInGuildBankTran::GetDefinition(void) const
 {
-    LIFT_STUB(0x156b20);
+    return &DepositInGuildBankTran::_def;
 }
+#pragma comment(linker, "/INCLUDE:?GetDefinition@DepositInGuildBankTran@@UEBAPEBUGameTranDef@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+// LIFT: placeholder. The real _def needs the state tables of the class (a later card).
+::GameTranDef DepositInGuildBankTran::_def;
 
 // 0x156b30
 ::GameTranDef const * __cdecl WithdrawFromGuildBankTran::GetDefinition(void) const
 {
-    LIFT_STUB(0x156b30);
+    return &WithdrawFromGuildBankTran::_def;
 }
+#pragma comment(linker, "/INCLUDE:?GetDefinition@WithdrawFromGuildBankTran@@UEBAPEBUGameTranDef@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+// LIFT: placeholder. The real _def needs the state tables of the class (a later card).
+::GameTranDef WithdrawFromGuildBankTran::_def;

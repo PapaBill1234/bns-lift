@@ -5,17 +5,26 @@
 // 0x180c70
 ::GameTranDef const * __cdecl PartyBattleResultTran::GetDefinition(void) const
 {
-    LIFT_STUB(0x180c70);
+    return &PartyBattleResultTran::_def;
 }
+#pragma comment(linker, "/INCLUDE:?GetDefinition@PartyBattleResultTran@@UEBAPEBUGameTranDef@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+// LIFT: placeholder. The real _def needs the state tables of the class (a later card).
+::GameTranDef PartyBattleResultTran::_def;
 
 // 0x180c80
 ::GameTranDef const * __cdecl DuelResultTran::GetDefinition(void) const
 {
-    LIFT_STUB(0x180c80);
+    return &DuelResultTran::_def;
 }
+#pragma comment(linker, "/INCLUDE:?GetDefinition@DuelResultTran@@UEBAPEBUGameTranDef@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+// LIFT: placeholder. The real _def needs the state tables of the class (a later card).
+::GameTranDef DuelResultTran::_def;
 
 // 0x180c90
 ::GameTranDef const * __cdecl TimeAttackRecordResultTran::GetDefinition(void) const
 {
-    LIFT_STUB(0x180c90);
+    return &TimeAttackRecordResultTran::_def;
 }
+#pragma comment(linker, "/INCLUDE:?GetDefinition@TimeAttackRecordResultTran@@UEBAPEBUGameTranDef@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+// LIFT: placeholder. The real _def needs the state tables of the class (a later card).
+::GameTranDef TimeAttackRecordResultTran::_def;

@@ -7,6 +7,7 @@ class MileageDepositTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x1107e0
+    static ::GameTranDef _def;  // LIFT: PDB data MileageDepositTran::_def
     __cdecl MileageDepositTran(::User *);  // 0x16b9d0
 private:
     virtual bool __cdecl work(int, void *);  // 0x16bb30

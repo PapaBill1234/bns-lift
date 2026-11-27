@@ -7,6 +7,7 @@ class DepositInGuildBankTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x156b20
+    static ::GameTranDef _def;  // LIFT: PDB data DepositInGuildBankTran::_def
 private:
     virtual bool __cdecl work(int, void *);  // 0x1598c0
     bool __cdecl init(int, void *);  // 0x159940
@@ -19,6 +20,7 @@ class WithdrawFromGuildBankTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x156b30
+    static ::GameTranDef _def;  // LIFT: PDB data WithdrawFromGuildBankTran::_def
 private:
     virtual bool __cdecl work(int, void *);  // 0x15a410
     bool __cdecl init(int, void *);  // 0x15a490

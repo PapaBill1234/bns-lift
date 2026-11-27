@@ -5,5 +5,8 @@
 // 0x224250
 ::GameTranDef const * __cdecl TakeTimeBasedPlayRewardTran::GetDefinition(void) const
 {
-    LIFT_STUB(0x224250);
+    return &TakeTimeBasedPlayRewardTran::_def;
 }
+#pragma comment(linker, "/INCLUDE:?GetDefinition@TakeTimeBasedPlayRewardTran@@UEBAPEBUGameTranDef@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+// LIFT: placeholder. The real _def needs the state tables of the class (a later card).
+::GameTranDef TakeTimeBasedPlayRewardTran::_def;

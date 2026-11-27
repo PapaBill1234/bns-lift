@@ -7,6 +7,7 @@ class DuelBotTrainingRoomResultTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0xaca50
+    static ::GameTranDef _def;  // LIFT: PDB data DuelBotTrainingRoomResultTran::_def
 private:
     virtual bool __cdecl work(int, void *);  // 0xafaf0
     bool __cdecl init(int, void *);  // 0xafb70
@@ -19,6 +20,7 @@ class DuelBotTrainingRoomRewardTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0xaca60
+    static ::GameTranDef _def;  // LIFT: PDB data DuelBotTrainingRoomRewardTran::_def
 private:
     virtual bool __cdecl work(int, void *);  // 0xb0320
     bool __cdecl init(int, void *);  // 0xb03a0

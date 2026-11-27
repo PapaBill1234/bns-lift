@@ -5,17 +5,26 @@
 // 0x15af00
 ::GameTranDef const * __cdecl RegisterPurchaseTran::GetDefinition(void) const
 {
-    LIFT_STUB(0x15af00);
+    return &RegisterPurchaseTran::_def;
 }
+#pragma comment(linker, "/INCLUDE:?GetDefinition@RegisterPurchaseTran@@UEBAPEBUGameTranDef@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+// LIFT: placeholder. The real _def needs the state tables of the class (a later card).
+::GameTranDef RegisterPurchaseTran::_def;
 
 // 0x15af10
 ::GameTranDef const * __cdecl RegisterBidTran::GetDefinition(void) const
 {
-    LIFT_STUB(0x15af10);
+    return &RegisterBidTran::_def;
 }
+#pragma comment(linker, "/INCLUDE:?GetDefinition@RegisterBidTran@@UEBAPEBUGameTranDef@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+// LIFT: placeholder. The real _def needs the state tables of the class (a later card).
+::GameTranDef RegisterBidTran::_def;
 
 // 0x15af20
 ::GameTranDef const * __cdecl UpdateBidTran::GetDefinition(void) const
 {
-    LIFT_STUB(0x15af20);
+    return &UpdateBidTran::_def;
 }
+#pragma comment(linker, "/INCLUDE:?GetDefinition@UpdateBidTran@@UEBAPEBUGameTranDef@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+// LIFT: placeholder. The real _def needs the state tables of the class (a later card).
+::GameTranDef UpdateBidTran::_def;

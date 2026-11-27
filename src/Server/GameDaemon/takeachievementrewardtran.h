@@ -7,6 +7,7 @@ class TakeAchievementRewardTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x1d77b0
+    static ::GameTranDef _def;  // LIFT: PDB data TakeAchievementRewardTran::_def
 private:
     virtual bool __cdecl work(int, void *);  // 0x1d7820
     bool __cdecl init(int, void *);  // 0x1d7950

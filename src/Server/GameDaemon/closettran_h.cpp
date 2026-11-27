@@ -5,11 +5,17 @@
 // 0x80070
 ::GameTranDef const * __cdecl PutItemIntoClosetTran::GetDefinition(void) const
 {
-    LIFT_STUB(0x80070);
+    return &PutItemIntoClosetTran::_def;
 }
+#pragma comment(linker, "/INCLUDE:?GetDefinition@PutItemIntoClosetTran@@UEBAPEBUGameTranDef@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+// LIFT: placeholder. The real _def needs the state tables of the class (a later card).
+::GameTranDef PutItemIntoClosetTran::_def;
 
 // 0x80080
 ::GameTranDef const * __cdecl TakeItemFromClosetTran::GetDefinition(void) const
 {
-    LIFT_STUB(0x80080);
+    return &TakeItemFromClosetTran::_def;
 }
+#pragma comment(linker, "/INCLUDE:?GetDefinition@TakeItemFromClosetTran@@UEBAPEBUGameTranDef@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+// LIFT: placeholder. The real _def needs the state tables of the class (a later card).
+::GameTranDef TakeItemFromClosetTran::_def;

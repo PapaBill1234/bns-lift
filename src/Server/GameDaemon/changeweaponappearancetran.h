@@ -7,6 +7,7 @@ class ChangeWeaponAppearanceTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x714c0
+    static ::GameTranDef _def;  // LIFT: PDB data ChangeWeaponAppearanceTran::_def
 private:
     virtual bool __cdecl work(int, void *);  // 0x71500
     bool __cdecl init(int, void *);  // 0x71560

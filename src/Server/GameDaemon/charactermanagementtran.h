@@ -7,6 +7,7 @@ class ChangeCharacterAppearanceTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x725a0
+    static ::GameTranDef _def;  // LIFT: PDB data ChangeCharacterAppearanceTran::_def
 private:
     virtual bool __cdecl work(int, void *);  // 0x73bf0
     bool __cdecl init(int, void *);  // 0x73c60
@@ -19,6 +20,7 @@ class ChangeCharacterRaceTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x725c0
+    static ::GameTranDef _def;  // LIFT: PDB data ChangeCharacterRaceTran::_def
 private:
     virtual bool __cdecl work(int, void *);  // 0x74e10
     bool __cdecl init(int, void *);  // 0x74e80
@@ -32,6 +34,7 @@ class ChangeCharacterSexTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x725b0
+    static ::GameTranDef _def;  // LIFT: PDB data ChangeCharacterSexTran::_def
 private:
     virtual bool __cdecl work(int, void *);  // 0x74200
     bool __cdecl init(int, void *);  // 0x74270
@@ -45,6 +48,7 @@ class CreateCharacterTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x72590
+    static ::GameTranDef _def;  // LIFT: PDB data CreateCharacterTran::_def
     __cdecl CreateCharacterTran(void);  // 0x726c0
 private:
     virtual bool __cdecl work(int, void *);  // 0x72790
@@ -58,6 +62,7 @@ class DeleteCharacterTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x725e0
+    static ::GameTranDef _def;  // LIFT: PDB data DeleteCharacterTran::_def
     __cdecl DeleteCharacterTran(void);  // 0x760b0
 private:
     virtual bool __cdecl work(int, void *);  // 0x76160
@@ -71,6 +76,7 @@ class RenameCharacterTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x725d0
+    static ::GameTranDef _def;  // LIFT: PDB data RenameCharacterTran::_def
 private:
     virtual bool __cdecl work(int, void *);  // 0x75b30
     bool __cdecl init(int, void *);  // 0x75ba0
@@ -83,6 +89,7 @@ class RestoreCharacterTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x725f0
+    static ::GameTranDef _def;  // LIFT: PDB data RestoreCharacterTran::_def
 private:
     virtual bool __cdecl work(int, void *);  // 0x76930
     bool __cdecl init(int, void *);  // 0x769b0

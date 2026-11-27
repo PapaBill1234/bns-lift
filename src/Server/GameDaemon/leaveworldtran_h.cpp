@@ -6,8 +6,11 @@
 // 0x35fe0
 ::GameTranDef const * __cdecl LeaveWorldTran::GetDefinition(void) const
 {
-    LIFT_STUB(0x35fe0);
+    return &LeaveWorldTran::_def;
 }
+#pragma comment(linker, "/INCLUDE:?GetDefinition@LeaveWorldTran@@UEBAPEBUGameTranDef@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+// LIFT: placeholder. The real _def (0xE7FA70) needs the state tables of the class (a later card).
+::GameTranDef LeaveWorldTran::_def;
 
 // 0x35ff0
 __cdecl LogoutTran::LogoutTran(::User *)
@@ -24,11 +27,17 @@ __cdecl LogoutArenaTran::LogoutArenaTran(::User *)
 // 0x360f0
 ::GameTranDef const * __cdecl LogoutArenaTran::GetDefinition(void) const
 {
-    LIFT_STUB(0x360f0);
+    return &LogoutArenaTran::_def;
 }
+#pragma comment(linker, "/INCLUDE:?GetDefinition@LogoutArenaTran@@UEBAPEBUGameTranDef@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+// LIFT: placeholder. The real _def needs the state tables of the class (a later card).
+::GameTranDef LogoutArenaTran::_def;
 
 // 0x1397e0
 ::GameTranDef const * __cdecl ReturnToArenaLobbyTran::GetDefinition(void) const
 {
-    LIFT_STUB(0x1397e0);
+    return &ReturnToArenaLobbyTran::_def;
 }
+#pragma comment(linker, "/INCLUDE:?GetDefinition@ReturnToArenaLobbyTran@@UEBAPEBUGameTranDef@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+// LIFT: placeholder. The real _def needs the state tables of the class (a later card).
+::GameTranDef ReturnToArenaLobbyTran::_def;

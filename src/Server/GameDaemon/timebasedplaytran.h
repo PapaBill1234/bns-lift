@@ -7,6 +7,7 @@ class TakeTimeBasedPlayRewardTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x224250
+    static ::GameTranDef _def;  // LIFT: PDB data TakeTimeBasedPlayRewardTran::_def
     __cdecl TakeTimeBasedPlayRewardTran(::User *);  // 0x224260
 private:
     bool __cdecl sendFailToClient(short);  // 0x2242d0

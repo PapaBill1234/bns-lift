@@ -7,6 +7,7 @@ class ConfirmInvitationChallengePartyTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x65db0
+    static ::GameTranDef _def;  // LIFT: PDB data ConfirmInvitationChallengePartyTran::_def
     __cdecl ConfirmInvitationChallengePartyTran(::User *);  // 0x6fd20
 private:
     virtual bool __cdecl work(int, void *);  // 0x6fdf0
@@ -22,6 +23,7 @@ class CreateChallengePartyTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x65da0
+    static ::GameTranDef _def;  // LIFT: PDB data CreateChallengePartyTran::_def
 private:
     virtual bool __cdecl work(int, void *);  // 0x6f470
     bool __cdecl init(int, void *);  // 0x6f4f0
@@ -35,6 +37,7 @@ class LeaveChallengePartyTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x65dc0
+    static ::GameTranDef _def;  // LIFT: PDB data LeaveChallengePartyTran::_def
     __cdecl LeaveChallengePartyTran(::User *);  // 0x706d0
     virtual __cdecl ~LeaveChallengePartyTran(void);  // 0x707a0
 private:

@@ -14,6 +14,7 @@ class LobbyTokenAuthTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x13e270
+    static ::GameTranDef _def;  // LIFT: PDB data LobbyTokenAuthTran::_def
     __cdecl LobbyTokenAuthTran(::Session *);  // 0x14edb0
     virtual __cdecl ~LobbyTokenAuthTran(void);  // 0x14eff0
 private:

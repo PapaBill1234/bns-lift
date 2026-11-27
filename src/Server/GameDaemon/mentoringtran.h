@@ -7,6 +7,7 @@ class ConfirmInvitationMentoringTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x16a300
+    static ::GameTranDef _def;  // LIFT: PDB data ConfirmInvitationMentoringTran::_def
     __cdecl ConfirmInvitationMentoringTran(::User *);  // 0x16a320
 private:
     virtual bool __cdecl work(int, void *);  // 0x16a4c0
@@ -21,6 +22,7 @@ class LeaveMentoringTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x16a310
+    static ::GameTranDef _def;  // LIFT: PDB data LeaveMentoringTran::_def
 private:
     virtual bool __cdecl work(int, void *);  // 0x16b000
     bool __cdecl init(int &, void *);  // 0x16b0e0

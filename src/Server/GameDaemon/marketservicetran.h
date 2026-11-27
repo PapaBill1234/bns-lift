@@ -7,6 +7,7 @@ class RegisterBidTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x15af10
+    static ::GameTranDef _def;  // LIFT: PDB data RegisterBidTran::_def
 private:
     virtual bool __cdecl work(int, void *);  // 0x165250
     bool __cdecl init(int, void *);  // 0x165370
@@ -26,6 +27,7 @@ class RegisterPurchaseTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x15af00
+    static ::GameTranDef _def;  // LIFT: PDB data RegisterPurchaseTran::_def
 private:
     virtual bool __cdecl work(int, void *);  // 0x1638d0
     bool __cdecl init(int, void *);  // 0x1639f0
@@ -45,6 +47,7 @@ class UpdateBidTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x15af20
+    static ::GameTranDef _def;  // LIFT: PDB data UpdateBidTran::_def
 private:
     virtual bool __cdecl work(int, void *);  // 0x166bb0
     bool __cdecl init(int, void *);  // 0x166d00

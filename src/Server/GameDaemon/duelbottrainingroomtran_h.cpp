@@ -5,11 +5,17 @@
 // 0xaca50
 ::GameTranDef const * __cdecl DuelBotTrainingRoomResultTran::GetDefinition(void) const
 {
-    LIFT_STUB(0xaca50);
+    return &DuelBotTrainingRoomResultTran::_def;
 }
+#pragma comment(linker, "/INCLUDE:?GetDefinition@DuelBotTrainingRoomResultTran@@UEBAPEBUGameTranDef@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+// LIFT: placeholder. The real _def needs the state tables of the class (a later card).
+::GameTranDef DuelBotTrainingRoomResultTran::_def;
 
 // 0xaca60
 ::GameTranDef const * __cdecl DuelBotTrainingRoomRewardTran::GetDefinition(void) const
 {
-    LIFT_STUB(0xaca60);
+    return &DuelBotTrainingRoomRewardTran::_def;
 }
+#pragma comment(linker, "/INCLUDE:?GetDefinition@DuelBotTrainingRoomRewardTran@@UEBAPEBUGameTranDef@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+// LIFT: placeholder. The real _def needs the state tables of the class (a later card).
+::GameTranDef DuelBotTrainingRoomRewardTran::_def;

@@ -5,5 +5,8 @@
 // 0x1107e0
 ::GameTranDef const * __cdecl MileageDepositTran::GetDefinition(void) const
 {
-    LIFT_STUB(0x1107e0);
+    return &MileageDepositTran::_def;
 }
+#pragma comment(linker, "/INCLUDE:?GetDefinition@MileageDepositTran@@UEBAPEBUGameTranDef@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+// LIFT: placeholder. The real _def needs the state tables of the class (a later card).
+::GameTranDef MileageDepositTran::_def;
