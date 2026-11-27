@@ -25,3 +25,8 @@
 - `src/Server/GameDaemon/instantpaymenttran.h`, `instantpaymenttran_h.cpp`
 - `src/Server/GameDaemon/accountinventorytran.h`, `accountinventorytran_h.cpp`
 - `Docs/Plan/handoffs/lift-gamedaemon-gap-009-e9.md`
+
+## Round 5: dead-strip keep
+
+Each lifted getter and `InstantPaymentJob::DataId` now has a `/INCLUDE` pragma with a `// LIFT:` note. No live caller emits their vtables yet. The pragma keeps them in the link, so funcdiff can pair them. The bodies did not change.
+`InstantPaymentDrawSlateNewStoneSubJob::DataId` is still a stub, so it has no pragma. The decorated names are built from the PDB signature and are not checked against the PDB publics.

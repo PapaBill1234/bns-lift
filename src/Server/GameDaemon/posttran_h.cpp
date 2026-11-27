@@ -3,6 +3,10 @@
 #include "posttran.h"
 #include "LiftStub.h"
 
+#pragma comment(linker, "/INCLUDE:?GetDefinition@MarkExpressPostTran@@UEBAPEBUGameTranDef@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetDefinition@DetachPostAttachmentTran_IndetachFixed@@UEBAPEBUGameTranDef@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetDefinition@DeliverPostTran@@UEBAPEBUGameTranDef@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+
 // 0x1960e0
 ::GameTranDef const * __cdecl MarkExpressPostTran::GetDefinition(void) const
 {

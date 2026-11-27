@@ -3,6 +3,9 @@
 #include "instantpaymenttran.h"
 #include "LiftStub.h"
 
+#pragma comment(linker, "/INCLUDE:?GetDefinition@InstantPaymentTran@@UEBAPEBUGameTranDef@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?DataId@InstantPaymentJob@@UEAAHXZ")  // LIFT: dead-strip keep (no live caller yet)
+
 // 0x110700
 __cdecl InstantPaymentTryBuyCollectionItemsParam::InstantPaymentTryBuyCollectionItemsParam(void)
 {

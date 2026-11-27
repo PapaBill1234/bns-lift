@@ -3,6 +3,20 @@
 #include "accountinventorytran.h"
 #include "LiftStub.h"
 
+#pragma comment(linker, "/INCLUDE:?GetDefinition@AccountInventoryGetGoodsCountTran@@UEBAPEBUGameTranDef@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetDefinition@AccountInventoryListGoodsTran@@UEBAPEBUGameTranDef@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetDefinition@AccountInventoryTakeGoodsTran@@UEBAPEBUGameTranDef@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetDefinition@AccountInventoryRetrieveWarehouseLobbyServiceItemListTran@@UEBAPEBUGameTranDef@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetDefinition@AccountInventoryRetrieveWarehouseItemListTran@@UEBAPEBUGameTranDef@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetDefinition@AccountInventoryTakeWarehouseItemTran@@UEBAPEBUGameTranDef@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetDefinition@AccountInventoryJumpingCharacter2TicketTran@@UEBAPEBUGameTranDef@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetDefinition@AccountInventoryBoardGachaParticipationCountPerSeasonTran@@UEBAPEBUGameTranDef@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetDefinition@AccountInventoryBoardGachaParticipationInfoPerPcTran@@UEBAPEBUGameTranDef@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetDefinition@AccountInventoryBoardGachaDrawByItemTran@@UEBAPEBUGameTranDef@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetDefinition@AccountInventoryBoardGachaDrawByInstantPaymentTran@@UEBAPEBUGameTranDef@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetDefinition@AccountInventoryBoardGachaParticipationRewardStateTran@@UEBAPEBUGameTranDef@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetDefinition@AccountInventoryBoardGachaTakeParticipationRewardTran@@UEBAPEBUGameTranDef@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+
 // 0x1c30b0
 ::GameTranDef const * __cdecl AccountInventoryGetGoodsCountTran::GetDefinition(void) const
 {
