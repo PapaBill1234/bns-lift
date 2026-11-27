@@ -2,18 +2,21 @@
 
 ## Lifted
 
-All 30 getters of `Summoned` in `summoned_h` (RVA 0x455210 to 0x4553e0).
-Each getter returns one field of `_levelData->` (`Data::SummonedLevelRecord`).
-The field names come from the PDB. The Hex-Rays record index matches the field offset.
+None. The 30 getters are `LIFT_STUB` bodies again.
 
 ## Not done
 
-None.
+All 30 functions of `summoned_h`, RVA 0x455210 to 0x4553e0 (step 0x10).
+Names: `Summoned::GetAttackHitValueModify` to `Summoned::GetRHypermovePowerModify`.
 
-## Notes
+Reason: the bodies read `_levelData` (PDB offset 6640, type `Data::SummonedLevelRecordPtr`).
+`class Summoned` in `summoned.h` has no members and no base class.
+The PDB layout needs the base class (type 0xDC71) and the members `_data` to `_historyItems`.
+The class size is 0x2A40. This layout is not in the header yet.
+A later card must add the layout first. Then it can lift the getters.
+The pseudocode field names (for example `attack_hit_value_modify`) must be checked against the record type then.
 
-- No dead-strip pragma added. These functions are virtual. The vftable keeps them.
-- The driver must run the build, the gate and the funcdiff comparison.
+The earlier compile error was `use of undeclared identifier _levelData`. The revert removes it.
 
 ## Files changed
 
