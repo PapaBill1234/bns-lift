@@ -3,12 +3,23 @@
 #include "gameobject.h"
 #include "pc.h"
 #include "zone.h"
+#include <string.h>
 #include "LiftStub.h"
 
 // 0x40d810
+#pragma comment(linker, "/INCLUDE:??0ItemPouch@@QEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
 __cdecl ItemPouch::ItemPouch(void)
+    : pouchId(0)
 {
-    LIFT_STUB(0x40d810);
+    money = 0;
+    itemCount = 0;
+    totalItemCount = 0;
+    owner = NULL;
+    _appearance = 0;
+    _maxAppearancePrioirty = 0;
+    _itemPouchAdditionalInfo = 0;
+    _diceResult = -1;
+    memset(item, 0, sizeof(item));
 }
 
 // 0x40d890
@@ -36,9 +47,23 @@ void __cdecl ItemPouch::TakeEffect(::Zone *, ::Pc *)
 }
 
 // 0x40dd70
-::DroppedItem const * __cdecl ItemPouch::Next(::DroppedItem const *) const
+#pragma comment(linker, "/INCLUDE:?Next@ItemPouch@@QEBAPEBUDroppedItem@@PEBU2@@Z")  // LIFT: dead-strip keep (no live caller yet)
+::DroppedItem const * __cdecl ItemPouch::Next(::DroppedItem const *i) const
 {
-    LIFT_STUB(0x40dd70);
+    __int64 index = -1;
+    if (i != NULL)
+    {
+        index = i - item;
+        if (index < 0)
+            return NULL;
+    }
+
+    for (++index; index < 16; ++index)  // LIFT: 16 = MAX_ITEM_COUNT
+    {
+        if (item[index].valid == 1)
+            return &item[index];
+    }
+    return NULL;
 }
 
 // 0x40dde0

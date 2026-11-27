@@ -1,6 +1,7 @@
 // creature.h: creature.cpp, creature.h (GameDaemon PDB, 2019 + PDB). Wave 0: declarations of the stubbed functions only.
 // LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
 #pragma once
+#include <set>
 #include "GameDaemonFwd.h"
 
 // LIFT: views of the PDB record Data::SkillModifyLimitRecord (base DrEl, size 0x30) and of Data::SkillModifyLimitRecordPtr.
@@ -248,7 +249,25 @@ private:
     bool __cdecl checkAccountExpQuota(__int64 &);  // 0x276400
 public:
     bool __cdecl HandleAccountExpWithoutConsumeQuota(__int64, ::ChangedProperty *, short);  // 0x2764f0
+    // LIFT: PDB layout (size 0xC50). Only the members that the lifted bodies use are declared.
+    typedef std::set<unsigned short, std::less<__int64>, StlAllocator<unsigned short, 2> > ChangedPropertyIdSet;
+private:
+    char lift_pad_8[0x28 - 8];  // LIFT: base GameObject (+8 to +0x27) is not declared yet
+public:
+    unsigned __int64 Id;  // +0x28 (PDB: GameObject::Id)
+private:
+    char lift_pad_30[0x235 - 0x30];  // LIFT: Prop (CreatureProperty, +0x30) is not declared yet
+public:
+    char lift_Prop_State_combat_side;  // +0x235 (PDB: Prop.State.combat_side, State at Prop+0xD8, combat_side at State+0x12D)
+private:
+    char lift_pad_236[0xBEC - 0x236];
+    int _creatureStateKeeperCount;  // +0xBEC
+    char lift_pad_bf0[0xC08 - 0xBF0];
+    ChangedPropertyIdSet _changedPropertyIdListSet;  // +0xC08
+    ChangedPropertyIdSet _changedExtraPropertyIdListSet;  // +0xC28
+    char lift_pad_c48[0xC50 - 0xC48];
 };
+static_assert(sizeof(Creature) == 0xC50, "sizeof Creature");
 
 class CreatureStateKeeper
 {

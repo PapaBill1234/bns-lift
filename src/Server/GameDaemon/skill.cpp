@@ -124,9 +124,10 @@ bool __cdecl SkillContainer::Find(int)
 }
 
 // 0x58e8f0
-bool __cdecl SkillContainer::FindInPassiveSkills(int)
+#pragma comment(linker, "/INCLUDE:?FindInPassiveSkills@SkillContainer@@QEAA_NH@Z")  // LIFT: dead-strip keep (no live caller yet)
+bool __cdecl SkillContainer::FindInPassiveSkills(int skillId)
 {
-    LIFT_STUB(0x58e8f0);
+    return passiveSkillList.find(skillId) != passiveSkillList.end();
 }
 
 // 0x58e960
@@ -154,9 +155,23 @@ bool __cdecl SkillContainer::GetSkillPage2(char, bool &, wchar_t const *&, char 
 }
 
 // 0x58ebe0
-bool __cdecl SkillContainer::GetSkillPageEnable(char)
+#pragma comment(linker, "/INCLUDE:?GetSkillPageEnable@SkillContainer@@QEAA_ND@Z")  // LIFT: dead-strip keep (no live caller yet)
+bool __cdecl SkillContainer::GetSkillPageEnable(char page)
 {
-    LIFT_STUB(0x58ebe0);
+    switch (page)
+    {
+    case 0:
+        return skillPageProperty.Default.skill_page_enable1;
+    case 1:
+        return skillPageProperty.Default.skill_page_enable2;
+    case 2:
+        return skillPageProperty.Default.skill_page_enable3;
+    case 3:
+        return skillPageProperty.Default.skill_page_enable4;
+    case 4:
+        return skillPageProperty.Default.skill_page_enable5;
+    }
+    return false;
 }
 
 // 0x58ec40
@@ -202,9 +217,24 @@ bool __cdecl SkillContainer::ModifySkillPage2(char, bool, wchar_t const *)
 }
 
 // 0x58fc70
+#pragma comment(linker, "/INCLUDE:?GetCurrentSkillPageJobStyle@SkillContainer@@QEAADXZ")  // LIFT: dead-strip keep (no live caller yet)
 char __cdecl SkillContainer::GetCurrentSkillPageJobStyle(void)
 {
-    LIFT_STUB(0x58fc70);
+    // ❓ the 2019 body may be an inlined GetSkillPageJobStyle(current_skill_page).
+    switch (skillPageProperty.Default.current_skill_page)
+    {
+    case 1:
+        return skillPageProperty.Default.skill_page_job_style1;
+    case 2:
+        return skillPageProperty.Default.skill_page_job_style2;
+    case 3:
+        return skillPageProperty.Default.skill_page_job_style3;
+    case 4:
+        return skillPageProperty.Default.skill_page_job_style4;
+    case 5:
+        return skillPageProperty.Default.skill_page_job_style5;
+    }
+    return 0;
 }
 
 // 0x58fcc0
@@ -382,9 +412,10 @@ bool __cdecl SkillContainer::addCandidateSkill(char, int, char)
 }
 
 // 0x595430
-bool __cdecl SkillContainer::isCandidateSkill(char, int)
+#pragma comment(linker, "/INCLUDE:?isCandidateSkill@SkillContainer@@AEAA_NDH@Z")  // LIFT: dead-strip keep (no live caller yet)
+bool __cdecl SkillContainer::isCandidateSkill(char page, int skillId)
 {
-    LIFT_STUB(0x595430);
+    return candidateSkillList[page].find(skillId) != candidateSkillList[page].end();
 }
 
 // 0x5954b0

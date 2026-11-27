@@ -2040,7 +2040,14 @@ class DrStlAllocator {};
 struct DrTableDef {};
 struct DrTableSummary {};
 struct DrXmlDoc {};
-struct DroppedItem {};
+struct DroppedItem  // PDB layout, size 0x18
+{
+    char valid;  // +0x0
+    short count;  // +0x2
+    unsigned __int64 dataKey;  // +0x8
+    char index;  // +0x10
+    char additionalInfo;  // +0x11
+};
 struct DuelMoveInfo {};
 struct DuelResultTranResultNotifyInfo {};
 class EffectNode

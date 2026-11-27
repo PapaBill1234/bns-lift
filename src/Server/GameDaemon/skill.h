@@ -1,7 +1,49 @@
 // skill.h: skill.cpp (GameDaemon PDB, 2019 + PDB). Wave 0: declarations of the stubbed functions only.
 // LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
 #pragma once
+#include <map>
 #include "GameDaemonFwd.h"
+
+// LIFT: view of the PDB struct SkillPage::__default__ (size 0x190). Only the fields up to the job styles are declared.
+struct SkillPageDefaultView
+{
+    int skill_version;  // +0x0
+    char current_skill_page;  // +0x4
+    unsigned char skill_page_enable1 : 1;  // +0x5
+    wchar_t skill_page_name1[33];  // +0x6
+    unsigned char skill_page_enable2 : 1;  // +0x48
+    wchar_t skill_page_name2[33];  // +0x4A
+    unsigned char skill_page_enable3 : 1;  // +0x8C
+    wchar_t skill_page_name3[33];  // +0x8E
+    unsigned char skill_page_enable4 : 1;  // +0xD0
+    wchar_t skill_page_name4[33];  // +0xD2
+    unsigned char skill_page_enable5 : 1;  // +0x114
+    wchar_t skill_page_name5[33];  // +0x116
+    short skill_statpoint_attacker;  // +0x158
+    short skill_statpoint_defender;  // +0x15A
+    short skill_statpoint_additional;  // +0x15C
+    char skill_statpoint_selection_1;  // +0x15E
+    char skill_statpoint_selection_2;  // +0x15F
+    char skill_statpoint_selection_3;  // +0x160
+    char skill_statpoint_selection_4;  // +0x161
+    char skill_statpoint_selection_5;  // +0x162
+    char skill_page_job_style1;  // +0x163
+    char skill_page_job_style2;  // +0x164
+    char skill_page_job_style3;  // +0x165
+    char skill_page_job_style4;  // +0x166
+    char skill_page_job_style5;  // +0x167
+    char lift_pad_168[0x190 - 0x168];  // LIFT: skill_page_trait_selection1..5 (f_bin<5>) are not declared yet
+};
+static_assert(sizeof(SkillPageDefaultView) == 0x190, "sizeof SkillPage::__default__");
+
+// LIFT: view of the PDB class SkillPage (base Property, size 0x1C0).
+class SkillPageView
+{
+public:
+    char lift_pad_0[0x30];  // LIFT: base Property is not declared yet
+    ::SkillPageDefaultView Default;  // +0x30 (PDB: SkillPage::__default__ const)
+};
+static_assert(sizeof(SkillPageView) == 0x1C0, "sizeof SkillPage");
 
 class SkillContainer
 {
@@ -75,7 +117,15 @@ private:
     bool __cdecl isCandidateSkill(char, int);  // 0x595430
     ::SkillEntry * __cdecl findCandidateSkill(char, int);  // 0x5954b0
     bool __cdecl copyCurrentSkillPageTo2(char);  // 0x595530
+    // LIFT: PDB layout (size 0x328).
+    typedef std::map<unsigned int, ::SkillEntry *, std::less<unsigned int>, StlAllocator<std::pair<unsigned int, ::SkillEntry *>, 2> > SkillList;
+    ::Creature *owner;  // +0x0
+    SkillList acquiredSkillList[5];  // +0x8
+    SkillList candidateSkillList[5];  // +0xA8
+    SkillList passiveSkillList;  // +0x148
+    ::SkillPageView skillPageProperty;  // +0x168 (PDB type: SkillPage)
 };
+static_assert(sizeof(SkillContainer) == 0x328, "sizeof SkillContainer");
 
 class SkillEntry
 {

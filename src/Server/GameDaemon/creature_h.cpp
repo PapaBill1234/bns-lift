@@ -3,21 +3,28 @@
 #include "LiftStub.h"
 
 // 0x1d240
-void __cdecl Creature::AddChangedPropertyId(unsigned short)
+#pragma comment(linker, "/INCLUDE:?AddChangedPropertyId@Creature@@UEAAXG@Z")  // LIFT: dead-strip keep (no live caller yet)
+void __cdecl Creature::AddChangedPropertyId(unsigned short fieldId)
 {
-    LIFT_STUB(0x1d240);
+    _changedPropertyIdListSet.insert(fieldId);
 }
 
 // 0x1d280
-void __cdecl Creature::AddChangedExtraPropertyId(unsigned short)
+#pragma comment(linker, "/INCLUDE:?AddChangedExtraPropertyId@Creature@@UEAAXG@Z")  // LIFT: dead-strip keep (no live caller yet)
+void __cdecl Creature::AddChangedExtraPropertyId(unsigned short fieldId)
 {
-    LIFT_STUB(0x1d280);
+    _changedExtraPropertyIdListSet.insert(fieldId);
 }
 
 // 0x1edbb0
+// LIFT: the object type is the high 16 bits of the id (types 1, 2, 3, 240 and 241 can be in a duel combat).
+// ❓ the 2019 body compares combat_side as unsigned (<= 2); the source form of that compare is open.
+#pragma comment(linker, "/INCLUDE:?IsCreatureInDuelCombat@Creature@@QEBA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
 bool __cdecl Creature::IsCreatureInDuelCombat(void) const
 {
-    LIFT_STUB(0x1edbb0);
+    unsigned __int64 const objectType = Id >> 48;
+    return (objectType == 1 || objectType == 2 || objectType == 3 || objectType == 240 || objectType == 241)
+        && static_cast<unsigned char>(lift_Prop_State_combat_side) <= 2;
 }
 
 // 0x1edbf0

@@ -16,7 +16,10 @@
 #include "npcsquad.h"
 #include "pc.h"
 #include "systemaction.h"
+#include "Log.h"
 #include "LiftStub.h"
+
+#define ZONE_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\Zone.cpp"
 
 // 0x228470
 char __cdecl Zone::GetMaxInstantHeartCount(int, char)
@@ -103,15 +106,27 @@ bool __cdecl Zone::ReturnToArenaLobby(::Pc *, unsigned __int64)
 }
 
 // 0x22e900
-::Env * __cdecl Zone::GetEnvWithGeoId(short) const
+#pragma comment(linker, "/INCLUDE:?GetEnvWithGeoId@Zone@@QEBAPEAVEnv@@F@Z")  // LIFT: dead-strip keep (no live caller yet)
+::Env * __cdecl Zone::GetEnvWithGeoId(short geoEnvObjId) const
 {
-    LIFT_STUB(0x22e900);
+    // LIFT: the env list has 256 slots (index 1 to 255 is valid).
+    if (geoEnvObjId > 0 && geoEnvObjId < 256)
+        return _envList[geoEnvObjId];
+
+    Log::Write(Log::LT_ERROR, ZONE_FILE, 2321, L"[zone], get evn, invalid geoEnvObjId(%d)", static_cast<int>(geoEnvObjId));
+    return NULL;
 }
 
 // 0x22e960
-::Env * __cdecl Zone::GetEnv(unsigned __int64) const
+#pragma comment(linker, "/INCLUDE:?GetEnv@Zone@@QEBAPEAVEnv@@_K@Z")  // LIFT: dead-strip keep (no live caller yet)
+::Env * __cdecl Zone::GetEnv(unsigned __int64 envId) const
 {
-    LIFT_STUB(0x22e960);
+    int const index = static_cast<int>(envId);
+    if (index > 0 && index < 256)
+        return _envList[index];
+
+    Log::Write(Log::LT_ERROR, ZONE_FILE, 2334, L"[zone], get evn, invalid index (%d)", index);
+    return NULL;
 }
 
 // 0x22e9b0
@@ -367,9 +382,22 @@ bool __cdecl Zone::CreateFieldItem(::Pc *, unsigned int, unsigned __int64)
 }
 
 // 0x234380
-::FieldItem * __cdecl Zone::GetFieldItem(unsigned __int64) const
+#pragma comment(linker, "/INCLUDE:?GetFieldItem@Zone@@QEBAPEAVFieldItem@@_K@Z")  // LIFT: dead-strip keep (no live caller yet)
+::FieldItem * __cdecl Zone::GetFieldItem(unsigned __int64 id) const
 {
-    LIFT_STUB(0x234380);
+    // LIFT: the 2019 body has an inlined index search of FieldItemList (no PDB name).
+    int index = -1;
+    for (int i = 0; i < fieldItemList->Count; ++i)
+    {
+        if (fieldItemList->FieldItems[i]->Id == id)
+        {
+            index = i;
+            break;
+        }
+    }
+    if (index < 0)
+        return NULL;
+    return fieldItemList->FieldItems[index];
 }
 
 // 0x2343d0
@@ -475,9 +503,22 @@ bool __cdecl Zone::CreateCampfireByZone(unsigned int, ::vector16)
 }
 
 // 0x236630
-::Campfire * __cdecl Zone::GetCampfire(unsigned __int64) const
+#pragma comment(linker, "/INCLUDE:?GetCampfire@Zone@@QEBAPEAVCampfire@@_K@Z")  // LIFT: dead-strip keep (no live caller yet)
+::Campfire * __cdecl Zone::GetCampfire(unsigned __int64 id) const
 {
-    LIFT_STUB(0x236630);
+    // LIFT: the 2019 body has an inlined index search of CampfireList (no PDB name).
+    int index = -1;
+    for (int i = 0; i < campfireList->Count; ++i)
+    {
+        if (campfireList->Campfires[i]->Id == id)
+        {
+            index = i;
+            break;
+        }
+    }
+    if (index < 0)
+        return NULL;
+    return campfireList->Campfires[index];
 }
 
 // 0x236680
