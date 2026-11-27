@@ -1,7 +1,14 @@
-// effectproperty_h.cpp: effectproperty.h (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
+// effectproperty_h.cpp: effectproperty.h (GameDaemon PDB, 2019 + PDB).
 #include "effectproperty.h"
 #include "propertysync.h"
 #include "LiftStub.h"
+
+// LIFT: keep the lifted virtual functions until the callers are lifted. Card lift-gamedaemon-gap-002-e2.
+#pragma comment(linker, "/INCLUDE:?Name@EffectProperty@@UEBAPEB_WXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?FieldMax@EffectProperty@@MEBAHXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?FieldDefine@EffectProperty@@MEBAPEBUDef@Field@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SyncMax@EffectProperty@@MEBAHXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SyncDefine@EffectProperty@@MEBAPEBUDef@SyncBuffer@@XZ")  // LIFT: dead-strip keep (no live caller yet)
 
 // 0x19860
 __cdecl EffectProperty::~EffectProperty(void)
@@ -12,29 +19,35 @@ __cdecl EffectProperty::~EffectProperty(void)
 // 0x19870
 wchar_t const * __cdecl EffectProperty::Name(void) const
 {
-    LIFT_STUB(0x19870);
+    return L"EffectProperty";
 }
 
 // 0x19880
 int __cdecl EffectProperty::FieldMax(void) const
 {
-    LIFT_STUB(0x19880);
+    return fieldMax;
 }
 
 // 0x19890
 ::Field::Def const * __cdecl EffectProperty::FieldDefine(void) const
 {
-    LIFT_STUB(0x19890);
+    return fieldDefine;
 }
 
 // 0x198a0
 int __cdecl EffectProperty::SyncMax(void) const
 {
-    LIFT_STUB(0x198a0);
+    return syncMax;
 }
 
 // 0x198b0
 ::SyncBuffer::Def const * __cdecl EffectProperty::SyncDefine(void) const
 {
-    LIFT_STUB(0x198b0);
+    return syncDefine;
 }
+
+// LIFT: definitions of the PDB static data members.
+int EffectProperty::fieldMax;
+::Field::Def const * EffectProperty::fieldDefine;
+int EffectProperty::syncMax;
+::SyncBuffer::Def const * EffectProperty::syncDefine;
