@@ -13,7 +13,11 @@ public:
     struct CloneOrderWithDbId {};
     struct DisposeOrder {};
     struct DisposeOrderForCostGroup {};
-    struct DisposeOrderWithPos {};
+    struct DisposeOrderWithPos  // PDB layout (size 0x4)
+    {
+        unsigned short pos;  // +0x0
+        short count;         // +0x2
+    };
     enum ItemTransitType {};
     struct SetItemInfo {};
 public:

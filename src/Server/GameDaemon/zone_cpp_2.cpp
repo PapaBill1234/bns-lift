@@ -7,7 +7,40 @@
 #include "pc.h"
 #include "tagmatchduelmanager.h"
 #include "zonebroadcast.h"
+#include "Log.h"
 #include "LiftStub.h"
+
+#pragma comment(linker, "/INCLUDE:?GetTickTime@Zone@@QEAA_JXZ")  // LIFT: dead-strip keep (no live caller yet)
+
+namespace
+{
+// LIFT: views of PDB classes that have no layout in the skeleton yet. Offsets are from the PDB.
+
+// LIFT: view of SerializerTimer (_currentTick at +0x40).
+struct SerializerTimerView
+{
+    char lift_pad_0[0x40];
+    long _currentTick;  // +64 (0x40)
+};
+
+// LIFT: view of ZoneSerializer (Serializer::_timer at +0x18).
+struct ZoneSerializerView
+{
+    char lift_pad_0[0x18];
+    SerializerTimerView *_timer;  // +24 (0x18)
+};
+
+// LIFT: view of Zone (GameObject::Id at +0x28, TimerInterval at +0x3F10, _zoneSerializer at +0x3F58).
+struct ZoneTickView
+{
+    char lift_pad_0[0x28];
+    unsigned __int64 Id;                    // +40 (0x28)
+    char lift_pad_1[0x3F10 - 0x30];
+    long TimerInterval;                     // +16144 (0x3F10)
+    char lift_pad_2[0x3F58 - 0x3F14];
+    ZoneSerializerView *_zoneSerializer;    // +16216 (0x3F58)
+};
+}  // namespace
 
 // 0x23b470
 bool __cdecl Zone::AddEnvObjectBroadcast(int, short const *const, ::Env *)
@@ -606,5 +639,11 @@ void __cdecl Zone::makeCubeChangedPropertyAction(::ZoneBroadcastCube *)
 // 0x24ae90
 __int64 __cdecl Zone::GetTickTime(void)
 {
-    LIFT_STUB(0x24ae90);
+    ZoneTickView const *self = reinterpret_cast<ZoneTickView const *>(this);
+    if (self->_zoneSerializer != nullptr)
+        return self->TimerInterval * self->_zoneSerializer->_timer->_currentTick;
+    Log::Write(Log::LT_ERROR,
+               L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\Zone.cpp", 9941,
+               L"[zone], GetTickTime() failed; crash serializer is null, zone:%p, id:%#I64x", this, self->Id);
+    return 0;
 }

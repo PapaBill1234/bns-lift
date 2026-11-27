@@ -1,7 +1,23 @@
 // worldserializedobject_cpp.cpp: worldserializedobject.cpp (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
 #include "worldserializedobject.h"
 #include "pc.h"
+#include "Log.h"
 #include "LiftStub.h"
+
+#pragma comment(linker, "/INCLUDE:?writeError@GuildCraftWSO@@IEAAXPEA_W@Z")  // LIFT: dead-strip keep (no live caller yet)
+
+namespace
+{
+// LIFT: view of GuildCraftWSO. The skeleton class has no members yet. Offsets are from the PDB.
+struct GuildCraftWSOView
+{
+    char lift_pad_0[0x70];
+    int _guildCraftOp;                  // +112 (0x70). LIFT: PDB type GuildCraftWSO::GuildCraftOp
+    unsigned __int64 _guildId;          // +120 (0x78)
+    unsigned __int64 _guildCraftId;     // +128 (0x80)
+    unsigned __int64 _requestorId;      // +136 (0x88)
+};
+}  // namespace
 
 // 0x676270
 __cdecl WorldSerializedObject::WorldSerializedObject(unsigned short)
@@ -154,9 +170,13 @@ void __cdecl GuildCraftWSO::TimerExpired(long)
 }
 
 // 0x67a7e0
-void __cdecl GuildCraftWSO::writeError(wchar_t *)
+void __cdecl GuildCraftWSO::writeError(wchar_t *desc)
 {
-    LIFT_STUB(0x67a7e0);
+    GuildCraftWSOView const *self = reinterpret_cast<GuildCraftWSOView const *>(this);
+    Log::Write(Log::LT_ERROR,
+               L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\WorldSerializedObject.cpp",
+               2309, L"[guild craft wso], %s, guildId:0x%I64X, op:%d, guildCraftId:0x%I64X, requestorId:0x%I64X", desc,
+               self->_guildId, self->_guildCraftOp, self->_guildCraftId, self->_requestorId);
 }
 
 // 0x67a840

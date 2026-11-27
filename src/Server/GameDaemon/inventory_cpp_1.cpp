@@ -3,7 +3,13 @@
 #include "item.h"
 #include "pc.h"
 #include "propertytran.h"
+#include "Log.h"
 #include "LiftStub.h"
+
+#pragma comment(linker, "/INCLUDE:?AddChange@InventoryCacheUpdate@@QEAAXPEBVItem@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?IsActivatedGemSlot@Inventory@@SA_NI@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetItemClass@Inventory@@SA?AW4ItemClass@@F@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?Dispose@Inventory@@QEAA_NGFW4ItemReason@@@Z")  // LIFT: dead-strip keep (no live caller yet)
 
 // 0x4be600
 __cdecl InventoryClientUpdate::InventoryClientUpdate(::Pc *, ::ItemReason)
@@ -38,7 +44,7 @@ __cdecl InventoryCacheUpdate::InventoryCacheUpdate(::Pc *, bool)
 // 0x4bea20
 void __cdecl InventoryCacheUpdate::AddChange(::Item const *)
 {
-    LIFT_STUB(0x4bea20);
+    // The 2019 build has an empty body.
 }
 
 // 0x4bea70
@@ -60,9 +66,11 @@ __int64 __cdecl MoneyLimit::GetMoneyLimitCase(::MoneyLimit::LIMIT_CASE)
 }
 
 // 0x4bec40
-bool __cdecl Inventory::IsActivatedGemSlot(unsigned int)
+bool __cdecl Inventory::IsActivatedGemSlot(unsigned int gemId)
 {
-    LIFT_STUB(0x4bec40);
+    // Gem id 0 and gem ids 65001 to 65011 are not an activated slot.
+    return gemId != 0 && gemId != 65001 && gemId != 65002 && gemId != 65003 && gemId != 65004 && gemId != 65005 &&
+           gemId != 65006 && gemId != 65007 && gemId != 65008 && gemId != 65009 && gemId != 65010 && gemId != 65011;
 }
 
 // 0x4becb0
@@ -180,9 +188,27 @@ void __cdecl Inventory::InvokeEquipEffect(void)
 }
 
 // 0x4c10d0
-::ItemClass __cdecl Inventory::GetItemClass(short)
+::ItemClass __cdecl Inventory::GetItemClass(short subtype)
 {
-    LIFT_STUB(0x4c10d0);
+    switch (subtype)
+    {
+    case 0:
+        return ITEMCLASS_WEAPON;
+    case 1:
+        return ITEMCLASS_COSTUME;
+    case 2:
+        return ITEMCLASS_GROCERY;
+    case 3:
+        return ITEMCLASS_GEM;
+    case 4:
+        return ITEMCLASS_ACCESSORY;
+    default:
+        break;
+    }
+    Log::Write(Log::LT_ERROR,
+               L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\Inventory.cpp", 1210,
+               L"[inventory], GetItemClass, invalid subtype %d", subtype);
+    return ITEMCLASS_NONE;
 }
 
 // 0x4c1150
@@ -390,9 +416,15 @@ bool __cdecl Inventory::Dispose(int, ::Inventory::DisposeOrderWithPos const *con
 }
 
 // 0x4cfcc0
-bool __cdecl Inventory::Dispose(unsigned short, short, ::ItemReason)
+bool __cdecl Inventory::Dispose(unsigned short pos, short count, ::ItemReason reason)
 {
-    LIFT_STUB(0x4cfcc0);
+    // ❓ The 2019 code sets the order count to 1 and passes the 32-bit register of count (r8d) as the reason.
+    // The source form is not known. This form differs by one instruction (movsx r9d, r8w for mov r9d, r8d).
+    (void)reason;
+    Inventory::DisposeOrderWithPos order;
+    order.pos = pos;
+    order.count = 1;
+    return Dispose(1, &order, static_cast<::ItemReason>(count), 0, L"");
 }
 
 // 0x4cfd00

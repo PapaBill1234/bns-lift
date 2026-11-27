@@ -2,7 +2,51 @@
 #include "effectcontent.h"
 #include "creature.h"
 #include "zone.h"
+#include "Log.h"
+#include "AlertSender.h"
 #include "LiftStub.h"
+
+#pragma comment(linker, "/INCLUDE:?checkApply@HpDamageEffect@@EEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?checkApply@InitializeRecycleGroupEffect@@EEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?checkApply@AdditionalHpEffect@@EEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?checkApply@DesireIncreaseEffect@@EEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?checkApply@DifficultyTypeDispelAttributeHpDamageEffect@@EEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?checkApply@ReturnSimSkillEffect@@EEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?checkApply@ModifyRecycleTimeEffect@@EEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?checkApply@SetImmuneBreakerEffect@@EEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+
+// Path literal of EffectContent.cpp in the GameDaemon build (lessons A6).
+#define EFFECTCONTENT_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\EffectContent.cpp"
+
+namespace
+{
+// LIFT: views of PDB classes. The effect classes of the skeleton have no Effect base yet. Offsets are from the PDB.
+
+// LIFT: view of GameObject (Id at +0x28). The high 16 bits of Id hold the object type.
+struct GameObjectView
+{
+    char lift_pad_0[0x28];
+    unsigned __int64 Id;  // +40 (0x28)
+};
+
+// LIFT: view of Effect (target at +0x20, casterId at +0x28).
+struct EffectView
+{
+    char lift_pad_0[0x20];
+    GameObjectView *target;     // +32 (0x20)
+    unsigned __int64 casterId;  // +40 (0x28)
+};
+
+inline EffectView const *liftEffect(void const *effect)  // LIFT: no PDB name (view cast)
+{
+    return static_cast<EffectView const *>(effect);
+}
+
+inline __int64 liftIdType(unsigned __int64 id)  // LIFT: no PDB name (inline HIWORD(Id))
+{
+    return static_cast<unsigned short>(id >> 48);
+}
+}  // namespace
 
 // 0x5b4b30
 bool __cdecl CommonPassiveEffect::checkApply(void)
@@ -139,7 +183,8 @@ void __cdecl HpHealAttackPowerEffect::apply(void)
 // 0x5b8250
 bool __cdecl HpDamageEffect::checkApply(void)
 {
-    LIFT_STUB(0x5b8250);
+    __int64 type = liftIdType(liftEffect(this)->target->Id);
+    return type == 1 || type == 2 || type == 4 || type == 240 || type == 241 || type == 32;
 }
 
 // 0x5b8290
@@ -241,7 +286,8 @@ bool __cdecl PartAttackEffect::Initialize4(::EffectSource, ::Zone *, unsigned __
 // 0x5bca00
 bool __cdecl InitializeRecycleGroupEffect::checkApply(void)
 {
-    LIFT_STUB(0x5bca00);
+    __int64 type = liftIdType(liftEffect(this)->target->Id);
+    return type == 1 || type == 2 || type == 3 || type == 240 || type == 241;
 }
 
 // 0x5bca40
@@ -307,7 +353,8 @@ void __cdecl ExtendLinkEffect::apply(void)
 // 0x5bf3e0
 bool __cdecl AdditionalHpEffect::checkApply(void)
 {
-    LIFT_STUB(0x5bf3e0);
+    __int64 type = liftIdType(liftEffect(this)->target->Id);
+    return type == 1 || type == 2 || type == 4 || type == 240 || type == 241;
 }
 
 // 0x5bf420
@@ -319,7 +366,10 @@ void __cdecl ExtendEffect::apply(void)
 // 0x5bf4d0
 bool __cdecl DesireIncreaseEffect::checkApply(void)
 {
-    LIFT_STUB(0x5bf4d0);
+    __int64 type = liftIdType(liftEffect(this)->target->Id);
+    if (type == 1 || type == 2 || type == 4 || type == 240 || type == 241)
+        return type == 4;
+    return false;
 }
 
 // 0x5bf510
@@ -337,7 +387,9 @@ void __cdecl SetMinHateEffect::apply(void)
 // 0x5bf850
 bool __cdecl DifficultyTypeDispelAttributeHpDamageEffect::checkApply(void)
 {
-    LIFT_STUB(0x5bf850);
+    EffectView const *self = liftEffect(this);
+    __int64 type = liftIdType(self->target->Id);
+    return (type == 1 || type == 2 || type == 4 || type == 240 || type == 241) && liftIdType(self->casterId) == 4;
 }
 
 // 0x5bf890
@@ -577,7 +629,8 @@ void __cdecl ReturnToBaseCampEffect::apply(void)
 // 0x5c5de0
 bool __cdecl ReturnSimSkillEffect::checkApply(void)
 {
-    LIFT_STUB(0x5c5de0);
+    __int64 type = liftIdType(liftEffect(this)->target->Id);
+    return type == 1 || type == 240;
 }
 
 // 0x5c5e00
@@ -595,7 +648,15 @@ void __cdecl InitializeRecycleGroupEffect::apply(void)
 // 0x5c6200
 bool __cdecl ModifyRecycleTimeEffect::checkApply(void)
 {
-    LIFT_STUB(0x5c6200);
+    GameObjectView const *target = liftEffect(this)->target;
+    if (target == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, EFFECTCONTENT_FILE, 5495, L"== CRASH == [effect], ModifyRecycleTimeEffect::checkApply; target is null");
+        AlertSender::Write(EFFECTCONTENT_FILE, 5495, L"== CRASH == [effect], ModifyRecycleTimeEffect::checkApply; target is null");
+        return false;
+    }
+    __int64 type = liftIdType(target->Id);
+    return type == 1 || type == 2 || type == 3 || type == 240 || type == 241;
 }
 
 // 0x5c6280
@@ -607,7 +668,7 @@ void __cdecl ModifyRecycleTimeEffect::apply(void)
 // 0x5c65d0
 bool __cdecl SetImmuneBreakerEffect::checkApply(void)
 {
-    LIFT_STUB(0x5c65d0);
+    return liftIdType(liftEffect(this)->target->Id) == 4;
 }
 
 // 0x5c65f0
