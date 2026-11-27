@@ -43,8 +43,8 @@ bool __cdecl DrParallelWorkerManager::SetWorkerInitFunc(void (__cdecl *func)(voi
 // 0x6feaf0
 int __cdecl DrParallelWorkerManager::Execute(void * args)
 {
-    // ❓ The original subtracts 1 from the BOOL result: 0 on success, -1 on failure.
-    return ::PostQueuedCompletionStatus(_iocpHandle, 0, (ULONG_PTR)args, NULL) - 1;
+    // 0 on success, -1 on failure.
+    return ::PostQueuedCompletionStatus(_iocpHandle, 0, (ULONG_PTR)args, NULL) ? 0 : -1;
 }
 
 // 0x6feb20

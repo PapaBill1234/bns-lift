@@ -2,7 +2,7 @@
 
 Source: GameDaemon 2019 + PDB. Round 2. The driver does the build, the gate and the MATCH comparison. This session did not run them.
 
-## Lifted (37)
+## Lifted (35)
 
 - md5: `md5_init` (0x6ff850).
 - deflog: `DrDefLog::Write` (0x6eb380).
@@ -14,10 +14,13 @@ Source: GameDaemon 2019 + PDB. Round 2. The driver does the build, the gate and 
 - questtableimpl_cpp: `QuestTableImpl::GetQuest` (0x6f86a0), `QuestTableImpl::QuestTableImpl` (0x6fa2f0).
 - aliasimpl_cpp: `DrAliasMapImpl::WriteToBuffer` (0x6f33a0), `Count` (0x6f3610), `DrAliasMapImpl` (0x6f6450).
 - parallelworker: `DrParallelWorkerManager::Init` (0x6fea70), `SetWorkerFunc` (0x6fead0), `SetWorkerInitFunc` (0x6feae0), `Execute` (0x6feaf0), `StartWorkerPool` (0x6fecb0).
-- datapacker: `ZipPackedReaderIO::GetFileSize` (0x16b60), `GetFileName` (0x16bd0), `Next` (0x16c40), `Close` (0x16c70).
+- datapacker: `ZipPackedReaderIO::Next` (0x16c40), `Close` (0x16c70).
 - datareaderimpl: `DrDataReaderImpl::~DrDataReaderImpl` (0x6eb470), `LoadTableMT_PreProcBinder::Execute` (0x6eba00), `LoadTableMT_PostProcBinder::Execute` (0x6eba40), `loadTableWorker` (0x6ebc90), `DrDataReaderImpl::DrDataReaderImpl` (0x6ebfb0), `LoadTableBinder::Execute` (0x6ec450).
 
-## Not done (1)
+## Not done (3)
+
+- `ZipPackedReaderIO::GetFileSize` (0x16b60). It needs the GameDaemon forms of AlertSender::writev2 / Log::Write (shared card s2). The `LIFT_STUB` stays. The `/INCLUDE` pragma is removed.
+- `ZipPackedReaderIO::GetFileName` (0x16bd0). It needs the GameDaemon forms of AlertSender::writev2 / Log::Write (shared card s2). The `LIFT_STUB` stays. The `/INCLUDE` pragma is removed.
 
 - `loadAliasWorker` (0x6eb9a0). The PDB gives no type for the argument block. The pseudocode shows only 2 of the 4 arguments of the `DrTable::LoadAlias` call. One look-up did not give the layout. The `LIFT_STUB` stays.
 
@@ -27,10 +30,11 @@ Source: GameDaemon 2019 + PDB. Round 2. The driver does the build, the gate and 
 - `DrDataReaderImpl::LoadFuncBinder` has slot 0 dtor and slot 1 `Execute`. The three binders do not derive from it yet.
 - `loadTableWorker` uses a local argument struct. The PDB has no name for it (`// LIFT:` note).
 - `ZipPackedReaderIO` does not derive from `XmlReaderIO` yet. The BloodLib `XmlReaderIO` declares `int` returns, not `ErrCode`. The members use the VS2010 `std` containers. They have the same layout as the PDB `StlAllocator<T, 2>` containers.
-- `ZipPackedReaderIO` log calls use the GameDaemon path literal of `DataPacker.cpp` behind a macro with an `#ifndef` default (lesson A6).
 - `ZipPackedReaderIO::Next` returns the raw values 3 and 0. The PDB has no enumerators for `XmlReaderIO::ErrCode` (`// ❓`).
 - `DrParallelWorkerManager::Init` returns true when `CreateIoCompletionPort` fails. This is the original logic (`// BUG:`).
-- `DrParallelWorkerManager::Execute` returns the BOOL result minus 1 (`// ❓`).
+- `DrParallelWorkerManager::Execute` returns `PostQueuedCompletionStatus(...) ? 0 : -1`. This gives the original `setne; lea` form.
+- `DrAutoKeyTable::Find` tests `key < elCount` first and returns the element. The null return is last, as in the original block order.
+- `DrMultiKeyElMap` declares its virtuals in the PDB slot order: `clearLink` 0, `construct` 1, `set` 2, `get` 3, `count` 4. The exe has no separate body for `clearLink` and `construct`. Thus they have empty inline bodies (`// ❓`). `DrMultiKeyTable::Find` now calls `get` through slot 3.
 - `DrAliasStringTable` has its PDB member offsets. The pointer types of `_elArray` and `_stringTable` are placeholders.
 - `DrEl` has its 3 PDB members (`type`, `subtype`, `size`; size 0x6).
 - `DrDataTableImpl` has its 3 PDB members (`_tabledef` +8, `_uselowmemory` +0x10, `_useLegacyElHeader` +0x11). Its own virtual destructor gives the vfptr at +0. The base `DrDataTable : DrTable` is not declared yet: `DrTable` has no defined members, so a base gives unresolved externals (`// LIFT:` note).

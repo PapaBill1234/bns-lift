@@ -19,12 +19,16 @@ public:
     // DrStlAllocator is not a full allocator yet. The VS2010 std::map with std::allocator has the same layout (size 0x20).
     typedef std::map<unsigned __int64, ::DrEl *> ElPtrMap;
 public:
+    // LIFT: virtual order follows the PDB vtable: clearLink 0, construct 1, set 2, get 3, count 4.
+    // ❓ The exe has no separate body for clearLink and construct. Empty inline bodies keep the slots.
+    virtual void __cdecl clearLink(void) {}
+    virtual void __cdecl construct(unsigned __int64) {}
+    virtual ::DrEl * __cdecl set(unsigned __int64, ::DrEl *, bool);  // 0x6fd0f0
+    virtual ::DrEl *const __cdecl get(unsigned __int64) const;  // 0x6fcd10
     virtual int __cdecl count(void);  // 0x6fb440
     void __cdecl reconstruct(void);  // 0x6fc130
     void __cdecl destroy(void);  // 0x6fc2e0
     __cdecl ~DrMultiKeyElMap(void);  // 0x6fc870
-    virtual ::DrEl *const __cdecl get(unsigned __int64) const;  // 0x6fcd10
-    virtual ::DrEl * __cdecl set(unsigned __int64, ::DrEl *, bool);  // 0x6fd0f0
 public:
     ElPtrMap elMap;
     bool reconstructed;

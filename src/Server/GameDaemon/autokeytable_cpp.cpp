@@ -45,9 +45,9 @@ void __cdecl DrAutoKeyTable::GetTableSummary(::DrTableSummary &)
 // 0x6fd790
 ::DrEl *const __cdecl DrAutoKeyTable::Find(unsigned __int64 key) const
 {
-    if (key >= _elMap.elCount)
-        return nullptr;
-    return _elMap.elArray[key];
+    if (key < _elMap.elCount)
+        return _elMap.elArray[key];
+    return nullptr;
 }
 
 // 0x6fd7b0
