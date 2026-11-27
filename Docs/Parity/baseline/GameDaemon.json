@@ -1,4 +1,95 @@
 {
+"AccountInventoryBoardGachaDrawByInstantPaymentTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
+"AccountInventoryBoardGachaDrawByItemTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
+"AccountInventoryBoardGachaParticipationCountPerSeasonTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
+"AccountInventoryBoardGachaParticipationInfoPerPcTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
+"AccountInventoryBoardGachaParticipationRewardStateTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
+"AccountInventoryBoardGachaTakeParticipationRewardTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
+"AccountInventoryGetGoodsCountTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"AccountInventoryJumpingCharacter2TicketTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"AccountInventoryListGoodsTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"AccountInventoryRetrieveWarehouseItemListTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"AccountInventoryRetrieveWarehouseLobbyServiceItemListTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"AccountInventoryTakeGoodsTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"AccountInventoryTakeWarehouseItemTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "AcquiredSkill1::Version": {
 "calls": 100,
 "consts": 100,
@@ -103,6 +194,13 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"AssentGuildCraftTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
 },
 "BIT_initDStream": {
 "calls": 100,
@@ -293,6 +391,20 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"ContractGuildCraftTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
+"ContractGuildUniformTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
 "CostumeProperty::FieldDefine": {
 "calls": 100,
 "consts": 100,
@@ -398,12 +510,40 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"DeleteGuildTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DeliverPostTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
 "DepositInGuildBankTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
 "refs": 0,
 "score": 66.7,
 "status": "DIFF"
+},
+"DepositInGuildBankTranEx::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
+"DetachPostAttachmentTran_IndetachFixed::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "DiscoveryArea::FieldDefine": {
 "calls": 100,
@@ -446,6 +586,27 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"DonateGuildCraftBrandMaterialTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
+"DonateGuildCraftNormalMaterialTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
+"DonateGuildUniformTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
 },
 "DrDataTableImpl::Setup": {
 "calls": 100,
@@ -811,6 +972,20 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"IncreaseUniformRegistrationQuotaTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
+"InstantPaymentTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
 "LeaveChallengePartyTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
@@ -854,6 +1029,27 @@
 "status": "MATCH"
 },
 "LogoutArenaTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"MakeGuildCraftTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
+"MakeGuildUniformTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
+"MarkExpressPostTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -1203,6 +1399,13 @@
 "score": 66.7,
 "status": "DIFF"
 },
+"PutOnGuildUniformTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
 "QuestList::FieldDefine": {
 "calls": 100,
 "consts": 100,
@@ -1434,6 +1637,20 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"RegisterGuildUniformTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
+"RegisterGuildUniformWithDeletionTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
 "RegisterPurchaseTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
@@ -1447,6 +1664,13 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"RenameGuildTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
 },
 "RestoreCharacterTran::GetDefinition": {
 "calls": 100,
@@ -1602,12 +1826,26 @@
 "score": 66.7,
 "status": "DIFF"
 },
+"TryRegisterGuildTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "UpdateBidTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"UpdateGuildLevelTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
 },
 "User::GetId": {
 "calls": 100,
