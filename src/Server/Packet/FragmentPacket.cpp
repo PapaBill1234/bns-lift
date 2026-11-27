@@ -3,6 +3,10 @@
 // PostOfficeDaemon has the same logic and the same log line numbers at 0x1000-0x17b0.
 #include "PacketUtil.h"
 
+// Memory.h placement operators (LobbyGate 0x1000): the out-of-line operator delete(void*, void*) is the EH
+// cleanup of the placement new in FragmentPacketConcatenater::Clone (PDB funclet Clone::`1'::dtor$0).
+#include "PlacementNew.h"
+
 #include <stdarg.h>
 #include <new>
 
@@ -327,11 +331,13 @@ unsigned long long FragmentPacketConcatenater::AllocSize() const
 // 0x2870
 PacketConcatenater* FragmentPacketConcatenater::Clone(void* buffer) const
 {
-    if (buffer != nullptr)
-        return ::new (buffer) FragmentPacketConcatenater();
-    Log::Write(Log::LT_ERROR, kFile, 273, L"== CRASH == [network], FragmentPacketConcatenater Clone() failed");
-    AlertSender::Write(kFile, 273, L"== CRASH == [network], FragmentPacketConcatenater Clone() failed");
-    return nullptr;
+    if (buffer == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, kFile, 273, L"== CRASH == [network], FragmentPacketConcatenater Clone() failed");
+        AlertSender::Write(kFile, 273, L"== CRASH == [network], FragmentPacketConcatenater Clone() failed");
+        return nullptr;
+    }
+    return ::new (buffer) FragmentPacketConcatenater();
 }
 
 // 0x2920

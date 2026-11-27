@@ -49,26 +49,18 @@ static_assert(offsetof(FragmentPacket, composer) == 0x50, "FragmentPacket::compo
 class FragmentPacketConcatenater : public PacketConcatenateBuffer
 {
 public:
-    // LIFT: The constructor is inlined (Clone 0x2870, __pump_fragment_packet 0x1bc0).
+    // LIFT: The constructor is inlined (Clone 0x2870, __pump_fragment_packet 0x1bc0). The original builds the base,
+    // then relayPacket (Packet::Packet(PacketSplitter*) store order), then sets Command and TotalSize.
     FragmentPacketConcatenater()
     {
-        buffer = nullptr;
-        size = 0;
-        gbuffer = nullptr;
-        gbufsize = 0;
-        decomposer.format = nullptr;
-        decomposer.len = 0;
-        decomposer.index = 0;
-        decomposer.offset = 0;
-        decomposer.top = -1;
-        Command = 0;
-        TotalSize = 0;
-        relayPacket.Splitter = nullptr;
-        relayPacket.IsFragmentPacket = false;
-        relayPacket.FragmentPacketCmd = 0;
         relayPacket.CurHeader = nullptr;
+        relayPacket.Splitter = nullptr;
         relayPacket.ListHead = nullptr;
         relayPacket.ListTail = nullptr;
+        relayPacket.IsFragmentPacket = false;
+        relayPacket.FragmentPacketCmd = 0;
+        Command = 0;
+        TotalSize = 0;
     }
     virtual ~FragmentPacketConcatenater();                       // 0x2510
     virtual void Clear();                                        // 0x2590

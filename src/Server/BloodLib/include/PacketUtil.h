@@ -6,6 +6,16 @@
 
 class PacketFormatIterator
 {
+protected:
+    // PDB: protected PacketFormatIterator(char const*, int), inlined. The SetFormat call gives the placement new in
+    // FragmentPacketConcatenater::Clone (LG 0x2870, POD 0x1700) its EH cleanup; with a null format LTCG removes the call.
+    PacketFormatIterator(char const* format, int start) : format(nullptr), len(0), index(0)
+    {
+        if (format != nullptr)
+            SetFormat(format, start);
+    }
+    PacketFormatIterator() {}  // LIFT: the lift composers and decomposers set the format after construction
+
 public:
     virtual void Reset() { index = 0; }  // slot 0 LIFT: no out-of-line copy in LobbyGate.exe
     virtual void SetFormat(char const* format, int start);  // slot 1
@@ -113,6 +123,10 @@ static_assert(offsetof(SendFragmentPacketConcatenater, _packet) == 0x8, "SendFra
 class PacketDecomposer : public PacketFormatIterator
 {
 public:
+    // PDB: PacketDecomposer(char const*, int, unsigned int), inlined.
+    PacketDecomposer(char const* format, int start, unsigned int offset) : PacketFormatIterator(format, start), offset(offset) {}
+    PacketDecomposer() {}  // LIFT: the lift handlers set the format after construction
+
     virtual void Reset()  // LIFT: no out-of-line copy in LobbyGate.exe
     {
         index = 0;
@@ -127,6 +141,13 @@ static_assert(offsetof(PacketDecomposer, offset) == 0x18, "PacketDecomposer::off
 class RepeatPacketDecomposer : public PacketDecomposer
 {
 public:
+    // PDB: RepeatPacketDecomposer(char const*, int, unsigned int), inlined.
+    RepeatPacketDecomposer(char const* format, int start, unsigned int offset)
+        : PacketDecomposer(format, start, offset), top(-1)
+    {
+    }
+    RepeatPacketDecomposer() {}  // LIFT: the lift handlers set the format after construction
+
     virtual void Reset();
 
     short PopRepeatCount();                                // PDB: short
@@ -159,6 +180,17 @@ public:
     bool Decompose(int n, ...);
     unsigned short Decompose(VarData* data);
 
+protected:
+    // PDB: PacketConcatenateBuffer(), inlined (LG 0x2870, POD 0x1700): the decomposer first, then the buffer fields.
+    PacketConcatenateBuffer() : decomposer(nullptr, 0, 0)
+    {
+        buffer = nullptr;
+        size = 0;
+        gbuffer = nullptr;
+        gbufsize = 0;
+    }
+
+public:
     char const* buffer;
     int size;
     char* gbuffer;
