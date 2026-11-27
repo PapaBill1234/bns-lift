@@ -14,7 +14,6 @@
 #pragma comment(linker, "/INCLUDE:?AvailableNextStep@BossChallengeAttractionState@@UEAA_NH_J@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?EnableInfiniteHyperEnergy@BossChallengeAttractionState@@UEBA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?DrainTendencyScores@TendencyFieldAttractionState@@QEAA_NPEAH@Z")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?IsPcSpawnWithSummoned@TendencyFieldAttractionState@@UEAA_NW4EnterReason@@F@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?EnableInfiniteHyperEnergy@TendencyFieldAttractionState@@UEBA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?DisableMoveToArena@TendencyFieldAttractionState@@UEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?DisableMoveToSkillTrainingRoom@TendencyFieldAttractionState@@UEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
@@ -391,11 +390,10 @@ void __cdecl TendencyFieldAttractionState::FetchInZoneAttractionState(::Fragment
 }
 
 // 0x4fa50
-bool __cdecl TendencyFieldAttractionState::IsPcSpawnWithSummoned(::EnterReason reason, short job)
+bool __cdecl TendencyFieldAttractionState::IsPcSpawnWithSummoned(::EnterReason, short)
 {
-    return GetGameType() == static_cast< ::GameType>(6)      // GAMETYPE_TENDENCY_FIELD_BUYUDO
-        && reason == static_cast< ::EnterReason>(2)          // ENTERREASON_REVIVE
-        && job == 6;                                          // ❓ no PDB enum name found for the job 6
+    // LIFT: needs the PDB vtable order (GetGameType is slot 3); the skeleton class has another order. See handoff e18.
+    LIFT_STUB(0x4fa50);
 }
 
 // 0x4fa90
@@ -443,11 +441,11 @@ bool __cdecl TendencyFieldAttractionState::CanChangeChannel(short, short &)
 // 0x50120
 bool __cdecl TendencyFieldAttractionState::EnableInfiniteHyperEnergy(void) const
 {
-    if (liftTendencyFieldView(this)->_targetType != 0)  // TENDENCYFIELDTARGETTYPE_UNKNOWN
+    if (liftTendencyFieldView(this)->_targetType == 0)  // TENDENCYFIELDTARGETTYPE_UNKNOWN; LIFT: form (jne to the read block)
     {
-        return liftTendencyRecord(liftTendencyFieldView(this)->_tendencyFieldRecord)->enable_infinite_hyper_energy;
+        return false;
     }
-    return false;
+    return liftTendencyRecord(liftTendencyFieldView(this)->_tendencyFieldRecord)->enable_infinite_hyper_energy;
 }
 
 // 0x50140

@@ -48,3 +48,13 @@ The driver builds REF and NOREF and records the gate result and the MATCH compar
 | `GameTranExpireToken::Set` | store order; its `Log::Write` call makes the GD log functions live (they are rejected until engine issue E16 is fixed) | Back to `LIFT_STUB`. The `/INCLUDE` pragma and the view structs are removed. |
 | `AttractionState::CanChangeChannel` | P2_cc (je vs jne) | `0 == channel` early-return form (VS2010 scratch compile: same bytes) |
 | `DuelAttractionState::GetGameType` | P2_cc (je vs jne) | null check first, call last (VS2010 scratch compile: same bytes) |
+
+## Lead repair 2
+
+| Function | Reject | Repair |
+| --- | --- | --- |
+| `RestorationAction::cancelAction` (3 arguments) | P1_calls: the 4-argument overload is at vtable +0xb0; the skeleton class has another virtual order | Back to `LIFT_STUB`; pragma removed |
+| `TendencyFieldAttractionState::IsPcSpawnWithSummoned` | P1_calls: `GetGameType` is PDB slot 3 (+0x18); the skeleton class has another virtual order | Back to `LIFT_STUB`; pragma removed. Lifted body for later: `return GetGameType() == 6 (GAMETYPE_TENDENCY_FIELD_BUYUDO) && reason == 2 (ENTERREASON_REVIVE) && job == 6;` |
+| `TendencyFieldAttractionState::EnableInfiniteHyperEnergy` | P2_cc (je vs jne) | `_targetType == 0` early-return form |
+
+A later card must put the virtuals of the attraction-state and action classes in PDB slot order (`tools/pdbcls.py`).
