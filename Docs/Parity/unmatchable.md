@@ -14,9 +14,9 @@ triage, the instruction diffs and the Not-done reports of the batch authors. No 
 | Exe | Open | A | B | C |
 | --- | ---: | ---: | ---: | ---: |
 | CG | 16 | 16 | 0 | 0 |
-| LG | 42 | 42 | 0 | 0 |
+| LG | 41 | 41 | 0 | 0 |
 | SCD | 20 | 20 | 0 | 0 |
-| POD | 29 | 29 | 0 | 0 |
+| POD | 28 | 28 | 0 | 0 |
 
 ## CacheGate (CG)
 
@@ -155,14 +155,6 @@ triage, the instruction diffs and the Not-done reports of the batch authors. No 
 - Tried: see the reason (lead note LobbyGate-25d0).
 - Earlier record: `lessons.md` lines 451, 507.
 
-### `0x2870` `FragmentPacketConcatenater::Clone` DIFF
-
-- Score: 93.3 (calls 100, refs 100, consts 80). Proof level: A.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 39 insns, lift 39 insns, 7 changed hunks; first divergence: `-mov qword ptr [rsp+N], 0xfffffffffffffffe` / `-jne L` / `+je L`.
-- Reason: `0x2870` FragmentPacketConcatenater::Clone (main 93.3; LG `0x2870` and POD `0x1700`, same code): BLOCKED, cause known. The original builds `relayPacket` through the PDB constructor `Packet::Packet(PacketSplitter*)`, so it sets the EH state -2 at insn 1 (consts 80). The lift `Packet` has no constructor (card v2b2-fpc handoff, rounds 1 and 2). The constructor comes with card pkt3 (lead clone branch v2b2-pkt3 2252cc7). pkt3 waits for the operator decision on engine issue E-R4-ratio (ENGINE-ISSUES.md, B-fpc-clone). Forms tried: (1) main form, (2) fpc author rounds 1 and 2 (no constructor: no gain), (3) pkt3 with the constructor (blocked by E-R4-ratio, not measured on main). Next step after pkt3 lands: `relayPacket(nullptr)` in the init list of the FragmentPacketConcatenater constructor, then one check. Level A (blocked).
-- Tried: see the reason (lead note LobbyGate-2870).
-- Earlier record: `lessons.md` lines 516.
-
 ### `0x37f0` `FragmentPacket::StartRepeat` DIFF
 
 - Score: 93.3 (calls 100, refs 100, consts 80). Proof level: A.
@@ -250,6 +242,7 @@ triage, the instruction diffs and the Not-done reports of the batch authors. No 
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 242 insns, lift 232 insns, 39 changed hunks; first divergence: `-push r14` / `-push r15` / `-mov s5, qword ptr [s2 + 0x68]`.
 - Reason: `HandleLobbyLobbyGate_CloseSessionNotify` 0x10440 and `HandleLobbyLobbyGate_KickNotify` 0x10660: the call to `LobbyGate::AddJobTimer`. Evidence: original `mov rdx, qword ptr [rax + 0x30]` / `mov rcx, qword ptr [LobbyGate::_instance]` / `mov r8b, 3`. Lift `mov rcx, qword ptr [rax + 0x30]` / `mov dl, 3`. The lift build drops the `this` argument of `AddJobTimer` (LTCG custom calling convention). The original keeps `this` in rcx. The same 2 callers exist in the original. The cause is not known. A source form was not tried in this round. Look at `LobbyGate::AddJobTimer` 0x12bf0 in the lift: it can be that LTCG sees that `this` is always `_instance`.
 - Tried: see the reason (v2b-lg-01a).
+- Update 2026-11-27 (S1 job): card pkt3 (S1 branch `s1-pkt3` 77c6f21: the PDB Packet constructor and the PDB signatures) gives funcdiff MATCH here and 0 lost functions. It cannot land: integrate refuses 2 review rejects in other exes (SCD `HandleSmartCoupon_GameEventByCharacterReq` precheck P2_cc, LD `AccountInventoryChannel::SendFinishWarehouseItemConsumptionReq` TSend stub arguments). See ENGINE-ISSUES.md E-P2-zero-cmp and E-TSend-stub-args. It waits for an operator decision. Level A (blocked).
 
 ### `0x11ee0` `HandleLobbyLobbyGate_GetEnterWorldTokenOk` DIFF
 
@@ -278,6 +271,7 @@ triage, the instruction diffs and the Not-done reports of the batch authors. No 
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 53 insns, lift 53 insns, 9 changed hunks; first divergence: `-mov rax, qword ptr [rcx + 0x748]` / `-movzx s0d, r8b` / `-mov s1, rdx`.
 - Reason: `0x12bf0` LobbyGate::AddJobTimer: the original keeps `this` (rcx), gateKey (rdx), reason (r8b). Both original callers (0x105d9, 0x109ee, LobbyDPacketHandler.obj, LTCG) pass `rcx = LobbyGate::_instance`. The lift LTCG build removes the `this` argument and loads `LobbyGate::_instance` in the callee (rcx = gateKey, dl = reason). The PDB type is the member `void LobbyGate::(unsigned __int64, char)`, not static, not virtual; no data reference to 0x12bf0 (only .pdata). Same cause as POD `PingGenerator::sendPing`/`checkCacheGateServiceState` (lessons.md section D, "LTCG `this` propagation"). Tried: none in source; the source form is the PDB form.
 - Tried: see the reason (lead note LobbyGate-12bf0).
+- Update 2026-11-27 (S1 job): card pkt3 (S1 branch `s1-pkt3` 77c6f21: the PDB Packet constructor and the PDB signatures) gives funcdiff MATCH here and 0 lost functions. It cannot land: integrate refuses 2 review rejects in other exes (SCD `HandleSmartCoupon_GameEventByCharacterReq` precheck P2_cc, LD `AccountInventoryChannel::SendFinishWarehouseItemConsumptionReq` TSend stub arguments). See ENGINE-ISSUES.md E-P2-zero-cmp and E-TSend-stub-args. It waits for an operator decision. Level A (blocked).
 
 ### `0x12e70` `LobbyGate::initialize` DIFF
 
@@ -497,6 +491,7 @@ triage, the instruction diffs and the Not-done reports of the batch authors. No 
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 612 insns, lift 678 insns, 96 changed hunks.
 - Reason: `HandleSmartCoupon_GameEventByCharacterReq` 0x8360 (99.1). The evidence gives no instruction lines. The hint (constant 0x7b in one register) is not enough to find a source form. No change.
 - Tried: see the reason (v2b-scd-01b).
+- Update 2026-11-27 (S1 job): card pkt3 (`s1-pkt3` 77c6f21) gives funcdiff MATCH (PDB signature of `SmartCouponDB::RegisterGameEventLog`: references, `bool const`). Review precheck P2_cc rejects it: the original `cmp bx, ax; jb` (bx = 0) and the build `test ax, ax; jne` have the same condition; the register choice has no source control. See ENGINE-ISSUES.md E-P2-zero-cmp. Level A (blocked).
 
 ### `0x8e80` `HandleSmartCoupon_GameEventByAccountReq` DIFF
 
@@ -635,14 +630,6 @@ triage, the instruction diffs and the Not-done reports of the batch authors. No 
 - Tried: see the reason (lead note PostOfficeDaemon-1460).
 - Earlier record: `lessons.md` lines 451, 507.
 
-### `0x1700` `FragmentPacketConcatenater::Clone` DIFF
-
-- Score: 93.3 (calls 100, refs 100, consts 80). Proof level: A.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 39 insns, lift 39 insns, 7 changed hunks; first divergence: `-mov qword ptr [rsp+N], 0xfffffffffffffffe` / `-jne L` / `+je L`.
-- Reason: `0x1700` FragmentPacketConcatenater::Clone (main 93.3; LG `0x2870` and POD `0x1700`, same code): BLOCKED, cause known. The original builds `relayPacket` through the PDB constructor `Packet::Packet(PacketSplitter*)`, so it sets the EH state -2 at insn 1 (consts 80). The lift `Packet` has no constructor (card v2b2-fpc handoff, rounds 1 and 2). The constructor comes with card pkt3 (lead clone branch v2b2-pkt3 2252cc7). pkt3 waits for the operator decision on engine issue E-R4-ratio (ENGINE-ISSUES.md, B-fpc-clone). Forms tried: (1) main form, (2) fpc author rounds 1 and 2 (no constructor: no gain), (3) pkt3 with the constructor (blocked by E-R4-ratio, not measured on main). Next step after pkt3 lands: `relayPacket(nullptr)` in the init list of the FragmentPacketConcatenater constructor, then one check. Level A (blocked).
-- Tried: see the reason (lead note PostOfficeDaemon-1700).
-- Earlier record: `lessons.md` lines 516.
-
 ### `0x4ed0` `PingGenerator::sendPing` DIFF
 
 - Score: 99.2 (calls 100, refs 98, consts 100). Proof level: A.
@@ -650,6 +637,7 @@ triage, the instruction diffs and the Not-done reports of the batch authors. No 
 - Reason: Stop list (lessons D): LTCG `this` propagation of `PostOfficeDaemon::_instance`. No new idea.
 - Tried: see the reason (v2b-pod-01).
 - Earlier record: `lessons.md` lines 506.
+- Update 2026-11-27 (S1 job): card pkt3 (S1 branch `s1-pkt3` 77c6f21: the PDB Packet constructor and the PDB signatures) gives funcdiff MATCH here and 0 lost functions. It cannot land: integrate refuses 2 review rejects in other exes (SCD `HandleSmartCoupon_GameEventByCharacterReq` precheck P2_cc, LD `AccountInventoryChannel::SendFinishWarehouseItemConsumptionReq` TSend stub arguments). See ENGINE-ISSUES.md E-P2-zero-cmp and E-TSend-stub-args. It waits for an operator decision. Level A (blocked).
 
 ### `0x71e0` `CacheGateChannel::SendFragmentRelayRequest` DIFF
 
@@ -703,6 +691,7 @@ triage, the instruction diffs and the Not-done reports of the batch authors. No 
 - Reason: Stop list (lessons D): LTCG `this` propagation. The original reads `[rcx+0x840]`; the lift reads `_instance`. No new idea.
 - Tried: see the reason (v2b-pod-01).
 - Earlier record: `lessons.md` lines 506.
+- Update 2026-11-27 (S1 job): card pkt3 (S1 branch `s1-pkt3` 77c6f21: the PDB Packet constructor and the PDB signatures) gives funcdiff MATCH here and 0 lost functions. It cannot land: integrate refuses 2 review rejects in other exes (SCD `HandleSmartCoupon_GameEventByCharacterReq` precheck P2_cc, LD `AccountInventoryChannel::SendFinishWarehouseItemConsumptionReq` TSend stub arguments). See ENGINE-ISSUES.md E-P2-zero-cmp and E-TSend-stub-args. It waits for an operator decision. Level A (blocked).
 
 ### `0x14e50` `PostOfficeDB::LoadPostList` DIFF
 
