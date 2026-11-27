@@ -629,6 +629,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Data::SlateScrollCache::~SlateScrollCache": {
+"calls": 100,
+"consts": 100,
+"refs": 50,
+"score": 83.3,
+"status": "DIFF"
+},
 "DeleteCharacterTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
@@ -1294,6 +1301,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"GameObjectIdManager::~GameObjectIdManager": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "GemProperty::FieldDefine": {
 "calls": 100,
 "consts": 100,
@@ -1427,6 +1441,13 @@
 "score": 66.7,
 "status": "DIFF"
 },
+"Json::FastWriter::~FastWriter": {
+"calls": 100,
+"consts": 100,
+"refs": 75,
+"score": 91.7,
+"status": "DIFF"
+},
 "LeaveChallengePartyTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
@@ -1461,6 +1482,13 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"LogArchive::isPingTimeExpired": {
+"calls": 100,
+"consts": 100,
+"refs": 75,
+"score": 91.7,
+"status": "DIFF"
 },
 "LogServerSessionHandler::~LogServerSessionHandler": {
 "calls": 100,
@@ -2064,6 +2092,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"RankingSeasonInfo::~RankingSeasonInfo": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "RecycleTimeProperty::FieldDefine": {
 "calls": 100,
 "consts": 100,
@@ -2358,6 +2393,20 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"StringBuilderW::AppendFormat": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"StringBuilderW::~StringBuilderW": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Summoned::GetAOEDefendPowerModify": {
 "calls": 100,
 "consts": 100,
@@ -2597,6 +2646,13 @@
 "status": "MATCH"
 },
 "SummonedProperty::SyncMax": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"SystemMultiEvent::~SystemMultiEvent": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
