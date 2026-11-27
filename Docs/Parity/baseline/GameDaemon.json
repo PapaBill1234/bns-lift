@@ -273,10 +273,10 @@
 "status": "MATCH"
 },
 "AlertSender::fini": {
-"calls": 86,
-"consts": 50,
-"refs": 50,
-"score": 61.9,
+"calls": 100,
+"consts": 67,
+"refs": 100,
+"score": 88.9,
 "status": "DIFF"
 },
 "AlertSender::run": {
@@ -3598,6 +3598,13 @@
 "status": "MATCH"
 },
 "atexit": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"destroy": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
