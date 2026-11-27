@@ -2,24 +2,17 @@
 
 ## Lifted
 
-All 30 `Summoned::Get*Modify` getters (RVA 0x455210 to 0x4553e0).
+All 30 `Summoned::Get...Modify` getters (RVA 0x455210 to 0x4553e0). Each reads one short from the level record at `_levelData` (+0x19F0).
 
-Each getter returns one `short` of `Data::SummonedLevelRecord`.
-The record pointer is `_levelData._record` at `Summoned` offset 0x19F0 (PDB).
-The PDB offsets of the fields are used (0x9A to 0xD8, 0x154 to 0x15C).
+## Round 6 change
 
-## Note
+No live caller keeps these virtual getters, so `/OPT:REF` removed them. Each getter now has a `/INCLUDE` pragma. The pragma uses the decorated name `?<Name>@Summoned@@UEAAFXZ`. Each pragma line has the `// LIFT: dead-strip keep (no live caller yet)` note. The bodies did not change.
 
-`Summoned` has no lifted layout in `summoned.h` (no base, no members).
-Rounds 2 to 4 failed or stayed stubs for that reason.
-This round reads `_levelData` through a file-local helper `levelDataShort` with the PDB offset.
-`// LIFT:` in the source marks it.
-No pad and no invented member is added to the header.
-When the `Summoned` layout is lifted, replace the helper with `_levelData._record->field`.
+The decorated names follow the form of the landed cards (`UEAA`). The driver build must confirm them. A wrong name makes the linker fail with an unresolved symbol.
 
 ## Not done
 
-`SummonedEntry::SummonedEntry` (RVA 0x96fb0, 0x97010) stay `LIFT_STUB`. They are not in this card.
+None.
 
 ## Files changed
 
