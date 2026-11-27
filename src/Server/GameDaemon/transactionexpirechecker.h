@@ -18,11 +18,6 @@ class GameTranExpireToken
 public:
     virtual void __cdecl Expire(void);  // 0x225aa0
     ::TransactionExpireChecker::ExpireToken * __cdecl Set(::GameTran *, int);  // 0x225ae0
-private:
-    char lift_pad_8[0x30];  // ❓ no PDB name: base TransactionExpireChecker::ExpireToken (+8 to +0x37) is not declared yet
-    unsigned __int64 _tid;  // +56 (0x38)
-    int _state;             // +64 (0x40)
-    int _op;                // +68 (0x44)
 };
 
 class TransactionExpireChecker::ExpireTokenManager

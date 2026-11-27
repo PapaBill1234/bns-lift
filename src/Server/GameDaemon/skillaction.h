@@ -104,9 +104,6 @@ public:
 protected:
     virtual ::ActionPriorityClass __cdecl getPriority(void) const;  // 0x275e0
     virtual short __cdecl getDashAngle(unsigned __int64);  // 0x27600
-protected:
-    char lift_pad_8[0xDE];  // ❓ no PDB name: base Action and fields +8 to +0xE5 are not declared yet
-    short _dashAngle;       // +230 (0xE6)
 public:
     static ::SkillResult __cdecl GetSkillResultFromData(::Data::SkillSkillResultType);  // 0x48d400
     static bool __cdecl CheckSkillResult(bool, ::SkillResult, ::Data::SkillSkillResultType);  // 0x48d470

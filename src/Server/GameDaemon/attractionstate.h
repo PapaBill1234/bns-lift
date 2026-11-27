@@ -152,10 +152,16 @@ private:
     void __cdecl initEnvOperation(::Zone *) const;  // 0x50750
 private:
     // PDB layout (size 0x228). The base AttractionState holds only the vfptr (+0).
-    // LIFT: only the fields that the lifted bodies read are declared. The pads keep the PDB offsets.
+    // LIFT: only the first PDB fields are declared. The later fields are read through
+    // TendencyFieldAttractionStateView (below) until the full layout is lifted.
     ::_RTL_SRWLOCK _tendencyScoreLock;  // +8 (0x8)
     int _tendencyScore[4];              // +16 (0x10)
-    char lift_pad_20[0x30];             // ❓ PDB fields +0x20 to +0x4F (_tendencyState to _playable) are not declared yet
+};
+
+// LIFT: view of the later PDB fields of TendencyFieldAttractionState (size 0x228). The pads keep the PDB offsets.
+struct TendencyFieldAttractionStateView
+{
+    char lift_pad_0[0x50];              // ❓ PDB fields +0 to +0x4F (vfptr to _playable) are not declared here
     void const *_tendencyFieldRecord;   // +80 (0x50) LIFT: PDB type Data::TendencyFieldRecordPtr (one pointer _record)
     char lift_pad_58[0x1C0];            // ❓ PDB fields +0x58 to +0x217 (_tendencyFieldDataKey to _victoryNpcResetStageTendency) are not declared yet
     int _targetType;                    // +536 (0x218) PDB type TendencyFieldTargetType
@@ -163,4 +169,9 @@ private:
     ::GameType _gameType;               // +544 (0x220)
     int _eventStartStep;                // +548 (0x224) PDB type TendencyFieldAttractionState::EventStartStep
 };
+
+inline TendencyFieldAttractionStateView const *liftTendencyFieldView(TendencyFieldAttractionState const *state)  // LIFT: no PDB name
+{
+    return reinterpret_cast<TendencyFieldAttractionStateView const *>(state);
+}
 

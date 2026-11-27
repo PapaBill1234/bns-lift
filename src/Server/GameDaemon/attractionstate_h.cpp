@@ -36,7 +36,7 @@ wchar_t const * __cdecl TendencyFieldAttractionState::GetTypeName(void)
 // 0x35ee0
 ::GameType const __cdecl TendencyFieldAttractionState::GetGameType(void) const
 {
-    return _gameType;
+    return liftTendencyFieldView(this)->_gameType;
 }
 
 // 0x35ef0

@@ -443,9 +443,9 @@ bool __cdecl TendencyFieldAttractionState::CanChangeChannel(short, short &)
 // 0x50120
 bool __cdecl TendencyFieldAttractionState::EnableInfiniteHyperEnergy(void) const
 {
-    if (_targetType != 0)  // TENDENCYFIELDTARGETTYPE_UNKNOWN
+    if (liftTendencyFieldView(this)->_targetType != 0)  // TENDENCYFIELDTARGETTYPE_UNKNOWN
     {
-        return liftTendencyRecord(_tendencyFieldRecord)->enable_infinite_hyper_energy;
+        return liftTendencyRecord(liftTendencyFieldView(this)->_tendencyFieldRecord)->enable_infinite_hyper_energy;
     }
     return false;
 }
@@ -459,31 +459,31 @@ bool __cdecl TendencyFieldAttractionState::CanManifestTendency(::Zone *) const
 // 0x501f0
 bool __cdecl TendencyFieldAttractionState::DisableMoveToArena(void)
 {
-    return liftTendencyRecord(_tendencyFieldRecord)->disable_move_to_arena;
+    return liftTendencyRecord(liftTendencyFieldView(this)->_tendencyFieldRecord)->disable_move_to_arena;
 }
 
 // 0x50200
 bool __cdecl TendencyFieldAttractionState::DisableMoveToSkillTrainingRoom(void)
 {
-    return liftTendencyRecord(_tendencyFieldRecord)->disable_move_to_skill_training_room;
+    return liftTendencyRecord(liftTendencyFieldView(this)->_tendencyFieldRecord)->disable_move_to_skill_training_room;
 }
 
 // 0x50210
 bool __cdecl TendencyFieldAttractionState::EnableChangeFactionCostume(void)
 {
-    return liftTendencyRecord(_tendencyFieldRecord)->enable_change_faction_costume;
+    return liftTendencyRecord(liftTendencyFieldView(this)->_tendencyFieldRecord)->enable_change_faction_costume;
 }
 
 // 0x50220
 bool __cdecl TendencyFieldAttractionState::EnableSetGuildMeetingPlace(void)
 {
-    return liftTendencyRecord(_tendencyFieldRecord)->enable_set_guild_meeting_place;
+    return liftTendencyRecord(liftTendencyFieldView(this)->_tendencyFieldRecord)->enable_set_guild_meeting_place;
 }
 
 // 0x50230
 bool __cdecl TendencyFieldAttractionState::EnableWarpToGuildMember(void)
 {
-    return liftTendencyRecord(_tendencyFieldRecord)->enable_warp_to_guild_member;
+    return liftTendencyRecord(liftTendencyFieldView(this)->_tendencyFieldRecord)->enable_warp_to_guild_member;
 }
 
 // 0x50240

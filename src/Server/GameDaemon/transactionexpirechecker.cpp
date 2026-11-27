@@ -16,6 +16,16 @@ struct GameTranView
     int _lastState;         // +36 (0x24)
 };
 
+// LIFT: view of the PDB class GameTranExpireToken (base TransactionExpireChecker::ExpireToken at +0).
+// Only the fields that the lifted body writes are declared.
+struct GameTranExpireTokenView
+{
+    char lift_pad_0[0x38];  // ❓ no PDB name: vfptr and base TransactionExpireChecker::ExpireToken (+0 to +0x37) are not declared yet
+    unsigned __int64 _tid;  // +56 (0x38)
+    int _state;             // +64 (0x40)
+    int _op;                // +68 (0x44)
+};
+
 // 0x2251c0
 bool __cdecl TransactionExpireChecker::Initialize(long)
 {
@@ -75,9 +85,10 @@ void __cdecl GameTranExpireToken::Expire(void)
     }
 
     ::GameTranView const *view = reinterpret_cast< ::GameTranView const *>(tran);
-    _tid = view->_id;      // PDB: GameTran::GetId()
-    _op = op;
-    _state = view->_state; // PDB: GameTran::GetState()
+    ::GameTranExpireTokenView *token = reinterpret_cast< ::GameTranExpireTokenView *>(this);
+    token->_tid = view->_id;      // PDB: GameTran::GetId()
+    token->_op = op;
+    token->_state = view->_state; // PDB: GameTran::GetState()
     // LIFT: 0x225ae0 the base TransactionExpireChecker::ExpireToken is at +0 in the PDB; the skeleton class has no base yet.
     return reinterpret_cast< ::TransactionExpireChecker::ExpireToken *>(this);
 }

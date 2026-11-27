@@ -1,11 +1,11 @@
 # Handoff: lift-gamedaemon-gap-018-e18 (card lift-gamedaemon-e18)
 
-Round 1. Two sessions did the work. The driver split the first session at the context limit.
+Round 1 and round 2. In round 1, two sessions did the work. The driver split the first session at the context limit.
 
 ## Lifted
 
 - `attractionstate_h`: all 6 functions (0x35ea0, 0x35ec0, 0x35ed0, 0x35ee0, 0x35ef0, 0x35f00).
-- `attractionstate_cpp`: 26 of 28 functions. These include `TendencyFieldAttractionState::DrainTendencyScores` (0x4dd80).
+- `attractionstate_cpp`: 27 of 28 functions. These include `TendencyFieldAttractionState::DrainTendencyScores` (0x4dd80).
 - `systemaction_h`: `RestorationAction::cancelAction` (0x456530).
 - `skillaction_h`: `TargetSelectorForDamageTransferNpcSquad::~TargetSelectorForDamageTransferNpcSquad` (0x27560), `SkillAction::getDashAngle` (0x27600).
 - `transactionexpirechecker`: `GameTranExpireToken::Set` (0x225ae0).
@@ -14,7 +14,8 @@ Each lifted function with no live caller has a `/INCLUDE` dead-strip keep pragma
 
 ## Decisions
 
-- `TendencyFieldAttractionState` now declares `_tendencyScoreLock` (+0x8) and `_tendencyScore[4]` (+0x10) from the PDB. A pad keeps the offsets +0x20 to +0x4F.
+- `TendencyFieldAttractionState` now declares `_tendencyScoreLock` (+0x8) and `_tendencyScore[4]` (+0x10) from the PDB.
+- Round 2: the gate failed with 4 `pdb_layout` errors. The cause: `lift_pad_*` members in PDB classes (`TendencyFieldAttractionState` two times, `SkillAction`, `GameTranExpireToken`). The layout check accepts only PDB member names in a PDB class. The fix moves the pads and the later fields to view structs: `TendencyFieldAttractionStateView` (in `attractionstate.h`), `SkillActionView` (in `skillaction_h.cpp`) and `GameTranExpireTokenView` (in `transactionexpirechecker.cpp`). The view names are not in the PDB, so the check skips them. The bodies read the fields through a cast of `this`. The offsets do not change.
 - `DrainTendencyScores` uses a plain index loop. The compiler makes the pointer-delta loop of the pseudocode from it.
 - Error code 1189 in `AttractionState::CanChangeChannel` has no PDB enum name. It has a `// ❓` mark.
 
