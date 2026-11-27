@@ -7,6 +7,7 @@ class AccountInventoryBoardGachaDrawByInstantPaymentTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x1c3150
+    static ::GameTranDef _def;
 private:
     virtual bool __cdecl work(int, void *);  // 0x1cede0
     bool __cdecl init(int, void *);  // 0x1cee80
@@ -20,6 +21,7 @@ class AccountInventoryBoardGachaDrawByItemTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x1c3140
+    static ::GameTranDef _def;
     __cdecl AccountInventoryBoardGachaDrawByItemTran(::User *);  // 0x1cc240
     virtual __cdecl ~AccountInventoryBoardGachaDrawByItemTran(void);  // 0x1cc340
 private:
@@ -48,6 +50,7 @@ class AccountInventoryBoardGachaParticipationCountPerSeasonTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x1c3120
+    static ::GameTranDef _def;
 private:
     virtual bool __cdecl work(int, void *);  // 0x1cb6f0
     bool __cdecl init(int, void *);  // 0x1cb790
@@ -61,6 +64,7 @@ class AccountInventoryBoardGachaParticipationInfoPerPcTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x1c3130
+    static ::GameTranDef _def;
 private:
     virtual bool __cdecl work(int, void *);  // 0x1cbc00
     bool __cdecl init(int, void *);  // 0x1cbca0
@@ -74,6 +78,7 @@ class AccountInventoryBoardGachaParticipationRewardStateTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x1c3160
+    static ::GameTranDef _def;
 private:
     virtual bool __cdecl work(int, void *);  // 0x1cf540
     bool __cdecl init(int, void *);  // 0x1cf5e0
@@ -87,6 +92,7 @@ class AccountInventoryBoardGachaTakeParticipationRewardTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x1c3170
+    static ::GameTranDef _def;
 private:
     virtual bool __cdecl work(int, void *);  // 0x1cfd40
     bool __cdecl init(int, void *);  // 0x1cfde0
@@ -101,6 +107,7 @@ class AccountInventoryGetGoodsCountTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x1c30b0
+    static ::GameTranDef _def;
 private:
     virtual bool __cdecl work(int, void *);  // 0x1c31e0
     bool __cdecl init(int, void *);  // 0x1c3270
@@ -114,6 +121,7 @@ class AccountInventoryJumpingCharacter2TicketTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x1c3110
+    static ::GameTranDef _def;
     __cdecl AccountInventoryJumpingCharacter2TicketTran(::User *);  // 0x1c83c0
     virtual __cdecl ~AccountInventoryJumpingCharacter2TicketTran(void);  // 0x1c8480
 private:
@@ -142,6 +150,7 @@ class AccountInventoryListGoodsTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x1c30c0
+    static ::GameTranDef _def;
 private:
     virtual bool __cdecl work(int, void *);  // 0x1c36d0
     bool __cdecl init(int, void *);  // 0x1c3760
@@ -155,6 +164,7 @@ class AccountInventoryRetrieveWarehouseItemListTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x1c30f0
+    static ::GameTranDef _def;
 private:
     virtual bool __cdecl work(int, void *);  // 0x1c5920
     bool __cdecl init(int, void *);  // 0x1c59b0
@@ -168,6 +178,7 @@ class AccountInventoryRetrieveWarehouseLobbyServiceItemListTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x1c30e0
+    static ::GameTranDef _def;
 private:
     virtual bool __cdecl work(int, void *);  // 0x1c5070
     bool __cdecl init(int, void *);  // 0x1c5100
@@ -181,6 +192,7 @@ class AccountInventoryTakeGoodsTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x1c30d0
+    static ::GameTranDef _def;
 private:
     virtual bool __cdecl work(int, void *);  // 0x1c42b0
     bool __cdecl init(int, void *);  // 0x1c4340
@@ -194,6 +206,7 @@ class AccountInventoryTakeWarehouseItemTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x1c3100
+    static ::GameTranDef _def;
 private:
     virtual bool __cdecl work(int, void *);  // 0x1c67e0
     bool __cdecl init(int, void *);  // 0x1c68c0

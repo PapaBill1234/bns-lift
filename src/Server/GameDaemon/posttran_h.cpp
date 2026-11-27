@@ -1,23 +1,24 @@
-// posttran_h.cpp: posttran.h (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
+// posttran_h.cpp: posttran.h (GameDaemon PDB, 2019 + PDB). The GetDefinition getters are lifted.
+// LIFT: the _def data is not lifted yet. The empty GameTranDef of the header stands in for the PDB data.
 #include "posttran.h"
 #include "LiftStub.h"
 
 // 0x1960e0
 ::GameTranDef const * __cdecl MarkExpressPostTran::GetDefinition(void) const
 {
-    LIFT_STUB(0x1960e0);
+    return &_def;
 }
 
 // 0x1960f0
 ::GameTranDef const * __cdecl DetachPostAttachmentTran_IndetachFixed::GetDefinition(void) const
 {
-    LIFT_STUB(0x1960f0);
+    return &_def;
 }
 
 // 0x196100
 ::GameTranDef const * __cdecl DeliverPostTran::GetDefinition(void) const
 {
-    LIFT_STUB(0x196100);
+    return &_def;
 }
 
 // 0x196130
@@ -25,3 +26,7 @@ __cdecl ResumeDeliverPostTranAfterUICTask::ResumeDeliverPostTranAfterUICTask(voi
 {
     LIFT_STUB(0x196130);
 }
+
+::GameTranDef MarkExpressPostTran::_def;
+::GameTranDef DetachPostAttachmentTran_IndetachFixed::_def;
+::GameTranDef DeliverPostTran::_def;

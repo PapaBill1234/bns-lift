@@ -9,6 +9,7 @@ public:
     enum CHECK_POST_ZS_RESULT_TYPE {};
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x196100
+    static ::GameTranDef _def;
 private:
     ::DeliverPostTran::CHECK_POST_ZS_RESULT_TYPE __cdecl checkAndPostForExecutingInZS(int, bool *);  // 0x1996c0
     virtual bool __cdecl work(int, void *);  // 0x199b40
@@ -45,6 +46,7 @@ class DetachPostAttachmentTran_IndetachFixed
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x1960f0
+    static ::GameTranDef _def;
 private:
     virtual bool __cdecl work(int, void *);  // 0x1987a0
     bool __cdecl detachReq(void);  // 0x1988a0
@@ -59,6 +61,7 @@ class MarkExpressPostTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x1960e0
+    static ::GameTranDef _def;
 private:
     virtual bool __cdecl work(int, void *);  // 0x197c10
     bool __cdecl charge(void);  // 0x197d50

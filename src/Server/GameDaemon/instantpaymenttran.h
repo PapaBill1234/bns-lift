@@ -19,6 +19,9 @@ public:
 
 class InstantPaymentDrawSlateNewStoneSubJob
 {
+public:
+    char _pad0[0x160];  // LIFT: the base layout is not lifted yet; _cashId is at 0x168 in the PDB
+    int _cashId;
 protected:
     virtual bool __cdecl tryInstantPaymentOkImpl(void *);  // 0x136950
     virtual void __cdecl sendFailPacket(short);  // 0x137390
@@ -29,6 +32,7 @@ class InstantPaymentJob
 {
 protected:
     virtual int __cdecl DataId(void);  // 0x1107d0
+    virtual int __cdecl DataId(short) = 0;  // LIFT: PDB vtable slot 14
 public:
     virtual bool __cdecl init(int, void *);  // 0x132850
     virtual bool __cdecl procBeforePurchase(int, void *);  // 0x1328f0
@@ -69,6 +73,7 @@ class InstantPaymentTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x1107c0
+    static ::GameTranDef _def;  // LIFT: PDB data InstantPaymentTran::_def
     virtual __cdecl ~InstantPaymentTran(void);  // 0x132640
 private:
     virtual bool __cdecl work(int, void *);  // 0x1326b0

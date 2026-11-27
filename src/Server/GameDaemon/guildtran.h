@@ -7,6 +7,7 @@ class AssentGuildCraftTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x1212b0
+    static ::GameTranDef _def;
 private:
     virtual bool __cdecl work(int, void *);  // 0x1279c0
     bool __cdecl init(int, void *);  // 0x127a40
@@ -19,6 +20,7 @@ class ContractGuildCraftTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x1212a0
+    static ::GameTranDef _def;
 private:
     virtual bool __cdecl work(int, void *);  // 0x126160
     bool __cdecl init(int, void *);  // 0x126240
@@ -31,6 +33,7 @@ class ContractGuildUniformTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x121300
+    static ::GameTranDef _def;
 private:
     virtual bool __cdecl work(int, void *);  // 0x12bc20
     bool __cdecl init(int, void *);  // 0x12bca0
@@ -43,6 +46,7 @@ class DeleteGuildTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x121280
+    static ::GameTranDef _def;
     __cdecl DeleteGuildTran(::User *);  // 0x124560
 private:
     virtual bool __cdecl work(int, void *);  // 0x1245d0
@@ -56,6 +60,7 @@ class DepositInGuildBankTranEx
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x121290
+    static ::GameTranDef _def;
     __cdecl DepositInGuildBankTranEx(::User *);  // 0x1251c0
 private:
     virtual bool __cdecl work(int, void *);  // 0x1252b0
@@ -68,6 +73,7 @@ class DonateGuildCraftBrandMaterialTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x1212e0
+    static ::GameTranDef _def;
     __cdecl DonateGuildCraftBrandMaterialTran(::User *);  // 0x12a330
 private:
     virtual bool __cdecl work(int, void *);  // 0x12a440
@@ -80,6 +86,7 @@ class DonateGuildCraftNormalMaterialTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x1212d0
+    static ::GameTranDef _def;
     __cdecl DonateGuildCraftNormalMaterialTran(::User *);  // 0x129490
 private:
     virtual bool __cdecl work(int, void *);  // 0x129590
@@ -92,6 +99,7 @@ class DonateGuildUniformTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x121310
+    static ::GameTranDef _def;
 private:
     virtual bool __cdecl work(int, void *);  // 0x12cd90
     bool __cdecl init(int, void *);  // 0x12cdf0
@@ -103,6 +111,7 @@ class IncreaseUniformRegistrationQuotaTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x121360
+    static ::GameTranDef _def;
 private:
     virtual bool __cdecl work(int, void *);  // 0x1300b0
     bool __cdecl init(int, void *);  // 0x130110
@@ -114,6 +123,7 @@ class MakeGuildCraftTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x1212c0
+    static ::GameTranDef _def;
     __cdecl MakeGuildCraftTran(::User *);  // 0x1285d0
 private:
     virtual bool __cdecl work(int, void *);  // 0x1286a0
@@ -127,6 +137,7 @@ class MakeGuildUniformTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x121320
+    static ::GameTranDef _def;
 private:
     virtual bool __cdecl work(int, void *);  // 0x12db80
     bool __cdecl init(int, void *);  // 0x12dc00
@@ -139,6 +150,7 @@ class PutOnGuildUniformTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x121340
+    static ::GameTranDef _def;
 private:
     virtual bool __cdecl work(int, void *);  // 0x12edc0
     bool __cdecl init(int, void *);  // 0x12ee40
@@ -151,6 +163,7 @@ class RegisterGuildUniformTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x121330
+    static ::GameTranDef _def;
 private:
     virtual bool __cdecl work(int, void *);  // 0x12e4a0
     bool __cdecl init(int, void *);  // 0x12e520
@@ -163,6 +176,7 @@ class RegisterGuildUniformWithDeletionTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x121350
+    static ::GameTranDef _def;
 private:
     virtual bool __cdecl work(int, void *);  // 0x12f710
     bool __cdecl init(int, void *);  // 0x12f790
@@ -175,6 +189,7 @@ class RenameGuildTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x121270
+    static ::GameTranDef _def;
     __cdecl RenameGuildTran(::User *);  // 0x122720
 private:
     virtual bool __cdecl work(int, void *);  // 0x122880
@@ -191,6 +206,7 @@ class TryRegisterGuildTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x121260
+    static ::GameTranDef _def;
     __cdecl TryRegisterGuildTran(::User *);  // 0x1219c0
 private:
     virtual bool __cdecl work(int, void *);  // 0x121a70
@@ -207,6 +223,7 @@ class UpdateGuildLevelTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x1212f0
+    static ::GameTranDef _def;
 private:
     virtual bool __cdecl work(int, void *);  // 0x12b230
     bool __cdecl init(int, void *);  // 0x12b2b0

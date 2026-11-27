@@ -1,4 +1,5 @@
-// instantpaymenttran_h.cpp: instantpaymenttran.h (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
+// instantpaymenttran_h.cpp: instantpaymenttran.h (GameDaemon PDB, 2019 + PDB). The getters and DataId leaves are lifted.
+// LIFT: the _def data is not lifted yet. The empty GameTranDef of the header stands in for the PDB data.
 #include "instantpaymenttran.h"
 #include "LiftStub.h"
 
@@ -11,19 +12,19 @@ __cdecl InstantPaymentTryBuyCollectionItemsParam::InstantPaymentTryBuyCollection
 // 0x1107c0
 ::GameTranDef const * __cdecl InstantPaymentTran::GetDefinition(void) const
 {
-    LIFT_STUB(0x1107c0);
+    return &_def;
 }
 
 // 0x1107d0
 int __cdecl InstantPaymentJob::DataId(void)
 {
-    LIFT_STUB(0x1107d0);
+    return DataId(0);
 }
 
 // 0x1ee480
 int __cdecl InstantPaymentDrawSlateNewStoneSubJob::DataId(short)
 {
-    LIFT_STUB(0x1ee480);
+    return _cashId;
 }
 
 // 0x350300
@@ -31,3 +32,5 @@ __cdecl InstantPaymentBuyCollectionItemsSubJob::InstantPaymentBuyCollectionItems
 {
     LIFT_STUB(0x350300);
 }
+
+::GameTranDef InstantPaymentTran::_def;
