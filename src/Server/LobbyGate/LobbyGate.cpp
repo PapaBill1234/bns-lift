@@ -223,6 +223,11 @@ void LobbyGate::AddJobTimer(unsigned long long gateKey, char reason)
         }
     }
 }
+// LIFT: 0x12bf0 the original keeps `this` in rcx (both callers pass LobbyGate::_instance). Without a taken address
+// LTCG drops `this`. The address in a selectany COMDAT constant keeps the member function convention.
+typedef void (LobbyGate::*LobbyGateAddJobTimerFn)(unsigned long long, char);
+extern LobbyGateAddJobTimerFn const LobbyGateAddJobTimerRef;
+__declspec(selectany) extern LobbyGateAddJobTimerFn const LobbyGateAddJobTimerRef = &LobbyGate::AddJobTimer;
 
 // 0x12cd0
 long LobbyGate::GetTimerInterval()

@@ -890,7 +890,10 @@ short ClientSessionHandler::SwitchCmdLobbyGateToLobbyDaemon(short lobbyGateCmd)
 // 0x6fa0
 bool ClientSessionTimerJob::HandleEvent(EventContext* context, unsigned long numOfBytes)
 {
-    if (_key != 0 && _timerReason > TR_NONE && _timerReason < TR_MAX)
+    // LIFT: 0x6fca (client.cpp:1145) the original has a second range test after the first one (1136).
+    // BUG: 0x6fa0 the second test can never be true (`&&` where `||` is meant). It has no effect; the first test holds.
+    if (_key != 0 && _timerReason > TR_NONE && _timerReason < TR_MAX &&
+        !(_timerReason < TR_KICK && _timerReason > TR_CLOSE))
     {
         GateKeyManager* gatekeyManager = LobbyGate::_instance->_gatekeyManager;
         if (gatekeyManager == nullptr)
@@ -912,7 +915,8 @@ bool ClientSessionTimerJob::HandleEvent(EventContext* context, unsigned long num
             {
                 // LIFT: 0x6fa0 keeps cliKey in a register and reads _instance->_clientManager again for RemoveClient.
                 long long const cliKey = entry->_cliKey;
-                Client* client = LobbyGate::_instance->_clientManager->AcquireClient(cliKey);
+                ClientManager* const clientManager = LobbyGate::_instance->_clientManager;
+                Client* client = clientManager->AcquireClient(cliKey);
                 if (client != nullptr)
                 {
                     Session* session = const_cast<Session*>(client->GetSession());

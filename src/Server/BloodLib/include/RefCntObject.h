@@ -50,7 +50,14 @@ class RefCntObject
 {
 public:
     // Inlined in Session::Session (0xdee0) and Port::Port: _ref = 1, _tag = 10, _history = nullptr.
-    RefCntObject() : _tag(10), _ref(1), _history(nullptr) {}
+    RefCntObject()
+    {
+        // LIFT: body stores, as in ReleaseEvent (DelayedRelease.cpp). The originals store _ref before _tag
+        // (LG 0x12bf0, SCD DelayedRelease).
+        _ref = 1;
+        _tag = 10;
+        _history = nullptr;
+    }
     virtual ~RefCntObject();                                                   // slot 0
 private:
     virtual void deallocate_object(wchar_t const* file, int line);             // slot 1

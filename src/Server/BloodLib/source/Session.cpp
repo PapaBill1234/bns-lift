@@ -482,6 +482,13 @@ void Session::Close(bool graceful)
     if (removed)
         _port->RemoveSession(this);
 }
+#if defined(LIFT_EXE_LG)
+// LIFT: LG ClientSessionTimerJob::HandleEvent 0x6fa0 passes edx = 0 to Session::Close at both call sites. Without a
+// taken address LTCG drops the constant argument. The address in a selectany COMDAT constant keeps the argument.
+typedef void (Session::*SessionCloseFn)(bool);
+extern SessionCloseFn const SessionCloseRef;
+__declspec(selectany) extern SessionCloseFn const SessionCloseRef = &Session::Close;
+#endif
 
 // 0xEE90
 bool Session::close(bool force)
