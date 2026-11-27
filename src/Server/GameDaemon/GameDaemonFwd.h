@@ -259,7 +259,13 @@ class Campfire;
 class CampfireIdManager;
 class CampfireList;
 enum CampfireType {};
-enum CancelActionReason {};
+enum CancelActionReason
+{
+    CANCELACTIONREASON_USER_REQUEST = 0,
+    CANCELACTIONREASON_MOVE = 1,
+    CANCELACTIONREASON_OVERRIDE_SKILL = 2,
+    CANCELACTIONREASON_ATTACKED = 3,
+};
 enum CancelTime {};
 class CancelTradeTask;
 class CaptureTheFlag;

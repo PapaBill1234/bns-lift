@@ -10,6 +10,11 @@
 #include "zone.h"
 #include "LiftStub.h"
 
+#pragma comment(linker, "/INCLUDE:?availableCancel@RepairWithCampfireAction@@EEAA_NW4CancelActionReason@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?availableCancel@PickupAction@@EEAA_NW4CancelActionReason@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?availableCancel@PickupDeadBodyAction@@EEAA_NW4CancelActionReason@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?availableCancel@PutdownFieldItemAction@@EEAA_NW4CancelActionReason@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+
 // 0x51e390
 void __cdecl DeleteWeaponGemSlotTask::start(void)
 {
@@ -65,9 +70,9 @@ void __cdecl RepairWithCampfireAction::cancelAction(::Action::CancelReason, wcha
 }
 
 // 0x51fa50
-bool __cdecl RepairWithCampfireAction::availableCancel(::CancelActionReason)
+bool __cdecl RepairWithCampfireAction::availableCancel(::CancelActionReason reason)
 {
-    LIFT_STUB(0x51fa50);
+    return reason == CANCELACTIONREASON_USER_REQUEST || reason == CANCELACTIONREASON_MOVE || reason == CANCELACTIONREASON_ATTACKED;
 }
 
 // 0x51fa70
@@ -419,9 +424,9 @@ void __cdecl PickupAction::sendOpenItemPouchOk(::Pc *, ::ItemPouch *)
 }
 
 // 0x52c230
-bool __cdecl PickupAction::availableCancel(::CancelActionReason)
+bool __cdecl PickupAction::availableCancel(::CancelActionReason reason)
 {
-    LIFT_STUB(0x52c230);
+    return reason == CANCELACTIONREASON_MOVE || reason == CANCELACTIONREASON_ATTACKED;
 }
 
 // 0x52c240
@@ -533,9 +538,9 @@ void __cdecl PickupFieldItemAction::failAction(::Action::FailReason)
 }
 
 // 0x52e720
-bool __cdecl PickupDeadBodyAction::availableCancel(::CancelActionReason)
+bool __cdecl PickupDeadBodyAction::availableCancel(::CancelActionReason reason)
 {
-    LIFT_STUB(0x52e720);
+    return reason == CANCELACTIONREASON_USER_REQUEST;
 }
 
 // 0x52e730
@@ -563,9 +568,9 @@ void __cdecl PutdownFieldItemAction::failAction(::Action::FailReason)
 }
 
 // 0x52ed00
-bool __cdecl PutdownFieldItemAction::availableCancel(::CancelActionReason)
+bool __cdecl PutdownFieldItemAction::availableCancel(::CancelActionReason reason)
 {
-    LIFT_STUB(0x52ed00);
+    return reason == CANCELACTIONREASON_USER_REQUEST || reason == CANCELACTIONREASON_MOVE;
 }
 
 // 0x52ed10
