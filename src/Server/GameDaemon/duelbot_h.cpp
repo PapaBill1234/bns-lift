@@ -44,6 +44,11 @@
 #pragma comment(linker, "/INCLUDE:?GetAbnormalDefendPowerModify@DuelBot@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?GetHatePowerModify@DuelBot@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
 
+// LIFT: DuelBot has no member list yet (the base DuelBotCreature is not lifted). The two PDB members that these
+// functions read are mapped by offset: _abilityData at +0x1868 and _skillResultContext at +0x1880.
+#define _abilityData (*(DuelBotAbilityPtrView *)((char *)this + 0x1868))
+#define _skillResultContext (*(DuelBotSkillResultContext *)((char *)this + 0x1880))
+
 // 0x97240
 void __cdecl DuelBot::ClearLastComboSkillValue(void)
 {

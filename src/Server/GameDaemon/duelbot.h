@@ -3,9 +3,9 @@
 #pragma once
 #include "GameDaemonFwd.h"
 
-// LIFT: local PDB layout of the 0x118 byte record Data::DuelBotAbilityRecord (the header DrEl + key + base fields are opaque).
-namespace Data {
-class DuelBotAbilityRecord
+// LIFT: local view of the 0x118 byte record Data::DuelBotAbilityRecord (the header DrEl + key + base fields are opaque).
+// The name differs from the PDB class on purpose: the view is partial, so pdb_layout must not compare it.
+class DuelBotAbilityRecordView
 {
 public:
     char _lift_head[0xBE];  // 0x0: DrEl, key, alias, max_hp ... abnormal_defend_base_percent
@@ -35,12 +35,11 @@ public:
     short defend_counter_reduce_modify;  // 0xEC
 };
 
-class DuelBotAbilityRecordPtr
+class DuelBotAbilityPtrView
 {
 public:
-    DuelBotAbilityRecord *_record;  // 0x0 (PDB: DrRecordPtr::_record, DrEl *)
+    DuelBotAbilityRecordView *_record;  // 0x0 (PDB: DrRecordPtr::_record, DrEl *)
 };
-}  // namespace Data
 
 // LIFT: PDB class SkillResultContext (size 0xB0). The vptr is a plain slot: the class is never constructed here.
 struct DuelBotSkillResultContext
@@ -129,13 +128,6 @@ public:
     virtual void __cdecl OnCombatEnd(void);  // 0x9e6b0
     void __cdecl SetActiveDuelBotSummoned(::DuelBotSummoned *);  // 0x9e7c0
     void __cdecl ClearDuelBotSummoned(void);  // 0x5ea260
-
-    // LIFT: PDB layout (size 0x1938). The base DuelBotCreature/Creature layout is not lifted yet, so it is opaque.
-    char _lift_baseStorage[0x1868 - sizeof(void *)];  // vptr, DuelBotCreature, _recycleTimeManager ... _data (to 0x1868)
-    Data::DuelBotAbilityRecordPtr _abilityData;  // 0x1868
-    char _lift_equippedAndTrained[0x10];  // 0x1870: _equippedItemData, _trainedSkillData
-    DuelBotSkillResultContext _skillResultContext;  // 0x1880
-    ::DuelBotSummoned *duelBotSummoned;  // 0x1930
 };
 
 class DuelBotCreature
