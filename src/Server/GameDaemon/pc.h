@@ -14,7 +14,7 @@ public:
     void __cdecl CancelToTake(void);  // 0x5d4f80
 };
 
-class Pc
+class Pc : private ::LiftBytes<0x4e30 - 8>  // LIFT: PDB bases and members +8 to +0x4E2F are not declared yet
 {
 public:
     enum AccountExpReason {};
@@ -574,12 +574,12 @@ public:
     void __cdecl RefreshSkillInfo(bool);  // 0x60f8f0
     void __cdecl ActivateSlateAbilities(::EnterReason);  // 0x60f960
 private:
-    // LIFT: Pc has only part of its PDB members yet (size 0x95A8). The gaps hold the bases and the other members.
-    char lift_pad_8[0x4e30 - 8];
+    // LIFT: Pc has only part of its PDB members yet (size 0x95A8). The LiftBytes base holds the PDB bases and
+    // the members from +8 to +0x4E2F. A char array with the PDB name of the first member holds each other gap.
     bool _exceptHate;  // +0x4E30
-    char lift_pad_4e31[0x8cc8 - 0x4e31];
+    char _combatModeType[0x8cc8 - 0x4e34];  // +0x4E34 (LIFT: PDB members _combatModeType to before _skillResultContext, not declared yet)
     ::SkillResultContext _skillResultContext;  // +0x8CC8
-    char lift_pad_8d78[0x95a8 - 0x8d78];
+    char _inviteMentoringContext[0x95a8 - 0x8d78];  // +0x8D78 (LIFT: PDB members _inviteMentoringContext to the end, not declared yet)
 };
 
 struct PcInfoForGameLog

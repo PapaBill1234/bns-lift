@@ -64,8 +64,8 @@ struct GeoDataTerrain
     __int64 _size;  // +0
     int id;  // +8
     ::geo_box16 boundary;  // +12
-    // LIFT: PDB members from sector_xmin (+24) to volumeCellOffsets (+104) are not declared yet. Size 0x70.
-    char lift_pad_18[0x70 - 0x18];
+    // LIFT: PDB members from sector_xmin (+24) to volumeCellOffsets (+104) are not declared yet (PDB size 0x70).
+    // The lift reads this struct only through a pointer, so the short size has no effect.
 };
 
 class GeoRegion
@@ -103,7 +103,7 @@ private:
     ::GeoRegion const * __cdecl getRegion(unsigned int) const;  // 0xdabe0
 };
 
-class GeoZone
+class GeoZone : private ::LiftBytes<0x1b0>  // LIFT: PDB members from zoneData (+0) to _eventStageCount (+424) are not declared yet
 {
 public:
     bool __cdecl FindCell(short, short, short, ::GeoCell &) const;  // 0x1d1c0
@@ -140,8 +140,6 @@ public:
     int X_TO_CELL_X(short x) const { return terrain->X_TO_CELL_X(x); }
     int Y_TO_CELL_Y(short y) const { return terrain->Y_TO_CELL_Y(y); }
 private:
-    // LIFT: PDB members from zoneData (+0) to _eventStageCount (+424) are not declared yet.
-    char lift_pad_0[0x1b0];
     ::GeoTerrain const *terrain;  // +432
     ::GeoRegion const *region;  // +440
 };

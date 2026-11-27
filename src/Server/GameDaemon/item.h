@@ -183,7 +183,7 @@ class WeaponTrait;
 // The base Property (+0 to +47) is not declared yet.
 struct ItemBaseAccessoryPropertyView
 {
-    char lift_pad_0[0x30];
+    char lift_pad_0[0x30];  // ❓ no PDB name: base Property (+0 to +0x2F) is not declared yet
     struct
     {
         char depot;  // +0
@@ -201,7 +201,7 @@ struct ItemBaseAccessoryPropertyView
 // Only the members of the lifted bodies are declared. The Item members (+8 to +39) are not declared yet.
 // LIFT: the PDB member prop has the type <Trait>Property. Only the AccessoryProperty layout is declared.
 template <class Trait>
-class ItemBase : public ::Item
+class ItemBase : public ::Item, private ::LiftBytes<0x28 - 8>  // LIFT: the Item members (+8 to +0x27) are not declared yet
 {
 public:
     virtual int __cdecl GetDataId(void) const;
@@ -211,7 +211,6 @@ public:
     virtual unsigned short __cdecl GetPos(void) const;
     virtual bool __cdecl GetSequestration(void) const;
 protected:
-    char lift_pad_8[0x28 - 8];
     void *data;  // +40 (PDB: Data::ItemRecord<Trait>Ptr)
     ::ItemBaseAccessoryPropertyView prop;  // +48 (PDB: <Trait>Property)
 };

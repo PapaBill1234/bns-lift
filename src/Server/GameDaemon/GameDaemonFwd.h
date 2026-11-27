@@ -10,6 +10,15 @@
 #include <vector>
 #include <map>
 #include <utility>
+
+// LIFT: build helper, no PDB type. ❓ It holds the bytes of the PDB bases and members that a partial
+// class layout does not declare yet. A class uses it as a private base, so the declared members keep
+// their PDB offsets and each declared member has its PDB name.
+template <int N>
+struct LiftBytes
+{
+    char lift_bytes[N];  // ❓ no PDB name
+};
 #include "../../External/BannedWordFilter/BannedWordFilterLib.h"
 #include "../../Security/source/BloodCrypto/crypto/Crypto.h"
 #include "../../Security/source/BloodCrypto/crypto/aes128.h"
@@ -2141,12 +2150,11 @@ struct SeasonContentsSchedule {};
 struct SeasonContentsSyncData {};
 struct SelectedRewardItemIndexInfo {};
 struct ServerPing {};
-// LIFT: PDB class SkillResultContext (size 0xB0). The vptr is a plain slot: the ctor and dtor are not lifted yet.
+// LIFT: PDB class SkillResultContext (size 0xB0). The vfptr (+0) is a LiftBytes<8> base: the ctor and dtor are not lifted yet.
 // The PDB members are private. They are public here because the inline accessors are not declared yet.
-class SkillResultContext
+class SkillResultContext : private ::LiftBytes<8>
 {
 public:
-    void *lift_vfptr;  // +0
     unsigned int _lastComboSkill;  // +8
     __int64 _lastComboSkillFireLimitTime;  // +16
     __int64 _lastComboSkillExecFirstLimitTime;  // +24

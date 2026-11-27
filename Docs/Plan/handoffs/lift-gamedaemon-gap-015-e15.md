@@ -26,6 +26,16 @@ Round 1. Two sessions did the work. The driver builds, gates and does the parity
 - `ZoneTriggerNpcKilledEvent2::GetData` (0x6761d0): same cause. The member `_data` is at +24.
 - `Pc::GetGuildCombatRewardDataId` (0x97130): the pseudocode writes the result through the second argument register. The PDB signature has `char` in that place. The signature question is open. The body also needs the `Pc` members `_guildCombatInfoLock` and `_guildCombatResult` and the lock idiom. These are not declared.
 
+## Round 2: pdb_layout fix
+
+- Round 1 failed the gate: `pdb_layout` found 9 errors. Each error was a padding member (`lift_pad_*`, `lift_vfptr`) with no PDB name.
+- Round 2 adds the build helper `LiftBytes<N>` in `GameDaemonFwd.h`. A partial class uses it as a private base. The base holds the bytes of the undeclared PDB bases and members. The declared members keep their PDB offsets.
+- `Pc`, `Env`, `GeoZone`, `ZoneSerializedObject`, `SkillResultContext` and `ItemBase<Trait>` now use a `LiftBytes` base.
+- `Env` declares the real PDB members from `_geoEnvObj` (+72) to `_exceptLootCaseBitmap` (+124).
+- `Pc` holds its two inner gaps in char arrays with the PDB names `_combatModeType` (+0x4E34) and `_inviteMentoringContext` (+0x8D78). Later cards must split these arrays into the real members.
+- `GeoDataTerrain` has no tail padding now. The lift reads it only through a pointer.
+- The resym message about `GameFailReason` is a resym limit. It is not a layout error.
+
 ## Files changed
 
 - `src/Server/GameDaemon/GameDaemonFwd.h`

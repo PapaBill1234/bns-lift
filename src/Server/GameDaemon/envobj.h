@@ -45,13 +45,13 @@ protected:
 // Only the fields that the lifted bodies read are declared.
 struct EnvZoneEnv2RecordView
 {
-    char lift_pad_0[0x68];
+    char lift_pad_0[0x68];  // ❓ no PDB name: fields +0 to +0x67 are not declared yet
     long manipulate_duration;  // +104 (0x68)
 };
 
 struct EnvZoneEnv2PlaceRecordView
 {
-    char lift_pad_0[0x38];
+    char lift_pad_0[0x38];  // ❓ no PDB name: fields +0 to +0x37 are not declared yet
     short action_radius;  // +56 (0x38)
 };
 
@@ -67,7 +67,7 @@ public:
     ::EnvZoneEnv2PlaceRecordView *_record;  // 0x0 (PDB: DrRecordPtr::_record, DrEl *)
 };
 
-class Env
+class Env : private ::LiftBytes<0x30 - 8>  // LIFT: base GameObject (+8 to +0x2F) is not declared yet
 {
 public:
     virtual short __cdecl GetActionRadius(void);  // 0x4553f0
@@ -123,12 +123,22 @@ protected:
 public:
     void __cdecl SetGuildBattleFieldGateEnableOnly(bool);  // 0x59a6a0
 protected:
-    // LIFT: base GameObject and the PDB members from _geoEnvObj (+72) to _exceptLootCaseBitmap (+124) are not declared yet.
-    char lift_pad_8[0x30 - 8];
+    // LIFT: the members of base GameObject (+8 to +0x2F) are in the LiftBytes base.
     ::EnvZoneEnv2PtrView _env2;  // +48 (PDB: Data::ZoneEnv2RecordPtr)
     void *_env2spawn;  // +56 (PDB: Data::ZoneEnv2SpawnRecordPtr)
     ::EnvZoneEnv2PlacePtrView _env2place;  // +64 (PDB: Data::ZoneEnv2PlaceRecordPtr)
-    char lift_pad_48[0x80 - 0x48];
+    ::GeoEnvObj const *_geoEnvObj;  // +72
+    void const *_script;  // +80 (PDB: Data::ObjectScript const *)
+    char _state;  // +88
+    int _hp;  // +92
+    unsigned __int64 _sessionPc;  // +96
+    unsigned __int64 _autorizedPc;  // +104
+    ::Zone *_zone;  // +112
+    bool _enable;  // +120
+    bool _initEnable;  // +121
+    bool _empty;  // +122
+    bool _alreadyDropFieldItem;  // +123
+    char _exceptLootCaseBitmap;  // +124
     unsigned __int64 _ownerId;  // +128
 };
 

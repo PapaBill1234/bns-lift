@@ -3,7 +3,7 @@
 #pragma once
 #include "GameDaemonFwd.h"
 
-class ZoneSerializedObject
+class ZoneSerializedObject : private ::LiftBytes<0x70 - 8>  // LIFT: the members of base SerializedObject (+8 to +0x6F) are not declared yet
 {
 public:
     __cdecl ZoneSerializedObject(void);  // 0x25fa00
@@ -23,8 +23,6 @@ public:
     void __cdecl DetachParent(void);  // 0x25fc00
     ::Zone *GetZone() { return _zoneInstance; }
 private:
-    // LIFT: the members of base SerializedObject (+8 to +0x70) are not declared yet.
-    char lift_pad_8[0x70 - 8];
     ::Zone *_zoneInstance;  // +112
     bool _shortLived;  // +120
 };
