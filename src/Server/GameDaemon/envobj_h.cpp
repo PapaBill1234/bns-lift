@@ -4,19 +4,21 @@
 #include "pc.h"
 #include "LiftStub.h"
 
+#pragma comment(linker, "/INCLUDE:?GetActionRadius@Env@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetManipulateDuration@Env@@UEAAJD@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?GetOwnerId@Env@@UEAA_KXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?CheckToManipulate@AirDash@@UEAA_NPEAVPc@@PEAVItem@@PEBUQuestRequiredItems@@DAEAF@Z")  // LIFT: dead-strip keep (no live caller yet)
 
 // 0x4553f0
 short __cdecl Env::GetActionRadius(void)
 {
-    LIFT_STUB(0x4553f0);
+    return _env2place._record->action_radius;
 }
 
 // 0x455400
 long __cdecl Env::GetManipulateDuration(char)
 {
-    LIFT_STUB(0x455400);
+    return _env2._record->manipulate_duration;
 }
 
 // 0x455410

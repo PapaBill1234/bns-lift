@@ -41,6 +41,32 @@ protected:
     virtual void __cdecl OnTimer(::Zone *, unsigned short);  // 0x59eb20
 };
 
+// LIFT: views of the PDB records Data::ZoneEnv2Record and Data::ZoneEnv2PlaceRecord (base DrEl, size 6).
+// Only the fields that the lifted bodies read are declared.
+struct EnvZoneEnv2RecordView
+{
+    char lift_pad_0[0x68];
+    long manipulate_duration;  // +104 (0x68)
+};
+
+struct EnvZoneEnv2PlaceRecordView
+{
+    char lift_pad_0[0x38];
+    short action_radius;  // +56 (0x38)
+};
+
+class EnvZoneEnv2PtrView
+{
+public:
+    ::EnvZoneEnv2RecordView *_record;  // 0x0 (PDB: DrRecordPtr::_record, DrEl *)
+};
+
+class EnvZoneEnv2PlacePtrView
+{
+public:
+    ::EnvZoneEnv2PlaceRecordView *_record;  // 0x0 (PDB: DrRecordPtr::_record, DrEl *)
+};
+
 class Env
 {
 public:
@@ -97,8 +123,12 @@ protected:
 public:
     void __cdecl SetGuildBattleFieldGateEnableOnly(bool);  // 0x59a6a0
 protected:
-    // LIFT: base GameObject and the PDB members from _env2 (+48) to _exceptLootCaseBitmap (+124) are not declared yet.
-    char lift_pad_8[0x80 - 8];
+    // LIFT: base GameObject and the PDB members from _geoEnvObj (+72) to _exceptLootCaseBitmap (+124) are not declared yet.
+    char lift_pad_8[0x30 - 8];
+    ::EnvZoneEnv2PtrView _env2;  // +48 (PDB: Data::ZoneEnv2RecordPtr)
+    void *_env2spawn;  // +56 (PDB: Data::ZoneEnv2SpawnRecordPtr)
+    ::EnvZoneEnv2PlacePtrView _env2place;  // +64 (PDB: Data::ZoneEnv2PlaceRecordPtr)
+    char lift_pad_48[0x80 - 0x48];
     unsigned __int64 _ownerId;  // +128
 };
 

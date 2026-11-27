@@ -2,15 +2,34 @@
 #include "item.h"
 #include "LiftStub.h"
 
+#pragma comment(linker, "/INCLUDE:?GetFieldCount@?$ItemBase@VWeaponTrait@@@@UEBAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetPos@?$ItemBase@VAccessoryTrait@@@@UEBAGXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetClass@?$ItemBase@VGroceryTrait@@@@UEBADXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetDepot@?$ItemBase@VAccessoryTrait@@@@UEBAEXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetClass@?$ItemBase@VGemTrait@@@@UEBADXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetDataId@?$ItemBase@VAccessoryTrait@@@@UEBAHXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetClass@?$ItemBase@VAccessoryTrait@@@@UEBADXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetSequestration@?$ItemBase@VAccessoryTrait@@@@UEBA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+
 // 0x667eb0 ItemBase<WeaponTrait>::FetchOpXmlData: LIFT: no body in wave 0 (member of a class template).
 
 // 0x668200 ItemBase<WeaponTrait>::FetchOpDBData: LIFT: no body in wave 0 (member of a class template).
 
-// 0x668830 ItemBase<WeaponTrait>::GetFieldCount: LIFT: no body in wave 0 (member of a class template).
+// 0x668830
+template <>
+short __cdecl ItemBase< ::WeaponTrait>::GetFieldCount(void) const
+{
+    return 48;  // ❓ the source can use WeaponProperty::FIELD_COUNT. The PDB gives no value for it.
+}
 
 // 0x668840 ItemBase<AccessoryTrait>::SetLevel: LIFT: no body in wave 0 (member of a class template).
 
-// 0x668870 ItemBase<AccessoryTrait>::GetPos: LIFT: no body in wave 0 (member of a class template).
+// 0x668870
+template <>
+unsigned short __cdecl ItemBase< ::AccessoryTrait>::GetPos(void) const
+{
+    return prop.Default.pos;
+}
 
 // 0x668880 ItemBase<AccessoryTrait>::SetDepot: LIFT: no body in wave 0 (member of a class template).
 
@@ -66,9 +85,19 @@
 
 // 0x66b460 ItemBase<GroceryTrait>::FetchOpDBData: LIFT: no body in wave 0 (member of a class template).
 
-// 0x66ba90 ItemBase<GroceryTrait>::GetClass: LIFT: no body in wave 0 (member of a class template).
+// 0x66ba90
+template <>
+char __cdecl ItemBase< ::GroceryTrait>::GetClass(void) const
+{
+    return 3;  // LIFT: item class grocery
+}
 
-// 0x66baa0 ItemBase<AccessoryTrait>::GetDepot: LIFT: no body in wave 0 (member of a class template).
+// 0x66baa0
+template <>
+unsigned char __cdecl ItemBase< ::AccessoryTrait>::GetDepot(void) const
+{
+    return prop.Default.depot;
+}
 
 // 0x66bab0 ItemBase<GroceryTrait>::SetSequestration: LIFT: no body in wave 0 (member of a class template).
 
@@ -100,7 +129,12 @@
 
 // 0x66cee0 ItemBase<GemTrait>::FetchOpDBData: LIFT: no body in wave 0 (member of a class template).
 
-// 0x66d510 ItemBase<GemTrait>::GetClass: LIFT: no body in wave 0 (member of a class template).
+// 0x66d510
+template <>
+char __cdecl ItemBase< ::GemTrait>::GetClass(void) const
+{
+    return 4;  // LIFT: item class gem
+}
 
 // 0x66d520 ItemBase<AccessoryTrait>::GetData: LIFT: no body in wave 0 (member of a class template).
 
@@ -130,11 +164,26 @@
 
 // 0x66e7b0 ItemBase<AccessoryTrait>::FetchOpDBData: LIFT: no body in wave 0 (member of a class template).
 
-// 0x66ede0 ItemBase<AccessoryTrait>::GetDataId: LIFT: no body in wave 0 (member of a class template).
+// 0x66ede0
+template <>
+int __cdecl ItemBase< ::AccessoryTrait>::GetDataId(void) const
+{
+    return prop.Default.data_id;
+}
 
-// 0x66edf0 ItemBase<AccessoryTrait>::GetClass: LIFT: no body in wave 0 (member of a class template).
+// 0x66edf0
+template <>
+char __cdecl ItemBase< ::AccessoryTrait>::GetClass(void) const
+{
+    return 5;  // LIFT: item class accessory
+}
 
-// 0x66ee10 ItemBase<AccessoryTrait>::GetSequestration: LIFT: no body in wave 0 (member of a class template).
+// 0x66ee10
+template <>
+bool __cdecl ItemBase< ::AccessoryTrait>::GetSequestration(void) const
+{
+    return prop.Default.sequestration;
+}
 
 // 0x66ee20 ItemBase<AccessoryTrait>::SetPos: LIFT: no body in wave 0 (member of a class template).
 

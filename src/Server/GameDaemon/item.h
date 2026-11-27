@@ -174,6 +174,48 @@ public:
     char __cdecl R_GetOpenRandomOptionSlotCount(::Data::ItemRecordPtr) const;  // 0x552720
 };
 
+class AccessoryTrait;
+class GemTrait;
+class GroceryTrait;
+class WeaponTrait;
+
+// LIFT: view of the PDB group AccessoryProperty::__default__ at AccessoryProperty+48.
+// The base Property (+0 to +47) is not declared yet.
+struct ItemBaseAccessoryPropertyView
+{
+    char lift_pad_0[0x30];
+    struct
+    {
+        char depot;  // +0
+        short pos;  // +2
+        int data_id;  // +4
+        char level;  // +8
+        int exp;  // +12
+        unsigned char used : 1;  // +16 bit 0
+        unsigned char sequestration : 1;  // +16 bit 1
+        unsigned char locked : 1;  // +16 bit 2
+    } Default;  // +48
+};
+
+// LIFT: class template ItemBase<Trait> (PDB, base Item, size 0x110 for AccessoryTrait).
+// Only the members of the lifted bodies are declared. The Item members (+8 to +39) are not declared yet.
+// LIFT: the PDB member prop has the type <Trait>Property. Only the AccessoryProperty layout is declared.
+template <class Trait>
+class ItemBase : public ::Item
+{
+public:
+    virtual int __cdecl GetDataId(void) const;
+    virtual char __cdecl GetClass(void) const;
+    virtual short __cdecl GetFieldCount(void) const;
+    virtual unsigned char __cdecl GetDepot(void) const;
+    virtual unsigned short __cdecl GetPos(void) const;
+    virtual bool __cdecl GetSequestration(void) const;
+protected:
+    char lift_pad_8[0x28 - 8];
+    void *data;  // +40 (PDB: Data::ItemRecord<Trait>Ptr)
+    ::ItemBaseAccessoryPropertyView prop;  // +48 (PDB: <Trait>Property)
+};
+
 class ItemFactory
 {
 public:
