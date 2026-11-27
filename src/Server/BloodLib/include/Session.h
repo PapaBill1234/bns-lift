@@ -129,6 +129,7 @@ public:
     friend class NPChannel;        // LIFT: access for the inlined send in NPChannel::SendMsg (SmartCouponDaemon)
     friend class ManagementSessionHandler; // LIFT: access for the inlined send in the management handlers (PostOfficeDaemon)
     friend class WorldChannel;             // LIFT: access for the inlined send in WorldChannel::SendRelayResponse (PostOfficeDaemon)
+    friend class Pc;                       // LIFT: access for the inlined send in Pc::Send(PacketList const *) (GameDaemon)
     // LIFT: access for the inlined send and completeHandshake in the LobbyGate packet handlers
     friend bool HandleLobbyGate_ContentsRuleListReq(Session* session, Packet const* packet);
     friend bool HandleLobbyGate_HelloReq(Session* session, Packet* packet);

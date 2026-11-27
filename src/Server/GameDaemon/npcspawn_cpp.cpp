@@ -4,6 +4,53 @@
 #include "npctask.h"
 #include "LiftStub.h"
 
+#pragma comment(linker, "/INCLUDE:?GetNpc@NpcSpawn@@QEAAPEAVNpc@@_K@Z")  // LIFT: dead-strip keep (no live caller yet)
+// LIFT: GetNpc inlines getNpcPos, so the out-of-line body has no live caller.
+#pragma comment(linker, "/INCLUDE:?getNpcPos@NpcSpawn@@AEAAH_K@Z")  // LIFT: dead-strip keep (no live caller yet)
+
+namespace
+{
+// LIFT: views of PDB classes that have no layout in the skeleton yet. Offsets are from the PDB.
+
+// LIFT: view of Data::ZoneRecord (key at +0x8).
+struct ZoneRecordKeyView
+{
+    char lift_pad_0[0x8];
+    int key;  // +8 (0x8). LIFT: PDB type Data::ZoneRecord::Key (id)
+};
+
+// LIFT: view of GeoZone::IndexInfo.
+struct GeoZoneIndexInfoView
+{
+    int *indexes;    // +0 (0x0)
+    int indexCount;  // +8 (0x8)
+    int count;       // +12 (0xC)
+};
+
+// LIFT: view of GeoZone (zoneData._record at +0, _npcSpawnIndexInfo at +0x70).
+struct GeoZoneSpawnView
+{
+    ZoneRecordKeyView const *zoneData_record;  // +0 (0x0). LIFT: GeoZone::zoneData._record
+    char lift_pad_0[0x70 - 0x8];
+    GeoZoneIndexInfoView _npcSpawnIndexInfo;   // +112 (0x70)
+};
+
+// LIFT: view of Zone (GeoZoneData at +0x3F60).
+struct ZoneSpawnView
+{
+    char lift_pad_0[0x3F60];
+    GeoZoneSpawnView const *GeoZoneData;  // +16224 (0x3F60)
+};
+
+// LIFT: view of NpcSpawn (PDB size 0x80).
+struct NpcSpawnView
+{
+    ZoneSpawnView *_zone;  // +0 (0x0)
+    void const *_records;  // +8 (0x8). LIFT: PDB type Data::ZoneNpcSpawnRecordPtr const *
+    ::Npc **_npc;          // +16 (0x10)
+};
+}  // namespace
+
 // 0x428dd0
 __cdecl NpcSpawn::~NpcSpawn(void)
 {
@@ -17,15 +64,32 @@ bool __cdecl NpcSpawn::Initialize(void)
 }
 
 // 0x429730
-::Npc * __cdecl NpcSpawn::GetNpc(unsigned __int64)
+::Npc * __cdecl NpcSpawn::GetNpc(unsigned __int64 npcSpawnKey)
 {
-    LIFT_STUB(0x429730);
+    int pos = getNpcPos(npcSpawnKey);
+    if (pos < 0)
+        return nullptr;
+    return reinterpret_cast<NpcSpawnView *>(this)->_npc[pos];
 }
 
 // 0x429780
-int __cdecl NpcSpawn::getNpcPos(unsigned __int64)
+int __cdecl NpcSpawn::getNpcPos(unsigned __int64 npcSpawnKey)
 {
-    LIFT_STUB(0x429780);
+    NpcSpawnView const *self = reinterpret_cast<NpcSpawnView const *>(this);
+    if (npcSpawnKey == 0)
+        return -1;
+    GeoZoneSpawnView const *geoZone = self->_zone->GeoZoneData;
+    if (self->_npc == nullptr)
+        return -1;
+    // LIFT: the low 32 bits of the key are the zone id, the next 16 bits are the spawn index.
+    if (geoZone->zoneData_record->key != static_cast<int>(npcSpawnKey))
+        return -1;
+    short index = static_cast<short>(npcSpawnKey >> 32);
+    if (index == 0)
+        return -1;
+    if (geoZone->_npcSpawnIndexInfo.indexCount <= index)
+        return -1;
+    return geoZone->_npcSpawnIndexInfo.indexes[index];
 }
 
 // 0x4297c0

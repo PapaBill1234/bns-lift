@@ -1,5 +1,65 @@
 # lift-gamedaemon-gap-028-e28 handoff
 
+## zone_cpp_2
+
+Lifted: `Zone::GetTickTime` (0x24ae90). The stem has no other function in this card.
+
+## zonetimer_cpp
+
+Lifted: `ZoneSerializer::preExecute` (0x260170). It has a dead-strip keep pragma.
+
+## worldserializedobject_cpp
+
+Lifted: `GuildCraftWSO::writeError` (0x67a7e0). It has a dead-strip keep pragma.
+
+## npcspawn_cpp
+
+Lifted:
+
+- `NpcSpawn::GetNpc` (0x429730)
+- `NpcSpawn::getNpcPos` (0x429780)
+
+`GetNpc` calls `getNpcPos`. The pseudocode of `GetNpc` shows the inlined form of `getNpcPos`. Both bodies have a dead-strip keep pragma. The bodies read `NpcSpawn`, `Zone`, `GeoZone` and `Data::ZoneRecord` through local views with PDB offsets.
+
+## inventory_cpp_1
+
+Lifted:
+
+- `InventoryCacheUpdate::AddChange` (0x4bea20)
+- `Inventory::IsActivatedGemSlot` (0x4bec40)
+- `Inventory::GetCacheId` (0x4bed10)
+- `Inventory::GetItemClass` (0x4c10d0)
+- `Inventory::Dispose` (0x4cfcc0)
+
+**Not done:**
+
+- `InventoryClientUpdate::InventoryClientUpdate` (0x4be600): it needs the `FragmentPacket` and `RepeatPacketComposer` members of `InventoryClientUpdate`. The skeleton does not declare them.
+- `InventoryClientUpdate::Send` (0x4be900): same cause.
+
+## pc_cpp_2
+
+Lifted (all 12 functions):
+
+- `Pc::IsSharableCombatModeZone` (0x5e6a90)
+- `Pc::GetActiveSummoned` (0x5ea0d0)
+- `Pc::Send(char const *, char *)` (0x5eb2e0)
+- `Pc::Send(char const *, ...)` (0x5eb350)
+- `Pc::Send(Packet const *)` (0x5eb3c0)
+- `Pc::Send(PacketList const *)` (0x5eb420)
+- `Pc::ReturningToArenaLobby` (0x5ed820)
+- `Pc::RollbackReturnToArenaLobby` (0x5ed880)
+- `Pc::SetGameGameMode` (0x5edae0)
+- `Pc::GetGameGameMode` (0x5edb30)
+- `Pc::GetArenaAttraction` (0x5ee6b0)
+- `Pc::SetIpAddress` (0x5f0f00)
+
+The bodies read `Pc` through a local view with PDB offsets. `Pc::_user` is read as `Channel const *` (the PDB base of `User` at +0), and `Channel::GetSession` is the virtual call. `Pc::Send(PacketList const *)` calls the private `Session::send`, so `Session.h` (BloodLib) has a new `friend class Pc;` line. Each body has a dead-strip keep pragma.
+
+Open items for the reviewer:
+
+- The `PacketList::Buffers` element type is not checked in the PDB. The view uses `PacketBuffer const **`, as in the call of the original.
+- `Pc::_arenaLock` is a `CriticalSection`. The view uses `CRITICAL_SECTION` at the same offset (the PDB member `CS` is at +0).
+
 ## effectcontent_cpp_1
 
 Lifted:
@@ -25,3 +85,17 @@ The effect classes of the skeleton have no `Effect` base. The bodies read `targe
 - `CastCancelEffect::apply` (0x5b8ab0): it calls a virtual function through a member at Creature+0x8A0. The member and the slot are not known.
 - `ReturnSimSkillEffect::apply` (0x5c5e00): same member at Creature+0x8A0, and a derived effect record.
 - `TransitEffect::TransitEffect` (0x5c5530): the skeleton has no `InstantEffect` base and no `TransitEffect` members.
+
+## Changed files
+
+- `src/Server/GameDaemon/effectcontent_cpp_1.cpp`
+- `src/Server/GameDaemon/inventory.h`
+- `src/Server/GameDaemon/inventory_cpp_1.cpp`
+- `src/Server/GameDaemon/worldserializedobject_cpp.cpp`
+- `src/Server/GameDaemon/zone_cpp_2.cpp`
+- `src/Server/GameDaemon/zonetimer_cpp.cpp`
+- `src/Server/GameDaemon/npcspawn_cpp.cpp`
+- `src/Server/GameDaemon/pc_cpp_2.cpp`
+- `src/Server/BloodLib/include/Session.h`
+
+Session 2 checked the Creature+0x1D0 field again. No class in the PDB type header has a Creature member at 0x1D0 (the field is in a nested member). The stem stays in this state.

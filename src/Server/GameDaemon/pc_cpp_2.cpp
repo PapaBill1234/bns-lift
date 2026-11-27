@@ -11,7 +11,92 @@
 #include "team.h"
 #include "user.h"
 #include "zone.h"
+#include "Log.h"
+#include "../BloodLib/include/Network.h"
 #include "LiftStub.h"
+
+#pragma comment(linker, "/INCLUDE:?IsSharableCombatModeZone@Pc@@QEBA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetActiveSummoned@Pc@@QEAAPEAVSummoned@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?Send@Pc@@QEAAXPEBDPEAD@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?Send@Pc@@UEAAXPEBDZZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?Send@Pc@@UEAAXPEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?Send@Pc@@UEAAXPEBVPacketList@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?ReturningToArenaLobby@Pc@@QEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?RollbackReturnToArenaLobby@Pc@@QEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SetGameGameMode@Pc@@QEAAXD@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetGameGameMode@Pc@@QEBA?BDXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetArenaAttraction@Pc@@QEBADXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SetIpAddress@Pc@@QEAAXK@Z")  // LIFT: dead-strip keep (no live caller yet)
+
+namespace
+{
+// LIFT: view of PacketList. The skeleton class is empty. Offsets are from the PDB.
+struct PacketListView
+{
+    char lift_pad_0[0x4];
+    int Count;                       // +4 (0x4)
+    PacketBuffer const **Buffers;    // +8 (0x8). ❓ PDB element type not checked; the original passes it as PacketBuffer const **
+};
+
+// LIFT: views of PDB classes that have no layout in the skeleton yet. Offsets are from the PDB.
+
+// LIFT: view of Data::ZoneRecord (sharable_combatmode at +0xB9).
+struct ZoneRecordView
+{
+    char lift_pad_0[0xB9];
+    bool sharable_combatmode;  // +185 (0xB9)
+};
+
+// LIFT: view of GeoZone (zoneData at +0, a Data::ZoneRecordPtr with _record at +0).
+struct GeoZoneView
+{
+    ZoneRecordView const *zoneData_record;  // +0 (0x0). LIFT: GeoZone::zoneData._record
+};
+
+// LIFT: view of Zone (GeoZoneData at +0x3F60).
+struct ZoneGeoView
+{
+    char lift_pad_0[0x3F60];
+    GeoZoneView const *GeoZoneData;  // +16224 (0x3F60)
+};
+
+// LIFT: view of Summoned (_summonedState at +0x1A10).
+struct SummonedView
+{
+    char lift_pad_0[0x1A10];
+    int _summonedState;  // +6672 (0x1A10). LIFT: PDB type Summoned::SummonedState
+};
+enum
+{
+    LIFT_SUMMONED_STATE_SPAWNING = 1,  // LIFT: Summoned::SUMMONED_STATE_SPAWNING
+    LIFT_SUMMONED_STATE_SPAWNED = 2,   // LIFT: Summoned::SUMMONED_STATE_SPAWNED
+};
+
+// LIFT: view of Pc. The skeleton class declares only part of its PDB members.
+struct PcView
+{
+    char lift_pad_0[0x28];
+    unsigned __int64 Id;                 // +40 (0x28). GameObject::Id
+    char lift_pad_1[0x8B8 - 0x30];
+    ZoneGeoView *zone;                   // +2232 (0x8B8). Creature::zone
+    char lift_pad_2[0x4DE0 - 0x8C0];
+    ::Channel const *_user;              // +19936 (0x4DE0). LIFT: PDB type User const *, base Channel at +0
+    char lift_pad_3[0x4DEC - 0x4DE8];
+    unsigned long _ipAddress;            // +19948 (0x4DEC)
+    char lift_pad_4[0x8C80 - 0x4DF0];
+    SummonedView *_summoned;             // +35968 (0x8C80)
+    char lift_pad_5[0x8EC0 - 0x8C88];
+    CRITICAL_SECTION _arenaLock;         // +36544 (0x8EC0). LIFT: PDB type CriticalSection (CS at +0, size 0x28)
+    char lift_pad_6[0x8F08 - 0x8EE8];
+    char _arenaLobbyEnterParam_attraction;  // +36616 (0x8F08). _arenaLobbyEnterParam (+0x8EF0) ._attraction (+0x18)
+    char lift_pad_7[0x9054 - 0x8F09];
+    bool _isReturningToArenaLobby;       // +36948 (0x9054)
+    char _arenaGameGameMode;             // +36949 (0x9055)
+};
+
+wchar_t const *const PC_CHANNEL_HEADER_FILE =
+    L"E:\\DailyBuild02\\GameDaemon-Common-0.0.348\\depot\\Branch\\348NC\\Program\\Server\\BloodLib\\include\\Channel.h";
+}  // namespace
 
 // 0x5e5ad0
 void __cdecl Pc::CalculateSkillScore(void)
@@ -40,7 +125,14 @@ bool __cdecl Pc::GetNearRespawnArea(::vector16, unsigned int &, unsigned __int64
 // 0x5e6a90
 bool __cdecl Pc::IsSharableCombatModeZone(void) const
 {
-    LIFT_STUB(0x5e6a90);
+    ZoneGeoView const *zone = reinterpret_cast<PcView const *>(this)->zone;
+    if (zone != nullptr)
+    {
+        GeoZoneView const *geoZone = zone->GeoZoneData;
+        if (geoZone != nullptr && geoZone->zoneData_record != nullptr)
+            return geoZone->zoneData_record->sharable_combatmode;
+    }
+    return false;
 }
 
 // 0x5e6ac0
@@ -154,7 +246,13 @@ void __cdecl Pc::MakeSummoned(__int64, wchar_t const *const)
 // 0x5ea0d0
 ::Summoned * __cdecl Pc::GetActiveSummoned(void)
 {
-    LIFT_STUB(0x5ea0d0);
+    SummonedView *summoned = reinterpret_cast<PcView *>(this)->_summoned;
+    if (summoned == nullptr)
+        return nullptr;
+    int summonedState = summoned->_summonedState;
+    if (summonedState != LIFT_SUMMONED_STATE_SPAWNING && summonedState != LIFT_SUMMONED_STATE_SPAWNED)
+        return nullptr;
+    return reinterpret_cast< ::Summoned *>(summoned);
 }
 
 // 0x5ea0f0
@@ -218,27 +316,70 @@ void __cdecl Pc::SendGameBuilderAuth(void)
 }
 
 // 0x5eb2e0
-void __cdecl Pc::Send(char const *, char *)
+void __cdecl Pc::Send(char const *format, char *args)
 {
-    LIFT_STUB(0x5eb2e0);
+    ::Channel const *user = reinterpret_cast<PcView *>(this)->_user;
+    if (user != nullptr)
+    {
+        Session *session = const_cast<Session *>(user->GetSession());
+        if (session != nullptr)
+        {
+            session->SendV(format, args);
+            session->removeReferenceCount(PC_CHANNEL_HEADER_FILE, 52);
+        }
+    }
 }
 
 // 0x5eb350
-void __cdecl Pc::Send(char const *, ...)
+void __cdecl Pc::Send(char const *format, ...)
 {
-    LIFT_STUB(0x5eb350);
+    va_list args;
+    va_start(args, format);
+    ::Channel const *user = reinterpret_cast<PcView *>(this)->_user;
+    if (user != nullptr)
+    {
+        Session *session = const_cast<Session *>(user->GetSession());
+        if (session != nullptr)
+        {
+            session->SendV(format, args);
+            session->removeReferenceCount(PC_CHANNEL_HEADER_FILE, 52);
+        }
+    }
+    va_end(args);
 }
 
 // 0x5eb3c0
-void __cdecl Pc::Send(::Packet const *)
+void __cdecl Pc::Send(::Packet const *packet)
 {
-    LIFT_STUB(0x5eb3c0);
+    ::Channel const *user = reinterpret_cast<PcView *>(this)->_user;
+    if (user != nullptr)
+    {
+        Session *session = const_cast<Session *>(user->GetSession());
+        if (session != nullptr)
+        {
+            session->Send(packet);
+            session->removeReferenceCount(PC_CHANNEL_HEADER_FILE, 52);
+        }
+    }
 }
 
 // 0x5eb420
-void __cdecl Pc::Send(::PacketList const *)
+void __cdecl Pc::Send(::PacketList const *packetList)
 {
-    LIFT_STUB(0x5eb420);
+    ::Channel const *user = reinterpret_cast<PcView *>(this)->_user;
+    if (user != nullptr)
+    {
+        Session *session = const_cast<Session *>(user->GetSession());
+        if (session != nullptr)
+        {
+            // LIFT: inline Session::Send(PacketList const *)
+            session->_lock.Enter();
+            PacketListView const *list = reinterpret_cast<PacketListView const *>(packetList);
+            session->send(list->Buffers, list->Count);
+            session->_lock.Leave();
+            session->removeReferenceCount(PC_CHANNEL_HEADER_FILE, 52);
+        }
+    }
 }
 
 // 0x5eb4a0
@@ -286,13 +427,25 @@ void __cdecl Pc::SendEnterArenaOk(void)
 // 0x5ed820
 bool __cdecl Pc::ReturningToArenaLobby(void)
 {
-    LIFT_STUB(0x5ed820);
+    PcView *self = reinterpret_cast<PcView *>(this);
+    bool result = false;
+    EnterCriticalSection(&self->_arenaLock);
+    if (!self->_isReturningToArenaLobby)
+    {
+        self->_isReturningToArenaLobby = true;
+        result = true;
+    }
+    LeaveCriticalSection(&self->_arenaLock);
+    return result;
 }
 
 // 0x5ed880
 void __cdecl Pc::RollbackReturnToArenaLobby(void)
 {
-    LIFT_STUB(0x5ed880);
+    PcView *self = reinterpret_cast<PcView *>(this);
+    EnterCriticalSection(&self->_arenaLock);
+    self->_isReturningToArenaLobby = false;
+    LeaveCriticalSection(&self->_arenaLock);
 }
 
 // 0x5ed8c0
@@ -308,15 +461,22 @@ void __cdecl Pc::SetArenaRoom(::ArenaRoom *, __int64)
 }
 
 // 0x5edae0
-void __cdecl Pc::SetGameGameMode(char)
+void __cdecl Pc::SetGameGameMode(char gameGameMode)
 {
-    LIFT_STUB(0x5edae0);
+    PcView *self = reinterpret_cast<PcView *>(this);
+    EnterCriticalSection(&self->_arenaLock);
+    self->_arenaGameGameMode = gameGameMode;
+    LeaveCriticalSection(&self->_arenaLock);
 }
 
 // 0x5edb30
 char const __cdecl Pc::GetGameGameMode(void) const
 {
-    LIFT_STUB(0x5edb30);
+    PcView *self = const_cast<PcView *>(reinterpret_cast<PcView const *>(this));
+    EnterCriticalSection(&self->_arenaLock);
+    char gameGameMode = self->_arenaGameGameMode;
+    LeaveCriticalSection(&self->_arenaLock);
+    return gameGameMode;
 }
 
 // 0x5edb70
@@ -328,7 +488,11 @@ bool __cdecl Pc::SendReturnToGameOk(char)
 // 0x5ee6b0
 char __cdecl Pc::GetArenaAttraction(void) const
 {
-    LIFT_STUB(0x5ee6b0);
+    PcView *self = const_cast<PcView *>(reinterpret_cast<PcView const *>(this));
+    EnterCriticalSection(&self->_arenaLock);
+    char attraction = self->_arenaLobbyEnterParam_attraction;
+    LeaveCriticalSection(&self->_arenaLock);
+    return attraction;
 }
 
 // 0x5ee6f0
@@ -434,9 +598,18 @@ void __cdecl Pc::GetGameAccountId(int, wchar_t *const)
 }
 
 // 0x5f0f00
-void __cdecl Pc::SetIpAddress(unsigned long)
+void __cdecl Pc::SetIpAddress(unsigned long ip)
 {
-    LIFT_STUB(0x5f0f00);
+    PcView *self = reinterpret_cast<PcView *>(this);
+    if (self->_ipAddress != 0)
+    {
+        Log::Write(Log::LT_ERROR,
+                   L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\Pc.cpp",
+                   10589, L"[pc], %s; ip address already set. pc:%I64x, ip:%s, new ip:%s", L"Pc::SetIpAddress", self->Id,
+                   Network::GetAddressStringW(self->_ipAddress), Network::GetAddressStringW(ip));
+        return;
+    }
+    self->_ipAddress = ip;
 }
 
 // 0x5f0f90
