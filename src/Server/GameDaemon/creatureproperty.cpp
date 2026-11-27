@@ -3,6 +3,15 @@
 #include "propertysync.h"
 #include "LiftStub.h"
 
+// LIFT: keep the lifted virtual functions until the callers are lifted (the vftable and the callers are stubs;
+// /OPT:REF drops them). Card lift-gamedaemon-0d.
+#pragma comment(linker, "/INCLUDE:?Version@CreatureProperty@@UEBAHXZ")
+#pragma comment(linker, "/INCLUDE:?Name@CreatureProperty@@UEBAPEB_WXZ")
+#pragma comment(linker, "/INCLUDE:?FieldMax@CreatureProperty@@MEBAHXZ")
+#pragma comment(linker, "/INCLUDE:?FieldDefine@CreatureProperty@@MEBAPEBUDef@Field@@XZ")
+#pragma comment(linker, "/INCLUDE:?SyncMax@CreatureProperty@@MEBAHXZ")
+#pragma comment(linker, "/INCLUDE:?SyncDefine@CreatureProperty@@MEBAPEBUDef@SyncBuffer@@XZ")
+
 // 0x19340
 __cdecl CreatureProperty::~CreatureProperty(void)
 {
@@ -12,35 +21,41 @@ __cdecl CreatureProperty::~CreatureProperty(void)
 // 0x19350
 int __cdecl CreatureProperty::Version(void) const
 {
-    LIFT_STUB(0x19350);
+    return 293;
 }
 
 // 0x19360
 wchar_t const * __cdecl CreatureProperty::Name(void) const
 {
-    LIFT_STUB(0x19360);
+    return L"CreatureProperty";
 }
 
 // 0x19370
 int __cdecl CreatureProperty::FieldMax(void) const
 {
-    LIFT_STUB(0x19370);
+    return fieldMax;
 }
 
 // 0x19380
 ::Field::Def const * __cdecl CreatureProperty::FieldDefine(void) const
 {
-    LIFT_STUB(0x19380);
+    return fieldDefine;
 }
 
 // 0x19390
 int __cdecl CreatureProperty::SyncMax(void) const
 {
-    LIFT_STUB(0x19390);
+    return syncMax;
 }
 
 // 0x193a0
 ::SyncBuffer::Def const * __cdecl CreatureProperty::SyncDefine(void) const
 {
-    LIFT_STUB(0x193a0);
+    return syncDefine;
 }
+
+// LIFT: definitions of the PDB static data members (see the PDB data records of the class). Pilot of card lift-gamedaemon-0d.
+int CreatureProperty::fieldMax;
+::Field::Def const * CreatureProperty::fieldDefine;
+int CreatureProperty::syncMax;
+::SyncBuffer::Def const * CreatureProperty::syncDefine;

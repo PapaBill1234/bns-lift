@@ -15,5 +15,11 @@ protected:
     virtual ::Field::Def const * __cdecl FieldDefine(void) const;  // 0x19420
     virtual int __cdecl SyncMax(void) const;  // 0x19430
     virtual ::SyncBuffer::Def const * __cdecl SyncDefine(void) const;  // 0x19440
+    // LIFT: PDB data members (protected static). Pilot of card lift-gamedaemon-0d. The values are set at start-up
+    // by Property::initInstance (a later wave lifts the caller). The PDB mangles the 2 pointers as const (a const object that start-up code writes). A const definition with a constant value folds the getter, so the pilot uses a plain pointer. ❓
+    static int fieldMax;
+    static ::Field::Def const * fieldDefine;
+    static int syncMax;
+    static ::SyncBuffer::Def const * syncDefine;
 };
 

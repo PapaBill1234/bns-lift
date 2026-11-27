@@ -3,6 +3,15 @@
 #include "propertysync.h"
 #include "LiftStub.h"
 
+// LIFT: keep the lifted virtual functions until the callers are lifted (the vftable and the callers are stubs;
+// /OPT:REF drops them). Card lift-gamedaemon-0d.
+#pragma comment(linker, "/INCLUDE:?TypeId@ActivatedTeleport@@UEBA?BHXZ")
+#pragma comment(linker, "/INCLUDE:?Name@ActivatedTeleport@@UEBAPEB_WXZ")
+#pragma comment(linker, "/INCLUDE:?FieldMax@ActivatedTeleport@@MEBAHXZ")
+#pragma comment(linker, "/INCLUDE:?FieldDefine@ActivatedTeleport@@MEBAPEBUDef@Field@@XZ")
+#pragma comment(linker, "/INCLUDE:?SyncMax@ActivatedTeleport@@MEBAHXZ")
+#pragma comment(linker, "/INCLUDE:?SyncDefine@ActivatedTeleport@@MEBAPEBUDef@SyncBuffer@@XZ")
+
 // 0x193e0
 __cdecl ActivatedTeleport::~ActivatedTeleport(void)
 {
@@ -12,35 +21,41 @@ __cdecl ActivatedTeleport::~ActivatedTeleport(void)
 // 0x193f0
 int const __cdecl ActivatedTeleport::TypeId(void) const
 {
-    LIFT_STUB(0x193f0);
+    return 13;
 }
 
 // 0x19400
 wchar_t const * __cdecl ActivatedTeleport::Name(void) const
 {
-    LIFT_STUB(0x19400);
+    return L"ActivatedTeleport";
 }
 
 // 0x19410
 int __cdecl ActivatedTeleport::FieldMax(void) const
 {
-    LIFT_STUB(0x19410);
+    return fieldMax;
 }
 
 // 0x19420
 ::Field::Def const * __cdecl ActivatedTeleport::FieldDefine(void) const
 {
-    LIFT_STUB(0x19420);
+    return fieldDefine;
 }
 
 // 0x19430
 int __cdecl ActivatedTeleport::SyncMax(void) const
 {
-    LIFT_STUB(0x19430);
+    return syncMax;
 }
 
 // 0x19440
 ::SyncBuffer::Def const * __cdecl ActivatedTeleport::SyncDefine(void) const
 {
-    LIFT_STUB(0x19440);
+    return syncDefine;
 }
+
+// LIFT: definitions of the PDB static data members (see the PDB data records of the class). Pilot of card lift-gamedaemon-0d.
+int ActivatedTeleport::fieldMax;
+::Field::Def const * ActivatedTeleport::fieldDefine;
+int ActivatedTeleport::syncMax;
+::SyncBuffer::Def const * ActivatedTeleport::syncDefine;
