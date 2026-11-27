@@ -247,8 +247,35 @@ public:
     void __cdecl Clear(void);  // 0x55b960
 };
 
+// LIFT: view of the PDB WeaponProperty (size 0x110). Only the group Remaster (+0xB8) is declared.
+struct WeaponItemPropertyView
+{
+    char lift_pad_0[0xB8];  // ❓ no PDB name: base Property and the groups Default, Gem, EnchantGem are not declared yet
+    struct
+    {
+        short enchant_point;  // +0
+        char enchant_consecutive_trial;  // +2
+        char enchant_crack;  // +3
+        char enchant_restore;  // +4
+        __int64 random_effect_group_id_1;  // +8
+        __int64 random_effect_group_id_2;  // +16
+        __int64 random_effect_group_id_3;  // +24
+        __int64 random_effect_group_id_4;  // +32
+        __int64 random_effect_group_id_5;  // +40
+        __int64 random_effect_id_1;  // +48
+        __int64 random_effect_id_2;  // +56
+        __int64 random_effect_id_3;  // +64
+        __int64 random_effect_id_4;  // +72
+        __int64 random_effect_id_5;  // +80
+    } Remaster;  // +0xB8 (PDB: WeaponProperty::__remaster__)
+};
+
+// LIFT: PDB class WeaponItem derives from ItemBase<WeaponTrait>. The base is not declared here yet.
 class WeaponItem
 {
+protected:
+    char lift_pad_8[0x28];  // ❓ no PDB name: Item members (+8 to +0x27) and ItemBase::data (+0x28)
+    ::WeaponItemPropertyView prop;  // +0x30 (PDB: WeaponProperty)
 public:
     virtual void __cdecl SetCount(short);  // 0x4542d0
     virtual short __cdecl GetMaxDurability(void) const;  // 0x454340

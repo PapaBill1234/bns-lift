@@ -306,9 +306,23 @@ bool __cdecl WeaponItem::R_CheckEnchantTargetItem(void)
 }
 
 // 0x5535f0
-__int64 __cdecl WeaponItem::R_GetRandomEffectId(char) const
+#pragma comment(linker, "/INCLUDE:?R_GetRandomEffectId@WeaponItem@@UEBA_JD@Z")  // LIFT: dead-strip keep (no live caller yet)
+__int64 __cdecl WeaponItem::R_GetRandomEffectId(char groupIndex) const
 {
-    LIFT_STUB(0x5535f0);
+    switch (groupIndex)
+    {
+    case 0:
+        return prop.Remaster.random_effect_id_1;
+    case 1:
+        return prop.Remaster.random_effect_id_2;
+    case 2:
+        return prop.Remaster.random_effect_id_3;
+    case 3:
+        return prop.Remaster.random_effect_id_4;
+    case 4:
+        return prop.Remaster.random_effect_id_5;
+    }
+    return 0;
 }
 
 // 0x553640
@@ -318,9 +332,23 @@ void __cdecl WeaponItem::R_SetRandomEffectId(char, __int64)
 }
 
 // 0x5536a0
-__int64 __cdecl WeaponItem::R_GetRandomEffectGroupId(char) const
+#pragma comment(linker, "/INCLUDE:?R_GetRandomEffectGroupId@WeaponItem@@UEBA_JD@Z")  // LIFT: dead-strip keep (no live caller yet)
+__int64 __cdecl WeaponItem::R_GetRandomEffectGroupId(char groupIndex) const
 {
-    LIFT_STUB(0x5536a0);
+    switch (groupIndex)
+    {
+    case 0:
+        return prop.Remaster.random_effect_group_id_1;
+    case 1:
+        return prop.Remaster.random_effect_group_id_2;
+    case 2:
+        return prop.Remaster.random_effect_group_id_3;
+    case 3:
+        return prop.Remaster.random_effect_group_id_4;
+    case 4:
+        return prop.Remaster.random_effect_group_id_5;
+    }
+    return 0;
 }
 
 // 0x5536f0
