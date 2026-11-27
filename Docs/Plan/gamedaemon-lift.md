@@ -52,7 +52,18 @@ The original GameDaemon is a unity build. The PDB modules are `UnityBuild02.obj`
 
 The plan maps each function to its source file from the PDB line tables (first line entry at the function start). 19 functions have no file.
 
-Rule for GameDaemon: one `.cpp` per original source file, in `src/Server/GameDaemon/`. The wave 0 pilot (card 0d) checks that this does not change codegen against a unity TU ❓.
+Rule for GameDaemon: one `.cpp` per original source file, in `src/Server/GameDaemon/`. Card `0d` checked it (pilot below). Do not build a unity TU.
+
+| Item | Value |
+| --- | --- |
+| Pilot | 2 files of module `UnityBuild10`: `creatureproperty.cpp` (0x19340) and `activatedteleport.cpp` (0x193e0). 12 lifted leaf functions (6 per file: `Version` or `TypeId`, `Name`, `FieldMax`, `FieldDefine`, `SyncMax`, `SyncDefine`) and 12 `/INCLUDE:` pragmas. The 2 destructors stay stubs: their vftables need the `Property` layout (wave W2). |
+| Form A | per-file TUs (the skeleton layout) |
+| Form B | `unity_pilot.cpp` with `#include` of the 2 files in the original order; the 2 files leave the CMake list |
+| Result | GameDaemon funcdiff: 89 paired, 67 MATCH, 12,762 only in original, in both forms. The 12 pilot functions are MATCH 100.0 in both forms. All 89 entries (status and scores) are equal. The exe size is equal (241,152 bytes). |
+| Decision | Per-file TUs are safe for these functions. Use per-file TUs. |
+| Limit | The pilot has trivial getters only. They have no inlining across files and no file-local COMDAT. Under `/GL /LTCG` the linker inlines across TUs in both forms, so a difference is not expected. If a later card sees a DIFF that only the original unity form explains (insn diff: code from another file inlined, or a `static` function shared by the files), the card writes it in `lessons.md` and the lead decides on a unity group for that module. |
+| Finding | A `const` static pointer with a constant definition (`= 0`) lets `/GL` fold the getter to `xor eax,eax`: `FieldDefine` and `SyncDefine` became DIFF or unpaired (ICF). The PDB mangles the pointers as const, but the original puts them in `.data` (start-up code writes them). The pilot declares them as plain pointers (`// ❓` in the header). Later waves lift the start-up code (`Property::initInstance` callers) and restore the const type. |
+| Evidence | 12 MATCH in A after the change; before it, A had 8 MATCH (4 getters folded). |
 
 ### Counted functions by area
 
@@ -227,19 +238,33 @@ The card engine (operator tooling, not in this repo) knows 5 exes now. GameDaemo
 
 ## 7. Build and disk
 
-Estimates scale LobbyDaemon by 6.6× code. Card `0d` replaces them with measured numbers.
+Measured by card `0d` on this host (8 cores, 22 GB, shared with other jobs) with the wave-0 skeleton: 563 sources, 11,923 stub bodies, 12 lifted functions. VS2010 SP1 under Wine, `tools/vs2010/build.sh GameDaemon`, inside `slotrun`. Raw logs: `<work-root>/s4/measure/0d/`.
 
-| Item | LobbyDaemon (measured) | GameDaemon ❓ |
-| --- | --- | --- |
-| Original exe / PDB | | 16.3 MB / 37.7 MB (measured) |
-| VS2010 objects | 61 MB (+46 MB shared) | ~400 MB |
-| Extra disk per full card dir | card dir now 334 MB | +0.6 to 1.0 GB |
-| Warm linked build | 51 s | ~220 to 260 s |
-| Cold build | 221 s | ~24 min at 4 cl jobs |
-| LTCG link peak RAM | inside 2,130 MB slot peak | unknown, can be above the slot peak |
-| funcdiff | a few s | ~30 s |
+| Item | LobbyDaemon (measured) | GameDaemon, measured (skeleton) | GameDaemon, full lift ❓ |
+| --- | --- | --- | --- |
+| Original exe / PDB | | 16.3 MB / 37.7 MB | |
+| VS2010 objects | 61 MB (+46 MB shared) | 542 MB (563 objects, about 1 MB each: stub debug types) | about 600 MB |
+| Output exe / PDB / map | 1.3 MB / 4.6 MB | 0.24 MB / 5.6 MB / 0.04 MB (`/OPT:REF`); 0.73 MB / 11.7 MB / 2.1 MB (`/OPT:NOREF`) | 7 to 16 MB / 40 MB / 3 MB |
+| Card dir (clone, clang build, VS2010 objects, exe, PDB) | 334 MB | about 650 MB | 0.7 to 1.0 GB |
+| Cold VS2010 build (empty obj dir, 8 jobs) | 221 s | 7 min 03 s (compile 6 min 28 s, link 34 s) | 9 to 12 min |
+| Warm build, 1 `.cpp` touched | 51 s (cached script) | 2 min 00 s (1 cl 1.4 s, link 31 s, script about 88 s) | 3.5 to 4 min |
+| Warm build, 3 `.cpp` changed, other work on the host | | 3 min 29 s (link 55 s) | |
+| LTCG link (`/OPT:REF /OPT:ICF`) | 17 s | 34 s cold, 31 s warm, up to 55 s on a busy host | about 2 min (6.6 x LobbyDaemon) |
+| LTCG link with `/OPT:NOREF` (all code kept; local test) | | 42 s | 2 to 3 min |
+| Peak RAM of the link | 234 MB | 0.92 GB (`/OPT:REF`); 1.01 GB (`/OPT:NOREF`) | 1.5 to 2.5 GB |
+| Peak RAM of one `cl` job (`/usr/bin/time` on `wine`) | 60 MB (largest source, 1,723 lines) ❓ | 57 to 60 MB; unity TU of 2 files 57 MB | below 200 MB |
+| funcdiff | a few s | 80 to 106 s (227 MB RAM); first run caches the PDB dump | 2 to 3 min |
+| Clang build of `GameDaemon.exe` (cold) | | 166 s | |
 
-- The data disk has 35 GB free now. The disk guard floor is about 20 GB. 3 card dirs in parallel can use 3 to 4 GB more. Clean card dirs after land.
+How to read the numbers:
+
+- The compile phase costs about 2.7 s per source, mostly the start of Wine (`/GL` makes `cl` write only the front end). Real code adds little: the largest LobbyDaemon source takes 2.2 s. So the cold build stays near 7 min plus the larger front end of big files (about 9 to 12 min ❓). The old estimate (24 min) was too high.
+- The code generation happens in the link (`/LTCG`). The link of the skeleton is small because `wmain` is a stub and `/OPT:REF` drops nearly all code. `/OPT:NOREF` keeps the stubs (1.0 GB) but the stubs have tiny bodies. Full lift estimate: 17 s and 234 MB for 1.08 MB of LobbyDaemon code, times 6.6 (7.09 MB of GameDaemon code) gives 114 s and 1.55 GB. A floor of 1.0 GB for the 563 objects (types and symbols) and the scaled code together give an upper bound of 2.5 GB. Engine limit E7 must use 2.5 GB for the link, not the 0.92 GB of the skeleton ❓.
+- Every build script run has a fixed cost of about 90 s for 563 objects (`winepath` and the stale checks). A card that needs one object still waits for it.
+- The 8 `cl` jobs use all 8 cores. A cold build on a busy host needs more time. Run at most one cold GameDaemon build at a time. Warm builds and links can run in parallel: the link uses one core.
+- Build on build3: waits for engine item E8 (the GameDaemon original and the toolchain cache are not on build2 and build3 yet). Row to fill: cold build, warm build, link, peak RAM.
+
+- The data disk has 30 GB free now. The disk guard floor is about 21 GB. A card dir of GameDaemon costs about 0.65 GB (0.7 to 1.0 GB later); a NOREF test link adds 14 MB. Clean card dirs after land.
 - A change in a unity-size TU recompiles many functions. Per-file TUs keep card builds small.
 
 ## 8. Token estimate
@@ -271,8 +296,8 @@ Unit: nocr tokens (meter column). Base rates are measured on the LobbyDaemon wav
 
 | Risk | Effect | Action |
 | --- | --- | --- |
-| Unity build codegen | Per-file TUs can give other inlining or COMDAT order | Pilot in card `0d` before W1 |
-| LTCG link RAM and time | Slots run out of RAM; gates take minutes | Measure in `0d`; set E7; fewer parallel GameDaemon builds |
+| Unity build codegen | Per-file TUs can give other inlining or COMDAT order | Pilot in card `0d`: no difference for 12 functions (section 2). Watch for a DIFF that only unity explains |
+| LTCG link RAM and time | Slots run out of RAM; gates take minutes | Measured in `0d` (section 7): 0.92 GB now, 1.5 to 2.5 GB full ❓; set E7; one cold build at a time |
 | Disk | Disk guard stops builds | Clean card dirs; watch free space each wave |
 | Stub callers fold | Callers stay DIFF until callees are lifted | Wave order callees first |
 | Shared BloodLib differs | A GameDaemon fix can break another exe | Card gate: no lost MATCH in all exes; `lift_common_gd` for GameDaemon-only forms |
