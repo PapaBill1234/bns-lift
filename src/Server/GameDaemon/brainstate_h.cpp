@@ -1,9 +1,10 @@
-// brainstate_h.cpp: brainstate.h (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
+// brainstate_h.cpp: brainstate.h (GameDaemon PDB, 2019 + PDB).
 #include "brainstate.h"
 #include "LiftStub.h"
 
 // 0x633b0
+// The body only resets the vftable to BrainState (base dtor inlined). The
+// binary folds it with SpawnState::~SpawnState.
 __cdecl ActSeqState::~ActSeqState(void)
 {
-    LIFT_STUB(0x633b0);
 }

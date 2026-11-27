@@ -1,6 +1,8 @@
 // serializer.cpp: serializer.cpp (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
 #include "serializer.h"
 #include "serializedobject.h"
+#include "serializertimer.h"
+#include "Log.h"
 #include "LiftStub.h"
 
 // 0x663e00
@@ -18,7 +20,13 @@ void __cdecl Serializer::dump(void)
 // 0x664020
 ::SerializedObjectQueue * __cdecl Serializer::GetNextExpire(void)
 {
-    LIFT_STUB(0x664020);
+    if (_timer == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\Serializer.cpp", 98,
+                   L"[serializer], next expire is null, serializer:%p", this);
+        return nullptr;
+    }
+    return _timer->GetNextExpire();
 }
 
 // 0x664090

@@ -85,7 +85,7 @@ bool __cdecl SerializerTimer::Initialize(::Serializer *, int)
 // 0x666180
 unsigned __int64 __cdecl SerializerTimer::TimerId(void) const
 {
-    LIFT_STUB(0x666180);
+    return _serializer->Id();
 }
 
 // 0x666190

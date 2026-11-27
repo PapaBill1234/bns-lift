@@ -16,11 +16,17 @@ public:
     void __cdecl dump(void);  // 0x663ed0
     ::SerializedObjectQueue * __cdecl GetNextExpire(void);  // 0x664020
     bool __cdecl Initialize(unsigned __int64, long, long);  // 0x664090
+    // PDB: public, inlined (no RVA).
+    unsigned __int64 Id() const { return _id; }
 protected:
     void __cdecl execute(long, ::SerializedObjectQueue *, unsigned int *);  // 0x664280
 public:
     bool __cdecl Post(::SerializedObject *, long);  // 0x664d10
 protected:
     bool __cdecl post(::SerializedObject *);  // 0x664d80
+private:
+    // LIFT: Serializer has only part of its PDB members yet (size 0x98).
+    unsigned __int64 _id;  // +8
+    long _interval;  // +16
+    ::SerializerTimer *_timer;  // +24
 };
-

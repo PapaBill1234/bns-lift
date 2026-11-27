@@ -3,10 +3,12 @@
 #pragma once
 #include "GameDaemonFwd.h"
 
-class LtExpireSO
+class LtExpireSO : private ::LiftBytes<0x70 - 8>  // LIFT: PDB base SerializedObject (+8 to +0x6F) is not declared yet
 {
 protected:
     virtual void __cdecl TimerExpired(long);  // 0x4307b0
+private:
+    bool _enable;  // +0x70
 };
 
 class SerializedObject

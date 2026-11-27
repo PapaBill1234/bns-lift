@@ -4,8 +4,10 @@
 
 // 0x1b2230
 __cdecl RankingResult::RankingResult(void)
+    : state(RESULT_STATE_NONE)
+    , resultSeasonCount(0)
 {
-    LIFT_STUB(0x1b2230);
+    InitializeSRWLock(&lock);
 }
 
 // 0x1b2300

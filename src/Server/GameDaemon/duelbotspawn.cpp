@@ -2,12 +2,25 @@
 #include "duelbotspawn.h"
 #include "duelbot.h"
 #include "duelbottask.h"
+#include "Memory.h"
 #include "LiftStub.h"
+
+#define DUELBOTSPAWN_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\DuelBotSpawn.cpp"
 
 // 0xaa700
 bool __cdecl DuelBotSpawn::Init(void)
 {
-    LIFT_STUB(0xaa700);
+    if (_zone == nullptr)
+        return false;
+
+    _maxDuelBot = 5;
+    // ❓ Hex-Rays drops the line argument of the first call. 49 is the line before the second call (50).
+    _duelBot = static_cast<DuelBot**>(
+        Memory::_Manager[2]->AllocZero(sizeof(DuelBot*) * _maxDuelBot, DUELBOTSPAWN_FILE, 49));
+    _spawnTask = static_cast<DuelBotSpawnTask**>(
+        Memory::_Manager[2]->AllocZero(sizeof(DuelBotSpawnTask*) * _maxDuelBot, DUELBOTSPAWN_FILE, 50));
+
+    return _duelBot != nullptr && _spawnTask != nullptr;
 }
 
 // 0xaa790

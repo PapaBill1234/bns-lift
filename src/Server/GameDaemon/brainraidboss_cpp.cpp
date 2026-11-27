@@ -3,6 +3,7 @@
 #include "creature.h"
 #include "npc.h"
 #include "LiftStub.h"
+#include <string.h>
 
 // 0x634f0
 __cdecl BrainRaidBoss::BrainRaidBoss(::Npc &)
@@ -13,7 +14,8 @@ __cdecl BrainRaidBoss::BrainRaidBoss(::Npc &)
 // 0x63700
 void __cdecl BrainRaidBoss::InitSpecialState(void)
 {
-    LIFT_STUB(0x63700);
+    memset(_specialTargets, 0, sizeof(_specialTargets));
+    _specialRotateCount = 0;
 }
 
 // 0x63730

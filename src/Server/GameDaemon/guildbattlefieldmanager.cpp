@@ -32,7 +32,6 @@ void __cdecl GuildBattleFieldManager::OnRevived(::Pc *)
 // 0x112310
 void __cdecl GuildBattleFieldManager::OnActivated(::Pc *)
 {
-    LIFT_STUB(0x112310);
 }
 
 // 0x112430

@@ -3,7 +3,7 @@
 #pragma once
 #include "GameDaemonFwd.h"
 
-class CaptureTheFlag
+class CaptureTheFlag : private ::LiftBytes<0xd628 - 8>  // LIFT: PDB base and members +8 to +0xD627 are not declared yet
 {
 public:
     virtual bool __cdecl Init(::Zone *, unsigned __int64);  // 0x64980
@@ -31,5 +31,9 @@ public:
     virtual void __cdecl OnDead(unsigned __int64, ::Pc *);  // 0x170e30
     virtual __int64 __cdecl Context1(void);  // 0x180ed0
     virtual __int64 __cdecl Context2(void);  // 0x180ee0
+private:
+    // LIFT: CaptureTheFlag has only part of its PDB members yet (size 0xD648).
+    int _flagCount;  // +0xD628
+    __int64 _lastFlagSpawnedTime;  // +0xD630
 };
 

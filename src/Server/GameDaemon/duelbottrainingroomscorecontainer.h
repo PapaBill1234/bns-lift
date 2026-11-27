@@ -20,6 +20,11 @@ public:
     bool __cdecl SetRewardValueToRecord(::DuelBotTrainingRoomScoreContainer::DuelBotTrainingRoomScoreValue &, char, char);  // 0xaf670
     void __cdecl FetchList(::Packet *, ::RepeatPacketComposer *);  // 0xaf770
     bool __cdecl SetReceiveRewardFlag(void);  // 0xafa40
+private:
+    ::DuelBotTrainingRoomScoreEntry **_entryList;  // +0
+    ::Pc *_owner;  // +8
+    bool _receiveFlag;  // +16
+    long long _receiveFlagResetTime;  // +24
 };
 
 class DuelBotTrainingRoomScoreEntry

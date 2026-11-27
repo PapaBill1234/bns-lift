@@ -16,5 +16,11 @@ public:
     void __cdecl CancelSpawn(::DuelBotSpawnTask *, int);  // 0xab3e0
 private:
     void __cdecl forceDespawn(::DuelBot *, bool);  // 0xab460
+private:
+    ::Zone *_zone;  // +0
+    ::DuelBot **_duelBot;  // +8
+    ::DuelBotSpawnTask **_spawnTask;  // +16
+    int _maxDuelBot;  // +24
+    char _targetJob;  // +28
 };
 

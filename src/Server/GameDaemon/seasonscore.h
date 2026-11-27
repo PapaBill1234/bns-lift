@@ -45,6 +45,23 @@ public:
     bool __cdecl SetRecord(::SeasonContentsGuildCombatRecord const &, bool, bool, int);  // 0x1bbba0
     ::SeasonContentsGuildCombatRecordEntry const * __cdecl GetRecordEntry(char);  // 0x1bbe50
     void __cdecl FetchList(::FragmentPacket &);  // 0x1bbed0
+private:
+    // PDB: private, inlined (no RVA).
+    // ❓ Only the type 8 case is known (from the inlined copy in GetRecordEntry 0x1bbe50).
+    int const convertSeasonContentsTypeToEntryIndex(char seasonContentsType) const
+    {
+        switch (seasonContentsType)
+        {
+        case 8:
+            return 1;
+        default:
+            return -1;
+        }
+    }
+
+    ::SeasonContentsGuildCombatRecordEntry **_entryList;  // +0
+    int _capacity;  // +8
+    ::Guild *_owner;  // +16
 };
 
 class SeasonContentsGuildCombatRecordEntry

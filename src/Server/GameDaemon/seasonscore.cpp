@@ -2,6 +2,8 @@
 #include "seasonscore.h"
 #include "guild.h"
 #include "pc.h"
+#include "Log.h"
+#include "AlertSender.h"
 #include "LiftStub.h"
 
 // 0x1b9f00
@@ -119,9 +121,18 @@ bool __cdecl SeasonContentsGuildCombatRecordContainer::SetRecord(::SeasonContent
 }
 
 // 0x1bbe50
-::SeasonContentsGuildCombatRecordEntry const * __cdecl SeasonContentsGuildCombatRecordContainer::GetRecordEntry(char)
+::SeasonContentsGuildCombatRecordEntry const * __cdecl SeasonContentsGuildCombatRecordContainer::GetRecordEntry(char seasonContentsType)
 {
-    LIFT_STUB(0x1bbe50);
+    int const entryIndex = convertSeasonContentsTypeToEntryIndex(seasonContentsType);
+    if (entryIndex < 0)
+    {
+        Log::Write(Log::LT_ERROR, L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\SeasonScore.cpp", 780,
+                   L"== CRASH == invalid record entry index, seasonContentsType:%d, entryIndex:%d", seasonContentsType, entryIndex);
+        AlertSender::Write(L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\SeasonScore.cpp", 780,
+                           L"== CRASH == invalid record entry index, seasonContentsType:%d, entryIndex:%d", seasonContentsType, entryIndex);
+        return nullptr;
+    }
+    return _entryList[entryIndex];
 }
 
 // 0x1bbed0
