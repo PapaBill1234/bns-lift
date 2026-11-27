@@ -930,6 +930,216 @@
 "score": 66.7,
 "status": "DIFF"
 },
+"Npc::GetAOEDefendPowerModify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Npc::GetAbnormalAttackPowerModify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Npc::GetAbnormalDefendPowerModify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Npc::GetAttackAttributeModify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Npc::GetAttackCounterDamageModify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Npc::GetAttackCriticalDamageModify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Npc::GetAttackCriticalValueModify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Npc::GetAttackHitValueModify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Npc::GetAttackParryPierceModify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Npc::GetAttackPerfectParryDamageModify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Npc::GetAttackPierceModify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Npc::GetAttackStiffDurationValueModify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Npc::GetCastDurationValueModify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Npc::GetDefendCounterReduceModify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Npc::GetDefendCriticalDamageModify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Npc::GetDefendCriticalValueModify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Npc::GetDefendDodgeValueModify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Npc::GetDefendForceValueModify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Npc::GetDefendParryReduceModify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Npc::GetDefendParryValueModify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Npc::GetDefendPerfectParryReduceModify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Npc::GetDefendPhysicalValueModify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Npc::GetDefendStiffDurationValueModify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Npc::GetHatePowerModify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Npc::GetHealPowerModify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Npc::GetRAttackAbnormalHitModify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Npc::GetRAttackAoePierceModify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Npc::GetRDefendAbnormalDodgeModify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Npc::GetRHypermovePowerModify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Npc::GetRSupportPowerModify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "NpcContribution::TotalDamage": {
 "calls": 100,
 "consts": 100,
@@ -1329,6 +1539,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"SkillTrainingRoom::GetTypeName": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "TakeAchievementRewardTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
@@ -1386,6 +1603,13 @@
 "status": "DIFF"
 },
 "UpdateBidTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"User::GetId": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -1687,6 +1911,13 @@
 "status": "MATCH"
 },
 "ZSTD_updateStats": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZoneSerializedObject::TimerExpired": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
