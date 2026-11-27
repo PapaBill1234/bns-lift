@@ -5,7 +5,7 @@
 
 // LIFT: keep the lifted virtual functions until the callers are lifted (the vftable and the callers are stubs;
 // /OPT:REF drops them). Card lift-gamedaemon-gap-005-e5.
-#pragma comment(linker, "/INCLUDE:?TypeId@ChallengeListProperty@@UEBAHXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?TypeId@ChallengeListProperty@@UEBA?BHXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?FieldMax@ChallengeListProperty@@MEBAHXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?FieldDefine@ChallengeListProperty@@MEBAPEBUDef@Field@@XZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?SyncMax@ChallengeListProperty@@MEBAHXZ")  // LIFT: dead-strip keep (no live caller yet)
