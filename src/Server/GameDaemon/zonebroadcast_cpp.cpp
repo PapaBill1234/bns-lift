@@ -9,6 +9,21 @@
 #include "zone.h"
 #include "LiftStub.h"
 
+namespace
+{
+// LIFT: view of the PDB class ZoneBroadcastCube. Only the list heads that the lifted bodies use are declared.
+struct ZoneBroadcastCubeView
+{
+    char lift_pad_0[0x90];               // ❓ no PDB name: ZoneBroadcastCube +0 to +0x8F are not declared here
+    ::ZoneFieldItemNode *FieldItemHead;  // +144 (0x90)
+    ::ZoneCampfireNode *CampfireHead;    // +152 (0x98)
+};
+}
+
+#pragma comment(linker, "/INCLUDE:?AddToCube@ZoneFieldItemNode@@IEAA_NPEAVZoneBroadcastCube@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?AddToCube@ZoneCampfireNode@@IEAA_NPEAVZoneBroadcastCube@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?Clear@ZoneObjectIdList@@QEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
+
 // 0x25a050
 bool __cdecl ZoneCreatureNode::AddToCube(::ZoneBroadcastCube *)
 {
@@ -22,9 +37,19 @@ bool __cdecl ZoneCreatureNode::RemoveFromCube(void)
 }
 
 // 0x25a1e0
-bool __cdecl ZoneFieldItemNode::AddToCube(::ZoneBroadcastCube *)
+bool __cdecl ZoneFieldItemNode::AddToCube(::ZoneBroadcastCube *cube)
 {
-    LIFT_STUB(0x25a1e0);
+    if (cube == nullptr)
+        return false;
+
+    ZoneBroadcastCubeView *const view = reinterpret_cast<ZoneBroadcastCubeView *>(cube);
+    Cube = cube;
+    Prev = nullptr;
+    Next = view->FieldItemHead;
+    if (view->FieldItemHead != nullptr)
+        view->FieldItemHead->Prev = this;
+    reinterpret_cast<ZoneBroadcastCubeView *>(Cube)->FieldItemHead = this;
+    return true;
 }
 
 // 0x25a230
@@ -34,9 +59,19 @@ bool __cdecl ZoneFieldItemNode::RemoveFromCube(void)
 }
 
 // 0x25a2a0
-bool __cdecl ZoneCampfireNode::AddToCube(::ZoneBroadcastCube *)
+bool __cdecl ZoneCampfireNode::AddToCube(::ZoneBroadcastCube *cube)
 {
-    LIFT_STUB(0x25a2a0);
+    if (cube == nullptr)
+        return false;
+
+    ZoneBroadcastCubeView *const view = reinterpret_cast<ZoneBroadcastCubeView *>(cube);
+    Cube = cube;
+    Prev = nullptr;
+    Next = view->CampfireHead;
+    if (view->CampfireHead != nullptr)
+        view->CampfireHead->Prev = this;
+    reinterpret_cast<ZoneBroadcastCubeView *>(Cube)->CampfireHead = this;
+    return true;
 }
 
 // 0x25a2f0
@@ -54,7 +89,14 @@ void __cdecl ZoneObjectIdList::Add(unsigned __int64, char, __int64, unsigned cha
 // 0x25a430
 void __cdecl ZoneObjectIdList::Clear(void)
 {
-    LIFT_STUB(0x25a430);
+    for (unsigned int i = 0; i < Count; ++i)
+    {
+        Ids[i] = 0;
+        Datas[i] = 0;
+        Datas2[i] = 0;
+        Datas3[i] = 0;
+    }
+    Count = 0;
 }
 
 // 0x25a480

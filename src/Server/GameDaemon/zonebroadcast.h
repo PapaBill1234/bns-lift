@@ -14,6 +14,11 @@ class ZoneCampfireNode
 {
 protected:
     bool __cdecl AddToCube(::ZoneBroadcastCube *);  // 0x25a2a0
+private:
+    ::Campfire *campfire;  // +0
+    ::ZoneBroadcastCube *Cube;  // +8
+    ::ZoneCampfireNode *Next;  // +16
+    ::ZoneCampfireNode *Prev;  // +24
 };
 
 class ZoneCreatureList
@@ -58,6 +63,11 @@ class ZoneFieldItemNode
 protected:
     bool __cdecl AddToCube(::ZoneBroadcastCube *);  // 0x25a1e0
     bool __cdecl RemoveFromCube(void);  // 0x25a230
+private:
+    ::FieldItem *fieldItem;  // +0
+    ::ZoneBroadcastCube *Cube;  // +8
+    ::ZoneFieldItemNode *Next;  // +16
+    ::ZoneFieldItemNode *Prev;  // +24
 };
 
 class ZoneObjectIdList
@@ -68,5 +78,12 @@ public:
     void __cdecl Clear(void);  // 0x25a430
 private:
     void __cdecl grow(void);  // 0x25a480
+
+    unsigned int Size;  // +0
+    unsigned int Count;  // +4
+    unsigned __int64 *Ids;  // +8
+    char *Datas;  // +16
+    __int64 *Datas2;  // +24
+    unsigned char *Datas3;  // +32
 };
 
