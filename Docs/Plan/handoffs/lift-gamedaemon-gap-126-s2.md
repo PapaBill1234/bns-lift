@@ -62,6 +62,18 @@ Do one of these:
 - ❓ `REFCNT_HEADER` has no GD value. The GD build uses the CacheGate path in `RefCntObject::addReferenceCount`.
   The GD literal (in the pseudocode a reference into `zone._extraPublicProp`) is not known. Check the string when the function is live (lessons A6).
 
+## Round 3: MATCH gain from a live GD function
+
+The 5 log functions are still not live in GD (see round 2). Round 3 lifts a live GD function in a file of this card.
+
+- `AlertSender::fini` (GD 0x686c20) is live and paired. The round 2 build gives DIFF (score 61.9, calls 86).
+- Cause: the GD original calls the static function `destroy(AlertBufferList&)` (GD 0x686920, size 92, `AlertSender.obj`) out of line.
+  The shared form inlines the loop.
+- GD form (under `#if defined(LIFT_EXE_GD)`): a static `__declspec(noinline) void destroy(AlertBufferList&)` with the same loop
+  (`Memory::_Manager[2]->Free(buffer, L"source\\AlertSender.cpp", 95)`). `fini` calls it in the critical section.
+- The other 5 exes keep the inline loop.
+- Expected result: `AlertSender::fini` MATCH and `destroy` paired in GD. ❓ Not checked with a build.
+
 ## Changed files
 
 - `src/Server/GameDaemon/item_h_1.cpp`

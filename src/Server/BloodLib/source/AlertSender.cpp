@@ -87,7 +87,25 @@ bool AlertSender::init(wchar_t* address, wchar_t const* daemonName, int worldId,
     return true;
 }
 
-// 0x18B20 (SmartCouponDaemon)
+#if defined(LIFT_EXE_GD)
+// 0x686920 (GameDaemon) static destroy(AlertBufferList&), size 92.
+// LIFT: GameDaemon keeps it out of line (fini 0x686c20 calls it). The other exes inline the loop in fini.
+static __declspec(noinline) void destroy(AlertBufferList& list)
+{
+    AlertBuffer* buffer = list._head;
+    while (buffer != nullptr)
+    {
+        AlertBuffer* next = buffer->_next;
+        Memory::_Manager[2]->Free(buffer, ALERT_SENDER_FILE, 95);
+        buffer = next;
+    }
+    list._head = nullptr;
+    list._tail = nullptr;
+    list._count = 0;
+}
+#endif
+
+// 0x18B20 (SmartCouponDaemon), 0x686c20 (GameDaemon)
 void AlertSender::fini()
 {
     if (Daemon::Instance != nullptr)
@@ -116,6 +134,9 @@ void AlertSender::fini()
     _daemonName[0] = 0;
     _worldId = 0;
     EnterCriticalSection(&_cs);
+#if defined(LIFT_EXE_GD)
+    destroy(_bufferList);
+#else
     AlertBuffer* buffer = _bufferList._head;
     while (buffer != nullptr)
     {
@@ -126,6 +147,7 @@ void AlertSender::fini()
     _bufferList._head = nullptr;
     _bufferList._tail = nullptr;
     _bufferList._count = 0;
+#endif
     LeaveCriticalSection(&_cs);
 }
 
