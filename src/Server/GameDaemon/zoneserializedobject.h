@@ -10,8 +10,14 @@ public:
     virtual __cdecl ~ZoneSerializedObject(void);  // 0x25fab0
     void __cdecl SetZone(::Zone *);  // 0x25fb40
 protected:
+    // LIFT: slots 1-5 come from RefCntObject and RelationalRefCntObject (not lifted yet). Pure placeholders keep the PDB slot order.
+    virtual void __cdecl lift_slot1_deallocate_object(void) = 0;
+    virtual void __cdecl lift_slot2_deallocate_me(void) = 0;
+    virtual void __cdecl lift_slot3_DumpRefCntHistory(void) = 0;
+    virtual void __cdecl lift_slot4_parentRoleAllocator(void) = 0;
+    virtual void __cdecl lift_slot5_childRoleAllocator(void) = 0;
+    virtual void __cdecl TimerExpired(long);  // 0x25fbf0, PDB slot 6 (override of SerializedObject)
     virtual void __cdecl TimerExpired(unsigned int, long) = 0;  // PDB slot 7, pure
-    virtual void __cdecl TimerExpired(long);  // 0x25fbf0
 public:
     void __cdecl DetachParent(void);  // 0x25fc00
 };
