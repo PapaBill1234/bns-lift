@@ -12,7 +12,7 @@ All bodies are getters of Property classes. Each one returns a constant or a sta
 - `MentoringProperty`: Name, FieldMax, FieldDefine, SyncMax, SyncDefine.
 - `QuestList`: Name, FieldMax, FieldDefine, SyncMax, SyncDefine.
 
-Each class gets four protected static members (`fieldMax`, `fieldDefine`, `syncMax`, `syncDefine`). The form is the same as the pilot in `creatureproperty`. No `/INCLUDE` pragma is used (the source guard forbids it). `/OPT:REF` can remove a lifted function that has no live caller. The driver must handle this in the build.
+Each class gets four protected static members (`fieldMax`, `fieldDefine`, `syncMax`, `syncDefine`). The form is the same as the pilot in `creatureproperty`. Each lifted function has a `/INCLUDE` pragma with a `// LIFT:` note, because no live caller exists yet. Without it, `/OPT:REF` removes the function and funcdiff cannot pair it (round 2 had 0 MATCH for this reason).
 
 ## Not done
 

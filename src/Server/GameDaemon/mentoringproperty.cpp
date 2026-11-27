@@ -3,6 +3,13 @@
 #include "propertysync.h"
 #include "LiftStub.h"
 
+// LIFT: keep the lifted virtual functions until the callers are lifted (card lift-gamedaemon-gap-003-e3).
+#pragma comment(linker, "/INCLUDE:?Name@MentoringProperty@@UEBAPEB_WXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?FieldMax@MentoringProperty@@MEBAHXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?FieldDefine@MentoringProperty@@MEBAPEBUDef@Field@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SyncMax@MentoringProperty@@MEBAHXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SyncDefine@MentoringProperty@@MEBAPEBUDef@SyncBuffer@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+
 // 0x19bd0
 __cdecl MentoringProperty::~MentoringProperty(void)
 {
