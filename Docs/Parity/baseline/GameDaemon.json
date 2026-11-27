@@ -195,6 +195,41 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Action::GetSlotId": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Action::SetSlotId": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Action::cancelAction": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ActionQueue::generateInstanceId": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ActionQueue::~ActionQueue": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "ActivatedTeleport::FieldDefine": {
 "calls": 100,
 "consts": 100,
@@ -1316,6 +1351,13 @@
 "status": "MATCH"
 },
 "DuelBotActionQueue::GetMovement": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DuelBotActionQueue::GetOperation": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -2470,6 +2512,20 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"PcActionQueue::GetOperation": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PcPublicRaidState::CheckAddScoreCoolTime": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "PcPublicRaidState::GetAddScoreCount": {
 "calls": 100,
 "consts": 100,
@@ -2512,6 +2568,20 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"PickupAction::availableCancel": {
+"calls": 100,
+"consts": 0,
+"refs": 100,
+"score": 66.7,
+"status": "DIFF"
+},
+"PickupDeadBodyAction::availableCancel": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "PutItemIntoClosetTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
@@ -2525,6 +2595,13 @@
 "refs": 0,
 "score": 66.7,
 "status": "DIFF"
+},
+"PutdownFieldItemAction::availableCancel": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "QuestList::FieldDefine": {
 "calls": 100,
@@ -2833,6 +2910,13 @@
 "refs": 0,
 "score": 66.7,
 "status": "DIFF"
+},
+"RepairWithCampfireAction::availableCancel": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "RestoreCharacterTran::GetDefinition": {
 "calls": 100,
