@@ -16,6 +16,20 @@ protected:
     bool __cdecl checkReservePcCount(::Pc *, ::Zone *, int, int);  // 0x1a10b0
 };
 
+// LIFT: views of the PDB record Data::PublicRaidRecord (base DrEl, size 0xB0) and of Data::PublicRaidRecordPtr.
+// Only the fields that the lifted bodies read are declared.
+struct PublicRaidRecordView
+{
+    char lift_pad_0[0x20];  // ❓ no PDB name: fields +0 to +0x1F are not declared yet
+    char max_pc_count;  // +32 (0x20)
+};
+
+class PublicRaidRecordPtrView
+{
+public:
+    ::PublicRaidRecordView *_record;  // 0x0 (PDB: DrRecordPtr::_record, DrEl *)
+};
+
 class PublicRaid
 {
 public:
@@ -55,6 +69,10 @@ private:
     void __cdecl broadcastPublicRaidEventStop(short);  // 0x1a3800
     void __cdecl doEnvOperation(void);  // 0x1a39f0
     bool __cdecl getEventCylinder(::cylinder16 &);  // 0x1a3b40
+private:
+    // PDB layout (size 0xD3A8). The vfptr is at +0.
+    char lift_pad_8[0xD340];  // ❓ no PDB name: base EnterPublicRaidAttractionState and _state (+8 to +0xD347) are not declared yet
+    ::PublicRaidRecordPtrView _data;  // +54088 (0xD348) (PDB: Data::PublicRaidRecordPtr)
 };
 
 class PublicRaidGameLog

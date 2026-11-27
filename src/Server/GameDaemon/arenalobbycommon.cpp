@@ -3,6 +3,10 @@
 #include "pc.h"
 #include "LiftStub.h"
 
+#pragma comment(linker, "/INCLUDE:?IsDungeonGameMode@ArenaLobbyRoomUtil@@SA_ND@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?IsPartyBattleFieldGameMode@ArenaLobbyRoomUtil@@SA_ND@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?IsPublicRaidGameMode@ArenaLobbyRoomUtil@@SA_ND@Z")  // LIFT: dead-strip keep (no live caller yet)
+
 // 0x45180
 void __cdecl ArenaLobbySend::HelloGame(::Session const *, short)
 {
@@ -118,21 +122,24 @@ char __cdecl ArenaLobbyRoomUtil::ConvertArenaDungeonGameModeToDifficultyType(cha
 }
 
 // 0x49390
-bool __cdecl ArenaLobbyRoomUtil::IsDungeonGameMode(char)
+bool __cdecl ArenaLobbyRoomUtil::IsDungeonGameMode(char arenaDungeonGameMode)
 {
-    LIFT_STUB(0x49390);
+    // ❓ PDB enumerator names of the arena dungeon game modes are not looked up. Values 1 to 3 are dungeon modes.
+    return arenaDungeonGameMode > 0 && arenaDungeonGameMode <= 3;
 }
 
 // 0x493a0
-bool __cdecl ArenaLobbyRoomUtil::IsPartyBattleFieldGameMode(char)
+bool __cdecl ArenaLobbyRoomUtil::IsPartyBattleFieldGameMode(char arenaDungeonGameMode)
 {
-    LIFT_STUB(0x493a0);
+    // ❓ Values 4 to 6 are party battle field modes.
+    return arenaDungeonGameMode >= 4 && arenaDungeonGameMode <= 6;
 }
 
 // 0x493b0
-bool __cdecl ArenaLobbyRoomUtil::IsPublicRaidGameMode(char)
+bool __cdecl ArenaLobbyRoomUtil::IsPublicRaidGameMode(char arenaDungeonGameMode)
 {
-    LIFT_STUB(0x493b0);
+    // ❓ Values 7, 8 and 10 are public raid modes.
+    return arenaDungeonGameMode >= 7 && (arenaDungeonGameMode <= 8 || arenaDungeonGameMode == 10);
 }
 
 // 0x493d0

@@ -7,7 +7,18 @@ class BrainConst
 {
 public:
     enum Event {};
-    enum State {};
+    // PDB enumerators of BrainConst::State.
+    enum State
+    {
+        STATE_INVALID = 0,
+        STATE_SPAWN = 1,
+        STATE_ACT_SEQ = 2,
+        STATE_FOLLOW = 3,
+        STATE_TALK = 4,
+        STATE_COMBAT_SEQ = 5,
+        STATE_RETURN = 6,
+        STATE_COUNT = 7,
+    };
 public:
     static wchar_t const * __cdecl GetState(::BrainConst::State);  // 0x402c60
     static wchar_t const * __cdecl GetEvent(::BrainConst::Event);  // 0x402cd0

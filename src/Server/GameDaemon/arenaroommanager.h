@@ -25,6 +25,20 @@ public:
     virtual char __cdecl GetArenaAttraction(void);  // 0x66a1a0
 };
 
+// LIFT: views of the PDB record Data::InterDungeonListRecord (base DrEl, size 0x48) and of Data::InterDungeonListRecordPtr.
+// Only the fields that the lifted bodies read are declared.
+struct ArenaInterDungeonListRecordView
+{
+    char lift_pad_0[0x30];  // ❓ no PDB name: fields +0 to +0x2F are not declared yet
+    unsigned __int64 public_raid;  // +48 (0x30)
+};
+
+class ArenaInterDungeonListRecordPtrView
+{
+public:
+    ::ArenaInterDungeonListRecordView *_record;  // 0x0 (PDB: DrRecordPtr::_record, DrEl *)
+};
+
 class ArenaPublicRaidRoom
 {
 public:
@@ -40,6 +54,12 @@ protected:
     virtual ::Data::PcContentsTypeType __cdecl GetPcContentsType(void);  // 0x4a500
 public:
     virtual bool __cdecl GetPcSpawnInfo(unsigned int, unsigned __int64, unsigned int *, ::vector16 *, int *);  // 0x4a520
+protected:
+    // PDB layout (size 0xD388). The vfptr is at +0.
+    char lift_pad_8[0xD370];  // ❓ no PDB name: base ArenaDungeonRoom up to +0xD377 is not declared yet
+    ::ArenaInterDungeonListRecordPtrView _interDungeonList;  // +54136 (0xD378) (PDB: ArenaDungeonRoom::_interDungeonList)
+    char _arenaPortalPublicRaidModeType;  // +54144 (0xD380) (LIFT: PDB type is char const; const waits for the lifted ctor)
+    long volatile _reservePcCount;  // +54148 (0xD384)
 };
 
 class ArenaRoom

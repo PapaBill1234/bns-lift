@@ -8,6 +8,8 @@
 #include "npc.h"
 #include "LiftStub.h"
 
+#pragma comment(linker, "/INCLUDE:?ReserveTransitBerserk@BossCombatSequence@@UEAA_N_K@Z")  // LIFT: dead-strip keep (no live caller yet)
+
 // 0x77bc0
 ::Action * __cdecl BossCombatSequence::NextCombatAction(::BrainBase &, ::Creature *, int, ::NpcActionQueue::ActionExpiredReason, bool &)
 {
@@ -15,9 +17,12 @@
 }
 
 // 0x77d70
-bool __cdecl BossCombatSequence::ReserveTransitBerserk(unsigned __int64)
+bool __cdecl BossCombatSequence::ReserveTransitBerserk(unsigned __int64 seq)
 {
-    LIFT_STUB(0x77d70);
+    if (_reservedBerserkSeqId != 0)
+        return false;
+    _reservedBerserkSeqId = seq;
+    return true;
 }
 
 // 0x77d90

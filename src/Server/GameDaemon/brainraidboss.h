@@ -4,6 +4,14 @@
 #include "GameDaemonFwd.h"
 #include "brainconst.h"
 
+// LIFT: view of the PDB class CombatSeqState (base BrainState, size 0x18). Only the fields that the lifted bodies read are declared.
+struct BrainRaidBossCombatSeqStateView
+{
+    void *lift_vfptr;  // +0 (0x0): vfptr of BrainState
+    ::CombatSequence *_combatSeq;  // +8 (0x8) (PDB: CombatSequence &)
+    unsigned __int64 _lastTargetId;  // +16 (0x10)
+};
+
 class BrainRaidBoss
 {
 protected:
@@ -17,5 +25,14 @@ private:
     void __cdecl getNearSpecialTargets(::Creature **const, char, char);  // 0x63ac0
     void __cdecl getFarSpecialTargets(::Creature **const, char, char);  // 0x63c80
     void __cdecl getMinHateSpecialTargets(::Creature **const, char, char);  // 0x63e40
+private:
+    // PDB layout (size 0xCB8). The vfptr is at +0.
+    char lift_pad_8[0xC00];  // ❓ no PDB name: base BrainBase, _actSeq, _bossCombatSeq and _hateList (+8 to +0xC07) are not declared yet
+    unsigned __int64 _spawn[1];  // +3080 (0xC08) (PDB: SpawnState, size 0x8)
+    unsigned __int64 _act[2];  // +3088 (0xC10) (PDB: ActSeqState, size 0x10)
+    ::BrainRaidBossCombatSeqStateView _combat;  // +3104 (0xC20) (PDB: CombatSeqState)
+    unsigned __int64 _return[3];  // +3128 (0xC38) (PDB: ReturnState, size 0x18)
+    unsigned __int64 _specialTargets[12];  // +3152 (0xC50)
+    char _specialRotateCount;  // +3248 (0xCB0)
 };
 
