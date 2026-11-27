@@ -1123,11 +1123,7 @@ bool HandleLobbyLobbyGate_KickNotify(Session const* session, Packet* packet)
         ch->removeReferenceCount(HANDLER_FILE, 1463);
         return true;
     }
-    // LIFT: 0x10660 the inlined Packet constructor (Splitter, IsFragmentPacket, a 28-byte memset).
     Packet p;
-    p.Splitter = nullptr;
-    p.IsFragmentPacket = false;
-    memset(&p.FragmentPacketCmd, 0, 28);
     p.Allocate();
     if (!p.Compose("hQ", 10, reason))
     {
