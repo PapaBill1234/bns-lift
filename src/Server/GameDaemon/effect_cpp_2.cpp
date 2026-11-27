@@ -4,6 +4,9 @@
 #include "effectproperty.h"
 #include "zone.h"
 #include "LiftStub.h"
+#include <new>
+
+#define EFFECT_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\Effect.cpp"
 
 // 0x5aac20
 __cdecl EffectContainer::~EffectContainer(void)
@@ -216,9 +219,28 @@ short __cdecl EffectContainer::GetListSize(void)
 }
 
 // 0x5b03c0
-short __cdecl EffectContainer::newIndex(::EffectSlot)
+#pragma comment(linker, "/INCLUDE:?newIndex@EffectContainer@@AEAAFW4EffectSlot@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+short __cdecl EffectContainer::newIndex(::EffectSlot slot)
 {
-    LIFT_STUB(0x5b03c0);
+    if (slot == SLOT_NONE)
+        return -1;
+    if (ownerEffectSlot == NULL)
+        return -1;
+
+    ::EffectSlotList *const list = ownerEffectSlot->GetEffectSlotList(slot);
+    if (list == NULL)
+        return -1;
+
+    short const start = list->lastIndex;
+    int index = start;
+    while (list->effects[index] != NULL)
+    {
+        index = (index + 1) % list->capacity;
+        if (index == list->lastIndex)
+            return -1;
+    }
+    list->lastIndex = static_cast<short>(start + 1) % list->capacity;
+    return static_cast<short>(index);
 }
 
 // 0x5b0440
@@ -348,9 +370,13 @@ bool __cdecl EffectFactory::initEffect(::Effect *, ::EffectSource, ::Zone *, uns
 }
 
 // 0x5b4870
+#pragma comment(linker, "/INCLUDE:??0EffectList@@QEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
 __cdecl EffectList::EffectList(void)
 {
-    LIFT_STUB(0x5b4870);
+    head = ::new (Memory::_Manager[2]->Alloc(sizeof(::EffectNode), EFFECT_FILE, 5924)) ::EffectNode;
+    head->prev = head;
+    head->next = NULL;
+    head->effectData = NULL;
 }
 
 // 0x5b48d0
@@ -372,9 +398,22 @@ void __cdecl EffectList::Delete(::EffectNode *)
 }
 
 // 0x5b49f0
+#pragma comment(linker, "/INCLUDE:?Clear@EffectList@@QEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
 void __cdecl EffectList::Clear(void)
 {
-    LIFT_STUB(0x5b49f0);
+    ::EffectNode* node = head->next;
+    while (node != NULL)
+    {
+        ::EffectNode* const next = node->next;
+        node->effectData = NULL;
+        node->prev = NULL;
+        node->next = NULL;
+        Memory::_Manager[2]->Free(node, EFFECT_FILE, 6031);
+        node = next;
+    }
+    head->prev = head;
+    head->next = NULL;
+    head->effectData = NULL;
 }
 
 // 0x5b4aa0

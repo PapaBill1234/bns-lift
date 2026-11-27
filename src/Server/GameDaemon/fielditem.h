@@ -34,6 +34,10 @@ private:
     bool __cdecl invokeThrowEffect(::Creature *);  // 0x5a22e0
     bool __cdecl invokeEffect(::Creature *, unsigned __int64);  // 0x5a2520
     bool __cdecl checkTargetStateFilter(::Creature *, unsigned __int64) const;  // 0x5a25a0
+private:
+    char lift_pad_8[0x28 - 8];  // LIFT: base GameObject (+8 to +0x27) is not declared yet
+public:
+    unsigned __int64 Id;  // +0x28 (PDB: GameObject::Id)
 };
 
 class FieldItemIdManager
@@ -50,5 +54,9 @@ public:
     ::FieldItem * __cdecl CreateFieldItem(void);  // 0x5a2920
     bool __cdecl Remove(unsigned __int64);  // 0x5a29d0
     bool __cdecl RemoveAll(void);  // 0x5a2ac0
+    // LIFT: PDB members (size 0x20); IdMgr (+0x10) and zone (+0x18) are not declared yet.
+    ::FieldItem **FieldItems;  // +0x0
+    int Count;  // +0x8
+    int MaxSize;  // +0xC
 };
 

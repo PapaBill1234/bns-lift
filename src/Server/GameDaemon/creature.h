@@ -3,6 +3,29 @@
 #pragma once
 #include "GameDaemonFwd.h"
 
+// LIFT: views of the PDB record Data::SkillModifyLimitRecord (base DrEl, size 0x30) and of Data::SkillModifyLimitRecordPtr.
+// Only the fields that the lifted bodies read are declared.
+struct SkillModifyLimitRecordView
+{
+    char lift_pad_0[0x18];  // DrEl base (+0), key (+8), alias (+0x10): not declared yet
+    short recycle_duration_min_ratio_percent;  // +24 (0x18)
+    short recycle_duration_max_ratio_percent;  // +26 (0x1A)
+    short sp_consume_min_value;  // +28 (0x1C)
+    short sp_consume_max_value;  // +30 (0x1E)
+    short damage_power_percent_min_ratio_percent;  // +32 (0x20)
+    short damage_power_percent_max_ratio_percent;  // +34 (0x22)
+    short hp_drain_percent_min_ratio_percent;  // +36 (0x24)
+    short hp_drain_percent_max_ratio_percent;  // +38 (0x26)
+    short heal_percent_min_ratio_percent;  // +40 (0x28)
+    short heal_percent_max_ratio_percent;  // +42 (0x2A)
+};
+
+class SkillModifyLimitRecordPtrView
+{
+public:
+    ::SkillModifyLimitRecordView *_record;  // 0x0 (PDB: DrRecordPtr::_record, DrEl *)
+};
+
 class ApplySkillModifyInfo
 {
 public:
@@ -11,7 +34,21 @@ public:
     int const __cdecl CalcDamagePowerPercent(int) const;  // 0x453740
     short const __cdecl CalcHealPercent(short) const;  // 0x4537e0
     short const __cdecl CalcHpDrainPercent(short) const;  // 0x453880
+private:
+    int _divideValue;  // +0 (0x0)
+    bool _skillModify;  // +4 (0x4)
+    short _recycleDurationModifyPercent;  // +6 (0x6)
+    int _recycleDurationModifyDiff;  // +8 (0x8)
+    int _spConsumeModifyDiff;  // +12 (0xC)
+    short _damagePowerPercentModifyPercent;  // +16 (0x10)
+    int _damagePowerPercentModifyDiff;  // +20 (0x14)
+    short _hpDrainPercentModifyPercent;  // +24 (0x18)
+    int _hpDrainPercentModifyDiff;  // +28 (0x1C)
+    short _healPercentModifyPercent;  // +32 (0x20)
+    int _healPercentModifyDiff;  // +36 (0x24)
+    ::SkillModifyLimitRecordPtrView _skillModifyLimitData;  // +40 (0x28) (PDB type: Data::SkillModifyLimitRecordPtr)
 };
+static_assert(sizeof(ApplySkillModifyInfo) == 0x30, "sizeof ApplySkillModifyInfo");
 
 class ChangedProperty
 {

@@ -607,7 +607,7 @@ class EffectList;
 class EffectNode;
 class EffectProperty;
 class EffectRegion;
-enum EffectSlot {};
+enum EffectSlot { SLOT_NONE = -1 };
 struct EffectSlotList;
 enum EffectSource {};
 class EffectTimer;
@@ -2043,7 +2043,17 @@ struct DrXmlDoc {};
 struct DroppedItem {};
 struct DuelMoveInfo {};
 struct DuelResultTranResultNotifyInfo {};
-class EffectNode {};
+class EffectNode
+{
+public:
+    // PDB: EffectNode::EffectNode (inlined in EffectList::EffectList 0x5b4870)
+    EffectNode() : effectData(NULL), prev(NULL), next(NULL), deleteReserved(false) {}
+    ::PassiveEffect* effectData;  // +0x00
+    EffectNode* prev;             // +0x08
+    EffectNode* next;             // +0x10
+    bool deleteReserved;          // +0x18
+};
+static_assert(sizeof(EffectNode) == 0x20, "sizeof EffectNode");
 struct EffectSlotList
 {
     ::PassiveEffect** effects;  // +0x00

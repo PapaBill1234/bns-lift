@@ -13,6 +13,9 @@ public:
     virtual void __cdecl OnTimer(::Zone *, unsigned short);  // 0x643b0
 private:
     void __cdecl remove(void);  // 0x643d0
+    char lift_pad_8[0x28 - 8];  // LIFT: base GameObject (+8 to +0x27) is not declared yet
+public:
+    unsigned __int64 Id;  // +0x28 (PDB: GameObject::Id)
 };
 
 class CampfireIdManager
@@ -28,5 +31,9 @@ public:
     bool __cdecl Initialize(::Zone *, int);  // 0x646e0
     ::Campfire * __cdecl CreateCampfire(void);  // 0x647d0
     bool __cdecl Remove(unsigned __int64);  // 0x64880
+    // LIFT: PDB members (size 0x20); IdMgr (+0x10) and zone (+0x18) are not declared yet.
+    ::Campfire **Campfires;  // +0x0
+    int Count;  // +0x8
+    int MaxSize;  // +0xC
 };
 

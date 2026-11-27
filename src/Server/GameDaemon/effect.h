@@ -4,6 +4,14 @@
 #include "GameDaemonFwd.h"
 #include "effectproperty.h"
 
+// PDB: CreatureEffectSlot (size 0x8, abstract base of the creature effect slots).
+class CreatureEffectSlot
+{
+public:
+    virtual ~CreatureEffectSlot();  // slot 0
+    virtual ::EffectSlotList *const GetEffectSlotList(int const) = 0;  // slot 1
+};
+
 class BossNpcEffectSlot
 {
 public:
@@ -129,6 +137,8 @@ private:
     void __cdecl executeSchedule(long);  // 0x5b0790
     void __cdecl releaseDetachedList(void);  // 0x5b0920
     void __cdecl reschedule(__int64, long);  // 0x5b09e0
+    // LIFT: PDB members from +0x00 only; the rest of the 0x100 layout comes in a later card.
+    ::CreatureEffectSlot* ownerEffectSlot;  // +0x00
 };
 
 class EffectFactory
@@ -162,6 +172,8 @@ public:
     void __cdecl Insert(::PassiveEffect *);  // 0x5b4910
     void __cdecl Delete(::EffectNode *);  // 0x5b4990
     void __cdecl Clear(void);  // 0x5b49f0
+private:
+    ::EffectNode* head;  // +0x00
 };
 
 class EffectTimer
