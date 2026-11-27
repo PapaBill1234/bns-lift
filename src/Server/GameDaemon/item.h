@@ -207,10 +207,10 @@ struct ItemBaseAccessoryPropertyView
 };
 
 // LIFT: class template ItemBase<Trait> (PDB, base Item, size 0x110 for AccessoryTrait).
-// Only the members of the lifted bodies are declared. The Item members (+8 to +39) are not declared yet.
+// Only the members of the lifted bodies are declared. The Item members (+8 to +39) are in class Item.
 // LIFT: the PDB member prop has the type <Trait>Property. Only the AccessoryProperty layout is declared.
 template <class Trait>
-class ItemBase : public ::Item, private ::LiftBytes<0x28 - 8>  // LIFT: the Item members (+8 to +0x27) are not declared yet
+class ItemBase : public ::Item  // LIFT: the Item members (+8 to +0x27) are declared in Item (card e17)
 {
 public:
     virtual int __cdecl GetDataId(void) const;
