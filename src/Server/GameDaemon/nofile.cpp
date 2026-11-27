@@ -1,4 +1,7 @@
 // nofile.cpp: no source file in the PDB (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
+// LIFT: per-exe StlMemory.h path (A6). The inlined StlAllocator::deallocate of this exe uses the GameDaemon build path.
+#define LIFT_STLMEMORY_FILE \
+    L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\bloodlib\\include\\StlMemory.h"
 #include "GameDaemonFwd.h"
 #include "datapacker.h"
 #include "datareaderimpl.h"
@@ -9,10 +12,14 @@
 #include "rankingseason.h"
 #include "LiftStub.h"
 
+#pragma comment(linker, "/INCLUDE:??1SlateScrollCache@Data@@QEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:??1RankingSeasonInfo@@QEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:??0Exception@Json@@QEAA@AEBV01@@Z")  // LIFT: dead-strip keep (no live caller yet)
+
 // 0x118e0
+// PDB: compiler-generated. The body is the inlined destructor of stones.
 __cdecl Data::SlateScrollCache::~SlateScrollCache(void)
 {
-    LIFT_STUB(0x118e0);
 }
 
 // 0x157c0
@@ -42,9 +49,9 @@ __cdecl TakeTimeBasedPlayRewardResponseParam::~TakeTimeBasedPlayRewardResponsePa
 }
 
 // 0x1b4030
+// PDB: compiler-generated. The body is the inlined destructor of resultScheduleList.
 __cdecl RankingSeasonInfo::~RankingSeasonInfo(void)
 {
-    LIFT_STUB(0x1b4030);
 }
 
 // 0x1ee8e0
@@ -88,9 +95,10 @@ __cdecl Json::LogicError::~LogicError(void)
 }
 
 // 0x6a84d0
-__cdecl Json::Exception::Exception(::Json::Exception const &)
+// PDB: compiler-generated copy constructor.
+__cdecl Json::Exception::Exception(::Json::Exception const & that)
+    : std::exception(that), msg_(that.msg_)
 {
-    LIFT_STUB(0x6a84d0);
 }
 
 // 0x6a85d0

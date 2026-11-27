@@ -4,12 +4,15 @@
 #include "GameDaemonFwd.h"
 
 namespace Json {
-class Exception
+// PDB layout: size 0x40.
+class Exception : public std::exception
 {
 public:
     virtual __cdecl ~Exception(void);  // 0x6a83c0
     virtual char const * __cdecl what(void) const;  // 0x6a8420
     __cdecl Exception(::Json::Exception const &);  // 0x6a84d0
+protected:
+    ::std::basic_string<char, ::std::char_traits<char>, ::StlAllocator<char, 2> > msg_;  // +0x18
 };
 }
 

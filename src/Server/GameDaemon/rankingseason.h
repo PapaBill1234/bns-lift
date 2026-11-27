@@ -8,7 +8,21 @@ struct RankingSeasonInfo
 public:
     void __cdecl CopySeasonInfo(::RankingSeasonInfo &);  // 0x180910
     __cdecl ~RankingSeasonInfo(void);  // 0x1b4030
+
+    // LIFT: card lift-gamedaemon-e12 adds the PDB data members (size 0xE0).
+    char seasonContentsType;                    // +0x00
+    int seasonContentsScheduleNumber;           // +0x04
+    wchar_t seasonContentsSeasonName[71];       // +0x08
+    char seasonType;                            // +0x96
+    short playerType;                           // +0x98
+    long long startTime;                        // +0xA0
+    long long endTime;                          // +0xA8
+    long long resultExpirationTime;             // +0xB0
+    short rewardGroupId;                        // +0xB8
+    int defaultRatingScore;                     // +0xBC
+    std::vector<RankingSeasonResultScheduleInfo*, StlAllocator<RankingSeasonResultScheduleInfo*, 2> > resultScheduleList;  // +0xC0
 };
+static_assert(sizeof(RankingSeasonInfo) == 0xE0, "sizeof RankingSeasonInfo");
 
 class RankingSeasonManager
 {

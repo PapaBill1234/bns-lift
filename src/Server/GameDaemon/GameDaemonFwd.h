@@ -2269,10 +2269,20 @@ public:
 
 // LIFT: these classes have functions only in nofile.cpp (no source file in the PDB).
 namespace Data {
+// PDB layout: size 0x4.
+struct SlateStoneCache
+{
+    short stone_id;  // +0x00
+    char group;      // +0x02
+};
+
+// PDB layout: size 0x20.
 struct SlateScrollCache
 {
 public:
     __cdecl ~SlateScrollCache(void);  // 0x118e0
+
+    std::vector<Data::SlateStoneCache, StlAllocator<Data::SlateStoneCache, 1> > stones;  // +0x00
 };
 }
 namespace Json {
