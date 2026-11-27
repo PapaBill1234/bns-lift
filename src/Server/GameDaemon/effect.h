@@ -27,8 +27,23 @@ public:
     virtual ::EffectSlotList *const __cdecl GetEffectSlotList(int);  // 0x5aa760
 };
 
-class Effect
+class Effect : public ::DynamicRefCntObj
 {
+    // PDB data members (size 0x70).
+protected:
+    ::Zone * zone;                              // +0x18
+    ::GameObject * target;                      // +0x20
+    unsigned __int64 casterId;                  // +0x28
+    char skillInstanceId;                       // +0x30
+    unsigned __int64 skillKey;                  // +0x38
+    unsigned int groupId;                       // +0x40
+    ::Data::EffectRecord const * data;          // +0x48
+    ::EffectSlot effectSlot;                    // +0x50
+    ::EffectSource source;                      // +0x54
+    __int64 damageRate;                         // +0x58
+    bool broadcastEnable;                       // +0x60
+    int broadcastBitFlag;                       // +0x64
+    ::EffectAttachFail _invokeReason;           // +0x68
 protected:
     virtual bool __cdecl Initialize2(::EffectSource, ::Zone *, unsigned __int64, unsigned __int64, char, unsigned __int64, ::Data::EffectRecord const *, long);  // 0x453a20
     virtual bool __cdecl Initialize3(::EffectSource, ::Zone *, unsigned __int64, unsigned __int64, char, unsigned __int64, ::Data::EffectRecord const *, bool, ::SkillResult, ::ApplySkillModifyInfo *, short, ::vector16, short, short);  // 0x453a60
@@ -171,7 +186,7 @@ public:
     __cdecl NpcEffectSlot(void);  // 0x5aa810
 };
 
-class PassiveEffect
+class PassiveEffect : public ::Effect
 {
 public:
     enum ReturnStackable {};
@@ -179,10 +194,25 @@ public:
     virtual short __cdecl GetDbIndex(void) const;  // 0x453b20
     virtual char __cdecl GetStackCount(void) const;  // 0x453b30
     __cdecl PassiveEffect(void);  // 0x5a49b0
+    // PDB data members (size 0x100).
 private:
-    char _liftEffectBase[0xB0];  // LIFT: Effect base and PassiveEffect members (+0x08 to +0xB8), later waves
+    short _slotIndex;                           // +0x70
+    long _scheduleTime;                         // +0x74
+    __int64 _updateTime;                        // +0x78
+    bool _validateAction;                       // +0x80
+    bool _immuned;                              // +0x81
+    bool _detach;                               // +0x82
+    bool _appliedMaxStackFlag;                  // +0x83
+    __int64 _attachedTime;                      // +0x88
+    __int64 _passiveDuration;                   // +0x90
+    __int64 _lastUpdateScheduleTime;            // +0x98
+    long _passiveInterval;                      // +0xA0
+    long _accumulateDiffTime;                   // +0xA4
 protected:
-    ::EffectProperty _prop;  // +0xB8
+    ::Data::EffectAccumulateDamageSlotType _accumulateDamageSlotType;  // +0xA8
+    int _accumulatedDamageType;                 // +0xAC. LIFT: the PDB type is Data::EffectAccumulatedDamageTypeType (enum, not declared yet)
+    __int64 _maxAccumulateDamage;               // +0xB0
+    ::EffectProperty _prop;                     // +0xB8
 protected:
     virtual bool __cdecl Initialize1(::EffectSource, ::Zone *, unsigned __int64, unsigned __int64, char, unsigned __int64, ::Data::EffectRecord const *);  // 0x5a4b80
 public:

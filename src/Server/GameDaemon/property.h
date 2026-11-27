@@ -45,5 +45,10 @@ private:
     static short __cdecl initBitfield(int, ::FieldDef const *const, int, ::Field::Def *const, unsigned short, void *);  // 0x68b610
     static ::SyncBuffer::Def * __cdecl initSyncDefine(int, ::SyncDef const *const, int, bool, int, ::Field::Def *const, void *);  // 0x68b770
     static unsigned char __cdecl findMaxId(int, ::SyncDef const *const);  // 0x68ba10
+
+    // PDB data members (size 0x30).
+private:
+    ::SyncBuffer * buffer[4];      // +0x08
+    ::QueryString * whereClause;   // +0x28
 };
 

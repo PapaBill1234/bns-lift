@@ -33,10 +33,17 @@ The driver builds, gates and compares MATCH counts. This session did not build.
 
 ## Decisions
 
-- `GameDaemon` gets a partial PDB layout: `replyCacheHelloEvent` (+0x748), `config` (+0xAA8), `arenaAttraction` (+0x1030). Pads fill the other bytes. Size is 0x15378.
+- Round 2: the gate check `pdb_layout` failed with 11 errors. Each error was a `_lift...` pad member. A pad has no PDB member name. Round 2 removes all pads:
+  - `GameDaemon` now has its PDB base `Daemon` (BloodLib, size 0x748). It declares each PDB member from +0x748 to `arenaGameChannelEnable` (+0x1031). The members after +0x1038 follow in later waves. There is no `sizeof` assert now.
+  - `GamedConfig` declares each PDB member from +0x00 to `_arenaId` (+0xF8). There is no `sizeof` assert now.
+  - `Inventory` declares all PDB members (size 0x5B8).
+  - `Effect` now has its PDB base `DynamicRefCntObj` and its PDB members (+0x18 to +0x68). `PassiveEffect` now has its PDB base `Effect` and its PDB members (+0x70 to +0xB8).
+  - `Property` gets its PDB members `buffer[4]` and `whereClause`. `EffectProperty` now has its PDB base `Property`.
+  - A member whose PDB type is not declared yet is a sized stand-in (`unsigned __int64 name[n]` or `int` / `void *`). It has the PDB name and offset. Its `// LIFT:` comment gives the PDB type. Later waves replace the stand-ins.
+- `GameDaemon` reads `replyCacheHelloEvent` (+0x748), `config` (+0xAA8) and `arenaAttraction` (+0x1030).
 - `GameDaemon::GamedInstance` is a static member. `gamedaemon_h.cpp` defines it until `gamedaemon.cpp` is lifted. Move the definition then.
 - `gamedaemon.h` includes the BloodLib `Lock.h` for `SystemEvent`.
-- `GamedConfig` gets a partial PDB layout: `_arenaEnabled` (+0xED), `_arenaId` (+0xF8). Size is 0x660.
+- `GameDaemon` reads `GamedConfig::_arenaEnabled` (+0xED) and `GamedConfig::_arenaId` (+0xF8).
 - `TimeBasedPlaySeasonSchedule::Rule` gets its PDB members `minutes` and `rewardList[4]`. The constructor does the same stores as `Rule::Clear`.
 - `gamedaemon_h.cpp` has `/INCLUDE` dead-strip pragmas for the 8 lifted bodies. The mangled names come from the MSVC rules, not from a publics dump. If the link fails on one name, fix that name.
 - `effect_h.cpp` and `inventory_cpp_2.cpp` have no dead-strip pragmas. Their mangled names have complex parameters. Add them when a publics dump is available, or when a lifted caller keeps them.
@@ -87,4 +94,5 @@ The driver runs the gate and the MATCH comparison after this session. This sessi
 - `src/Server/GameDaemon/gamedaemon.h`
 - `src/Server/GameDaemon/gamedaemon_h.cpp`
 - `src/Server/GameDaemon/gamedconfig.h`
+- `src/Server/GameDaemon/property.h` (round 2)
 - `Docs/Plan/handoffs/lift-gamedaemon-gap-017-e17.md`

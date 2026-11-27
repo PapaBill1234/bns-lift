@@ -4,6 +4,9 @@
 #include "GameDaemonFwd.h"
 #include "Lock.h"
 
+class SessionHandler;
+class LogFile;
+
 class BuilderSessionHandler
 {
 public:
@@ -14,7 +17,7 @@ public:
     virtual bool __cdecl PacketHandler(::Session const *, ::Packet const *) const;  // 0x33ac20
 };
 
-class GameDaemon
+class GameDaemon : public ::Daemon
 {
 public:
     virtual long __cdecl GetTimerMaxTime(void);  // 0x191e0
@@ -67,24 +70,64 @@ public:
     static void __cdecl WriteDump(bool);  // 0x3438f0
     static wchar_t const * __cdecl GetAddressStringWForLogs(unsigned long);  // 0x343910
 
-    // PDB data members (partial layout, size 0x15378).
     static ::GameDaemon * GamedInstance;
+
+    // PDB data members (PDB size 0x15378). LIFT: the members after arenaGameChannelEnable (+0x1038 to +0x15378) follow in later waves.
+    // LIFT: a member with an `unsigned __int64 x[n]` type is a sized stand-in. Its comment gives the PDB type, which is not declared yet.
 private:
-    char _liftGameDaemonPad0[0x748 - 0x8];      // LIFT: base class and members before replyCacheHelloEvent, later waves
+    ::SystemEvent replyCacheHelloEvent;                          // +0x748
+    ::SystemEvent replyArenaLobbyHelloEvent;                     // +0x750
+    ::SystemEvent npInitialConnectEvent;                         // +0x758
+    unsigned __int64 npRegisterGameServiceEvent[0x328 / 8];      // +0x760. LIFT: PDB type SystemMultiEvent
+    ::SystemEvent npRegisterGameGroupServiceEvent;               // +0xA88
+    long volatile _challengePartyListLoaded;                     // +0xA90
+    long volatile _mentoringListLoaded;                          // +0xA94
 public:
-    ::SystemEvent replyCacheHelloEvent;         // +0x748
+    ::PublisherLibsInterface * _plsInterface;                    // +0xA98
+    void * _tlsInterface;                                        // +0xAA0. LIFT: PDB type TencentLibsInterface *
 private:
-    char _liftGameDaemonPad1[0xAA8 - 0x750];    // LIFT: members, later waves
-public:
-    ::GamedConfig * config;                     // +0xAA8
-private:
-    char _liftGameDaemonPad2[0x1030 - 0xAB0];   // LIFT: members, later waves
-public:
-    char arenaAttraction;                       // +0x1030
-private:
-    char _liftGameDaemonTail[0x15378 - 0x1031]; // LIFT: members after arenaAttraction, later waves
+    ::GamedConfig * config;                                      // +0xAA8
+    ::RuleConfig * ruleConfig;                                   // +0xAB0
+    int _pType;                                                  // +0xAB8. LIFT: PDB type PRODUCT_TYPE (enum)
+    ::UserManager * userManager;                                 // +0xAC0
+    ::CloseWaitManager * closeWaitManager;                       // +0xAC8
+    ::BuilderOperationManager * builderOperationManager;         // +0xAD0
+    void * bannedWordFilter;                                     // +0xAD8. LIFT: PDB type BannedWordFilterLib *
+    ::BannedWordFilterDynamicMemoryManager * bannedWordFilterMemoryManager;  // +0xAE0
+    unsigned __int64 localeSet[0x18 / 8];                        // +0xAE8. LIFT: PDB type GameLocaleSet
+    unsigned __int64 petitionSessionHandler[0x8 / 8];            // +0xB00. LIFT: PDB type PetitionSessionHandler
+    ::PetitionManager * petitionManager;                         // +0xB08
+    ::SessionHandler * sessionHandler[25];                       // +0xB10
+    ::LogFile * logFile;                                         // +0xBD8
+    ::LogFile * logFgtFile;                                      // +0xBE0
+    ::LogFile * auditLogFile;                                    // +0xBE8
+    ::LogFile * surveyLogFile;                                   // +0xBF0
+    ::LogFile * ncGuardLogFile;                                  // +0xBF8
+    ::LogFile * clientLogFile;                                   // +0xC00
+    unsigned __int64 broadcastCrypt[0x18 / 8];                   // +0xC08. LIFT: PDB type BroadcastCrypt
+    unsigned __int64 cachedChannel[0x28 / 8];                    // +0xC20. LIFT: PDB type CachedChannel
+    int * duelRatingBeginnerConst;                               // +0xC48
+    unsigned __int64 randomStoreInitializationSchedule[0x18 / 8];  // +0xC50. LIFT: PDB type RandomStoreInitializationSchedule
+    int gameMileageEffectiveDurationInDays;                      // +0xC68
+    ::RankingSeasonManager * rankingSeasonMgr;                   // +0xC70
+    unsigned __int64 timeBasedPlaySeasonSchedule[0x1E0 / 8];     // +0xC78. LIFT: PDB type TimeBasedPlaySeasonSchedule
+    ::BoardGacha * boardGacha;                                   // +0xE58
+    __int64 duelBotTraineeKey;                                   // +0xE60
+    __int64 duelBotTrainerKey;                                   // +0xE68
+    char recombat;                                               // +0xE70
+    unsigned __int64 arenaSideArenaLobbyChannel[0x38 / 8];       // +0xE78. LIFT: PDB type ArenaSideArenaLobbyChannel
+    unsigned __int64 arenaGameManager[0x38 / 8];                 // +0xEB0. LIFT: PDB type ArenaGameManager
+    unsigned __int64 arenaGameSessionHandler[0x8 / 8];           // +0xEE8. LIFT: PDB type ArenaGameSessionHandler
+    unsigned __int64 gameSideArenaLobbySessionHander[0x8 / 8];   // +0xEF0. LIFT: PDB type GameSideArenaLobbySessionHandler
+    unsigned __int64 gameArenaLobbyManager[0xD0 / 8];            // +0xEF8. LIFT: PDB type GameArenaLobbyManager
+    unsigned __int64 gameArenaManager[0x50 / 8];                 // +0xFC8. LIFT: PDB type GameArenaManager
+    unsigned __int64 gameArenaSessionHandler[0x8 / 8];           // +0x1018. LIFT: PDB type GameArenaSessionHandler
+    ::DisconnectedArenaSessionManager * disconnectedArenaSessionManager;  // +0x1020
+    ::ArenaRoomManager * arenaRoomManager;                       // +0x1028
+    char arenaAttraction;                                        // +0x1030
+    bool arenaGameChannelEnable;                                 // +0x1031
 };
-static_assert(sizeof(GameDaemon) == 0x15378, "sizeof GameDaemon");
+static_assert(sizeof(::Daemon) == 0x748, "sizeof Daemon (GameDaemon base)");
 
 class GamedCooldownTimer
 {

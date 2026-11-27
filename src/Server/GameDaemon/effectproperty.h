@@ -3,8 +3,9 @@
 #pragma once
 #include "GameDaemonFwd.h"
 #include "propertysync.h"
+#include "property.h"
 
-class EffectProperty
+class EffectProperty : public ::Property
 {
 public:
     virtual __cdecl ~EffectProperty(void);  // 0x19860
@@ -32,8 +33,6 @@ public:
         long long expiration_time;  // +0x10
     };
 
-private:
-    char _liftPropertyBase[0x28];  // LIFT: Property base members (+0x08 to +0x30), later waves
 public:
     EffectProperty::__default__ Default;  // +0x30. LIFT: the PDB type is `__default__ const`
 };

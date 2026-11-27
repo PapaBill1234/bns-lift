@@ -246,10 +246,21 @@ private:
 
     // PDB data members (partial layout, size 0x5B8).
 private:
-    ::Pc* owner;                              // +0x000
-    char _liftInventoryPad[0x528 - 0x8];      // LIFT: _depotList[13] and the other members, later waves
-    ::Item* _tradeItems[9];                   // +0x528
-    char _liftInventoryTail[0x5B8 - 0x570];   // LIFT: members after _tradeItems, later waves
+    ::Pc* owner;                                  // +0x000
+    unsigned __int64 _depotList[13][4];           // +0x008. LIFT: the PDB type is Inventory::Depot[13] (0x20 each), not declared yet
+    unsigned __int64 _setItemList[38][2];         // +0x1A8. LIFT: the PDB type is Inventory::SetItemInfo[38] (0x10 each), not declared yet
+    char _setItemListCount;                       // +0x408
+    char _soldFront;                              // +0x409
+    char _soldRear;                               // +0x40A
+    ::Item* _soldItems[11];                       // +0x410
+    ::Item* _pawnItems[11];                       // +0x468
+    char _pawnItemCount;                          // +0x4C0
+    ::Item* _tranItems[11];                       // +0x4C8
+    char _tranItemCount;                          // +0x520
+    bool _leavedZone;                             // +0x521
+    ::Item* _tradeItems[9];                       // +0x528
+    unsigned __int64 _timeLimitItemPQ[5];         // +0x570. LIFT: the PDB type is TimeLimitItemPriorityQueue (0x28), not declared yet
+    unsigned __int64 _timeLimitItemIDList[4];     // +0x598. LIFT: the PDB type is std::vector<unsigned __int64, StlAllocator<unsigned __int64,2> > (0x20), not declared yet
 };
 static_assert(sizeof(Inventory) == 0x5B8, "sizeof Inventory");
 
