@@ -1,10 +1,12 @@
-// systemaction_h.cpp: systemaction.h (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
+// systemaction_h.cpp: systemaction.h (GameDaemon PDB, 2019 + PDB).
 #include "systemaction.h"
 #include "action.h"
 #include "LiftStub.h"
 
+#pragma comment(linker, "/INCLUDE:?cancelAction@RestorationAction@@EEAAXW4CancelReason@Action@@PEB_WH@Z")  // LIFT: dead-strip keep (no live caller yet)
+
 // 0x456530
-void __cdecl RestorationAction::cancelAction(::Action::CancelReason, wchar_t const *, int)
+void __cdecl RestorationAction::cancelAction(::Action::CancelReason reason, wchar_t const *file, int line)
 {
-    LIFT_STUB(0x456530);
+    cancelAction(reason, file, line, 0);
 }

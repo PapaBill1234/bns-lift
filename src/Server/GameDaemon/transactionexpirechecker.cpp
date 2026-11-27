@@ -3,6 +3,19 @@
 #include "gametran.h"
 #include "LiftStub.h"
 
+#pragma comment(linker, "/INCLUDE:?Set@GameTranExpireToken@@QEAAPEAVExpireToken@TransactionExpireChecker@@PEAVGameTran@@H@Z")  // LIFT: dead-strip keep (no live caller yet)
+
+#define TRANSACTIONEXPIRECHECKER_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\TransactionExpireChecker.cpp"
+
+// LIFT: view of the PDB class GameTran (size 0x50). Only the fields that the lifted bodies read are declared.
+struct GameTranView
+{
+    char lift_pad_0[0x18];  // ❓ no PDB name: base and vfptr (+0 to +0x17) are not declared yet
+    unsigned __int64 _id;   // +24 (0x18)
+    int _state;             // +32 (0x20)
+    int _lastState;         // +36 (0x24)
+};
+
 // 0x2251c0
 bool __cdecl TransactionExpireChecker::Initialize(long)
 {
@@ -52,7 +65,19 @@ void __cdecl GameTranExpireToken::Expire(void)
 }
 
 // 0x225ae0
-::TransactionExpireChecker::ExpireToken * __cdecl GameTranExpireToken::Set(::GameTran *, int)
+::TransactionExpireChecker::ExpireToken * __cdecl GameTranExpireToken::Set(::GameTran *tran, int op)
 {
-    LIFT_STUB(0x225ae0);
+    if (tran == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, TRANSACTIONEXPIRECHECKER_FILE, 235, L"== CRASH == [expire-token], set context fail; invalid parameter");
+        AlertSender::Write(TRANSACTIONEXPIRECHECKER_FILE, 235, L"== CRASH == [expire-token], set context fail; invalid parameter");
+        return nullptr;
+    }
+
+    ::GameTranView const *view = reinterpret_cast< ::GameTranView const *>(tran);
+    _tid = view->_id;      // PDB: GameTran::GetId()
+    _op = op;
+    _state = view->_state; // PDB: GameTran::GetState()
+    // LIFT: 0x225ae0 the base TransactionExpireChecker::ExpireToken is at +0 in the PDB; the skeleton class has no base yet.
+    return reinterpret_cast< ::TransactionExpireChecker::ExpireToken *>(this);
 }
