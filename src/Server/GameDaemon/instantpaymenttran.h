@@ -20,7 +20,7 @@ public:
 class InstantPaymentDrawSlateNewStoneSubJob
 {
 public:
-    char _pad0[0x160];  // LIFT: the base layout is not lifted yet; _cashId is at 0x168 in the PDB
+    char _pad0[0x164];  // LIFT: the base layout is not lifted yet; the vptr (4 bytes) and this pad put _cashId at 0x168 as in the PDB
     int _cashId;
 protected:
     virtual bool __cdecl tryInstantPaymentOkImpl(void *);  // 0x136950
