@@ -52,3 +52,11 @@ Easy leaves (GameDaemon). The driver builds, runs the gate and records the MATCH
 ## Gate and MATCH
 
 The driver runs the gate and the MATCH comparison after this session. This session did not build. It did not run the gate or funcdiff.
+
+## Lead repair
+
+| Functions | Reject | Repair |
+| --- | --- | --- |
+| 10 `Summoned` forwarders (`Send` x2, `SetCombatModeBy*` x4, `ResetCombatMode*` x3, `OnAttacked`), `ActSequenceLoader::LoadTableMT_PreProc`, `ArenaPublicRaidRoom::GetPublicRaidReservePcCount` | P1_calls: wrong vtable slot. Skeleton classes list virtuals in alphabetical order, not in PDB slot order. | Back to `LIFT_STUB`; their `/INCLUDE` pragmas are removed. A later card must put the classes in PDB slot order (`tools/pdbcls.py`). |
+| `ContributionPouch::ContributionPouch` | Original zeroes qwords at +0x18 and +0x28; the build writes 2 + 1 bytes (the element struct is not complete) | Back to `LIFT_STUB`; pragma removed |
+| `ArenaPublicRaidRoom::GetPublicRaidKey`, `PublicRaid::GetMaxPcCount` | P2_cc (jne vs je) | `if (rec != nullptr) return rec->x; return 0;` (VS2010 scratch compile: same bytes) |

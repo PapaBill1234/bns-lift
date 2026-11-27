@@ -21,7 +21,7 @@ wchar_t const * __cdecl PublicRaid::GetTypeName(void)
 // 0x180e60
 int __cdecl PublicRaid::GetMaxPcCount(void)
 {
-    if (_data._record == nullptr)
-        return 0;
-    return _data._record->max_pc_count;
+    if (_data._record != nullptr)  // LIFT: form (je to repz ret)
+        return _data._record->max_pc_count;
+    return 0;
 }

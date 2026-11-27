@@ -6,7 +6,6 @@
 #pragma comment(linker, "/INCLUDE:?GetArenaPortalPublicRaidModeType@ArenaRoom@@UEBADXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?SetPublicRaidReservePcCount@ArenaPublicRaidRoom@@UEAAXH@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?IsSetPublicRaidReservePcCount@ArenaPublicRaidRoom@@UEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?GetPublicRaidReservePcCount@ArenaPublicRaidRoom@@UEAAHXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?GetPublicRaidKey@ArenaPublicRaidRoom@@UEAA_KXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?GetArenaPortalPublicRaidModeType@ArenaPublicRaidRoom@@UEBADXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?GetArenaAttraction@ArenaDungeonRoom@@UEAADXZ")  // LIFT: dead-strip keep (no live caller yet)
@@ -33,17 +32,15 @@ bool __cdecl ArenaPublicRaidRoom::IsSetPublicRaidReservePcCount(void)
 // 0x27b50
 int __cdecl ArenaPublicRaidRoom::GetPublicRaidReservePcCount(void)
 {
-    if (IsSetPublicRaidReservePcCount())
-        return _reservePcCount;
-    return 0;
+    LIFT_STUB(0x27b50);
 }
 
 // 0x27b80
 unsigned __int64 __cdecl ArenaPublicRaidRoom::GetPublicRaidKey(void)
 {
-    if (_interDungeonList._record == nullptr)
-        return 0;
-    return _interDungeonList._record->public_raid;
+    if (_interDungeonList._record != nullptr)  // LIFT: form (je to repz ret)
+        return _interDungeonList._record->public_raid;
+    return 0;
 }
 
 // 0x27ba0
