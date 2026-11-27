@@ -104,6 +104,34 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"ChangeCharacterAppearanceTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ChangeCharacterRaceTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ChangeCharacterSexTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ChangeWeaponAppearanceTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
 "ClientOption::FieldDefine": {
 "calls": 100,
 "consts": 100,
@@ -188,6 +216,20 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"ConfirmInvitationChallengePartyTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
+"ConfirmInvitationMentoringTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
 "ContentQuotaProperty::FieldDefine": {
 "calls": 100,
 "consts": 100,
@@ -265,6 +307,20 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"CreateChallengePartyTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
+"CreateCharacterTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "CreatureProperty::FieldDefine": {
 "calls": 100,
 "consts": 100,
@@ -306,6 +362,20 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"DeleteCharacterTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DepositInGuildBankTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
 },
 "DiscoveryArea::FieldDefine": {
 "calls": 100,
@@ -363,6 +433,20 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"DuelBotTrainingRoomResultTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
+"DuelBotTrainingRoomRewardTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
 "DuelBotTrainingRoomScore::FieldDefine": {
 "calls": 100,
 "consts": 100,
@@ -404,6 +488,13 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"DuelResultTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
 },
 "EffectProperty::FieldDefine": {
 "calls": 100,
@@ -671,6 +762,34 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"LeaveChallengePartyTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
+"LeaveMentoringTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
+"LeaveWorldTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LobbyTokenAuthTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "LogArchive::Name": {
 "calls": 100,
 "consts": 100,
@@ -679,6 +798,13 @@
 "status": "MATCH"
 },
 "LogServerSessionHandler::~LogServerSessionHandler": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LogoutArenaTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -720,6 +846,55 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"MileageDepositTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
+"NPGetChannelPropertyTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
+"NPGroupInfoTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
+"NPRegisterServiceTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
+"NPValidateGroupTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
+"PartyBattleResultTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
+"PutItemIntoClosetTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
 "QuestList::FieldDefine": {
 "calls": 100,
 "consts": 100,
@@ -755,6 +930,62 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"RegisterBidTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RegisterPurchaseTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RenameCharacterTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RestoreCharacterTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ReturnToArenaLobbyTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TakeAchievementRewardTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
+"TakeItemFromClosetTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
+"TakeTimeBasedPlayRewardTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
 "Thread::stop": {
 "calls": 100,
 "consts": 100,
@@ -781,6 +1012,27 @@
 "consts": 67,
 "refs": 100,
 "score": 55.6,
+"status": "DIFF"
+},
+"TimeAttackRecordResultTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
+"UpdateBidTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WithdrawFromGuildBankTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
 "status": "DIFF"
 },
 "ZSTD_BtFindBestMatch": {
