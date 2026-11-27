@@ -3,13 +3,6 @@
 #include "propertysync.h"
 #include "LiftStub.h"
 
-// LIFT: keep the lifted virtual functions until the callers are lifted (card lift-gamedaemon-gap-003-e3).
-#pragma comment(linker, "/INCLUDE:?Name@GemProperty@@UEBAPEB_WXZ")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?FieldMax@GemProperty@@MEBAHXZ")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?FieldDefine@GemProperty@@MEBAPEBUDef@Field@@XZ")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?SyncMax@GemProperty@@MEBAHXZ")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?SyncDefine@GemProperty@@MEBAPEBUDef@SyncBuffer@@XZ")  // LIFT: dead-strip keep (no live caller yet)
-
 // 0x19ac0
 wchar_t const * __cdecl GemProperty::Name(void) const
 {

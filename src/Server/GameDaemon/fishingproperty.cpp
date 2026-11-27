@@ -3,14 +3,6 @@
 #include "propertysync.h"
 #include "LiftStub.h"
 
-// LIFT: keep the lifted virtual functions until the callers are lifted (card lift-gamedaemon-gap-003-e3).
-#pragma comment(linker, "/INCLUDE:?TypeId@FishingProperty@@UEBA?BHXZ")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?Name@FishingProperty@@UEBAPEB_WXZ")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?FieldMax@FishingProperty@@MEBAHXZ")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?FieldDefine@FishingProperty@@MEBAPEBUDef@Field@@XZ")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?SyncMax@FishingProperty@@MEBAHXZ")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?SyncDefine@FishingProperty@@MEBAPEBUDef@SyncBuffer@@XZ")  // LIFT: dead-strip keep (no live caller yet)
-
 // 0x19a30
 int const __cdecl FishingProperty::TypeId(void) const
 {

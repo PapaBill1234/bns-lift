@@ -3,14 +3,6 @@
 #include "propertysync.h"
 #include "LiftStub.h"
 
-// LIFT: keep the lifted virtual functions until the callers are lifted (card lift-gamedaemon-gap-003-e3).
-#pragma comment(linker, "/INCLUDE:?TypeId@ExtraCreatureProperty@@UEBA?BHXZ")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?Name@ExtraCreatureProperty@@UEBAPEB_WXZ")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?FieldMax@ExtraCreatureProperty@@MEBAHXZ")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?FieldDefine@ExtraCreatureProperty@@MEBAPEBUDef@Field@@XZ")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?SyncMax@ExtraCreatureProperty@@MEBAHXZ")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?SyncDefine@ExtraCreatureProperty@@MEBAPEBUDef@SyncBuffer@@XZ")  // LIFT: dead-strip keep (no live caller yet)
-
 // 0x19940
 __cdecl ExtraCreatureProperty::~ExtraCreatureProperty(void)
 {

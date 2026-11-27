@@ -3,14 +3,6 @@
 #include "propertysync.h"
 #include "LiftStub.h"
 
-// LIFT: keep the lifted virtual functions until the callers are lifted (card lift-gamedaemon-gap-003-e3).
-#pragma comment(linker, "/INCLUDE:?Version@GroceryProperty@@UEBAHXZ")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?Name@GroceryProperty@@UEBAPEB_WXZ")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?FieldMax@GroceryProperty@@MEBAHXZ")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?FieldDefine@GroceryProperty@@MEBAPEBUDef@Field@@XZ")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?SyncMax@GroceryProperty@@MEBAHXZ")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?SyncDefine@GroceryProperty@@MEBAPEBUDef@SyncBuffer@@XZ")  // LIFT: dead-strip keep (no live caller yet)
-
 // 0x19b40
 int __cdecl GroceryProperty::Version(void) const
 {
