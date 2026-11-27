@@ -2,18 +2,16 @@
 // LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
 #pragma once
 #include "GameDaemonFwd.h"
-#include <exception>
 
 namespace Json {
-// PDB layout: size 0x40.
-class Exception : public std::exception
+// LIFT: the PDB base std::exception and the member msg_ (+0x18) are not added yet. No other lifted
+// file links the CRT std::exception symbols. See the handoff (0x6a84d0 Not done).
+class Exception
 {
 public:
     virtual __cdecl ~Exception(void);  // 0x6a83c0
     virtual char const * __cdecl what(void) const;  // 0x6a8420
     __cdecl Exception(::Json::Exception const &);  // 0x6a84d0
-protected:
-    ::std::basic_string<char, ::std::char_traits<char>, ::StlAllocator<char, 2> > msg_;  // +0x18
 };
 }
 

@@ -14,8 +14,6 @@
 
 #pragma comment(linker, "/INCLUDE:??1SlateScrollCache@Data@@QEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:??1RankingSeasonInfo@@QEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:??0Exception@Json@@QEAA@AEBV01@@Z")  // LIFT: dead-strip keep (no live caller yet)
-
 // 0x118e0
 // PDB: compiler-generated. The body is the inlined destructor of stones.
 __cdecl Data::SlateScrollCache::~SlateScrollCache(void)
@@ -95,10 +93,9 @@ __cdecl Json::LogicError::~LogicError(void)
 }
 
 // 0x6a84d0
-// PDB: compiler-generated copy constructor.
-__cdecl Json::Exception::Exception(::Json::Exception const & that)
-    : std::exception(that), msg_(that.msg_)
+__cdecl Json::Exception::Exception(::Json::Exception const &)
 {
+    LIFT_STUB(0x6a84d0);
 }
 
 // 0x6a85d0
