@@ -24,7 +24,7 @@ int __cdecl InstantPaymentJob::DataId(void)
 // 0x1ee480
 int __cdecl InstantPaymentDrawSlateNewStoneSubJob::DataId(short)
 {
-    return _cashId;
+    LIFT_STUB(0x1ee480);  // LIFT: returns _cashId; the member needs the InstantPaymentJob base layout
 }
 
 // 0x350300

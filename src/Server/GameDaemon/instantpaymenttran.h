@@ -19,9 +19,7 @@ public:
 
 class InstantPaymentDrawSlateNewStoneSubJob
 {
-public:
-    char _pad0[0x164];  // LIFT: the base layout is not lifted yet; the vptr (4 bytes) and this pad put _cashId at 0x168 as in the PDB
-    int _cashId;
+// LIFT: no members and no base yet: the InstantPaymentJob layout is not lifted, so _cashId (PDB offset 360) cannot be placed.
 protected:
     virtual bool __cdecl tryInstantPaymentOkImpl(void *);  // 0x136950
     virtual void __cdecl sendFailPacket(short);  // 0x137390
