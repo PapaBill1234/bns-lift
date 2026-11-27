@@ -573,6 +573,13 @@ public:
     bool __cdecl ElevateJobStyle(bool);  // 0x60f670
     void __cdecl RefreshSkillInfo(bool);  // 0x60f8f0
     void __cdecl ActivateSlateAbilities(::EnterReason);  // 0x60f960
+private:
+    // LIFT: Pc has only part of its PDB members yet (size 0x95A8). The gaps hold the bases and the other members.
+    char lift_pad_8[0x4e30 - 8];
+    bool _exceptHate;  // +0x4E30
+    char lift_pad_4e31[0x8cc8 - 0x4e31];
+    ::SkillResultContext _skillResultContext;  // +0x8CC8
+    char lift_pad_8d78[0x95a8 - 0x8d78];
 };
 
 struct PcInfoForGameLog

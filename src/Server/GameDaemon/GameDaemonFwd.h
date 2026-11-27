@@ -2141,7 +2141,21 @@ struct SeasonContentsSchedule {};
 struct SeasonContentsSyncData {};
 struct SelectedRewardItemIndexInfo {};
 struct ServerPing {};
-class SkillResultContext {};
+// LIFT: PDB class SkillResultContext (size 0xB0). The vptr is a plain slot: the ctor and dtor are not lifted yet.
+// The PDB members are private. They are public here because the inline accessors are not declared yet.
+class SkillResultContext
+{
+public:
+    void *lift_vfptr;  // +0
+    unsigned int _lastComboSkill;  // +8
+    __int64 _lastComboSkillFireLimitTime;  // +16
+    __int64 _lastComboSkillExecFirstLimitTime;  // +24
+    __int64 _lastComboSkillExecLastLimitTime;  // +32
+    ::SkillResult _lastComboSkillExecFirstResult;  // +40
+    ::SkillResult _lastComboSkillExecLastResult;  // +44
+    __int64 _lastAttackLimitTime[8];  // +48
+    __int64 _lastAttackedLimitTime[8];  // +112
+};
 class SourceLocation {};
 struct SyncContext {};
 struct SyncDef {};

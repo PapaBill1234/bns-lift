@@ -13,16 +13,81 @@ protected:
     static void __cdecl SetObjList(::ObjIndex16List *, void *);  // 0xdb3c0
 };
 
+struct geo_vector16
+{
+    short x;  // +0
+    short y;  // +2
+    short z;  // +4
+};
+
+struct geo_box16
+{
+    ::geo_vector16 l;  // +0
+    ::geo_vector16 u;  // +6
+};
+
+struct GeoRegionSector
+{
+    int envIndex;  // +0
+};
+
+union RegionSectorPtr
+{
+    ::GeoRegionSector *ptr;  // +0
+    __int64 offset;  // +0
+};
+
+union EnvPtr
+{
+    char *ptr;  // +0
+    __int64 offset;  // +0
+};
+
+struct GeoDataRegion
+{
+    __int64 _size;  // +0
+    int id;  // +8
+    short sectorcx;  // +12
+    short sectorcy;  // +14
+    short sector_xmin;  // +16
+    short sector_xmax;  // +18
+    short sector_ymin;  // +20
+    short sector_ymax;  // +22
+    ::RegionSectorPtr sectors;  // +24
+    ::EnvPtr envs;  // +32
+    short origincx;  // +40
+    short origincy;  // +42
+};
+
+struct GeoDataTerrain
+{
+    __int64 _size;  // +0
+    int id;  // +8
+    ::geo_box16 boundary;  // +12
+    // LIFT: PDB members from sector_xmin (+24) to volumeCellOffsets (+104) are not declared yet. Size 0x70.
+    char lift_pad_18[0x70 - 0x18];
+};
+
 class GeoRegion
 {
 public:
     char __cdecl GetEnv(int, int, int) const;  // 0x8c440
+private:
+    ::GeoRegionSector const *GET_SECTOR(int cx, int cy) const
+    {
+        return &region->sectors.ptr[(cx - region->origincx) / 8 * region->sectorcy + (cy - region->origincy) / 8];
+    }
+    ::GeoDataRegion *region;  // +0
 };
 
 class GeoTerrain
 {
 public:
     bool __cdecl FindCell(short, short, short, short, ::GeoCell &, int &) const;  // 0xdac60
+    int X_TO_CELL_X(short x) const { return (x - terrain->boundary.l.x) / 8; }
+    int Y_TO_CELL_Y(short y) const { return (y - terrain->boundary.l.y) / 8; }
+private:
+    ::GeoDataTerrain const *terrain;  // +0
 };
 
 class GeoWorld
@@ -72,6 +137,13 @@ private:
 public:
     bool __cdecl IsFactionBattleFieldDungeon(void) const;  // 0xdf680
     bool __cdecl IsTeamPartyZone(void) const;  // 0xdf6d0
+    int X_TO_CELL_X(short x) const { return terrain->X_TO_CELL_X(x); }
+    int Y_TO_CELL_Y(short y) const { return terrain->Y_TO_CELL_Y(y); }
+private:
+    // LIFT: PDB members from zoneData (+0) to _eventStageCount (+424) are not declared yet.
+    char lift_pad_0[0x1b0];
+    ::GeoTerrain const *terrain;  // +432
+    ::GeoRegion const *region;  // +440
 };
 
 class RecordMaps

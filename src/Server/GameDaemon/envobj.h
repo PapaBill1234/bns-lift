@@ -96,6 +96,10 @@ protected:
     void __cdecl setGuildBattleFieldGateEnable(bool);  // 0x59a570
 public:
     void __cdecl SetGuildBattleFieldGateEnableOnly(bool);  // 0x59a6a0
+protected:
+    // LIFT: base GameObject and the PDB members from _env2 (+48) to _exceptLootCaseBitmap (+124) are not declared yet.
+    char lift_pad_8[0x80 - 8];
+    unsigned __int64 _ownerId;  // +128
 };
 
 class FallDeathRegion

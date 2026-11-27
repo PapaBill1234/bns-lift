@@ -21,5 +21,11 @@ protected:
     virtual void __cdecl TimerExpired(long);  // 0x25fbf0, PDB slot 6 (override of SerializedObject)
 public:
     void __cdecl DetachParent(void);  // 0x25fc00
+    ::Zone *GetZone() { return _zoneInstance; }
+private:
+    // LIFT: the members of base SerializedObject (+8 to +0x70) are not declared yet.
+    char lift_pad_8[0x70 - 8];
+    ::Zone *_zoneInstance;  // +112
+    bool _shortLived;  // +120
 };
 

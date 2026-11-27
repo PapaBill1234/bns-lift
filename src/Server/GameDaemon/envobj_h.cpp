@@ -4,6 +4,9 @@
 #include "pc.h"
 #include "LiftStub.h"
 
+#pragma comment(linker, "/INCLUDE:?GetOwnerId@Env@@UEAA_KXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?CheckToManipulate@AirDash@@UEAA_NPEAVPc@@PEAVItem@@PEBUQuestRequiredItems@@DAEAF@Z")  // LIFT: dead-strip keep (no live caller yet)
+
 // 0x4553f0
 short __cdecl Env::GetActionRadius(void)
 {
@@ -19,11 +22,12 @@ long __cdecl Env::GetManipulateDuration(char)
 // 0x455410
 unsigned __int64 __cdecl Env::GetOwnerId(void)
 {
-    LIFT_STUB(0x455410);
+    return _ownerId;
 }
 
 // 0x455430
-bool __cdecl AirDash::CheckToManipulate(::Pc *, ::Item *, ::QuestRequiredItems const *, char, short &)
+bool __cdecl AirDash::CheckToManipulate(::Pc *, ::Item *, ::QuestRequiredItems const *, char, short &failReason)
 {
-    LIFT_STUB(0x455430);
+    failReason = 641;  // LIFT: GAME_MANIPULATEFAIL_FAILED_TO_CHECK_MANIPULATE (0x281). The enum GameFailReason has no values yet.
+    return false;
 }
