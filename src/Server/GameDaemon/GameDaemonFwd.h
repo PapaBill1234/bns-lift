@@ -570,7 +570,17 @@ class DuelTagSkillAction;
 class DuelTask;
 class DuelTeam;
 class DungeonProgressToStepNTask;
-enum EconomyItemCategory {};
+enum EconomyItemCategory  // LIFT: PDB enumerators (card lift-gamedaemon-gap-016-e16).
+{
+    ECONOMY_ITEMCATEGORY_INVALID_CATEGORY = 0,
+    ECONOMY_ITEMCATEGORY_MONEY = 1,
+    ECONOMY_ITEMCATEGORY_WEAPON = 2,
+    ECONOMY_ITEMCATEGORY_COSTUME = 3,
+    ECONOMY_ITEMCATEGORY_ACCESSORY = 4,
+    ECONOMY_ITEMCATEGORY_GEM = 5,
+    ECONOMY_ITEMCATEGORY_GROCERY = 6,
+    ECONOMY_ITEMCATEGORY_GLOBAL_MAX = 7,
+};
 class Effect;
 enum EffectAttachFail {};
 class EffectAttributeFilter;
@@ -823,7 +833,16 @@ class InvokeEffectReaction;
 class InvokeEffectTask;
 class Item;
 class ItemAbilityEffect;
-enum ItemClass {};
+enum ItemClass  // LIFT: PDB enumerators (card lift-gamedaemon-gap-016-e16).
+{
+    ITEMCLASS_NONE = 0,
+    ITEMCLASS_WEAPON = 1,
+    ITEMCLASS_COSTUME = 2,
+    ITEMCLASS_GROCERY = 3,
+    ITEMCLASS_GEM = 4,
+    ITEMCLASS_ACCESSORY = 5,
+    ITEMCLASS_COUNT = 6,
+};
 class ItemFactory;
 class ItemListTask;
 class ItemPouch;

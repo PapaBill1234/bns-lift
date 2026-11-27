@@ -1,7 +1,16 @@
-// item_h_1.cpp: item.h part 1 (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
+// item_h_1.cpp: item.h part 1 (GameDaemon PDB, 2019 + PDB).
 #include "item.h"
 #include "pc.h"
 #include "LiftStub.h"
+// LIFT: the BloodLib headers come last. Their Windows macros must not rename the GameDaemon declarations.
+#include "AlertSender.h"
+#include "Log.h"
+
+// LIFT: keep the lifted virtual functions until the callers are lifted. Card lift-gamedaemon-gap-016-e16.
+#pragma comment(linker, "/INCLUDE:?SetCount@WeaponItem@@UEAAXF@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SetCount@CostumeItem@@UEAAXF@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SetCount@GemItem@@UEAAXF@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SetCount@AccessoryItem@@UEAAXF@Z")  // LIFT: dead-strip keep (no live caller yet)
 
 // 0x453ef0
 bool __cdecl ItemXmlHelper::Parse(wchar_t const *, wchar_t *, int &, ::ItemXmlHelper::XmlAttr *, int &)
@@ -10,9 +19,24 @@ bool __cdecl ItemXmlHelper::Parse(wchar_t const *, wchar_t *, int &, ::ItemXmlHe
 }
 
 // 0x454250
-static EconomyItemCategory GetEconomyCommonItemCategory(char)
+// LIFT: a static function (no public name), so no /INCLUDE pragma. The caller keeps it when it is lifted.
+static EconomyItemCategory GetEconomyCommonItemCategory(char itemClass)
 {
-    LIFT_STUB(0x454250);
+    switch (itemClass)
+    {
+    case ITEMCLASS_WEAPON:
+        return ECONOMY_ITEMCATEGORY_WEAPON;
+    case ITEMCLASS_COSTUME:
+        return ECONOMY_ITEMCATEGORY_COSTUME;
+    case ITEMCLASS_GROCERY:
+        return ECONOMY_ITEMCATEGORY_GROCERY;
+    case ITEMCLASS_GEM:
+        return ECONOMY_ITEMCATEGORY_GEM;
+    case ITEMCLASS_ACCESSORY:
+        return ECONOMY_ITEMCATEGORY_ACCESSORY;
+    default:
+        return ECONOMY_ITEMCATEGORY_INVALID_CATEGORY;
+    }
 }
 
 // 0x454290
@@ -22,9 +46,15 @@ __cdecl Item::~Item(void)
 }
 
 // 0x4542d0
-void __cdecl WeaponItem::SetCount(short)
+void __cdecl WeaponItem::SetCount(short count)
 {
-    LIFT_STUB(0x4542d0);
+    if (count != 1)
+    {
+        Log::Write(Log::LT_ERROR, L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\Item.h", 1447,
+                   L"== CRASH == [weapon-item], set count failed; count is not 1, count:%d", count);
+        AlertSender::Write(L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\Item.h", 1447,
+                           L"== CRASH == [weapon-item], set count failed; count is not 1, count:%d", count);
+    }
 }
 
 // 0x454330
@@ -156,9 +186,15 @@ void __cdecl AccessoryItem::SetTimeLimitType(char)
 }
 
 // 0x454630
-void __cdecl CostumeItem::SetCount(short)
+void __cdecl CostumeItem::SetCount(short count)
 {
-    LIFT_STUB(0x454630);
+    if (count != 1)
+    {
+        Log::Write(Log::LT_ERROR, L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\Item.h", 1586,
+                   L"== CRASH == [costume-item], set count failed; count is not 1, count:%d", count);
+        AlertSender::Write(L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\Item.h", 1586,
+                           L"== CRASH == [costume-item], set count failed; count is not 1, count:%d", count);
+    }
 }
 
 // 0x454690
@@ -210,9 +246,15 @@ void __cdecl GroceryItem::R_SetEnchantPoint(short)
 }
 
 // 0x4548f0
-void __cdecl GemItem::SetCount(short)
+void __cdecl GemItem::SetCount(short count)
 {
-    LIFT_STUB(0x4548f0);
+    if (count != 1)
+    {
+        Log::Write(Log::LT_ERROR, L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\Item.h", 1765,
+                   L"== CRASH == [gem-item], set count failed; count is not 1, count:%d", count);
+        AlertSender::Write(L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\Item.h", 1765,
+                           L"== CRASH == [gem-item], set count failed; count is not 1, count:%d", count);
+    }
 }
 
 // 0x454950
@@ -288,9 +330,15 @@ void __cdecl AccessoryItem::R_SetEnchantRestore(bool)
 }
 
 // 0x454ad0
-void __cdecl AccessoryItem::SetCount(short)
+void __cdecl AccessoryItem::SetCount(short count)
 {
-    LIFT_STUB(0x454ad0);
+    if (count != 1)
+    {
+        Log::Write(Log::LT_ERROR, L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\Item.h", 1886,
+                   L"== CRASH == [accessory-item], set count failed; count is not 1, count:%d", count);
+        AlertSender::Write(L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\Item.h", 1886,
+                           L"== CRASH == [accessory-item], set count failed; count is not 1, count:%d", count);
+    }
 }
 
 // 0x454b30
