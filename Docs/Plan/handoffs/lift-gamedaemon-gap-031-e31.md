@@ -7,7 +7,18 @@
 - `skill`: `SkillContainer::FindInPassiveSkills` (0x58e8f0), `SkillContainer::GetSkillPageEnable` (0x58ebe0), `SkillContainer::GetCurrentSkillPageJobStyle` (0x58fc70), `SkillContainer::isCandidateSkill` (0x595430).
 - `zone_cpp_1`: `Zone::GetEnvWithGeoId` (0x22e900), `Zone::GetEnv` (0x22e960), `Zone::GetFieldItem` (0x234380), `Zone::GetCampfire` (0x236630).
 - `creature_h`: `Creature::AddChangedPropertyId` (0x1d240), `Creature::AddChangedExtraPropertyId` (0x1d280), `Creature::IsCreatureInDuelCombat` (0x1edbb0), and the five `ApplySkillModifyInfo::Calc*` functions (0x453650, 0x4536f0, 0x453740, 0x4537e0, 0x453880).
-- `effectcontent_h`: the six `GetDataSubType` getters (0x479ee0, 0x47a4a0, 0x47a520, 0x47a530, 0x47a770, 0x47a7f0) and `IncreaseSpecialSkillGaugeEffect::checkApply` (0x47a800). The enumerators of `Data::EffectRecordSubType` are not declared, so the getters cast the 2019 values. `GameObject` now declares `Id` (+0x28). `IncreaseSpecialSkillGaugeEffect` declares only `Effect::target` (+0x20).
+- `effectcontent_h`: the six `GetDataSubType` getters (0x479ee0, 0x47a4a0, 0x47a520, 0x47a530, 0x47a770, 0x47a7f0) and `IncreaseSpecialSkillGaugeEffect::checkApply` (0x47a800). The enumerators of `Data::EffectRecordSubType` are not declared, so the getters cast the 2019 values.
+
+## Round 2 repair (pdb_layout)
+
+The round 1 gate failed in `pdb_layout`. The check refuses a member of a PDB class when the PDB has no member with the same name at the same offset. Round 1 put pad blocks and base members (`GameObject::Id`, `Effect::target`) directly into `GameObject`, `Campfire`, `FieldItem`, `Creature`, `Zone` and `IncreaseSpecialSkillGaugeEffect`.
+
+Round 2 removes these members from the PDB classes. The lifted bodies now read the members through view structs. The PDB does not have these structs, so the check does not compare them:
+
+- `GameObjectIdView` (`gameobject.h`): `GameObject::Id` (+0x28). `Zone::GetFieldItem`, `Zone::GetCampfire` and `checkApply` use it.
+- `EffectTargetView` (`effectcontent.h`): `Effect::target` (+0x20).
+- `ZoneMemberView` (`zone.h`): `_envList` (+0x3FD0), `fieldItemList` (+0x3FE0), `campfireList` (+0x4008).
+- `CreatureMemberView` (`creature.h`): `Id`, `Prop.State.combat_side` (+0x235), and the two changed-property sets (+0xC08, +0xC28).
 
 ## Gate and MATCH
 

@@ -348,10 +348,13 @@ class IncreaseSpecialSkillGaugeEffect
 private:
     virtual bool __cdecl checkApply(void);  // 0x47a800
     virtual void __cdecl apply(void);  // 0x5cc770
-    // LIFT: base InstantEffect (Effect) is not declared yet; only Effect::target (+0x20) is declared.
-    char lift_pad_8[0x20 - 8];
-protected:
-    ::GameObject *target;  // +0x20 (PDB: Effect::target)
+};
+
+// LIFT: view of the PDB class Effect (base of InstantEffect). Only Effect::target (+0x20) is declared.
+struct EffectTargetView
+{
+    char lift_pad_0[0x20];  // ❓ no PDB name: Effect fields +0 to +0x1F are not declared yet
+    ::GameObject *target;  // +32 (0x20) (PDB: Effect::target)
 };
 
 class InitializeRecycleGroupEffect

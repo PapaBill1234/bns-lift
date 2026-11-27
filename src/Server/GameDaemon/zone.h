@@ -323,35 +323,17 @@ public:
     bool __cdecl InOutCreatureDetectStart(char, unsigned __int64, ::Data::ScriptDetectRefTypeType, unsigned __int64, unsigned __int64, short, long, short, unsigned __int64, unsigned __int64, unsigned __int64, unsigned __int64);  // 0x258820
     unsigned char __cdecl GetPcBroadcastReceiverMask(unsigned __int64);  // 0x259ff0
     void __cdecl SetTransitableByNpcPortal(bool);  // 0x350390
-    // LIFT: PDB members that the lifted bodies read (Zone size 0x4698). The other members are not declared yet.
-private:
-    char lift_pad_8[0x3F60 - 8];  // ❓ +8 to +0x3F5F not declared yet
-public:
-    ::GeoZone const *GeoZoneData;  // +0x3F60
-private:
-    char lift_pad_3f68[0x3FA0 - 0x3F68];
-public:
-    ::NpcSquad **_npcSquad;  // +0x3FA0
-private:
-    char lift_pad_3fa8[0x3FB0 - 0x3FA8];
-public:
-    ::Convoy **_convoy;  // +0x3FB0
-private:
-    char lift_pad_3fb8[0x3FD0 - 0x3FB8];
-public:
-    ::Env **_envList;  // +0x3FD0
-private:
-    char lift_pad_3fd8[0x3FE0 - 0x3FD8];
-public:
-    ::FieldItemList *fieldItemList;  // +0x3FE0
-private:
-    char lift_pad_3fe8[0x4008 - 0x3FE8];
-public:
-    ::CampfireList *campfireList;  // +0x4008
-private:
-    char lift_pad_4010[0x4250 - 0x4010];
-public:
-    ::PcSpawnAction *PcSpawnActionList;  // +0x4250
+};
+
+// LIFT: view of the PDB class Zone (size 0x4698). Only the members that the lifted bodies read are declared.
+struct ZoneMemberView
+{
+    char lift_pad_0[0x3FD0];  // ❓ no PDB name: Zone fields +0 to +0x3FCF are not declared yet
+    ::Env **_envList;  // +16336 (0x3FD0) (PDB: Zone::_envList)
+    char lift_pad_3fd8[0x3FE0 - 0x3FD8];  // ❓ no PDB name: _guildBattleFieldEnvList2
+    ::FieldItemList *fieldItemList;  // +16352 (0x3FE0) (PDB: Zone::fieldItemList)
+    char lift_pad_3fe8[0x4008 - 0x3FE8];  // ❓ no PDB name: npcDeadBodyList and others
+    ::CampfireList *campfireList;  // +16392 (0x4008) (PDB: Zone::campfireList)
 };
 
 class ZonePerfMonitor

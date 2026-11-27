@@ -58,7 +58,8 @@ __cdecl CommonPassiveEffect::CommonPassiveEffect(void)
 #pragma comment(linker, "/INCLUDE:?checkApply@IncreaseSpecialSkillGaugeEffect@@EEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
 bool __cdecl IncreaseSpecialSkillGaugeEffect::checkApply(void)
 {
-    return static_cast<unsigned short>(target->Id >> 48) == 1;
+    ::GameObject const *const target = reinterpret_cast< ::EffectTargetView const *>(this)->target;
+    return static_cast<unsigned short>(reinterpret_cast< ::GameObjectIdView const *>(target)->Id >> 48) == 1;
 }
 
 // 0x47a820

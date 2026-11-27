@@ -34,10 +34,6 @@ private:
     bool __cdecl invokeThrowEffect(::Creature *);  // 0x5a22e0
     bool __cdecl invokeEffect(::Creature *, unsigned __int64);  // 0x5a2520
     bool __cdecl checkTargetStateFilter(::Creature *, unsigned __int64) const;  // 0x5a25a0
-private:
-    char lift_pad_8[0x28 - 8];  // LIFT: base GameObject (+8 to +0x27) is not declared yet
-public:
-    unsigned __int64 Id;  // +0x28 (PDB: GameObject::Id)
 };
 
 class FieldItemIdManager

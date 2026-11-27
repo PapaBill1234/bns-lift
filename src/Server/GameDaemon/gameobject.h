@@ -18,10 +18,13 @@ public:
     virtual void __cdecl OnAttacked(::Zone *, ::GameObject *, unsigned __int64, short);  // 0x36ca80
     virtual void __cdecl OnDamaged(::Zone *, ::GameObject *, unsigned int, __int64);  // 0x36cbf0
     virtual void __cdecl OnKilled(::Zone *, ::GameObject *, ::GameObject *, unsigned __int64, ::Data::QuestForwarding const *);  // 0x36cd80
-private:
-    char lift_pad_8[0x28 - 8];  // LIFT: PDB members from +8 to +0x27 are not declared yet
-public:
-    unsigned __int64 Id;  // +0x28 (PDB: GameObject::Id; the object type is the high 16 bits)
+};
+
+// LIFT: view of the PDB class GameObject. Only GameObject::Id (+0x28) is declared. The object type is the high 16 bits.
+struct GameObjectIdView
+{
+    char lift_pad_0[0x28];  // ❓ no PDB name: GameObject fields +0 to +0x27 are not declared yet
+    unsigned __int64 Id;  // +40 (0x28) (PDB: GameObject::Id)
 };
 
 class GameObjectCounter

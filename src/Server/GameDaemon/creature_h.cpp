@@ -6,14 +6,14 @@
 #pragma comment(linker, "/INCLUDE:?AddChangedPropertyId@Creature@@UEAAXG@Z")  // LIFT: dead-strip keep (no live caller yet)
 void __cdecl Creature::AddChangedPropertyId(unsigned short fieldId)
 {
-    _changedPropertyIdListSet.insert(fieldId);
+    reinterpret_cast< ::CreatureMemberView *>(this)->_changedPropertyIdListSet.insert(fieldId);
 }
 
 // 0x1d280
 #pragma comment(linker, "/INCLUDE:?AddChangedExtraPropertyId@Creature@@UEAAXG@Z")  // LIFT: dead-strip keep (no live caller yet)
 void __cdecl Creature::AddChangedExtraPropertyId(unsigned short fieldId)
 {
-    _changedExtraPropertyIdListSet.insert(fieldId);
+    reinterpret_cast< ::CreatureMemberView *>(this)->_changedExtraPropertyIdListSet.insert(fieldId);
 }
 
 // 0x1edbb0
@@ -22,9 +22,10 @@ void __cdecl Creature::AddChangedExtraPropertyId(unsigned short fieldId)
 #pragma comment(linker, "/INCLUDE:?IsCreatureInDuelCombat@Creature@@QEBA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
 bool __cdecl Creature::IsCreatureInDuelCombat(void) const
 {
-    unsigned __int64 const objectType = Id >> 48;
+    ::CreatureMemberView const *const view = reinterpret_cast< ::CreatureMemberView const *>(this);
+    unsigned __int64 const objectType = view->Id >> 48;
     return (objectType == 1 || objectType == 2 || objectType == 3 || objectType == 240 || objectType == 241)
-        && static_cast<unsigned char>(lift_Prop_State_combat_side) <= 2;
+        && static_cast<unsigned char>(view->combat_side) <= 2;
 }
 
 // 0x1edbf0

@@ -111,7 +111,7 @@ bool __cdecl Zone::ReturnToArenaLobby(::Pc *, unsigned __int64)
 {
     // LIFT: the env list has 256 slots (index 1 to 255 is valid).
     if (geoEnvObjId > 0 && geoEnvObjId < 256)
-        return _envList[geoEnvObjId];
+        return reinterpret_cast< ::ZoneMemberView const *>(this)->_envList[geoEnvObjId];
 
     Log::Write(Log::LT_ERROR, ZONE_FILE, 2321, L"[zone], get evn, invalid geoEnvObjId(%d)", static_cast<int>(geoEnvObjId));
     return NULL;
@@ -123,7 +123,7 @@ bool __cdecl Zone::ReturnToArenaLobby(::Pc *, unsigned __int64)
 {
     int const index = static_cast<int>(envId);
     if (index > 0 && index < 256)
-        return _envList[index];
+        return reinterpret_cast< ::ZoneMemberView const *>(this)->_envList[index];
 
     Log::Write(Log::LT_ERROR, ZONE_FILE, 2334, L"[zone], get evn, invalid index (%d)", index);
     return NULL;
@@ -386,10 +386,11 @@ bool __cdecl Zone::CreateFieldItem(::Pc *, unsigned int, unsigned __int64)
 ::FieldItem * __cdecl Zone::GetFieldItem(unsigned __int64 id) const
 {
     // LIFT: the 2019 body has an inlined index search of FieldItemList (no PDB name).
+    ::FieldItemList *const fieldItemList = reinterpret_cast< ::ZoneMemberView const *>(this)->fieldItemList;
     int index = -1;
     for (int i = 0; i < fieldItemList->Count; ++i)
     {
-        if (fieldItemList->FieldItems[i]->Id == id)
+        if (reinterpret_cast< ::GameObjectIdView const *>(fieldItemList->FieldItems[i])->Id == id)
         {
             index = i;
             break;
@@ -507,10 +508,11 @@ bool __cdecl Zone::CreateCampfireByZone(unsigned int, ::vector16)
 ::Campfire * __cdecl Zone::GetCampfire(unsigned __int64 id) const
 {
     // LIFT: the 2019 body has an inlined index search of CampfireList (no PDB name).
+    ::CampfireList *const campfireList = reinterpret_cast< ::ZoneMemberView const *>(this)->campfireList;
     int index = -1;
     for (int i = 0; i < campfireList->Count; ++i)
     {
-        if (campfireList->Campfires[i]->Id == id)
+        if (reinterpret_cast< ::GameObjectIdView const *>(campfireList->Campfires[i])->Id == id)
         {
             index = i;
             break;

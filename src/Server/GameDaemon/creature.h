@@ -249,25 +249,23 @@ private:
     bool __cdecl checkAccountExpQuota(__int64 &);  // 0x276400
 public:
     bool __cdecl HandleAccountExpWithoutConsumeQuota(__int64, ::ChangedProperty *, short);  // 0x2764f0
-    // LIFT: PDB layout (size 0xC50). Only the members that the lifted bodies use are declared.
+    // LIFT: PDB type of _changedPropertyIdListSet and _changedExtraPropertyIdListSet.
     typedef std::set<unsigned short, std::less<__int64>, StlAllocator<unsigned short, 2> > ChangedPropertyIdSet;
-private:
-    char lift_pad_8[0x28 - 8];  // LIFT: base GameObject (+8 to +0x27) is not declared yet
-public:
-    unsigned __int64 Id;  // +0x28 (PDB: GameObject::Id)
-private:
-    char lift_pad_30[0x235 - 0x30];  // LIFT: Prop (CreatureProperty, +0x30) is not declared yet
-public:
-    char lift_Prop_State_combat_side;  // +0x235 (PDB: Prop.State.combat_side, State at Prop+0xD8, combat_side at State+0x12D)
-private:
-    char lift_pad_236[0xBEC - 0x236];
-    int _creatureStateKeeperCount;  // +0xBEC
-    char lift_pad_bf0[0xC08 - 0xBF0];
-    ChangedPropertyIdSet _changedPropertyIdListSet;  // +0xC08
-    ChangedPropertyIdSet _changedExtraPropertyIdListSet;  // +0xC28
-    char lift_pad_c48[0xC50 - 0xC48];
 };
-static_assert(sizeof(Creature) == 0xC50, "sizeof Creature");
+
+// LIFT: view of the PDB class Creature (size 0xC50). Only the members that the lifted bodies use are declared.
+struct CreatureMemberView
+{
+    char lift_pad_0[0x28];  // ❓ no PDB name: GameObject fields +0 to +0x27 are not declared yet
+    unsigned __int64 Id;  // +40 (0x28) (PDB: GameObject::Id)
+    char lift_pad_30[0x235 - 0x30];  // ❓ no PDB name: Prop (CreatureProperty, +0x30) is not declared yet
+    char combat_side;  // +565 (0x235) (PDB: Prop.State.combat_side; State at Prop+0xD8, combat_side at State+0x12D)
+    char lift_pad_236[0xC08 - 0x236];  // ❓ no PDB name: fields +0x236 to +0xC07 are not declared yet
+    ::Creature::ChangedPropertyIdSet _changedPropertyIdListSet;  // +3080 (0xC08) (PDB: Creature::_changedPropertyIdListSet)
+    ::Creature::ChangedPropertyIdSet _changedExtraPropertyIdListSet;  // +3112 (0xC28) (PDB: Creature::_changedExtraPropertyIdListSet)
+    char lift_pad_c48[0xC50 - 0xC48];  // ❓ no PDB name: _instantDeathUnapplicable and others
+};
+static_assert(sizeof(CreatureMemberView) == 0xC50, "sizeof CreatureMemberView");
 
 class CreatureStateKeeper
 {
