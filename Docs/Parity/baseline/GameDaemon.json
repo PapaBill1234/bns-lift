@@ -237,6 +237,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"AirDash::CheckToManipulate": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "AirDashAction::getPriority": {
 "calls": 100,
 "consts": 100,
@@ -1357,6 +1364,27 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Env::GetActionRadius": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Env::GetManipulateDuration": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Env::GetOwnerId": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "ExtraCreatureProperty::FieldDefine": {
 "calls": 100,
 "consts": 100,
@@ -1518,6 +1546,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"GeoRegion::GetEnv": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "GetDataReaderInterfaceVersion": {
 "calls": 100,
 "consts": 100,
@@ -1615,6 +1650,62 @@
 "refs": 0,
 "score": 66.7,
 "status": "DIFF"
+},
+"ItemBase<AccessoryTrait>::GetClass": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ItemBase<AccessoryTrait>::GetDataId": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ItemBase<AccessoryTrait>::GetDepot": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ItemBase<AccessoryTrait>::GetPos": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ItemBase<AccessoryTrait>::GetSequestration": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ItemBase<GemTrait>::GetClass": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ItemBase<GroceryTrait>::GetClass": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ItemBase<WeaponTrait>::GetFieldCount": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Json::FastWriter::~FastWriter": {
 "calls": 100,
@@ -2015,12 +2106,159 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"NpcPartyTimer::TimerExpired": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "PartyBattleResultTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
 "refs": 0,
 "score": 66.7,
 "status": "DIFF"
+},
+"Pc::ClearLastComboSkillValue": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Pc::GetLastAttackLimitTime": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Pc::GetLastAttackedLimitTime": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Pc::GetLastComboExecFirstLimitTime": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Pc::GetLastComboExecFirstResult": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Pc::GetLastComboExecLastLimitTime": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Pc::GetLastComboExecLastResult": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Pc::GetLastComboFireLimitTime": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Pc::GetLastComboSkill": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Pc::GetSkillResultContext": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Pc::IsExceptHate": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Pc::SetExceptHate": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Pc::SetLastAttackLimitTime": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Pc::SetLastAttackedLimitTime": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Pc::SetLastComboExecFirstLimitTime": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Pc::SetLastComboExecFirstResult": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Pc::SetLastComboExecLastLimitTime": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Pc::SetLastComboExecLastResult": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Pc::SetLastComboFireLimitTime": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Pc::SetLastComboSkill": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "PcPublicRaidState::GetAddScoreCount": {
 "calls": 100,
