@@ -27,12 +27,12 @@ Lifted:
 
 - `InventoryCacheUpdate::AddChange` (0x4bea20)
 - `Inventory::IsActivatedGemSlot` (0x4bec40)
-- `Inventory::GetCacheId` (0x4bed10)
 - `Inventory::GetItemClass` (0x4c10d0)
 - `Inventory::Dispose` (0x4cfcc0)
 
 **Not done:**
 
+- `Inventory::GetCacheId` (0x4bed10): it calls the virtual `Item::GetClass` (PDB slot 13). The lifted `Item` class in `item.h` does not declare it, and its slot order is not the PDB order yet. The body stays `LIFT_STUB`.
 - `InventoryClientUpdate::InventoryClientUpdate` (0x4be600): it needs the `FragmentPacket` and `RepeatPacketComposer` members of `InventoryClientUpdate`. The skeleton does not declare them.
 - `InventoryClientUpdate::Send` (0x4be900): same cause.
 

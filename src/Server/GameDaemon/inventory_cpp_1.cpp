@@ -10,7 +10,6 @@
 #pragma comment(linker, "/INCLUDE:?IsActivatedGemSlot@Inventory@@SA_NI@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?GetItemClass@Inventory@@SA?AW4ItemClass@@F@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?Dispose@Inventory@@QEAA_NGFW4ItemReason@@@Z")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?GetCacheId@Inventory@@SADPEBVItem@@@Z")  // LIFT: dead-strip keep (no live caller yet)
 
 // 0x4be600
 __cdecl InventoryClientUpdate::InventoryClientUpdate(::Pc *, ::ItemReason)
@@ -81,24 +80,10 @@ bool __cdecl Inventory::CheckActivatedGemSlotExist(::Item const *)
 }
 
 // 0x4bed10
-char __cdecl Inventory::GetCacheId(::Item const *item)
+char __cdecl Inventory::GetCacheId(::Item const *)
 {
-    // LIFT: the case values are ItemClass and the results are cache ids. The PDB enumerator names are not used here.
-    switch (item->GetClass())
-    {
-    case 1:
-        return 3;
-    case 2:
-        return 4;
-    case 3:
-        return 5;
-    case 4:
-        return 11;
-    case 5:
-        return 15;
-    default:
-        return 0;
-    }
+    // LIFT: Not done. The lifted Item class (item.h) has no virtual GetClass (PDB slot 13) yet.
+    LIFT_STUB(0x4bed10);
 }
 
 // 0x4bed60
