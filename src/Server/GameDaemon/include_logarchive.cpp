@@ -5,5 +5,5 @@
 // 0x694060
 wchar_t const * __cdecl LogArchive::Name(void)
 {
-    LIFT_STUB(0x694060);
+    return L"LogArchive";
 }

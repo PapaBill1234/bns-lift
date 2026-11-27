@@ -5,5 +5,5 @@
 // 0x455420
 bool __cdecl DrTable::CanBeLoadedPieceByPiece(void)
 {
-    LIFT_STUB(0x455420);
+    return false;
 }

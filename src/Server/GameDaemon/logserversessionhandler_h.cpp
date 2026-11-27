@@ -5,5 +5,5 @@
 // 0x6ba560
 __cdecl LogServerSessionHandler::~LogServerSessionHandler(void)
 {
-    LIFT_STUB(0x6ba560);
+    // The compiler sets the vftable. The body is empty.
 }
