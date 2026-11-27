@@ -2,23 +2,29 @@
 
 Card: `lift-gamedaemon-e16`. Exe: GameDaemon (2019 + PDB).
 
-## Lifted (5 functions)
+## Lifted (1 function in item_h_1.cpp)
 
 The bodies come from the Hex-Rays cache. The names come from the PDB.
 
 | RVA | Function |
 | --- | --- |
 | 0x454250 | `GetEconomyCommonItemCategory` (static, `switch` on `ItemClass`) |
-| 0x4542d0 | `WeaponItem::SetCount` (crash log, `Item.h` line 1447) |
-| 0x454630 | `CostumeItem::SetCount` (crash log, line 1586) |
-| 0x4548f0 | `GemItem::SetCount` (crash log, line 1765) |
-| 0x454ad0 | `AccessoryItem::SetCount` (crash log, line 1886) |
 
-- The `SetCount` bodies call `Log::Write` and `AlertSender::Write` of BloodLib (`lift_common_gd`). `item_h_1.cpp` includes `AlertSender.h` and `Log.h` after the GameDaemon headers. Thus the Windows macros cannot rename a GameDaemon declaration.
-- The path literal is the GameDaemon `Item.h` path of the original binary (lesson A6).
-- Each `SetCount` has no live caller yet. `item_h_1.cpp` has a `/INCLUDE` pragma with a `// LIFT: dead-strip keep` note for each one.
 - `GetEconomyCommonItemCategory` is static in the PDB. It has no public name, so it has no pragma. The compiler drops it until a lifted caller uses it.
 - `GameDaemonFwd.h` now has the PDB enumerators of `EconomyItemCategory` and `ItemClass`.
+
+## Lead repair (round 2)
+
+The proof review rejected 5 shared BloodLib functions: `AlertSender::writev2`, `Log::Write`, `LogBuffer::Acquire`, `LogBuffer::deallocate_me`, `LogMedia::Add`. The GameDaemon forms of these functions differ from the shared forms (frame size, TLS offset, `addReferenceCount` arguments). Before this card they were dead-stripped. The 4 `SetCount` bodies kept them alive.
+
+The lead put the 4 `SetCount` functions back to `LIFT_STUB` and removed their `/INCLUDE` pragmas. They need the GameDaemon forms of the shared functions first (shared card).
+
+| RVA | Function | Needs |
+| --- | --- | --- |
+| 0x4542d0 | `WeaponItem::SetCount` | GameDaemon forms of `Log::Write` and `AlertSender::Write` |
+| 0x454630 | `CostumeItem::SetCount` | same |
+| 0x4548f0 | `GemItem::SetCount` | same |
+| 0x454ad0 | `AccessoryItem::SetCount` | same |
 
 ## Not done (35 functions)
 
