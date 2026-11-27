@@ -21,11 +21,16 @@ public:
     static long const DEFAULT_INTERVAL = 1000;
     static long const DEFAULT_DELAY = 10000;
 
+#if defined(LIFT_EXE_GD)
+    // GameDaemon 0x6a11d0: out-of-line (body: src/Server/GameDaemon/source_delayedrelease.cpp).
+    DelayedRelease(long interval, long delay);
+#else
     // PDB constructor, inlined in Daemon::start (0xb140).
     DelayedRelease(long interval, long delay)
         : _head(nullptr), _tail(nullptr), _count(0), _lastReleased(0), _interval(interval), _delay(delay)
     {
     }
+#endif
     // PDB destructor, inlined in Daemon::start (0xb140).
     ~DelayedRelease()
     {

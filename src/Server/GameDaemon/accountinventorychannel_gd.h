@@ -2,6 +2,7 @@
 // LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
 #pragma once
 #include "GameDaemonFwd.h"
+#include "../BloodLib/include/Lock.h"
 
 class AccountInventoryChannel
 {
@@ -27,7 +28,15 @@ public:
     bool __cdecl SendFinishInstantPaymentReq(short, unsigned __int64, ::id128 const &, __int64, __int64, bool);  // 0x328b0
     bool __cdecl SendBoardGachaDrawByInstantPaymentReq(short, unsigned __int64, ::id128 const &, __int64, wchar_t const *, __int64, short, int, ::InstantPaymentGoodsInfoParam &);  // 0x32ac0
     __cdecl ~AccountInventoryChannelManager(void);  // 0x18d060
+
+    // PDB layout (GameDaemon), size 0x98.
+private:
+    CriticalSection _lock;
+    short _worldIdCount;
+    short _worldIds[50];
+    ::AccountInventoryChannel** _channels;
 };
+static_assert(sizeof(AccountInventoryChannelManager) == 0x98, "sizeof AccountInventoryChannelManager");
 
 class AccountInventorySessionHandler
 {

@@ -2,13 +2,19 @@
 // LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
 #pragma once
 #include "GameDaemonFwd.h"
+#include "delayedrelease_gd.h"
 
-class DeleteEvent
+// PDB: DeleteEvent (GameDaemon), size 0x20.
+class DeleteEvent : public DynamicEventObject
 {
 public:
     virtual unsigned int __cdecl EventId(void) const;  // 0x137a30
     virtual bool __cdecl HandleEvent(::EventContext *, unsigned long);  // 0x6a1a50
+
+private:
+    ::DelayedDelete::Node* _head;
 };
+static_assert(sizeof(DeleteEvent) == 0x20, "sizeof DeleteEvent");
 
 class LeadTheBallManager
 {

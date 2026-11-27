@@ -44,6 +44,7 @@ class AutoCS
 public:
     explicit AutoCS(CriticalSection* cs);  // LIFT: inlined; asserts at Lock.h line 113
     ~AutoCS();                             // 0x3c80
+    void Enter();                          // GameDaemon 0x1cbd0 (body: src/Server/GameDaemon/lock.cpp)
     void Leave();                          // 0x3c90
 
     CriticalSection* CS;
