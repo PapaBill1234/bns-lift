@@ -9,5 +9,6 @@
 // 0x3502e0
 unsigned __int64 __cdecl User::GetId(void)
 {
-    return PcDbId;
+    // LIFT: the skeleton User has no members. PcDbId is at PDB +0xD8.
+    return *reinterpret_cast<unsigned __int64 *>(reinterpret_cast<char *>(this) + 0xD8);
 }

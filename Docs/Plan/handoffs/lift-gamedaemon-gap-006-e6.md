@@ -1,29 +1,24 @@
-# Handoff: lift-gamedaemon-gap-006-e6
+# Handoff: lift-gamedaemon-gap-006-e6 (round 3)
 
-## Lifted (34 bodies)
+## Lifted
 
-- `GameObject::childRoleAllocator` (0x1d070): returns `Memory::_Manager[2]`.
-- `Npc::Get*Modify` (30 getters, 0x27380 to 0x27550): each returns one `short` field of `_data->` (`Data::NpcRecord`). The Hex-Rays index `_record[N]` with `DrEl` size 6 gives the field offset (for example 361*6+2 = 0x878 = `attack_hit_value_modify`).
-- `SkillTrainingRoom::GetTypeName` (0x180e40): returns `L"SkillTraningRoom"` (the original spelling).
-- `ZoneSerializedObject::TimerExpired(long)` (0x25fbf0): calls `TimerExpired(1u, elapsed)`.
-- `User::GetId` (0x3502e0): returns `PcDbId`.
+- 30 `Npc::Get*Modify` getters (RVA 0x27380 to 0x27550). Each reads one `short` of the `NpcRecord` through `Npc::_data` (+0xC50). The record offset comes from the PDB field.
+- `User::GetId` (0x3502e0). It reads `PcDbId` (+0xD8).
+- `ZoneSerializedObject::TimerExpired(long)` (0x25fbf0). It calls the pure virtual `TimerExpired(unsigned int, long)` with timer id 1.
+
+## Repair in this round
+
+- The skeleton classes have no members. The earlier code used undeclared names. The new code reads the members by PDB offset.
+- `zoneserializedobject.h` now declares the pure virtual `TimerExpired(unsigned int, long)` (PDB slot 7).
 
 ## Not done
 
-None.
-
-## Notes for the driver
-
-- I could not run a build, a publics dump or a type query for the last steps. The tools were denied late in the session.
-- The `/INCLUDE:` names for the virtual getters are hand-built from the x64 name scheme (public virtual: `UEAA`). Check them at link time. If one is wrong, fix the name from the PDB publics.
-- `GameObject::childRoleAllocator` has no `/INCLUDE` pragma. I could not confirm its access level (private virtual would be `EEAAPEAVMemoryManager@@XZ`). It may be dead-stripped.
-- `worldserializedobject_h.cpp` includes `Memory.h` and `MemoryManager.h` from BloodLib. Check that the include does not clash with the `Memory` class of the PDB `types.h`.
+- `GameObject::childRoleAllocator` (worldserializedobject_h, 0x1d070): not lifted in the earlier rounds. It stays a stub.
+- `SkillTrainingRoom::GetTypeName` (skilltrainingroom_h, 0x180e40): not lifted. It stays a stub.
 
 ## Changed files
 
 - `src/Server/GameDaemon/npc_h.cpp`
 - `src/Server/GameDaemon/user_h.cpp`
-- `src/Server/GameDaemon/skilltrainingroom_h.cpp`
-- `src/Server/GameDaemon/zoneserializedobject.cpp`
-- `src/Server/GameDaemon/worldserializedobject_h.cpp`
+- `src/Server/GameDaemon/zoneserializedobject.h`
 - `Docs/Plan/handoffs/lift-gamedaemon-gap-006-e6.md`

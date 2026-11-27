@@ -10,6 +10,7 @@ public:
     virtual __cdecl ~ZoneSerializedObject(void);  // 0x25fab0
     void __cdecl SetZone(::Zone *);  // 0x25fb40
 protected:
+    virtual void __cdecl TimerExpired(unsigned int, long) = 0;  // PDB slot 7, pure
     virtual void __cdecl TimerExpired(long);  // 0x25fbf0
 public:
     void __cdecl DetachParent(void);  // 0x25fc00
