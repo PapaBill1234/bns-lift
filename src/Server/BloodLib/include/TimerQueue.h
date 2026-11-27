@@ -55,6 +55,8 @@ static_assert(sizeof(Timer) == 0x38, "sizeof Timer");
 static_assert(offsetof(Timer, next) == 0x20, "Timer::next");
 static_assert(offsetof(Timer, SlotIndex) == 0x30, "Timer::SlotIndex");
 
+// LIFT: GameDaemon only (card lift-gamedaemon-0c). Types of the declarations in TimerQueue.
+class Timer;
 class TimerQueue
 {
 public:
@@ -107,5 +109,9 @@ private:
         static_assert(offsetof(TimerQueue, StqSlot) == 0x40, "TimerQueue::StqSlot");
         static_assert(offsetof(TimerQueue, LtQueue) == 0x50, "TimerQueue::LtQueue");
     }
+    // LIFT: GameDaemon only (card lift-gamedaemon-0c). Declarations for the wave-0 stubs in
+    // src/Server/GameDaemon. They add no code to the other exes.
+protected:
+    bool __cdecl RemoveAndAdd(::Timer *, long, ::Timer *);  // GameDaemon 0x6b0ec0
 };
 static_assert(sizeof(TimerQueue) == 0x78, "sizeof TimerQueue");

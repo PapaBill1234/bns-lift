@@ -7,6 +7,8 @@
 struct FsdShowcaseRecord;
 
 // LIFT: The frame accessors are inlined in DecomposeShowcaseFsd (0x2e0b0).
+// LIFT: GameDaemon only (card lift-gamedaemon-0c). Types of the declarations in Fsd.
+class FsdComposer;
 class Fsd
 {
 public:
@@ -27,6 +29,10 @@ public:
 private:
     char* _buffer;
     short _size;
+    // LIFT: GameDaemon only (card lift-gamedaemon-0c). Declarations for the wave-0 stubs in
+    // src/Server/GameDaemon. They add no code to the other exes.
+public:
+    int __cdecl Compose(::FsdComposer &, int, ...);  // GameDaemon 0x6ea0c0
 };
 static_assert(sizeof(Fsd) == 0x10, "sizeof Fsd");
 

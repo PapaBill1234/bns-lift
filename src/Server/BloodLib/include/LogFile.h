@@ -45,6 +45,10 @@ public:
     long long _interval;
     wchar_t _lastPrefix[260];
     wchar_t _lastFileName[260];
+    // LIFT: GameDaemon only (card lift-gamedaemon-0c). Declarations for the wave-0 stubs in
+    // src/Server/GameDaemon. They add no code to the other exes.
+public:
+    void __cdecl Write(wchar_t const *, int, wchar_t const *, char *);  // GameDaemon 0x6a0250
 };
 static_assert(sizeof(LogFile) == 0x500, "sizeof LogFile");
 static_assert(offsetof(LogFile, _bufmax) == 0xB0, "LogFile::_bufmax");

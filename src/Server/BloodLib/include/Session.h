@@ -137,6 +137,12 @@ public:
     friend bool HandleLobbyGame_HelloReq(Session const* session, Packet const* packet);
     // LIFT: access for the inlined send in HandleLobbyLobbyGate_KickNotify (LobbyGate 0x10660)
     friend bool HandleLobbyLobbyGate_KickNotify(Session const* session, Packet* packet);
+    // LIFT: GameDaemon only (card lift-gamedaemon-0c). Declarations for the wave-0 stubs in
+    // src/Server/GameDaemon. They add no code to the other exes.
+public:
+    bool __cdecl IsConnected(void) const;  // GameDaemon 0x699170
+    void __cdecl SendText(char const *, ...) const;  // GameDaemon 0x6992c0
+    void __cdecl SendTextV(char const *, char *) const;  // GameDaemon 0x6994a0
 };
 static_assert(sizeof(Session) == 0x128, "sizeof Session");
 static_assert(offsetof(Session, _lock) == 0x18, "Session::_lock");

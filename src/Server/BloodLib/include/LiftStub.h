@@ -3,16 +3,24 @@
 // LIFT: VS2010 stdlib.h does not declare abort noreturn. __assume(0) marks the end as unreachable,
 // so that a stub with a return type compiles without error C4716.
 // Find all stubs with: grep -rn "LIFT_STUB(" src
-// The argument is the RVA of the function in LobbyDaemon.exe (2019 + PDB).
+// The argument is the RVA of the function in the exe of the module (2019 + PDB): LobbyDaemon.exe for
+// src/Server/LobbyDaemon, GameDaemon.exe for src/Server/GameDaemon, and so on.
+// LIFT: C sources (for example the GameDaemon zlib stubs) use the same macro. C has no '::'.
 #pragma once
 #include <intrin.h>
 #include <stdlib.h>
+
+#ifdef __cplusplus
+#define LIFT_STUB_ABORT ::abort
+#else
+#define LIFT_STUB_ABORT abort
+#endif
 
 #define LIFT_STUB(rva)     \
     do                     \
     {                      \
         (void)(rva);       \
         __debugbreak();    \
-        ::abort();         \
+        LIFT_STUB_ABORT(); \
         __assume(0);       \
     } while (0)

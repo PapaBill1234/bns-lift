@@ -1,0 +1,33 @@
+// associativetable_h.cpp: associativetable.h (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
+#include "associativetable.h"
+#include "LiftStub.h"
+
+// 0x6fb130
+::DrEl * __cdecl DrMultiKeyInnerIter::Ptr(void)
+{
+    LIFT_STUB(0x6fb130);
+}
+
+// 0x6fb170
+bool __cdecl DrMultiKeyInnerIter::Next(void)
+{
+    LIFT_STUB(0x6fb170);
+}
+
+// 0x6fb180
+bool __cdecl DrMultiKeyInnerIter::IsValid(void)
+{
+    LIFT_STUB(0x6fb180);
+}
+
+// 0x6fcd10
+::DrEl *const __cdecl DrMultiKeyElMap::get(unsigned __int64) const
+{
+    LIFT_STUB(0x6fcd10);
+}
+
+// 0x6fd0f0
+::DrEl * __cdecl DrMultiKeyElMap::set(unsigned __int64, ::DrEl *, bool)
+{
+    LIFT_STUB(0x6fd0f0);
+}

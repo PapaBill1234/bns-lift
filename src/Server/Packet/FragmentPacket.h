@@ -40,6 +40,11 @@ public:
     Packet packet;
     FragmentPacketSplitter splitter;
     RepeatPacketComposer composer;
+    // LIFT: GameDaemon only (card lift-gamedaemon-0c). Declarations for the wave-0 stubs in
+    // src/Server/GameDaemon. They add no code to the other exes.
+public:
+    char const * __cdecl FreeBody(void);  // GameDaemon 0x10d40
+    void __cdecl StartInnerPacket(char const *);  // GameDaemon 0x271c0
 };
 static_assert(sizeof(FragmentPacket) == 0xF8, "sizeof FragmentPacket");
 static_assert(offsetof(FragmentPacket, packet) == 0x8, "FragmentPacket::packet");

@@ -35,6 +35,8 @@ extern volatile int CONFIG_DIR_OPTION_LEN;  // 0x593c0 (value 6)
 // LIFT: array parameter. The original symbol is ?BloodDaemonMain@@YAXHQEAPEA_W@Z (Q = array parameter); the PDB type drops it.
 void BloodDaemonMain(int argc, wchar_t* argv[]);  // 0xa690
 
+// LIFT: GameDaemon only (card lift-gamedaemon-0c). Types of the declarations in Daemon.
+class RefCntObject;
 class Daemon
 {
 public:
@@ -146,6 +148,15 @@ public:
     DelayedRelease* GlobalDelayedRelease;
     bool allowClientIPAddressInLogs;
     bool allowClientSessionLifeCycleInLogs;
+    // LIFT: GameDaemon only (card lift-gamedaemon-0c). Declarations for the wave-0 stubs in
+    // src/Server/GameDaemon. They add no code to the other exes.
+public:
+    bool __cdecl AddDelayedRelease(void (__cdecl *)(::RefCntObject *, ::RefCntObject *, ::RefCntObject *), ::RefCntObject *, ::RefCntObject *, ::RefCntObject *);  // GameDaemon 0x68cf50
+    static void __cdecl SetPublicAddressWithSetting(unsigned long);  // GameDaemon 0x68d9e0
+protected:
+    bool __cdecl setInternalAddressRange(wchar_t const *);  // GameDaemon 0x68dcc0
+    bool __cdecl setPublicAddressRange(wchar_t const *);  // GameDaemon 0x68dd50
+    bool __cdecl allocateZstdDictionary(int);  // GameDaemon 0x68dde0
 };
 static_assert(sizeof(Daemon) == 0x748, "sizeof Daemon");
 static_assert(offsetof(Daemon, threadManager) == 0x30, "Daemon::threadManager");

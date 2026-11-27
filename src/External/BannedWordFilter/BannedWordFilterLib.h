@@ -29,4 +29,8 @@ public:
         return BannedWordFilterLoader::LoadNameFilter(BannedWordFilterLoader::CreateFileBuffer(fileFullPath));
     }
     bool FilterName(wchar_t const* const nameStr, bool* const isFiltered);  // 0x118a70
+    // LIFT: GameDaemon only (card lift-gamedaemon-0c). Declarations for the wave-0 stubs in
+    // src/Server/GameDaemon. They add no code to the other exes.
+public:
+    bool __cdecl LoadNameFilterBuffer(char const *, int);  // GameDaemon 0x6ea100
 };

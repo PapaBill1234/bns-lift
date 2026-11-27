@@ -17,6 +17,10 @@ public:
 };
 static_assert(sizeof(PacketSplitter) == 0x8, "sizeof PacketSplitter");
 
+// LIFT: GameDaemon only (card lift-gamedaemon-0c). Types of the declarations in Packet.
+class PacketComposer;
+class PacketDecomposer;
+class RepeatPacketComposer;
 class Packet
 {
 public:
@@ -85,6 +89,15 @@ public:
     Header* CurHeader;
     PacketBuffer* ListHead;
     PacketBuffer* ListTail;
+    // LIFT: GameDaemon only (card lift-gamedaemon-0c). Declarations for the wave-0 stubs in
+    // src/Server/GameDaemon. They add no code to the other exes.
+public:
+    void __cdecl IncRepeatCount(::RepeatPacketComposer *);  // GameDaemon 0xac70
+    bool __cdecl Reserve(::PacketComposer const *, ::Packet::VarData *);  // GameDaemon 0x6910a0
+    void __cdecl GrowAdd(void const *, short);  // GameDaemon 0x6912c0
+    void __cdecl Restore(short);  // GameDaemon 0x6915e0
+    unsigned short __cdecl DecomposeV(::PacketDecomposer *, int, char *) const;  // GameDaemon 0x691ef0
+    void __cdecl setRecvBuffer(char const *);  // GameDaemon 0x692220
 };
 static_assert(sizeof(Packet::VarData) == 0x10, "sizeof Packet::VarData");
 static_assert(sizeof(Packet) == 0x28, "sizeof Packet");

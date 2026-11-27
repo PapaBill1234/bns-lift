@@ -96,6 +96,11 @@ public:
     unsigned short ServerPort;
     int SessionSize;
     Session** session;
+    // LIFT: GameDaemon only (card lift-gamedaemon-0c). Declarations for the wave-0 stubs in
+    // src/Server/GameDaemon. They add no code to the other exes.
+protected:
+    void __cdecl initialize(unsigned int, unsigned long, unsigned short);  // GameDaemon 0x69a740
+    bool __cdecl initSession(bool *, bool, bool);  // GameDaemon 0x69a7e0
 };
 static_assert(sizeof(ClientSideDaemonChannel) == 0x28, "sizeof ClientSideDaemonChannel");
 static_assert(offsetof(ClientSideDaemonChannel, SessionSize) == 0x1C, "ClientSideDaemonChannel::SessionSize");

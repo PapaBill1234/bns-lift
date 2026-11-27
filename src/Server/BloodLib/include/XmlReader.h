@@ -90,6 +90,10 @@ public:
     virtual wchar_t const* GetFileName() const = 0;                                // slot 3
     virtual int Next() = 0;                                                        // slot 4
     virtual void Close() = 0;                                                      // slot 5
+    // LIFT: GameDaemon only (card lift-gamedaemon-0c). Declarations for the wave-0 stubs in
+    // src/Server/GameDaemon. They add no code to the other exes.
+public:
+    enum ErrCode {};  // GameDaemon PDB type
 };
 
 class XmlReaderLog

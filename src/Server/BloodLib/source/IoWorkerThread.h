@@ -16,6 +16,9 @@ struct ZSTD_customMem
 };
 extern "C" ZSTD_CCtx_s* ZSTD_createCCtx_advanced(ZSTD_customMem customMem);  // TODO(lift-zstd)
 
+// LIFT: GameDaemon only (card lift-gamedaemon-0c). Types of the declarations in IoWorker.
+struct EventContext;
+class EventObject;
 class IoWorker : public Thread
 {
 public:
@@ -43,6 +46,10 @@ public:
     int _workerId;
     Network* _networkInstance;
     void (*_failedEventHandler)(EventObject*);
+    // LIFT: GameDaemon only (card lift-gamedaemon-0c). Declarations for the wave-0 stubs in
+    // src/Server/GameDaemon. They add no code to the other exes.
+private:
+    void __cdecl handleFailedEvent(::EventObject *, ::EventContext *, unsigned long);  // GameDaemon 0x6b7ba0
 };
 static_assert(sizeof(IoWorker) == 0x48, "sizeof IoWorker");
 static_assert(offsetof(IoWorker, _workerId) == 0x30, "IoWorker::_workerId");

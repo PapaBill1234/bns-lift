@@ -1,0 +1,15 @@
+// lobbytokenauthtran_h.cpp: lobbytokenauthtran.h (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
+#include "lobbytokenauthtran.h"
+#include "LiftStub.h"
+
+// 0x13e020
+__cdecl EnterWorldOkParam::EnterWorldOkParam(void)
+{
+    LIFT_STUB(0x13e020);
+}
+
+// 0x13e270
+::GameTranDef const * __cdecl LobbyTokenAuthTran::GetDefinition(void) const
+{
+    LIFT_STUB(0x13e270);
+}
