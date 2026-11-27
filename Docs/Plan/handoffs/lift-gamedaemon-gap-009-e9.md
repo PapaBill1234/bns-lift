@@ -30,3 +30,7 @@
 
 Each lifted getter and `InstantPaymentJob::DataId` now has a `/INCLUDE` pragma with a `// LIFT:` note. No live caller emits their vtables yet. The pragma keeps them in the link, so funcdiff can pair them. The bodies did not change.
 `InstantPaymentDrawSlateNewStoneSubJob::DataId` is still a stub, so it has no pragma. The decorated names are built from the PDB signature and are not checked against the PDB publics.
+
+## Round 6: link fix
+
+The link failed with an unresolved symbol for the `InstantPaymentJob::DataId` pragma. The decorated name did not match the object symbol. The pragma is removed, so `InstantPaymentJob::DataId` has no dead-strip keep now. The other pragmas link.
