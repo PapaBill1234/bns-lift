@@ -3,6 +3,59 @@
 #pragma once
 #include "GameDaemonFwd.h"
 
+// LIFT: local PDB layout of the 0x118 byte record Data::DuelBotAbilityRecord (the header DrEl + key + base fields are opaque).
+namespace Data {
+class DuelBotAbilityRecord
+{
+public:
+    char _lift_head[0xBE];  // 0x0: DrEl, key, alias, max_hp ... abnormal_defend_base_percent
+    short abnormal_attack_power_modify;  // 0xBE
+    short abnormal_defend_power_modify;  // 0xC0
+    short hate_power_modify;  // 0xC2
+    short heal_power_modify;  // 0xC4
+    short aoe_defend_power_modify;  // 0xC6
+    short attack_hit_value_modify;  // 0xC8
+    short attack_critical_value_modify;  // 0xCA
+    short defend_critical_value_modify;  // 0xCC
+    short defend_dodge_value_modify;  // 0xCE
+    short defend_parry_value_modify;  // 0xD0
+    short defend_physical_value_modify;  // 0xD2
+    short defend_force_value_modify;  // 0xD4
+    short attack_stiff_duration_value_modify;  // 0xD6
+    short defend_stiff_duration_value_modify;  // 0xD8
+    short cast_duration_value_modify;  // 0xDA
+    short attack_critical_damage_modify;  // 0xDC
+    short defend_critical_damage_modify;  // 0xDE
+    short attack_pierce_modify;  // 0xE0
+    short attack_parry_pierce_modify;  // 0xE2
+    short defend_parry_reduce_modify;  // 0xE4
+    short attack_perfect_parry_damage_modify;  // 0xE6
+    short defend_perfect_parry_reduce_modify;  // 0xE8
+    short attack_counter_damage_modify;  // 0xEA
+    short defend_counter_reduce_modify;  // 0xEC
+};
+
+class DuelBotAbilityRecordPtr
+{
+public:
+    DuelBotAbilityRecord *_record;  // 0x0 (PDB: DrRecordPtr::_record, DrEl *)
+};
+}  // namespace Data
+
+// LIFT: PDB class SkillResultContext (size 0xB0). The vptr is a plain slot: the class is never constructed here.
+struct DuelBotSkillResultContext
+{
+    void *_vfptr;  // 0x0
+    unsigned int _lastComboSkill;  // 0x8
+    __int64 _lastComboSkillFireLimitTime;  // 0x10
+    __int64 _lastComboSkillExecFirstLimitTime;  // 0x18
+    __int64 _lastComboSkillExecLastLimitTime;  // 0x20
+    ::SkillResult _lastComboSkillExecFirstResult;  // 0x28
+    ::SkillResult _lastComboSkillExecLastResult;  // 0x2C
+    __int64 _lastAttackLimitTime[8];  // 0x30
+    __int64 _lastAttackedLimitTime[8];  // 0x70
+};
+
 class DuelBot
 {
 public:
@@ -76,6 +129,13 @@ public:
     virtual void __cdecl OnCombatEnd(void);  // 0x9e6b0
     void __cdecl SetActiveDuelBotSummoned(::DuelBotSummoned *);  // 0x9e7c0
     void __cdecl ClearDuelBotSummoned(void);  // 0x5ea260
+
+    // LIFT: PDB layout (size 0x1938). The base DuelBotCreature/Creature layout is not lifted yet, so it is opaque.
+    char _lift_baseStorage[0x1868 - sizeof(void *)];  // vptr, DuelBotCreature, _recycleTimeManager ... _data (to 0x1868)
+    Data::DuelBotAbilityRecordPtr _abilityData;  // 0x1868
+    char _lift_equippedAndTrained[0x10];  // 0x1870: _equippedItemData, _trainedSkillData
+    DuelBotSkillResultContext _skillResultContext;  // 0x1880
+    ::DuelBotSummoned *duelBotSummoned;  // 0x1930
 };
 
 class DuelBotCreature

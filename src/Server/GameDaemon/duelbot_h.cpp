@@ -1,6 +1,48 @@
-// duelbot_h.cpp: duelbot.h (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
+// duelbot_h.cpp: duelbot.h (GameDaemon PDB, 2019 + PDB). Wave E: DuelBot getters and setters are lifted.
 #include "duelbot.h"
 #include "LiftStub.h"
+
+// LIFT: dead-strip keep (no live caller yet) for the lifted virtual functions of DuelBot (0x97270 - 0x974e0).
+#pragma comment(linker, "/INCLUDE:?GetLastComboSkill@DuelBot@@UEBAIXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SetLastComboSkill@DuelBot@@UEAAXI@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetLastComboFireLimitTime@DuelBot@@UEBA_JXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SetLastComboFireLimitTime@DuelBot@@UEAAX_J@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetLastComboExecFirstLimitTime@DuelBot@@UEBA_JXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SetLastComboExecFirstLimitTime@DuelBot@@UEAAX_J@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetLastComboExecLastLimitTime@DuelBot@@UEBA_JXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SetLastComboExecLastLimitTime@DuelBot@@UEAAX_J@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetLastComboExecFirstResult@DuelBot@@UEBA?AW4SkillResult@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SetLastComboExecFirstResult@DuelBot@@UEAAXW4SkillResult@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetLastComboExecLastResult@DuelBot@@UEBA?AW4SkillResult@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SetLastComboExecLastResult@DuelBot@@UEAAXW4SkillResult@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetLastAttackLimitTime@DuelBot@@UEBA_JW4SkillResult@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SetLastAttackLimitTime@DuelBot@@UEAAXW4SkillResult@@_J@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetLastAttackedLimitTime@DuelBot@@UEBA_JW4SkillResult@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SetLastAttackedLimitTime@DuelBot@@UEAAXW4SkillResult@@_J@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetAttackHitValueModify@DuelBot@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetAttackCriticalValueModify@DuelBot@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetDefendCriticalValueModify@DuelBot@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetDefendDodgeValueModify@DuelBot@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetDefendParryValueModify@DuelBot@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetDefendPhysicalValueModify@DuelBot@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetDefendForceValueModify@DuelBot@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetAttackStiffDurationValueModify@DuelBot@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetDefendStiffDurationValueModify@DuelBot@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetCastDurationValueModify@DuelBot@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetAttackCriticalDamageModify@DuelBot@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetDefendCriticalDamageModify@DuelBot@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetAttackPierceModify@DuelBot@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetAttackParryPierceModify@DuelBot@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetDefendParryReduceModify@DuelBot@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetAttackPerfectParryDamageModify@DuelBot@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetDefendPerfectParryReduceModify@DuelBot@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetAttackCounterDamageModify@DuelBot@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetDefendCounterReduceModify@DuelBot@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetHealPowerModify@DuelBot@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetAOEDefendPowerModify@DuelBot@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetAbnormalAttackPowerModify@DuelBot@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetAbnormalDefendPowerModify@DuelBot@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetHatePowerModify@DuelBot@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
 
 // 0x97240
 void __cdecl DuelBot::ClearLastComboSkillValue(void)
@@ -11,241 +53,242 @@ void __cdecl DuelBot::ClearLastComboSkillValue(void)
 // 0x97270
 unsigned int __cdecl DuelBot::GetLastComboSkill(void) const
 {
-    LIFT_STUB(0x97270);
+    return _skillResultContext._lastComboSkill;
 }
 
 // 0x97280
-void __cdecl DuelBot::SetLastComboSkill(unsigned int)
+void __cdecl DuelBot::SetLastComboSkill(unsigned int skill)
 {
-    LIFT_STUB(0x97280);
+    _skillResultContext._lastComboSkill = skill;
 }
 
 // 0x97290
 __int64 __cdecl DuelBot::GetLastComboFireLimitTime(void) const
 {
-    LIFT_STUB(0x97290);
+    return _skillResultContext._lastComboSkillFireLimitTime;
 }
 
 // 0x972a0
-void __cdecl DuelBot::SetLastComboFireLimitTime(__int64)
+void __cdecl DuelBot::SetLastComboFireLimitTime(__int64 time)
 {
-    LIFT_STUB(0x972a0);
+    _skillResultContext._lastComboSkillFireLimitTime = time;
 }
 
 // 0x972b0
 __int64 __cdecl DuelBot::GetLastComboExecFirstLimitTime(void) const
 {
-    LIFT_STUB(0x972b0);
+    return _skillResultContext._lastComboSkillExecFirstLimitTime;
 }
 
 // 0x972c0
-void __cdecl DuelBot::SetLastComboExecFirstLimitTime(__int64)
+void __cdecl DuelBot::SetLastComboExecFirstLimitTime(__int64 time)
 {
-    LIFT_STUB(0x972c0);
+    _skillResultContext._lastComboSkillExecFirstLimitTime = time;
 }
 
 // 0x972d0
 __int64 __cdecl DuelBot::GetLastComboExecLastLimitTime(void) const
 {
-    LIFT_STUB(0x972d0);
+    return _skillResultContext._lastComboSkillExecLastLimitTime;
 }
 
 // 0x972e0
-void __cdecl DuelBot::SetLastComboExecLastLimitTime(__int64)
+void __cdecl DuelBot::SetLastComboExecLastLimitTime(__int64 time)
 {
-    LIFT_STUB(0x972e0);
+    _skillResultContext._lastComboSkillExecLastLimitTime = time;
 }
 
 // 0x972f0
 ::SkillResult __cdecl DuelBot::GetLastComboExecFirstResult(void) const
 {
-    LIFT_STUB(0x972f0);
+    return _skillResultContext._lastComboSkillExecFirstResult;
 }
 
 // 0x97300
-void __cdecl DuelBot::SetLastComboExecFirstResult(::SkillResult)
+void __cdecl DuelBot::SetLastComboExecFirstResult(::SkillResult result)
 {
-    LIFT_STUB(0x97300);
+    _skillResultContext._lastComboSkillExecFirstResult = result;
 }
 
 // 0x97310
 ::SkillResult __cdecl DuelBot::GetLastComboExecLastResult(void) const
 {
-    LIFT_STUB(0x97310);
+    return _skillResultContext._lastComboSkillExecLastResult;
 }
 
 // 0x97320
-void __cdecl DuelBot::SetLastComboExecLastResult(::SkillResult)
+void __cdecl DuelBot::SetLastComboExecLastResult(::SkillResult result)
 {
-    LIFT_STUB(0x97320);
+    _skillResultContext._lastComboSkillExecLastResult = result;
 }
 
 // 0x97330
-__int64 __cdecl DuelBot::GetLastAttackLimitTime(::SkillResult) const
+// LIFT: the index is result - 1 (the pseudocode reads from 0x28 + 8 * result, array base 0x30).
+__int64 __cdecl DuelBot::GetLastAttackLimitTime(::SkillResult result) const
 {
-    LIFT_STUB(0x97330);
+    return _skillResultContext._lastAttackLimitTime[result - 1];
 }
 
 // 0x97340
-void __cdecl DuelBot::SetLastAttackLimitTime(::SkillResult, __int64)
+void __cdecl DuelBot::SetLastAttackLimitTime(::SkillResult result, __int64 time)
 {
-    LIFT_STUB(0x97340);
+    _skillResultContext._lastAttackLimitTime[result - 1] = time;
 }
 
 // 0x97350
-__int64 __cdecl DuelBot::GetLastAttackedLimitTime(::SkillResult) const
+__int64 __cdecl DuelBot::GetLastAttackedLimitTime(::SkillResult result) const
 {
-    LIFT_STUB(0x97350);
+    return _skillResultContext._lastAttackedLimitTime[result - 1];
 }
 
 // 0x97360
-void __cdecl DuelBot::SetLastAttackedLimitTime(::SkillResult, __int64)
+void __cdecl DuelBot::SetLastAttackedLimitTime(::SkillResult result, __int64 time)
 {
-    LIFT_STUB(0x97360);
+    _skillResultContext._lastAttackedLimitTime[result - 1] = time;
 }
 
 // 0x97370
 short __cdecl DuelBot::GetAttackHitValueModify(void)
 {
-    LIFT_STUB(0x97370);
+    return _abilityData._record->attack_hit_value_modify;
 }
 
 // 0x97380
 short __cdecl DuelBot::GetAttackCriticalValueModify(void)
 {
-    LIFT_STUB(0x97380);
+    return _abilityData._record->attack_critical_value_modify;
 }
 
 // 0x97390
 short __cdecl DuelBot::GetDefendCriticalValueModify(void)
 {
-    LIFT_STUB(0x97390);
+    return _abilityData._record->defend_critical_value_modify;
 }
 
 // 0x973a0
 short __cdecl DuelBot::GetDefendDodgeValueModify(void)
 {
-    LIFT_STUB(0x973a0);
+    return _abilityData._record->defend_dodge_value_modify;
 }
 
 // 0x973b0
 short __cdecl DuelBot::GetDefendParryValueModify(void)
 {
-    LIFT_STUB(0x973b0);
+    return _abilityData._record->defend_parry_value_modify;
 }
 
 // 0x973c0
 short __cdecl DuelBot::GetDefendPhysicalValueModify(void)
 {
-    LIFT_STUB(0x973c0);
+    return _abilityData._record->defend_physical_value_modify;
 }
 
 // 0x973d0
 short __cdecl DuelBot::GetDefendForceValueModify(void)
 {
-    LIFT_STUB(0x973d0);
+    return _abilityData._record->defend_force_value_modify;
 }
 
 // 0x973e0
 short __cdecl DuelBot::GetAttackStiffDurationValueModify(void)
 {
-    LIFT_STUB(0x973e0);
+    return _abilityData._record->attack_stiff_duration_value_modify;
 }
 
 // 0x973f0
 short __cdecl DuelBot::GetDefendStiffDurationValueModify(void)
 {
-    LIFT_STUB(0x973f0);
+    return _abilityData._record->defend_stiff_duration_value_modify;
 }
 
 // 0x97400
 short __cdecl DuelBot::GetCastDurationValueModify(void)
 {
-    LIFT_STUB(0x97400);
+    return _abilityData._record->cast_duration_value_modify;
 }
 
 // 0x97410
 short __cdecl DuelBot::GetAttackCriticalDamageModify(void)
 {
-    LIFT_STUB(0x97410);
+    return _abilityData._record->attack_critical_damage_modify;
 }
 
 // 0x97420
 short __cdecl DuelBot::GetDefendCriticalDamageModify(void)
 {
-    LIFT_STUB(0x97420);
+    return _abilityData._record->defend_critical_damage_modify;
 }
 
 // 0x97430
 short __cdecl DuelBot::GetAttackPierceModify(void)
 {
-    LIFT_STUB(0x97430);
+    return _abilityData._record->attack_pierce_modify;
 }
 
 // 0x97440
 short __cdecl DuelBot::GetAttackParryPierceModify(void)
 {
-    LIFT_STUB(0x97440);
+    return _abilityData._record->attack_parry_pierce_modify;
 }
 
 // 0x97450
 short __cdecl DuelBot::GetDefendParryReduceModify(void)
 {
-    LIFT_STUB(0x97450);
+    return _abilityData._record->defend_parry_reduce_modify;
 }
 
 // 0x97460
 short __cdecl DuelBot::GetAttackPerfectParryDamageModify(void)
 {
-    LIFT_STUB(0x97460);
+    return _abilityData._record->attack_perfect_parry_damage_modify;
 }
 
 // 0x97470
 short __cdecl DuelBot::GetDefendPerfectParryReduceModify(void)
 {
-    LIFT_STUB(0x97470);
+    return _abilityData._record->defend_perfect_parry_reduce_modify;
 }
 
 // 0x97480
 short __cdecl DuelBot::GetAttackCounterDamageModify(void)
 {
-    LIFT_STUB(0x97480);
+    return _abilityData._record->attack_counter_damage_modify;
 }
 
 // 0x97490
 short __cdecl DuelBot::GetDefendCounterReduceModify(void)
 {
-    LIFT_STUB(0x97490);
+    return _abilityData._record->defend_counter_reduce_modify;
 }
 
 // 0x974a0
 short __cdecl DuelBot::GetHealPowerModify(void)
 {
-    LIFT_STUB(0x974a0);
+    return _abilityData._record->heal_power_modify;
 }
 
 // 0x974b0
 short __cdecl DuelBot::GetAOEDefendPowerModify(void)
 {
-    LIFT_STUB(0x974b0);
+    return _abilityData._record->aoe_defend_power_modify;
 }
 
 // 0x974c0
 short __cdecl DuelBot::GetAbnormalAttackPowerModify(void)
 {
-    LIFT_STUB(0x974c0);
+    return _abilityData._record->abnormal_attack_power_modify;
 }
 
 // 0x974d0
 short __cdecl DuelBot::GetAbnormalDefendPowerModify(void)
 {
-    LIFT_STUB(0x974d0);
+    return _abilityData._record->abnormal_defend_power_modify;
 }
 
 // 0x974e0
 short __cdecl DuelBot::GetHatePowerModify(void)
 {
-    LIFT_STUB(0x974e0);
+    return _abilityData._record->hate_power_modify;
 }
 
 // 0x974f0
