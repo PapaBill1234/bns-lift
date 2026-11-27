@@ -15,10 +15,11 @@ This repo is public. Do not commit binaries, keys, PDBs or IDA databases.
 | First 4 exes | 96.2 % parity (2558 of 2658). All 4 are at their level: CacheGate, SmartCouponDaemon and PostOfficeDaemon above 95 %, LobbyGate 94.9 %. |
 | Open functions (first 4) | 100. Each has a written proof in [Docs/Parity/unmatchable.md](Docs/Parity/unmatchable.md) (level A). 0 at level B. |
 | LobbyDaemon | Lift in progress: 1038 counted MATCH (47.1 %), 128 excluded MATCH not counted. Most of the other functions are still `LIFT_STUB` bodies. |
+| GameDaemon | Lift in progress: 517 MATCH of 12851 (4.0 %). Start 0.4 %. 12253 functions are still only in the original (stubs). Plan: [Docs/Plan/gamedaemon-lift.md](Docs/Plan/gamedaemon-lift.md). |
 | Method | Gap cards. Each card lifts the PDB class layout and the stub bodies of one class or job group. |
-| Last landed | pkt3 (packet helpers; PostOfficeDaemon +2; 2 review rejects excluded), t9 (LobbyGate HandleEvent, KickNotify, AddJobTimer; +3), fpc (FragmentPacketConcatenater::Clone; LobbyGate +1, PostOfficeDaemon +1). 0 lost in all 5 exes. |
+| Last landed | GameDaemon gap cards E1-E21 and S2 (2026-11-27): GameDaemon 67 → 517 MATCH since card 0d. 0 lost MATCH in the other 5 exes. |
 | Checks per landing | Full VS2010 build of all 5 exes, funcdiff against the original, 0 lost MATCH, 0 strict regress. Review v2 (prechecks P1-P5, P9 and a model review) checks each new MATCH without a strict full proof. |
-| Next | GameDaemon full lift: plan in `Docs/Plan/gamedaemon-lift.md` (in progress). |
+| Next | More GameDaemon gap cards (E22 and later), one class or job group per card. |
 
 ## Parity
 
