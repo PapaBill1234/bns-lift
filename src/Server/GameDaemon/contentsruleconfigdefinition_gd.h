@@ -11,6 +11,7 @@ public:
     static bool __cdecl ReloadContentsRuleConfig(bool &, bool &);  // 0x895c0
     static void __cdecl DestroyContentsRuleConfig(void);  // 0x89920
     static void __cdecl Dump(void);  // 0x89a50
+    static ::ContentsRuleConfig * Config;  // rva 0xF9C170 (PDB globals)
 private:
     static ::FragmentPacket * __cdecl MakeListPacket(::ContentsRuleConfig *);  // 0x89c50
     bool __cdecl ConvPacketElement(char *, char *, wchar_t const *const, wchar_t const *const, int);  // 0x8a100

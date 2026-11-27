@@ -3,18 +3,55 @@
 #include "creature.h"
 #include "effectproperty.h"
 #include "zone.h"
+#include "RefCntObject.h"
+#include "Daemon.h"
 #include "LiftStub.h"
+
+#pragma comment(linker, "/INCLUDE:??1Effect@@UEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetDataSubType@Effect@@UEAA?AW4EffectRecordSubType@Data@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetRemainDuration@PassiveEffect@@QEAAJPEA_W@Z")  // LIFT: dead-strip keep (no live caller yet)
+
+#define EFFECT_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\Effect.cpp"
+
+namespace
+{
+// LIFT: view of GameObject (PDB: base RefCntObject at +0, Id at +0x28). The skeleton GameObject has no base yet.
+struct GameObjectView
+{
+    char lift_pad_0[0x28];
+    unsigned __int64 Id;  // +40 (0x28)
+};
+
+// LIFT: view of DrEl (PDB: subtype at +2), the base of Data::EffectRecord.
+struct DrElView
+{
+    char type;            // +0
+    short subtype;        // +2
+    unsigned short size;  // +4
+};
+
+// LIFT: object type of a GameObject id (high 16 bits). ❓ PDB name of the inline helper.
+inline unsigned short GetObjectType(unsigned __int64 id)
+{
+    return static_cast<unsigned short>(id >> 48);
+}
+
+const unsigned short OBJECT_TYPE_32 = 32;  // LIFT: object type value 32 (pseudocode); ❓ enumerator name
+}
 
 // 0x5a2ec0
 __cdecl Effect::~Effect(void)
 {
-    LIFT_STUB(0x5a2ec0);
+    if (target != nullptr && GetObjectType(reinterpret_cast<GameObjectView const *>(target)->Id) != OBJECT_TYPE_32)
+        reinterpret_cast<::RefCntObject *>(target)->removeReferenceCount(EFFECT_FILE, 86);
 }
 
 // 0x5a2f30
 ::Data::EffectRecordSubType __cdecl Effect::GetDataSubType(void)
 {
-    LIFT_STUB(0x5a2f30);
+    if (data == nullptr)
+        return static_cast<::Data::EffectRecordSubType>(0);
+    return static_cast<::Data::EffectRecordSubType>(reinterpret_cast<DrElView const *>(data)->subtype);
 }
 
 // 0x5a2f40
@@ -80,7 +117,19 @@ void __cdecl Effect::createDuelbotEffectAction(char, unsigned int, char const *,
 // 0x5a3fd0
 bool __cdecl Effect::checkImmuneDebuff(void)
 {
-    LIFT_STUB(0x5a3fd0);
+    GameObjectView const * object = reinterpret_cast<GameObjectView const *>(target);
+    unsigned short type = GetObjectType(object->Id);
+    if (type != 1 && type != 2 && type != 4 && type != 240 && type != 241)  // LIFT: creature type values (pseudocode); ❓ enumerator names
+        return true;
+    if (!reinterpret_cast<CreatureAbnormalityView const *>(target)->immune_debuff)
+        return true;
+    EffectRecordView const * record = reinterpret_cast<EffectRecordView const *>(data);
+    if (record->buff_type != BUFF_TYPE_DEBUFF || record->ignore_immune_debuff)
+        return true;
+    Log::Write(Log::LT_DEBUG, EFFECT_FILE, 540,
+               L"[effect], failed to apply by immune debuff., effectId:%d, Creature:%#I64x, immune is true",
+               record->id, object->Id);
+    return false;
 }
 
 // 0x5a4060
@@ -200,7 +249,12 @@ void __cdecl PassiveEffect::CalcRemained(void)
 // 0x5a62a0
 long __cdecl PassiveEffect::GetRemainDuration(wchar_t *)
 {
-    LIFT_STUB(0x5a62a0);
+    __int64 now = GetTickCount64() - Daemon::Instance->StartSystemTick64;
+    long elapsed = static_cast<long>((now - _updateTime) / 100) * 100;
+    long remain = _prop.Default.duration - elapsed;
+    if (remain < 0)
+        return 0;
+    return remain;
 }
 
 // 0x5a6300

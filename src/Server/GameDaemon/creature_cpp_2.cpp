@@ -2,6 +2,25 @@
 #include "creature.h"
 #include "LiftStub.h"
 
+#pragma comment(linker, "/INCLUDE:?GetActivatedBadgeEquipSlot@Creature@@QEAADXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?IsActivatedBadgeEquipSlot@Creature@@QEAA_NE@Z")  // LIFT: dead-strip keep (no live caller yet)
+
+namespace
+{
+// LIFT: view of Creature (PDB: Prop at +0x30, CreatureProperty::State at +0xD8, __state__::activated_badge_page at +0x270).
+struct CreatureBadgeView
+{
+    char lift_pad_0[0x30 + 0xD8 + 0x270];
+    char activated_badge_page;  // +0x378 (Prop.State.activated_badge_page)
+};
+
+// LIFT: badge equip slot values (pseudocode). ❓ PDB enumerator names.
+const char BADGE_EQUIP_SLOT_NONE = 0;
+const char BADGE_EQUIP_SLOT_PAGE1 = 10;
+const char BADGE_EQUIP_SLOT_PAGE2 = 11;
+const char BADGE_EQUIP_SLOT_PAGE3 = 12;
+}
+
 // 0x26d4f0
 bool __cdecl Creature::HandleDebugFlag(unsigned short, ::f_flag8::Operation, ::ChangedProperty *)
 {
@@ -419,13 +438,24 @@ bool __cdecl Creature::HandleActivatedBadgePage(char, ::ChangedProperty *)
 // 0x2749f0
 char __cdecl Creature::GetActivatedBadgeEquipSlot(void)
 {
-    LIFT_STUB(0x2749f0);
+    switch (reinterpret_cast<CreatureBadgeView const *>(this)->activated_badge_page)
+    {
+    case 1:
+        return BADGE_EQUIP_SLOT_PAGE1;
+    case 2:
+        return BADGE_EQUIP_SLOT_PAGE2;
+    case 3:
+        return BADGE_EQUIP_SLOT_PAGE3;
+    default:
+        return BADGE_EQUIP_SLOT_NONE;
+    }
 }
 
 // 0x274a10
-bool __cdecl Creature::IsActivatedBadgeEquipSlot(unsigned char)
+bool __cdecl Creature::IsActivatedBadgeEquipSlot(unsigned char depot)
 {
-    LIFT_STUB(0x274a10);
+    // LIFT: the original inlines GetActivatedBadgeEquipSlot here.
+    return depot == static_cast<unsigned char>(GetActivatedBadgeEquipSlot());
 }
 
 // 0x274a60

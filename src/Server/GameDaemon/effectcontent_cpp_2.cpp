@@ -2,7 +2,81 @@
 #include "effectcontent.h"
 #include "creature.h"
 #include "zone.h"
+#include "Log.h"
 #include "LiftStub.h"
+
+#pragma comment(linker, "/INCLUDE:?checkApply@EmbersExplosionTimerEffect@@MEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?checkApply@DashEffect@@EEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?checkApply@DebuffGuildBattleFieldEffect@@MEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?checkApply@OceanicEffect@@EEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?checkApply@FallDeathEffect@@EEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?FindBlankModifyAbility@MasteryStatEquipEffect@@SAHPEBVEffectRecordMasteryStatEquip@Data@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?checkApply@SecondGaugePointEffect@@EEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?checkApply@IntervalSecondGaugePointEffect@@EEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?checkApply@AccumulatedDamageEffect@@EEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+
+#define EFFECTCONTENT_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\EffectContent.cpp"
+
+namespace
+{
+// LIFT: view of GameObject (PDB: Id at +0x28).
+struct GameObjectView
+{
+    char lift_pad_0[0x28];
+    unsigned __int64 Id;  // +40 (0x28)
+};
+
+// LIFT: view of Effect (PDB: target at +0x20, casterId at +0x28). The skeleton effect classes have no base yet.
+struct EffectView
+{
+    char lift_pad_0[0x20];
+    GameObjectView * target;     // +32 (0x20)
+    unsigned __int64 casterId;   // +40 (0x28)
+};
+
+// LIFT: view of Creature (PDB: Prop at +0x30; CreatureProperty::State at +0xD8, Abnormality at +0x738).
+struct CreatureView
+{
+    char lift_pad_0[0x30 + 0xD8 + 0xD8];
+    unsigned __int64 effect_flag_3;  // +0x1E0 (Prop.State.effect_flag_3)
+    char lift_pad_1[0x30 + 0xD8 + 0x142 - (0x30 + 0xD8 + 0xD8 + 8)];
+    char dead;                       // +0x24A (Prop.State.dead)
+    char lift_pad_2[0x30 + 0x738 + 1 - (0x30 + 0xD8 + 0x142 + 1)];
+    bool block_move;                 // +0x769 (Prop.Abnormality.block_move)
+};
+
+// LIFT: view of Npc (PDB: _flags at +3386).
+struct NpcFlagsView
+{
+    char lift_pad_0[3386];
+    unsigned short _flags;  // +3386 (0xD3A)
+};
+
+// LIFT: view of Data::EffectRecordMasteryStatEquip (PDB: modify_ability_for_mastery[16] at +0x278).
+struct EffectRecordMasteryStatEquipView
+{
+    char lift_pad_0[0x278];
+    short modify_ability_for_mastery[16];  // +0x278
+};
+
+// LIFT: object type of a GameObject id (high 16 bits). ❓ PDB names of the inline helpers and type values.
+inline unsigned short GetObjectType(unsigned __int64 id)
+{
+    return static_cast<unsigned short>(id >> 48);
+}
+
+inline bool IsCreatureType(unsigned __int64 id)
+{
+    unsigned short type = GetObjectType(id);
+    return type == 1 || type == 2 || type == 4 || type == 240 || type == 241;
+}
+
+const unsigned short OBJECT_TYPE_PC = 1;   // LIFT: value 1 (pseudocode); ❓ enumerator name
+const unsigned short OBJECT_TYPE_NPC = 4;  // LIFT: value 4 (pseudocode); ❓ enumerator name
+const unsigned short NPC_FLAG_SECOND_GAUGE = 0x80;  // LIFT: bit 7 of Npc::_flags (pseudocode); ❓ PDB name
+const unsigned __int64 EFFECT_FLAG_3_SECOND_GAUGE_STOPPED = 0x20;  // LIFT: bit of effect_flag_3 (pseudocode, log text); ❓ PDB name
+const int MAX_MODIFY_ABILITY_FOR_MASTERY = 16;  // LIFT: array size of modify_ability_for_mastery (PDB)
+}
 
 // 0x5c6940
 void __cdecl ReplacePositionEffect::apply(void)
@@ -103,7 +177,10 @@ void __cdecl BindingSkillStepEffect::attachApply(::ChangedProperty *)
 // 0x5c8620
 bool __cdecl EmbersExplosionTimerEffect::checkApply(void)
 {
-    LIFT_STUB(0x5c8620);
+    EffectView const * self = reinterpret_cast<EffectView const *>(this);
+    if (IsCreatureType(self->target->Id) && IsCreatureType(self->casterId))
+        return true;
+    return false;
 }
 
 // 0x5c8690
@@ -211,7 +288,13 @@ bool __cdecl DashEffect::Initialize5(::EffectSource, ::Zone *, unsigned __int64,
 // 0x5caf40
 bool __cdecl DashEffect::checkApply(void)
 {
-    LIFT_STUB(0x5caf40);
+    EffectView const * self = reinterpret_cast<EffectView const *>(this);
+    GameObjectView * target = self->target;
+    if (!IsCreatureType(target->Id))
+        return false;
+    if (self->casterId == target->Id && reinterpret_cast<CreatureView const *>(target)->block_move)
+        return false;
+    return true;
 }
 
 // 0x5caf90
@@ -277,7 +360,7 @@ void __cdecl ReviveExceptRuleEffect::attachDissolve(::ChangedProperty *, ::Detac
 // 0x5cbea0
 bool __cdecl DebuffGuildBattleFieldEffect::checkApply(void)
 {
-    LIFT_STUB(0x5cbea0);
+    return GetObjectType(reinterpret_cast<EffectView const *>(this)->target->Id) == OBJECT_TYPE_PC;
 }
 
 // 0x5cbec0
@@ -313,7 +396,8 @@ bool __cdecl OceanicEffect::Initialize5(::EffectSource, ::Zone *, unsigned __int
 // 0x5cc380
 bool __cdecl OceanicEffect::checkApply(void)
 {
-    LIFT_STUB(0x5cc380);
+    unsigned short type = GetObjectType(reinterpret_cast<EffectView const *>(this)->target->Id);
+    return type == 1 || type == 2 || type == 3;  // LIFT: type values 1, 2, 3 (pseudocode); ❓ enumerator names
 }
 
 // 0x5cc3a0
@@ -337,7 +421,10 @@ bool __cdecl FallDeathEffect::Initialize5(::EffectSource, ::Zone *, unsigned __i
 // 0x5cc5f0
 bool __cdecl FallDeathEffect::checkApply(void)
 {
-    LIFT_STUB(0x5cc5f0);
+    GameObjectView * target = reinterpret_cast<EffectView const *>(this)->target;
+    if (!IsCreatureType(target->Id))
+        return false;
+    return reinterpret_cast<CreatureView const *>(target)->dead != 1;
 }
 
 // 0x5cc630
@@ -479,9 +566,17 @@ bool __cdecl MasteryStatEquipEffect::AccumulateModifyAbility(::Data::EffectRecor
 }
 
 // 0x5cf7c0
-int __cdecl MasteryStatEquipEffect::FindBlankModifyAbility(::Data::EffectRecordMasteryStatEquip const *)
+int __cdecl MasteryStatEquipEffect::FindBlankModifyAbility(::Data::EffectRecordMasteryStatEquip const * eData)
 {
-    LIFT_STUB(0x5cf7c0);
+    if (eData == nullptr)
+        return -1;
+    EffectRecordMasteryStatEquipView const * record = reinterpret_cast<EffectRecordMasteryStatEquipView const *>(eData);
+    for (int i = 0; i < MAX_MODIFY_ABILITY_FOR_MASTERY; ++i)
+    {
+        if (record->modify_ability_for_mastery[i] == 0)
+            return i;
+    }
+    return -1;
 }
 
 // 0x5cf7f0
@@ -529,7 +624,17 @@ void __cdecl AttackGlideEffect::intervalApply(void)
 // 0x5d10a0
 bool __cdecl SecondGaugePointEffect::checkApply(void)
 {
-    LIFT_STUB(0x5d10a0);
+    GameObjectView * target = reinterpret_cast<EffectView const *>(this)->target;
+    if (GetObjectType(target->Id) != OBJECT_TYPE_NPC
+        || (reinterpret_cast<NpcFlagsView const *>(target)->_flags & NPC_FLAG_SECOND_GAUGE) == 0)
+        return false;
+    if ((reinterpret_cast<CreatureView const *>(target)->effect_flag_3 & EFFECT_FLAG_3_SECOND_GAUGE_STOPPED) != 0)
+    {
+        Log::Write(Log::LT_DEBUG, EFFECTCONTENT_FILE, 8388,
+                   L"[effect], SecondGaugePointEffect::checkApply; SecondGaugeStopped flag is true. no apply.");
+        return false;
+    }
+    return true;
 }
 
 // 0x5d1100
@@ -541,7 +646,9 @@ void __cdecl SecondGaugePointEffect::apply(void)
 // 0x5d13a0
 bool __cdecl IntervalSecondGaugePointEffect::checkApply(void)
 {
-    LIFT_STUB(0x5d13a0);
+    GameObjectView * target = reinterpret_cast<EffectView const *>(this)->target;
+    return GetObjectType(target->Id) == OBJECT_TYPE_NPC
+        && (reinterpret_cast<NpcFlagsView const *>(target)->_flags & NPC_FLAG_SECOND_GAUGE) != 0;
 }
 
 // 0x5d13d0
@@ -583,7 +690,11 @@ bool __cdecl AccumulatedDamageEffect::Initialize1(::EffectSource, ::Zone *, unsi
 // 0x5d1d00
 bool __cdecl AccumulatedDamageEffect::checkApply(void)
 {
-    LIFT_STUB(0x5d1d00);
+    EffectView const * self = reinterpret_cast<EffectView const *>(this);
+    unsigned short casterType = GetObjectType(self->casterId);
+    if ((casterType == 1 || casterType == 240) && IsCreatureType(self->target->Id))  // LIFT: type values 1, 240 (pseudocode); ❓ enumerator names
+        return true;
+    return false;
 }
 
 // 0x5d1d50

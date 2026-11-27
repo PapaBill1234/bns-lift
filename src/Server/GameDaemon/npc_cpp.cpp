@@ -10,7 +10,63 @@
 #include "pc.h"
 #include "raiddungeon.h"
 #include "zone.h"
+#include "gamedaemon.h"
+#include "gamedconfig.h"
+#include "contentsruleconfigdefinition_gd.h"
 #include "LiftStub.h"
+
+#pragma comment(linker, "/INCLUDE:?GetCombatSequence@Npc@@QEBAPEAVCombatSequence@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?calculateAdditionalExpBonusByTestServer@Npc@@AEAA_J_J@Z")  // LIFT: dead-strip keep (no live caller yet)
+
+namespace
+{
+// LIFT: view of BrainBase (PDB: GetState(BrainConst::State) is vtable slot 3).
+class BrainBaseView
+{
+public:
+    virtual void InitSpecialState(void) = 0;           // slot 0
+    virtual bool Start(int) = 0;                       // slot 1
+    virtual bool Stop(void) = 0;                       // slot 2
+    virtual ::BrainState * GetState(int) = 0;          // slot 3
+};
+
+// LIFT: view of the combat sequence brain state (CombatSequence * at +8).
+struct CombatSeqBrainStateView
+{
+    void * vfptr;                        // +0
+    ::CombatSequence * combatSequence;   // +8
+};
+
+// LIFT: view of Npc (PDB: _brain at +3216).
+struct NpcView
+{
+    char lift_pad_0[3216];
+    BrainBaseView * _brain;  // +3216 (0xC90)
+};
+
+// LIFT: view of GamedConfig (PDB: _testServerEnable at +746).
+struct GamedConfigView
+{
+    char lift_pad_0[746];
+    bool _testServerEnable;  // +746 (0x2EA)
+};
+
+// LIFT: view of GameDaemon (config is private in gamedaemon.h; PDB offset +0xAA8).
+struct GameDaemonView
+{
+    char lift_pad_0[0xAA8];
+    GamedConfigView * config;  // +0xAA8
+};
+
+// LIFT: view of ContentsRuleConfig (PDB: _testServerExpBonusPercentNpc at +100).
+struct ContentsRuleConfigView
+{
+    char lift_pad_0[100];
+    int _testServerExpBonusPercentNpc;  // +100 (0x64)
+};
+
+const int BRAIN_STATE_COMBAT_SEQUENCE = 5;  // LIFT: BrainConst::State value 5 (pseudocode); ❓ enumerator name
+}
 
 // 0x40f630
 __cdecl Npc::Npc(::Zone *, ::Data::NpcRecordPtr, ::NpcSpawnInfo)
@@ -345,7 +401,13 @@ bool __cdecl Npc::Hide(::HideType)
 // 0x41a220
 ::CombatSequence * __cdecl Npc::GetCombatSequence(void) const
 {
-    LIFT_STUB(0x41a220);
+    BrainBaseView * brain = reinterpret_cast<NpcView const *>(this)->_brain;
+    if (brain == nullptr)
+        return nullptr;
+    ::BrainState * state = brain->GetState(BRAIN_STATE_COMBAT_SEQUENCE);
+    if (state == nullptr)
+        return nullptr;
+    return reinterpret_cast<CombatSeqBrainStateView *>(state)->combatSequence;
 }
 
 // 0x41a260
@@ -433,9 +495,15 @@ void __cdecl Npc::TakeFactionScore(::GameObject *)
 }
 
 // 0x41ba20
-__int64 __cdecl Npc::calculateAdditionalExpBonusByTestServer(__int64)
+__int64 __cdecl Npc::calculateAdditionalExpBonusByTestServer(__int64 rewardExp)
 {
-    LIFT_STUB(0x41ba20);
+    // ❓ The pseudocode reads the first register (this) as the value. The PDB names rewardExp. The lift uses rewardExp.
+    if (rewardExp == 0 || !reinterpret_cast<GameDaemonView const *>(GameDaemon::GamedInstance)->config->_testServerEnable)
+        return 0;
+    __int64 bonus = rewardExp * reinterpret_cast<ContentsRuleConfigView const *>(ContentsRuleConfig::Config)->_testServerExpBonusPercentNpc / 100;
+    if (bonus > 0x7FFFFFFF)
+        return 0x7FFFFFFF;
+    return bonus;
 }
 
 // 0x41ba80

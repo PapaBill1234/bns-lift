@@ -2,6 +2,9 @@
 #include "contentsruleconfigdefinition_gd.h"
 #include "LiftStub.h"
 
+// LIFT: the PDB puts ContentsRuleConfig::Config in the globals (rva 0xF9C170). This file holds it until its owner is lifted.
+::ContentsRuleConfig * ContentsRuleConfig::Config = nullptr;
+
 // 0x89070
 ::ContentsRuleConfigLoad * __cdecl ContentsRuleConfigLoad::Load(void)
 {
