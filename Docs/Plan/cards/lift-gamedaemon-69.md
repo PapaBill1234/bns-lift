@@ -10,7 +10,7 @@
 | Pseudocode index | `~/.cache/bns-lift/hr/GameDaemon/index.tsv` (stem, rva, name, first, last, status, source file, part) |
 | Wave | W2 |
 | Model | opus |
-| Depends on | `lift-gamedaemon-68` |
+| Depends on | `lift-gamedaemon-e26`, `lift-gamedaemon-68` |
 | Pattern | none |
 | Plan | `Docs/Plan/gamedaemon-lift.md` sections 1, 3, 5 |
 
@@ -22,7 +22,9 @@
 
 ## Scope
 
-18 functions, about 2,189 pseudocode lines (about 17,512 tokens). Stems: `datamanager_cpp_1`.
+11 functions, about 2,111 pseudocode lines (about 16,888 tokens). Stems: `datamanager_cpp_1`.
+
+The easy functions of this stem are in `lift-gamedaemon-e26`. Do not change them unless a fix needs it.
 
 This card is part 3/10 of stem `datamanager_cpp_1`. The other parts are in other cards of this wave. They run one after the other (column "Depends on"). Edit only the functions in this table.
 
@@ -30,22 +32,15 @@ This card is part 3/10 of stem `datamanager_cpp_1`. The other parts are in other
 | ---: | --- | --- | --- | --- | ---: |
 | 1 | GD | `0x61e640` | `Data::DataManager::~DataManager` | datamanager_cpp_1 | 633 |
 | 2 | GD | `0x61f330` | `Data::DataManager::CloseLog` | datamanager_cpp_1 | 75 |
-| 3 | GD | `0x61f4c0` | `Data::DataManager::FlushLog` | datamanager_cpp_1 | 18 |
-| 4 | GD | `0x61f560` | `Data::DataManager::Load` | datamanager_cpp_1 | 187 |
-| 5 | GD | `0x61f8f0` | `Data::DataManager::loadData` | datamanager_cpp_1 | 143 |
-| 6 | GD | `0x61fc80` | `Data::DataManager::loadGeoData` | datamanager_cpp_1 | 108 |
-| 7 | GD | `0x61fe40` | `Data::DataManager::onConstructData` | datamanager_cpp_1 | 23 |
-| 8 | GD | `0x61ff00` | `Data::DataManager::checkToExistKeyFromAllTable` | datamanager_cpp_1 | 170 |
-| 9 | GD | `0x620270` | `Data::DataManager::constructData` | datamanager_cpp_1 | 565 |
-| 10 | GD | `0x620b20` | `Data::insertQuestErrorLog` | datamanager_cpp_1 | 64 |
-| 11 | GD | `0x620c40` | `Data::insertQuest` | datamanager_cpp_1 | 3 |
-| 12 | GD | `0x620d30` | `Data::insertQuestConvoy` | datamanager_cpp_1 | 3 |
-| 13 | GD | `0x620de0` | `Data::insertQuestFactionPcKill` | datamanager_cpp_1 | 3 |
-| 14 | GD | `0x620ec0` | `Data::insertQuestAttraction` | datamanager_cpp_1 | 47 |
-| 15 | GD | `0x620f50` | `Data::setDungeonInQuest` | datamanager_cpp_1 | 96 |
-| 16 | GD | `0x621120` | `Data::getNpcScriptId` | datamanager_cpp_1 | 23 |
-| 17 | GD | `0x621180` | `Data::getEnvScriptId` | datamanager_cpp_1 | 14 |
-| 18 | GD | `0x6211c0` | `Data::getZoneScriptId` | datamanager_cpp_1 | 14 |
+| 3 | GD | `0x61f560` | `Data::DataManager::Load` | datamanager_cpp_1 | 187 |
+| 4 | GD | `0x61f8f0` | `Data::DataManager::loadData` | datamanager_cpp_1 | 143 |
+| 5 | GD | `0x61fc80` | `Data::DataManager::loadGeoData` | datamanager_cpp_1 | 108 |
+| 6 | GD | `0x61fe40` | `Data::DataManager::onConstructData` | datamanager_cpp_1 | 23 |
+| 7 | GD | `0x61ff00` | `Data::DataManager::checkToExistKeyFromAllTable` | datamanager_cpp_1 | 170 |
+| 8 | GD | `0x620270` | `Data::DataManager::constructData` | datamanager_cpp_1 | 565 |
+| 9 | GD | `0x620b20` | `Data::insertQuestErrorLog` | datamanager_cpp_1 | 64 |
+| 10 | GD | `0x620ec0` | `Data::insertQuestAttraction` | datamanager_cpp_1 | 47 |
+| 11 | GD | `0x620f50` | `Data::setDungeonInQuest` | datamanager_cpp_1 | 96 |
 
 ## Tasks
 

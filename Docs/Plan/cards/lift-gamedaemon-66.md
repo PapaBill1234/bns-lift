@@ -1,4 +1,4 @@
-# lift-gamedaemon-66: Data packer and DataManager: datapacker, datamanager_h
+# lift-gamedaemon-66: Property headers and Data packer and others: skillpage, skillskinproperty, summonedproperty, weaponproperty, ...
 
 | Item | Value |
 | --- | --- |
@@ -10,7 +10,7 @@
 | Pseudocode index | `~/.cache/bns-lift/hr/GameDaemon/index.tsv` (stem, rva, name, first, last, status, source file, part) |
 | Wave | W2 |
 | Model | opus |
-| Depends on | `lift-gamedaemon-44`, `lift-gamedaemon-46` |
+| Depends on | `lift-gamedaemon-e13`, `lift-gamedaemon-e14`, `lift-gamedaemon-e26`, `lift-gamedaemon-2`, `lift-gamedaemon-35`, `lift-gamedaemon-46` |
 | Pattern | none |
 | Plan | `Docs/Plan/gamedaemon-lift.md` sections 1, 3, 5 |
 
@@ -22,29 +22,29 @@
 
 ## Scope
 
-19 functions, about 1,700 pseudocode lines (about 13,600 tokens). Stems: `datapacker`, `datamanager_h`.
+17 functions, about 1,609 pseudocode lines (about 12,872 tokens). Stems: `skillpage`, `skillskinproperty`, `summonedproperty`, `weaponproperty`, `datapacker`, `datamanager_h`.
+
+The easy functions of this stem are in `lift-gamedaemon-e13`, `lift-gamedaemon-e14`, `lift-gamedaemon-e26`. Do not change them unless a fix needs it.
 
 | n | Exe | RVA | PDB name | Stem | Lines |
 | ---: | --- | --- | --- | --- | ---: |
-| 1 | GD | `0x153d0` | `ZipPackedReaderIO::FileName::FileName` | datapacker | 44 |
-| 2 | GD | `0x154f0` | `ZipPackedReaderIO::~ZipPackedReaderIO` | datapacker | 30 |
-| 3 | GD | `0x15580` | `ZipPackedReaderIO::OpenZip` | datapacker | 115 |
-| 4 | GD | `0x15860` | `ZipPackedReaderIO::Verify` | datapacker | 426 |
-| 5 | GD | `0x16290` | `ZipPackedReaderIO::CloseZip` | datapacker | 23 |
-| 6 | GD | `0x16330` | `ZipPackedReaderIO::Open` | datapacker | 333 |
-| 7 | GD | `0x169a0` | `ZipPackedReaderIO::Read` | datapacker | 98 |
-| 8 | GD | `0x16b60` | `ZipPackedReaderIO::GetFileSize` | datapacker | 24 |
-| 9 | GD | `0x16bd0` | `ZipPackedReaderIO::GetFileName` | datapacker | 30 |
-| 10 | GD | `0x16c40` | `ZipPackedReaderIO::Next` | datapacker | 16 |
-| 11 | GD | `0x16c70` | `ZipPackedReaderIO::Close` | datapacker | 12 |
+| 1 | GD | `0x1a0e0` | `SkillPage::~SkillPage` | skillpage | 8 |
+| 2 | GD | `0x1a180` | `SkillSkinProperty::~SkillSkinProperty` | skillskinproperty | 8 |
+| 3 | GD | `0x1a220` | `SummonedProperty::~SummonedProperty` | summonedproperty | 8 |
+| 4 | GD | `0x1a2c0` | `WeaponProperty::~WeaponProperty` | weaponproperty | 8 |
+| 5 | GD | `0x153d0` | `ZipPackedReaderIO::FileName::FileName` | datapacker | 44 |
+| 6 | GD | `0x154f0` | `ZipPackedReaderIO::~ZipPackedReaderIO` | datapacker | 30 |
+| 7 | GD | `0x15580` | `ZipPackedReaderIO::OpenZip` | datapacker | 115 |
+| 8 | GD | `0x15860` | `ZipPackedReaderIO::Verify` | datapacker | 426 |
+| 9 | GD | `0x16290` | `ZipPackedReaderIO::CloseZip` | datapacker | 23 |
+| 10 | GD | `0x16330` | `ZipPackedReaderIO::Open` | datapacker | 333 |
+| 11 | GD | `0x169a0` | `ZipPackedReaderIO::Read` | datapacker | 98 |
 | 12 | GD | `0x16cb0` | `PathUtil::Tokenlize` | datapacker | 41 |
 | 13 | GD | `0x16db0` | `PathUtil::MatchPath` | datapacker | 74 |
 | 14 | GD | `0x16ec0` | `PathUtil::MatchFile` | datapacker | 105 |
 | 15 | GD | `0x1eddc0` | `Data::DataManager::GetNextRandomStoreDrawReward` | datamanager_h | 97 |
-| 16 | GD | `0x34ef90` | `Data::DataManager::CheckJumpingCharacterTicketItemDataId` | datamanager_h | 30 |
-| 17 | GD | `0x453bc0` | `Data::AdditionalServiceItems::Add` | datamanager_h | 138 |
-| 18 | GD | `0x453e30` | `Data::DataManager::GetSkillByQuestMissionList` | datamanager_h | 11 |
-| 19 | GD | `0x453e60` | `Data::DataManager::IsRankingPvEStageStartInfo` | datamanager_h | 53 |
+| 16 | GD | `0x453bc0` | `Data::AdditionalServiceItems::Add` | datamanager_h | 138 |
+| 17 | GD | `0x453e60` | `Data::DataManager::IsRankingPvEStageStartInfo` | datamanager_h | 53 |
 
 ## Tasks
 
@@ -56,6 +56,14 @@
 
 ## Files
 
+- `src/Server/GameDaemon/skillpage.cpp`
+- `src/Server/GameDaemon/skillpage.h`
+- `src/Server/GameDaemon/skillskinproperty.cpp`
+- `src/Server/GameDaemon/skillskinproperty.h`
+- `src/Server/GameDaemon/summonedproperty.cpp`
+- `src/Server/GameDaemon/summonedproperty.h`
+- `src/Server/GameDaemon/weaponproperty.cpp`
+- `src/Server/GameDaemon/weaponproperty.h`
 - `src/Server/GameDaemon/datapacker.cpp`
 - `src/Server/GameDaemon/datapacker.h`
 - `src/Server/GameDaemon/datamanager_h.cpp`

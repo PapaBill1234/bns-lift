@@ -1,4 +1,4 @@
-# lift-gamedaemon-9: Shared gaps and BloodLib: channel
+# lift-gamedaemon-9: Shared gaps and BloodLib: channel, packetbuffer, packetbufferhandler, perfcounterprovider, ...
 
 | Item | Value |
 | --- | --- |
@@ -10,7 +10,7 @@
 | Pseudocode index | `~/.cache/bns-lift/hr/GameDaemon/index.tsv` (stem, rva, name, first, last, status, source file, part) |
 | Wave | W1 |
 | Model | opus |
-| Depends on | `lift-gamedaemon-2`, `lift-gamedaemon-8` |
+| Depends on | `lift-gamedaemon-e12`, `lift-gamedaemon-e25`, `lift-gamedaemon-2`, `lift-gamedaemon-33` |
 | Pattern | `src/Server/BloodLib/source/Channel.cpp` |
 | Plan | `Docs/Plan/gamedaemon-lift.md` sections 1, 3, 5 |
 
@@ -22,34 +22,33 @@
 
 ## Scope
 
-24 functions, about 979 pseudocode lines (about 7,832 tokens). Stems: `channel`.
+21 functions, about 1,314 pseudocode lines (about 10,512 tokens). Stems: `channel`, `packetbuffer`, `packetbufferhandler`, `perfcounterprovider`, `security`, `port`.
+
+The easy functions of this stem are in `lift-gamedaemon-e25`, `lift-gamedaemon-e12`. Do not change them unless a fix needs it.
 
 | n | Exe | RVA | PDB name | Stem | Lines |
 | ---: | --- | --- | --- | --- | ---: |
 | 1 | GD | `0x699ea0` | `Channel::MakeSession` | channel | 51 |
-| 2 | GD | `0x69a3e0` | `DaemonChannel::Send` | channel | 20 |
-| 3 | GD | `0x69a440` | `DaemonChannel::Send` | channel | 15 |
-| 4 | GD | `0x69a4c0` | `DaemonChannel::Send` | channel | 20 |
-| 5 | GD | `0x69a540` | `ClientSideHashedDaemonChannel::OnAccept` | channel | 15 |
-| 6 | GD | `0x69a570` | `ClientSideHashedDaemonChannel::OnConnect` | channel | 18 |
-| 7 | GD | `0x69a5c0` | `ClientSideDaemonChannel::~ClientSideDaemonChannel` | channel | 81 |
-| 8 | GD | `0x69a740` | `ClientSideDaemonChannel::initialize` | channel | 22 |
-| 9 | GD | `0x69a7e0` | `ClientSideDaemonChannel::initSession` | channel | 65 |
-| 10 | GD | `0x69aa70` | `ClientSideHashedDaemonChannel::~ClientSideHashedDaemonChannel` | channel | 81 |
-| 11 | GD | `0x69abf0` | `ClientSideHashedDaemonChannel::Send` | channel | 24 |
-| 12 | GD | `0x69ac40` | `ClientSideHashedDaemonChannel::Send` | channel | 21 |
-| 13 | GD | `0x69aca0` | `ClientSideHashedDaemonChannel::OnClose` | channel | 12 |
-| 14 | GD | `0x69acc0` | `ClientSideHashedDaemonChannel::initialize` | channel | 22 |
-| 15 | GD | `0x69ad60` | `ClientSideHashedDaemonChannel::initSession` | channel | 71 |
-| 16 | GD | `0x69af30` | `ClientSideHashedDaemonChannel::getSession` | channel | 25 |
-| 17 | GD | `0x69afb0` | `ClientSideHashedDaemonChannel::releaseSession` | channel | 8 |
-| 18 | GD | `0x69b000` | `ServerSideDaemonChannel::~ServerSideDaemonChannel` | channel | 31 |
-| 19 | GD | `0x69b0a0` | `ServerSideDaemonChannel::Initialize` | channel | 28 |
-| 20 | GD | `0x69b170` | `ServerSideDaemonChannel::CloseAll` | channel | 33 |
-| 21 | GD | `0x69b260` | `ServerSideDaemonChannel::onAccept` | channel | 47 |
-| 22 | GD | `0x69b340` | `ServerSideDaemonChannel::onClose` | channel | 82 |
-| 23 | GD | `0x69b4c0` | `ServerSideDaemonChannel::getSession` | channel | 103 |
-| 24 | GD | `0x69b670` | `ServerSideDaemonChannel::releaseSession` | channel | 84 |
+| 2 | GD | `0x69a5c0` | `ClientSideDaemonChannel::~ClientSideDaemonChannel` | channel | 81 |
+| 3 | GD | `0x69a7e0` | `ClientSideDaemonChannel::initSession` | channel | 65 |
+| 4 | GD | `0x69aa70` | `ClientSideHashedDaemonChannel::~ClientSideHashedDaemonChannel` | channel | 81 |
+| 5 | GD | `0x69ad60` | `ClientSideHashedDaemonChannel::initSession` | channel | 71 |
+| 6 | GD | `0x69af30` | `ClientSideHashedDaemonChannel::getSession` | channel | 25 |
+| 7 | GD | `0x69b000` | `ServerSideDaemonChannel::~ServerSideDaemonChannel` | channel | 31 |
+| 8 | GD | `0x69b170` | `ServerSideDaemonChannel::CloseAll` | channel | 33 |
+| 9 | GD | `0x69b260` | `ServerSideDaemonChannel::onAccept` | channel | 47 |
+| 10 | GD | `0x69b340` | `ServerSideDaemonChannel::onClose` | channel | 82 |
+| 11 | GD | `0x69b4c0` | `ServerSideDaemonChannel::getSession` | channel | 103 |
+| 12 | GD | `0x69b670` | `ServerSideDaemonChannel::releaseSession` | channel | 84 |
+| 13 | GD | `0x69c6a0` | `parseHexInt` | packetbuffer | 45 |
+| 14 | GD | `0x69c790` | `parseDecInt` | packetbuffer | 49 |
+| 15 | GD | `0x69de40` | `TrustedPacketBufferHandler::ToPacket` | packetbufferhandler | 46 |
+| 16 | GD | `0x69e780` | `RawPacketBufferHandler::Clone` | packetbufferhandler | 42 |
+| 17 | GD | `0x69ebf0` | `PerfCounterProvider::setCounterSetInfo` | perfcounterprovider | 47 |
+| 18 | GD | `0x6a03d0` | `BroadcastCrypt::Initialize` | security | 144 |
+| 19 | GD | `0x6a3660` | `SessionPool::SessionPool` | port | 46 |
+| 20 | GD | `0x6a3780` | `SessionPool::~SessionPool` | port | 34 |
+| 21 | GD | `0x6a3c90` | `Port::Initialize` | port | 107 |
 
 ### Shared functions
 
@@ -59,6 +58,15 @@ These functions are in shared source. They are not MATCH in each lifted exe that
 | --- | --- | --- | --- |
 | `Channel::MakeSession` | `src/Server/BloodLib/source/Channel.cpp` | CacheGate, LobbyDaemon, LobbyGate, PostOfficeDaemon, SmartCouponDaemon | - |
 | `ClientSideDaemonChannel::~ClientSideDaemonChannel` | `src/Server/BloodLib/source/Channel.cpp` | CacheGate | - |
+| `parseHexInt` | `src/Server/BloodLib/source/PacketBuffer.cpp` | PostOfficeDaemon | - |
+| `parseDecInt` | `src/Server/BloodLib/source/PacketBuffer.cpp` | PostOfficeDaemon | - |
+| `TrustedPacketBufferHandler::ToPacket` | `src/Server/BloodLib/source/PacketBufferHandler.cpp` | CacheGate, LobbyDaemon, LobbyGate, PostOfficeDaemon, SmartCouponDaemon | EXCLUDED in LobbyDaemon: read its `excluded.tsv` row first |
+| `RawPacketBufferHandler::Clone` | `src/Server/BloodLib/source/PacketBufferHandler.cpp` | LobbyDaemon, SmartCouponDaemon | EXCLUDED in LobbyDaemon: read its `excluded.tsv` row first |
+| `PerfCounterProvider::setCounterSetInfo` | `src/Server/BloodLib/source/PerfCounterProvider.cpp` | LobbyDaemon | - |
+| `BroadcastCrypt::Initialize` | `src/Server/BloodLib/source/Security.cpp` | LobbyGate | - |
+| `SessionPool::SessionPool` | `src/Server/BloodLib/source/Port.cpp` | CacheGate, LobbyDaemon, LobbyGate, PostOfficeDaemon, SmartCouponDaemon | - |
+| `SessionPool::~SessionPool` | `src/Server/BloodLib/source/Port.cpp` | CacheGate, LobbyDaemon, LobbyGate, PostOfficeDaemon, SmartCouponDaemon | - |
+| `Port::Initialize` | `src/Server/BloodLib/source/Port.cpp` | CacheGate, LobbyDaemon, LobbyGate, PostOfficeDaemon, SmartCouponDaemon | EXCLUDED in LobbyDaemon: read its `excluded.tsv` row first |
 
 ## Tasks
 
@@ -75,6 +83,11 @@ These functions are in shared source. They are not MATCH in each lifted exe that
 - `src/Server/GameDaemon/channel.cpp`
 - `src/Server/GameDaemon/channel.h`
 - `src/Server/BloodLib/source/Channel.cpp`
+- `src/Server/BloodLib/source/PacketBuffer.cpp`
+- `src/Server/BloodLib/source/PacketBufferHandler.cpp`
+- `src/Server/BloodLib/source/PerfCounterProvider.cpp`
+- `src/Server/BloodLib/source/Security.cpp`
+- `src/Server/BloodLib/source/Port.cpp`
 
 ## Handoff
 

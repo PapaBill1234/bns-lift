@@ -1,4 +1,4 @@
-# lift-gamedaemon-8: BloodLib and Shared gaps: logagentpackethandler, daemonconfig, stringutil, source_crashhandler, ...
+# lift-gamedaemon-8: BloodLib and Shared gaps: logserversessionhandler_cpp, logagentpackethandler, source_alertsender, daemonconfig, ...
 
 | Item | Value |
 | --- | --- |
@@ -10,7 +10,7 @@
 | Pseudocode index | `~/.cache/bns-lift/hr/GameDaemon/index.tsv` (stem, rva, name, first, last, status, source file, part) |
 | Wave | W1 |
 | Model | opus |
-| Depends on | `lift-gamedaemon-7` |
+| Depends on | `lift-gamedaemon-e12`, `lift-gamedaemon-12`, `lift-gamedaemon-33`, `lift-gamedaemon-9` |
 | Pattern | `src/Server/BloodLib/source/Session.cpp` |
 | Plan | `Docs/Plan/gamedaemon-lift.md` sections 1, 3, 5 |
 
@@ -22,30 +22,34 @@
 
 ## Scope
 
-20 functions, about 1,559 pseudocode lines (about 12,472 tokens). Stems: `logagentpackethandler`, `daemonconfig`, `stringutil`, `source_crashhandler`, `session`, `packetbuffer`, `source_thread`, `perfcounterprovider`, `source_logmedia`, `security`.
+22 functions, about 1,847 pseudocode lines (about 14,776 tokens). Stems: `logserversessionhandler_cpp`, `logagentpackethandler`, `source_alertsender`, `daemonconfig`, `source_network`, `stringutil`, `source_crashhandler`, `session`.
+
+The easy functions of this stem are in `lift-gamedaemon-e12`. Do not change them unless a fix needs it.
 
 | n | Exe | RVA | PDB name | Stem | Lines |
 | ---: | --- | --- | --- | --- | ---: |
-| 1 | GD | `0x6d94e0` | `LogAgentPacketHandler::HandleLogdAckPacket` | logagentpackethandler | 111 |
-| 2 | GD | `0x68e9a0` | `DaemonConfig::Load` | daemonconfig | 159 |
-| 3 | GD | `0x68edb0` | `DaemonConfig::Dump` | daemonconfig | 118 |
-| 4 | GD | `0x6905a0` | `String::GetId128FromGuidString` | stringutil | 35 |
-| 5 | GD | `0x696750` | `CrashHandler::Initialize` | source_crashhandler | 25 |
-| 6 | GD | `0x6968d0` | `CrashHandler::SetLogPath` | source_crashhandler | 79 |
-| 7 | GD | `0x697720` | `Session::~Session` | session | 102 |
-| 8 | GD | `0x697b80` | `Session::Connect` | session | 178 |
-| 9 | GD | `0x697f20` | `Session::Accept` | session | 118 |
-| 10 | GD | `0x698920` | `Session::HandleEvent` | session | 178 |
-| 11 | GD | `0x699170` | `Session::IsConnected` | session | 14 |
-| 12 | GD | `0x6992c0` | `Session::SendText` | session | 10 |
-| 13 | GD | `0x6994a0` | `Session::SendTextV` | session | 88 |
-| 14 | GD | `0x699ac0` | `Session::deallocateCrypt` | session | 17 |
-| 15 | GD | `0x69c6a0` | `parseHexInt` | packetbuffer | 45 |
-| 16 | GD | `0x69c790` | `parseDecInt` | packetbuffer | 49 |
-| 17 | GD | `0x69daa0` | `ThreadManager::StopThread` | source_thread | 26 |
-| 18 | GD | `0x69ebf0` | `PerfCounterProvider::setCounterSetInfo` | perfcounterprovider | 47 |
-| 19 | GD | `0x69ed10` | `LogMedia::LogMedia` | source_logmedia | 16 |
-| 20 | GD | `0x6a03d0` | `BroadcastCrypt::Initialize` | security | 144 |
+| 1 | GD | `0x6d9010` | `LogServerSessionHandler::HandleVersionNotifyPacket` | logserversessionhandler_cpp | 92 |
+| 2 | GD | `0x6d91f0` | `LogServerSessionHandler::HandleInitAckPacket` | logserversessionhandler_cpp | 78 |
+| 3 | GD | `0x6d9370` | `LogServerSessionHandler::HandlePingAckPacket` | logserversessionhandler_cpp | 32 |
+| 4 | GD | `0x6d93f0` | `LogServerSessionHandler::HandleControlRequeryNotifyPacket` | logserversessionhandler_cpp | 55 |
+| 5 | GD | `0x6d94e0` | `LogAgentPacketHandler::HandleLogdAckPacket` | logagentpackethandler | 111 |
+| 6 | GD | `0x686a90` | `AlertSender::init` | source_alertsender | 72 |
+| 7 | GD | `0x686c20` | `AlertSender::fini` | source_alertsender | 42 |
+| 8 | GD | `0x68e9a0` | `DaemonConfig::Load` | daemonconfig | 159 |
+| 9 | GD | `0x68edb0` | `DaemonConfig::Dump` | daemonconfig | 118 |
+| 10 | GD | `0x68f1a0` | `Network::Initialize` | source_network | 50 |
+| 11 | GD | `0x68f5d0` | `Network::OpenPort` | source_network | 130 |
+| 12 | GD | `0x68f8e0` | `Network::OpenPort` | source_network | 32 |
+| 13 | GD | `0x68ff90` | `Network::initWorkerThread` | source_network | 63 |
+| 14 | GD | `0x6905a0` | `String::GetId128FromGuidString` | stringutil | 35 |
+| 15 | GD | `0x696750` | `CrashHandler::Initialize` | source_crashhandler | 25 |
+| 16 | GD | `0x6968d0` | `CrashHandler::SetLogPath` | source_crashhandler | 79 |
+| 17 | GD | `0x697720` | `Session::~Session` | session | 102 |
+| 18 | GD | `0x697b80` | `Session::Connect` | session | 178 |
+| 19 | GD | `0x697f20` | `Session::Accept` | session | 118 |
+| 20 | GD | `0x698920` | `Session::HandleEvent` | session | 178 |
+| 21 | GD | `0x6992c0` | `Session::SendText` | session | 10 |
+| 22 | GD | `0x6994a0` | `Session::SendTextV` | session | 88 |
 
 ### Shared functions
 
@@ -53,8 +57,14 @@ These functions are in shared source. They are not MATCH in each lifted exe that
 
 | PDB name | Shared file | Other exes | Note |
 | --- | --- | --- | --- |
+| `AlertSender::init` | `src/Server/BloodLib/source/AlertSender.cpp` | LobbyGate | - |
+| `AlertSender::fini` | `src/Server/BloodLib/source/AlertSender.cpp` | CacheGate, LobbyDaemon, LobbyGate, PostOfficeDaemon, SmartCouponDaemon | - |
 | `DaemonConfig::Load` | `src/Server/BloodLib/source/DaemonConfig.cpp` | CacheGate, LobbyDaemon, LobbyGate, PostOfficeDaemon, SmartCouponDaemon | EXCLUDED in LobbyDaemon: read its `excluded.tsv` row first |
 | `DaemonConfig::Dump` | `src/Server/BloodLib/source/DaemonConfig.cpp` | CacheGate, LobbyDaemon, SmartCouponDaemon | - |
+| `Network::Initialize` | `src/Server/BloodLib/source/Network.cpp` | CacheGate, LobbyDaemon, LobbyGate, PostOfficeDaemon, SmartCouponDaemon | - |
+| `Network::OpenPort` | `src/Server/BloodLib/source/Network.cpp` | CacheGate, LobbyDaemon, LobbyGate, PostOfficeDaemon, SmartCouponDaemon | - |
+| `Network::OpenPort` | `src/Server/BloodLib/source/Network.cpp` | CacheGate, LobbyDaemon, LobbyGate, PostOfficeDaemon, SmartCouponDaemon | - |
+| `Network::initWorkerThread` | `src/Server/BloodLib/source/Network.cpp` | CacheGate, LobbyDaemon, LobbyGate, PostOfficeDaemon, SmartCouponDaemon | EXCLUDED in LobbyDaemon: read its `excluded.tsv` row first |
 | `String::GetId128FromGuidString` | `src/Server/BloodLib/source/StringUtil.cpp` | CacheGate, LobbyDaemon, LobbyGate, PostOfficeDaemon, SmartCouponDaemon | EXCLUDED in LobbyDaemon: read its `excluded.tsv` row first |
 | `CrashHandler::Initialize` | `src/Server/BloodLib/source/CrashHandler.cpp` | CacheGate, LobbyDaemon, LobbyGate, PostOfficeDaemon, SmartCouponDaemon | - |
 | `CrashHandler::SetLogPath` | `src/Server/BloodLib/source/CrashHandler.cpp` | CacheGate, LobbyDaemon, LobbyGate, PostOfficeDaemon, SmartCouponDaemon | - |
@@ -62,13 +72,6 @@ These functions are in shared source. They are not MATCH in each lifted exe that
 | `Session::Connect` | `src/Server/BloodLib/source/Session.cpp` | CacheGate, LobbyDaemon, LobbyGate, PostOfficeDaemon, SmartCouponDaemon | - |
 | `Session::Accept` | `src/Server/BloodLib/source/Session.cpp` | CacheGate, LobbyDaemon, LobbyGate, PostOfficeDaemon, SmartCouponDaemon | EXCLUDED in LobbyDaemon: read its `excluded.tsv` row first |
 | `Session::HandleEvent` | `src/Server/BloodLib/source/Session.cpp` | CacheGate, LobbyDaemon, LobbyGate, PostOfficeDaemon, SmartCouponDaemon | - |
-| `Session::deallocateCrypt` | `src/Server/BloodLib/source/Security.cpp` | LobbyDaemon, LobbyGate | EXCLUDED in LobbyDaemon: read its `excluded.tsv` row first |
-| `parseHexInt` | `src/Server/BloodLib/source/PacketBuffer.cpp` | PostOfficeDaemon | - |
-| `parseDecInt` | `src/Server/BloodLib/source/PacketBuffer.cpp` | PostOfficeDaemon | - |
-| `ThreadManager::StopThread` | `src/Server/BloodLib/source/Thread.cpp` | CacheGate, LobbyDaemon, LobbyGate, PostOfficeDaemon, SmartCouponDaemon | - |
-| `PerfCounterProvider::setCounterSetInfo` | `src/Server/BloodLib/source/PerfCounterProvider.cpp` | LobbyDaemon | - |
-| `LogMedia::LogMedia` | `src/Server/BloodLib/source/LogMedia.cpp` | LobbyDaemon | EXCLUDED in LobbyDaemon: read its `excluded.tsv` row first |
-| `BroadcastCrypt::Initialize` | `src/Server/BloodLib/source/Security.cpp` | LobbyGate | - |
 
 ## Tasks
 
@@ -82,19 +85,18 @@ These functions are in shared source. They are not MATCH in each lifted exe that
 
 ## Files
 
+- `src/Server/GameDaemon/logserversessionhandler_cpp.cpp`
+- `src/Server/GameDaemon/logserversessionhandler_cpp.h`
 - `src/Server/GameDaemon/logagentpackethandler.cpp`
 - `src/Server/GameDaemon/logagentpackethandler.h`
+- `src/Server/BloodLib/source/AlertSender.cpp`
 - `src/Server/BloodLib/source/DaemonConfig.cpp`
+- `src/Server/BloodLib/source/Network.cpp`
 - `src/Server/BloodLib/source/StringUtil.cpp`
 - `src/Server/BloodLib/source/CrashHandler.cpp`
 - `src/Server/GameDaemon/session.cpp`
 - `src/Server/GameDaemon/session.h`
 - `src/Server/BloodLib/source/Session.cpp`
-- `src/Server/BloodLib/source/Security.cpp`
-- `src/Server/BloodLib/source/PacketBuffer.cpp`
-- `src/Server/BloodLib/source/Thread.cpp`
-- `src/Server/BloodLib/source/PerfCounterProvider.cpp`
-- `src/Server/BloodLib/source/LogMedia.cpp`
 
 ## Handoff
 

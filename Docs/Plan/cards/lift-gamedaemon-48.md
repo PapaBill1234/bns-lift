@@ -10,7 +10,7 @@
 | Pseudocode index | `~/.cache/bns-lift/hr/GameDaemon/index.tsv` (stem, rva, name, first, last, status, source file, part) |
 | Wave | W2 |
 | Model | opus |
-| Depends on | `lift-gamedaemon-47` |
+| Depends on | `lift-gamedaemon-e14`, `lift-gamedaemon-52` |
 | Pattern | `src/library/FsdReader/FsdDecomposer.cpp` |
 | Plan | `Docs/Plan/gamedaemon-lift.md` sections 1, 3, 5 |
 
@@ -22,7 +22,9 @@
 
 ## Scope
 
-8 functions, about 892 pseudocode lines (about 7,136 tokens). Stems: `questtableimpl_cpp`.
+7 functions, about 851 pseudocode lines (about 6,808 tokens). Stems: `questtableimpl_cpp`.
+
+The easy functions of this stem are in `lift-gamedaemon-e14`. Do not change them unless a fix needs it.
 
 This card is part 1/2 of stem `questtableimpl_cpp`. The other parts are in other cards of this wave. They run one after the other (column "Depends on"). Edit only the functions in this table.
 
@@ -35,7 +37,6 @@ This card is part 1/2 of stem `questtableimpl_cpp`. The other parts are in other
 | 5 | GD | `0x6f7f20` | `QuestTableImpl::loadCompletion` | questtableimpl_cpp | 104 |
 | 6 | GD | `0x6f8130` | `QuestTableImpl::loadTransit` | questtableimpl_cpp | 165 |
 | 7 | GD | `0x6f83d0` | `QuestTableImpl::allocQuestRewardContents` | questtableimpl_cpp | 43 |
-| 8 | GD | `0x6f8490` | `QuestTableImpl::clearBuffer` | questtableimpl_cpp | 41 |
 
 ## Tasks
 

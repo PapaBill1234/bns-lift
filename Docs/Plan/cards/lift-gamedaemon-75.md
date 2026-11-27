@@ -10,7 +10,7 @@
 | Pseudocode index | `~/.cache/bns-lift/hr/GameDaemon/index.tsv` (stem, rva, name, first, last, status, source file, part) |
 | Wave | W2 |
 | Model | opus |
-| Depends on | `lift-gamedaemon-74` |
+| Depends on | `lift-gamedaemon-e26`, `lift-gamedaemon-74` |
 | Pattern | none |
 | Plan | `Docs/Plan/gamedaemon-lift.md` sections 1, 3, 5 |
 
@@ -22,23 +22,23 @@
 
 ## Scope
 
-11 functions, about 1,610 pseudocode lines (about 12,880 tokens). Stems: `datamanager_cpp_1`.
+9 functions, about 1,564 pseudocode lines (about 12,512 tokens). Stems: `datamanager_cpp_1`.
+
+The easy functions of this stem are in `lift-gamedaemon-e26`. Do not change them unless a fix needs it.
 
 This card is part 9/10 of stem `datamanager_cpp_1`. The other parts are in other cards of this wave. They run one after the other (column "Depends on"). Edit only the functions in this table.
 
 | n | Exe | RVA | PDB name | Stem | Lines |
 | ---: | --- | --- | --- | --- | ---: |
-| 1 | GD | `0x62dba0` | `Data::postprocExpandInventoryData` | datamanager_cpp_1 | 31 |
-| 2 | GD | `0x62dc10` | `Data::postprocDuelBotEquippedItem` | datamanager_cpp_1 | 15 |
-| 3 | GD | `0x62dc50` | `Data::postprocGrade` | datamanager_cpp_1 | 111 |
-| 4 | GD | `0x62ddf0` | `Data::postprocNpcConvoy` | datamanager_cpp_1 | 32 |
-| 5 | GD | `0x62de60` | `Data::postprocRandomStore` | datamanager_cpp_1 | 225 |
-| 6 | GD | `0x62e260` | `Data::postprocRandomStoreItem` | datamanager_cpp_1 | 179 |
-| 7 | GD | `0x62e4e0` | `Data::postprocRandomStoreItemGroup` | datamanager_cpp_1 | 95 |
-| 8 | GD | `0x62e6f0` | `Data::postprocRandomStoreProbGroup` | datamanager_cpp_1 | 522 |
-| 9 | GD | `0x62ef50` | `Data::postprocRankingPvEStage` | datamanager_cpp_1 | 127 |
-| 10 | GD | `0x62f140` | `Data::postprocExpandRandomStore` | datamanager_cpp_1 | 88 |
-| 11 | GD | `0x62f2b0` | `Data::postprocZoneTriggerEventStage` | datamanager_cpp_1 | 185 |
+| 1 | GD | `0x62dc50` | `Data::postprocGrade` | datamanager_cpp_1 | 111 |
+| 2 | GD | `0x62ddf0` | `Data::postprocNpcConvoy` | datamanager_cpp_1 | 32 |
+| 3 | GD | `0x62de60` | `Data::postprocRandomStore` | datamanager_cpp_1 | 225 |
+| 4 | GD | `0x62e260` | `Data::postprocRandomStoreItem` | datamanager_cpp_1 | 179 |
+| 5 | GD | `0x62e4e0` | `Data::postprocRandomStoreItemGroup` | datamanager_cpp_1 | 95 |
+| 6 | GD | `0x62e6f0` | `Data::postprocRandomStoreProbGroup` | datamanager_cpp_1 | 522 |
+| 7 | GD | `0x62ef50` | `Data::postprocRankingPvEStage` | datamanager_cpp_1 | 127 |
+| 8 | GD | `0x62f140` | `Data::postprocExpandRandomStore` | datamanager_cpp_1 | 88 |
+| 9 | GD | `0x62f2b0` | `Data::postprocZoneTriggerEventStage` | datamanager_cpp_1 | 185 |
 
 ## Tasks
 

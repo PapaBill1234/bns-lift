@@ -10,7 +10,7 @@
 | Pseudocode index | `~/.cache/bns-lift/hr/GameDaemon/index.tsv` (stem, rva, name, first, last, status, source file, part) |
 | Wave | W1 |
 | Model | opus |
-| Depends on | `lift-gamedaemon-5`, `lift-gamedaemon-10` |
+| Depends on | `lift-gamedaemon-5`, `lift-gamedaemon-4` |
 | Pattern | `src/Server/BloodLib/source/LogFile.cpp` |
 | Plan | `Docs/Plan/gamedaemon-lift.md` sections 1, 3, 5 |
 

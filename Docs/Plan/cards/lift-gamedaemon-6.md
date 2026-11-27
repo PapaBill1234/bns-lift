@@ -1,4 +1,4 @@
-# lift-gamedaemon-6: Shared gaps and FsdReader: numbertheory, biarithmetic, prng, fsdcomposer, ...
+# lift-gamedaemon-6: Shared gaps and FsdReader and others: numbertheory, biarithmetic, fsdcomposer, fsd, ...
 
 | Item | Value |
 | --- | --- |
@@ -22,7 +22,7 @@
 
 ## Scope
 
-10 functions, about 2,265 pseudocode lines (about 18,120 tokens). Stems: `numbertheory`, `biarithmetic`, `prng`, `fsdcomposer`, `fsd`, `fsddecomposer`.
+12 functions, about 2,475 pseudocode lines (about 19,800 tokens). Stems: `numbertheory`, `biarithmetic`, `fsdcomposer`, `fsd`, `fsddecomposer`, `bannedwordfilterlib`, `bannedwordfilterloader`.
 
 | n | Exe | RVA | PDB name | Stem | Lines |
 | ---: | --- | --- | --- | --- | ---: |
@@ -31,11 +31,13 @@
 | 3 | GD | `0x6e17f0` | `BigInteger::invMod` | numbertheory | 696 |
 | 4 | GD | `0x6e3220` | `BigInteger::Divide` | biarithmetic | 493 |
 | 5 | GD | `0x6e3bf0` | `BigInteger::Divide` | biarithmetic | 60 |
-| 6 | GD | `0x6e45e0` | `Prng::Initialize` | prng | 27 |
-| 7 | GD | `0x6e9900` | `FsdComposer::ComposeV` | fsdcomposer | 154 |
-| 8 | GD | `0x6e9be0` | `FsdComposer::Compose` | fsdcomposer | 10 |
-| 9 | GD | `0x6ea0c0` | `Fsd::Compose` | fsd | 14 |
-| 10 | GD | `0x6ea040` | `FsdDecomposer::GetString` | fsddecomposer | 38 |
+| 6 | GD | `0x6e9900` | `FsdComposer::ComposeV` | fsdcomposer | 154 |
+| 7 | GD | `0x6e9be0` | `FsdComposer::Compose` | fsdcomposer | 10 |
+| 8 | GD | `0x6ea0c0` | `Fsd::Compose` | fsd | 14 |
+| 9 | GD | `0x6ea040` | `FsdDecomposer::GetString` | fsddecomposer | 38 |
+| 10 | GD | `0x6ea100` | `BannedWordFilterLib::LoadNameFilterBuffer` | bannedwordfilterlib | 31 |
+| 11 | GD | `0x6ea630` | `BannedWordFilterLoader::~BannedWordFilterLoader` | bannedwordfilterloader | 87 |
+| 12 | GD | `0x6ea880` | `BannedWordFilterLoader::LoadNameFilter` | bannedwordfilterloader | 119 |
 
 ### Shared functions
 
@@ -48,8 +50,8 @@ These functions are in shared source. They are not MATCH in each lifted exe that
 | `BigInteger::invMod` | `src/Security/source/BloodCrypto/math/bignumber/NumberTheory.cpp` | LobbyGate, PostOfficeDaemon, SmartCouponDaemon | - |
 | `BigInteger::Divide` | `src/Security/source/BloodCrypto/math/bignumber/biArithmetic.cpp` | LobbyGate, PostOfficeDaemon, SmartCouponDaemon | - |
 | `BigInteger::Divide` | `src/Security/source/BloodCrypto/math/bignumber/biArithmetic.cpp` | LobbyGate, PostOfficeDaemon, SmartCouponDaemon | - |
-| `Prng::Initialize` | `src/Security/source/BloodCrypto/math/prng/prng.cpp` | CacheGate, LobbyDaemon, LobbyGate, PostOfficeDaemon, SmartCouponDaemon | EXCLUDED in LobbyDaemon: read its `excluded.tsv` row first |
 | `FsdDecomposer::GetString` | `src/library/FsdReader/FsdDecomposer.cpp` | LobbyDaemon | - |
+| `BannedWordFilterLoader::LoadNameFilter` | `src/External/BannedWordFilter/BannedWordFilterLoader.cpp` | LobbyDaemon | EXCLUDED in LobbyDaemon: read its `excluded.tsv` row first |
 
 ## Tasks
 
@@ -65,12 +67,16 @@ These functions are in shared source. They are not MATCH in each lifted exe that
 
 - `src/Security/source/BloodCrypto/math/bignumber/NumberTheory.cpp`
 - `src/Security/source/BloodCrypto/math/bignumber/biArithmetic.cpp`
-- `src/Security/source/BloodCrypto/math/prng/prng.cpp`
 - `src/Server/GameDaemon/fsdcomposer.cpp`
 - `src/Server/GameDaemon/fsdcomposer.h`
 - `src/Server/GameDaemon/fsd.cpp`
 - `src/Server/GameDaemon/fsd.h`
 - `src/library/FsdReader/FsdDecomposer.cpp`
+- `src/Server/GameDaemon/bannedwordfilterlib.cpp`
+- `src/Server/GameDaemon/bannedwordfilterlib.h`
+- `src/Server/GameDaemon/bannedwordfilterloader.cpp`
+- `src/Server/GameDaemon/bannedwordfilterloader.h`
+- `src/External/BannedWordFilter/BannedWordFilterLoader.cpp`
 
 ## Handoff
 

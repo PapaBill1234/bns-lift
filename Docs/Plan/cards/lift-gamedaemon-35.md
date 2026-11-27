@@ -10,7 +10,7 @@
 | Pseudocode index | `~/.cache/bns-lift/hr/GameDaemon/index.tsv` (stem, rva, name, first, last, status, source file, part) |
 | Wave | W1 |
 | Model | opus |
-| Depends on | `lift-gamedaemon-4`, `lift-gamedaemon-34` |
+| Depends on | `lift-gamedaemon-e45`, `lift-gamedaemon-3`, `lift-gamedaemon-4` |
 | Pattern | `src/Server/BloodLib/source/Channel.cpp` |
 | Plan | `Docs/Plan/gamedaemon-lift.md` sections 1, 3, 5 |
 
@@ -22,7 +22,9 @@
 
 ## Scope
 
-27 functions, about 2,336 pseudocode lines (about 18,688 tokens). Stems: `source_property`.
+25 functions, about 2,280 pseudocode lines (about 18,240 tokens). Stems: `source_property`.
+
+The easy functions of this stem are in `lift-gamedaemon-e45`. Do not change them unless a fix needs it.
 
 | n | Exe | RVA | PDB name | Stem | Lines |
 | ---: | --- | --- | --- | --- | ---: |
@@ -41,18 +43,16 @@
 | 13 | GD | `0x689c70` | `Property::set` | source_property | 148 |
 | 14 | GD | `0x689f50` | `Property::updateSync` | source_property | 214 |
 | 15 | GD | `0x68a2e0` | `Property::updateSync` | source_property | 232 |
-| 16 | GD | `0x68a700` | `Property::Get` | source_property | 27 |
-| 17 | GD | `0x68a7c0` | `Property::Get` | source_property | 49 |
-| 18 | GD | `0x68a880` | `Property::GetPureData` | source_property | 192 |
-| 19 | GD | `0x68ac60` | `Property::GetPairData` | source_property | 36 |
-| 20 | GD | `0x68ad50` | `Property::get` | source_property | 128 |
-| 21 | GD | `0x68af20` | `Property::makeWhere` | source_property | 27 |
-| 22 | GD | `0x68afb0` | `Property::initInstance` | source_property | 51 |
-| 23 | GD | `0x68b100` | `Property::initFieldDefine` | source_property | 154 |
-| 24 | GD | `0x68b510` | `Property::findMaxId` | source_property | 43 |
-| 25 | GD | `0x68b610` | `Property::initBitfield` | source_property | 69 |
-| 26 | GD | `0x68b770` | `Property::initSyncDefine` | source_property | 137 |
-| 27 | GD | `0x68ba10` | `Property::findMaxId` | source_property | 29 |
+| 16 | GD | `0x68a7c0` | `Property::Get` | source_property | 49 |
+| 17 | GD | `0x68a880` | `Property::GetPureData` | source_property | 192 |
+| 18 | GD | `0x68ac60` | `Property::GetPairData` | source_property | 36 |
+| 19 | GD | `0x68ad50` | `Property::get` | source_property | 128 |
+| 20 | GD | `0x68af20` | `Property::makeWhere` | source_property | 27 |
+| 21 | GD | `0x68afb0` | `Property::initInstance` | source_property | 51 |
+| 22 | GD | `0x68b100` | `Property::initFieldDefine` | source_property | 154 |
+| 23 | GD | `0x68b510` | `Property::findMaxId` | source_property | 43 |
+| 24 | GD | `0x68b610` | `Property::initBitfield` | source_property | 69 |
+| 25 | GD | `0x68b770` | `Property::initSyncDefine` | source_property | 137 |
 
 ## Tasks
 

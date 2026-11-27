@@ -10,7 +10,7 @@
 | Pseudocode index | `~/.cache/bns-lift/hr/GameDaemon/index.tsv` (stem, rva, name, first, last, status, source file, part) |
 | Wave | W2 |
 | Model | opus |
-| Depends on | `lift-gamedaemon-47`, `lift-gamedaemon-48`, `lift-gamedaemon-50` |
+| Depends on | `lift-gamedaemon-e14`, `lift-gamedaemon-52`, `lift-gamedaemon-56`, `lift-gamedaemon-48` |
 | Pattern | `src/library/FsdReader/FsdDecomposer.cpp` |
 | Plan | `Docs/Plan/gamedaemon-lift.md` sections 1, 3, 5 |
 
@@ -22,19 +22,20 @@
 
 ## Scope
 
-7 functions, about 1,635 pseudocode lines (about 13,080 tokens). Stems: `questtableimpl_cpp`.
+6 functions, about 1,651 pseudocode lines (about 13,208 tokens). Stems: `questtableimpl_cpp`.
+
+The easy functions of this stem are in `lift-gamedaemon-e14`. Do not change them unless a fix needs it.
 
 This card is part 2/2 of stem `questtableimpl_cpp`. The other parts are in other cards of this wave. They run one after the other (column "Depends on"). Edit only the functions in this table.
 
 | n | Exe | RVA | PDB name | Stem | Lines |
 | ---: | --- | --- | --- | --- | ---: |
-| 1 | GD | `0x6f8550` | `QuestTableImpl::GetTableSummary` | questtableimpl_cpp | 56 |
-| 2 | GD | `0x6f86a0` | `QuestTableImpl::GetQuest` | questtableimpl_cpp | 13 |
+| 1 | GD | `0x6f8490` | `QuestTableImpl::clearBuffer` | questtableimpl_cpp | 41 |
+| 2 | GD | `0x6f8550` | `QuestTableImpl::GetTableSummary` | questtableimpl_cpp | 56 |
 | 3 | GD | `0x6f8710` | `QuestTableImpl::loadAcquisition` | questtableimpl_cpp | 400 |
 | 4 | GD | `0x6f8e60` | `QuestTableImpl::loadMission` | questtableimpl_cpp | 520 |
 | 5 | GD | `0x6f9790` | `QuestTableImpl::loadQuest` | questtableimpl_cpp | 554 |
 | 6 | GD | `0x6fa160` | `QuestTableImpl::LoadTable` | questtableimpl_cpp | 80 |
-| 7 | GD | `0x6fa2f0` | `QuestTableImpl::QuestTableImpl` | questtableimpl_cpp | 12 |
 
 ## Tasks
 

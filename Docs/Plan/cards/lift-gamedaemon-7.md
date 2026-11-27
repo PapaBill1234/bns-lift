@@ -10,37 +10,37 @@
 | Pseudocode index | `~/.cache/bns-lift/hr/GameDaemon/index.tsv` (stem, rva, name, first, last, status, source file, part) |
 | Wave | W1 |
 | Model | opus |
-| Depends on | `lift-gamedaemon-6` |
-| Pattern | `src/Security/source/BloodCrypto/crypto/Crypto.cpp` |
+| Depends on | `lift-gamedaemon-e45`, `lift-gamedaemon-6` |
+| Pattern | `src/Security/source/BloodCrypto/crypto/aes128NI.cpp` |
 | Plan | `Docs/Plan/gamedaemon-lift.md` sections 1, 3, 5 |
 
 ## Read first
 
 - Read "Lift method" in `Docs/Plan/plan.md`.
 - Grep `Docs/Parity/lessons.md` for A2 (block order), A6 (per-exe path literals), A12 (PDB member types), A18 (destructors), A21 (PDB facts) and A22 (per-exe source form). Do not read it in full.
-- Pattern: `src/Security/source/BloodCrypto/crypto/Crypto.cpp`. Read it one time. Use its form for the functions of this card.
+- Pattern: `src/Security/source/BloodCrypto/crypto/aes128NI.cpp`. Read it one time. Use its form for the functions of this card.
 
 ## Scope
 
-15 functions, about 1,131 pseudocode lines (about 9,048 tokens). Stems: `base64`, `rsa_cpp`, `crypto`, `aes128table`, `aes128ni`, `blowfish_cpp`, `ctr`, `ripemd160`, `dh`.
+13 functions, about 1,075 pseudocode lines (about 8,600 tokens). Stems: `base64`, `rsa_cpp`, `crypto`, `aes128table`, `aes128ni`, `blowfish_cpp`, `ctr`, `ripemd160`, `dh`.
+
+The easy functions of this stem are in `lift-gamedaemon-e45`. Do not change them unless a fix needs it.
 
 | n | Exe | RVA | PDB name | Stem | Lines |
 | ---: | --- | --- | --- | --- | ---: |
 | 1 | GD | `0x6df0c0` | `Bin2TextBase64::Decode` | base64 | 104 |
 | 2 | GD | `0x6dcff0` | `Rsa::decrypt` | rsa_cpp | 124 |
-| 3 | GD | `0x6df2f0` | `Crypto::Initialize` | crypto | 26 |
-| 4 | GD | `0x6df3a0` | `Crypto::InstanceSize` | crypto | 30 |
-| 5 | GD | `0x6df450` | `Crypto::Create` | crypto | 97 |
-| 6 | GD | `0x6e5200` | `aes128TableSetupEncKey` | aes128table | 127 |
-| 7 | GD | `0x6e6170` | `Aes128Table_Encrypt` | aes128table | 60 |
-| 8 | GD | `0x6e6350` | `Aes128NI_Setup` | aes128ni | 89 |
-| 9 | GD | `0x6e64a0` | `Aes128NI_Encrypt` | aes128ni | 67 |
-| 10 | GD | `0x6e65e0` | `Aes128NI_Decrypt` | aes128ni | 48 |
-| 11 | GD | `0x6e6dd0` | `Blowfish::Encrypt` | blowfish_cpp | 65 |
-| 12 | GD | `0x6e79a0` | `Ctr::Setup` | ctr | 81 |
-| 13 | GD | `0x6e7ad0` | `Ctr::Encrypt` | ctr | 57 |
-| 14 | GD | `0x6dee00` | `Ripemd160::Digest` | ripemd160 | 102 |
-| 15 | GD | `0x6dffd0` | `Dh::getValue` | dh | 54 |
+| 3 | GD | `0x6df450` | `Crypto::Create` | crypto | 97 |
+| 4 | GD | `0x6e5200` | `aes128TableSetupEncKey` | aes128table | 127 |
+| 5 | GD | `0x6e6170` | `Aes128Table_Encrypt` | aes128table | 60 |
+| 6 | GD | `0x6e6350` | `Aes128NI_Setup` | aes128ni | 89 |
+| 7 | GD | `0x6e64a0` | `Aes128NI_Encrypt` | aes128ni | 67 |
+| 8 | GD | `0x6e65e0` | `Aes128NI_Decrypt` | aes128ni | 48 |
+| 9 | GD | `0x6e6dd0` | `Blowfish::Encrypt` | blowfish_cpp | 65 |
+| 10 | GD | `0x6e79a0` | `Ctr::Setup` | ctr | 81 |
+| 11 | GD | `0x6e7ad0` | `Ctr::Encrypt` | ctr | 57 |
+| 12 | GD | `0x6dee00` | `Ripemd160::Digest` | ripemd160 | 102 |
+| 13 | GD | `0x6dffd0` | `Dh::getValue` | dh | 54 |
 
 ### Shared functions
 
@@ -49,8 +49,6 @@ These functions are in shared source. They are not MATCH in each lifted exe that
 | PDB name | Shared file | Other exes | Note |
 | --- | --- | --- | --- |
 | `Rsa::decrypt` | `src/Security/source/BloodCrypto/crypto/rsa.cpp` | LobbyGate, PostOfficeDaemon, SmartCouponDaemon | - |
-| `Crypto::Initialize` | `src/Security/source/BloodCrypto/crypto/Crypto.cpp` | CacheGate, LobbyDaemon, LobbyGate, PostOfficeDaemon, SmartCouponDaemon | EXCLUDED in LobbyDaemon: read its `excluded.tsv` row first |
-| `Crypto::InstanceSize` | `src/Security/source/BloodCrypto/crypto/Crypto.cpp` | LobbyGate | - |
 | `Crypto::Create` | `src/Security/source/BloodCrypto/crypto/Crypto.cpp` | LobbyGate | - |
 | `aes128TableSetupEncKey` | `src/Security/source/BloodCrypto/crypto/aes128Table.cpp` | CacheGate, LobbyDaemon, LobbyGate, PostOfficeDaemon, SmartCouponDaemon | - |
 | `Aes128Table_Encrypt` | `src/Security/source/BloodCrypto/crypto/aes128Table.cpp` | CacheGate, LobbyDaemon, LobbyGate, PostOfficeDaemon, SmartCouponDaemon | EXCLUDED in LobbyDaemon: read its `excluded.tsv` row first |

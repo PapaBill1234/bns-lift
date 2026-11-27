@@ -91,11 +91,13 @@ Rule for GameDaemon: one `.cpp` per original source file, in `src/Server/GameDae
 
 ## 3. Wave order
 
-Order: callees first, callers last. Reason: a `LIFT_STUB` body becomes noreturn under LTCG, and ICF folds it. A real caller of a stub then stays DIFF. So leaves (library, data, objects) come before actions, channels and handlers.
+Order: easy leaves first (wave E), then callees first, callers last. Reason: a `LIFT_STUB` body becomes noreturn under LTCG, and ICF folds it. A real caller of a stub then stays DIFF. So leaves (library, data, objects) come before actions, channels and handlers. A leaf calls no other lifted function, so it can MATCH in any wave.
 
-### Card queue (measured, card `lift-gamedaemon-0b`)
+Source of wave E: owner order 2026-11-27 ("get all easiest stuff out of the way"), card `lift-gamedaemon-0b2`.
 
-Queue: `Docs/Plan/cards/lift-gamedaemon-plan.tsv` (10 columns; column 10 = wave). Cards: `Docs/Plan/cards/lift-gamedaemon-N.md` for W1 and W2.
+### Card queue (measured, cards `lift-gamedaemon-0b` and `lift-gamedaemon-0b2`)
+
+Queue: `Docs/Plan/cards/lift-gamedaemon-plan.tsv` (10 columns; column 10 = wave; row order = run order). Cards: `Docs/Plan/cards/lift-gamedaemon-eN.md` for E, `lift-gamedaemon-N.md` for W1 and W2.
 
 | Class | Functions | Card scope |
 | --- | ---: | --- |
@@ -107,15 +109,51 @@ Queue: `Docs/Plan/cards/lift-gamedaemon-plan.tsv` (10 columns; column 10 = wave)
 
 | Wave | Functions | Pseudocode lines | Tokens (8 per line) | Cards | Status |
 | --- | ---: | ---: | ---: | ---: | --- |
-| W1 | 875 | 86,967 | 0.70M | 44 (20 `sonnet:high`) | ready |
-| W2 | 837 | 92,373 | 0.74M | 52 (7 `sonnet:high`) | ready |
-| W3 | 2,731 | 275,444 | 2.20M | 140 | planned |
-| W4 | 1,391 | 144,637 | 1.16M | 73 | planned |
-| W5 | 1,878 | 191,448 | 1.53M | 98 | planned |
-| W6 | 460 | 70,514 | 0.56M | 32 | planned |
-| W7 | 3,369 | 312,452 | 2.50M | 167 | planned |
-| W8 | 658 | 51,766 | 0.41M | 26 | planned |
-| Total | 12,199 | 1,225,601 | 9.80M | 632 | |
+| E | 1,622 | 23,616 | 0.19M | 45 (11 `sonnet:high`) | ready |
+| W1 | 754 | 84,837 | 0.68M | 38 (20 `sonnet:high`) | ready |
+| W2 | 573 | 89,783 | 0.72M | 42 | ready |
+| W3 | 2,303 | 268,557 | 2.15M | 131 | planned |
+| W4 | 1,219 | 142,057 | 1.14M | 69 | planned |
+| W5 | 1,707 | 189,088 | 1.51M | 94 | planned |
+| W6 | 444 | 70,235 | 0.56M | 32 | planned |
+| W7 | 2,999 | 306,559 | 2.45M | 158 | planned |
+| W8 | 578 | 50,869 | 0.41M | 24 | planned |
+| Total | 12,199 | 1,225,601 | 9.80M | 633 | |
+
+Card 0b had W1 875 functions (44 cards), W2 837 (52), W3 2,731 (140), W4 1,391 (73), W5 1,878 (98), W6 460 (32), W7 3,369 (167), W8 658 (26). Wave E took its easy functions out of these waves.
+
+#### Ease rule (card 0b2, script `ease_gd.py`)
+
+Each `new` and `shared-diff` function gets these measured values from the pseudocode:
+
+| Value | Rule |
+| --- | --- |
+| Lines | `last - first + 1` in `index.tsv` |
+| Calls | Different direct calls in the body to counted functions of class `new`, `shared-diff` or `anticheat`. Calls to CRT functions, `shared-match` functions, Win32 and compiler helpers and virtual calls (`->f(`) do not count. 0 calls = leaf. |
+| Form | `empty`; `getter` (one `return x;`); `setter` (one `this->m = x;`); `xtor` (constructor or destructor with at most 6 statements) |
+| Plain | Leaf and (a form, or at most 8 lines: one statement) |
+| Best state | `shared-diff` only: best funcdiff state in the 5 lifted exes (`Docs/Parity/baseline/<Exe>.json`) |
+| Cost | Lines + 40 per call. +100 for a `shared-diff` function that is MATCH in no exe. Cost is the inverse of expected MATCH per token. |
+
+| Rule | Value | Reason |
+| --- | --- | --- |
+| Easy (wave E) | Leaf, at most 30 lines | In the 5 lifted exes, 830 of 837 leaves (99 %) of at most 30 lines are MATCH; above 30 lines, 95 %. |
+| Cap | At most 40 easy functions per stem | One E card holds 20 to 40 functions, and no stem is in two E cards. 39 easy functions (stems `duelbot_h`, `publisherlibsfunctions`) stay in their W card. |
+| Excluded | Anti-cheat functions; upstream cards (zstd, zlib, minizip) | No hand lift. |
+| Not easy | A simple form with a call (55 functions, for example a destructor that calls a base destructor) | A stub callee keeps it DIFF. It stays in its W card. |
+| Card ease key | Cost per function of the card. Upstream cards: 0 (no hand lift). | |
+| Ease band | `floor(log2(ease key))` | One band = a factor 2 in cost per function. |
+
+Wave E cards (`lift-gamedaemon-e1` to `-e45`):
+
+- One E card holds 20 to 40 functions and at most 2,500 lines from 1 or more stems of one source wave (W1 to W8). All easy functions of a stem are in one E card. 4 cards have fewer than 20 functions: their source wave has no other card with space (W1 11, W4 15, W5 15, W6 16).
+- Packing: stems with only plain functions first and in their own cards; easiest stem first; first fit.
+- Order: lowest ease band first; inside one band, the source wave order (W1 first); then the ease key.
+- Model: `sonnet:high` when each function is plain (11 cards); else `opus` (34 cards).
+- Depends on: `lift-gamedaemon-0e` only. A dep chain is necessary only when two E cards edit one file (0 cases).
+- A W card that edits a file of an E card depends on that E card (475 W cards).
+- W1 and W2 order: the easiest ready card first (ease band, then the area order), each dep before its user.
+- W card ids: a W card keeps the 0b id of the card with the most of its functions (586 cards). 46 old ids went away (empty or merged). 2 new ids: `lift-gamedaemon-633` (W3), `lift-gamedaemon-634` (W7).
 
 Planner rules (card 0b):
 
@@ -124,15 +162,16 @@ Planner rules (card 0b):
 - A stem above 40 functions or 2,500 lines is split by RVA into parts. The parts of one stem are a serial chain ("Depends on"). Thus two cards that edit the same file never run at the same time.
 - 3 cards hold 1 function above 2,500 lines. A function cannot be split.
 - Many cards have fewer than 20 functions: the mean function has about 100 pseudocode lines, so the 2,500-line limit applies first.
-- The game log cards (395 functions) and the property header cards (193 functions) have one layout. The first card of each group is `opus` and sets the pattern. The other cards are `sonnet:high` and depend on it.
+- The game log cards (395 functions) have one layout. The first card is `opus` and sets the pattern. The other cards are `sonnet:high` and depend on it. Card 0b2 moved most property header functions (getters) to wave E. The rest are in mixed W2 cards, so the property header group has no pattern card now.
 - "Depends on" holds the chain part before, and the cards that hold callees (found in the pseudocode by PDB name) when the call order is clear. The wave gate of section 5 still applies.
 - W3 to W8 rows have status `planned`: stems and counts only, chain deps only. A wave planner writes their card files and callee deps.
 
 | Wave | Content | Counted | Cards ❓ | Pseudocode tokens ❓ |
 | --- | --- | ---: | ---: | ---: |
 | W0 | Setup: pseudocode export per source file, planner, skeleton, unity pilot, switch-on (section 4) | 0 | 5 | |
-| W1 | Shared and common gaps: BloodLib new code (json, property, channel, log archive, HTTP client), BloodCrypto gaps, server shared, packet game log, FsdReader, banned word filter; zstd from upstream source | 875 | 44 | 0.70M |
-| W2 | Data layer: DataManager, DataReader library, property headers. zlib and minizip from upstream source where the codegen allows. | 837 | 52 | 0.74M |
+| E | Easy leaves of all areas W1 to W8 (owner order 2026-11-27, card 0b2) | 1,622 | 45 | 0.19M |
+| W1 | Shared and common gaps: BloodLib new code (json, property, channel, log archive, HTTP client), BloodCrypto gaps, server shared, packet game log, FsdReader, banned word filter; zstd from upstream source | 754 | 38 | 0.68M |
+| W2 | Data layer: DataManager, DataReader library, property headers. zlib and minizip from upstream source where the codegen allows. | 573 | 42 | 0.72M |
 | W3 | Core objects: GameDaemon main and config, world, zone, geo world, creature, PC, NPC, user, item, inventory, effect, skill, env objects | ~2,800 | 93 | ~2.4M |
 | W4 | Actions and server checks: move action, geo move checker, path finder, skill action, reaction, system, NPC, manipulate and boss skill actions, inventory action | ~1,390 | 46 | ~1.2M |
 | W5 | Channels and transactions: CacheDaemon, LobbyDaemon, account inventory, arena, market dealer and other channels; all `*tran.cpp`; tickets | ~1,820 | 61 | ~1.7M |
@@ -140,8 +179,8 @@ Planner rules (card 0b):
 | W7 | Content systems: task, quest journal, guild, team, party, duel, battle royal, arena rooms, other content | ~3,370 | 112 | ~2.6M |
 | W8 | GM and debug: game debug commands and handlers, GameBuilder; publisher and Tencent log code; anti-cheat glue as off bodies | ~680 | 23 | ~0.5M |
 
-- W1 and W2 numbers are measured (card `lift-gamedaemon-0b`). The other rows are the first plan estimates. The measured queue below replaces them.
-- Total: 632 cards in `Docs/Plan/cards/lift-gamedaemon-plan.tsv` (96 ready, 536 planned).
+- E, W1 and W2 numbers are measured (cards `lift-gamedaemon-0b` and `0b2`). The other rows are the first plan estimates. The measured queue above replaces them.
+- Total: 633 cards in `Docs/Plan/cards/lift-gamedaemon-plan.tsv` (125 ready: E 45, W1 38, W2 42; 508 planned).
 - Rust steps: R10 at 1,285 MATCH, R20 at 2,570, and so on (`modernize.md`). A Rust step does not block the lift.
 - Inside a wave, cards run in parallel only when their files do not overlap.
 

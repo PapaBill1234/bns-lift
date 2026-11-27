@@ -10,7 +10,7 @@
 | Pseudocode index | `~/.cache/bns-lift/hr/GameDaemon/index.tsv` (stem, rva, name, first, last, status, source file, part) |
 | Wave | W2 |
 | Model | opus |
-| Depends on | `lift-gamedaemon-40`, `lift-gamedaemon-47`, `lift-gamedaemon-50` |
+| Depends on | `lift-gamedaemon-e26`, `lift-gamedaemon-40`, `lift-gamedaemon-56` |
 | Pattern | `src/library/FsdReader/FsdDecomposer.cpp` |
 | Plan | `Docs/Plan/gamedaemon-lift.md` sections 1, 3, 5 |
 
@@ -22,45 +22,42 @@
 
 ## Scope
 
-33 functions, about 2,204 pseudocode lines (about 17,632 tokens). Stems: `elreaderimpl`.
+28 functions, about 2,257 pseudocode lines (about 18,056 tokens). Stems: `elreaderimpl`.
+
+The easy functions of this stem are in `lift-gamedaemon-e26`. Do not change them unless a fix needs it.
 
 This card is part 1/2 of stem `elreaderimpl`. The other parts are in other cards of this wave. They run one after the other (column "Depends on"). Edit only the functions in this table.
 
 | n | Exe | RVA | PDB name | Stem | Lines |
 | ---: | --- | --- | --- | --- | ---: |
-| 1 | GD | `0x6ed6d0` | `DrElReaderImpl::~DrElReaderImpl` | elreaderimpl | 7 |
-| 2 | GD | `0x6ed6e0` | `DrElReaderImpl::GetElAllocedSize` | elreaderimpl | 182 |
-| 3 | GD | `0x6ed9b0` | `DrElReaderImpl::DeleteElementExtra` | elreaderimpl | 141 |
-| 4 | GD | `0x6edcb0` | `DrElReaderImpl::RelocateAddress` | elreaderimpl | 116 |
-| 5 | GD | `0x6edef0` | `DrElReaderImpl::__readBool` | elreaderimpl | 33 |
-| 6 | GD | `0x6edfe0` | `DrElReaderImpl::shinkBlank` | elreaderimpl | 75 |
-| 7 | GD | `0x6ee0e0` | `DrElReaderImpl::isMultiKey` | elreaderimpl | 35 |
-| 8 | GD | `0x6ee160` | `DrElReaderImpl::tokenize` | elreaderimpl | 25 |
-| 9 | GD | `0x6ee200` | `DrElReaderImpl::findSubtype` | elreaderimpl | 20 |
-| 10 | GD | `0x6ee280` | `DrElReaderImpl::findEltype` | elreaderimpl | 17 |
-| 11 | GD | `0x6ee2f0` | `DrElReaderImpl::findTableType` | elreaderimpl | 21 |
-| 12 | GD | `0x6ee370` | `DrElReaderImpl::findSeqstr` | elreaderimpl | 21 |
-| 13 | GD | `0x6ee3d0` | `DrElReaderImpl::readSeq` | elreaderimpl | 29 |
-| 14 | GD | `0x6ee470` | `DrElReaderImpl::readSeq16` | elreaderimpl | 27 |
-| 15 | GD | `0x6ee520` | `DrElReaderImpl::readPropField` | elreaderimpl | 24 |
-| 16 | GD | `0x6ee5c0` | `DrElReaderImpl::readSub` | elreaderimpl | 33 |
-| 17 | GD | `0x6ee630` | `DrElReaderImpl::readVersion` | elreaderimpl | 98 |
-| 18 | GD | `0x6ee840` | `DrElReaderImpl::DrElReaderImpl` | elreaderimpl | 12 |
-| 19 | GD | `0x6ee860` | `DrElReaderImpl::AllocedSize` | elreaderimpl | 7 |
-| 20 | GD | `0x6ee870` | `DrElReaderImpl::RelocateElMemory` | elreaderimpl | 259 |
-| 21 | GD | `0x6eedf0` | `DrElReaderImpl::DeleteElementExtraNativePointer` | elreaderimpl | 174 |
-| 22 | GD | `0x6ef1b0` | `DrElReaderImpl::__readStr` | elreaderimpl | 33 |
-| 23 | GD | `0x6ef280` | `DrElReaderImpl::__readRef` | elreaderimpl | 114 |
-| 24 | GD | `0x6ef5b0` | `DrElReaderImpl::__readDateTime` | elreaderimpl | 84 |
-| 25 | GD | `0x6ef7c0` | `DrElReaderImpl::readInt8` | elreaderimpl | 51 |
-| 26 | GD | `0x6ef870` | `DrElReaderImpl::readInt16` | elreaderimpl | 51 |
-| 27 | GD | `0x6ef920` | `DrElReaderImpl::readInt32` | elreaderimpl | 51 |
-| 28 | GD | `0x6ef9d0` | `DrElReaderImpl::readInt64` | elreaderimpl | 51 |
-| 29 | GD | `0x6efa80` | `DrElReaderImpl::readFloat32` | elreaderimpl | 50 |
-| 30 | GD | `0x6efb40` | `DrElReaderImpl::readVector16` | elreaderimpl | 88 |
-| 31 | GD | `0x6efcb0` | `DrElReaderImpl::readVector32` | elreaderimpl | 88 |
-| 32 | GD | `0x6efe20` | `DrElReaderImpl::readIColor` | elreaderimpl | 88 |
-| 33 | GD | `0x6eff90` | `DrElReaderImpl::readFColor` | elreaderimpl | 99 |
+| 1 | GD | `0x6ed6e0` | `DrElReaderImpl::GetElAllocedSize` | elreaderimpl | 182 |
+| 2 | GD | `0x6ed9b0` | `DrElReaderImpl::DeleteElementExtra` | elreaderimpl | 141 |
+| 3 | GD | `0x6edcb0` | `DrElReaderImpl::RelocateAddress` | elreaderimpl | 116 |
+| 4 | GD | `0x6edef0` | `DrElReaderImpl::__readBool` | elreaderimpl | 33 |
+| 5 | GD | `0x6edfe0` | `DrElReaderImpl::shinkBlank` | elreaderimpl | 75 |
+| 6 | GD | `0x6ee0e0` | `DrElReaderImpl::isMultiKey` | elreaderimpl | 35 |
+| 7 | GD | `0x6ee160` | `DrElReaderImpl::tokenize` | elreaderimpl | 25 |
+| 8 | GD | `0x6ee5c0` | `DrElReaderImpl::readSub` | elreaderimpl | 33 |
+| 9 | GD | `0x6ee630` | `DrElReaderImpl::readVersion` | elreaderimpl | 98 |
+| 10 | GD | `0x6ee860` | `DrElReaderImpl::AllocedSize` | elreaderimpl | 7 |
+| 11 | GD | `0x6ee870` | `DrElReaderImpl::RelocateElMemory` | elreaderimpl | 259 |
+| 12 | GD | `0x6eedf0` | `DrElReaderImpl::DeleteElementExtraNativePointer` | elreaderimpl | 174 |
+| 13 | GD | `0x6ef1b0` | `DrElReaderImpl::__readStr` | elreaderimpl | 33 |
+| 14 | GD | `0x6ef280` | `DrElReaderImpl::__readRef` | elreaderimpl | 114 |
+| 15 | GD | `0x6ef5b0` | `DrElReaderImpl::__readDateTime` | elreaderimpl | 84 |
+| 16 | GD | `0x6ef7c0` | `DrElReaderImpl::readInt8` | elreaderimpl | 51 |
+| 17 | GD | `0x6ef870` | `DrElReaderImpl::readInt16` | elreaderimpl | 51 |
+| 18 | GD | `0x6ef920` | `DrElReaderImpl::readInt32` | elreaderimpl | 51 |
+| 19 | GD | `0x6ef9d0` | `DrElReaderImpl::readInt64` | elreaderimpl | 51 |
+| 20 | GD | `0x6efa80` | `DrElReaderImpl::readFloat32` | elreaderimpl | 50 |
+| 21 | GD | `0x6efb40` | `DrElReaderImpl::readVector16` | elreaderimpl | 88 |
+| 22 | GD | `0x6efcb0` | `DrElReaderImpl::readVector32` | elreaderimpl | 88 |
+| 23 | GD | `0x6efe20` | `DrElReaderImpl::readIColor` | elreaderimpl | 88 |
+| 24 | GD | `0x6eff90` | `DrElReaderImpl::readFColor` | elreaderimpl | 99 |
+| 25 | GD | `0x6f0140` | `DrElReaderImpl::readBox` | elreaderimpl | 105 |
+| 26 | GD | `0x6f0340` | `DrElReaderImpl::readMsec` | elreaderimpl | 55 |
+| 27 | GD | `0x6f0400` | `DrElReaderImpl::readAngle` | elreaderimpl | 44 |
+| 28 | GD | `0x6f04a0` | `DrElReaderImpl::readStr` | elreaderimpl | 27 |
 
 ## Tasks
 

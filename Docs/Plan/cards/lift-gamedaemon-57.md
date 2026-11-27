@@ -10,7 +10,7 @@
 | Pseudocode index | `~/.cache/bns-lift/hr/GameDaemon/index.tsv` (stem, rva, name, first, last, status, source file, part) |
 | Wave | W2 |
 | Model | opus |
-| Depends on | `lift-gamedaemon-49`, `lift-gamedaemon-50`, `lift-gamedaemon-51`, `lift-gamedaemon-52`, `lift-gamedaemon-53`, `lift-gamedaemon-54`, `lift-gamedaemon-55`, `lift-gamedaemon-56` |
+| Depends on | `lift-gamedaemon-e14`, `lift-gamedaemon-56`, `lift-gamedaemon-55`, `lift-gamedaemon-53` |
 | Pattern | `src/library/FsdReader/FsdDecomposer.cpp` |
 | Plan | `Docs/Plan/gamedaemon-lift.md` sections 1, 3, 5 |
 
@@ -22,45 +22,40 @@
 
 ## Scope
 
-35 functions, about 1,495 pseudocode lines (about 11,960 tokens). Stems: `datareaderimpl`.
+28 functions, about 1,413 pseudocode lines (about 11,304 tokens). Stems: `datareaderimpl`.
+
+The easy functions of this stem are in `lift-gamedaemon-e14`. Do not change them unless a fix needs it.
 
 | n | Exe | RVA | PDB name | Stem | Lines |
 | ---: | --- | --- | --- | --- | ---: |
-| 1 | GD | `0x6eb470` | `DrDataReaderImpl::~DrDataReaderImpl` | datareaderimpl | 7 |
-| 2 | GD | `0x6eb480` | `DrDataReaderImpl::Close` | datareaderimpl | 9 |
-| 3 | GD | `0x6eb4b0` | `DrDataReaderImpl::CreateElReader` | datareaderimpl | 19 |
-| 4 | GD | `0x6eb500` | `DrDataReaderImpl::CreateAliasMap` | datareaderimpl | 19 |
-| 5 | GD | `0x6eb550` | `DrDataReaderImpl::CreateAliasMapMT` | datareaderimpl | 19 |
-| 6 | GD | `0x6eb5b0` | `DrDataReaderImpl::ReleaseAliasMapMT` | datareaderimpl | 17 |
-| 7 | GD | `0x6eb610` | `DrDataReaderImpl::CreateQuestTable` | datareaderimpl | 19 |
-| 8 | GD | `0x6eb660` | `DrDataReaderImpl::ReleaseTable` | datareaderimpl | 15 |
-| 9 | GD | `0x6eb6b0` | `DrDataReaderImpl::loadAlias` | datareaderimpl | 66 |
-| 10 | GD | `0x6eb860` | `XmlPieceAliasReader::Read` | datareaderimpl | 37 |
-| 11 | GD | `0x6eb9a0` | `loadAliasWorker` | datareaderimpl | 12 |
-| 12 | GD | `0x6eba00` | `LoadTableMT_PreProcBinder::Execute` | datareaderimpl | 13 |
-| 13 | GD | `0x6eba40` | `LoadTableMT_PostProcBinder::Execute` | datareaderimpl | 13 |
-| 14 | GD | `0x6ebac0` | `DrDataReaderImpl::ReadBinaryDataFile` | datareaderimpl | 25 |
-| 15 | GD | `0x6ebb80` | `DrDataReaderImpl::ReadBinaryDataFileStream` | datareaderimpl | 33 |
-| 16 | GD | `0x6ebc40` | `DrDataReaderImpl::ReadBinaryDataFileFromMem` | datareaderimpl | 25 |
-| 17 | GD | `0x6ebc90` | `loadTableWorker` | datareaderimpl | 13 |
-| 18 | GD | `0x6ebcd0` | `DrDataReaderImpl::clearDocument` | datareaderimpl | 29 |
-| 19 | GD | `0x6ebd70` | `DrDataReaderImpl::createTable` | datareaderimpl | 50 |
-| 20 | GD | `0x6ebe70` | `XmlPieceTableReader::Read` | datareaderimpl | 37 |
-| 21 | GD | `0x6ebfb0` | `DrDataReaderImpl::DrDataReaderImpl` | datareaderimpl | 8 |
-| 22 | GD | `0x6ebfc0` | `DrDataReaderImpl::ReleaseElReader` | datareaderimpl | 17 |
-| 23 | GD | `0x6ec010` | `DrDataReaderImpl::ReleaseAliasMap` | datareaderimpl | 17 |
-| 24 | GD | `0x6ec060` | `DrDataReaderImpl::LoadAlias` | datareaderimpl | 32 |
-| 25 | GD | `0x6ec0d0` | `DrDataReaderImpl::LoadAliasMT` | datareaderimpl | 149 |
-| 26 | GD | `0x6ec450` | `LoadTableBinder::Execute` | datareaderimpl | 16 |
-| 27 | GD | `0x6ec4c0` | `DrDataReaderImpl::loadTable` | datareaderimpl | 44 |
-| 28 | GD | `0x6ec590` | `DrDataReaderImpl::loadTableMT` | datareaderimpl | 163 |
-| 29 | GD | `0x6ec920` | `DrDataReaderImpl::loadTablePieceByPiece` | datareaderimpl | 100 |
-| 30 | GD | `0x6ecb60` | `DrDataReaderImpl::LoadDocument` | datareaderimpl | 204 |
-| 31 | GD | `0x6ed050` | `DrDataReaderImpl::Setup` | datareaderimpl | 29 |
-| 32 | GD | `0x6ed0f0` | `DrDataReaderImpl::LoadAliasPieceByPiece` | datareaderimpl | 129 |
-| 33 | GD | `0x6ed400` | `DrDataReaderImpl::LoadTable` | datareaderimpl | 19 |
-| 34 | GD | `0x6ed450` | `DrDataReaderImpl::LoadTableMT` | datareaderimpl | 30 |
-| 35 | GD | `0x6ed4c0` | `DrDataReaderImpl::LoadTablePieceByPiece` | datareaderimpl | 61 |
+| 1 | GD | `0x6eb480` | `DrDataReaderImpl::Close` | datareaderimpl | 9 |
+| 2 | GD | `0x6eb4b0` | `DrDataReaderImpl::CreateElReader` | datareaderimpl | 19 |
+| 3 | GD | `0x6eb500` | `DrDataReaderImpl::CreateAliasMap` | datareaderimpl | 19 |
+| 4 | GD | `0x6eb550` | `DrDataReaderImpl::CreateAliasMapMT` | datareaderimpl | 19 |
+| 5 | GD | `0x6eb5b0` | `DrDataReaderImpl::ReleaseAliasMapMT` | datareaderimpl | 17 |
+| 6 | GD | `0x6eb610` | `DrDataReaderImpl::CreateQuestTable` | datareaderimpl | 19 |
+| 7 | GD | `0x6eb660` | `DrDataReaderImpl::ReleaseTable` | datareaderimpl | 15 |
+| 8 | GD | `0x6eb6b0` | `DrDataReaderImpl::loadAlias` | datareaderimpl | 66 |
+| 9 | GD | `0x6eb860` | `XmlPieceAliasReader::Read` | datareaderimpl | 37 |
+| 10 | GD | `0x6ebac0` | `DrDataReaderImpl::ReadBinaryDataFile` | datareaderimpl | 25 |
+| 11 | GD | `0x6ebb80` | `DrDataReaderImpl::ReadBinaryDataFileStream` | datareaderimpl | 33 |
+| 12 | GD | `0x6ebc40` | `DrDataReaderImpl::ReadBinaryDataFileFromMem` | datareaderimpl | 25 |
+| 13 | GD | `0x6ebcd0` | `DrDataReaderImpl::clearDocument` | datareaderimpl | 29 |
+| 14 | GD | `0x6ebd70` | `DrDataReaderImpl::createTable` | datareaderimpl | 50 |
+| 15 | GD | `0x6ebe70` | `XmlPieceTableReader::Read` | datareaderimpl | 37 |
+| 16 | GD | `0x6ebfc0` | `DrDataReaderImpl::ReleaseElReader` | datareaderimpl | 17 |
+| 17 | GD | `0x6ec010` | `DrDataReaderImpl::ReleaseAliasMap` | datareaderimpl | 17 |
+| 18 | GD | `0x6ec060` | `DrDataReaderImpl::LoadAlias` | datareaderimpl | 32 |
+| 19 | GD | `0x6ec0d0` | `DrDataReaderImpl::LoadAliasMT` | datareaderimpl | 149 |
+| 20 | GD | `0x6ec4c0` | `DrDataReaderImpl::loadTable` | datareaderimpl | 44 |
+| 21 | GD | `0x6ec590` | `DrDataReaderImpl::loadTableMT` | datareaderimpl | 163 |
+| 22 | GD | `0x6ec920` | `DrDataReaderImpl::loadTablePieceByPiece` | datareaderimpl | 100 |
+| 23 | GD | `0x6ecb60` | `DrDataReaderImpl::LoadDocument` | datareaderimpl | 204 |
+| 24 | GD | `0x6ed050` | `DrDataReaderImpl::Setup` | datareaderimpl | 29 |
+| 25 | GD | `0x6ed0f0` | `DrDataReaderImpl::LoadAliasPieceByPiece` | datareaderimpl | 129 |
+| 26 | GD | `0x6ed400` | `DrDataReaderImpl::LoadTable` | datareaderimpl | 19 |
+| 27 | GD | `0x6ed450` | `DrDataReaderImpl::LoadTableMT` | datareaderimpl | 30 |
+| 28 | GD | `0x6ed4c0` | `DrDataReaderImpl::LoadTablePieceByPiece` | datareaderimpl | 61 |
 
 ## Tasks
 

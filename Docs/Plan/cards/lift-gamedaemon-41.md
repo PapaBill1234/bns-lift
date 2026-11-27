@@ -1,4 +1,4 @@
-# lift-gamedaemon-41: BloodLib: source_jsoncpp part 1/3
+# lift-gamedaemon-41: BloodLib: source_jsoncpp part 1/2
 
 | Item | Value |
 | --- | --- |
@@ -10,7 +10,7 @@
 | Pseudocode index | `~/.cache/bns-lift/hr/GameDaemon/index.tsv` (stem, rva, name, first, last, status, source file, part) |
 | Wave | W1 |
 | Model | opus |
-| Depends on | `lift-gamedaemon-0e` |
+| Depends on | `lift-gamedaemon-e25` |
 | Pattern | none |
 | Plan | `Docs/Plan/gamedaemon-lift.md` sections 1, 3, 5 |
 
@@ -22,30 +22,31 @@
 
 ## Scope
 
-18 functions, about 2,485 pseudocode lines (about 19,880 tokens). Stems: `source_jsoncpp`.
+17 functions, about 2,462 pseudocode lines (about 19,696 tokens). Stems: `source_jsoncpp`.
 
-This card is part 1/3 of stem `source_jsoncpp`. The other parts are in other cards of this wave. They run one after the other (column "Depends on"). Edit only the functions in this table.
+The easy functions of this stem are in `lift-gamedaemon-e25`. Do not change them unless a fix needs it.
+
+This card is part 1/2 of stem `source_jsoncpp`. The other parts are in other cards of this wave. They run one after the other (column "Depends on"). Edit only the functions in this table.
 
 | n | Exe | RVA | PDB name | Stem | Lines |
 | ---: | --- | --- | --- | --- | ---: |
 | 1 | GD | `0x6a4ca0` | `Json::codePointToUTF8` | source_jsoncpp | 112 |
-| 2 | GD | `0x6a4eb0` | `Json::Reader::Reader` | source_jsoncpp | 23 |
-| 3 | GD | `0x6a4f40` | `Json::Reader::parse` | source_jsoncpp | 82 |
-| 4 | GD | `0x6a5120` | `Json::Reader::readValue` | source_jsoncpp | 183 |
-| 5 | GD | `0x6a5560` | `Json::Reader::skipCommentTokens` | source_jsoncpp | 197 |
-| 6 | GD | `0x6a58f0` | `Json::Reader::readToken` | source_jsoncpp | 186 |
-| 7 | GD | `0x6a5c40` | `Json::Reader::readComment` | source_jsoncpp | 114 |
-| 8 | GD | `0x6a5da0` | `Json::normalizeEOL` | source_jsoncpp | 127 |
-| 9 | GD | `0x6a5f90` | `Json::Reader::addComment` | source_jsoncpp | 37 |
-| 10 | GD | `0x6a6040` | `Json::Reader::readNumber` | source_jsoncpp | 62 |
-| 11 | GD | `0x6a6120` | `Json::Reader::readObject` | source_jsoncpp | 405 |
-| 12 | GD | `0x6a6970` | `Json::Reader::readArray` | source_jsoncpp | 264 |
-| 13 | GD | `0x6a6ec0` | `Json::Reader::decodeNumber` | source_jsoncpp | 111 |
-| 14 | GD | `0x6a70b0` | `Json::Reader::decodeNumber` | source_jsoncpp | 71 |
-| 15 | GD | `0x6a71f0` | `Json::Reader::decodeDouble` | source_jsoncpp | 135 |
-| 16 | GD | `0x6a7600` | `Json::Reader::decodeString` | source_jsoncpp | 141 |
-| 17 | GD | `0x6a7860` | `Json::Reader::decodeString` | source_jsoncpp | 174 |
-| 18 | GD | `0x6a7c00` | `Json::Reader::decodeUnicodeCodePoint` | source_jsoncpp | 61 |
+| 2 | GD | `0x6a4f40` | `Json::Reader::parse` | source_jsoncpp | 82 |
+| 3 | GD | `0x6a5120` | `Json::Reader::readValue` | source_jsoncpp | 183 |
+| 4 | GD | `0x6a5560` | `Json::Reader::skipCommentTokens` | source_jsoncpp | 197 |
+| 5 | GD | `0x6a58f0` | `Json::Reader::readToken` | source_jsoncpp | 186 |
+| 6 | GD | `0x6a5c40` | `Json::Reader::readComment` | source_jsoncpp | 114 |
+| 7 | GD | `0x6a5da0` | `Json::normalizeEOL` | source_jsoncpp | 127 |
+| 8 | GD | `0x6a5f90` | `Json::Reader::addComment` | source_jsoncpp | 37 |
+| 9 | GD | `0x6a6040` | `Json::Reader::readNumber` | source_jsoncpp | 62 |
+| 10 | GD | `0x6a6120` | `Json::Reader::readObject` | source_jsoncpp | 405 |
+| 11 | GD | `0x6a6970` | `Json::Reader::readArray` | source_jsoncpp | 264 |
+| 12 | GD | `0x6a6ec0` | `Json::Reader::decodeNumber` | source_jsoncpp | 111 |
+| 13 | GD | `0x6a70b0` | `Json::Reader::decodeNumber` | source_jsoncpp | 71 |
+| 14 | GD | `0x6a71f0` | `Json::Reader::decodeDouble` | source_jsoncpp | 135 |
+| 15 | GD | `0x6a7600` | `Json::Reader::decodeString` | source_jsoncpp | 141 |
+| 16 | GD | `0x6a7860` | `Json::Reader::decodeString` | source_jsoncpp | 174 |
+| 17 | GD | `0x6a7c00` | `Json::Reader::decodeUnicodeCodePoint` | source_jsoncpp | 61 |
 
 ## Tasks
 

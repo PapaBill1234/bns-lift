@@ -1,4 +1,4 @@
-# lift-gamedaemon-37: Banned word filter and Shared gaps and others: bannedwordfilterlib, bannedwordfilterloader, constfiltername, table, ...
+# lift-gamedaemon-37: Shared gaps and Common library and others: constfiltername, twofish2, fragmentpacket_h, fragmentpacket_cpp
 
 | Item | Value |
 | --- | --- |
@@ -10,34 +10,38 @@
 | Pseudocode index | `~/.cache/bns-lift/hr/GameDaemon/index.tsv` (stem, rva, name, first, last, status, source file, part) |
 | Wave | W1 |
 | Model | opus |
-| Depends on | `lift-gamedaemon-0e` |
-| Pattern | `src/External/BannedWordFilter/BannedWordFilterLoader.cpp` |
+| Depends on | `lift-gamedaemon-e1`, `lift-gamedaemon-e45`, `lift-gamedaemon-3` |
+| Pattern | `src/Server/Packet/FragmentPacket.cpp` |
 | Plan | `Docs/Plan/gamedaemon-lift.md` sections 1, 3, 5 |
 
 ## Read first
 
 - Read "Lift method" in `Docs/Plan/plan.md`.
 - Grep `Docs/Parity/lessons.md` for A2 (block order), A6 (per-exe path literals), A12 (PDB member types), A18 (destructors), A21 (PDB facts) and A22 (per-exe source form). Do not read it in full.
-- Pattern: `src/External/BannedWordFilter/BannedWordFilterLoader.cpp`. Read it one time. Use its form for the functions of this card.
+- Pattern: `src/Server/Packet/FragmentPacket.cpp`. Read it one time. Use its form for the functions of this card.
 
 ## Scope
 
-12 functions, about 1,740 pseudocode lines (about 13,920 tokens). Stems: `bannedwordfilterlib`, `bannedwordfilterloader`, `constfiltername`, `table`, `twofish2`.
+14 functions, about 1,847 pseudocode lines (about 14,776 tokens). Stems: `constfiltername`, `twofish2`, `fragmentpacket_h`, `fragmentpacket_cpp`.
+
+The easy functions of this stem are in `lift-gamedaemon-e45`, `lift-gamedaemon-e1`. Do not change them unless a fix needs it.
 
 | n | Exe | RVA | PDB name | Stem | Lines |
 | ---: | --- | --- | --- | --- | ---: |
-| 1 | GD | `0x6ea100` | `BannedWordFilterLib::LoadNameFilterBuffer` | bannedwordfilterlib | 31 |
-| 2 | GD | `0x6ea630` | `BannedWordFilterLoader::~BannedWordFilterLoader` | bannedwordfilterloader | 87 |
-| 3 | GD | `0x6ea880` | `BannedWordFilterLoader::LoadNameFilter` | bannedwordfilterloader | 119 |
-| 4 | GD | `0x6eaf00` | `ConstFilterName` | constfiltername | 203 |
-| 5 | GD | `0x1d050` | `DrElIter::~DrElIter` | table | 8 |
-| 6 | GD | `0x39d410` | `ParseHexDword` | twofish2 | 52 |
-| 7 | GD | `0x39d4e0` | `RS_MDS_Encode` | twofish2 | 49 |
-| 8 | GD | `0x39d680` | `BuildMDS` | twofish2 | 181 |
-| 9 | GD | `0x39db80` | `ReverseRoundSubkeys` | twofish2 | 31 |
-| 10 | GD | `0x39dbd0` | `Xor256` | twofish2 | 73 |
-| 11 | GD | `0x39dee0` | `reKey` | twofish2 | 520 |
-| 12 | GD | `0x39ead0` | `blockEncrypt` | twofish2 | 386 |
+| 1 | GD | `0x6eaf00` | `ConstFilterName` | constfiltername | 203 |
+| 2 | GD | `0x39d410` | `ParseHexDword` | twofish2 | 52 |
+| 3 | GD | `0x39d4e0` | `RS_MDS_Encode` | twofish2 | 49 |
+| 4 | GD | `0x39d680` | `BuildMDS` | twofish2 | 181 |
+| 5 | GD | `0x39db80` | `ReverseRoundSubkeys` | twofish2 | 31 |
+| 6 | GD | `0x39dbd0` | `Xor256` | twofish2 | 73 |
+| 7 | GD | `0x39dee0` | `reKey` | twofish2 | 520 |
+| 8 | GD | `0x39ead0` | `blockEncrypt` | twofish2 | 386 |
+| 9 | GD | `0x271c0` | `FragmentPacket::StartInnerPacket` | fragmentpacket_h | 12 |
+| 10 | GD | `0xdf700` | `SimplePacketSplitter::AddBuffer` | fragmentpacket_cpp | 47 |
+| 11 | GD | `0xdf7a0` | `FragmentPacketSplitter::AddBuffer` | fragmentpacket_cpp | 81 |
+| 12 | GD | `0xdf8c0` | `FragmentPacketSplitter::Finalize` | fragmentpacket_cpp | 31 |
+| 13 | GD | `0xdfaf0` | `FragmentPacketConcatenater::Add` | fragmentpacket_cpp | 138 |
+| 14 | GD | `0xdfd90` | `FragmentPacketConcatenater::Clone` | fragmentpacket_cpp | 43 |
 
 ### Shared functions
 
@@ -45,8 +49,11 @@ These functions are in shared source. They are not MATCH in each lifted exe that
 
 | PDB name | Shared file | Other exes | Note |
 | --- | --- | --- | --- |
-| `BannedWordFilterLoader::LoadNameFilter` | `src/External/BannedWordFilter/BannedWordFilterLoader.cpp` | LobbyDaemon | EXCLUDED in LobbyDaemon: read its `excluded.tsv` row first |
 | `ConstFilterName` | `src/External/BannedWordFilter/ConstFilterName.cpp` | LobbyDaemon | - |
+| `FragmentPacketSplitter::AddBuffer` | `src/Server/Packet/FragmentPacket.cpp` | LobbyDaemon, LobbyGate, PostOfficeDaemon | - |
+| `FragmentPacketSplitter::Finalize` | `src/Server/Packet/FragmentPacket.cpp` | LobbyDaemon, LobbyGate, PostOfficeDaemon | - |
+| `FragmentPacketConcatenater::Add` | `src/Server/Packet/FragmentPacket.cpp` | LobbyDaemon, LobbyGate, PostOfficeDaemon | - |
+| `FragmentPacketConcatenater::Clone` | `src/Server/Packet/FragmentPacket.cpp` | LobbyDaemon, LobbyGate, PostOfficeDaemon | - |
 
 ## Tasks
 
@@ -60,16 +67,14 @@ These functions are in shared source. They are not MATCH in each lifted exe that
 
 ## Files
 
-- `src/Server/GameDaemon/bannedwordfilterlib.cpp`
-- `src/Server/GameDaemon/bannedwordfilterlib.h`
-- `src/Server/GameDaemon/bannedwordfilterloader.cpp`
-- `src/Server/GameDaemon/bannedwordfilterloader.h`
-- `src/External/BannedWordFilter/BannedWordFilterLoader.cpp`
 - `src/External/BannedWordFilter/ConstFilterName.cpp`
-- `src/Server/GameDaemon/table.cpp`
-- `src/Server/GameDaemon/table.h`
 - `src/Server/GameDaemon/twofish2.cpp`
 - `src/Server/GameDaemon/twofish2.h`
+- `src/Server/GameDaemon/fragmentpacket_h.cpp`
+- `src/Server/GameDaemon/fragmentpacket_h.h`
+- `src/Server/GameDaemon/fragmentpacket_cpp.cpp`
+- `src/Server/GameDaemon/fragmentpacket_cpp.h`
+- `src/Server/Packet/FragmentPacket.cpp`
 
 ## Handoff
 

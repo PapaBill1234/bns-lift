@@ -10,7 +10,7 @@
 | Pseudocode index | `~/.cache/bns-lift/hr/GameDaemon/index.tsv` (stem, rva, name, first, last, status, source file, part) |
 | Wave | W2 |
 | Model | opus |
-| Depends on | `lift-gamedaemon-67`, `lift-gamedaemon-93` |
+| Depends on | `lift-gamedaemon-e13`, `lift-gamedaemon-67`, `lift-gamedaemon-93` |
 | Pattern | none |
 | Plan | `Docs/Plan/gamedaemon-lift.md` sections 1, 3, 5 |
 
@@ -22,35 +22,35 @@
 
 ## Scope
 
-23 functions, about 2,463 pseudocode lines (about 19,704 tokens). Stems: `datamanager_cpp_3`.
+21 functions, about 2,460 pseudocode lines (about 19,680 tokens). Stems: `datamanager_cpp_3`.
+
+The easy functions of this stem are in `lift-gamedaemon-e13`. Do not change them unless a fix needs it.
 
 This card is part 8/10 of stem `datamanager_cpp_3`. The other parts are in other cards of this wave. They run one after the other (column "Depends on"). Edit only the functions in this table.
 
 | n | Exe | RVA | PDB name | Stem | Lines |
 | ---: | --- | --- | --- | --- | ---: |
-| 1 | GD | `0x65ccb0` | `Data::validateSkillTrait` | datamanager_cpp_3 | 33 |
-| 2 | GD | `0x65cd50` | `Data::validateFish` | datamanager_cpp_3 | 116 |
-| 3 | GD | `0x65cf80` | `Data::validateFishingField` | datamanager_cpp_3 | 69 |
-| 4 | GD | `0x65d0b0` | `Data::validateBadgeSetItem` | datamanager_cpp_3 | 25 |
-| 5 | GD | `0x65d150` | `Data::validateBadgeSynthesisCost` | datamanager_cpp_3 | 25 |
-| 6 | GD | `0x65d1f0` | `Data::validateBadgeSynthesisRecipe` | datamanager_cpp_3 | 80 |
-| 7 | GD | `0x65d330` | `Data::validateClosetGroup` | datamanager_cpp_3 | 186 |
-| 8 | GD | `0x65d660` | `Data::validateSkillSystematization` | datamanager_cpp_3 | 125 |
-| 9 | GD | `0x65d8b0` | `Data::validateJobStyle` | datamanager_cpp_3 | 111 |
-| 10 | GD | `0x65daa0` | `Data::validateDifficultyTypeModify` | datamanager_cpp_3 | 88 |
-| 11 | GD | `0x65dc50` | `Data::validateBoardGacha` | datamanager_cpp_3 | 52 |
-| 12 | GD | `0x65dd70` | `Data::validateBoardGachaReward` | datamanager_cpp_3 | 241 |
-| 13 | GD | `0x65e190` | `Data::validateContentsReset` | datamanager_cpp_3 | 119 |
-| 14 | GD | `0x65e3d0` | `Data::validateSlateScroll` | datamanager_cpp_3 | 148 |
-| 15 | GD | `0x65e6e0` | `Data::validateSlateScrollStone` | datamanager_cpp_3 | 75 |
-| 16 | GD | `0x65e8c0` | `Data::validateSlateStone` | datamanager_cpp_3 | 81 |
-| 17 | GD | `0x65ea20` | `Data::validateSoulMaskSet` | datamanager_cpp_3 | 108 |
-| 18 | GD | `0x65ec60` | `Data::validateItemRandomOption` | datamanager_cpp_3 | 277 |
-| 19 | GD | `0x65f0d0` | `Data::validateCostGroup` | datamanager_cpp_3 | 154 |
-| 20 | GD | `0x65f360` | `Data::validateZoneAreaGroup` | datamanager_cpp_3 | 95 |
-| 21 | GD | `0x65f520` | `Data::validateZoneNpcRandomSpawn` | datamanager_cpp_3 | 76 |
-| 22 | GD | `0x65f6a0` | `Data::validateSecondaryStat` | datamanager_cpp_3 | 99 |
-| 23 | GD | `0x65f910` | `Data::validateFormulaConstant` | datamanager_cpp_3 | 80 |
+| 1 | GD | `0x65cd50` | `Data::validateFish` | datamanager_cpp_3 | 116 |
+| 2 | GD | `0x65cf80` | `Data::validateFishingField` | datamanager_cpp_3 | 69 |
+| 3 | GD | `0x65d1f0` | `Data::validateBadgeSynthesisRecipe` | datamanager_cpp_3 | 80 |
+| 4 | GD | `0x65d330` | `Data::validateClosetGroup` | datamanager_cpp_3 | 186 |
+| 5 | GD | `0x65d660` | `Data::validateSkillSystematization` | datamanager_cpp_3 | 125 |
+| 6 | GD | `0x65d8b0` | `Data::validateJobStyle` | datamanager_cpp_3 | 111 |
+| 7 | GD | `0x65daa0` | `Data::validateDifficultyTypeModify` | datamanager_cpp_3 | 88 |
+| 8 | GD | `0x65dc50` | `Data::validateBoardGacha` | datamanager_cpp_3 | 52 |
+| 9 | GD | `0x65dd70` | `Data::validateBoardGachaReward` | datamanager_cpp_3 | 241 |
+| 10 | GD | `0x65e190` | `Data::validateContentsReset` | datamanager_cpp_3 | 119 |
+| 11 | GD | `0x65e3d0` | `Data::validateSlateScroll` | datamanager_cpp_3 | 148 |
+| 12 | GD | `0x65e6e0` | `Data::validateSlateScrollStone` | datamanager_cpp_3 | 75 |
+| 13 | GD | `0x65e8c0` | `Data::validateSlateStone` | datamanager_cpp_3 | 81 |
+| 14 | GD | `0x65ea20` | `Data::validateSoulMaskSet` | datamanager_cpp_3 | 108 |
+| 15 | GD | `0x65ec60` | `Data::validateItemRandomOption` | datamanager_cpp_3 | 277 |
+| 16 | GD | `0x65f0d0` | `Data::validateCostGroup` | datamanager_cpp_3 | 154 |
+| 17 | GD | `0x65f360` | `Data::validateZoneAreaGroup` | datamanager_cpp_3 | 95 |
+| 18 | GD | `0x65f520` | `Data::validateZoneNpcRandomSpawn` | datamanager_cpp_3 | 76 |
+| 19 | GD | `0x65f6a0` | `Data::validateSecondaryStat` | datamanager_cpp_3 | 99 |
+| 20 | GD | `0x65f910` | `Data::validateFormulaConstant` | datamanager_cpp_3 | 80 |
+| 21 | GD | `0x65fac0` | `Data::validateItemFusion` | datamanager_cpp_3 | 80 |
 
 ## Tasks
 

@@ -1,4 +1,4 @@
-# lift-gamedaemon-39: Server shared and Shared gaps: bnscommonutil, smartcoupondchannel, bnscommonconfigdefinition, coupongameeventconfig
+# lift-gamedaemon-39: Packet and Server shared and others: gamepackethandlerlist, chattinglog, bnscommonutil, smartcoupondchannel, ...
 
 | Item | Value |
 | --- | --- |
@@ -10,7 +10,7 @@
 | Pseudocode index | `~/.cache/bns-lift/hr/GameDaemon/index.tsv` (stem, rva, name, first, last, status, source file, part) |
 | Wave | W1 |
 | Model | opus |
-| Depends on | `lift-gamedaemon-2`, `lift-gamedaemon-8`, `lift-gamedaemon-9`, `lift-gamedaemon-33` |
+| Depends on | `lift-gamedaemon-e45`, `lift-gamedaemon-2`, `lift-gamedaemon-12`, `lift-gamedaemon-9`, `lift-gamedaemon-8` |
 | Pattern | `src/Server/Shared/BnsCommonConfigDefinition.cpp` |
 | Plan | `Docs/Plan/gamedaemon-lift.md` sections 1, 3, 5 |
 
@@ -22,30 +22,34 @@
 
 ## Scope
 
-20 functions, about 1,756 pseudocode lines (about 14,048 tokens). Stems: `bnscommonutil`, `smartcoupondchannel`, `bnscommonconfigdefinition`, `coupongameeventconfig`.
+22 functions, about 2,277 pseudocode lines (about 18,216 tokens). Stems: `gamepackethandlerlist`, `chattinglog`, `bnscommonutil`, `smartcoupondchannel`, `bnscommonconfigdefinition`.
+
+The easy functions of this stem are in `lift-gamedaemon-e45`. Do not change them unless a fix needs it.
 
 | n | Exe | RVA | PDB name | Stem | Lines |
 | ---: | --- | --- | --- | --- | ---: |
-| 1 | GD | `0xa690` | `BnsCommonUtil::ConvProductTypeStr2ProductTypes` | bnscommonutil | 43 |
-| 2 | GD | `0x27fe0` | `GenerateGameEventTid` | smartcoupondchannel | 22 |
-| 3 | GD | `0x28030` | `SmartCouponSessionHandler::OnAccept` | smartcoupondchannel | 16 |
-| 4 | GD | `0x28070` | `SmartCouponSessionHandler::OnConnect` | smartcoupondchannel | 110 |
-| 5 | GD | `0x282a0` | `SmartCouponSessionHandler::OnClose` | smartcoupondchannel | 90 |
-| 6 | GD | `0x28480` | `SmartCouponSessionHandler::PacketHandler` | smartcoupondchannel | 26 |
-| 7 | GD | `0x284e0` | `SmartCoupondChannel::Initialize` | smartcoupondchannel | 58 |
-| 8 | GD | `0x28610` | `SmartCoupondChannel::SendHello` | smartcoupondchannel | 44 |
-| 9 | GD | `0x28780` | `SmartCoupondChannelManager::Initialize` | smartcoupondchannel | 202 |
-| 10 | GD | `0x28ad0` | `SmartCoupondChannelManager::Destroy` | smartcoupondchannel | 65 |
-| 11 | GD | `0x28c40` | `SmartCoupondChannelManager::acquire` | smartcoupondchannel | 62 |
-| 12 | GD | `0x28d10` | `SmartCoupondChannelManager::Send` | smartcoupondchannel | 63 |
-| 13 | GD | `0x28e00` | `SmartCoupondChannelManager::LoadGameEventConfig` | smartcoupondchannel | 40 |
-| 14 | GD | `0x28eb0` | `SmartCoupondChannelManager::SendGameEventByCharacterReq` | smartcoupondchannel | 148 |
-| 15 | GD | `0x29170` | `SmartCoupondChannelManager::checkGameEventConfig` | smartcoupondchannel | 91 |
-| 16 | GD | `0x9820` | `BnsCommonConfigLoad::Load` | bnscommonconfigdefinition | 18 |
-| 17 | GD | `0x9960` | `BnsCommonConfig::LoadBnsCommonConfig` | bnscommonconfigdefinition | 80 |
-| 18 | GD | `0x9e20` | `BnsCommonConfig::Dump` | bnscommonconfigdefinition | 98 |
-| 19 | GD | `0x9fe0` | `BnsCommonConfig::CheckMinMaxBoundary` | bnscommonconfigdefinition | 116 |
-| 20 | GD | `0x1a3d0` | `GameEventConfig::SetupGameEventListFromXml` | coupongameeventconfig | 364 |
+| 1 | GD | `0xdfe50` | `HandleGame_QQC2CReq` | gamepackethandlerlist | 8 |
+| 2 | GD | `0xdfe60` | `GameTestBotQuery` | gamepackethandlerlist | 714 |
+| 3 | GD | `0x291490` | `ChattingLog::MessageByItemDistrict` | chattinglog | 57 |
+| 4 | GD | `0x291630` | `ChattingLog::MessageByItemWorld` | chattinglog | 57 |
+| 5 | GD | `0x5d48a0` | `ChattingLog::Normal` | chattinglog | 55 |
+| 6 | GD | `0x5d4a30` | `ChattingLog::Whisper` | chattinglog | 58 |
+| 7 | GD | `0xa690` | `BnsCommonUtil::ConvProductTypeStr2ProductTypes` | bnscommonutil | 43 |
+| 8 | GD | `0x28070` | `SmartCouponSessionHandler::OnConnect` | smartcoupondchannel | 110 |
+| 9 | GD | `0x282a0` | `SmartCouponSessionHandler::OnClose` | smartcoupondchannel | 90 |
+| 10 | GD | `0x284e0` | `SmartCoupondChannel::Initialize` | smartcoupondchannel | 58 |
+| 11 | GD | `0x28610` | `SmartCoupondChannel::SendHello` | smartcoupondchannel | 44 |
+| 12 | GD | `0x28780` | `SmartCoupondChannelManager::Initialize` | smartcoupondchannel | 202 |
+| 13 | GD | `0x28ad0` | `SmartCoupondChannelManager::Destroy` | smartcoupondchannel | 65 |
+| 14 | GD | `0x28c40` | `SmartCoupondChannelManager::acquire` | smartcoupondchannel | 62 |
+| 15 | GD | `0x28d10` | `SmartCoupondChannelManager::Send` | smartcoupondchannel | 63 |
+| 16 | GD | `0x28e00` | `SmartCoupondChannelManager::LoadGameEventConfig` | smartcoupondchannel | 40 |
+| 17 | GD | `0x28eb0` | `SmartCoupondChannelManager::SendGameEventByCharacterReq` | smartcoupondchannel | 148 |
+| 18 | GD | `0x29170` | `SmartCoupondChannelManager::checkGameEventConfig` | smartcoupondchannel | 91 |
+| 19 | GD | `0x9820` | `BnsCommonConfigLoad::Load` | bnscommonconfigdefinition | 18 |
+| 20 | GD | `0x9960` | `BnsCommonConfig::LoadBnsCommonConfig` | bnscommonconfigdefinition | 80 |
+| 21 | GD | `0x9e20` | `BnsCommonConfig::Dump` | bnscommonconfigdefinition | 98 |
+| 22 | GD | `0x9fe0` | `BnsCommonConfig::CheckMinMaxBoundary` | bnscommonconfigdefinition | 116 |
 
 ### Shared functions
 
@@ -57,7 +61,6 @@ These functions are in shared source. They are not MATCH in each lifted exe that
 | `BnsCommonConfig::LoadBnsCommonConfig` | `src/Server/Shared/BnsCommonConfigDefinition.cpp` | CacheGate, LobbyDaemon, LobbyGate, PostOfficeDaemon, SmartCouponDaemon | - |
 | `BnsCommonConfig::Dump` | `src/Server/Shared/BnsCommonConfigDefinition.cpp` | CacheGate, LobbyDaemon, LobbyGate, PostOfficeDaemon, SmartCouponDaemon | - |
 | `BnsCommonConfig::CheckMinMaxBoundary` | `src/Server/Shared/BnsCommonConfigDefinition.cpp` | CacheGate, LobbyDaemon, LobbyGate, PostOfficeDaemon, SmartCouponDaemon | - |
-| `GameEventConfig::SetupGameEventListFromXml` | `src/Server/Shared/CouponGameEventConfig.cpp` | SmartCouponDaemon | - |
 
 ## Tasks
 
@@ -71,12 +74,15 @@ These functions are in shared source. They are not MATCH in each lifted exe that
 
 ## Files
 
+- `src/Server/GameDaemon/gamepackethandlerlist.cpp`
+- `src/Server/GameDaemon/gamepackethandlerlist.h`
+- `src/Server/GameDaemon/chattinglog.cpp`
+- `src/Server/GameDaemon/chattinglog.h`
 - `src/Server/GameDaemon/bnscommonutil.cpp`
 - `src/Server/GameDaemon/bnscommonutil.h`
 - `src/Server/GameDaemon/smartcoupondchannel.cpp`
 - `src/Server/GameDaemon/smartcoupondchannel.h`
 - `src/Server/Shared/BnsCommonConfigDefinition.cpp`
-- `src/Server/Shared/CouponGameEventConfig.cpp`
 
 ## Handoff
 

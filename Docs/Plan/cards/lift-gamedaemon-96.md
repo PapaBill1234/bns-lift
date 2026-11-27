@@ -10,7 +10,7 @@
 | Pseudocode index | `~/.cache/bns-lift/hr/GameDaemon/index.tsv` (stem, rva, name, first, last, status, source file, part) |
 | Wave | W2 |
 | Model | opus |
-| Depends on | `lift-gamedaemon-12`, `lift-gamedaemon-66`, `lift-gamedaemon-95` |
+| Depends on | `lift-gamedaemon-e13`, `lift-gamedaemon-66`, `lift-gamedaemon-95` |
 | Pattern | none |
 | Plan | `Docs/Plan/gamedaemon-lift.md` sections 1, 3, 5 |
 
@@ -22,24 +22,24 @@
 
 ## Scope
 
-12 functions, about 668 pseudocode lines (about 5,344 tokens). Stems: `datamanager_cpp_3`.
+10 functions, about 1,156 pseudocode lines (about 9,248 tokens). Stems: `datamanager_cpp_3`.
+
+The easy functions of this stem are in `lift-gamedaemon-e13`. Do not change them unless a fix needs it.
 
 This card is part 10/10 of stem `datamanager_cpp_3`. The other parts are in other cards of this wave. They run one after the other (column "Depends on"). Edit only the functions in this table.
 
 | n | Exe | RVA | PDB name | Stem | Lines |
 | ---: | --- | --- | --- | --- | ---: |
-| 1 | GD | `0x6621b0` | `Data::DataManager::GetDifficultyTypeDataIndex` | datamanager_cpp_3 | 23 |
+| 1 | GD | `0x6619b0` | `Data::validateConfigPreDataLoad` | datamanager_cpp_3 | 546 |
 | 2 | GD | `0x662210` | `Data::DataManager::loadHiddenFieldFromBoastEvent` | datamanager_cpp_3 | 38 |
 | 3 | GD | `0x662300` | `Data::DataManager::setBoastEventSubTypeRecord` | datamanager_cpp_3 | 244 |
 | 4 | GD | `0x6626b0` | `Data::DataManager::GetAbilityFieldValueByBenifitAbilitySeq` | datamanager_cpp_3 | 139 |
-| 5 | GD | `0x662910` | `Data::DataManager::GetChallengeTypeDay` | datamanager_cpp_3 | 21 |
-| 6 | GD | `0x662990` | `Data::DataManager::GetChallengeTypeWeek` | datamanager_cpp_3 | 14 |
-| 7 | GD | `0x662a10` | `Data::DataManager::WriteDataReaderErrorLog` | datamanager_cpp_3 | 29 |
-| 8 | GD | `0x662a80` | `Data::DataManager::WriteScriptLoaderErrorLog` | datamanager_cpp_3 | 18 |
-| 9 | GD | `0x662ab0` | `Data::DataManager::WriteDataLoadErrorLog` | datamanager_cpp_3 | 18 |
-| 10 | GD | `0x662ae0` | `Data::DataManager::WriteDataValidationFailureLog` | datamanager_cpp_3 | 18 |
-| 11 | GD | `0x662b10` | `Data::DataManager::ConstructAdditionalServiceItems` | datamanager_cpp_3 | 72 |
-| 12 | GD | `0x662c10` | `Data::BoardGachaData::SetBoardGachaRecord` | datamanager_cpp_3 | 34 |
+| 5 | GD | `0x662a10` | `Data::DataManager::WriteDataReaderErrorLog` | datamanager_cpp_3 | 29 |
+| 6 | GD | `0x662a80` | `Data::DataManager::WriteScriptLoaderErrorLog` | datamanager_cpp_3 | 18 |
+| 7 | GD | `0x662ab0` | `Data::DataManager::WriteDataLoadErrorLog` | datamanager_cpp_3 | 18 |
+| 8 | GD | `0x662ae0` | `Data::DataManager::WriteDataValidationFailureLog` | datamanager_cpp_3 | 18 |
+| 9 | GD | `0x662b10` | `Data::DataManager::ConstructAdditionalServiceItems` | datamanager_cpp_3 | 72 |
+| 10 | GD | `0x662c10` | `Data::BoardGachaData::SetBoardGachaRecord` | datamanager_cpp_3 | 34 |
 
 ## Tasks
 

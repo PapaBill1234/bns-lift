@@ -1,4 +1,4 @@
-# lift-gamedaemon-5: BloodLib: logarchiveutil, logarchivesession, logserversessionhandler_h, logserver
+# lift-gamedaemon-5: BloodLib: logarchivesession, logserver, logagent, logarchivecontext
 
 | Item | Value |
 | --- | --- |
@@ -10,7 +10,7 @@
 | Pseudocode index | `~/.cache/bns-lift/hr/GameDaemon/index.tsv` (stem, rva, name, first, last, status, source file, part) |
 | Wave | W1 |
 | Model | opus |
-| Depends on | `lift-gamedaemon-0e` |
+| Depends on | `lift-gamedaemon-e25`, `lift-gamedaemon-e45` |
 | Pattern | `src/Server/BloodLib/source/LogFile.cpp` |
 | Plan | `Docs/Plan/gamedaemon-lift.md` sections 1, 3, 5 |
 
@@ -22,34 +22,37 @@
 
 ## Scope
 
-24 functions, about 2,060 pseudocode lines (about 16,480 tokens). Stems: `logarchiveutil`, `logarchivesession`, `logserversessionhandler_h`, `logserver`.
+25 functions, about 1,402 pseudocode lines (about 11,216 tokens). Stems: `logarchivesession`, `logserver`, `logagent`, `logarchivecontext`.
+
+The easy functions of this stem are in `lift-gamedaemon-e25`, `lift-gamedaemon-e45`. Do not change them unless a fix needs it.
 
 | n | Exe | RVA | PDB name | Stem | Lines |
 | ---: | --- | --- | --- | --- | ---: |
-| 1 | GD | `0x6b8130` | `LogArchiveUtil::GetUtf8StringSizeToTranslate` | logarchiveutil | 37 |
-| 2 | GD | `0x6b81e0` | `LogArchiveUtil::UnicodeToMultibyte` | logarchiveutil | 46 |
-| 3 | GD | `0x6b82e0` | `LogArchiveUtil::ComposeNetLogData` | logarchiveutil | 418 |
-| 4 | GD | `0x6b8cf0` | `LogArchiveUtil::ConvertNetDataToFileData` | logarchiveutil | 577 |
-| 5 | GD | `0x6b9af0` | `LogArchiveUtil::ReplaceOriginCharToSpecialChar` | logarchiveutil | 64 |
-| 6 | GD | `0x6b9ba0` | `LogArchiveUtil::GetAlphabetCount` | logarchiveutil | 42 |
-| 7 | GD | `0x6b9d00` | `LogArchiveSession::~LogArchiveSession` | logarchivesession | 20 |
-| 8 | GD | `0x6b9d60` | `LogArchiveSession::Connect` | logarchivesession | 87 |
-| 9 | GD | `0x6b9fd0` | `LogArchiveSession::Send` | logarchivesession | 86 |
-| 10 | GD | `0x6ba1f0` | `LogArchiveSession::Recv` | logarchivesession | 40 |
-| 11 | GD | `0x6ba300` | `LogArchiveSession::recv` | logarchivesession | 82 |
-| 12 | GD | `0x6ba510` | `LogArchiveSession::Close` | logarchivesession | 19 |
-| 13 | GD | `0x6ba560` | `LogServerSessionHandler::~LogServerSessionHandler` | logserversessionhandler_h | 7 |
-| 14 | GD | `0x6ba5a0` | `LogServer::~LogServer` | logserver | 44 |
-| 15 | GD | `0x6ba6b0` | `LogServer::Initialize` | logserver | 40 |
-| 16 | GD | `0x6ba780` | `LogServer::Connect` | logserver | 7 |
-| 17 | GD | `0x6ba7a0` | `LogServer::Close` | logserver | 41 |
-| 18 | GD | `0x6ba870` | `LogServer::ClearLogData` | logserver | 31 |
-| 19 | GD | `0x6ba900` | `LogServer::AsyncSend` | logserver | 102 |
-| 20 | GD | `0x6bab30` | `LogServer::SendComplete` | logserver | 93 |
-| 21 | GD | `0x6bad70` | `LogServer::RecvComplete` | logserver | 59 |
-| 22 | GD | `0x6baf30` | `LogServer::waitComplete` | logserver | 48 |
-| 23 | GD | `0x6bb020` | `LogServer::AsyncRecv` | logserver | 25 |
-| 24 | GD | `0x6bb0a0` | `LogServer::HandlePacket` | logserver | 45 |
+| 1 | GD | `0x6b9d60` | `LogArchiveSession::Connect` | logarchivesession | 87 |
+| 2 | GD | `0x6b9fd0` | `LogArchiveSession::Send` | logarchivesession | 86 |
+| 3 | GD | `0x6ba1f0` | `LogArchiveSession::Recv` | logarchivesession | 40 |
+| 4 | GD | `0x6ba300` | `LogArchiveSession::recv` | logarchivesession | 82 |
+| 5 | GD | `0x6ba5a0` | `LogServer::~LogServer` | logserver | 44 |
+| 6 | GD | `0x6ba6b0` | `LogServer::Initialize` | logserver | 40 |
+| 7 | GD | `0x6ba780` | `LogServer::Connect` | logserver | 7 |
+| 8 | GD | `0x6ba7a0` | `LogServer::Close` | logserver | 41 |
+| 9 | GD | `0x6ba870` | `LogServer::ClearLogData` | logserver | 31 |
+| 10 | GD | `0x6ba900` | `LogServer::AsyncSend` | logserver | 102 |
+| 11 | GD | `0x6bab30` | `LogServer::SendComplete` | logserver | 93 |
+| 12 | GD | `0x6bad70` | `LogServer::RecvComplete` | logserver | 59 |
+| 13 | GD | `0x6baf30` | `LogServer::waitComplete` | logserver | 48 |
+| 14 | GD | `0x6bb0a0` | `LogServer::HandlePacket` | logserver | 45 |
+| 15 | GD | `0x6bb200` | `LogAgent::HandlePacket` | logagent | 34 |
+| 16 | GD | `0x6d8560` | `LogArchiveWriteBuffer::LogArchiveWriteBuffer` | logarchivecontext | 48 |
+| 17 | GD | `0x6d8650` | `LogArchiveWriteBuffer::PushNetworkData` | logarchivecontext | 101 |
+| 18 | GD | `0x6d8860` | `LogArchiveWriteBuffer::PushFileData` | logarchivecontext | 76 |
+| 19 | GD | `0x6d89e0` | `LogArchiveWriteBuffer::ClearNetworkBuffer` | logarchivecontext | 42 |
+| 20 | GD | `0x6d8aa0` | `LogArchiveWriteBuffer::ClearFileBuffer` | logarchivecontext | 37 |
+| 21 | GD | `0x6d8b30` | `LogArchiveWriteBuffer::growBufferChunkSize` | logarchivecontext | 85 |
+| 22 | GD | `0x6d8ca0` | `LogArchiveWriteBuffer::growBufferCount` | logarchivecontext | 68 |
+| 23 | GD | `0x6d8de0` | `LogArchiveWriteContext::LogArchiveWriteContext` | logarchivecontext | 38 |
+| 24 | GD | `0x6d8f20` | `LogArchiveWriteContext::SwitchStatus` | logarchivecontext | 34 |
+| 25 | GD | `0x6d8fa0` | `LogArchiveWriteContext::GetWritingBuffer` | logarchivecontext | 34 |
 
 ## Tasks
 
@@ -61,14 +64,14 @@
 
 ## Files
 
-- `src/Server/GameDaemon/logarchiveutil.cpp`
-- `src/Server/GameDaemon/logarchiveutil.h`
 - `src/Server/GameDaemon/logarchivesession.cpp`
 - `src/Server/GameDaemon/logarchivesession.h`
-- `src/Server/GameDaemon/logserversessionhandler_h.cpp`
-- `src/Server/GameDaemon/logserversessionhandler_h.h`
 - `src/Server/GameDaemon/logserver.cpp`
 - `src/Server/GameDaemon/logserver.h`
+- `src/Server/GameDaemon/logagent.cpp`
+- `src/Server/GameDaemon/logagent.h`
+- `src/Server/GameDaemon/logarchivecontext.cpp`
+- `src/Server/GameDaemon/logarchivecontext.h`
 
 ## Handoff
 

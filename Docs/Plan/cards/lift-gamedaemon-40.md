@@ -1,4 +1,4 @@
-# lift-gamedaemon-40: Shared gaps and VC headers and no-file functions: npchannel2, strsafe, fsdshowcaserecord
+# lift-gamedaemon-40: Shared gaps and VC headers and no-file functions: coupongameeventconfig, npchannel2, strsafe, fsdshowcaserecord
 
 | Item | Value |
 | --- | --- |
@@ -10,7 +10,7 @@
 | Pseudocode index | `~/.cache/bns-lift/hr/GameDaemon/index.tsv` (stem, rva, name, first, last, status, source file, part) |
 | Wave | W1 |
 | Model | opus |
-| Depends on | `lift-gamedaemon-6`, `lift-gamedaemon-8` |
+| Depends on | `lift-gamedaemon-e45`, `lift-gamedaemon-6` |
 | Pattern | `src/Server/Shared/NPChannel2.cpp` |
 | Plan | `Docs/Plan/gamedaemon-lift.md` sections 1, 3, 5 |
 
@@ -22,11 +22,13 @@
 
 ## Scope
 
-6 functions, about 554 pseudocode lines (about 4,432 tokens). Stems: `npchannel2`, `strsafe`, `fsdshowcaserecord`.
+6 functions, about 896 pseudocode lines (about 7,168 tokens). Stems: `coupongameeventconfig`, `npchannel2`, `strsafe`, `fsdshowcaserecord`.
+
+The easy functions of this stem are in `lift-gamedaemon-e45`. Do not change them unless a fix needs it.
 
 | n | Exe | RVA | PDB name | Stem | Lines |
 | ---: | --- | --- | --- | --- | ---: |
-| 1 | GD | `0x1b090` | `NPTransactionRegistry::NPTransactionRegistry` | npchannel2 | 22 |
+| 1 | GD | `0x1a3d0` | `GameEventConfig::SetupGameEventListFromXml` | coupongameeventconfig | 364 |
 | 2 | GD | `0x1bb30` | `NPChannel::~NPChannel` | npchannel2 | 51 |
 | 3 | GD | `0x1bed0` | `NPChannel::SendMsg` | npchannel2 | 178 |
 | 4 | GD | `0x27a370` | `StringCchPrintfW` | strsafe | 34 |
@@ -39,7 +41,7 @@ These functions are in shared source. They are not MATCH in each lifted exe that
 
 | PDB name | Shared file | Other exes | Note |
 | --- | --- | --- | --- |
-| `NPTransactionRegistry::NPTransactionRegistry` | `src/Server/Shared/NPChannel2.cpp` | LobbyDaemon, SmartCouponDaemon | - |
+| `GameEventConfig::SetupGameEventListFromXml` | `src/Server/Shared/CouponGameEventConfig.cpp` | SmartCouponDaemon | - |
 | `NPChannel::~NPChannel` | `src/Server/Shared/NPChannel2.cpp` | LobbyDaemon, SmartCouponDaemon | - |
 | `NPChannel::SendMsg` | `src/Server/Shared/NPChannel2.cpp` | LobbyDaemon, SmartCouponDaemon | - |
 | `DecomposeShowcaseFsd` | `src/library/FsdReader/FsdDecomposer.h` | LobbyDaemon | - |
@@ -56,6 +58,7 @@ These functions are in shared source. They are not MATCH in each lifted exe that
 
 ## Files
 
+- `src/Server/Shared/CouponGameEventConfig.cpp`
 - `src/Server/Shared/NPChannel2.cpp`
 - `src/Server/GameDaemon/strsafe.cpp`
 - `src/Server/GameDaemon/strsafe.h`

@@ -1,4 +1,4 @@
-# lift-gamedaemon-55: DataReader: associativetable_cpp
+# lift-gamedaemon-55: DataReader: binarydatafile, associativetable_cpp, associativetable_h
 
 | Item | Value |
 | --- | --- |
@@ -10,7 +10,7 @@
 | Pseudocode index | `~/.cache/bns-lift/hr/GameDaemon/index.tsv` (stem, rva, name, first, last, status, source file, part) |
 | Wave | W2 |
 | Model | opus |
-| Depends on | `lift-gamedaemon-47`, `lift-gamedaemon-50` |
+| Depends on | `lift-gamedaemon-e14`, `lift-gamedaemon-52`, `lift-gamedaemon-56` |
 | Pattern | `src/library/FsdReader/FsdDecomposer.cpp` |
 | Plan | `Docs/Plan/gamedaemon-lift.md` sections 1, 3, 5 |
 
@@ -22,30 +22,38 @@
 
 ## Scope
 
-20 functions, about 1,017 pseudocode lines (about 8,136 tokens). Stems: `associativetable_cpp`.
+26 functions, about 1,749 pseudocode lines (about 13,992 tokens). Stems: `binarydatafile`, `associativetable_cpp`, `associativetable_h`.
+
+The easy functions of this stem are in `lift-gamedaemon-e14`. Do not change them unless a fix needs it.
 
 | n | Exe | RVA | PDB name | Stem | Lines |
 | ---: | --- | --- | --- | --- | ---: |
-| 1 | GD | `0x6fb1a0` | `DrMultiKeyTable::LoadAlias` | associativetable_cpp | 47 |
-| 2 | GD | `0x6fb280` | `DrMultiKeyTable::GetTableSummary` | associativetable_cpp | 32 |
-| 3 | GD | `0x6fb330` | `DrMultiKeyTable::Find` | associativetable_cpp | 7 |
-| 4 | GD | `0x6fb340` | `DrMultiKeyTable::createInnerIter` | associativetable_cpp | 37 |
-| 5 | GD | `0x6fb3f0` | `DrMultiKeyTable::removeInnerIter` | associativetable_cpp | 14 |
-| 6 | GD | `0x6fb440` | `DrMultiKeyElMap::count` | associativetable_cpp | 10 |
-| 7 | GD | `0x6fb490` | `DrMultiKeyTable::createInnerIter` | associativetable_cpp | 21 |
-| 8 | GD | `0x6fb9f0` | `DrMultiKeyTable::setup` | associativetable_cpp | 122 |
-| 9 | GD | `0x6fbc00` | `DrMultiKeyTable::LoadTable` | associativetable_cpp | 130 |
-| 10 | GD | `0x6fbe40` | `DrMultiKeyTable::LoadTableMT_PreProc` | associativetable_cpp | 107 |
-| 11 | GD | `0x6fc060` | `DrMultiKeyTable::LoadTableMT_PostProc` | associativetable_cpp | 59 |
-| 12 | GD | `0x6fc130` | `DrMultiKeyElMap::reconstruct` | associativetable_cpp | 94 |
-| 13 | GD | `0x6fc2e0` | `DrMultiKeyElMap::destroy` | associativetable_cpp | 23 |
-| 14 | GD | `0x6fc370` | `DrMultiKeyTable::clearElMap` | associativetable_cpp | 24 |
-| 15 | GD | `0x6fc3f0` | `DrMultiKeyTable::constructExtraBuffer` | associativetable_cpp | 108 |
-| 16 | GD | `0x6fc5c0` | `DrMultiKeyTable::FinishLoadTable` | associativetable_cpp | 11 |
-| 17 | GD | `0x6fc630` | `DrMultiKeyTable::PrepareLoadTable` | associativetable_cpp | 8 |
-| 18 | GD | `0x6fc640` | `DrMultiKeyTable::ReadFromBuffer` | associativetable_cpp | 115 |
-| 19 | GD | `0x6fc870` | `DrMultiKeyElMap::~DrMultiKeyElMap` | associativetable_cpp | 28 |
-| 20 | GD | `0x6fd210` | `DrMultiKeyTable::DrMultiKeyTable` | associativetable_cpp | 20 |
+| 1 | GD | `0x6fa370` | `BinaryDataFile::readFromMem` | binarydatafile | 187 |
+| 2 | GD | `0x6fa7b0` | `BinaryDataFile::readFromFileStream` | binarydatafile | 190 |
+| 3 | GD | `0x6fac30` | `BinaryDataFile::ReadFromMem` | binarydatafile | 40 |
+| 4 | GD | `0x6fad10` | `BinaryDataFile::ReadFromFileStream` | binarydatafile | 40 |
+| 5 | GD | `0x6fade0` | `BinaryDataFile::ReadFromFile` | binarydatafile | 80 |
+| 6 | GD | `0x6faff0` | `BinaryDataFile::ReadFromFileStream` | binarydatafile | 52 |
+| 7 | GD | `0x6fb1a0` | `DrMultiKeyTable::LoadAlias` | associativetable_cpp | 47 |
+| 8 | GD | `0x6fb280` | `DrMultiKeyTable::GetTableSummary` | associativetable_cpp | 32 |
+| 9 | GD | `0x6fb340` | `DrMultiKeyTable::createInnerIter` | associativetable_cpp | 37 |
+| 10 | GD | `0x6fb3f0` | `DrMultiKeyTable::removeInnerIter` | associativetable_cpp | 14 |
+| 11 | GD | `0x6fb490` | `DrMultiKeyTable::createInnerIter` | associativetable_cpp | 21 |
+| 12 | GD | `0x6fb9f0` | `DrMultiKeyTable::setup` | associativetable_cpp | 122 |
+| 13 | GD | `0x6fbc00` | `DrMultiKeyTable::LoadTable` | associativetable_cpp | 130 |
+| 14 | GD | `0x6fbe40` | `DrMultiKeyTable::LoadTableMT_PreProc` | associativetable_cpp | 107 |
+| 15 | GD | `0x6fc060` | `DrMultiKeyTable::LoadTableMT_PostProc` | associativetable_cpp | 59 |
+| 16 | GD | `0x6fc130` | `DrMultiKeyElMap::reconstruct` | associativetable_cpp | 94 |
+| 17 | GD | `0x6fc2e0` | `DrMultiKeyElMap::destroy` | associativetable_cpp | 23 |
+| 18 | GD | `0x6fc370` | `DrMultiKeyTable::clearElMap` | associativetable_cpp | 24 |
+| 19 | GD | `0x6fc3f0` | `DrMultiKeyTable::constructExtraBuffer` | associativetable_cpp | 108 |
+| 20 | GD | `0x6fc5c0` | `DrMultiKeyTable::FinishLoadTable` | associativetable_cpp | 11 |
+| 21 | GD | `0x6fc630` | `DrMultiKeyTable::PrepareLoadTable` | associativetable_cpp | 8 |
+| 22 | GD | `0x6fc640` | `DrMultiKeyTable::ReadFromBuffer` | associativetable_cpp | 115 |
+| 23 | GD | `0x6fc870` | `DrMultiKeyElMap::~DrMultiKeyElMap` | associativetable_cpp | 28 |
+| 24 | GD | `0x6fd210` | `DrMultiKeyTable::DrMultiKeyTable` | associativetable_cpp | 20 |
+| 25 | GD | `0x6fcd10` | `DrMultiKeyElMap::get` | associativetable_h | 74 |
+| 26 | GD | `0x6fd0f0` | `DrMultiKeyElMap::set` | associativetable_h | 86 |
 
 ## Tasks
 
@@ -57,8 +65,12 @@
 
 ## Files
 
+- `src/Server/GameDaemon/binarydatafile.cpp`
+- `src/Server/GameDaemon/binarydatafile.h`
 - `src/Server/GameDaemon/associativetable_cpp.cpp`
 - `src/Server/GameDaemon/associativetable_cpp.h`
+- `src/Server/GameDaemon/associativetable_h.cpp`
+- `src/Server/GameDaemon/associativetable_h.h`
 
 ## Handoff
 

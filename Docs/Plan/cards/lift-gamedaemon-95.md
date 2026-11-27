@@ -10,7 +10,7 @@
 | Pseudocode index | `~/.cache/bns-lift/hr/GameDaemon/index.tsv` (stem, rva, name, first, last, status, source file, part) |
 | Wave | W2 |
 | Model | opus |
-| Depends on | `lift-gamedaemon-94` |
+| Depends on | `lift-gamedaemon-e13`, `lift-gamedaemon-94` |
 | Pattern | none |
 | Plan | `Docs/Plan/gamedaemon-lift.md` sections 1, 3, 5 |
 
@@ -22,24 +22,24 @@
 
 ## Scope
 
-12 functions, about 2,106 pseudocode lines (about 16,848 tokens). Stems: `datamanager_cpp_3`.
+10 functions, about 1,480 pseudocode lines (about 11,840 tokens). Stems: `datamanager_cpp_3`.
+
+The easy functions of this stem are in `lift-gamedaemon-e13`. Do not change them unless a fix needs it.
 
 This card is part 9/10 of stem `datamanager_cpp_3`. The other parts are in other cards of this wave. They run one after the other (column "Depends on"). Edit only the functions in this table.
 
 | n | Exe | RVA | PDB name | Stem | Lines |
 | ---: | --- | --- | --- | --- | ---: |
-| 1 | GD | `0x65fac0` | `Data::validateItemFusion` | datamanager_cpp_3 | 80 |
-| 2 | GD | `0x65fc30` | `Data::openXmlReader` | datamanager_cpp_3 | 55 |
-| 3 | GD | `0x65fd10` | `Data::DataManager::getAcquireSkillByQuestMission` | datamanager_cpp_3 | 105 |
-| 4 | GD | `0x65fe60` | `Data::DataManager::constructMainFactionId` | datamanager_cpp_3 | 68 |
-| 5 | GD | `0x660020` | `Data::DataManager::getMaxWeaponGemSlot` | datamanager_cpp_3 | 184 |
-| 6 | GD | `0x6604f0` | `Data::DataManager::checkKeepWeaponGemSlot` | datamanager_cpp_3 | 305 |
-| 7 | GD | `0x660a10` | `Data::DataManager::checkKeepWeaponAppearance` | datamanager_cpp_3 | 367 |
-| 8 | GD | `0x6612a0` | `Data::DataManager::IsInWeeklyTime` | datamanager_cpp_3 | 101 |
-| 9 | GD | `0x661460` | `Data::DataManager::GetNearbyWeeklyTime` | datamanager_cpp_3 | 111 |
-| 10 | GD | `0x6616e0` | `Data::DataManager::checkDuplicatedWeeklyTimeTable` | datamanager_cpp_3 | 125 |
-| 11 | GD | `0x6618b0` | `Data::DataManager::AddArenaDaemonPersistentZone` | datamanager_cpp_3 | 59 |
-| 12 | GD | `0x6619b0` | `Data::validateConfigPreDataLoad` | datamanager_cpp_3 | 546 |
+| 1 | GD | `0x65fc30` | `Data::openXmlReader` | datamanager_cpp_3 | 55 |
+| 2 | GD | `0x65fd10` | `Data::DataManager::getAcquireSkillByQuestMission` | datamanager_cpp_3 | 105 |
+| 3 | GD | `0x65fe60` | `Data::DataManager::constructMainFactionId` | datamanager_cpp_3 | 68 |
+| 4 | GD | `0x660020` | `Data::DataManager::getMaxWeaponGemSlot` | datamanager_cpp_3 | 184 |
+| 5 | GD | `0x6604f0` | `Data::DataManager::checkKeepWeaponGemSlot` | datamanager_cpp_3 | 305 |
+| 6 | GD | `0x660a10` | `Data::DataManager::checkKeepWeaponAppearance` | datamanager_cpp_3 | 367 |
+| 7 | GD | `0x6612a0` | `Data::DataManager::IsInWeeklyTime` | datamanager_cpp_3 | 101 |
+| 8 | GD | `0x661460` | `Data::DataManager::GetNearbyWeeklyTime` | datamanager_cpp_3 | 111 |
+| 9 | GD | `0x6616e0` | `Data::DataManager::checkDuplicatedWeeklyTimeTable` | datamanager_cpp_3 | 125 |
+| 10 | GD | `0x6618b0` | `Data::DataManager::AddArenaDaemonPersistentZone` | datamanager_cpp_3 | 59 |
 
 ## Tasks
 

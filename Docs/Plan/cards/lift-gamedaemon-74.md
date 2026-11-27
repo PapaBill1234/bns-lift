@@ -10,7 +10,7 @@
 | Pseudocode index | `~/.cache/bns-lift/hr/GameDaemon/index.tsv` (stem, rva, name, first, last, status, source file, part) |
 | Wave | W2 |
 | Model | opus |
-| Depends on | `lift-gamedaemon-73` |
+| Depends on | `lift-gamedaemon-e26`, `lift-gamedaemon-73` |
 | Pattern | none |
 | Plan | `Docs/Plan/gamedaemon-lift.md` sections 1, 3, 5 |
 
@@ -22,27 +22,26 @@
 
 ## Scope
 
-15 functions, about 2,489 pseudocode lines (about 19,912 tokens). Stems: `datamanager_cpp_1`.
+12 functions, about 2,452 pseudocode lines (about 19,616 tokens). Stems: `datamanager_cpp_1`.
+
+The easy functions of this stem are in `lift-gamedaemon-e26`. Do not change them unless a fix needs it.
 
 This card is part 8/10 of stem `datamanager_cpp_1`. The other parts are in other cards of this wave. They run one after the other (column "Depends on"). Edit only the functions in this table.
 
 | n | Exe | RVA | PDB name | Stem | Lines |
 | ---: | --- | --- | --- | --- | ---: |
 | 1 | GD | `0x62b1f0` | `Data::DataManager::checkDisjoinedQuestReward` | datamanager_cpp_1 | 722 |
-| 2 | GD | `0x62be40` | `Data::DataManager::GetExp` | datamanager_cpp_1 | 18 |
-| 3 | GD | `0x62be90` | `Data::DataManager::AddExceedLevelData` | datamanager_cpp_1 | 159 |
-| 4 | GD | `0x62c1b0` | `Data::DataManager::GetAccountExp` | datamanager_cpp_1 | 18 |
-| 5 | GD | `0x62c210` | `Data::DataManager::GetQuotaKeyRecord` | datamanager_cpp_1 | 41 |
-| 6 | GD | `0x62c2b0` | `Data::DataManager::GetMasteryExp` | datamanager_cpp_1 | 18 |
-| 7 | GD | `0x62c300` | `Data::DataManager::GetGradeBenefitList` | datamanager_cpp_1 | 44 |
-| 8 | GD | `0x62c370` | `Data::DataManager::GetWeaponBrandMaxGemSlotCount` | datamanager_cpp_1 | 44 |
-| 9 | GD | `0x62c3e0` | `Data::DataManager::loadSoulNpcSkill` | datamanager_cpp_1 | 156 |
-| 10 | GD | `0x62c740` | `Data::DataManager::getNextSoulNpcSkills` | datamanager_cpp_1 | 89 |
-| 11 | GD | `0x62c910` | `Data::postprocNpc` | datamanager_cpp_1 | 14 |
-| 12 | GD | `0x62c980` | `Data::postprocNpcBrainParameters` | datamanager_cpp_1 | 37 |
-| 13 | GD | `0x62ca10` | `Data::postprocItem` | datamanager_cpp_1 | 631 |
-| 14 | GD | `0x62d390` | `Data::postprocReward` | datamanager_cpp_1 | 434 |
-| 15 | GD | `0x62da90` | `Data::postprocItemTransformUpgradeItem` | datamanager_cpp_1 | 64 |
+| 2 | GD | `0x62be90` | `Data::DataManager::AddExceedLevelData` | datamanager_cpp_1 | 159 |
+| 3 | GD | `0x62c210` | `Data::DataManager::GetQuotaKeyRecord` | datamanager_cpp_1 | 41 |
+| 4 | GD | `0x62c300` | `Data::DataManager::GetGradeBenefitList` | datamanager_cpp_1 | 44 |
+| 5 | GD | `0x62c370` | `Data::DataManager::GetWeaponBrandMaxGemSlotCount` | datamanager_cpp_1 | 44 |
+| 6 | GD | `0x62c3e0` | `Data::DataManager::loadSoulNpcSkill` | datamanager_cpp_1 | 156 |
+| 7 | GD | `0x62c740` | `Data::DataManager::getNextSoulNpcSkills` | datamanager_cpp_1 | 89 |
+| 8 | GD | `0x62c980` | `Data::postprocNpcBrainParameters` | datamanager_cpp_1 | 37 |
+| 9 | GD | `0x62ca10` | `Data::postprocItem` | datamanager_cpp_1 | 631 |
+| 10 | GD | `0x62d390` | `Data::postprocReward` | datamanager_cpp_1 | 434 |
+| 11 | GD | `0x62da90` | `Data::postprocItemTransformUpgradeItem` | datamanager_cpp_1 | 64 |
+| 12 | GD | `0x62dba0` | `Data::postprocExpandInventoryData` | datamanager_cpp_1 | 31 |
 
 ## Tasks
 

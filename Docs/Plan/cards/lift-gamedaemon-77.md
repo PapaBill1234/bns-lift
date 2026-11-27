@@ -10,7 +10,7 @@
 | Pseudocode index | `~/.cache/bns-lift/hr/GameDaemon/index.tsv` (stem, rva, name, first, last, status, source file, part) |
 | Wave | W2 |
 | Model | opus |
-| Depends on | `lift-gamedaemon-0e` |
+| Depends on | `lift-gamedaemon-e26` |
 | Pattern | none |
 | Plan | `Docs/Plan/gamedaemon-lift.md` sections 1, 3, 5 |
 
@@ -22,7 +22,9 @@
 
 ## Scope
 
-18 functions, about 2,456 pseudocode lines (about 19,648 tokens). Stems: `datamanager_cpp_2`.
+16 functions, about 2,399 pseudocode lines (about 19,192 tokens). Stems: `datamanager_cpp_2`.
+
+The easy functions of this stem are in `lift-gamedaemon-e26`. Do not change them unless a fix needs it.
 
 This card is part 1/10 of stem `datamanager_cpp_2`. The other parts are in other cards of this wave. They run one after the other (column "Depends on"). Edit only the functions in this table.
 
@@ -33,19 +35,17 @@ This card is part 1/10 of stem `datamanager_cpp_2`. The other parts are in other
 | 3 | GD | `0x631380` | `Data::DataManager::loadHiddenFieldFromFishingField` | datamanager_cpp_2 | 592 |
 | 4 | GD | `0x631c00` | `Data::DataManager::loadHiddenFieldFromItemBrand` | datamanager_cpp_2 | 484 |
 | 5 | GD | `0x632410` | `Data::DataManager::loadHiddenFieldFromContentsReset` | datamanager_cpp_2 | 180 |
-| 6 | GD | `0x632730` | `Data::DataManager::IsValidCombatSeasonContentsType` | datamanager_cpp_2 | 27 |
-| 7 | GD | `0x6327a0` | `Data::DataManager::GetCombatSeasonContentsTypeCount` | datamanager_cpp_2 | 33 |
-| 8 | GD | `0x632820` | `Data::DataManager::IsWarFieldMainZone` | datamanager_cpp_2 | 31 |
-| 9 | GD | `0x6328e0` | `Data::DataManager::GetBattleRoyalFieldScoreConversion` | datamanager_cpp_2 | 31 |
-| 10 | GD | `0x632990` | `Data::DataManager::GetGameModeFromArenaMatchingRuleDetailType` | datamanager_cpp_2 | 57 |
-| 11 | GD | `0x632a70` | `Data::DataManager::ConstructItemUsableKeyMap` | datamanager_cpp_2 | 147 |
-| 12 | GD | `0x632d70` | `Data::DataManager::IsItemUsable` | datamanager_cpp_2 | 191 |
-| 13 | GD | `0x633010` | `Data::DataManager::ConstructDuelBotTrainingRoomVersion` | datamanager_cpp_2 | 46 |
-| 14 | GD | `0x633110` | `Data::DataManager::ConstructRandomDistributionAccumulated` | datamanager_cpp_2 | 80 |
-| 15 | GD | `0x6332b0` | `Data::DataManager::GetRandRangeByDistribution` | datamanager_cpp_2 | 108 |
-| 16 | GD | `0x633410` | `Data::DataManager::GetNextSeasonContentsDefaultRatingScore` | datamanager_cpp_2 | 30 |
-| 17 | GD | `0x633490` | `Data::DataManager::FindSkillChildren` | datamanager_cpp_2 | 84 |
-| 18 | GD | `0x6335b0` | `Data::DataManager::FindSkill3Keys` | datamanager_cpp_2 | 89 |
+| 6 | GD | `0x6327a0` | `Data::DataManager::GetCombatSeasonContentsTypeCount` | datamanager_cpp_2 | 33 |
+| 7 | GD | `0x632820` | `Data::DataManager::IsWarFieldMainZone` | datamanager_cpp_2 | 31 |
+| 8 | GD | `0x6328e0` | `Data::DataManager::GetBattleRoyalFieldScoreConversion` | datamanager_cpp_2 | 31 |
+| 9 | GD | `0x632990` | `Data::DataManager::GetGameModeFromArenaMatchingRuleDetailType` | datamanager_cpp_2 | 57 |
+| 10 | GD | `0x632a70` | `Data::DataManager::ConstructItemUsableKeyMap` | datamanager_cpp_2 | 147 |
+| 11 | GD | `0x632d70` | `Data::DataManager::IsItemUsable` | datamanager_cpp_2 | 191 |
+| 12 | GD | `0x633010` | `Data::DataManager::ConstructDuelBotTrainingRoomVersion` | datamanager_cpp_2 | 46 |
+| 13 | GD | `0x633110` | `Data::DataManager::ConstructRandomDistributionAccumulated` | datamanager_cpp_2 | 80 |
+| 14 | GD | `0x6332b0` | `Data::DataManager::GetRandRangeByDistribution` | datamanager_cpp_2 | 108 |
+| 15 | GD | `0x633490` | `Data::DataManager::FindSkillChildren` | datamanager_cpp_2 | 84 |
+| 16 | GD | `0x6335b0` | `Data::DataManager::FindSkill3Keys` | datamanager_cpp_2 | 89 |
 
 ## Tasks
 

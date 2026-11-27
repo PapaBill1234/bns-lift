@@ -1,4 +1,4 @@
-# lift-gamedaemon-42: BloodLib: source_jsoncpp part 2/3
+# lift-gamedaemon-42: BloodLib: source_jsoncpp part 2/2
 
 | Item | Value |
 | --- | --- |
@@ -10,7 +10,7 @@
 | Pseudocode index | `~/.cache/bns-lift/hr/GameDaemon/index.tsv` (stem, rva, name, first, last, status, source file, part) |
 | Wave | W1 |
 | Model | opus |
-| Depends on | `lift-gamedaemon-41` |
+| Depends on | `lift-gamedaemon-e25`, `lift-gamedaemon-41` |
 | Pattern | none |
 | Plan | `Docs/Plan/gamedaemon-lift.md` sections 1, 3, 5 |
 
@@ -22,9 +22,11 @@
 
 ## Scope
 
-23 functions, about 1,028 pseudocode lines (about 8,224 tokens). Stems: `source_jsoncpp`.
+32 functions, about 2,465 pseudocode lines (about 19,720 tokens). Stems: `source_jsoncpp`.
 
-This card is part 2/3 of stem `source_jsoncpp`. The other parts are in other cards of this wave. They run one after the other (column "Depends on"). Edit only the functions in this table.
+The easy functions of this stem are in `lift-gamedaemon-e25`. Do not change them unless a fix needs it.
+
+This card is part 2/2 of stem `source_jsoncpp`. The other parts are in other cards of this wave. They run one after the other (column "Depends on"). Edit only the functions in this table.
 
 | n | Exe | RVA | PDB name | Stem | Lines |
 | ---: | --- | --- | --- | --- | ---: |
@@ -34,23 +36,32 @@ This card is part 2/3 of stem `source_jsoncpp`. The other parts are in other car
 | 4 | GD | `0x6a8100` | `Json::Reader::currentValue` | source_jsoncpp | 31 |
 | 5 | GD | `0x6a81d0` | `Json::duplicateStringValue` | source_jsoncpp | 31 |
 | 6 | GD | `0x6a8290` | `Json::duplicateAndPrefixStringValue` | source_jsoncpp | 45 |
-| 7 | GD | `0x6a83c0` | `Json::Exception::~Exception` | source_jsoncpp | 17 |
-| 8 | GD | `0x6a8420` | `Json::Exception::what` | source_jsoncpp | 13 |
-| 9 | GD | `0x6a8440` | `Json::throwRuntimeError` | source_jsoncpp | 22 |
-| 10 | GD | `0x6a8540` | `Json::throwLogicError` | source_jsoncpp | 22 |
-| 11 | GD | `0x6a8600` | `Json::Value::CommentInfo::~CommentInfo` | source_jsoncpp | 11 |
-| 12 | GD | `0x6a8620` | `Json::Value::CommentInfo::setComment` | source_jsoncpp | 36 |
-| 13 | GD | `0x6a8720` | `Json::Value::CZString::CZString` | source_jsoncpp | 26 |
-| 14 | GD | `0x6a87a0` | `Json::Value::CZString::~CZString` | source_jsoncpp | 11 |
-| 15 | GD | `0x6a87d0` | `Json::Value::CZString::operator<` | source_jsoncpp | 28 |
-| 16 | GD | `0x6a8850` | `Json::Value::Value` | source_jsoncpp | 86 |
-| 17 | GD | `0x6a8a10` | `Json::Value::~Value` | source_jsoncpp | 48 |
-| 18 | GD | `0x6a8ae0` | `Json::Value::operator=` | source_jsoncpp | 34 |
-| 19 | GD | `0x6a8b80` | `Json::Value::asString` | source_jsoncpp | 82 |
-| 20 | GD | `0x6a8d00` | `Json::Value::asInt` | source_jsoncpp | 88 |
-| 21 | GD | `0x6a8ea0` | `Json::Value::asInt64` | source_jsoncpp | 85 |
-| 22 | GD | `0x6a9010` | `Json::Value::asUInt64` | source_jsoncpp | 88 |
-| 23 | GD | `0x6a91a0` | `Json::Value::asDouble` | source_jsoncpp | 56 |
+| 7 | GD | `0x6a8620` | `Json::Value::CommentInfo::setComment` | source_jsoncpp | 36 |
+| 8 | GD | `0x6a8720` | `Json::Value::CZString::CZString` | source_jsoncpp | 26 |
+| 9 | GD | `0x6a8850` | `Json::Value::Value` | source_jsoncpp | 86 |
+| 10 | GD | `0x6a8a10` | `Json::Value::~Value` | source_jsoncpp | 48 |
+| 11 | GD | `0x6a8ae0` | `Json::Value::operator=` | source_jsoncpp | 34 |
+| 12 | GD | `0x6a8b80` | `Json::Value::asString` | source_jsoncpp | 82 |
+| 13 | GD | `0x6a8d00` | `Json::Value::asInt` | source_jsoncpp | 88 |
+| 14 | GD | `0x6a8ea0` | `Json::Value::asInt64` | source_jsoncpp | 85 |
+| 15 | GD | `0x6a9010` | `Json::Value::asUInt64` | source_jsoncpp | 88 |
+| 16 | GD | `0x6a91a0` | `Json::Value::asDouble` | source_jsoncpp | 56 |
+| 17 | GD | `0x6a9270` | `Json::Value::asFloat` | source_jsoncpp | 56 |
+| 18 | GD | `0x6a9340` | `Json::Value::asBool` | source_jsoncpp | 31 |
+| 19 | GD | `0x6a9400` | `Json::Value::size` | source_jsoncpp | 51 |
+| 20 | GD | `0x6a94b0` | `Json::Value::operator[]` | source_jsoncpp | 153 |
+| 21 | GD | `0x6a9780` | `Json::Value::operator[]` | source_jsoncpp | 90 |
+| 22 | GD | `0x6a98e0` | `Json::Value::operator[]` | source_jsoncpp | 23 |
+| 23 | GD | `0x6a9960` | `Json::Value::resolveReference` | source_jsoncpp | 177 |
+| 24 | GD | `0x6a9c80` | `Json::Value::find` | source_jsoncpp | 129 |
+| 25 | GD | `0x6a9e50` | `Json::Value::getMemberNames` | source_jsoncpp | 123 |
+| 26 | GD | `0x6aa110` | `Json::Value::isInt64` | source_jsoncpp | 34 |
+| 27 | GD | `0x6aa230` | `Json::Value::setComment` | source_jsoncpp | 31 |
+| 28 | GD | `0x6aa2e0` | `Json::valueToString` | source_jsoncpp | 53 |
+| 29 | GD | `0x6aa4f0` | `Json::valueToString` | source_jsoncpp | 73 |
+| 30 | GD | `0x6aa6e0` | `Json::valueToQuotedStringN` | source_jsoncpp | 292 |
+| 31 | GD | `0x6aad70` | `Json::FastWriter::write` | source_jsoncpp | 22 |
+| 32 | GD | `0x6aae10` | `Json::FastWriter::writeValue` | source_jsoncpp | 223 |
 
 ## Tasks
 

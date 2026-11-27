@@ -1,4 +1,4 @@
-# lift-gamedaemon-4: BloodLib: source_delayedrelease, httpclient, propertydb, source_timer
+# lift-gamedaemon-4: BloodLib: httpclient, propertydb, source_timer, logarchiveutil
 
 | Item | Value |
 | --- | --- |
@@ -11,43 +11,43 @@
 | Wave | W1 |
 | Model | opus |
 | Depends on | `lift-gamedaemon-2` |
-| Pattern | `src/Server/BloodLib/source/DelayedRelease.cpp` |
+| Pattern | `src/Server/BloodLib/source/Timer.cpp` |
 | Plan | `Docs/Plan/gamedaemon-lift.md` sections 1, 3, 5 |
 
 ## Read first
 
 - Read "Lift method" in `Docs/Plan/plan.md`.
 - Grep `Docs/Parity/lessons.md` for A2 (block order), A6 (per-exe path literals), A12 (PDB member types), A18 (destructors), A21 (PDB facts) and A22 (per-exe source form). Do not read it in full.
-- Pattern: `src/Server/BloodLib/source/DelayedRelease.cpp`. Read it one time. Use its form for the functions of this card.
+- Pattern: `src/Server/BloodLib/source/Timer.cpp`. Read it one time. Use its form for the functions of this card.
 
 ## Scope
 
-22 functions, about 1,474 pseudocode lines (about 11,792 tokens). Stems: `source_delayedrelease`, `httpclient`, `propertydb`, `source_timer`.
+22 functions, about 2,456 pseudocode lines (about 19,648 tokens). Stems: `httpclient`, `propertydb`, `source_timer`, `logarchiveutil`.
 
 | n | Exe | RVA | PDB name | Stem | Lines |
 | ---: | --- | --- | --- | --- | ---: |
-| 1 | GD | `0x6a11d0` | `DelayedRelease::DelayedRelease` | source_delayedrelease | 14 |
-| 2 | GD | `0x6a16d0` | `DelayedDelete::Add` | source_delayedrelease | 46 |
-| 3 | GD | `0x6a17c0` | `DelayedDelete::Delete` | source_delayedrelease | 80 |
-| 4 | GD | `0x6a1960` | `DelayedDelete::Cleanup` | source_delayedrelease | 22 |
-| 5 | GD | `0x6a19d0` | `DelayedDelete::deleteNode` | source_delayedrelease | 21 |
-| 6 | GD | `0x6a1a50` | `DeleteEvent::HandleEvent` | source_delayedrelease | 19 |
-| 7 | GD | `0x6a1af0` | `HTTPClient::~HTTPClient` | httpclient | 42 |
-| 8 | GD | `0x6a1c00` | `HTTPClient::Request` | httpclient | 139 |
-| 9 | GD | `0x6a1e80` | `HTTPClient::connect` | httpclient | 69 |
-| 10 | GD | `0x6a2080` | `HTTPClient::requestOfURI` | httpclient | 21 |
-| 11 | GD | `0x6a20b0` | `HTTPClient::responseOfBytes` | httpclient | 31 |
-| 12 | GD | `0x6a2180` | `HTTPClient::queryHttpInfo` | httpclient | 61 |
-| 13 | GD | `0x6a2300` | `HTTPClient::queryContentLength` | httpclient | 23 |
-| 14 | GD | `0x6a23a0` | `HTTPClient::response` | httpclient | 225 |
-| 15 | GD | `0x6a2810` | `HTTPClient::GetHttpResponseUnicodeString` | httpclient | 76 |
-| 16 | GD | `0x6a29c0` | `HTTPClient::parseURL` | httpclient | 194 |
-| 17 | GD | `0x6a2d30` | `HTTPClient::requestPostBody` | httpclient | 74 |
-| 18 | GD | `0x6a2e70` | `WebUtil::ConvertMultiByteToWideChar` | httpclient | 91 |
-| 19 | GD | `0x6a30a0` | `WebUtil::ConvertWideCharToMultiByte` | httpclient | 72 |
-| 20 | GD | `0x6ae310` | `DbSyncDefine::MakeWhereClause` | propertydb | 30 |
-| 21 | GD | `0x6ae400` | `QueryString::Append` | propertydb | 62 |
-| 22 | GD | `0x6b0ec0` | `TimerQueue::RemoveAndAdd` | source_timer | 62 |
+| 1 | GD | `0x6a1af0` | `HTTPClient::~HTTPClient` | httpclient | 42 |
+| 2 | GD | `0x6a1c00` | `HTTPClient::Request` | httpclient | 139 |
+| 3 | GD | `0x6a1e80` | `HTTPClient::connect` | httpclient | 69 |
+| 4 | GD | `0x6a2080` | `HTTPClient::requestOfURI` | httpclient | 21 |
+| 5 | GD | `0x6a20b0` | `HTTPClient::responseOfBytes` | httpclient | 31 |
+| 6 | GD | `0x6a2180` | `HTTPClient::queryHttpInfo` | httpclient | 61 |
+| 7 | GD | `0x6a2300` | `HTTPClient::queryContentLength` | httpclient | 23 |
+| 8 | GD | `0x6a23a0` | `HTTPClient::response` | httpclient | 225 |
+| 9 | GD | `0x6a2810` | `HTTPClient::GetHttpResponseUnicodeString` | httpclient | 76 |
+| 10 | GD | `0x6a29c0` | `HTTPClient::parseURL` | httpclient | 194 |
+| 11 | GD | `0x6a2d30` | `HTTPClient::requestPostBody` | httpclient | 74 |
+| 12 | GD | `0x6a2e70` | `WebUtil::ConvertMultiByteToWideChar` | httpclient | 91 |
+| 13 | GD | `0x6a30a0` | `WebUtil::ConvertWideCharToMultiByte` | httpclient | 72 |
+| 14 | GD | `0x6ae310` | `DbSyncDefine::MakeWhereClause` | propertydb | 30 |
+| 15 | GD | `0x6ae400` | `QueryString::Append` | propertydb | 62 |
+| 16 | GD | `0x6b0ec0` | `TimerQueue::RemoveAndAdd` | source_timer | 62 |
+| 17 | GD | `0x6b8130` | `LogArchiveUtil::GetUtf8StringSizeToTranslate` | logarchiveutil | 37 |
+| 18 | GD | `0x6b81e0` | `LogArchiveUtil::UnicodeToMultibyte` | logarchiveutil | 46 |
+| 19 | GD | `0x6b82e0` | `LogArchiveUtil::ComposeNetLogData` | logarchiveutil | 418 |
+| 20 | GD | `0x6b8cf0` | `LogArchiveUtil::ConvertNetDataToFileData` | logarchiveutil | 577 |
+| 21 | GD | `0x6b9af0` | `LogArchiveUtil::ReplaceOriginCharToSpecialChar` | logarchiveutil | 64 |
+| 22 | GD | `0x6b9ba0` | `LogArchiveUtil::GetAlphabetCount` | logarchiveutil | 42 |
 
 ## Tasks
 
@@ -59,14 +59,14 @@
 
 ## Files
 
-- `src/Server/GameDaemon/source_delayedrelease.cpp`
-- `src/Server/GameDaemon/source_delayedrelease.h`
 - `src/Server/GameDaemon/httpclient.cpp`
 - `src/Server/GameDaemon/httpclient.h`
 - `src/Server/GameDaemon/propertydb.cpp`
 - `src/Server/GameDaemon/propertydb.h`
 - `src/Server/GameDaemon/source_timer.cpp`
 - `src/Server/GameDaemon/source_timer.h`
+- `src/Server/GameDaemon/logarchiveutil.cpp`
+- `src/Server/GameDaemon/logarchiveutil.h`
 
 ## Handoff
 

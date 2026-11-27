@@ -10,7 +10,7 @@
 | Pseudocode index | `~/.cache/bns-lift/hr/GameDaemon/index.tsv` (stem, rva, name, first, last, status, source file, part) |
 | Wave | W2 |
 | Model | opus |
-| Depends on | `lift-gamedaemon-90` |
+| Depends on | `lift-gamedaemon-e13`, `lift-gamedaemon-90` |
 | Pattern | none |
 | Plan | `Docs/Plan/gamedaemon-lift.md` sections 1, 3, 5 |
 
@@ -23,6 +23,8 @@
 ## Scope
 
 8 functions, about 2,445 pseudocode lines (about 19,560 tokens). Stems: `datamanager_cpp_3`.
+
+The easy functions of this stem are in `lift-gamedaemon-e13`. Do not change them unless a fix needs it.
 
 This card is part 5/10 of stem `datamanager_cpp_3`. The other parts are in other cards of this wave. They run one after the other (column "Depends on"). Edit only the functions in this table.
 

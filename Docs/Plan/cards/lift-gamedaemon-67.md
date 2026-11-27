@@ -10,7 +10,7 @@
 | Pseudocode index | `~/.cache/bns-lift/hr/GameDaemon/index.tsv` (stem, rva, name, first, last, status, source file, part) |
 | Wave | W2 |
 | Model | opus |
-| Depends on | `lift-gamedaemon-47` |
+| Depends on | `lift-gamedaemon-e26` |
 | Pattern | none |
 | Plan | `Docs/Plan/gamedaemon-lift.md` sections 1, 3, 5 |
 
@@ -22,39 +22,31 @@
 
 ## Scope
 
-27 functions, about 1,292 pseudocode lines (about 10,336 tokens). Stems: `datamanager_cpp_1`.
+17 functions, about 1,139 pseudocode lines (about 9,112 tokens). Stems: `datamanager_cpp_1`.
+
+The easy functions of this stem are in `lift-gamedaemon-e26`. Do not change them unless a fix needs it.
 
 This card is part 1/10 of stem `datamanager_cpp_1`. The other parts are in other cards of this wave. They run one after the other (column "Depends on"). Edit only the functions in this table.
 
 | n | Exe | RVA | PDB name | Stem | Lines |
 | ---: | --- | --- | --- | --- | ---: |
-| 1 | GD | `0x616f60` | `Data::DataStaticMemoryManager::Alloc` | datamanager_cpp_1 | 11 |
-| 2 | GD | `0x616f70` | `Data::DataStaticMemoryManager::Realloc` | datamanager_cpp_1 | 12 |
-| 3 | GD | `0x616f90` | `Data::DataStaticMemoryManager::Free` | datamanager_cpp_1 | 11 |
-| 4 | GD | `0x616fb0` | `Data::WriteDataManagerLog` | datamanager_cpp_1 | 16 |
-| 5 | GD | `0x617060` | `Data::GamedGeoDataLog::WriteErrorV` | datamanager_cpp_1 | 12 |
-| 6 | GD | `0x617090` | `Data::GamedGeoDataLog::WriteDebugV` | datamanager_cpp_1 | 12 |
-| 7 | GD | `0x6170c0` | `Data::GamedGeoDataLog::WriteTraceV` | datamanager_cpp_1 | 12 |
-| 8 | GD | `0x6170f0` | `Data::XmlReaderLogger::Error` | datamanager_cpp_1 | 15 |
-| 9 | GD | `0x617130` | `Data::XmlReaderLogger::Debug` | datamanager_cpp_1 | 15 |
-| 10 | GD | `0x617170` | `Data::XmlReaderLogger::Trace` | datamanager_cpp_1 | 15 |
-| 11 | GD | `0x6171b0` | `Data::DataLogger::Write` | datamanager_cpp_1 | 39 |
-| 12 | GD | `0x617290` | `Data::NoneSpecifyObjectQuestForwarding::AddNoneSpecifyObjectQuestForwardingInfo` | datamanager_cpp_1 | 34 |
-| 13 | GD | `0x617320` | `Data::JumpingCharacterData::JumpingCharacterData` | datamanager_cpp_1 | 54 |
-| 14 | GD | `0x617490` | `Data::JumpingCharacterData::~JumpingCharacterData` | datamanager_cpp_1 | 21 |
-| 15 | GD | `0x617500` | `Data::JumpingCharacterData::addJumpingQuest` | datamanager_cpp_1 | 77 |
-| 16 | GD | `0x617630` | `Data::JumpingCharacterData::addJumpingTeleport` | datamanager_cpp_1 | 78 |
-| 17 | GD | `0x617760` | `Data::JumpingCharacterData::addJumpingCharacter` | datamanager_cpp_1 | 72 |
-| 18 | GD | `0x617880` | `Data::JumpingCharacterData::addJumpingTutorialZone` | datamanager_cpp_1 | 74 |
-| 19 | GD | `0x6179a0` | `Data::JumpingCharacterData2::JumpingCharacterData2` | datamanager_cpp_1 | 46 |
-| 20 | GD | `0x617a90` | `Data::JumpingCharacterData2::~JumpingCharacterData2` | datamanager_cpp_1 | 21 |
-| 21 | GD | `0x617b10` | `Data::JumpingCharacterData2::AddJumpingCharacterQuestsToComplete` | datamanager_cpp_1 | 231 |
-| 22 | GD | `0x617f20` | `Data::JumpingCharacterData2::AddJumpingQuest` | datamanager_cpp_1 | 127 |
-| 23 | GD | `0x6181b0` | `Data::JumpingCharacterData2::AddJumpingTeleport` | datamanager_cpp_1 | 62 |
-| 24 | GD | `0x618280` | `Data::SlateRelationCache::~SlateRelationCache` | datamanager_cpp_1 | 25 |
-| 25 | GD | `0x6182f0` | `Data::SlateRelationCache::init` | datamanager_cpp_1 | 35 |
-| 26 | GD | `0x618390` | `Data::SlateRelationCache::addStoneCache` | datamanager_cpp_1 | 50 |
-| 27 | GD | `0x618450` | `Data::DataManager::InitInstance` | datamanager_cpp_1 | 115 |
+| 1 | GD | `0x6170f0` | `Data::XmlReaderLogger::Error` | datamanager_cpp_1 | 15 |
+| 2 | GD | `0x617130` | `Data::XmlReaderLogger::Debug` | datamanager_cpp_1 | 15 |
+| 3 | GD | `0x617170` | `Data::XmlReaderLogger::Trace` | datamanager_cpp_1 | 15 |
+| 4 | GD | `0x6171b0` | `Data::DataLogger::Write` | datamanager_cpp_1 | 39 |
+| 5 | GD | `0x617290` | `Data::NoneSpecifyObjectQuestForwarding::AddNoneSpecifyObjectQuestForwardingInfo` | datamanager_cpp_1 | 34 |
+| 6 | GD | `0x617320` | `Data::JumpingCharacterData::JumpingCharacterData` | datamanager_cpp_1 | 54 |
+| 7 | GD | `0x617500` | `Data::JumpingCharacterData::addJumpingQuest` | datamanager_cpp_1 | 77 |
+| 8 | GD | `0x617630` | `Data::JumpingCharacterData::addJumpingTeleport` | datamanager_cpp_1 | 78 |
+| 9 | GD | `0x617760` | `Data::JumpingCharacterData::addJumpingCharacter` | datamanager_cpp_1 | 72 |
+| 10 | GD | `0x617880` | `Data::JumpingCharacterData::addJumpingTutorialZone` | datamanager_cpp_1 | 74 |
+| 11 | GD | `0x6179a0` | `Data::JumpingCharacterData2::JumpingCharacterData2` | datamanager_cpp_1 | 46 |
+| 12 | GD | `0x617b10` | `Data::JumpingCharacterData2::AddJumpingCharacterQuestsToComplete` | datamanager_cpp_1 | 231 |
+| 13 | GD | `0x617f20` | `Data::JumpingCharacterData2::AddJumpingQuest` | datamanager_cpp_1 | 127 |
+| 14 | GD | `0x6181b0` | `Data::JumpingCharacterData2::AddJumpingTeleport` | datamanager_cpp_1 | 62 |
+| 15 | GD | `0x6182f0` | `Data::SlateRelationCache::init` | datamanager_cpp_1 | 35 |
+| 16 | GD | `0x618390` | `Data::SlateRelationCache::addStoneCache` | datamanager_cpp_1 | 50 |
+| 17 | GD | `0x618450` | `Data::DataManager::InitInstance` | datamanager_cpp_1 | 115 |
 
 ## Tasks
 

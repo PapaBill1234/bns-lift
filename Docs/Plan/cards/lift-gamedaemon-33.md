@@ -1,4 +1,4 @@
-# lift-gamedaemon-33: Shared gaps and BloodLib: port, source_pipeconsole, windowconsole, ioworkerthread_cpp, ...
+# lift-gamedaemon-33: Shared gaps and BloodLib: source_pipeconsole, windowconsole, ioworkerthread_cpp, connection, ...
 
 | Item | Value |
 | --- | --- |
@@ -10,7 +10,7 @@
 | Pseudocode index | `~/.cache/bns-lift/hr/GameDaemon/index.tsv` (stem, rva, name, first, last, status, source file, part) |
 | Wave | W1 |
 | Model | opus |
-| Depends on | `lift-gamedaemon-2`, `lift-gamedaemon-10` |
+| Depends on | `lift-gamedaemon-e45`, `lift-gamedaemon-2` |
 | Pattern | `src/Server/BloodLib/source/PipeConsole.cpp` |
 | Plan | `Docs/Plan/gamedaemon-lift.md` sections 1, 3, 5 |
 
@@ -22,27 +22,29 @@
 
 ## Scope
 
-17 functions, about 1,485 pseudocode lines (about 11,880 tokens). Stems: `port`, `source_pipeconsole`, `windowconsole`, `ioworkerthread_cpp`, `connection`.
+17 functions, about 1,547 pseudocode lines (about 12,376 tokens). Stems: `source_pipeconsole`, `windowconsole`, `ioworkerthread_cpp`, `connection`, `listener`.
+
+The easy functions of this stem are in `lift-gamedaemon-e45`. Do not change them unless a fix needs it.
 
 | n | Exe | RVA | PDB name | Stem | Lines |
 | ---: | --- | --- | --- | --- | ---: |
-| 1 | GD | `0x6a3660` | `SessionPool::SessionPool` | port | 46 |
-| 2 | GD | `0x6a3780` | `SessionPool::~SessionPool` | port | 34 |
-| 3 | GD | `0x6a3c90` | `Port::Initialize` | port | 107 |
-| 4 | GD | `0x6aefc0` | `PipeCommandProcess::processCommand` | source_pipeconsole | 117 |
-| 5 | GD | `0x6af430` | `PipeConsole::processCommand` | source_pipeconsole | 203 |
-| 6 | GD | `0x6af620` | `PipeConsole::checkFrozenThread` | source_pipeconsole | 170 |
-| 7 | GD | `0x6afd40` | `PipeConsole::run` | source_pipeconsole | 143 |
-| 8 | GD | `0x6b0450` | `PipeConsole::SetInvalidInfo` | source_pipeconsole | 80 |
-| 9 | GD | `0x6b0580` | `PipeConsole::addNode` | source_pipeconsole | 25 |
-| 10 | GD | `0x6b06d0` | `PipeConsole::cleanup` | source_pipeconsole | 97 |
-| 11 | GD | `0x6b1520` | `WindowConsole::WindowConsole` | windowconsole | 21 |
-| 12 | GD | `0x6b1650` | `WindowConsole::Open` | windowconsole | 109 |
-| 13 | GD | `0x6b1920` | `WindowConsole::Close` | windowconsole | 28 |
-| 14 | GD | `0x6b7880` | `IoWorker::run` | ioworkerthread_cpp | 145 |
-| 15 | GD | `0x6b7ba0` | `IoWorker::handleFailedEvent` | ioworkerthread_cpp | 34 |
-| 16 | GD | `0x6bd800` | `Connection::Accept` | connection | 59 |
-| 17 | GD | `0x6bd960` | `Connection::Connect` | connection | 67 |
+| 1 | GD | `0x6aefc0` | `PipeCommandProcess::processCommand` | source_pipeconsole | 117 |
+| 2 | GD | `0x6af430` | `PipeConsole::processCommand` | source_pipeconsole | 203 |
+| 3 | GD | `0x6af620` | `PipeConsole::checkFrozenThread` | source_pipeconsole | 170 |
+| 4 | GD | `0x6afd40` | `PipeConsole::run` | source_pipeconsole | 143 |
+| 5 | GD | `0x6b0450` | `PipeConsole::SetInvalidInfo` | source_pipeconsole | 80 |
+| 6 | GD | `0x6b06d0` | `PipeConsole::cleanup` | source_pipeconsole | 97 |
+| 7 | GD | `0x6b1520` | `WindowConsole::WindowConsole` | windowconsole | 21 |
+| 8 | GD | `0x6b1650` | `WindowConsole::Open` | windowconsole | 109 |
+| 9 | GD | `0x6b1920` | `WindowConsole::Close` | windowconsole | 28 |
+| 10 | GD | `0x6b7880` | `IoWorker::run` | ioworkerthread_cpp | 145 |
+| 11 | GD | `0x6b7ba0` | `IoWorker::handleFailedEvent` | ioworkerthread_cpp | 34 |
+| 12 | GD | `0x6bd800` | `Connection::Accept` | connection | 59 |
+| 13 | GD | `0x6bd960` | `Connection::Connect` | connection | 67 |
+| 14 | GD | `0x6be110` | `PortListener::Initialize` | listener | 90 |
+| 15 | GD | `0x6be4a0` | `PortListener::HandleFailedEvent` | listener | 30 |
+| 16 | GD | `0x6be530` | `PortListener::asyncAccept` | listener | 42 |
+| 17 | GD | `0x6be650` | `PortListener::accept` | listener | 112 |
 
 ### Shared functions
 
@@ -50,21 +52,21 @@ These functions are in shared source. They are not MATCH in each lifted exe that
 
 | PDB name | Shared file | Other exes | Note |
 | --- | --- | --- | --- |
-| `SessionPool::SessionPool` | `src/Server/BloodLib/source/Port.cpp` | CacheGate, LobbyDaemon, LobbyGate, PostOfficeDaemon, SmartCouponDaemon | - |
-| `SessionPool::~SessionPool` | `src/Server/BloodLib/source/Port.cpp` | CacheGate, LobbyDaemon, LobbyGate, PostOfficeDaemon, SmartCouponDaemon | - |
-| `Port::Initialize` | `src/Server/BloodLib/source/Port.cpp` | CacheGate, LobbyDaemon, LobbyGate, PostOfficeDaemon, SmartCouponDaemon | EXCLUDED in LobbyDaemon: read its `excluded.tsv` row first |
 | `PipeCommandProcess::processCommand` | `src/Server/BloodLib/source/PipeConsole.cpp` | CacheGate, LobbyDaemon, LobbyGate, PostOfficeDaemon, SmartCouponDaemon | - |
 | `PipeConsole::processCommand` | `src/Server/BloodLib/source/PipeConsole.cpp` | CacheGate, LobbyDaemon, LobbyGate, PostOfficeDaemon, SmartCouponDaemon | - |
 | `PipeConsole::checkFrozenThread` | `src/Server/BloodLib/source/PipeConsole.cpp` | CacheGate, LobbyDaemon, LobbyGate, PostOfficeDaemon, SmartCouponDaemon | - |
 | `PipeConsole::run` | `src/Server/BloodLib/source/PipeConsole.cpp` | CacheGate, LobbyDaemon, LobbyGate, PostOfficeDaemon, SmartCouponDaemon | - |
 | `PipeConsole::SetInvalidInfo` | `src/Server/BloodLib/source/PipeConsole.cpp` | CacheGate, LobbyDaemon, PostOfficeDaemon, SmartCouponDaemon | - |
-| `PipeConsole::addNode` | `src/Server/BloodLib/source/PipeConsole.cpp` | CacheGate, LobbyDaemon, LobbyGate, PostOfficeDaemon, SmartCouponDaemon | - |
 | `PipeConsole::cleanup` | `src/Server/BloodLib/source/PipeConsole.cpp` | CacheGate, LobbyDaemon, LobbyGate, PostOfficeDaemon, SmartCouponDaemon | - |
 | `WindowConsole::WindowConsole` | `src/Server/BloodLib/source/WindowConsole.cpp` | CacheGate, LobbyDaemon, LobbyGate, PostOfficeDaemon, SmartCouponDaemon | EXCLUDED in LobbyDaemon: read its `excluded.tsv` row first |
 | `WindowConsole::Open` | `src/Server/BloodLib/source/WindowConsole.cpp` | CacheGate, LobbyDaemon, LobbyGate, PostOfficeDaemon, SmartCouponDaemon | - |
 | `WindowConsole::Close` | `src/Server/BloodLib/source/WindowConsole.cpp` | CacheGate, LobbyDaemon, LobbyGate, PostOfficeDaemon, SmartCouponDaemon | - |
 | `IoWorker::run` | `src/Server/BloodLib/source/IoWorkerThread.cpp` | CacheGate, LobbyDaemon, LobbyGate, PostOfficeDaemon, SmartCouponDaemon | - |
 | `Connection::Accept` | `src/Server/BloodLib/source/Connection.cpp` | CacheGate, LobbyDaemon, LobbyGate, PostOfficeDaemon, SmartCouponDaemon | EXCLUDED in LobbyDaemon: read its `excluded.tsv` row first |
+| `PortListener::Initialize` | `src/Server/BloodLib/source/Listener.cpp` | CacheGate, LobbyDaemon, LobbyGate, PostOfficeDaemon, SmartCouponDaemon | EXCLUDED in LobbyDaemon: read its `excluded.tsv` row first |
+| `PortListener::HandleFailedEvent` | `src/Server/BloodLib/source/Listener.cpp` | CacheGate, LobbyDaemon, LobbyGate, PostOfficeDaemon, SmartCouponDaemon | EXCLUDED in LobbyDaemon: read its `excluded.tsv` row first |
+| `PortListener::asyncAccept` | `src/Server/BloodLib/source/Listener.cpp` | CacheGate, LobbyDaemon, LobbyGate, PostOfficeDaemon, SmartCouponDaemon | EXCLUDED in LobbyDaemon: read its `excluded.tsv` row first |
+| `PortListener::accept` | `src/Server/BloodLib/source/Listener.cpp` | CacheGate, LobbyDaemon, LobbyGate, PostOfficeDaemon, SmartCouponDaemon | - |
 
 ## Tasks
 
@@ -78,7 +80,6 @@ These functions are in shared source. They are not MATCH in each lifted exe that
 
 ## Files
 
-- `src/Server/BloodLib/source/Port.cpp`
 - `src/Server/BloodLib/source/PipeConsole.cpp`
 - `src/Server/BloodLib/source/WindowConsole.cpp`
 - `src/Server/GameDaemon/ioworkerthread_cpp.cpp`
@@ -87,6 +88,7 @@ These functions are in shared source. They are not MATCH in each lifted exe that
 - `src/Server/GameDaemon/connection.cpp`
 - `src/Server/GameDaemon/connection.h`
 - `src/Server/BloodLib/source/Connection.cpp`
+- `src/Server/BloodLib/source/Listener.cpp`
 
 ## Handoff
 

@@ -1,4 +1,4 @@
-# lift-gamedaemon-3: BloodLib and Shared gaps: daemon, source_packet, source_packetutil, source_refcntobject
+# lift-gamedaemon-3: BloodLib and Shared gaps: propertysync, daemon, source_packet, source_packetutil, ...
 
 | Item | Value |
 | --- | --- |
@@ -10,7 +10,7 @@
 | Pseudocode index | `~/.cache/bns-lift/hr/GameDaemon/index.tsv` (stem, rva, name, first, last, status, source file, part) |
 | Wave | W1 |
 | Model | opus |
-| Depends on | `lift-gamedaemon-1`, `lift-gamedaemon-2` |
+| Depends on | `lift-gamedaemon-e25`, `lift-gamedaemon-e45`, `lift-gamedaemon-1` |
 | Pattern | `src/Server/BloodLib/source/PacketUtil.cpp` |
 | Plan | `Docs/Plan/gamedaemon-lift.md` sections 1, 3, 5 |
 
@@ -22,32 +22,33 @@
 
 ## Scope
 
-22 functions, about 832 pseudocode lines (about 6,656 tokens). Stems: `daemon`, `source_packet`, `source_packetutil`, `source_refcntobject`.
+21 functions, about 1,297 pseudocode lines (about 10,376 tokens). Stems: `propertysync`, `daemon`, `source_packet`, `source_packetutil`, `source_refcntobject`.
+
+The easy functions of this stem are in `lift-gamedaemon-e45`, `lift-gamedaemon-e25`. Do not change them unless a fix needs it.
 
 | n | Exe | RVA | PDB name | Stem | Lines |
 | ---: | --- | --- | --- | --- | ---: |
-| 1 | GD | `0x68cf50` | `Daemon::AddDelayedRelease` | daemon | 23 |
-| 2 | GD | `0x68d9e0` | `Daemon::SetPublicAddressWithSetting` | daemon | 11 |
-| 3 | GD | `0x68dba0` | `parseCIDRAddress` | daemon | 25 |
-| 4 | GD | `0x68dcc0` | `Daemon::setInternalAddressRange` | daemon | 28 |
-| 5 | GD | `0x68dd50` | `Daemon::setPublicAddressRange` | daemon | 28 |
-| 6 | GD | `0x68dde0` | `Daemon::allocateZstdDictionary` | daemon | 97 |
-| 7 | GD | `0x6910a0` | `Packet::Reserve` | source_packet | 51 |
-| 8 | GD | `0x6912c0` | `Packet::GrowAdd` | source_packet | 28 |
-| 9 | GD | `0x6915e0` | `Packet::Restore` | source_packet | 23 |
-| 10 | GD | `0x691ef0` | `Packet::DecomposeV` | source_packet | 59 |
-| 11 | GD | `0x692220` | `Packet::setRecvBuffer` | source_packet | 17 |
-| 12 | GD | `0x692840` | `RepeatPacketComposer::PushInnerPacket` | source_packetutil | 33 |
-| 13 | GD | `0x692960` | `RepeatPacketComposer::PopInnerPacket` | source_packetutil | 39 |
-| 14 | GD | `0x693170` | `PacketConcatenateBuffer::Decompose` | source_packetutil | 32 |
-| 15 | GD | `0x693240` | `PacketConcatenateBuffer::DecomposeV` | source_packetutil | 27 |
-| 16 | GD | `0x6934a0` | `RelationalRefCntObject::initRole` | source_refcntobject | 64 |
-| 17 | GD | `0x6935c0` | `RelationalRefCntObject::clearRole` | source_refcntobject | 24 |
+| 1 | GD | `0x687ce0` | `SyncBuffer::~SyncBuffer` | propertysync | 48 |
+| 2 | GD | `0x687df0` | `SyncBuffer::Initialize` | propertysync | 81 |
+| 3 | GD | `0x687fc0` | `SyncBuffer::Initialize` | propertysync | 40 |
+| 4 | GD | `0x6880c0` | `SyncBuffer::Clear` | propertysync | 36 |
+| 5 | GD | `0x688130` | `SyncBuffer::Copy` | propertysync | 32 |
+| 6 | GD | `0x6881b0` | `SyncBuffer::Set` | propertysync | 193 |
+| 7 | GD | `0x688560` | `SyncBuffer::set` | propertysync | 188 |
+| 8 | GD | `0x6888d0` | `SyncBuffer::setString` | propertysync | 51 |
+| 9 | GD | `0x68dcc0` | `Daemon::setInternalAddressRange` | daemon | 28 |
+| 10 | GD | `0x68dd50` | `Daemon::setPublicAddressRange` | daemon | 28 |
+| 11 | GD | `0x68dde0` | `Daemon::allocateZstdDictionary` | daemon | 97 |
+| 12 | GD | `0x6910a0` | `Packet::Reserve` | source_packet | 51 |
+| 13 | GD | `0x691ef0` | `Packet::DecomposeV` | source_packet | 59 |
+| 14 | GD | `0x692840` | `RepeatPacketComposer::PushInnerPacket` | source_packetutil | 33 |
+| 15 | GD | `0x692960` | `RepeatPacketComposer::PopInnerPacket` | source_packetutil | 39 |
+| 16 | GD | `0x693170` | `PacketConcatenateBuffer::Decompose` | source_packetutil | 32 |
+| 17 | GD | `0x6934a0` | `RelationalRefCntObject::initRole` | source_refcntobject | 64 |
 | 18 | GD | `0x693640` | `RelationalRefCntObject::AddChild` | source_refcntobject | 53 |
 | 19 | GD | `0x693800` | `RelationalRefCntObject::removeChild` | source_refcntobject | 49 |
 | 20 | GD | `0x6939a0` | `RelationalRefCntObject::removeParent` | source_refcntobject | 40 |
-| 21 | GD | `0x693a60` | `RelationalRefCntObject::remove_child` | source_refcntobject | 26 |
-| 22 | GD | `0x693ae0` | `RelationalRefCntObject::deallocate_object` | source_refcntobject | 55 |
+| 21 | GD | `0x693ae0` | `RelationalRefCntObject::deallocate_object` | source_refcntobject | 55 |
 
 ### Shared functions
 
@@ -69,6 +70,8 @@ These functions are in shared source. They are not MATCH in each lifted exe that
 
 ## Files
 
+- `src/Server/GameDaemon/propertysync.cpp`
+- `src/Server/GameDaemon/propertysync.h`
 - `src/Server/GameDaemon/daemon.cpp`
 - `src/Server/GameDaemon/daemon.h`
 - `src/Server/GameDaemon/source_packet.cpp`

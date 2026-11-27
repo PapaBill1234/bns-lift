@@ -1,4 +1,4 @@
-# lift-gamedaemon-12: BloodLib: source_logarchive, stringbuilder, source_logfile, source_lognetwork
+# lift-gamedaemon-12: BloodLib: source_logarchive, source_lognetwork, source_delayedrelease
 
 | Item | Value |
 | --- | --- |
@@ -10,19 +10,21 @@
 | Pseudocode index | `~/.cache/bns-lift/hr/GameDaemon/index.tsv` (stem, rva, name, first, last, status, source file, part) |
 | Wave | W1 |
 | Model | opus |
-| Depends on | `lift-gamedaemon-2`, `lift-gamedaemon-8`, `lift-gamedaemon-11` |
-| Pattern | `src/Server/BloodLib/source/LogFile.cpp` |
+| Depends on | `lift-gamedaemon-e12`, `lift-gamedaemon-e25`, `lift-gamedaemon-2`, `lift-gamedaemon-4`, `lift-gamedaemon-11` |
+| Pattern | `src/Server/BloodLib/source/DelayedRelease.cpp` |
 | Plan | `Docs/Plan/gamedaemon-lift.md` sections 1, 3, 5 |
 
 ## Read first
 
 - Read "Lift method" in `Docs/Plan/plan.md`.
 - Grep `Docs/Parity/lessons.md` for A2 (block order), A6 (per-exe path literals), A12 (PDB member types), A18 (destructors), A21 (PDB facts) and A22 (per-exe source form). Do not read it in full.
-- Pattern: `src/Server/BloodLib/source/LogFile.cpp`. Read it one time. Use its form for the functions of this card.
+- Pattern: `src/Server/BloodLib/source/DelayedRelease.cpp`. Read it one time. Use its form for the functions of this card.
 
 ## Scope
 
-27 functions, about 1,638 pseudocode lines (about 13,104 tokens). Stems: `source_logarchive`, `stringbuilder`, `source_logfile`, `source_lognetwork`.
+23 functions, about 1,660 pseudocode lines (about 13,280 tokens). Stems: `source_logarchive`, `source_lognetwork`, `source_delayedrelease`.
+
+The easy functions of this stem are in `lift-gamedaemon-e12`, `lift-gamedaemon-e25`. Do not change them unless a fix needs it.
 
 | n | Exe | RVA | PDB name | Stem | Lines |
 | ---: | --- | --- | --- | --- | ---: |
@@ -33,26 +35,22 @@
 | 5 | GD | `0x694810` | `LogArchive::Write` | source_logarchive | 57 |
 | 6 | GD | `0x694980` | `LogArchive::run` | source_logarchive | 85 |
 | 7 | GD | `0x694b90` | `LogArchive::AccessLogServer` | source_logarchive | 156 |
-| 8 | GD | `0x695070` | `LogArchive::IsUnsentFileExist` | source_logarchive | 25 |
-| 9 | GD | `0x695150` | `LogArchive::ChangeFileMode` | source_logarchive | 32 |
-| 10 | GD | `0x6951e0` | `LogArchive::constructEventArray` | source_logarchive | 56 |
-| 11 | GD | `0x6952f0` | `LogArchive::processTimeout` | source_logarchive | 29 |
-| 12 | GD | `0x6953d0` | `LogArchive::processEventInFileMode` | source_logarchive | 35 |
-| 13 | GD | `0x6954a0` | `LogArchive::processEventInNetMode` | source_logarchive | 30 |
-| 14 | GD | `0x695530` | `LogArchive::flush` | source_logarchive | 27 |
-| 15 | GD | `0x6955b0` | `LogArchive::write` | source_logarchive | 31 |
-| 16 | GD | `0x695610` | `LogArchive::pushLogData` | source_logarchive | 76 |
-| 17 | GD | `0x695870` | `LogArchive::isPingTimeExpired` | source_logarchive | 15 |
-| 18 | GD | `0x6958f0` | `LogArchive::pushPingReqPacket` | source_logarchive | 60 |
-| 19 | GD | `0x695aa0` | `LogArchive::startupWinSockLib` | source_logarchive | 14 |
-| 20 | GD | `0x69dd00` | `StringBuilderW::~StringBuilderW` | stringbuilder | 8 |
-| 21 | GD | `0x69dd40` | `StringBuilderW::AppendFormat` | stringbuilder | 21 |
-| 22 | GD | `0x6a0250` | `LogFile::Write` | source_logfile | 21 |
-| 23 | GD | `0x6a07c0` | `LogNetwork::Instance` | source_lognetwork | 32 |
-| 24 | GD | `0x6a0870` | `LogNetwork::Stop` | source_lognetwork | 71 |
-| 25 | GD | `0x6a09d0` | `LogNetwork::AddSession` | source_lognetwork | 150 |
-| 26 | GD | `0x6a0c90` | `LogNetwork::RemoveSession` | source_lognetwork | 84 |
-| 27 | GD | `0x6a0e30` | `LogNetwork::write` | source_lognetwork | 185 |
+| 8 | GD | `0x695150` | `LogArchive::ChangeFileMode` | source_logarchive | 32 |
+| 9 | GD | `0x6951e0` | `LogArchive::constructEventArray` | source_logarchive | 56 |
+| 10 | GD | `0x6952f0` | `LogArchive::processTimeout` | source_logarchive | 29 |
+| 11 | GD | `0x6953d0` | `LogArchive::processEventInFileMode` | source_logarchive | 35 |
+| 12 | GD | `0x6954a0` | `LogArchive::processEventInNetMode` | source_logarchive | 30 |
+| 13 | GD | `0x695530` | `LogArchive::flush` | source_logarchive | 27 |
+| 14 | GD | `0x6955b0` | `LogArchive::write` | source_logarchive | 31 |
+| 15 | GD | `0x695610` | `LogArchive::pushLogData` | source_logarchive | 76 |
+| 16 | GD | `0x6958f0` | `LogArchive::pushPingReqPacket` | source_logarchive | 60 |
+| 17 | GD | `0x6a07c0` | `LogNetwork::Instance` | source_lognetwork | 32 |
+| 18 | GD | `0x6a0870` | `LogNetwork::Stop` | source_lognetwork | 71 |
+| 19 | GD | `0x6a09d0` | `LogNetwork::AddSession` | source_lognetwork | 150 |
+| 20 | GD | `0x6a0c90` | `LogNetwork::RemoveSession` | source_lognetwork | 84 |
+| 21 | GD | `0x6a0e30` | `LogNetwork::write` | source_lognetwork | 185 |
+| 22 | GD | `0x6a16d0` | `DelayedDelete::Add` | source_delayedrelease | 46 |
+| 23 | GD | `0x6a17c0` | `DelayedDelete::Delete` | source_delayedrelease | 80 |
 
 ## Tasks
 
@@ -66,12 +64,10 @@
 
 - `src/Server/GameDaemon/source_logarchive.cpp`
 - `src/Server/GameDaemon/source_logarchive.h`
-- `src/Server/GameDaemon/stringbuilder.cpp`
-- `src/Server/GameDaemon/stringbuilder.h`
-- `src/Server/GameDaemon/source_logfile.cpp`
-- `src/Server/GameDaemon/source_logfile.h`
 - `src/Server/GameDaemon/source_lognetwork.cpp`
 - `src/Server/GameDaemon/source_lognetwork.h`
+- `src/Server/GameDaemon/source_delayedrelease.cpp`
+- `src/Server/GameDaemon/source_delayedrelease.h`
 
 ## Handoff
 
