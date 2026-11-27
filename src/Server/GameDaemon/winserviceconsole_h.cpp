@@ -1,9 +1,11 @@
-// winserviceconsole_h.cpp: winserviceconsole.h (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
+// winserviceconsole_h.cpp: winserviceconsole.h (GameDaemon PDB, 2019 + PDB).
 #include "winserviceconsole_gd.h"
-#include "LiftStub.h"
+#include "actsequenceloader.h"
+#pragma comment(linker, "/INCLUDE:?ReadFromBuffer@ActSequenceLoader@@UEAA_NAEBVDrElReader@@AEBUDrLoaderDef@@PEBE_K@Z")  // LIFT: dead-strip keep (no live caller yet)
 
 // 0x455420
-bool __cdecl DrTable::CanBeLoadedPieceByPiece(void)
+// LIFT: the PDB names this slot ActSequenceLoader::ReadFromBuffer; the body is in winserviceconsole.h.
+bool __cdecl ActSequenceLoader::ReadFromBuffer(::DrElReader const &, ::DrLoaderDef const &, unsigned char const *, unsigned __int64)
 {
     return false;
 }
