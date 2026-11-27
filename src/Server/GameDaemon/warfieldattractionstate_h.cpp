@@ -2,6 +2,8 @@
 #include "warfieldattractionstate.h"
 #include "questtableimpl.h"
 #include "LiftStub.h"
+#pragma comment(linker, "/INCLUDE:?GetTypeName@WarFieldAttractionState@@UEAAPEB_WXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetTableType@QuestTableImpl@@UEAA?AW4TableType@@XZ")  // LIFT: dead-strip keep (no live caller yet)
 
 // 0x1ee750
 wchar_t const * __cdecl WarFieldAttractionState::GetTypeName(void)

@@ -26,6 +26,10 @@ None.
 - No dead-strip pragma added. The driver build shows if any is needed.
 - Build, gate and MATCH counts are not run in this session.
 
+## Round 3
+
+I added `/INCLUDE` dead-strip pragmas for all 11 bodies. The bodies had no live caller, so `/OPT:REF` removed them. I built the mangled names by hand from the PDB signatures. I did not run a build.
+
 ## Files changed
 
 - `src/Server/GameDaemon/challengepartyattractionstate_h.cpp`, `challengepartyattractionstate.h`

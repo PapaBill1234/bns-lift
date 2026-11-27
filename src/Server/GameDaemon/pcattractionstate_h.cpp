@@ -1,6 +1,15 @@
 // pcattractionstate_h.cpp: pcattractionstate.h (GameDaemon PDB, 2019 + PDB).
 #include "pcattractionstate.h"
 #include "LiftStub.h"
+#pragma comment(linker, "/INCLUDE:?GetResetCombatModeCoolTime@PcPublicRaidState@@UEBA_JXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SetAddScoreCoolTime@PcPublicRaidState@@UEAAX_J@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?IsEventAttendee@PcPublicRaidState@@UEBA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SetEventAttendee@PcPublicRaidState@@UEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?ResetEventAttendee@PcPublicRaidState@@UEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetAddScoreCount@PcPublicRaidState@@UEBAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?IncrementAddScoreCount@PcPublicRaidState@@UEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetAddScroeCoolTime@PcPublicRaidState@@UEBA_JXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SetResetCombatModeCoolTime@PcPublicRaidState@@UEAAX_J@Z")  // LIFT: dead-strip keep (no live caller yet)
 
 // 0x180ba0 (shared body with NpcContribution::TotalDamage)
 __int64 __cdecl PcPublicRaidState::GetResetCombatModeCoolTime(void) const
