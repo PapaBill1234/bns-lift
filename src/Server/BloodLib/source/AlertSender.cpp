@@ -160,6 +160,110 @@ void AlertSender::Write(wchar_t const* file, int line, wchar_t const* format, ..
 
 // 0x18CF0 (SmartCouponDaemon)
 // LTCG removed `this`. The code uses _alertSender, that is the same object.
+#if defined(LIFT_EXE_GD)
+// LIFT: GameDaemon form (0x686da0 GD, lessons A22). The GD frame is 0x16e0 (shared form 0x16d0).
+// The GD body has all buffers in the function scope (lstr, fstr, ext, name, log at rsp+0x50, 0xd0,
+// 0x2e0, 0x4f0, 0x700) and nested blocks in place of early returns.
+// ❓ The frame size and the jg/jle branch order are not checked with an object dump in this card.
+void AlertSender::writev2(wchar_t const* file, int line, wchar_t const* format, char* args)
+{
+    wchar_t lstr[64];
+    wchar_t fstr[260];
+    wchar_t ext[264];
+    wchar_t name[264];
+    wchar_t log[2000];
+
+    if (_init && _run)
+    {
+        short fileBytes;
+        if (file != nullptr)
+        {
+            _wsplitpath_s(file, nullptr, 0, nullptr, 0, name, 260, ext, 260);
+            short count = static_cast<short>(swprintf_s(fstr, L"%s%s", name, ext));
+            if (count < 0)
+                return;
+            fileBytes = static_cast<short>(count * 2);
+        }
+        else
+        {
+            fstr[0] = 0;
+            fileBytes = 0;
+        }
+
+        // The original makes this string and does not use it.
+        if (static_cast<short>(swprintf_s(lstr, L"%d,", line)) >= 0)
+        {
+            short logCount = static_cast<short>(vswprintf_s(log, 2000, format, args));
+            if (logCount >= 0)
+            {
+                short logBytes = static_cast<short>(2 * logCount);
+                short size = static_cast<short>(fileBytes + logBytes + _versionBytes + _daemonNameBytes + 20);
+                AlertBuffer* buffer = static_cast<AlertBuffer*>(
+                    Memory::_Manager[2]->AllocZero(size + sizeof(AlertBuffer), ALERT_SENDER_FILE, 399));
+                if (buffer != nullptr)
+                {
+                    *reinterpret_cast<short*>(&buffer->_buffer[buffer->_count]) = size;
+                    buffer->_count += 2;
+                    *reinterpret_cast<short*>(&buffer->_buffer[buffer->_count]) = 2;
+                    buffer->_count += 2;
+                    *reinterpret_cast<short*>(&buffer->_buffer[buffer->_count]) = _daemonNameBytes;
+                    buffer->_count += 2;
+                    int bytes = _daemonNameBytes;
+                    memcpy(&buffer->_buffer[buffer->_count], _daemonName, _daemonNameBytes);
+                    buffer->_count += bytes;
+                    *reinterpret_cast<int*>(&buffer->_buffer[buffer->_count]) = _worldId;
+                    buffer->_count += 4;
+                    *reinterpret_cast<short*>(&buffer->_buffer[buffer->_count]) = _versionBytes;
+                    buffer->_count += 2;
+                    bytes = _versionBytes;
+                    memcpy(&buffer->_buffer[buffer->_count], _version, _versionBytes);
+                    buffer->_count += bytes;
+                    *reinterpret_cast<short*>(&buffer->_buffer[buffer->_count]) = fileBytes;
+                    buffer->_count += 2;
+                    memcpy(&buffer->_buffer[buffer->_count], fstr, fileBytes);
+                    buffer->_count += fileBytes;
+                    *reinterpret_cast<int*>(&buffer->_buffer[buffer->_count]) = line;
+                    buffer->_count += 4;
+                    *reinterpret_cast<short*>(&buffer->_buffer[buffer->_count]) = logBytes;
+                    buffer->_count += 2;
+                    bytes = logBytes;
+                    memcpy(&buffer->_buffer[buffer->_count], log, bytes);
+                    buffer->_count += bytes;
+
+                    bool added;
+                    EnterCriticalSection(&_cs);
+                    if (_maxLogCount > _bufferList._count)
+                    {
+                        if (_bufferList._tail != nullptr)
+                        {
+                            _bufferList._tail->_next = buffer;
+                            _bufferList._tail = buffer;
+                            buffer->_next = nullptr;
+                            ++_bufferList._count;
+                        }
+                        else
+                        {
+                            _bufferList._head = buffer;
+                            _bufferList._tail = buffer;
+                            _bufferList._count = 1;
+                        }
+                        added = true;
+                    }
+                    else
+                    {
+                        added = false;
+                    }
+                    LeaveCriticalSection(&_cs);
+                    if (added)
+                        SetEvent(_itemEvent);
+                    else
+                        Memory::_Manager[2]->Free(buffer, ALERT_SENDER_FILE, 427);
+                }
+            }
+        }
+    }
+}
+#else
 void AlertSender::writev2(wchar_t const* file, int line, wchar_t const* format, char* args)
 {
     if (!_init || !_run)
@@ -257,6 +361,7 @@ void AlertSender::writev2(wchar_t const* file, int line, wchar_t const* format, 
     else
         Memory::_Manager[2]->Free(buffer, ALERT_SENDER_FILE, 427);
 }
+#endif
 
 // 0x19300 (SmartCouponDaemon)
 bool AlertSender::sendRemain(AlertBufferList& bufferList)

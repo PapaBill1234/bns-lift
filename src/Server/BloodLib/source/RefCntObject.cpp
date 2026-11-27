@@ -42,6 +42,27 @@ void RefCntObject::operator delete(void* ptr, wchar_t const* file, int line)
 
 // 0x2150
 // LIFT: the original body has no trace of ignoreHistory (LTCG removed it). The lift does not read it.
+// LIFT: GameDaemon form (0xa870 GD, RefCntObject.h:77). The GD body reads ignoreHistory, and the callers
+// LogBuffer::Acquire (0x69d2e0 GD) and LogMedia::Add (0x69ed80 GD) pass it in edx (lessons A22).
+#if defined(LIFT_EXE_GD)
+long RefCntObject::addReferenceCount(bool ignoreHistory, wchar_t const* file, int line)
+{
+    long ref = _ref;
+    if (ref > 0)
+    {
+        if (!ignoreHistory && _history != nullptr)
+            _history->add(ref, file, line, RefCntHistory::OP_ADDREF);
+        return InterlockedIncrement(&_ref);
+    }
+    Log::Write(Log::LT_ERROR, REFCNT_HEADER_ALT, 153,
+               L"== CRASH == [ref obj], cannot add reference count, this:0x%p, ref:%d, tag:0x%08x, file:%s, line:%d",
+               this, _ref, _tag, file, line);
+    AlertSender::Write(REFCNT_HEADER_ALT, 153,
+                       L"== CRASH == [ref obj], cannot add reference count, this:0x%p, ref:%d, tag:0x%08x, file:%s, line:%d",
+                       this, _ref, _tag, file, line);
+    return 0;
+}
+#else
 long RefCntObject::addReferenceCount(bool ignoreHistory, wchar_t const* file, int line)
 {
     (void)ignoreHistory;
@@ -59,6 +80,7 @@ long RefCntObject::addReferenceCount(bool ignoreHistory, wchar_t const* file, in
         _history->add(_ref, file, line, RefCntHistory::OP_ADDREF);
     return InterlockedIncrement(&_ref);
 }
+#endif
 
 // 0x2230
 long RefCntObject::removeReferenceCount(wchar_t const* file, int line)
@@ -126,11 +148,23 @@ bool RefCntHistory::add(long ref, wchar_t const* file, int line, Operation op)
     RefCntHistoryItem& item = _history[seq % _historyMax];
     item._seq = seq;
     item._time = Daemon::Now;
+#if defined(LIFT_EXE_GD)
+    // LIFT: GameDaemon store order (0x693d00 GD): _file, _threadId, _line, _op, _ref (lessons A19, A22).
+    // ❓ The E16 review shows this store order under the LogMedia::Add row. The GD LogMedia::Add calls
+    // addReferenceCount out of line, so the order belongs to this function.
+    DWORD threadId = GetCurrentThreadId();
+    item._file = file;
+    item._threadId = threadId;
+    item._line = line;
+    item._op = static_cast<char>(op);
+    item._ref = static_cast<short>(ref);
+#else
     item._threadId = GetCurrentThreadId();
     item._file = file;
     item._op = static_cast<char>(op);
     item._line = line;
     item._ref = static_cast<short>(ref);
+#endif
     return true;
 }
 
