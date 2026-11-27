@@ -577,7 +577,10 @@ private:
     // LIFT: Pc has only part of its PDB members yet (size 0x95A8). The LiftBytes base holds the PDB bases and
     // the members from +8 to +0x4E2F. A char array with the PDB name of the first member holds each other gap.
     bool _exceptHate;  // +0x4E30
-    char _combatModeType[0x8cc8 - 0x4e34];  // +0x4E34 (LIFT: PDB members _combatModeType to before _skillResultContext, not declared yet)
+    ::Pc::CombatModeType _combatModeType;  // +0x4E34
+    short _targetedCountByNpc;  // +0x4E38
+    long long _enterWorldTime;  // +0x4E40
+    char _lastReportBotSpammerTime[0x8cc8 - 0x4e48];  // +0x4E48 (LIFT: PDB members _lastReportBotSpammerTime to before _skillResultContext, not declared yet)
     ::SkillResultContext _skillResultContext;  // +0x8CC8
     char _inviteMentoringContext[0x95a8 - 0x8d78];  // +0x8D78 (LIFT: PDB members _inviteMentoringContext to the end, not declared yet)
 };

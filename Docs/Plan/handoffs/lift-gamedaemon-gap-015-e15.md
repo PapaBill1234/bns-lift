@@ -47,7 +47,7 @@ Round 1. Two sessions did the work. The driver builds, gates and does the parity
 - `src/Server/GameDaemon/item_h_2.cpp`
 - `src/Server/GameDaemon/npcparty.h`
 - `src/Server/GameDaemon/npcparty_h.cpp`
-- `src/Server/GameDaemon/pc.h`
+- `src/Server/GameDaemon/pc.h` (round 3: `_combatModeType`, `_targetedCountByNpc` and `_enterWorldTime` now have their PDB types. This fixes the `pdb_layout` error at +0x4E34. The pad now starts at `_lastReportBotSpammerTime` (+0x4E48).)
 - `src/Server/GameDaemon/pc_h.cpp`
 - `src/Server/GameDaemon/zoneserializedobject.h`
 - `Docs/Plan/handoffs/lift-gamedaemon-gap-015-e15.md`
