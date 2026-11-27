@@ -309,6 +309,7 @@ bool __cdecl WeaponItem::R_CheckEnchantTargetItem(void)
 #pragma comment(linker, "/INCLUDE:?R_GetRandomEffectId@WeaponItem@@UEBA_JD@Z")  // LIFT: dead-strip keep (no live caller yet)
 __int64 __cdecl WeaponItem::R_GetRandomEffectId(char groupIndex) const
 {
+    const ::WeaponItemPropertyView &prop = reinterpret_cast<const ::WeaponItemView *>(this)->prop;
     switch (groupIndex)
     {
     case 0:
@@ -335,6 +336,7 @@ void __cdecl WeaponItem::R_SetRandomEffectId(char, __int64)
 #pragma comment(linker, "/INCLUDE:?R_GetRandomEffectGroupId@WeaponItem@@UEBA_JD@Z")  // LIFT: dead-strip keep (no live caller yet)
 __int64 __cdecl WeaponItem::R_GetRandomEffectGroupId(char groupIndex) const
 {
+    const ::WeaponItemPropertyView &prop = reinterpret_cast<const ::WeaponItemView *>(this)->prop;
     switch (groupIndex)
     {
     case 0:

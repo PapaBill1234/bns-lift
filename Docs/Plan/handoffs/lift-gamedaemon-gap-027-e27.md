@@ -66,6 +66,12 @@ The `Item` items need one structural card: declare the `Item` vtable in PDB orde
 - `EffectRecordView` uses PDB offsets: `key.id` at +0x8, `buff_type` at +0x38, `ignore_immune_debuff` at +0xC2.
 - The `XDG_RUNTIME_DIR` line in the build log comes from the build environment. It does not come from the source.
 
+## Round 3
+
+- The round 2 gate failed on `pdb_layout`: `WeaponItem::lift_pad_8` and `WeaponItem::prop` have no PDB member with these names.
+- Round 3 removes the two members from `WeaponItem`. A new view `WeaponItemView` (pad +0 to +0x2F, `prop` at +0x30) holds them. This replaces the note on the `WeaponItem` pad above.
+- The two `WeaponItem` getters read `prop` through `reinterpret_cast<const WeaponItemView *>(this)`. The logic and the offsets do not change.
+
 ## Gate and MATCH
 
 The driver builds and runs the gate and funcdiff after this session. This session did not run them.

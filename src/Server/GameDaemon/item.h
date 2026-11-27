@@ -270,12 +270,16 @@ struct WeaponItemPropertyView
     } Remaster;  // +0xB8 (PDB: WeaponProperty::__remaster__)
 };
 
+// LIFT: view of a PDB WeaponItem object. Only the member ItemBase<WeaponTrait>::prop (+0x30) is declared.
+struct WeaponItemView
+{
+    char lift_pad_0[0x30];  // ❓ no PDB name: vfptr, Item members (+8 to +0x27) and ItemBase::data (+0x28)
+    ::WeaponItemPropertyView prop;  // +0x30 (PDB: WeaponProperty)
+};
+
 // LIFT: PDB class WeaponItem derives from ItemBase<WeaponTrait>. The base is not declared here yet.
 class WeaponItem
 {
-protected:
-    char lift_pad_8[0x28];  // ❓ no PDB name: Item members (+8 to +0x27) and ItemBase::data (+0x28)
-    ::WeaponItemPropertyView prop;  // +0x30 (PDB: WeaponProperty)
 public:
     virtual void __cdecl SetCount(short);  // 0x4542d0
     virtual short __cdecl GetMaxDurability(void) const;  // 0x454340
