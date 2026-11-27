@@ -1,4 +1,11 @@
 {
+"ActSequenceLoader::ReadFromBuffer": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "ActivatedTeleport::FieldDefine": {
 "calls": 100,
 "consts": 100,
@@ -658,6 +665,20 @@
 "status": "MATCH"
 },
 "HeapMemoryManager::ReallocZero": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LogArchive::Name": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LogServerSessionHandler::~LogServerSessionHandler": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
