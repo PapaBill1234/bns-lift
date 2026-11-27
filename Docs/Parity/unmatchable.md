@@ -14,7 +14,7 @@ triage, the instruction diffs and the Not-done reports of the batch authors. No 
 | Exe | Open | A | B | C |
 | --- | ---: | ---: | ---: | ---: |
 | CG | 16 | 16 | 0 | 0 |
-| LG | 41 | 41 | 0 | 0 |
+| LG | 38 | 38 | 0 | 0 |
 | SCD | 20 | 20 | 0 | 0 |
 | POD | 28 | 28 | 0 | 0 |
 
@@ -186,13 +186,6 @@ triage, the instruction diffs and the Not-done reports of the batch authors. No 
 - Tried: see the reason (lead note LobbyGate-5cf0).
 - Earlier record: `lessons.md` lines 515.
 
-### `0x6fa0` `ClientSessionTimerJob::HandleEvent` DIFF
-
-- Score: 98.0 (calls 100, refs 100, consts 94). Proof level: A.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 112 insns, lift 106 insns, 8 changed hunks; first divergence: `-cmp edx, 1` / `-jge L` / `-cmp edx, 3`.
-- Reason: `0x6fa0` ClientSessionTimerJob::HandleEvent: after merge-02 the second range test (client.cpp:1145) is in the lift. The residue: the original passes `edx = 0` to `Session::Close(bool)` at both sites (0x70bd, 0x712b); the lift LTCG build drops the constant argument. The original LobbyGate has only these 2 callers of Session::Close (0x18350), both with 0, and still keeps the argument. Same cause as `LobbyGate::AddJobTimer` 0x12bf0 (LTCG argument propagation in the lift build only).
-- Tried: see the reason (lead note LobbyGate-6fa0).
-
 ### `0x8600` `ContentsRuleConfig::Dump` DIFF
 
 - Score: 99.2 (calls 100, refs 98, consts 100). Proof level: A.
@@ -235,14 +228,7 @@ triage, the instruction diffs and the Not-done reports of the batch authors. No 
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 124 insns, lift 124 insns, 17 changed hunks; first divergence: `-mov qword ptr [rsp+N], rbx` / `+mov qword ptr [rsp+N], rsi`.
 - Reason: `HandleLobbyLobbyGate_CloseSessionNotify` 0x10440 and `HandleLobbyLobbyGate_KickNotify` 0x10660: the call to `LobbyGate::AddJobTimer`. Evidence: original `mov rdx, qword ptr [rax + 0x30]` / `mov rcx, qword ptr [LobbyGate::_instance]` / `mov r8b, 3`. Lift `mov rcx, qword ptr [rax + 0x30]` / `mov dl, 3`. The lift build drops the `this` argument of `AddJobTimer` (LTCG custom calling convention). The original keeps `this` in rcx. The same 2 callers exist in the original. The cause is not known. A source form was not tried in this round. Look at `LobbyGate::AddJobTimer` 0x12bf0 in the lift: it can be that LTCG sees that `this` is always `_instance`.
 - Tried: see the reason (v2b-lg-01a).
-
-### `0x10660` `HandleLobbyLobbyGate_KickNotify` DIFF
-
-- Score: 99.4 (calls 100, refs 98, consts 100). Proof level: A.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 242 insns, lift 232 insns, 39 changed hunks; first divergence: `-push r14` / `-push r15` / `-mov s5, qword ptr [s2 + 0x68]`.
-- Reason: `HandleLobbyLobbyGate_CloseSessionNotify` 0x10440 and `HandleLobbyLobbyGate_KickNotify` 0x10660: the call to `LobbyGate::AddJobTimer`. Evidence: original `mov rdx, qword ptr [rax + 0x30]` / `mov rcx, qword ptr [LobbyGate::_instance]` / `mov r8b, 3`. Lift `mov rcx, qword ptr [rax + 0x30]` / `mov dl, 3`. The lift build drops the `this` argument of `AddJobTimer` (LTCG custom calling convention). The original keeps `this` in rcx. The same 2 callers exist in the original. The cause is not known. A source form was not tried in this round. Look at `LobbyGate::AddJobTimer` 0x12bf0 in the lift: it can be that LTCG sees that `this` is always `_instance`.
-- Tried: see the reason (v2b-lg-01a).
-- Update 2026-11-27 (S1 job): card pkt3 (S1 branch `s1-pkt3` 77c6f21: the PDB Packet constructor and the PDB signatures) gives funcdiff MATCH here and 0 lost functions. It cannot land: integrate refuses 2 review rejects in other exes (SCD `HandleSmartCoupon_GameEventByCharacterReq` precheck P2_cc, LD `AccountInventoryChannel::SendFinishWarehouseItemConsumptionReq` TSend stub arguments). See ENGINE-ISSUES.md E-P2-zero-cmp and E-TSend-stub-args. It waits for an operator decision. Level A (blocked).
+- Update 2026-11-27: card v2b2-t9 (826f709, landed 41b4c0b) fixes the `AddJobTimer` `this` argument with a selectany member-pointer reference. KickNotify 0x10660 is MATCH. CloseSessionNotify stays DIFF, score 96.8 -> 97.8 on main 41b4c0b. The residue was not examined in this job. Level A.
 
 ### `0x11ee0` `HandleLobbyLobbyGate_GetEnterWorldTokenOk` DIFF
 
@@ -264,14 +250,6 @@ triage, the instruction diffs and the Not-done reports of the batch authors. No 
 - Reason: `0x127a0` LobbyGateReloadInvalidRestoreTimer::restoreInvalid: code and loop form are the same. The loop runs from `INVALID_REASON_STR` (0x91300) to the end pointer `INVALID_REASON_STR + 3` (0x91318). In the original image the next global at 0x91318 is `bypassHandler`, so funcdiff names the end pointer `bypassHandler`. In the lift image the array is followed by `HEX_PREFIXES`. The ref name depends on the LTCG data layout, not on the function source (refs 80, calls 100, consts 100). Evidence: llvm-objdump 0x1400127b6 `lea rdi, [0x140091300]`, 0x1400127bd `lea r13, [0x140091318]`; pdbq data `bypassHandler rva 0x91318`. Tried: none; a source change to move a global next to the array is a layout trick, not a faithful fix.
 - Tried: see the reason (lead note LobbyGate-127a0).
 - Earlier record: `lessons.md` lines 999, 1025.
-
-### `0x12bf0` `LobbyGate::AddJobTimer` DIFF
-
-- Score: 96.3 (calls 100, refs 89, consts 100). Proof level: A.
-- Evidence (main 8af60dd, `-` original, `+` lift): orig 53 insns, lift 53 insns, 9 changed hunks; first divergence: `-mov rax, qword ptr [rcx + 0x748]` / `-movzx s0d, r8b` / `-mov s1, rdx`.
-- Reason: `0x12bf0` LobbyGate::AddJobTimer: the original keeps `this` (rcx), gateKey (rdx), reason (r8b). Both original callers (0x105d9, 0x109ee, LobbyDPacketHandler.obj, LTCG) pass `rcx = LobbyGate::_instance`. The lift LTCG build removes the `this` argument and loads `LobbyGate::_instance` in the callee (rcx = gateKey, dl = reason). The PDB type is the member `void LobbyGate::(unsigned __int64, char)`, not static, not virtual; no data reference to 0x12bf0 (only .pdata). Same cause as POD `PingGenerator::sendPing`/`checkCacheGateServiceState` (lessons.md section D, "LTCG `this` propagation"). Tried: none in source; the source form is the PDB form.
-- Tried: see the reason (lead note LobbyGate-12bf0).
-- Update 2026-11-27 (S1 job): card pkt3 (S1 branch `s1-pkt3` 77c6f21: the PDB Packet constructor and the PDB signatures) gives funcdiff MATCH here and 0 lost functions. It cannot land: integrate refuses 2 review rejects in other exes (SCD `HandleSmartCoupon_GameEventByCharacterReq` precheck P2_cc, LD `AccountInventoryChannel::SendFinishWarehouseItemConsumptionReq` TSend stub arguments). See ENGINE-ISSUES.md E-P2-zero-cmp and E-TSend-stub-args. It waits for an operator decision. Level A (blocked).
 
 ### `0x12e70` `LobbyGate::initialize` DIFF
 
@@ -333,6 +311,7 @@ triage, the instruction diffs and the Not-done reports of the batch authors. No 
 - Evidence (main 8af60dd, `-` original, `+` lift): orig 189 insns, lift 178 insns, 32 changed hunks; first divergence: `-mov qword ptr [rsp+N], rsi` / `+push rsi` / `+push r12`.
 - Reason: `0x23000` BroadcastCrypt::Initialize: the original passes the constant 2 in a register to `InstanceSize` and to `Create` (the crypto mode). The lift LTCG build removes the constant argument and the callee uses 2 directly. The PDB types keep the parameter, so the source form is the PDB form. Same cause as LobbyGate::AddJobTimer `0x12bf0` and Session::Close `0x6fa0` (LTCG constant propagation; ENGINE-ISSUES 10). Tried (lead, merge-03b): the size test with signed `/16*16` (orig `cdq; and edx, 0xf`) gave 95.2 -> 94.9, so it was dropped.
 - Tried: see the reason (lead note LobbyGate-23000).
+- Update 2026-11-27: 0x6fa0 and 0x12bf0 are MATCH since 41b4c0b (card v2b2-t9): a `__declspec(selectany)` member-pointer reference to the callee keeps the LTCG-dropped argument. This form was not tried for 0x23000.
 
 ### `0x29250` `PipeCommandProcess::processCommand` DIFF
 
