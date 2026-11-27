@@ -12,13 +12,12 @@
 // 0x35ea0
 bool __cdecl AttractionState::CanChangeChannel(short channel, short &error)
 {
-    if (channel != 0)
+    if (0 == channel)  // LIFT: form (xor eax,eax; cmp ax,dx; jne)
     {
-        return true;
+        error = 1189;  // ❓ no PDB enum name found for the error code 1189
+        return false;
     }
-
-    error = 1189;  // ❓ no PDB enum name found for the error code 1189
-    return false;
+    return true;
 }
 
 // 0x35ec0

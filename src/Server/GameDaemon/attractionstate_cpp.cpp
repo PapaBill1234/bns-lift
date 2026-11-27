@@ -513,11 +513,11 @@ void __cdecl TendencyFieldAttractionState::initEnvOperation(::Zone *) const
 // 0x50a70
 ::GameType const __cdecl DuelAttractionState::GetGameType(void) const
 {
-    if (_duelMgr != nullptr)
+    if (_duelMgr == nullptr)  // LIFT: form (cmp [rcx+8],0; jne to the call block)
     {
-        return liftDuel(_duelMgr)->GetGameType();
+        return static_cast< ::GameType>(0);  // GAMETYPE_INVALID
     }
-    return static_cast< ::GameType>(0);  // GAMETYPE_INVALID
+    return liftDuel(_duelMgr)->GetGameType();
 }
 
 // 0x50a90

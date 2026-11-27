@@ -40,3 +40,11 @@ The driver builds REF and NOREF and records the gate result and the MATCH compar
 - `src/Server/GameDaemon/transactionexpirechecker.cpp`
 - `src/Server/GameDaemon/transactionexpirechecker.h`
 - `Docs/Plan/handoffs/lift-gamedaemon-gap-018-e18.md`
+
+## Lead repair
+
+| Function | Reject | Repair |
+| --- | --- | --- |
+| `GameTranExpireToken::Set` | store order; its `Log::Write` call makes the GD log functions live (they are rejected until engine issue E16 is fixed) | Back to `LIFT_STUB`. The `/INCLUDE` pragma and the view structs are removed. |
+| `AttractionState::CanChangeChannel` | P2_cc (je vs jne) | `0 == channel` early-return form (VS2010 scratch compile: same bytes) |
+| `DuelAttractionState::GetGameType` | P2_cc (je vs jne) | null check first, call last (VS2010 scratch compile: same bytes) |
