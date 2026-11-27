@@ -3,32 +3,45 @@
 #include "propertysync.h"
 #include "LiftStub.h"
 
+// LIFT: keep the lifted virtual functions until the callers are lifted. Card lift-gamedaemon-e4.
+#pragma comment(linker, "/INCLUDE:?Name@RaidDungeonBindProperty@@UEBAPEB_WXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?FieldMax@RaidDungeonBindProperty@@MEBAHXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?FieldDefine@RaidDungeonBindProperty@@MEBAPEBUDef@Field@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SyncMax@RaidDungeonBindProperty@@MEBAHXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SyncDefine@RaidDungeonBindProperty@@MEBAPEBUDef@SyncBuffer@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+
 // 0x19d80
 wchar_t const * __cdecl RaidDungeonBindProperty::Name(void) const
 {
-    LIFT_STUB(0x19d80);
+    return L"RaidDungeonBindProperty";
 }
 
 // 0x19d90
 int __cdecl RaidDungeonBindProperty::FieldMax(void) const
 {
-    LIFT_STUB(0x19d90);
+    return fieldMax;
 }
 
 // 0x19da0
 ::Field::Def const * __cdecl RaidDungeonBindProperty::FieldDefine(void) const
 {
-    LIFT_STUB(0x19da0);
+    return fieldDefine;
 }
 
 // 0x19db0
 int __cdecl RaidDungeonBindProperty::SyncMax(void) const
 {
-    LIFT_STUB(0x19db0);
+    return syncMax;
 }
 
 // 0x19dc0
 ::SyncBuffer::Def const * __cdecl RaidDungeonBindProperty::SyncDefine(void) const
 {
-    LIFT_STUB(0x19dc0);
+    return syncDefine;
 }
+
+// LIFT: definitions of the PDB static data members (card lift-gamedaemon-e4).
+int RaidDungeonBindProperty::fieldMax;
+::Field::Def const * RaidDungeonBindProperty::fieldDefine;
+int RaidDungeonBindProperty::syncMax;
+::SyncBuffer::Def const * RaidDungeonBindProperty::syncDefine;

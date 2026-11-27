@@ -15,5 +15,10 @@ protected:
     virtual ::Field::Def const * __cdecl FieldDefine(void) const;  // 0x19ed0
     virtual int __cdecl SyncMax(void) const;  // 0x19ee0
     virtual ::SyncBuffer::Def const * __cdecl SyncDefine(void) const;  // 0x19ef0
+    // LIFT: PDB data members (protected static). Set at start-up by Property::initInstance. Plain pointers, as in the pilot. ❓
+    static int fieldMax;
+    static ::Field::Def const * fieldDefine;
+    static int syncMax;
+    static ::SyncBuffer::Def const * syncDefine;
 };
 

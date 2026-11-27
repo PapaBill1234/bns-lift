@@ -3,6 +3,14 @@
 #include "propertysync.h"
 #include "LiftStub.h"
 
+// LIFT: keep the lifted virtual functions until the callers are lifted (the vftable and the callers are stubs;
+// /OPT:REF drops them). Card lift-gamedaemon-e4.
+#pragma comment(linker, "/INCLUDE:?Name@QuestProperty@@UEBAPEB_WXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?FieldMax@QuestProperty@@MEBAHXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?FieldDefine@QuestProperty@@MEBAPEBUDef@Field@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SyncMax@QuestProperty@@MEBAHXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SyncDefine@QuestProperty@@MEBAPEBUDef@SyncBuffer@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+
 // 0x19cf0
 __cdecl QuestProperty::~QuestProperty(void)
 {
@@ -12,29 +20,35 @@ __cdecl QuestProperty::~QuestProperty(void)
 // 0x19d00
 wchar_t const * __cdecl QuestProperty::Name(void) const
 {
-    LIFT_STUB(0x19d00);
+    return L"QuestProperty";
 }
 
 // 0x19d10
 int __cdecl QuestProperty::FieldMax(void) const
 {
-    LIFT_STUB(0x19d10);
+    return fieldMax;
 }
 
 // 0x19d20
 ::Field::Def const * __cdecl QuestProperty::FieldDefine(void) const
 {
-    LIFT_STUB(0x19d20);
+    return fieldDefine;
 }
 
 // 0x19d30
 int __cdecl QuestProperty::SyncMax(void) const
 {
-    LIFT_STUB(0x19d30);
+    return syncMax;
 }
 
 // 0x19d40
 ::SyncBuffer::Def const * __cdecl QuestProperty::SyncDefine(void) const
 {
-    LIFT_STUB(0x19d40);
+    return syncDefine;
 }
+
+// LIFT: definitions of the PDB static data members (card lift-gamedaemon-e4).
+int QuestProperty::fieldMax;
+::Field::Def const * QuestProperty::fieldDefine;
+int QuestProperty::syncMax;
+::SyncBuffer::Def const * QuestProperty::syncDefine;
