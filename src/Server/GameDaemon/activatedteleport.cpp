@@ -5,12 +5,12 @@
 
 // LIFT: keep the lifted virtual functions until the callers are lifted (the vftable and the callers are stubs;
 // /OPT:REF drops them). Card lift-gamedaemon-0d.
-#pragma comment(linker, "/INCLUDE:?TypeId@ActivatedTeleport@@UEBA?BHXZ")
-#pragma comment(linker, "/INCLUDE:?Name@ActivatedTeleport@@UEBAPEB_WXZ")
-#pragma comment(linker, "/INCLUDE:?FieldMax@ActivatedTeleport@@MEBAHXZ")
-#pragma comment(linker, "/INCLUDE:?FieldDefine@ActivatedTeleport@@MEBAPEBUDef@Field@@XZ")
-#pragma comment(linker, "/INCLUDE:?SyncMax@ActivatedTeleport@@MEBAHXZ")
-#pragma comment(linker, "/INCLUDE:?SyncDefine@ActivatedTeleport@@MEBAPEBUDef@SyncBuffer@@XZ")
+#pragma comment(linker, "/INCLUDE:?TypeId@ActivatedTeleport@@UEBA?BHXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?Name@ActivatedTeleport@@UEBAPEB_WXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?FieldMax@ActivatedTeleport@@MEBAHXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?FieldDefine@ActivatedTeleport@@MEBAPEBUDef@Field@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SyncMax@ActivatedTeleport@@MEBAHXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SyncDefine@ActivatedTeleport@@MEBAPEBUDef@SyncBuffer@@XZ")  // LIFT: dead-strip keep (no live caller yet)
 
 // 0x193e0
 __cdecl ActivatedTeleport::~ActivatedTeleport(void)

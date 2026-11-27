@@ -5,12 +5,12 @@
 
 // LIFT: keep the lifted virtual functions until the callers are lifted (the vftable and the callers are stubs;
 // /OPT:REF drops them). Card lift-gamedaemon-0d.
-#pragma comment(linker, "/INCLUDE:?Version@CreatureProperty@@UEBAHXZ")
-#pragma comment(linker, "/INCLUDE:?Name@CreatureProperty@@UEBAPEB_WXZ")
-#pragma comment(linker, "/INCLUDE:?FieldMax@CreatureProperty@@MEBAHXZ")
-#pragma comment(linker, "/INCLUDE:?FieldDefine@CreatureProperty@@MEBAPEBUDef@Field@@XZ")
-#pragma comment(linker, "/INCLUDE:?SyncMax@CreatureProperty@@MEBAHXZ")
-#pragma comment(linker, "/INCLUDE:?SyncDefine@CreatureProperty@@MEBAPEBUDef@SyncBuffer@@XZ")
+#pragma comment(linker, "/INCLUDE:?Version@CreatureProperty@@UEBAHXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?Name@CreatureProperty@@UEBAPEB_WXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?FieldMax@CreatureProperty@@MEBAHXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?FieldDefine@CreatureProperty@@MEBAPEBUDef@Field@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SyncMax@CreatureProperty@@MEBAHXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SyncDefine@CreatureProperty@@MEBAPEBUDef@SyncBuffer@@XZ")  // LIFT: dead-strip keep (no live caller yet)
 
 // 0x19340
 __cdecl CreatureProperty::~CreatureProperty(void)
