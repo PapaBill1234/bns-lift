@@ -139,6 +139,10 @@ PYEOF
 
 for exe in "${EXES[@]}"; do
   SEEN=()
+  # GameDaemon is opt-in: the clang build dir must be configured with -DLIFT_GAMEDAEMON=ON.
+  if ! ninja -C "$B" -t query "$exe.exe" > /dev/null 2>&1; then
+    echo "$exe: no ninja target $exe.exe in $B (GameDaemon: cmake -DLIFT_GAMEDAEMON=ON)"; RC=1; continue
+  fi
   mapfile -t items < <(collect "$exe.exe")
   srcs=(); res=()
   for it in "${items[@]}"; do
@@ -151,7 +155,7 @@ for exe in "${EXES[@]}"; do
     srcs+=("$s")
   done
   # LIFT: a source that has the token LIFT_EXE_ (itself or in a repo header) gets one object per exe.
-  case "$exe" in CacheGate) tag=CG;; LobbyGate) tag=LG;; SmartCouponDaemon) tag=SCD;; PostOfficeDaemon) tag=POD;; LobbyDaemon) tag=LD;; *) tag="";; esac
+  case "$exe" in CacheGate) tag=CG;; LobbyGate) tag=LG;; SmartCouponDaemon) tag=SCD;; PostOfficeDaemon) tag=POD;; LobbyDaemon) tag=LD;; GameDaemon) tag=GD;; *) tag="";; esac
   declare -A PE=()
   if [ -n "$tag" ]; then
     while IFS= read -r s; do PE[$s]=1; done < <(printf '%s\n' "${srcs[@]}" | python3 -c "$PEREXE_PY" $(sed -n '/set(LIFT_SRC_INCLUDE/,/^)/p' CMakeLists.txt | grep -o 'src/[^ )]*'))
@@ -164,9 +168,11 @@ for exe in "${EXES[@]}"; do
     if [ -n "${PE[$s]:-}" ]; then w+=("$(winepath -w "$R/$O/obj/$tag/$s.obj")"); else w+=("$(winepath -w "$R/$O/obj/$s.obj")"); fi
   done
   for r in "${res[@]}"; do w+=("$(winepath -w "$R/$r")"); done
+  # LIFT: GameDaemon also writes a map file (card lift-gamedaemon-0d reads it).
+  map=(); [ "$exe" = GameDaemon ] && map=(/MAP:"$(winepath -w "$R/$O/$exe.map")")
   rsp="$O/$exe.rsp"
   printf '"%s"\n' "${w[@]}" > "$rsp"
-  if ! wine "$VS2010_BIN/link.exe" /nologo /LTCG /DEBUG /OPT:REF /OPT:ICF /SUBSYSTEM:CONSOLE /MACHINE:X64 \
+  if ! wine "$VS2010_BIN/link.exe" /nologo /LTCG /DEBUG /OPT:REF /OPT:ICF /SUBSYSTEM:CONSOLE /MACHINE:X64 "${map[@]}" \
        /OUT:"$(winepath -w "$R/$O/$exe.exe")" /PDB:"$(winepath -w "$R/$O/$exe.pdb")" @"$(winepath -w "$R/$rsp")" \
        msvcrt.lib msvcprt.lib kernel32.lib odbc32.lib ws2_32.lib iphlpapi.lib ole32.lib advapi32.lib shell32.lib \
        version.lib user32.lib shlwapi.lib > "$O/$exe.link.log" 2>&1; then

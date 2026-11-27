@@ -6,6 +6,8 @@
 # Fail when the MATCH count of an exe goes down, or a MATCH function becomes DIFF.
 # A MATCH -> DIFF change is allowed only if Docs/Parity/allow-worse.txt has "<EXE> <function> | <reason>".
 # Usage: tools/parity.sh [--update|--accept] [EXE...]
+#   GameDaemon is opt-in until card lift-gamedaemon-0e: give it by name (tools/parity.sh GameDaemon). It needs the
+#   clang build with -DLIFT_GAMEDAEMON=ON. With no Docs/Parity/baseline/GameDaemon.json the gate reports it and passes.
 #   --update: build, compare, then write the new results as the baseline.
 #   --accept: no build. Copy the results of the last run to the baseline (the runner does this after a pass).
 # Cards never change Docs/Parity/baseline/. The runner checks against the committed baseline and then accepts.

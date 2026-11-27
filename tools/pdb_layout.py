@@ -47,7 +47,8 @@ sys.path.insert(0, HERE)
 import pdbq  # noqa: E402
 
 CACHE = os.path.expanduser("~/.cache/bns-lift/resym")
-SERVERS = ("CacheGate", "LobbyGate", "SmartCouponDaemon", "PostOfficeDaemon", "LobbyDaemon", "MarketDealerDaemon")
+SERVERS = ("CacheGate", "LobbyGate", "SmartCouponDaemon", "PostOfficeDaemon", "LobbyDaemon", "MarketDealerDaemon",
+           "GameDaemon")
 # CMake target -> the server PDBs of the exes that link it (CMakeLists.txt target_link_libraries).
 # A class of a target with more than one server must match each of these PDBs that has the class.
 TARGET_PDB = {
@@ -59,6 +60,8 @@ TARGET_PDB = {
     "lift_common_pod": ("PostOfficeDaemon",),
     "LobbyDaemon": ("LobbyDaemon",), "lift_lobbydaemon": ("LobbyDaemon",), "lift_common_ld": ("LobbyDaemon",),
     "lift_marketdealerdaemon": ("MarketDealerDaemon",),
+    # GameDaemon is opt-in (cmake -DLIFT_GAMEDAEMON=ON). lift_common_gd goes into GameDaemon only.
+    "GameDaemon": ("GameDaemon",), "lift_gamedaemon": ("GameDaemon",), "lift_common_gd": ("GameDaemon",),
     # LG, SCD, POD and LobbyDaemon link lift_common; lift_marketdealerdaemon links it too. CacheGate does not.
     "lift_common": ("LobbyGate", "SmartCouponDaemon", "PostOfficeDaemon", "LobbyDaemon", "MarketDealerDaemon"),
 }
