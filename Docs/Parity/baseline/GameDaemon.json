@@ -1504,6 +1504,55 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"GameDaemon::GetTimerInterval": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GameDaemon::IsArenaDaemon": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GameDaemon::IsArenaDungeonDaemon": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GameDaemon::IsArenaEnabledGameDaemon": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GameDaemon::Name": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GameDaemon::SetEventReplyCacheHello": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GameDaemon::ShortName": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "GameObjectIdManager::~GameObjectIdManager": {
 "calls": 100,
 "consts": 100,
@@ -3162,6 +3211,13 @@
 "refs": 0,
 "score": 66.7,
 "status": "DIFF"
+},
+"TimeBasedPlaySeasonSchedule::Rule::Rule": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "TryRegisterGuildTran::GetDefinition": {
 "calls": 100,
