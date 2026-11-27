@@ -1,4 +1,53 @@
 {
+"AccessoryProperty::FieldDefine": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"AccessoryProperty::FieldMax": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"AccessoryProperty::Name": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"AccessoryProperty::SyncDefine": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"AccessoryProperty::SyncMax": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"AccessoryProperty::TypeId": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"AccessoryProperty::Version": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "AccountInventoryBoardGachaDrawByInstantPaymentTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
@@ -84,6 +133,48 @@
 "status": "MATCH"
 },
 "AccountInventoryTakeWarehouseItemTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"AcquiredSkill1::FieldDefine": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"AcquiredSkill1::FieldMax": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"AcquiredSkill1::Name": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"AcquiredSkill1::SyncDefine": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"AcquiredSkill1::SyncMax": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"AcquiredSkill1::TypeId": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -210,6 +301,41 @@
 "status": "MATCH"
 },
 "BIT_reloadDStream": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ChallengeListProperty::FieldDefine": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ChallengeListProperty::FieldMax": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ChallengeListProperty::SyncDefine": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ChallengeListProperty::SyncMax": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ChallengeListProperty::TypeId": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -608,7 +734,35 @@
 "score": 66.7,
 "status": "DIFF"
 },
+"DrDataTableImpl::DrDataTableImpl": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DrDataTableImpl::Find": {
+"calls": 0,
+"consts": 0,
+"refs": 0,
+"score": 0.0,
+"status": "DIFF"
+},
+"DrDataTableImpl::ReferenceCopiedEl": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "DrDataTableImpl::Setup": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DrDataTableImpl::UseLegacyElHeader": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -1175,6 +1329,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"GetDataReaderInterfaceVersion": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "GroceryProperty::FieldDefine": {
 "calls": 100,
 "consts": 100,
@@ -1302,6 +1463,13 @@
 "status": "MATCH"
 },
 "LogServerSessionHandler::~LogServerSessionHandler": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Logger": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -1756,6 +1924,27 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"QuestTableImpl::GetMaxQuestId": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"QuestTableImpl::GetMaxQuestNum": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"QuestTableImpl::GetQuestByIndex": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "RaidDungeonBindProperty::FieldDefine": {
 "calls": 100,
 "consts": 100,
@@ -2044,6 +2233,41 @@
 "status": "MATCH"
 },
 "SkillTrainingRoom::GetTypeName": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"SlateProperty::FieldDefine": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"SlateProperty::FieldMax": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"SlateProperty::SyncDefine": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"SlateProperty::SyncMax": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"SlateProperty::TypeId": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -2721,13 +2945,6 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
-},
-"wmain": {
-"calls": 0,
-"consts": 0,
-"refs": 100,
-"score": 33.3,
-"status": "DIFF"
 },
 "wmainCRTStartup": {
 "calls": 100,
