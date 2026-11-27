@@ -153,7 +153,9 @@ private:
 private:
     // PDB layout (size 0x228). The base AttractionState holds only the vfptr (+0).
     // LIFT: only the fields that the lifted bodies read are declared. The pads keep the PDB offsets.
-    char lift_pad_8[0x48];              // ❓ PDB fields +8 to +0x4F (_tendencyScoreLock to _playable) are not declared yet
+    ::_RTL_SRWLOCK _tendencyScoreLock;  // +8 (0x8)
+    int _tendencyScore[4];              // +16 (0x10)
+    char lift_pad_20[0x30];             // ❓ PDB fields +0x20 to +0x4F (_tendencyState to _playable) are not declared yet
     void const *_tendencyFieldRecord;   // +80 (0x50) LIFT: PDB type Data::TendencyFieldRecordPtr (one pointer _record)
     char lift_pad_58[0x1C0];            // ❓ PDB fields +0x58 to +0x217 (_tendencyFieldDataKey to _victoryNpcResetStageTendency) are not declared yet
     int _targetType;                    // +536 (0x218) PDB type TendencyFieldTargetType

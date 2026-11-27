@@ -13,6 +13,7 @@
 
 #pragma comment(linker, "/INCLUDE:?AvailableNextStep@BossChallengeAttractionState@@UEAA_NH_J@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?EnableInfiniteHyperEnergy@BossChallengeAttractionState@@UEBA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?DrainTendencyScores@TendencyFieldAttractionState@@QEAA_NPEAH@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?IsPcSpawnWithSummoned@TendencyFieldAttractionState@@UEAA_NW4EnterReason@@F@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?EnableInfiniteHyperEnergy@TendencyFieldAttractionState@@UEBA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?DisableMoveToArena@TendencyFieldAttractionState@@UEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
@@ -306,9 +307,21 @@ void __cdecl TendencyFieldAttractionState::AddTendencyScore(char, int)
 }
 
 // 0x4dd80
-bool __cdecl TendencyFieldAttractionState::DrainTendencyScores(int *)
+bool __cdecl TendencyFieldAttractionState::DrainTendencyScores(int *scores)
 {
-    LIFT_STUB(0x4dd80);
+    bool drained = false;
+
+    AcquireSRWLockExclusive(&_tendencyScoreLock);
+    for (int i = 0; i < 4; ++i)
+    {
+        int const score = _tendencyScore[i];
+        scores[i] = score;
+        _tendencyScore[i] = 0;
+        drained |= score > 0;
+    }
+    ReleaseSRWLockExclusive(&_tendencyScoreLock);
+
+    return drained;
 }
 
 // 0x4de00
