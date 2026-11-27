@@ -15,5 +15,9 @@ protected:
     virtual ::Field::Def const * __cdecl FieldDefine(void) const;  // 0x1a1c0
     virtual int __cdecl SyncMax(void) const;  // 0x1a1d0
     virtual ::SyncBuffer::Def const * __cdecl SyncDefine(void) const;  // 0x1a1e0
+    static int fieldMax;
+    static ::Field::Def const * fieldDefine;
+    static int syncMax;
+    static ::SyncBuffer::Def const * syncDefine;
 };
 
