@@ -300,6 +300,13 @@
 "score": 66.7,
 "status": "DIFF"
 },
+"AttractionState::CanChangeChannel": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "BIT_initDStream": {
 "calls": 100,
 "consts": 100,
@@ -308,6 +315,27 @@
 "status": "MATCH"
 },
 "BIT_reloadDStream": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BossChallengeAttractionState::AvailableNextStep": {
+"calls": 100,
+"consts": 0,
+"refs": 100,
+"score": 66.7,
+"status": "DIFF"
+},
+"BossChallengeAttractionState::EnableInfiniteHyperEnergy": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BossChallengeAttractionState::GetTypeName": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -971,6 +999,41 @@
 "refs": 0,
 "score": 66.7,
 "status": "DIFF"
+},
+"DuelAttractionState::CanResurrect": {
+"calls": 0,
+"consts": 100,
+"refs": 100,
+"score": 66.7,
+"status": "DIFF"
+},
+"DuelAttractionState::CanTakeAchievementReward": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DuelAttractionState::GetGameType": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DuelAttractionState::GetTypeName": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DuelAttractionState::OnZoneAttractionEventTimer": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "DuelBot::GetAOEDefendPowerModify": {
 "calls": 100,
@@ -2162,6 +2225,104 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"PartyBattleFieldAttractionState::CanProgressQuest": {
+"calls": 100,
+"consts": 50,
+"refs": 100,
+"score": 83.3,
+"status": "DIFF"
+},
+"PartyBattleFieldAttractionState::CanResurrect": {
+"calls": 0,
+"consts": 100,
+"refs": 100,
+"score": 66.7,
+"status": "DIFF"
+},
+"PartyBattleFieldAttractionState::CanTakeAchievementReward": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PartyBattleFieldAttractionState::CheckToManipulateEnv": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PartyBattleFieldAttractionState::DisposeFieldItem": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PartyBattleFieldAttractionState::EnableInfiniteHyperEnergy": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PartyBattleFieldAttractionState::GetTypeName": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PartyBattleFieldAttractionState::Leave": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PartyBattleFieldAttractionState::OnCanceledEnvManipulation": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PartyBattleFieldAttractionState::OnDamagedEvent": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PartyBattleFieldAttractionState::OnDead": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PartyBattleFieldAttractionState::OnEnterFootSwitch": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PartyBattleFieldAttractionState::OnEnvManipulated": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PartyBattleFieldAttractionState::TryToManipulateEnv": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "PartyBattleResultTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
@@ -2764,6 +2925,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"SkillAction::getDashAngle": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "SkillPage::FieldDefine": {
 "calls": 100,
 "consts": 100,
@@ -3176,6 +3344,76 @@
 "refs": 0,
 "score": 66.7,
 "status": "DIFF"
+},
+"TargetSelectorForDamageTransferNpcSquad::~TargetSelectorForDamageTransferNpcSquad": {
+"calls": 100,
+"consts": 100,
+"refs": 67,
+"score": 88.9,
+"status": "DIFF"
+},
+"TendencyFieldAttractionState::DisableMoveToArena": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TendencyFieldAttractionState::DisableMoveToSkillTrainingRoom": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TendencyFieldAttractionState::DrainTendencyScores": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TendencyFieldAttractionState::EnableChangeFactionCostume": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TendencyFieldAttractionState::EnableInfiniteHyperEnergy": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TendencyFieldAttractionState::EnableSetGuildMeetingPlace": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TendencyFieldAttractionState::EnableWarpToGuildMember": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TendencyFieldAttractionState::GetGameType": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TendencyFieldAttractionState::GetTypeName": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Thread::stop": {
 "calls": 100,
