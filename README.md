@@ -23,7 +23,7 @@ This repo is public. Do not commit binaries, keys, PDBs or IDA databases.
 ## Parity
 
 <!-- parity:start -->
-Last update: card `lift-gamedaemon-gap-009-e9` (2026-11-27). Tool: `tools/parity.sh` (VS2010 /GL /LTCG build vs original, funcdiff).
+Last update: card `lift-gamedaemon-gap-010-e10` (2026-11-27). Tool: `tools/parity.sh` (VS2010 /GL /LTCG build vs original, funcdiff).
 
 | Exe | Parity | MATCH | DIFF | Excluded | Only in original | Total | Mean score | Start | Change | Level |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
@@ -32,7 +32,7 @@ Last update: card `lift-gamedaemon-gap-009-e9` (2026-11-27). Tool: `tools/parity
 | SmartCouponDaemon | **97.0 %** | 649 | 19 | 1 | 0 | 669 | 99.8 | 33.6 % | +63.4 | 95 % ✅ |
 | PostOfficeDaemon | **96.6 %** | 733 | 25 | 0 | 1 | 759 | 99.7 | 34.5 % | +62.1 | 95 % ✅ |
 | LobbyDaemon | **47.1 %** | 1038 | 286 | 128 | 752 | 2204 | 97.4 | 2.2 % | +44.9 | below 90 % |
-| GameDaemon | **2.0 %** | 254 | 67 | 0 | 12530 | 12851 | 94.4 | 0.4 % | +1.5 | Lift in progress |
+| GameDaemon | **2.3 %** | 294 | 67 | 0 | 12490 | 12851 | 95.0 | 0.4 % | +1.9 | Lift in progress |
 | **First 4** | **96.2 %** | 2558 | | | | 2658 | | 37.0 % | +59.3 | 95 % ✅ |
 
 | Shared library (functions in 2+ exes) | Parity | MATCH in each exe | DIFF in 1+ exe | Total | Goal |
@@ -168,4 +168,5 @@ First 4 and shared library: CacheGate, LobbyGate, SmartCouponDaemon, PostOfficeD
 | `lift-gamedaemon-gap-007-e7` | 96.7 % | 94.9 % | 97.0 % | 96.6 % | 47.1 % | 1.6 % |
 | `lift-gamedaemon-gap-006-e6` | 96.7 % | 94.9 % | 97.0 % | 96.6 % | 47.1 % | 1.9 % |
 | `lift-gamedaemon-gap-009-e9` | 96.7 % | 94.9 % | 97.0 % | 96.6 % | 47.1 % | 2.0 % |
+| `lift-gamedaemon-gap-010-e10` | 96.7 % | 94.9 % | 97.0 % | 96.6 % | 47.1 % | 2.3 % |
 <!-- parity:end -->
