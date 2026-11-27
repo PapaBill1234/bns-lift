@@ -86,7 +86,8 @@ public:
     // LIFT: callers use them. LTCG IPA then keeps `this` as an argument of checkCacheGateServiceState (0x14930).
     static PostOfficeDaemon* Instance() { return _instance; }
     static CacheGateChannel* CheckCacheGateServiceState() { return Instance()->checkCacheGateServiceState(); }
-    CacheGateChannel* checkCacheGateServiceState();                                         // 0x14930
+    // PDB: ?checkCacheGateServiceState@PostOfficeDaemon@@AEBAQEAVCacheGateChannel@@XZ (const method, const pointer result).
+    CacheGateChannel* const checkCacheGateServiceState() const;                             // 0x14930
     static CacheGateChannel* checkDestinationServiceState(unsigned short destinationWid);  // 0x147d0
 
 protected:

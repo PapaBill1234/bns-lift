@@ -260,8 +260,8 @@ bool HandleSmartCoupon_GameEventByCharacterReq(Session const* session, Packet co
                        session->_id, channel->GetId(), cmd, channel->_daemonId._wid, tid,
                        GUID_ARGS(event->_gameAccountId), event->_pcdbid, event->_gameEventId);
             int dbRetValue = 0;
-            if (!SmartCouponDB::RegisterGameEventLog(&dbRetValue, &event->_gameAccountId, event->_wid, event->_pcdbid,
-                                                     event->_gameEventId, &event->_gameEventLogId))
+            if (!SmartCouponDB::RegisterGameEventLog(dbRetValue, event->_gameAccountId, event->_wid, event->_pcdbid,
+                                                     event->_gameEventId, event->_gameEventLogId))
             {
                 Log::Write(Log::LT_ERROR, DAEMONPACKETHANDLER_FILE, 183,
                            L"[packet], 0x%.16I64X, %I64d, failed to register game event log in db, cmd:%d, wid:%d, "
@@ -385,8 +385,8 @@ bool HandleSmartCoupon_GameEventByAccountReq(Session const* session, Packet cons
                        session->_id, channel->GetId(), cmd, channel->_daemonId._wid, tid,
                        GUID_ARGS(event->_gameAccountId), event->_gameEventId);
             int dbRetValue = 0;
-            if (!SmartCouponDB::RegisterGameEventLog(&dbRetValue, &event->_gameAccountId, event->_wid, event->_pcdbid,
-                                                     event->_gameEventId, &event->_gameEventLogId))
+            if (!SmartCouponDB::RegisterGameEventLog(dbRetValue, event->_gameAccountId, event->_wid, event->_pcdbid,
+                                                     event->_gameEventId, event->_gameEventLogId))
             {
                 Log::Write(Log::LT_ERROR, DAEMONPACKETHANDLER_FILE, 289,
                            L"[packet], 0x%.16I64X, %I64d, failed to register game event log in db, cmd:%d, wid:%d, "

@@ -105,8 +105,8 @@ struct AutoDbTran
 class SmartCouponDB
 {
 public:
-    static bool RegisterGameEventLog(int* dbRetValue, id128* gameAccountId, short worldId, long long pcdbid,
-                                     int gameEventId, long long* outGameEventLogId);  // 0x10B00
+    static bool const RegisterGameEventLog(int& dbRetValue, id128& gameAccountId, short worldId, long long pcdbid,
+                                           int gameEventId, long long& outGameEventLogId);  // 0x10B00 (PDB signature)
     static bool UpdateStatusToProcessFailure(int* dbRetValue, long long gameEventLogId, id128* gameAccountId,
                                              short worldId, long long pcdbid, int gameEventId);  // 0x11130
     static bool ProcessCharacterGameEventLog(int* dbRetValue, long long gameEventLogId, id128* gameAccountId,

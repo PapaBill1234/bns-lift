@@ -641,7 +641,7 @@ CacheGateChannel* PostOfficeDaemon::checkDestinationServiceState(unsigned short 
 }
 
 // 0x14930
-CacheGateChannel* PostOfficeDaemon::checkCacheGateServiceState()
+CacheGateChannel* const PostOfficeDaemon::checkCacheGateServiceState() const
 {
     CacheGateChannelManager* const manager = _cachegateChannelManager;
     // Inlined CacheGateChannelManager::GetCacheGateChannel. LIFT: the PDB type record has this public method. It has no body (inlined).

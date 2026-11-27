@@ -86,17 +86,18 @@ bool RetrieveEventLogContext::AddEventLogInfo(EventLogInfo const* info)
 }
 
 // 0x10b00
-bool SmartCouponDB::RegisterGameEventLog(int* dbRetValue, id128* gameAccountId, short worldId, long long pcdbid,
-                                         int gameEventId, long long* outGameEventLogId)
+// PDB: static bool const RegisterGameEventLog(int&, id128&, short, __int64, int, __int64&).
+bool const SmartCouponDB::RegisterGameEventLog(int& dbRetValue, id128& gameAccountId, short worldId, long long pcdbid,
+                                               int gameEventId, long long& outGameEventLogId)
 {
-    *dbRetValue = 0;
-    *outGameEventLogId = 0;
-    if (IsZeroGuid(gameAccountId) || gameEventId == 0)
+    dbRetValue = 0;
+    outGameEventLogId = 0;
+    if (IsZeroGuid(&gameAccountId) || gameEventId == 0)
     {
         Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 129,
                    L"[%s], invalid parameter, reg-game-event-log, account-id:" GUID_FMT
                    L", wid:%d, pcdbid:0x%I64X, game-event-id:%d",
-                   MODULE_NAME, GUID_ARGS(*gameAccountId), worldId, pcdbid, gameEventId);
+                   MODULE_NAME, GUID_ARGS(gameAccountId), worldId, pcdbid, gameEventId);
         return false;
     }
     AutoDbTran tran(1);
@@ -105,7 +106,7 @@ bool SmartCouponDB::RegisterGameEventLog(int* dbRetValue, id128* gameAccountId, 
         Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 136,
                    L"[%s], failed to acquire transaction, dbId:%d, reg-game-event-log, account-id:" GUID_FMT
                    L", wid:%d, pcdbid:0x%I64X, game-event-id:%d",
-                   MODULE_NAME, 1, GUID_ARGS(*gameAccountId), worldId, pcdbid, gameEventId);
+                   MODULE_NAME, 1, GUID_ARGS(gameAccountId), worldId, pcdbid, gameEventId);
         return false;
     }
     wchar_t const* const query = L"{?=CALL dbo.usp_RegisterGameEventLog(?,?,?,?,?)}";
@@ -114,7 +115,7 @@ bool SmartCouponDB::RegisterGameEventLog(int* dbRetValue, id128* gameAccountId, 
         Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 142,
                    L"[%s], failed to prepare sql, reg-game-event-log, account-id:" GUID_FMT
                    L", wid:%d, pcdbid:0x%I64X, game-event-id:%d, query:%s",
-                   MODULE_NAME, GUID_ARGS(*gameAccountId), worldId, pcdbid, gameEventId, query);
+                   MODULE_NAME, GUID_ARGS(gameAccountId), worldId, pcdbid, gameEventId, query);
         return false;
     }
     unsigned long long retLen = 0;
@@ -123,31 +124,31 @@ bool SmartCouponDB::RegisterGameEventLog(int* dbRetValue, id128* gameAccountId, 
     unsigned long long pcdbidLen = (pcdbid != 0) ? 0 : kNullData;
     unsigned long long gameEventIdLen = 0;
     unsigned long long outLen = 0;
-    if (tran.Tran->BindParam(1, SQL_PARAM_OUTPUT, dbRetValue, SQL_INTEGER, SQL_C_SLONG, &retLen) &&
-        tran.Tran->BindParam(2, SQL_PARAM_INPUT, gameAccountId, SQL_GUID, SQL_C_GUID, &gameAccountIdLen) &&
+    if (tran.Tran->BindParam(1, SQL_PARAM_OUTPUT, &dbRetValue, SQL_INTEGER, SQL_C_SLONG, &retLen) &&
+        tran.Tran->BindParam(2, SQL_PARAM_INPUT, &gameAccountId, SQL_GUID, SQL_C_GUID, &gameAccountIdLen) &&
         tran.Tran->BindParam(3, SQL_PARAM_INPUT, (worldId != 0) ? &worldId : nullptr, SQL_SMALLINT, SQL_C_SSHORT,
                              &widLen) &&
         tran.Tran->BindParam(4, SQL_PARAM_INPUT, (pcdbid != 0) ? &pcdbid : nullptr, SQL_BIGINT, SQL_C_SBIGINT,
                              &pcdbidLen) &&
         tran.Tran->BindParam(5, SQL_PARAM_INPUT, &gameEventId, SQL_INTEGER, SQL_C_SLONG, &gameEventIdLen) &&
-        tran.Tran->BindParam(6, SQL_PARAM_OUTPUT, outGameEventLogId, SQL_BIGINT, SQL_C_SBIGINT, &outLen))
+        tran.Tran->BindParam(6, SQL_PARAM_OUTPUT, &outGameEventLogId, SQL_BIGINT, SQL_C_SBIGINT, &outLen))
     {
         if (!tran.Tran->Execute())
         {
             Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 164,
                        L"[%s], failed to execute sql, reg-game-event-log, account-id:" GUID_FMT
                        L", wid:%d, pcdbid:0x%I64X, game-event-id:%d, query:%s",
-                       MODULE_NAME, GUID_ARGS(*gameAccountId), worldId, pcdbid, gameEventId, query);
+                       MODULE_NAME, GUID_ARGS(gameAccountId), worldId, pcdbid, gameEventId, query);
             return false;
         }
-        if (*dbRetValue != 0)
+        if (dbRetValue != 0)
             return false;
         return true;
     }
     Log::Write(Log::LT_ERROR, SMARTCOUPONDB_FILE, 175,
                L"[%s], failed to bind parameter, reg-game-event-log, account-id:" GUID_FMT
                L", wid:%d, pcdbid:0x%I64X, game-event-id:%d",
-               MODULE_NAME, GUID_ARGS(*gameAccountId), worldId, pcdbid, gameEventId);
+               MODULE_NAME, GUID_ARGS(gameAccountId), worldId, pcdbid, gameEventId);
     return false;
 }
 
