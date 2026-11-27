@@ -1,29 +1,54 @@
-// defmemory_cpp.cpp: defmemory.cpp (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
+// defmemory_cpp.cpp: defmemory.cpp (GameDaemon PDB, 2019 + PDB).
 #include "defmemory.h"
 #include "LiftStub.h"
 
+#pragma comment(linker, "/INCLUDE:?SetupMemory@DrMemoryManager@@SA_NW4Section@1@PEAVDrMemory@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:??0DrHeapMemory@@QEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
+
+::DrMemory * DrMemoryManager::memory[DrMemoryManager::SECTION_MAX];
+
 // 0x6ed5c0
-bool __cdecl DrMemoryManager::SetupMemory(::DrMemoryManager::Section, ::DrMemory *)
+bool __cdecl DrMemoryManager::SetupMemory(::DrMemoryManager::Section section, ::DrMemory * memory)
 {
-    LIFT_STUB(0x6ed5c0);
+    if (section < 0 || section >= SECTION_MAX)
+        return false;
+
+    DrMemoryManager::memory[section] = memory;
+    return true;
+}
+
+// 0x6ed620
+__cdecl DrHeapMemory::DrHeapMemory(void)
+    : heap(nullptr)
+{
+    heap = ::HeapCreate(0, 0, 0);
 }
 
 // 0x6ed5e0
 __cdecl DrHeapMemory::~DrHeapMemory(void)
 {
-    LIFT_STUB(0x6ed5e0);
+    ::HeapDestroy(heap);
 }
 
 // 0x6ed600
-void * __cdecl DrHeapMemory::Alloc(unsigned __int64, wchar_t const *, int)
+void * __cdecl DrHeapMemory::Alloc(unsigned __int64 size, wchar_t const * file, int line)
 {
-    LIFT_STUB(0x6ed600);
+    return ::HeapAlloc(heap, HEAP_GENERATE_EXCEPTIONS, size);
 }
 
-// 0x6ed620
-__cdecl DrHeapMemory::DrHeapMemory(void)
+// 0x6b7dc0 (folded with HeapMemoryManager::Realloc). LIFT: the vtable of the ctor needs it.
+void * __cdecl DrHeapMemory::Realloc(void * ptr, unsigned __int64 size, wchar_t const * file, int line)
 {
-    LIFT_STUB(0x6ed620);
+    // LIFT: same source form as HeapMemoryManager::Realloc (BloodLib). The linker folds the 2 bodies (ICF) only when the code is the same.
+    if (ptr == nullptr)
+        return ::HeapAlloc(heap, 0, size);
+    return ::HeapReAlloc(heap, 0, ptr, size);
+}
+
+// 0x6b7e10 (folded with HeapMemoryManager::Free). LIFT: the vtable of the ctor needs it.
+void __cdecl DrHeapMemory::Free(void * ptr, wchar_t const * file, int line)
+{
+    ::HeapFree(heap, 0, ptr);
 }
 
 // 0x6ed6a0

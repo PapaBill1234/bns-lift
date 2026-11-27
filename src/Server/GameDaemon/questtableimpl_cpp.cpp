@@ -2,6 +2,9 @@
 #include "questtableimpl.h"
 #include "LiftStub.h"
 
+#pragma comment(linker, "/INCLUDE:?GetQuest@QuestTableImpl@@UEBAPEBVQuest@@G@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:??0QuestTableImpl@@QEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
+
 // 0x6f7440
 bool __cdecl QuestTableImpl::loadFilterSet(::QuestFilterSet *, ::XmlElement const *, ::QuestTableImpl::LoaderContext &)
 {
@@ -57,9 +60,11 @@ void __cdecl QuestTableImpl::GetTableSummary(::DrTableSummary &)
 }
 
 // 0x6f86a0
-::Quest const * __cdecl QuestTableImpl::GetQuest(unsigned short) const
+::Quest const * __cdecl QuestTableImpl::GetQuest(unsigned short questId) const
 {
-    LIFT_STUB(0x6f86a0);
+    if (_questArray == nullptr || questId == 0 || questId > _maxQuestId)
+        return nullptr;
+    return _questArray[questId - 1];
 }
 
 // 0x6f8710
@@ -88,6 +93,9 @@ bool __cdecl QuestTableImpl::LoadTable(::XmlReader const &, ::DrElReader const &
 
 // 0x6fa2f0
 __cdecl QuestTableImpl::QuestTableImpl(void)
+    : _maxQuestId(0)
+    , _questListSize(0)
+    , _questArray(nullptr)
+    , _questListArray(nullptr)
 {
-    LIFT_STUB(0x6fa2f0);
 }

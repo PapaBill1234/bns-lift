@@ -1,11 +1,12 @@
-// deflog.h: deflog.h (GameDaemon PDB, 2019 + PDB). Wave 0: declarations of the stubbed functions only.
-// LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
+// deflog.h: deflog.h (GameDaemon PDB, 2019 + PDB).
 #pragma once
 #include "GameDaemonFwd.h"
 
-class DrDefLog
+// PDB layout (size 0x8): base DrLog.
+class DrDefLog : public DrLog
 {
 public:
-    virtual void __cdecl Write(::DrLog::Type, wchar_t const *, int, wchar_t const *, ...);  // 0x6eb380
+    static DrDefLog* Instance();
+    virtual void __cdecl Write(::DrLog::Type type, wchar_t const* file, int line, wchar_t const* format, ...);  // 0x6eb380
 };
 

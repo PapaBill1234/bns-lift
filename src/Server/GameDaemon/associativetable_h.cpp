@@ -2,22 +2,33 @@
 #include "associativetable.h"
 #include "LiftStub.h"
 
+#pragma comment(linker, "/INCLUDE:?Ptr@DrMultiKeyInnerIter@@EEAAPEAUDrEl@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?Next@DrMultiKeyInnerIter@@EEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?IsValid@DrMultiKeyInnerIter@@EEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+
 // 0x6fb130
 ::DrEl * __cdecl DrMultiKeyInnerIter::Ptr(void)
 {
-    LIFT_STUB(0x6fb130);
+    if (IsValid())
+        return elArray[it].node;
+    return nullptr;
 }
 
 // 0x6fb170
 bool __cdecl DrMultiKeyInnerIter::Next(void)
 {
-    LIFT_STUB(0x6fb170);
+    ++it;
+    return IsValid();
 }
 
 // 0x6fb180
 bool __cdecl DrMultiKeyInnerIter::IsValid(void)
 {
-    LIFT_STUB(0x6fb180);
+    if (elCount <= 0)
+        return false;
+    if (it < elCount && it >= 0)
+        return true;
+    return false;
 }
 
 // 0x6fcd10

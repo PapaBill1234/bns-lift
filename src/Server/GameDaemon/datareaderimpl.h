@@ -6,7 +6,13 @@
 class DrDataReaderImpl
 {
 public:
-    struct LoadFuncBinder {};
+    // LIFT: slot 0 dtor, slot 1 Execute (loadTableWorker calls slot 1). The binders below do not derive from it yet.
+    // Nothing constructs it, so the dtor has no definition here.
+    struct LoadFuncBinder
+    {
+        virtual __cdecl ~LoadFuncBinder(void);
+        virtual bool __cdecl Execute(::DrTable &, ::XmlReader const &, ::DrElReader const &, ::DrLoaderDef const &, ::DrAliasMap &) = 0;
+    };
 public:
     __cdecl ~DrDataReaderImpl(void);  // 0x6eb470
     static void __cdecl Close(void);  // 0x6eb480

@@ -29,11 +29,25 @@ public:
     __cdecl ~DrAliasMapImpl(void);  // 0x6f6320
     __cdecl DrAliasMapImpl(void);  // 0x6f6450
     virtual void __cdecl ClearTable(wchar_t const *, bool);  // 0x6f6490
+private:
+    // PDB layout (size 0x48): base DrAliasMap (vfptr only) +0, _aliasmap +8.
+    // LIFT: the PDB type of _aliasmap is std::map<std::basic_string<wchar_t, ci_wchar_traits, DrStlAllocator<wchar_t, 1> >, unsigned __int64,
+    // std::less<...>, DrStlAllocator<std::pair<...>, 1> >. ci_wchar_traits and DrStlAllocator are not full types yet.
+    // The VS2010 std::map with std::wstring and std::allocator has the same layout (size 0x20).
+    typedef std::map<std::wstring, unsigned __int64> Map;
+    Map _aliasmap;
+    bool _reconstructed;
+    bool _useStringTable;
+    ::DrAliasStringTable * _stringTable;
+    ::DrAliasMapImpl::AliasArrayElement * _elArray;
+    int _elCount;
 };
 
+// PDB layout (size 0x20): _elCount +0, _elArray +8, _stringTable +16, _stringTableSize +24.
 class DrAliasStringTable
 {
 public:
+    int Count() const { return _elCount; }
     void __cdecl Clear(void);  // 0x6f33b0
     bool __cdecl Find(wchar_t const *, unsigned __int64 *) const;  // 0x6f3430
 private:
@@ -41,6 +55,12 @@ private:
 public:
     bool __cdecl ReadFromBuffer(unsigned char const *, unsigned __int64, unsigned __int64, bool);  // 0x6f3900
     bool __cdecl Build(::DrAliasMapImpl::AliasArrayElement const *, int);  // 0x6f3a10
+private:
+    // LIFT: only the offsets and _elCount are confirmed. The pointer types of _elArray and _stringTable are placeholders.
+    int _elCount;
+    void * _elArray;
+    wchar_t * _stringTable;
+    unsigned __int64 _stringTableSize;
 };
 
 struct ci_wchar_traits

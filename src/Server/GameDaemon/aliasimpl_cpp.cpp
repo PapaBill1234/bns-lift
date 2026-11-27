@@ -2,10 +2,12 @@
 #include "aliasimpl.h"
 #include "LiftStub.h"
 
+#pragma comment(linker, "/INCLUDE:??0DrAliasMapImpl@@QEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
+
 // 0x6f33a0
-bool __cdecl DrAliasMapImpl::WriteToBuffer(unsigned char *, unsigned __int64)
+bool __cdecl DrAliasMapImpl::WriteToBuffer(unsigned char * buffer, unsigned __int64 buffersize)
 {
-    LIFT_STUB(0x6f33a0);
+    return buffer != nullptr;
 }
 
 // 0x6f33b0
@@ -23,7 +25,11 @@ bool __cdecl DrAliasStringTable::Find(wchar_t const *, unsigned __int64 *) const
 // 0x6f3610
 int __cdecl DrAliasMapImpl::Count(void) const
 {
-    LIFT_STUB(0x6f3610);
+    if (_useStringTable && _stringTable != nullptr)
+        return _stringTable->Count();
+    if (_reconstructed)
+        return _elCount;
+    return (int)_aliasmap.size();
 }
 
 // 0x6f3630
@@ -125,7 +131,11 @@ __cdecl DrAliasMapImpl::~DrAliasMapImpl(void)
 // 0x6f6450
 __cdecl DrAliasMapImpl::DrAliasMapImpl(void)
 {
-    LIFT_STUB(0x6f6450);
+    _elArray = nullptr;
+    _elCount = 0;
+    _stringTable = nullptr;
+    _reconstructed = false;
+    _useStringTable = false;
 }
 
 // 0x6f6490

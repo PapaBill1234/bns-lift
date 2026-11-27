@@ -32,10 +32,10 @@ public:
     __cdecl QuestTableImpl(void);  // 0x6fa2f0
 private:
     // LIFT: PDB members. The class has no base yet, so the members start at +8 after the vftable (PDB: base QuestTable, same offsets).
-    // The member _el (DrEl, +32) is not declared yet.
     unsigned short _maxQuestId;  // +8
     unsigned short _questListSize;  // +10
     ::Quest * * _questArray;  // +16
     ::Quest * * _questListArray;  // +24
+    ::DrEl _el;  // +32
 };
 

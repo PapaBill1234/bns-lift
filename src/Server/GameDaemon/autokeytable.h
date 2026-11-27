@@ -2,25 +2,48 @@
 // LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
 #pragma once
 #include "GameDaemonFwd.h"
+#include "tableimpl.h"
+#include <vector>
 
+// PDB layout (size 0x28): elArray +0, elCount +32.
 struct DrAutoKeyElMap
 {
+public:
+    // LIFT: the PDB type is std::vector<DrEl*, DrStlAllocator<DrEl*, 0> >. DrStlAllocator is not a full allocator yet.
+    // The VS2010 std::vector with std::allocator has the same layout (_Myfirst, _Mylast, _Myend, _Alval; size 0x20).
+    typedef std::vector< ::DrEl *> ElPtrArray;
 public:
     void __cdecl destroy(void);  // 0x6fda40
     __cdecl ~DrAutoKeyElMap(void);  // 0x6fdb30
     void __cdecl construct(unsigned __int64);  // 0x6fe150
+public:
+    ElPtrArray elArray;
+    unsigned __int64 elCount;
 };
 
-class DrAutoKeyInnerIter
+// PDB layout (size 0x20): base DrInnerIter, elPtrArray +8, beginIndex +16, index +20, elCount +24.
+class DrAutoKeyInnerIter : public DrInnerIter
 {
 private:
     virtual bool __cdecl IsValid(void);  // 0x6fd300
     virtual ::DrEl * __cdecl Ptr(void);  // 0x6fd450
     virtual bool __cdecl Next(void);  // 0x6fd480
+private:
+    DrAutoKeyElMap::ElPtrArray const * elPtrArray;
+    int beginIndex;
+    int index;
+    int elCount;
 };
 
-class DrAutoKeyTable
+// PDB layout (size 0x60): base DrDataTableImpl (size 0x18), _elMap +24.
+class DrAutoKeyTable : public DrDataTableImpl
 {
+    DrAutoKeyElMap _elMap;
+    char * _tableBuffer;
+    char * _tableExtraBuffer;
+    int _tableSize;
+    int _tableExtraSize;
+    unsigned __int64 _nextAutoKey;
 public:
     virtual bool __cdecl LoadAlias(::XmlReader const &, ::DrElReader const &, ::DrLoaderDef const &, ::DrAliasMap &);  // 0x6fd320
     virtual void __cdecl FinishLoadAlias(void);  // 0x6fd410

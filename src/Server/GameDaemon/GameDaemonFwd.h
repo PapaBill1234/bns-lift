@@ -1977,17 +1977,47 @@ struct DonateNormalMaterialOkParam {};
 class DrAliasMap {};
 struct DrAttrDef {};
 class DrDataReader {};
-struct DrEl {};
+// PDB layout (size 0x6).
+struct DrEl
+{
+    char type;
+    short subtype;
+    unsigned short size;
+};
 struct DrElDef {};
 class DrElReader {};
-class DrInnerIter {};
+// PDB layout (size 0x8): vfptr only.
+class DrInnerIter
+{
+public:
+    virtual DrEl* Ptr() = 0;
+    virtual bool Next() = 0;
+    virtual bool IsValid() = 0;
+};
 struct DrLoaderDef {};
+// PDB layout (size 0x8): vfptr only.
 class DrLog
 {
 public:
-    enum Type {};
+    enum Type
+    {
+        Trace = 0,
+        Debug = 1,
+        Error = 2,
+    };
+public:
+    DrLog() {}
+    virtual ~DrLog() {}
+    virtual void Write(Type type, wchar_t const* file, int line, wchar_t const* format, ...) = 0;
 };
-class DrMemory {};
+// PDB layout (size 0x8): vfptr only.
+class DrMemory
+{
+public:
+    virtual void* Alloc(unsigned __int64 size, wchar_t const* file, int line) = 0;
+    virtual void* Realloc(void* ptr, unsigned __int64 size, wchar_t const* file, int line) = 0;
+    virtual void Free(void* ptr, wchar_t const* file, int line) = 0;
+};
 struct DrScriptObj {};
 struct DrScriptObjDef {};
 template <class T0, int T1>

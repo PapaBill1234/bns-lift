@@ -2,6 +2,11 @@
 #include "datapacker.h"
 #include "LiftStub.h"
 
+#pragma comment(linker, "/INCLUDE:?GetFileSize@ZipPackedReaderIO@@UEBAIXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetFileName@ZipPackedReaderIO@@UEBAPEB_WXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?Next@ZipPackedReaderIO@@UEAA?AW4ErrCode@XmlReaderIO@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?Close@ZipPackedReaderIO@@UEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
+
 // 0x153d0
 __cdecl ZipPackedReaderIO::FileName::FileName(char const *, unsigned __int64, unsigned __int64, unsigned __int64, unsigned int)
 {
@@ -44,28 +49,52 @@ void __cdecl ZipPackedReaderIO::CloseZip(void)
     LIFT_STUB(0x169a0);
 }
 
+// LIFT: the original path literal of this file in the GameDaemon build (A6).
+#ifndef DATAPACKER_SRC_FILE
+#define DATAPACKER_SRC_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\..\\Data\\DataPacker.cpp"
+#endif
+
 // 0x16b60
 unsigned int __cdecl ZipPackedReaderIO::GetFileSize(void) const
 {
-    LIFT_STUB(0x16b60);
+    if (_openFileIdx < 0 || (unsigned __int64)(__int64)_openFileIdx >= _openFileArray.size())
+    {
+        Log::Write(Log::LT_ERROR, DATAPACKER_SRC_FILE, 1144,
+            L"[zip-packed-reader], cannot get file size; invalid index, current-idx:%d, size:%d",
+            _openFileIdx, _openFileArray.size());
+        return 0;
+    }
+    return (unsigned int)_openFileArray[_openFileIdx]->_Myval._uncompressedSize;
 }
 
 // 0x16bd0
 wchar_t const * __cdecl ZipPackedReaderIO::GetFileName(void) const
 {
-    LIFT_STUB(0x16bd0);
+    if (_openFileIdx < 0 || (unsigned __int64)(__int64)_openFileIdx >= _openFileArray.size())
+    {
+        Log::Write(Log::LT_ERROR, DATAPACKER_SRC_FILE, 1155,
+            L"[zip-packed-reader], cannot get file name; invalid index, current-idx:%d, size:%d",
+            _openFileIdx, _openFileArray.size());
+        return nullptr;
+    }
+    return _openFileArray[_openFileIdx]->_Myval._pathW.c_str();
 }
 
 // 0x16c40
 ::XmlReaderIO::ErrCode __cdecl ZipPackedReaderIO::Next(void)
 {
-    LIFT_STUB(0x16c40);
+    // ❓ The PDB has no enumerators for XmlReaderIO::ErrCode. 3 is the end of the list, 0 is success.
+    if (_openFileIdx < 0 || _openFileArray.size() <= (unsigned __int64)(_openFileIdx + 1))
+        return (::XmlReaderIO::ErrCode)3;
+    ++_openFileIdx;
+    return (::XmlReaderIO::ErrCode)0;
 }
 
 // 0x16c70
 void __cdecl ZipPackedReaderIO::Close(void)
 {
-    LIFT_STUB(0x16c70);
+    _openFileIdx = -1;
+    _openFileArray.clear();
 }
 
 // 0x16cb0

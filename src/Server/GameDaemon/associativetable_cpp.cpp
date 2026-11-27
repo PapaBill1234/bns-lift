@@ -2,6 +2,9 @@
 #include "associativetable.h"
 #include "LiftStub.h"
 
+#pragma comment(linker, "/INCLUDE:?Find@DrMultiKeyTable@@UEBAQEAUDrEl@@_K@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?count@DrMultiKeyElMap@@UEAAHXZ")  // LIFT: dead-strip keep (no live caller yet)
+
 // 0x6fb1a0
 bool __cdecl DrMultiKeyTable::LoadAlias(::XmlReader const &, ::DrElReader const &, ::DrLoaderDef const &, ::DrAliasMap &)
 {
@@ -15,9 +18,9 @@ void __cdecl DrMultiKeyTable::GetTableSummary(::DrTableSummary &)
 }
 
 // 0x6fb330
-::DrEl *const __cdecl DrMultiKeyTable::Find(unsigned __int64) const
+::DrEl *const __cdecl DrMultiKeyTable::Find(unsigned __int64 key) const
 {
-    LIFT_STUB(0x6fb330);
+    return _elMap.get(key);
 }
 
 // 0x6fb340
@@ -35,7 +38,9 @@ void __cdecl DrMultiKeyTable::removeInnerIter(::DrInnerIter *) const
 // 0x6fb440
 int __cdecl DrMultiKeyElMap::count(void)
 {
-    LIFT_STUB(0x6fb440);
+    if (reconstructed)
+        return elCount;
+    return (int)elMap.size();
 }
 
 // 0x6fb490

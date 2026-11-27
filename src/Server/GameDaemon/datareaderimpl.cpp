@@ -3,10 +3,16 @@
 #include "winserviceconsole_gd.h"
 #include "LiftStub.h"
 
+#pragma comment(linker, "/INCLUDE:??0DrDataReaderImpl@@QEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:??1DrDataReaderImpl@@QEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?Execute@LoadTableMT_PreProcBinder@@UEAA_NAEAVDrTable@@AEBVXmlReader@@AEBVDrElReader@@AEBUDrLoaderDef@@AEAVDrAliasMap@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?Execute@LoadTableMT_PostProcBinder@@UEAA_NAEAVDrTable@@AEBVXmlReader@@AEBVDrElReader@@AEBUDrLoaderDef@@AEAVDrAliasMap@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?Execute@LoadTableBinder@@UEAA_NAEAVDrTable@@AEBVXmlReader@@AEBVDrElReader@@AEBUDrLoaderDef@@AEAVDrAliasMap@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?loadTableWorker@@YAIPEAX@Z")  // LIFT: dead-strip keep (no live caller yet)
+
 // 0x6eb470
 __cdecl DrDataReaderImpl::~DrDataReaderImpl(void)
 {
-    LIFT_STUB(0x6eb470);
 }
 
 // 0x6eb480
@@ -70,15 +76,15 @@ unsigned int __cdecl loadAliasWorker(void *)
 }
 
 // 0x6eba00
-bool __cdecl LoadTableMT_PreProcBinder::Execute(::DrTable &, ::XmlReader const &, ::DrElReader const &, ::DrLoaderDef const &, ::DrAliasMap &)
+bool __cdecl LoadTableMT_PreProcBinder::Execute(::DrTable & table, ::XmlReader const & xmlreader, ::DrElReader const & elreader, ::DrLoaderDef const & loaderdef, ::DrAliasMap & aliasmap)
 {
-    LIFT_STUB(0x6eba00);
+    return table.LoadTableMT_PreProc(xmlreader, elreader, loaderdef, aliasmap);
 }
 
 // 0x6eba40
-bool __cdecl LoadTableMT_PostProcBinder::Execute(::DrTable &, ::XmlReader const &, ::DrElReader const &, ::DrLoaderDef const &, ::DrAliasMap &)
+bool __cdecl LoadTableMT_PostProcBinder::Execute(::DrTable & table, ::XmlReader const & xmlreader, ::DrElReader const & elreader, ::DrLoaderDef const & loaderdef, ::DrAliasMap & aliasmap)
 {
-    LIFT_STUB(0x6eba40);
+    return table.LoadTableMT_PostProc(xmlreader, elreader, loaderdef, aliasmap);
 }
 
 // 0x6ebac0
@@ -100,9 +106,20 @@ bool __cdecl DrDataReaderImpl::ReadBinaryDataFileFromMem(unsigned char *, int, :
 }
 
 // 0x6ebc90
-unsigned int __cdecl loadTableWorker(void *)
+unsigned int __cdecl loadTableWorker(void * args)
 {
-    LIFT_STUB(0x6ebc90);
+    // LIFT: 0x6ebc90. The PDB gives no type for the argument block. The fields follow the six pointer reads of the body.
+    struct LoadTableWorkerArgs
+    {
+        ::DrDataReaderImpl::LoadFuncBinder * binder;
+        ::DrTable * table;
+        ::XmlReader const * xmlreader;
+        ::DrElReader const * elreader;
+        ::DrLoaderDef const * loaderdef;
+        ::DrAliasMap * aliasmap;
+    };
+    LoadTableWorkerArgs * a = (LoadTableWorkerArgs *)args;
+    return a->binder->Execute(*a->table, *a->xmlreader, *a->elreader, *a->loaderdef, *a->aliasmap);
 }
 
 // 0x6ebcd0
@@ -126,7 +143,6 @@ bool __cdecl XmlPieceTableReader::Read(::XmlDoc *)
 // 0x6ebfb0
 __cdecl DrDataReaderImpl::DrDataReaderImpl(void)
 {
-    LIFT_STUB(0x6ebfb0);
 }
 
 // 0x6ebfc0
@@ -154,9 +170,12 @@ bool __cdecl DrDataReaderImpl::LoadAliasMT(::XmlReader const &, ::DrElReader con
 }
 
 // 0x6ec450
-bool __cdecl LoadTableBinder::Execute(::DrTable &, ::XmlReader const &, ::DrElReader const &, ::DrLoaderDef const &, ::DrAliasMap &)
+bool __cdecl LoadTableBinder::Execute(::DrTable & table, ::XmlReader const & xmlreader, ::DrElReader const & elreader, ::DrLoaderDef const & loaderdef, ::DrAliasMap & aliasmap)
 {
-    LIFT_STUB(0x6ec450);
+    table.PrepareLoadTable();
+    bool result = table.LoadTable(xmlreader, elreader, loaderdef, aliasmap);
+    table.FinishLoadTable(elreader, loaderdef);
+    return result;
 }
 
 // 0x6ec4c0

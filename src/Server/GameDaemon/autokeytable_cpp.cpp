@@ -2,6 +2,10 @@
 #include "autokeytable.h"
 #include "LiftStub.h"
 
+#pragma comment(linker, "/INCLUDE:?FinishLoadAlias@DrAutoKeyTable@@UEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?Find@DrAutoKeyTable@@UEBAQEAUDrEl@@_K@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?destroy@DrAutoKeyElMap@@QEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
+
 // 0x6fd320
 bool __cdecl DrAutoKeyTable::LoadAlias(::XmlReader const &, ::DrElReader const &, ::DrLoaderDef const &, ::DrAliasMap &)
 {
@@ -11,7 +15,7 @@ bool __cdecl DrAutoKeyTable::LoadAlias(::XmlReader const &, ::DrElReader const &
 // 0x6fd410
 void __cdecl DrAutoKeyTable::FinishLoadAlias(void)
 {
-    LIFT_STUB(0x6fd410);
+    _nextAutoKey = 1;
 }
 
 // 0x6fd4c0
@@ -39,9 +43,11 @@ void __cdecl DrAutoKeyTable::GetTableSummary(::DrTableSummary &)
 }
 
 // 0x6fd790
-::DrEl *const __cdecl DrAutoKeyTable::Find(unsigned __int64) const
+::DrEl *const __cdecl DrAutoKeyTable::Find(unsigned __int64 key) const
 {
-    LIFT_STUB(0x6fd790);
+    if (key >= _elMap.elCount)
+        return nullptr;
+    return _elMap.elArray[key];
 }
 
 // 0x6fd7b0
@@ -65,7 +71,8 @@ void __cdecl DrAutoKeyTable::removeInnerIter(::DrInnerIter *) const
 // 0x6fda40
 void __cdecl DrAutoKeyElMap::destroy(void)
 {
-    LIFT_STUB(0x6fda40);
+    elArray.clear();
+    elCount = 0;
 }
 
 // 0x6fdab0
