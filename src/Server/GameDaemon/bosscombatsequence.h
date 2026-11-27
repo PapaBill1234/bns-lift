@@ -5,7 +5,7 @@
 #include "action.h"
 #include "combatsequence.h"
 
-class BossCombatSequence
+class BossCombatSequence : private ::LiftBytes<0x188 - 8>  // LIFT: PDB base CombatSequence (+8 to +0x187) is not declared yet
 {
 public:
     virtual __cdecl ~BossCombatSequence(void);  // 0x630d0
@@ -27,7 +27,6 @@ private:
     ::Action * __cdecl createWakeupAttack(::BrainBase &, ::Creature *);  // 0x794b0
 private:
     // PDB layout (size 0x198). The vfptr is at +0.
-    char lift_pad_8[0x180];  // ❓ no PDB name: base CombatSequence (+8 to +0x187) is not declared yet
     bool _isInBerserkSeq;  // +392 (0x188)
     unsigned __int64 _reservedBerserkSeqId;  // +400 (0x190)
 };

@@ -19,6 +19,7 @@ Easy leaves (GameDaemon). The driver builds, runs the gate and records the MATCH
 - `Summoned` now has a partial PDB layout. A `LiftBytes` private base holds +8 to +0x19FF (base `ControlledCreature` and `_data`, `_levelData`, `_summonedEntry`). The class declares `_master` (+0x1A00) to `_combatStartTime` (+0x1A20). `_history` and `_historyItems` are not declared yet.
 - `Summoned::SummonedState` is an empty enum. Its enumerators are not declared yet.
 - The `Summoned` forwarders call the `Pc` virtual functions. The skeleton vftable slot order of `Pc` is not the PDB order yet. Thus these bodies can stay DIFF until a later card fixes the `Pc` vftable.
+- Round 2 fixes the `pdb_layout` gate errors (5 errors). The round 1 headers declared `lift_pad_8` members, and the PDB has no member with that name. `ArenaPublicRaidRoom` also declared `_interDungeonList`, but the PDB puts that member in the base `ArenaDungeonRoom`. Now each padding area is a private base. `BossCombatSequence`, `BrainRaidBoss` and `PublicRaid` use `LiftBytes`. `ArenaPublicRaidRoom` uses the view `ArenaPublicRaidRoomBaseView`, which holds the padding and `_interDungeonList`. The member offsets do not change.
 - The new `Summoned` bodies have no live caller. They have `/INCLUDE` dead-strip pragmas with a `// LIFT:` note.
 
 ## Not done

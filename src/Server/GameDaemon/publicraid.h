@@ -30,7 +30,7 @@ public:
     ::PublicRaidRecordView *_record;  // 0x0 (PDB: DrRecordPtr::_record, DrEl *)
 };
 
-class PublicRaid
+class PublicRaid : private ::LiftBytes<0xD348 - 8>  // LIFT: PDB base EnterPublicRaidAttractionState and _state (+8 to +0xD347) are not declared yet
 {
 public:
     virtual wchar_t const * __cdecl GetTypeName(void);  // 0x180e50
@@ -71,7 +71,6 @@ private:
     bool __cdecl getEventCylinder(::cylinder16 &);  // 0x1a3b40
 private:
     // PDB layout (size 0xD3A8). The vfptr is at +0.
-    char lift_pad_8[0xD340];  // ❓ no PDB name: base EnterPublicRaidAttractionState and _state (+8 to +0xD347) are not declared yet
     ::PublicRaidRecordPtrView _data;  // +54088 (0xD348) (PDB: Data::PublicRaidRecordPtr)
 };
 

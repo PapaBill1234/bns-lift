@@ -39,7 +39,15 @@ public:
     ::ArenaInterDungeonListRecordView *_record;  // 0x0 (PDB: DrRecordPtr::_record, DrEl *)
 };
 
-class ArenaPublicRaidRoom
+// LIFT: view of the PDB base ArenaDungeonRoom of ArenaPublicRaidRoom (+8 to +0xD37F). It is a private base,
+// so the declared members of ArenaPublicRaidRoom keep their PDB offsets.
+struct ArenaPublicRaidRoomBaseView
+{
+    char lift_pad_8[0xD370];  // ❓ no PDB name: base ArenaDungeonRoom up to +0xD377 is not declared yet
+    ::ArenaInterDungeonListRecordPtrView _interDungeonList;  // +54136 (0xD378) in ArenaPublicRaidRoom (PDB: ArenaDungeonRoom::_interDungeonList)
+};
+
+class ArenaPublicRaidRoom : private ::ArenaPublicRaidRoomBaseView  // LIFT: view of the PDB base ArenaDungeonRoom (+8 to +0xD37F)
 {
 public:
     virtual void __cdecl SetPublicRaidReservePcCount(int);  // 0x27b30
@@ -56,8 +64,6 @@ public:
     virtual bool __cdecl GetPcSpawnInfo(unsigned int, unsigned __int64, unsigned int *, ::vector16 *, int *);  // 0x4a520
 protected:
     // PDB layout (size 0xD388). The vfptr is at +0.
-    char lift_pad_8[0xD370];  // ❓ no PDB name: base ArenaDungeonRoom up to +0xD377 is not declared yet
-    ::ArenaInterDungeonListRecordPtrView _interDungeonList;  // +54136 (0xD378) (PDB: ArenaDungeonRoom::_interDungeonList)
     char _arenaPortalPublicRaidModeType;  // +54144 (0xD380) (LIFT: PDB type is char const; const waits for the lifted ctor)
     long volatile _reservePcCount;  // +54148 (0xD384)
 };

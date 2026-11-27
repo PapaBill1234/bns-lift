@@ -12,7 +12,7 @@ struct BrainRaidBossCombatSeqStateView
     unsigned __int64 _lastTargetId;  // +16 (0x10)
 };
 
-class BrainRaidBoss
+class BrainRaidBoss : private ::LiftBytes<0xC08 - 8>  // LIFT: PDB base BrainBase, _actSeq, _bossCombatSeq and _hateList (+8 to +0xC07) are not declared yet
 {
 protected:
     virtual unsigned __int64 __cdecl GetLastTargetId(void) const;  // 0x634a0
@@ -27,7 +27,6 @@ private:
     void __cdecl getMinHateSpecialTargets(::Creature **const, char, char);  // 0x63e40
 private:
     // PDB layout (size 0xCB8). The vfptr is at +0.
-    char lift_pad_8[0xC00];  // ❓ no PDB name: base BrainBase, _actSeq, _bossCombatSeq and _hateList (+8 to +0xC07) are not declared yet
     unsigned __int64 _spawn[1];  // +3080 (0xC08) (PDB: SpawnState, size 0x8)
     unsigned __int64 _act[2];  // +3088 (0xC10) (PDB: ActSeqState, size 0x10)
     ::BrainRaidBossCombatSeqStateView _combat;  // +3104 (0xC20) (PDB: CombatSeqState)
