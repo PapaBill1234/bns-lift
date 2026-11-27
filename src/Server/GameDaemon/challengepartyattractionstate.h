@@ -32,8 +32,8 @@ private:
     void __cdecl initPatternScore(::Zone *);  // 0x6ee50
     bool __cdecl isTimeOut(::Zone *);  // 0x6eeb0
     void __cdecl initPlayerState(::Pc *);  // 0x6ef00
-    // LIFT: the PDB members before +16 are not declared yet; pad keeps _attractionOption at +16.
-    __int64 _padTo16;  // +8 (_data)
+    // LIFT: _data is Data::ChallengePartyRecordPtr in the PDB (8 bytes); the type is not included here yet.
+    __int64 _data;  // +8
     char _attractionOption;  // +16
 public:
     virtual __cdecl ~ChallengePartyAttractionState(void);  // 0x6f370
