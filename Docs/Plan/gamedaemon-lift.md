@@ -208,6 +208,7 @@ Planner rules (card 0b):
 | Lessons | Each new fix pattern goes into `Docs/Parity/lessons.md` | `Docs/Parity/README.md` |
 | Stall | 3 rounds with no gain = `stopped`, with a cause per open function | `Docs/Parity/README.md` |
 | Wave gate | All cards of the wave landed or parked with a cause; lessons written; a 10 % step starts its Rust step | this plan, `modernize.md` |
+| Dead-strip | A function with no live caller gets an `/INCLUDE:<public name>` pragma, else `/OPT:REF` removes it and it gets no MATCH. Card 0c: the skeleton pairs 77 functions only (`wmain` is a stub). | `Docs/Parity/lessons.md` (`/INCLUDE` rows), card 0c |
 
 ## 6. Card engine needs
 
