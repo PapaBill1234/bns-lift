@@ -3,6 +3,14 @@
 #include "propertysync.h"
 #include "LiftStub.h"
 
+// LIFT: keep the lifted virtual functions until the callers are lifted. Card lift-gamedaemon-gap-002-e2.
+#pragma comment(linker, "/INCLUDE:?TypeId@ClientOption@@UEBA?BHXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?Name@ClientOption@@UEBAPEB_WXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?FieldMax@ClientOption@@MEBAHXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?FieldDefine@ClientOption@@MEBAPEBUDef@Field@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SyncMax@ClientOption@@MEBAHXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SyncDefine@ClientOption@@MEBAPEBUDef@SyncBuffer@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+
 
 // 0x19480
 __cdecl ClientOption::~ClientOption(void)

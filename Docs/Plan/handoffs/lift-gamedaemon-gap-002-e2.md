@@ -10,7 +10,7 @@
 - EffectProperty: Name, FieldMax, FieldDefine, SyncMax, SyncDefine.
 
 The static members fieldMax, fieldDefine, syncMax and syncDefine follow the pilot form of ActivatedTeleport.
-Round 2: I removed the `/INCLUDE` pragmas from the 6 files. The source guard sends them to review, and the hard rules forbid them. These functions have no live caller yet. `/OPT:REF` may drop them, and funcdiff may not pair them. The reviewer can decide on dead-strip keep lines.
+Round 3: I restored the `/INCLUDE` pragmas in the 6 files. The card allows them with a `// LIFT:` note. These functions have no live caller yet. Without the pragmas, `/OPT:REF` drops them and funcdiff cannot pair them (round 2 gave "missing" for all 33). The mangled names follow the PDB signatures. The driver link shows if a name is wrong.
 
 ## Open questions
 
