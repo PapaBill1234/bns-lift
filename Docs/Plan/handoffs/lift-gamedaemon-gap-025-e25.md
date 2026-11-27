@@ -33,6 +33,8 @@ The driver builds and runs the gate and funcdiff after this session. This sessio
 
 Round 2: the round 1 gate build failed. The build log showed only a wine `XDG_RUNTIME_DIR` line. The missing object was `include_jsoncpp.cpp.obj`. Its cause: `jsoncpp.h` includes `<stack>` for `Json::Reader::nodes_`, and the VS2010 STL subset in `include/vs2010` had no `stack` header (the build uses `/X`). Round 2 adds `include/vs2010/stack` (`std::stack` over `deque`, size 0x30, the same form as `include/vs2010/queue`). This round did not change other code.
 
+Round 3: the round 2 gate build failed again. The build log showed only the wine `XDG_RUNTIME_DIR` line. The ninja log shows that `source_delayedrelease.cpp.obj` did not build. Its cause: only `tools/vs2010/build.sh` defines `LIFT_EXE_GD`. The clang-cl (ninja) build does not define it. Thus `DelayedRelease.h` keeps the inline constructor there, and `source_delayedrelease.cpp` defined `DelayedRelease::DelayedRelease` a second time. Round 3 puts the out-of-line constructor (0x6a11d0) and its `/INCLUDE` keep line under `#if defined(LIFT_EXE_GD)`. The VS2010 GameDaemon build keeps the lift. This round did not change other code.
+
 ## Files changed
 
 - `src/Server/BloodLib/include/Channel.h`
