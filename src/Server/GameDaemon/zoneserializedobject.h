@@ -16,8 +16,9 @@ protected:
     virtual void __cdecl lift_slot3_DumpRefCntHistory(void) = 0;
     virtual void __cdecl lift_slot4_parentRoleAllocator(void) = 0;
     virtual void __cdecl lift_slot5_childRoleAllocator(void) = 0;
+    // MSVC orders same-name virtual overloads in reverse declaration order.
+    virtual void __cdecl TimerExpired(unsigned int, long) = 0;  // PDB slot 7 (+0x38), pure
     virtual void __cdecl TimerExpired(long);  // 0x25fbf0, PDB slot 6 (override of SerializedObject)
-    virtual void __cdecl TimerExpired(unsigned int, long) = 0;  // PDB slot 7, pure
 public:
     void __cdecl DetachParent(void);  // 0x25fc00
 };
