@@ -1,12 +1,14 @@
-// worldserializedobject_h.cpp: worldserializedobject.h (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
+// worldserializedobject_h.cpp: worldserializedobject.h (GameDaemon PDB, 2019 + PDB). childRoleAllocator lifted (card lift-gamedaemon-gap-006-e6).
 #include "worldserializedobject.h"
 #include "gameobject.h"
 #include "LiftStub.h"
+#include "Memory.h"
+#include "MemoryManager.h"
 
 // 0x1d070
 ::MemoryManager * __cdecl GameObject::childRoleAllocator(void)
 {
-    LIFT_STUB(0x1d070);
+    return const_cast< ::MemoryManager * >(Memory::_Manager[2]);
 }
 
 // 0x8c240

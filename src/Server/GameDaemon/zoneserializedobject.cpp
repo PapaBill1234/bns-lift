@@ -21,10 +21,14 @@ void __cdecl ZoneSerializedObject::SetZone(::Zone *)
     LIFT_STUB(0x25fb40);
 }
 
+// LIFT: keep the lifted virtual until the callers are lifted (the vftable and the callers are stubs;
+// /OPT:REF drops it). Card lift-gamedaemon-gap-006-e6.
+#pragma comment(linker, "/INCLUDE:?TimerExpired@ZoneSerializedObject@@MEAAXJ@Z")  // LIFT: dead-strip keep (no live caller yet)
+
 // 0x25fbf0
-void __cdecl ZoneSerializedObject::TimerExpired(long)
+void __cdecl ZoneSerializedObject::TimerExpired(long elapsed)
 {
-    LIFT_STUB(0x25fbf0);
+    TimerExpired(1u, elapsed);  // DEFAULT_TIMER_ID
 }
 
 // 0x25fc00

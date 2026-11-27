@@ -1,183 +1,216 @@
-// npc_h.cpp: npc.h (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
+// npc_h.cpp: npc.h (GameDaemon PDB, 2019 + PDB). Lifted: 30 record getters (card lift-gamedaemon-gap-006-e6).
 #include "npc.h"
 #include "LiftStub.h"
+
+// LIFT: keep the lifted virtual getters until the callers are lifted (the vftable and the callers are stubs;
+// /OPT:REF drops them). Card lift-gamedaemon-gap-006-e6.
+#pragma comment(linker, "/INCLUDE:?GetAttackHitValueModify@Npc@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetAttackCriticalValueModify@Npc@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetDefendCriticalValueModify@Npc@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetDefendDodgeValueModify@Npc@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetDefendParryValueModify@Npc@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetDefendPhysicalValueModify@Npc@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetDefendForceValueModify@Npc@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetAttackStiffDurationValueModify@Npc@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetDefendStiffDurationValueModify@Npc@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetCastDurationValueModify@Npc@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetAttackCriticalDamageModify@Npc@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetDefendCriticalDamageModify@Npc@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetAttackPierceModify@Npc@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetAttackParryPierceModify@Npc@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetDefendParryReduceModify@Npc@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetAttackPerfectParryDamageModify@Npc@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetDefendPerfectParryReduceModify@Npc@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetAttackCounterDamageModify@Npc@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetDefendCounterReduceModify@Npc@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetHealPowerModify@Npc@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetAOEDefendPowerModify@Npc@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetAbnormalAttackPowerModify@Npc@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetAbnormalDefendPowerModify@Npc@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetHatePowerModify@Npc@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetAttackAttributeModify@Npc@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetRAttackAoePierceModify@Npc@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetRAttackAbnormalHitModify@Npc@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetRDefendAbnormalDodgeModify@Npc@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetRSupportPowerModify@Npc@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetRHypermovePowerModify@Npc@@UEAAFXZ")  // LIFT: dead-strip keep (no live caller yet)
 
 // 0x27380
 short __cdecl Npc::GetAttackHitValueModify(void)
 {
-    LIFT_STUB(0x27380);
+    return _data->attack_hit_value_modify;
 }
 
 // 0x27390
 short __cdecl Npc::GetAttackCriticalValueModify(void)
 {
-    LIFT_STUB(0x27390);
+    return _data->attack_critical_value_modify;
 }
 
 // 0x273a0
 short __cdecl Npc::GetDefendCriticalValueModify(void)
 {
-    LIFT_STUB(0x273a0);
+    return _data->defend_critical_value_modify;
 }
 
 // 0x273b0
 short __cdecl Npc::GetDefendDodgeValueModify(void)
 {
-    LIFT_STUB(0x273b0);
+    return _data->defend_dodge_value_modify;
 }
 
 // 0x273c0
 short __cdecl Npc::GetDefendParryValueModify(void)
 {
-    LIFT_STUB(0x273c0);
+    return _data->defend_parry_value_modify;
 }
 
 // 0x273d0
 short __cdecl Npc::GetDefendPhysicalValueModify(void)
 {
-    LIFT_STUB(0x273d0);
+    return _data->defend_physical_value_modify;
 }
 
 // 0x273e0
 short __cdecl Npc::GetDefendForceValueModify(void)
 {
-    LIFT_STUB(0x273e0);
+    return _data->defend_force_value_modify;
 }
 
 // 0x273f0
 short __cdecl Npc::GetAttackStiffDurationValueModify(void)
 {
-    LIFT_STUB(0x273f0);
+    return _data->attack_stiff_duration_value_modify;
 }
 
 // 0x27400
 short __cdecl Npc::GetDefendStiffDurationValueModify(void)
 {
-    LIFT_STUB(0x27400);
+    return _data->defend_stiff_duration_value_modify;
 }
 
 // 0x27410
 short __cdecl Npc::GetCastDurationValueModify(void)
 {
-    LIFT_STUB(0x27410);
+    return _data->cast_duration_value_modify;
 }
 
 // 0x27420
 short __cdecl Npc::GetAttackCriticalDamageModify(void)
 {
-    LIFT_STUB(0x27420);
+    return _data->attack_critical_damage_modify;
 }
 
 // 0x27430
 short __cdecl Npc::GetDefendCriticalDamageModify(void)
 {
-    LIFT_STUB(0x27430);
+    return _data->defend_critical_damage_modify;
 }
 
 // 0x27440
 short __cdecl Npc::GetAttackPierceModify(void)
 {
-    LIFT_STUB(0x27440);
+    return _data->attack_pierce_modify;
 }
 
 // 0x27450
 short __cdecl Npc::GetAttackParryPierceModify(void)
 {
-    LIFT_STUB(0x27450);
+    return _data->attack_parry_pierce_modify;
 }
 
 // 0x27460
 short __cdecl Npc::GetDefendParryReduceModify(void)
 {
-    LIFT_STUB(0x27460);
+    return _data->defend_parry_reduce_modify;
 }
 
 // 0x27470
 short __cdecl Npc::GetAttackPerfectParryDamageModify(void)
 {
-    LIFT_STUB(0x27470);
+    return _data->attack_perfect_parry_damage_modify;
 }
 
 // 0x27480
 short __cdecl Npc::GetDefendPerfectParryReduceModify(void)
 {
-    LIFT_STUB(0x27480);
+    return _data->defend_perfect_parry_reduce_modify;
 }
 
 // 0x27490
 short __cdecl Npc::GetAttackCounterDamageModify(void)
 {
-    LIFT_STUB(0x27490);
+    return _data->attack_counter_damage_modify;
 }
 
 // 0x274a0
 short __cdecl Npc::GetDefendCounterReduceModify(void)
 {
-    LIFT_STUB(0x274a0);
+    return _data->defend_counter_reduce_modify;
 }
 
 // 0x274b0
 short __cdecl Npc::GetHealPowerModify(void)
 {
-    LIFT_STUB(0x274b0);
+    return _data->heal_power_modify;
 }
 
 // 0x274c0
 short __cdecl Npc::GetAOEDefendPowerModify(void)
 {
-    LIFT_STUB(0x274c0);
+    return _data->aoe_defend_power_modify;
 }
 
 // 0x274d0
 short __cdecl Npc::GetAbnormalAttackPowerModify(void)
 {
-    LIFT_STUB(0x274d0);
+    return _data->abnormal_attack_power_modify;
 }
 
 // 0x274e0
 short __cdecl Npc::GetAbnormalDefendPowerModify(void)
 {
-    LIFT_STUB(0x274e0);
+    return _data->abnormal_defend_power_modify;
 }
 
 // 0x274f0
 short __cdecl Npc::GetHatePowerModify(void)
 {
-    LIFT_STUB(0x274f0);
+    return _data->hate_power_modify;
 }
 
 // 0x27500
 short __cdecl Npc::GetAttackAttributeModify(void)
 {
-    LIFT_STUB(0x27500);
+    return _data->attack_attribute_modify;
 }
 
 // 0x27510
 short __cdecl Npc::GetRAttackAoePierceModify(void)
 {
-    LIFT_STUB(0x27510);
+    return _data->r_attack_aoe_pierce_modify;
 }
 
 // 0x27520
 short __cdecl Npc::GetRAttackAbnormalHitModify(void)
 {
-    LIFT_STUB(0x27520);
+    return _data->r_attack_abnormal_hit_modify;
 }
 
 // 0x27530
 short __cdecl Npc::GetRDefendAbnormalDodgeModify(void)
 {
-    LIFT_STUB(0x27530);
+    return _data->r_defend_abnormal_dodge_modify;
 }
 
 // 0x27540
 short __cdecl Npc::GetRSupportPowerModify(void)
 {
-    LIFT_STUB(0x27540);
+    return _data->r_support_power_modify;
 }
 
 // 0x27550
 short __cdecl Npc::GetRHypermovePowerModify(void)
 {
-    LIFT_STUB(0x27550);
+    return _data->r_hypermove_power_modify;
 }
