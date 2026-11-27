@@ -188,6 +188,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"ActSequenceLoader::GetTableType": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "ActSequenceLoader::ReadFromBuffer": {
 "calls": 100,
 "consts": 100,
@@ -328,6 +335,69 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"ArenaDungeonRoom::GetArenaAttraction": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ArenaLobbyRoomUtil::IsDungeonGameMode": {
+"calls": 100,
+"consts": 0,
+"refs": 100,
+"score": 66.7,
+"status": "DIFF"
+},
+"ArenaLobbyRoomUtil::IsPartyBattleFieldGameMode": {
+"calls": 100,
+"consts": 50,
+"refs": 100,
+"score": 83.3,
+"status": "DIFF"
+},
+"ArenaLobbyRoomUtil::IsPublicRaidGameMode": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ArenaPublicRaidRoom::GetArenaPortalPublicRaidModeType": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ArenaPublicRaidRoom::GetPublicRaidKey": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ArenaPublicRaidRoom::IsSetPublicRaidReservePcCount": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ArenaPublicRaidRoom::SetPublicRaidReservePcCount": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ArenaRoom::GetArenaPortalPublicRaidModeType": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "AssentGuildCraftTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
@@ -342,6 +412,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"AttractionState::~AttractionState": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "BIT_initDStream": {
 "calls": 100,
 "consts": 100,
@@ -350,6 +427,27 @@
 "status": "MATCH"
 },
 "BIT_reloadDStream": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BannedWordFilterDynamicMemoryManager::Alloc": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BannedWordFilterDynamicMemoryManager::Free": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BannedWordFilterDynamicMemoryManager::Realloc": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -371,6 +469,27 @@
 "status": "MATCH"
 },
 "BossChallengeAttractionState::GetTypeName": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BossCombatSequence::ReserveTransitBerserk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BrainRaidBoss::GetLastTargetId": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BrainRaidBoss::GetState": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -2253,6 +2372,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"NpcContribution::Reset": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "NpcContribution::TotalDamage": {
 "calls": 100,
 "consts": 100,
@@ -2519,6 +2645,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"PcContribution::PcContribution": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "PcPublicRaidState::CheckAddScoreCoolTime": {
 "calls": 100,
 "consts": 100,
@@ -2576,6 +2709,20 @@
 "status": "DIFF"
 },
 "PickupDeadBodyAction::availableCancel": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PublicRaid::GetMaxPcCount": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PublicRaid::GetTypeName": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -3156,6 +3303,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Summoned::FinishCombat": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Summoned::GetAOEDefendPowerModify": {
 "calls": 100,
 "consts": 100,
@@ -3360,6 +3514,13 @@
 "status": "MATCH"
 },
 "Summoned::GetRSupportPowerModify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Summoned::StartCombat": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
