@@ -2,6 +2,7 @@
 // LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
 #pragma once
 #include "GameDaemonFwd.h"
+#include <exception>
 
 namespace Json {
 // PDB layout: size 0x40.
