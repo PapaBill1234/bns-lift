@@ -2,6 +2,7 @@
 // LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
 #pragma once
 #include "GameDaemonFwd.h"
+#include "Lock.h"
 
 class BuilderSessionHandler
 {
@@ -65,7 +66,25 @@ public:
     bool __cdecl NotCheckToPlayInWeek(char);  // 0x343650
     static void __cdecl WriteDump(bool);  // 0x3438f0
     static wchar_t const * __cdecl GetAddressStringWForLogs(unsigned long);  // 0x343910
+
+    // PDB data members (partial layout, size 0x15378).
+    static ::GameDaemon * GamedInstance;
+private:
+    char _liftGameDaemonPad0[0x748 - 0x8];      // LIFT: base class and members before replyCacheHelloEvent, later waves
+public:
+    ::SystemEvent replyCacheHelloEvent;         // +0x748
+private:
+    char _liftGameDaemonPad1[0xAA8 - 0x750];    // LIFT: members, later waves
+public:
+    ::GamedConfig * config;                     // +0xAA8
+private:
+    char _liftGameDaemonPad2[0x1030 - 0xAB0];   // LIFT: members, later waves
+public:
+    char arenaAttraction;                       // +0x1030
+private:
+    char _liftGameDaemonTail[0x15378 - 0x1031]; // LIFT: members after arenaAttraction, later waves
 };
+static_assert(sizeof(GameDaemon) == 0x15378, "sizeof GameDaemon");
 
 class GamedCooldownTimer
 {
@@ -128,7 +147,11 @@ struct TimeBasedPlaySeasonSchedule::Rule
 {
 public:
     __cdecl Rule(void);  // 0x1ee590
+
+    short minutes;      // +0x00
+    int rewardList[4];  // +0x04
 };
+static_assert(sizeof(TimeBasedPlaySeasonSchedule::Rule) == 0x14, "sizeof TimeBasedPlaySeasonSchedule::Rule");
 
 unsigned __int64 __cdecl GenerateTid(void);  // 0x339ee0
 int wmain(int, wchar_t**);  // 0x33a190
