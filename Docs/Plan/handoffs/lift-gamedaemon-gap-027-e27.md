@@ -59,6 +59,13 @@ Session 2 decisions:
 
 The `Item` items need one structural card: declare the `Item` vtable in PDB order (84 slots), make `ItemBase<Trait>` and `WeaponItem` derive in the PDB chain, and declare `Data::ItemRecord`.
 
+## Round 2
+
+- The round 1 gate build failed. `effect_cpp_1.cpp` used `CreatureAbnormalityView`, `EffectRecordView`, `BUFF_TYPE_DEBUFF` and `Log` but did not declare or include them. Round 2 adds the two views, the constant and `#include "Log.h"`.
+- `CreatureAbnormalityView::immune_debuff` is at +0x76F (Prop +0x30, Abnormality +0x738, field +7). The pseudocode reads it as `HIBYTE(target[39]._parentRole)`, and that is the same address.
+- `EffectRecordView` uses PDB offsets: `key.id` at +0x8, `buff_type` at +0x38, `ignore_immune_debuff` at +0xC2.
+- The `XDG_RUNTIME_DIR` line in the build log comes from the build environment. It does not come from the source.
+
 ## Gate and MATCH
 
 The driver builds and runs the gate and funcdiff after this session. This session did not run them.

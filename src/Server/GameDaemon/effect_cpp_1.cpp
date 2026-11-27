@@ -5,6 +5,7 @@
 #include "zone.h"
 #include "RefCntObject.h"
 #include "Daemon.h"
+#include "Log.h"
 #include "LiftStub.h"
 
 #pragma comment(linker, "/INCLUDE:??1Effect@@UEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
@@ -37,6 +38,26 @@ inline unsigned short GetObjectType(unsigned __int64 id)
 }
 
 const unsigned short OBJECT_TYPE_32 = 32;  // LIFT: object type value 32 (pseudocode); ❓ enumerator name
+
+// LIFT: view of Creature (PDB: Prop at +0x30, CreatureProperty::Abnormality at +0x738, __abnormality__::immune_debuff at +7).
+struct CreatureAbnormalityView
+{
+    char lift_pad_0[0x30 + 0x738 + 7];
+    bool immune_debuff;  // +0x76F (Prop.Abnormality.immune_debuff)
+};
+
+// LIFT: view of Data::EffectRecord (PDB: key at +8, buff_type at +0x38, ignore_immune_debuff at +0xC2).
+struct EffectRecordView
+{
+    char lift_pad_0[8];
+    int id;                     // +0x8 (key.id)
+    char lift_pad_1[0x38 - 0xC];
+    char buff_type;             // +0x38
+    char lift_pad_2[0xC2 - 0x39];
+    bool ignore_immune_debuff;  // +0xC2
+};
+
+const char BUFF_TYPE_DEBUFF = 2;  // LIFT: buff_type value 2 (pseudocode); ❓ enumerator name
 }
 
 // 0x5a2ec0
