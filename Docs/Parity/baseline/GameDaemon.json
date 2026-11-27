@@ -741,19 +741,96 @@
 "score": 66.7,
 "status": "DIFF"
 },
-"DrDataTableImpl::DrDataTableImpl": {
+"DrAliasMapImpl::Clear": {
+"calls": 0,
+"consts": 100,
+"refs": 100,
+"score": 66.7,
+"status": "DIFF"
+},
+"DrAliasMapImpl::Count": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
 },
-"DrDataTableImpl::Find": {
+"DrAliasMapImpl::DrAliasMapImpl": {
 "calls": 0,
-"consts": 0,
-"refs": 0,
-"score": 0.0,
+"consts": 100,
+"refs": 100,
+"score": 66.7,
 "status": "DIFF"
+},
+"DrAliasMapImpl::WriteToBuffer": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DrAutoKeyElMap::destroy": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DrAutoKeyInnerIter::IsValid": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DrAutoKeyInnerIter::Next": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DrAutoKeyInnerIter::Ptr": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DrAutoKeyTable::Find": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DrAutoKeyTable::FinishLoadAlias": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DrDataReaderImpl::DrDataReaderImpl": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DrDataReaderImpl::~DrDataReaderImpl": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DrDataTableImpl::DrDataTableImpl": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "DrDataTableImpl::ReferenceCopiedEl": {
 "calls": 100,
@@ -776,6 +853,27 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"DrDefLog::Write": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DrHeapMemory::Alloc": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DrHeapMemory::DrHeapMemory": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "DrHeapMemory::Free": {
 "calls": 100,
 "consts": 100,
@@ -789,6 +887,83 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"DrMemoryManager::SetupMemory": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DrMultiKeyElMap::count": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DrMultiKeyInnerIter::IsValid": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DrMultiKeyInnerIter::Next": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DrMultiKeyInnerIter::Ptr": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DrMultiKeyTable::Find": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DrParallelWorkerManager::Execute": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DrParallelWorkerManager::Init": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DrParallelWorkerManager::SetWorkerFunc": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DrParallelWorkerManager::SetWorkerInitFunc": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DrParallelWorkerManager::StartWorkerPool": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
 },
 "DuelBot::GetAOEDefendPowerModify": {
 "calls": 100,
@@ -1469,6 +1644,27 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"LoadTableBinder::Execute": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LoadTableMT_PostProcBinder::Execute": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LoadTableMT_PreProcBinder::Execute": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "LobbyTokenAuthTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
@@ -1966,7 +2162,21 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"QuestTableImpl::GetQuest": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "QuestTableImpl::GetQuestByIndex": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"QuestTableImpl::QuestTableImpl": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -3079,6 +3289,20 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"ZipPackedReaderIO::Close": {
+"calls": 0,
+"consts": 67,
+"refs": 100,
+"score": 55.6,
+"status": "DIFF"
+},
+"ZipPackedReaderIO::Next": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "ZoneSerializedObject::TimerExpired": {
 "calls": 100,
 "consts": 100,
@@ -3136,6 +3360,20 @@
 "status": "MATCH"
 },
 "atexit": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"loadTableWorker": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"md5_init": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
