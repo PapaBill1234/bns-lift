@@ -2,6 +2,40 @@
 #include "jsoncpp.h"
 #include "gameobject.h"
 #include "LiftStub.h"
+#include <math.h>
+#include <stdlib.h>
+#include <string.h>
+
+#pragma comment(linker, "/INCLUDE:??0Reader@Json@@QEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:??1CommentInfo@Value@Json@@QEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:??1CZString@Value@Json@@QEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:??MCZString@Value@Json@@QEBA_NAEBV012@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?isInt@Value@Json@@QEBA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?isUInt64@Value@Json@@QEBA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:??1GameObjectIdManager@@UEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
+
+namespace Json {
+// PDB data: maxUInt64AsDouble (jsoncpp.cpp static).
+static double const maxUInt64AsDouble = 18446744073709551615.0;
+
+// LIFT: inlined helper of jsoncpp. No PDB function.
+static inline bool IsIntegral(double d)
+{
+    double integral_part;
+    return modf(d, &integral_part) == 0.0;
+}
+
+// LIFT: inlined helper of jsoncpp. No PDB function.
+static inline void uintToString(unsigned __int64 value, char*& current)
+{
+    *--current = 0;
+    do
+    {
+        *--current = static_cast<char>(value % 10U + static_cast<unsigned>('0'));
+        value /= 10U;
+    } while (value != 0);
+}
+}
 
 namespace Json {
 // 0x6a4ca0
@@ -12,9 +46,10 @@ static std::basic_string<char,std::char_traits<char>,StlAllocator<char,2> >  cod
 }
 
 // 0x6a4eb0
-__cdecl Json::Reader::Reader(void)
+Json::Reader::Reader(void)
+    : errors_(), document_(), begin_(), end_(), current_(), lastValueEnd_(), lastValue_(), commentsBefore_(),
+      features_(Features::all()), collectComments_()
 {
-    LIFT_STUB(0x6a4eb0);
 }
 
 // 0x6a4f40
@@ -182,7 +217,9 @@ void __cdecl Json::throwLogicError(::std::basic_string<char, ::std::char_traits<
 // 0x6a8600
 __cdecl Json::Value::CommentInfo::~CommentInfo(void)
 {
-    LIFT_STUB(0x6a8600);
+    // LIFT: releaseStringValue is inlined (free).
+    if (comment_ != nullptr)
+        free(comment_);
 }
 
 // 0x6a8620
@@ -200,13 +237,25 @@ __cdecl Json::Value::CZString::CZString(::Json::Value::CZString const &)
 // 0x6a87a0
 __cdecl Json::Value::CZString::~CZString(void)
 {
-    LIFT_STUB(0x6a87a0);
+    // LIFT: releaseStringValue is inlined (free).
+    if (cstr_ != nullptr && storage_.policy_ == duplicate)
+        free(const_cast<char*>(cstr_));
 }
 
 // 0x6a87d0
-bool __cdecl Json::Value::CZString::operator<(::Json::Value::CZString const &) const
+bool __cdecl Json::Value::CZString::operator<(::Json::Value::CZString const &other) const
 {
-    LIFT_STUB(0x6a87d0);
+    if (cstr_ == nullptr)
+        return index_ < other.index_;
+    unsigned int thisLen = storage_.length_;
+    unsigned int otherLen = other.storage_.length_;
+    unsigned int minLen = (thisLen < otherLen) ? thisLen : otherLen;
+    int comp = memcmp(cstr_, other.cstr_, minLen);
+    if (comp < 0)
+        return true;
+    if (comp > 0)
+        return false;
+    return thisLen < otherLen;
 }
 
 // 0x6a8850
@@ -314,7 +363,18 @@ unsigned int __cdecl Json::Value::size(void) const
 // 0x6aa080
 bool __cdecl Json::Value::isInt(void) const
 {
-    LIFT_STUB(0x6aa080);
+    switch (type_)
+    {
+    case intValue:
+        return value_.int_ >= minInt && value_.int_ <= maxInt;
+    case uintValue:
+        return value_.uint_ <= static_cast<unsigned int>(maxInt);
+    case realValue:
+        return value_.real_ >= minInt && value_.real_ <= maxInt && IsIntegral(value_.real_);
+    default:
+        break;
+    }
+    return false;
 }
 
 // 0x6aa110
@@ -326,7 +386,18 @@ bool __cdecl Json::Value::isInt64(void) const
 // 0x6aa1b0
 bool __cdecl Json::Value::isUInt64(void) const
 {
-    LIFT_STUB(0x6aa1b0);
+    switch (type_)
+    {
+    case intValue:
+        return value_.int_ >= 0;
+    case uintValue:
+        return true;
+    case realValue:
+        return value_.real_ >= 0 && value_.real_ < maxUInt64AsDouble && IsIntegral(value_.real_);
+    default:
+        break;
+    }
+    return false;
 }
 
 // 0x6aa230
@@ -342,9 +413,12 @@ void __cdecl Json::Value::setComment(char const *, unsigned __int64, ::Json::Com
 }
 
 // 0x6aa430
-::std::basic_string<char, ::std::char_traits<char>, ::StlAllocator<char, 2> > __cdecl Json::valueToString(unsigned __int64)
+::std::basic_string<char, ::std::char_traits<char>, ::StlAllocator<char, 2> > __cdecl Json::valueToString(unsigned __int64 value)
 {
-    LIFT_STUB(0x6aa430);
+    char buffer[3 * sizeof(unsigned __int64) + 1];  // LIFT: UIntToStringBuffer
+    char* current = buffer + sizeof(buffer);
+    uintToString(value, current);
+    return current;
 }
 
 // 0x6aa4f0
@@ -354,15 +428,15 @@ void __cdecl Json::Value::setComment(char const *, unsigned __int64, ::Json::Com
 }
 
 // 0x6aa650
-::std::basic_string<char, ::std::char_traits<char>, ::StlAllocator<char, 2> > __cdecl Json::valueToString(double)
+::std::basic_string<char, ::std::char_traits<char>, ::StlAllocator<char, 2> > __cdecl Json::valueToString(double value)
 {
-    LIFT_STUB(0x6aa650);
+    return valueToString(value, false, 17);
 }
 
 // 0x6aa680
-::std::basic_string<char, ::std::char_traits<char>, ::StlAllocator<char, 2> > __cdecl Json::valueToString(bool)
+::std::basic_string<char, ::std::char_traits<char>, ::StlAllocator<char, 2> > __cdecl Json::valueToString(bool value)
 {
-    LIFT_STUB(0x6aa680);
+    return value ? "true" : "false";
 }
 
 namespace Json {
@@ -374,9 +448,9 @@ static std::basic_string<char,std::char_traits<char>,StlAllocator<char,2> >  val
 }
 
 // 0x6aad60
+// LIFT: ICF folds this empty destructor with other empty virtual destructors (HR shows another vftable).
 __cdecl GameObjectIdManager::~GameObjectIdManager(void)
 {
-    LIFT_STUB(0x6aad60);
 }
 
 // 0x6aad70
