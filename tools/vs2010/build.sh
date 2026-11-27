@@ -5,7 +5,7 @@
 # Needs:
 #   - ~/toolchains/vs2010 (see Docs/Plan/plan.md, "VS2010 SP1 compiler"). Never commit it.
 #   - The clang build dir (default: build). The script takes the object list of each exe and the .res files from it.
-# Usage: tools/vs2010/build.sh [EXE...]   (default: CacheGate LobbyGate SmartCouponDaemon PostOfficeDaemon LobbyDaemon)
+# Usage: tools/vs2010/build.sh [EXE...]   (default: CacheGate LobbyGate SmartCouponDaemon PostOfficeDaemon LobbyDaemon GameDaemon)
 # Env: LIFT_BUILD_DIR (clang build dir), VS2010_OUT (default: build-vs2010), JOBS (default: nproc)
 # Output: $VS2010_OUT/<EXE>.exe and <EXE>.pdb.
 # Header changes: the .dep file of each object lists its repo headers. A newer header rebuilds the object.
@@ -15,7 +15,7 @@ R="$PWD"
 B="${LIFT_BUILD_DIR:-build}"
 O="${VS2010_OUT:-build-vs2010}"
 JOBS="${JOBS:-$(nproc)}"
-EXES=("$@"); [ ${#EXES[@]} -gt 0 ] || EXES=(CacheGate LobbyGate SmartCouponDaemon PostOfficeDaemon LobbyDaemon)
+EXES=("$@"); [ ${#EXES[@]} -gt 0 ] || EXES=(CacheGate LobbyGate SmartCouponDaemon PostOfficeDaemon LobbyDaemon GameDaemon)
 # shellcheck source=/dev/null
 source "$HOME/toolchains/vs2010/bin/vs2010-env.sh"
 [ -f "$B/build.ninja" ] || { echo "no $B/build.ninja: run tools/gate.sh first" >&2; exit 2; }
@@ -139,7 +139,7 @@ PYEOF
 
 for exe in "${EXES[@]}"; do
   SEEN=()
-  # GameDaemon is opt-in: the clang build dir must be configured with -DLIFT_GAMEDAEMON=ON.
+  # GameDaemon needs a clang build dir that is configured with -DLIFT_GAMEDAEMON=ON (tools/gate.sh does this).
   if ! ninja -C "$B" -t query "$exe.exe" > /dev/null 2>&1; then
     echo "$exe: no ninja target $exe.exe in $B (GameDaemon: cmake -DLIFT_GAMEDAEMON=ON)"; RC=1; continue
   fi

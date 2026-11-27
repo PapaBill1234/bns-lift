@@ -4,12 +4,14 @@ Sources (all in git): Docs/Parity/baseline/<EXE>.json (per-function results),
 Docs/Parity/progress.tsv (total per exe = paired + only in original; start and last card).
 Docs/Parity/excluded.tsv (excluded symbols: not MATCH; own column 'Excluded').
 tools/parity.sh --accept runs this after each accepted lift-parity card. Manual run: tools/parity_readme.py"""
-import collections, json, re, sys
+import collections, json, os, re, sys
 sys.path.insert(0, "tools")
 import parity_excluded as px
-# CORE: the first 4 exes (summary row and shared library). LobbyDaemon is in the lift; it gets its own row.
+# CORE: the first 4 exes (summary row and shared library). LobbyDaemon and GameDaemon are in the lift; each gets its own row.
+# GameDaemon has a row only when its baseline file and a progress.tsv entry exist. Its level text is "Lift in progress".
 CORE = ["CacheGate", "LobbyGate", "SmartCouponDaemon", "PostOfficeDaemon"]
-EXES = CORE + ["LobbyDaemon"]
+EXES = CORE + ["LobbyDaemon", "GameDaemon"]
+IN_PROGRESS = {"GameDaemon"}
 START, END = "<!-- parity:start -->", "<!-- parity:end -->"
 
 rows = [l.rstrip("\n").split("\t") for l in open("Docs/Parity/progress.tsv")][1:]
@@ -20,7 +22,7 @@ first = {}
 for row in rows:  # start = first card that measured the exe
     for e, v in cells(row).items():
         first.setdefault(e, v)
-EXES = [e for e in EXES if e in last]
+EXES = [e for e in EXES if e in last and os.path.exists(f"Docs/Parity/baseline/{e}.json")]
 d = {e: json.load(open(f"Docs/Parity/baseline/{e}.json")) for e in EXES}
 excl = px.load()
 
@@ -42,10 +44,11 @@ for e in EXES:
     mean = sum(x["score"] for x in r.values()) / max(len(r), 1)
     p0 = pct(*first[e]) if e in first else 0
     p = pct(m, t)
+    lvl = "Lift in progress" if e in IN_PROGRESS else level(p)
     sx += xc
     if e in CORE:
         sm += m; st += t
-    out.append(f"| {e} | **{p:.1f} %** | {m} | {diff} | {xc} | {only} | {t} | {mean:.1f} | {p0:.1f} % | {p - p0:+.1f} | {level(p)} |")
+    out.append(f"| {e} | **{p:.1f} %** | {m} | {diff} | {xc} | {only} | {t} | {mean:.1f} | {p0:.1f} % | {p - p0:+.1f} | {lvl} |")
 p = pct(sm, st)
 p0 = pct(sum(first[e][0] for e in CORE), sum(first[e][1] for e in CORE))
 out.append(f"| **First 4** | **{p:.1f} %** | {sm} | | | | {st} | | {p0:.1f} % | {p - p0:+.1f} | {level(p)} |")
@@ -57,7 +60,7 @@ sp = pct(len(shared) - len(sbad), len(shared))
 out += ["", "| Shared library (functions in 2+ exes) | Parity | MATCH in each exe | DIFF in 1+ exe | Total | Goal |",
         "| --- | ---: | ---: | ---: | ---: | --- |",
         f"| BloodLib, Shared, Packet, CRT | **{sp:.1f} %** | {len(shared) - len(sbad)} | {len(sbad)} | {len(shared)} | 99 % |"]
-out += ["", f"First 4 and shared library: CacheGate, LobbyGate, SmartCouponDaemon, PostOfficeDaemon. LobbyDaemon: lift in progress; most functions are still stubs (only in original). Goal: 95 % per exe, 99 % preferred. Shared library: 99 % preferred. MATCH never holds excluded symbols (review rejected, no honest source fix: [Docs/Parity/excluded.tsv](Docs/Parity/excluded.tsv)); they are in the column Excluded ({sx} now). Rules: [Docs/Parity/README.md](Docs/Parity/README.md). History: [Docs/Parity/progress.tsv](Docs/Parity/progress.tsv).",
+out += ["", f"First 4 and shared library: CacheGate, LobbyGate, SmartCouponDaemon, PostOfficeDaemon. LobbyDaemon: lift in progress; most functions are still stubs (only in original). GameDaemon: lift in progress. Goal: 95 % per exe, 99 % preferred. Shared library: 99 % preferred. MATCH never holds excluded symbols (review rejected, no honest source fix: [Docs/Parity/excluded.tsv](Docs/Parity/excluded.tsv)); they are in the column Excluded ({sx} now). Rules: [Docs/Parity/README.md](Docs/Parity/README.md). History: [Docs/Parity/progress.tsv](Docs/Parity/progress.tsv).",
         "", "| Card | " + " | ".join(EXES) + " |", "| --- |" + " ---: |" * len(EXES)]
 for row in rows:
     c = cells(row)

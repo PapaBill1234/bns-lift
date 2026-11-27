@@ -10,7 +10,7 @@ BAD="$(git ls-files -co --exclude-standard | grep -v '^tools/LegacyBin/' | grep 
 [ -z "$BAD" ] || { echo "binary or key files: $BAD"; exit 1; }
 if [ -f CMakeLists.txt ]; then
   B="${LIFT_BUILD_DIR:-build}"
-  cmake -S . -B "$B" -G Ninja -DCMAKE_TOOLCHAIN_FILE=cmake/clangcl-wine.cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON >/dev/null
+  cmake -S . -B "$B" -G Ninja -DCMAKE_TOOLCHAIN_FILE=cmake/clangcl-wine.cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DLIFT_GAMEDAEMON=ON >/dev/null
   cmake --build "$B" 2>&1 | tail -40   # pipefail: a build error stops the script here
 fi
 # 3. tools/gate_extra.sh (selftest and the PDB layout check). It must be there and executable (git mode 100755).
