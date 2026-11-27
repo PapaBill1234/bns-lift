@@ -1,39 +1,52 @@
-// attractionstate_h.cpp: attractionstate.h (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
+// attractionstate_h.cpp: attractionstate.h (GameDaemon PDB, 2019 + PDB).
 #include "attractionstate.h"
 #include "LiftStub.h"
 
+#pragma comment(linker, "/INCLUDE:?CanChangeChannel@AttractionState@@UEAA_NFAEAF@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetTypeName@BossChallengeAttractionState@@UEAAPEB_WXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetTypeName@TendencyFieldAttractionState@@UEAAPEB_WXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetGameType@TendencyFieldAttractionState@@UEBA?BW4GameType@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetTypeName@DuelAttractionState@@UEAAPEB_WXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetTypeName@PartyBattleFieldAttractionState@@UEAAPEB_WXZ")  // LIFT: dead-strip keep (no live caller yet)
+
 // 0x35ea0
-bool __cdecl AttractionState::CanChangeChannel(short, short &)
+bool __cdecl AttractionState::CanChangeChannel(short channel, short &error)
 {
-    LIFT_STUB(0x35ea0);
+    if (channel != 0)
+    {
+        return true;
+    }
+
+    error = 1189;  // ❓ no PDB enum name found for the error code 1189
+    return false;
 }
 
 // 0x35ec0
 wchar_t const * __cdecl BossChallengeAttractionState::GetTypeName(void)
 {
-    LIFT_STUB(0x35ec0);
+    return L"BossChallenge";
 }
 
 // 0x35ed0
 wchar_t const * __cdecl TendencyFieldAttractionState::GetTypeName(void)
 {
-    LIFT_STUB(0x35ed0);
+    return L"TendencyField";
 }
 
 // 0x35ee0
 ::GameType const __cdecl TendencyFieldAttractionState::GetGameType(void) const
 {
-    LIFT_STUB(0x35ee0);
+    return _gameType;
 }
 
 // 0x35ef0
 wchar_t const * __cdecl DuelAttractionState::GetTypeName(void)
 {
-    LIFT_STUB(0x35ef0);
+    return L"Duel";
 }
 
 // 0x35f00
 wchar_t const * __cdecl PartyBattleFieldAttractionState::GetTypeName(void)
 {
-    LIFT_STUB(0x35f00);
+    return L"PartyBattleField";
 }

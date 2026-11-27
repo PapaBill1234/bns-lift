@@ -42,6 +42,18 @@ private:
     void __cdecl spawnRoundBossNpc(::Zone *) const;  // 0x4db30
 public:
     virtual bool __cdecl EnableInfiniteHyperEnergy(void) const;  // 0x4dbd0
+private:
+    // PDB layout (size 0x38). The base AttractionState holds only the vfptr (+0).
+    int _bossChallengeDataId;          // +8 (0x8)
+    short _requireScore;               // +12 (0xC)
+    short _lastRound;                  // +14 (0xE)
+    bool _isInfiniteHyperEnergyZone;   // +16 (0x10)
+    __int64 _currentBossNpc;           // +24 (0x18)
+    __int64 _currentSpawnBossNpc;      // +32 (0x20)
+    __int64 _roundNpcReset;            // +40 (0x28)
+    long _bossSpawnDelay;              // +48 (0x30)
+    short _currentRound;               // +52 (0x34)
+    short _currentScore;               // +54 (0x36)
 };
 
 class DuelAttractionState
@@ -62,6 +74,10 @@ public:
     virtual void __cdecl SetRoomInfo(::Zone *, ::ArenaLobbyRoomInfo const &, bool);  // 0x50eb0
     virtual void __cdecl OnEntered(::Zone *, ::Creature *, ::EnterReason);  // 0x50ec0
     virtual bool __cdecl Leave(::Pc *);  // 0x50f00
+private:
+    // PDB layout (size 0x18). The base AttractionState holds only the vfptr (+0).
+    ::DuelManager *_duelMgr;               // +8 (0x8)
+    ::GameObjectTimer *_duelEventTimer;    // +16 (0x10)
 };
 
 class PartyBattleFieldAttractionState
@@ -87,6 +103,10 @@ public:
     virtual bool __cdecl CheckToManipulateEnv(::Pc *, ::Env *, ::Data::ZoneEnv2RecordPtr const &);  // 0x51410
     virtual bool __cdecl TryToManipulateEnv(::Pc *, ::Env *, ::Data::ZoneEnv2RecordPtr &);  // 0x51420
     virtual void __cdecl OnEnterFootSwitch(::Creature *, ::Env *, ::Data::ZoneEnv2RecordPtr const &);  // 0x51430
+private:
+    // PDB layout (size 0x18). The base AttractionState holds only the vfptr (+0).
+    ::PartyBattleManager *_partyBattleMgr;         // +8 (0x8)
+    ::GameObjectTimer *_partyBattleEventTimer;     // +16 (0x10)
 };
 
 class TendencyFieldAttractionState
@@ -130,5 +150,15 @@ private:
     void __cdecl executeTendencyNpcResetStage(::Zone *, char) const;  // 0x50450
     void __cdecl executeVictoryNpcResetStage(::Zone *, char) const;  // 0x505f0
     void __cdecl initEnvOperation(::Zone *) const;  // 0x50750
+private:
+    // PDB layout (size 0x228). The base AttractionState holds only the vfptr (+0).
+    // LIFT: only the fields that the lifted bodies read are declared. The pads keep the PDB offsets.
+    char lift_pad_8[0x48];              // ❓ PDB fields +8 to +0x4F (_tendencyScoreLock to _playable) are not declared yet
+    void const *_tendencyFieldRecord;   // +80 (0x50) LIFT: PDB type Data::TendencyFieldRecordPtr (one pointer _record)
+    char lift_pad_58[0x1C0];            // ❓ PDB fields +0x58 to +0x217 (_tendencyFieldDataKey to _victoryNpcResetStageTendency) are not declared yet
+    int _targetType;                    // +536 (0x218) PDB type TendencyFieldTargetType
+    bool _mainZone;                     // +540 (0x21C)
+    ::GameType _gameType;               // +544 (0x220)
+    int _eventStartStep;                // +548 (0x224) PDB type TendencyFieldAttractionState::EventStartStep
 };
 

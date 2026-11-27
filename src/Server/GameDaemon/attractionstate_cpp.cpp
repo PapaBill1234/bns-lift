@@ -1,4 +1,4 @@
-// attractionstate_cpp.cpp: attractionstate.cpp (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
+// attractionstate_cpp.cpp: attractionstate.cpp (GameDaemon PDB, 2019 + PDB).
 #include "attractionstate.h"
 #include "controlledcreature.h"
 #include "creature.h"
@@ -10,6 +10,161 @@
 #include "tendencymanager.h"
 #include "zone.h"
 #include "LiftStub.h"
+
+#pragma comment(linker, "/INCLUDE:?AvailableNextStep@BossChallengeAttractionState@@UEAA_NH_J@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?EnableInfiniteHyperEnergy@BossChallengeAttractionState@@UEBA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?IsPcSpawnWithSummoned@TendencyFieldAttractionState@@UEAA_NW4EnterReason@@F@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?EnableInfiniteHyperEnergy@TendencyFieldAttractionState@@UEBA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?DisableMoveToArena@TendencyFieldAttractionState@@UEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?DisableMoveToSkillTrainingRoom@TendencyFieldAttractionState@@UEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?EnableChangeFactionCostume@TendencyFieldAttractionState@@UEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?EnableSetGuildMeetingPlace@TendencyFieldAttractionState@@UEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?EnableWarpToGuildMember@TendencyFieldAttractionState@@UEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetGameType@DuelAttractionState@@UEBA?BW4GameType@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?OnZoneAttractionEventTimer@DuelAttractionState@@UEAAXPEAVZone@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?CanResurrect@DuelAttractionState@@UEAA_NPEBVControlledCreature@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?CanTakeAchievementReward@DuelAttractionState@@UEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?CanResurrect@PartyBattleFieldAttractionState@@UEAA_NPEBVControlledCreature@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?CanTakeAchievementReward@PartyBattleFieldAttractionState@@UEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?CanProgressQuest@PartyBattleFieldAttractionState@@UEAA_N_K@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?OnDead@PartyBattleFieldAttractionState@@UEAAXPEAVZone@@_KPEAVCreature@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?OnDamagedEvent@PartyBattleFieldAttractionState@@UEAAXPEAVZone@@QEAVControlledCreature@@PEAVCreature@@_J@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?OnEnvManipulated@PartyBattleFieldAttractionState@@UEAAXPEAVPc@@PEAVEnv@@AEBVZoneEnv2RecordPtr@Data@@DD@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?OnCanceledEnvManipulation@PartyBattleFieldAttractionState@@UEAAXPEAVEnv@@AEAVZoneEnv2RecordPtr@Data@@DD@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?DisposeFieldItem@PartyBattleFieldAttractionState@@UEAA_NPEAVPc@@PEAVFieldItem@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?Leave@PartyBattleFieldAttractionState@@UEAA_NPEAVPc@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?EnableInfiniteHyperEnergy@PartyBattleFieldAttractionState@@UEBA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?CheckToManipulateEnv@PartyBattleFieldAttractionState@@UEAA_NPEAVPc@@PEAVEnv@@AEBVZoneEnv2RecordPtr@Data@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?TryToManipulateEnv@PartyBattleFieldAttractionState@@UEAA_NPEAVPc@@PEAVEnv@@AEAVZoneEnv2RecordPtr@Data@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?OnEnterFootSwitch@PartyBattleFieldAttractionState@@UEAAXPEAVCreature@@PEAVEnv@@AEBVZoneEnv2RecordPtr@Data@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+
+namespace
+{
+// LIFT: views of PDB classes that have no layout in the skeleton yet. Only the read fields and the called
+// virtual slots are declared. Slot numbers and offsets are from the PDB.
+
+// LIFT: view of GameObject (Id at +0x28). The high 16 bits of Id hold the object type (1 = Pc, 4 = Npc).
+struct GameObjectView
+{
+    char lift_pad_0[0x28];
+    unsigned __int64 Id;  // +40 (0x28)
+};
+
+inline unsigned short liftObjectType(void const *object)  // LIFT: no PDB name (inline HIWORD(Id))
+{
+    return static_cast<unsigned short>(static_cast<GameObjectView const *>(object)->Id >> 48);
+}
+
+inline unsigned __int64 liftObjectId(void const *object)  // LIFT: no PDB name (inline read of GameObject::Id)
+{
+    return static_cast<GameObjectView const *>(object)->Id;
+}
+
+// LIFT: view of Data::TendencyFieldRecord (size 0x208).
+struct TendencyFieldRecordView
+{
+    char lift_pad_0[0x200];
+    bool enable_infinite_hyper_energy;          // +512 (0x200)
+    bool disable_move_to_arena;                 // +513 (0x201)
+    bool disable_move_to_skill_training_room;   // +514 (0x202)
+    bool enable_change_faction_costume;         // +515 (0x203)
+    bool enable_set_guild_meeting_place;        // +516 (0x204)
+    bool enable_warp_to_guild_member;           // +517 (0x205)
+};
+
+// LIFT: view of DuelRule (vfptr, 5 slots used).
+class DuelRuleView
+{
+public:
+    virtual void lift_slot0(void) = 0;  // ~DuelRule
+    virtual void lift_slot1(void) = 0;  // CalcRoundResult
+    virtual void lift_slot2(void) = 0;  // IsGameDone
+    virtual void lift_slot3(void) = 0;  // CalcGameResult
+    virtual bool CanResurrect(::Pc const *const) const = 0;  // slot 4
+};
+
+// LIFT: view of DuelManager (size 0xD4B0).
+class DuelManagerView
+{
+public:
+    virtual void lift_slot0(void) = 0;  // ~DuelManager
+    virtual ::GameType const GetGameType(void) const = 0;  // slot 1
+    virtual void lift_slot2(void) = 0;  // verifyDuelType
+    virtual void lift_slot3(void) = 0;  // instantiateDuelRule
+    virtual void lift_slot4(void) = 0;  // instantiateDuelTeam
+    virtual void lift_slot5(void) = 0;  // handleOnDead
+    virtual void lift_slot6(void) = 0;  // handleOnLeave
+    virtual void OnEventTimer(void) = 0;  // slot 7
+
+    char lift_pad_8[0x10];      // _data, _zone
+    DuelRuleView *_rule;        // +24 (0x18)
+    char lift_pad_20[0x20];     // _memberRule, _teams, _emcee
+    int _gameState;             // +64 (0x40) PDB type DuelGameState
+};
+
+// LIFT: view of Data::PartyBattleFieldZoneRecord (size 0x140).
+struct PartyBattleFieldZoneRecordView
+{
+    char lift_pad_0[0x104];
+    bool enable_infinite_hyper_energy;  // +260 (0x104)
+};
+
+// LIFT: view of ArenaLobbyRoomInfo.
+struct ArenaLobbyRoomInfoView
+{
+    char lift_pad_0[0x28];
+    int _detailRule;  // +40 (0x28) PDB type Data::ArenaMatchingRuleDetailType
+};
+
+// LIFT: view of PartyBattleManager (size 0xD5F0, slots 0 to 23 declared).
+class PartyBattleManagerView
+{
+public:
+    virtual void lift_slot0(void) = 0;   // ~PartyBattleManager
+    virtual void lift_slot1(void) = 0;   // GetGameType
+    virtual void lift_slot2(void) = 0;   // Init
+    virtual bool EnterByRevive(::Pc *) = 0;  // slot 3
+    virtual bool Enter(::Pc *) = 0;  // slot 4
+    virtual bool Leave(::Pc *) = 0;  // slot 5
+    virtual void lift_slot6(void) = 0;   // Ready
+    virtual void lift_slot7(void) = 0;   // EnterNpc
+    virtual void lift_slot8(void) = 0;   // Start
+    virtual void lift_slot9(void) = 0;   // Vote
+    virtual void lift_slot10(void) = 0;  // Finish
+    virtual void lift_slot11(void) = 0;  // OnTimer
+    virtual void lift_slot12(void) = 0;  // CheckToFinishGame
+    virtual bool CanResurrect(::Pc *) = 0;  // slot 13
+    virtual bool CanTakeAchievementReward(void) = 0;  // slot 14
+    virtual void lift_slot15(void) = 0;  // GetNearRespawnArea
+    virtual bool CheckToManipulateEnv(::Pc *, ::Env *, ::Data::ZoneEnv2RecordPtr const &) = 0;  // slot 16
+    virtual bool TryToManipulateEnv(::Pc *, ::Env *, ::Data::ZoneEnv2RecordPtr &) = 0;  // slot 17
+    virtual void OnEnterFootSwitch(::Creature *, ::Env *, ::Data::ZoneEnv2RecordPtr const &) = 0;  // slot 18
+    virtual void DisposeFieldItem(::Pc *, ::FieldItem *) = 0;  // slot 19
+    virtual void OnDamaged(unsigned __int64, ::Creature *, __int64) = 0;  // slot 20
+    virtual void OnDead(unsigned __int64, ::Pc *) = 0;  // slot 21
+    virtual void OnEnvManipulated(::Pc *, ::Env *, ::Data::ZoneEnv2RecordPtr const &, char, char) = 0;  // slot 22
+    virtual void OnCanceledEnvManipulation(::Env *, ::Data::ZoneEnv2RecordPtr &, char, char) = 0;  // slot 23
+
+    PartyBattleFieldZoneRecordView const *_data;  // +8 (0x8) PDB type Data::PartyBattleFieldZoneRecordPtr (one pointer _record)
+    char lift_pad_10[0x40];                       // _zone to _isGiveReward
+    ArenaLobbyRoomInfoView _roomInfo;             // +80 (0x50)
+};
+
+inline DuelManagerView *liftDuel(::DuelManager *duelMgr)
+{
+    return reinterpret_cast<DuelManagerView *>(duelMgr);
+}
+
+inline PartyBattleManagerView *liftPartyBattle(::PartyBattleManager *partyBattleMgr)
+{
+    return reinterpret_cast<PartyBattleManagerView *>(partyBattleMgr);
+}
+
+inline TendencyFieldRecordView const *liftTendencyRecord(void const *record)
+{
+    return static_cast<TendencyFieldRecordView const *>(record);
+}
+}  // namespace
 
 // 0x4c4c0
 void __cdecl AttractionReward::SetReward(unsigned __int64, unsigned __int64 *const, char *const, int)
@@ -78,9 +233,34 @@ void __cdecl BossChallengeAttractionState::OnNpcKilled(::Zone *, ::GameObject *,
 }
 
 // 0x4d840
-bool __cdecl BossChallengeAttractionState::AvailableNextStep(int, __int64)
+bool __cdecl BossChallengeAttractionState::AvailableNextStep(int step, __int64 value)
 {
-    LIFT_STUB(0x4d840);
+    if (step == 0)
+    {
+        return true;
+    }
+
+    if (step == 1)
+    {
+        // LIFT: inline body of the PDB function BossChallengeAttractionState::accumulateScore(short).
+        short score = static_cast<short>(value);
+        if (_currentScore + score > _requireScore)
+        {
+            score = _requireScore - _currentScore;
+        }
+        if (score > 0)
+        {
+            _currentScore += score;
+        }
+        return _currentScore >= _requireScore;
+    }
+
+    if (step == 2)
+    {
+        return value == _currentBossNpc;
+    }
+
+    return false;
 }
 
 // 0x4d8a0
@@ -110,7 +290,7 @@ void __cdecl BossChallengeAttractionState::spawnRoundBossNpc(::Zone *) const
 // 0x4dbd0
 bool __cdecl BossChallengeAttractionState::EnableInfiniteHyperEnergy(void) const
 {
-    LIFT_STUB(0x4dbd0);
+    return _isInfiniteHyperEnergyZone;
 }
 
 // 0x4dbe0
@@ -198,9 +378,11 @@ void __cdecl TendencyFieldAttractionState::FetchInZoneAttractionState(::Fragment
 }
 
 // 0x4fa50
-bool __cdecl TendencyFieldAttractionState::IsPcSpawnWithSummoned(::EnterReason, short)
+bool __cdecl TendencyFieldAttractionState::IsPcSpawnWithSummoned(::EnterReason reason, short job)
 {
-    LIFT_STUB(0x4fa50);
+    return GetGameType() == static_cast< ::GameType>(6)      // GAMETYPE_TENDENCY_FIELD_BUYUDO
+        && reason == static_cast< ::EnterReason>(2)          // ENTERREASON_REVIVE
+        && job == 6;                                          // ❓ no PDB enum name found for the job 6
 }
 
 // 0x4fa90
@@ -248,7 +430,11 @@ bool __cdecl TendencyFieldAttractionState::CanChangeChannel(short, short &)
 // 0x50120
 bool __cdecl TendencyFieldAttractionState::EnableInfiniteHyperEnergy(void) const
 {
-    LIFT_STUB(0x50120);
+    if (_targetType != 0)  // TENDENCYFIELDTARGETTYPE_UNKNOWN
+    {
+        return liftTendencyRecord(_tendencyFieldRecord)->enable_infinite_hyper_energy;
+    }
+    return false;
 }
 
 // 0x50140
@@ -260,31 +446,31 @@ bool __cdecl TendencyFieldAttractionState::CanManifestTendency(::Zone *) const
 // 0x501f0
 bool __cdecl TendencyFieldAttractionState::DisableMoveToArena(void)
 {
-    LIFT_STUB(0x501f0);
+    return liftTendencyRecord(_tendencyFieldRecord)->disable_move_to_arena;
 }
 
 // 0x50200
 bool __cdecl TendencyFieldAttractionState::DisableMoveToSkillTrainingRoom(void)
 {
-    LIFT_STUB(0x50200);
+    return liftTendencyRecord(_tendencyFieldRecord)->disable_move_to_skill_training_room;
 }
 
 // 0x50210
 bool __cdecl TendencyFieldAttractionState::EnableChangeFactionCostume(void)
 {
-    LIFT_STUB(0x50210);
+    return liftTendencyRecord(_tendencyFieldRecord)->enable_change_faction_costume;
 }
 
 // 0x50220
 bool __cdecl TendencyFieldAttractionState::EnableSetGuildMeetingPlace(void)
 {
-    LIFT_STUB(0x50220);
+    return liftTendencyRecord(_tendencyFieldRecord)->enable_set_guild_meeting_place;
 }
 
 // 0x50230
 bool __cdecl TendencyFieldAttractionState::EnableWarpToGuildMember(void)
 {
-    LIFT_STUB(0x50230);
+    return liftTendencyRecord(_tendencyFieldRecord)->enable_warp_to_guild_member;
 }
 
 // 0x50240
@@ -314,7 +500,11 @@ void __cdecl TendencyFieldAttractionState::initEnvOperation(::Zone *) const
 // 0x50a70
 ::GameType const __cdecl DuelAttractionState::GetGameType(void) const
 {
-    LIFT_STUB(0x50a70);
+    if (_duelMgr != nullptr)
+    {
+        return liftDuel(_duelMgr)->GetGameType();
+    }
+    return static_cast< ::GameType>(0);  // GAMETYPE_INVALID
 }
 
 // 0x50a90
@@ -344,19 +534,22 @@ void __cdecl DuelAttractionState::OnZoneAttractionTimer(::Zone *)
 // 0x50dd0
 void __cdecl DuelAttractionState::OnZoneAttractionEventTimer(::Zone *)
 {
-    LIFT_STUB(0x50dd0);
+    liftDuel(_duelMgr)->OnEventTimer();
 }
 
 // 0x50de0
-bool __cdecl DuelAttractionState::CanResurrect(::ControlledCreature const *)
+bool __cdecl DuelAttractionState::CanResurrect(::ControlledCreature const *creature)
 {
-    LIFT_STUB(0x50de0);
+    // LIFT: DuelManager::CanResurrect(Pc const *) is inline here: it calls DuelRule::CanResurrect (slot 4).
+    return creature != nullptr
+        && liftObjectType(creature) == 1
+        && liftDuel(_duelMgr)->_rule->CanResurrect(reinterpret_cast< ::Pc const *>(creature));
 }
 
 // 0x50e10
 bool __cdecl DuelAttractionState::CanTakeAchievementReward(void)
 {
-    LIFT_STUB(0x50e10);
+    return liftDuel(_duelMgr)->_gameState != 3;  // DUELGAMESTATE_FINISHED
 }
 
 // 0x50e20
@@ -420,45 +613,56 @@ void __cdecl PartyBattleFieldAttractionState::OnZoneAttractionTimer(::Zone *)
 }
 
 // 0x51260
-bool __cdecl PartyBattleFieldAttractionState::CanResurrect(::ControlledCreature const *)
+bool __cdecl PartyBattleFieldAttractionState::CanResurrect(::ControlledCreature const *creature)
 {
-    LIFT_STUB(0x51260);
+    // ❓ PartyBattleManager::CanResurrect takes a non-const Pc *; the cast of the const creature is an assumption.
+    return creature != nullptr
+        && liftObjectType(creature) == 1
+        && liftPartyBattle(_partyBattleMgr)->CanResurrect(const_cast< ::Pc *>(reinterpret_cast< ::Pc const *>(creature)));
 }
 
 // 0x51280
 bool __cdecl PartyBattleFieldAttractionState::CanTakeAchievementReward(void)
 {
-    LIFT_STUB(0x51280);
+    return liftPartyBattle(_partyBattleMgr)->CanTakeAchievementReward();
 }
 
 // 0x51290
 bool __cdecl PartyBattleFieldAttractionState::CanProgressQuest(unsigned __int64)
 {
-    LIFT_STUB(0x51290);
+    // ❓ detail rules 3 to 5 of Data::ArenaMatchingRuleDetailType block quest progress; the enum names are not resolved.
+    int const detailRule = liftPartyBattle(_partyBattleMgr)->_roomInfo._detailRule;
+    return static_cast<unsigned int>(detailRule - 3) > 2;
 }
 
 // 0x512b0
-void __cdecl PartyBattleFieldAttractionState::OnDead(::Zone *, unsigned __int64, ::Creature *)
+void __cdecl PartyBattleFieldAttractionState::OnDead(::Zone *, unsigned __int64 attackerId, ::Creature *victim)
 {
-    LIFT_STUB(0x512b0);
+    if (victim != nullptr && liftObjectType(victim) == 1)
+    {
+        liftPartyBattle(_partyBattleMgr)->OnDead(attackerId, reinterpret_cast< ::Pc *>(victim));
+    }
 }
 
 // 0x512e0
-void __cdecl PartyBattleFieldAttractionState::OnDamagedEvent(::Zone *, ::ControlledCreature *const, ::Creature *, __int64)
+void __cdecl PartyBattleFieldAttractionState::OnDamagedEvent(::Zone *, ::ControlledCreature *const attacker, ::Creature *victim, __int64 damage)
 {
-    LIFT_STUB(0x512e0);
+    if (victim != nullptr && attacker != nullptr)
+    {
+        liftPartyBattle(_partyBattleMgr)->OnDamaged(liftObjectId(attacker), victim, damage);
+    }
 }
 
 // 0x51320
-void __cdecl PartyBattleFieldAttractionState::OnEnvManipulated(::Pc *, ::Env *, ::Data::ZoneEnv2RecordPtr const &, char, char)
+void __cdecl PartyBattleFieldAttractionState::OnEnvManipulated(::Pc *pc, ::Env *env, ::Data::ZoneEnv2RecordPtr const &envData, char preState, char state)
 {
-    LIFT_STUB(0x51320);
+    liftPartyBattle(_partyBattleMgr)->OnEnvManipulated(pc, env, envData, preState, state);
 }
 
 // 0x51350
-void __cdecl PartyBattleFieldAttractionState::OnCanceledEnvManipulation(::Env *, ::Data::ZoneEnv2RecordPtr &, char, char)
+void __cdecl PartyBattleFieldAttractionState::OnCanceledEnvManipulation(::Env *env, ::Data::ZoneEnv2RecordPtr &envData, char preState, char state)
 {
-    LIFT_STUB(0x51350);
+    liftPartyBattle(_partyBattleMgr)->OnCanceledEnvManipulation(env, envData, preState, state);
 }
 
 // 0x51370
@@ -468,9 +672,10 @@ void __cdecl PartyBattleFieldAttractionState::SetRoomInfo(::Zone *, ::ArenaLobby
 }
 
 // 0x51380
-bool __cdecl PartyBattleFieldAttractionState::DisposeFieldItem(::Pc *, ::FieldItem *)
+bool __cdecl PartyBattleFieldAttractionState::DisposeFieldItem(::Pc *pc, ::FieldItem *fieldItem)
 {
-    LIFT_STUB(0x51380);
+    liftPartyBattle(_partyBattleMgr)->DisposeFieldItem(pc, fieldItem);
+    return true;
 }
 
 // 0x513a0
@@ -480,31 +685,31 @@ void __cdecl PartyBattleFieldAttractionState::OnEntered(::Zone *, ::Creature *, 
 }
 
 // 0x513f0
-bool __cdecl PartyBattleFieldAttractionState::Leave(::Pc *)
+bool __cdecl PartyBattleFieldAttractionState::Leave(::Pc *pc)
 {
-    LIFT_STUB(0x513f0);
+    return liftPartyBattle(_partyBattleMgr)->Leave(pc);
 }
 
 // 0x51400
 bool __cdecl PartyBattleFieldAttractionState::EnableInfiniteHyperEnergy(void) const
 {
-    LIFT_STUB(0x51400);
+    return liftPartyBattle(_partyBattleMgr)->_data->enable_infinite_hyper_energy;
 }
 
 // 0x51410
-bool __cdecl PartyBattleFieldAttractionState::CheckToManipulateEnv(::Pc *, ::Env *, ::Data::ZoneEnv2RecordPtr const &)
+bool __cdecl PartyBattleFieldAttractionState::CheckToManipulateEnv(::Pc *pc, ::Env *env, ::Data::ZoneEnv2RecordPtr const &envData)
 {
-    LIFT_STUB(0x51410);
+    return liftPartyBattle(_partyBattleMgr)->CheckToManipulateEnv(pc, env, envData);
 }
 
 // 0x51420
-bool __cdecl PartyBattleFieldAttractionState::TryToManipulateEnv(::Pc *, ::Env *, ::Data::ZoneEnv2RecordPtr &)
+bool __cdecl PartyBattleFieldAttractionState::TryToManipulateEnv(::Pc *pc, ::Env *env, ::Data::ZoneEnv2RecordPtr &envData)
 {
-    LIFT_STUB(0x51420);
+    return liftPartyBattle(_partyBattleMgr)->TryToManipulateEnv(pc, env, envData);
 }
 
 // 0x51430
-void __cdecl PartyBattleFieldAttractionState::OnEnterFootSwitch(::Creature *, ::Env *, ::Data::ZoneEnv2RecordPtr const &)
+void __cdecl PartyBattleFieldAttractionState::OnEnterFootSwitch(::Creature *creature, ::Env *env, ::Data::ZoneEnv2RecordPtr const &envData)
 {
-    LIFT_STUB(0x51430);
+    liftPartyBattle(_partyBattleMgr)->OnEnterFootSwitch(creature, env, envData);
 }
