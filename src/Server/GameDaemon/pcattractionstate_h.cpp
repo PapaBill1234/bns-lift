@@ -1,57 +1,57 @@
-// pcattractionstate_h.cpp: pcattractionstate.h (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
+// pcattractionstate_h.cpp: pcattractionstate.h (GameDaemon PDB, 2019 + PDB).
 #include "pcattractionstate.h"
 #include "LiftStub.h"
 
-// 0x180ba0
+// 0x180ba0 (shared body with NpcContribution::TotalDamage)
 __int64 __cdecl PcPublicRaidState::GetResetCombatModeCoolTime(void) const
 {
-    LIFT_STUB(0x180ba0);
+    return _lastResetCombatModeTime;
 }
 
 // 0x180bb0
-void __cdecl PcPublicRaidState::SetAddScoreCoolTime(__int64)
+void __cdecl PcPublicRaidState::SetAddScoreCoolTime(__int64 now)
 {
-    LIFT_STUB(0x180bb0);
+    _lastAddScoreTime = now;
 }
 
 // 0x180bc0
 bool __cdecl PcPublicRaidState::IsEventAttendee(void) const
 {
-    LIFT_STUB(0x180bc0);
+    return _isEventAttendee;
 }
 
 // 0x180bd0
 void __cdecl PcPublicRaidState::SetEventAttendee(void)
 {
-    LIFT_STUB(0x180bd0);
+    _isEventAttendee = true;
 }
 
 // 0x180be0
 void __cdecl PcPublicRaidState::ResetEventAttendee(void)
 {
-    LIFT_STUB(0x180be0);
+    _isEventAttendee = false;
 }
 
 // 0x180bf0
 short __cdecl PcPublicRaidState::GetAddScoreCount(void) const
 {
-    LIFT_STUB(0x180bf0);
+    return _addScoreCount;
 }
 
 // 0x180c00
 void __cdecl PcPublicRaidState::IncrementAddScoreCount(void)
 {
-    LIFT_STUB(0x180c00);
+    ++_addScoreCount;
 }
 
-// 0x4535a0
+// 0x4535a0 (shared body with DuelBotActionQueue::GetMovement)
 __int64 __cdecl PcPublicRaidState::GetAddScroeCoolTime(void) const
 {
-    LIFT_STUB(0x4535a0);
+    return _lastAddScoreTime;
 }
 
-// 0x6fd280
-void __cdecl PcPublicRaidState::SetResetCombatModeCoolTime(__int64)
+// 0x6fd280 (shared body with DrDataTableImpl::Setup)
+void __cdecl PcPublicRaidState::SetResetCombatModeCoolTime(__int64 now)
 {
-    LIFT_STUB(0x6fd280);
+    _lastResetCombatModeTime = now;
 }

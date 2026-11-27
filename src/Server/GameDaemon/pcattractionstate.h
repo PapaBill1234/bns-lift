@@ -17,5 +17,11 @@ public:
     virtual bool __cdecl CheckAddScoreCoolTime(::Pc *, __int64, long) const;  // 0x18c880
     virtual __int64 __cdecl GetAddScroeCoolTime(void) const;  // 0x4535a0
     virtual void __cdecl SetResetCombatModeCoolTime(__int64);  // 0x6fd280
+private:
+    // LIFT: PDB members of PcPublicRaidState (base PcAttractionState not declared yet; vptr is at +0).
+    __int64 _lastResetCombatModeTime;  // +8
+    __int64 _lastAddScoreTime;  // +16
+    bool _isEventAttendee;  // +24
+    short _addScoreCount;  // +26
 };
 
