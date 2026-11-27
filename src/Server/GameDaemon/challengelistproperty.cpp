@@ -1,12 +1,20 @@
-// challengelistproperty.cpp: challengelistproperty.h (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
+// challengelistproperty.cpp: challengelistproperty.h (GameDaemon PDB, 2019 + PDB).
 #include "challengelistproperty.h"
 #include "propertysync.h"
 #include "LiftStub.h"
 
+// LIFT: keep the lifted virtual functions until the callers are lifted (the vftable and the callers are stubs;
+// /OPT:REF drops them). Card lift-gamedaemon-gap-005-e5.
+#pragma comment(linker, "/INCLUDE:?TypeId@ChallengeListProperty@@UEBAHXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?FieldMax@ChallengeListProperty@@MEBAHXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?FieldDefine@ChallengeListProperty@@MEBAPEBUDef@Field@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SyncMax@ChallengeListProperty@@MEBAHXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SyncDefine@ChallengeListProperty@@MEBAPEBUDef@SyncBuffer@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+
 // 0x96c0
 int const __cdecl ChallengeListProperty::TypeId(void) const
 {
-    LIFT_STUB(0x96c0);
+    return 38;
 }
 
 // 0x96d0
@@ -18,23 +26,29 @@ wchar_t const * __cdecl ChallengeListProperty::Name(void) const
 // 0x96e0
 int __cdecl ChallengeListProperty::FieldMax(void) const
 {
-    LIFT_STUB(0x96e0);
+    return fieldMax;
 }
 
 // 0x96f0
 ::Field::Def const * __cdecl ChallengeListProperty::FieldDefine(void) const
 {
-    LIFT_STUB(0x96f0);
+    return fieldDefine;
 }
 
 // 0x9700
 int __cdecl ChallengeListProperty::SyncMax(void) const
 {
-    LIFT_STUB(0x9700);
+    return syncMax;
 }
 
 // 0x9710
 ::SyncBuffer::Def const * __cdecl ChallengeListProperty::SyncDefine(void) const
 {
-    LIFT_STUB(0x9710);
+    return syncDefine;
 }
+
+// LIFT: definitions of the PDB static data members (see creatureproperty.h).
+int ChallengeListProperty::fieldMax;
+::Field::Def const * ChallengeListProperty::fieldDefine;
+int ChallengeListProperty::syncMax;
+::SyncBuffer::Def const * ChallengeListProperty::syncDefine;

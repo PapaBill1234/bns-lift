@@ -40,6 +40,8 @@ public:
     virtual bool __cdecl LoadTable(::XmlReader const &, ::DrElReader const &, ::DrLoaderDef *, int, ::DrAliasMap &);  // 0x6ed400
     virtual bool __cdecl LoadTableMT(::XmlReader const &, ::DrElReader const &, ::DrLoaderDef *, int, ::DrAliasMap &, void (__cdecl *)(void));  // 0x6ed450
     virtual bool __cdecl LoadTablePieceByPiece(::XmlReader const &, ::DrElReader const &, ::DrLoaderDef *, int, ::DrAliasMap &, int, bool, ::XmlReader const *);  // 0x6ed4c0
+    // LIFT: PDB static data member (read by Logger at 0x6eb320). Defined in datareader.cpp.
+    static ::DrLog * _logger;
 };
 
 struct LoadTableBinder

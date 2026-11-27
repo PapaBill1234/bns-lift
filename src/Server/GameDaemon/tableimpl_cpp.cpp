@@ -1,17 +1,23 @@
-// tableimpl_cpp.cpp: tableimpl.cpp (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
+// tableimpl_cpp.cpp: tableimpl.cpp (GameDaemon PDB, 2019 + PDB).
 #include "tableimpl.h"
 #include "LiftStub.h"
 
+// LIFT: keep the lifted functions until the callers are lifted (the vftable and the callers are stubs;
+// /OPT:REF drops them). Card lift-gamedaemon-gap-005-e5.
+#pragma comment(linker, "/INCLUDE:?ReferenceCopiedEl@DrDataTableImpl@@UEAAPEAUDrEl@@PEAU2@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:??0DrDataTableImpl@@QEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
+
 // 0x6f7430
+// LIFT: not lifted. The body writes the vftable of the base DrTable. The class has no base yet.
 __cdecl DrDataTableImpl::~DrDataTableImpl(void)
 {
     LIFT_STUB(0x6f7430);
 }
 
 // 0x6feec0
-::DrEl * __cdecl DrDataTableImpl::ReferenceCopiedEl(::DrEl *)
+::DrEl * __cdecl DrDataTableImpl::ReferenceCopiedEl(::DrEl * elPtr)
 {
-    LIFT_STUB(0x6feec0);
+    return elPtr;
 }
 
 // 0x6feed0
@@ -23,5 +29,7 @@ __cdecl DrDataTableImpl::~DrDataTableImpl(void)
 // 0x6fefa0
 __cdecl DrDataTableImpl::DrDataTableImpl(void)
 {
-    LIFT_STUB(0x6fefa0);
+    _tabledef = nullptr;
+    _uselowmemory = false;
+    _useLegacyElHeader = false;
 }

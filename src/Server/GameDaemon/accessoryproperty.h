@@ -8,11 +8,17 @@ class AccessoryProperty
 {
 public:
     virtual int const __cdecl TypeId(void) const;  // 0x191d0
+    virtual int __cdecl Version(void) const;  // 0x191e0
     virtual wchar_t const * __cdecl Name(void) const;  // 0x191f0
 protected:
     virtual int __cdecl FieldMax(void) const;  // 0x19200
     virtual ::Field::Def const * __cdecl FieldDefine(void) const;  // 0x19210
     virtual int __cdecl SyncMax(void) const;  // 0x19220
     virtual ::SyncBuffer::Def const * __cdecl SyncDefine(void) const;  // 0x19230
+    // LIFT: PDB data members (protected static), same form as CreatureProperty.
+    static int fieldMax;
+    static ::Field::Def const * fieldDefine;
+    static int syncMax;
+    static ::SyncBuffer::Def const * syncDefine;
 };
 
