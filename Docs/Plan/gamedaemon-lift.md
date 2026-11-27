@@ -93,11 +93,46 @@ Rule for GameDaemon: one `.cpp` per original source file, in `src/Server/GameDae
 
 Order: callees first, callers last. Reason: a `LIFT_STUB` body becomes noreturn under LTCG, and ICF folds it. A real caller of a stub then stays DIFF. So leaves (library, data, objects) come before actions, channels and handlers.
 
+### Card queue (measured, card `lift-gamedaemon-0b`)
+
+Queue: `Docs/Plan/cards/lift-gamedaemon-plan.tsv` (10 columns; column 10 = wave). Cards: `Docs/Plan/cards/lift-gamedaemon-N.md` for W1 and W2.
+
+| Class | Functions | Card scope |
+| --- | ---: | --- |
+| `shared-match` (MATCH in each lifted exe that has the name) | 606 | No card. The skeleton links the shared source. |
+| `shared-diff` (shared, not MATCH in each exe) | 96 | W1. 32 of them are EXCLUDED in 1 or more exes. |
+| `anticheat` (section 1: vendor 11, glue 33, TencentProtect 2) | 46 | No card. |
+| `new` | 12,103 | Wave from the wave map below. |
+| Total | 12,851 | |
+
+| Wave | Functions | Pseudocode lines | Tokens (8 per line) | Cards | Status |
+| --- | ---: | ---: | ---: | ---: | --- |
+| W1 | 875 | 86,967 | 0.70M | 44 (20 `sonnet:high`) | ready |
+| W2 | 837 | 92,373 | 0.74M | 52 (7 `sonnet:high`) | ready |
+| W3 | 2,731 | 275,444 | 2.20M | 140 | planned |
+| W4 | 1,391 | 144,637 | 1.16M | 73 | planned |
+| W5 | 1,878 | 191,448 | 1.53M | 98 | planned |
+| W6 | 460 | 70,514 | 0.56M | 32 | planned |
+| W7 | 3,369 | 312,452 | 2.50M | 167 | planned |
+| W8 | 658 | 51,766 | 0.41M | 26 | planned |
+| Total | 12,199 | 1,225,601 | 9.80M | 632 | |
+
+Planner rules (card 0b):
+
+- A name in a GameDaemon source file is `shared` only if the lift defines it in shared code. Else it is `new` (35 functions, for example `wmain`). The card names the other exe file as a hint.
+- zstd (W1), zlib and minizip (W2) are upstream cards. They link the upstream source and do not lift by hand (lessons A5).
+- A stem above 40 functions or 2,500 lines is split by RVA into parts. The parts of one stem are a serial chain ("Depends on"). Thus two cards that edit the same file never run at the same time.
+- 3 cards hold 1 function above 2,500 lines. A function cannot be split.
+- Many cards have fewer than 20 functions: the mean function has about 100 pseudocode lines, so the 2,500-line limit applies first.
+- The game log cards (395 functions) and the property header cards (193 functions) have one layout. The first card of each group is `opus` and sets the pattern. The other cards are `sonnet:high` and depend on it.
+- "Depends on" holds the chain part before, and the cards that hold callees (found in the pseudocode by PDB name) when the call order is clear. The wave gate of section 5 still applies.
+- W3 to W8 rows have status `planned`: stems and counts only, chain deps only. A wave planner writes their card files and callee deps.
+
 | Wave | Content | Counted | Cards ❓ | Pseudocode tokens ❓ |
 | --- | --- | ---: | ---: | ---: |
 | W0 | Setup: pseudocode export per source file, planner, skeleton, unity pilot, switch-on (section 4) | 0 | 5 | |
-| W1 | Shared and common gaps: BloodLib new code (json, property, channel, log archive, HTTP client), BloodCrypto gaps, server shared, packet game log, FsdReader, banned word filter | ~860 | 29 | ~0.9M |
-| W2 | Data layer: DataManager, DataReader library, property headers. zlib and minizip from upstream source where the codegen allows. | ~840 | 28 | ~0.9M |
+| W1 | Shared and common gaps: BloodLib new code (json, property, channel, log archive, HTTP client), BloodCrypto gaps, server shared, packet game log, FsdReader, banned word filter; zstd from upstream source | 875 | 44 | 0.70M |
+| W2 | Data layer: DataManager, DataReader library, property headers. zlib and minizip from upstream source where the codegen allows. | 837 | 52 | 0.74M |
 | W3 | Core objects: GameDaemon main and config, world, zone, geo world, creature, PC, NPC, user, item, inventory, effect, skill, env objects | ~2,800 | 93 | ~2.4M |
 | W4 | Actions and server checks: move action, geo move checker, path finder, skill action, reaction, system, NPC, manipulate and boss skill actions, inventory action | ~1,390 | 46 | ~1.2M |
 | W5 | Channels and transactions: CacheDaemon, LobbyDaemon, account inventory, arena, market dealer and other channels; all `*tran.cpp`; tickets | ~1,820 | 61 | ~1.7M |
@@ -105,7 +140,8 @@ Order: callees first, callers last. Reason: a `LIFT_STUB` body becomes noreturn 
 | W7 | Content systems: task, quest journal, guild, team, party, duel, battle royal, arena rooms, other content | ~3,370 | 112 | ~2.6M |
 | W8 | GM and debug: game debug commands and handlers, GameBuilder; publisher and Tencent log code; anti-cheat glue as off bodies | ~680 | 23 | ~0.5M |
 
-- Total: about 412 cards ❓. The W0 planner card makes the exact card list per wave.
+- W1 and W2 numbers are measured (card `lift-gamedaemon-0b`). The other rows are the first plan estimates. The measured queue below replaces them.
+- Total: 632 cards in `Docs/Plan/cards/lift-gamedaemon-plan.tsv` (96 ready, 536 planned).
 - Rust steps: R10 at 1,285 MATCH, R20 at 2,570, and so on (`modernize.md`). A Rust step does not block the lift.
 - Inside a wave, cards run in parallel only when their files do not overlap.
 
