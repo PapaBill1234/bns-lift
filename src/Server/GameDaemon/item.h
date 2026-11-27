@@ -129,6 +129,15 @@ class Item
 {
 public:
     virtual __cdecl ~Item(void);  // 0x454290
+
+    // PDB data members (size 0x28). LIFT: the virtual slot order is not the PDB order yet.
+    unsigned __int64 GetDbId(void) const { return dbid; }  // PDB inline (no RVA)
+protected:
+    ::Pc* _owner;                // +0x08
+    unsigned __int64 dbid;       // +0x10
+    bool _reserved;              // +0x18
+    __int64 _insertReqTick;      // +0x20
+public:
     static short __cdecl FetchDbFromXmlData(int, char, wchar_t const *, char *, short, ::EconomyItemCategory *);  // 0x54f400
     virtual char __cdecl GetSetItemCount(void);  // 0x54f780
     void __cdecl DetachEffect(void);  // 0x54f7b0

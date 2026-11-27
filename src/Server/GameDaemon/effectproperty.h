@@ -20,5 +20,22 @@ protected:
     static ::SyncBuffer::Def const * syncDefine;
 public:
     __cdecl EffectProperty(void);  // 0x198f0
+
+    // PDB nested type EffectProperty::__default__ (size 0x18).
+    struct __default__
+    {
+        short pos;                  // +0x00
+        int data_id;                // +0x04
+        int duration;               // +0x08
+        char stack_count;           // +0x0C
+        char detach_count;          // +0x0D
+        long long expiration_time;  // +0x10
+    };
+
+private:
+    char _liftPropertyBase[0x28];  // LIFT: Property base members (+0x08 to +0x30), later waves
+public:
+    EffectProperty::__default__ Default;  // +0x30. LIFT: the PDB type is `__default__ const`
 };
+static_assert(sizeof(EffectProperty::__default__) == 0x18, "sizeof EffectProperty::__default__");
 

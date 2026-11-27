@@ -524,7 +524,12 @@ bool __cdecl Inventory::RemoveTradeSuggestion(unsigned short)
 // 0x507920
 bool __cdecl Inventory::CheckTradeSuggestion(void) const
 {
-    LIFT_STUB(0x507920);
+    // Slot 0 is not checked. A suggested item must have a db id.
+    for (int i = 1; i < 9; ++i) {
+        if (_tradeItems[i] != nullptr && _tradeItems[i]->GetDbId() == 0)
+            return false;
+    }
+    return true;
 }
 
 // 0x507960

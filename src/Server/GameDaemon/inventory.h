@@ -243,7 +243,15 @@ private:
     bool __cdecl combineCostGroup(unsigned __int64, unsigned __int64, ::Inventory::DisposeOrderForCostGroup *const, int &, __int64 &);  // 0x509670
     bool __cdecl makeDisposeOrderFromCostGroup(::Data::CostGroupRecordPtr, unsigned short, ::Inventory::DisposeOrderWithPos const *const, int &, ::Inventory::DisposeOrderWithPos *const, __int64 &);  // 0x509850
     bool __cdecl makeDisposeOrder(int, ::Inventory::DisposeOrderForCostGroup const *const, int &, ::Inventory::DisposeOrderWithPos *const);  // 0x509e50
+
+    // PDB data members (partial layout, size 0x5B8).
+private:
+    ::Pc* owner;                              // +0x000
+    char _liftInventoryPad[0x528 - 0x8];      // LIFT: _depotList[13] and the other members, later waves
+    ::Item* _tradeItems[9];                   // +0x528
+    char _liftInventoryTail[0x5B8 - 0x570];   // LIFT: members after _tradeItems, later waves
 };
+static_assert(sizeof(Inventory) == 0x5B8, "sizeof Inventory");
 
 class InventoryCacheUpdate
 {

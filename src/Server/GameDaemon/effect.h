@@ -2,6 +2,7 @@
 // LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
 #pragma once
 #include "GameDaemonFwd.h"
+#include "effectproperty.h"
 
 class BossNpcEffectSlot
 {
@@ -15,6 +16,8 @@ class ControlledCreatureEffectSlot
 public:
     virtual ::EffectSlotList *const __cdecl GetEffectSlotList(int);  // 0x453b40
     __cdecl ControlledCreatureEffectSlot(void);  // 0x5aa150
+private:
+    ::EffectSlotList slotList[19];  // +0x08. LIFT: the other PDB members follow in later waves
 };
 
 class DuelBotEffectSlot
@@ -176,6 +179,10 @@ public:
     virtual short __cdecl GetDbIndex(void) const;  // 0x453b20
     virtual char __cdecl GetStackCount(void) const;  // 0x453b30
     __cdecl PassiveEffect(void);  // 0x5a49b0
+private:
+    char _liftEffectBase[0xB0];  // LIFT: Effect base and PassiveEffect members (+0x08 to +0xB8), later waves
+protected:
+    ::EffectProperty _prop;  // +0xB8
 protected:
     virtual bool __cdecl Initialize1(::EffectSource, ::Zone *, unsigned __int64, unsigned __int64, char, unsigned __int64, ::Data::EffectRecord const *);  // 0x5a4b80
 public:

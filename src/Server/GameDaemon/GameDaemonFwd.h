@@ -2038,7 +2038,14 @@ struct DroppedItem {};
 struct DuelMoveInfo {};
 struct DuelResultTranResultNotifyInfo {};
 class EffectNode {};
-struct EffectSlotList {};
+struct EffectSlotList
+{
+    ::PassiveEffect** effects;  // +0x00
+    short lastIndex;            // +0x08
+    short count;                // +0x0A
+    short capacity;             // +0x0C
+};
+static_assert(sizeof(EffectSlotList) == 0x10, "sizeof EffectSlotList");
 struct ExceptSpawnIdRange {};
 class Field
 {
