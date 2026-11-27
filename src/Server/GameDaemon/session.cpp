@@ -6,7 +6,12 @@
 // 0x699170
 bool __cdecl Session::IsConnected(void) const
 {
-    LIFT_STUB(0x699170);
+    // LIFT: the PDB method is const; the inlined lock helpers are not.
+    CriticalSection& lock = const_cast<CriticalSection&>(_lock);
+    lock.Enter();
+    bool connected = _state == CONNECTED && _connection->_socket != INVALID_SOCKET;
+    lock.Leave();
+    return connected;
 }
 
 // 0x6992c0

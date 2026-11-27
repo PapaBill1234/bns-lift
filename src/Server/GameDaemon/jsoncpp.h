@@ -14,13 +14,27 @@ public:
 }
 
 namespace Json {
-class FastWriter
+// PDB: Json::Writer (abstract base, size 0x8). The destructor is inlined (empty).
+class Writer
+{
+public:
+    virtual ~Writer() {}
+    virtual ::std::basic_string<char, ::std::char_traits<char>, ::StlAllocator<char, 2> > __cdecl write(::Json::Value const &) = 0;
+};
+
+// PDB layout: size 0x38.
+class FastWriter : public Writer
 {
 public:
     virtual __cdecl ~FastWriter(void);  // 0x6761e0
     virtual ::std::basic_string<char, ::std::char_traits<char>, ::StlAllocator<char, 2> > __cdecl write(::Json::Value const &);  // 0x6aad70
 private:
     void __cdecl writeValue(::Json::Value const &);  // 0x6aae10
+
+    ::std::basic_string<char, ::std::char_traits<char>, ::StlAllocator<char, 2> > document_;  // +0x08
+    bool yamlCompatiblityEnabled_;  // +0x30
+    bool dropNullPlaceholders_;     // +0x31
+    bool omitEndingLineFeed_;       // +0x32
 };
 }
 

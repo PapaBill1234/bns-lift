@@ -2,6 +2,10 @@
 #include "logarchive.h"
 #include "LiftStub.h"
 
+#pragma comment(linker, "/INCLUDE:?IsUnsentFileExist@LogArchive@@IEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?isPingTimeExpired@LogArchive@@AEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?startupWinSockLib@LogArchive@@AEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+
 // 0x694070
 __cdecl LogArchive::LogArchive(int)
 {
@@ -47,7 +51,20 @@ bool __cdecl LogArchive::AccessLogServer(long)
 // 0x695070
 bool __cdecl LogArchive::IsUnsentFileExist(void)
 {
-    LIFT_STUB(0x695070);
+    wchar_t searchFilePath[MAX_PATH] = { 0 };
+    swprintf_s(searchFilePath, MAX_PATH, L"%s\\*.unsent", _unsentPath);
+
+    WIN32_FIND_DATAW wfd;
+    HANDLE find = FindFirstFileW(searchFilePath, &wfd);
+    if (find == INVALID_HANDLE_VALUE)
+        return false;
+
+    if (!FindClose(find))
+    {
+        Log::Write(Log::LT_ERROR, L"source\\LogArchive.cpp", 464, L"== CRASH == [LogArchive], FindClose failed");
+        AlertSender::Write(L"source\\LogArchive.cpp", 464, L"== CRASH == [LogArchive], FindClose failed");
+    }
+    return true;
 }
 
 // 0x695150
@@ -101,7 +118,14 @@ void __cdecl LogArchive::pushLogData(::LogBuffer const *)
 // 0x695870
 bool __cdecl LogArchive::isPingTimeExpired(void)
 {
-    LIFT_STUB(0x695870);
+    static long long tick = GetTickCount64() - Daemon::Instance->StartSystemTick64;
+
+    long long elapsed = GetTickCount64() - Daemon::Instance->StartSystemTick64 - tick;
+    if (elapsed < _pingInterval)
+        return false;
+
+    tick = GetTickCount64() - Daemon::Instance->StartSystemTick64;
+    return true;
 }
 
 // 0x6958f0
@@ -113,5 +137,11 @@ bool __cdecl LogArchive::pushPingReqPacket(void)
 // 0x695aa0
 bool __cdecl LogArchive::startupWinSockLib(void)
 {
-    LIFT_STUB(0x695aa0);
+    WSADATA data;
+    int error = WSAStartup(MAKEWORD(2, 2), &data);
+    if (error == 0)
+        return true;
+
+    Log::Write(L"source\\LogArchive.cpp", 762, error, L"WSAStartup()");
+    return false;
 }
