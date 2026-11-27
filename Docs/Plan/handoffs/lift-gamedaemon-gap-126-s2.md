@@ -32,6 +32,36 @@ Card: `lift-gamedaemon-s2`, round 1. Source: GameDaemon 2019 + PDB pseudocode.
 - `LogBuffer::deallocate_me` (0x69d2c0 GD): the same TLS cause as `Log::Write`. The body is the same as the source.
 - `AlertSender::writev2`: the frame size and the `jg` branch are not proven. The next round must check them with `llvm-objdump` on the GD object.
 
+## Round 2: cause of the +0 result
+
+Round 1 gained 0 MATCH. Round 2 found the cause. The cause is not in the GD forms.
+
+- The round 1 GD link map (`build-vs2010/GameDaemon.map`) has no `SetCount`, no `AlertSender::writev2`,
+  no `Log::Write` and no `RefCntObject::addReferenceCount`.
+- `build-vs2010/GameDaemon.funcdiff.json` has no `*Item::*` function, no `Log::*`, no `LogBuffer::*` and no `LogMedia::*` function.
+  From AlertSender it pairs only `AlertSender`, `Name`, `createSocket`, `fini`, `run` and `sendRemain`.
+- Cause: the 4 `SetCount` bodies are virtual. No live GD code refers to the vtables of `WeaponItem`, `CostumeItem`, `GemItem` or `AccessoryItem`.
+  `/OPT:REF` removes the 4 bodies. Then the 5 shared log functions have no live GD caller. The linker removes them too. funcdiff cannot pair them.
+- In E16 round 1, the `/INCLUDE` pragmas kept the 4 bodies. The hard rules of the author run forbid new `/INCLUDE` pragmas.
+  The other GD files use `/INCLUDE` pragmas as dead-strip keeps (for example `accessoryproperty.cpp`), but an author cannot add one.
+- A different live caller needs a change of other GameDaemon files. The card forbids that.
+- Thus no source change in the files of this card can give a MATCH gain. Round 2 makes no code change.
+  An object dump cannot prove the GD forms of round 1, because the functions are not in the GD image.
+
+### Decision for the lead
+
+Do one of these:
+
+1. Let the lead (not the author) add the 4 `/INCLUDE` pragmas of E16 round 1 to `src/Server/GameDaemon/item_h_1.cpp`
+   (`?SetCount@WeaponItem@@UEAAXF@Z` and the 3 other forms). Then run the gate and read the funcdiff rows of the 5 functions,
+   `RefCntObject::addReferenceCount` and `RefCntHistory::add`.
+2. Or land this card after a card that lifts a live GD caller of `Log::Write` (for example the constructor of an item class).
+
+### Open item in the GD forms (not checked)
+
+- ❓ `REFCNT_HEADER` has no GD value. The GD build uses the CacheGate path in `RefCntObject::addReferenceCount`.
+  The GD literal (in the pseudocode a reference into `zone._extraPublicProp`) is not known. Check the string when the function is live (lessons A6).
+
 ## Changed files
 
 - `src/Server/GameDaemon/item_h_1.cpp`
