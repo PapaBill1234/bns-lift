@@ -115,6 +115,7 @@ public:
     friend class Port;
     friend class SessionPool;
     friend class Channel;
+    friend class DaemonChannel;  // LIFT: access for send in DaemonChannel::Send (GameDaemon 0x69a4c0)
     friend class IoWorker;
     friend class Network;
     friend class ReconnectTimer;

@@ -1,9 +1,11 @@
-// channel_gd.h: channel.cpp (GameDaemon PDB, 2019 + PDB). Wave 0: declarations of the stubbed functions only.
-// LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
+// channel_gd.h: channel.cpp (GameDaemon PDB, 2019 + PDB).
 #pragma once
 #include "GameDaemonFwd.h"
+#include "../BloodLib/include/Channel.h"
+#include "../BloodLib/include/Lock.h"
 
-class ClientSideHashedDaemonChannel
+// PDB: ClientSideHashedDaemonChannel (GameDaemon), size 0x28.
+class ClientSideHashedDaemonChannel : public SessionHandler
 {
 public:
     virtual __cdecl ~ClientSideHashedDaemonChannel(void);  // 0x69aa70
@@ -12,11 +14,21 @@ public:
 protected:
     void __cdecl initialize(unsigned int, unsigned long, unsigned short);  // 0x69acc0
     bool __cdecl initSession(bool *, bool, bool);  // 0x69ad60
-    virtual ::Session * __cdecl getSession(unsigned __int64);  // 0x69af30
-    virtual void __cdecl releaseSession(::Session *);  // 0x69afb0
-};
+    virtual ::Session * __cdecl getSession(unsigned __int64);  // 0x69af30, slot 7
+    virtual void __cdecl releaseSession(::Session *);  // 0x69afb0, slot 8
 
-class ServerSideDaemonChannel
+private:
+    int _connectedSessionCount;
+    unsigned int _portId;
+    unsigned long _serverIp;
+    unsigned short _serverPort;
+    int _sessionSize;
+    Session** _session;
+};
+static_assert(sizeof(ClientSideHashedDaemonChannel) == 0x28, "sizeof ClientSideHashedDaemonChannel");
+
+// PDB: ServerSideDaemonChannel (GameDaemon), size 0x58.
+class ServerSideDaemonChannel : public DaemonChannel
 {
 public:
     virtual __cdecl ~ServerSideDaemonChannel(void);  // 0x69b000
@@ -27,5 +39,13 @@ protected:
     virtual void __cdecl onClose(::Session const *, bool, bool);  // 0x69b340
     virtual ::Session * __cdecl getSession(void);  // 0x69b4c0
     virtual void __cdecl releaseSession(::Session *);  // 0x69b670
-};
 
+private:
+    int MaxSession;
+    CriticalSection Lock;
+    int SessionCount;
+    int LastSelected;
+    Session** SessionList;
+    bool* UsedList;
+};
+static_assert(sizeof(ServerSideDaemonChannel) == 0x58, "sizeof ServerSideDaemonChannel");

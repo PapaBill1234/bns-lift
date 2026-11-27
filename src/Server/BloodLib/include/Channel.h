@@ -5,6 +5,7 @@
 
 class Session;
 class Packet;
+class PacketList;
 
 class Channel : public DynamicRefCntObj
 {
@@ -60,6 +61,10 @@ public:
     virtual bool OnAccept(Session const* session) const;                         // 0x108B0
     virtual bool OnConnect(Session const* session, bool firstConnected) const;   // 0x108E0
     virtual void OnClose(Session const* session, bool tryReconnect) const;       // 0x10910
+    // LIFT: GameDaemon bodies (src/Server/GameDaemon/channel.cpp). They add no code to the other exes.
+    bool Send(char const* format, ...);                    // GameDaemon 0x69a3e0
+    bool Send(Packet const* packet, Session* session);     // GameDaemon 0x69a440
+    bool Send(PacketList const* packetList);               // GameDaemon 0x69a4c0
 
 protected:
     virtual Session* getSession() = 0;                                           // slot 7

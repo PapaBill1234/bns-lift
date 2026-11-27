@@ -2185,7 +2185,20 @@ struct NpcSpawnParam {};
 struct ObjIndex16List { short count; short *list; };  // PDB layout (size 0x10)
 struct ObjIndexList { char count; char *list; };  // PDB layout (size 0x10)
 struct OpXmlData {};
-class PacketList {};
+// PDB: PacketList (GameDaemon), size 0x10.
+class PacketList
+{
+public:
+    int GetCount() const { return Count; }
+    // LIFT: the PDB has GetBufferList protected. DaemonChannel::Send (0x69a4c0) reads it inline.
+    PacketBuffer const** GetBufferList() const { return const_cast<PacketBuffer const**>(Buffers); }
+
+private:
+    int Size;
+    int Count;
+    PacketBuffer** Buffers;
+};
+static_assert(sizeof(PacketList) == 0x10, "sizeof PacketList");
 struct PartyBattleResultTranResultNotifyInfo {};
 struct PartyBattleSideMember {};
 struct PartyBattleVoteRecord {};
