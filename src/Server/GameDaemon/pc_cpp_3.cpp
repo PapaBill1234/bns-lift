@@ -48,7 +48,7 @@ struct PcContributionView
 };
 
 // LIFT: view of Zone. GeoZoneData at +0x3F60, _guildBattleFieldMgr at +0x43A0.
-struct ZoneView
+struct Pc3ZoneView
 {
     char lift_pad_0[0x3F60];
     void const *GeoZoneData;            // +0x3F60
@@ -64,7 +64,7 @@ struct CreatureView
     char lift_pad_1[0x150 - 0x30];
     __int64 guild_id;                   // +0x150. Prop (+0x30) .State (+0xD8) .guild_id (+0x48)
     char lift_pad_2[0x8B8 - 0x158];
-    ZoneView *zone;                     // +0x8B8
+    Pc3ZoneView *zone;                  // +0x8B8
 };
 
 // LIFT: view of Pc. The skeleton class declares only part of its PDB members.
@@ -75,7 +75,7 @@ struct PcView
     char lift_pad_1[0x150 - 0x30];
     __int64 guild_id;                   // +0x150
     char lift_pad_2[0x8B8 - 0x158];
-    ZoneView *zone;                     // +0x8B8
+    Pc3ZoneView *zone;                  // +0x8B8
     char lift_pad_3[0x3050 - 0x8C0];
     short _gradeCount;                  // +0x3050
     char lift_pad_4[0x3058 - 0x3052];
@@ -876,7 +876,7 @@ bool __cdecl Pc::checkTeamGuildBattleFieldWithTarget(::Creature *target)
 {
     PcView *self = reinterpret_cast<PcView *>(this);
     CreatureView *targetView = reinterpret_cast<CreatureView *>(target);
-    ZoneView *zone = self->zone;
+    Pc3ZoneView *zone = self->zone;
     bool result = true;
     if (zone != nullptr && zone->GeoZoneData != nullptr && zone == targetView->zone && zone->_guildBattleFieldMgr != nullptr)
     {
