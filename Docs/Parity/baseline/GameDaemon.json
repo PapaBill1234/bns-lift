@@ -776,6 +776,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Creature::GetActivatedBadgeEquipSlot": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "CreatureProperty::FieldDefine": {
 "calls": 100,
 "consts": 100,
@@ -824,6 +831,13 @@
 "refs": 50,
 "score": 83.3,
 "status": "DIFF"
+},
+"DebuffGuildBattleFieldEffect::checkApply": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "DeleteCharacterTran::GetDefinition": {
 "calls": 100,
@@ -1588,6 +1602,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"EmbersExplosionTimerEffect::checkApply": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Env::GetActionRadius": {
 "calls": 100,
 "consts": 100,
@@ -1680,6 +1701,13 @@
 "status": "MATCH"
 },
 "FSE_readNCount": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"FallDeathEffect::checkApply": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -1922,6 +1950,13 @@
 "consts": 100,
 "refs": 0,
 "score": 66.7,
+"status": "DIFF"
+},
+"IntervalSecondGaugePointEffect::checkApply": {
+"calls": 100,
+"consts": 67,
+"refs": 100,
+"score": 88.9,
 "status": "DIFF"
 },
 "ItemBase<AccessoryTrait>::GetClass": {
@@ -2393,6 +2428,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"OceanicEffect::checkApply": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "PartyBattleFieldAttractionState::CanProgressQuest": {
 "calls": 100,
 "consts": 50,
@@ -2497,6 +2539,13 @@
 "refs": 0,
 "score": 66.7,
 "status": "DIFF"
+},
+"PassiveEffect::GetRemainDuration": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "Pc::ClearLastComboSkillValue": {
 "calls": 100,
@@ -3731,6 +3780,20 @@
 "status": "MATCH"
 },
 "WarFieldAttractionState::GetTypeName": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WeaponItem::R_GetRandomEffectGroupId": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"WeaponItem::R_GetRandomEffectId": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
