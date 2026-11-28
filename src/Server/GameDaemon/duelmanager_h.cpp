@@ -1,12 +1,23 @@
-// duelmanager_h.cpp: duelmanager.h (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
+// duelmanager_h.cpp: duelmanager.h (GameDaemon PDB, 2019 + PDB).
+// LIFT: per-exe StlMemory.h path (A6). The inlined std::list head node allocation uses the GameDaemon build path.
+#define LIFT_STLMEMORY_FILE \
+    L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\bloodlib\\include\\StlMemory.h"
 #include "duelmanager.h"
 #include "pc.h"
 #include "LiftStub.h"
 
 // 0x27bb0
-__cdecl DuelTeam::DuelTeam(int, int)
+#pragma comment(linker, "/INCLUDE:??0DuelTeam@@QEAA@HH@Z")  // LIFT: dead-strip keep (no live caller yet)
+__cdecl DuelTeam::DuelTeam(int const teamIndex, int const maxMemberCount)
+    : _teamIndex(teamIndex)
+    , _members()
+    , _reserveKey(0)
+    , _maxMemberCount(maxMemberCount)
+    , _ratingScore(0)
+    , _maxRatingScore(0)
+    , _totalRatingScore(0)
+    , _teamAttackDamage(0)
 {
-    LIFT_STUB(0x27bb0);
 }
 
 // 0x27c30

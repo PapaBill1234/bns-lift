@@ -1,10 +1,26 @@
-// brainmonstertalkable_h.cpp: brainmonstertalkable.h (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
+// brainmonstertalkable_h.cpp: brainmonstertalkable.h (GameDaemon PDB, 2019 + PDB).
 #include "brainmonstertalkable.h"
 #include "brainconst.h"
 #include "LiftStub.h"
 
 // 0x630e0
-::BrainState * __cdecl BrainMonsterTalkable::GetState(::BrainConst::State)
+#pragma comment(linker, "/INCLUDE:?GetState@BrainMonsterTalkable@@MEAAPEAVBrainState@@W4State@BrainConst@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+// LIFT: the state members are byte views (see brainmonstertalkable.h). The casts give the member addresses.
+::BrainState * __cdecl BrainMonsterTalkable::GetState(::BrainConst::State state)
 {
-    LIFT_STUB(0x630e0);
+    switch (state)
+    {
+    case ::BrainConst::STATE_SPAWN:
+        return reinterpret_cast< ::BrainState *>(&_spawn);
+    case ::BrainConst::STATE_ACT_SEQ:
+        return reinterpret_cast< ::BrainState *>(&_act);
+    case ::BrainConst::STATE_TALK:
+        return reinterpret_cast< ::BrainState *>(&_talk);
+    case ::BrainConst::STATE_COMBAT_SEQ:
+        return reinterpret_cast< ::BrainState *>(&_combat);
+    case ::BrainConst::STATE_RETURN:
+        return reinterpret_cast< ::BrainState *>(&_return);
+    default:
+        return NULL;
+    }
 }

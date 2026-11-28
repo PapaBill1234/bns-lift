@@ -3,6 +3,11 @@
 #include "summoned.h"
 #include "zone.h"
 #include "LiftStub.h"
+#include "AlertSender.h"
+#include "Log.h"
+
+// LIFT: per-exe path literal (lessons A6).
+#define GAMEOBJECT_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\GameObject.cpp"
 
 // 0x36c4f0
 void __cdecl GameObject::Initialize(unsigned __int64)
@@ -11,15 +16,22 @@ void __cdecl GameObject::Initialize(unsigned __int64)
 }
 
 // 0x36c580
+#pragma comment(linker, "/INCLUDE:?Think@GameObject@@UEAA_NPEBVScriptEvent@@@Z")  // LIFT: dead-strip keep (no live caller yet)
 bool __cdecl GameObject::Think(::ScriptEvent const *)
 {
-    LIFT_STUB(0x36c580);
+    Log::Write(Log::LT_ERROR, GAMEOBJECT_FILE, 44, L"== CRASH == [object], Think; called ... wrong");
+    AlertSender::Write(GAMEOBJECT_FILE, 44, L"== CRASH == [object], Think; called ... wrong");
+    return false;
 }
 
 // 0x36c5c0
-void __cdecl GameObject::OnTimer(::Zone *, unsigned short)
+#pragma comment(linker, "/INCLUDE:?OnTimer@GameObject@@UEAAXPEAVZone@@G@Z")  // LIFT: dead-strip keep (no live caller yet)
+void __cdecl GameObject::OnTimer(::Zone *, unsigned short timerSubtype)
 {
-    LIFT_STUB(0x36c5c0);
+    // LIFT: GameObject::Id is read through the view GameObjectIdView (gameobject.h).
+    unsigned __int64 const id = reinterpret_cast< ::GameObjectIdView const *>(this)->Id;
+    Log::Write(Log::LT_ERROR, GAMEOBJECT_FILE, 50, L"== CRASH == [object], OnTimer; called ... wrong, id:0x%I64x, subtype:%u", id, timerSubtype);
+    AlertSender::Write(GAMEOBJECT_FILE, 50, L"== CRASH == [object], OnTimer; called ... wrong, id:0x%I64x, subtype:%u", id, timerSubtype);
 }
 
 // 0x36c630

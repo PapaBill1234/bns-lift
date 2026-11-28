@@ -1,6 +1,7 @@
 // raiddungeon.h: raiddungeon.cpp (GameDaemon PDB, 2019 + PDB). Wave 0: declarations of the stubbed functions only.
 // LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
 #pragma once
+#include <stddef.h>
 #include "GameDaemonFwd.h"
 
 class RaidDungeon
@@ -31,7 +32,24 @@ public:
     void __cdecl PostConfirmTask(__int64);  // 0x1a9a00
 private:
     bool __cdecl confirm(unsigned __int64);  // 0x1a9b90
+
+    // LIFT: PDB layout of RaidDungeon (size 0x1B0). Only the fields that the lifted bodies read are declared.
+    char lift_pad_8[0x10];  // ❓ base DynamicRefCntObj (+0x8 to +0x17, after the vfptr) is not declared yet
+    unsigned __int64 _id;  // +24 (0x18)
+    unsigned __int64 _dbId;  // +32 (0x20)
+    char _currentStep;  // +40 (0x28)
+    bool _waitConfirm;  // +41 (0x29)
+    long volatile _boundPcCount;  // +44 (0x2C)
+    __int64 _expireTime;  // +48 (0x30)
+    char lift_pad_38[0x8];  // ❓ _data (Data::RaidDungeonRecordPtr, +0x38) is not declared yet
+    bool _removed;  // +64 (0x40)
+    unsigned __int64 _occupyingObjectId;  // +72 (0x48)
+    char lift_pad_50[0x138];  // ❓ _occupyingPcInfo to _currentBossNpcInCombat (+0x50 to +0x187) are not declared yet
+    ::CriticalSection _raidDungeonCS;  // +392 (0x188)
 };
+static_assert(offsetof(RaidDungeon, _occupyingObjectId) == 0x48, "RaidDungeon::_occupyingObjectId");
+static_assert(offsetof(RaidDungeon, _raidDungeonCS) == 0x188, "RaidDungeon::_raidDungeonCS");
+static_assert(sizeof(RaidDungeon) == 0x1B0, "RaidDungeon size");
 
 class RaidDungeonBindPropertyEntry
 {
@@ -56,7 +74,20 @@ public:
     ::Pointer2< ::RaidDungeon> __cdecl DestroyRaidDungeon(unsigned __int64);  // 0x1aadf0
     ::Pointer2< ::RaidDungeon> __cdecl GetRaidDungeonPtrById(unsigned __int64);  // 0x1aaf70
     ::Pointer2< ::RaidDungeon> __cdecl GetRaidDungeonPtrByDbId(unsigned __int64);  // 0x1aaff0
+
+    // LIFT: PDB nested type RaidDungeonManager::BoundDungeonList.
+    typedef std::map<unsigned __int64, ::RaidDungeon *, std::less<unsigned __int64>, StlAllocator<std::pair<unsigned __int64, ::RaidDungeon *>, 2> > BoundDungeonList;
+private:
+    int _raidDungeonCount;  // +8 (0x8)
+    int _raidDungeonCapacity;  // +12 (0xC)
+    ::RaidDungeon **_raidDungeonList;  // +16 (0x10)
+    BoundDungeonList _boundRaidDungeonlist;  // +24 (0x18)
+    __int64 _expirationTime;  // +56 (0x38)
+    ::CriticalSection _lock;  // +64 (0x40)
+    __int64 _lastIssuedId;  // +104 (0x68)
 };
+static_assert(offsetof(RaidDungeonManager, _expirationTime) == 0x38, "RaidDungeonManager::_expirationTime");
+static_assert(sizeof(RaidDungeonManager) == 0x70, "RaidDungeonManager size");
 
 class RaidDungeonPropertyContainer
 {
@@ -72,7 +103,17 @@ public:
     bool __cdecl UnbindRaidDungeon(int, __int64, bool);  // 0x1abe30
     bool __cdecl CheckExpiredRaidDungeon(bool);  // 0x1ac3c0
     bool __cdecl DisposeAll(void);  // 0x1ac690
+
+    // LIFT: PDB nested types RaidDungeonPropertyContainer::BindList and UnbindList.
+    typedef std::map<__int64, ::RaidDungeonBindPropertyEntry *, std::less<__int64>, StlAllocator<std::pair<__int64, ::RaidDungeonBindPropertyEntry *>, 2> > BindList;
+    typedef std::map<int, ::RaidDungeonUnbindPropertyEntry *, std::less<int>, StlAllocator<std::pair<int, ::RaidDungeonUnbindPropertyEntry *>, 2> > UnbindList;
+private:
+    BindList _bindList;  // +0 (0x0)
+    UnbindList _unbindList;  // +32 (0x20)
+    ::Pc *_owner;  // +64 (0x40)
 };
+static_assert(offsetof(RaidDungeonPropertyContainer, _owner) == 0x40, "RaidDungeonPropertyContainer::_owner");
+static_assert(sizeof(RaidDungeonPropertyContainer) == 0x48, "RaidDungeonPropertyContainer size");
 
 class RaidDungeonUnbindPropertyEntry
 {

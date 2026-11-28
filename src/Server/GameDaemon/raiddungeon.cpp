@@ -1,4 +1,7 @@
 // raiddungeon.cpp: raiddungeon.cpp (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
+// LIFT: per-exe StlMemory.h path (A6). The inlined std::map head node allocation uses the GameDaemon build path.
+#define LIFT_STLMEMORY_FILE \
+    L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\bloodlib\\include\\StlMemory.h"
 #include "raiddungeon.h"
 #include "bossnpc.h"
 #include "pc.h"
@@ -72,9 +75,13 @@ void __cdecl RaidDungeon::SendInfomation(::Pc *)
 }
 
 // 0x1a8360
+#pragma comment(linker, "/INCLUDE:?GetOccupyingObjectId@RaidDungeon@@QEAA_KXZ")  // LIFT: dead-strip keep (no live caller yet)
 unsigned __int64 __cdecl RaidDungeon::GetOccupyingObjectId(void)
 {
-    LIFT_STUB(0x1a8360);
+    _raidDungeonCS.Enter();
+    unsigned __int64 const occupyingObjectId = _occupyingObjectId;
+    _raidDungeonCS.Leave();
+    return occupyingObjectId;
 }
 
 // 0x1a83a0
@@ -102,9 +109,13 @@ bool __cdecl RaidDungeon::OnBossNpcKilled(::Data::BossNpcRecordPtr)
 }
 
 // 0x1a94a0
+#pragma comment(linker, "/INCLUDE:?IsBound@RaidDungeon@@QEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
 bool __cdecl RaidDungeon::IsBound(void)
 {
-    LIFT_STUB(0x1a94a0);
+    _raidDungeonCS.Enter();
+    bool const bound = _waitConfirm || _dbId != 0;
+    _raidDungeonCS.Leave();
+    return bound;
 }
 
 // 0x1a94f0
@@ -138,15 +149,23 @@ bool __cdecl RaidDungeon::confirm(unsigned __int64)
 }
 
 // 0x1aa220
+#pragma comment(linker, "/INCLUDE:??0RaidDungeonManager@@QEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
 __cdecl RaidDungeonManager::RaidDungeonManager(void)
+    : _raidDungeonCount(0)
+    , _raidDungeonCapacity(0)
+    , _raidDungeonList(NULL)
+    , _boundRaidDungeonlist()
+    , _expirationTime(0)
+    , _lock()
+    , _lastIssuedId(0)
 {
-    LIFT_STUB(0x1aa220);
 }
 
 // 0x1aa2d0
+// LIFT: the member destructors do the work (_lock: DeleteCriticalSection, then _boundRaidDungeonlist).
+#pragma comment(linker, "/INCLUDE:??1RaidDungeonManager@@UEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
 __cdecl RaidDungeonManager::~RaidDungeonManager(void)
 {
-    LIFT_STUB(0x1aa2d0);
 }
 
 // 0x1aa340
@@ -234,9 +253,12 @@ short __cdecl RaidDungeonUnbindPropertyEntry::FetchBroadcast(char *, short)
 }
 
 // 0x1ab2e0
+#pragma comment(linker, "/INCLUDE:??0RaidDungeonPropertyContainer@@QEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
 __cdecl RaidDungeonPropertyContainer::RaidDungeonPropertyContainer(void)
+    : _bindList()
+    , _unbindList()
+    , _owner(NULL)
 {
-    LIFT_STUB(0x1ab2e0);
 }
 
 // 0x1ab3b0

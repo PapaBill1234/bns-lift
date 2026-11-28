@@ -1,6 +1,7 @@
 // duelmanager.h: duelmanager.cpp, duelmanager.h (GameDaemon PDB, 2019 + PDB). Wave 0: declarations of the stubbed functions only.
 // LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
 #pragma once
+#include <list>
 #include "GameDaemonFwd.h"
 
 // LIFT: view of the PDB record Data::DuelRecord (base DrEl, size 0x440).
@@ -99,8 +100,14 @@ public:
 class DuelTeam
 {
 public:
-    __cdecl DuelTeam(int, int);  // 0x27bb0
-    virtual __cdecl ~DuelTeam(void);  // 0x27c30
+    // LIFT: PDB nested type DuelTeam::DuelMembers.
+    typedef std::list< ::DuelMember *, StlAllocator< ::DuelMember *, 2> > DuelMembers;
+
+    __cdecl DuelTeam(int const, int const);  // 0x27bb0
+    virtual __cdecl ~DuelTeam(void);  // 0x27c30 (slot 0)
+    // LIFT: the virtual functions follow the PDB slot order (ResetRound slot 1, instantiateDuelMember slot 2).
+    // ❓ slot 3 onLeave has no body in the sources yet and is not declared.
+    virtual void __cdecl ResetRound(void);  // 0xb1cf0
 private:
     virtual ::DuelMember *const __cdecl instantiateDuelMember(int, int, ::Pc *const);  // 0x27d60
 public:
@@ -109,6 +116,19 @@ public:
     ::DuelMember *const __cdecl GetDuelMember(::Pc const *const);  // 0xb1890
     bool __cdecl Join(int, ::Pc *const);  // 0xb1920
     bool __cdecl Leave(::Pc *const);  // 0xb1b20
-    virtual void __cdecl ResetRound(void);  // 0xb1cf0
+private:
+    int const _teamIndex;  // +8 (0x8)
+protected:
+    DuelMembers _members;  // +16 (0x10)
+    __int64 _reserveKey;  // +40 (0x28)
+private:
+    int _maxMemberCount;  // +48 (0x30)
+    int _ratingScore;  // +52 (0x34)
+    int _maxRatingScore;  // +56 (0x38)
+    int _totalRatingScore;  // +60 (0x3C)
+    __int64 _teamAttackDamage;  // +64 (0x40)
+    __cdecl DuelTeam(DuelTeam const &);  // PDB: private, no body
+    DuelTeam &operator=(DuelTeam const &);  // PDB: private, no body
 };
+static_assert(sizeof(DuelTeam) == 0x48, "DuelTeam size");
 
