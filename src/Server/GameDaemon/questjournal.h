@@ -162,7 +162,7 @@ public:
     static bool __cdecl IsRewardRestrictedCase(::QuestCase const &);  // 0x572fa0
 private:
     static bool __cdecl validateQuestId(unsigned short);  // 0x573010
-    bool __cdecl isScriptableCase(short);  // 0x5730a0
+    static bool __cdecl isScriptableCase(short);  // 0x5730a0
 public:
     bool __cdecl ProcessRollbackCase(::ScriptEvent const &, unsigned short, char, char);  // 0x5730f0
     bool __cdecl ProcessMissionStepTimeLimitFail(unsigned short, char, bool);  // 0x5734b0

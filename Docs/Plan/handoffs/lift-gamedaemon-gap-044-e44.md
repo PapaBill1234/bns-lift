@@ -4,8 +4,7 @@
 
 Stem `questjournal_cpp_2`:
 
-- `QuestJournal::validateQuestId` (0x573010).
-- `QuestJournal::isScriptableCase` (0x5730a0).
+- `QuestJournal::isScriptableCase` (0x5730a0). Round 2: it is now `static`, so the case value is the first argument. The keep pragma uses the static name (`CA_NF@Z`). The PDB public name is a member form (`AEAA_NF@Z`). The driver must check that the pragma resolves.
 - `QuestJournal::RemoveLeaveZoneRollbackQuestIndex` (0x581080).
 - `QuestJournal::removeAttrationQuest` (0x583ce0).
 
@@ -26,6 +25,7 @@ Stem `rankingseason_cpp`:
 
 Stem `questjournal_cpp_2` (the stem is closed for this round; the 4 lifted bodies above are the only edits):
 
+- `QuestJournal::validateQuestId` (0x573010): P2_cc first branch jb/ja; a later card. The body is back to `LIFT_STUB`. The keep pragma is removed.
 - `QuestJournal::IsRewardRestrictedCase` (0x572fa0): the static array `_rewardRestrictedCase` has no definition in the repo. `QuestCase` has no layout in the headers. Note: the original tests `subtype <= 25`, but the array has 25 entries (a read of one byte past the end).
 - `QuestJournal::calcQuestRewardExpBonus` (0x57a090): `Data::DataManager`, `QuestTable` and `GameDaemon::ruleConfig` have no layout in the headers.
 - `QuestJournal::calcQuestRewardExpBonusTestServer` (0x57a110): `ContentsRuleConfig` has no members in the headers.

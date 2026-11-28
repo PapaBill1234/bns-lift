@@ -5,8 +5,7 @@
 #include "LiftStub.h"
 #include "Log.h"
 
-#pragma comment(linker, "/INCLUDE:?validateQuestId@QuestJournal@@CA_NG@Z")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?isScriptableCase@QuestJournal@@AEAA_NF@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?isScriptableCase@QuestJournal@@CA_NF@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?RemoveLeaveZoneRollbackQuestIndex@QuestJournal@@QEAA_NH@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?removeAttrationQuest@QuestJournal@@AEAA_NH@Z")  // LIFT: dead-strip keep (no live caller yet)
 
@@ -21,16 +20,7 @@ bool __cdecl QuestJournal::IsRewardRestrictedCase(::QuestCase const &)
 // 0x573010
 bool __cdecl QuestJournal::validateQuestId(unsigned short questId)
 {
-    if ((questId >= 1 && questId <= 2000)
-        || (questId >= 20000 && questId <= 23000)
-        || (questId >= 25000 && questId <= 25300)
-        || (questId >= 28000 && questId <= 29999))
-    {
-        return true;
-    }
-
-    Log::Write(Log::LT_ERROR, QUESTJOURNAL_FILE, 10096, L"[quest], invalid quest id, quest:%d", questId);
-    return false;
+    LIFT_STUB(0x573010);
 }
 
 // 0x5730a0
