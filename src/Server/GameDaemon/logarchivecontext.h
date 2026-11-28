@@ -10,7 +10,7 @@ public:
     __cdecl ~LogArchiveReadBuffer(void);  // 0x6d84c0
     bool __cdecl ClearBuffer(void);  // 0x6d84f0
 
-private:
+public:  // LIFT: public so the offsetof asserts compile
     _WSABUF _wsaBuf;  // +0x20
 };
 static_assert(sizeof(LogArchiveReadBuffer) == 0x30, "sizeof LogArchiveReadBuffer");
@@ -33,7 +33,7 @@ protected:
     bool __cdecl growBufferChunkSize(unsigned int);  // 0x6d8b30
     bool __cdecl growBufferCount(unsigned int);  // 0x6d8ca0
 
-private:
+public:  // LIFT: public so the offsetof asserts compile
     char *_pBufferChunkHead;  // +0x0
     char *_pBufferChunkTail;  // +0x8
     _WSABUF *_pWsaBufs;  // +0x10
@@ -56,7 +56,7 @@ public:
     bool __cdecl SwitchStatus(void);  // 0x6d8f20
     ::LogArchiveWriteBuffer *const __cdecl GetWritingBuffer(void) const;  // 0x6d8fa0
 
-private:
+public:  // LIFT: public so the offsetof asserts compile
     LogArchiveWriteBuffer *_pWriteBuffers[2];  // +0x20
     int _status;  // +0x30
     int _mode;  // +0x34
