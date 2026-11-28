@@ -17,7 +17,6 @@
 #pragma comment(linker, "/INCLUDE:?IncreaseOccupationCount@PartyBattleSide@@QEAAX_K@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?IncreaseManipulationCount@PartyBattleSide@@QEAAX_K@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?GetFirstMemberId@PartyBattleSide@@QEAA_KXZ")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?CheckToFinishGame@PartyBattleManager@@UEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?CanTakeAchievementReward@PartyBattleManager@@UEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?isSaveGameResult@PartyBattleManager@@MEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
 
@@ -250,23 +249,7 @@ void __cdecl PartyBattleManager::Finish(void)
 // 0x184310
 bool __cdecl PartyBattleManager::CheckToFinishGame(void)
 {
-    ::Zone *zone = PBM_VIEW->_zone;
-    if (zone == nullptr)
-        return false;
-    // LIFT: Zone::GetZoneScore (0x258710) is inline here: a null score gives 0. Score types 4 and 5 are the two sides.
-    ::ZoneScore *score = ((ZoneView *)zone)->_score;
-    int betaScore = 0;
-    int alphaScore;
-    if (score != nullptr)
-        alphaScore = score->Score(4);
-    else
-        alphaScore = 0;
-    if (PBM_VIEW->_data->goal_score <= alphaScore)
-        return true;
-    score = ((ZoneView *)zone)->_score;
-    if (score != nullptr)
-        betaScore = score->Score(5);
-    return PBM_VIEW->_data->goal_score <= betaScore;
+    LIFT_STUB(0x184310);
 }
 
 // 0x184370

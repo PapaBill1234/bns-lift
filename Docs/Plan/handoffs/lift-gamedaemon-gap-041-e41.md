@@ -10,7 +10,6 @@ Stem `partybattlemanager_cpp`:
 - `PartyBattleSide::IncreaseOccupationCount` (0x181b20)
 - `PartyBattleSide::IncreaseManipulationCount` (0x181b80)
 - `PartyBattleSide::GetFirstMemberId` (0x182200)
-- `PartyBattleManager::CheckToFinishGame` (0x184310)
 - `PartyBattleManager::CanTakeAchievementReward` (0x1843d0)
 - `PartyBattleManager::isSaveGameResult` (0x185b70)
 
@@ -22,6 +21,7 @@ Stem `guild_cpp_1`:
 
 ## Not done
 
+- `PartyBattleManager::CheckToFinishGame` (0x184310): review reject P2_cc (build `je`, original `jne`) and P9_ret_width. It is a `LIFT_STUB` again and its keep pragma is removed. A later card.
 - `PartyBattleManager::CanResurrect` (0x184370): the offset of `Pc::_lastDeadTime` is not in a repo view. One look-up did not give it.
 - `PartyBattleManager::getAttackerPc` (0x1858d0): the owner field of the attacker object (type 2) is not decoded. It needs the Npc or Summoned layout.
 - `Guild::SetRenameGuildInProgress` (0xe1a50), `Guild::GetGuildInfoForGameLog` (0xe1ac0), `Guild::ResetLevelUp` (0xe5f90), `Guild::GetMemberIndexByPcDbId` (0xe8440): `Guild` has no member list in the repo. These bodies need `_guildCS`, `_renameGuildInProgress`, `_reserveLevelUp`, `_guildMember` and the guild info fields, and the `GuildInfoForGameLog` layout. Add a Guild view in a later round.
@@ -44,8 +44,11 @@ Stem `guild_cpp_1`:
 ## Repair round 3 (review round 1)
 
 - `Guild::GetBanishOpenGuildMemberCountResetTime`: declared `static` in `guild.h`. The original body does not read `this`, so `now` is the first argument. The keep pragma uses the static name.
-- `PartyBattleManager::CheckToFinishGame`: the score reads follow the pseudocode order (preset 0, `if` on the score pointer). This fixes the branch sense.
 - `PartyBattleManager::isSaveGameResult`: one unsigned compare `(unsigned)(rule - 3) > 2` and the reward flag, as in the original.
+
+## Repair round 4
+
+- `PartyBattleManager::CheckToFinishGame` is a `LIFT_STUB` again. The `/INCLUDE` pragma is removed.
 
 ## Changed files
 
