@@ -31,6 +31,7 @@ Each lifted body has a dead-strip `/INCLUDE` keep pragma with a `// LIFT:` note.
 - `NpcSquad` now derives from `NpcParty`, as in the PDB. The `NpcParty` data members are now `protected`, so that `NpcSquad` can read them. The `NpcSquad` members `_squad` and `_npc[20]` are not declared yet.
 - `NpcSquad::EventOccured` uses a local `ScriptEventView` (size 0x98, PDB layout). The skeleton `ScriptEvent` has no members yet.
 - `Pc::CalculateStyleScoreBonus` reads `Prop.State.style_score` through `CreatureMemberView`, because the skeleton `Pc` has no `Creature` base yet. `RuleConfig` has the four `_styleScoreExp*` members now (+540 to +552). `Pc` is a friend of `RuleConfig`, because no PDB accessor was found.
+- Round 2 fix (pdb_layout): `Pc::_takingAchievementRewardLock` is now an `_RTL_SRWLOCK` at +0x4F40. The gap after it starts at +0x4F48 and has the PDB name `_isTakingAchievementReward`. The two `RuleConfig` gap arrays now have the PDB names of their first members (`_usePcContentsTypeDungeonEnable` at +0, `_useReserveFactionReputation` at +84).
 
 ## Not done
 

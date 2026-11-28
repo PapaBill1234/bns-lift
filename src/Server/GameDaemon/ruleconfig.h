@@ -12,10 +12,10 @@ public:
     int FactionTransferLimitPcCount(void) const { return _factionTransferLimitPcCount; }  // PDB inline
 private:
     void __cdecl setMarketRegisterTimeTaxExtra(void);  // 0x3d7670
-    char lift_pad_0[76];  // ❓ no PDB name: members +0 to +75 are not declared yet
+    char _usePcContentsTypeDungeonEnable[76];  // +0 (LIFT: PDB members _usePcContentsTypeDungeonEnable to before _factionTransferLimitPercent, not declared yet)
     int _factionTransferLimitPercent;  // +76
     int _factionTransferLimitPcCount;  // +80
-    char lift_pad_54[540 - 84];  // ❓ no PDB name: members +84 to +539 are not declared yet
+    char _useReserveFactionReputation[540 - 84];  // +84 (LIFT: PDB members _useReserveFactionReputation to before _styleScoreExpStep1, not declared yet)
     int _styleScoreExpStep1;  // +540
     int _styleScoreExpStep2;  // +544
     int _styleScoreExpBonus1;  // +548

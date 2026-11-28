@@ -597,7 +597,8 @@ private:
     char _lastReportBotSpammerTime[0x4f30 - 0x4e48];  // +0x4E48 (LIFT: PDB members _lastReportBotSpammerTime to before _tryingInstantPaymentLock, not declared yet)
     ::_RTL_SRWLOCK _tryingInstantPaymentLock;  // +0x4F30
     bool _isTryingInstantPayment;  // +0x4F38
-    char _takingAchievementRewardLock[0x8cc8 - 0x4f40];  // +0x4F40 (LIFT: PDB members _takingAchievementRewardLock to before _skillResultContext, not declared yet)
+    ::_RTL_SRWLOCK _takingAchievementRewardLock;  // +0x4F40
+    char _isTakingAchievementReward[0x8cc8 - 0x4f48];  // +0x4F48 (LIFT: PDB members _isTakingAchievementReward to before _skillResultContext, not declared yet)
     ::SkillResultContext _skillResultContext;  // +0x8CC8
     char _inviteMentoringContext[0x8e78 - 0x8d78];  // +0x8D78 (LIFT: PDB members _inviteMentoringContext to before lastStyleLimitTime, not declared yet)
     __int64 lastStyleLimitTime;  // +0x8E78
