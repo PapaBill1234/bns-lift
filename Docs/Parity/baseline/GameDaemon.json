@@ -342,6 +342,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"AlertSender::Write": {
+"calls": 0,
+"consts": 100,
+"refs": 100,
+"score": 66.7,
+"status": "DIFF"
+},
 "AlertSender::createSocket": {
 "calls": 100,
 "consts": 100,
@@ -2351,6 +2358,20 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Log::Add": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Log::Write [?Write@Log@@SAXW4Type@1@PEB_WH1ZZ]": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "LogArchive::Name": {
 "calls": 100,
 "consts": 100,
@@ -2363,6 +2384,76 @@
 "consts": 100,
 "refs": 75,
 "score": 91.7,
+"status": "DIFF"
+},
+"LogBuffer::Acquire": {
+"calls": 0,
+"consts": 50,
+"refs": 40,
+"score": 30.0,
+"status": "DIFF"
+},
+"LogBuffer::GetLog": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LogBuffer::GetType": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LogBuffer::Prepare": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LogBuffer::Release": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LogBuffer::deallocate_me": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LogBufferAllocator::allocate": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LogBufferPool::allocate": {
+"calls": 100,
+"consts": 100,
+"refs": 83,
+"score": 94.4,
+"status": "DIFF"
+},
+"LogBufferPool::deallocate": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LogMedia::Add": {
+"calls": 50,
+"consts": 0,
+"refs": 40,
+"score": 30.0,
 "status": "DIFF"
 },
 "LogServerSessionHandler::~LogServerSessionHandler": {
@@ -3435,6 +3526,55 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"RefCntHistory::add": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RefCntHistory::dump": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RefCntObject::DumpRefCntHistory": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RefCntObject::addReferenceCount": {
+"calls": 67,
+"consts": 100,
+"refs": 33,
+"score": 66.7,
+"status": "DIFF"
+},
+"RefCntObject::deallocate_object": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RefCntObject::removeReferenceCount [?removeReferenceCount@RefCntObject@@QEAAJPEB_WH@Z]": {
+"calls": 100,
+"consts": 100,
+"refs": 33,
+"score": 77.8,
+"status": "DIFF"
+},
+"RefCntObject::~RefCntObject": {
+"calls": 100,
+"consts": 100,
+"refs": 50,
+"score": 83.3,
+"status": "DIFF"
 },
 "RegisterBidTran::GetDefinition": {
 "calls": 100,
@@ -4788,6 +4928,13 @@
 "status": "MATCH"
 },
 "pre_cpp_init": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"swprintf": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
