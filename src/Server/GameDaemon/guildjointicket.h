@@ -3,7 +3,8 @@
 #pragma once
 #include "GameDaemonFwd.h"
 
-class GuildJoinTicket
+// PDB: GuildJoinTicket, size 0x68.
+class GuildJoinTicket : public DynamicRefCntObj
 {
 protected:
     __cdecl GuildJoinTicket(void);  // 0x115dc0
@@ -22,9 +23,20 @@ protected:
     void __cdecl SetTicketListPerGuild(::GuildJoinTicketListPerGuild *);  // 0x116b20
 public:
     static short __cdecl GetTicketStateFromInProgressTicketState(short);  // 0x36deb0
+private:
+    unsigned __int64 _pcdbid;  // +0x18
+    unsigned __int64 _guildId;  // +0x20
+    short _ticketType;  // +0x28
+    short _ticketState;  // +0x2a
+    __int64 _expirationTime;  // +0x30
+    ::GuildJoinTicketListPerGuild *_ticketListPerGuild;  // +0x38
+    CriticalSection _lock;  // +0x40
 };
+static_assert(sizeof(GuildJoinTicket) == 0x68, "sizeof GuildJoinTicket");
 
-class GuildJoinTicketListPerGuild
+// PDB: GuildJoinTicketListPerGuild, size 0x200.
+// LIFT: the PDB virtual destructor has no declared body yet; the implicit destructor stands in for it.
+class GuildJoinTicketListPerGuild : public DynamicRefCntObj
 {
 protected:
     __cdecl GuildJoinTicketListPerGuild(void);  // 0x118370
@@ -43,7 +55,19 @@ protected:
     void __cdecl DeleteGuildJoinTicket(unsigned __int64);  // 0x119440
     void __cdecl DeleteAllGuildJoinTicket(void);  // 0x119610
     void __cdecl ClearExpiredGuildJoinTicket(__int64);  // 0x1197c0
+private:
+    unsigned __int64 _guildId;  // +0x18
+    ::GuildJoinTicket *_ticketList[50];  // +0x20
+    int _guildApplicationCount;  // +0x1b0
+    int _guildInvitationCount;  // +0x1b4
+    int _maxGuildApplicationQuota;  // +0x1b8
+    int _maxGuildInvitationQuota;  // +0x1bc
+    int _maxGuildJoinTicketQuota;  // +0x1c0
+    __int64 _timeStamp;  // +0x1c8
+    bool _inProgress;  // +0x1d0
+    CriticalSection _lock;  // +0x1d8
 };
+static_assert(sizeof(GuildJoinTicketListPerGuild) == 0x200, "sizeof GuildJoinTicketListPerGuild");
 
 class GuildJoinTicketListPerPc
 {

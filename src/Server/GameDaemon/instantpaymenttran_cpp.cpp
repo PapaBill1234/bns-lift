@@ -2,6 +2,9 @@
 #include "instantpaymenttran.h"
 #include "LiftStub.h"
 
+#pragma comment(linker, "/INCLUDE:?tryAbortImpl@InstantPaymentJob@@MEAA_NF@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?DataId@InstantPaymentBuyCollectionItemsSubJob@@UEAAHF@Z")  // LIFT: dead-strip keep (no live caller yet)
+
 // 0x132640
 __cdecl InstantPaymentTran::~InstantPaymentTran(void)
 {
@@ -53,7 +56,8 @@ bool __cdecl InstantPaymentJob::tryInstantPaymentReq(void *)
 // 0x133900
 bool __cdecl InstantPaymentJob::tryAbortImpl(short)
 {
-    LIFT_STUB(0x133900);
+    postFailProc();
+    return true;
 }
 
 // 0x133920
@@ -159,9 +163,9 @@ void __cdecl InstantPaymentBuyCollectionItemsSubJob::sendFailPacket(short)
 }
 
 // 0x135f00
-int __cdecl InstantPaymentBuyCollectionItemsSubJob::DataId(short)
+int __cdecl InstantPaymentBuyCollectionItemsSubJob::DataId(short idx)
 {
-    LIFT_STUB(0x135f00);
+    return _buyParam.buyItem[idx].chargeItem;
 }
 
 // 0x135f10

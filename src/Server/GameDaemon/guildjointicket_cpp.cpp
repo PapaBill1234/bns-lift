@@ -1,11 +1,20 @@
 // guildjointicket_cpp.cpp: guildjointicket.cpp (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
 #include "guildjointicket.h"
 #include "LiftStub.h"
+#include <string.h>
+
+#pragma comment(linker, "/INCLUDE:??0GuildJoinTicket@@IEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:??0GuildJoinTicketListPerGuild@@IEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
 
 // 0x115dc0
 __cdecl GuildJoinTicket::GuildJoinTicket(void)
+    : _pcdbid(0)
+    , _guildId(0)
+    , _ticketType(0)
+    , _ticketState(0)
+    , _expirationTime(0)
+    , _ticketListPerGuild(nullptr)
 {
-    LIFT_STUB(0x115dc0);
 }
 
 // 0x115e30
@@ -178,8 +187,16 @@ void __cdecl GuildJoinTicketListPerPc::ClearExpiredGuildJoinTicket(__int64)
 
 // 0x118370
 __cdecl GuildJoinTicketListPerGuild::GuildJoinTicketListPerGuild(void)
+    : _guildId(0)
+    , _guildApplicationCount(0)
+    , _guildInvitationCount(0)
+    , _maxGuildApplicationQuota(0)
+    , _maxGuildInvitationQuota(0)
+    , _maxGuildJoinTicketQuota(0)
+    , _timeStamp(0)
+    , _inProgress(false)
 {
-    LIFT_STUB(0x118370);
+    memset(_ticketList, 0, sizeof(_ticketList));
 }
 
 // 0x118440

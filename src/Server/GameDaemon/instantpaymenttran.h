@@ -3,7 +3,62 @@
 #pragma once
 #include "GameDaemonFwd.h"
 
-class InstantPaymentBuyCollectionItemsSubJob
+// PDB: InstantPaymentJob, size 0x158. The vtable order is the PDB slot order.
+class InstantPaymentJob
+{
+public:
+    enum INSTANT_PAYMENT_JOB_TYPE {};
+    virtual __cdecl ~InstantPaymentJob(void) {}  // slot 0
+    virtual INSTANT_PAYMENT_JOB_TYPE __cdecl GetType(void) = 0;  // slot 1
+    virtual bool __cdecl init(int, void *);  // 0x132850, slot 2
+    bool __cdecl tryInstantPaymentReq(void *);  // 0x1334b0
+    bool __cdecl tryInstantPaymentOk(void *);  // 0x132930
+    bool __cdecl tryInstantPaymentFail(short);  // 0x133070
+    virtual bool __cdecl finishInstantPaymentReq(void *);  // 0x133920, slot 3
+    virtual bool __cdecl finishInstantPaymentOk(void *);  // 0x133de0, slot 4
+    virtual bool __cdecl finishInstantPaymentFail(short);  // 0x134240, slot 5
+    virtual bool __cdecl finishAbort(void *);  // 0x134390, slot 6
+    virtual bool __cdecl procBeforePurchase(int, void *);  // 0x1328f0, slot 7
+    virtual bool __cdecl apply(int, void *);  // 0x132910, slot 8
+    virtual bool __cdecl procAfterPurchase(int, void *) = 0;  // LIFT: PDB slot 9; body not declared yet
+protected:
+    virtual bool __cdecl tryAbortImpl(short);  // 0x133900, slot 10
+    virtual bool __cdecl tryInstantPaymentFailImpl(void) = 0;  // slot 11
+    virtual bool __cdecl tryInstantPaymentOkImpl(void *) = 0;  // slot 12
+    virtual int __cdecl DataId(void);  // 0x1107d0, slot 13
+    virtual int __cdecl DataId(short) = 0;  // slot 14
+    virtual void __cdecl setExtraParam(void *) = 0;  // slot 15
+    virtual void __cdecl postFailProc(void) = 0;  // slot 16
+    virtual void __cdecl sendFailPacket(short) = 0;  // slot 17
+private:
+    short __cdecl getGameFailReason(void);  // 0x1343b0
+protected:
+    ::InstantPaymentTran *_tran;  // +0x8
+    unsigned __int64 _goodsInfo[33];  // +0x10  LIFT: PDB type InstantPaymentGoodsInfoParam (0x108 bytes); its layout is not lifted yet
+    __int64 _resultServiceId;  // +0x118
+    __int64 _resultPurchaseId;  // +0x120
+    unsigned int _resultServiceTypes[10];  // +0x128
+    short _resultServiceTypeCount;  // +0x150
+    short _instantPaymentFailReason;  // +0x152
+};
+
+// PDB: InstantPaymentTryBuyCollectionItemsParam, size 0x110.
+struct InstantPaymentTryBuyCollectionItemsParam
+{
+public:
+    struct BuyItem
+    {
+        unsigned int chargeItem;  // +0x0
+        unsigned __int64 closetGroupKey;  // +0x8
+        unsigned __int64 collectionItemKey;  // +0x10
+    };
+    short buyItemCount;  // +0x0
+    BuyItem buyItem[10];  // +0x8
+    unsigned __int64 reserved[3];  // +0xf8  LIFT: PDB type ReservedPosForInstantPayment (0x18 bytes); its layout is not lifted yet
+    __cdecl InstantPaymentTryBuyCollectionItemsParam(void);  // 0x110700
+};
+
+class InstantPaymentBuyCollectionItemsSubJob : public InstantPaymentJob
 {
 protected:
     virtual void __cdecl setExtraParam(void *);  // 0x135e20
@@ -15,6 +70,8 @@ protected:
     virtual bool __cdecl tryInstantPaymentFailImpl(void);  // 0x136510
 public:
     __cdecl InstantPaymentBuyCollectionItemsSubJob(::InstantPaymentTran *);  // 0x350300
+private:
+    ::InstantPaymentTryBuyCollectionItemsParam _buyParam;  // +0x158
 };
 
 class InstantPaymentDrawSlateNewStoneSubJob
@@ -24,29 +81,6 @@ protected:
     virtual bool __cdecl tryInstantPaymentOkImpl(void *);  // 0x136950
     virtual void __cdecl sendFailPacket(short);  // 0x137390
     virtual int __cdecl DataId(short);  // 0x1ee480
-};
-
-class InstantPaymentJob
-{
-protected:
-    virtual int __cdecl DataId(void);  // 0x1107d0
-    virtual int __cdecl DataId(short) = 0;  // LIFT: PDB vtable slot 14
-public:
-    virtual bool __cdecl init(int, void *);  // 0x132850
-    virtual bool __cdecl procBeforePurchase(int, void *);  // 0x1328f0
-    virtual bool __cdecl apply(int, void *);  // 0x132910
-    bool __cdecl tryInstantPaymentOk(void *);  // 0x132930
-    bool __cdecl tryInstantPaymentFail(short);  // 0x133070
-    bool __cdecl tryInstantPaymentReq(void *);  // 0x1334b0
-protected:
-    virtual bool __cdecl tryAbortImpl(short);  // 0x133900
-public:
-    virtual bool __cdecl finishInstantPaymentReq(void *);  // 0x133920
-    virtual bool __cdecl finishInstantPaymentOk(void *);  // 0x133de0
-    virtual bool __cdecl finishInstantPaymentFail(short);  // 0x134240
-    virtual bool __cdecl finishAbort(void *);  // 0x134390
-private:
-    short __cdecl getGameFailReason(void);  // 0x1343b0
 };
 
 class InstantPaymentRandomStoreDrawSubJob
@@ -86,11 +120,5 @@ protected:
     virtual bool __cdecl tryInstantPaymentFailImpl(void);  // 0x135970
 public:
     virtual int __cdecl DataId(short);  // 0x6eb460
-};
-
-struct InstantPaymentTryBuyCollectionItemsParam
-{
-public:
-    __cdecl InstantPaymentTryBuyCollectionItemsParam(void);  // 0x110700
 };
 

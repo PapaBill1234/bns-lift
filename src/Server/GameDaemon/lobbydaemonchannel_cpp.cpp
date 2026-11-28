@@ -3,6 +3,8 @@
 #include "user.h"
 #include "LiftStub.h"
 
+#pragma comment(linker, "/INCLUDE:?HandleLobbyGame_UpdateAccountContentQuotaOk@@YA_NPEBVSession@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+
 // 0x13e280
 bool __cdecl LobbyDaemonSessionHandler::OnAccept(::Session const *) const
 {
@@ -388,9 +390,13 @@ bool __cdecl HandleLobbyGame_UpdateAccountExpFail(::Session const *, ::Packet co
 }
 
 // 0x14b0e0
-bool __cdecl HandleLobbyGame_UpdateAccountContentQuotaOk(::Session const *, ::Packet const *)
+bool __cdecl HandleLobbyGame_UpdateAccountContentQuotaOk(::Session const *, ::Packet const *packet)
 {
-    LIFT_STUB(0x14b0e0);
+    short c;
+    __int64 gameTid;
+    unsigned __int64 pcdbid;
+    packet->Decompose("hqq", &c, &gameTid, &pcdbid);
+    return true;
 }
 
 // 0x14b120
