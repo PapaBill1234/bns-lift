@@ -421,6 +421,45 @@ struct ZoneView
 {
     char lift_pad_0[0x4270];            // ❓ PDB fields +0 to +0x426F are not declared here
     ::ZoneScore *_score;                // +17008 (0x4270)
+    struct ZoneNpcSpawnEventManagerView *_npcSpawnEventManager;  // +17016 (0x4278) PDB type ZoneNpcSpawnEventManager *
+    void *_eventStageManager;           // +17024 (0x4280) LIFT: PDB type not declared here
+    struct AttractionStateView *_attractionState;  // +17032 (0x4288) PDB type AttractionState *
+};
+
+// LIFT: view of the AttractionState PDB vtable (slots 0 to 5). No object of this view is made, so no vtable is emitted.
+struct AttractionStateView
+{
+    virtual ~AttractionStateView() = 0;                        // slot 0
+    virtual ::ATTRACTION_STATE_TYPE GetType(void) = 0;         // slot 1
+    virtual wchar_t const *GetTypeName(void) = 0;              // slot 2
+    virtual int GetGameType(void) const = 0;                   // slot 3 LIFT: PDB return type GameType const
+    virtual bool Init(::Zone *, bool) = 0;                     // slot 4
+    virtual bool IsEnterPublicRaidAttractionState(void) = 0;   // slot 5
+};
+
+// LIFT: view of the ZoneNpcSpawnEvent PDB layout (size 0x18).
+struct ZoneNpcSpawnEventView
+{
+    virtual ~ZoneNpcSpawnEventView() = 0;                                 // slot 0
+    virtual void HandleNpcSpawnEvent(::Zone *, unsigned __int64) = 0;     // slot 1
+    virtual void ResetContext(::Zone *) = 0;                              // slot 2
+    ZoneNpcSpawnEventView *Next(void) { return _next; }                   // inline in the original
+
+    char _type;                         // +8 (0x8)
+    ZoneNpcSpawnEventView *_next;       // +16 (0x10)
+};
+
+// LIFT: view of the ZoneNpcSpawnEventManager PDB layout (size 0x10).
+struct ZoneNpcSpawnEventManagerView
+{
+    // Inline in the original (inlined at Zone::HandleNpcSpawnEvent 0x2567d0).
+    void HandleNpcSpawnEvent(::Zone *zone, ::ZoneNpcSpawnEvent::SpawnEvent e, unsigned __int64 dataKey)
+    {
+        for (ZoneNpcSpawnEventView *ev = _eventListHead[e]; ev != nullptr; ev = ev->Next())
+            ev->HandleNpcSpawnEvent(zone, dataKey);
+    }
+
+    ZoneNpcSpawnEventView *_eventListHead[2];  // +0 (0x0)
 };
 
 inline ZoneView *liftZoneView(Zone *zone)  // LIFT: no PDB name

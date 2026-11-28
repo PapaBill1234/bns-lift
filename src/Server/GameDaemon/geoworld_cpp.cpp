@@ -8,6 +8,38 @@
 
 #pragma comment(linker, "/INCLUDE:??0GeoCube@@IEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:??1GeoCube@@IEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetRespawn@GeoZone@@QEBA_KD@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?IsTeamPartyZone@GeoZone@@QEBA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+
+namespace {
+
+// LIFT: view of dr_tref (PDB size 0x10).
+struct DrTrefView
+{
+    short table;               // +0 (0x0)
+    unsigned __int64 key;      // +8 (0x8)
+};
+
+// LIFT: view of Data::ZoneRecord (PDB size 0x508). The pads keep the PDB offsets.
+struct ZoneRecordView
+{
+    char lift_pad_0[0x28];     // DrEl, key, alias, deprecated_zone, transfer_pcspawn_by_deprecated
+    char zone_type2;           // +40 (0x28)
+    DrTrefView attraction;     // +48 (0x30)
+    char lift_pad_40[0x30];    // district to region
+    unsigned __int64 respawn;  // +112 (0x70)
+    unsigned __int64 respawn_by_activated_faction_required_faction[2];  // +120 (0x78)
+    unsigned __int64 respawn_by_activated_faction[2];                   // +136 (0x88)
+};
+static_assert(sizeof(ZoneRecordView) == 0x98, "ZoneRecordView offsets");
+
+// LIFT: GeoZone::zoneData (+0, Data::ZoneRecordPtr) holds the record pointer at +0.
+inline ZoneRecordView const *liftZoneRecord(GeoZone const *zone)  // LIFT: no PDB name
+{
+    return *reinterpret_cast<ZoneRecordView const *const *>(zone);
+}
+
+}  // namespace
 
 // 0xd97e0
 __cdecl RecordMaps::RecordMaps(void)
@@ -198,9 +230,18 @@ bool __cdecl GeoZone::GetPcSpawn(short, short &, short &, short &, short &) cons
 }
 
 // 0xdf0e0
-unsigned __int64 __cdecl GeoZone::GetRespawn(char) const
+unsigned __int64 __cdecl GeoZone::GetRespawn(char factionId) const
 {
-    LIFT_STUB(0xdf0e0);
+    // LIFT: formtest DIFF 4 (the original indexes the array from the record base; same logic).
+    if (factionId <= 0)
+        return liftZoneRecord(this)->respawn;
+    for (unsigned int i = 0; i < 2; ++i)
+    {
+        if (liftZoneRecord(this)->respawn_by_activated_faction[i] != 0
+            && factionId == liftZoneRecord(this)->respawn_by_activated_faction_required_faction[i])
+            return liftZoneRecord(this)->respawn_by_activated_faction[(int)i];
+    }
+    return liftZoneRecord(this)->respawn;
 }
 
 // 0xdf130
@@ -242,7 +283,11 @@ bool __cdecl GeoZone::IsFactionBattleFieldDungeon(void) const
 // 0xdf6d0
 bool __cdecl GeoZone::IsTeamPartyZone(void) const
 {
-    LIFT_STUB(0xdf6d0);
+    // LIFT: 23, 31, 35, 74 and 170 are attraction table ids of the team party zones (Data::DataManager loader index).
+    ZoneRecordView const *record = liftZoneRecord(this);
+    return record->zone_type2 == 3
+        && (record->attraction.table == 23 || record->attraction.table == 31 || record->attraction.table == 35
+            || record->attraction.table == 74 || record->attraction.table == 170);
 }
 
 // 0x105e20 RecordIndexMapContainer<Data::ZonePcSpawnRecordPtr>::RecordIndexMapContainer<Data::ZonePcSpawnRecordPtr>: LIFT: no body in wave 0 (member of a class template).

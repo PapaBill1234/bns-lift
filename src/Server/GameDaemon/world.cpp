@@ -9,7 +9,16 @@
 #include "worldserializedobject.h"
 #include "zone.h"
 #include "zonetimer.h"
+#include "Memory.h"
 #include "LiftStub.h"
+
+// ❓ The case of the file name (World.cpp) is not proven. The other GameDaemon literals use the class case (Zone.cpp, GeoWorld.cpp).
+#define WORLD_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\World.cpp"
+
+#pragma comment(linker, "/INCLUDE:??1?$IdManager@_J@@QEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?Initialize@?$IdManager@_J@@QEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?PushId@?$IdManager@_J@@QEAA_N_J@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?PopId@?$IdManager@_J@@QEAA_JXZ")  // LIFT: dead-strip keep (no live caller yet)
 
 // 0x3ebfb0
 __cdecl WorldClock::~WorldClock(void)
@@ -677,10 +686,69 @@ bool __cdecl World::ComposeGuildInfoList(::FragmentPacket &)
     LIFT_STUB(0x3fb9c0);
 }
 
-// 0x42eed0 IdManager<__int64>::~IdManager<__int64>: LIFT: no body in wave 0 (member of a class template).
+// 0x42eed0
+template <typename T>
+__cdecl IdManager<T>::~IdManager(void)
+{
+    IdNode *node = _head->_next;
+    while (node != _tail)
+    {
+        IdNode *del = node;
+        node = node->_next;
+        Memory::_Manager[2]->Free(del, WORLD_FILE, 6808);
+    }
+    Memory::_Manager[2]->Free(_head, WORLD_FILE, 6811);
+    Memory::_Manager[2]->Free(_tail, WORLD_FILE, 6812);
+}
 
-// 0x42ef80 IdManager<__int64>::Initialize: LIFT: no body in wave 0 (member of a class template).
+// 0x42ef80
+template <typename T>
+void __cdecl IdManager<T>::Initialize(void)
+{
+    _head = static_cast<IdNode *>(Memory::_Manager[2]->Alloc(sizeof(IdNode), WORLD_FILE, 6818));
+    _tail = static_cast<IdNode *>(Memory::_Manager[2]->Alloc(sizeof(IdNode), WORLD_FILE, 6819));
+    _head->_prev = _head;
+    _head->_next = _tail;
+    _tail->_prev = _head;
+    _tail->_next = _tail;
+}
 
-// 0x42f000 IdManager<__int64>::PushId: LIFT: no body in wave 0 (member of a class template).
+// 0x42f000
+template <typename T>
+bool __cdecl IdManager<T>::PushId(T const id)
+{
+    bool result = false;
+    _idMgrCS.Enter();
+    IdNode *node = static_cast<IdNode *>(Memory::_Manager[2]->Alloc(sizeof(IdNode), WORLD_FILE, 6832));
+    if (node != nullptr)
+    {
+        node->_id = id;
+        result = true;
+        _tail->_prev->_next = node;
+        node->_prev = _tail->_prev;
+        _tail->_prev = node;
+        node->_next = _tail;
+    }
+    _idMgrCS.Leave();
+    return result;
+}
 
-// 0x42f0a0 IdManager<__int64>::PopId: LIFT: no body in wave 0 (member of a class template).
+// 0x42f0a0
+template <typename T>
+T __cdecl IdManager<T>::PopId(void)
+{
+    T id = 0;
+    _idMgrCS.Enter();
+    IdNode *node = _head->_next;
+    if (node != _tail)
+    {
+        id = node->_id;
+        _head->_next = node->_next;
+        node->_next->_prev = _head;
+        Memory::_Manager[2]->Free(node, WORLD_FILE, 6871);
+    }
+    _idMgrCS.Leave();
+    return id;
+}
+
+template class IdManager<__int64>;  // LIFT: explicit instantiation emits the 4 bodies above

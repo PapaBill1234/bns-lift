@@ -24,6 +24,12 @@
 #pragma comment(linker, "/INCLUDE:?Find@ZoneWaitingPcList@@QEAA_NPEAVPc@@@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?GetCount@ZoneWaitingPcList@@QEAAIXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?EndZsoTest@ZonePerfMonitor@@QEAAXH@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?HandleNpcSpawnEvent@Zone@@QEAAXW4SpawnEvent@ZoneNpcSpawnEvent@@_K@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetDuelAttractionState@Zone@@QEAAPEAVDuelAttractionState@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetPartyBattleFieldAttractionState@Zone@@QEAAPEAVPartyBattleFieldAttractionState@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetPublicRaid@Zone@@QEAAPEAVPublicRaid@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetEnterPublicRaidAttractionState@Zone@@QEAAPEAVEnterPublicRaidAttractionState@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetBattleRoyalFieldAttractionState@Zone@@QEAAPEAVBattleRoyalField@@XZ")  // LIFT: dead-strip keep (no live caller yet)
 
 // 0x24aef0
 void __cdecl Zone::updateCreatureProperty(void)
@@ -332,9 +338,11 @@ int __cdecl Zone::InvokeEffectToAllPc(unsigned __int64)
 }
 
 // 0x2567d0
-void __cdecl Zone::HandleNpcSpawnEvent(::ZoneNpcSpawnEvent::SpawnEvent, unsigned __int64)
+void __cdecl Zone::HandleNpcSpawnEvent(::ZoneNpcSpawnEvent::SpawnEvent e, unsigned __int64 dataKey)
 {
-    LIFT_STUB(0x2567d0);
+    ZoneNpcSpawnEventManagerView *npcSpawnEventManager = liftZoneView(this)->_npcSpawnEventManager;
+    if (npcSpawnEventManager != nullptr)
+        npcSpawnEventManager->HandleNpcSpawnEvent(this, e, dataKey);
 }
 
 // 0x256830
@@ -430,31 +438,46 @@ void __cdecl Zone::CheckAndEnableGuildBattleFieldGate(void)
 // 0x257ad0
 ::DuelAttractionState * __cdecl Zone::GetDuelAttractionState(void)
 {
-    LIFT_STUB(0x257ad0);
+    AttractionStateView *attractionState = liftZoneView(this)->_attractionState;
+    if (attractionState != nullptr && attractionState->GetType() == ATTRACTION_STATE_TYPE_DUEL)
+        return reinterpret_cast< ::DuelAttractionState *>(liftZoneView(this)->_attractionState);
+    return nullptr;
 }
 
 // 0x257b10
 ::PartyBattleFieldAttractionState * __cdecl Zone::GetPartyBattleFieldAttractionState(void)
 {
-    LIFT_STUB(0x257b10);
+    AttractionStateView *attractionState = liftZoneView(this)->_attractionState;
+    if (attractionState != nullptr && attractionState->GetType() == ATTRACTION_STATE_TYPE_PARTYBATTLE)
+        return reinterpret_cast< ::PartyBattleFieldAttractionState *>(liftZoneView(this)->_attractionState);
+    return nullptr;
 }
 
 // 0x257b50
 ::PublicRaid * __cdecl Zone::GetPublicRaid(void)
 {
-    LIFT_STUB(0x257b50);
+    AttractionStateView *attractionState = liftZoneView(this)->_attractionState;
+    if (attractionState != nullptr && attractionState->GetType() == ATTRACTION_STATE_TYPE_PUBLIC_RAID)
+        return reinterpret_cast< ::PublicRaid *>(liftZoneView(this)->_attractionState);
+    return nullptr;
 }
 
 // 0x257b90
 ::EnterPublicRaidAttractionState * __cdecl Zone::GetEnterPublicRaidAttractionState(void)
 {
-    LIFT_STUB(0x257b90);
+    if (liftZoneView(this)->_attractionState != nullptr
+        && liftZoneView(this)->_attractionState->IsEnterPublicRaidAttractionState())
+        return reinterpret_cast< ::EnterPublicRaidAttractionState *>(liftZoneView(this)->_attractionState);
+    return nullptr;
 }
 
 // 0x257bd0
 ::BattleRoyalField * __cdecl Zone::GetBattleRoyalFieldAttractionState(void)
 {
-    LIFT_STUB(0x257bd0);
+    AttractionStateView *attractionState = liftZoneView(this)->_attractionState;
+    if (attractionState != nullptr && attractionState->GetType() == ATTRACTION_STATE_TYPE_BATTLEROYAL_FIELD)
+        return reinterpret_cast< ::BattleRoyalField *>(liftZoneView(this)->_attractionState);
+    return nullptr;
 }
 
 // 0x257c10

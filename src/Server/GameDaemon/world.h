@@ -2,6 +2,31 @@
 // LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
 #pragma once
 #include "GameDaemonFwd.h"
+#include "Lock.h"
+
+// PDB layout of IdManager<__int64> (size 0x38). The members are defined in world.cpp (explicit instantiation).
+template <typename T>
+class IdManager
+{
+public:
+    struct IdNode
+    {
+        T _id;              // +0 (0x0)
+        IdNode *_prev;      // +8 (0x8)
+        IdNode *_next;      // +16 (0x10)
+    };
+
+    __cdecl IdManager(void);
+    __cdecl ~IdManager(void);  // 0x42eed0 (__int64)
+    void __cdecl Initialize(void);  // 0x42ef80 (__int64)
+    bool __cdecl PushId(T const);  // 0x42f000 (__int64)
+    T __cdecl PopId(void);  // 0x42f0a0 (__int64)
+
+private:
+    IdNode *_head;                  // +0 (0x0)
+    IdNode *_tail;                  // +8 (0x8)
+    ::CriticalSection _idMgrCS;     // +16 (0x10)
+};
 
 class GuildTimerJobPriorityQueue
 {
