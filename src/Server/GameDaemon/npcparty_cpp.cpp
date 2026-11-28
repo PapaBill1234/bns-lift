@@ -48,18 +48,9 @@ bool __cdecl NpcParty::Remove(::Npc *npc)
 }
 
 // 0x428d10
-#pragma comment(linker, "/INCLUDE:?SetVar@NpcParty@@QEAAXH_J@Z")  // LIFT: dead-strip keep (no live caller yet)
-void __cdecl NpcParty::SetVar(int index, __int64 val)
+void __cdecl NpcParty::SetVar(int, __int64)
 {
-    // LIFT: the original tests the index as unsigned (one compare covers index < 0 and index > 3).
-    if (static_cast<unsigned int>(index) > 3)
-    {
-        Log::Write(Log::LT_ERROR, NPCPARTY_FILE, 178, L"[NpcParty], SetVar invalid index : %d", index);
-    }
-    else
-    {
-        _var[index] = val;
-    }
+    LIFT_STUB(0x428d10);
 }
 
 // 0x428d50

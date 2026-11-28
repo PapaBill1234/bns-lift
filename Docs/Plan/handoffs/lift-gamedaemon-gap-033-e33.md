@@ -1,4 +1,4 @@
-# Handoff: lift-gamedaemon-gap-033-e33 (round 4)
+# Handoff: lift-gamedaemon-gap-033-e33 (round 5)
 
 Card: `lift-gamedaemon-e33`. Exe: GameDaemon (2019 + PDB).
 The driver does the build, the gate and the MATCH comparison. This file does not record them.
@@ -21,7 +21,6 @@ The driver does the build, the gate and the MATCH comparison. This file does not
 | `0x263a40` | `Creature::CanJoinFaction` | 1 |
 | `0x264050` | `Creature::CheckCombatSideEnabled` | 1 |
 | `0x265160` | `Creature::GetAbnormalState` | 1 |
-| `0x428d10` | `NpcParty::SetVar` | 4 |
 | `0x5e51b0` | `Pc::CalculateStyleScoreBonus` | 4 (repair) |
 | `0x5d8320` | `Pc::SendRetrieveRankingRewardListFail` | 4 |
 | `0x5d8390` | `Pc::SendRetrieveGuildRankingInfoFail` | 4 |
@@ -47,7 +46,6 @@ Each lifted body has a dead-strip `/INCLUDE` keep pragma with a `// LIFT:` note.
 - `RuleConfig` has the four `_styleScoreExp*` members (+540 to +552). `Pc` is a friend of `RuleConfig`, because no PDB accessor was found.
 - `Pc` is `LiftBytes` up to +0x4E30. The `Pc::Send*Fail` bodies read `GameObject::Id` (+0x28) and `Pc::_pcDbId` (+0x4E10) through the macros `PC1_ID` and `PC1_DBID` in `pc_cpp_1.cpp`. `gamepackethandler_2.cpp` uses the same method.
 - `Pc::SendAbortCraftFail` logs and sends the constant 3, not `failReason`. This is the original behavior. The source name of the constant is not known (marked `// ❓`).
-- `NpcParty::SetVar` tests the index as `unsigned int`, as the original does (one compare for both bounds).
 - Round 2 fix (pdb_layout): `Pc::_takingAchievementRewardLock` is an `_RTL_SRWLOCK` at +0x4F40. The `RuleConfig` gap arrays have the PDB names of their first members.
 
 ## Not done
@@ -57,6 +55,7 @@ Each lifted body has a dead-strip `/INCLUDE` keep pragma with a `// LIFT:` note.
 | `0x558a40` | `GemItem::BroadcastEquip` | The skeleton `Pc` covers `_equipGearScore` with a padding array. The gem record field at record +0x78 is not modeled. |
 | `0x558a70` | `GemItem::BroadcastUnequip` | Same reason as `GemItem::BroadcastEquip`. |
 | `0x558aa0` | `GemItem::R_CheckEnchantTargetItem` | The log path is open, but the skeleton `GemItem` does not derive from `ItemBase<GemTrait>`. Its virtual slot order is not the PDB order. The calls to `GetData`, `GetPos` and `GetDepot` cannot use the original vtable slots. |
+| `0x428d10` | `NpcParty::SetVar` | P2_cc first branch: build `jbe`, original `ja`. Back to `LIFT_STUB` in round 5. A later card. |
 | `0x428c70` | `NpcParty::Add` | The skeleton `Npc` does not declare `_spawnInfo._spawnData`. |
 | `0x42db10` | `NpcSquad::CheckLeaderlessParty` | It uses a DataManager loader table lookup (`_loaderDefs[254]`) and `NpcSquad::_squad`. The skeleton models neither of them. |
 | `0x261650` | `Creature::GetExtraBroadcastOnChangePropertySize` | The log path is open, but the skeleton does not declare `GameDaemon::publisherCode` or `Creature::_extraProp`. |
