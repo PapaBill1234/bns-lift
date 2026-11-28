@@ -19,7 +19,6 @@
 
 #define ZONE_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\Zone.cpp"
 
-#pragma comment(linker, "/INCLUDE:?GetZoneScore@Zone@@QEAAHD@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?Initialize@ZoneWaitingPcList@@QEAA_NH@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?Find@ZoneWaitingPcList@@QEAA_NPEAVPc@@@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?GetCount@ZoneWaitingPcList@@QEAAIXZ")  // LIFT: dead-strip keep (no live caller yet)
@@ -529,12 +528,9 @@ void __cdecl Zone::ChangeEventZoneMode(char, char, short, __int64, bool)
 }
 
 // 0x258710
-int __cdecl Zone::GetZoneScore(char scoreType)
+int __cdecl Zone::GetZoneScore(char)
 {
-    ::ZoneScore *score = liftZoneView(this)->_score;
-    if (score == nullptr)
-        return 0;
-    return score->Score(scoreType);
+    LIFT_STUB(0x258710);
 }
 
 // 0x258770

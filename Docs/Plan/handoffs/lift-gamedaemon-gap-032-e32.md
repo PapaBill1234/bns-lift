@@ -4,7 +4,7 @@ The driver builds, runs the gate and records the MATCH counts. This file does no
 
 ## Lifted
 
-The first session of this round lifted these bodies. The second session lifted `World::getChannelEnable`.
+The first sessions lifted these bodies. The repair session (round 3) put `Zone::GetZoneScore` and `World::getChannelEnable` back to `LIFT_STUB` because review rejected them.
 
 | RVA | PDB name | Note |
 | --- | --- | --- |
@@ -14,7 +14,6 @@ The first session of this round lifted these bodies. The second session lifted `
 | `0x257b50` | `Zone::GetPublicRaid` | |
 | `0x257b90` | `Zone::GetEnterPublicRaidAttractionState` | |
 | `0x257bd0` | `Zone::GetBattleRoyalFieldAttractionState` | |
-| `0x258710` | `Zone::GetZoneScore` | |
 | `0x2589c0` | `ZoneWaitingPcList::Initialize` | |
 | `0x258f80` | `ZoneWaitingPcList::Find` | |
 | `0x259340` | `ZoneWaitingPcList::GetCount` | |
@@ -27,12 +26,13 @@ The first session of this round lifted these bodies. The second session lifted `
 | `0x42ef80` | `IdManager<__int64>::Initialize` | Dead-strip keep pragma. |
 | `0x42f000` | `IdManager<__int64>::PushId` | Dead-strip keep pragma. |
 | `0x42f0a0` | `IdManager<__int64>::PopId` | Dead-strip keep pragma. |
-| `0x3f6e00` | `World::getChannelEnable` | Dead-strip keep pragma. Formtest DIFF 6: the original has `channel` in rcx and does not use `this`. The PDB lists `this`, so an LTCG register change is likely. Same logic. `World::ChannelList` now has its PDB layout. |
 
 ## Not done
 
 | RVA | PDB name | Reason |
 | --- | --- | --- |
+| `0x258710` | `Zone::GetZoneScore` | Review reject (P2_cc: the branch sense differs). The stub is back. The keep pragma is removed. |
+| `0x3f6e00` | `World::getChannelEnable` | Review reject: the calling convention differs from the original. The stub is back. The keep pragma is removed. |
 | `0x13150` | `ZoneCellAttributeTable::~ZoneCellAttributeTable` | Log path (E16): calls `Log::Write`. |
 | `0x25cef0` | `InOutDetector::InOutDetector` | `InOutDetector` has no layout in the repo. `vector16` is an empty struct in `GameDaemonFwd.h`. `ZERO_VECTOR16` is not declared. The `std::map` member needs `StlAllocator`. That is more than 5 reads. |
 | `0x25d210` | `InOutDetector::clear` | Same cause as the constructor. |
