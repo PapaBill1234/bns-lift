@@ -177,7 +177,7 @@ void __cdecl BoardGachaRetrieveSeasonInfoWSO::TimerExpired(long)
 }
 
 // 0xd9e0
-void __cdecl BoardGachaRetrieveSeasonInfoWSO::SendFail(::Pc *, short)
+void __cdecl BoardGachaRetrieveSeasonInfoWSO::SendFail(::Pc *pc, short failReason)
 {
     // ❓ failReason is not used. The original sends the constant 2.
     if (pc != nullptr)
@@ -197,7 +197,7 @@ void __cdecl BoardGachaSessionCloseWSO::TimerExpired(long)
 }
 
 // 0xde40
-void __cdecl BoardGachaSessionCloseWSO::SendFail(::Pc *, short)
+void __cdecl BoardGachaSessionCloseWSO::SendFail(::Pc *pc, short failReason)
 {
     // ❓ failReason is not used. The original sends the constant 2.
     if (pc != nullptr)
@@ -211,7 +211,7 @@ void __cdecl BoardGachaBoardInfoReqWSO::TimerExpired(long)
 }
 
 // 0xdff0
-void __cdecl BoardGachaBoardInfoReqWSO::SendFail(::Pc *, short)
+void __cdecl BoardGachaBoardInfoReqWSO::SendFail(::Pc *pc, short failReason)
 {
     // ❓ failReason is not used. The original sends the constant 2.
     if (pc != nullptr)
@@ -225,7 +225,7 @@ void __cdecl BoardGachaRetrieveParticipationInfoAllWSO::TimerExpired(long)
 }
 
 // 0xe200
-void __cdecl BoardGachaRetrieveParticipationInfoAllWSO::SendFail(::Pc *, short)
+void __cdecl BoardGachaRetrieveParticipationInfoAllWSO::SendFail(::Pc *pc, short failReason)
 {
     // ❓ failReason is not used. The original sends the constant 2.
     if (pc != nullptr)
