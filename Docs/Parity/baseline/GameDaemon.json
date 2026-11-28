@@ -188,6 +188,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"ActSeqState::~ActSeqState": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
 "ActSequenceLoader::GetTableType": {
 "calls": 100,
 "consts": 100,
@@ -454,6 +461,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"BattleRoyalField::GetTypeName": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "BossChallengeAttractionState::AvailableNextStep": {
 "calls": 100,
 "consts": 0,
@@ -490,6 +504,27 @@
 "status": "MATCH"
 },
 "BrainRaidBoss::GetState": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BrainRaidBoss::InitSpecialState": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CaptureTheFlag::Context1": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CaptureTheFlag::Context2": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -840,6 +875,13 @@
 "status": "MATCH"
 },
 "DeleteCharacterTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DeleteEvent::EventId": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -1504,6 +1546,20 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"DuelBotSpawn::Init": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DuelBotTrainingRoom::GetTypeName": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "DuelBotTrainingRoomResultTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
@@ -1812,6 +1868,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"GameTranExpireToken::GetTid": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "GemProperty::FieldDefine": {
 "calls": 100,
 "consts": 100,
@@ -2022,6 +2085,13 @@
 "score": 91.7,
 "status": "DIFF"
 },
+"LeadTheBallManager::Context1": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "LeaveChallengePartyTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
@@ -2100,6 +2170,13 @@
 "status": "MATCH"
 },
 "LogoutArenaTran::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LtExpireSO::TimerExpired": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -2539,6 +2616,13 @@
 "refs": 0,
 "score": 66.7,
 "status": "DIFF"
+},
+"PartyMatchMaker::Name": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "PassiveEffect::GetRemainDuration": {
 "calls": 100,
@@ -3023,6 +3107,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"RankingResult::RankingResult": {
+"calls": 100,
+"consts": 100,
+"refs": 50,
+"score": 83.3,
+"status": "DIFF"
+},
 "RankingSeasonInfo::~RankingSeasonInfo": {
 "calls": 100,
 "consts": 100,
@@ -3199,6 +3290,13 @@
 "status": "MATCH"
 },
 "SeasonContentsTimeAttackRecord::SyncMax": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"SerializerTimer::TimerId": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -3640,10 +3738,10 @@
 "status": "DIFF"
 },
 "TargetSelectorForDamageTransferNpcSquad::~TargetSelectorForDamageTransferNpcSquad": {
-"calls": 100,
+"calls": 0,
 "consts": 100,
 "refs": 67,
-"score": 88.9,
+"score": 55.6,
 "status": "DIFF"
 },
 "TendencyFieldAttractionState::DisableMoveToArena": {
