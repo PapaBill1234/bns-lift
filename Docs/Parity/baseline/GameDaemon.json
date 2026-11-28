@@ -531,6 +531,13 @@
 "score": 45.2,
 "status": "DIFF"
 },
+"AutoCS::~AutoCS": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "AutoSRW::~AutoSRW": {
 "calls": 100,
 "consts": 100,
@@ -2183,6 +2190,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"EnterWorldOkParam::~EnterWorldOkParam": {
+"calls": 100,
+"consts": 67,
+"refs": 100,
+"score": 88.9,
+"status": "DIFF"
+},
 "Env::GetActionRadius": {
 "calls": 100,
 "consts": 100,
@@ -3673,6 +3687,13 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"LogoutOkParam::~LogoutOkParam": {
+"calls": 100,
+"consts": 67,
+"refs": 100,
+"score": 88.9,
+"status": "DIFF"
 },
 "LtExpireSO::TimerExpired": {
 "calls": 100,
@@ -6465,6 +6486,13 @@
 "consts": 67,
 "refs": 100,
 "score": 55.6,
+"status": "DIFF"
+},
+"ZipPackedReaderIO::FileName::~FileName": {
+"calls": 67,
+"consts": 89,
+"refs": 33,
+"score": 63.0,
 "status": "DIFF"
 },
 "ZipPackedReaderIO::Next": {
