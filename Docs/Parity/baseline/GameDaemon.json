@@ -1425,6 +1425,89 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Data::DataManager::GetCombatSeasonContentsTypeCount": {
+"calls": 100,
+"consts": 100,
+"exact": false,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Data::DataManager::GetGameModeFromArenaMatchingRuleDetailType": {
+"calls": 100,
+"consts": 100,
+"refs": 88,
+"score": 95.8,
+"status": "DIFF"
+},
+"Data::DataManager::GetGradeBenefitList": {
+"calls": 100,
+"consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Data::DataManager::GetWeaponBrandMaxGemSlotCount": {
+"calls": 100,
+"consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Data::DataManager::IsRankingPvEStageStartInfo": {
+"calls": 100,
+"consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Data::DataManager::WriteDataLoadErrorLog": {
+"calls": 0,
+"consts": 100,
+"refs": 100,
+"score": 66.7,
+"status": "DIFF"
+},
+"Data::DataManager::WriteDataReaderErrorLog": {
+"calls": 40,
+"consts": 100,
+"refs": 100,
+"score": 80.0,
+"status": "DIFF"
+},
+"Data::DataManager::WriteDataValidationFailureLog": {
+"calls": 0,
+"consts": 100,
+"refs": 100,
+"score": 66.7,
+"status": "DIFF"
+},
+"Data::DataManager::WriteScriptLoaderErrorLog": {
+"calls": 0,
+"consts": 100,
+"refs": 100,
+"score": 66.7,
+"status": "DIFF"
+},
+"Data::DataManager::addToArenaDuelZoneIdList": {
+"calls": 100,
+"consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Data::DataManager::addToArenaDungeonZoneIdList": {
+"calls": 100,
+"consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Data::FilterSet::FilterSet": {
 "calls": 100,
 "consts": 100,
