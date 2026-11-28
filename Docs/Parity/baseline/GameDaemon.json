@@ -580,6 +580,34 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"BoardGachaBoardInfoReqWSO::SendFail": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
+"BoardGachaRetrieveParticipationInfoAllWSO::SendFail": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
+"BoardGachaRetrieveSeasonInfoWSO::SendFail": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
+"BoardGachaSessionCloseWSO::SendFail": {
+"calls": 100,
+"consts": 100,
+"refs": 0,
+"score": 66.7,
+"status": "DIFF"
+},
 "BossChallengeAttractionState::AvailableNextStep": {
 "calls": 100,
 "consts": 0,
@@ -629,6 +657,20 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"BrainBoss::GetLastTargetId": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BrainBoss::GetState": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "BrainBoss::InitSpecialState": {
 "calls": 100,
 "consts": 100,
@@ -644,6 +686,34 @@
 "status": "DIFF"
 },
 "BrainCitizen::GetState": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BrainFollower::GetLastTargetId": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BrainFollower::GetState": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BrainMonster::GetLastTargetId": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BrainMonster::GetState": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -1202,6 +1272,13 @@
 "refs": 50,
 "score": 83.3,
 "status": "DIFF"
+},
+"DeathMatchDuelManager::verifyDuelType": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "DebuffGuildBattleFieldEffect::checkApply": {
 "calls": 100,
@@ -2204,6 +2281,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"FactionContribution::TopContributionGroupId": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "FallDamageEffect::GetDataSubType": {
 "calls": 100,
 "consts": 100,
@@ -2401,6 +2485,20 @@
 "status": "MATCH"
 },
 "GameDaemon::ShortName": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GameLocale::GetVietToneMarkType": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GameLocale::IsWupperNotApplied": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -2632,6 +2730,13 @@
 "status": "MATCH"
 },
 "Guild::findByPcDbIdInWaiting": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GuildContribution::Reset": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -3989,6 +4094,13 @@
 "score": 88.9,
 "status": "DIFF"
 },
+"OccupationWarManager::OnCanceledEnvManipulation": {
+"calls": 100,
+"consts": 50,
+"refs": 100,
+"score": 83.3,
+"status": "DIFF"
+},
 "OceanicEffect::GetDataSubType": {
 "calls": 100,
 "consts": 100,
@@ -3997,6 +4109,13 @@
 "status": "MATCH"
 },
 "OceanicEffect::checkApply": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"OpenQuest::getDaemonUpTimeSec": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -5768,6 +5887,34 @@
 "status": "MATCH"
 },
 "SystemMultiEvent::~SystemMultiEvent": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TagMatchDuelManager::getOppositeFightMember": {
+"calls": 100,
+"consts": 67,
+"refs": 67,
+"score": 77.8,
+"status": "DIFF"
+},
+"TagMatchDuelManager::resetRound": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TagMatchDuelManager::verifyDuelType": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TagMatchDuelTeam::ResetRound": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
