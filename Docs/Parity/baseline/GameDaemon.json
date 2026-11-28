@@ -587,6 +587,48 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"BrainBase::popState": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BrainBase::pushState": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BrainBase::~BrainBase": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BrainBoss::InitSpecialState": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BrainBoss::checkPCHateListEmptied": {
+"calls": 100,
+"consts": 50,
+"refs": 100,
+"score": 83.3,
+"status": "DIFF"
+},
+"BrainCitizen::GetState": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "BrainRaidBoss::GetLastTargetId": {
 "calls": 100,
 "consts": 100,
@@ -621,6 +663,20 @@
 "refs": 67,
 "score": 88.9,
 "status": "DIFF"
+},
+"Campfire::GetRemainDuration": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CampfireIdManager::IsExist": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "CaptureTheFlag::Context1": {
 "calls": 100,
@@ -833,6 +889,13 @@
 "status": "MATCH"
 },
 "CollectingProperty::TypeId": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"CombatSequence::registerLastAction": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -1875,12 +1938,47 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"DuelManager::finishGame [?finishGame@DuelManager@@AEAAXXZ]": {
+"calls": 25,
+"consts": 0,
+"refs": 100,
+"score": 41.7,
+"status": "DIFF"
+},
+"DuelManager::resetRound": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DuelMember::ReadyRound": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DuelMember::ResetRound": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "DuelResultTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
 "refs": 0,
 "score": 66.7,
 "status": "DIFF"
+},
+"DuelTeam::ResetRound": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "DynamicEventObject::deallocate_me": {
 "calls": 100,
@@ -2064,6 +2162,27 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"FieldItem::GetRemainedDecomposition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"FieldItem::GetRemainedExplosion": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"FieldItemIdManager::IsExist": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "FishingProperty::FieldDefine": {
 "calls": 100,
 "consts": 100,
@@ -2219,6 +2338,13 @@
 "status": "MATCH"
 },
 "GameDaemon::ShortName": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GameObjectIdManager::Make": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -3064,6 +3190,13 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"LeadTheBallManager::OnCanceledEnvManipulation": {
+"calls": 100,
+"consts": 86,
+"refs": 100,
+"score": 95.2,
+"status": "DIFF"
 },
 "LeaveChallengePartyTran::GetDefinition": {
 "calls": 100,
@@ -4626,6 +4759,13 @@
 "score": 83.3,
 "status": "DIFF"
 },
+"RankingSeasonInfo::CopySeasonInfo": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "RankingSeasonInfo::~RankingSeasonInfo": {
 "calls": 100,
 "consts": 100,
@@ -4639,6 +4779,27 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"RankingSeasonManager::isClosedSeason": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RecycleTimeManager::SetGlobalRecycleTime2": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RecycleTimeManager::confirmRecycleTime2": {
+"calls": 100,
+"consts": 50,
+"refs": 100,
+"score": 83.3,
+"status": "DIFF"
 },
 "RecycleTimeProperty::FieldDefine": {
 "calls": 100,
@@ -6131,6 +6292,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"getAngle": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "loadTableWorker": {
 "calls": 100,
 "consts": 100,
@@ -6153,6 +6321,13 @@
 "status": "MATCH"
 },
 "pre_cpp_init": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"randomValue2Amount100": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
