@@ -29,8 +29,8 @@ bool __cdecl HandleGame_CheckRoundTripTimeReq(::Pc *pc, ::Packet const *packet)
     short cmd;
     __int64 data1;
     __int64 data2;
-    // ❓ The original tests the result with "xor ecx, ecx; cmp cx, ax; jb". No source form found yet (test ax, ax here).
-    if (packet->Decompose("hqq", &cmd, &data1, &data2) == 0)
+    // LIFT: the original compares the unsigned result with 0 ("xor ecx, ecx; cmp cx, ax; jb") and reuses ecx as LT_ERROR.
+    if (0 >= packet->Decompose("hqq", &cmd, &data1, &data2))
     {
         Log::Write(Log::LT_ERROR,
                    L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\GamePacketHandler.cpp",

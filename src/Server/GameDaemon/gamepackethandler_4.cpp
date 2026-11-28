@@ -120,9 +120,15 @@ bool __cdecl HandleGame_PassingItemAbilityReq(::Pc *, ::Packet const *)
 }
 
 // 0x3be660
-bool __cdecl HandleGame_PickGemCardReq(::Pc *pc, ::Packet const *)
+bool __cdecl HandleGame_PickGemCardReq(::Pc *pc, ::Packet const *packet)
 {
+    // LIFT: the original keeps a /GS cookie (frame 0x48) but no live local. The handler is off: it returns before
+    // its old decompose code. The compiler drops that code but keeps the cookie of its local buffer.
+    // ❓ The PDB does not give the old buffer or the decompose format. The size 8 and "b" are a code-form guess.
+    char buf[8];
     Log::Write(Log::LT_ERROR, GPH4_FILE, 22407, L"HandleGame_PickGemCardReq failed; pc:0x%I64x", GPH4_PC_ID(pc));
+    return true;
+    packet->Decompose("b", buf);
     return true;
 }
 

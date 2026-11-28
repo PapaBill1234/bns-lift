@@ -237,6 +237,20 @@ protected:
     void __cdecl SetUser(::User const *);  // 0x5eb050
 public:
     void __cdecl SendGameBuilderAuth(void);  // 0x5eb130
+private:
+    // LIFT: vtable pad. The PDB puts the Send group at slots 73-75 (Send(char const *, ...) at +0x258). This header
+    // does not declare all PDB virtuals yet, so 9 pad slots move the Send group to its PDB slots. Later waves
+    // replace the pads with the PDB virtuals in PDB order. No PDB names.
+    virtual void __cdecl liftVtablePad0(void) = 0;  // LIFT: no PDB name
+    virtual void __cdecl liftVtablePad1(void) = 0;  // LIFT: no PDB name
+    virtual void __cdecl liftVtablePad2(void) = 0;  // LIFT: no PDB name
+    virtual void __cdecl liftVtablePad3(void) = 0;  // LIFT: no PDB name
+    virtual void __cdecl liftVtablePad4(void) = 0;  // LIFT: no PDB name
+    virtual void __cdecl liftVtablePad5(void) = 0;  // LIFT: no PDB name
+    virtual void __cdecl liftVtablePad6(void) = 0;  // LIFT: no PDB name
+    virtual void __cdecl liftVtablePad7(void) = 0;  // LIFT: no PDB name
+    virtual void __cdecl liftVtablePad8(void) = 0;  // LIFT: no PDB name
+public:
     void __cdecl Send(char const *, char *);  // 0x5eb2e0
     virtual void __cdecl Send(char const *, ...);  // 0x5eb350
     virtual void __cdecl Send(::Packet const *);  // 0x5eb3c0
