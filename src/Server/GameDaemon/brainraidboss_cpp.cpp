@@ -5,6 +5,8 @@
 #include "LiftStub.h"
 #include <string.h>
 
+#pragma comment(linker, "/INCLUDE:?InitSpecialState@BrainRaidBoss@@UEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
+
 // 0x634f0
 __cdecl BrainRaidBoss::BrainRaidBoss(::Npc &)
 {

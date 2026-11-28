@@ -5,6 +5,8 @@
 #include "zone.h"
 #include "LiftStub.h"
 
+#pragma comment(linker, "/INCLUDE:?OnActivated@GuildBattleFieldManager@@QEAAXPEAVPc@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+
 // 0x111bf0
 bool __cdecl GuildBattleFieldManager::Initialize(::Zone *, __int64)
 {

@@ -2,6 +2,10 @@
 #include "leadtheballmanager.h"
 #include "LiftStub.h"
 
+#pragma comment(linker, "/INCLUDE:?EventId@DeleteEvent@@UEBAIXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?Context1@LeadTheBallManager@@UEAA_JXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?Context2@LeadTheBallManager@@UEAA_JXZ")  // LIFT: dead-strip keep (no live caller yet)
+
 namespace
 {
 // LIFT: view of the PDB base class PartyBattleManager. Only the fields that the lifted bodies read are declared.

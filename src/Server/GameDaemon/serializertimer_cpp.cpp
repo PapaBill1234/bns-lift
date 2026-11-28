@@ -4,6 +4,8 @@
 #include "serializer.h"
 #include "LiftStub.h"
 
+#pragma comment(linker, "/INCLUDE:?TimerId@SerializerTimer@@MEBA_KXZ")  // LIFT: dead-strip keep (no live caller yet)
+
 // 0x665000
 __cdecl TimerSlotVector::~TimerSlotVector(void)
 {

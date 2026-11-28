@@ -2,6 +2,8 @@
 #include "rankingreward.h"
 #include "LiftStub.h"
 
+#pragma comment(linker, "/INCLUDE:??0RankingResult@@QEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
+
 // 0x1b2230
 __cdecl RankingResult::RankingResult(void)
     : state(RESULT_STATE_NONE)

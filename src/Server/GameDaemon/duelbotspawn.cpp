@@ -5,6 +5,8 @@
 #include "Memory.h"
 #include "LiftStub.h"
 
+#pragma comment(linker, "/INCLUDE:?Init@DuelBotSpawn@@QEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+
 #define DUELBOTSPAWN_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\DuelBotSpawn.cpp"
 
 // 0xaa700

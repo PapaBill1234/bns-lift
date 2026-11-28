@@ -20,13 +20,7 @@ void __cdecl Serializer::dump(void)
 // 0x664020
 ::SerializedObjectQueue * __cdecl Serializer::GetNextExpire(void)
 {
-    if (_timer == nullptr)
-    {
-        Log::Write(Log::LT_ERROR, L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\Serializer.cpp", 98,
-                   L"[serializer], next expire is null, serializer:%p", this);
-        return nullptr;
-    }
-    return _timer->GetNextExpire();
+    LIFT_STUB(0x664020);
 }
 
 // 0x664090
