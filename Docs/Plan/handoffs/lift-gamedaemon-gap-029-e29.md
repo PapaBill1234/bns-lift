@@ -1,45 +1,51 @@
 # lift-gamedaemon-gap-029-e29 handoff (card lift-gamedaemon-e29)
 
-Round 1. The driver builds, runs the gate and records the MATCH counts. This session did not build.
+Round 2 (repair of review rejects). The driver builds, runs the gate and records the MATCH counts. This session did not build.
 
-## Lifted (25)
+## Repair actions
 
-### creaturejob (22)
+- The review rejected 4 bodies. Each one is now its skeleton `LIFT_STUB` body again, and its `/INCLUDE` keep pragma is gone.
+- The caster check in creaturejob calls `Log::Write` and `AlertSender::Write`. All 19 caster-check bodies are now `LIFT_STUB` again (log path, E16). Their pragmas are gone.
+- The caster-check macro, the `CreatureJobRuleView` and `CreatureView` views and the `Log.h` / `AlertSender.h` includes are gone from `creaturejob.cpp`.
+- The accepted bodies did not change.
 
-- The caster check (`== CRASH == [creature-job-rule], invalid caster`, Log and AlertSender) in 19 bodies:
-  `BladeMasterRule::OnAttackResultEvent` (0x99560), `SwordMasterRule::OnAttackResultEvent` (0x99790),
-  `KungFuFighterRule::OnAttackResultEvent` (0x99bb0), `KungFuFighterRule::OnAttackedResultEvent` (0x99c00),
-  `ForceMasterRule::OnAttackResultEvent` (0x99c90), `ForceMasterRule::OnAttackedResultEvent` (0x99ce0),
-  `ShooterRule::OnAttackResultEvent` (0x99d30), `ShooterRule::OnAttackedResultEvent` (0x99d80),
-  `DestroyerRule::OnAttackResultEvent` (0x99dd0), `SummonerRule::OnAttackedResultEvent` (0x9a1a0),
-  `AssassinRule::OnAttackResultEvent` (0x9a2b0), `WarriorRule::OnAttackResultEvent` (0x9a450),
-  `WarriorRule::OnAttackedResultEvent` (0x9a4a0), `ArcherRule::OnAttackResultEvent` (0x9a530),
-  `ArcherRule::OnAttackedResultEvent` (0x9a580), `SpearMasterRule::OnAttackResultEvent` (0x9a670),
-  `SpearMasterRule::OnAttackedResultEvent` (0x9a6c0), `ThundererRule::OnAttackResultEvent` (0x9a750),
-  `ThundererRule::OnAttackedResultEvent` (0x9a7a0).
-- `BladeMasterRule::CheckToChangeStance` (0x99770) and `SwordMasterRule::CheckToChangeStance` (0x999a0).
-- `DestroyerRule::OnDamaged` (0x9a010): empty body.
+## Lifted (4)
 
-Notes:
-- The rule classes have no `CreatureJobRule` base yet. The bodies read `_caster` (+8) through the view
-  `CreatureJobRuleView`. The getters read `Creature::Prop.State.sp` (+0x168) through the view `CreatureView`.
-- Formtest: the original caster check has a /GS cookie (frame 0x38). The lifted form has no cookie (frame 0x28).
-  The rest of the code is the same. ❓ The source of the cookie is not known. These bodies will probably stay DIFF.
-- Formtest: the getter had DIFF 3 (`cmp sp, 0` / `jg` against `cmp 0, sp` / `jl`). The source now uses `0 < sp`.
-  This form was not tested.
-- Each lifted body has a `/INCLUDE` keep pragma with a `// LIFT:` note.
+### creaturejob (1)
+
+- `DestroyerRule::OnDamaged` (0x9a010): empty body. It has a `/INCLUDE` keep pragma with a `// LIFT:` note.
 
 ### zonebroadcast_cpp (3)
 
 - `ZoneFieldItemNode::AddToCube` (0x25a1e0), `ZoneCampfireNode::AddToCube` (0x25a2a0), `ZoneObjectIdList::Clear` (0x25a430).
-- `zonebroadcast.h` now has the PDB members of `ZoneFieldItemNode`, `ZoneCampfireNode` and `ZoneObjectIdList`.
-- The bodies read `ZoneBroadcastCube::FieldItemHead` (+0x90) and `CampfireHead` (+0x98) through the view `ZoneBroadcastCubeView`.
+- `zonebroadcast.h` has the PDB members of `ZoneFieldItemNode`, `ZoneCampfireNode` and `ZoneObjectIdList`.
 - Each body has a `/INCLUDE` keep pragma with a `// LIFT:` note.
 
-## Not done (15)
+## Not done (36)
 
 | RVA | Function | Reason |
 | --- | --- | --- |
+| 0x99560 | `BladeMasterRule::OnAttackResultEvent` | Review reject (P1_calls, P3_imm). Also log path (E16). |
+| 0x99790 | `SwordMasterRule::OnAttackResultEvent` | Review reject (P1_calls, P3_imm). Also log path (E16). |
+| 0x99770 | `BladeMasterRule::CheckToChangeStance` | Review reject (P2_cc, P9_ret_width). |
+| 0x999a0 | `SwordMasterRule::CheckToChangeStance` | Review reject (P2_cc, P9_ret_width). |
+| 0x99bb0 | `KungFuFighterRule::OnAttackResultEvent` | log path (E16) |
+| 0x99c00 | `KungFuFighterRule::OnAttackedResultEvent` | log path (E16) |
+| 0x99c90 | `ForceMasterRule::OnAttackResultEvent` | log path (E16) |
+| 0x99ce0 | `ForceMasterRule::OnAttackedResultEvent` | log path (E16) |
+| 0x99d30 | `ShooterRule::OnAttackResultEvent` | log path (E16) |
+| 0x99d80 | `ShooterRule::OnAttackedResultEvent` | log path (E16) |
+| 0x99dd0 | `DestroyerRule::OnAttackResultEvent` | log path (E16) |
+| 0x9a1a0 | `SummonerRule::OnAttackedResultEvent` | log path (E16) |
+| 0x9a2b0 | `AssassinRule::OnAttackResultEvent` | log path (E16) |
+| 0x9a450 | `WarriorRule::OnAttackResultEvent` | log path (E16) |
+| 0x9a4a0 | `WarriorRule::OnAttackedResultEvent` | log path (E16) |
+| 0x9a530 | `ArcherRule::OnAttackResultEvent` | log path (E16) |
+| 0x9a580 | `ArcherRule::OnAttackedResultEvent` | log path (E16) |
+| 0x9a670 | `SpearMasterRule::OnAttackResultEvent` | log path (E16) |
+| 0x9a6c0 | `SpearMasterRule::OnAttackedResultEvent` | log path (E16) |
+| 0x9a750 | `ThundererRule::OnAttackResultEvent` | log path (E16) |
+| 0x9a7a0 | `ThundererRule::OnAttackedResultEvent` | log path (E16) |
 | 0x996f0 | `BladeMasterRule::OnPointZero` | Calls the virtual `Creature::HandleStance` (PDB slot 68). `creature.h` does not declare the virtual functions in PDB slot order. |
 | 0x99730 | `BladeMasterRule::OnCombatModeChanged` | Same as above (`HandleStance`, slot 68). |
 | 0x99920 | `SwordMasterRule::OnPointZero` | Same as above. |
@@ -52,11 +58,11 @@ Notes:
 | 0x9a600 | `ArcherRule::OnCombatModeChanged` | Same as above. |
 | 0x9a710 | `SpearMasterRule::OnCombatModeChanged` | Same as above. |
 | 0x9a7f0 | `ThundererRule::OnCombatModeChanged` | Same as above. |
-| 0x25f250 | `ZoneNpcSpawnNpcKilledEvent2::ResetContext` | Needs the `ZoneNpcSpawnEventRecord` field (pseudocode shows `record[13].subtype`), `Zone::_zoneMode` and the event layout (`_data`, `_targetNpcCount`, `_killedCount`). These are not in the repo headers. |
+| 0x25f250 | `ZoneNpcSpawnNpcKilledEvent2::ResetContext` | Needs the `ZoneNpcSpawnEventRecord` field, `Zone::_zoneMode` and the event layout (`_data`, `_targetNpcCount`, `_killedCount`). These are not in the repo headers. |
 | 0x25f390 | `ZoneNpcSpawnNpcKilledEvent3::ResetContext` | Same as above. |
-| 0x25f680 | `ZoneNpcSpawnEventManager::clear` | Needs the `ZoneNpcSpawnEvent` vtable (destructor slot 0), `_next`, `_eventListHead[2]` and the delete form (`Memory::_Manager[2]->Free`, line 425). These are not in the repo headers. |
+| 0x25f680 | `ZoneNpcSpawnEventManager::clear` | Needs the `ZoneNpcSpawnEvent` vtable (destructor slot 0), `_next`, `_eventListHead[2]` and the delete form. These are not in the repo headers. |
 
-Advice: a `Creature` layout card (PDB virtual slot order) must come before the 12 `HandleStance` callers.
+Advice: a `Creature` layout card (PDB virtual slot order) must come before the 12 `HandleStance` callers. The caster-check bodies must wait until E16 is closed.
 
 ## Changed files
 
