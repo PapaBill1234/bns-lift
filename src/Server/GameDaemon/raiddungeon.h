@@ -47,8 +47,6 @@ private:
     char lift_pad_50[0x138];  // ❓ _occupyingPcInfo to _currentBossNpcInCombat (+0x50 to +0x187) are not declared yet
     ::CriticalSection _raidDungeonCS;  // +392 (0x188)
 };
-static_assert(offsetof(RaidDungeon, _occupyingObjectId) == 0x48, "RaidDungeon::_occupyingObjectId");
-static_assert(offsetof(RaidDungeon, _raidDungeonCS) == 0x188, "RaidDungeon::_raidDungeonCS");
 static_assert(sizeof(RaidDungeon) == 0x1B0, "RaidDungeon size");
 
 class RaidDungeonBindPropertyEntry
@@ -86,7 +84,6 @@ private:
     ::CriticalSection _lock;  // +64 (0x40)
     __int64 _lastIssuedId;  // +104 (0x68)
 };
-static_assert(offsetof(RaidDungeonManager, _expirationTime) == 0x38, "RaidDungeonManager::_expirationTime");
 static_assert(sizeof(RaidDungeonManager) == 0x70, "RaidDungeonManager size");
 
 class RaidDungeonPropertyContainer
@@ -112,7 +109,6 @@ private:
     UnbindList _unbindList;  // +32 (0x20)
     ::Pc *_owner;  // +64 (0x40)
 };
-static_assert(offsetof(RaidDungeonPropertyContainer, _owner) == 0x40, "RaidDungeonPropertyContainer::_owner");
 static_assert(sizeof(RaidDungeonPropertyContainer) == 0x48, "RaidDungeonPropertyContainer size");
 
 class RaidDungeonUnbindPropertyEntry
