@@ -18,7 +18,6 @@ The driver does the build, the gate and the MATCH comparison. This file does not
 | `0x5d7180` | `Pc::IsTryingInstantPayment` |
 | `0x5e2dc0` | `Pc::SetCombatModeByTargeted` |
 | `0x5e5510` | `Pc::DeactivateSkillScore` |
-| `0x5e51b0` | `Pc::CalculateStyleScoreBonus` |
 | `0x261e60` | `Creature::initMoveCtx` |
 | `0x263a40` | `Creature::CanJoinFaction` |
 | `0x264050` | `Creature::CheckCombatSideEnabled` |
@@ -30,7 +29,9 @@ Each lifted body has a dead-strip `/INCLUDE` keep pragma with a `// LIFT:` note.
 
 - `NpcSquad` now derives from `NpcParty`, as in the PDB. The `NpcParty` data members are now `protected`, so that `NpcSquad` can read them. The `NpcSquad` members `_squad` and `_npc[20]` are not declared yet.
 - `NpcSquad::EventOccured` uses a local `ScriptEventView` (size 0x98, PDB layout). The skeleton `ScriptEvent` has no members yet.
-- `Pc::CalculateStyleScoreBonus` reads `Prop.State.style_score` through `CreatureMemberView`, because the skeleton `Pc` has no `Creature` base yet. `RuleConfig` has the four `_styleScoreExp*` members now (+540 to +552). `Pc` is a friend of `RuleConfig`, because no PDB accessor was found.
+- `RuleConfig` has the four `_styleScoreExp*` members now (+540 to +552). `Pc` is a friend of `RuleConfig`, because no PDB accessor was found. These members stay for a later lift of `Pc::CalculateStyleScoreBonus`.
+- Round 3 repair: review rejected `Pc::CalculateStyleScoreBonus` (P2_cc: build `jle`, original `jl`). Its body is the `LIFT_STUB` again. Its `/INCLUDE` pragma is removed.
+- Round 3 repair: the carried rejects `AlertSender::writev2`, `Log::Write`, `LogBuffer::Acquire`, `LogBuffer::deallocate_me`, `LogMedia::Add` and `RefCntHistory::add` are not in the files of this card. This card did not change them (the diff against the base has no BloodLib or log file). This session did not change them. No lifted body in this card calls a log-path function.
 - Round 2 fix (pdb_layout): `Pc::_takingAchievementRewardLock` is now an `_RTL_SRWLOCK` at +0x4F40. The gap after it starts at +0x4F48 and has the PDB name `_isTakingAchievementReward`. The two `RuleConfig` gap arrays now have the PDB names of their first members (`_usePcContentsTypeDungeonEnable` at +0, `_useReserveFactionReputation` at +84).
 
 ## Not done
@@ -60,6 +61,7 @@ Each lifted body has a dead-strip `/INCLUDE` keep pragma with a `// LIFT:` note.
 | `0x5db450` | `Pc::IsInTeamPartyZone` | The skeleton does not declare `GameObject::zone`, `Zone::GeoZoneData` or the `GeoZone::zoneData` record layout. |
 | `0x5db4a0` | `Pc::IsInPartyBattleFieldZone` | Same reason as `Pc::IsInTeamPartyZone`. |
 | `0x5db4e0` | `Pc::IsInPartyZone` | Same reason as `Pc::IsInTeamPartyZone`. |
+| `0x5e51b0` | `Pc::CalculateStyleScoreBonus` | Review reject P2_cc (build `jle`, original `jl`). The body is the `LIFT_STUB` again. |
 | `0x5e1650` | `Pc::GetPcContentsType` | The skeleton does not declare `GamedConfig` arena members, `GameDaemon::arenaAttraction`, `Pc::_arenaRoom` or `Pc::_enterArenaParam`. |
 
 ## Changed files

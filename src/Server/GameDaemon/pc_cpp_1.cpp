@@ -648,22 +648,9 @@ void __cdecl Pc::ClearStyleScore(void)
 }
 
 // 0x5e51b0
-#pragma comment(linker, "/INCLUDE:?CalculateStyleScoreBonus@Pc@@QEAA_J_J@Z")  // LIFT: dead-strip keep (no live caller yet)
-__int64 __cdecl Pc::CalculateStyleScoreBonus(__int64 exp)
+__int64 __cdecl Pc::CalculateStyleScoreBonus(__int64)
 {
-    // LIFT: Pc derives from Creature in the PDB. The skeleton Pc has no Creature base yet.
-    short styleScore = reinterpret_cast<const ::CreatureMemberView *>(this)->style_score;
-    if (styleScore <= 0)
-        return 0;
-    ::RuleConfig *ruleConfig = GameDaemon::GamedInstance->GetRuleConfig();
-    int bonus = 0;
-    if (styleScore >= ruleConfig->_styleScoreExpStep2)
-        bonus = ruleConfig->_styleScoreExpBonus2;
-    else if (styleScore >= ruleConfig->_styleScoreExpStep1)
-        bonus = ruleConfig->_styleScoreExpBonus1;
-    if (bonus <= 0)
-        return 0;
-    return exp * bonus / 1000;
+    LIFT_STUB(0x5e51b0);
 }
 
 // 0x5e5220
