@@ -66,7 +66,6 @@ Stem `gamedaemon_cpp`:
 - 0x342ae0 `GamedCooldownTimer::EventId`
 - 0x343030 `GameDaemon::ServiceName`
 - 0x343650 `GameDaemon::NotCheckToPlayInWeek` (the body uses the VS2010 `_Lower_bound` loop. The repo `algorithm` header has no `binary_search`.)
-- 0x3438f0 `GameDaemon::WriteDump` (round 4 repair of P5_zero_arg: see Notes)
 - 0x343910 `GameDaemon::GetAddressStringWForLogs`
 
 ## Not done
@@ -75,12 +74,13 @@ Stem `gamedaemon_cpp`:
 | --- | --- | --- |
 | 0x156b80 | `ManagementdChannel::PacketHandler` | The global `GamedManagementdPacketGamedSideHandlerList` (rva 0xE7FAF0) is not in the repo. Its size and entries are not known. One look-up did not give them. A later card that adds the handler list can lift this body. |
 | 0x33aed0 | `NPMessageHandleEvent::~NPMessageHandleEvent` | The skeleton class has no base (PDB: DynamicEventObject). The delete form of `_tran` (virtual destructor call, then `Memory::_Manager[2]->Free`) is not clear. |
+| 0x3438f0 | `GameDaemon::WriteDump` | SEH filter `GetExceptionInformation` does not compile; P5_zero_arg; a later card. The body is back to `LIFT_STUB`. |
 | 0x315de0 | `CachedChannel::InitChangedCachePacket` | The pseudocode is not clear: it writes a vftable (`AddChangedCachePacketSplitter`) into the first argument, and the `Packet::Compose` arguments do not agree with the format strings. One look-up did not give the form. |
 
 ## Notes
 
 - Round 4 rebase: `gametran.h` has no conflict markers. It keeps the main declarations and the PDB layouts of this card. Stem `gametran_h` needed no change in round 4.
-- Round 4, 0x3438f0 `GameDaemon::WriteDump`: the body calls `RaiseException(0xC0000005, 1, 0, NULL)` with all 4 arguments. The filter calls `GenerateDump(GetExceptionInformation(), false)`. The body does not read `fullMemory`, so the build does not spill it. Formtest gives SAME for the main body (`xor r9d, r9d` and `xor r8d, r8d` are present). The filter funclet stays DIFF (`GenerateDump` is a stub).
+- Round 5: `GameDaemon::WriteDump` is a `LIFT_STUB` again and has no `/INCLUDE` pragma. `GetExceptionInformation` did not compile in the gate build.
 - 0x16cf30: the destructor frees `_mileageList` with `Memory::_Manager[2]->Free` only when `_mileageCount` is not 0. The file literal is the per-exe path of MileageDepositTran.cpp, line 453. It has a dead-strip keep pragma.
 - The log bodies use the GameDaemon forms of `Log::Write` (E129). `AlertSender::Write` stays a stub. The card does not lift it.
 - The session did not run the gate or funcdiff. The driver builds and records the MATCH comparison.
