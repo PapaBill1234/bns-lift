@@ -47,23 +47,9 @@ void __cdecl ItemPouch::TakeEffect(::Zone *, ::Pc *)
 }
 
 // 0x40dd70
-#pragma comment(linker, "/INCLUDE:?Next@ItemPouch@@QEBAPEBUDroppedItem@@PEBU2@@Z")  // LIFT: dead-strip keep (no live caller yet)
-::DroppedItem const * __cdecl ItemPouch::Next(::DroppedItem const *i) const
+::DroppedItem const * __cdecl ItemPouch::Next(::DroppedItem const *) const
 {
-    __int64 index = -1;
-    if (i != NULL)
-    {
-        index = i - item;
-        if (index < 0)
-            return NULL;
-    }
-
-    for (++index; index < 16; ++index)  // LIFT: 16 = MAX_ITEM_COUNT
-    {
-        if (item[index].valid == 1)
-            return &item[index];
-    }
-    return NULL;
+    LIFT_STUB(0x40dd70);
 }
 
 // 0x40dde0

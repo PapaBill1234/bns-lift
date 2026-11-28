@@ -2,11 +2,11 @@
 
 ## Lifted
 
-- `itempouch`: `ItemPouch::ItemPouch` (0x40d810), `ItemPouch::Next` (0x40dd70).
-- `effect_cpp_2`: `EffectContainer::newIndex` (0x5b03c0), `EffectList::EffectList` (0x5b4870), `EffectList::Clear` (0x5b49f0).
+- `itempouch`: `ItemPouch::ItemPouch` (0x40d810).
+- `effect_cpp_2`: `EffectList::EffectList` (0x5b4870), `EffectList::Clear` (0x5b49f0).
 - `skill`: `SkillContainer::FindInPassiveSkills` (0x58e8f0), `SkillContainer::GetSkillPageEnable` (0x58ebe0), `SkillContainer::GetCurrentSkillPageJobStyle` (0x58fc70), `SkillContainer::isCandidateSkill` (0x595430).
-- `zone_cpp_1`: `Zone::GetEnvWithGeoId` (0x22e900), `Zone::GetEnv` (0x22e960), `Zone::GetFieldItem` (0x234380), `Zone::GetCampfire` (0x236630).
-- `creature_h`: `Creature::AddChangedPropertyId` (0x1d240), `Creature::AddChangedExtraPropertyId` (0x1d280), `Creature::IsCreatureInDuelCombat` (0x1edbb0), and the five `ApplySkillModifyInfo::Calc*` functions (0x453650, 0x4536f0, 0x453740, 0x4537e0, 0x453880).
+- `zone_cpp_1`: `Zone::GetFieldItem` (0x234380), `Zone::GetCampfire` (0x236630).
+- `creature_h`: `Creature::AddChangedPropertyId` (0x1d240), `Creature::AddChangedExtraPropertyId` (0x1d280).
 - `effectcontent_h`: the six `GetDataSubType` getters (0x479ee0, 0x47a4a0, 0x47a520, 0x47a530, 0x47a770, 0x47a7f0) and `IncreaseSpecialSkillGaugeEffect::checkApply` (0x47a800). The enumerators of `Data::EffectRecordSubType` are not declared, so the getters cast the 2019 values.
 
 ## Round 2 repair (pdb_layout)
@@ -20,18 +20,31 @@ Round 2 removes these members from the PDB classes. The lifted bodies now read t
 - `ZoneMemberView` (`zone.h`): `_envList` (+0x3FD0), `fieldItemList` (+0x3FE0), `campfireList` (+0x4008).
 - `CreatureMemberView` (`creature.h`): `Id`, `Prop.State.combat_side` (+0x235), and the two changed-property sets (+0xC08, +0xC28).
 
+## Round 3 repair (review rejects and log path)
+
+Round 3 puts these bodies back to the skeleton `LIFT_STUB` body and removes their `/INCLUDE` keep pragmas:
+
+- Review rejects (P2_cc and other precheck rules): `ItemPouch::Next`, `EffectContainer::newIndex`, `Creature::IsCreatureInDuelCombat` and the five `ApplySkillModifyInfo::Calc*` functions.
+- Log path (E16): `Zone::GetEnvWithGeoId` and `Zone::GetEnv` call `Log::Write`. The `Log.h` include and the `ZONE_FILE` path literal in `zone_cpp_1.cpp` are now unused, so round 3 removes them.
+
 ## Gate and MATCH
 
 The driver runs the build, the gate and the MATCH comparison after this session.
 
 ## Not done
 
+- `itempouch` / `ItemPouch::Next` (0x40dd70): review reject P2_cc (build `je`, original `jne`). The stub stays.
+- `effect_cpp_2` / `EffectContainer::newIndex` (0x5b03c0): review reject P2_cc (build `je`, original `jne`). The stub stays.
 - `effect_cpp_2` / `EffectFactory::CreateEffect` (0x5b37f0): the Hex-Rays cache has no pseudocode for this function (the entry is `None`). The body is 0x180 bytes, not empty. The stub stays.
-- `creature_h` / `CreatureStateKeeper::~CreatureStateKeeper` (0x1edbf0): the body decrements `Creature::_creatureStateKeeperCount` and then runs the `Pointer2<Creature>` destructor (`RefCntObject::removeReferenceCount`). In the lift headers, `Pointer2` is an empty class, `Creature` has no `RefCntObject` base, and `CreatureStateKeeper` has no members. That work is larger than one leaf. The stub stays.
+- `skill` / `SkillContainer::responseDispose` (0x593020): the body calls a variadic send virtual of `Creature` (format `"hic"`, packet 1428). The lift headers do not declare the `Creature` virtual table, so the slot and the name are unknown. The stub stays.
+- `zone_cpp_1` / `Zone::GetEnvWithGeoId` (0x22e900): log path (E16). The stub stays.
+- `zone_cpp_1` / `Zone::GetEnv` (0x22e960): log path (E16). The stub stays.
 - `zone_cpp_1` / `Zone::GetNpcSquad` (0x22ec00) and `Zone::GetConvoy` (0x22ec50): the body reads `GeoZone::zoneData` (zone id in the record) and `GeoZone::_npcSquadIndexInfo` / `_convoyIndexInfo`. In the lift headers, `GeoZone` is an opaque byte block. The stubs stay.
 - `zone_cpp_1` / `Zone::spawnEnd` (0x231510): the body unlinks `PcSpawnAction::_prev` / `_next` and calls `RefCntObject::removeReferenceCount`. In the lift headers, `PcSpawnAction` has no members and no `RefCntObject` base. The stub stays.
-- `zone_cpp_1` / `Zone::SelectFieldItem` (0x2348d0): the public name is a non-static member (`QEAA`), but the binary reads the byte array from RDX and returns a qword from RCX (the `this` register). A static form with a loop bound of 3 gives DIFF 18 (register allocation only); a member form gives DIFF 20. The source form is open. The stub stays.
-- `skill` / `SkillContainer::responseDispose` (0x593020): the body calls a variadic send virtual of `Creature` (format `"hic"`, packet 1428). The lift headers do not declare the `Creature` virtual table, so the slot and the name are unknown. The stub stays.
+- `zone_cpp_1` / `Zone::SelectFieldItem` (0x2348d0): the public name is a non-static member (`QEAA`), but the binary reads the byte array from RDX and returns a qword from RCX (the `this` register). The source form is open. The stub stays.
+- `creature_h` / `Creature::IsCreatureInDuelCombat` (0x1edbb0): review reject P2_cc, P3_imm, P9_ret_width. The stub stays.
+- `creature_h` / `CreatureStateKeeper::~CreatureStateKeeper` (0x1edbf0): the body decrements `Creature::_creatureStateKeeperCount` and then runs the `Pointer2<Creature>` destructor (`RefCntObject::removeReferenceCount`). In the lift headers, `Pointer2` is an empty class, `Creature` has no `RefCntObject` base, and `CreatureStateKeeper` has no members. The stub stays.
+- `creature_h` / `ApplySkillModifyInfo::CalcRecycleDuration` (0x453650), `CalcSpConsume` (0x4536f0), `CalcDamagePowerPercent` (0x453740), `CalcHealPercent` (0x4537e0), `CalcHpDrainPercent` (0x453880): review reject P2_cc (build `cmovg`, original `jle`). The stubs stay.
 
 ## Changed files
 

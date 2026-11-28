@@ -219,28 +219,9 @@ short __cdecl EffectContainer::GetListSize(void)
 }
 
 // 0x5b03c0
-#pragma comment(linker, "/INCLUDE:?newIndex@EffectContainer@@AEAAFW4EffectSlot@@@Z")  // LIFT: dead-strip keep (no live caller yet)
-short __cdecl EffectContainer::newIndex(::EffectSlot slot)
+short __cdecl EffectContainer::newIndex(::EffectSlot)
 {
-    if (slot == SLOT_NONE)
-        return -1;
-    if (ownerEffectSlot == NULL)
-        return -1;
-
-    ::EffectSlotList *const list = ownerEffectSlot->GetEffectSlotList(slot);
-    if (list == NULL)
-        return -1;
-
-    short const start = list->lastIndex;
-    int index = start;
-    while (list->effects[index] != NULL)
-    {
-        index = (index + 1) % list->capacity;
-        if (index == list->lastIndex)
-            return -1;
-    }
-    list->lastIndex = static_cast<short>(start + 1) % list->capacity;
-    return static_cast<short>(index);
+    LIFT_STUB(0x5b03c0);
 }
 
 // 0x5b0440

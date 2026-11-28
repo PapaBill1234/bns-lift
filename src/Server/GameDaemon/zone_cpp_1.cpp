@@ -16,10 +16,7 @@
 #include "npcsquad.h"
 #include "pc.h"
 #include "systemaction.h"
-#include "Log.h"
 #include "LiftStub.h"
-
-#define ZONE_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\Zone.cpp"
 
 // 0x228470
 char __cdecl Zone::GetMaxInstantHeartCount(int, char)
@@ -106,27 +103,15 @@ bool __cdecl Zone::ReturnToArenaLobby(::Pc *, unsigned __int64)
 }
 
 // 0x22e900
-#pragma comment(linker, "/INCLUDE:?GetEnvWithGeoId@Zone@@QEBAPEAVEnv@@F@Z")  // LIFT: dead-strip keep (no live caller yet)
-::Env * __cdecl Zone::GetEnvWithGeoId(short geoEnvObjId) const
+::Env * __cdecl Zone::GetEnvWithGeoId(short) const
 {
-    // LIFT: the env list has 256 slots (index 1 to 255 is valid).
-    if (geoEnvObjId > 0 && geoEnvObjId < 256)
-        return reinterpret_cast< ::ZoneMemberView const *>(this)->_envList[geoEnvObjId];
-
-    Log::Write(Log::LT_ERROR, ZONE_FILE, 2321, L"[zone], get evn, invalid geoEnvObjId(%d)", static_cast<int>(geoEnvObjId));
-    return NULL;
+    LIFT_STUB(0x22e900);
 }
 
 // 0x22e960
-#pragma comment(linker, "/INCLUDE:?GetEnv@Zone@@QEBAPEAVEnv@@_K@Z")  // LIFT: dead-strip keep (no live caller yet)
-::Env * __cdecl Zone::GetEnv(unsigned __int64 envId) const
+::Env * __cdecl Zone::GetEnv(unsigned __int64) const
 {
-    int const index = static_cast<int>(envId);
-    if (index > 0 && index < 256)
-        return reinterpret_cast< ::ZoneMemberView const *>(this)->_envList[index];
-
-    Log::Write(Log::LT_ERROR, ZONE_FILE, 2334, L"[zone], get evn, invalid index (%d)", index);
-    return NULL;
+    LIFT_STUB(0x22e960);
 }
 
 // 0x22e9b0
