@@ -17,12 +17,8 @@
 
 #pragma comment(linker, "/INCLUDE:?SetTakingAchievementReward@Pc@@QEAAX_N@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?IsTakingAchievementReward@Pc@@QEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?EnableToRetrieveMyRanking@Pc@@QEAA_ND@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?HasCraft@Pc@@QEAA_ND@Z")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?IsJoinedCraftUnion@Pc@@QEAA_ND@Z")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?GetCraftUnionExp@Pc@@QEAAFD@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?FetchCraftUnionList@Pc@@QEAAXPEAVFragmentPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?IsRegisteredCraftRecipe@Pc@@QEAA_NH_K@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?clearCraftList@Pc@@AEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?IsUsingJumpingCharacter2Ticket@Pc@@QEAA?B_NXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?ClearTransformItemRetry@Pc@@QEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
@@ -293,15 +289,7 @@ void __cdecl Pc::ResetPetDurabilityDecreaseCount(void)
 // 0x607550
 bool __cdecl Pc::EnableToRetrieveMyRanking(char seasonContentsType)
 {
-    if (static_cast<unsigned char>(seasonContentsType - 1) > 0xE)
-        return false;
-    __time64_t now = _time64(nullptr);
-    // LIFT: ContentsRuleConfig::_myRankingRefreshInterval is int at +0x90 (PDB).
-    __int64 myRankingRefreshInterval = *reinterpret_cast<int *>(reinterpret_cast<char *>(ContentsRuleConfig::Config) + 0x90);
-    AcquireSRWLockShared(PcAt<::_RTL_SRWLOCK>(this, PC_rankingRetrieveTimeLock));
-    bool result = myRankingRefreshInterval < now - PcAt<__int64>(this, PC_rankingRetrieveTime)[seasonContentsType];
-    ReleaseSRWLockShared(PcAt<::_RTL_SRWLOCK>(this, PC_rankingRetrieveTimeLock));
-    return result;
+    LIFT_STUB(0x607550);
 }
 
 // 0x607600
@@ -430,16 +418,7 @@ bool __cdecl Pc::HasCraft(char unionType)
 // 0x6083a0
 bool __cdecl Pc::IsJoinedCraftUnion(char unionType)
 {
-    if (*PcAt<char>(this, PC_craftUnionCount) == 0)
-        return false;
-    CraftUnionView *unions = PcAt<CraftUnionView>(this, PC_craftUnion);
-    char i = 0;
-    while (unionType != unions[i].unionType)
-    {
-        if (++i >= 2)
-            return false;
-    }
-    return true;
+    LIFT_STUB(0x6083a0);
 }
 
 // 0x6083e0
@@ -451,14 +430,7 @@ bool __cdecl Pc::LeaveCraftUnion(char)
 // 0x6084c0
 short __cdecl Pc::GetCraftUnionExp(char unionType)
 {
-    CraftUnionView *unions = PcAt<CraftUnionView>(this, PC_craftUnion);
-    int i = 0;
-    for (CraftUnionView *p = unions; p->unionType == 0 || unionType != p->unionType; ++p)
-    {
-        if (++i >= 2)
-            return -1;
-    }
-    return unions[i].unionExp;
+    LIFT_STUB(0x6084c0);
 }
 
 // 0x608500
@@ -491,20 +463,7 @@ void __cdecl Pc::FetchCraftUnionList(::FragmentPacket *packet)
 // 0x608720
 bool __cdecl Pc::IsRegisteredCraftRecipe(int recipeId, unsigned __int64 groupAlias)
 {
-    CraftListView *list = PcAt<CraftListView>(this, PC_craftList);
-    AcquireSRWLockShared(PcAt<::_RTL_SRWLOCK>(this, PC_craftListLock));
-    bool result = false;
-    for (char **it = list->_Myfirst; it != list->_Mylast; ++it)
-    {
-        char *craft = *it;
-        if (craft != nullptr && (recipeId == CraftRecipeId(craft) || groupAlias == CraftGroupAlias(craft)))
-        {
-            result = true;
-            break;
-        }
-    }
-    ReleaseSRWLockShared(PcAt<::_RTL_SRWLOCK>(this, PC_craftListLock));
-    return result;
+    LIFT_STUB(0x608720);
 }
 
 // 0x6087c0

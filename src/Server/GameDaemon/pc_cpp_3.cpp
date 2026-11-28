@@ -19,7 +19,6 @@
 #pragma comment(linker, "/INCLUDE:?LeaveArenaLobbyOk@Pc@@QEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?ReturnToGameByEnterFail@Pc@@QEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?GetArenaSessionState@Pc@@QEBA?AW4ArenaSession@1@XZ")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?IsInArenaOrArenaLobby@Pc@@QEBA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?checkTeamGuildBattleFieldWithTarget@Pc@@QEAA_NPEAVCreature@@@Z")  // LIFT: dead-strip keep (no live caller yet)
 
 #define PC_CPP_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\Pc.cpp"
@@ -729,14 +728,7 @@ short __cdecl Pc::SendMoveToArena(int, bool, char)
 // 0x601020
 bool __cdecl Pc::IsInArenaOrArenaLobby(void) const
 {
-    PcView const *self = reinterpret_cast<PcView const *>(this);
-    CRITICAL_SECTION *lock = const_cast<CRITICAL_SECTION *>(&self->_arenaLock);
-    EnterCriticalSection(lock);
-    unsigned int arenaSession = static_cast<unsigned int>(self->_arenaSession);
-    bool result = arenaSession >= LIFT_ARENA_SESSION_MOVE_TO_ARENA_LOBBY &&
-                  (arenaSession <= LIFT_ARENA_SESSION_IN_ARENA_LOBBY || (arenaSession - 5) <= 1);
-    LeaveCriticalSection(lock);
-    return result;
+    LIFT_STUB(0x601020);
 }
 
 // 0x601080

@@ -17,12 +17,9 @@
 #pragma comment(linker, "/INCLUDE:?SetData@TimeBasedPlayInfoList@@QEAAXAEBV1@@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?SetDurationForDebug@TimeBasedPlayInfoList@@QEAA_NDH@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?SetPcCafeDebugCode@User@@QEAAXPEA_WD@Z")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?setExistContentsBan@User@@AEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?IsBannedContents@User@@QEBA_ND@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?SetSession@User@@UEAAXPEBVSession@@@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?resetPc@User@@CAXPEAVRefCntObject@@00@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?resetPc@User@@AEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?ClearBotState@User@@QEAAXPEB_WH@Z")  // LIFT: dead-strip keep (no live caller yet)
 
 namespace
 {
@@ -414,30 +411,13 @@ void __cdecl User::SetContentsBanDebugCode(int, __int64, __int64)
 // 0x3e5e60
 void __cdecl User::setExistContentsBan(void)
 {
-    if (UseContentsBan())
-    {
-        // LIFT: _contentsBanList is 9 entries of (_effectiveFrom, _effectiveTo), 16 bytes each.
-        __int64 *entry = UserAt<__int64>(this, USER_contentsBanList);
-        for (__int64 i = 0; entry[0] == 0 && entry[1] == 0; entry += 2)
-        {
-            if (++i >= 9)
-                return;
-        }
-        *UserAt<bool>(this, USER_existContentsBan) = true;
-    }
+    LIFT_STUB(0x3e5e60);
 }
 
 // 0x3e5eb0
 bool __cdecl User::IsBannedContents(char banId) const
 {
-    if (UseContentsBan() && static_cast<unsigned char>(banId - 1) <= 7u)
-    {
-        __time64_t now = _time64(nullptr);
-        __int64 *entry = UserAt<__int64>(this, USER_contentsBanList) + banId * 2;
-        if (entry[0] <= now)
-            return now <= entry[1];
-    }
-    return false;
+    LIFT_STUB(0x3e5eb0);
 }
 
 // 0x3e5f50
@@ -555,20 +535,9 @@ void __cdecl User::AddBotState(::Data::BotScoringConditionConditionTypeType, __i
 }
 
 // 0x3e8440
-void __cdecl User::ClearBotState(wchar_t const *file, int)
+void __cdecl User::ClearBotState(wchar_t const *, int)
 {
-    // LIFT: the original reads edx (low 32 bits of the first argument) as the log line number. It ignores the second argument.
-    int line = static_cast<int>(reinterpret_cast<__int64>(file));  // ❓ the original has mov ebp, edx here. This form gives mov rbp, rdx.
-    for (int i = 0; i < 8; ++i)
-    {
-        // LIFT: User::_botScoreInfo.state[i] (+0x430, 0x18 bytes each): value +0, lastCheckTime +8, extra +0x10.
-        char *state = reinterpret_cast<char *>(this) + USER_botScoreState + i * 24;
-        *reinterpret_cast<__int64 *>(state) = 0;
-        *reinterpret_cast<__int64 *>(state + 8) = _time64(nullptr);
-        *(state + 16) = 0;
-    }
-    Log::Write(Log::LT_DEBUG, USER_PC_CPP_FILE, line, L"[user], ClearBotState, pcDbId:0x%I64x",
-               *UserAt<unsigned __int64>(this, USER_PcDbId));
+    LIFT_STUB(0x3e8440);
 }
 
 // 0x3e84d0
