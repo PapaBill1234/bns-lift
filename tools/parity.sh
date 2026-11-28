@@ -15,6 +15,8 @@
 # Excluded symbols (Docs/Parity/excluded.tsv, tools/parity_excluded.py) never count as MATCH. --accept and --update
 # write them into the baseline with status EXCLUDED. The gate ignores them: an excluded symbol that turns DIFF is
 # not a loss. progress.tsv and the README show MATCH without them and a separate excluded count.
+# MATCH-B (exact, tools/parity_exact.py): with env PARITY_STRICT (the strict directory of the same build, from the
+# runner), --accept writes "exact" into each MATCH row of the baseline and " exact N" into the progress.tsv cell.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 UPDATE=0
@@ -24,30 +26,43 @@ ACCEPT=0
 EXES=("$@"); [ ${#EXES[@]} -gt 0 ] || EXES=(CacheGate LobbyGate SmartCouponDaemon PostOfficeDaemon LobbyDaemon GameDaemon)
 O="${VS2010_OUT:-build-vs2010}"
 # Copy one funcdiff result to the baseline. Excluded MATCH symbols get status EXCLUDED.
-# With no excluded symbol for the exe, the file is a byte copy (same as before excluded.tsv).
+# With PARITY_STRICT, each MATCH row gets "exact" (tools/parity_exact.py).
+# With no excluded symbol and no strict data for the exe, the file is a byte copy (same as before excluded.tsv).
 write_baseline() {
   python3 - "$O/$1.funcdiff.json" "Docs/Parity/baseline/$1.json" "$1" <<'PY'
-import json, shutil, sys
+import json, os, shutil, sys
 sys.path.insert(0, "tools")
 import parity_excluded as px
+import parity_exact as pe
 src, dst, exe = sys.argv[1:]
 sym = px.load().get(exe, {})
-if not sym:
+strict = pe.load_strict(os.environ.get("PARITY_STRICT", ""), exe)
+if not sym and strict is None:
     shutil.copyfile(src, dst)
     sys.exit(0)
+rows = px.mark(json.load(open(src)), sym)
+if strict is not None:
+    try:
+        rows = pe.mark(rows, strict)
+    except ValueError as e:   # strict data of another build: no exact data for this exe, the accept goes on
+        print(f"{exe}: MATCH-B not written: {e}", file=sys.stderr)
+        for r in rows.values():
+            r.pop("exact", None)
 with open(dst, "w") as f:
-    json.dump(px.mark(json.load(open(src)), sym), f, indent=0, sort_keys=True)
+    json.dump(rows, f, indent=0, sort_keys=True)
 PY
 }
 if [ "$ACCEPT" = 1 ]; then
   python3 tools/parity_excluded.py >/dev/null || { python3 tools/parity_excluded.py; exit 1; }
   for e in "${EXES[@]}"; do write_baseline "$e"; done
   # One row per accepted card in Docs/Parity/progress.tsv: date, card, then MATCH/total per exe.
-  # MATCH does not hold excluded symbols. A cell gets " excluded N" when N > 0.
+  # MATCH does not hold excluded symbols. A cell gets " exact N" when the baseline has MATCH-B data, and
+  # " excluded N" when N > 0.
   python3 - "$O" "${PARITY_CARD:-manual}" "${EXES[@]}" <<'PY'
 import datetime, json, os, re, sys
 sys.path.insert(0, "tools")
 import parity_excluded as px
+import parity_exact as pe
 o, card, exes = sys.argv[1], sys.argv[2], sys.argv[3:]
 f = "Docs/Parity/progress.tsv"
 excl = px.load()
@@ -57,7 +72,9 @@ for e in exes:
     only = int(re.search(r"(\d+) only in original", open(f"{o}/{e}.funcdiff.txt").readline()).group(1))
     m, x, _ = px.count(new, excl.get(e, {}))
     t = len(new) + only
-    cells.append(f"{e} {m}/{t} {100*m/max(t,1):.1f}%" + (f" excluded {x}" if x else ""))
+    n = pe.count(json.load(open(pe.baseline(e))), excl.get(e, {}))
+    cells.append(f"{e} {m}/{t} {100*m/max(t,1):.1f}%" + (f" exact {n}" if n is not None else "")
+                 + (f" excluded {x}" if x else ""))
 new_file = not os.path.exists(f)
 with open(f, "a") as fh:
     if new_file:

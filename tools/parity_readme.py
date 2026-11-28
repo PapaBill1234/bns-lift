@@ -3,10 +3,12 @@
 Sources (all in git): Docs/Parity/baseline/<EXE>.json (per-function results),
 Docs/Parity/progress.tsv (total per exe = paired + only in original; start and last card).
 Docs/Parity/excluded.tsv (excluded symbols: not MATCH; own column 'Excluded').
+Column 'Exact' = MATCH-B: MATCH rows with "exact" true (tools/parity_exact.py). An exe with no exact data shows '-'.
 tools/parity.sh --accept runs this after each accepted lift-parity card. Manual run: tools/parity_readme.py"""
 import collections, json, os, re, sys
 sys.path.insert(0, "tools")
 import parity_excluded as px
+import parity_exact as pe
 # CORE: the first 4 exes (summary row and shared library). LobbyDaemon and GameDaemon are in the lift; each gets its own row.
 # GameDaemon has a row only when its baseline file and a progress.tsv entry exist. Its level text is "Lift in progress".
 CORE = ["CacheGate", "LobbyGate", "SmartCouponDaemon", "PostOfficeDaemon"]
@@ -33,12 +35,14 @@ def level(p):
     return "99 % ✅" if p >= 99 else "95 % ✅" if p >= 95 else "90 % ✅" if p >= 90 else "below 90 %"
 
 out = [f"Last update: card `{rows[-1][1]}` ({rows[-1][0]}). Tool: `tools/parity.sh` (VS2010 /GL /LTCG build vs original, funcdiff).", "",
-       "| Exe | Parity | MATCH | DIFF | Excluded | Only in original | Total | Mean score | Start | Change | Level |",
-       "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |"]
+       "| Exe | Parity | MATCH | Exact | DIFF | Excluded | Only in original | Total | Mean score | Start | Change | Level |",
+       "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |"]
 sm = st = sx = 0
+sn = 0   # exact sum of the first 4; None when one of them has no exact data
 for e in EXES:
     r = d[e]
     m, xc, diff = px.count(r, excl.get(e, {}))
+    n = pe.count(r, excl.get(e, {}))
     t = last.get(e, (0, len(r)))[1]
     only = t - len(r)
     mean = sum(x["score"] for x in r.values()) / max(len(r), 1)
@@ -48,10 +52,12 @@ for e in EXES:
     sx += xc
     if e in CORE:
         sm += m; st += t
-    out.append(f"| {e} | **{p:.1f} %** | {m} | {diff} | {xc} | {only} | {t} | {mean:.1f} | {p0:.1f} % | {p - p0:+.1f} | {lvl} |")
+        sn = None if sn is None or n is None else sn + n
+    ex = "-" if n is None else str(n)
+    out.append(f"| {e} | **{p:.1f} %** | {m} | {ex} | {diff} | {xc} | {only} | {t} | {mean:.1f} | {p0:.1f} % | {p - p0:+.1f} | {lvl} |")
 p = pct(sm, st)
 p0 = pct(sum(first[e][0] for e in CORE), sum(first[e][1] for e in CORE))
-out.append(f"| **First 4** | **{p:.1f} %** | {sm} | | | | {st} | | {p0:.1f} % | {p - p0:+.1f} | {level(p)} |")
+out.append(f"| **First 4** | **{p:.1f} %** | {sm} | {'-' if sn is None else sn} | | | | {st} | | {p0:.1f} % | {p - p0:+.1f} | {level(p)} |")
 
 count = collections.Counter(k for e in CORE for k in d[e])
 shared = [k for k, n in count.items() if n >= 2]
@@ -60,7 +66,7 @@ sp = pct(len(shared) - len(sbad), len(shared))
 out += ["", "| Shared library (functions in 2+ exes) | Parity | MATCH in each exe | DIFF in 1+ exe | Total | Goal |",
         "| --- | ---: | ---: | ---: | ---: | --- |",
         f"| BloodLib, Shared, Packet, CRT | **{sp:.1f} %** | {len(shared) - len(sbad)} | {len(sbad)} | {len(shared)} | 99 % |"]
-out += ["", f"First 4 and shared library: CacheGate, LobbyGate, SmartCouponDaemon, PostOfficeDaemon. LobbyDaemon: lift in progress; most functions are still stubs (only in original). GameDaemon: lift in progress. Goal: 95 % per exe, 99 % preferred. Shared library: 99 % preferred. MATCH never holds excluded symbols (review rejected, no honest source fix: [Docs/Parity/excluded.tsv](Docs/Parity/excluded.tsv)); they are in the column Excluded ({sx} now). Rules: [Docs/Parity/README.md](Docs/Parity/README.md). History: [Docs/Parity/progress.tsv](Docs/Parity/progress.tsv).",
+out += ["", f"First 4 and shared library: CacheGate, LobbyGate, SmartCouponDaemon, PostOfficeDaemon. LobbyDaemon: lift in progress; most functions are still stubs (only in original). GameDaemon: lift in progress. Goal: 95 % per exe, 99 % preferred. Shared library: 99 % preferred. MATCH never holds excluded symbols (review rejected, no honest source fix: [Docs/Parity/excluded.tsv](Docs/Parity/excluded.tsv)); they are in the column Excluded ({sx} now). Exact (MATCH-B) = MATCH functions whose ordered instruction stream is also equal to the original (registers, order, branch sense); '-' = not measured yet. Rules: [Docs/Parity/README.md](Docs/Parity/README.md). History: [Docs/Parity/progress.tsv](Docs/Parity/progress.tsv).",
         "", "| Card | " + " | ".join(EXES) + " |", "| --- |" + " ---: |" * len(EXES)]
 for row in rows:
     c = cells(row)
