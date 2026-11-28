@@ -3,7 +3,6 @@
 #include "LiftStub.h"
 
 #pragma comment(linker, "/INCLUDE:?GetActivatedBadgeEquipSlot@Creature@@QEAADXZ")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?IsActivatedBadgeEquipSlot@Creature@@QEAA_NE@Z")  // LIFT: dead-strip keep (no live caller yet)
 
 namespace
 {
@@ -452,10 +451,9 @@ char __cdecl Creature::GetActivatedBadgeEquipSlot(void)
 }
 
 // 0x274a10
-bool __cdecl Creature::IsActivatedBadgeEquipSlot(unsigned char depot)
+bool __cdecl Creature::IsActivatedBadgeEquipSlot(unsigned char)
 {
-    // LIFT: the original inlines GetActivatedBadgeEquipSlot here.
-    return depot == static_cast<unsigned char>(GetActivatedBadgeEquipSlot());
+    LIFT_STUB(0x274a10);
 }
 
 // 0x274a60

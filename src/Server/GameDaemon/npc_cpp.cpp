@@ -15,8 +15,6 @@
 #include "contentsruleconfigdefinition_gd.h"
 #include "LiftStub.h"
 
-#pragma comment(linker, "/INCLUDE:?GetCombatSequence@Npc@@QEBAPEAVCombatSequence@@XZ")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?calculateAdditionalExpBonusByTestServer@Npc@@AEAA_J_J@Z")  // LIFT: dead-strip keep (no live caller yet)
 
 namespace
 {
@@ -401,13 +399,7 @@ bool __cdecl Npc::Hide(::HideType)
 // 0x41a220
 ::CombatSequence * __cdecl Npc::GetCombatSequence(void) const
 {
-    BrainBaseView * brain = reinterpret_cast<NpcView const *>(this)->_brain;
-    if (brain == nullptr)
-        return nullptr;
-    ::BrainState * state = brain->GetState(BRAIN_STATE_COMBAT_SEQUENCE);
-    if (state == nullptr)
-        return nullptr;
-    return reinterpret_cast<CombatSeqBrainStateView *>(state)->combatSequence;
+    LIFT_STUB(0x41a220);
 }
 
 // 0x41a260
@@ -495,15 +487,9 @@ void __cdecl Npc::TakeFactionScore(::GameObject *)
 }
 
 // 0x41ba20
-__int64 __cdecl Npc::calculateAdditionalExpBonusByTestServer(__int64 rewardExp)
+__int64 __cdecl Npc::calculateAdditionalExpBonusByTestServer(__int64)
 {
-    // ❓ The pseudocode reads the first register (this) as the value. The PDB names rewardExp. The lift uses rewardExp.
-    if (rewardExp == 0 || !reinterpret_cast<GameDaemonView const *>(GameDaemon::GamedInstance)->config->_testServerEnable)
-        return 0;
-    __int64 bonus = rewardExp * reinterpret_cast<ContentsRuleConfigView const *>(ContentsRuleConfig::Config)->_testServerExpBonusPercentNpc / 100;
-    if (bonus > 0x7FFFFFFF)
-        return 0x7FFFFFFF;
-    return bonus;
+    LIFT_STUB(0x41ba20);
 }
 
 // 0x41ba80

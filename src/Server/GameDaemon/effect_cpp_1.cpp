@@ -8,8 +8,6 @@
 #include "Log.h"
 #include "LiftStub.h"
 
-#pragma comment(linker, "/INCLUDE:??1Effect@@UEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?GetDataSubType@Effect@@UEAA?AW4EffectRecordSubType@Data@@XZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?GetRemainDuration@PassiveEffect@@QEAAJPEA_W@Z")  // LIFT: dead-strip keep (no live caller yet)
 
 #define EFFECT_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\Effect.cpp"
@@ -63,16 +61,13 @@ const char BUFF_TYPE_DEBUFF = 2;  // LIFT: buff_type value 2 (pseudocode); ❓ e
 // 0x5a2ec0
 __cdecl Effect::~Effect(void)
 {
-    if (target != nullptr && GetObjectType(reinterpret_cast<GameObjectView const *>(target)->Id) != OBJECT_TYPE_32)
-        reinterpret_cast<::RefCntObject *>(target)->removeReferenceCount(EFFECT_FILE, 86);
+    LIFT_STUB(0x5a2ec0);
 }
 
 // 0x5a2f30
 ::Data::EffectRecordSubType __cdecl Effect::GetDataSubType(void)
 {
-    if (data == nullptr)
-        return static_cast<::Data::EffectRecordSubType>(0);
-    return static_cast<::Data::EffectRecordSubType>(reinterpret_cast<DrElView const *>(data)->subtype);
+    LIFT_STUB(0x5a2f30);
 }
 
 // 0x5a2f40
@@ -138,19 +133,7 @@ void __cdecl Effect::createDuelbotEffectAction(char, unsigned int, char const *,
 // 0x5a3fd0
 bool __cdecl Effect::checkImmuneDebuff(void)
 {
-    GameObjectView const * object = reinterpret_cast<GameObjectView const *>(target);
-    unsigned short type = GetObjectType(object->Id);
-    if (type != 1 && type != 2 && type != 4 && type != 240 && type != 241)  // LIFT: creature type values (pseudocode); ❓ enumerator names
-        return true;
-    if (!reinterpret_cast<CreatureAbnormalityView const *>(target)->immune_debuff)
-        return true;
-    EffectRecordView const * record = reinterpret_cast<EffectRecordView const *>(data);
-    if (record->buff_type != BUFF_TYPE_DEBUFF || record->ignore_immune_debuff)
-        return true;
-    Log::Write(Log::LT_DEBUG, EFFECT_FILE, 540,
-               L"[effect], failed to apply by immune debuff., effectId:%d, Creature:%#I64x, immune is true",
-               record->id, object->Id);
-    return false;
+    LIFT_STUB(0x5a3fd0);
 }
 
 // 0x5a4060

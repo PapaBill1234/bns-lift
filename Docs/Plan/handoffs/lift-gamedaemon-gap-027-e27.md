@@ -72,6 +72,27 @@ The `Item` items need one structural card: declare the `Item` vtable in PDB orde
 - Round 3 removes the two members from `WeaponItem`. A new view `WeaponItemView` (pad +0 to +0x2F, `prop` at +0x30) holds them. This replaces the note on the `WeaponItem` pad above.
 - The two `WeaponItem` getters read `prop` through `reinterpret_cast<const WeaponItemView *>(this)`. The logic and the offsets do not change.
 
+## Round 4 (repair: review rejects and log path E16)
+
+Round 4 puts these bodies back to the skeleton `LIFT_STUB` body. It removes their `/INCLUDE` keep pragmas. The bodies in the "Lifted" table above that are in this list are now **Not done**.
+
+| RVA | PDB name | Reason |
+| --- | --- | --- |
+| 0x41a220 | `Npc::GetCombatSequence` | Review reject P2_cc (jne in place of je). |
+| 0x41ba20 | `Npc::calculateAdditionalExpBonusByTestServer` | Review reject: the original reads the value from rcx, the build from rdx. |
+| 0x5a2ec0 | `Effect::~Effect` | Review reject P3_imm (immediate 0x30 missing). |
+| 0x5a2f30 | `Effect::GetDataSubType` | Review reject P2_cc (jne in place of je). |
+| 0x5a3fd0 | `Effect::checkImmuneDebuff` | Calls `Log::Write`. Log path engine issue E16 is open. |
+| 0x274a10 | `Creature::IsActivatedBadgeEquipSlot` | Review reject P9_ret_width. |
+| 0x5caf40 | `DashEffect::checkApply` | Review reject P2_cc (jne in place of ja). |
+| 0x5cf7c0 | `MasteryStatEquipEffect::FindBlankModifyAbility` | Review reject P2_cc (jl in place of jb). |
+| 0x5d10a0 | `SecondGaugePointEffect::checkApply` | Calls `Log::Write`. Log path engine issue E16 is open. |
+| 0x5d1d00 | `AccumulatedDamageEffect::checkApply` | Review reject P2_cc, P3_imm, P9_ret_width. |
+
+The rejects for `AlertSender::writev2`, `Log::Write`, `LogBuffer::Acquire`, `LogBuffer::deallocate_me`, `LogMedia::Add` and `RefCntHistory::dump` are not in the files of this card. This card did not lift them. No other lifted body of this card calls a log function.
+
+Bodies that stay lifted: `PassiveEffect::GetRemainDuration`, `Creature::GetActivatedBadgeEquipSlot`, `EmbersExplosionTimerEffect::checkApply`, `DebuffGuildBattleFieldEffect::checkApply`, `OceanicEffect::checkApply`, `FallDeathEffect::checkApply`, `IntervalSecondGaugePointEffect::checkApply`, `WeaponItem::R_GetRandomEffectId`, `WeaponItem::R_GetRandomEffectGroupId`.
+
 ## Gate and MATCH
 
 The driver builds and runs the gate and funcdiff after this session. This session did not run them.
