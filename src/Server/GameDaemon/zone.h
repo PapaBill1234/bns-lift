@@ -382,7 +382,8 @@ private:
     ::Zone const *zone;                     // +120 (0x78)
     unsigned int geoZoneId;                 // +128 (0x80)
     ::LogFile *file;                        // +136 (0x88)
-    char lift_pad_90[0x18];                 // ❓ PDB fields zoneCounter (ZoneCounterSet, +0x90) and initCounter (+0xA0) are not declared yet
+    char zoneCounter[0x10];                 // +144 (0x90) ❓ PDB type is ZoneCounterSet (size 0x10, base CounterSet); the full class is not declared in GameDaemon yet
+    bool initCounter;                       // +160 (0xA0)
     ZsoTestResult _zsoTestResult[3];        // +168 (0xA8)
     __int64 StartMsec;                      // +288 (0x120)
     __int64 EndMsec;                        // +296 (0x128)

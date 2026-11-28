@@ -66,3 +66,9 @@ The first session of this round lifted these bodies. The second session lifted `
 - `src/Server/GameDaemon/zonescore.h`
 - `src/Server/GameDaemon/zonecellattributemanager.cpp` (note on the log-path stub only)
 - `Docs/Plan/handoffs/lift-gamedaemon-gap-032-e32.md`
+
+## Round 2 fix
+
+- The gate `pdb_layout` check failed on `ZonePerfMonitor::lift_pad_90`.
+- `zone.h` now declares the PDB members `zoneCounter` (+0x90) and `initCounter` (+0xA0).
+- `zoneCounter` is a 0x10-byte placeholder. Its PDB type is `ZoneCounterSet`. GameDaemon does not declare the full class yet (marked `// ❓`).
