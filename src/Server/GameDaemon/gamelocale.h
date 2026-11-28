@@ -7,7 +7,16 @@ class GameLocale
 {
 public:
     struct ThaiCell {};
-    enum VietToneMarkType {};
+    enum VietToneMarkType
+    {
+        VIETTONEMARK_TYPE_NONE = 0,
+        VIETTONEMARK_TYPE_GRAVEACCENT = 1,
+        VIETTONEMARK_TYPE_ACUTEACCENT = 2,
+        VIETTONEMARK_TYPE_HOOKABOVE = 3,
+        VIETTONEMARK_TYPE_TILDE = 4,
+        VIETTONEMARK_TYPE_DOTBELOW = 5,
+        VIETTONEMARK_TYPE_COUNT = 6
+    };
     enum VietVowelType {};
 public:
     bool __cdecl IsAllowedChar(wchar_t, bool, wchar_t const *);  // 0xd4aa0

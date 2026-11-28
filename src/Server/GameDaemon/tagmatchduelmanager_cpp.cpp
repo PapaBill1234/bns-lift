@@ -3,7 +3,18 @@
 #include "duelmanager.h"
 #include "pc.h"
 #include "zone.h"
+#include "gamedaemon.h"
+#include "AlertSender.h"
+#include "Log.h"
 #include "LiftStub.h"
+
+// LIFT: per-exe path literal (lessons A6).
+#define TAGMATCHDUELMANAGER_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\TagMatchDuelManager.cpp"
+
+#pragma comment(linker, "/INCLUDE:?ResetRound@TagMatchDuelMember@@UEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?ResetRound@TagMatchDuelTeam@@UEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?resetRound@TagMatchDuelManager@@EEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?getOppositeFightMember@TagMatchDuelManager@@AEBAQEBVTagMatchDuelMember@@H@Z")  // LIFT: dead-strip keep (no live caller yet)
 
 // 0x1d04b0
 bool __cdecl TagMatchDuelMember::ReadyRound(short &)
@@ -14,7 +25,22 @@ bool __cdecl TagMatchDuelMember::ReadyRound(short &)
 // 0x1d0560
 void __cdecl TagMatchDuelMember::ResetRound(void)
 {
-    LIFT_STUB(0x1d0560);
+    // Partial PDB offsets. DuelMember: _arenaPosition +24, _roundReady +28, _roundEntrance +29, _isDeported +30, _attackDamage +32.
+    // TagMatchDuelMember: _duelOrder +40, _spawnIndex +44, _takeTagTokenLimitTime +48, _duelSkillCount[2] +56.
+    // RuleConfig: _duelMaxTagSkillUsageCount +0x3B4, _duelMaxInterferenceSkillUsageCount +0x3B8.
+    ::GameDaemon *gamed = ::GameDaemon::GamedInstance;
+    char *self = reinterpret_cast<char *>(this);
+    *reinterpret_cast<int *>(self + 24) = 1;  // ARENAPOSITION_WAITING
+    self[28] = 0;
+    self[29] = 0;
+    self[30] = 0;
+    *reinterpret_cast<__int64 *>(self + 32) = 0;
+    self[40] = 0;
+    *reinterpret_cast<int *>(self + 44) = -1;
+    *reinterpret_cast<__int64 *>(self + 48) = 0;
+    const char *rule = reinterpret_cast<const char *>(gamed->ruleConfig);
+    *reinterpret_cast<int *>(self + 56) = *reinterpret_cast<const int *>(rule + 0x3B4);
+    *reinterpret_cast<int *>(self + 60) = *reinterpret_cast<const int *>(rule + 0x3B8);
 }
 
 // 0x1d05c0
@@ -44,7 +70,12 @@ void __cdecl TagMatchDuelTeam::onLeave(::DuelMember *const)
 // 0x1d0ae0
 void __cdecl TagMatchDuelTeam::ResetRound(void)
 {
-    LIFT_STUB(0x1d0ae0);
+    // Partial PDB offsets. DuelTeam::_teamAttackDamage +64. TagMatchDuelTeam: _fightMember +72, _tagTokenOwnerMember +80, _interferenceMember +88.
+    char *self = reinterpret_cast<char *>(this);
+    *reinterpret_cast<__int64 *>(self + 64) = 0;
+    *reinterpret_cast<void **>(self + 72) = nullptr;
+    *reinterpret_cast<void **>(self + 80) = nullptr;
+    *reinterpret_cast<void **>(self + 88) = nullptr;
 }
 
 // 0x1d0b00
@@ -144,9 +175,19 @@ void __cdecl TagMatchDuelManager::onEliminate(::DuelMember *const, ::TagMatchDue
 }
 
 // 0x1d46d0
-::TagMatchDuelMember const *const __cdecl TagMatchDuelManager::getOppositeFightMember(int) const
+::TagMatchDuelMember const *const __cdecl TagMatchDuelManager::getOppositeFightMember(int myTeamIndex) const
 {
-    LIFT_STUB(0x1d46d0);
+    // Partial PDB offsets. DuelManager::_teams[2] +40. TagMatchDuelTeam::_fightMember +72.
+    if (static_cast<unsigned int>(myTeamIndex) <= 1)
+    {
+        const char *const *teams = reinterpret_cast<const char *const *>(reinterpret_cast<const char *>(this) + 40);
+        return *reinterpret_cast< ::TagMatchDuelMember const *const *>(teams[myTeamIndex == 0] + 72);
+    }
+    Log::Write(Log::LT_ERROR, TAGMATCHDUELMANAGER_FILE, 995,
+               L"== CRASH == [duel], TagMatchDuelManager::getOppositeFightMember; invalid parameter, myTeamIndex:%d", myTeamIndex);
+    AlertSender::Write(TAGMATCHDUELMANAGER_FILE, 995,
+                       L"== CRASH == [duel], TagMatchDuelManager::getOppositeFightMember; invalid parameter, myTeamIndex:%d", myTeamIndex);
+    return nullptr;
 }
 
 // 0x1d4740
@@ -188,7 +229,10 @@ void __cdecl TagMatchDuelManager::rearrangeDuelMember(::DuelTeam *const)
 // 0x1d5570
 void __cdecl TagMatchDuelManager::resetRound(void)
 {
-    LIFT_STUB(0x1d5570);
+    // Partial PDB offsets. DuelManager::_lastAttackTeam +54146. TagMatchDuelManager::_interferenceBonusIndex +54448.
+    char *self = reinterpret_cast<char *>(this);
+    self[54146] = -1;
+    *reinterpret_cast<int *>(self + 54448) = 0;
 }
 
 // 0x1d5590

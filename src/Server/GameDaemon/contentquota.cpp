@@ -1,7 +1,13 @@
 // contentquota.cpp: contentquota.cpp (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
 #include "contentquota.h"
 #include "pc.h"
+#include "Memory.h"
 #include "LiftStub.h"
+
+#define CONTENTQUOTA_STLMEMORY_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\bloodlib\\include\\StlMemory.h"
+
+#pragma comment(linker, "/INCLUDE:??0ContentQuotaManager@@QEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?Top@ContentQuotaPriorityQueue@@QEAAPEAVContentQuota@@XZ")  // LIFT: dead-strip keep (no live caller yet)
 
 // 0x85060
 __cdecl ContentQuota::ContentQuota(void)
@@ -102,7 +108,25 @@ void __cdecl ContentQuotaPriorityQueue::Clear(void)
 // 0x86390
 __cdecl ContentQuotaManager::ContentQuotaManager(void)
 {
-    LIFT_STUB(0x86390);
+    // Partial PDB offsets of ContentQuotaManager:
+    //   _contentQuotaList (std::map) +0: _Myhead +8, _Mysize +16
+    //   _contentQuotaPQ +32: _quotaPQ.c._Myfirst +40, _Mylast +48, _Myend +56, comp +64
+    //   _owner +72
+    // The tree node is 48 bytes: _Left +0, _Parent +8, _Right +16, _Color +24, _Isnil +25.
+    char *self = reinterpret_cast<char *>(this);
+    *reinterpret_cast<unsigned __int64 *>(self + 16) = 0;
+    char *node = static_cast<char *>(Memory::_Manager[2]->Alloc(48, CONTENTQUOTA_STLMEMORY_FILE, 60));
+    *reinterpret_cast<char **>(self + 8) = node;
+    *reinterpret_cast<char **>(node) = node;
+    *reinterpret_cast<char **>(*reinterpret_cast<char **>(self + 8) + 8) = *reinterpret_cast<char **>(self + 8);
+    *reinterpret_cast<char **>(*reinterpret_cast<char **>(self + 8) + 16) = *reinterpret_cast<char **>(self + 8);
+    *(*reinterpret_cast<char **>(self + 8) + 24) = 1;
+    *(*reinterpret_cast<char **>(self + 8) + 25) = 1;
+    *reinterpret_cast<void **>(self + 40) = nullptr;
+    *reinterpret_cast<void **>(self + 48) = nullptr;
+    *reinterpret_cast<void **>(self + 56) = nullptr;
+    *(self + 64) = 0;
+    *reinterpret_cast<void **>(self + 72) = nullptr;
 }
 
 // 0x86410
@@ -282,5 +306,10 @@ void __cdecl ContentQuotaManager::FetchAllAccountContentQuota(::std::vector< ::A
 // 0x3fb920
 ::ContentQuota * __cdecl ContentQuotaPriorityQueue::Top(void)
 {
-    LIFT_STUB(0x3fb920);
+    // Partial PDB offsets: _quotaPQ.c._Myfirst +8, _Mylast +16.
+    ::ContentQuota *const *first = *reinterpret_cast< ::ContentQuota *const *const *>(reinterpret_cast<const char *>(this) + 8);
+    ::ContentQuota *const *last = *reinterpret_cast< ::ContentQuota *const *const *>(reinterpret_cast<const char *>(this) + 16);
+    if (first == last)
+        return nullptr;
+    return *first;
 }

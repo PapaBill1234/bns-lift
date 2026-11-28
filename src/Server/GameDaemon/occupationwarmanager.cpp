@@ -6,6 +6,8 @@
 #include "zone.h"
 #include "LiftStub.h"
 
+#pragma comment(linker, "/INCLUDE:?OnCanceledEnvManipulation@OccupationWarManager@@UEAAXPEAVEnv@@AEAVZoneEnv2RecordPtr@Data@@DD@Z")  // LIFT: dead-strip keep (no live caller yet)
+
 // 0x170b00
 bool __cdecl OccupationWarManager::Init(::Zone *, unsigned __int64)
 {
@@ -37,9 +39,12 @@ void __cdecl OccupationWarManager::OnEnvManipulated(::Pc *, ::Env *, ::Data::Zon
 }
 
 // 0x171500
-void __cdecl OccupationWarManager::OnCanceledEnvManipulation(::Env *, ::Data::ZoneEnv2RecordPtr &, char, char)
+void __cdecl OccupationWarManager::OnCanceledEnvManipulation(::Env *env, ::Data::ZoneEnv2RecordPtr &envData, char preState, char state)
 {
-    LIFT_STUB(0x171500);
+    // DrRecordPtr::_record is the only member (+0). It is protected, so read it through a cast.
+    const void *record = *reinterpret_cast<const void *const *>(&envData);
+    if (env != nullptr && record != nullptr && state >= 5 && state <= 8)
+        env->ChangeState(preState);
 }
 
 // 0x171540
