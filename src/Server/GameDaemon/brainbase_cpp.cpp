@@ -130,14 +130,9 @@ bool __cdecl BrainBase::ResetHateByIndex(int, wchar_t const *)
 }
 
 // 0x400d10
-#pragma comment(linker, "/INCLUDE:?ResetAllHates@BrainBase@@QEAAXPEB_W@Z")  // LIFT: dead-strip keep (no live caller yet)
 void __cdecl BrainBase::ResetAllHates(wchar_t const * reason)
 {
-    ::BrainBaseMemberView *self = reinterpret_cast< ::BrainBaseMemberView *>(this);
-    for (int i = 0; i < self->_hateMax; ++i)
-        ResetHateByIndex(i, reason);
-    self->_curTargetIndex = -1;
-    self->_hateTourValue = 0;
+    LIFT_STUB(0x400d10);
 }
 
 // 0x400d80

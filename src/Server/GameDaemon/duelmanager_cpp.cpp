@@ -115,19 +115,9 @@ bool __cdecl DuelTeam::IsTeamMember(::Pc const *const) const
 }
 
 // 0xb1860
-#pragma comment(linker, "/INCLUDE:?IsTeamMemberAllDead@DuelTeam@@QEBA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
 bool __cdecl DuelTeam::IsTeamMemberAllDead(void) const
 {
-    DuelTeamView const *self = reinterpret_cast<DuelTeamView const *>(this);
-    DuelTeamView::MemberNode const *head = self->_members._Myhead;
-    for (DuelTeamView::MemberNode const *it = head->_Next; it != head; it = it->_Next)
-    {
-        DuelMemberView const *member = it->_Myval;
-        // LIFT: DuelMember::IsRoundEntrance and Pc dead check are inlined in the original.
-        if (member->_roundEntrance && member->_pc->dead == 0)
-            return false;
-    }
-    return true;
+    LIFT_STUB(0xb1860);
 }
 
 // 0xb1890

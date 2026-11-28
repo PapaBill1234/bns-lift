@@ -69,3 +69,13 @@ The author did not run a build, the gate or funcdiff. The driver does them.
 - `PartyMatchQueue::push` (0x18b0e0): the skeleton class has no members. The body needs the PDB member `std::deque<Pc *, StlAllocator<Pc *, 2> > _queue[15]`, `Pc::_partyMatchQueueRegistered` and `RefCntObject::removeReferenceCount` on `Pc`.
 - `PartyMatchPoint::PartyMatchPoint` (0x18b1a0): the body constructs the inline `PartyMatchQueue` member (15 deques). The skeleton classes have no members. If you add them, the stub destructors change too, and `PartyMatchPoint` must get access to the protected `PartyMatchQueue` constructor and destructor.
 - `AchievementData::SendNewbieCareCompleteRegister` (0x34aa0): the skeleton has no `Packet` class, no static `_newbieCareCompletePacket` and no virtual `Pc::Send(Packet const *)`.
+
+## Round 4 repair
+
+Round 3 review rejected three bodies. They are back to `LIFT_STUB`. Their `/INCLUDE` pragmas are removed. The lists above that name them as lifted are out of date. These three are **Not done** now, for a later card:
+
+- `BrainBase::IsPeace` (0x34f040): review reject P2_cc (build `je`, original `jl`) and P9_ret_width.
+- `BrainBase::ResetAllHates` (0x400d10): review reject P1_calls (build `ind[+0x20]`, original `ind[+0x28]`).
+- `DuelTeam::IsTeamMemberAllDead` (0xb1860): review reject. The first load reads the list head from a different offset (original `[rcx+0x10]`).
+
+The other 21 accepted bodies are unchanged. Changed files: `brainbase_h.cpp`, `brainbase_cpp.cpp`, `duelmanager_cpp.cpp` and this handoff file.
