@@ -8,7 +8,6 @@
 
 #pragma comment(linker, "/INCLUDE:??0DrAliasMapImpl@@QEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:??1DrAliasMapImpl@@QEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?Find@DrAliasStringTable@@QEBA_NPEB_WPEA_K@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?ReadFromBuffer@DrAliasStringTable@@QEAA_NPEBE_K1_N@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?Build@DrAliasStringTable@@QEAA_NPEBUAliasArrayElement@DrAliasMapImpl@@H@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?allocElArray@DrAliasMapImpl@@AEAAXH@Z")  // LIFT: dead-strip keep (no live caller yet)
@@ -53,37 +52,8 @@ static inline void toUpperCopy(wchar_t * dst, wchar_t const * src, __int64 size)
 // 0x6f3430
 bool __cdecl DrAliasStringTable::Find(wchar_t const * alias, unsigned __int64 * key) const
 {
-    if (alias == nullptr)
-        return false;
-
-    wchar_t toupperBuffer[200] = { 0 };
-    toUpperCopy(toupperBuffer, alias, 200);
-
-    char ansiAlias[200] = { 0 };
-    WideCharToMultiByte(CP_ACP, 0, toupperBuffer, -1, ansiAlias, 200, nullptr, nullptr);
-
-    int low = 0;
-    int high = _elCount - 1;
-    while (low <= high)
-    {
-        int mid = (low + high) / 2;
-        int cmp = strcmp(_elArray[mid].alias, ansiAlias);
-        if (cmp < 0)
-        {
-            low = mid + 1;
-        }
-        else if (cmp > 0)
-        {
-            high = mid - 1;
-        }
-        else
-        {
-            if (key != nullptr)
-                *key = _elArray[mid].key;
-            return true;
-        }
-    }
-    return false;
+    // LIFT: review reject P2_cc (build jge, original je). A later card lifts it.
+    LIFT_STUB(0x6f3430);
 }
 
 // 0x6f3610

@@ -60,6 +60,15 @@
 - Fix: `defmemory.h` no longer declares the 2 derived dtors, and `defmemory_h.cpp` no longer defines them. The 2 classes keep the PDB base `DrHeapMemory`. No code constructs them, so the build emits no derived vftable.
 - All other lifted bodies have no change. This session could not run formtest (shell access was denied). The driver build is the proof.
 
+## Round 6 fix
+
+- Review rejected `DrAliasStringTable::Find` (0x6f3430): P2_cc (build `jge`, original `je`, index 2).
+- Fix: `Find` is a `LIFT_STUB` again. Its keep pragma is removed.
+
+### Not done
+
+- `DrAliasStringTable::Find` (0x6f3430): P2_cc reject in review. A later card lifts it.
+
 ## Open items
 
 - `DrAliasMapImpl::DrAliasMapImpl` (0x6f6450) stays DIFF (it was DIFF in the baseline). The class has no `DrAliasMap` base, so the vtable differs.
