@@ -482,6 +482,27 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"AutoCS::Enter": {
+"calls": 86,
+"consts": 0,
+"refs": 50,
+"score": 45.2,
+"status": "DIFF"
+},
+"AutoCS::Leave": {
+"calls": 86,
+"consts": 0,
+"refs": 50,
+"score": 45.2,
+"status": "DIFF"
+},
+"AutoSRW::~AutoSRW": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "BIT_initDStream": {
 "calls": 100,
 "consts": 100,
@@ -707,6 +728,41 @@
 "status": "MATCH"
 },
 "ClientOption::TypeId": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ClientSideDaemonChannel::initialize": {
+"calls": 80,
+"consts": 100,
+"refs": 50,
+"score": 76.7,
+"status": "DIFF"
+},
+"ClientSideHashedDaemonChannel::Send [?Send@ClientSideHashedDaemonChannel@@QEAA_N_KPEBDZZ]": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ClientSideHashedDaemonChannel::Send [?Send@ClientSideHashedDaemonChannel@@QEAA_N_KPEBVPacket@@@Z]": {
+"calls": 44,
+"consts": 100,
+"refs": 100,
+"score": 81.5,
+"status": "DIFF"
+},
+"ClientSideHashedDaemonChannel::initialize": {
+"calls": 80,
+"consts": 67,
+"refs": 50,
+"score": 65.6,
+"status": "DIFF"
+},
+"ClientSideHashedDaemonChannel::releaseSession": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -944,6 +1000,27 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Daemon::SetPublicAddressWithSetting": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DaemonChannel::Send [?Send@DaemonChannel@@QEAA_NPEBDZZ]": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DaemonChannel::Send [?Send@DaemonChannel@@QEAA_NPEBVPacketList@@@Z]": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "DashEffect::GetDataSubType": {
 "calls": 100,
 "consts": 100,
@@ -965,6 +1042,20 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"DelayedDelete::Cleanup": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DelayedRelease::DelayedRelease": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "DeleteCharacterTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
@@ -973,6 +1064,13 @@
 "status": "MATCH"
 },
 "DeleteEvent::EventId": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DeleteEvent::HandleEvent": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -2659,6 +2757,48 @@
 "score": 91.7,
 "status": "DIFF"
 },
+"Json::Reader::Reader": {
+"calls": 0,
+"consts": 80,
+"refs": 0,
+"score": 26.7,
+"status": "DIFF"
+},
+"Json::Value::CZString::operator<": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Json::Value::CZString::~CZString": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Json::Value::CommentInfo::~CommentInfo": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Json::Value::isInt": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Json::Value::isUInt64": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "LeadTheBallManager::Context1": {
 "calls": 100,
 "consts": 100,
@@ -2762,6 +2902,20 @@
 "consts": 100,
 "refs": 75,
 "score": 91.7,
+"status": "DIFF"
+},
+"LogArchiveSession::Close": {
+"calls": 100,
+"consts": 100,
+"refs": 50,
+"score": 83.3,
+"status": "DIFF"
+},
+"LogArchiveSession::~LogArchiveSession": {
+"calls": 100,
+"consts": 100,
+"refs": 67,
+"score": 88.9,
 "status": "DIFF"
 },
 "LogBuffer::Acquire": {
@@ -2965,6 +3119,13 @@
 "consts": 100,
 "refs": 0,
 "score": 66.7,
+"status": "DIFF"
+},
+"Network::GetAddressStringW": {
+"calls": 100,
+"consts": 80,
+"refs": 67,
+"score": 82.2,
 "status": "DIFF"
 },
 "NoneTargetSkillAction::SucceedTargetInfo": {
@@ -4212,6 +4373,13 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"ServerSideDaemonChannel::Initialize": {
+"calls": 44,
+"consts": 100,
+"refs": 75,
+"score": 73.1,
+"status": "DIFF"
 },
 "Session::Send [?Send@Session@@QEBAXPEBDZZ]": {
 "calls": 100,
