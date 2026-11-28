@@ -6,6 +6,27 @@
 #include "npc.h"
 #include "LiftStub.h"
 
+#define BRAINBASE_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\BrainBase.cpp"
+
+namespace
+{
+// LIFT: view of the PDB record Data::NpcRecord (alias at +0x10). The skeleton has no record members yet.
+struct BrainNpcRecordView
+{
+    char lift_pad_0[0x10];
+    wchar_t const *alias;         // +16 (0x10)
+};
+
+// LIFT: view of Npc (PDB: GameObject::Id at +0x28, Npc::_data (Data::NpcRecordPtr) at +0xC50).
+struct BrainNpcView
+{
+    char lift_pad_0[0x28];
+    unsigned __int64 Id;          // +40 (0x28)
+    char lift_pad_1[0xC50 - 0x30];
+    BrainNpcRecordView *_data;    // +3152 (0xC50)
+};
+}
+
 // 0x3feee0
 __cdecl BrainBase::BrainBase(::Npc &, ::BrainBase::TransitionTable &, ::Data::NpcBrainType, char)
 {
@@ -13,9 +34,9 @@ __cdecl BrainBase::BrainBase(::Npc &, ::BrainBase::TransitionTable &, ::Data::Np
 }
 
 // 0x3fefc0
+#pragma comment(linker, "/INCLUDE:??1BrainBase@@MEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
 __cdecl BrainBase::~BrainBase(void)
 {
-    LIFT_STUB(0x3fefc0);
 }
 
 // 0x3fefd0
@@ -109,9 +130,14 @@ bool __cdecl BrainBase::ResetHateByIndex(int, wchar_t const *)
 }
 
 // 0x400d10
-void __cdecl BrainBase::ResetAllHates(wchar_t const *)
+#pragma comment(linker, "/INCLUDE:?ResetAllHates@BrainBase@@QEAAXPEB_W@Z")  // LIFT: dead-strip keep (no live caller yet)
+void __cdecl BrainBase::ResetAllHates(wchar_t const * reason)
 {
-    LIFT_STUB(0x400d10);
+    ::BrainBaseMemberView *self = reinterpret_cast< ::BrainBaseMemberView *>(this);
+    for (int i = 0; i < self->_hateMax; ++i)
+        ResetHateByIndex(i, reason);
+    self->_curTargetIndex = -1;
+    self->_hateTourValue = 0;
 }
 
 // 0x400d80
@@ -235,15 +261,35 @@ void __cdecl BrainBase::traceHate(wchar_t *, ...)
 }
 
 // 0x402910
-void __cdecl BrainBase::pushState(::BrainConst::State)
+#pragma comment(linker, "/INCLUDE:?pushState@BrainBase@@AEAAXW4State@BrainConst@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+void __cdecl BrainBase::pushState(::BrainConst::State state)
 {
-    LIFT_STUB(0x402910);
+    ::BrainBaseMemberView *self = reinterpret_cast< ::BrainBaseMemberView *>(this);
+    if (++self->_top >= 16)
+    {
+        BrainNpcView *npc = reinterpret_cast<BrainNpcView *>(self->_npc);
+        Log::Write(Log::LT_ERROR, BRAINBASE_FILE, 1910, L"[brain], invalid brain stack; brain stack overflow, npc-id:0x%I64x, npc-alias:%s",
+                   npc->Id, npc->_data->alias);
+        self->_top = 0;
+        self->_stack[0] = ::BrainConst::STATE_SPAWN;
+    }
+    self->_stack[self->_top] = state;
 }
 
 // 0x4029a0
-::BrainConst::State __cdecl BrainBase::popState(::BrainConst::State)
+#pragma comment(linker, "/INCLUDE:?popState@BrainBase@@AEAA?AW4State@BrainConst@@W423@@Z")  // LIFT: dead-strip keep (no live caller yet)
+::BrainConst::State __cdecl BrainBase::popState(::BrainConst::State def)
 {
-    LIFT_STUB(0x4029a0);
+    ::BrainBaseMemberView *self = reinterpret_cast< ::BrainBaseMemberView *>(this);
+    if (--self->_top < 0)
+    {
+        BrainNpcView *npc = reinterpret_cast<BrainNpcView *>(self->_npc);
+        Log::Write(Log::LT_ERROR, BRAINBASE_FILE, 1922, L"[brain], invalid brain stack; brain stack underflow, npc-id:0x%I64x, npc-alias:%s",
+                   npc->Id, npc->_data->alias);
+        self->_top = 0;
+        self->_stack[0] = def;
+    }
+    return self->_stack[self->_top];
 }
 
 // 0x402a20

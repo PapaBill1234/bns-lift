@@ -66,6 +66,7 @@ bool __cdecl CombatSequence::CheckLOS(::Zone *, ::vector16, ::vector16, int)
 // 0x4059c0
 static bool isSufficentHpCondition(Creature*, const char)
 {
+    // LIFT: Not done. ❓ HP_PERCENT_COND_TABLE (20 entries) is not declared and its values are not known.
     LIFT_STUB(0x4059c0);
 }
 
@@ -174,6 +175,7 @@ bool __cdecl CombatSequence::fireSpecial(::BrainBase &, ::Creature *)
 // 0x407c80
 char __cdecl CombatSequence::checkSpecialFired(::Npc &, char, __int64, ::ScriptEvent &)
 {
+    // LIFT: Not done. The pseudocode cache has no body for this function.
     LIFT_STUB(0x407c80);
 }
 

@@ -12,6 +12,7 @@ void __cdecl AchievementData::MakeNewbieCareCompletePacket(void)
 // 0x34aa0
 void __cdecl AchievementData::SendNewbieCareCompleteRegister(::Pc *)
 {
+    // LIFT: Not done. The skeleton has no Packet class (inline ctor, Copy, Clear), no static _newbieCareCompletePacket and no virtual Pc::Send(Packet const *).
     LIFT_STUB(0x34aa0);
 }
 
