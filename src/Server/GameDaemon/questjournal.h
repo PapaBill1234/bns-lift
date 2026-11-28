@@ -294,6 +294,34 @@ private:
     bool __cdecl completeJumpingQuest(::QuestJournal::QuestRequestInfo const &, ::Quest const *, ::QuestJournal::RewardList &, ::QuestJournal::RequestFromType);  // 0x588330
     void __cdecl checkRewardForJumpingCharacter(unsigned short, unsigned __int64 *const, int, ::QuestJournal::RewardList &);  // 0x5885e0
     void __cdecl giveSkillForJumpingCharacter(::QuestJournal::RewardList &);  // 0x588760
+private:
+    // PDB layout (size 0x9A8).
+    ::Pc *_owner;  // +0x0
+    short _questCount;  // +0x8
+    short _epicQuestCount;  // +0xA
+    short _normalQuestCount;  // +0xC
+    short _jobQuestCount;  // +0xE
+    short _unbindDungeonQuestCount;  // +0x10
+    short _bindDungeonQuestCount;  // +0x12
+    short _attractionQuestCount;  // +0x14
+    short _simpleQuestCount;  // +0x16
+    short _tendencyQuestCount;  // +0x18
+    short _mentoringQuestCount;  // +0x1A
+    short _effectQuestCount;  // +0x1C
+    ::OpenQuest *_openQuests[67];  // +0x20
+    char _completes[0x8b8 - 0x238];  // +0x238 (LIFT: PDB type QuestList, layout not declared yet)
+    short _leaveZoneRollbackCount;  // +0x8B8
+    int _leaveZoneRollbackQuestIdxs[3];  // +0x8BC
+    int _unbindDungeonQuestIdxs[1];  // +0x8C8
+    int _duelQuestIdxs[35];  // +0x8CC
+    short _duelQuestCount;  // +0x958
+    int _attractionQuestIdxs[5];  // +0x95C
+    int _simpleQuestIdxs[5];  // +0x970
+    int _tendencyQuestIdxs[3];  // +0x984
+    int _epicQuestIdx;  // +0x990
+    int _dailyQuestCount;  // +0x994
+    int _weeklyQuestCount;  // +0x998
+    long long _completionTimeDeleteTime;  // +0x9A0
 };
 
 struct QuestJournal::RewardList

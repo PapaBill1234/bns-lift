@@ -3,6 +3,14 @@
 #include "inventory.h"
 #include "questlist.h"
 #include "LiftStub.h"
+#include "Log.h"
+
+#pragma comment(linker, "/INCLUDE:?validateQuestId@QuestJournal@@CA_NG@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?isScriptableCase@QuestJournal@@AEAA_NF@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?RemoveLeaveZoneRollbackQuestIndex@QuestJournal@@QEAA_NH@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?removeAttrationQuest@QuestJournal@@AEAA_NH@Z")  // LIFT: dead-strip keep (no live caller yet)
+
+#define QUESTJOURNAL_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\QuestJournal.cpp"
 
 // 0x572fa0
 bool __cdecl QuestJournal::IsRewardRestrictedCase(::QuestCase const &)
@@ -11,15 +19,39 @@ bool __cdecl QuestJournal::IsRewardRestrictedCase(::QuestCase const &)
 }
 
 // 0x573010
-bool __cdecl QuestJournal::validateQuestId(unsigned short)
+bool __cdecl QuestJournal::validateQuestId(unsigned short questId)
 {
-    LIFT_STUB(0x573010);
+    if ((questId >= 1 && questId <= 2000)
+        || (questId >= 20000 && questId <= 23000)
+        || (questId >= 25000 && questId <= 25300)
+        || (questId >= 28000 && questId <= 29999))
+    {
+        return true;
+    }
+
+    Log::Write(Log::LT_ERROR, QUESTJOURNAL_FILE, 10096, L"[quest], invalid quest id, quest:%d", questId);
+    return false;
 }
 
 // 0x5730a0
-bool __cdecl QuestJournal::isScriptableCase(short)
+bool __cdecl QuestJournal::isScriptableCase(short caseType)
 {
-    LIFT_STUB(0x5730a0);
+    switch (caseType)
+    {
+    case 0:
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+    case 8:
+    case 10:
+    case 11:
+    case 17:
+    case 18:
+        return true;
+    default:
+        return false;
+    }
 }
 
 // 0x5730f0
@@ -443,9 +475,19 @@ bool __cdecl QuestJournal::AddLeaveZoneRollbackQuestIndex(int)
 }
 
 // 0x581080
-bool __cdecl QuestJournal::RemoveLeaveZoneRollbackQuestIndex(int)
+bool __cdecl QuestJournal::RemoveLeaveZoneRollbackQuestIndex(int questIndex)
 {
-    LIFT_STUB(0x581080);
+    for (int i = 0; i < _leaveZoneRollbackCount; ++i)
+    {
+        if (_leaveZoneRollbackQuestIdxs[i] == questIndex)
+        {
+            if (i < _leaveZoneRollbackCount - 1)
+                _leaveZoneRollbackQuestIdxs[i] = _leaveZoneRollbackQuestIdxs[_leaveZoneRollbackCount - 1];
+            --_leaveZoneRollbackCount;
+            break;
+        }
+    }
+    return true;
 }
 
 // 0x5810f0
@@ -539,9 +581,20 @@ bool __cdecl QuestJournal::checkDuelCurrentStraightWin(char, char, int, ::QuestJ
 }
 
 // 0x583ce0
-bool __cdecl QuestJournal::removeAttrationQuest(int)
+bool __cdecl QuestJournal::removeAttrationQuest(int questIndex)
 {
-    LIFT_STUB(0x583ce0);
+    int last = _attractionQuestCount - 1;
+    for (int i = last; i >= 0; --i)
+    {
+        if (_attractionQuestIdxs[i] == questIndex)
+        {
+            if (i < last)
+                _attractionQuestIdxs[i] = _attractionQuestIdxs[last];
+            --_attractionQuestCount;
+            break;
+        }
+    }
+    return true;
 }
 
 // 0x583d40
