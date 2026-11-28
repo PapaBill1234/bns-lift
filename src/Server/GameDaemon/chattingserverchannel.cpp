@@ -2,6 +2,11 @@
 #include "chattingserverchannel.h"
 #include "pc.h"
 #include "LiftStub.h"
+#include "Packet.h"
+#include "Log.h"
+
+// LIFT: per-exe path literal (lessons A6).
+#define CHATTINGSERVERCHANNEL_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\ChattingServerChannel.cpp"
 
 // 0x76ca0
 __cdecl ChattingServerChannel::~ChattingServerChannel(void)
@@ -40,9 +45,16 @@ bool __cdecl HandleChattingGame_A2G_AUTHENTICATE_USERNotify(::Session const *, :
 }
 
 // 0x77250
-bool __cdecl HandleChattingGame_A2G_PROTOCOL_VERSIONNotify(::Session const *, ::Packet const *)
+#pragma comment(linker, "/INCLUDE:?HandleChattingGame_A2G_PROTOCOL_VERSIONNotify@@YA_NPEBVSession@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+bool __cdecl HandleChattingGame_A2G_PROTOCOL_VERSIONNotify(::Session const *, ::Packet const * packet)
 {
-    LIFT_STUB(0x77250);
+    short c;
+    int protocolVersion;
+    packet->Decompose("hi", &c, &protocolVersion);
+    Log::Write(Log::LT_DEBUG, CHATTINGSERVERCHANNEL_FILE, 179,
+               L"[chatting-channel], HandleChattingGame_A2G_PROTOCOL_VERSIONNotify, protocolVersion :%d",
+               protocolVersion);
+    return true;
 }
 
 // 0x772a0

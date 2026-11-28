@@ -425,16 +425,17 @@ static int GenerateDump(_EXCEPTION_POINTERS*, bool)
 
 // 0x3438f0
 #pragma comment(linker, "/INCLUDE:?WriteDump@GameDaemon@@SAX_N@Z")  // LIFT: dead-strip keep (no live caller yet)
-void __cdecl GameDaemon::WriteDump(bool fullMemory)
+void __cdecl GameDaemon::WriteDump(bool /*fullMemory*/)
 {
     // The original raises an access violation and writes the dump in the filter (filt$0, 0x702a30, line 4357).
-    // LIFT: the original filter does not load fullMemory (GenerateDump does not use it; the 2019 build drops the
-    // argument). The repo build spills fullMemory to its home slot. That is the one remaining difference.
+    // LIFT: the original filter does not load fullMemory (GenerateDump does not use it). The body does not
+    // read the argument, so the build does not spill it. RaiseException gets all 4 arguments (r8 = r9 = 0).
+    // ❓ the source maybe passed fullMemory; the 2019 build gives no load of it.
     __try
     {
         RaiseException(0xC0000005, 1, 0, NULL);
     }
-    __except (GenerateDump(GetExceptionInformation(), fullMemory))
+    __except (GenerateDump(GetExceptionInformation(), false))
     {
     }
 }

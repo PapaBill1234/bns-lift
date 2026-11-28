@@ -1,6 +1,10 @@
 // managementdchannel.cpp: managementdchannel.cpp (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
 #include "managementdchannel.h"
 #include "LiftStub.h"
+#include "Log.h"
+
+// LIFT: per-exe path literal (lessons A6).
+#define MANAGEMENTDCHANNEL_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\ManagementdChannel.cpp"
 
 // 0x156b70
 __cdecl ManagementdChannel::~ManagementdChannel(void)
@@ -15,9 +19,11 @@ bool __cdecl ManagementdChannel::PacketHandler(::Session const *, ::Packet const
 }
 
 // 0x156be0
+#pragma comment(linker, "/INCLUDE:?onCloseAll@ManagementdChannel@@MEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
 bool __cdecl ManagementdChannel::onCloseAll(void)
 {
-    LIFT_STUB(0x156be0);
+    Log::Write(Log::LT_ERROR, MANAGEMENTDCHANNEL_FILE, 43, L"[managementd channel], all gamed session closed");
+    return true;
 }
 
 // 0x156c10
