@@ -10,5 +10,13 @@ public:
     bool __cdecl IsAuthorizedMember(unsigned __int64) const;  // 0x16d9c0
     bool __cdecl Buy(unsigned __int64, char);  // 0x16da10
     bool __cdecl SendItemList(::Pc *) const;  // 0x16dac0
+private:
+    // PDB layout of MysteriousStore (size 0x1C0).
+    ::Npc *_owner;  // +0x0
+    unsigned __int64 _authorizedPcdbid[24];  // +0x8
+    unsigned __int64 _boughtItemId[24];  // +0xC8
+    char _boughtItemIndex[24];  // +0x188
+    bool _alreadyBought[24];  // +0x1A0
+    void *_itemGroupData;  // +0x1B8 LIFT: Data::MysteriousStoreItemGroupRecordPtr view
 };
 

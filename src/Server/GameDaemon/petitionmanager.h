@@ -3,13 +3,24 @@
 #pragma once
 #include "GameDaemonFwd.h"
 
-class Petition
+class Petition : public ::DynamicRefCntObj
 {
 public:
     __cdecl Petition(void);  // 0x18f8d0
     bool __cdecl Submit(__int64, wchar_t const *);  // 0x18f970
     bool __cdecl Accept(int);  // 0x18fa50
     bool __cdecl CheckOut(__int64, wchar_t const *);  // 0x18fa90
+private:
+    // PDB layout of Petition (size 0x110).
+    int _id;  // +0x18
+    int _state;  // +0x1C
+    __int64 _pcDbId;  // +0x20
+    wchar_t _pcName[33];  // +0x28
+    __int64 _reqPcDbId;  // +0x70
+    wchar_t _reqPcName[33];  // +0x78
+    __int64 _gmPcDbId;  // +0xC0
+    wchar_t _gmPcName[33];  // +0xC8
+    bool _forced;  // +0x10A
 };
 
 class PetitionManager

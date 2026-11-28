@@ -2,6 +2,13 @@
 #include "guildcraft.h"
 #include "LiftStub.h"
 
+static_assert(sizeof(GuildCraft) == 0x1848, "sizeof GuildCraft");
+
+#pragma comment(linker, "/INCLUDE:?GetAsseintGuildCraftQuota@GuildCraft@@QEAADD@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?MakeGuildCraft@GuildCraft@@QEAAXHFH_J0@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?EnableDonationGuildCraft@GuildCraft@@QEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?IsCompletedGuildCraftDonation@GuildCraft@@QEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+
 // 0x1133d0
 __cdecl GuildCraft::GuildCraft(void)
 {
@@ -63,9 +70,20 @@ short __cdecl GuildCraft::EnableAssentGuildCraft(unsigned __int64, char, short)
 }
 
 // 0x114960
-char __cdecl GuildCraft::GetAsseintGuildCraftQuota(char)
+char __cdecl GuildCraft::GetAsseintGuildCraftQuota(char productionType)
 {
-    LIFT_STUB(0x114960);
+    char quota = 0;
+    AcquireSRWLockShared(&_srwLock);
+    for (int i = 0; i < 7; ++i)
+    {
+        if (_assentients[i].productionType == productionType)
+        {
+            quota = _assentients[i].quota;
+            break;
+        }
+    }
+    ReleaseSRWLockShared(&_srwLock);
+    return quota;
 }
 
 // 0x1149f0
@@ -81,15 +99,26 @@ bool __cdecl GuildCraft::EnableMakeGuildCraft(char, ::GuildCraft::Product &)
 }
 
 // 0x114b90
-void __cdecl GuildCraft::MakeGuildCraft(int, short, int, __int64, __int64)
+void __cdecl GuildCraft::MakeGuildCraft(int productDataId, short productLevel, int productTotalAmount, __int64 startTime, __int64 endTime)
 {
-    LIFT_STUB(0x114b90);
+    AcquireSRWLockExclusive(&_srwLock);
+    _state = 3;  // ❓ PDB enumerator name of the craft state is not looked up.
+    _startTime = startTime;
+    _productDataId = productDataId;
+    _productLevel = productLevel;
+    _productTotalAmount = productTotalAmount;
+    _productRemainAmount = productTotalAmount;
+    _endTime = endTime;
+    ReleaseSRWLockExclusive(&_srwLock);
 }
 
 // 0x114c30
 bool __cdecl GuildCraft::EnableDonationGuildCraft(void)
 {
-    LIFT_STUB(0x114c30);
+    AcquireSRWLockShared(&_srwLock);
+    bool enable = _state == 1;  // ❓ PDB enumerator name of the craft state is not looked up.
+    ReleaseSRWLockShared(&_srwLock);
+    return enable;
 }
 
 // 0x114c80
@@ -137,7 +166,16 @@ unsigned __int64 __cdecl GuildCraft::AddDonationBrandMaterial(unsigned int, char
 // 0x115190
 bool __cdecl GuildCraft::IsCompletedGuildCraftDonation(void)
 {
-    LIFT_STUB(0x115190);
+    bool completed = false;
+    AcquireSRWLockExclusive(&_srwLock);
+    if (_assentientsCount == _assentientsCompletedCount && _normalMaterialsCount == _normalMaterialsCompletedCount &&
+        _brandMaterialsCount == _brandMaterialsCompletedCount)
+    {
+        _state = 2;  // ❓ PDB enumerator name of the craft state is not looked up.
+        completed = true;
+    }
+    ReleaseSRWLockExclusive(&_srwLock);
+    return completed;
 }
 
 // 0x115210

@@ -3,6 +3,23 @@
 #pragma once
 #include "GameDaemonFwd.h"
 
+// PDB class ClientSessionData (GameDaemon, size 0x20). The constructor is inlined in ClientSessionHandler::OnAccept.
+class ClientSessionData
+{
+public:
+    ClientSessionData()
+    {
+        _lastRequestTime[0] = 0;
+        _lastRequestTime[1] = 0;
+        _lastArenaSpectateUpdateTime[0] = 0;
+        _lastArenaSpectateUpdateTime[1] = 0;
+    }
+private:
+    __int64 _lastRequestTime[2];  // +0x0
+    __int64 _lastArenaSpectateUpdateTime[2];  // +0x10
+};
+static_assert(sizeof(ClientSessionData) == 0x20, "sizeof ClientSessionData");
+
 class ClientSessionHandler
 {
 public:

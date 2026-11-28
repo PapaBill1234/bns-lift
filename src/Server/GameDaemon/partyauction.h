@@ -27,10 +27,28 @@ private:
     virtual void __cdecl start(void);  // 0x176050
 };
 
-class PartyAuction
+class PartyAuction : public ::RefCntObject
 {
 public:
-    struct AuctionItem {};
+    struct AuctionItem
+    {
+        __int64 dataKey;  // +0
+        short count;  // +8
+        char additionalInfo;  // +10
+        char index;  // +11
+        char page;  // +12
+        bool finish;  // +13
+    };
+    struct AuctionMember
+    {
+        ::Pc *pc;  // +0
+        bool pass;  // +8
+        char page;  // +9
+    };
+public:
+    virtual ~PartyAuction();  // LIFT: declared for the PDB vtable; the body is in a later card
+private:
+    virtual void deallocate_me(void *, wchar_t const *, int);  // LIFT: PDB override; the body is in a later card
 public:
     bool __cdecl Initialize(::PartyAuction::AuctionItem *const, char, __int64, unsigned __int64, unsigned __int64, __int64, __int64, __int64, ::PartyPickupRule);  // 0x171a20
     bool __cdecl Enter(::Pc **const, char);  // 0x171b70
@@ -55,6 +73,25 @@ private:
 public:
     short __cdecl GiveUpCurrrentItem(::Pc *, char);  // 0x175050
     bool __cdecl DistributionCurrentItem(unsigned __int64, ::TeamPartyProxy *);  // 0x175430
+private:
+    // PDB layout of PartyAuction (size 0x1D8).
+    ::PartyAuction::AuctionItem _auctionItems[16];  // +0x18
+    char _auctionitemCount;  // +0x118
+    char _currentAuctionIndex;  // +0x119
+    bool _currentAuctionFinish;  // +0x11A
+    __int64 _currentAuctionLimitTime;  // +0x120
+    long _currnetAuctionDuration;  // +0x128
+    __int64 _currentItemPrice;  // +0x130
+    __int64 _currentItemBiddingMember;  // +0x138
+    __int64 _emcee;  // +0x140
+    __int64 _partyId;  // +0x148
+    __int64 _zoneId;  // +0x150
+    __int64 _targetId;  // +0x158
+    __int64 _partyOptionStartPrice;  // +0x160
+    int _partyOptionPickupRule;  // +0x168 LIFT: PartyPickupRule view
+    char _page;  // +0x16C
+    ::PartyAuction::AuctionMember _members[6];  // +0x170
+    char _memberCount;  // +0x1D0
 };
 
 class PassPartyAuctionTask

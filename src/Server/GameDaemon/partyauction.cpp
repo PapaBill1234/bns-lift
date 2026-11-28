@@ -3,6 +3,11 @@
 #include "pc.h"
 #include "LiftStub.h"
 
+static_assert(sizeof(PartyAuction) == 0x1D8, "sizeof PartyAuction");
+
+#pragma comment(linker, "/INCLUDE:?nextStep@PartyAuction@@AEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?checkAuth@PartyAuction@@AEAA_NH@Z")  // LIFT: dead-strip keep (no live caller yet)
+
 // 0x171a20
 bool __cdecl PartyAuction::Initialize(::PartyAuction::AuctionItem *const, char, __int64, unsigned __int64, unsigned __int64, __int64, __int64, __int64, ::PartyPickupRule)
 {
@@ -48,7 +53,24 @@ bool __cdecl PartyAuction::startAuction(::TeamPartyProxy *)
 // 0x173570
 bool __cdecl PartyAuction::nextStep(void)
 {
-    LIFT_STUB(0x173570);
+    // LIFT: the loop below is PartyAuction::isFinish, inlined in the original.
+    bool finish = true;
+    for (int i = 0; i < _auctionitemCount; ++i)
+    {
+        if (!_auctionItems[i].finish)
+        {
+            finish = false;
+            break;
+        }
+    }
+    if (finish)
+        return false;
+
+    do
+    {
+        _currentAuctionIndex = static_cast<char>((_currentAuctionIndex + 1) % _auctionitemCount);
+    } while (_auctionItems[_currentAuctionIndex].finish);
+    return true;
 }
 
 // 0x1735e0
@@ -64,9 +86,13 @@ void __cdecl PartyAuction::sendSelectPacket(void)
 }
 
 // 0x1736c0
-bool __cdecl PartyAuction::checkAuth(int)
+bool __cdecl PartyAuction::checkAuth(int memberIndex)
 {
-    LIFT_STUB(0x1736c0);
+    if (memberIndex < 0 || memberIndex >= _memberCount)
+        return false;
+    if (_members[memberIndex].pc == nullptr)
+        return false;
+    return _auctionItems[_currentAuctionIndex].page >= _members[memberIndex].page;
 }
 
 // 0x173710
