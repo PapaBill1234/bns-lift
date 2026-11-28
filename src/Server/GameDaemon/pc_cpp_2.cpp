@@ -26,7 +26,6 @@
 #pragma comment(linker, "/INCLUDE:?SetGameGameMode@Pc@@QEAAXD@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?GetGameGameMode@Pc@@QEBA?BDXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?GetArenaAttraction@Pc@@QEBADXZ")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?SetIpAddress@Pc@@QEAAXK@Z")  // LIFT: dead-strip keep (no live caller yet)
 
 namespace
 {
@@ -598,18 +597,9 @@ void __cdecl Pc::GetGameAccountId(int, wchar_t *const)
 }
 
 // 0x5f0f00
-void __cdecl Pc::SetIpAddress(unsigned long ip)
+void __cdecl Pc::SetIpAddress(unsigned long)
 {
-    PcView *self = reinterpret_cast<PcView *>(this);
-    if (self->_ipAddress != 0)
-    {
-        Log::Write(Log::LT_ERROR,
-                   L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\Pc.cpp",
-                   10589, L"[pc], %s; ip address already set. pc:%I64x, ip:%s, new ip:%s", L"Pc::SetIpAddress", self->Id,
-                   Network::GetAddressStringW(self->_ipAddress), Network::GetAddressStringW(ip));
-        return;
-    }
-    self->_ipAddress = ip;
+    LIFT_STUB(0x5f0f00);
 }
 
 // 0x5f0f90

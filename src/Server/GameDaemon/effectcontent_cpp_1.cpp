@@ -3,20 +3,14 @@
 #include "creature.h"
 #include "zone.h"
 #include "Log.h"
-#include "AlertSender.h"
 #include "LiftStub.h"
 
 #pragma comment(linker, "/INCLUDE:?checkApply@HpDamageEffect@@EEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?checkApply@InitializeRecycleGroupEffect@@EEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?checkApply@AdditionalHpEffect@@EEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?checkApply@DesireIncreaseEffect@@EEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?checkApply@DifficultyTypeDispelAttributeHpDamageEffect@@EEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?checkApply@ReturnSimSkillEffect@@EEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?checkApply@ModifyRecycleTimeEffect@@EEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?checkApply@SetImmuneBreakerEffect@@EEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
-
-// Path literal of EffectContent.cpp in the GameDaemon build (lessons A6).
-#define EFFECTCONTENT_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\EffectContent.cpp"
 
 namespace
 {
@@ -387,9 +381,7 @@ void __cdecl SetMinHateEffect::apply(void)
 // 0x5bf850
 bool __cdecl DifficultyTypeDispelAttributeHpDamageEffect::checkApply(void)
 {
-    EffectView const *self = liftEffect(this);
-    __int64 type = liftIdType(self->target->Id);
-    return (type == 1 || type == 2 || type == 4 || type == 240 || type == 241) && liftIdType(self->casterId) == 4;
+    LIFT_STUB(0x5bf850);
 }
 
 // 0x5bf890
@@ -648,15 +640,7 @@ void __cdecl InitializeRecycleGroupEffect::apply(void)
 // 0x5c6200
 bool __cdecl ModifyRecycleTimeEffect::checkApply(void)
 {
-    GameObjectView const *target = liftEffect(this)->target;
-    if (target == nullptr)
-    {
-        Log::Write(Log::LT_ERROR, EFFECTCONTENT_FILE, 5495, L"== CRASH == [effect], ModifyRecycleTimeEffect::checkApply; target is null");
-        AlertSender::Write(EFFECTCONTENT_FILE, 5495, L"== CRASH == [effect], ModifyRecycleTimeEffect::checkApply; target is null");
-        return false;
-    }
-    __int64 type = liftIdType(target->Id);
-    return type == 1 || type == 2 || type == 3 || type == 240 || type == 241;
+    LIFT_STUB(0x5c6200);
 }
 
 // 0x5c6280

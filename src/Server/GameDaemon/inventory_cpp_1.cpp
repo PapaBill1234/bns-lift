@@ -8,7 +8,6 @@
 
 #pragma comment(linker, "/INCLUDE:?AddChange@InventoryCacheUpdate@@QEAAXPEBVItem@@@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?IsActivatedGemSlot@Inventory@@SA_NI@Z")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?GetItemClass@Inventory@@SA?AW4ItemClass@@F@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?Dispose@Inventory@@QEAA_NGFW4ItemReason@@@Z")  // LIFT: dead-strip keep (no live caller yet)
 
 // 0x4be600
@@ -189,27 +188,9 @@ void __cdecl Inventory::InvokeEquipEffect(void)
 }
 
 // 0x4c10d0
-::ItemClass __cdecl Inventory::GetItemClass(short subtype)
+::ItemClass __cdecl Inventory::GetItemClass(short)
 {
-    switch (subtype)
-    {
-    case 0:
-        return ITEMCLASS_WEAPON;
-    case 1:
-        return ITEMCLASS_COSTUME;
-    case 2:
-        return ITEMCLASS_GROCERY;
-    case 3:
-        return ITEMCLASS_GEM;
-    case 4:
-        return ITEMCLASS_ACCESSORY;
-    default:
-        break;
-    }
-    Log::Write(Log::LT_ERROR,
-               L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\Inventory.cpp", 1210,
-               L"[inventory], GetItemClass, invalid subtype %d", subtype);
-    return ITEMCLASS_NONE;
+    LIFT_STUB(0x4c10d0);
 }
 
 // 0x4c1150

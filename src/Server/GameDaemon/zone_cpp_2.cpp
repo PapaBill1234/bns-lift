@@ -10,7 +10,6 @@
 #include "Log.h"
 #include "LiftStub.h"
 
-#pragma comment(linker, "/INCLUDE:?GetTickTime@Zone@@QEAA_JXZ")  // LIFT: dead-strip keep (no live caller yet)
 
 namespace
 {
@@ -639,11 +638,5 @@ void __cdecl Zone::makeCubeChangedPropertyAction(::ZoneBroadcastCube *)
 // 0x24ae90
 __int64 __cdecl Zone::GetTickTime(void)
 {
-    ZoneTickView const *self = reinterpret_cast<ZoneTickView const *>(this);
-    if (self->_zoneSerializer != nullptr)
-        return self->TimerInterval * self->_zoneSerializer->_timer->_currentTick;
-    Log::Write(Log::LT_ERROR,
-               L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\Zone.cpp", 9941,
-               L"[zone], GetTickTime() failed; crash serializer is null, zone:%p, id:%#I64x", this, self->Id);
-    return 0;
+    LIFT_STUB(0x24ae90);
 }
