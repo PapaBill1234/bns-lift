@@ -1,19 +1,6 @@
 // defmemory.h: defmemory.cpp, defmemory.h (GameDaemon PDB, 2019 + PDB).
-// LIFT: DrBaseDynamicMemory and DrBaseStaticMemory have no members yet. Later waves add the PDB layouts.
 #pragma once
 #include "GameDaemonFwd.h"
-
-class DrBaseDynamicMemory
-{
-public:
-    static ::DrBaseDynamicMemory * __cdecl Instance(void);  // 0x6ecff0
-};
-
-class DrBaseStaticMemory
-{
-public:
-    static ::DrBaseStaticMemory * __cdecl Instance(void);  // 0x6ecf90
-};
 
 // PDB layout (size 0x10): base DrMemory, heap at +8.
 class DrHeapMemory : public DrMemory
@@ -27,6 +14,23 @@ public:
 protected:
     void * heap;
 };
+
+// PDB layout (size 0x10): base DrHeapMemory, no own members.
+class DrBaseDynamicMemory : public DrHeapMemory
+{
+public:
+    static ::DrBaseDynamicMemory * __cdecl Instance(void);  // 0x6ecff0
+};
+
+// PDB layout (size 0x10): base DrHeapMemory, no own members.
+class DrBaseStaticMemory : public DrHeapMemory
+{
+public:
+    static ::DrBaseStaticMemory * __cdecl Instance(void);  // 0x6ecf90
+};
+
+// LIFT: per-exe path literal of the 2019 build (lessons A6).
+#define DR_DEFMEMORY_FILE L"e:\\dailybuild02\\platformbinary-common-0.0.346\\depot\\branch\\346nc\\program\\library\\datareader\\src\\DefMemory.h"
 
 // PDB layout (size 0x8): base DrMemory, static memory[2].
 class DrMemoryManager : public DrMemory

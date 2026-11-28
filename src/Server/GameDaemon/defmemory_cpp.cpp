@@ -1,6 +1,5 @@
 // defmemory_cpp.cpp: defmemory.cpp (GameDaemon PDB, 2019 + PDB).
 #include "defmemory.h"
-#include "LiftStub.h"
 
 #pragma comment(linker, "/INCLUDE:?SetupMemory@DrMemoryManager@@SA_NW4Section@1@PEAVDrMemory@@@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:??0DrHeapMemory@@QEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
@@ -52,7 +51,14 @@ void __cdecl DrHeapMemory::Free(void * ptr, wchar_t const * file, int line)
 }
 
 // 0x6ed6a0
-::DrMemory * __cdecl DrMemoryManager::Memory(::DrMemoryManager::Section)
+::DrMemory * __cdecl DrMemoryManager::Memory(::DrMemoryManager::Section section)
 {
-    LIFT_STUB(0x6ed6a0);
+    if (section < 0 || section >= SECTION_MAX)
+        return nullptr;
+
+    // ❓ The 2019 build falls back to the static memory for both sections (DrBaseDynamicMemory::Instance is not called here).
+    ::DrMemory * result = DrMemoryManager::memory[section];
+    if (result == nullptr)
+        return DrBaseStaticMemory::Instance();
+    return result;
 }

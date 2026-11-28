@@ -2071,8 +2071,7 @@ public:
 };
 struct DrScriptObj {};
 struct DrScriptObjDef {};
-template <class T0, int T1>
-class DrStlAllocator {};
+// LIFT: DrStlAllocator is defined in drstlmemory.h (the full allocator needs DrMemoryManager).
 struct DrTableDef {};
 struct DrTableSummary {};
 struct DroppedItem  // PDB layout, size 0x18
