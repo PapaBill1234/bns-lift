@@ -146,6 +146,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"AchievementDaemonChannel::onConnect": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "AcquiredSkill1::FieldDefine": {
 "calls": 100,
 "consts": 100,
@@ -747,6 +754,13 @@
 "refs": 0,
 "score": 66.7,
 "status": "DIFF"
+},
+"Connection::AsyncSend": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "ContentQuotaProperty::FieldDefine": {
 "calls": 100,
@@ -1987,6 +2001,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"GameSideArenaLobbySessionHandler::OnAccept": {
+"calls": 100,
+"consts": 100,
+"refs": 67,
+"score": 88.9,
+"status": "DIFF"
+},
 "GameTranExpireToken::GetTid": {
 "calls": 100,
 "consts": 100,
@@ -2121,6 +2142,20 @@
 "status": "MATCH"
 },
 "HUF_readStats": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleAchievementGameGameHelloFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleRankingGame_HelloFail": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -2365,12 +2400,26 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Log::Write [?Write@Log@@SAXPEB_WHJ0ZZ]": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Log::Write [?Write@Log@@SAXW4Type@1@PEB_WH1ZZ]": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"Log::WriteV [?WriteV@Log@@SAXPEB_WHJ0PEAD@Z]": {
+"calls": 86,
+"consts": 100,
+"refs": 100,
+"score": 95.2,
+"status": "DIFF"
 },
 "LogArchive::Name": {
 "calls": 100,
@@ -2504,6 +2553,13 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"MarketReaderAgentSessionHandler::OnAccept": {
+"calls": 100,
+"consts": 100,
+"refs": 67,
+"score": 88.9,
+"status": "DIFF"
 },
 "MentoringProperty::FieldDefine": {
 "calls": 100,
@@ -2828,6 +2884,76 @@
 "status": "MATCH"
 },
 "OceanicEffect::checkApply": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Packet::Clear": {
+"calls": 60,
+"consts": 100,
+"refs": 60,
+"score": 73.3,
+"status": "DIFF"
+},
+"Packet::Decompose [?Decompose@Packet@@QEBAGPEBDZZ]": {
+"calls": 57,
+"consts": 80,
+"refs": 50,
+"score": 62.4,
+"status": "DIFF"
+},
+"Packet::~Packet": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PacketBuffer::Compose": {
+"calls": 95,
+"consts": 95,
+"refs": 72,
+"score": 87.3,
+"status": "DIFF"
+},
+"PacketBuffer::Decompose": {
+"calls": 100,
+"consts": 98,
+"refs": 100,
+"score": 99.2,
+"status": "DIFF"
+},
+"PacketBuffer::deallocate_me": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PacketBuffer::encrypt": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PacketBufferAllocator::allocate": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PacketBufferPool::allocate": {
+"calls": 100,
+"consts": 100,
+"refs": 80,
+"score": 93.3,
+"status": "DIFF"
+},
+"PacketBufferPool::deallocate": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -3478,6 +3604,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"RankingChannel::onConnect": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "RankingResult::RankingResult": {
 "calls": 100,
 "consts": 100,
@@ -3731,6 +3864,41 @@
 "status": "MATCH"
 },
 "SerializerTimer::TimerId": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Session::Send [?Send@Session@@QEBAXPEBDZZ]": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Session::SendV": {
+"calls": 92,
+"consts": 92,
+"refs": 56,
+"score": 79.8,
+"status": "DIFF"
+},
+"Session::send": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"SessionSendBuffer::Add": {
+"calls": 71,
+"consts": 100,
+"refs": 67,
+"score": 79.4,
+"status": "DIFF"
+},
+"SessionSendBuffer::increaseBuffer": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
