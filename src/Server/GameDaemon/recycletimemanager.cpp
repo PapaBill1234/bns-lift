@@ -1,6 +1,26 @@
 // recycletimemanager.cpp: recycletimemanager.cpp (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
 #include "recycletimemanager.h"
+#include "Daemon.h"
 #include "LiftStub.h"
+
+namespace
+{
+// LIFT: view of the PDB struct RecycleTimeManager::RecycleTime (size 0x18).
+struct RecycleTimeEntryView
+{
+    __int64 time;        // +0 (0x0)
+    bool confirmed;      // +8 (0x8)
+    __int64 actualTime;  // +16 (0x10)
+};
+
+// LIFT: view of the PDB class RecycleTimeManager (size 0xBD8). Only the members that the lifted bodies use are declared.
+struct RecycleTimeView
+{
+    void *owner;                                 // +0 (0x0) Creature *
+    RecycleTimeEntryView _grobalRecycleGroup[20];  // +8 (0x8)
+    RecycleTimeEntryView *_recycleGroup[6];        // +488 (0x1E8)
+};
+}
 
 // 0x60fa40
 __cdecl RecycleTimeManager::RecycleTimeManager(void)
@@ -33,9 +53,15 @@ void __cdecl RecycleTimeManager::ExtendLimitTime2(char, short, long)
 }
 
 // 0x6101c0
-void __cdecl RecycleTimeManager::SetGlobalRecycleTime2(short, long)
+#pragma comment(linker, "/INCLUDE:?SetGlobalRecycleTime2@RecycleTimeManager@@QEAAXFJ@Z")  // LIFT: dead-strip keep (no live caller yet)
+void __cdecl RecycleTimeManager::SetGlobalRecycleTime2(short id, long duration)
 {
-    LIFT_STUB(0x6101c0);
+    // LIFT: the original inlines setGlobalRecycleTime2 (id range 1..GLOBAL_RECYCLE_GROUP_COUNT = 20).
+    RecycleTimeView *self = reinterpret_cast<RecycleTimeView *>(this);
+    int groupId = id;
+    __int64 time = duration + (GetTickCount64() - Daemon::Instance->StartSystemTick64);
+    if (groupId >= 1 && groupId <= 20)
+        self->_grobalRecycleGroup[groupId - 1].time = time;
 }
 
 // 0x610220
@@ -123,9 +149,19 @@ void __cdecl RecycleTimeManager::sendCache2(short, __int64)
 }
 
 // 0x610fd0
-void __cdecl RecycleTimeManager::confirmRecycleTime2(short)
+#pragma comment(linker, "/INCLUDE:?confirmRecycleTime2@RecycleTimeManager@@AEAAXF@Z")  // LIFT: dead-strip keep (no live caller yet)
+void __cdecl RecycleTimeManager::confirmRecycleTime2(short id)
 {
-    LIFT_STUB(0x610fd0);
+    RecycleTimeView *self = reinterpret_cast<RecycleTimeView *>(this);
+    char index = static_cast<char>(id - 1);
+    // LIFT: 25 = DB_RECYCLE_GROUP_COUNT; _recycleGroup[4] is the db group.
+    if (index < 0 || index >= 25)
+    {
+        Log::Write(Log::LT_ERROR, L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\RecycleTimeManager.cpp", 619,
+                   L"[recycle time manager], confirmRecycleTime, invalid groupId %d", id);
+        return;
+    }
+    self->_recycleGroup[4][index].confirmed = true;
 }
 
 // 0x611020

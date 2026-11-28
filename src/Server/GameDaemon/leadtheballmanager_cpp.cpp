@@ -49,10 +49,38 @@ void __cdecl LeadTheBallManager::OnEnvManipulated(::Pc *, ::Env *, ::Data::ZoneE
     LIFT_STUB(0x138550);
 }
 
-// 0x138720
-void __cdecl LeadTheBallManager::OnCanceledEnvManipulation(::Env *, ::Data::ZoneEnv2RecordPtr &, char, char)
+namespace
 {
-    LIFT_STUB(0x138720);
+// LIFT: view of the PDB class PartyBattleManager (base of LeadTheBallManager). Only _step is declared.
+struct LtbPartyBattleManagerView
+{
+    char lift_pad_0[0x18];
+    char _step;  // +24 (0x18)
+};
+
+// LIFT: view of DrEl (PDB: subtype at +2), the base of Data::ZoneEnv2Record.
+struct LtbZoneEnv2RecordView
+{
+    short type;     // +0
+    short subtype;  // +2
+};
+
+// LIFT: view of Data::ZoneEnv2RecordPtr (PDB: DrRecordPtr::_record at +0).
+struct LtbZoneEnv2PtrView
+{
+    LtbZoneEnv2RecordView *_record;  // +0
+};
+}
+
+// 0x138720
+#pragma comment(linker, "/INCLUDE:?OnCanceledEnvManipulation@LeadTheBallManager@@UEAAXPEAVEnv@@AEAVZoneEnv2RecordPtr@Data@@DD@Z")  // LIFT: dead-strip keep (no live caller yet)
+void __cdecl LeadTheBallManager::OnCanceledEnvManipulation(::Env * env, ::Data::ZoneEnv2RecordPtr & envData, char preState, char state)
+{
+    LtbPartyBattleManagerView *self = reinterpret_cast<LtbPartyBattleManagerView *>(this);
+    LtbZoneEnv2PtrView &data = reinterpret_cast<LtbZoneEnv2PtrView &>(envData);
+    // LIFT: ❓ PDB names of step 2 and env subtype 6 (and states 8, 9) are not known.
+    if (env != nullptr && data._record != nullptr && self->_step == 2 && data._record->subtype == 6 && state >= 8 && state <= 9)
+        env->ChangeState(preState);
 }
 
 // 0x138770
