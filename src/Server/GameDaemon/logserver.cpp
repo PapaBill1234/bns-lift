@@ -1,5 +1,6 @@
 // logserver.cpp: logserver.cpp (GameDaemon PDB, 2019 + PDB).
 #include "logserver.h"
+#include "logarchivesession.h"
 #include "logarchivecontext.h"
 #include "logserversessionhandler.h"
 #include "../BloodLib/include/Log.h"
@@ -81,7 +82,8 @@ bool __cdecl LogServer::Initialize(bool seqIdLogEnable, unsigned __int64 seqIdLo
 // 0x6ba780
 bool __cdecl LogServer::Connect(unsigned long ip, unsigned short port)
 {
-    return LogArchiveSession::Connect(ip, port);
+    // LIFT: LogServer has no base member in the header yet; call the base body through a cast.
+    return reinterpret_cast<LogArchiveSession *>(this)->LogArchiveSession::Connect(ip, port);
 }
 
 // 0x6ba7a0
