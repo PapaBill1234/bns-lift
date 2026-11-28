@@ -1,6 +1,7 @@
 // partybattlemanager.h: partybattlemanager.cpp, partybattlemanager.h (GameDaemon PDB, 2019 + PDB). Wave 0: declarations of the stubbed functions only.
 // LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
 #pragma once
+#include <cstddef>
 #include "GameDaemonFwd.h"
 
 class PartyBattleGameLog
@@ -117,5 +118,58 @@ private:
     void __cdecl spawnMember(::Pc *, ::Data::ZonePcSpawnRecordPtr const &);  // 0x182e30
     bool __cdecl invokeEffect(::Zone *, unsigned __int64, ::Data::EffectRecordPtr const &);  // 0x183120
     void __cdecl resetAllMemberSpecialSkillGauge(::Zone *);  // 0x1831d0
+private:
+    // PDB layout (size 0x30).
+    char _combatSide;                   // +0 (0x0)
+    short _worldId;                     // +2 (0x2)
+    short _memberCapacity;              // +4 (0x4)
+    ::PartyBattleSideMember *_member;   // +8 (0x8)
+    short _memberCount;                 // +16 (0x10)
+    int _ratingScore;                   // +20 (0x14)
+    int _totalRatingScore;              // +24 (0x18)
+    int _maxRatingScore;                // +28 (0x1C)
+    unsigned __int64 _guildId;          // +32 (0x20)
+    short _goalInCount;                 // +40 (0x28)
+    short _consecutiveGoalInCount;      // +42 (0x2A)
 };
+static_assert(sizeof(PartyBattleSide) == 0x30, "sizeof PartyBattleSide");
+
+// LIFT: local view of the PDB struct PartyBattleSideMember (size 0x1F0). The name differs on purpose: the view is partial.
+struct PartyBattleSideMemberView
+{
+    char lift_pad_0[0x18];              // ❓ pcInfo (ArenaLobbyTeamMemberInfo) +0 to +0x17 are not declared here
+    unsigned __int64 _pcId;             // +24 (0x18) (PDB: pcInfo._pcId)
+    char lift_pad_1[0x1A0];             // ❓ pcInfo +0x20 to +0x1BF
+    char side;                          // +448 (0x1C0)
+    char state;                         // +449 (0x1C1)
+    short killCount;                    // +450 (0x1C2)
+    short straightKillCount;            // +452 (0x1C4)
+    short deathCount;                   // +454 (0x1C6)
+    short occupationCount;              // +456 (0x1C8)
+    short manipulationCount;            // +458 (0x1CA)
+    char lift_pad_2[0x24];              // ❓ attackDamage ... disconnectPrevWinningStreak (+0x1CC to +0x1EF)
+};
+static_assert(sizeof(PartyBattleSideMemberView) == 0x1F0, "sizeof PartyBattleSideMemberView");
+
+// LIFT: local view of the PDB record Data::PartyBattleFieldZoneRecord (size 0x140). Only goal_score is declared.
+struct PartyBattleFieldZoneRecordView
+{
+    char lift_head[0x102];              // ❓ DrEl, key, alias ... kill_score are not declared here
+    short goal_score;                   // +258 (0x102)
+};
+
+// LIFT: local view of the PDB class PartyBattleManager (size 0xD5F0). Only the members that the lifted bodies read are declared.
+struct PartyBattleManagerView
+{
+    void *lift_vfptr;                           // +0 (0x0)
+    ::PartyBattleFieldZoneRecordView *_data;    // +8 (0x8) (PDB: Data::PartyBattleFieldZoneRecordPtr::_record)
+    ::Zone *_zone;                              // +16 (0x10)
+    char _step;                                 // +24 (0x18)
+    char lift_pad_0[0x35];                      // ❓ _stepStartTime ... _envOperated (+0x19 to +0x4D)
+    bool _isGiveReward;                         // +78 (0x4E)
+    char lift_pad_1[0x29];                      // ❓ _roomInfo +0x0 to +0x27 (+0x4F to +0x77)
+    int _detailRule;                            // +120 (0x78) (PDB: _roomInfo._detailRule, Data::ArenaMatchingRuleDetailType)
+};
+static_assert(offsetof(PartyBattleManagerView, _isGiveReward) == 0x4E, "PartyBattleManager::_isGiveReward");
+static_assert(offsetof(PartyBattleManagerView, _detailRule) == 0x78, "PartyBattleManager::_roomInfo._detailRule");
 

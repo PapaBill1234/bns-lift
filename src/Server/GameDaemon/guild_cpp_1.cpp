@@ -1,7 +1,10 @@
 // guild_cpp_1.cpp: guild.cpp part 1 (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
 #include "guild.h"
 #include "guildbank.h"
+#include <time.h>
 #include "LiftStub.h"
+
+#pragma comment(linker, "/INCLUDE:?GetBanishOpenGuildMemberCountResetTime@Guild@@QEAA_J_JH@Z")  // LIFT: dead-strip keep (no live caller yet)
 
 // 0xe0910
 __cdecl Guild::Guild(void)
@@ -160,9 +163,19 @@ void __cdecl Guild::ResetLevelUp(void)
 }
 
 // 0xe5fd0
-__int64 __cdecl Guild::GetBanishOpenGuildMemberCountResetTime(__int64, int)
+__int64 __cdecl Guild::GetBanishOpenGuildMemberCountResetTime(__int64 now, int resetHour)
 {
-    LIFT_STUB(0xe5fd0);
+    // LIFT: the body does not read this. LTCG drops the unused this argument (now comes in rcx).
+    tm today;
+    if (_localtime64_s(&today, &now) != 0)
+        return 0;
+    today.tm_hour = resetHour;
+    today.tm_sec = 0;
+    today.tm_min = 0;
+    __int64 resetTime = _mktime64(&today);
+    if (now < resetTime)
+        resetTime -= 86400;
+    return resetTime;
 }
 
 // 0xe6050

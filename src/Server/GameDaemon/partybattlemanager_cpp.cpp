@@ -6,18 +6,50 @@
 #include "npc.h"
 #include "pc.h"
 #include "zone.h"
+#include "zonescore.h"
+#include "Memory.h"
+#include "MemoryManager.h"
 #include "LiftStub.h"
+
+#pragma comment(linker, "/INCLUDE:??0PartyBattleSide@@QEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:??1PartyBattleSide@@QEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?IncreaseDeathCount@PartyBattleSide@@QEAAX_K@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?IncreaseOccupationCount@PartyBattleSide@@QEAAX_K@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?IncreaseManipulationCount@PartyBattleSide@@QEAAX_K@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetFirstMemberId@PartyBattleSide@@QEAA_KXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?CheckToFinishGame@PartyBattleManager@@UEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?CanTakeAchievementReward@PartyBattleManager@@UEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?isSaveGameResult@PartyBattleManager@@MEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+
+// LIFT: PartyBattleManager has no member list yet. The lifted bodies read its members through PartyBattleManagerView.
+#define PBM_VIEW ((PartyBattleManagerView *)this)
+// LIFT: _member is PartyBattleSideMember * in the PDB. The lifted bodies read it through PartyBattleSideMemberView.
+#define PBS_MEMBER ((PartyBattleSideMemberView *)_member)
 
 // 0x181370
 __cdecl PartyBattleSide::PartyBattleSide(void)
+    : _combatSide(0)
+    , _worldId(0)
+    , _memberCapacity(0)
+    , _member(nullptr)
+    , _memberCount(0)
+    , _ratingScore(0)
+    , _totalRatingScore(0)
+    , _maxRatingScore(0)
+    , _guildId(0)
+    , _goalInCount(0)
+    , _consecutiveGoalInCount(0)
 {
-    LIFT_STUB(0x181370);
 }
 
 // 0x1813a0
 __cdecl PartyBattleSide::~PartyBattleSide(void)
 {
-    LIFT_STUB(0x1813a0);
+    if (_member != nullptr)
+    {
+        Memory::_Manager[2]->Free(_member, L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\PartyBattleManager.cpp", 49);
+        _member = nullptr;
+    }
 }
 
 // 0x1813e0
@@ -39,21 +71,49 @@ void __cdecl PartyBattleSide::OnFinished(::Zone *, ::PartyBattleManager *)
 }
 
 // 0x181aa0
-void __cdecl PartyBattleSide::IncreaseDeathCount(unsigned __int64)
+void __cdecl PartyBattleSide::IncreaseDeathCount(unsigned __int64 victimId)
 {
-    LIFT_STUB(0x181aa0);
+    if (victimId == 0)
+        return;
+    for (short i = 0; i < _memberCount; ++i)
+    {
+        if (PBS_MEMBER[i]._pcId == victimId)
+        {
+            ++PBS_MEMBER[i].deathCount;
+            PBS_MEMBER[i].straightKillCount = 0;
+            return;
+        }
+    }
 }
 
 // 0x181b20
-void __cdecl PartyBattleSide::IncreaseOccupationCount(unsigned __int64)
+void __cdecl PartyBattleSide::IncreaseOccupationCount(unsigned __int64 pcId)
 {
-    LIFT_STUB(0x181b20);
+    if (pcId == 0)
+        return;
+    for (short i = 0; i < _memberCount; ++i)
+    {
+        if (PBS_MEMBER[i]._pcId == pcId)
+        {
+            ++PBS_MEMBER[i].occupationCount;
+            return;
+        }
+    }
 }
 
 // 0x181b80
-void __cdecl PartyBattleSide::IncreaseManipulationCount(unsigned __int64)
+void __cdecl PartyBattleSide::IncreaseManipulationCount(unsigned __int64 pcId)
 {
-    LIFT_STUB(0x181b80);
+    if (pcId == 0)
+        return;
+    for (short i = 0; i < _memberCount; ++i)
+    {
+        if (PBS_MEMBER[i]._pcId == pcId)
+        {
+            ++PBS_MEMBER[i].manipulationCount;
+            return;
+        }
+    }
 }
 
 // 0x181be0
@@ -83,7 +143,12 @@ bool __cdecl PartyBattleSide::SetMembers(char, ::ArenaLobbyTeamMemberInfo *const
 // 0x182200
 unsigned __int64 __cdecl PartyBattleSide::GetFirstMemberId(void)
 {
-    LIFT_STUB(0x182200);
+    for (short i = 0; i < _memberCount; ++i)
+    {
+        if (PBS_MEMBER[i].state != 0)
+            return PBS_MEMBER[i]._pcId;
+    }
+    return 0;
 }
 
 // 0x182250
@@ -185,7 +250,17 @@ void __cdecl PartyBattleManager::Finish(void)
 // 0x184310
 bool __cdecl PartyBattleManager::CheckToFinishGame(void)
 {
-    LIFT_STUB(0x184310);
+    ::Zone *zone = PBM_VIEW->_zone;
+    if (zone == nullptr)
+        return false;
+    // LIFT: Zone::GetZoneScore (0x258710) is inline here: a null score gives 0. Score types 4 and 5 are the two sides.
+    ::ZoneScore *score = ((ZoneView *)zone)->_score;
+    int alphaScore = score != nullptr ? score->Score(4) : 0;
+    if (PBM_VIEW->_data->goal_score <= alphaScore)
+        return true;
+    score = ((ZoneView *)zone)->_score;
+    int betaScore = score != nullptr ? score->Score(5) : 0;
+    return PBM_VIEW->_data->goal_score <= betaScore;
 }
 
 // 0x184370
@@ -197,7 +272,7 @@ bool __cdecl PartyBattleManager::CanResurrect(::Pc *)
 // 0x1843d0
 bool __cdecl PartyBattleManager::CanTakeAchievementReward(void)
 {
-    LIFT_STUB(0x1843d0);
+    return PBM_VIEW->_step != 4;  // ❓ step 4: PartyBattleStep value without a checked PDB enumerator name
 }
 
 // 0x1843e0
@@ -353,7 +428,11 @@ char __cdecl PartyBattleManager::getIndividualScoreResult(char, ::PartyBattleRes
 // 0x185b70
 bool __cdecl PartyBattleManager::isSaveGameResult(void)
 {
-    LIFT_STUB(0x185b70);
+    // ❓ detail rules 3 to 5 do not save the result (PDB enumerator names not checked).
+    int detailRule = PBM_VIEW->_detailRule;
+    if (detailRule >= 3 && detailRule <= 5)
+        return false;
+    return PBM_VIEW->_isGiveReward;
 }
 
 // 0x185b90
