@@ -7,7 +7,8 @@
 class DrHeapMemory : public DrMemory
 {
 public:
-    __cdecl DrHeapMemory(void);  // 0x6ed620
+    // LIFT: noinline (lessons A4). Both Instance bodies (0x6ecf90, 0x6ecff0) call the ctor out of line in the original.
+    __declspec(noinline) __cdecl DrHeapMemory(void);  // 0x6ed620
     virtual __cdecl ~DrHeapMemory(void);  // 0x6ed5e0
     virtual void * __cdecl Alloc(unsigned __int64 size, wchar_t const * file, int line);  // 0x6ed600
     virtual void * __cdecl Realloc(void * ptr, unsigned __int64 size, wchar_t const * file, int line);  // 0x6b7dc0

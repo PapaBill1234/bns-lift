@@ -35,6 +35,13 @@
 - `aliasimpl.h`, `aliasimpl_h.cpp` and `aliasimpl_cpp.cpp` used `<cwctype>`, `<cstring>` and `<cwchar>`. No other file in the tree uses these headers. They now include `<wctype.h>`, `<string.h>` and `<wchar.h>`. The code does not use `std::` names from these headers.
 - Stem `datareader` needs no change in this round. Round 1 lifted its 4 functions.
 
+## Round 3 fix
+
+- Proof fail: `DrHeapMemory::DrHeapMemory` (0x6ed620) went from 1.0 to 0.9333. The 2 `Instance` bodies are the first callers of the ctor. The original calls the ctor out of line from both `Instance` bodies, then writes the vftable, then calls `atexit`. LTCG probably inlines the ctor into the new callers and changes its emitted form.
+- Fix (lessons A4): `defmemory.h` declares the ctor `__declspec(noinline)` with a `// LIFT:` note. The `Instance` bodies stay lifted.
+- This session could not run formtest (shell access was denied). The driver build is the proof. If the ctor is still not MATCH, the next round must put `DrBaseStaticMemory::Instance` (0x6ecf90) and `DrBaseDynamicMemory::Instance` (0x6ecff0) back to `LIFT_STUB` and record them as **Not done**.
+- Stem `datareader` needs no change in this round.
+
 ## Open items
 
 - `DrAliasMapImpl::DrAliasMapImpl` (0x6f6450) stays DIFF (it was DIFF in the baseline). The class has no `DrAliasMap` base, so the vtable differs.
