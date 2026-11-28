@@ -110,14 +110,9 @@ bool __cdecl RaidDungeon::OnBossNpcKilled(::Data::BossNpcRecordPtr)
 }
 
 // 0x1a94a0
-#pragma comment(linker, "/INCLUDE:?IsBound@RaidDungeon@@QEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
 bool __cdecl RaidDungeon::IsBound(void)
 {
-    ::RaidDungeonView *const self = reinterpret_cast< ::RaidDungeonView *>(this);
-    self->_raidDungeonCS.Enter();
-    bool const bound = self->_waitConfirm || self->_dbId != 0;
-    self->_raidDungeonCS.Leave();
-    return bound;
+    LIFT_STUB(0x1a94a0);
 }
 
 // 0x1a94f0

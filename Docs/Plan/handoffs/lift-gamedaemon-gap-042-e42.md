@@ -14,26 +14,21 @@ Card: Easy leaves (GameDaemon), wave E. Round 1.
 - `0x467380` `Data::ObjectScript::GetDecisionSequence`
 - `0x97070` `DuelManager::isSaveGameResult`
 - `0x630e0` `BrainMonsterTalkable::GetState`. The state members are byte views at their PDB offsets. The base BrainBase and the state classes are not declared yet.
-- `0x27bb0` `DuelTeam::DuelTeam`
 - `0x36c580` `GameObject::Think`
 - `0x36c5c0` `GameObject::OnTimer`
 - `0x1909e0` `PetitionPacketBufferHandler::Destroy`
 - `0x190a90` `PetitionPacketBufferHandler::ToBuffer`
 - `0x190c10` `PetitionPacketBufferHandler::Decompose`
 - `0x1a8360` `RaidDungeon::GetOccupyingObjectId`
-- `0x1a94a0` `RaidDungeon::IsBound`
 - `0x1aa220` `RaidDungeonManager::RaidDungeonManager`
 - `0x1aa2d0` `RaidDungeonManager::~RaidDungeonManager`
 - `0x1ab2e0` `RaidDungeonPropertyContainer::RaidDungeonPropertyContainer`
 - `0x202980` `TeamManager::unlock`. `TeamManager::TeamMgrLockCount` is a thread-local static member. The body decrements it after it leaves the lock.
 - `0x2062f0` `Team::GetPartyDifficultyType`
 - `0x206320` `Team::GetPartyMemberCount`
-- `0x207970` `Team::GetPartyDungeonStep`. The inlined `TeamParty::GetDungeonStep` is written in place.
 - `0x2079e0` `Team::GetPartyChallengePartyAttractionId`
-- `0x207a40` `Team::PartyIsInChallengePartyAttraction`
 - `0x207cb0` `Team::IsPublishedRecruitArenaDungeonPartyMember`
 - `0x20e710` `Team::findEmptyPartyIndex`
-- `0x20f150` `Team::setVisible`. The 2019 body does not read the parameter. It logs 1 and stores true. This is marked `// ❓`.
 - The Team bodies read the members through byte views (`TeamView`, `TeamPartyView`, `TeamManagerView` in `team.h`), because these classes have no PDB members in the sources yet. The `/INCLUDE` names are hand-mangled. If the link fails, check them with `pdbpub.py`.
 
 ## Round 3 repair
@@ -51,6 +46,11 @@ Card: Easy leaves (GameDaemon), wave E. Round 1.
 
 ## Not done
 
+- `0x27bb0` `DuelTeam::DuelTeam`. Review reject: the list member offsets differ (original `_Mysize` at `[rcx+0x18]`, `_Myhead` at `[rdi+0x10]`). A later card.
+- `0x1a94a0` `RaidDungeon::IsBound`. Reject P2_cc (build `jne`, original `je`) and P3_imm (original `0x1`). A later card.
+- `0x207970` `Team::GetPartyDungeonStep`. Reject P3_imm (original `0xff`) and P9_ret_width. A later card.
+- `0x207a40` `Team::PartyIsInChallengePartyAttraction`. Reject P2_cc (build `setne`, original `seta`). A later card.
+- `0x20f150` `Team::setVisible`. Reject P3_imm (original 4 times `0x1`). A later card.
 - `0x42e430` `Data::QuestDecision::QuestDecision`. The code is folded with a std::vector constructor (identical code folding). The body stays without a lift.
 - `0x131560` `GuildUniform::fetchUniformInfo`. The GameDaemon sources do not declare `FragmentPacket` (packet, composer and the variadic `Compose`). A later card must add it.
 - `0x2c3590` `TakeAttractionRewardTask::start`. `AttractionState` has no virtual declarations. The task class has no `_childRole` member. `ZoneInstance::_attractionState` is only a view type.
@@ -80,6 +80,12 @@ Card: Easy leaves (GameDaemon), wave E. Round 1.
 - Fix: the file-local copy in `duelmanager_cpp.cpp` is now `DuelManagerCppView`. Its uses in that file use the new name.
 - The header view `DuelManagerView` stays as it was.
 - Also changed: `src/Server/GameDaemon/duelmanager_cpp.cpp`.
+
+## Round 6 repair
+
+- Five bodies went back to `LIFT_STUB`: `DuelTeam::DuelTeam`, `RaidDungeon::IsBound`, `Team::GetPartyDungeonStep`, `Team::PartyIsInChallengePartyAttraction`, `Team::setVisible`. Their `/INCLUDE` pragmas are removed. See "Not done".
+- The 19 accepted bodies and `DuelManagerView` are unchanged.
+- Changed files: `duelmanager_h.cpp`, `raiddungeon.cpp`, `team_cpp_2.cpp`.
 
 ## Gate and MATCH
 

@@ -8,23 +8,9 @@
 #include "LiftStub.h"
 
 // 0x27bb0
-#pragma comment(linker, "/INCLUDE:??0DuelTeam@@QEAA@HH@Z")  // LIFT: dead-strip keep (no live caller yet)
-__cdecl DuelTeam::DuelTeam(int const teamIndex, int const maxMemberCount)
-    : _teamIndex(teamIndex)
+__cdecl DuelTeam::DuelTeam(int const, int const)
 {
-    // Inlined std::list ctor: size 0, then the head node (24 bytes) from Memory::_Manager[2].
-    _members._Mysize = 0;
-    DuelMembers::Node *head = static_cast<DuelMembers::Node *>(
-        Memory::_Manager[2]->Alloc(24, LIFT_STLMEMORY_FILE, 60));
-    _members._Myhead = head;
-    head->_Next = head;
-    _members._Myhead->_Prev = _members._Myhead;
-    _reserveKey = 0;
-    _maxMemberCount = maxMemberCount;
-    _ratingScore = 0;
-    _maxRatingScore = 0;
-    _totalRatingScore = 0;
-    _teamAttackDamage = 0;
+    LIFT_STUB(0x27bb0);
 }
 
 // 0x27c30

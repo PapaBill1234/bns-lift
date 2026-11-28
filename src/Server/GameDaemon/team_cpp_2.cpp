@@ -248,23 +248,9 @@ bool __cdecl Team::AddPartyAuction(int, unsigned __int64, ::PartyAuction *)
 }
 
 // 0x207970
-#pragma comment(linker, "/INCLUDE:?GetPartyDungeonStep@Team@@QEBADHF@Z")  // LIFT: dead-strip keep (no live caller yet)
-char __cdecl Team::GetPartyDungeonStep(int partyIndex, short dungeonId) const
+char __cdecl Team::GetPartyDungeonStep(int, short) const
 {
-    ::TeamView const *const self = reinterpret_cast< ::TeamView const *>(this);
-    if (partyIndex >= 0 && self->_partyCapacity > partyIndex)
-    {
-        ::TeamPartyView const *const party = self->_parties[partyIndex];
-        if (party != nullptr)
-        {
-            // LIFT: inlined TeamParty::GetDungeonStep(short).
-            if (party->_dungeonId != 0 && dungeonId != party->_dungeonId)
-                return -1;
-            return party->_dungeonStep;
-        }
-    }
-    Log::Write(Log::LT_ERROR, TEAM_FILE, 7796, L"[team], get party dungeon step failed. cannot find party, id:0x%I64x", self->Id);
-    return -1;
+    LIFT_STUB(0x207970);
 }
 
 // 0x2079e0
@@ -283,18 +269,9 @@ unsigned __int64 __cdecl Team::GetPartyChallengePartyAttractionId(int partyIndex
 }
 
 // 0x207a40
-#pragma comment(linker, "/INCLUDE:?PartyIsInChallengePartyAttraction@Team@@QEBA_NH@Z")  // LIFT: dead-strip keep (no live caller yet)
-bool __cdecl Team::PartyIsInChallengePartyAttraction(int partyIndex) const
+bool __cdecl Team::PartyIsInChallengePartyAttraction(int) const
 {
-    ::TeamView const *const self = reinterpret_cast< ::TeamView const *>(this);
-    if (partyIndex >= 0 && self->_partyCapacity > partyIndex)
-    {
-        ::TeamPartyView const *const party = self->_parties[partyIndex];
-        if (party != nullptr)
-            return party->_challengePartyAttractionKey != 0;
-    }
-    Log::Write(Log::LT_ERROR, TEAM_FILE, 7858, L"[team], is in challenge-party-attraction failed. cannot find party, id:0x%I64x", self->Id);
-    return false;
+    LIFT_STUB(0x207a40);
 }
 
 // 0x207aa0
@@ -578,18 +555,9 @@ bool __cdecl Team::reserveTeamMember(char, ::Pc const *, ::Pc const *, int *)
 }
 
 // 0x20f150
-#pragma comment(linker, "/INCLUDE:?setVisible@Team@@AEAA_N_N@Z")  // LIFT: dead-strip keep (no live caller yet)
 bool __cdecl Team::setVisible(bool)
 {
-    // ❓ The 2019 body does not read the parameter. It logs 1 as the param and stores true.
-    ::TeamView *const self = reinterpret_cast< ::TeamView *>(this);
-    if (self->_visible)
-    {
-        Log::Write(Log::LT_ERROR, TEAM_FILE, 10803, L"[team], set visible, invalid state, cur visible:%d, param:%d", static_cast<int>(self->_visible), 1);
-        return false;
-    }
-    self->_visible = true;
-    return true;
+    LIFT_STUB(0x20f150);
 }
 
 // 0x20f1a0
