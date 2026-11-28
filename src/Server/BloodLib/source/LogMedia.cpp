@@ -16,6 +16,10 @@ wchar_t* LogMedia::GetLastFileName()
 
 // 0x285B0 (SmartCouponDaemon)
 // LIFT: noinline. The original calls it from its only caller Log::Add (CacheGate 0xa2c0) in all 4 exes.
+// GameDaemon 0x69ed80: the same body. The GD addReferenceCount form (RefCntObject.cpp) keeps the bool in edx.
+#if defined(LIFT_EXE_GD)
+#pragma comment(linker, "/INCLUDE:?Add@LogMedia@@IEAAHPEAVLogBuffer@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#endif
 __declspec(noinline) int LogMedia::Add(LogBuffer* logbuffer)
 {
     int first = 0;

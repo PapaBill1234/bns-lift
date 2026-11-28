@@ -1,5 +1,8 @@
 // Log.obj (SmartCouponDaemon PDB).
 // swprintf (0x22BA0) is the CRT inline. The lift calls the CRT function.
+#if defined(LIFT_EXE_GD)
+#define LIFT_LOG_ADD_MEMBER  // LIFT: GameDaemon Log::Add is a private member (see Log.h)
+#endif
 #include "Log.h"
 #include <stdarg.h>
 #include <stdio.h>
@@ -15,6 +18,11 @@ extern "C" int __cdecl _vswprintf_c_l(wchar_t* buffer, size_t count, wchar_t con
 #include "MemoryManager.h"
 
 static wchar_t const LOG_FILE[] = L"source\\Log.cpp";
+
+#if defined(LIFT_EXE_GD)
+// GameDaemon 0x687a10 Log::Write (card lift-gamedaemon-e129).
+#pragma comment(linker, "/INCLUDE:?Write@Log@@SAXW4Type@1@PEB_WH1ZZ")  // LIFT: dead-strip keep (no live caller yet)
+#endif
 
 Log* Log::instance = nullptr;
 
@@ -120,7 +128,11 @@ void Log::WriteV(wchar_t const* file, int line, long errorCode, wchar_t const* f
     LogBuffer* logbuf = LogBufferAllocator::_Local->allocate();
     logbuf->Prepare(LT_ERROR, file, line);
     _vswprintf_c_l(logbuf->_log, 1980, fmt, nullptr, args);
+#if defined(LIFT_EXE_GD)
+    instance->Add(logbuf);  // LIFT: GD Log::Add is a member (see Log.h)
+#else
     Add(logbuf);
+#endif
     logbuf->removeReferenceCount(LOG_FILE, 184);
 }
 
@@ -134,7 +146,11 @@ void Log::Write(Type type, wchar_t const* file, int line, wchar_t const* format,
         LogBuffer* logbuf = LogBufferAllocator::_Local->allocate();
         logbuf->Prepare(type, file, line);
         _vswprintf_c_l(logbuf->_log, 1980, format, nullptr, args);  // LobbyGate 0x1adcf
+#if defined(LIFT_EXE_GD)
+        instance->Add(logbuf);  // LIFT: GD Log::Add is a member (see Log.h)
+#else
         Add(logbuf);
+#endif
         logbuf->removeReferenceCount(LOG_FILE, 209);
     }
     va_end(args);

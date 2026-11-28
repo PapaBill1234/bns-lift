@@ -50,6 +50,10 @@ void LogBuffer::deallocate_me(void* ptr, wchar_t const* file, int line)
 }
 
 // 0x200D0 (SmartCouponDaemon)
+// GameDaemon 0x69d2e0: the same body. The GD addReferenceCount form (RefCntObject.cpp) keeps the bool in edx.
+#if defined(LIFT_EXE_GD)
+#pragma comment(linker, "/INCLUDE:?Acquire@LogBuffer@@UEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+#endif
 bool LogBuffer::Acquire()
 {
     addReferenceCount(false, LOGBUFFER_FILE, 100);

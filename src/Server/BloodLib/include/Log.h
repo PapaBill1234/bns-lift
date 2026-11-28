@@ -52,7 +52,15 @@ private:
     virtual ~Log();
     virtual wchar_t const* Name();
     virtual void run();
+#if defined(LIFT_LOG_ADD_MEMBER)
+    // LIFT: GameDaemon form. The GD public is ?Add@Log@@AEAAXPEAVLogBuffer@@@Z (private member, 0x687b70).
+    // The body uses instance, not this. LTCG drops the unused this: buf is in rcx (lessons A22).
+    // Log.cpp sets LIFT_LOG_ADD_MEMBER for GameDaemon. Only Log.cpp calls Add. This header has no per-exe
+    // token, so its includers keep one object for all exes.
+    void Add(LogBuffer* buf);
+#else
     static void Add(LogBuffer* buf);  // SmartCouponDaemon 0x19B50: static, uses instance
+#endif
 
     static void FlushInline();  // LIFT: lift helper, same body as Flush, defined in Daemon.cpp (inlined there in the orig)
     static Log* instance;
