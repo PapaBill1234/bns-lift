@@ -2,8 +2,13 @@
 #include "gamearenachannel.h"
 #include "pc.h"
 #include "LiftStub.h"
+#include "AlertSender.h"
+#include "Log.h"
 #include <windows.h>
 #include <string.h>
+
+// LIFT: per-exe path literal (lessons A6).
+#define GAMEARENACHANNEL_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\GameArenaChannel.cpp"
 
 namespace
 {
@@ -274,9 +279,14 @@ void __cdecl GameArenaManager::CheckPing(__int64)
 }
 
 // 0xd26d0
+#pragma comment(linker, "/INCLUDE:?OnAccept@GameSideArenaLobbySessionHandler@@UEBA_NPEBVSession@@@Z")  // LIFT: dead-strip keep (no live caller yet)
 bool __cdecl GameSideArenaLobbySessionHandler::OnAccept(::Session const *) const
 {
-    LIFT_STUB(0xd26d0);
+    Log::Write(Log::LT_ERROR, GAMEARENACHANNEL_FILE, 7087,
+               L"== CRASH == [game-arenalobby], cannot accept from arena lobby (game connect to arenalobby)");
+    AlertSender::Write(GAMEARENACHANNEL_FILE, 7087,
+                       L"== CRASH == [game-arenalobby], cannot accept from arena lobby (game connect to arenalobby)");
+    return false;
 }
 
 // 0xd2710

@@ -1,6 +1,13 @@
 // rankingchannel.cpp: rankingchannel.cpp (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
 #include "rankingchannel.h"
+#include "gamedaemon.h"
 #include "LiftStub.h"
+
+#pragma comment(linker, "/INCLUDE:?onConnect@RankingChannel@@MEAA_NPEBVSession@@_N@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?HandleRankingGame_HelloFail@@YA_NPEBVSession@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+
+// LIFT: per-exe path literal (lessons A6).
+#define RANKINGCHANNEL_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\RankingChannel.cpp"
 
 // 0x1aef40
 __cdecl RankingChannel::~RankingChannel(void)
@@ -27,9 +34,17 @@ bool __cdecl RankingChannel::PacketHandler(::Session const *, ::Packet const *) 
 }
 
 // 0x1af180
-bool __cdecl RankingChannel::onConnect(::Session const *, bool)
+bool __cdecl RankingChannel::onConnect(::Session const *session, bool firstConnected)
 {
-    LIFT_STUB(0x1af180);
+    if (firstConnected)
+        Log::Write(Log::LT_DEBUG, RANKINGCHANNEL_FILE, 174, L"[ranking-channel], connected, session-id:0x%I64x", session->_id);
+    else
+        Log::Write(Log::LT_DEBUG, RANKINGCHANNEL_FILE, 178, L"[ranking-channel], reconnected, session-id:0x%I64x", session->_id);
+    _pingSent = 0;
+    _pingReceived = 0;
+    // LIFT: hello packet. Command 1 and value 10 are literals in the original (no PDB enum names found).
+    session->Send("hhh", 1, 10, _clusterId);
+    return true;
 }
 
 // 0x1af210
@@ -75,9 +90,16 @@ bool __cdecl HandleRankingGame_HelloOk(::Session const *, ::Packet const *)
 }
 
 // 0x1af940
-bool __cdecl HandleRankingGame_HelloFail(::Session const *, ::Packet const *)
+bool __cdecl HandleRankingGame_HelloFail(::Session const *session, ::Packet const *packet)
 {
-    LIFT_STUB(0x1af940);
+    short cmd = 0;
+    short reason = 0;
+    packet->Decompose("hh", &cmd, &reason);
+    Log::Write(Log::LT_ERROR, RANKINGCHANNEL_FILE, 432, L"[ranking-channel], hello failed, session-id:0x%I64x, reason:%d",
+               session->_id, static_cast<int>(reason));
+    // LIFT: LTCG inlines GameDaemon::SetEventReplyCacheHello (0x180e10) here; the original ignores the result.
+    GameDaemon::SetEventReplyCacheHello();
+    return true;
 }
 
 // 0x1af9d0

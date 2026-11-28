@@ -3,7 +3,8 @@
 #pragma once
 #include "GameDaemonFwd.h"
 
-class AchievementDaemonChannel
+// LIFT: PDB layout (size 0x40, base ClientSideDaemonChannel). Card lift-gamedaemon-e131.
+class AchievementDaemonChannel : public ClientSideDaemonChannel
 {
 public:
     virtual __cdecl ~AchievementDaemonChannel(void);  // 0x32da0
@@ -20,6 +21,19 @@ public:
     void __cdecl Destroy(void);  // 0xa7870
 protected:
     virtual ::Session * __cdecl getSession(void);  // 0x180c20
+private:
+    short _clusterId;
+    long long _pingSent;
+    long long _pingReceived;
+    friend struct AchievementDaemonChannelLayout;
+};
+
+struct AchievementDaemonChannelLayout
+{
+    static_assert(sizeof(AchievementDaemonChannel) == 0x40, "sizeof AchievementDaemonChannel");
+    static_assert(offsetof(AchievementDaemonChannel, _clusterId) == 0x28, "AchievementDaemonChannel::_clusterId");
+    static_assert(offsetof(AchievementDaemonChannel, _pingSent) == 0x30, "AchievementDaemonChannel::_pingSent");
+    static_assert(offsetof(AchievementDaemonChannel, _pingReceived) == 0x38, "AchievementDaemonChannel::_pingReceived");
 };
 
 bool __cdecl HandleAchievementGameGameHelloOk(::Session const *, ::Packet const *);  // 0x334c0

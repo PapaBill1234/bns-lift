@@ -2,11 +2,21 @@
 #include "marketreaderagentchannel.h"
 #include "pc.h"
 #include "LiftStub.h"
+#include "AlertSender.h"
+#include "Log.h"
+
+// LIFT: per-exe path literal (lessons A6).
+#define MARKETREADERAGENTCHANNEL_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\MarketReaderAgentChannel.cpp"
 
 // 0x1618f0
+#pragma comment(linker, "/INCLUDE:?OnAccept@MarketReaderAgentSessionHandler@@UEBA_NPEBVSession@@@Z")  // LIFT: dead-strip keep (no live caller yet)
 bool __cdecl MarketReaderAgentSessionHandler::OnAccept(::Session const *) const
 {
-    LIFT_STUB(0x1618f0);
+    Log::Write(Log::LT_ERROR, MARKETREADERAGENTCHANNEL_FILE, 23,
+               L"== CRASH == [game-marketR], cannot accept from marketR (game connect to marketR)");
+    AlertSender::Write(MARKETREADERAGENTCHANNEL_FILE, 23,
+                       L"== CRASH == [game-marketR], cannot accept from marketR (game connect to marketR)");
+    return false;
 }
 
 // 0x161930

@@ -3,7 +3,8 @@
 #pragma once
 #include "GameDaemonFwd.h"
 
-class RankingChannel
+// LIFT: PDB layout (size 0x40, base ClientSideDaemonChannel). Card lift-gamedaemon-e131.
+class RankingChannel : public ClientSideDaemonChannel
 {
 public:
     virtual __cdecl ~RankingChannel(void);  // 0x1aef40
@@ -19,6 +20,19 @@ public:
     bool __cdecl InsertRankingScore(__int64, __int64, short, char, __int64, __int64, __int64, char, int, wchar_t *, char, __int64, wchar_t const *, wchar_t const *);  // 0x1af4b0
     void __cdecl SendLoadGuildRankingResultList(void);  // 0x1af5c0
     bool __cdecl SendLoadPlayerSeasonResultByPlayerTypeList(short, __int64);  // 0x1af660
+private:
+    short _clusterId;
+    long long _pingSent;
+    long long _pingReceived;
+    friend struct RankingChannelLayout;
+};
+
+struct RankingChannelLayout
+{
+    static_assert(sizeof(RankingChannel) == 0x40, "sizeof RankingChannel");
+    static_assert(offsetof(RankingChannel, _clusterId) == 0x28, "RankingChannel::_clusterId");
+    static_assert(offsetof(RankingChannel, _pingSent) == 0x30, "RankingChannel::_pingSent");
+    static_assert(offsetof(RankingChannel, _pingReceived) == 0x38, "RankingChannel::_pingReceived");
 };
 
 bool __cdecl HandleRankingGame_HelloOk(::Session const *, ::Packet const *);  // 0x1af710
