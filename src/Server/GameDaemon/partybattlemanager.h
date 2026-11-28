@@ -1,7 +1,7 @@
 // partybattlemanager.h: partybattlemanager.cpp, partybattlemanager.h (GameDaemon PDB, 2019 + PDB). Wave 0: declarations of the stubbed functions only.
 // LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
 #pragma once
-#include <cstddef>
+#include <stddef.h>
 #include "GameDaemonFwd.h"
 
 class PartyBattleGameLog

@@ -36,6 +36,11 @@ Stem `guild_cpp_1`:
 - `isSaveGameResult` skips detail rules 3 to 5. The enumerator names are not checked.
 - The mangled names in the keep pragmas were written by hand. Check them against the publics if a body does not pair.
 
+## Repair round 2
+
+- The gate build failed. The toolchain did not find the header `<cstddef>`.
+- `src/Server/GameDaemon/partybattlemanager.h` now includes `<stddef.h>` for `offsetof`. Other repo headers use the same form.
+
 ## Changed files
 
 - `src/Server/GameDaemon/partybattlemanager.h`
