@@ -1,6 +1,11 @@
 // cachedaemonchannel_2.cpp: cachedaemonchannel.cpp part 2 (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
 #include "cachedaemonchannel.h"
 #include "LiftStub.h"
+#include "AlertSender.h"
+#include "Log.h"
+
+// LIFT: per-exe path literal (lessons A6).
+#define CACHEDAEMONCHANNEL2_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\CacheDaemonChannel.cpp"
 
 // 0x2f51f0
 bool __cdecl HandleCacheGame_LoadGuildListFail(::Session const *, ::Packet const *)
@@ -549,9 +554,12 @@ bool __cdecl HandleCacheGame_LoadMileageDepositRetryListOk(::Session const *, ::
 }
 
 // 0x3041c0
+#pragma comment(linker, "/INCLUDE:?HandleCacheGame_LoadMileageDepositRetryListFail@@YA_NPEBVSession@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
 bool __cdecl HandleCacheGame_LoadMileageDepositRetryListFail(::Session const *, ::Packet const *)
 {
-    LIFT_STUB(0x3041c0);
+    Log::Write(Log::LT_DEBUG, CACHEDAEMONCHANNEL2_FILE, 10330,
+               L"[cache-channel], LoadMileageDepositRetryListFail, recv ok, ");
+    return true;
 }
 
 // 0x3041f0
@@ -561,9 +569,14 @@ bool __cdecl HandleCacheGame_LoadRaidDungeonListOk(::Session const *, ::Packet c
 }
 
 // 0x3042c0
+#pragma comment(linker, "/INCLUDE:?HandleCacheGame_LoadRaidDungeonListFail@@YA_NPEBVSession@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
 bool __cdecl HandleCacheGame_LoadRaidDungeonListFail(::Session const *, ::Packet const *)
 {
-    LIFT_STUB(0x3042c0);
+    Log::Write(Log::LT_ERROR, CACHEDAEMONCHANNEL2_FILE, 10358,
+               L"== CRASH == [cache-channel], HandleCacheGame_LoadRaidDungeonListFail");
+    AlertSender::Write(CACHEDAEMONCHANNEL2_FILE, 10358,
+                       L"== CRASH == [cache-channel], HandleCacheGame_LoadRaidDungeonListFail");
+    return true;
 }
 
 // 0x304300
@@ -573,9 +586,12 @@ bool __cdecl HandleCacheGame_BindRaidDungeonOk(::Session const *, ::Packet const
 }
 
 // 0x304520
+#pragma comment(linker, "/INCLUDE:?HandleCacheGame_BindRaidDungeonFail@@YA_NPEBVSession@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
 bool __cdecl HandleCacheGame_BindRaidDungeonFail(::Session const *, ::Packet const *)
 {
-    LIFT_STUB(0x304520);
+    AlertSender::Write(CACHEDAEMONCHANNEL2_FILE, 10402, L"[cache-channel], HandleCacheGame_BindRaidDungeonFail");
+    Log::Write(Log::LT_ERROR, CACHEDAEMONCHANNEL2_FILE, 10402, L"[cache-channel], HandleCacheGame_BindRaidDungeonFail");
+    return true;
 }
 
 // 0x304560
@@ -585,9 +601,12 @@ bool __cdecl HandleCacheGame_UpdateRaidDungeonOk(::Session const *, ::Packet con
 }
 
 // 0x3046b0
+#pragma comment(linker, "/INCLUDE:?HandleCacheGame_UpdateRaidDungeonFail@@YA_NPEBVSession@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
 bool __cdecl HandleCacheGame_UpdateRaidDungeonFail(::Session const *, ::Packet const *)
 {
-    LIFT_STUB(0x3046b0);
+    AlertSender::Write(CACHEDAEMONCHANNEL2_FILE, 10434, L"[cache-channel], HandleCacheGame_UpdateRaidDungeonFail");
+    Log::Write(Log::LT_ERROR, CACHEDAEMONCHANNEL2_FILE, 10434, L"[cache-channel], HandleCacheGame_UpdateRaidDungeonFail");
+    return true;
 }
 
 // 0x3046f0

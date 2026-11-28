@@ -7,6 +7,13 @@
 #include <vector>
 #include <algorithm>
 #include "LiftStub.h"
+#include "Session.h"
+#include "AlertSender.h"
+#include "Log.h"
+#include <intrin.h>
+
+// LIFT: per-exe path literal (lessons A6).
+#define GAMEDAEMON_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\GameDaemon.cpp"
 
 #pragma comment(linker, "/INCLUDE:?EventId@GamedReloadInvalidRestoreTimer@@UEBAIXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?GetRandomStoreServiceState@GameDaemon@@SAHD@Z")  // LIFT: dead-strip keep (no live caller yet)
@@ -52,9 +59,20 @@ inline GameDaemonView * AsView(::GameDaemon * daemon)
 }
 
 // 0x339ee0
+#pragma comment(linker, "/INCLUDE:?GenerateTid@@YA_KXZ")  // LIFT: dead-strip keep (no live caller yet)
 unsigned __int64 __cdecl GenerateTid(void)
 {
-    LIFT_STUB(0x339ee0);
+    // LIFT: the PDB has no symbol for the counter (pseudocode name _seed__, data 0x101e138). Static counter as in LobbyDaemon.
+    static unsigned __int64 __seed__ = 0;
+    long long const result = _InterlockedIncrement64(reinterpret_cast<volatile __int64 *>(&__seed__));
+    if (result == 0)
+    {
+        // The counter wrapped to 0. Take the next value and log it.
+        long long const v = _InterlockedExchangeAdd64(reinterpret_cast<volatile __int64 *>(&__seed__), 1);
+        Log::Write(Log::LT_ERROR, GAMEDAEMON_FILE, 122, L"[game-tran], tid overflow");
+        return static_cast<unsigned __int64>(v + 1);
+    }
+    return static_cast<unsigned __int64>(result);
 }
 
 // 0x339f30
@@ -70,15 +88,20 @@ int wmain(int, wchar_t**)
 }
 
 // 0x33a210
-bool __cdecl ManageSessionHandler::OnAccept(::Session const *) const
+#pragma comment(linker, "/INCLUDE:?OnAccept@ManageSessionHandler@@UEBA_NPEBVSession@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+bool __cdecl ManageSessionHandler::OnAccept(::Session const * session) const
 {
-    LIFT_STUB(0x33a210);
+    Log::Write(Log::LT_DEBUG, GAMEDAEMON_FILE, 255, L"Manage Session(%I64X), Accepted", session->_id);
+    return true;
 }
 
 // 0x33a250
+#pragma comment(linker, "/INCLUDE:?OnConnect@ManageSessionHandler@@UEBA_NPEBVSession@@_N@Z")  // LIFT: dead-strip keep (no live caller yet)
 bool __cdecl ManageSessionHandler::OnConnect(::Session const *, bool) const
 {
-    LIFT_STUB(0x33a250);
+    Log::Write(Log::LT_ERROR, GAMEDAEMON_FILE, 261, L"== CRASH == [manage session handler], OnConnect; called ... wrong");
+    AlertSender::Write(GAMEDAEMON_FILE, 261, L"== CRASH == [manage session handler], OnConnect; called ... wrong");
+    return false;
 }
 
 // 0x33a290
@@ -106,15 +129,20 @@ bool __cdecl ManageSessionHandler::QaCommandPacketHandler(::Session const *, ::P
 }
 
 // 0x33aaf0
-bool __cdecl BuilderSessionHandler::OnAccept(::Session const *) const
+#pragma comment(linker, "/INCLUDE:?OnAccept@BuilderSessionHandler@@UEBA_NPEBVSession@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+bool __cdecl BuilderSessionHandler::OnAccept(::Session const * session) const
 {
-    LIFT_STUB(0x33aaf0);
+    Log::Write(Log::LT_DEBUG, GAMEDAEMON_FILE, 486, L"Builder Session(%I64X), Accepted", session->_id);
+    return true;
 }
 
 // 0x33ab30
+#pragma comment(linker, "/INCLUDE:?OnConnect@BuilderSessionHandler@@UEBA_NPEBVSession@@_N@Z")  // LIFT: dead-strip keep (no live caller yet)
 bool __cdecl BuilderSessionHandler::OnConnect(::Session const *, bool) const
 {
-    LIFT_STUB(0x33ab30);
+    Log::Write(Log::LT_ERROR, GAMEDAEMON_FILE, 492, L"== CRASH == [builder session handler], OnConnect; called ... wrong");
+    AlertSender::Write(GAMEDAEMON_FILE, 492, L"== CRASH == [builder session handler], OnConnect; called ... wrong");
+    return false;
 }
 
 // 0x33ab70
@@ -396,9 +424,19 @@ static int GenerateDump(_EXCEPTION_POINTERS*, bool)
 }
 
 // 0x3438f0
-void __cdecl GameDaemon::WriteDump(bool)
+#pragma comment(linker, "/INCLUDE:?WriteDump@GameDaemon@@SAX_N@Z")  // LIFT: dead-strip keep (no live caller yet)
+void __cdecl GameDaemon::WriteDump(bool fullMemory)
 {
-    LIFT_STUB(0x3438f0);
+    // The original raises an access violation and writes the dump in the filter (filt$0, 0x702a30, line 4357).
+    // LIFT: the original filter does not load fullMemory (GenerateDump does not use it; the 2019 build drops the
+    // argument). The repo build spills fullMemory to its home slot. That is the one remaining difference.
+    __try
+    {
+        RaiseException(0xC0000005, 1, 0, NULL);
+    }
+    __except (GenerateDump(GetExceptionInformation(), fullMemory))
+    {
+    }
 }
 
 // 0x343910

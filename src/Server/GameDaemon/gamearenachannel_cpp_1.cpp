@@ -1,17 +1,30 @@
 // gamearenachannel_cpp_1.cpp: gamearenachannel.cpp part 1 (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
 #include "gamearenachannel.h"
 #include "LiftStub.h"
+#include "Session.h"
+#include "AlertSender.h"
+#include "Log.h"
+
+// LIFT: per-exe path literal (lessons A6).
+#define GAMEARENACHANNEL_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\GameArenaChannel.cpp"
 
 // 0xbdb30
-bool __cdecl GameArenaSessionHandler::OnAccept(::Session const *) const
+#pragma comment(linker, "/INCLUDE:?OnAccept@GameArenaSessionHandler@@UEBA_NPEBVSession@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+bool __cdecl GameArenaSessionHandler::OnAccept(::Session const * session) const
 {
-    LIFT_STUB(0xbdb30);
+    Log::Write(Log::LT_DEBUG, GAMEARENACHANNEL_FILE, 48, L"[game-arena], accepted, session:0x%I64x", session->_id);
+    return true;
 }
 
 // 0xbdb70
+#pragma comment(linker, "/INCLUDE:?OnConnect@GameArenaSessionHandler@@UEBA_NPEBVSession@@_N@Z")  // LIFT: dead-strip keep (no live caller yet)
 bool __cdecl GameArenaSessionHandler::OnConnect(::Session const *, bool) const
 {
-    LIFT_STUB(0xbdb70);
+    Log::Write(Log::LT_ERROR, GAMEARENACHANNEL_FILE, 54,
+               L"== CRASH == [game-arena], cannot connect game to arena (arena connect to game)");
+    AlertSender::Write(GAMEARENACHANNEL_FILE, 54,
+                       L"== CRASH == [game-arena], cannot connect game to arena (arena connect to game)");
+    return false;
 }
 
 // 0xbdbb0

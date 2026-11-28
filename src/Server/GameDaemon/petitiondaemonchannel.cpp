@@ -1,11 +1,21 @@
 // petitiondaemonchannel.cpp: petitiondaemonchannel.cpp (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
 #include "petitiondaemonchannel.h"
 #include "LiftStub.h"
+#include "AlertSender.h"
+#include "Log.h"
+
+// LIFT: per-exe path literal (lessons A6).
+#define PETITIONDAEMONCHANNEL_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\PetitionDaemonChannel.cpp"
 
 // 0x18c8a0
+#pragma comment(linker, "/INCLUDE:?OnAccept@PetitionSessionHandler@@UEBA_NPEBVSession@@@Z")  // LIFT: dead-strip keep (no live caller yet)
 bool __cdecl PetitionSessionHandler::OnAccept(::Session const *) const
 {
-    LIFT_STUB(0x18c8a0);
+    Log::Write(Log::LT_ERROR, PETITIONDAEMONCHANNEL_FILE, 19,
+               L"== CRASH == [game-petition], cannot accept from petitiond (game connect to petitiond)");
+    AlertSender::Write(PETITIONDAEMONCHANNEL_FILE, 19,
+                       L"== CRASH == [game-petition], cannot accept from petitiond (game connect to petitiond)");
+    return false;
 }
 
 // 0x18c8e0

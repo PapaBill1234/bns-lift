@@ -27,6 +27,8 @@ public:
     static bool __cdecl IsArenaEnabledGameDaemon(void);  // 0x1107f0
     static bool __cdecl InitializeRankingResult(void);  // 0x180ca0
     static bool __cdecl SetEventReplyCacheHello(void);  // 0x180e10
+    // LIFT: 0x311c10 has SetEventReplyCacheHello inlined (header body in the original). The friend line gives the same access.
+    friend bool __cdecl HandleCacheGame_InitializeMentoringFail(::Session const *, ::Packet const *);
     virtual wchar_t const * __cdecl ShortName(void);  // 0x1ee6f0
     virtual wchar_t const * __cdecl Name(void);  // 0x1ee700
     virtual long __cdecl GetTimerInterval(void);  // 0x1ee710

@@ -13,6 +13,12 @@
 #include "skill.h"
 #include "summonedproperty.h"
 #include "LiftStub.h"
+#include "gamedaemon.h"
+#include "Packet.h"
+#include "Log.h"
+
+// LIFT: per-exe path literal (lessons A6).
+#define CACHEDAEMONCHANNEL3_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\CacheDaemonChannel.cpp"
 
 // 0x306260
 bool __cdecl HandleCacheGame_RetryTakeRankingRewardOk(::Session const *, ::Packet const *)
@@ -387,9 +393,16 @@ bool __cdecl HandleCacheGame_InitializeMentoringOk(::Session const *, ::Packet c
 }
 
 // 0x311c10
+#pragma comment(linker, "/INCLUDE:?HandleCacheGame_InitializeMentoringFail@@YA_NPEBVSession@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
 bool __cdecl HandleCacheGame_InitializeMentoringFail(::Session const *, ::Packet const *)
 {
-    LIFT_STUB(0x311c10);
+    Log::Write(Log::LT_ERROR, CACHEDAEMONCHANNEL3_FILE, 13663,
+               L"[cachedchannel], CacheGame_InitializeMentoringFail; recv ok,");
+    // LIFT: inlined GameDaemon::SetEventReplyCacheHello (0x180e10).
+    void *event = GameDaemon::GamedInstance->replyCacheHelloEvent.Event;
+    if (event != nullptr)
+        SetEvent(event);
+    return true;
 }
 
 // 0x311c50
@@ -465,9 +478,16 @@ bool __cdecl HandleCacheGame_TryBoardGachaPaymentFail(::Session const *, ::Packe
 }
 
 // 0x314b00
-bool __cdecl HandleCacheGame_PurePropertyTransactionOk(::Session const *, ::Packet const *)
+#pragma comment(linker, "/INCLUDE:?HandleCacheGame_PurePropertyTransactionOk@@YA_NPEBVSession@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+bool __cdecl HandleCacheGame_PurePropertyTransactionOk(::Session const *, ::Packet const * packet)
 {
-    LIFT_STUB(0x314b00);
+    short c;
+    __int64 tid = 0;
+    __int64 pcDbId = 0;
+    packet->Decompose("hqq", &c, &tid, &pcDbId);
+    Log::Write(Log::LT_DEBUG, CACHEDAEMONCHANNEL3_FILE, 14244,
+               L"[cachedchannel], PurePropertyTransactionOk; tid:%#I64X, pcDbId:%#I64X", tid, pcDbId);
+    return true;
 }
 
 // 0x314b70

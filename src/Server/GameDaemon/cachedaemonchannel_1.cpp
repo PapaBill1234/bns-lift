@@ -2,6 +2,12 @@
 #include "cachedaemonchannel.h"
 #include "property.h"
 #include "LiftStub.h"
+#include "Packet.h"
+#include "AlertSender.h"
+#include "Log.h"
+
+// LIFT: per-exe path literal (lessons A6).
+#define CACHEDAEMONCHANNEL1_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\CacheDaemonChannel.cpp"
 
 // 0x2e0720
 void __cdecl ComposePropertyPair(::FragmentPacket &, ::Property &)
@@ -46,9 +52,11 @@ bool __cdecl HandleCacheGame_HelloOk(::Session const *, ::Packet const *)
 }
 
 // 0x2e1380
+#pragma comment(linker, "/INCLUDE:?HandleCacheGame_HelloFail@@YA_NPEBVSession@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
 bool __cdecl HandleCacheGame_HelloFail(::Session const *, ::Packet const *)
 {
-    LIFT_STUB(0x2e1380);
+    Log::Write(Log::LT_ERROR, CACHEDAEMONCHANNEL1_FILE, 362, L"[cachedchannel] Cached didn't authorize this gamed");
+    return true;
 }
 
 // 0x2e13b0
@@ -58,9 +66,12 @@ bool __cdecl HandleCacheGame_InitializeSeasonContentsScheduleOk(::Session const 
 }
 
 // 0x2e14a0
+#pragma comment(linker, "/INCLUDE:?HandleCacheGame_InitializeSeasonContentsScheduleFail@@YA_NPEBVSession@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
 bool __cdecl HandleCacheGame_InitializeSeasonContentsScheduleFail(::Session const *, ::Packet const *)
 {
-    LIFT_STUB(0x2e14a0);
+    Log::Write(Log::LT_ERROR, CACHEDAEMONCHANNEL1_FILE, 391,
+               L"[cachedchannel], CacheGame_InitializeSeasonContentsScheduleFail; recv ok,");
+    return true;
 }
 
 // 0x2e14d0
@@ -70,9 +81,12 @@ bool __cdecl HandleCacheGame_InitializeSeasonContentsChallengePartyScheduleOk(::
 }
 
 // 0x2e15b0
+#pragma comment(linker, "/INCLUDE:?HandleCacheGame_InitializeSeasonContentsChallengePartyScheduleFail@@YA_NPEBVSession@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
 bool __cdecl HandleCacheGame_InitializeSeasonContentsChallengePartyScheduleFail(::Session const *, ::Packet const *)
 {
-    LIFT_STUB(0x2e15b0);
+    Log::Write(Log::LT_ERROR, CACHEDAEMONCHANNEL1_FILE, 424, L"[%s], %s; recv ok.", L"challenge-party",
+               L"HandleCacheGame_InitializeSeasonContentsChallengePartyScheduleFail");
+    return true;
 }
 
 // 0x2e15f0
@@ -82,15 +96,29 @@ bool __cdecl HandleCacheGame_LoadGuildCombatRecordOk(::Session const *, ::Packet
 }
 
 // 0x2e1a80
-bool __cdecl HandleCacheGame_LoadGuildCombatRecordFail(::Session const *, ::Packet const *)
+#pragma comment(linker, "/INCLUDE:?HandleCacheGame_LoadGuildCombatRecordFail@@YA_NPEBVSession@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+bool __cdecl HandleCacheGame_LoadGuildCombatRecordFail(::Session const *, ::Packet const * packet)
 {
-    LIFT_STUB(0x2e1a80);
+    short c;
+    short reason = 1;
+    packet->Decompose("hh", &c, &reason);
+    Log::Write(Log::LT_ERROR, CACHEDAEMONCHANNEL1_FILE, 522,
+               L"== CRASH == [cachedchannel], CacheGame_LoadGuildCombatRecordFail; recv ok, recv reason:%d", reason);
+    AlertSender::Write(CACHEDAEMONCHANNEL1_FILE, 522,
+                       L"== CRASH == [cachedchannel], CacheGame_LoadGuildCombatRecordFail; recv ok, recv reason:%d", reason);
+    return false;
 }
 
 // 0x2e1b00
-bool __cdecl HandleCacheGame_RetrieveFactionStatisticsFail(::Session const *, ::Packet const *)
+#pragma comment(linker, "/INCLUDE:?HandleCacheGame_RetrieveFactionStatisticsFail@@YA_NPEBVSession@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+bool __cdecl HandleCacheGame_RetrieveFactionStatisticsFail(::Session const *, ::Packet const * packet)
 {
-    LIFT_STUB(0x2e1b00);
+    short c;
+    short failReason;
+    packet->Decompose("hh", &c, &failReason);
+    Log::Write(Log::LT_ERROR, CACHEDAEMONCHANNEL1_FILE, 533,
+               L"[cachedchannel], CacheGame_RetrieveFactionStatisticsFail, reason:%d", failReason);
+    return true;
 }
 
 // 0x2e1b50
@@ -196,15 +224,29 @@ bool __cdecl HandleCacheGame_CheckPostCapacityFail(::Session const *, ::Packet c
 }
 
 // 0x2e4010
-bool __cdecl HandleCacheGame_DeliverSystemPostOk(::Session const *, ::Packet const *)
+#pragma comment(linker, "/INCLUDE:?HandleCacheGame_DeliverSystemPostOk@@YA_NPEBVSession@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+bool __cdecl HandleCacheGame_DeliverSystemPostOk(::Session const *, ::Packet const * packet)
 {
-    LIFT_STUB(0x2e4010);
+    short c;
+    __int64 tid;
+    __int64 receiptId;
+    packet->Decompose("hqq", &c, &tid, &receiptId);
+    Log::Write(Log::LT_DEBUG, CACHEDAEMONCHANNEL1_FILE, 1240,
+               L"[cachedchannel], HandleCacheGame_DeliverSystemPostOk, tid:%#I64x, receiptId:%#I64x", tid, receiptId);
+    return true;
 }
 
 // 0x2e4080
-bool __cdecl HandleCacheGame_DeliverSystemPostFail(::Session const *, ::Packet const *)
+#pragma comment(linker, "/INCLUDE:?HandleCacheGame_DeliverSystemPostFail@@YA_NPEBVSession@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+bool __cdecl HandleCacheGame_DeliverSystemPostFail(::Session const *, ::Packet const * packet)
 {
-    LIFT_STUB(0x2e4080);
+    short c;
+    __int64 tid;
+    short failReason;
+    packet->Decompose("hqE", &c, &tid, &failReason);
+    Log::Write(Log::LT_DEBUG, CACHEDAEMONCHANNEL1_FILE, 1253,
+               L"[cachedchannel], HandleCacheGame_DeliverSystemPostFail, tid:%#I64x, failReason:%d", tid, failReason);
+    return true;
 }
 
 // 0x2e40f0
