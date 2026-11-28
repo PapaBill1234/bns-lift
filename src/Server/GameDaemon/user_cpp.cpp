@@ -6,6 +6,9 @@
 #include "contentsruleconfigdefinition_gd.h"
 #include <time.h>
 #include <wchar.h>
+#include "Channel.h"
+#include "RefCntObject.h"
+#include "Log.h"
 #include "LiftStub.h"
 
 #pragma comment(linker, "/INCLUDE:??1TimeBasedPlayInfoList@@QEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
@@ -16,6 +19,10 @@
 #pragma comment(linker, "/INCLUDE:?SetPcCafeDebugCode@User@@QEAAXPEA_WD@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?setExistContentsBan@User@@AEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?IsBannedContents@User@@QEBA_ND@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SetSession@User@@UEAAXPEBVSession@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?resetPc@User@@CAXPEAVRefCntObject@@00@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?resetPc@User@@AEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?ClearBotState@User@@QEAAXPEB_WH@Z")  // LIFT: dead-strip keep (no live caller yet)
 
 namespace
 {
@@ -51,8 +58,16 @@ inline T *UserAt(void const *self, unsigned offset)
     return reinterpret_cast<T *>(const_cast<char *>(static_cast<char const *>(self)) + offset);
 }
 
+#define USER_CPP_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\User.cpp"
+#define USER_PC_CPP_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\Pc.cpp"
+
 enum
 {
+    USER_PcDbId = 216,
+    USER_PcId = 224,
+    USER_pc = 720,
+    USER_SendHashKey = 728,
+    USER_botScoreState = 1072,
     USER_ChargeBaseType = 400,
     USER_PcCafeCode = 676,
     USER_contentsBanList = 872,
@@ -63,7 +78,9 @@ enum
 };
 
 // LIFT: GamedConfig::_useContentsBan is bool at +0x2D1 (PDB). GameDaemon::publisherCode is char at +0x15341 (PDB).
-inline bool UseContentsBan() { return *reinterpret_cast<bool *>(reinterpret_cast<char *>(GameDaemon::GamedInstance->config) + 721); }
+// LIFT: GameDaemon::config is at +0xAA8 (PDB, private). Read it by offset.
+inline GamedConfig *GamedConfigOf() { return *reinterpret_cast<GamedConfig **>(reinterpret_cast<char *>(GameDaemon::GamedInstance) + 0xAA8); }
+inline bool UseContentsBan() { return *reinterpret_cast<bool *>(reinterpret_cast<char *>(GamedConfigOf()) + 721); }
 inline char PublisherCode() { return *(reinterpret_cast<char *>(GameDaemon::GamedInstance) + 86849); }
 }  // namespace
 
@@ -290,9 +307,16 @@ __cdecl User::~User(void)
 }
 
 // 0x3e4610
-void __cdecl User::SetSession(::Session const *)
+void __cdecl User::SetSession(::Session const *session)
 {
-    LIFT_STUB(0x3e4610);
+    if (session != nullptr)
+    {
+        GamedConfig *config = GamedConfigOf();
+        // LIFT: Session::_id is at +0x68 (PDB). The arena id compare is unsigned in the original.
+        if (!config->_arenaEnabled || static_cast<unsigned>(config->_arenaId) <= 0u)
+            *UserAt<unsigned __int64>(this, USER_SendHashKey) = *UserAt<unsigned __int64>(session, 0x68);
+    }
+    reinterpret_cast<Channel *>(this)->Channel::SetSession(session);  // LIFT: User has no declared base yet. Channel is the base at +0.
 }
 
 // 0x3e4650
@@ -345,15 +369,28 @@ void __cdecl User::ResetPc(bool)
 }
 
 // 0x3e56f0
-void __cdecl User::resetPc(::RefCntObject *, ::RefCntObject *, ::RefCntObject *)
+void __cdecl User::resetPc(::RefCntObject *ref1, ::RefCntObject *, ::RefCntObject *)
 {
-    LIFT_STUB(0x3e56f0);
+    // LIFT: thunk. The first argument is the User (Channel base at +0). It jumps to resetPc(void).
+    reinterpret_cast<User *>(ref1)->resetPc();
 }
 
 // 0x3e5700
 void __cdecl User::resetPc(void)
 {
-    LIFT_STUB(0x3e5700);
+    Pc *pc = *UserAt<Pc *>(this, USER_pc);
+    if (pc != nullptr)
+    {
+        *UserAt<unsigned __int64>(this, USER_PcId) = 0;
+        *UserAt<Pc *>(this, USER_pc) = nullptr;
+        // LIFT: Pc::_user is at +0x4DE0 and Pc::_pcDbId is at +0x4E10 (PDB). Pc is a RefCntObject.
+        RefCntObject *user = *UserAt<RefCntObject *>(pc, 0x4DE0);
+        *UserAt<void *>(pc, 0x4DE0) = nullptr;
+        *UserAt<unsigned __int64>(pc, 0x4E10) = 0;
+        if (user != nullptr)
+            user->removeReferenceCount(USER_CPP_FILE, 1763);
+        reinterpret_cast<RefCntObject *>(pc)->removeReferenceCount(USER_CPP_FILE, 1765);
+    }
 }
 
 // 0x3e5770
@@ -518,9 +555,20 @@ void __cdecl User::AddBotState(::Data::BotScoringConditionConditionTypeType, __i
 }
 
 // 0x3e8440
-void __cdecl User::ClearBotState(wchar_t const *, int)
+void __cdecl User::ClearBotState(wchar_t const *file, int)
 {
-    LIFT_STUB(0x3e8440);
+    // LIFT: the original reads edx (low 32 bits of the first argument) as the log line number. It ignores the second argument.
+    int line = static_cast<int>(reinterpret_cast<__int64>(file));  // ❓ the original has mov ebp, edx here. This form gives mov rbp, rdx.
+    for (int i = 0; i < 8; ++i)
+    {
+        // LIFT: User::_botScoreInfo.state[i] (+0x430, 0x18 bytes each): value +0, lastCheckTime +8, extra +0x10.
+        char *state = reinterpret_cast<char *>(this) + USER_botScoreState + i * 24;
+        *reinterpret_cast<__int64 *>(state) = 0;
+        *reinterpret_cast<__int64 *>(state + 8) = _time64(nullptr);
+        *(state + 16) = 0;
+    }
+    Log::Write(Log::LT_DEBUG, USER_PC_CPP_FILE, line, L"[user], ClearBotState, pcDbId:0x%I64x",
+               *UserAt<unsigned __int64>(this, USER_PcDbId));
 }
 
 // 0x3e84d0

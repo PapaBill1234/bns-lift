@@ -7,8 +7,12 @@
 #include "Packet.h"
 #include "PacketUtil.h"
 #include "Log.h"
+#include "Memory.h"
+#include "MemoryManager.h"
 #include "RefCntObject.h"
 #include <time.h>
+#include <stdio.h>
+#include <wchar.h>
 #include "LiftStub.h"
 
 #pragma comment(linker, "/INCLUDE:?SetTakingAchievementReward@Pc@@QEAAX_N@Z")  // LIFT: dead-strip keep (no live caller yet)
@@ -23,6 +27,9 @@
 #pragma comment(linker, "/INCLUDE:?IsUsingJumpingCharacter2Ticket@Pc@@QEAA?B_NXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?ClearTransformItemRetry@Pc@@QEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?isAccountExpCharged@Pc@@AEAA_N_J_N@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetPowerInfoForGameLog@Pc@@QEAAXAEAUPcInfoForGameLog@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?ClearAttractionReward@Pc@@QEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SendInitializeSeasonContentsRecordFail@Pc@@QEAAXW4GameFailReason@@@Z")  // LIFT: dead-strip keep (no live caller yet)
 
 #define PC_CPP_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\Pc.cpp"
 
@@ -39,6 +46,7 @@ inline T *PcAt(void *self, unsigned offset)
 enum
 {
     PC_Id = 0x28,
+    PC_pcDbId = 0x4E10,
     PC_account_exp_last_update_time = 0x370,  // Prop (+0x30) .State (+0xD8) .account_exp_last_update_time (+0x268)
     PC_attractionReward = 0x2FB8,
     PC_accountExpNextChargeTime = 0x3040,
@@ -228,9 +236,16 @@ void __cdecl Pc::GetVitalityInfoForGameLog(::PcInfoForGameLog &)
 }
 
 // 0x606d10
-void __cdecl Pc::GetPowerInfoForGameLog(::PcInfoForGameLog &)
+void __cdecl Pc::GetPowerInfoForGameLog(::PcInfoForGameLog &pcInfo)
 {
-    LIFT_STUB(0x606d10);
+    // LIFT: the Pc members at these offsets have no PDB name in the skeleton yet. The RVA 0x606d10 body reads them by offset.
+    // LIFT: PcInfoForGameLog.power is at +0x570 (PDB). The skeleton struct has no members yet.
+    __int64 a = (*PcAt<short>(this, 0x558) + *PcAt<short>(this, 0x550)) / 2;
+    __int64 b = (*PcAt<int>(this, 0x540) + *PcAt<int>(this, 0x530)) / 2;
+    __int64 c = (*PcAt<short>(this, 0x640) + *PcAt<short>(this, 0x638)) / 2;
+    __int64 d = (*PcAt<short>(this, 0x630) + *PcAt<short>(this, 0x628)) / 2;
+    __int64 p1 = a + b;
+    swprintf_s(PcAt<wchar_t>(&pcInfo, 0x570), 0x80u, L"%I64d/%I64d", p1, d + (p1 + c));
 }
 
 // 0x606db0
@@ -649,7 +664,16 @@ void __cdecl Pc::DropEffectPouch(short &, ::vector16 &)
 // 0x60af20
 void __cdecl Pc::ClearAttractionReward(void)
 {
-    LIFT_STUB(0x60af20);
+    // LIFT: AttractionReward has no declared vfptr yet. Call slot 0 (scalar deleting destructor, flag 1) by the vtable.
+    typedef void *(__fastcall *AttractionRewardDtor)(void *, __int64);
+    void **slot = PcAt<void *>(this, PC_attractionReward);
+    void *attractionReward = *slot;
+    if (attractionReward != nullptr)
+    {
+        (*reinterpret_cast<AttractionRewardDtor *>(*reinterpret_cast<void ***>(attractionReward)))(attractionReward, 1);
+        Memory::_Manager[2]->Free(*slot, PC_CPP_FILE, 20525);
+        *slot = nullptr;
+    }
 }
 
 // 0x60af80
@@ -691,7 +715,12 @@ void __cdecl Pc::SendInitializeSeasonContentsRecordOk(void)
 // 0x60b880
 void __cdecl Pc::SendInitializeSeasonContentsRecordFail(::GameFailReason)
 {
-    LIFT_STUB(0x60b880);
+    // LIFT: the original logs and sends the constant 2. It does not read the reason argument.
+    int v3 = 2;
+    Log::Write(Log::LT_ERROR, PC_CPP_FILE, 20768,
+               L"[pc], fail to initialize season contents record, pcid:0x%I64X, pcdbid:0x%I64X, reason:%d",
+               *PcAt<unsigned __int64>(this, PC_Id), *PcAt<unsigned __int64>(this, PC_pcDbId), v3);
+    Send("hh", 105, v3);
 }
 
 // 0x60b8f0
