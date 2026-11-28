@@ -1,6 +1,7 @@
 // defmemory.h: defmemory.cpp, defmemory.h (GameDaemon PDB, 2019 + PDB).
 #pragma once
 #include "GameDaemonFwd.h"
+#include <new>
 
 // PDB layout (size 0x10): base DrMemory, heap at +8.
 class DrHeapMemory : public DrMemory
@@ -48,4 +49,14 @@ public:
 private:
     static ::DrMemory * memory[SECTION_MAX];
 };
+
+// LIFT: inline array helper of DefMemory.h (line 193 of the 2019 build). The PDB has no name for it (inlined), so DrNewArray is a lift name.
+template <class T>
+inline T * DrNewArray(int count)
+{
+    T * p = static_cast<T *>(DrMemoryManager::Memory(DrMemoryManager::SECTION_STATIC)->Alloc(sizeof(T) * count, DR_DEFMEMORY_FILE, 193));
+    for (int i = 0; i < count; ++i)
+        ::new (static_cast<void *>(&p[i])) T();
+    return p;
+}
 

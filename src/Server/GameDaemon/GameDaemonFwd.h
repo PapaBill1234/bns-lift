@@ -2004,7 +2004,24 @@ struct DismissPartyLogInfo {};
 struct DonateBrandMaterialOkParam {};
 struct DonateGuildUniformMaterialOkParam {};
 struct DonateNormalMaterialOkParam {};
-class DrAliasMap {};
+// PDB layout (size 0x8): vfptr only. Interface of the alias maps.
+class DrAliasMap
+{
+public:
+    virtual int __cdecl Count(void) const = 0;  // slot 0
+    virtual bool __cdecl Find(wchar_t const *, unsigned __int64 *) const = 0;  // slot 1
+    virtual bool __cdecl Insert(wchar_t const *, unsigned __int64) = 0;  // slot 2
+    virtual void __cdecl Clear(void) = 0;  // slot 3
+    virtual void __cdecl ClearTable(wchar_t const *, bool) = 0;  // slot 4
+    virtual void __cdecl Reconstruct(void) = 0;  // slot 5
+    virtual bool __cdecl ReadFromBuffer(unsigned char const *, unsigned __int64, unsigned __int64, bool) = 0;  // slot 6
+    virtual unsigned __int64 __cdecl WriteSize(void) const = 0;  // slot 7
+    virtual bool __cdecl WriteToBuffer(unsigned char *, unsigned __int64) = 0;  // slot 8
+    virtual bool __cdecl ReplaceIfChanged(wchar_t const *, ::DrAliasMap const &) = 0;  // slot 9
+    virtual bool __cdecl IsSubsetOf(wchar_t const *, ::DrAliasMap const &) const = 0;  // slot 10
+    virtual void __cdecl InsertInto(::DrAliasMap &) const = 0;  // slot 11
+    virtual void __cdecl Print(::DrLog *) = 0;  // slot 12
+};
 struct DrAttrDef {};
 class DrDataReader {};
 // PDB layout (size 0x6).

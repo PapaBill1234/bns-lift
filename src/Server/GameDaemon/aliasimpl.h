@@ -1,12 +1,49 @@
-// aliasimpl.h: aliasimpl.cpp, aliasimpl.h (GameDaemon PDB, 2019 + PDB). Wave 0: declarations of the stubbed functions only.
-// LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
+// aliasimpl.h: aliasimpl.cpp, aliasimpl.h (GameDaemon PDB, 2019 + PDB).
 #pragma once
 #include "GameDaemonFwd.h"
+#include "defmemory.h"
+#include "drstlmemory.h"
+#include <cwctype>
+#include <map>
+#include <string>
+#include <vector>
 
+// PDB layout (size 0x1): base std::char_traits<wchar_t>. Case-insensitive traits.
+struct ci_wchar_traits : public std::char_traits<wchar_t>
+{
+public:
+    // ❓ eq, ne, lt and find are inlined in the 2019 build. The bodies follow compare (towupper).
+    static bool __cdecl eq(wchar_t const c1, wchar_t const c2) { return towupper(c1) == towupper(c2); }
+    static bool __cdecl ne(wchar_t const c1, wchar_t const c2) { return towupper(c1) != towupper(c2); }
+    static bool __cdecl lt(wchar_t const c1, wchar_t const c2) { return towupper(c1) < towupper(c2); }
+    static int __cdecl compare(wchar_t const *, wchar_t const *, unsigned __int64);  // 0x6f3310
+    static wchar_t const * __cdecl find(wchar_t const * s, unsigned __int64 n, wchar_t const & a)
+    {
+        for (; n != 0; --n, ++s)
+        {
+            if (towupper(*s) == towupper(a))
+                return s;
+        }
+        return nullptr;
+    }
+};
+
+class DrAliasStringTable;
+
+// PDB layout (size 0x48): base DrAliasMap +0, _aliasmap +8.
+// LIFT: the class has no DrAliasMap base yet. WriteSize and Print (vtable slots 7 and 12) have no body in this card.
+// The own vfptr keeps the member offsets of the PDB.
 class DrAliasMapImpl
 {
 public:
-    struct AliasArrayElement {};
+    // PDB layout (size 0x30): alias +0, key +40.
+    struct AliasArrayElement
+    {
+        AliasArrayElement() : key(0) {}
+        std::basic_string<wchar_t, ci_wchar_traits, DrStlAllocator<wchar_t, 1> > alias;
+        unsigned __int64 key;
+    };
+    typedef std::map<std::basic_string<wchar_t, ci_wchar_traits, DrStlAllocator<wchar_t, 1> >, unsigned __int64, std::less<std::basic_string<wchar_t, ci_wchar_traits, DrStlAllocator<wchar_t, 1> > >, DrStlAllocator<std::pair<std::basic_string<wchar_t, ci_wchar_traits, DrStlAllocator<wchar_t, 1> >, unsigned __int64>, 1> > Map;
 public:
     virtual bool __cdecl WriteToBuffer(unsigned char *, unsigned __int64);  // 0x6f33a0
     virtual int __cdecl Count(void) const;  // 0x6f3610
@@ -30,11 +67,6 @@ public:
     __cdecl DrAliasMapImpl(void);  // 0x6f6450
     virtual void __cdecl ClearTable(wchar_t const *, bool);  // 0x6f6490
 private:
-    // PDB layout (size 0x48): base DrAliasMap (vfptr only) +0, _aliasmap +8.
-    // LIFT: the PDB type of _aliasmap is std::map<std::basic_string<wchar_t, ci_wchar_traits, DrStlAllocator<wchar_t, 1> >, unsigned __int64,
-    // std::less<...>, DrStlAllocator<std::pair<...>, 1> >. ci_wchar_traits and DrStlAllocator are not full types yet.
-    // The VS2010 std::map with std::wstring and std::allocator has the same layout (size 0x20).
-    typedef std::map<std::wstring, unsigned __int64> Map;
     Map _aliasmap;
     bool _reconstructed;
     bool _useStringTable;
@@ -47,6 +79,14 @@ private:
 class DrAliasStringTable
 {
 public:
+    // PDB layout (size 0x10): key +0, alias +8.
+    struct ArrayElement
+    {
+        ArrayElement() : key(0), alias(nullptr) {}
+        unsigned __int64 key;
+        char * alias;
+    };
+public:
     int Count() const { return _elCount; }
     void __cdecl Clear(void);  // 0x6f33b0
     bool __cdecl Find(wchar_t const *, unsigned __int64 *) const;  // 0x6f3430
@@ -56,16 +96,8 @@ public:
     bool __cdecl ReadFromBuffer(unsigned char const *, unsigned __int64, unsigned __int64, bool);  // 0x6f3900
     bool __cdecl Build(::DrAliasMapImpl::AliasArrayElement const *, int);  // 0x6f3a10
 private:
-    // LIFT: only the offsets and _elCount are confirmed. The pointer types of _elArray and _stringTable are placeholders.
     int _elCount;
-    void * _elArray;
-    wchar_t * _stringTable;
-    unsigned __int64 _stringTableSize;
+    ::DrAliasStringTable::ArrayElement * _elArray;
+    char * _stringTable;
+    int _stringTableSize;
 };
-
-struct ci_wchar_traits
-{
-public:
-    static int __cdecl compare(wchar_t const *, wchar_t const *, unsigned __int64);  // 0x6f3310
-};
-
