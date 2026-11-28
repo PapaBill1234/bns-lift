@@ -16,7 +16,6 @@
 #pragma comment(linker, "/INCLUDE:?SetData@TimeBasedPlayInfoList@@QEAAXAEBV1@@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?SetDurationForDebug@TimeBasedPlayInfoList@@QEAA_NDH@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?SetPcCafeDebugCode@User@@QEAAXPEA_WD@Z")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?SetSession@User@@UEAAXPEBVSession@@@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?resetPc@User@@CAXPEAVRefCntObject@@00@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?resetPc@User@@AEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
 
@@ -305,14 +304,7 @@ __cdecl User::~User(void)
 // 0x3e4610
 void __cdecl User::SetSession(::Session const *session)
 {
-    if (session != nullptr)
-    {
-        GamedConfig *config = GamedConfigOf();
-        // LIFT: Session::_id is at +0x68 (PDB). The arena id compare is unsigned in the original.
-        if (!config->_arenaEnabled || static_cast<unsigned>(config->_arenaId) <= 0u)
-            *UserAt<unsigned __int64>(this, USER_SendHashKey) = *UserAt<unsigned __int64>(session, 0x68);
-    }
-    reinterpret_cast<Channel *>(this)->Channel::SetSession(session);  // LIFT: User has no declared base yet. Channel is the base at +0.
+    LIFT_STUB(0x3e4610);
 }
 
 // 0x3e4650
