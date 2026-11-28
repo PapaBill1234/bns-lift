@@ -4143,6 +4143,27 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"ZoneCampfireNode::AddToCube": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZoneFieldItemNode::AddToCube": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZoneObjectIdList::Clear": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "ZoneSerializedObject::TimerExpired": {
 "calls": 100,
 "consts": 100,
