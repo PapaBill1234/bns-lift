@@ -3,7 +3,80 @@
 #include "achievementdata.h"
 #include "creature.h"
 #include "geoworld.h"
+#include "contentsruleconfigdefinition_gd.h"
+#include "Packet.h"
+#include "PacketUtil.h"
+#include "Log.h"
+#include "RefCntObject.h"
+#include <time.h>
 #include "LiftStub.h"
+
+#pragma comment(linker, "/INCLUDE:?SetTakingAchievementReward@Pc@@QEAAX_N@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?IsTakingAchievementReward@Pc@@QEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?EnableToRetrieveMyRanking@Pc@@QEAA_ND@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?HasCraft@Pc@@QEAA_ND@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?IsJoinedCraftUnion@Pc@@QEAA_ND@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetCraftUnionExp@Pc@@QEAAFD@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?FetchCraftUnionList@Pc@@QEAAXPEAVFragmentPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?IsRegisteredCraftRecipe@Pc@@QEAA_NH_K@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?clearCraftList@Pc@@AEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?IsUsingJumpingCharacter2Ticket@Pc@@QEAA?B_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?ClearTransformItemRetry@Pc@@QEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?isAccountExpCharged@Pc@@AEAA_N_J_N@Z")  // LIFT: dead-strip keep (no live caller yet)
+
+#define PC_CPP_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\Pc.cpp"
+
+namespace
+{
+// LIFT: the skeleton class Pc does not declare these PDB members. Read them by PDB offset.
+template <class T>
+inline T *PcAt(void *self, unsigned offset)
+{
+    return reinterpret_cast<T *>(static_cast<char *>(self) + offset);
+}
+
+// LIFT: PDB offsets in Pc (GameDaemon 2019 + PDB).
+enum
+{
+    PC_Id = 0x28,
+    PC_account_exp_last_update_time = 0x370,  // Prop (+0x30) .State (+0xD8) .account_exp_last_update_time (+0x268)
+    PC_attractionReward = 0x2FB8,
+    PC_accountExpNextChargeTime = 0x3040,
+    PC_isUsingJumpingCharacter2TicketLock = 0x3470,
+    PC_isUsingJumpingCharacter2Ticket = 0x3478,
+    PC_rankingRetrieveTimeLock = 0x4EA8,
+    PC_rankingRetrieveTime = 0x4EB0,
+    PC_isTakingAchievementReward = 0x4F48,
+    PC_craftListLock = 0x9548,
+    PC_craftList = 0x9550,
+    PC_craftUnion = 0x9570,
+    PC_craftUnionCount = 0x9578,
+    PC_transformItemRetryRecipeId = 0x9588,
+    PC_transformItemRetryMainIngredientDbId = 0x9590,
+};
+
+// LIFT: view of std::vector<CraftInfo *> (VS2010: proxy, first, last, end).
+struct CraftListView
+{
+    void *_Myproxy;
+    char **_Myfirst;
+    char **_Mylast;
+    char **_Myend;
+};
+
+// LIFT: view of CraftUnion (size 4).
+struct CraftUnionView
+{
+    char unionType;   // +0
+    char lift_pad_0;
+    short unionExp;   // +2
+};
+
+// LIFT: CraftInfo members by PDB offset: recipeId +0x20, groupAlias +0x28, unionType +0x30.
+inline int CraftRecipeId(char const *craft) { return *reinterpret_cast<int const *>(craft + 0x20); }
+inline unsigned __int64 CraftGroupAlias(char const *craft) { return *reinterpret_cast<unsigned __int64 const *>(craft + 0x28); }
+inline char CraftUnionType(char const *craft) { return craft[0x30]; }
+}  // namespace
 
 // 0x6048e0
 bool __cdecl Pc::CheckToTransferFaction2WithEpicQuest(char, unsigned short &)
@@ -126,15 +199,20 @@ void __cdecl Pc::SetNewbieInfoFlag(void)
 }
 
 // 0x6068c0
-void __cdecl Pc::SetTakingAchievementReward(bool)
+void __cdecl Pc::SetTakingAchievementReward(bool isTakingAchievementReward)
 {
-    LIFT_STUB(0x6068c0);
+    AcquireSRWLockExclusive(&_takingAchievementRewardLock);
+    *PcAt<bool>(this, PC_isTakingAchievementReward) = isTakingAchievementReward;
+    ReleaseSRWLockExclusive(&_takingAchievementRewardLock);
 }
 
 // 0x606910
 bool __cdecl Pc::IsTakingAchievementReward(void)
 {
-    LIFT_STUB(0x606910);
+    AcquireSRWLockShared(&_takingAchievementRewardLock);
+    bool result = *PcAt<bool>(this, PC_isTakingAchievementReward);
+    ReleaseSRWLockShared(&_takingAchievementRewardLock);
+    return result;
 }
 
 // 0x606950
@@ -198,9 +276,17 @@ void __cdecl Pc::ResetPetDurabilityDecreaseCount(void)
 }
 
 // 0x607550
-bool __cdecl Pc::EnableToRetrieveMyRanking(char)
+bool __cdecl Pc::EnableToRetrieveMyRanking(char seasonContentsType)
 {
-    LIFT_STUB(0x607550);
+    if (static_cast<unsigned char>(seasonContentsType - 1) > 0xE)
+        return false;
+    __time64_t now = _time64(nullptr);
+    // LIFT: ContentsRuleConfig::_myRankingRefreshInterval is int at +0x90 (PDB).
+    __int64 myRankingRefreshInterval = *reinterpret_cast<int *>(reinterpret_cast<char *>(ContentsRuleConfig::Config) + 0x90);
+    AcquireSRWLockShared(PcAt<::_RTL_SRWLOCK>(this, PC_rankingRetrieveTimeLock));
+    bool result = myRankingRefreshInterval < now - PcAt<__int64>(this, PC_rankingRetrieveTime)[seasonContentsType];
+    ReleaseSRWLockShared(PcAt<::_RTL_SRWLOCK>(this, PC_rankingRetrieveTimeLock));
+    return result;
 }
 
 // 0x607600
@@ -306,15 +392,39 @@ bool __cdecl Pc::JoinCraftUnion(char)
 }
 
 // 0x608300
-bool __cdecl Pc::HasCraft(char)
+bool __cdecl Pc::HasCraft(char unionType)
 {
-    LIFT_STUB(0x608300);
+    bool result = false;
+    CraftListView *list = PcAt<CraftListView>(this, PC_craftList);
+    AcquireSRWLockShared(PcAt<::_RTL_SRWLOCK>(this, PC_craftListLock));
+    if (list->_Mylast - list->_Myfirst != 0)
+    {
+        for (char **it = list->_Myfirst; it != list->_Mylast; ++it)
+        {
+            if (*it != nullptr && unionType == CraftUnionType(*it))
+            {
+                result = true;
+                break;
+            }
+        }
+    }
+    ReleaseSRWLockShared(PcAt<::_RTL_SRWLOCK>(this, PC_craftListLock));
+    return result;
 }
 
 // 0x6083a0
-bool __cdecl Pc::IsJoinedCraftUnion(char)
+bool __cdecl Pc::IsJoinedCraftUnion(char unionType)
 {
-    LIFT_STUB(0x6083a0);
+    if (*PcAt<char>(this, PC_craftUnionCount) == 0)
+        return false;
+    CraftUnionView *unions = PcAt<CraftUnionView>(this, PC_craftUnion);
+    char i = 0;
+    while (unionType != unions[i].unionType)
+    {
+        if (++i >= 2)
+            return false;
+    }
+    return true;
 }
 
 // 0x6083e0
@@ -324,9 +434,16 @@ bool __cdecl Pc::LeaveCraftUnion(char)
 }
 
 // 0x6084c0
-short __cdecl Pc::GetCraftUnionExp(char)
+short __cdecl Pc::GetCraftUnionExp(char unionType)
 {
-    LIFT_STUB(0x6084c0);
+    CraftUnionView *unions = PcAt<CraftUnionView>(this, PC_craftUnion);
+    int i = 0;
+    for (CraftUnionView *p = unions; p->unionType == 0 || unionType != p->unionType; ++p)
+    {
+        if (++i >= 2)
+            return -1;
+    }
+    return unions[i].unionExp;
 }
 
 // 0x608500
@@ -336,15 +453,43 @@ short __cdecl Pc::AddCraftUnionExp(char, short)
 }
 
 // 0x608630
-void __cdecl Pc::FetchCraftUnionList(::FragmentPacket *)
+void __cdecl Pc::FetchCraftUnionList(::FragmentPacket *packet)
 {
-    LIFT_STUB(0x608630);
+    if (packet->packet.CurHeader == nullptr || static_cast<unsigned short>(4000 - packet->packet.CurHeader->size) < 2u)
+        packet->packet.Allocate(&packet->composer);
+    packet->composer.PushRepeatCount(&packet->packet);
+    CraftUnionView *unions = PcAt<CraftUnionView>(this, PC_craftUnion);
+    for (char i = 0; i < 2; ++i)
+    {
+        if (static_cast<unsigned char>(unions[i].unionType - 1) <= 0xD)
+        {
+            if (packet->FreeSize() < 3u)
+                packet->packet.Allocate(&packet->composer);
+            if (packet->Compose(2, static_cast<unsigned int>(unions[i].unionType), static_cast<unsigned int>(unions[i].unionExp)) == 0)
+                return;
+            packet->IncRepeatCount();
+        }
+    }
+    packet->composer.PopRepeatCount();
 }
 
 // 0x608720
-bool __cdecl Pc::IsRegisteredCraftRecipe(int, unsigned __int64)
+bool __cdecl Pc::IsRegisteredCraftRecipe(int recipeId, unsigned __int64 groupAlias)
 {
-    LIFT_STUB(0x608720);
+    CraftListView *list = PcAt<CraftListView>(this, PC_craftList);
+    AcquireSRWLockShared(PcAt<::_RTL_SRWLOCK>(this, PC_craftListLock));
+    bool result = false;
+    for (char **it = list->_Myfirst; it != list->_Mylast; ++it)
+    {
+        char *craft = *it;
+        if (craft != nullptr && (recipeId == CraftRecipeId(craft) || groupAlias == CraftGroupAlias(craft)))
+        {
+            result = true;
+            break;
+        }
+    }
+    ReleaseSRWLockShared(PcAt<::_RTL_SRWLOCK>(this, PC_craftListLock));
+    return result;
 }
 
 // 0x6087c0
@@ -362,7 +507,23 @@ bool __cdecl Pc::IsRegisteredCraftRecipe(int, unsigned __int64)
 // 0x608950
 void __cdecl Pc::clearCraftList(void)
 {
-    LIFT_STUB(0x608950);
+    CraftListView *list = PcAt<CraftListView>(this, PC_craftList);
+    AcquireSRWLockExclusive(PcAt<::_RTL_SRWLOCK>(this, PC_craftListLock));
+    char **first = list->_Myfirst;
+    for (char **last = list->_Mylast; first != last; ++first)
+    {
+        if (*first != nullptr)
+            reinterpret_cast<::RefCntObject *>(*first)->removeReferenceCount(PC_CPP_FILE, 19749);
+    }
+    // vector::clear: erase(begin, end).
+    char **mylast = list->_Mylast;
+    char **myfirst = list->_Myfirst;
+    if (myfirst != mylast)
+    {
+        memmove(myfirst, mylast, 0);
+        list->_Mylast = myfirst;
+    }
+    ReleaseSRWLockExclusive(PcAt<::_RTL_SRWLOCK>(this, PC_craftListLock));
 }
 
 // 0x608a10
@@ -434,7 +595,10 @@ bool __cdecl Pc::SetUsingJumpingCharacter2Ticket(bool)
 // 0x60a3c0
 bool const __cdecl Pc::IsUsingJumpingCharacter2Ticket(void)
 {
-    LIFT_STUB(0x60a3c0);
+    AcquireSRWLockShared(PcAt<::_RTL_SRWLOCK>(this, PC_isUsingJumpingCharacter2TicketLock));
+    bool result = *PcAt<bool>(this, PC_isUsingJumpingCharacter2Ticket);
+    ReleaseSRWLockShared(PcAt<::_RTL_SRWLOCK>(this, PC_isUsingJumpingCharacter2TicketLock));
+    return result;
 }
 
 // 0x60a400
@@ -464,7 +628,10 @@ void __cdecl Pc::SetTransformItemRetry(unsigned __int64, unsigned __int64)
 // 0x60ac30
 void __cdecl Pc::ClearTransformItemRetry(void)
 {
-    LIFT_STUB(0x60ac30);
+    *PcAt<unsigned __int64>(this, PC_transformItemRetryRecipeId) = 0;
+    *PcAt<unsigned __int64>(this, PC_transformItemRetryMainIngredientDbId) = 0;
+    Log::Write(Log::LT_DEBUG, PC_CPP_FILE, 20434, L"[pc], transform retry, clear, pc:%#I64x",
+               *PcAt<unsigned __int64>(this, PC_Id));
 }
 
 // 0x60ac70
@@ -582,9 +749,23 @@ void __cdecl Pc::recoverAccountExp(void)
 }
 
 // 0x60d880
-bool __cdecl Pc::isAccountExpCharged(__int64, bool)
+bool __cdecl Pc::isAccountExpCharged(__int64 now, bool isChargeCheck)
 {
-    LIFT_STUB(0x60d880);
+    __int64 accountExpNextChargeTime = *PcAt<__int64>(this, PC_accountExpNextChargeTime);
+    __time64_t Time = now;
+    if (accountExpNextChargeTime > 0 && now < accountExpNextChargeTime)
+        return true;
+    // LIFT: ContentsRuleConfig::_accountExpQuotaResetTime is int at +0x7A8 (PDB).
+    int accountExpQuotaResetTime = *reinterpret_cast<int *>(reinterpret_cast<char *>(ContentsRuleConfig::Config) + 0x7A8);
+    tm currentTime;
+    _localtime64_s(&currentTime, &Time);
+    __int64 v8 = 0;
+    if (currentTime.tm_hour < accountExpQuotaResetTime)
+        v8 = -1;
+    __int64 v9 = Time + 60 * (-currentTime.tm_min + 60 * (accountExpQuotaResetTime - currentTime.tm_hour + 24 * v8)) + -currentTime.tm_sec;
+    if (isChargeCheck)
+        *PcAt<__int64>(this, PC_accountExpNextChargeTime) = v9 + 86400;
+    return *PcAt<__int64>(this, PC_account_exp_last_update_time) >= v9;
 }
 
 // 0x60d970
