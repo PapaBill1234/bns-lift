@@ -5,7 +5,7 @@ An excluded symbol is a function that funcdiff calls MATCH, but that a review re
 (no honest source fix, for example an LTCG layout effect). It gets no credit. It is not a MATCH in any total.
 
 excluded.tsv: one header line, then one row per symbol. Tab-separated columns:
-  exe           exe name (CacheGate, LobbyGate, SmartCouponDaemon, PostOfficeDaemon, LobbyDaemon)
+  exe           exe name (CacheGate, LobbyGate, SmartCouponDaemon, PostOfficeDaemon, LobbyDaemon, GameDaemon)
   symbol        funcdiff key of the function
   reason        why there is no honest fix (10 characters or more)
   card          card that excluded it
@@ -24,7 +24,7 @@ import sys
 
 PATH = "Docs/Parity/excluded.tsv"
 COLUMNS = ["exe", "symbol", "reason", "card", "proof_digest"]
-EXES = ["CacheGate", "LobbyGate", "SmartCouponDaemon", "PostOfficeDaemon", "LobbyDaemon"]
+EXES = ["CacheGate", "LobbyGate", "SmartCouponDaemon", "PostOfficeDaemon", "LobbyDaemon", "GameDaemon"]
 EXCLUDED = "EXCLUDED"
 DIGEST = re.compile(r"^[0-9a-f]{64}$")
 
