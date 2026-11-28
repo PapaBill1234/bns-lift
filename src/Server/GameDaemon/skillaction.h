@@ -16,8 +16,14 @@ protected:
     virtual bool __cdecl invokeExecute(char, unsigned short &);  // 0x4ac7e0
 };
 
-class ChainSkillAction
+class ChainSkillAction : private ::LiftBytes<0xB8 - 8>  // LIFT: PDB base SkillAction (+8 to +0xB7) is not declared yet
 {
+private:
+    unsigned __int64 _targetId;  // +0xB8 (PDB member of base SkillAction)
+    char lift_skillaction_tail[0x2050 - 0xC0];  // ❓ no PDB name: rest of base SkillAction (+0xC0 to +0x204F)
+    bool _chainfinished;  // +0x2050
+    unsigned __int64 _gatheredTargets[30];  // +0x2058
+    char _gatheredTargetCount;  // +0x2148
 public:
     __cdecl ChainSkillAction(void);  // 0x4aef80
 protected:
@@ -83,8 +89,11 @@ protected:
     virtual bool __cdecl invokeExecute(char, unsigned short &);  // 0x4b18f0
 };
 
-class NoneTargetSkillAction
+class NoneTargetSkillAction : private ::LiftBytes<0xB8 - 8>  // LIFT: PDB base SkillAction (+8 to +0xB7) is not declared yet
 {
+private:
+    unsigned __int64 _targetId;  // +0xB8 (PDB member of base SkillAction)
+    char lift_skillaction_tail[0x2050 - 0xC0];  // ❓ no PDB name: rest of base SkillAction (+0xC0 to +0x204F)
 protected:
     virtual bool __cdecl isCastable(void);  // 0x4aff30
     virtual bool __cdecl isFlyable(char);  // 0x4b0700
@@ -318,8 +327,13 @@ private:
     ::std::map<unsigned __int64, TargetInfo, ::std::less<unsigned __int64>, ::StlAllocator< ::std::pair<unsigned __int64, TargetInfo>, 2> > _list;  // +8 (0x8)
 };
 
-class TargetSkillAction
+class TargetSkillAction : private ::LiftBytes<0xB8 - 8>  // LIFT: PDB base SkillAction (+8 to +0xB7) is not declared yet
 {
+private:
+    unsigned __int64 _targetId;  // +0xB8 (PDB member of base SkillAction)
+    char lift_skillaction_tail[0x2050 - 0xC0];  // ❓ no PDB name: rest of base SkillAction (+0xC0 to +0x204F)
+    unsigned __int64 _gatheredTargets[30];  // +0x2050
+    char _gatheredTargetCount;  // +0x2140
 public:
     __cdecl TargetSkillAction(void);  // 0x4aca00
 protected:
