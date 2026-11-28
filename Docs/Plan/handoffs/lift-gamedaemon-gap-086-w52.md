@@ -42,6 +42,15 @@
 - This session could not run formtest (shell access was denied). The driver build is the proof. If the ctor is still not MATCH, the next round must put `DrBaseStaticMemory::Instance` (0x6ecf90) and `DrBaseDynamicMemory::Instance` (0x6ecff0) back to `LIFT_STUB` and record them as **Not done**.
 - Stem `datareader` needs no change in this round.
 
+## Round 4 fix
+
+- Cause: ICF folded the `DrHeapMemory` vftable with the `DrBaseDynamicMemory` vftable. The ctor (0x6ed620) then loaded the wrong vftable. The round 3 `noinline` was not the cause.
+- Fix: `defmemory.h` no longer has `__declspec(noinline)` on the `DrHeapMemory` ctor.
+- Fix: `DrBaseStaticMemory` and `DrBaseDynamicMemory` declare their PDB virtual dtors. `defmemory_h.cpp` defines them as empty bodies, apart from `~DrHeapMemory`. Their deleting dtor calls `DrHeapMemory::~DrHeapMemory` out of line. The `DrHeapMemory` deleting dtor keeps the inline body. Thus slot 3 differs and the vftables do not fold.
+- Formtest (no LTCG): the ctor 0x6ed620 is SAME. `Instance` 0x6ecf90 is FORM, 0x6ecff0 is SAME.
+- Known residue: the derived deleting dtor 0x6eb430 shows DIFF 2. The explicit dtor writes the derived vftable before the call; the original does not. 0x6eb430 was not MATCH in the baseline. This residue also stops the fold of the 2 derived vftables with each other.
+- If the driver proof still fails on 0x6ed620: put `DrBaseStaticMemory::Instance` (0x6ecf90) and `DrBaseDynamicMemory::Instance` (0x6ecff0) back to `LIFT_STUB` and remove the 2 derived dtors.
+
 ## Open items
 
 - `DrAliasMapImpl::DrAliasMapImpl` (0x6f6450) stays DIFF (it was DIFF in the baseline). The class has no `DrAliasMap` base, so the vtable differs.
