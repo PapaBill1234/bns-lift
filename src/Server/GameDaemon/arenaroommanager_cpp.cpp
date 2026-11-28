@@ -1,6 +1,19 @@
 // arenaroommanager_cpp.cpp: arenaroommanager.cpp (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
 #include "arenaroommanager.h"
+#include <intrin.h>
+#include <wchar.h>
+#include "Log.h"
+#include "Packet.h"
 #include "LiftStub.h"
+
+#define ARENAROOMMANAGER_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\ArenaRoomManager.cpp"
+
+#pragma comment(linker, "/INCLUDE:?build@ArenaDuelRoom@@MEAA_ND@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetPcContentsType@ArenaPublicRaidRoom@@MEAA?AW4PcContentsTypeType@Data@@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?IssueOtp@ArenaRoomManager@@QEAA_KXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:??0ArenaSessionTimer@@QEAA@_J0PEB_W@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?Init@DisconnectedArenaSessionInfo@@QEAAXPEBV1@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?Decompose@DisconnectedArenaSessionInfo@@QEAA_NPEBVPacket@@AEAVPacketDecomposer@@@Z")  // LIFT: dead-strip keep (no live caller yet)
 
 // 0x49a20
 bool __cdecl ArenaRoom::Build(short, unsigned __int64, unsigned __int64, bool, ::FragmentPacketConcatenater *)
@@ -21,9 +34,21 @@ int __cdecl ArenaRoom::GetMemberCount(void)
 }
 
 // 0x49c50
-bool __cdecl ArenaDuelRoom::build(char)
+bool __cdecl ArenaDuelRoom::build(char arenaLobbyGameMode)
 {
-    LIFT_STUB(0x49c50);
+    // ❓ PDB enumerator names of the arena lobby and arena duel game modes are not looked up. The values are those of the original.
+    if (arenaLobbyGameMode == 1)
+    {
+        _roomInfo._gameGameMode = 1;
+        return true;
+    }
+    if (arenaLobbyGameMode == 2)
+    {
+        _roomInfo._gameGameMode = 2;
+        return true;
+    }
+    _roomInfo._gameGameMode = 0;
+    return false;
 }
 
 // 0x49c80
@@ -89,7 +114,10 @@ bool __cdecl ArenaPublicRaidRoom::getZoneCreationInfo(unsigned int, unsigned int
 // 0x4a500
 ::Data::PcContentsTypeType __cdecl ArenaPublicRaidRoom::GetPcContentsType(void)
 {
-    LIFT_STUB(0x4a500);
+    // ❓ PDB enumerator names of the public raid mode are not looked up. Modes 1 to 4 give the battle royal type.
+    if (_arenaPortalPublicRaidModeType >= 1 && _arenaPortalPublicRaidModeType <= 4)
+        return static_cast< ::Data::PcContentsTypeType>(4);  // PC_CONTENTS_TYPE_BATTLE_ROYAL
+    return static_cast< ::Data::PcContentsTypeType>(1);  // PC_CONTENTS_TYPE_NORMAL
 }
 
 // 0x4a520
@@ -113,7 +141,13 @@ __cdecl ArenaRoomManager::~ArenaRoomManager(void)
 // 0x4a900
 unsigned __int64 __cdecl ArenaRoomManager::IssueOtp(void)
 {
-    LIFT_STUB(0x4a900);
+    unsigned __int64 otp = _InterlockedIncrement64(reinterpret_cast<__int64 volatile *>(&_otpSeed));
+    if (otp == 0)  // ArenaRoom::INVALID_OTP
+    {
+        otp = _InterlockedIncrement64(reinterpret_cast<__int64 volatile *>(&_otpSeed));
+        Log::Write(Log::LT_ERROR, ARENAROOMMANAGER_FILE, 796, L"[arena-room-manager], otp overflow");
+    }
+    return otp;
 }
 
 // 0x4a950
@@ -135,15 +169,33 @@ void __cdecl ArenaRoomManager::RemoveTimeout(__int64, __int64)
 }
 
 // 0x4ac20
-__cdecl ArenaSessionTimer::ArenaSessionTimer(__int64, __int64, wchar_t const *)
+__cdecl ArenaSessionTimer::ArenaSessionTimer(__int64 pcDbId, __int64 reserveKey, wchar_t const *name)
+    : _touchTime(_time64(nullptr)), _pcDbId(pcDbId), _reserveKey(reserveKey), _state(STATE_DST)
 {
-    LIFT_STUB(0x4ac20);
+    if (name != nullptr)
+        wcsncpy(_name, name, 33);
+    else
+        _name[0] = 0;
 }
 
 // 0x4acd0
-void __cdecl DisconnectedArenaSessionInfo::Init(::DisconnectedArenaSessionInfo const *)
+void __cdecl DisconnectedArenaSessionInfo::Init(::DisconnectedArenaSessionInfo const *sessionInfo)
 {
-    LIFT_STUB(0x4acd0);
+    if (sessionInfo != nullptr)
+    {
+        _disconnectedTime = sessionInfo->_disconnectedTime;
+        _pcDbId = sessionInfo->_pcDbId;
+        _teamId = sessionInfo->_teamId;
+        _partyId = sessionInfo->_partyId;
+        _reserveKey = sessionInfo->_reserveKey;
+        _worldId = sessionInfo->_worldId;
+        _arenaId = sessionInfo->_arenaId;
+        _zoneId = sessionInfo->_zoneId;
+        _geoZoneId = sessionInfo->_geoZoneId;
+        _moveType = sessionInfo->_moveType;
+        _gameMode = sessionInfo->_gameMode;
+        wcsncpy(_name, sessionInfo->_name, 33);
+    }
 }
 
 // 0x4ad60
@@ -153,9 +205,12 @@ bool __cdecl DisconnectedArenaSessionInfo::BuildPacket(::Packet &, ::PacketCompo
 }
 
 // 0x4ae50
-bool __cdecl DisconnectedArenaSessionInfo::Decompose(::Packet const *, ::PacketDecomposer &)
+bool __cdecl DisconnectedArenaSessionInfo::Decompose(::Packet const *packet, ::PacketDecomposer &pdr)
 {
-    LIFT_STUB(0x4ae50);
+    // ❓ The 13th field (arena attraction) goes to a local. The class has no member for it.
+    char attraction = 0;
+    return packet->Decompose(&pdr, 13, &_disconnectedTime, &_pcDbId, _name, 33, &_teamId, &_partyId, &_reserveKey,
+                             &_worldId, &_arenaId, &_zoneId, &_geoZoneId, &_moveType, &_gameMode, &attraction) != 0;
 }
 
 // 0x4af50

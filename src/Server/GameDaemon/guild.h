@@ -2,6 +2,7 @@
 // LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
 #pragma once
 #include "GameDaemonFwd.h"
+#include "../BloodLib/include/Lock.h"
 #include "guildbank.h"
 #include "guilduniform.h"
 
@@ -10,6 +11,41 @@ class Guild
 public:
     struct MeetingPlace {};
     struct RankingRewardInfo {};
+    struct Member
+    {
+        unsigned __int64 pcId;  // +0 (0x0)
+        unsigned __int64 pcDbId;  // +8 (0x8)
+        wchar_t name[33];  // +16 (0x10)
+        short level;  // +82 (0x52)
+        char faction2;  // +84 (0x54)
+        short masteryLevel;  // +86 (0x56)
+        short race;  // +88 (0x58)
+        short job;  // +90 (0x5A)
+        char grade;  // +92 (0x5C)
+        __int64 registrationTime;  // +96 (0x60)
+        __int64 logoutTime;  // +104 (0x68)
+        short worldId;  // +112 (0x70)
+        int geoZone;  // +116 (0x74)
+        short x;  // +120 (0x78)
+        short y;  // +122 (0x7A)
+        short z;  // +124 (0x7C)
+        __int64 qqId;  // +128 (0x80)
+    };
+    struct WaitingMember
+    {
+        unsigned __int64 pcDbId;  // +0 (0x0)
+        wchar_t name[33];  // +8 (0x8)
+        short level;  // +74 (0x4A)
+        char faction2;  // +76 (0x4C)
+        short masteryLevel;  // +78 (0x4E)
+        short race;  // +80 (0x50)
+        short job;  // +82 (0x52)
+        short worldId;  // +84 (0x54)
+        wchar_t requestorName[33];  // +86 (0x56)
+        __int64 reserveTimestamp;  // +152 (0x98)
+        bool confirmReserved;  // +160 (0xA0)
+        __int64 qqId;  // +168 (0xA8)
+    };
 public:
     __cdecl Guild(void);  // 0xe0910
     virtual __cdecl ~Guild(void);  // 0xe0c30
@@ -224,16 +260,42 @@ public:
     void __cdecl BroadcastChangedGuildRankingInfo(char, int);  // 0x104ba0
     void __cdecl BroadcastChangedGuildCombatRecord(::SeasonContentsGuildCombatRecordEntry *, ::Packet *);  // 0x104cb0
     bool __cdecl GetGuildUniformParam(char *const);  // 0x34f3b0
+private:
+    // PDB layout (size 0x8000). The vfptr is at +0. Only the members that the lifted bodies use are declared.
+    char lift_pad_8[0x18];  // ❓ no PDB name: base +8 to +0x17 and _combatRecordContext (+0x18) are not declared yet
+    ::Guild::Member _guildMember[100];  // +32 (0x20)
+    int _guildMemberCount;  // +13632 (0x3540)
+    ::Guild::WaitingMember _waitingGuildMember[100];  // +13640 (0x3548)
+    int _waitingGuildMemberCount;  // +31240 (0x7A08)
+    char lift_pad_7a0c[0x2C8];  // ❓ no PDB name: members +0x7A0C to +0x7CD3 are not declared yet
+    unsigned int _permission[5];  // +31956 (0x7CD4) (❓ PDB type 0xBCBC not looked up; the original reads 32-bit elements, grade 1 to 5)
+    char lift_pad_7ce8[0x318];  // ❓ no PDB name: members +0x7CE8 to +0x7FFF are not declared yet
 };
+static_assert(sizeof(Guild::Member) == 0x88, "sizeof Guild::Member");
+static_assert(sizeof(Guild::WaitingMember) == 0xB0, "sizeof Guild::WaitingMember");
+static_assert(sizeof(Guild) == 0x8000, "sizeof Guild");
 
 class GuildIdManager
 {
+public:
+    struct GuildIdNode
+    {
+        unsigned __int64 guildId;  // +0 (0x0)
+        ::GuildIdManager::GuildIdNode *prev;  // +8 (0x8)
+        ::GuildIdManager::GuildIdNode *next;  // +16 (0x10)
+    };
 public:
     __cdecl ~GuildIdManager(void);  // 0x104e60
     void __cdecl Initialize(void);  // 0x104f10
     bool __cdecl PushGuildId(unsigned __int64 &);  // 0x104f90
     unsigned __int64 __cdecl PopGuildId(void);  // 0x105030
+private:
+    // PDB layout (size 0x38).
+    ::GuildIdManager::GuildIdNode *head;  // +0 (0x0)
+    ::GuildIdManager::GuildIdNode *tail;  // +8 (0x8)
+    ::CriticalSection GuildIdMgrCS;  // +16 (0x10)
 };
+static_assert(sizeof(GuildIdManager) == 0x38, "sizeof GuildIdManager");
 
 struct SeasonContentsRankingLogInfo
 {

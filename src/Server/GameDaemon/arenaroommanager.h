@@ -3,6 +3,14 @@
 #pragma once
 #include "GameDaemonFwd.h"
 
+// LIFT: view of the PDB struct ArenaLobbyRoomInfo (size 0xD330). Only the fields that the lifted bodies use are declared.
+struct ArenaLobbyRoomInfoView
+{
+    unsigned __int64 _id;  // +0 (0x0)
+    unsigned __int64 _portalKey;  // +8 (0x8)
+    char _gameGameMode;  // +16 (0x10)
+};
+
 class ArenaDuelRoom
 {
 protected:
@@ -10,6 +18,10 @@ protected:
     virtual bool __cdecl getZoneCreationInfo(unsigned int, unsigned int *, ::vector16 *, int *);  // 0x49c80
 public:
     virtual bool __cdecl GetPcSpawnInfo(unsigned int, unsigned __int64, unsigned int *, ::vector16 *, int *);  // 0x49d90
+protected:
+    // PDB layout (base ArenaRoom). The vfptr is at +0.
+    char lift_pad_8[0x40];  // ❓ no PDB name: base ArenaRoom +8 to +0x47 is not declared yet
+    ::ArenaLobbyRoomInfoView _roomInfo;  // +72 (0x48) (PDB: ArenaRoom::_roomInfo, ArenaLobbyRoomInfo)
 };
 
 class ArenaDungeonRoom
@@ -86,23 +98,55 @@ public:
     unsigned __int64 __cdecl Add(::ArenaRoom *);  // 0x4a950
     ::ArenaRoom * __cdecl Acquire(unsigned __int64);  // 0x4aa30
     void __cdecl RemoveTimeout(__int64, __int64);  // 0x4aae0
+private:
+    // PDB layout (size 0x58). The vfptr is at +0.
+    unsigned __int64 _otpSeed;  // +8 (0x8)
+    char lift_pad_10[0x48];  // ❓ no PDB name: _roomList (+0x10, std::map) and _lock (+0x30, CriticalSection) are not declared yet
 };
 
-class ArenaSessionTimer
+class ArenaSessionTimer : public ::DynamicRefCntObj
 {
 public:
-    enum STATE {};
+    enum STATE
+    {
+        STATE_NONE = 0,
+        STATE_DST = 1,
+        STATE_RDST = 2,
+    };
 public:
     __cdecl ArenaSessionTimer(__int64, __int64, wchar_t const *);  // 0x4ac20
+private:
+    // PDB layout (size 0x78).
+    __int64 _touchTime;  // +24 (0x18)
+    unsigned __int64 _pcDbId;  // +32 (0x20)
+    __int64 _reserveKey;  // +40 (0x28)
+    ::ArenaSessionTimer::STATE _state;  // +48 (0x30)
+    wchar_t _name[33];  // +52 (0x34)
 };
 
-class DisconnectedArenaSessionInfo
+class DisconnectedArenaSessionInfo : public ::DynamicRefCntObj
 {
 public:
     void __cdecl Init(::DisconnectedArenaSessionInfo const *);  // 0x4acd0
     bool __cdecl BuildPacket(::Packet &, ::PacketComposer &);  // 0x4ad60
     bool __cdecl Decompose(::Packet const *, ::PacketDecomposer &);  // 0x4ae50
     void __cdecl SendExpireUpdateArenaSession(char);  // 0x4af50
+private:
+    // PDB layout (size 0xA0).
+    wchar_t _name[33];  // +24 (0x18)
+    __int64 _disconnectedTime;  // +96 (0x60)
+    unsigned __int64 _pcDbId;  // +104 (0x68)
+    unsigned __int64 _teamId;  // +112 (0x70)
+    unsigned __int64 _partyId;  // +120 (0x78)
+    unsigned __int64 _reserveKey;  // +128 (0x80)
+    int _arenaId;  // +136 (0x88)
+    int _worldId;  // +140 (0x8C)
+    unsigned __int64 _zoneId;  // +144 (0x90)
+    unsigned int _geoZoneId;  // +152 (0x98)
+    char _moveType;  // +156 (0x9C)
+    char _gameMode;  // +157 (0x9D)
+    bool _logined;  // +158 (0x9E)
+    bool _return;  // +159 (0x9F)
 };
 
 class DisconnectedArenaSessionManager
@@ -123,3 +167,6 @@ public:
     ::DisconnectedArenaSessionInfo * __cdecl AcquireSession(unsigned __int64);  // 0x4c0b0
 };
 
+static_assert(sizeof(ArenaRoomManager) == 0x58, "sizeof ArenaRoomManager");
+static_assert(sizeof(ArenaSessionTimer) == 0x78, "sizeof ArenaSessionTimer");
+static_assert(sizeof(DisconnectedArenaSessionInfo) == 0xA0, "sizeof DisconnectedArenaSessionInfo");

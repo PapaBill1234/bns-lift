@@ -4,7 +4,20 @@
 #include "guilduniform.h"
 #include "pc.h"
 #include "seasonscore.h"
+#include <wchar.h>
+#include "Memory.h"
+#include "MemoryManager.h"
 #include "LiftStub.h"
+
+#define GUILD_CPP_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\Guild.cpp"
+
+#pragma comment(linker, "/INCLUDE:?findByPcDbId@Guild@@AEAAH_K@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?findByPcName@Guild@@AEAAHPEB_W@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?findByPcDbIdInWaiting@Guild@@AEAAH_K@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?checkPermissionGuild20@Guild@@AEAA_NHD@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?Initialize@GuildIdManager@@QEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?PushGuildId@GuildIdManager@@QEAA_NAEA_K@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?PopGuildId@GuildIdManager@@QEAA_KXZ")  // LIFT: dead-strip keep (no live caller yet)
 
 // 0xf4c40
 void __cdecl Guild::BroadcastRenameGuild(unsigned __int64, wchar_t const *, __int64)
@@ -193,27 +206,53 @@ bool __cdecl Guild::delWaitingGuildMember(unsigned __int64)
 }
 
 // 0xfa740
-int __cdecl Guild::findByPcDbId(unsigned __int64)
+int __cdecl Guild::findByPcDbId(unsigned __int64 pcDbId)
 {
-    LIFT_STUB(0xfa740);
+    if (_guildMemberCount <= 0)
+        return -1;
+    for (int i = 0; i < 100; ++i)  // ❓ PDB constant name of the member array size not looked up
+    {
+        if (pcDbId == _guildMember[i].pcDbId)
+            return i;
+    }
+    return -1;
 }
 
 // 0xfa770
-int __cdecl Guild::findByPcName(wchar_t const *)
+int __cdecl Guild::findByPcName(wchar_t const *pcName)
 {
-    LIFT_STUB(0xfa770);
+    if (_guildMemberCount <= 0)
+        return -1;
+    for (int i = 0; i < 100; ++i)
+    {
+        if (_wcsicmp(_guildMember[i].name, pcName) == 0)
+            return i;
+    }
+    return -1;
 }
 
 // 0xfa7f0
-int __cdecl Guild::findByPcDbIdInWaiting(unsigned __int64)
+int __cdecl Guild::findByPcDbIdInWaiting(unsigned __int64 pcDbId)
 {
-    LIFT_STUB(0xfa7f0);
+    if (_waitingGuildMemberCount <= 0)
+        return -1;
+    for (int i = 0; i < 100; ++i)
+    {
+        if (pcDbId == _waitingGuildMember[i].pcDbId)
+            return i;
+    }
+    return -1;
 }
 
 // 0xfa830
-bool __cdecl Guild::checkPermissionGuild20(int, char)
+bool __cdecl Guild::checkPermissionGuild20(int grade, char permission)
 {
-    LIFT_STUB(0xfa830);
+    // ❓ PDB enumerator names of the grade (1 to 5) and the permission (1 to 17) are not looked up.
+    if (grade < 1 || grade > 5)
+        return false;
+    if (permission < 1 || permission > 17)
+        return false;
+    return (_permission[grade - 1] & (1 << (permission - 1))) != 0;
 }
 
 // 0xfa870
@@ -621,17 +660,46 @@ __cdecl GuildIdManager::~GuildIdManager(void)
 // 0x104f10
 void __cdecl GuildIdManager::Initialize(void)
 {
-    LIFT_STUB(0x104f10);
+    head = static_cast<GuildIdNode *>(Memory::_Manager[2]->Alloc(sizeof(GuildIdNode), GUILD_CPP_FILE, 10385));
+    tail = static_cast<GuildIdNode *>(Memory::_Manager[2]->Alloc(sizeof(GuildIdNode), GUILD_CPP_FILE, 10386));
+    head->prev = head;
+    head->next = tail;
+    tail->prev = head;
+    tail->next = tail;
 }
 
 // 0x104f90
-bool __cdecl GuildIdManager::PushGuildId(unsigned __int64 &)
+bool __cdecl GuildIdManager::PushGuildId(unsigned __int64 &guildId)
 {
-    LIFT_STUB(0x104f90);
+    bool result = false;
+    GuildIdMgrCS.Enter();
+    GuildIdNode *node = static_cast<GuildIdNode *>(Memory::_Manager[2]->Alloc(sizeof(GuildIdNode), GUILD_CPP_FILE, 10398));
+    if (node != nullptr)
+    {
+        result = true;
+        node->guildId = guildId;
+        tail->prev->next = node;
+        node->prev = tail->prev;
+        tail->prev = node;
+        node->next = tail;
+    }
+    GuildIdMgrCS.Leave();
+    return result;
 }
 
 // 0x105030
 unsigned __int64 __cdecl GuildIdManager::PopGuildId(void)
 {
-    LIFT_STUB(0x105030);
+    unsigned __int64 guildId = 0;
+    GuildIdMgrCS.Enter();
+    GuildIdNode *node = head->next;
+    if (node != tail)
+    {
+        guildId = node->guildId;
+        head->next = node->next;
+        node->next->prev = head;
+        Memory::_Manager[2]->Free(node, GUILD_CPP_FILE, 10436);
+    }
+    GuildIdMgrCS.Leave();
+    return guildId;
 }
