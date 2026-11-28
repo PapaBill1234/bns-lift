@@ -4367,6 +4367,27 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"QuestJournal::RemoveLeaveZoneRollbackQuestIndex": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"QuestJournal::isScriptableCase": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"QuestJournal::removeAttrationQuest": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "QuestList::FieldDefine": {
 "calls": 100,
 "consts": 100,
@@ -4606,6 +4627,13 @@
 "status": "DIFF"
 },
 "RankingSeasonInfo::~RankingSeasonInfo": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RankingSeasonManager::GetSeasonContentsSchedule": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
