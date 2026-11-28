@@ -1,4 +1,4 @@
-// LobbyConfig.obj (LobbyDaemon PDB, 2019 + PDB): the XML table LobbyConfig::_Def and its default values.
+﻿// LobbyConfig.obj (LobbyDaemon PDB, 2019 + PDB): the XML table LobbyConfig::_Def and its default values.
 // LIFT: this file holds only the table. The original has it in LobbyConfig.obj. A separate file keeps the
 // LobbyConfig.cpp bodies free of merge conflicts.
 // The rows come from the exe .rdata at rva 0x205DD0 (167 rows of 40 bytes). DaemonConfig::Dump (0xe3c00) stops

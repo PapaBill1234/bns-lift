@@ -1,4 +1,4 @@
-// ContentsRuleConfigDefinition.obj (LobbyGate PDB).
+﻿// ContentsRuleConfigDefinition.obj (LobbyGate PDB).
 #include "ContentsRuleConfigDefinition.h"
 #include "FragmentPacket.h"
 #include "Daemon.h"

@@ -1,4 +1,4 @@
-// ContentsRuleConfigDefinition.obj (LobbyDaemon PDB, 2019 + PDB).
+﻿// ContentsRuleConfigDefinition.obj (LobbyDaemon PDB, 2019 + PDB).
 // LIFT: the LobbyGate file of the same name (src/Server/LobbyGate) has a different class (13 rows, list packet).
 // This file copies its patterns. It does not share code with it.
 // LIFT: ContentsRuleConfigReload, ReloadContentsRuleConfig (0x29980), UpdateReloadedVariable (0x2a090),
