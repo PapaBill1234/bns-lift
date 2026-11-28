@@ -2730,7 +2730,23 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"FragmentPacket::Compose": {
+"calls": 100,
+"consts": 100,
+"exact": false,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "FragmentPacket::FreeBody": {
+"calls": 100,
+"consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"FragmentPacket::FreeSize": {
 "calls": 100,
 "consts": 100,
 "exact": true,
@@ -4822,6 +4838,28 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"NpcSpawnInfo::GetActDetect": {
+"calls": 100,
+"consts": 0,
+"refs": 100,
+"score": 66.7,
+"status": "DIFF"
+},
+"NpcSpawnInfo::GetActSocial": {
+"calls": 100,
+"consts": 0,
+"refs": 100,
+"score": 66.7,
+"status": "DIFF"
+},
+"NpcSpawnInfo::GetAlias": {
+"calls": 100,
+"consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "NpcSquad::EventOccured": {
 "calls": 100,
 "consts": 67,
@@ -4867,6 +4905,20 @@
 "score": 69.0,
 "status": "DIFF"
 },
+"Packet::AddSize [?AddSize@Packet@@QEAAXF@Z]": {
+"calls": 80,
+"consts": 100,
+"refs": 50,
+"score": 76.7,
+"status": "DIFF"
+},
+"Packet::Allocate [?Allocate@Packet@@QEAAPEBDPEAVPacketComposer@@@Z]": {
+"calls": 89,
+"consts": 100,
+"refs": 50,
+"score": 79.6,
+"status": "DIFF"
+},
 "Packet::Allocate [?Allocate@Packet@@QEAAPEBDXZ]": {
 "calls": 100,
 "consts": 100,
@@ -4880,6 +4932,13 @@
 "consts": 100,
 "refs": 60,
 "score": 73.3,
+"status": "DIFF"
+},
+"Packet::ComposeV": {
+"calls": 46,
+"consts": 94,
+"refs": 60,
+"score": 66.8,
 "status": "DIFF"
 },
 "Packet::Decompose [?Decompose@Packet@@QEBAGPEBDZZ]": {
@@ -4918,11 +4977,18 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"PacketBuffer::CheckCompose": {
+"calls": 92,
+"consts": 100,
+"refs": 88,
+"score": 93.5,
+"status": "DIFF"
+},
 "PacketBuffer::Compose": {
 "calls": 95,
-"consts": 95,
-"refs": 72,
-"score": 87.3,
+"consts": 100,
+"refs": 77,
+"score": 90.6,
 "status": "DIFF"
 },
 "PacketBuffer::Decompose": {
@@ -5175,7 +5241,30 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Pc::AvailableTurnBack": {
+"calls": 100,
+"consts": 100,
+"refs": 67,
+"score": 88.9,
+"status": "DIFF"
+},
+"Pc::BeginArenaLobbyReservation": {
+"calls": 100,
+"consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Pc::CalculateStyleScoreBonus": {
+"calls": 100,
+"consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Pc::ClearAttractionReward": {
 "calls": 100,
 "consts": 100,
 "exact": true,
@@ -5191,6 +5280,14 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Pc::ClearTransformItemRetry": {
+"calls": 100,
+"consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Pc::DeactivateSkillScore": {
 "calls": 100,
 "consts": 100,
@@ -5198,6 +5295,13 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"Pc::FetchCraftUnionList": {
+"calls": 92,
+"consts": 89,
+"refs": 100,
+"score": 93.7,
+"status": "DIFF"
 },
 "Pc::GetActiveSummoned": {
 "calls": 100,
@@ -5208,6 +5312,14 @@
 "status": "MATCH"
 },
 "Pc::GetArenaAttraction": {
+"calls": 100,
+"consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Pc::GetArenaSessionState": {
 "calls": 100,
 "consts": 100,
 "exact": true,
@@ -5287,6 +5399,22 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Pc::GetPowerInfoForGameLog": {
+"calls": 100,
+"consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Pc::GetRewardContribution": {
+"calls": 100,
+"consts": 100,
+"exact": false,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Pc::GetSkillResultContext": {
 "calls": 100,
 "consts": 100,
@@ -5294,6 +5422,13 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"Pc::HasCraft": {
+"calls": 100,
+"consts": 80,
+"refs": 100,
+"score": 93.3,
+"status": "DIFF"
 },
 "Pc::IsExceptHate": {
 "calls": 100,
@@ -5311,6 +5446,14 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Pc::IsTakingAchievementReward": {
+"calls": 100,
+"consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Pc::IsTryingInstantPayment": {
 "calls": 100,
 "consts": 100,
@@ -5319,7 +5462,39 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Pc::IsUsingJumpingCharacter2Ticket": {
+"calls": 100,
+"consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Pc::LeaveArenaLobbyOk": {
+"calls": 100,
+"consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Pc::ReturnToGameByEnterFail": {
+"calls": 100,
+"consts": 100,
+"exact": false,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Pc::ReturningToArenaLobby": {
+"calls": 100,
+"consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Pc::RollbackArenaLobbyReservation": {
 "calls": 100,
 "consts": 100,
 "exact": true,
@@ -5336,6 +5511,14 @@
 "status": "MATCH"
 },
 "Pc::SendAbortCraftFail": {
+"calls": 100,
+"consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Pc::SendInitializeSeasonContentsRecordFail": {
 "calls": 100,
 "consts": 100,
 "exact": true,
@@ -5484,6 +5667,38 @@
 "status": "MATCH"
 },
 "Pc::SetLastComboSkill": {
+"calls": 100,
+"consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Pc::SetTakingAchievementReward": {
+"calls": 100,
+"consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Pc::checkTeamGuildBattleFieldWithTarget": {
+"calls": 100,
+"consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Pc::isAccountExpCharged": {
+"calls": 100,
+"consts": 100,
+"exact": false,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Pc::isActivatedGrade": {
 "calls": 100,
 "consts": 100,
 "exact": true,
@@ -6203,6 +6418,20 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"RepeatPacketComposer::PopRepeatCount": {
+"calls": 86,
+"consts": 100,
+"refs": 67,
+"score": 84.1,
+"status": "DIFF"
+},
+"RepeatPacketComposer::PushRepeatCount": {
+"calls": 97,
+"consts": 100,
+"refs": 78,
+"score": 91.6,
+"status": "DIFF"
+},
 "RestorationAction::availableCancel": {
 "calls": 100,
 "consts": 100,
@@ -6348,9 +6577,9 @@
 },
 "Session::SendV": {
 "calls": 92,
-"consts": 92,
+"consts": 100,
 "refs": 56,
-"score": 79.8,
+"score": 82.4,
 "status": "DIFF"
 },
 "Session::send": {
@@ -7128,6 +7357,46 @@
 "score": 66.7,
 "status": "DIFF"
 },
+"TimeBasedPlayInfoList::GetValidCheckTimeUTC": {
+"calls": 100,
+"consts": 100,
+"exact": false,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TimeBasedPlayInfoList::SetData": {
+"calls": 100,
+"consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TimeBasedPlayInfoList::SetDurationForDebug": {
+"calls": 100,
+"consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TimeBasedPlayInfoList::SetLastCheckTimeUTC": {
+"calls": 100,
+"consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TimeBasedPlayInfoList::~TimeBasedPlayInfoList": {
+"calls": 100,
+"consts": 100,
+"exact": false,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "TimeBasedPlaySeasonSchedule::Rule::Rule": {
 "calls": 100,
 "consts": 100,
@@ -7176,6 +7445,14 @@
 "status": "DIFF"
 },
 "User::GetId": {
+"calls": 100,
+"consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"User::SetPcCafeDebugCode": {
 "calls": 100,
 "consts": 100,
 "exact": true,
