@@ -417,7 +417,7 @@ void __cdecl Zone::OnDamagedEvent(::ControlledCreature *const, ::Creature *, __i
     LIFT_STUB(0x257640);
 }
 
-// 0x2577b0
+// 0x2577b0 LIFT: log path (E16). The body calls Log::Write and AlertSender::Write. Keep the stub.
 bool __cdecl Zone::IsAllowInvitePartyInArena(void)
 {
     LIFT_STUB(0x2577b0);
@@ -543,7 +543,7 @@ short __cdecl Zone::GetZoneTypeGameLog(void) const
     LIFT_STUB(0x258770);
 }
 
-// 0x2587e0
+// 0x2587e0 LIFT: log path (E16). The body calls Log::Write. Keep the stub.
 void __cdecl Zone::SetZRegVar(int, __int64)
 {
     LIFT_STUB(0x2587e0);
@@ -627,7 +627,7 @@ unsigned int __cdecl ZoneWaitingPcList::GetCount(void)
     return result;
 }
 
-// 0x2593a0
+// 0x2593a0 LIFT: log path (E16). The body destroys a LogFile (LogMedia). Keep the stub.
 __cdecl ZonePerfMonitor::~ZonePerfMonitor(void)
 {
     LIFT_STUB(0x2593a0);

@@ -19,6 +19,7 @@
 #pragma comment(linker, "/INCLUDE:?Initialize@?$IdManager@_J@@QEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?PushId@?$IdManager@_J@@QEAA_N_J@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?PopId@?$IdManager@_J@@QEAA_JXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?getChannelEnable@World@@AEAA_NPEAUChannelList@1@F@Z")  // LIFT: dead-strip keep (no live caller yet)
 
 // 0x3ebfb0
 __cdecl WorldClock::~WorldClock(void)
@@ -477,9 +478,12 @@ bool __cdecl World::DisableChannel(unsigned int, short, bool)
 }
 
 // 0x3f6e00
-bool __cdecl World::getChannelEnable(::World::ChannelList *, short)
+bool __cdecl World::getChannelEnable(::World::ChannelList *channel, short channelIndex)
 {
-    LIFT_STUB(0x3f6e00);
+    // LIFT: formtest DIFF 6. The original does not use `this` (channel is in rcx, likely an LTCG register change). Same logic.
+    if (channel != nullptr && channelIndex >= 1 && channelIndex <= channel->maxChannelCount)
+        return (channel->enable[(channelIndex - 1) / 8] >> ((channelIndex - 1) % 8)) & 1;
+    return false;
 }
 
 // 0x3f6e50

@@ -250,7 +250,7 @@ bool __cdecl GeoZone::FindRespawn(char, ::Data::ZoneRespawnRecordPtr *) const
     LIFT_STUB(0xdf130);
 }
 
-// 0xdf1c0
+// 0xdf1c0 LIFT: log path (E16). The body calls Log::Write. Keep the stub.
 bool __cdecl GeoZone::FindArea(unsigned int, ::box16 &) const
 {
     LIFT_STUB(0xdf1c0);

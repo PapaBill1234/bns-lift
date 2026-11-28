@@ -50,7 +50,13 @@ protected:
 class World
 {
 public:
-    struct ChannelList {};
+    // PDB layout of World::ChannelList (size 0xCC0).
+    struct ChannelList
+    {
+        int maxChannelCount;    // +0 (0x0)
+        ::Zone *zone[400];      // +8 (0x8)
+        char enable[51];        // +3208 (0xC88)
+    };
 public:
     __cdecl World(void);  // 0x3ec370
     __cdecl ~World(void);  // 0x3ec570

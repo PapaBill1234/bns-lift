@@ -8,7 +8,7 @@ __cdecl ZoneCellAttributeTable::ZoneCellAttributeTable(int, ::Data::ZoneCellAttr
     LIFT_STUB(0x130c0);
 }
 
-// 0x13150
+// 0x13150 LIFT: log path (E16). The body calls Log::Write. Keep the stub.
 __cdecl ZoneCellAttributeTable::~ZoneCellAttributeTable(void)
 {
     LIFT_STUB(0x13150);
