@@ -132,6 +132,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"AccountInventorySessionHandler::OnAccept": {
+"calls": 100,
+"consts": 100,
+"refs": 67,
+"score": 88.9,
+"status": "DIFF"
+},
 "AccountInventoryTakeGoodsTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
@@ -390,6 +397,13 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"ArenaGameSessionHandler::OnAccept": {
+"calls": 100,
+"consts": 100,
+"refs": 67,
+"score": 88.9,
+"status": "DIFF"
 },
 "ArenaLobbyRoomUtil::IsDungeonGameMode": {
 "calls": 100,
@@ -1721,6 +1735,13 @@
 "score": 66.7,
 "status": "DIFF"
 },
+"DynamicEventObject::deallocate_me": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "EffectList::Clear": {
 "calls": 100,
 "consts": 100,
@@ -2141,6 +2162,20 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"GuildJoinTicket::GuildJoinTicket": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GuildJoinTicketListPerGuild::GuildJoinTicketListPerGuild": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "HUF_readStats": {
 "calls": 100,
 "consts": 100,
@@ -2148,7 +2183,70 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"HandleAccountInventoryGame_BoardGachaCancelDrawByItemFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleAccountInventoryGame_BoardGachaCancelDrawByItemOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleAccountInventoryGame_BoardGachaFinishDrawByItemRecoveryFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleAccountInventoryGame_BoardGachaRetrieveSeasonScheduleFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleAccountInventoryGame_RefundInstantPaymentFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleAccountInventoryGame_RefundInstantPaymentOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "HandleAchievementGameGameHelloFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleArenaGameArenaHelloFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleArenaLobbyArenaHelloFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleDuelBotGameGameHelloFail": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -2226,6 +2324,97 @@
 "status": "MATCH"
 },
 "HandleGame_UpgradeJumpingCharacterStateWithCreationQuotaReq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleLobbyGame_CloseSessionNotify": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleLobbyGame_UpdateAccountContentQuotaFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleLobbyGame_UpdateAccountContentQuotaOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleLobbyGame_UpdateAccountExpFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleLobbyGame_UpdateAccountRecycleTimeFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleMarketServiceCancelBidReservationFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleMarketServiceCancelBidReservationOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleMarketServiceCancelPurchaseReservationFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleMarketServiceCancelPurchaseReservationOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleMarketServiceCancelSaleReservationFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleMarketServiceCancelSaleReservationOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleMarketServiceHelloFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleMarketServiceHelloOk": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -2344,12 +2533,40 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"InstantPaymentBuyCollectionItemsSubJob::DataId": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"InstantPaymentBuyCollectionItemsSubJob::setExtraParam": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"InstantPaymentJob::tryAbortImpl": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "InstantPaymentTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
 "refs": 0,
 "score": 66.7,
 "status": "DIFF"
+},
+"InstantPaymentTransformItemSubJob::setExtraParam": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "IntervalSecondGaugePointEffect::checkApply": {
 "calls": 100,
@@ -2490,6 +2707,13 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"LobbyDaemonSessionHandler::OnAccept": {
+"calls": 100,
+"consts": 100,
+"refs": 67,
+"score": 88.9,
+"status": "DIFF"
 },
 "LobbyTokenAuthTran::GetDefinition": {
 "calls": 100,
@@ -2658,6 +2882,13 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"MarketDealerAgentSessionHandler::OnAccept": {
+"calls": 100,
+"consts": 100,
+"refs": 67,
+"score": 88.9,
+"status": "DIFF"
 },
 "MarketReaderAgentSessionHandler::OnAccept": {
 "calls": 100,
@@ -3449,6 +3680,13 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"PostOfficeAgentSessionHandler::OnAccept": {
+"calls": 100,
+"consts": 100,
+"refs": 67,
+"score": 88.9,
+"status": "DIFF"
 },
 "PublicRaid::GetMaxPcCount": {
 "calls": 100,
