@@ -122,7 +122,14 @@ class NpcPredefinedMoveAction
 {
 public:
     enum NpcMoveSpeed {};
-    enum NpcMoveType {};
+    enum NpcMoveType
+    {
+        NPC_MOVE_TYPE_MOVEAROUND = 0,
+        NPC_MOVE_TYPE_PATHWAY_WALK = 1,
+        NPC_MOVE_TYPE_PATHWAY_RUN = 2,
+        NPC_MOVE_TYPE_PATHWAY_SPRINT = 3,
+        NPC_MOVE_TYPE_MAX = 4,
+    };
 public:
     static wchar_t * __cdecl NpcMoveTypeName(::NpcPredefinedMoveAction::NpcMoveType);  // 0x41ca80
     bool __cdecl SetDestination(::vector16 const *, int, ::NpcPredefinedMoveAction::NpcMoveSpeed, bool, short);  // 0x41cac0

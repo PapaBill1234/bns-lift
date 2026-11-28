@@ -387,9 +387,10 @@ void __cdecl RestorationAction::cancelAction(::Action::CancelReason, wchar_t con
 }
 
 // 0x4bde10
-bool __cdecl RestorationAction::availableCancel(::CancelActionReason)
+#pragma comment(linker, "/INCLUDE:?availableCancel@RestorationAction@@EEAA_NW4CancelActionReason@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+bool __cdecl RestorationAction::availableCancel(::CancelActionReason reason)
 {
-    LIFT_STUB(0x4bde10);
+    return reason == CANCELACTIONREASON_ATTACKED;
 }
 
 // 0x4bde20

@@ -127,9 +127,21 @@ void __cdecl NpcKnockBackAction::cancelAction(::Action::CancelReason, wchar_t co
 }
 
 // 0x41ca80
-wchar_t * __cdecl NpcPredefinedMoveAction::NpcMoveTypeName(::NpcPredefinedMoveAction::NpcMoveType)
+#pragma comment(linker, "/INCLUDE:?NpcMoveTypeName@NpcPredefinedMoveAction@@SAPEA_WW4NpcMoveType@1@@Z")  // LIFT: dead-strip keep (no live caller yet)
+wchar_t * __cdecl NpcPredefinedMoveAction::NpcMoveTypeName(::NpcPredefinedMoveAction::NpcMoveType npcMoveType)
 {
-    LIFT_STUB(0x41ca80);
+    switch (npcMoveType)
+    {
+    case NPC_MOVE_TYPE_MOVEAROUND:
+        return L"movearound";
+    case NPC_MOVE_TYPE_PATHWAY_WALK:
+        return L"pathway walk";
+    case NPC_MOVE_TYPE_PATHWAY_RUN:
+        return L"pathway run";
+    case NPC_MOVE_TYPE_PATHWAY_SPRINT:
+        return L"pathway sprint";
+    }
+    return L"unknown";
 }
 
 // 0x41cac0

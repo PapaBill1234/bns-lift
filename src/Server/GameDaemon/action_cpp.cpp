@@ -55,9 +55,18 @@ void __cdecl Action::CancelAction(::Action::CancelReason, unsigned __int64, wcha
 }
 
 // 0x468190
-bool __cdecl Action::availableCancel(::CancelActionReason)
+#pragma comment(linker, "/INCLUDE:?availableCancel@Action@@MEAA_NW4CancelActionReason@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+bool __cdecl Action::availableCancel(::CancelActionReason reason)
 {
-    LIFT_STUB(0x468190);
+    switch (reason)
+    {
+    case CANCELACTIONREASON_USER_REQUEST:
+    case CANCELACTIONREASON_MOVE:
+    case CANCELACTIONREASON_OVERRIDE_SKILL:
+    case CANCELACTIONREASON_ATTACKED:
+        return true;
+    }
+    return false;
 }
 
 // 0x4681a0
@@ -175,9 +184,10 @@ void __cdecl PcActionQueue::ReturnSimSkill(unsigned __int64, bool)
 }
 
 // 0x469f00
-void __cdecl DuelBotActionQueue::RequestActionCancel(::CancelActionReason, unsigned __int64)
+#pragma comment(linker, "/INCLUDE:?RequestActionCancel@DuelBotActionQueue@@UEAAXW4CancelActionReason@@_K@Z")  // LIFT: dead-strip keep (no live caller yet)
+void __cdecl DuelBotActionQueue::RequestActionCancel(::CancelActionReason reason, unsigned __int64 cancellerId)
 {
-    LIFT_STUB(0x469f00);
+    _operation->RequestCancel(reason, cancellerId);
 }
 
 // 0x469f10
@@ -529,9 +539,10 @@ void __cdecl DuelBotSummonedActionQueue::ActionFinished(::Action *)
 }
 
 // 0x46d330
-void __cdecl DuelBotActionQueue::IntervalAction(::Action *, long)
+#pragma comment(linker, "/INCLUDE:?IntervalAction@DuelBotActionQueue@@UEAAXPEAVAction@@J@Z")  // LIFT: dead-strip keep (no live caller yet)
+void __cdecl DuelBotActionQueue::IntervalAction(::Action *action, long elapsed)
 {
-    LIFT_STUB(0x46d330);
+    action->intervalAction(elapsed);
 }
 
 // 0x46d340
