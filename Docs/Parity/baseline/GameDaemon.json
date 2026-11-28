@@ -2554,6 +2554,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Guild::GetBanishOpenGuildMemberCountResetTime": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "GuildJoinTicket::GuildJoinTicket": {
 "calls": 100,
 "consts": 100,
@@ -4066,12 +4073,68 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"PartyBattleManager::CanTakeAchievementReward": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PartyBattleManager::isSaveGameResult": {
+"calls": 100,
+"consts": 50,
+"refs": 100,
+"score": 83.3,
+"status": "DIFF"
+},
 "PartyBattleResultTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
 "refs": 0,
 "score": 66.7,
 "status": "DIFF"
+},
+"PartyBattleSide::GetFirstMemberId": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PartyBattleSide::IncreaseDeathCount": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PartyBattleSide::IncreaseManipulationCount": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PartyBattleSide::IncreaseOccupationCount": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PartyBattleSide::PartyBattleSide": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PartyBattleSide::~PartyBattleSide": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "PartyMatchMaker::Name": {
 "calls": 100,
