@@ -5,6 +5,12 @@
 #include "gamedaemon.h"
 #include "ruleconfig.h"
 #include "LiftStub.h"
+#include "Log.h"
+
+// LIFT: Pc members are not declared yet (LiftBytes). PDB offsets: GameObject::Id +0x28, Pc::_pcDbId +0x4E10.
+#define PC1_ID(pc) (*reinterpret_cast<unsigned __int64 const *>(reinterpret_cast<char const *>(pc) + 0x28))
+#define PC1_DBID(pc) (*reinterpret_cast<unsigned __int64 const *>(reinterpret_cast<char const *>(pc) + 0x4E10))
+#define PC1_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\Pc.cpp"
 
 // 0x5d4bf0
 __cdecl CraftInfo::CraftInfo(void)
@@ -137,57 +143,96 @@ bool __cdecl Pc::SendRetrieveRankingRewardListOk(void)
 }
 
 // 0x5d8320
-void __cdecl Pc::SendRetrieveRankingRewardListFail(short)
+#pragma comment(linker, "/INCLUDE:?SendRetrieveRankingRewardListFail@Pc@@QEAAXF@Z")  // LIFT: dead-strip keep (no live caller yet)
+void __cdecl Pc::SendRetrieveRankingRewardListFail(short failReason)
 {
-    LIFT_STUB(0x5d8320);
+    Log::Write(Log::LT_ERROR, PC1_FILE, 1245,
+               L"send retrieve ranking reward list fail ok, pcdbid:%#I64x, failReason:%d",
+               PC1_DBID(this), static_cast<int>(failReason));
+    Send("hE", 966, failReason);
 }
 
 // 0x5d8390
-void __cdecl Pc::SendRetrieveGuildRankingInfoFail(short)
+#pragma comment(linker, "/INCLUDE:?SendRetrieveGuildRankingInfoFail@Pc@@QEAAXF@Z")  // LIFT: dead-strip keep (no live caller yet)
+void __cdecl Pc::SendRetrieveGuildRankingInfoFail(short failReason)
 {
-    LIFT_STUB(0x5d8390);
+    Log::Write(Log::LT_ERROR, PC1_FILE, 1276,
+               L"send retrieve guild ranking info fail ok, pc:%#I64x, pcdbid:%#I64x, failReason:%d",
+               PC1_ID(this), PC1_DBID(this), static_cast<int>(failReason));
+    Send("hE", 963, failReason);
 }
 
 // 0x5d8400
-void __cdecl Pc::SendRetrieveChallengePartyRankingInfoFail(short)
+#pragma comment(linker, "/INCLUDE:?SendRetrieveChallengePartyRankingInfoFail@Pc@@QEAAXF@Z")  // LIFT: dead-strip keep (no live caller yet)
+void __cdecl Pc::SendRetrieveChallengePartyRankingInfoFail(short failReason)
 {
-    LIFT_STUB(0x5d8400);
+    Log::Write(Log::LT_ERROR, PC1_FILE, 1296,
+               L"[%s], %s; pcid:%#I64x, pcdbid:%#I64x, failReason:%d",
+               L"challenge-party", L"Pc::SendRetrieveChallengePartyRankingInfoFail",
+               PC1_ID(this), PC1_DBID(this), static_cast<int>(failReason));
+    Send("hE", 1056, failReason);
 }
 
 // 0x5d8490
-void __cdecl Pc::SendTakeRankingRewardFail(short)
+#pragma comment(linker, "/INCLUDE:?SendTakeRankingRewardFail@Pc@@QEAAXF@Z")  // LIFT: dead-strip keep (no live caller yet)
+void __cdecl Pc::SendTakeRankingRewardFail(short failReason)
 {
-    LIFT_STUB(0x5d8490);
+    Log::Write(Log::LT_ERROR, PC1_FILE, 1303,
+               L"send take ranking reward fail ok, pc:%#I64x, pcdbid:%#I64x, failReason:%d",
+               PC1_ID(this), PC1_DBID(this), static_cast<int>(failReason));
+    Send("hE", 969, failReason);
 }
 
 // 0x5d8500
-void __cdecl Pc::SendRegisterCraftFail(int, short)
+#pragma comment(linker, "/INCLUDE:?SendRegisterCraftFail@Pc@@QEAAXHF@Z")  // LIFT: dead-strip keep (no live caller yet)
+void __cdecl Pc::SendRegisterCraftFail(int recipeId, short failReason)
 {
-    LIFT_STUB(0x5d8500);
+    Log::Write(Log::LT_ERROR, PC1_FILE, 1309,
+               L"send register craft fail ok, pc:%#I64x, pcdbid:%#I64x, recipeId:%d, failReason:%d",
+               PC1_ID(this), PC1_DBID(this), recipeId, static_cast<int>(failReason));
+    Send("hEi", 1462, failReason, recipeId);
 }
 
 // 0x5d8590
-void __cdecl Pc::SendTakeCraftFail(unsigned __int64, short)
+#pragma comment(linker, "/INCLUDE:?SendTakeCraftFail@Pc@@QEAAX_KF@Z")  // LIFT: dead-strip keep (no live caller yet)
+void __cdecl Pc::SendTakeCraftFail(unsigned __int64 craftId, short failReason)
 {
-    LIFT_STUB(0x5d8590);
+    Log::Write(Log::LT_ERROR, PC1_FILE, 1315,
+               L"send take craft fail ok, pc:%#I64x, pcdbid:%#I64x, craftId:%#I64x, failReason:%d",
+               PC1_ID(this), PC1_DBID(this), craftId, static_cast<int>(failReason));
+    Send("hEq", 1465, failReason, craftId);
 }
 
 // 0x5d8620
-void __cdecl Pc::SendAbortCraftFail(unsigned __int64, short)
+#pragma comment(linker, "/INCLUDE:?SendAbortCraftFail@Pc@@QEAAX_KF@Z")  // LIFT: dead-strip keep (no live caller yet)
+void __cdecl Pc::SendAbortCraftFail(unsigned __int64 craftId, short failReason)
 {
-    LIFT_STUB(0x5d8620);
+    // ❓ The original logs and sends the constant 3, not failReason. The source name of the constant is not known.
+    (void)failReason;
+    Log::Write(Log::LT_ERROR, PC1_FILE, 1321,
+               L"send abort craft fail ok, pc:%#I64x, pcdbid:%#I64x, craftId:%#I64x, failReason:%d",
+               PC1_ID(this), PC1_DBID(this), craftId, 3);
+    Send("hEq", 1468, 3, craftId);
 }
 
 // 0x5d86a0
-void __cdecl Pc::SendJoinCraftUnionFail(char, short)
+#pragma comment(linker, "/INCLUDE:?SendJoinCraftUnionFail@Pc@@QEAAXDF@Z")  // LIFT: dead-strip keep (no live caller yet)
+void __cdecl Pc::SendJoinCraftUnionFail(char unionType, short failReason)
 {
-    LIFT_STUB(0x5d86a0);
+    Log::Write(Log::LT_ERROR, PC1_FILE, 1327,
+               L"send join craft union fail ok, pc:%#I64x, pcdbid:%#I64x, unionType:%d, failReason:%d",
+               PC1_ID(this), PC1_DBID(this), static_cast<int>(unionType), static_cast<int>(failReason));
+    Send("hEc", 1471, failReason, unionType);
 }
 
 // 0x5d8730
-void __cdecl Pc::SendLeaveCraftUnionFail(char, short)
+#pragma comment(linker, "/INCLUDE:?SendLeaveCraftUnionFail@Pc@@QEAAXDF@Z")  // LIFT: dead-strip keep (no live caller yet)
+void __cdecl Pc::SendLeaveCraftUnionFail(char unionType, short failReason)
 {
-    LIFT_STUB(0x5d8730);
+    Log::Write(Log::LT_ERROR, PC1_FILE, 1333,
+               L"send leave craft union fail ok, pc:%#I64x, pcdbid:%#I64x, unionType:%d, failReason:%d",
+               PC1_ID(this), PC1_DBID(this), static_cast<int>(unionType), static_cast<int>(failReason));
+    Send("hEc", 1474, failReason, unionType);
 }
 
 // 0x5d87c0
@@ -648,9 +693,23 @@ void __cdecl Pc::ClearStyleScore(void)
 }
 
 // 0x5e51b0
-__int64 __cdecl Pc::CalculateStyleScoreBonus(__int64)
+#pragma comment(linker, "/INCLUDE:?CalculateStyleScoreBonus@Pc@@QEAA_J_J@Z")  // LIFT: dead-strip keep (no live caller yet)
+__int64 __cdecl Pc::CalculateStyleScoreBonus(__int64 exp)
 {
-    LIFT_STUB(0x5e51b0);
+    short style_score = reinterpret_cast< ::CreatureMemberView *>(this)->style_score;
+    __int64 bonus = 0;
+    // LIFT: the original compares as 0 >= style_score (cmp 0, style_score; jl). The form "style_score <= 0" gives test/jle.
+    if (0 >= style_score)
+        return 0;
+    ::RuleConfig *ruleConfig = GameDaemon::GamedInstance->GetRuleConfig();
+    int bonusRate = 0;
+    if (style_score >= ruleConfig->_styleScoreExpStep2)
+        bonusRate = ruleConfig->_styleScoreExpBonus2;
+    else if (style_score >= ruleConfig->_styleScoreExpStep1)
+        bonusRate = ruleConfig->_styleScoreExpBonus1;
+    if (bonusRate > 0)
+        bonus = exp * bonusRate / 1000;
+    return bonus;
 }
 
 // 0x5e5220

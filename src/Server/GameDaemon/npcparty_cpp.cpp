@@ -2,6 +2,7 @@
 #include "npcparty.h"
 #include "npc.h"
 #include "LiftStub.h"
+#include "Log.h"
 
 #define NPCPARTY_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\NpcParty.cpp"
 
@@ -47,9 +48,18 @@ bool __cdecl NpcParty::Remove(::Npc *npc)
 }
 
 // 0x428d10
-void __cdecl NpcParty::SetVar(int, __int64)
+#pragma comment(linker, "/INCLUDE:?SetVar@NpcParty@@QEAAXH_J@Z")  // LIFT: dead-strip keep (no live caller yet)
+void __cdecl NpcParty::SetVar(int index, __int64 val)
 {
-    LIFT_STUB(0x428d10);
+    // LIFT: the original tests the index as unsigned (one compare covers index < 0 and index > 3).
+    if (static_cast<unsigned int>(index) > 3)
+    {
+        Log::Write(Log::LT_ERROR, NPCPARTY_FILE, 178, L"[NpcParty], SetVar invalid index : %d", index);
+    }
+    else
+    {
+        _var[index] = val;
+    }
 }
 
 // 0x428d50
