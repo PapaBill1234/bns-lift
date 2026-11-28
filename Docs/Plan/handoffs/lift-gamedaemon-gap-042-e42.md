@@ -42,6 +42,13 @@ Card: Easy leaves (GameDaemon), wave E. Round 1.
 - `DuelTeam::DuelTeam` (0x27bb0) now writes the inlined list constructor by hand. It sets `_Mysize` to 0 and takes the 24-byte head node from `Memory::_Manager[2]`. It links the node to itself.
 - `GuildUniform::fetchUniformInfo` (0x131560) stays Not done. See below.
 
+## Round 4 repair
+
+- The gate `pdb_layout` refused 8 invented `lift_pad_*` members in PDB classes. They are gone. The bodies now read the PDB classes through `<Class>View` structs and `reinterpret_cast`.
+- New views: `GuildUniformView` (`guilduniform.h`), `DuelManagerView` (`duelmanager.h`), `BrainMonsterTalkableView` (`brainmonstertalkable.h`), `Data::ObjectScriptView` (`scripttable.h`), `RaidDungeonView` (`raiddungeon.h`).
+- The PDB classes `GuildUniform`, `DuelManager`, `BrainMonsterTalkable`, `Data::ObjectScript` and `RaidDungeon` now declare functions only. The `sizeof` asserts of these classes moved to offset asserts on the views.
+- The bodies are unchanged. The stem `task_cpp_4` has no change in this round: its two functions are still Not done (see below). The stem `team_cpp_2` has no change: the gate did not flag it and its 9 bodies are already lifted.
+
 ## Not done
 
 - `0x42e430` `Data::QuestDecision::QuestDecision`. The code is folded with a std::vector constructor (identical code folding). The body stays without a lift.

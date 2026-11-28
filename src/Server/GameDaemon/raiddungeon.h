@@ -32,22 +32,29 @@ public:
     void __cdecl PostConfirmTask(__int64);  // 0x1a9a00
 private:
     bool __cdecl confirm(unsigned __int64);  // 0x1a9b90
+};
 
-    // LIFT: PDB layout of RaidDungeon (size 0x1B0). Only the fields that the lifted bodies read are declared.
-    char lift_pad_8[0x10];  // ❓ base DynamicRefCntObj (+0x8 to +0x17, after the vfptr) is not declared yet
+// LIFT: partial view of the PDB class RaidDungeon (size 0x1B0). The bodies read it with reinterpret_cast.
+// Only the fields that the lifted bodies read are declared.
+struct RaidDungeonView
+{
+    void *lift_vfptr;  // +0 (0x0) vfptr
+    char lift_pad_8[0x10];  // PDB field +0x8 to +0x17 (DynamicRefCntObj base, after the vfptr)
     unsigned __int64 _id;  // +24 (0x18)
     unsigned __int64 _dbId;  // +32 (0x20)
     char _currentStep;  // +40 (0x28)
     bool _waitConfirm;  // +41 (0x29)
     long volatile _boundPcCount;  // +44 (0x2C)
     __int64 _expireTime;  // +48 (0x30)
-    char lift_pad_38[0x8];  // ❓ _data (Data::RaidDungeonRecordPtr, +0x38) is not declared yet
+    char lift_pad_38[0x8];  // PDB field +0x38 (_data, Data::RaidDungeonRecordPtr)
     bool _removed;  // +64 (0x40)
     unsigned __int64 _occupyingObjectId;  // +72 (0x48)
-    char lift_pad_50[0x138];  // ❓ _occupyingPcInfo to _currentBossNpcInCombat (+0x50 to +0x187) are not declared yet
+    char lift_pad_50[0x138];  // PDB fields +0x50 to +0x187 (_occupyingPcInfo to _currentBossNpcInCombat)
     ::CriticalSection _raidDungeonCS;  // +392 (0x188)
 };
-static_assert(sizeof(RaidDungeon) == 0x1B0, "RaidDungeon size");
+static_assert(offsetof(RaidDungeonView, _waitConfirm) == 0x29, "RaidDungeon::_waitConfirm");
+static_assert(offsetof(RaidDungeonView, _occupyingObjectId) == 0x48, "RaidDungeon::_occupyingObjectId");
+static_assert(offsetof(RaidDungeonView, _raidDungeonCS) == 0x188, "RaidDungeon::_raidDungeonCS");
 
 class RaidDungeonBindPropertyEntry
 {

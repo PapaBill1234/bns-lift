@@ -33,21 +33,19 @@ public:
     short __cdecl TryAbandonGuildUniform(unsigned __int64, unsigned __int64, unsigned __int64);  // 0x131ca0
     bool __cdecl EnableRegisterGuildUniform(void);  // 0x131db0
     unsigned __int64 __cdecl AddDonationMaterial(unsigned int, short, int);  // 0x131e00
-public:
-    // LIFT: PDB layout of GuildUniform (size 0x438). Only the fields that the lifted bodies read are declared.
-    char lift_pad_0[0x18];  // ❓ base DynamicRefCntObj (+0 to +0x17, vfptr and ref count) is not declared yet
-    unsigned __int64 _uniformId;  // +24 (0x18)
-    wchar_t _uniformName[33];  // +32 (0x20)
+};
+
+// LIFT: partial view of the PDB class GuildUniform (size 0x438). The bodies read it with reinterpret_cast.
+// Only the fields that the lifted bodies read are declared.
+struct GuildUniformView
+{
+    char lift_pad_0[0x62];  // PDB fields +0 to +0x61 (DynamicRefCntObj base to _uniformName)
     char _state;  // +98 (0x62)
-    __int64 _registrationTime;  // +104 (0x68)
-    __int64 _startTime;  // +112 (0x70)
-    __int64 _endTime;  // +120 (0x78)
-    char lift_pad_80[0x3B0];  // ❓ _materialCount to _material (+0x80 to +0x42F) are not declared yet
+    char lift_pad_63[0x430 - 0x63];  // PDB fields +0x63 to +0x42F (_registrationTime to _material)
     ::_RTL_SRWLOCK _srwLock;  // +1072 (0x430)
 };
-static_assert(offsetof(GuildUniform, _state) == 0x62, "GuildUniform::_state");
-static_assert(offsetof(GuildUniform, _srwLock) == 0x430, "GuildUniform::_srwLock");
-static_assert(sizeof(GuildUniform) == 0x438, "sizeof GuildUniform");
+static_assert(offsetof(GuildUniformView, _state) == 0x62, "GuildUniform::_state");
+static_assert(offsetof(GuildUniformView, _srwLock) == 0x430, "GuildUniform::_srwLock");
 
 class GuildUniformManager
 {

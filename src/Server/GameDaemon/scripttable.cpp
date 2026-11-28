@@ -85,10 +85,11 @@ __cdecl Data::ObjectScript::~ObjectScript(void)
 // 0x467380
 ::Data::DecisionSequence const * __cdecl Data::ObjectScript::GetDecisionSequence(char event, ::dr_tref const *) const
 {
-    for (int i = 0; i < _eventNum; ++i)
+    ::Data::ObjectScriptView const *const self = reinterpret_cast< ::Data::ObjectScriptView const *>(this);
+    for (int i = 0; i < self->_eventNum; ++i)
     {
-        if (_eventSearchArray[i]._event == event)
-            return _eventSearchArray[i]._decisionSequence;
+        if (self->_eventSearchArray[i]._event == event)
+            return self->_eventSearchArray[i]._decisionSequence;
     }
     return NULL;
 }

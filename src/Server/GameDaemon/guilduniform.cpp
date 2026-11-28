@@ -66,9 +66,10 @@ short __cdecl GuildUniform::TryAbandonGuildUniform(unsigned __int64, unsigned __
 #pragma comment(linker, "/INCLUDE:?EnableRegisterGuildUniform@GuildUniform@@QEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
 bool __cdecl GuildUniform::EnableRegisterGuildUniform(void)
 {
-    AcquireSRWLockShared(&_srwLock);
-    bool const enable = _state == GUILDUNIFORMSTATE_MAKED;
-    ReleaseSRWLockShared(&_srwLock);
+    ::GuildUniformView *const self = reinterpret_cast< ::GuildUniformView *>(this);
+    AcquireSRWLockShared(&self->_srwLock);
+    bool const enable = self->_state == GUILDUNIFORMSTATE_MAKED;
+    ReleaseSRWLockShared(&self->_srwLock);
     return enable;
 }
 
@@ -116,7 +117,7 @@ int __cdecl GuildUniformManager::GetRegisteredUniformCount(void)
     AcquireSRWLockExclusive(&_srwLock);
     for (char i = 0; i < _uniformTotalCount; ++i)
     {
-        if (_uniformList[i] != NULL && _uniformList[i]->_state == GUILDUNIFORMSTATE_REGISTERED)
+        if (_uniformList[i] != NULL && reinterpret_cast< ::GuildUniformView *>(_uniformList[i])->_state == GUILDUNIFORMSTATE_REGISTERED)
             ++count;
     }
     ReleaseSRWLockExclusive(&_srwLock);

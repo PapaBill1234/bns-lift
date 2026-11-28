@@ -8,18 +8,19 @@
 // LIFT: the state members are byte views (see brainmonstertalkable.h). The casts give the member addresses.
 ::BrainState * __cdecl BrainMonsterTalkable::GetState(::BrainConst::State state)
 {
+    ::BrainMonsterTalkableView *const self = reinterpret_cast< ::BrainMonsterTalkableView *>(this);
     switch (state)
     {
     case ::BrainConst::STATE_SPAWN:
-        return reinterpret_cast< ::BrainState *>(&_spawn);
+        return reinterpret_cast< ::BrainState *>(&self->_spawn);
     case ::BrainConst::STATE_ACT_SEQ:
-        return reinterpret_cast< ::BrainState *>(&_act);
+        return reinterpret_cast< ::BrainState *>(&self->_act);
     case ::BrainConst::STATE_TALK:
-        return reinterpret_cast< ::BrainState *>(&_talk);
+        return reinterpret_cast< ::BrainState *>(&self->_talk);
     case ::BrainConst::STATE_COMBAT_SEQ:
-        return reinterpret_cast< ::BrainState *>(&_combat);
+        return reinterpret_cast< ::BrainState *>(&self->_combat);
     case ::BrainConst::STATE_RETURN:
-        return reinterpret_cast< ::BrainState *>(&_return);
+        return reinterpret_cast< ::BrainState *>(&self->_return);
     default:
         return NULL;
     }

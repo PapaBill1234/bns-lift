@@ -2,6 +2,7 @@
 // LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
 #pragma once
 #include "GameDaemonFwd.h"
+#include <stddef.h>
 
 // LIFT: view of the PDB record Data::DuelRecord (base DrEl, size 0x440).
 // Only the fields that the lifted bodies read are declared.
@@ -11,13 +12,19 @@ struct DuelRecordView
     bool is_unrated_match;  // +984 (0x3D8)
 };
 
+// LIFT: partial view of the PDB class DuelManager (size 0xD4B0). The bodies read it with reinterpret_cast.
+// Only the fields that the lifted bodies read are declared.
+struct DuelManagerView
+{
+    void *lift_vfptr;  // +0 (0x0) vfptr
+    ::DuelRecordView *_data;  // +8 (0x8) PDB type Data::DuelRecordPtr (one pointer _record)
+    char lift_pad_10[0x39];  // PDB fields +0x10 to +0x48 (_zone to _teamEnd)
+    bool _calcRatingScore;  // +73 (0x49)
+};
+static_assert(offsetof(DuelManagerView, _calcRatingScore) == 0x49, "DuelManager::_calcRatingScore");
+
 class DuelManager
 {
-public:
-    // LIFT: part of the PDB layout of DuelManager (size 0xD4B0). Only the fields that the lifted bodies read are declared.
-    ::DuelRecordView *_data;  // +8 (0x8) PDB type Data::DuelRecordPtr (one pointer _record)
-    char lift_pad_10[0x39];  // ❓ fields +0x10 to +0x48 are not declared yet
-    bool _calcRatingScore;  // +73 (0x49)
 public:
     enum DuelScoreResult {};
 private:

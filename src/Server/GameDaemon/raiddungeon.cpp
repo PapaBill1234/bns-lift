@@ -78,9 +78,10 @@ void __cdecl RaidDungeon::SendInfomation(::Pc *)
 #pragma comment(linker, "/INCLUDE:?GetOccupyingObjectId@RaidDungeon@@QEAA_KXZ")  // LIFT: dead-strip keep (no live caller yet)
 unsigned __int64 __cdecl RaidDungeon::GetOccupyingObjectId(void)
 {
-    _raidDungeonCS.Enter();
-    unsigned __int64 const occupyingObjectId = _occupyingObjectId;
-    _raidDungeonCS.Leave();
+    ::RaidDungeonView *const self = reinterpret_cast< ::RaidDungeonView *>(this);
+    self->_raidDungeonCS.Enter();
+    unsigned __int64 const occupyingObjectId = self->_occupyingObjectId;
+    self->_raidDungeonCS.Leave();
     return occupyingObjectId;
 }
 
@@ -112,9 +113,10 @@ bool __cdecl RaidDungeon::OnBossNpcKilled(::Data::BossNpcRecordPtr)
 #pragma comment(linker, "/INCLUDE:?IsBound@RaidDungeon@@QEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
 bool __cdecl RaidDungeon::IsBound(void)
 {
-    _raidDungeonCS.Enter();
-    bool const bound = _waitConfirm || _dbId != 0;
-    _raidDungeonCS.Leave();
+    ::RaidDungeonView *const self = reinterpret_cast< ::RaidDungeonView *>(this);
+    self->_raidDungeonCS.Enter();
+    bool const bound = self->_waitConfirm || self->_dbId != 0;
+    self->_raidDungeonCS.Leave();
     return bound;
 }
 

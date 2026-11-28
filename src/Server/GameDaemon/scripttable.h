@@ -49,8 +49,14 @@ public:
         char _event;  // +0 (0x0)
         ::Data::DecisionSequence *_decisionSequence;  // +8 (0x8)
     };
-    char lift_pad_8[0x20];  // ❓ _scriptRecord (PDB type Data::ScriptScript, +8 to +0x27) is not declared yet
-private:
+};
+
+// LIFT: partial view of the PDB class Data::ObjectScript. The bodies read it with reinterpret_cast.
+// Only the fields that the lifted bodies read are declared.
+struct ObjectScriptView
+{
+    void *lift_vfptr;  // +0 (0x0) vfptr
+    char lift_pad_8[0x20];  // PDB field +8 to +0x27 (_scriptRecord, Data::ScriptScript)
     int _eventNum;  // +40 (0x28)
     ::Data::ObjectScript::EventSearchNode *_eventSearchArray;  // +48 (0x30)
     int _questDecisionNum;  // +56 (0x38)

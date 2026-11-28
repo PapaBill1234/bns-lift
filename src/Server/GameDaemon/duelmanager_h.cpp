@@ -43,5 +43,6 @@ __cdecl DuelTeam::~DuelTeam(void)
 #pragma comment(linker, "/INCLUDE:?isSaveGameResult@DuelManager@@AEBA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
 bool __cdecl DuelManager::isSaveGameResult(void) const
 {
-    return !_data->is_unrated_match && _calcRatingScore;
+    ::DuelManagerView const *const self = reinterpret_cast< ::DuelManagerView const *>(this);
+    return !self->_data->is_unrated_match && self->_calcRatingScore;
 }
