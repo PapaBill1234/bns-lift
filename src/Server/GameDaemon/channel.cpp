@@ -13,11 +13,23 @@
 #pragma comment(linker, "/INCLUDE:?Send@DaemonChannel@@QEAA_NPEBDZZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?Send@DaemonChannel@@QEAA_NPEBVPacket@@PEAVSession@@@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?Send@DaemonChannel@@QEAA_NPEBVPacketList@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?initialize@ClientSideDaemonChannel@@IEAAXIKG@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?Send@ClientSideHashedDaemonChannel@@QEAA_N_KPEBDZZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?Send@ClientSideHashedDaemonChannel@@QEAA_N_KPEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?initialize@ClientSideHashedDaemonChannel@@IEAAXIKG@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?releaseSession@ClientSideHashedDaemonChannel@@MEAAXPEAVSession@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?Initialize@ServerSideDaemonChannel@@QEAA_NH@Z")  // LIFT: dead-strip keep (no live caller yet)
 
 static wchar_t const CHANNEL_FILE[] = L"source\\Channel.cpp";
+
+// LIFT: inlined assert of BloodLib (Log, alert, crash). No PDB name. Same form as BloodLib/source/Channel.cpp.
+#define CHANNEL_ASSERT_CRASH(line)                                                  \
+    do                                                                              \
+    {                                                                               \
+        Log::Write(Log::LT_ERROR, CHANNEL_FILE, line, L"== CRASH == ASSERT CRASH"); \
+        AlertSender::Write(CHANNEL_FILE, line, L"== CRASH == ASSERT CRASH");       \
+        CrashHandler::MakeCrash("source\\Channel.cpp", line, L"");                  \
+    } while (0)
 
 // 0x69a3e0
 bool DaemonChannel::Send(char const* format, ...)
@@ -55,10 +67,13 @@ bool DaemonChannel::Send(PacketList const* packetList)
 }
 
 // 0x69a740
-// LIFT: log path (E16): the inlined assert calls Log::Write and AlertSender::Write.
-void __cdecl ClientSideDaemonChannel::initialize(unsigned int, unsigned long, unsigned short)
+void __cdecl ClientSideDaemonChannel::initialize(unsigned int portId, unsigned long ip, unsigned short port)
 {
-    LIFT_STUB(0x69a740);
+    if (ip == 0 || port == 0 || session != nullptr)
+        CHANNEL_ASSERT_CRASH(292);
+    PortId = portId;
+    ServerIp = ip;
+    ServerPort = port;
 }
 
 // 0x69a7e0
@@ -99,10 +114,15 @@ bool __cdecl ClientSideHashedDaemonChannel::Send(unsigned __int64 hashKey, ::Pac
 }
 
 // 0x69acc0
-// LIFT: log path (E16): the inlined assert calls Log::Write and AlertSender::Write.
-void __cdecl ClientSideHashedDaemonChannel::initialize(unsigned int, unsigned long, unsigned short)
+// ❓ HR (0x69acc0) stores the constant 4 in _portId and moves ip and port one argument down. LTCG propagated
+// the constant portId of the only caller. The source form below is the plain form.
+void __cdecl ClientSideHashedDaemonChannel::initialize(unsigned int portId, unsigned long ip, unsigned short port)
 {
-    LIFT_STUB(0x69acc0);
+    if (ip == 0 || port == 0 || _session != nullptr)
+        CHANNEL_ASSERT_CRASH(484);
+    _portId = portId;
+    _serverIp = ip;
+    _serverPort = port;
 }
 
 // 0x69ad60
@@ -131,10 +151,16 @@ __cdecl ServerSideDaemonChannel::~ServerSideDaemonChannel(void)
 }
 
 // 0x69b0a0
-// LIFT: log path (E16): the inlined assert calls Log::Write and AlertSender::Write.
-bool __cdecl ServerSideDaemonChannel::Initialize(int)
+bool __cdecl ServerSideDaemonChannel::Initialize(int maxSession)
 {
-    LIFT_STUB(0x69b0a0);
+    if (maxSession <= 0 || MaxSession != 0 || SessionCount != 0 || SessionList != nullptr)
+        CHANNEL_ASSERT_CRASH(619);
+    MaxSession = maxSession;
+    SessionCount = 0;
+    LastSelected = 0;
+    SessionList = static_cast<Session**>(Memory::_Manager[2]->AllocZero(sizeof(Session*) * MaxSession, CHANNEL_FILE, 625));
+    UsedList = static_cast<bool*>(Memory::_Manager[2]->AllocZero(MaxSession, CHANNEL_FILE, 626));
+    return true;
 }
 
 // 0x69b170
