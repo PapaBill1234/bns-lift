@@ -8,10 +8,28 @@ class GuildCraft : public ::DynamicRefCntObj
 {
 public:
     struct Product {};
-    // LIFT: views of the PDB nested types. Only the sizes and the used fields are exact.
-    struct NormalMaterial { char _pad[16]; };
-    struct BrandMaterial { char _pad[24]; };
-    struct PCInfo { unsigned __int64 _pad[10]; };  // LIFT: 8-byte aligned view (PDB +8 offset of pcList)
+    // PDB nested types (NormalMaterial 0x10, BrandMaterial 0x18, PCInfo 0x50).
+    struct NormalMaterial
+    {
+        unsigned int itemDataID;  // +0
+        short itemLevel;  // +4
+        int itemAmount;  // +8
+        short itemDataAmount;  // +12
+    };
+    struct BrandMaterial
+    {
+        unsigned int itemDataId;  // +0
+        short itemLevel;  // +4
+        unsigned int brandID;  // +8
+        char conditionType;  // +12
+        int amount;  // +16
+        short dataAmount;  // +20
+    };
+    struct PCInfo
+    {
+        unsigned __int64 pcDbId;  // +0
+        wchar_t pcName[33];  // +8
+    };
     struct Assentient
     {
         char productionType;  // +0

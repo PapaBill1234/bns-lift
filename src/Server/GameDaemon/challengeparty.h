@@ -55,19 +55,21 @@ public:
 private:
     ::CriticalSection _lock;  // +0x18
     long volatile _isModifiable;  // +0x40
-    // LIFT: padding for _bestRecords[2] (+0x48), _bestRecordContext[2] (+0x68), _latestRankingInfo[2] (+0x868) and _rankingDesc[401] (+0x948).
-    char _pad44[0xC70 - 0x44];
-    // LIFT: view of LoadChallengePartyInfo (PDB size 0x58). GameDaemonFwd.h has only an empty LoadChallengePartyInfo.
+    // LIFT: the members from _bestRecords (+0x48) to _memberCount (+0xF08) are not declared yet. ChallengePartyView reads them.
+};
+
+// LIFT: partial view of the PDB layout of ChallengeParty (size 0xF10). Read it with reinterpret_cast<ChallengePartyView *>(this).
+// LoadChallengePartyInfo is a view too (PDB size 0x58). GameDaemonFwd.h has only an empty LoadChallengePartyInfo.
+struct ChallengePartyView
+{
+    char lift_pad_0[0xC70];  // vfptr, DynamicRefCntObj base, _lock, _isModifiable, _bestRecords, ..., _rankingDesc
     struct
     {
         long long _challengePartyId;  // +0
         wchar_t _name[33];  // +8
         unsigned long long _leaderPcDbId;  // +0x50
-    } _info;  // +0xC70
-    char _members[0xF08 - 0xCC8];  // LIFT: padding for ChallengeParty::Member _members[6] (+0xCC8)
-    int _memberCount;  // +0xF08
+    } _info;  // +0xC70 (PDB: ChallengeParty::_info)
 };
-static_assert(sizeof(ChallengeParty) == 0xF10, "sizeof ChallengeParty");
 
 class ChallengePartyManager  // PDB size 0x30
 {

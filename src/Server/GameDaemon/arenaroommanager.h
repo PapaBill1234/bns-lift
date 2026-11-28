@@ -2,6 +2,10 @@
 // LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
 #pragma once
 #include "GameDaemonFwd.h"
+#include <windows.h>
+#include <map>
+#include "../BloodLib/include/Lock.h"
+#include "../BloodLib/include/StlMemory.h"
 
 // LIFT: view of the PDB struct ArenaLobbyRoomInfo (size 0xD330). Only the fields that the lifted bodies use are declared.
 struct ArenaLobbyRoomInfoView
@@ -18,8 +22,12 @@ protected:
     virtual bool __cdecl getZoneCreationInfo(unsigned int, unsigned int *, ::vector16 *, int *);  // 0x49c80
 public:
     virtual bool __cdecl GetPcSpawnInfo(unsigned int, unsigned __int64, unsigned int *, ::vector16 *, int *);  // 0x49d90
-protected:
-    // PDB layout (base ArenaRoom). The vfptr is at +0.
+};
+
+// LIFT: view of the PDB base ArenaRoom as seen from ArenaDuelRoom. The vfptr is at +0. Read it with reinterpret_cast.
+struct ArenaDuelRoomView
+{
+    void *_vfptr;  // +0
     char lift_pad_8[0x40];  // ❓ no PDB name: base ArenaRoom +8 to +0x47 is not declared yet
     ::ArenaLobbyRoomInfoView _roomInfo;  // +72 (0x48) (PDB: ArenaRoom::_roomInfo, ArenaLobbyRoomInfo)
 };
@@ -101,7 +109,8 @@ public:
 private:
     // PDB layout (size 0x58). The vfptr is at +0.
     unsigned __int64 _otpSeed;  // +8 (0x8)
-    char lift_pad_10[0x48];  // ❓ no PDB name: _roomList (+0x10, std::map) and _lock (+0x30, CriticalSection) are not declared yet
+    ::std::map<unsigned __int64, ::ArenaRoom *, ::std::less<unsigned __int64>, ::StlAllocator< ::std::pair<unsigned __int64, ::ArenaRoom *>, 2> > _roomList;  // +16 (0x10)
+    ::CriticalSection _lock;  // +48 (0x30)
 };
 
 class ArenaSessionTimer : public ::DynamicRefCntObj

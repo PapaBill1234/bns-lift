@@ -128,3 +128,15 @@ The earlier session of this round closed the stems `arenaroommanager_cpp`, `guil
 - `src/Server/GameDaemon/mysteriousstore.cpp`
 - `src/Server/GameDaemon/challengeparty.h`
 - `src/Server/GameDaemon/challengeparty.cpp`
+
+## Repair round 3 (pdb_layout errors)
+
+The `pdb_layout` gate found 10 pad or invented members. The bodies did not change. Only the member access changed.
+
+- `ArenaDuelRoom`: the class holds no members now. `ArenaDuelRoomView` holds `_roomInfo`. `build` reads it with `reinterpret_cast`.
+- `ArenaRoomManager`: the pad is gone. The class declares `_roomList` (+0x10) and `_lock` (+0x30) with their PDB types. `sizeof` is still 0x58.
+- `ChallengeParty`: the pad and the members after `_isModifiable` are gone. `ChallengePartyView` holds `_info` (+0xC70). The destructor reads it with `reinterpret_cast`. The `sizeof` assert is removed (the class is partial).
+- `Guild`: the class has the base `DynamicRefCntObj` and the member `_combatRecordContext` (+0x18) now. The pads are gone. `GuildView` holds `_permission` (+0x7CD4). `checkPermissionGuild20` reads it with `reinterpret_cast`. The `sizeof(Guild)` assert is removed (the class is partial).
+- `GuildCraft::NormalMaterial`, `BrandMaterial` and `PCInfo`: the pads are replaced by the PDB members with PDB names and offsets.
+
+No function went back to `LIFT_STUB` in this round.

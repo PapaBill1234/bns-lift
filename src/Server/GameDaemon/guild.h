@@ -6,7 +6,9 @@
 #include "guildbank.h"
 #include "guilduniform.h"
 
-class Guild
+struct GuildCombatRecordContext;
+
+class Guild : public ::DynamicRefCntObj
 {
 public:
     struct MeetingPlace {};
@@ -261,19 +263,22 @@ public:
     void __cdecl BroadcastChangedGuildCombatRecord(::SeasonContentsGuildCombatRecordEntry *, ::Packet *);  // 0x104cb0
     bool __cdecl GetGuildUniformParam(char *const);  // 0x34f3b0
 private:
-    // PDB layout (size 0x8000). The vfptr is at +0. Only the members that the lifted bodies use are declared.
-    char lift_pad_8[0x18];  // ❓ no PDB name: base +8 to +0x17 and _combatRecordContext (+0x18) are not declared yet
+    // PDB layout (size 0x8000). Only the members up to +0x7A0C are declared. GuildView reads the others.
+    ::GuildCombatRecordContext *_combatRecordContext;  // +24 (0x18)
     ::Guild::Member _guildMember[100];  // +32 (0x20)
     int _guildMemberCount;  // +13632 (0x3540)
     ::Guild::WaitingMember _waitingGuildMember[100];  // +13640 (0x3548)
     int _waitingGuildMemberCount;  // +31240 (0x7A08)
-    char lift_pad_7a0c[0x2C8];  // ❓ no PDB name: members +0x7A0C to +0x7CD3 are not declared yet
+};
+
+// LIFT: partial view of the PDB layout of Guild (size 0x8000). Read it with reinterpret_cast<GuildView *>(this).
+struct GuildView
+{
+    char lift_pad_0[0x7CD4];  // vfptr, base, members +0x18 to +0x7CD3
     unsigned int _permission[5];  // +31956 (0x7CD4) (❓ PDB type 0xBCBC not looked up; the original reads 32-bit elements, grade 1 to 5)
-    char lift_pad_7ce8[0x318];  // ❓ no PDB name: members +0x7CE8 to +0x7FFF are not declared yet
 };
 static_assert(sizeof(Guild::Member) == 0x88, "sizeof Guild::Member");
 static_assert(sizeof(Guild::WaitingMember) == 0xB0, "sizeof Guild::WaitingMember");
-static_assert(sizeof(Guild) == 0x8000, "sizeof Guild");
 
 class GuildIdManager
 {

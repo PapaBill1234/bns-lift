@@ -252,7 +252,7 @@ bool __cdecl Guild::checkPermissionGuild20(int grade, char permission)
         return false;
     if (permission < 1 || permission > 17)
         return false;
-    return (_permission[grade - 1] & (1 << (permission - 1))) != 0;
+    return (reinterpret_cast< ::GuildView *>(this)->_permission[grade - 1] & (1 << (permission - 1))) != 0;
 }
 
 // 0xfa870

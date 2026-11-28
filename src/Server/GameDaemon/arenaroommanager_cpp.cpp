@@ -36,18 +36,19 @@ int __cdecl ArenaRoom::GetMemberCount(void)
 // 0x49c50
 bool __cdecl ArenaDuelRoom::build(char arenaLobbyGameMode)
 {
+    ::ArenaDuelRoomView *view = reinterpret_cast< ::ArenaDuelRoomView *>(this);
     // ❓ PDB enumerator names of the arena lobby and arena duel game modes are not looked up. The values are those of the original.
     if (arenaLobbyGameMode == 1)
     {
-        _roomInfo._gameGameMode = 1;
+        view->_roomInfo._gameGameMode = 1;
         return true;
     }
     if (arenaLobbyGameMode == 2)
     {
-        _roomInfo._gameGameMode = 2;
+        view->_roomInfo._gameGameMode = 2;
         return true;
     }
-    _roomInfo._gameGameMode = 0;
+    view->_roomInfo._gameGameMode = 0;
     return false;
 }
 

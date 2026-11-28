@@ -21,7 +21,7 @@ __cdecl ChallengeParty::~ChallengeParty(void)
 {
     // The _lock member destructor and the DynamicRefCntObj base destructor run after this body.
     Log::Write(Log::LT_DEBUG, CHALLENGEPARTY_FILE, 34, L"[%s], %s; challengePartyId:%#I64x, refCount:%d", L"challenge-party",
-               L"ChallengeParty::~ChallengeParty", _info._challengePartyId, _ref);
+               L"ChallengeParty::~ChallengeParty", reinterpret_cast< ::ChallengePartyView *>(this)->_info._challengePartyId, _ref);
 }
 
 // 0x66010
