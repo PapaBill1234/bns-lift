@@ -41,8 +41,15 @@ Stem `guild_cpp_1`:
 - The gate build failed. The toolchain did not find the header `<cstddef>`.
 - `src/Server/GameDaemon/partybattlemanager.h` now includes `<stddef.h>` for `offsetof`. Other repo headers use the same form.
 
+## Repair round 3 (review round 1)
+
+- `Guild::GetBanishOpenGuildMemberCountResetTime`: declared `static` in `guild.h`. The original body does not read `this`, so `now` is the first argument. The keep pragma uses the static name.
+- `PartyBattleManager::CheckToFinishGame`: the score reads follow the pseudocode order (preset 0, `if` on the score pointer). This fixes the branch sense.
+- `PartyBattleManager::isSaveGameResult`: one unsigned compare `(unsigned)(rule - 3) > 2` and the reward flag, as in the original.
+
 ## Changed files
 
+- `src/Server/GameDaemon/guild.h`
 - `src/Server/GameDaemon/partybattlemanager.h`
 - `src/Server/GameDaemon/partybattlemanager_cpp.cpp`
 - `src/Server/GameDaemon/guild_cpp_1.cpp`

@@ -4,7 +4,7 @@
 #include <time.h>
 #include "LiftStub.h"
 
-#pragma comment(linker, "/INCLUDE:?GetBanishOpenGuildMemberCountResetTime@Guild@@QEAA_J_JH@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetBanishOpenGuildMemberCountResetTime@Guild@@SA_J_JH@Z")  // LIFT: dead-strip keep (no live caller yet); static form: the original body has no this (now in rcx)
 
 // 0xe0910
 __cdecl Guild::Guild(void)

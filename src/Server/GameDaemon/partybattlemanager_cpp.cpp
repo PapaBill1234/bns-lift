@@ -255,11 +255,17 @@ bool __cdecl PartyBattleManager::CheckToFinishGame(void)
         return false;
     // LIFT: Zone::GetZoneScore (0x258710) is inline here: a null score gives 0. Score types 4 and 5 are the two sides.
     ::ZoneScore *score = ((ZoneView *)zone)->_score;
-    int alphaScore = score != nullptr ? score->Score(4) : 0;
+    int betaScore = 0;
+    int alphaScore;
+    if (score != nullptr)
+        alphaScore = score->Score(4);
+    else
+        alphaScore = 0;
     if (PBM_VIEW->_data->goal_score <= alphaScore)
         return true;
     score = ((ZoneView *)zone)->_score;
-    int betaScore = score != nullptr ? score->Score(5) : 0;
+    if (score != nullptr)
+        betaScore = score->Score(5);
     return PBM_VIEW->_data->goal_score <= betaScore;
 }
 
@@ -429,10 +435,7 @@ char __cdecl PartyBattleManager::getIndividualScoreResult(char, ::PartyBattleRes
 bool __cdecl PartyBattleManager::isSaveGameResult(void)
 {
     // ❓ detail rules 3 to 5 do not save the result (PDB enumerator names not checked).
-    int detailRule = PBM_VIEW->_detailRule;
-    if (detailRule >= 3 && detailRule <= 5)
-        return false;
-    return PBM_VIEW->_isGiveReward;
+    return (unsigned int)(PBM_VIEW->_detailRule - 3) > 2 && PBM_VIEW->_isGiveReward;
 }
 
 // 0x185b90

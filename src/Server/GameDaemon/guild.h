@@ -37,7 +37,7 @@ public:
     bool __cdecl ReserveDistruction(unsigned __int64);  // 0xe5190
     bool __cdecl ReserveDistructionByBuilder(unsigned __int64, wchar_t const *);  // 0xe59b0
     void __cdecl ResetLevelUp(void);  // 0xe5f90
-    __int64 __cdecl GetBanishOpenGuildMemberCountResetTime(__int64, int);  // 0xe5fd0
+    static __int64 __cdecl GetBanishOpenGuildMemberCountResetTime(__int64, int);  // 0xe5fd0
     bool __cdecl BanishGuildMember(unsigned __int64, char, wchar_t *, short &);  // 0xe6050
     bool __cdecl LeaveGuild(unsigned __int64, wchar_t const *, short &);  // 0xe72a0
     bool __cdecl LeaveGuildOk(unsigned __int64, unsigned __int64, short, ::GuildFlagBearerInfo &, char, __int64);  // 0xe79f0
