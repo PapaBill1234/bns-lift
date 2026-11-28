@@ -87,6 +87,12 @@ Card: Easy leaves (GameDaemon), wave E. Round 1.
 - The 19 accepted bodies and `DuelManagerView` are unchanged.
 - Changed files: `duelmanager_h.cpp`, `raiddungeon.cpp`, `team_cpp_2.cpp`.
 
+## Round 7 repair
+
+- `DuelTeam::DuelTeam` (0x27bb0) stays a `LIFT_STUB`. It now initializes the const member `_teamIndex` from its second parameter, so it compiles.
+- The other four stubs are not constructors. They need no member initializer.
+- Changed file: `src/Server/GameDaemon/duelmanager_h.cpp`.
+
 ## Gate and MATCH
 
 The driver builds and runs the gate and the MATCH comparison after this session.

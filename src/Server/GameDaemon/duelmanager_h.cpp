@@ -8,7 +8,8 @@
 #include "LiftStub.h"
 
 // 0x27bb0
-__cdecl DuelTeam::DuelTeam(int const, int const)
+__cdecl DuelTeam::DuelTeam(int const, int const teamIndex)
+    : _teamIndex(teamIndex)
 {
     LIFT_STUB(0x27bb0);
 }
