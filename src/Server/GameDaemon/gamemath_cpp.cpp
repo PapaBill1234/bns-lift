@@ -1,6 +1,18 @@
 // gamemath_cpp.cpp: gamemath.cpp (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
 #include "gamemath.h"
+#include "gamedaemon.h"
+#include "gamedconfig.h"
 #include "LiftStub.h"
+#include <stdlib.h>
+
+#pragma comment(linker, "/INCLUDE:?tryProbability@@YA_NH@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?tryProbability10000@@YA_NH@Z")  // LIFT: dead-strip keep (no live caller yet)
+
+// Partial PDB offset: GamedConfig::_userandomValue2 is at +0x30C.
+static bool useRandomValue2()
+{
+    return *(reinterpret_cast<const bool *>(GameDaemon::GamedInstance->config) + 0x30C);
+}
 
 // 0xd5760
 int __cdecl randomValue(int)
@@ -15,13 +27,25 @@ int __cdecl randomValue(int, int)
 }
 
 // 0xd5840
-bool __cdecl tryProbability(int)
+bool __cdecl tryProbability(int probability)
 {
-    LIFT_STUB(0xd5840);
+    if (!useRandomValue2())
+        return rand() % 100 < probability;
+    unsigned int value;
+    do
+        value = rand();
+    while (value >= 0x7FBC);
+    return static_cast<int>(value / 0x147) < probability;
 }
 
 // 0xd58d0
-bool __cdecl tryProbability10000(int)
+bool __cdecl tryProbability10000(int probability)
 {
-    LIFT_STUB(0xd58d0);
+    if (!useRandomValue2())
+        return rand() % 10000 < probability;
+    unsigned int value;
+    do
+        value = rand();
+    while (value >= 0x7530);
+    return static_cast<int>(value / 3) < probability;
 }

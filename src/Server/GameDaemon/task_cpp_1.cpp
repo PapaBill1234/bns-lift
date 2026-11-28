@@ -5,6 +5,8 @@
 #include "zone.h"
 #include "LiftStub.h"
 
+#pragma comment(linker, "/INCLUDE:?TimerExpired@EnterZoneTask@@EEAAXIJ@Z")  // LIFT: dead-strip keep (no live caller yet)
+
 // 0x2917d0
 __cdecl Task::Task(unsigned short)
 {
@@ -216,9 +218,10 @@ void __cdecl RequestSkillTrigger::start(void)
 }
 
 // 0x294050
-void __cdecl EnterZoneTask::TimerExpired(unsigned int, long)
+void __cdecl EnterZoneTask::TimerExpired(unsigned int timerId, long elapsed)
 {
-    LIFT_STUB(0x294050);
+    // The original ignores both arguments and calls the virtual start().
+    start();
 }
 
 // 0x294060

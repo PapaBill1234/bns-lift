@@ -3,6 +3,11 @@
 #include "pc.h"
 #include "LiftStub.h"
 
+#pragma comment(linker, "/INCLUDE:?SendFail@BoardGachaRetrieveSeasonInfoWSO@@SAXPEAVPc@@F@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SendFail@BoardGachaSessionCloseWSO@@SAXPEAVPc@@F@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SendFail@BoardGachaBoardInfoReqWSO@@SAXPEAVPc@@F@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?SendFail@BoardGachaRetrieveParticipationInfoAllWSO@@SAXPEAVPc@@F@Z")  // LIFT: dead-strip keep (no live caller yet)
+
 // 0xb3e0
 __cdecl BoardGacha::~BoardGacha(void)
 {
@@ -174,7 +179,9 @@ void __cdecl BoardGachaRetrieveSeasonInfoWSO::TimerExpired(long)
 // 0xd9e0
 void __cdecl BoardGachaRetrieveSeasonInfoWSO::SendFail(::Pc *, short)
 {
-    LIFT_STUB(0xd9e0);
+    // ❓ failReason is not used. The original sends the constant 2.
+    if (pc != nullptr)
+        pc->Send("hE", 1120, 2);
 }
 
 // 0xda10
@@ -192,7 +199,9 @@ void __cdecl BoardGachaSessionCloseWSO::TimerExpired(long)
 // 0xde40
 void __cdecl BoardGachaSessionCloseWSO::SendFail(::Pc *, short)
 {
-    LIFT_STUB(0xde40);
+    // ❓ failReason is not used. The original sends the constant 2.
+    if (pc != nullptr)
+        pc->Send("hE", 1130, 2);
 }
 
 // 0xde70
@@ -204,7 +213,9 @@ void __cdecl BoardGachaBoardInfoReqWSO::TimerExpired(long)
 // 0xdff0
 void __cdecl BoardGachaBoardInfoReqWSO::SendFail(::Pc *, short)
 {
-    LIFT_STUB(0xdff0);
+    // ❓ failReason is not used. The original sends the constant 2.
+    if (pc != nullptr)
+        pc->Send("hE", 1132, 2);
 }
 
 // 0xe020
@@ -216,5 +227,7 @@ void __cdecl BoardGachaRetrieveParticipationInfoAllWSO::TimerExpired(long)
 // 0xe200
 void __cdecl BoardGachaRetrieveParticipationInfoAllWSO::SendFail(::Pc *, short)
 {
-    LIFT_STUB(0xe200);
+    // ❓ failReason is not used. The original sends the constant 2.
+    if (pc != nullptr)
+        pc->Send("hE", 1141, 2);
 }
