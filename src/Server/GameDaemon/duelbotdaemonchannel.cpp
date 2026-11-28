@@ -2,6 +2,10 @@
 #include "duelbotdaemonchannel.h"
 #include "duelbot.h"
 #include "LiftStub.h"
+#include "Log.h"
+
+// LIFT: per-exe path literal (lessons A6).
+#define DUELBOTDAEMONCHANNEL_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\DuelBotDaemonChannel.cpp"
 
 // 0xa76a0
 __cdecl DuelBotDaemonChannel::~DuelBotDaemonChannel(void)
@@ -76,9 +80,15 @@ bool __cdecl HandleDuelBotGameGameHelloOk(::Session const *, ::Packet const *)
 }
 
 // 0xa7f70
-bool __cdecl HandleDuelBotGameGameHelloFail(::Session const *, ::Packet const *)
+#pragma comment(linker, "/INCLUDE:?HandleDuelBotGameGameHelloFail@@YA_NPEBVSession@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+bool __cdecl HandleDuelBotGameGameHelloFail(::Session const *session, ::Packet const *packet)
 {
-    LIFT_STUB(0xa7f70);
+    short cmd = 0;
+    short reason = 0;
+    packet->Decompose("hh", &cmd, &reason);
+    Log::Write(Log::LT_ERROR, DUELBOTDAEMONCHANNEL_FILE, 310, L"[duelbot-channel], hello failed, session-id:0x%I64x, reason:%d",
+               session->_id, static_cast<int>(reason));
+    return true;
 }
 
 // 0xa7fe0

@@ -1,11 +1,21 @@
 // accountinventorychannel_cpp.cpp: accountinventorychannel.cpp (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
 #include "accountinventorychannel_gd.h"
 #include "LiftStub.h"
+#include "AlertSender.h"
+#include "Log.h"
+
+// LIFT: per-exe path literal (lessons A6).
+#define ACCOUNTINVENTORYCHANNEL_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\AccountInventoryChannel.cpp"
 
 // 0x29390
+#pragma comment(linker, "/INCLUDE:?OnAccept@AccountInventorySessionHandler@@UEBA_NPEBVSession@@@Z")  // LIFT: dead-strip keep (no live caller yet)
 bool __cdecl AccountInventorySessionHandler::OnAccept(::Session const *) const
 {
-    LIFT_STUB(0x29390);
+    Log::Write(Log::LT_ERROR, ACCOUNTINVENTORYCHANNEL_FILE, 35,
+               L"== CRASH == [game-accountI], cannot accept from accountI (game connect to accountI)");
+    AlertSender::Write(ACCOUNTINVENTORYCHANNEL_FILE, 35,
+                       L"== CRASH == [game-accountI], cannot accept from accountI (game connect to accountI)");
+    return false;
 }
 
 // 0x293d0
@@ -225,21 +235,45 @@ bool __cdecl HandleAccountInventoryGame_FinishInstantPaymentFail(::Session const
 }
 
 // 0x2da60
-bool __cdecl HandleAccountInventoryGame_RefundInstantPaymentOk(::Session const *, ::Packet const *)
+#pragma comment(linker, "/INCLUDE:?HandleAccountInventoryGame_RefundInstantPaymentOk@@YA_NPEBVSession@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+bool __cdecl HandleAccountInventoryGame_RefundInstantPaymentOk(::Session const *, ::Packet const *packet)
 {
-    LIFT_STUB(0x2da60);
+    short c;
+    __int64 gameTid;
+    __int64 purchaseId;
+    __int64 refundReceptionId;
+    packet->Decompose("hqqq", &c, &gameTid, &purchaseId, &refundReceptionId);
+    Log::Write(Log::LT_DEBUG, ACCOUNTINVENTORYCHANNEL_FILE, 1236,
+               L"[game-accountI] HandleAccountInventoryGame_RefundInstantPaymentOk, tid:%#I64x, purchaseId:%I64d, refundReceptionId:%I64d",
+               gameTid, purchaseId, refundReceptionId);
+    return true;
 }
 
 // 0x2dae0
-bool __cdecl HandleAccountInventoryGame_RefundInstantPaymentFail(::Session const *, ::Packet const *)
+#pragma comment(linker, "/INCLUDE:?HandleAccountInventoryGame_RefundInstantPaymentFail@@YA_NPEBVSession@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+bool __cdecl HandleAccountInventoryGame_RefundInstantPaymentFail(::Session const *, ::Packet const *packet)
 {
-    LIFT_STUB(0x2dae0);
+    short c;
+    __int64 gameTid;
+    short errorReason;
+    packet->Decompose("hqE", &c, &gameTid, &errorReason);
+    Log::Write(Log::LT_DEBUG, ACCOUNTINVENTORYCHANNEL_FILE, 1247,
+               L"[game-accountI] HandleAccountInventoryGame_RefundInstantPaymentFail, tid:%#I64x, errorCode:%d",
+               gameTid, static_cast<int>(errorReason));
+    return true;
 }
 
 // 0x2db50
-bool __cdecl HandleAccountInventoryGame_BoardGachaRetrieveSeasonScheduleFail(::Session const *, ::Packet const *)
+#pragma comment(linker, "/INCLUDE:?HandleAccountInventoryGame_BoardGachaRetrieveSeasonScheduleFail@@YA_NPEBVSession@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+bool __cdecl HandleAccountInventoryGame_BoardGachaRetrieveSeasonScheduleFail(::Session const *, ::Packet const *packet)
 {
-    LIFT_STUB(0x2db50);
+    short c;
+    short errorReason;
+    packet->Decompose("hE", &c, &errorReason);
+    Log::Write(Log::LT_DEBUG, ACCOUNTINVENTORYCHANNEL_FILE, 1258,
+               L"[game-accountI] HandleAccountInventoryGame_BoardGachaRetrieveSeasonScheduleFail, errorCode:%d",
+               static_cast<int>(errorReason));
+    return true;
 }
 
 // 0x2dba0
@@ -333,21 +367,48 @@ bool __cdecl HandleAccountInventoryGame_BoardGachaFinishDrawByItemRecoveryOk(::S
 }
 
 // 0x30a40
-bool __cdecl HandleAccountInventoryGame_BoardGachaFinishDrawByItemRecoveryFail(::Session const *, ::Packet const *)
+#pragma comment(linker, "/INCLUDE:?HandleAccountInventoryGame_BoardGachaFinishDrawByItemRecoveryFail@@YA_NPEBVSession@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+bool __cdecl HandleAccountInventoryGame_BoardGachaFinishDrawByItemRecoveryFail(::Session const *, ::Packet const *packet)
 {
-    LIFT_STUB(0x30a40);
+    short c;
+    __int64 gameTid;
+    __int64 pcdbid;
+    short errorReason;
+    // BUG: the format "hqE" has no field for pcdbid. Decompose writes errorReason into pcdbid, and the log shows stack values.
+    packet->Decompose("hqE", &c, &gameTid, &pcdbid, &errorReason);
+    Log::Write(Log::LT_DEBUG, ACCOUNTINVENTORYCHANNEL_FILE, 2026,
+               L"[game-accountI] #BoardGachaFinishDrawByItemRecoveryFail, tid:%#I64x, pcdbid:%#I64x, errorCode:%d",
+               gameTid, pcdbid, static_cast<int>(errorReason));
+    return true;
 }
 
 // 0x30ac0
-bool __cdecl HandleAccountInventoryGame_BoardGachaCancelDrawByItemOk(::Session const *, ::Packet const *)
+#pragma comment(linker, "/INCLUDE:?HandleAccountInventoryGame_BoardGachaCancelDrawByItemOk@@YA_NPEBVSession@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+bool __cdecl HandleAccountInventoryGame_BoardGachaCancelDrawByItemOk(::Session const *, ::Packet const *packet)
 {
-    LIFT_STUB(0x30ac0);
+    short c;
+    __int64 gameTid;
+    __int64 pcdbid;
+    packet->Decompose("hqq", &c, &gameTid, &pcdbid);
+    Log::Write(Log::LT_DEBUG, ACCOUNTINVENTORYCHANNEL_FILE, 2041,
+               L"[game-accountI] #BoardGachaCancelDrawByItemOk, tid:%#I64x, pcdbid:%#I64x",
+               gameTid, pcdbid);
+    return true;
 }
 
 // 0x30b30
-bool __cdecl HandleAccountInventoryGame_BoardGachaCancelDrawByItemFail(::Session const *, ::Packet const *)
+#pragma comment(linker, "/INCLUDE:?HandleAccountInventoryGame_BoardGachaCancelDrawByItemFail@@YA_NPEBVSession@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+bool __cdecl HandleAccountInventoryGame_BoardGachaCancelDrawByItemFail(::Session const *, ::Packet const *packet)
 {
-    LIFT_STUB(0x30b30);
+    short c;
+    __int64 gameTid;
+    __int64 pcdbid;
+    short errorReason;
+    packet->Decompose("hqqE", &c, &gameTid, &pcdbid, &errorReason);
+    Log::Write(Log::LT_DEBUG, ACCOUNTINVENTORYCHANNEL_FILE, 2055,
+               L"[game-accountI] #BoardGachaCancelDrawByItemFail, tid:%#I64x, errorCode:%d",
+               gameTid, static_cast<int>(errorReason));
+    return true;
 }
 
 // 0x30ba0

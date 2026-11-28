@@ -2,6 +2,11 @@
 #include "arenagamechannel.h"
 #include "pc.h"
 #include "LiftStub.h"
+#include "AlertSender.h"
+#include "Log.h"
+
+// LIFT: per-exe path literal (lessons A6).
+#define ARENAGAMECHANNEL_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\ArenaGameChannel.cpp"
 
 // 0x36160
 __cdecl ArenaGameChannel::ArenaGameChannel(::DaemonInfo const &)
@@ -22,9 +27,14 @@ void __cdecl ArenaGameChannel::CheckPing(void)
 }
 
 // 0x36480
+#pragma comment(linker, "/INCLUDE:?OnAccept@ArenaGameSessionHandler@@UEBA_NPEBVSession@@@Z")  // LIFT: dead-strip keep (no live caller yet)
 bool __cdecl ArenaGameSessionHandler::OnAccept(::Session const *) const
 {
-    LIFT_STUB(0x36480);
+    Log::Write(Log::LT_ERROR, ARENAGAMECHANNEL_FILE, 114,
+               L"== CRASH == [arena-game], cannot accept from game (arena connect to game)");
+    AlertSender::Write(ARENAGAMECHANNEL_FILE, 114,
+                       L"== CRASH == [arena-game], cannot accept from game (arena connect to game)");
+    return false;
 }
 
 // 0x364c0
@@ -52,9 +62,15 @@ bool __cdecl HandleArenaGameArenaHelloOk(::Session const *, ::Packet const *)
 }
 
 // 0x37030
-bool __cdecl HandleArenaGameArenaHelloFail(::Session const *, ::Packet const *)
+#pragma comment(linker, "/INCLUDE:?HandleArenaGameArenaHelloFail@@YA_NPEBVSession@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+bool __cdecl HandleArenaGameArenaHelloFail(::Session const *session, ::Packet const *packet)
 {
-    LIFT_STUB(0x37030);
+    short cmd;  // LIFT: the original does not set cmd and reason before Decompose (0x37030).
+    short reason;
+    packet->Decompose("hh", &cmd, &reason);
+    Log::Write(Log::LT_ERROR, ARENAGAMECHANNEL_FILE, 378, L"[arena-game], hello failed, session-id:0x%I64x, reason:%d",
+               session->_id, static_cast<int>(reason));
+    return false;
 }
 
 // 0x37090
@@ -286,9 +302,15 @@ bool __cdecl HandleArenaLobbyArenaHelloOk(::Session const *, ::Packet const *)
 }
 
 // 0x3d850
-bool __cdecl HandleArenaLobbyArenaHelloFail(::Session const *, ::Packet const *)
+#pragma comment(linker, "/INCLUDE:?HandleArenaLobbyArenaHelloFail@@YA_NPEBVSession@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+bool __cdecl HandleArenaLobbyArenaHelloFail(::Session const *session, ::Packet const *packet)
 {
-    LIFT_STUB(0x3d850);
+    short cmd = 0;
+    short reason = 0;
+    packet->Decompose("hh", &cmd, &reason);
+    Log::Write(Log::LT_ERROR, ARENAGAMECHANNEL_FILE, 2274, L"[arena-lobby], hello arena failed, session-id:0x%I64x, reason:%d",
+               session->_id, static_cast<int>(reason));
+    return false;
 }
 
 // 0x3d8c0
@@ -304,6 +326,7 @@ bool __cdecl HandleArenaLobbyArenaDisconnectGameNotify(::Session const *, ::Pack
 }
 
 // 0x3da90
+// ❓ Not done: the format string "hiQciQcssqhqE" has 13 fields, but the pseudocode shows only two targets (see handoff).
 bool __cdecl HandleArenaLobbyArenaRelayFailNotify(::Session const *, ::Packet const *)
 {
     LIFT_STUB(0x3da90);
