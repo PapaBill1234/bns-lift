@@ -5,18 +5,6 @@
 #include "LiftStub.h"
 #include <stdlib.h>
 
-#pragma comment(linker, "/INCLUDE:?tryProbability@@YA_NH@Z")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?tryProbability10000@@YA_NH@Z")  // LIFT: dead-strip keep (no live caller yet)
-
-// LIFT: GameDaemon::config is a private PDB member at +0xAA8. Read it by offset.
-// LIFT: GamedConfig::_userandomValue2 is at +0x30C.
-static bool useRandomValue2()
-{
-    const char *daemon = reinterpret_cast<const char *>(GameDaemon::GamedInstance);
-    const char *config = *reinterpret_cast<const char * const *>(daemon + 0xAA8);
-    return *reinterpret_cast<const bool *>(config + 0x30C);
-}
-
 // 0xd5760
 int __cdecl randomValue(int)
 {
@@ -32,23 +20,11 @@ int __cdecl randomValue(int, int)
 // 0xd5840
 bool __cdecl tryProbability(int probability)
 {
-    if (!useRandomValue2())
-        return rand() % 100 < probability;
-    unsigned int value;
-    do
-        value = rand();
-    while (value >= 0x7FBC);
-    return static_cast<int>(value / 0x147) < probability;
+    LIFT_STUB(0xd5840);
 }
 
 // 0xd58d0
 bool __cdecl tryProbability10000(int probability)
 {
-    if (!useRandomValue2())
-        return rand() % 10000 < probability;
-    unsigned int value;
-    do
-        value = rand();
-    while (value >= 0x7530);
-    return static_cast<int>(value / 3) < probability;
+    LIFT_STUB(0xd58d0);
 }

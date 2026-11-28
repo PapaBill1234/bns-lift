@@ -11,7 +11,6 @@
 // LIFT: per-exe path literal (lessons A6).
 #define TAGMATCHDUELMANAGER_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\TagMatchDuelManager.cpp"
 
-#pragma comment(linker, "/INCLUDE:?ResetRound@TagMatchDuelMember@@UEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?ResetRound@TagMatchDuelTeam@@UEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?resetRound@TagMatchDuelManager@@EEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?getOppositeFightMember@TagMatchDuelManager@@AEBAQEBVTagMatchDuelMember@@H@Z")  // LIFT: dead-strip keep (no live caller yet)
@@ -25,24 +24,7 @@ bool __cdecl TagMatchDuelMember::ReadyRound(short &)
 // 0x1d0560
 void __cdecl TagMatchDuelMember::ResetRound(void)
 {
-    // Partial PDB offsets. DuelMember: _arenaPosition +24, _roundReady +28, _roundEntrance +29, _isDeported +30, _attackDamage +32.
-    // TagMatchDuelMember: _duelOrder +40, _spawnIndex +44, _takeTagTokenLimitTime +48, _duelSkillCount[2] +56.
-    // RuleConfig: _duelMaxTagSkillUsageCount +0x3B4, _duelMaxInterferenceSkillUsageCount +0x3B8.
-    ::GameDaemon *gamed = ::GameDaemon::GamedInstance;
-    char *self = reinterpret_cast<char *>(this);
-    *reinterpret_cast<int *>(self + 24) = 1;  // ARENAPOSITION_WAITING
-    self[28] = 0;
-    self[29] = 0;
-    self[30] = 0;
-    *reinterpret_cast<__int64 *>(self + 32) = 0;
-    self[40] = 0;
-    *reinterpret_cast<int *>(self + 44) = -1;
-    *reinterpret_cast<__int64 *>(self + 48) = 0;
-    // LIFT: GameDaemon::ruleConfig is private; read it at PDB offset +0xAB0.
-    const char *rule = reinterpret_cast<const char *>(
-        *reinterpret_cast< ::RuleConfig * const *>(reinterpret_cast<const char *>(gamed) + 0xAB0));
-    *reinterpret_cast<int *>(self + 56) = *reinterpret_cast<const int *>(rule + 0x3B4);
-    *reinterpret_cast<int *>(self + 60) = *reinterpret_cast<const int *>(rule + 0x3B8);
+    LIFT_STUB(0x1d0560);
 }
 
 // 0x1d05c0
