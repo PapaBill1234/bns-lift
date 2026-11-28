@@ -7,7 +7,109 @@
 #include "transactionexpirechecker.h"
 #include "zone.h"
 #include "zoneserializedobject.h"
+#include "Daemon.h"
+#include "Log.h"
 #include "LiftStub.h"
+
+#pragma comment(linker, "/INCLUDE:?isActivatedGrade@Pc@@AEBA_NH@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetRewardContribution@Pc@@QEAA_J_K_J@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?AvailableTurnBack@Pc@@QEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?BeginArenaLobbyReservation@Pc@@QEAA_N_KD@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?RollbackArenaLobbyReservation@Pc@@QEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?LeaveArenaLobbyOk@Pc@@QEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?ReturnToGameByEnterFail@Pc@@QEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetArenaSessionState@Pc@@QEBA?AW4ArenaSession@1@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?IsInArenaOrArenaLobby@Pc@@QEBA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?checkTeamGuildBattleFieldWithTarget@Pc@@QEAA_NPEAVCreature@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+
+#define PC_CPP_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\Pc.cpp"
+
+namespace
+{
+// LIFT: views of PDB classes whose members the skeleton does not declare. Offsets are from the PDB.
+
+// LIFT: view of GradeInfo (size 0x20). gameGradeKey +0, activation +8.
+struct GradeInfoView
+{
+    int gameGradeKey;      // +0x0
+    int gradeId;           // +0x4
+    char activation;       // +0x8
+    char lift_pad_0[0x20 - 0x9];
+};
+
+// LIFT: view of PcContribution (size 0x28).
+struct PcContributionView
+{
+    unsigned __int64 _npcId;       // +0x0
+    __int64 _combatStartTime;      // +0x8
+    char _contributionType;        // +0x10
+    char lift_pad_0[7];
+    __int64 _damage[2];            // +0x18
+};
+
+// LIFT: view of Zone. GeoZoneData at +0x3F60, _guildBattleFieldMgr at +0x43A0.
+struct ZoneView
+{
+    char lift_pad_0[0x3F60];
+    void const *GeoZoneData;            // +0x3F60
+    char lift_pad_1[0x43A0 - 0x3F68];
+    void *_guildBattleFieldMgr;         // +0x43A0
+};
+
+// LIFT: view of Creature (Id +0x28, Prop.State.guild_id +0x150, zone +0x8B8).
+struct CreatureView
+{
+    char lift_pad_0[0x28];
+    unsigned __int64 Id;                // +0x28
+    char lift_pad_1[0x150 - 0x30];
+    __int64 guild_id;                   // +0x150. Prop (+0x30) .State (+0xD8) .guild_id (+0x48)
+    char lift_pad_2[0x8B8 - 0x158];
+    ZoneView *zone;                     // +0x8B8
+};
+
+// LIFT: view of Pc. The skeleton class declares only part of its PDB members.
+struct PcView
+{
+    char lift_pad_0[0x28];
+    unsigned __int64 Id;                // +0x28
+    char lift_pad_1[0x150 - 0x30];
+    __int64 guild_id;                   // +0x150
+    char lift_pad_2[0x8B8 - 0x158];
+    ZoneView *zone;                     // +0x8B8
+    char lift_pad_3[0x3050 - 0x8C0];
+    short _gradeCount;                  // +0x3050
+    char lift_pad_4[0x3058 - 0x3052];
+    GradeInfoView _gradeList[32];       // +0x3058
+    char lift_pad_5[0x4E10 - (0x3058 + 32 * 0x20)];
+    unsigned __int64 _pcDbId;           // +0x4E10
+    char lift_pad_6[0x4E98 - 0x4E18];
+    __int64 _enterPortalFailStamp;      // +0x4E98
+    char lift_pad_7[0x8EC0 - 0x4EA0];
+    CRITICAL_SECTION _arenaLock;        // +0x8EC0. LIFT: PDB type CriticalSection (CS at +0, size 0x28)
+    int _arenaSession;                  // +0x8EE8. LIFT: PDB type Pc::ArenaSession
+    char lift_pad_8[4];
+    unsigned __int64 _arenaLobbyEnterParam_roomId;          // +0x8EF0
+    unsigned __int64 _arenaLobbyEnterParam_pcArenaLobbyId;  // +0x8EF8
+    unsigned __int64 _arenaLobbyEnterParam_portalKey;       // +0x8F00
+    char _arenaLobbyEnterParam_attraction;                  // +0x8F08
+    char lift_pad_9[0x8F28 - 0x8F09];
+    char _reserveArenaParam[0x50];      // +0x8F28. LIFT: PDB type ReserveArenaParam
+    char lift_pad_10[0x9055 - 0x8F78];
+    char _arenaGameGameMode;            // +0x9055
+    char lift_pad_11[0x9068 - 0x9056];
+    PcContributionView _contributionList[2];  // +0x9068
+    char _contributionCount;            // +0x90B8
+};
+
+// LIFT: values of Pc::ArenaSession.
+enum
+{
+    LIFT_ARENA_SESSION_IN_WORLD = 1,
+    LIFT_ARENA_SESSION_MOVE_TO_ARENA_LOBBY = 2,
+    LIFT_ARENA_SESSION_IN_ARENA_LOBBY = 3,
+    LIFT_ARENA_SESSION_RETURN_TO_GAME = 4,
+};
+}  // namespace
 
 // 0x5f70b0
 void __cdecl Pc::ActivateGradeBenefit(int)
@@ -52,9 +154,15 @@ bool __cdecl Pc::IsAllowedContent(char)
 }
 
 // 0x5f7d50
-bool __cdecl Pc::isActivatedGrade(int) const
+bool __cdecl Pc::isActivatedGrade(int gradeKey) const
 {
-    LIFT_STUB(0x5f7d50);
+    PcView const *self = reinterpret_cast<PcView const *>(this);
+    for (short i = 0; i < self->_gradeCount; ++i)
+    {
+        if (self->_gradeList[i].activation != 0 && gradeKey == self->_gradeList[i].gameGradeKey)
+            return true;
+    }
+    return false;
 }
 
 // 0x5f7d90
@@ -88,9 +196,19 @@ void __cdecl Pc::insertContribution(unsigned __int64, __int64, char, __int64)
 }
 
 // 0x5f8590
-__int64 __cdecl Pc::GetRewardContribution(unsigned __int64, __int64)
+__int64 __cdecl Pc::GetRewardContribution(unsigned __int64 npcId, __int64 combatStartTime)
 {
-    LIFT_STUB(0x5f8590);
+    PcView *self = reinterpret_cast<PcView *>(this);
+    char contributionCount = self->_contributionCount;
+    char i = 0;
+    if (contributionCount <= 0)
+        return 0;
+    while (self->_contributionList[i]._npcId != npcId || self->_contributionList[i]._combatStartTime != combatStartTime)
+    {
+        if (++i >= contributionCount)
+            return 0;
+    }
+    return self->_contributionList[i]._damage[1];
 }
 
 // 0x5f85e0
@@ -174,7 +292,23 @@ void __cdecl Pc::SendEnterPortalFail(::GameFailReason)
 // 0x5fa2a0
 bool __cdecl Pc::AvailableTurnBack(void)
 {
-    LIFT_STUB(0x5fa2a0);
+    PcView *self = reinterpret_cast<PcView *>(this);
+    if (self->_enterPortalFailStamp == 0)
+    {
+        // LIFT: the format string is in .rdata (Hex-Rays shows zone._extraPrivateProp[3532]). "hi" = short, int. ❓
+        Send("hi", 297, 1186);
+        Log::Write(Log::LT_DEBUG, PC_CPP_FILE, 13848, L"[turn back portal], fail to turn back for not portal fail, pc:%I64x",
+                   self->Id);
+        return false;
+    }
+    if ((__int64)(GetTickCount64() - Daemon::Instance->StartSystemTick64 - self->_enterPortalFailStamp) > 30000)
+    {
+        Send("hi", 297, 1185);
+        Log::Write(Log::LT_DEBUG, PC_CPP_FILE, 13857, L"[turn back portal], fail to turn back for too late, pc:%I64x",
+                   self->Id);
+        return false;
+    }
+    return true;
 }
 
 // 0x5fa360
@@ -292,15 +426,35 @@ short __cdecl Pc::CheckArenaPortalUsable(::Data::ArenaPortalRecordPtr)
 }
 
 // 0x5fc9f0
-bool __cdecl Pc::BeginArenaLobbyReservation(unsigned __int64, char)
+bool __cdecl Pc::BeginArenaLobbyReservation(unsigned __int64 arenaPortalKey, char arenaAttraction)
 {
-    LIFT_STUB(0x5fc9f0);
+    PcView *self = reinterpret_cast<PcView *>(this);
+    bool result = true;
+    EnterCriticalSection(&self->_arenaLock);
+    if (self->_arenaSession == LIFT_ARENA_SESSION_IN_WORLD)
+    {
+        self->_arenaSession = LIFT_ARENA_SESSION_MOVE_TO_ARENA_LOBBY;
+        self->_arenaLobbyEnterParam_portalKey = arenaPortalKey;
+        self->_arenaLobbyEnterParam_pcArenaLobbyId = 0;
+        self->_arenaLobbyEnterParam_roomId = 0;
+        self->_arenaLobbyEnterParam_attraction = arenaAttraction;
+    }
+    else
+    {
+        result = false;
+    }
+    LeaveCriticalSection(&self->_arenaLock);
+    return result;
 }
 
 // 0x5fca90
 void __cdecl Pc::RollbackArenaLobbyReservation(void)
 {
-    LIFT_STUB(0x5fca90);
+    PcView *self = reinterpret_cast<PcView *>(this);
+    EnterCriticalSection(&self->_arenaLock);
+    if (self->_arenaSession == LIFT_ARENA_SESSION_MOVE_TO_ARENA_LOBBY)
+        self->_arenaSession = LIFT_ARENA_SESSION_IN_WORLD;
+    LeaveCriticalSection(&self->_arenaLock);
 }
 
 // 0x5fcae0
@@ -354,7 +508,22 @@ bool __cdecl Pc::EnterArenaLobbyOk(char)
 // 0x5fdc40
 bool __cdecl Pc::LeaveArenaLobbyOk(void)
 {
-    LIFT_STUB(0x5fdc40);
+    PcView *self = reinterpret_cast<PcView *>(this);
+    bool result = true;
+    EnterCriticalSection(&self->_arenaLock);
+    if (self->_arenaSession == LIFT_ARENA_SESSION_IN_ARENA_LOBBY)
+    {
+        self->_arenaSession = LIFT_ARENA_SESSION_RETURN_TO_GAME;
+        self->_arenaLobbyEnterParam_portalKey = 0;
+        self->_arenaLobbyEnterParam_roomId = 0;
+        self->_arenaGameGameMode = 0;
+    }
+    else
+    {
+        result = false;
+    }
+    LeaveCriticalSection(&self->_arenaLock);
+    return result;
 }
 
 // 0x5fdcc0
@@ -528,7 +697,16 @@ void __cdecl Pc::ArenaLobbyClosed(short)
 // 0x600e20
 void __cdecl Pc::ReturnToGameByEnterFail(void)
 {
-    LIFT_STUB(0x600e20);
+    PcView *self = reinterpret_cast<PcView *>(this);
+    EnterCriticalSection(&self->_arenaLock);
+    self->_arenaSession = LIFT_ARENA_SESSION_RETURN_TO_GAME;
+    memset(self->_reserveArenaParam, 0, sizeof(self->_reserveArenaParam));
+    self->_arenaLobbyEnterParam_roomId = 0;
+    self->_arenaLobbyEnterParam_pcArenaLobbyId = 0;
+    self->_arenaLobbyEnterParam_portalKey = 0;
+    *reinterpret_cast<unsigned __int64 *>(&self->_arenaLobbyEnterParam_attraction) = 0;
+    LeaveCriticalSection(&self->_arenaLock);
+    Send("hQ", 620, 3);
 }
 
 // 0x600eb0
@@ -540,13 +718,25 @@ short __cdecl Pc::SendMoveToArena(int, bool, char)
 // 0x600fe0
 ::Pc::ArenaSession __cdecl Pc::GetArenaSessionState(void) const
 {
-    LIFT_STUB(0x600fe0);
+    PcView const *self = reinterpret_cast<PcView const *>(this);
+    CRITICAL_SECTION *lock = const_cast<CRITICAL_SECTION *>(&self->_arenaLock);
+    EnterCriticalSection(lock);
+    ::Pc::ArenaSession state = static_cast< ::Pc::ArenaSession>(self->_arenaSession);
+    LeaveCriticalSection(lock);
+    return state;
 }
 
 // 0x601020
 bool __cdecl Pc::IsInArenaOrArenaLobby(void) const
 {
-    LIFT_STUB(0x601020);
+    PcView const *self = reinterpret_cast<PcView const *>(this);
+    CRITICAL_SECTION *lock = const_cast<CRITICAL_SECTION *>(&self->_arenaLock);
+    EnterCriticalSection(lock);
+    unsigned int arenaSession = static_cast<unsigned int>(self->_arenaSession);
+    bool result = arenaSession >= LIFT_ARENA_SESSION_MOVE_TO_ARENA_LOBBY &&
+                  (arenaSession <= LIFT_ARENA_SESSION_IN_ARENA_LOBBY || (arenaSession - 5) <= 1);
+    LeaveCriticalSection(lock);
+    return result;
 }
 
 // 0x601080
@@ -682,9 +872,21 @@ bool __cdecl Pc::checkTeamFactionBattleFieldWithTarget(::Creature *)
 }
 
 // 0x604430
-bool __cdecl Pc::checkTeamGuildBattleFieldWithTarget(::Creature *)
+bool __cdecl Pc::checkTeamGuildBattleFieldWithTarget(::Creature *target)
 {
-    LIFT_STUB(0x604430);
+    PcView *self = reinterpret_cast<PcView *>(this);
+    CreatureView *targetView = reinterpret_cast<CreatureView *>(target);
+    ZoneView *zone = self->zone;
+    bool result = true;
+    if (zone != nullptr && zone->GeoZoneData != nullptr && zone == targetView->zone && zone->_guildBattleFieldMgr != nullptr)
+    {
+        Log::Write(Log::LT_DEBUG, PC_CPP_FILE, 17893,
+                   L"[pc], checkTeamGuildBattleFieldWithTarget, pc:0x%I64x, pcdbid:0x%I64x, target:0x%I64x", self->Id,
+                   self->_pcDbId, targetView->Id);
+        if (self->guild_id != targetView->guild_id)
+            return false;
+    }
+    return result;
 }
 
 // 0x6044d0
