@@ -353,9 +353,9 @@ void __cdecl DuelManager::finishGame(void)
 {
     DuelManagerView *self = reinterpret_cast<DuelManagerView *>(this);
     // LIFT: DuelTeam::IsTeamEmpty is inlined in the original.
-    if (self->_teams[0]->_members.empty())
+    if (self->_teams[0]->_members._Mysize == 0)
         finishGame(static_cast< ::DuelGameResult>(4));  // LIFT: DUELGAMERESULT_BETA_WIN = 4 (PDB)
-    else if (self->_teams[1]->_members.empty())
+    else if (self->_teams[1]->_members._Mysize == 0)
         finishGame(static_cast< ::DuelGameResult>(3));  // LIFT: DUELGAMERESULT_ALPHA_WIN = 3 (PDB)
     else
         finishGame(self->_rule->CalcGameResult());
