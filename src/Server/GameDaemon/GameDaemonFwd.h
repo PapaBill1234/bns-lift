@@ -2024,7 +2024,28 @@ public:
     virtual bool Next() = 0;
     virtual bool IsValid() = 0;
 };
-struct DrLoaderDef {};
+// PDB layout (size 0x10).
+struct DrXmlDoc
+{
+    XmlDoc * * doc;  // +0 (0x0)
+    int doccount;  // +8 (0x8)
+};
+// PDB layout (size 0x60).
+struct DrLoaderDef
+{
+    DrTable * table;  // +0 (0x0)
+    DrTableDef const * tabledef;  // +8 (0x8)
+    wchar_t const * path;  // +16 (0x10)
+    wchar_t const * xml;  // +24 (0x18)
+    bool subdir;  // +32 (0x20)
+    wchar_t const * xsd;  // +40 (0x28)
+    bool (* postproc)(DrEl *);  // +48 (0x30)
+    DrXmlDoc xmldoc;  // +56 (0x38)
+    DrXmlDoc l10ndoc;  // +72 (0x48)
+    bool loaded;  // +88 (0x58)
+    float tableCacheSize;  // +92 (0x5C)
+};
+static_assert(sizeof(DrLoaderDef) == 0x60, "sizeof DrLoaderDef");
 // PDB layout (size 0x8): vfptr only.
 class DrLog
 {
@@ -2054,7 +2075,6 @@ template <class T0, int T1>
 class DrStlAllocator {};
 struct DrTableDef {};
 struct DrTableSummary {};
-struct DrXmlDoc {};
 struct DroppedItem  // PDB layout, size 0x18
 {
     char valid;  // +0x0

@@ -2,6 +2,21 @@
 // LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
 #pragma once
 #include "GameDaemonFwd.h"
+#include <stddef.h>
+#include <map>
+#include "../BloodLib/include/Lock.h"
+#include "../BloodLib/include/LogFile.h"
+#include "../BloodLib/include/StlMemory.h"
+#include "../Packet/FragmentPacket.h"
+
+namespace Data {
+class AccountLevelRecordPtr;
+class LevelRecordPtr;
+struct ExceedLevelData;
+struct SoulNpcSkillCategoryData;
+struct RandomDistributionAccumulated;
+class BoastEventRecord;
+}
 
 namespace Data {
 class AdditionalServiceItems
@@ -32,6 +47,144 @@ public:
 namespace Data {
 class DataManager
 {
+public:
+    struct DroppedPouchPosInfo
+    {
+    public:
+        short posCount;  // +0 (0x0)
+        short pos[1000];  // +2 (0x2)
+    };
+    struct PvEStageStartInfoID
+    {
+    public:
+        PvEStageStartInfoID(short a, unsigned __int64 k) : attraction(a), attractionKey(k) {}
+        PvEStageStartInfoID() {}
+        bool operator==(::Data::DataManager::PvEStageStartInfoID const & o) const { return attraction == o.attraction && attractionKey == o.attractionKey; }
+        bool operator<(::Data::DataManager::PvEStageStartInfoID const & o) const { return attraction < o.attraction || (attraction == o.attraction && attractionKey < o.attractionKey); }
+        short attraction;  // +0 (0x0)
+        unsigned __int64 attractionKey;  // +8 (0x8)
+    };
+    struct RandomStoreDrawRewardID
+    {
+    public:
+        char _randomStoreNumber;  // +0 (0x0)
+        int _accumulatedRequiredDrawCount;  // +4 (0x4)
+    };
+    struct RankingPvEStageStartInfo
+    {
+    public:
+        ::Data::DataManager::PvEStageStartInfoID id;  // +0 (0x0)
+        char seasonContentsType;  // +16 (0x10)
+    };
+    // PDB layout (size 0xD6E8). Members in PDB order. A by-value type without a lifted layout is a qword array.
+    ::DrDataReader * _reader;  // +0 (0x0)
+    ::DrAliasMap * _aliasMap;  // +8 (0x8)
+    ::DrElReader * _elreader;  // +16 (0x10)
+    ::DrLoaderDef _loaderDefs[266];  // +24 (0x18)
+    ::CombatSequenceLoader * _combatSequence;  // +0x63D8
+    ::ActSequenceLoader * _actSequence;  // +0x63E0
+    ::QuestTable * _quest;  // +0x63E8
+    ::Data::ScriptTable * _script;  // +0x63F0
+    ::GeoWorld * _geoWorld;  // +0x63F8
+    ::FilterFactory * _filterFactory;  // +0x6400
+    ::ReactionFactory * _reactionFactory;  // +0x6408
+    int * _expTable;  // +0x6410
+    ::Data::LevelRecordPtr * _levelDataTable;  // +0x6418
+    ::Data::ExceedLevelData * _exceedLevelDataList;  // +0x6420
+    int _exceedLevelDataListCount;  // +0x6428
+    int _exceedLevelFirstLevel;  // +0x642C
+    __int64 * _masteryExpTable;  // +0x6430
+    __int64 * _accountExpTable;  // +0x6438
+    ::Data::AccountLevelRecordPtr * _accountLevelDataTable;  // +0x6440
+    wchar_t _rootDataPath[260];  // +0x6448
+    wchar_t _zoneRootDataPath[260];  // +0x6650
+    wchar_t _scriptRootDataPath[260];  // +0x6858
+    wchar_t _questRootDataPath[260];  // +0x6A60
+    wchar_t _terrainRootDataPath[260];  // +0x6C68
+    wchar_t _socialRootDataPath[260];  // +0x6E70
+    wchar_t _zipFileDataPath[260];  // +0x7078
+    int _mainFactionCount;  // +0x7280
+    char * _mainFactionIds;  // +0x7288
+    int _gemGearScoreCount;  // +0x7290
+    int _gemCardGearScoreCount;  // +0x7294
+    int * _gemGearScoreTable;  // +0x7298
+    int * _gemCardGearScoreTable;  // +0x72A0
+    int _arenaDungeonZoneIdCapacity;  // +0x72A8
+    int _arenaDungeonZoneIdCount;  // +0x72AC
+    unsigned __int64 * _arenaDungeonZoneIds;  // +0x72B0
+    int _arenaDuelZoneIdCapacity;  // +0x72B8
+    int _arenaDuelZoneIdCount;  // +0x72BC
+    unsigned __int64 * _arenaDuelZoneIds;  // +0x72C0
+    int _vitalityBenefitGradeKey;  // +0x72C8
+    int _quotaKeyRecordListCount;  // +0x72CC
+    ::Data::ContentQuotaRecordPtr * _quotaKeyRecordList;  // +0x72D0
+    unsigned __int64 _zoneBroadcastSocialActionNpc;  // +0x72D8
+    unsigned __int64 _zoneBroadcastSocialActionNpc2;  // +0x72E0
+    int _bossHpZoneBroadcastGeoZoneId;  // +0x72E8
+    __int64 _challengeListWeekStartDateTime;  // +0x72F0
+    int _challengeListWeekCount;  // +0x72F8
+    ::std::map<unsigned short, ::Data::AcquireSkillByQuestMission *, ::std::less<unsigned short>, ::StlAllocator< ::std::pair<unsigned short, ::Data::AcquireSkillByQuestMission *>, 2> > _skillByQuestMissionList;  // +0x7300
+    ::std::map<unsigned __int64, char *, ::std::less<unsigned __int64>, ::StlAllocator< ::std::pair<unsigned __int64, char *>, 2> > _weeklyTimeTableList;  // +0x7320
+    ::std::map<unsigned __int64, ::std::pair<int, int>, ::std::less<unsigned __int64>, ::StlAllocator< ::std::pair<unsigned __int64, ::std::pair<int, int> >, 2> > _weeklyTimeMinuteTableList;  // +0x7340
+    unsigned __int64 _battleRoyalFieldJobStyleRestrictionList[3];  // +0x7360. LIFT: PDB type std::list<int,StlAllocator<int,2> > (size 0x18, align 8), layout not lifted yet
+    unsigned __int64 _arenaDaemonPersistentZoneList[3];  // +0x7378. LIFT: PDB type std::list<int,StlAllocator<int,2> > (size 0x18, align 8), layout not lifted yet
+    ::std::multimap<int, int, ::std::less<int>, ::StlAllocator< ::std::pair<int, int>, 2> > _skillChildrenMap;  // +0x7390
+    ::std::multimap<int, unsigned __int64, ::std::less<int>, ::StlAllocator< ::std::pair<int, unsigned __int64>, 2> > _skillVariationMap;  // +0x73B0
+    ::std::map<int, ::Data::GradeBenefit *, ::std::less<int>, ::StlAllocator< ::std::pair<int, ::Data::GradeBenefit *>, 2> > _gradeBenefitListMap;  // +0x73D0
+    ::std::map<unsigned __int64, char, ::std::less<unsigned __int64>, ::StlAllocator< ::std::pair<unsigned __int64, char>, 2> > _weaponBrandMaxGemSlotCountMap;  // +0x73F0
+    bool _enableSouNpcSkill;  // +0x7410
+    ::Data::SoulNpcSkillCategoryData * * _soulNpcSkills;  // +0x7418
+    ::std::map<unsigned __int64, int, ::std::less<unsigned __int64>, ::StlAllocator< ::std::pair<unsigned __int64, int>, 2> > _itemUsableRelationKeyMap;  // +0x7420
+    ::std::map<unsigned __int64, unsigned __int64, ::std::less<unsigned __int64>, ::StlAllocator< ::std::pair<unsigned __int64, unsigned __int64>, 2> > _itemUsableRelationAttractionGroupMap;  // +0x7440
+    bool _duelBotChallengeDispelEffectType[642];  // +0x7460
+    bool _skillTrainingRoomRemainEffectType[642];  // +0x76E2
+    bool _challengePartyAttractionRemainEffectType[642];  // +0x7964
+    unsigned int _skillTrainingRoomAttractionKey;  // +0x7BE8
+    unsigned int _publicRaidAttractionKey;  // +0x7BEC
+    unsigned __int64 _challengePartyAttractionKey;  // +0x7BF0
+    unsigned int _battleRoyalFieldAttractionKey;  // +0x7BF8
+    short _duelBotTrainingRoomVersion;  // +0x7BFC
+    __int64 _newbieInfoFlag;  // +0x7C00
+    ::std::map<unsigned __int64, ::Data::RandomDistributionAccumulated *, ::std::less<unsigned __int64>, ::StlAllocator< ::std::pair<unsigned __int64, ::Data::RandomDistributionAccumulated *>, 2> > _randomDistributionKeyMap;  // +0x7C08
+    unsigned __int64 _mentoringRecordPtr;  // +0x7C28. LIFT: PDB type Data::MentoringRecordPtr (size 8, align 8), layout not lifted yet
+    short _mentoringEnableVersion;  // +0x7C30
+    short _mentoringLastVersion;  // +0x7C32
+    unsigned __int64 _jumpingCharacterData[0x4F8 / 8];  // +0x7C38. LIFT: PDB type Data::JumpingCharacterData (size 0x4F8, align 8), layout not lifted yet
+    unsigned __int64 _jumpingCharacterData2[0xD8 / 8];  // +0x8130. LIFT: PDB type Data::JumpingCharacterData2 (size 0xD8, align 8), layout not lifted yet
+    unsigned __int64 _noneSpecifyObjectQuest[3][0x140 / 8];  // +0x8208. LIFT: PDB type Data::NoneSpecifyObjectQuestForwarding[3] (size 0x140 each, align 8), layout not lifted yet
+    unsigned __int64 _pvpDifficultyTypePtr;  // +0x85C8. LIFT: PDB type Data::DifficultyTypeRecordPtr (size 8, align 8), layout not lifted yet
+    unsigned __int64 _defaultDifficultyTypePtr;  // +0x85D0. LIFT: PDB type Data::DifficultyTypeRecordPtr (size 8, align 8), layout not lifted yet
+    char _defaultDifficultyTypeId;  // +0x85D8
+    int _defaultDifficultyTypeDataIdx;  // +0x85DC
+    ::std::multimap<__int64, ::Data::BoastEventRecord *, ::std::less<__int64>, ::StlAllocator< ::std::pair<__int64, ::Data::BoastEventRecord *>, 2> > _boastEventMap[6];  // +0x85E0
+    bool _parallelLoad;  // +0x86A0
+    ::CriticalSection _dataReaderErrorLogFileLock;  // +0x86A8
+    ::LogFile * _dataReaderErrorLogFile;  // +0x86D0
+    ::LogFile * _scriptLoaderErrorLogFile;  // +0x86D8
+    ::LogFile * _dataLoadErrorLogFile;  // +0x86E0
+    ::LogFile * _dataValidationFailureLogFile;  // +0x86E8
+    ::std::map< ::Data::DataManager::PvEStageStartInfoID, ::Data::DataManager::RankingPvEStageStartInfo *, ::std::less< ::Data::DataManager::PvEStageStartInfoID>, ::StlAllocator< ::std::pair< ::Data::DataManager::PvEStageStartInfoID, ::Data::DataManager::RankingPvEStageStartInfo *>, 2> > _rankingPvEStageStartInfoMap;  // +0x86F0
+    ::std::map< ::Data::DataManager::RandomStoreDrawRewardID, ::Data::RandomStoreDrawRewardRecordPtr, ::std::less< ::Data::DataManager::RandomStoreDrawRewardID>, ::StlAllocator< ::std::pair< ::Data::DataManager::RandomStoreDrawRewardID, ::Data::RandomStoreDrawRewardRecordPtr>, 2> > _RandomStoreDrawRewardSet;  // +0x8710
+    int _firstRandomStoreDrawRewardRequiredDrawCount[2];  // +0x8730
+    int _lastRandomStoreDrawRewardRequiredDrawCount[2];  // +0x8738
+    int _totalRandomStoreDrawRewardRequiredDrawCount[2];  // +0x8740
+    ::Data::DataManager::DroppedPouchPosInfo _droppedPouchPos[10];  // +0x8748
+    char _droppedPouchPosCount;  // +0xD57C
+    unsigned __int64 _elevationJobStyleQuestList[4];  // +0xD580. LIFT: PDB type std::map<unsigned short,char,std::less<unsigned int>,StlAllocator<std::pair<unsigned short,char>,2> > (size 0x20, align 8), layout not lifted yet
+    int _badgeSetItemScoreUnitSize;  // +0xD5A0
+    int _badgeSynthesisScoreUnitSize;  // +0xD5A4
+    ::FragmentPacket _badgeSynthesisResultDataPacket;  // +0xD5A8
+    int _maxBadge1SynthesisScore;  // +0xD6A0
+    int _maxBadge2SynthesisScore;  // +0xD6A4
+    int _maxBadge3SynthesisScore;  // +0xD6A8
+    ::Data::AdditionalServiceItems * _additionalServiceItems;  // +0xD6B0
+    unsigned __int64 _boardGachaData;  // +0xD6B8. LIFT: PDB type Data::BoardGachaData (size 8, align 8), layout not lifted yet
+    unsigned __int64 _slatecaches[2];  // +0xD6C0. LIFT: PDB type Data::SlateRelationCache (size 0x10, align 8), layout not lifted yet
+    unsigned __int64 _formulaConstantData;  // +0xD6D0. LIFT: PDB type Data::FormulaConstantData (size 8, align 8), layout not lifted yet
+    int _itemFusionScoreUnitSize;  // +0xD6D8
+    int * _maxItemFusionScores;  // +0xD6E0
+private:
+    static ::Data::DataManager * Instance;
 public:
     ::Data::RandomStoreDrawRewardRecordPtr const __cdecl GetNextRandomStoreDrawReward(char, int);  // 0x1eddc0
     static bool __cdecl CheckJumpingCharacterTicketItemDataId(unsigned int);  // 0x34ef90
@@ -197,6 +350,125 @@ public:
     bool __cdecl ConstructAdditionalServiceItems(void);  // 0x662b10
 };
 }
+static_assert(sizeof(Data::DataManager) == 0xD6E8, "sizeof Data::DataManager");
+static_assert(offsetof(Data::DataManager, _reader) == 0x0, "Data::DataManager::_reader");
+static_assert(offsetof(Data::DataManager, _aliasMap) == 0x8, "Data::DataManager::_aliasMap");
+static_assert(offsetof(Data::DataManager, _elreader) == 0x10, "Data::DataManager::_elreader");
+static_assert(offsetof(Data::DataManager, _loaderDefs) == 0x18, "Data::DataManager::_loaderDefs");
+static_assert(offsetof(Data::DataManager, _combatSequence) == 0x63D8, "Data::DataManager::_combatSequence");
+static_assert(offsetof(Data::DataManager, _actSequence) == 0x63E0, "Data::DataManager::_actSequence");
+static_assert(offsetof(Data::DataManager, _quest) == 0x63E8, "Data::DataManager::_quest");
+static_assert(offsetof(Data::DataManager, _script) == 0x63F0, "Data::DataManager::_script");
+static_assert(offsetof(Data::DataManager, _geoWorld) == 0x63F8, "Data::DataManager::_geoWorld");
+static_assert(offsetof(Data::DataManager, _filterFactory) == 0x6400, "Data::DataManager::_filterFactory");
+static_assert(offsetof(Data::DataManager, _reactionFactory) == 0x6408, "Data::DataManager::_reactionFactory");
+static_assert(offsetof(Data::DataManager, _expTable) == 0x6410, "Data::DataManager::_expTable");
+static_assert(offsetof(Data::DataManager, _levelDataTable) == 0x6418, "Data::DataManager::_levelDataTable");
+static_assert(offsetof(Data::DataManager, _exceedLevelDataList) == 0x6420, "Data::DataManager::_exceedLevelDataList");
+static_assert(offsetof(Data::DataManager, _exceedLevelDataListCount) == 0x6428, "Data::DataManager::_exceedLevelDataListCount");
+static_assert(offsetof(Data::DataManager, _exceedLevelFirstLevel) == 0x642C, "Data::DataManager::_exceedLevelFirstLevel");
+static_assert(offsetof(Data::DataManager, _masteryExpTable) == 0x6430, "Data::DataManager::_masteryExpTable");
+static_assert(offsetof(Data::DataManager, _accountExpTable) == 0x6438, "Data::DataManager::_accountExpTable");
+static_assert(offsetof(Data::DataManager, _accountLevelDataTable) == 0x6440, "Data::DataManager::_accountLevelDataTable");
+static_assert(offsetof(Data::DataManager, _rootDataPath) == 0x6448, "Data::DataManager::_rootDataPath");
+static_assert(offsetof(Data::DataManager, _zoneRootDataPath) == 0x6650, "Data::DataManager::_zoneRootDataPath");
+static_assert(offsetof(Data::DataManager, _scriptRootDataPath) == 0x6858, "Data::DataManager::_scriptRootDataPath");
+static_assert(offsetof(Data::DataManager, _questRootDataPath) == 0x6A60, "Data::DataManager::_questRootDataPath");
+static_assert(offsetof(Data::DataManager, _terrainRootDataPath) == 0x6C68, "Data::DataManager::_terrainRootDataPath");
+static_assert(offsetof(Data::DataManager, _socialRootDataPath) == 0x6E70, "Data::DataManager::_socialRootDataPath");
+static_assert(offsetof(Data::DataManager, _zipFileDataPath) == 0x7078, "Data::DataManager::_zipFileDataPath");
+static_assert(offsetof(Data::DataManager, _mainFactionCount) == 0x7280, "Data::DataManager::_mainFactionCount");
+static_assert(offsetof(Data::DataManager, _mainFactionIds) == 0x7288, "Data::DataManager::_mainFactionIds");
+static_assert(offsetof(Data::DataManager, _gemGearScoreCount) == 0x7290, "Data::DataManager::_gemGearScoreCount");
+static_assert(offsetof(Data::DataManager, _gemCardGearScoreCount) == 0x7294, "Data::DataManager::_gemCardGearScoreCount");
+static_assert(offsetof(Data::DataManager, _gemGearScoreTable) == 0x7298, "Data::DataManager::_gemGearScoreTable");
+static_assert(offsetof(Data::DataManager, _gemCardGearScoreTable) == 0x72A0, "Data::DataManager::_gemCardGearScoreTable");
+static_assert(offsetof(Data::DataManager, _arenaDungeonZoneIdCapacity) == 0x72A8, "Data::DataManager::_arenaDungeonZoneIdCapacity");
+static_assert(offsetof(Data::DataManager, _arenaDungeonZoneIdCount) == 0x72AC, "Data::DataManager::_arenaDungeonZoneIdCount");
+static_assert(offsetof(Data::DataManager, _arenaDungeonZoneIds) == 0x72B0, "Data::DataManager::_arenaDungeonZoneIds");
+static_assert(offsetof(Data::DataManager, _arenaDuelZoneIdCapacity) == 0x72B8, "Data::DataManager::_arenaDuelZoneIdCapacity");
+static_assert(offsetof(Data::DataManager, _arenaDuelZoneIdCount) == 0x72BC, "Data::DataManager::_arenaDuelZoneIdCount");
+static_assert(offsetof(Data::DataManager, _arenaDuelZoneIds) == 0x72C0, "Data::DataManager::_arenaDuelZoneIds");
+static_assert(offsetof(Data::DataManager, _vitalityBenefitGradeKey) == 0x72C8, "Data::DataManager::_vitalityBenefitGradeKey");
+static_assert(offsetof(Data::DataManager, _quotaKeyRecordListCount) == 0x72CC, "Data::DataManager::_quotaKeyRecordListCount");
+static_assert(offsetof(Data::DataManager, _quotaKeyRecordList) == 0x72D0, "Data::DataManager::_quotaKeyRecordList");
+static_assert(offsetof(Data::DataManager, _zoneBroadcastSocialActionNpc) == 0x72D8, "Data::DataManager::_zoneBroadcastSocialActionNpc");
+static_assert(offsetof(Data::DataManager, _zoneBroadcastSocialActionNpc2) == 0x72E0, "Data::DataManager::_zoneBroadcastSocialActionNpc2");
+static_assert(offsetof(Data::DataManager, _bossHpZoneBroadcastGeoZoneId) == 0x72E8, "Data::DataManager::_bossHpZoneBroadcastGeoZoneId");
+static_assert(offsetof(Data::DataManager, _challengeListWeekStartDateTime) == 0x72F0, "Data::DataManager::_challengeListWeekStartDateTime");
+static_assert(offsetof(Data::DataManager, _challengeListWeekCount) == 0x72F8, "Data::DataManager::_challengeListWeekCount");
+static_assert(offsetof(Data::DataManager, _skillByQuestMissionList) == 0x7300, "Data::DataManager::_skillByQuestMissionList");
+static_assert(offsetof(Data::DataManager, _weeklyTimeTableList) == 0x7320, "Data::DataManager::_weeklyTimeTableList");
+static_assert(offsetof(Data::DataManager, _weeklyTimeMinuteTableList) == 0x7340, "Data::DataManager::_weeklyTimeMinuteTableList");
+static_assert(offsetof(Data::DataManager, _battleRoyalFieldJobStyleRestrictionList) == 0x7360, "Data::DataManager::_battleRoyalFieldJobStyleRestrictionList");
+static_assert(offsetof(Data::DataManager, _arenaDaemonPersistentZoneList) == 0x7378, "Data::DataManager::_arenaDaemonPersistentZoneList");
+static_assert(offsetof(Data::DataManager, _skillChildrenMap) == 0x7390, "Data::DataManager::_skillChildrenMap");
+static_assert(offsetof(Data::DataManager, _skillVariationMap) == 0x73B0, "Data::DataManager::_skillVariationMap");
+static_assert(offsetof(Data::DataManager, _gradeBenefitListMap) == 0x73D0, "Data::DataManager::_gradeBenefitListMap");
+static_assert(offsetof(Data::DataManager, _weaponBrandMaxGemSlotCountMap) == 0x73F0, "Data::DataManager::_weaponBrandMaxGemSlotCountMap");
+static_assert(offsetof(Data::DataManager, _enableSouNpcSkill) == 0x7410, "Data::DataManager::_enableSouNpcSkill");
+static_assert(offsetof(Data::DataManager, _soulNpcSkills) == 0x7418, "Data::DataManager::_soulNpcSkills");
+static_assert(offsetof(Data::DataManager, _itemUsableRelationKeyMap) == 0x7420, "Data::DataManager::_itemUsableRelationKeyMap");
+static_assert(offsetof(Data::DataManager, _itemUsableRelationAttractionGroupMap) == 0x7440, "Data::DataManager::_itemUsableRelationAttractionGroupMap");
+static_assert(offsetof(Data::DataManager, _duelBotChallengeDispelEffectType) == 0x7460, "Data::DataManager::_duelBotChallengeDispelEffectType");
+static_assert(offsetof(Data::DataManager, _skillTrainingRoomRemainEffectType) == 0x76E2, "Data::DataManager::_skillTrainingRoomRemainEffectType");
+static_assert(offsetof(Data::DataManager, _challengePartyAttractionRemainEffectType) == 0x7964, "Data::DataManager::_challengePartyAttractionRemainEffectType");
+static_assert(offsetof(Data::DataManager, _skillTrainingRoomAttractionKey) == 0x7BE8, "Data::DataManager::_skillTrainingRoomAttractionKey");
+static_assert(offsetof(Data::DataManager, _publicRaidAttractionKey) == 0x7BEC, "Data::DataManager::_publicRaidAttractionKey");
+static_assert(offsetof(Data::DataManager, _challengePartyAttractionKey) == 0x7BF0, "Data::DataManager::_challengePartyAttractionKey");
+static_assert(offsetof(Data::DataManager, _battleRoyalFieldAttractionKey) == 0x7BF8, "Data::DataManager::_battleRoyalFieldAttractionKey");
+static_assert(offsetof(Data::DataManager, _duelBotTrainingRoomVersion) == 0x7BFC, "Data::DataManager::_duelBotTrainingRoomVersion");
+static_assert(offsetof(Data::DataManager, _newbieInfoFlag) == 0x7C00, "Data::DataManager::_newbieInfoFlag");
+static_assert(offsetof(Data::DataManager, _randomDistributionKeyMap) == 0x7C08, "Data::DataManager::_randomDistributionKeyMap");
+static_assert(offsetof(Data::DataManager, _mentoringRecordPtr) == 0x7C28, "Data::DataManager::_mentoringRecordPtr");
+static_assert(offsetof(Data::DataManager, _mentoringEnableVersion) == 0x7C30, "Data::DataManager::_mentoringEnableVersion");
+static_assert(offsetof(Data::DataManager, _mentoringLastVersion) == 0x7C32, "Data::DataManager::_mentoringLastVersion");
+static_assert(offsetof(Data::DataManager, _jumpingCharacterData) == 0x7C38, "Data::DataManager::_jumpingCharacterData");
+static_assert(offsetof(Data::DataManager, _jumpingCharacterData2) == 0x8130, "Data::DataManager::_jumpingCharacterData2");
+static_assert(offsetof(Data::DataManager, _noneSpecifyObjectQuest) == 0x8208, "Data::DataManager::_noneSpecifyObjectQuest");
+static_assert(offsetof(Data::DataManager, _pvpDifficultyTypePtr) == 0x85C8, "Data::DataManager::_pvpDifficultyTypePtr");
+static_assert(offsetof(Data::DataManager, _defaultDifficultyTypePtr) == 0x85D0, "Data::DataManager::_defaultDifficultyTypePtr");
+static_assert(offsetof(Data::DataManager, _defaultDifficultyTypeId) == 0x85D8, "Data::DataManager::_defaultDifficultyTypeId");
+static_assert(offsetof(Data::DataManager, _defaultDifficultyTypeDataIdx) == 0x85DC, "Data::DataManager::_defaultDifficultyTypeDataIdx");
+static_assert(offsetof(Data::DataManager, _boastEventMap) == 0x85E0, "Data::DataManager::_boastEventMap");
+static_assert(offsetof(Data::DataManager, _parallelLoad) == 0x86A0, "Data::DataManager::_parallelLoad");
+static_assert(offsetof(Data::DataManager, _dataReaderErrorLogFileLock) == 0x86A8, "Data::DataManager::_dataReaderErrorLogFileLock");
+static_assert(offsetof(Data::DataManager, _dataReaderErrorLogFile) == 0x86D0, "Data::DataManager::_dataReaderErrorLogFile");
+static_assert(offsetof(Data::DataManager, _scriptLoaderErrorLogFile) == 0x86D8, "Data::DataManager::_scriptLoaderErrorLogFile");
+static_assert(offsetof(Data::DataManager, _dataLoadErrorLogFile) == 0x86E0, "Data::DataManager::_dataLoadErrorLogFile");
+static_assert(offsetof(Data::DataManager, _dataValidationFailureLogFile) == 0x86E8, "Data::DataManager::_dataValidationFailureLogFile");
+static_assert(offsetof(Data::DataManager, _rankingPvEStageStartInfoMap) == 0x86F0, "Data::DataManager::_rankingPvEStageStartInfoMap");
+static_assert(offsetof(Data::DataManager, _RandomStoreDrawRewardSet) == 0x8710, "Data::DataManager::_RandomStoreDrawRewardSet");
+static_assert(offsetof(Data::DataManager, _firstRandomStoreDrawRewardRequiredDrawCount) == 0x8730, "Data::DataManager::_firstRandomStoreDrawRewardRequiredDrawCount");
+static_assert(offsetof(Data::DataManager, _lastRandomStoreDrawRewardRequiredDrawCount) == 0x8738, "Data::DataManager::_lastRandomStoreDrawRewardRequiredDrawCount");
+static_assert(offsetof(Data::DataManager, _totalRandomStoreDrawRewardRequiredDrawCount) == 0x8740, "Data::DataManager::_totalRandomStoreDrawRewardRequiredDrawCount");
+static_assert(offsetof(Data::DataManager, _droppedPouchPos) == 0x8748, "Data::DataManager::_droppedPouchPos");
+static_assert(offsetof(Data::DataManager, _droppedPouchPosCount) == 0xD57C, "Data::DataManager::_droppedPouchPosCount");
+static_assert(offsetof(Data::DataManager, _elevationJobStyleQuestList) == 0xD580, "Data::DataManager::_elevationJobStyleQuestList");
+static_assert(offsetof(Data::DataManager, _badgeSetItemScoreUnitSize) == 0xD5A0, "Data::DataManager::_badgeSetItemScoreUnitSize");
+static_assert(offsetof(Data::DataManager, _badgeSynthesisScoreUnitSize) == 0xD5A4, "Data::DataManager::_badgeSynthesisScoreUnitSize");
+static_assert(offsetof(Data::DataManager, _badgeSynthesisResultDataPacket) == 0xD5A8, "Data::DataManager::_badgeSynthesisResultDataPacket");
+static_assert(offsetof(Data::DataManager, _maxBadge1SynthesisScore) == 0xD6A0, "Data::DataManager::_maxBadge1SynthesisScore");
+static_assert(offsetof(Data::DataManager, _maxBadge2SynthesisScore) == 0xD6A4, "Data::DataManager::_maxBadge2SynthesisScore");
+static_assert(offsetof(Data::DataManager, _maxBadge3SynthesisScore) == 0xD6A8, "Data::DataManager::_maxBadge3SynthesisScore");
+static_assert(offsetof(Data::DataManager, _additionalServiceItems) == 0xD6B0, "Data::DataManager::_additionalServiceItems");
+static_assert(offsetof(Data::DataManager, _boardGachaData) == 0xD6B8, "Data::DataManager::_boardGachaData");
+static_assert(offsetof(Data::DataManager, _slatecaches) == 0xD6C0, "Data::DataManager::_slatecaches");
+static_assert(offsetof(Data::DataManager, _formulaConstantData) == 0xD6D0, "Data::DataManager::_formulaConstantData");
+static_assert(offsetof(Data::DataManager, _itemFusionScoreUnitSize) == 0xD6D8, "Data::DataManager::_itemFusionScoreUnitSize");
+static_assert(offsetof(Data::DataManager, _maxItemFusionScores) == 0xD6E0, "Data::DataManager::_maxItemFusionScores");
+static_assert(sizeof(Data::DataManager::DroppedPouchPosInfo) == 0x7D2, "sizeof Data::DataManager::DroppedPouchPosInfo");
+static_assert(offsetof(Data::DataManager::DroppedPouchPosInfo, posCount) == 0x0, "Data::DataManager::DroppedPouchPosInfo::posCount");
+static_assert(offsetof(Data::DataManager::DroppedPouchPosInfo, pos) == 0x2, "Data::DataManager::DroppedPouchPosInfo::pos");
+static_assert(sizeof(Data::DataManager::PvEStageStartInfoID) == 0x10, "sizeof Data::DataManager::PvEStageStartInfoID");
+static_assert(offsetof(Data::DataManager::PvEStageStartInfoID, attraction) == 0x0, "Data::DataManager::PvEStageStartInfoID::attraction");
+static_assert(offsetof(Data::DataManager::PvEStageStartInfoID, attractionKey) == 0x8, "Data::DataManager::PvEStageStartInfoID::attractionKey");
+static_assert(sizeof(Data::DataManager::RandomStoreDrawRewardID) == 0x8, "sizeof Data::DataManager::RandomStoreDrawRewardID");
+static_assert(offsetof(Data::DataManager::RandomStoreDrawRewardID, _randomStoreNumber) == 0x0, "Data::DataManager::RandomStoreDrawRewardID::_randomStoreNumber");
+static_assert(offsetof(Data::DataManager::RandomStoreDrawRewardID, _accumulatedRequiredDrawCount) == 0x4, "Data::DataManager::RandomStoreDrawRewardID::_accumulatedRequiredDrawCount");
+static_assert(sizeof(Data::DataManager::RankingPvEStageStartInfo) == 0x18, "sizeof Data::DataManager::RankingPvEStageStartInfo");
+static_assert(offsetof(Data::DataManager::RankingPvEStageStartInfo, id) == 0x0, "Data::DataManager::RankingPvEStageStartInfo::id");
+static_assert(offsetof(Data::DataManager::RankingPvEStageStartInfo, seasonContentsType) == 0x10, "Data::DataManager::RankingPvEStageStartInfo::seasonContentsType");
 
 namespace Data {
 class DataStaticMemoryManager
