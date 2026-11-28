@@ -57,9 +57,22 @@ void __cdecl RankingSeasonManager::AddSeasonContentsSchedule(::SeasonContentsSch
 }
 
 // 0x1b5e40
-bool __cdecl RankingSeasonManager::GetSeasonContentsSchedule(char, ::SeasonContentsSchedule &)
+#pragma comment(linker, "/INCLUDE:?GetSeasonContentsSchedule@RankingSeasonManager@@QEAA_NDAEAUSeasonContentsSchedule@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+bool __cdecl RankingSeasonManager::GetSeasonContentsSchedule(const char seasonContentsType, ::SeasonContentsSchedule &schedule)
 {
-    LIFT_STUB(0x1b5e40);
+    bool result = false;
+    // LIFT: the valid range is 1..15; type 2 has no schedule (enum names are not in the PDB facts).
+    if (seasonContentsType <= 0 || seasonContentsType >= 16 || seasonContentsType == 2)
+        return false;
+
+    ::AcquireSRWLockShared(&_lock);
+    if (_schedule[seasonContentsType] != nullptr)
+    {
+        schedule = *_schedule[seasonContentsType];
+        result = true;
+    }
+    ::ReleaseSRWLockShared(&_lock);
+    return result;
 }
 
 // 0x1b5ef0

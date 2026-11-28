@@ -2244,7 +2244,17 @@ class ScriptParam {};
 struct SeasonContentsChallengePartyBestRecord {};
 struct SeasonContentsGuildCombatRecord {};
 struct SeasonContentsResultInfoOfGuild {};
-struct SeasonContentsSchedule {};
+// LIFT: PDB struct SeasonContentsSchedule (size 0x20).
+struct SeasonContentsSchedule
+{
+    char seasonContentsType;                    // +0x00
+    int seasonContentsScheduleNumber;           // +0x04
+    int defaultRatingScore;                     // +0x08
+    bool isCalculationRanking;                  // +0x0C
+    char weeklyScheduleNumber;                  // +0x0D
+    __int64 weeklyClosingTime;                  // +0x10
+    __int64 weeklyEndingTime;                   // +0x18
+};
 struct SeasonContentsSyncData {};
 struct SelectedRewardItemIndexInfo {};
 struct ServerPing {};

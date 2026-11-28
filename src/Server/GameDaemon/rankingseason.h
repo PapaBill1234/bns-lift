@@ -24,7 +24,7 @@ public:
 };
 static_assert(sizeof(RankingSeasonInfo) == 0xE0, "sizeof RankingSeasonInfo");
 
-class RankingSeasonManager
+class RankingSeasonManager : private ::LiftBytes<0x18 - 8>  // LIFT: PDB base 0x74A9 (_ref, _tag, _history; +8 to +0x17) is not declared yet
 {
 private:
     bool __cdecl isClosedSeason(char);  // 0x1809b0
@@ -47,5 +47,19 @@ private:
     void __cdecl searchCurrentSeason(char, ::SeasonContentsSchedule &);  // 0x1b6da0
 public:
     bool __cdecl DecomposeSeasonInfoFromRanking(::FragmentPacketConcatenater *);  // 0x1b7040
+
+    // LIFT: PDB data members (size 0x98). The vfptr is at +0.
+private:
+    ::_RTL_SRWLOCK _activatedSeasonLock;        // +0x18
+    ::LiftBytes<0x20> _activatedSeason;         // +0x20  LIFT: PDB type SeasonList (std::map) is not declared yet
+    ::_RTL_SRWLOCK _resultSeasonLock;           // +0x40
+    ::LiftBytes<0x20> _resultSeason;            // +0x48  LIFT: PDB type SeasonList (std::map) is not declared yet
+    ::_RTL_SRWLOCK _lock;                       // +0x68
+    ::SeasonContentsSchedule **_schedule;       // +0x70
+    ::_RTL_SRWLOCK _seasonInfoPacketLock;       // +0x78
+    ::LiftBytes<8> _seasonInfoPacket;           // +0x80  LIFT: PDB pointer type 0x8698 is not declared yet
+    ::_RTL_SRWLOCK _closedSeasonBitFlagLock;    // +0x88
+    __int64 _closedSeasonBitFlag;               // +0x90
 };
+static_assert(sizeof(RankingSeasonManager) == 0x98, "sizeof RankingSeasonManager");
 
