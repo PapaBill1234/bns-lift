@@ -41,7 +41,16 @@ class GameObjectIdManager
 {
 public:
     unsigned __int64 __cdecl Make(unsigned __int64);  // 0x1d090
-    virtual __cdecl ~GameObjectIdManager(void);  // 0x6aad60
+    virtual __cdecl ~GameObjectIdManager(void);  // 0x6aad60, PDB slot 0
+protected:
+    virtual bool __cdecl IsExist(unsigned __int64) = 0;  // PDB slot 1
+private:
+    // PDB layout (size 0x38). The vfptr is at +0.
+    unsigned int Index;  // +8 (0x8)
+    unsigned __int64 Type;  // +16 (0x10)
+    unsigned __int64 Mask[2];  // +24 (0x18)
+    unsigned int Bit[2];  // +40 (0x28)
+    unsigned int MaxIndex;  // +48 (0x30)
 };
 
 class GameObjectTimer

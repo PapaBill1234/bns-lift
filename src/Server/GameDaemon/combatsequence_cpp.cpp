@@ -8,9 +8,52 @@
 #include "zone.h"
 #include "LiftStub.h"
 
+namespace
+{
+// LIFT: view of the PDB class CombatSequence (size 0x188). The skeleton class has no members yet.
+struct CombatSequenceView
+{
+    char lift_pad_0[0x30];
+    __int64 _specialFiredTime[10];                          // +48 (0x30)
+    char lift_pad_1[0x134 - 0x80];
+    long _skillCooldownDuration;                            // +308 (0x134)
+    __int64 _skillCooldownStart;                            // +312 (0x138)
+    char lift_pad_2[0x156 - 0x140];
+    char _firedSpecial;                                     // +342 (0x156)
+    char lift_pad_3[0x160 - 0x157];
+    ::Data::CombatSequenceAction const * _lastActionSeq;    // +352 (0x160)
+    ::Action const * _lastAction;                           // +360 (0x168)
+    bool _inComboSequence;                                  // +368 (0x170)
+};
+
+// LIFT: view of Creature (PDB: zone at +0x8B8).
+struct CreatureZoneView
+{
+    char lift_pad_0[0x8B8];
+    ::Zone * zone;  // +2232 (0x8B8)
+};
+
+// LIFT: view of Action (PDB: _actionClass at +0x92). Action::_actionClass is private in the skeleton.
+struct ActionClassView
+{
+    char lift_pad_0[0x92];
+    unsigned short _actionClass;  // +146 (0x92)
+};
+
+// LIFT: view of Data::CombatSequenceAction (PDB: combo_skip_count at +0xF).
+struct CombatSequenceActionView
+{
+    char lift_pad_0[0xF];
+    char combo_skip_count;  // +15 (0xF)
+};
+
+const unsigned short ACTION_CLASS_SKILL = 6;  // LIFT: value 6 (pseudocode); ❓ enumerator name
+}
+
 // 0x630d0
 __cdecl BossCombatSequence::~BossCombatSequence(void)
 {
+    // LIFT: Not done. The original stores the CombatSequence vftable; the skeleton has no CombatSequence base.
     LIFT_STUB(0x630d0);
 }
 
@@ -147,9 +190,14 @@ bool __cdecl CombatSequence::FireSpecial(::Npc &, char, unsigned __int64, long, 
 }
 
 // 0x4080b0
-void __cdecl CombatSequence::finishSpecial(::Npc &)
+#pragma comment(linker, "/INCLUDE:?finishSpecial@CombatSequence@@AEAAXAEAVNpc@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+void __cdecl CombatSequence::finishSpecial(::Npc & npc)
 {
-    LIFT_STUB(0x4080b0);
+    CombatSequenceView *self = reinterpret_cast<CombatSequenceView *>(this);
+    ::Zone *zone = reinterpret_cast<CreatureZoneView *>(&npc)->zone;
+    // Zone::GetTickTime is inlined in the original (LTCG). It is still a LIFT_STUB.
+    self->_specialFiredTime[self->_firedSpecial - 1] = zone->GetTickTime();
+    self->_firedSpecial = 0;
 }
 
 // 0x408130
@@ -171,9 +219,25 @@ void __cdecl CombatSequence::finishSpecial(::Npc &)
 }
 
 // 0x408970
-::Action * __cdecl CombatSequence::registerLastAction(::Action *, ::Data::CombatSequenceAction const &)
+#pragma comment(linker, "/INCLUDE:?registerLastAction@CombatSequence@@AEAAPEAVAction@@PEAV2@AEBVCombatSequenceAction@Data@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+::Action * __cdecl CombatSequence::registerLastAction(::Action * action, ::Data::CombatSequenceAction const & actionSeq)
 {
-    LIFT_STUB(0x408970);
+    CombatSequenceView *self = reinterpret_cast<CombatSequenceView *>(this);
+    if (action != nullptr)
+    {
+        if (self->_lastActionSeq == nullptr)
+        {
+            self->_lastActionSeq = &actionSeq;
+            self->_lastAction = action;
+        }
+        if (reinterpret_cast<ActionClassView *>(action)->_actionClass != ACTION_CLASS_SKILL)
+        {
+            self->_skillCooldownDuration = 0;
+            self->_skillCooldownStart = 0;
+        }
+        self->_inComboSequence = reinterpret_cast<CombatSequenceActionView const *>(&actionSeq)->combo_skip_count > 0;
+    }
+    return action;
 }
 
 // 0x4089c0

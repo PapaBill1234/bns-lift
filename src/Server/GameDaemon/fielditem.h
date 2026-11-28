@@ -2,6 +2,7 @@
 // LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
 #pragma once
 #include "GameDaemonFwd.h"
+#include "gameobject.h"
 
 class FieldItem
 {
@@ -50,6 +51,24 @@ public:
     ::FieldItem * __cdecl CreateFieldItem(void);  // 0x5a2920
     bool __cdecl Remove(unsigned __int64);  // 0x5a29d0
     bool __cdecl RemoveAll(void);  // 0x5a2ac0
+    ::FieldItem * __cdecl Get(unsigned __int64 id) const  // PDB: inline (no RVA)
+    {
+        int index = find(id);
+        if (index < 0)
+            return nullptr;
+        return FieldItems[index];
+    }
+private:
+    int __cdecl find(unsigned __int64 id) const  // PDB: inline (no RVA)
+    {
+        for (int i = 0; i < Count; ++i)
+        {
+            if (reinterpret_cast<::GameObjectIdView const *>(FieldItems[i])->Id == id)
+                return i;
+        }
+        return -1;
+    }
+public:
     // LIFT: PDB members (size 0x20); IdMgr (+0x10) and zone (+0x18) are not declared yet.
     ::FieldItem **FieldItems;  // +0x0
     int Count;  // +0x8

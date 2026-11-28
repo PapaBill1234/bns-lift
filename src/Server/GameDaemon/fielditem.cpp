@@ -2,12 +2,38 @@
 #include "fielditem.h"
 #include "creature.h"
 #include "zone.h"
+#include "Daemon.h"
 #include "LiftStub.h"
 
-// 0x5a06b0
-bool __cdecl FieldItemIdManager::IsExist(unsigned __int64)
+#pragma comment(linker, "/INCLUDE:?IsExist@FieldItemIdManager@@MEAA_N_K@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetRemainedDecomposition@FieldItem@@QEBA_JXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetRemainedExplosion@FieldItem@@QEBA_JXZ")  // LIFT: dead-strip keep (no live caller yet)
+
+namespace
 {
-    LIFT_STUB(0x5a06b0);
+// LIFT: view of the PDB class FieldItemIdManager (size 0x48). The skeleton class has no members yet.
+struct FieldItemIdManagerView
+{
+    char lift_pad_0[0x38];
+    ::Zone const * Zone;  // +56 (0x38)
+};
+
+// LIFT: view of the PDB class FieldItem. The skeleton class has no members yet.
+struct FieldItemView
+{
+    char lift_pad_0[0x40];
+    long remainedDecomposition;  // +64 (0x40)
+    long remainedExplosion;      // +68 (0x44)
+    __int64 droppedTime;         // +72 (0x48)
+    __int64 activatedTime;       // +80 (0x50)
+};
+}
+
+// 0x5a06b0
+bool __cdecl FieldItemIdManager::IsExist(unsigned __int64 id)
+{
+    ::Zone const *zone = reinterpret_cast<FieldItemIdManagerView *>(this)->Zone;
+    return reinterpret_cast<::ZoneMemberView const *>(zone)->fieldItemList->Get(id) != nullptr;
 }
 
 // 0x5a0700
@@ -31,13 +57,23 @@ bool __cdecl FieldItem::Initialize(unsigned __int64, unsigned int, ::vector16, :
 // 0x5a0a90
 __int64 __cdecl FieldItem::GetRemainedDecomposition(void) const
 {
-    LIFT_STUB(0x5a0a90);
+    FieldItemView const *self = reinterpret_cast<FieldItemView const *>(this);
+    __int64 now = GetTickCount64() - Daemon::Instance->StartSystemTick64;
+    __int64 remained = self->remainedDecomposition - (now - self->droppedTime) / 100 * 100;
+    if (remained < 0)
+        return 0;
+    return remained;
 }
 
 // 0x5a0af0
 __int64 __cdecl FieldItem::GetRemainedExplosion(void) const
 {
-    LIFT_STUB(0x5a0af0);
+    FieldItemView const *self = reinterpret_cast<FieldItemView const *>(this);
+    __int64 now = GetTickCount64() - Daemon::Instance->StartSystemTick64;
+    __int64 remained = self->remainedExplosion - (now - self->activatedTime) / 100 * 100;
+    if (remained < 0)
+        return 0;
+    return remained;
 }
 
 // 0x5a0b50

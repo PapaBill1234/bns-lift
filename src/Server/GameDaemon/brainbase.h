@@ -64,3 +64,39 @@ public:
     bool __cdecl CancelActionByCombatSeqTransit(void);  // 0x402a20
 };
 
+// LIFT: view of the PDB struct BrainBase::HateTarget (size 0x28). The skeleton class has no members yet.
+struct BrainBaseHateTargetView
+{
+    unsigned __int64 _creatureId;  // +0 (0x0)
+    unsigned __int64 _masterId;  // +8 (0x8)
+    __int64 _lastUpdate;  // +16 (0x10)
+    __int64 _hate;  // +24 (0x18)
+    unsigned char _flag;  // +32 (0x20)
+};
+
+// LIFT: view of the PDB class BrainBase (size 0xA0). The vfptr is at +0. The skeleton class has no members yet.
+struct BrainBaseMemberView
+{
+    void *lift_vfptr;  // +0 (0x0)
+    ::BrainBaseHateTargetView *_hates;  // +8 (0x8)
+    char _hateMax;  // +16 (0x10)
+    char _targetingType;  // +17 (0x11)
+    char _curTargetIndex;  // +18 (0x12)
+    unsigned char _hateTourValue;  // +19 (0x13)
+    short _periodBindCurTarget;  // +20 (0x14)
+    __int64 _curBindedEnemyTargetExpireTime;  // +24 (0x18)
+    ::Npc *_npc;  // +32 (0x20) (PDB: Npc &)
+    ::BrainBase::TransitionTable *_tt;  // +40 (0x28) (PDB: TransitionTable &)
+    ::BrainConst::Event _pendingEvent;  // +48 (0x30)
+    ::BrainConst::State _stack[16];  // +52 (0x34)
+    int _top;  // +116 (0x74)
+    unsigned char _flag;  // +120 (0x78)
+    char _brainType;  // +121 (0x79)
+    char _provocateIndex;  // +122 (0x7A)
+    unsigned __int64 _squadRuleTargetId;  // +128 (0x80)
+    bool _squadTargetRuleEnable;  // +136 (0x88)
+    bool _isForcedCombatMode;  // +137 (0x89)
+    unsigned __int64 _forcedAttackTargetId;  // +144 (0x90)
+    unsigned __int64 _referenceHateTargetId;  // +152 (0x98)
+};
+
