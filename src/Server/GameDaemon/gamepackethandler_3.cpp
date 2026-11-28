@@ -3,6 +3,8 @@
 #include "pc.h"
 #include "LiftStub.h"
 
+#pragma comment(linker, "/INCLUDE:?HandleGame_CheckRoundTripTimeReq@@YA_NPEAVPc@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+
 // 0x39c3d0
 bool __cdecl HandleGame_SkillScoreReq(::Pc *, ::Packet const *)
 {
@@ -22,9 +24,22 @@ bool __cdecl HandleGame_AutoLogoutCheckReq(::Pc *, ::Packet const *)
 }
 
 // 0x39c8e0
-bool __cdecl HandleGame_CheckRoundTripTimeReq(::Pc *, ::Packet const *)
+bool __cdecl HandleGame_CheckRoundTripTimeReq(::Pc *pc, ::Packet const *packet)
 {
-    LIFT_STUB(0x39c8e0);
+    short cmd;
+    __int64 data1;
+    __int64 data2;
+    // ❓ The original tests the result with "xor ecx, ecx; cmp cx, ax; jb". No source form found yet (test ax, ax here).
+    if (packet->Decompose("hqq", &cmd, &data1, &data2) == 0)
+    {
+        Log::Write(Log::LT_ERROR,
+                   L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\GamePacketHandler.cpp",
+                   12846, L"[game packet], HandleGame_CheckRoundTripTimeReq; decompose failed, pcid:0x%I64x",
+                   *reinterpret_cast<unsigned __int64 const *>(reinterpret_cast<char const *>(pc) + 0x28));  // LIFT: GameObject::Id +0x28 (Pc members not declared yet)
+        return true;
+    }
+    pc->Send("hqq", 413, data1, data2);
+    return true;
 }
 
 // 0x39c980

@@ -3,6 +3,25 @@
 #include "pc.h"
 #include "LiftStub.h"
 
+#pragma comment(linker, "/INCLUDE:?HandleGame_ExtendJumpingCharacterCreationQuotaWithWarehouseItemReq@@YA_NPEAVPc@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?HandleGame_UpgradeJumpingCharacterStateWithCreationQuotaReq@@YA_NPEAVPc@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?HandleGame_SaveVitalityReq@@YA_NPEAVPc@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?HandleGame_RestoreVitalityReq@@YA_NPEAVPc@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?HandleGame_PickGemCardReq@@YA_NPEAVPc@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+
+// LIFT: Pc members are not declared yet (LiftBytes). PDB offsets: GameObject::Id +0x28, Pc::_pcDbId +0x4E10.
+#define GPH4_PC_ID(pc) (*reinterpret_cast<unsigned __int64 const *>(reinterpret_cast<char const *>(pc) + 0x28))
+#define GPH4_PC_DBID(pc) (*reinterpret_cast<unsigned __int64 const *>(reinterpret_cast<char const *>(pc) + 0x4E10))
+#define GPH4_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\GamePacketHandler.cpp"
+
+// PDB struct (size 0x18). No other source file declares it yet.
+struct ExtendJumpingCharacteCreationQuotaWithWarehouseItemReqParam
+{
+    long long labelId;
+    long long itemInstanceId;
+    int itemDataId;
+};
+
 // 0x3bb180
 bool __cdecl HandleGame_ListGoodsFromAccountInventoryReq(::Pc *, ::Packet const *)
 {
@@ -34,15 +53,26 @@ bool __cdecl HandleGame_TakeWarehouseItemReq(::Pc *, ::Packet const *)
 }
 
 // 0x3bc2e0
-bool __cdecl HandleGame_ExtendJumpingCharacterCreationQuotaWithWarehouseItemReq(::Pc *, ::Packet const *)
+bool __cdecl HandleGame_ExtendJumpingCharacterCreationQuotaWithWarehouseItemReq(::Pc *pc, ::Packet const *packet)
 {
-    LIFT_STUB(0x3bc2e0);
+    short c;
+    ExtendJumpingCharacteCreationQuotaWithWarehouseItemReqParam param;
+    packet->Decompose("hqqi", &c, &param.labelId, &param.itemInstanceId, &param.itemDataId);
+    Log::Write(Log::LT_ERROR, GPH4_FILE, 21633,
+               L"HandleGame_ExtendJumpingCharacterCreationQuotaReq; not available, pcid:0x%I64x, pcDbId:%#I64x",
+               GPH4_PC_ID(pc), GPH4_PC_DBID(pc));
+    pc->Send("hEqq", 785, 1886, param.labelId, param.itemInstanceId);
+    return true;
 }
 
 // 0x3bc3b0
-bool __cdecl HandleGame_UpgradeJumpingCharacterStateWithCreationQuotaReq(::Pc *, ::Packet const *)
+bool __cdecl HandleGame_UpgradeJumpingCharacterStateWithCreationQuotaReq(::Pc *pc, ::Packet const *)
 {
-    LIFT_STUB(0x3bc3b0);
+    Log::Write(Log::LT_ERROR, GPH4_FILE, 21710,
+               L"HandleGame_UpgradeJumpingCharacterStateWithCreationQuotaReq: not available, pcid:0x%I64x, pcDbId:%#I64x",
+               GPH4_PC_ID(pc), GPH4_PC_DBID(pc));
+    pc->Send("hE", 788, 1893);
+    return true;
 }
 
 // 0x3bc420
@@ -58,9 +88,10 @@ bool __cdecl HandleGame_TraceRouteIPReq(::Pc *, ::Packet const *)
 }
 
 // 0x3bc9f0
-bool __cdecl HandleGame_SaveVitalityReq(::Pc *, ::Packet const *)
+bool __cdecl HandleGame_SaveVitalityReq(::Pc *pc, ::Packet const *)
 {
-    LIFT_STUB(0x3bc9f0);
+    Log::Write(Log::LT_ERROR, GPH4_FILE, 21879, L"[vitality], deprecated packet, Pc:0x%I64x", GPH4_PC_ID(pc));
+    return true;
 }
 
 // 0x3bca20
@@ -70,9 +101,10 @@ bool __cdecl HandleGame_RechargeVitalityReq(::Pc *, ::Packet const *)
 }
 
 // 0x3bcd00
-bool __cdecl HandleGame_RestoreVitalityReq(::Pc *, ::Packet const *)
+bool __cdecl HandleGame_RestoreVitalityReq(::Pc *pc, ::Packet const *)
 {
-    LIFT_STUB(0x3bcd00);
+    Log::Write(Log::LT_ERROR, GPH4_FILE, 21976, L"[vitality], deprecated packet, Pc:0x%I64x", GPH4_PC_ID(pc));
+    return true;
 }
 
 // 0x3bcd30
@@ -88,9 +120,10 @@ bool __cdecl HandleGame_PassingItemAbilityReq(::Pc *, ::Packet const *)
 }
 
 // 0x3be660
-bool __cdecl HandleGame_PickGemCardReq(::Pc *, ::Packet const *)
+bool __cdecl HandleGame_PickGemCardReq(::Pc *pc, ::Packet const *)
 {
-    LIFT_STUB(0x3be660);
+    Log::Write(Log::LT_ERROR, GPH4_FILE, 22407, L"HandleGame_PickGemCardReq failed; pc:0x%I64x", GPH4_PC_ID(pc));
+    return true;
 }
 
 // 0x3be6b0

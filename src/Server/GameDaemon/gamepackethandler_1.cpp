@@ -3,10 +3,19 @@
 #include "pc.h"
 #include "LiftStub.h"
 
+#pragma comment(linker, "/INCLUDE:?HandleGame_PingReq@@YA_NPEBVSession@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?HandleGame_GodSay@@YA_NPEAVPc@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?HandleGame_AcquireRenewalQuestReq@@YA_NPEAVPc@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+
+// LIFT: Pc members are not declared yet (LiftBytes). PDB offset: GameObject::Id +0x28.
+#define GPH1_PC_ID(pc) (*reinterpret_cast<unsigned __int64 const *>(reinterpret_cast<char const *>(pc) + 0x28))
+#define GPH1_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\GamePacketHandler.cpp"
+
 // 0x36df20
-bool __cdecl HandleGame_PingReq(::Session const *, ::Packet const *)
+bool __cdecl HandleGame_PingReq(::Session const *session, ::Packet const *)
 {
-    LIFT_STUB(0x36df20);
+    Log::Write(Log::LT_DEBUG, GPH1_FILE, 116, L"HandleGame_PingReq: ping received, session:0x%I64x", session->_id);
+    return true;
 }
 
 // 0x36df60
@@ -70,9 +79,17 @@ bool __cdecl HandleGame_EnterZoneReq(::Pc *, ::Packet const *)
 }
 
 // 0x36feb0
-bool __cdecl HandleGame_GodSay(::Pc *, ::Packet const *)
+bool __cdecl HandleGame_GodSay(::Pc *pc, ::Packet const *packet)
 {
-    LIFT_STUB(0x36feb0);
+    short cmd;
+    // ❓ HR shows the format as a pooled literal; one short output gives "h".
+    if (packet->Decompose("h", &cmd) == 0)
+    {
+        Log::Write(Log::LT_ERROR, GPH1_FILE, 734, L"[pc], god say req; packet decompose fail");
+        return false;
+    }
+    Log::Write(Log::LT_DEBUG, GPH1_FILE, 738, L"pcId:%#I64x, GodSay(%d)", GPH1_PC_ID(pc), static_cast<int>(cmd));
+    return true;
 }
 
 // 0x36ff30
@@ -586,9 +603,13 @@ bool __cdecl HandleGame_ResetQuestCompletionTimeReq(::Pc *, ::Packet const *)
 }
 
 // 0x384270
-bool __cdecl HandleGame_AcquireRenewalQuestReq(::Pc *, ::Packet const *)
+bool __cdecl HandleGame_AcquireRenewalQuestReq(::Pc *pc, ::Packet const *)
 {
-    LIFT_STUB(0x384270);
+    // ❓ HR shows the format as a pooled literal; packet id + error code gives "hE".
+    pc->Send("hE", 1419, 2);
+    Log::Write(Log::LT_ERROR, GPH1_FILE, 5911,
+               L"[game packet], HandleGame_AcquireRenewalQuestReq failed; disabled, pc:0x%I64x", GPH1_PC_ID(pc));
+    return true;
 }
 
 // 0x3842d0

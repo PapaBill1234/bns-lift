@@ -3,6 +3,15 @@
 #include "controlledcreature.h"
 #include "pc.h"
 #include "LiftStub.h"
+#include "Log.h"
+
+#pragma comment(linker, "/INCLUDE:?HandleGame_CreatePartyReq@@YA_NPEAVPc@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?HandleGame_SendPetitionChatNotifyReq@@YA_NPEAVPc@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+
+// LIFT: Pc members are not declared yet (LiftBytes). PDB offsets: GameObject::Id +0x28, Pc::_pcDbId +0x4E10.
+#define GPH2_PC_ID(pc) (*reinterpret_cast<unsigned __int64 const *>(reinterpret_cast<char const *>(pc) + 0x28))
+#define GPH2_PC_DBID(pc) (*reinterpret_cast<unsigned __int64 const *>(reinterpret_cast<char const *>(pc) + 0x4E10))
+#define GPH2_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\GamePacketHandler.cpp"
 
 // 0x387980
 bool __cdecl HandleGame_FishManipulateReq(::Pc *, ::Packet const *)
@@ -137,9 +146,12 @@ bool __cdecl HandleGame_RejectSuggestPartyReq(::Pc *, ::Packet const *)
 }
 
 // 0x38c070
-bool __cdecl HandleGame_CreatePartyReq(::Pc *, ::Packet const *)
+bool __cdecl HandleGame_CreatePartyReq(::Pc *pc, ::Packet const *)
 {
-    LIFT_STUB(0x38c070);
+    Log::Write(Log::LT_ERROR, GPH2_FILE, 8211, L"[party], create party, not available, pcid:0x%I64x, pcDbId:%#I64x",
+               GPH2_PC_ID(pc), GPH2_PC_DBID(pc));
+    pc->Send("hE", 154, 2);
+    return true;
 }
 
 // 0x38c0e0
@@ -656,7 +668,8 @@ bool __cdecl HandleGame_FeedbackPetitionReq(::Pc *, ::Packet const *)
 // 0x39b970
 bool __cdecl HandleGame_SendPetitionChatNotifyReq(::Pc *, ::Packet const *)
 {
-    LIFT_STUB(0x39b970);
+    Log::Write(Log::LT_DEBUG, GPH2_FILE, 12557, L"[petition], HandleGame_FeedbackPetitionReq not supported");
+    return true;
 }
 
 // 0x39b9a0
