@@ -1,6 +1,13 @@
 // geoworld_cpp.cpp: geoworld.cpp (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
 #include "geoworld.h"
+#include "Memory.h"
 #include "LiftStub.h"
+#include <string.h>
+
+#define GEOWORLD_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\GeoWorld.cpp"
+
+#pragma comment(linker, "/INCLUDE:??0GeoCube@@IEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:??1GeoCube@@IEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
 
 // 0xd97e0
 __cdecl RecordMaps::RecordMaps(void)
@@ -65,7 +72,12 @@ bool __cdecl GeoTerrain::FindCell(short, short, short, short, ::GeoCell &, int &
 // 0xdb0d0
 __cdecl GeoCube::GeoCube(void)
 {
-    LIFT_STUB(0xdb0d0);
+    index = 0;
+    nearbyCount = 0;
+    memset(nearby, 0, sizeof(nearby));
+    memset(&visibleEnvObjs, 0, sizeof(visibleEnvObjs));
+    memset(&checkEnvObjs, 0, sizeof(checkEnvObjs));
+    memset(&gatherSources, 0, sizeof(gatherSources));
 }
 
 // 0xdb110
@@ -77,7 +89,10 @@ void __cdecl GeoCube::Initialize(int, int, int)
 // 0xdb290
 __cdecl GeoCube::~GeoCube(void)
 {
-    LIFT_STUB(0xdb290);
+    if (visibleEnvObjs.list != nullptr)
+        Memory::_Manager[1]->Free(visibleEnvObjs.list, GEOWORLD_FILE, 1546);
+    if (checkEnvObjs.list != nullptr)
+        Memory::_Manager[1]->Free(checkEnvObjs.list, GEOWORLD_FILE, 1549);
 }
 
 // 0xdb2f0

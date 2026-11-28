@@ -12,7 +12,18 @@
 #include "zonebroadcast.h"
 #include "zonenpcspawnevent.h"
 #include "zoneserializedobject.h"
+#include "zonescore.h"
+#include "Memory.h"
 #include "LiftStub.h"
+#include <time.h>
+
+#define ZONE_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\Zone.cpp"
+
+#pragma comment(linker, "/INCLUDE:?GetZoneScore@Zone@@QEAAHD@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?Initialize@ZoneWaitingPcList@@QEAA_NH@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?Find@ZoneWaitingPcList@@QEAA_NPEAVPc@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetCount@ZoneWaitingPcList@@QEAAIXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?EndZsoTest@ZonePerfMonitor@@QEAAXH@Z")  // LIFT: dead-strip keep (no live caller yet)
 
 // 0x24aef0
 void __cdecl Zone::updateCreatureProperty(void)
@@ -495,9 +506,12 @@ void __cdecl Zone::ChangeEventZoneMode(char, char, short, __int64, bool)
 }
 
 // 0x258710
-int __cdecl Zone::GetZoneScore(char)
+int __cdecl Zone::GetZoneScore(char scoreType)
 {
-    LIFT_STUB(0x258710);
+    ::ZoneScore *score = liftZoneView(this)->_score;
+    if (score == nullptr)
+        return 0;
+    return score->Score(scoreType);
 }
 
 // 0x258770
@@ -525,9 +539,18 @@ __cdecl ZoneWaitingPcList::~ZoneWaitingPcList(void)
 }
 
 // 0x2589c0
-bool __cdecl ZoneWaitingPcList::Initialize(int)
+bool __cdecl ZoneWaitingPcList::Initialize(int maxSize)
 {
-    LIFT_STUB(0x2589c0);
+    this->maxSize = maxSize;
+    count = 0;
+    gmCount = 0;
+    pcList = static_cast< ::Pc **>(
+        Memory::_Manager[2]->AllocZero(sizeof(::Pc *) * (maxSize + 30), ZONE_FILE, 14736));
+    pcId = static_cast<unsigned __int64 *>(
+        Memory::_Manager[2]->AllocZero(sizeof(unsigned __int64) * (maxSize + 30), ZONE_FILE, 14738));
+    pcRegisterTime = static_cast<__int64 *>(
+        Memory::_Manager[2]->AllocZero(sizeof(__int64) * (maxSize + 30), ZONE_FILE, 14740));
+    return true;
 }
 
 // 0x258a50
@@ -543,9 +566,21 @@ bool __cdecl ZoneWaitingPcList::DeleteInvalidPc(unsigned __int64)
 }
 
 // 0x258f80
-bool __cdecl ZoneWaitingPcList::Find(::Pc *)
+bool __cdecl ZoneWaitingPcList::Find(::Pc *pc)
 {
-    LIFT_STUB(0x258f80);
+    bool found = false;
+    listLock.Enter();
+    int total = count + gmCount;
+    for (int i = 0; i < total; ++i)
+    {
+        if (pcList[i] == pc)
+        {
+            found = true;
+            break;
+        }
+    }
+    listLock.Leave();
+    return found;
 }
 
 // 0x259000
@@ -563,7 +598,10 @@ void __cdecl ZoneWaitingPcList::RemoveAll(void)
 // 0x259340
 unsigned int __cdecl ZoneWaitingPcList::GetCount(void)
 {
-    LIFT_STUB(0x259340);
+    listLock.Enter();
+    unsigned int result = count;
+    listLock.Leave();
+    return result;
 }
 
 // 0x2593a0
@@ -603,9 +641,13 @@ bool __cdecl ZonePerfMonitor::initZoneCounter(void)
 }
 
 // 0x259f90
-void __cdecl ZonePerfMonitor::EndZsoTest(int)
+void __cdecl ZonePerfMonitor::EndZsoTest(int zsoType)
 {
-    LIFT_STUB(0x259f90);
+    _zsoTestResult[zsoType].end = clock();
+    __int64 elapsed = _zsoTestResult[zsoType].end - _zsoTestResult[zsoType].start;
+    _zsoTestResult[zsoType].total += elapsed;
+    if (_zsoTestResult[zsoType].max < elapsed)
+        _zsoTestResult[zsoType].max = elapsed;
 }
 
 // 0x259ff0

@@ -2127,8 +2127,8 @@ class MissionStepFail {};
 struct MoveTypeList {};
 class NPTransaction {};
 struct NpcSpawnParam {};
-struct ObjIndex16List {};
-struct ObjIndexList {};
+struct ObjIndex16List { short count; short *list; };  // PDB layout (size 0x10)
+struct ObjIndexList { char count; char *list; };  // PDB layout (size 0x10)
 struct OpXmlData {};
 class PacketList {};
 struct PartyBattleResultTranResultNotifyInfo {};

@@ -11,7 +11,16 @@ protected:
     __cdecl ~GeoCube(void);  // 0xdb290
     static void __cdecl SetObjList(::ObjIndexList *, void *);  // 0xdb2f0
     static void __cdecl SetObjList(::ObjIndex16List *, void *);  // 0xdb3c0
+protected:
+    // PDB layout (size 0x60).
+    int index;                          // +0 (0x0)
+    int nearbyCount;                    // +4 (0x4)
+    int nearby[9];                      // +8 (0x8)
+    ::ObjIndex16List checkEnvObjs;      // +48 (0x30)
+    ::ObjIndex16List visibleEnvObjs;    // +64 (0x40)
+    ::ObjIndexList gatherSources;       // +80 (0x50)
 };
+static_assert(sizeof(GeoCube) == 0x60, "sizeof GeoCube");
 
 struct geo_vector16
 {

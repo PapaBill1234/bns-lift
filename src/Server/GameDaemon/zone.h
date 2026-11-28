@@ -348,7 +348,50 @@ private:
     bool __cdecl initZoneCounter(void);  // 0x259e40
 public:
     void __cdecl EndZsoTest(int);  // 0x259f90
+
+    struct ZsoTestResult
+    {
+        __int64 start;       // +0
+        __int64 end;         // +8
+        __int64 total;       // +16
+        __int64 max;         // +24
+        unsigned int count;  // +32
+    };
+
+private:
+    // PDB layout (size 0x150). The vfptr is at +0.
+    long StartClock;                        // +8 (0x8)
+    long FinishClock;                       // +12 (0xC)
+    unsigned int Count;                     // +16 (0x10)
+    unsigned int ReportIntervalCount;       // +20 (0x14)
+    __int64 Amount;                         // +24 (0x18)
+    __int64 Max;                            // +32 (0x20)
+    int AmountZso;                          // +40 (0x28)
+    int MaxZso;                             // +44 (0x2C)
+    int AmountPc;                           // +48 (0x30)
+    int AmountNpc;                          // +52 (0x34)
+    int AmountSummoned;                     // +56 (0x38)
+    int AmountFieldItem;                    // +60 (0x3C)
+    int AmountNpcDeadBody;                  // +64 (0x40)
+    __int64 AmountEnterLeaveBytes;          // +72 (0x48)
+    __int64 AmountAlreadyInZoneBytes;       // +80 (0x50)
+    __int64 AmountSightBytes;               // +88 (0x58)
+    __int64 AmountOutCubeCreatureBytes;     // +96 (0x60)
+    __int64 AmountInCubeCreatureBytes;      // +104 (0x68)
+    __int64 AmountActionBytes;              // +112 (0x70)
+    ::Zone const *zone;                     // +120 (0x78)
+    unsigned int geoZoneId;                 // +128 (0x80)
+    ::LogFile *file;                        // +136 (0x88)
+    char lift_pad_90[0x18];                 // ❓ PDB fields zoneCounter (ZoneCounterSet, +0x90) and initCounter (+0xA0) are not declared yet
+    ZsoTestResult _zsoTestResult[3];        // +168 (0xA8)
+    __int64 StartMsec;                      // +288 (0x120)
+    __int64 EndMsec;                        // +296 (0x128)
+    unsigned __int64 processCycleStart;     // +304 (0x130)
+    unsigned __int64 processCycleEnd;       // +312 (0x138)
+    unsigned __int64 threadCycleStart;      // +320 (0x140)
+    unsigned __int64 threadCycleEnd;        // +328 (0x148)
 };
+static_assert(sizeof(ZonePerfMonitor) == 0x150, "sizeof ZonePerfMonitor");
 
 class ZoneWaitingPcList
 {
@@ -361,5 +404,27 @@ public:
     bool __cdecl Remove(::Pc *, unsigned __int64);  // 0x259000
     void __cdecl RemoveAll(void);  // 0x2591d0
     unsigned int __cdecl GetCount(void);  // 0x259340
+private:
+    // PDB layout (size 0x50).
+    ::Pc **pcList;                      // +0 (0x0)
+    unsigned __int64 *pcId;             // +8 (0x8)
+    __int64 *pcRegisterTime;            // +16 (0x10)
+    int maxSize;                        // +24 (0x18)
+    int count;                          // +28 (0x1C)
+    int gmCount;                        // +32 (0x20)
+    ::CriticalSection listLock;         // +40 (0x28)
 };
+static_assert(sizeof(ZoneWaitingPcList) == 0x50, "sizeof ZoneWaitingPcList");
+
+// LIFT: view of the Zone PDB fields that the lifted bodies read (PDB size 0x4698). The pad keeps the PDB offset.
+struct ZoneView
+{
+    char lift_pad_0[0x4270];            // ❓ PDB fields +0 to +0x426F are not declared here
+    ::ZoneScore *_score;                // +17008 (0x4270)
+};
+
+inline ZoneView *liftZoneView(Zone *zone)  // LIFT: no PDB name
+{
+    return reinterpret_cast<ZoneView *>(zone);
+}
 
