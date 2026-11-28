@@ -447,6 +447,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"ArenaPublicRaidRoom::GetPcContentsType": {
+"calls": 100,
+"consts": 67,
+"refs": 100,
+"score": 88.9,
+"status": "DIFF"
+},
 "ArenaPublicRaidRoom::GetPublicRaidKey": {
 "calls": 100,
 "consts": 100,
@@ -469,6 +476,20 @@
 "status": "MATCH"
 },
 "ArenaRoom::GetArenaPortalPublicRaidModeType": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ArenaRoomManager::IssueOtp": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ArenaSessionTimer::ArenaSessionTimer": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -734,6 +755,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"ChallengeParty::~ChallengeParty": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "ChallengePartyAttractionState::GetTypeName": {
 "calls": 100,
 "consts": 100,
@@ -747,6 +775,13 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"ChallengePartyManager::Initialize": {
+"calls": 86,
+"consts": 100,
+"refs": 100,
+"score": 95.2,
+"status": "DIFF"
 },
 "ChangeCharacterAppearanceTran::GetDefinition": {
 "calls": 100,
@@ -817,6 +852,20 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"ClientSessionHandler::OnAccept": {
+"calls": 100,
+"consts": 0,
+"refs": 100,
+"score": 66.7,
+"status": "DIFF"
+},
+"ClientSessionHandler::OnConnect": {
+"calls": 100,
+"consts": 100,
+"refs": 67,
+"score": 88.9,
+"status": "DIFF"
 },
 "ClientSideDaemonChannel::initialize": {
 "calls": 80,
@@ -1232,6 +1281,20 @@
 "status": "MATCH"
 },
 "DetachPostAttachmentTran_IndetachFixed::GetDefinition": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DisconnectedArenaSessionInfo::Init": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DisconnectedArenaSessionInfo::~DisconnectedArenaSessionInfo": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -2561,6 +2624,69 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Guild::findByPcDbId": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Guild::findByPcDbIdInWaiting": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GuildCraft::EnableDonationGuildCraft": {
+"calls": 100,
+"consts": 0,
+"refs": 100,
+"score": 66.7,
+"status": "DIFF"
+},
+"GuildCraft::GetAsseintGuildCraftQuota": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GuildCraft::IsCompletedGuildCraftDonation": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GuildCraft::MakeGuildCraft": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GuildIdManager::Initialize": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GuildIdManager::PopGuildId": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GuildIdManager::PushGuildId": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "GuildJoinTicket::GuildJoinTicket": {
 "calls": 100,
 "consts": 100,
@@ -3548,6 +3674,13 @@
 "score": 66.7,
 "status": "DIFF"
 },
+"MysteriousStore::IsAuthorizedMember": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "NPGetChannelPropertyTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
@@ -3969,6 +4102,13 @@
 "status": "DIFF"
 },
 "PacketBufferPool::deallocate": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PartyAuction::checkAuth": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -4487,6 +4627,20 @@
 "status": "MATCH"
 },
 "PcPublicRaidState::SetEventAttendee": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Petition::Accept": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Petition::Petition": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
