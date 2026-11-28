@@ -45,6 +45,11 @@ All lifted leaves have a `/INCLUDE` keep pragma with a `// LIFT:` note.
 - `src/Server/GameDaemon/brainbase_h.cpp`
 - `Docs/Plan/handoffs/lift-gamedaemon-gap-040-e40.md`
 
+## Round 2 fix
+
+- The gate build failed: the lift toolchain has no `<list>` header. `duelmanager_cpp.cpp` does not include `<list>` now. `DuelTeamView::_members` is a local view of the VS2010 list layout (`_Myhead` at +8, `_Mysize` at +16). `DuelTeam::IsTeamMemberAllDead` walks the nodes from `_Myhead->_Next`, as in the original.
+- Changed file: `src/Server/GameDaemon/duelmanager_cpp.cpp`.
+
 ## Gate and MATCH
 
 The author did not run a build, the gate or funcdiff. The driver does them.

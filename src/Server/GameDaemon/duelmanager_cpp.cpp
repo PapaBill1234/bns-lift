@@ -4,7 +4,6 @@
 #include "pc.h"
 #include "zone.h"
 #include "LiftStub.h"
-#include <list>
 
 #define DUELMANAGER_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\DuelManager.cpp"
 
@@ -38,7 +37,21 @@ struct DuelMemberView
 // LIFT: view of the PDB class DuelTeam (size 0x48, vfptr at +0). The skeleton class has no members yet.
 struct DuelTeamView
 {
-    typedef std::list<DuelMemberView *, StlAllocator<DuelMemberView *, 2> > DuelMembers;
+    // LIFT: view of the node of std::list<DuelMember *, StlAllocator<DuelMember *, 2> > (VS2010 _List_nod::_Node).
+    // The lift toolchain has no <list> header.
+    struct MemberNode
+    {
+        MemberNode *_Next;        // +0
+        MemberNode *_Prev;        // +8
+        DuelMemberView *_Myval;   // +16
+    };
+    // LIFT: view of the PDB member _members (std::list, size 0x18).
+    struct DuelMembers
+    {
+        void *lift_alval;         // +0 StlAllocator (padded)
+        MemberNode *_Myhead;      // +8
+        unsigned long long _Mysize;  // +16
+    };
     void *lift_vfptr;             // +0 (0x0)
     int _teamIndex;               // +8 (0x8)
     DuelMembers _members;         // +16 (0x10)
@@ -106,9 +119,10 @@ bool __cdecl DuelTeam::IsTeamMember(::Pc const *const) const
 bool __cdecl DuelTeam::IsTeamMemberAllDead(void) const
 {
     DuelTeamView const *self = reinterpret_cast<DuelTeamView const *>(this);
-    for (DuelTeamView::DuelMembers::const_iterator it = self->_members.begin(); it != self->_members.end(); ++it)
+    DuelTeamView::MemberNode const *head = self->_members._Myhead;
+    for (DuelTeamView::MemberNode const *it = head->_Next; it != head; it = it->_Next)
     {
-        DuelMemberView const *member = *it;
+        DuelMemberView const *member = it->_Myval;
         // LIFT: DuelMember::IsRoundEntrance and Pc dead check are inlined in the original.
         if (member->_roundEntrance && member->_pc->dead == 0)
             return false;
