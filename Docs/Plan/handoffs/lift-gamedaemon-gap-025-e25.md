@@ -8,7 +8,7 @@ Exe: GameDaemon (2019 + PDB). Round 1. Two sessions did the work (planned contex
 - `lock`: `AccountInventoryChannelManager::~AccountInventoryChannelManager` (0x18d060), `AutoSRW::~AutoSRW` (0x1dc200).
 - `source_delayedrelease`: `DelayedRelease::DelayedRelease` (0x6a11d0), `DelayedDelete::Cleanup` (0x6a1960), `DelayedDelete::deleteNode` (0x6a19d0), `DeleteEvent::HandleEvent` (0x6a1a50).
 - `channel`: `DaemonChannel::Send` x3 (0x69a3e0, 0x69a440, 0x69a4c0), `ClientSideHashedDaemonChannel::Send` x2 (0x69abf0, 0x69ac40), `ClientSideHashedDaemonChannel::releaseSession` (0x69afb0).
-- Round 6 (log path open, E16): `LogFile::Write` (0x6a0250), `LogArchiveSession::~LogArchiveSession` (0x6b9d00), `LogArchiveSession::Close` (0x6ba510), `AutoCS::Enter` (0x1cbd0), `AutoCS::Leave` (0x1cc50), `ClientSideDaemonChannel::initialize` (0x69a740), `ClientSideHashedDaemonChannel::initialize` (0x69acc0), `ServerSideDaemonChannel::Initialize` (0x69b0a0).
+- Round 6 (log path open, E16): `LogArchiveSession::~LogArchiveSession` (0x6b9d00), `LogArchiveSession::Close` (0x6ba510), `AutoCS::Enter` (0x1cbd0), `AutoCS::Leave` (0x1cc50), `ClientSideDaemonChannel::initialize` (0x69a740), `ClientSideHashedDaemonChannel::initialize` (0x69acc0), `ServerSideDaemonChannel::Initialize` (0x69b0a0).
 - `source_jsoncpp`: `Json::Reader::Reader` (0x6a4eb0), `Json::Value::CommentInfo::~CommentInfo` (0x6a8600), `Json::Value::CZString::~CZString` (0x6a87a0), `Json::Value::CZString::operator<` (0x6a87d0), `Json::Value::isInt` (0x6aa080), `Json::Value::isUInt64` (0x6aa1b0), `Json::valueToString(unsigned __int64)` (0x6aa430), `Json::valueToString(double)` (0x6aa650), `Json::valueToString(bool)` (0x6aa680).
 
 ## Decisions
@@ -21,6 +21,7 @@ Exe: GameDaemon (2019 + PDB). Round 1. Two sessions did the work (planned contex
 
 ## Not done
 
+- 0x6a0250 `LogFile::Write`: link LNK2001 in GD; the body object does not export the symbol; a later card.
 - 0x6a83c0 `Json::Exception::~Exception`: `Json::Exception` has no `std::exception` base and no `msg_` member yet (earlier decision, see the comment in `jsoncpp.h` and 0x6a84d0). The body needs that layout.
 - 0x6a8420 `Json::Exception::what`: same cause (needs `msg_`).
 - 0x6a8440 `Json::throwRuntimeError`: same cause. `Json::RuntimeError` also has no layout.
@@ -37,6 +38,8 @@ Round 3: the round 2 gate build failed again. The build log showed only the wine
 Round 4: the round 3 deferred link failed. The link log showed an unresolved external `LogFile::Write` from `source_logfile.cpp.obj` (the `/INCLUDE` line). This is the log path (E16). Round 4 put back the `LIFT_STUB` bodies of all 8 log-path functions of this card (see "Not done"). It removed their `/INCLUDE` lines and the two inlined assert macros in `lock.cpp` and `channel.cpp`. This round did not change other bodies.
 
 Round 6: the log path is open (E16 live, E129 landed, `logset.json` names are empty). Round 6 restores the round 3 bodies of the 8 log-path functions. It also restores their `/INCLUDE` keep lines and the two inlined assert macros in `lock.cpp` and `channel.cpp`. `AlertSender::Write` stays a GameDaemon `LIFT_STUB`. The asserts only call it. This round did not change the `source_jsoncpp` stem. Its 4 **Not done** bodies need the `Json::Exception` layout, not the log path. This round did not change other bodies.
+
+Round 7: the round 6 GameDaemon link failed with LNK2001 for `LogFile::Write` (`?Write@LogFile@@QEAAXPEB_WHPEB_WPEAD@Z`) from `source_logfile.cpp.obj`. Round 7 puts back the round 5 form of `LogFile::Write` (`LIFT_STUB(0x6a0250)`) and removes its `/INCLUDE` line. All other round 6 bodies stay. This round did not change other code.
 
 ## Files changed
 
