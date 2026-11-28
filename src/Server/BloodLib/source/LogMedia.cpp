@@ -18,7 +18,8 @@ wchar_t* LogMedia::GetLastFileName()
 // LIFT: noinline. The original calls it from its only caller Log::Add (CacheGate 0xa2c0) in all 4 exes.
 // GameDaemon 0x69ed80: the same body. The GD addReferenceCount form (RefCntObject.cpp) keeps the bool in edx.
 #if defined(LIFT_EXE_GD)
-#pragma comment(linker, "/INCLUDE:?Add@LogMedia@@IEAAHPEAVLogBuffer@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+// LIFT: the shared header declares Add public (QEAA). The GameDaemon PDB has it protected (IEAA).
+#pragma comment(linker, "/INCLUDE:?Add@LogMedia@@QEAAHPEAVLogBuffer@@@Z")  // LIFT: dead-strip keep (no live caller yet)
 #endif
 __declspec(noinline) int LogMedia::Add(LogBuffer* logbuffer)
 {

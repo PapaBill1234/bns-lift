@@ -10,7 +10,7 @@ All GameDaemon changes are inside `#if defined(LIFT_EXE_GD)` (or `LIFT_LOG_ADD_M
 | --- | --- | --- |
 | `Log::Write` (`?Write@Log@@SAXW4Type@1@PEB_WH1ZZ`) | 0x687a10 | GD `Log::Add` (0x687b70) is a private member, not static. `Log.h` declares the member form under `LIFT_LOG_ADD_MEMBER`. `Log::Write` and `Log::WriteV` call `instance->Add(logbuf)` for GD. Keep pragma added. |
 | `LogBuffer::Acquire` | 0x69d2e0 | The body stays the same. The GD `RefCntObject::addReferenceCount` form (already in `RefCntObject.cpp`) gives the 4-argument call. Keep pragma added. |
-| `LogMedia::Add` | 0x69ed80 | The body stays the same, as for `LogBuffer::Acquire`. Keep pragma added. |
+| `LogMedia::Add` | 0x69ed80 | The body stays the same, as for `LogBuffer::Acquire`. Keep pragma added. The pragma uses the build name `?Add@LogMedia@@QEAAHPEAVLogBuffer@@@Z` (the shared header declares `Add` public). Round 1 used the PDB name (protected, `IEAA`). That name did not resolve and the GameDaemon link failed. |
 | `AlertSender::writev2` | 0x686da0 | The GD form reads all members through `_alertSender` (LTCG removed `this`). The list test puts the "full" branch first. The tail test puts the empty-list branch first. The log copy size is the int product `2 * logCount`. Keep pragma added. |
 
 ## Notes for review
