@@ -1,4 +1,18 @@
 {
+"AccessoryItem::R_GetRandomEffectGroupId": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"AccessoryItem::R_GetRandomEffectId": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "AccessoryProperty::FieldDefine": {
 "calls": 100,
 "consts": 100,
@@ -951,12 +965,40 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Creature::CanJoinFaction": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Creature::CheckCombatSideEnabled": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Creature::GetAbnormalState": {
+"calls": 100,
+"consts": 93,
+"refs": 100,
+"score": 97.8,
+"status": "DIFF"
+},
 "Creature::GetActivatedBadgeEquipSlot": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"Creature::initMoveCtx": {
+"calls": 80,
+"consts": 100,
+"refs": 80,
+"score": 86.7,
+"status": "DIFF"
 },
 "CreatureProperty::FieldDefine": {
 "calls": 100,
@@ -1179,13 +1221,6 @@
 "calls": 100,
 "consts": 100,
 "refs": 0,
-"score": 66.7,
-"status": "DIFF"
-},
-"DrAliasMapImpl::Clear": {
-"calls": 0,
-"consts": 100,
-"refs": 100,
 "score": 66.7,
 "status": "DIFF"
 },
@@ -2128,6 +2163,20 @@
 "status": "DIFF"
 },
 "GameTranExpireToken::GetTid": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GemItem::R_GetRandomEffectGroupId": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GemItem::R_GetRandomEffectId": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -3359,6 +3408,27 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"NpcParty::Add": {
+"calls": 0,
+"consts": 0,
+"refs": 100,
+"score": 33.3,
+"status": "DIFF"
+},
+"NpcParty::Remove": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"NpcParty::~NpcParty": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "NpcPartyTimer::TimerExpired": {
 "calls": 100,
 "consts": 100,
@@ -3372,6 +3442,13 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"NpcSquad::EventOccured": {
+"calls": 100,
+"consts": 67,
+"refs": 100,
+"score": 88.9,
+"status": "DIFF"
 },
 "OceanicEffect::GetDataSubType": {
 "calls": 100,
@@ -3576,7 +3653,21 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Pc::CalculateStyleScoreBonus": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Pc::ClearLastComboSkillValue": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Pc::DeactivateSkillScore": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -3681,6 +3772,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Pc::IsTryingInstantPayment": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Pc::ReturningToArenaLobby": {
 "calls": 100,
 "consts": 100,
@@ -3689,6 +3787,76 @@
 "status": "MATCH"
 },
 "Pc::RollbackReturnToArenaLobby": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Pc::SendAbortCraftFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Pc::SendJoinCraftUnionFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Pc::SendLeaveCraftUnionFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Pc::SendRegisterCraftFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Pc::SendRetrieveChallengePartyRankingInfoFail": {
+"calls": 100,
+"consts": 100,
+"refs": 80,
+"score": 93.3,
+"status": "DIFF"
+},
+"Pc::SendRetrieveGuildRankingInfoFail": {
+"calls": 100,
+"consts": 100,
+"refs": 67,
+"score": 88.9,
+"status": "DIFF"
+},
+"Pc::SendRetrieveRankingRewardListFail": {
+"calls": 100,
+"consts": 100,
+"refs": 67,
+"score": 88.9,
+"status": "DIFF"
+},
+"Pc::SendTakeCraftFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Pc::SendTakeRankingRewardFail": {
+"calls": 100,
+"consts": 100,
+"refs": 67,
+"score": 88.9,
+"status": "DIFF"
+},
+"Pc::SetCombatModeByTargeted": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
