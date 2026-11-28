@@ -64,10 +64,10 @@ struct DuelTeamView
 };
 
 // LIFT: view of the PDB class DuelManager (size 0xD4B0, vfptr at +0). The skeleton class has no members yet.
-struct DuelManagerView
+struct DuelManagerCppView
 {
     void *lift_vfptr;             // +0 (0x0)
-    void *_data;                  // +8 (0x8) Data::DuelRecordPtr
+    void *_data;                // +8 (0x8) Data::DuelRecordPtr
     ::Zone *_zone;                // +16 (0x10)
     ::DuelRule *_rule;            // +24 (0x18)
     int _memberRule;              // +32 (0x20)
@@ -341,7 +341,7 @@ void __cdecl DuelManager::finishRound(void)
 #pragma comment(linker, "/INCLUDE:?finishGame@DuelManager@@AEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
 void __cdecl DuelManager::finishGame(void)
 {
-    DuelManagerView *self = reinterpret_cast<DuelManagerView *>(this);
+    DuelManagerCppView *self = reinterpret_cast<DuelManagerCppView *>(this);
     // LIFT: DuelTeam::IsTeamEmpty is inlined in the original.
     if (self->_teams[0]->_members._Mysize == 0)
         finishGame(static_cast< ::DuelGameResult>(4));  // LIFT: DUELGAMERESULT_BETA_WIN = 4 (PDB)
@@ -379,7 +379,7 @@ void __cdecl DuelManager::leaveFromArena(void)
 #pragma comment(linker, "/INCLUDE:?resetRound@DuelManager@@MEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
 void __cdecl DuelManager::resetRound(void)
 {
-    reinterpret_cast<DuelManagerView *>(this)->_lastAttackTeam = -1;
+    reinterpret_cast<DuelManagerCppView *>(this)->_lastAttackTeam = -1;
 }
 
 // 0xb84e0

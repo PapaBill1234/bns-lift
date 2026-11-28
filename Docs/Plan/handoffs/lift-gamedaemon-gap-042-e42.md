@@ -74,6 +74,13 @@ Card: Easy leaves (GameDaemon), wave E. Round 1.
 - `src/Server/GameDaemon/raiddungeon.cpp`, `raiddungeon.h`
 - `src/Server/GameDaemon/team_cpp_2.cpp`, `team.h`
 
+## Round 5 repair
+
+- Cause: `DuelManagerView` existed in `duelmanager.h` and in `duelmanager_cpp.cpp`. The name was ambiguous.
+- Fix: the file-local copy in `duelmanager_cpp.cpp` is now `DuelManagerCppView`. Its uses in that file use the new name.
+- The header view `DuelManagerView` stays as it was.
+- Also changed: `src/Server/GameDaemon/duelmanager_cpp.cpp`.
+
 ## Gate and MATCH
 
 The driver builds and runs the gate and the MATCH comparison after this session.
