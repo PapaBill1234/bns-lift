@@ -300,6 +300,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"AdditionalHpEffect::checkApply": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "AirDash::CheckToManipulate": {
 "calls": 100,
 "consts": 100,
@@ -957,6 +964,13 @@
 "refs": 0,
 "score": 66.7,
 "status": "DIFF"
+},
+"DesireIncreaseEffect::checkApply": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "DetachPostAttachmentTran_IndetachFixed::GetDefinition": {
 "calls": 100,
@@ -2113,6 +2127,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"HpDamageEffect::checkApply": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "IdManager<__int64>::Initialize": {
 "calls": 100,
 "consts": 100,
@@ -2148,6 +2169,13 @@
 "score": 66.7,
 "status": "DIFF"
 },
+"InitializeRecycleGroupEffect::checkApply": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "InstantPaymentTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
@@ -2160,6 +2188,20 @@
 "consts": 67,
 "refs": 100,
 "score": 88.9,
+"status": "DIFF"
+},
+"Inventory::IsActivatedGemSlot": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"InventoryCacheUpdate::AddChange": {
+"calls": 0,
+"consts": 100,
+"refs": 0,
+"score": 33.3,
 "status": "DIFF"
 },
 "ItemBase<AccessoryTrait>::GetClass": {
@@ -2799,6 +2841,27 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Pc::GetActiveSummoned": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Pc::GetArenaAttraction": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Pc::GetGameGameMode": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Pc::GetLastAttackLimitTime": {
 "calls": 100,
 "consts": 100,
@@ -2869,7 +2932,35 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Pc::IsSharableCombatModeZone": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Pc::ReturningToArenaLobby": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Pc::RollbackReturnToArenaLobby": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Pc::SetExceptHate": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Pc::SetGameGameMode": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -3380,6 +3471,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"ReturnSimSkillEffect::checkApply": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "ReturnToArenaLobbyTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
@@ -3465,6 +3563,13 @@
 "status": "MATCH"
 },
 "SerializerTimer::TimerId": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"SetImmuneBreakerEffect::checkApply": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -4529,6 +4634,13 @@
 "status": "MATCH"
 },
 "ZoneSerializedObject::TimerExpired": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZoneSerializer::preExecute": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
