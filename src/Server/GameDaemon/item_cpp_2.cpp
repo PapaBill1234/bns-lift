@@ -161,9 +161,24 @@ bool __cdecl AccessoryItem::checkToInvokeEffect(void) const
 }
 
 // 0x557fe0
-__int64 __cdecl AccessoryItem::R_GetRandomEffectId(char) const
+#pragma comment(linker, "/INCLUDE:?R_GetRandomEffectId@AccessoryItem@@UEBA_JD@Z")  // LIFT: dead-strip keep (no live caller yet)
+__int64 __cdecl AccessoryItem::R_GetRandomEffectId(char groupIndex) const
 {
-    LIFT_STUB(0x557fe0);
+    const ::AccessoryItemPropertyView &prop = reinterpret_cast<const ::AccessoryItemView *>(this)->prop;
+    switch (groupIndex)
+    {
+    case 0:
+        return prop.Remaster.random_effect_id_1;
+    case 1:
+        return prop.Remaster.random_effect_id_2;
+    case 2:
+        return prop.Remaster.random_effect_id_3;
+    case 3:
+        return prop.Remaster.random_effect_id_4;
+    case 4:
+        return prop.Remaster.random_effect_id_5;
+    }
+    return 0;
 }
 
 // 0x558030
@@ -173,9 +188,24 @@ void __cdecl AccessoryItem::R_SetRandomEffectId(char, __int64)
 }
 
 // 0x558090
-__int64 __cdecl AccessoryItem::R_GetRandomEffectGroupId(char) const
+#pragma comment(linker, "/INCLUDE:?R_GetRandomEffectGroupId@AccessoryItem@@UEBA_JD@Z")  // LIFT: dead-strip keep (no live caller yet)
+__int64 __cdecl AccessoryItem::R_GetRandomEffectGroupId(char groupIndex) const
 {
-    LIFT_STUB(0x558090);
+    const ::AccessoryItemPropertyView &prop = reinterpret_cast<const ::AccessoryItemView *>(this)->prop;
+    switch (groupIndex)
+    {
+    case 0:
+        return prop.Remaster.random_effect_group_id_1;
+    case 1:
+        return prop.Remaster.random_effect_group_id_2;
+    case 2:
+        return prop.Remaster.random_effect_group_id_3;
+    case 3:
+        return prop.Remaster.random_effect_group_id_4;
+    case 4:
+        return prop.Remaster.random_effect_group_id_5;
+    }
+    return 0;
 }
 
 // 0x5580e0
@@ -251,15 +281,45 @@ bool __cdecl GemItem::R_CheckEnchantTargetItem(void)
 }
 
 // 0x558b50
-__int64 __cdecl GemItem::R_GetRandomEffectId(char) const
+#pragma comment(linker, "/INCLUDE:?R_GetRandomEffectId@GemItem@@UEBA_JD@Z")  // LIFT: dead-strip keep (no live caller yet)
+__int64 __cdecl GemItem::R_GetRandomEffectId(char groupIndex) const
 {
-    LIFT_STUB(0x558b50);
+    const ::GemItemPropertyView &prop = reinterpret_cast<const ::GemItemView *>(this)->prop;
+    switch (groupIndex)
+    {
+    case 0:
+        return prop.Remaster.random_effect_id_1;
+    case 1:
+        return prop.Remaster.random_effect_id_2;
+    case 2:
+        return prop.Remaster.random_effect_id_3;
+    case 3:
+        return prop.Remaster.random_effect_id_4;
+    case 4:
+        return prop.Remaster.random_effect_id_5;
+    }
+    return 0;
 }
 
 // 0x558ba0
-__int64 __cdecl GemItem::R_GetRandomEffectGroupId(char) const
+#pragma comment(linker, "/INCLUDE:?R_GetRandomEffectGroupId@GemItem@@UEBA_JD@Z")  // LIFT: dead-strip keep (no live caller yet)
+__int64 __cdecl GemItem::R_GetRandomEffectGroupId(char groupIndex) const
 {
-    LIFT_STUB(0x558ba0);
+    const ::GemItemPropertyView &prop = reinterpret_cast<const ::GemItemView *>(this)->prop;
+    switch (groupIndex)
+    {
+    case 0:
+        return prop.Remaster.random_effect_group_id_1;
+    case 1:
+        return prop.Remaster.random_effect_group_id_2;
+    case 2:
+        return prop.Remaster.random_effect_group_id_3;
+    case 3:
+        return prop.Remaster.random_effect_group_id_4;
+    case 4:
+        return prop.Remaster.random_effect_group_id_5;
+    }
+    return 0;
 }
 
 // 0x558bf0

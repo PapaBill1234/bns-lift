@@ -71,6 +71,7 @@ public:
     static wchar_t const * __cdecl GetAddressStringWForLogs(unsigned long);  // 0x343910
 
     static ::GameDaemon * GamedInstance;
+    ::RuleConfig * GetRuleConfig(void) { return ruleConfig; }  // PDB inline
 
     // PDB data members (PDB size 0x15378). LIFT: the members after arenaGameChannelEnable (+0x1038 to +0x15378) follow in later waves.
     // LIFT: a member with an `unsigned __int64 x[n]` type is a sized stand-in. Its comment gives the PDB type, which is not declared yet.

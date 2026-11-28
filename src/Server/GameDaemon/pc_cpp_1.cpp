@@ -83,9 +83,13 @@ __cdecl Pc::~Pc(void)
 }
 
 // 0x5d7180
+#pragma comment(linker, "/INCLUDE:?IsTryingInstantPayment@Pc@@QEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
 bool __cdecl Pc::IsTryingInstantPayment(void)
 {
-    LIFT_STUB(0x5d7180);
+    AcquireSRWLockShared(&_tryingInstantPaymentLock);
+    bool isTrying = _isTryingInstantPayment;
+    ReleaseSRWLockShared(&_tryingInstantPaymentLock);
+    return isTrying;
 }
 
 // 0x5d71c0
@@ -431,9 +435,10 @@ void __cdecl Pc::SetCombatModeByAttacked(::SourceLocation const &)
 }
 
 // 0x5e2dc0
+#pragma comment(linker, "/INCLUDE:?SetCombatModeByTargeted@Pc@@UEAAXAEBVSourceLocation@@@Z")  // LIFT: dead-strip keep (no live caller yet)
 void __cdecl Pc::SetCombatModeByTargeted(::SourceLocation const &)
 {
-    LIFT_STUB(0x5e2dc0);
+    ++_targetedCountByNpc;
 }
 
 // 0x5e2dd0
@@ -659,9 +664,23 @@ void __cdecl Pc::ActivateSkillScore(__int64)
 }
 
 // 0x5e5510
+#pragma comment(linker, "/INCLUDE:?DeactivateSkillScore@Pc@@QEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
 void __cdecl Pc::DeactivateSkillScore(void)
 {
-    LIFT_STUB(0x5e5510);
+    _activatedSkillScore = false;
+    _bonusSkillScoreRate = 0;
+    _skillScoreUseHeartCount = 0;
+    _skillScoreUseItemPoint = 0;
+    _skillScoreBossNpcKillCount = 0;
+    _skillScoreStartTime = 0;
+    _skillScoreMaxComboCount = 0;
+    if (_skillScoreComboCount > 0)
+        _skillScoreMaxComboCount = _skillScoreComboCount;
+    _skillScoreRate = 0;
+    _skillScoreComboCount = 0;
+    _skillScoreKillCount = 0;
+    _baseSkillScore = 0;
+    _lastSkillScoreLimitTime = 0;
 }
 
 // 0x5e5560

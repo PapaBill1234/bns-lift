@@ -6,6 +6,9 @@
 #include "npc.h"
 #include "pc.h"
 #include "zone.h"
+#include "gamedaemon.h"
+#include "ruleconfig.h"
+#include "Daemon.h"
 #include "LiftStub.h"
 
 // 0x260cd0
@@ -129,9 +132,22 @@ bool __cdecl Creature::ChangeMoveState(::CreatureMoveState, short, wchar_t *)
 }
 
 // 0x261e60
+#pragma comment(linker, "/INCLUDE:?initMoveCtx@Creature@@AEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
 void __cdecl Creature::initMoveCtx(void)
 {
-    LIFT_STUB(0x261e60);
+    ::CreatureMemberView *self = reinterpret_cast< ::CreatureMemberView *>(this);
+    self->moveCtx.state = static_cast< ::CreatureMoveState>(0);  // RUN_STATE
+    self->moveCtx.fallStartZ = -32000;
+    self->moveCtx.jumpStartZ = -32000;
+    self->moveCtx.jumpTopZ = -32000;
+    self->moveCtx.glideStartZ = -32000;
+    self->moveCtx.boostStartZ = -32000;
+    self->moveCtx.diveStartZ = -32000;
+    // LIFT: Id >> 48 is the object type. Type 1 is a Pc.
+    if ((self->Id >> 48) != 1)
+        self->moveCtx.hyperEnergyPoint = 0;
+    self->moveCtx.lastHyperMoveTime = GetTickCount64() - Daemon::Instance->StartSystemTick64;
+    self->moveCtx.lastGlideTime = GetTickCount64() - Daemon::Instance->StartSystemTick64;
 }
 
 // 0x261f10
@@ -201,9 +217,21 @@ int __cdecl Creature::GetFactionLevel(int)
 }
 
 // 0x263a40
-bool __cdecl Creature::CanJoinFaction(char, __int64, __int64)
+#pragma comment(linker, "/INCLUDE:?CanJoinFaction@Creature@@SA_ND_J0@Z")  // LIFT: dead-strip keep (no live caller yet)
+bool __cdecl Creature::CanJoinFaction(char factionId, __int64 faction1Count, __int64 faction2Count)
 {
-    LIFT_STUB(0x263a40);
+    if (factionId <= 0)
+        return false;
+    __int64 totalCount = faction1Count + faction2Count;
+    ::RuleConfig *ruleConfig = GameDaemon::GamedInstance->GetRuleConfig();
+    if (totalCount <= ruleConfig->FactionTransferLimitPcCount())
+        return true;
+    __int64 factionCount = 0;
+    if (factionId == 1)
+        factionCount = faction1Count;
+    else if (factionId == 2)
+        factionCount = faction2Count;
+    return factionCount <= totalCount * ruleConfig->FactionTransferLimitPercent() / 100;
 }
 
 // 0x263ab0
@@ -237,9 +265,18 @@ bool __cdecl Creature::CanAttack(::Creature *, ::Creature *)
 }
 
 // 0x264050
-bool __cdecl Creature::CheckCombatSideEnabled(::Creature *, ::Creature *)
+#pragma comment(linker, "/INCLUDE:?CheckCombatSideEnabled@Creature@@SA_NPEAV1@0@Z")  // LIFT: dead-strip keep (no live caller yet)
+bool __cdecl Creature::CheckCombatSideEnabled(::Creature *myself, ::Creature *target)
 {
-    LIFT_STUB(0x264050);
+    if (myself == nullptr || target == nullptr)
+        return false;
+    char mySide = reinterpret_cast< ::CreatureMemberView *>(myself)->combat_side;
+    char targetSide = reinterpret_cast< ::CreatureMemberView *>(target)->combat_side;
+    if (mySide == 6 && targetSide == 6)
+        return true;
+    if (mySide != 0 && mySide != 5 && targetSide != 0 && targetSide != 5)
+        return true;
+    return false;
 }
 
 // 0x264090
@@ -309,9 +346,21 @@ bool __cdecl Creature::CheckEffectFlag(::Data::EffectFlagType) const
 }
 
 // 0x265160
+#pragma comment(linker, "/INCLUDE:?GetAbnormalState@Creature@@QEAA?AW4AbnormalState@@XZ")  // LIFT: dead-strip keep (no live caller yet)
 ::AbnormalState __cdecl Creature::GetAbnormalState(void)
 {
-    LIFT_STUB(0x265160);
+    // ❓ the enumerator names of AbnormalState are not declared. The body returns only 0 or 1.
+    const ::CreatureMemberView *self = reinterpret_cast<const ::CreatureMemberView *>(this);
+    char linkState = self->link_state;
+    if (linkState == 2 && (self->link_type == 4 || self->link_type == 7))
+        return static_cast< ::AbnormalState>(1);
+    __int64 effectFlag = self->effect_flag;
+    if ((effectFlag & 0x400) != 0 || (linkState == 2 && self->link_type == 1))
+        return static_cast< ::AbnormalState>(1);
+    if ((effectFlag & 0x1) != 0 || (effectFlag & 0x2000) != 0 || (effectFlag & 0x8000) != 0
+        || (effectFlag & 0x10000) != 0 || (effectFlag & 0x20000) != 0)
+        return static_cast< ::AbnormalState>(1);
+    return static_cast< ::AbnormalState>(0);
 }
 
 // 0x2651d0

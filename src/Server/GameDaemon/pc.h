@@ -594,9 +594,26 @@ private:
     ::Pc::CombatModeType _combatModeType;  // +0x4E34
     short _targetedCountByNpc;  // +0x4E38
     long long _enterWorldTime;  // +0x4E40
-    char _lastReportBotSpammerTime[0x8cc8 - 0x4e48];  // +0x4E48 (LIFT: PDB members _lastReportBotSpammerTime to before _skillResultContext, not declared yet)
+    char _lastReportBotSpammerTime[0x4f30 - 0x4e48];  // +0x4E48 (LIFT: PDB members _lastReportBotSpammerTime to before _tryingInstantPaymentLock, not declared yet)
+    ::_RTL_SRWLOCK _tryingInstantPaymentLock;  // +0x4F30
+    bool _isTryingInstantPayment;  // +0x4F38
+    char _takingAchievementRewardLock[0x8cc8 - 0x4f40];  // +0x4F40 (LIFT: PDB members _takingAchievementRewardLock to before _skillResultContext, not declared yet)
     ::SkillResultContext _skillResultContext;  // +0x8CC8
-    char _inviteMentoringContext[0x95a8 - 0x8d78];  // +0x8D78 (LIFT: PDB members _inviteMentoringContext to the end, not declared yet)
+    char _inviteMentoringContext[0x8e78 - 0x8d78];  // +0x8D78 (LIFT: PDB members _inviteMentoringContext to before lastStyleLimitTime, not declared yet)
+    __int64 lastStyleLimitTime;  // +0x8E78
+    bool _activatedSkillScore;  // +0x8E80
+    int _bonusSkillScoreRate;  // +0x8E84
+    short _skillScoreUseHeartCount;  // +0x8E88
+    short _skillScoreUseItemPoint;  // +0x8E8A
+    short _skillScoreBossNpcKillCount;  // +0x8E8C
+    __int64 _skillScoreStartTime;  // +0x8E90
+    int _baseSkillScore;  // +0x8E98
+    int _skillScoreRate;  // +0x8E9C
+    int _skillScoreComboCount;  // +0x8EA0
+    int _skillScoreMaxComboCount;  // +0x8EA4
+    short _skillScoreKillCount;  // +0x8EA8
+    __int64 _lastSkillScoreLimitTime;  // +0x8EB0
+    char _equipGearScore[0x95a8 - 0x8eb8];  // +0x8EB8 (LIFT: PDB members _equipGearScore to the end, not declared yet)
 };
 
 struct PcInfoForGameLog

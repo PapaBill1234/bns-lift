@@ -19,6 +19,15 @@ protected:
     bool __cdecl initializeTimer(void);  // 0x428c00
 public:
     void __cdecl SetVar(int, __int64);  // 0x428d10
+private:
+    int _type;  // +8 (PDB: NpcParty::Type) LIFT: the enum NpcParty::Type is not declared yet
+    ::Zone *_zone;  // +16
+    ::NpcPartyTimer *_timer;  // +24
+    unsigned __int64 const *_spawnKey;  // +32
+    ::Npc **_npc;  // +40
+    int _maxNpc;  // +48
+    int _leaderIdx;  // +52
+    __int64 _var[4];  // +56
 };
 
 class NpcPartyTimer : public ::ZoneSerializedObject

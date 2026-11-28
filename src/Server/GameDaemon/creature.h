@@ -253,14 +253,37 @@ public:
     typedef std::set<unsigned short, std::less<__int64>, StlAllocator<unsigned short, 2> > ChangedPropertyIdSet;
 };
 
+// LIFT: PDB struct CreatureMoveCtx (size 64).
+struct CreatureMoveCtx
+{
+    char cell[12];  // +0 ❓ PDB type 0xC5AD is not declared here
+    int fallStartZ;  // +12
+    int jumpStartZ;  // +16
+    int jumpTopZ;  // +20
+    __int64 lastHyperMoveTime;  // +24
+    long hyperEnergyPoint;  // +32
+    __int64 lastGlideTime;  // +40
+    int glideStartZ;  // +48
+    int boostStartZ;  // +52
+    int diveStartZ;  // +56
+    ::CreatureMoveState state;  // +60
+};
+
 // LIFT: view of the PDB class Creature (size 0xC50). Only the members that the lifted bodies use are declared.
 struct CreatureMemberView
 {
     char lift_pad_0[0x28];  // ❓ no PDB name: GameObject fields +0 to +0x27 are not declared yet
     unsigned __int64 Id;  // +40 (0x28) (PDB: GameObject::Id)
-    char lift_pad_30[0x235 - 0x30];  // ❓ no PDB name: Prop (CreatureProperty, +0x30) is not declared yet
+    char lift_pad_30[0x178 - 0x30];  // ❓ no PDB name: Prop (CreatureProperty, +0x30) is not declared yet
+    char link_type;  // +0x178 (PDB: Prop.State.link_type; State at Prop+0xD8, link_type at State+112)
+    char link_state;  // +0x179 (PDB: Prop.State.link_state, State+113)
+    char lift_pad_17a[0x1D0 - 0x17A];  // ❓ no PDB name: Prop.State fields are not declared yet
+    __int64 effect_flag;  // +0x1D0 (PDB: Prop.State.effect_flag, State+200)
+    char lift_pad_1d8[0x235 - 0x1D8];  // ❓ no PDB name: Prop.State fields are not declared yet
     char combat_side;  // +565 (0x235) (PDB: Prop.State.combat_side; State at Prop+0xD8, combat_side at State+0x12D)
-    char lift_pad_236[0xC08 - 0x236];  // ❓ no PDB name: fields +0x236 to +0xC07 are not declared yet
+    char lift_pad_236[0x8C8 - 0x236];  // ❓ no PDB name: fields +0x236 to +0x8C7 are not declared yet
+    ::CreatureMoveCtx moveCtx;  // +0x8C8 (PDB: Creature::moveCtx)
+    char lift_pad_908[0xC08 - 0x908];  // ❓ no PDB name: fields +0x908 to +0xC07 are not declared yet
     ::Creature::ChangedPropertyIdSet _changedPropertyIdListSet;  // +3080 (0xC08) (PDB: Creature::_changedPropertyIdListSet)
     ::Creature::ChangedPropertyIdSet _changedExtraPropertyIdListSet;  // +3112 (0xC28) (PDB: Creature::_changedExtraPropertyIdListSet)
     char lift_pad_c48[0xC50 - 0xC48];  // ❓ no PDB name: _instantDeathUnapplicable and others

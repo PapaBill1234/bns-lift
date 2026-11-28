@@ -277,6 +277,53 @@ struct WeaponItemView
     ::WeaponItemPropertyView prop;  // +0x30 (PDB: WeaponProperty)
 };
 
+// LIFT: the group Remaster of AccessoryProperty and GemProperty has the same fields as the WeaponProperty group.
+struct ItemRemasterPropertyView
+{
+    short enchant_point;  // +0
+    char enchant_consecutive_trial;  // +2
+    char enchant_crack;  // +3
+    char enchant_restore;  // +4
+    __int64 random_effect_group_id_1;  // +8
+    __int64 random_effect_group_id_2;  // +16
+    __int64 random_effect_group_id_3;  // +24
+    __int64 random_effect_group_id_4;  // +32
+    __int64 random_effect_group_id_5;  // +40
+    __int64 random_effect_id_1;  // +48
+    __int64 random_effect_id_2;  // +56
+    __int64 random_effect_id_3;  // +64
+    __int64 random_effect_id_4;  // +72
+    __int64 random_effect_id_5;  // +80
+};
+
+// LIFT: view of the PDB AccessoryProperty (size 0xE0). Only the group Remaster (+0x88) is declared.
+struct AccessoryItemPropertyView
+{
+    char lift_pad_0[0x88];  // ❓ no PDB name: base Property and the group Default are not declared here
+    ::ItemRemasterPropertyView Remaster;  // +0x88 (PDB: AccessoryProperty::__remaster__)
+};
+
+// LIFT: view of a PDB AccessoryItem object. Only the member ItemBase<AccessoryTrait>::prop (+0x30) is declared.
+struct AccessoryItemView
+{
+    char lift_pad_0[0x30];  // ❓ no PDB name: vfptr, Item members (+8 to +0x27) and ItemBase::data (+0x28)
+    ::AccessoryItemPropertyView prop;  // +0x30 (PDB: AccessoryProperty)
+};
+
+// LIFT: view of the PDB GemProperty (size 0xD8). Only the group Remaster (+0x80) is declared.
+struct GemItemPropertyView
+{
+    char lift_pad_0[0x80];  // ❓ no PDB name: base Property and the group Default are not declared here
+    ::ItemRemasterPropertyView Remaster;  // +0x80 (PDB: GemProperty::__remaster__)
+};
+
+// LIFT: view of a PDB GemItem object. Only the member ItemBase<GemTrait>::prop (+0x30) is declared.
+struct GemItemView
+{
+    char lift_pad_0[0x30];  // ❓ no PDB name: vfptr, Item members (+8 to +0x27) and ItemBase::data (+0x28)
+    ::GemItemPropertyView prop;  // +0x30 (PDB: GemProperty)
+};
+
 // LIFT: PDB class WeaponItem derives from ItemBase<WeaponTrait>. The base is not declared here yet.
 class WeaponItem
 {
