@@ -29,6 +29,12 @@
 - `DrAliasMapImpl::ReadFromBuffer` (0x6f5fa0): not done in this session (context limit).
 - `DrAliasMapImpl::ClearTable` (0x6f6490): not done in this session (context limit).
 
+## Round 2 fix
+
+- The gate build failed: the include path has no `<cstddef>`. `drstlmemory.h` now includes `<stddef.h>`.
+- `aliasimpl.h`, `aliasimpl_h.cpp` and `aliasimpl_cpp.cpp` used `<cwctype>`, `<cstring>` and `<cwchar>`. No other file in the tree uses these headers. They now include `<wctype.h>`, `<string.h>` and `<wchar.h>`. The code does not use `std::` names from these headers.
+- Stem `datareader` needs no change in this round. Round 1 lifted its 4 functions.
+
 ## Open items
 
 - `DrAliasMapImpl::DrAliasMapImpl` (0x6f6450) stays DIFF (it was DIFF in the baseline). The class has no `DrAliasMap` base, so the vtable differs.

@@ -3,7 +3,7 @@
 #include "GameDaemonFwd.h"
 #include "defmemory.h"
 #include "drstlmemory.h"
-#include <cwctype>
+#include <wctype.h>
 #include <map>
 #include <string>
 #include <vector>

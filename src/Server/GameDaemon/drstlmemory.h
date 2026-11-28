@@ -3,7 +3,7 @@
 #pragma once
 #include "GameDaemonFwd.h"
 #include "defmemory.h"
-#include <cstddef>
+#include <stddef.h>
 #include <new>
 
 // LIFT: per-exe path literal of the 2019 build (lessons A6).

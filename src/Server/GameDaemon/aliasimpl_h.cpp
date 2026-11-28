@@ -1,6 +1,6 @@
 // aliasimpl_h.cpp: aliasimpl.h (GameDaemon PDB, 2019 + PDB).
 #include "aliasimpl.h"
-#include <cwctype>
+#include <wctype.h>
 
 #pragma comment(linker, "/INCLUDE:?compare@ci_wchar_traits@@SAHPEB_W0_K@Z")  // LIFT: dead-strip keep (no live caller yet)
 

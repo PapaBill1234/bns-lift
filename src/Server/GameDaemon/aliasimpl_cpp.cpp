@@ -3,8 +3,8 @@
 #include "elreaderimpl.h"
 #include "LiftStub.h"
 #include <windows.h>
-#include <cstring>
-#include <cwchar>
+#include <string.h>
+#include <wchar.h>
 
 #pragma comment(linker, "/INCLUDE:??0DrAliasMapImpl@@QEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:??1DrAliasMapImpl@@QEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
