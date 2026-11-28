@@ -1,7 +1,6 @@
 // duelmanager.h: duelmanager.cpp, duelmanager.h (GameDaemon PDB, 2019 + PDB). Wave 0: declarations of the stubbed functions only.
 // LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
 #pragma once
-#include <list>
 #include "GameDaemonFwd.h"
 
 // LIFT: view of the PDB record Data::DuelRecord (base DrEl, size 0x440).
@@ -100,8 +99,20 @@ public:
 class DuelTeam
 {
 public:
-    // LIFT: PDB nested type DuelTeam::DuelMembers.
-    typedef std::list< ::DuelMember *, StlAllocator< ::DuelMember *, 2> > DuelMembers;
+    // LIFT: PDB nested type DuelTeam::DuelMembers (std::list, size 0x18). The lift build has no STL headers.
+    // Layout view of the list header: the bodies walk the nodes by hand.
+    struct DuelMembers
+    {
+        struct Node
+        {
+            Node *_Next;
+            Node *_Prev;
+            ::DuelMember *_Myval;
+        };
+        void *lift_alval;  // +0 (0x0) ❓ no PDB name: allocator proxy slot
+        Node *_Myhead;  // +8 (0x8)
+        unsigned long long _Mysize;  // +16 (0x10)
+    };
 
     __cdecl DuelTeam(int const, int const);  // 0x27bb0
     virtual __cdecl ~DuelTeam(void);  // 0x27c30 (slot 0)

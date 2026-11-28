@@ -36,6 +36,12 @@ Card: Easy leaves (GameDaemon), wave E. Round 1.
 - `0x20f150` `Team::setVisible`. The 2019 body does not read the parameter. It logs 1 and stores true. This is marked `// ❓`.
 - The Team bodies read the members through byte views (`TeamView`, `TeamPartyView`, `TeamManagerView` in `team.h`), because these classes have no PDB members in the sources yet. The `/INCLUDE` names are hand-mangled. If the link fails, check them with `pdbpub.py`.
 
+## Round 3 repair
+
+- The build failed on `#include <list>` in `duelmanager.h`. The lift build has no STL headers. `DuelTeam::DuelMembers` is now a layout struct of the PDB `std::list` (`lift_alval` +0, `_Myhead` +8, `_Mysize` +0x10, with a `Node` type).
+- `DuelTeam::DuelTeam` (0x27bb0) now writes the inlined list constructor by hand. It sets `_Mysize` to 0 and takes the 24-byte head node from `Memory::_Manager[2]`. It links the node to itself.
+- `GuildUniform::fetchUniformInfo` (0x131560) stays Not done. See below.
+
 ## Not done
 
 - `0x42e430` `Data::QuestDecision::QuestDecision`. The code is folded with a std::vector constructor (identical code folding). The body stays without a lift.
