@@ -5,10 +5,12 @@
 
 // 0xb370 FragmentPacket::FreeSize: LIFT: no body in wave 0 (shared class FragmentPacket has another form or the change needs codegen (W1, pattern 35)).
 
+#pragma comment(linker, "/INCLUDE:?FreeBody@FragmentPacket@@QEAAPEBDXZ")  // LIFT: dead-strip keep (no live caller yet)
+
 // 0x10d40
 char const * __cdecl FragmentPacket::FreeBody(void)
 {
-    LIFT_STUB(0x10d40);
+    return packet.GetFreeBody();
 }
 
 // 0x271c0

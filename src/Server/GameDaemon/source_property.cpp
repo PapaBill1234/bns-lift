@@ -1,6 +1,9 @@
 // source_property.cpp: property.cpp (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
 #include "property.h"
 #include "propertysync.h"
+#include "../BloodLib/include/AlertSender.h"
+#include "../BloodLib/include/CrashHandler.h"
+#include "../BloodLib/include/Log.h"
 #include "LiftStub.h"
 
 // 0x688a70
@@ -159,8 +162,35 @@ short __cdecl Property::initBitfield(int, ::FieldDef const *const, int, ::Field:
     LIFT_STUB(0x68b770);
 }
 
-// 0x68ba10
-unsigned char __cdecl Property::findMaxId(int, ::SyncDef const *const)
+#pragma comment(linker, "/INCLUDE:?findMaxId@Property@@CAEHQEBUSyncDef@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+
+// LIFT: partial view of the PDB struct SyncDef (size 4). The header declares it without members.
+struct SyncDefView
 {
-    LIFT_STUB(0x68ba10);
+    unsigned char id;          // +0
+    unsigned char type;        // +1
+    unsigned char dynamic;     // +2
+    unsigned char initupdate;  // +3
+};
+static_assert(sizeof(SyncDefView) == 4, "sizeof SyncDef");
+
+static wchar_t const PROPERTY_FILE[] = L"source\\Property.cpp";
+
+// 0x68ba10
+unsigned char __cdecl Property::findMaxId(int sdefCnt, ::SyncDef const *const sdef)
+{
+    SyncDefView const *def = reinterpret_cast<SyncDefView const *>(sdef);
+    int id = 0;
+    for (int i = 0; i < sdefCnt; ++i, ++def)
+    {
+        if (def->id >= 4)
+        {
+            Log::Write(Log::LT_ERROR, PROPERTY_FILE, 1999, L"== CRASH == ASSERT CRASH");
+            AlertSender::Write(PROPERTY_FILE, 1999, L"== CRASH == ASSERT CRASH");
+            CrashHandler::MakeCrash("source\\Property.cpp", 1999, L"");
+        }
+        if (id < def->id)
+            id = def->id;
+    }
+    return static_cast<unsigned char>(id + 1);
 }
