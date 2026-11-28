@@ -3,8 +3,21 @@
 #pragma once
 #include "GameDaemonFwd.h"
 
+// LIFT: view of the PDB record Data::DuelRecord (base DrEl, size 0x440).
+// Only the fields that the lifted bodies read are declared.
+struct DuelRecordView
+{
+    char lift_pad_0[0x3D8];  // ❓ no PDB name: fields +0 to +0x3D7 are not declared yet
+    bool is_unrated_match;  // +984 (0x3D8)
+};
+
 class DuelManager
 {
+public:
+    // LIFT: part of the PDB layout of DuelManager (size 0xD4B0). Only the fields that the lifted bodies read are declared.
+    ::DuelRecordView *_data;  // +8 (0x8) PDB type Data::DuelRecordPtr (one pointer _record)
+    char lift_pad_10[0x39];  // ❓ fields +0x10 to +0x48 are not declared yet
+    bool _calcRatingScore;  // +73 (0x49)
 public:
     enum DuelScoreResult {};
 private:

@@ -3,6 +3,11 @@
 #include "task.h"
 #include "zone.h"
 #include "LiftStub.h"
+#include "AlertSender.h"
+#include "Log.h"
+
+// LIFT: per-exe path literal (lessons A6).
+#define WARFIELDMANAGER_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\WarFieldManager.cpp"
 
 // 0x226b00
 __cdecl WarFieldGroup::WarFieldGroup(void)
@@ -23,9 +28,14 @@ bool __cdecl WarFieldGroup::init(unsigned __int64)
 }
 
 // 0x226d70
+#pragma comment(linker, "/INCLUDE:?getDataKey@WarFieldGroup@@AEAA_KXZ")  // LIFT: dead-strip keep (no live caller yet)
 unsigned __int64 __cdecl WarFieldGroup::getDataKey(void)
 {
-    LIFT_STUB(0x226d70);
+    if (_data != nullptr)
+        return _data->key;
+    Log::Write(Log::LT_ERROR, WARFIELDMANAGER_FILE, 43, L"== CRASH == [war-field], %s; Invalid data", L"WarFieldGroup::getDataKey");
+    AlertSender::Write(WARFIELDMANAGER_FILE, 43, L"== CRASH == [war-field], %s; Invalid data", L"WarFieldGroup::getDataKey");
+    return 0;
 }
 
 // 0x226de0

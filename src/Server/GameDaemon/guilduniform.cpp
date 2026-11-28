@@ -63,9 +63,13 @@ short __cdecl GuildUniform::TryAbandonGuildUniform(unsigned __int64, unsigned __
 }
 
 // 0x131db0
+#pragma comment(linker, "/INCLUDE:?EnableRegisterGuildUniform@GuildUniform@@QEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
 bool __cdecl GuildUniform::EnableRegisterGuildUniform(void)
 {
-    LIFT_STUB(0x131db0);
+    AcquireSRWLockShared(&_srwLock);
+    bool const enable = _state == GUILDUNIFORMSTATE_MAKED;
+    ReleaseSRWLockShared(&_srwLock);
+    return enable;
 }
 
 // 0x131e00
@@ -105,9 +109,18 @@ bool __cdecl GuildUniformManager::DelGuildUniform(unsigned __int64)
 }
 
 // 0x1324a0
+#pragma comment(linker, "/INCLUDE:?GetRegisteredUniformCount@GuildUniformManager@@QEAAHXZ")  // LIFT: dead-strip keep (no live caller yet)
 int __cdecl GuildUniformManager::GetRegisteredUniformCount(void)
 {
-    LIFT_STUB(0x1324a0);
+    char count = 0;
+    AcquireSRWLockExclusive(&_srwLock);
+    for (char i = 0; i < _uniformTotalCount; ++i)
+    {
+        if (_uniformList[i] != NULL && _uniformList[i]->_state == GUILDUNIFORMSTATE_REGISTERED)
+            ++count;
+    }
+    ReleaseSRWLockExclusive(&_srwLock);
+    return count;
 }
 
 // 0x132500

@@ -22,7 +22,8 @@ __cdecl DuelTeam::~DuelTeam(void)
 }
 
 // 0x97070
+#pragma comment(linker, "/INCLUDE:?isSaveGameResult@DuelManager@@AEBA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
 bool __cdecl DuelManager::isSaveGameResult(void) const
 {
-    LIFT_STUB(0x97070);
+    return !_data->is_unrated_match && _calcRatingScore;
 }

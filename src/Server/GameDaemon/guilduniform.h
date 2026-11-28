@@ -2,6 +2,18 @@
 // LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
 #pragma once
 #include "GameDaemonFwd.h"
+#include <stddef.h>
+
+// PDB enum GuildUniformState.
+enum GuildUniformState
+{
+    GUILDUNIFORMSTATE_INVALID = 0x0,
+    GUILDUNIFORMSTATE_CONTRACTED = 0x1,
+    GUILDUNIFORMSTATE_READY_TO_MAKE = 0x2,
+    GUILDUNIFORMSTATE_IN_MAKING = 0x3,
+    GUILDUNIFORMSTATE_MAKED = 0x4,
+    GUILDUNIFORMSTATE_REGISTERED = 0x5,
+};
 
 class GuildUniform
 {
@@ -21,7 +33,21 @@ public:
     short __cdecl TryAbandonGuildUniform(unsigned __int64, unsigned __int64, unsigned __int64);  // 0x131ca0
     bool __cdecl EnableRegisterGuildUniform(void);  // 0x131db0
     unsigned __int64 __cdecl AddDonationMaterial(unsigned int, short, int);  // 0x131e00
+public:
+    // LIFT: PDB layout of GuildUniform (size 0x438). Only the fields that the lifted bodies read are declared.
+    char lift_pad_0[0x18];  // ❓ base DynamicRefCntObj (+0 to +0x17, vfptr and ref count) is not declared yet
+    unsigned __int64 _uniformId;  // +24 (0x18)
+    wchar_t _uniformName[33];  // +32 (0x20)
+    char _state;  // +98 (0x62)
+    __int64 _registrationTime;  // +104 (0x68)
+    __int64 _startTime;  // +112 (0x70)
+    __int64 _endTime;  // +120 (0x78)
+    char lift_pad_80[0x3B0];  // ❓ _materialCount to _material (+0x80 to +0x42F) are not declared yet
+    ::_RTL_SRWLOCK _srwLock;  // +1072 (0x430)
 };
+static_assert(offsetof(GuildUniform, _state) == 0x62, "GuildUniform::_state");
+static_assert(offsetof(GuildUniform, _srwLock) == 0x430, "GuildUniform::_srwLock");
+static_assert(sizeof(GuildUniform) == 0x438, "sizeof GuildUniform");
 
 class GuildUniformManager
 {
@@ -33,7 +59,14 @@ public:
     bool __cdecl DelGuildUniform(unsigned __int64);  // 0x1323c0
     int __cdecl GetRegisteredUniformCount(void);  // 0x1324a0
     bool __cdecl FetchGuildUniformList(::FragmentPacket &);  // 0x132500
+public:
+    // LIFT: PDB layout of GuildUniformManager (size 0x60).
+    ::_RTL_SRWLOCK _srwLock;  // +0 (0x0)
+    ::GuildUniform *_uniformList[10];  // +8 (0x8)
+    char _uniformTotalCount;  // +88 (0x58)
 };
+static_assert(offsetof(GuildUniformManager, _uniformTotalCount) == 0x58, "GuildUniformManager::_uniformTotalCount");
+static_assert(sizeof(GuildUniformManager) == 0x60, "sizeof GuildUniformManager");
 
 class NamingRule
 {

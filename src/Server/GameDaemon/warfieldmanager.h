@@ -3,8 +3,19 @@
 #pragma once
 #include "GameDaemonFwd.h"
 
+// LIFT: view of the PDB record Data::WarFieldRecord (base DrEl, size 0x3B8).
+// Only the fields that the lifted bodies read are declared.
+struct WarFieldRecordView
+{
+    char lift_pad_0[0x8];  // ❓ base DrEl (+0 to +7) is not declared here
+    unsigned __int64 key;  // +8 (0x8) PDB type Data::WarFieldRecord::Key
+};
+
 class WarFieldGroup
 {
+public:
+    // LIFT: PDB Data::WarFieldRecordPtr _data (+0). Only the record pointer is declared.
+    ::WarFieldRecordView *_data;  // +0 (0x0) (PDB: DrRecordPtr::_record, DrEl *)
 private:
     __cdecl WarFieldGroup(void);  // 0x226b00
     __cdecl ~WarFieldGroup(void);  // 0x226c00
