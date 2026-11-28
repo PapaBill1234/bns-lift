@@ -279,7 +279,9 @@ struct CreatureMemberView
     char link_state;  // +0x179 (PDB: Prop.State.link_state, State+113)
     char lift_pad_17a[0x1D0 - 0x17A];  // ❓ no PDB name: Prop.State fields are not declared yet
     __int64 effect_flag;  // +0x1D0 (PDB: Prop.State.effect_flag, State+200)
-    char lift_pad_1d8[0x235 - 0x1D8];  // ❓ no PDB name: Prop.State fields are not declared yet
+    char lift_pad_1d8[0x22A - 0x1D8];  // ❓ no PDB name: Prop.State fields are not declared yet
+    short style_score;  // +0x22A (PDB: Prop.State.style_score, State+290)
+    char lift_pad_22c[0x235 - 0x22C];  // ❓ no PDB name: Prop.State fields are not declared yet
     char combat_side;  // +565 (0x235) (PDB: Prop.State.combat_side; State at Prop+0xD8, combat_side at State+0x12D)
     char lift_pad_236[0x8C8 - 0x236];  // ❓ no PDB name: fields +0x236 to +0x8C7 are not declared yet
     ::CreatureMoveCtx moveCtx;  // +0x8C8 (PDB: Creature::moveCtx)

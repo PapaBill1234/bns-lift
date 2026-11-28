@@ -15,5 +15,11 @@ private:
     char lift_pad_0[76];  // ❓ no PDB name: members +0 to +75 are not declared yet
     int _factionTransferLimitPercent;  // +76
     int _factionTransferLimitPcCount;  // +80
+    char lift_pad_54[540 - 84];  // ❓ no PDB name: members +84 to +539 are not declared yet
+    int _styleScoreExpStep1;  // +540
+    int _styleScoreExpStep2;  // +544
+    int _styleScoreExpBonus1;  // +548
+    int _styleScoreExpBonus2;  // +552
+    friend class ::Pc;  // LIFT: Pc::CalculateStyleScoreBonus reads the _styleScoreExp* members (no PDB accessor found)
 };
 

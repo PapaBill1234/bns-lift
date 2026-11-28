@@ -19,7 +19,7 @@ protected:
     bool __cdecl initializeTimer(void);  // 0x428c00
 public:
     void __cdecl SetVar(int, __int64);  // 0x428d10
-private:
+protected:  // LIFT: NpcSquad (derived) reads NpcParty::_npc, _maxNpc and _leaderIdx.
     int _type;  // +8 (PDB: NpcParty::Type) LIFT: the enum NpcParty::Type is not declared yet
     ::Zone *_zone;  // +16
     ::NpcPartyTimer *_timer;  // +24

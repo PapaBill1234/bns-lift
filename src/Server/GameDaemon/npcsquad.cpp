@@ -4,6 +4,7 @@
 #include "npc.h"
 #include "zone.h"
 #include "LiftStub.h"
+#include <string.h>
 
 // 0x42d000
 __cdecl NpcSquad::NpcSquad(::Zone *, ::Data::ZoneNpcSquadRecordPtr)
@@ -11,10 +12,33 @@ __cdecl NpcSquad::NpcSquad(::Zone *, ::Data::ZoneNpcSquadRecordPtr)
     LIFT_STUB(0x42d000);
 }
 
-// 0x42d0a0
-void __cdecl NpcSquad::EventOccured(::ScriptEvent const *)
+// LIFT: view of the PDB ScriptEvent (size 0x98). The skeleton ScriptEvent has no members yet.
+struct ScriptEventView
 {
-    LIFT_STUB(0x42d0a0);
+    char objectType;          // +0x0
+    char type;                // +0x1
+    bool broadcasted;         // +0x2
+    ::Zone *zone;             // +0x8
+    ::GameObject *subject;    // +0x10
+    char param[0x98 - 0x18];  // +0x18 (PDB: ScriptParam param[8])
+};
+static_assert(sizeof(ScriptEventView) == 0x98, "ScriptEvent size (PDB)");
+
+// 0x42d0a0
+#pragma comment(linker, "/INCLUDE:?EventOccured@NpcSquad@@EEAAXPEBVScriptEvent@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+void __cdecl NpcSquad::EventOccured(::ScriptEvent const *e)
+{
+    if (e == nullptr)
+        return;
+    if (_leaderIdx < 0 || _leaderIdx >= _maxNpc)
+        return;
+    ::Npc *leader = NpcParty::_npc[_leaderIdx];
+    if (leader == nullptr)
+        return;
+    ScriptEventView broadcastedEvent;
+    memcpy(&broadcastedEvent, e, sizeof(broadcastedEvent));
+    broadcastedEvent.broadcasted = true;
+    leader->Think(reinterpret_cast<const ::ScriptEvent *>(&broadcastedEvent));
 }
 
 // 0x42d140

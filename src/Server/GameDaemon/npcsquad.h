@@ -2,8 +2,10 @@
 // LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
 #pragma once
 #include "GameDaemonFwd.h"
+#include "npcparty.h"
 
-class NpcSquad
+// PDB: base public NpcParty (+0). The members _squad (+0x58) and _npc[20] (+0x60) are not declared yet.
+class NpcSquad : public ::NpcParty
 {
 public:
     enum GroupMoveEvent {};
