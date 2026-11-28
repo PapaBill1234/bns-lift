@@ -8,7 +8,13 @@ class LogArchiveSession
 public:
     enum SessionType
     {
+        LOGARCHIVE_SESSION_INVALID = 0,
+        LOGARCHIVE_SESSION_LOGAGENT = 1,
+        LOGARCHIVE_SESSION_LOGSERVER = 2,
+        LOGARCHIVE_SESSION_MAX = 3,
     };
+
+    static wchar_t const *sessionNames[LOGARCHIVE_SESSION_MAX];  // rva 0xE761F8
 
     virtual __cdecl ~LogArchiveSession(void);  // 0x6b9d00
     virtual bool __cdecl Connect(unsigned long, unsigned short);  // 0x6b9d60
