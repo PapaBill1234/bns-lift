@@ -68,6 +68,10 @@ The header `challengeparty.h` now has the PDB layout of `ChallengeParty` (base `
 
 The remaining stubs of the closed stems have a `// ❓ Not done:` note with the reason.
 
+### Round 2 fix
+
+The gate build failed on the size checks of `GuildCraft::Assentient` (0x330) and `GuildCraft` (0x1848). The view `GuildCraft::PCInfo` had 1-byte alignment, so `pcList` started at +2 and not at +8. The view now uses an `unsigned __int64` array of 80 bytes. Thus `pcList` is at +8, `quota` is at +0x328 and the size is 0x330. The `GuildCraft` size is now 0x1848 again.
+
 ## Not done
 
 The earlier session of this round closed the stems `arenaroommanager_cpp`, `guild_cpp_2`, `guildcraft`, `partyauction`, `petitionmanager`, `clientsessionhandler` and `mysteriousstore`. The later sessions do not change these stems. The functions below stay `LIFT_STUB`.

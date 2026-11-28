@@ -11,7 +11,7 @@ public:
     // LIFT: views of the PDB nested types. Only the sizes and the used fields are exact.
     struct NormalMaterial { char _pad[16]; };
     struct BrandMaterial { char _pad[24]; };
-    struct PCInfo { char _pad[80]; };
+    struct PCInfo { unsigned __int64 _pad[10]; };  // LIFT: 8-byte aligned view (PDB +8 offset of pcList)
     struct Assentient
     {
         char productionType;  // +0
