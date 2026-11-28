@@ -2155,7 +2155,112 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"HandleGame_AcquireRenewalQuestReq": {
+"calls": 100,
+"consts": 100,
+"refs": 67,
+"score": 88.9,
+"status": "DIFF"
+},
+"HandleGame_CheckRoundTripTimeReq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleGame_CreatePartyReq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleGame_ExtendJumpingCharacterCreationQuotaWithWarehouseItemReq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleGame_GodSay": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleGame_PickGemCardReq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleGame_PingReq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleGame_RestoreVitalityReq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleGame_SaveVitalityReq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleGame_SendPetitionChatNotifyReq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleGame_UpgradeJumpingCharacterStateWithCreationQuotaReq": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "HandleRankingGame_HelloFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleSmartCoupon_GameEventByAccountFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleSmartCoupon_GameEventByAccountOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleSmartCoupon_GameEventByCharacterFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleSmartCoupon_GameEventByCharacterOk": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
