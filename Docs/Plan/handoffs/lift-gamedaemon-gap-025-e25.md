@@ -8,14 +8,14 @@ Exe: GameDaemon (2019 + PDB). Round 1. Two sessions did the work (planned contex
 - `lock`: `AccountInventoryChannelManager::~AccountInventoryChannelManager` (0x18d060), `AutoSRW::~AutoSRW` (0x1dc200).
 - `source_delayedrelease`: `DelayedRelease::DelayedRelease` (0x6a11d0), `DelayedDelete::Cleanup` (0x6a1960), `DelayedDelete::deleteNode` (0x6a19d0), `DeleteEvent::HandleEvent` (0x6a1a50).
 - `channel`: `DaemonChannel::Send` x3 (0x69a3e0, 0x69a440, 0x69a4c0), `ClientSideHashedDaemonChannel::Send` x2 (0x69abf0, 0x69ac40), `ClientSideHashedDaemonChannel::releaseSession` (0x69afb0).
-- `source_jsoncpp`: `Json::Reader::Reader` (0x6a4eb0), `Json::Value::CommentInfo::~CommentInfo` (0x6a8600), `Json::Value::CZString::~CZString` (0x6a87a0), `Json::Value::CZString::operator<` (0x6a87d0), `Json::Value::isInt` (0x6aa080), `Json::Value::isUInt64` (0x6aa1b0), `Json::valueToString(unsigned __int64)` (0x6aa430), `Json::valueToString(double)` (0x6aa650), `Json::valueToString(bool)` (0x6aa680), `GameObjectIdManager::~GameObjectIdManager` (0x6aad60).
+- `source_jsoncpp`: `Json::Reader::Reader` (0x6a4eb0), `Json::Value::CommentInfo::~CommentInfo` (0x6a8600), `Json::Value::CZString::~CZString` (0x6a87a0), `Json::Value::CZString::operator<` (0x6a87d0), `Json::Value::isInt` (0x6aa080), `Json::Value::isUInt64` (0x6aa1b0), `Json::valueToString(unsigned __int64)` (0x6aa430), `Json::valueToString(double)` (0x6aa650), `Json::valueToString(bool)` (0x6aa680).
 
 ## Decisions
 
 - `LogArchiveSession`: the destructor calls `Close`. The compiler inlines `Close` (both bodies use line 249). The HR cache does not show the text of the log format string. The text in the source is a guess and has a `❓` mark.
 - `jsoncpp.h`: added the PDB layouts of `Json::Value` (0x28), `Json::Value::CZString` (0x10), `Json::Value::CommentInfo`, `Json::Reader` (0xE0), `Json::Reader::Token`, `Json::Reader::ErrorInfo`, `Json::Features` and the enum `Json::ValueType`. `ValueHolder::map_` is `void*` for now (PDB type `ObjectValues*`).
 - `IsIntegral`, `uintToString` and `maxUInt64AsDouble` are file statics of jsoncpp.cpp. The compiler inlines the two helpers.
-- `GameObjectIdManager::~GameObjectIdManager` is an empty body. ICF folds it with other empty virtual destructors.
+- Round 5 repair: `GameObjectIdManager::~GameObjectIdManager` (0x6aad60) has the `LIFT_STUB` of main again, and its `/INCLUDE` line is removed. The card change (an empty virtual destructor with a keep pragma) changed the ICF fold of `LogServerSessionHandler::~LogServerSessionHandler` (0x6ba560), and that baseline MATCH went away. The stub was MATCH on main, so it stays as on main.
 - The three `Json::valueToString` bodies have no `/INCLUDE` pragma. The public names have a long `StlAllocator` return type, and a wrong name stops the link. If funcdiff cannot pair them, add the pragma with the name from the publics dump.
 
 ## Not done

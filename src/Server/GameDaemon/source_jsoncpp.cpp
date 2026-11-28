@@ -12,7 +12,6 @@
 #pragma comment(linker, "/INCLUDE:??MCZString@Value@Json@@QEBA_NAEBV012@@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?isInt@Value@Json@@QEBA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?isUInt64@Value@Json@@QEBA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:??1GameObjectIdManager@@UEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
 
 namespace Json {
 // PDB data: maxUInt64AsDouble (jsoncpp.cpp static).
@@ -448,9 +447,9 @@ static std::basic_string<char,std::char_traits<char>,StlAllocator<char,2> >  val
 }
 
 // 0x6aad60
-// LIFT: ICF folds this empty destructor with other empty virtual destructors (HR shows another vftable).
 __cdecl GameObjectIdManager::~GameObjectIdManager(void)
 {
+    LIFT_STUB(0x6aad60);
 }
 
 // 0x6aad70
