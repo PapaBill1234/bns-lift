@@ -2,6 +2,24 @@
 #include "gamearenachannel.h"
 #include "pc.h"
 #include "LiftStub.h"
+#include <windows.h>
+#include <string.h>
+
+namespace
+{
+// LIFT: view of GameArenaLobbyManager (PDB size 0xD0). The skeleton class declares no members yet.
+struct GameArenaLobbyManagerView
+{
+    CRITICAL_SECTION _lock;                       // +0 (0x0). LIFT: PDB type CriticalSection (CS at +0, size 0x28)
+    short _worldIdCount;                          // +40 (0x28)
+    short _worldIds[50];                          // +42 (0x2A)
+    bool _connectedWorld[50];                     // +142 (0x8E)
+    ::GameSideArenaLobbyChannel **_channels;      // +192 (0xC0)
+    unsigned int _connectedArenaLobbyId;          // +200 (0xC8)
+    bool _isInitializeGuildInfo;                  // +204 (0xCC)
+};
+static_assert(sizeof(GameArenaLobbyManagerView) == 0xD0, "sizeof GameArenaLobbyManager");
+}  // namespace
 
 // 0xcbfb0
 bool __cdecl HandleArenaLobbyGameCancelMatchOk(::Session const *, ::Packet const *)
@@ -298,9 +316,17 @@ void __cdecl GameSideArenaLobbyChannel::CheckPing(void)
 }
 
 // 0xd3000
+#pragma comment(linker, "/INCLUDE:??0GameArenaLobbyManager@@QEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
 __cdecl GameArenaLobbyManager::GameArenaLobbyManager(void)
 {
-    LIFT_STUB(0xd3000);
+    GameArenaLobbyManagerView *self = reinterpret_cast<GameArenaLobbyManagerView *>(this);
+    InitializeCriticalSection(&self->_lock);  // CriticalSection::CriticalSection (inlined)
+    self->_worldIdCount = 0;
+    self->_channels = nullptr;
+    self->_connectedArenaLobbyId = 0;
+    self->_isInitializeGuildInfo = false;
+    memset(self->_worldIds, 0, sizeof(self->_worldIds));
+    memset(self->_connectedWorld, 0, sizeof(self->_connectedWorld));
 }
 
 // 0xd3080

@@ -2,10 +2,35 @@
 #include "npservicetran.h"
 #include "LiftStub.h"
 
-// 0x16f4e0
-char * __cdecl GetNPCustomProtocolStr(::NPCustomProtocolType)
+namespace
 {
-    LIFT_STUB(0x16f4e0);
+// LIFT: PDB enumerators of NPCustomProtocolType. The skeleton enum in GameDaemonFwd.h has no enumerators yet.
+const ::NPCustomProtocolType NP_CUSTOM_PROTOCOL_TYPE_GAME = static_cast< ::NPCustomProtocolType>(1);
+const ::NPCustomProtocolType NP_CUSTOM_PROTOCOL_TYPE_WORLD = static_cast< ::NPCustomProtocolType>(2);
+const ::NPCustomProtocolType NP_CUSTOM_PROTOCOL_TYPE_GAMEWAREHOUSE = static_cast< ::NPCustomProtocolType>(3);
+const ::NPCustomProtocolType NP_CUSTOM_PROTOCOL_TYPE_AUCTION = static_cast< ::NPCustomProtocolType>(4);
+const ::NPCustomProtocolType NP_CUSTOM_PROTOCOL_TYPE_GAMEGROUP = static_cast< ::NPCustomProtocolType>(5);
+}  // namespace
+
+// 0x16f4e0
+#pragma comment(linker, "/INCLUDE:?GetNPCustomProtocolStr@@YAPEADW4NPCustomProtocolType@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+char * __cdecl GetNPCustomProtocolStr(::NPCustomProtocolType type)
+{
+    switch (type)
+    {
+    case NP_CUSTOM_PROTOCOL_TYPE_GAME:
+        return "Srv2Game";
+    case NP_CUSTOM_PROTOCOL_TYPE_WORLD:
+        return "Srv2World";
+    case NP_CUSTOM_PROTOCOL_TYPE_GAMEWAREHOUSE:
+        return "Srv2GameWarehouse";
+    case NP_CUSTOM_PROTOCOL_TYPE_AUCTION:
+        return "Srv2GameAuction";
+    case NP_CUSTOM_PROTOCOL_TYPE_GAMEGROUP:
+        return "Srv2GameGroup";
+    default:
+        return "Invalid";
+    }
 }
 
 // 0x16f530
