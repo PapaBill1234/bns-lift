@@ -186,7 +186,11 @@ void AlertSender::Write(wchar_t const* file, int line, wchar_t const* format, ..
 // LIFT: GameDaemon form (0x686da0 GD, lessons A22). The GD frame is 0x16e0 (shared form 0x16d0).
 // The GD body has all buffers in the function scope (lstr, fstr, ext, name, log at rsp+0x50, 0xd0,
 // 0x2e0, 0x4f0, 0x700) and nested blocks in place of early returns.
-// ❓ The frame size and the jg/jle branch order are not checked with an object dump in this card.
+// The GD body reads the members through _alertSender (LTCG removed `this`), the list test puts the
+// "full" branch first (jg, lessons A2) and the tail test puts the empty-list branch first.
+// Card lift-gamedaemon-e129: formtest (no /GL) gives the same branch order. The frame is 0x16d0 there;
+// the original keeps the constant 2 in r15 (one more save slot, frame 0x16e0).
+#pragma comment(linker, "/INCLUDE:?writev2@AlertSender@@AEAAXPEB_WH0PEAD@Z")  // LIFT: dead-strip keep (no live caller yet)
 void AlertSender::writev2(wchar_t const* file, int line, wchar_t const* format, char* args)
 {
     wchar_t lstr[64];
@@ -195,7 +199,7 @@ void AlertSender::writev2(wchar_t const* file, int line, wchar_t const* format, 
     wchar_t name[264];
     wchar_t log[2000];
 
-    if (_init && _run)
+    if (_alertSender._init && _alertSender._run)
     {
         short fileBytes;
         if (file != nullptr)
@@ -219,7 +223,8 @@ void AlertSender::writev2(wchar_t const* file, int line, wchar_t const* format, 
             if (logCount >= 0)
             {
                 short logBytes = static_cast<short>(2 * logCount);
-                short size = static_cast<short>(fileBytes + logBytes + _versionBytes + _daemonNameBytes + 20);
+                short size = static_cast<short>(fileBytes + logBytes + _alertSender._versionBytes +
+                                                _alertSender._daemonNameBytes + 20);
                 AlertBuffer* buffer = static_cast<AlertBuffer*>(
                     Memory::_Manager[2]->AllocZero(size + sizeof(AlertBuffer), ALERT_SENDER_FILE, 399));
                 if (buffer != nullptr)
@@ -228,56 +233,57 @@ void AlertSender::writev2(wchar_t const* file, int line, wchar_t const* format, 
                     buffer->_count += 2;
                     *reinterpret_cast<short*>(&buffer->_buffer[buffer->_count]) = 2;
                     buffer->_count += 2;
-                    *reinterpret_cast<short*>(&buffer->_buffer[buffer->_count]) = _daemonNameBytes;
+                    *reinterpret_cast<short*>(&buffer->_buffer[buffer->_count]) = _alertSender._daemonNameBytes;
                     buffer->_count += 2;
-                    int bytes = _daemonNameBytes;
-                    memcpy(&buffer->_buffer[buffer->_count], _daemonName, _daemonNameBytes);
+                    int bytes = _alertSender._daemonNameBytes;
+                    memcpy(&buffer->_buffer[buffer->_count], _alertSender._daemonName, _alertSender._daemonNameBytes);
                     buffer->_count += bytes;
-                    *reinterpret_cast<int*>(&buffer->_buffer[buffer->_count]) = _worldId;
+                    *reinterpret_cast<int*>(&buffer->_buffer[buffer->_count]) = _alertSender._worldId;
                     buffer->_count += 4;
-                    *reinterpret_cast<short*>(&buffer->_buffer[buffer->_count]) = _versionBytes;
+                    *reinterpret_cast<short*>(&buffer->_buffer[buffer->_count]) = _alertSender._versionBytes;
                     buffer->_count += 2;
-                    bytes = _versionBytes;
-                    memcpy(&buffer->_buffer[buffer->_count], _version, _versionBytes);
+                    bytes = _alertSender._versionBytes;
+                    memcpy(&buffer->_buffer[buffer->_count], _alertSender._version, _alertSender._versionBytes);
                     buffer->_count += bytes;
                     *reinterpret_cast<short*>(&buffer->_buffer[buffer->_count]) = fileBytes;
                     buffer->_count += 2;
-                    memcpy(&buffer->_buffer[buffer->_count], fstr, fileBytes);
-                    buffer->_count += fileBytes;
+                    bytes = fileBytes;
+                    memcpy(&buffer->_buffer[buffer->_count], fstr, bytes);
+                    buffer->_count += bytes;
                     *reinterpret_cast<int*>(&buffer->_buffer[buffer->_count]) = line;
                     buffer->_count += 4;
                     *reinterpret_cast<short*>(&buffer->_buffer[buffer->_count]) = logBytes;
                     buffer->_count += 2;
-                    bytes = logBytes;
+                    bytes = 2 * logCount;  // LIFT: int product of the short count (movsx; add ebx, ebx)
                     memcpy(&buffer->_buffer[buffer->_count], log, bytes);
                     buffer->_count += bytes;
 
                     bool added;
-                    EnterCriticalSection(&_cs);
-                    if (_maxLogCount > _bufferList._count)
-                    {
-                        if (_bufferList._tail != nullptr)
-                        {
-                            _bufferList._tail->_next = buffer;
-                            _bufferList._tail = buffer;
-                            buffer->_next = nullptr;
-                            ++_bufferList._count;
-                        }
-                        else
-                        {
-                            _bufferList._head = buffer;
-                            _bufferList._tail = buffer;
-                            _bufferList._count = 1;
-                        }
-                        added = true;
-                    }
-                    else
+                    EnterCriticalSection(&_alertSender._cs);
+                    if (_alertSender._maxLogCount <= _alertSender._bufferList._count)
                     {
                         added = false;
                     }
-                    LeaveCriticalSection(&_cs);
+                    else
+                    {
+                        if (_alertSender._bufferList._tail == nullptr)
+                        {
+                            _alertSender._bufferList._head = buffer;
+                            _alertSender._bufferList._tail = buffer;
+                            _alertSender._bufferList._count = 1;
+                        }
+                        else
+                        {
+                            _alertSender._bufferList._tail->_next = buffer;
+                            _alertSender._bufferList._tail = buffer;
+                            buffer->_next = nullptr;
+                            ++_alertSender._bufferList._count;
+                        }
+                        added = true;
+                    }
+                    LeaveCriticalSection(&_alertSender._cs);
                     if (added)
-                        SetEvent(_itemEvent);
+                        SetEvent(_alertSender._itemEvent);
                     else
                         Memory::_Manager[2]->Free(buffer, ALERT_SENDER_FILE, 427);
                 }
