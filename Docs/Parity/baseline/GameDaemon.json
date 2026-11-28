@@ -3534,6 +3534,13 @@
 "score": 95.2,
 "status": "DIFF"
 },
+"LogAgent::HandlePacket": {
+"calls": 57,
+"consts": 67,
+"refs": 25,
+"score": 49.6,
+"status": "DIFF"
+},
 "LogAgent::~LogAgent": {
 "calls": 100,
 "consts": 100,
@@ -3583,11 +3590,95 @@
 "score": 83.3,
 "status": "DIFF"
 },
+"LogArchiveSession::Connect": {
+"calls": 100,
+"consts": 100,
+"refs": 67,
+"score": 88.9,
+"status": "DIFF"
+},
+"LogArchiveSession::Recv": {
+"calls": 100,
+"consts": 92,
+"refs": 40,
+"score": 77.4,
+"status": "DIFF"
+},
+"LogArchiveSession::Send": {
+"calls": 78,
+"consts": 94,
+"refs": 35,
+"score": 69.1,
+"status": "DIFF"
+},
+"LogArchiveSession::recv": {
+"calls": 95,
+"consts": 100,
+"refs": 55,
+"score": 83.3,
+"status": "DIFF"
+},
 "LogArchiveSession::~LogArchiveSession": {
 "calls": 100,
 "consts": 100,
 "refs": 67,
 "score": 88.9,
+"status": "DIFF"
+},
+"LogArchiveWriteBuffer::ClearFileBuffer": {
+"calls": 100,
+"consts": 100,
+"refs": 67,
+"score": 88.9,
+"status": "DIFF"
+},
+"LogArchiveWriteBuffer::ClearNetworkBuffer": {
+"calls": 100,
+"consts": 100,
+"refs": 67,
+"score": 88.9,
+"status": "DIFF"
+},
+"LogArchiveWriteBuffer::PushFileData": {
+"calls": 100,
+"consts": 100,
+"refs": 75,
+"score": 91.7,
+"status": "DIFF"
+},
+"LogArchiveWriteBuffer::PushNetworkData": {
+"calls": 94,
+"consts": 100,
+"refs": 67,
+"score": 86.9,
+"status": "DIFF"
+},
+"LogArchiveWriteBuffer::growBufferChunkSize": {
+"calls": 71,
+"consts": 91,
+"refs": 80,
+"score": 80.8,
+"status": "DIFF"
+},
+"LogArchiveWriteBuffer::growBufferCount": {
+"calls": 71,
+"consts": 89,
+"refs": 80,
+"score": 80.1,
+"status": "DIFF"
+},
+"LogArchiveWriteContext::GetWritingBuffer": {
+"calls": 100,
+"consts": 100,
+"refs": 67,
+"score": 88.9,
+"status": "DIFF"
+},
+"LogArchiveWriteContext::SwitchStatus": {
+"calls": 100,
+"consts": 67,
+"refs": 67,
+"score": 77.8,
 "status": "DIFF"
 },
 "LogBuffer::Acquire": {
@@ -3665,6 +3756,55 @@
 "consts": 100,
 "refs": 50,
 "score": 83.3,
+"status": "DIFF"
+},
+"LogServer::AsyncSend": {
+"calls": 77,
+"consts": 80,
+"refs": 70,
+"score": 75.6,
+"status": "DIFF"
+},
+"LogServer::ClearLogData": {
+"calls": 40,
+"consts": 67,
+"refs": 0,
+"score": 35.6,
+"status": "DIFF"
+},
+"LogServer::HandlePacket": {
+"calls": 31,
+"consts": 73,
+"refs": 25,
+"score": 42.8,
+"status": "DIFF"
+},
+"LogServer::Initialize": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"LogServer::RecvComplete": {
+"calls": 81,
+"consts": 88,
+"refs": 38,
+"score": 68.8,
+"status": "DIFF"
+},
+"LogServer::SendComplete": {
+"calls": 77,
+"consts": 80,
+"refs": 46,
+"score": 67.9,
+"status": "DIFF"
+},
+"LogServer::waitComplete": {
+"calls": 100,
+"consts": 100,
+"refs": 75,
+"score": 91.7,
 "status": "DIFF"
 },
 "LogServerSessionHandler::~LogServerSessionHandler": {
