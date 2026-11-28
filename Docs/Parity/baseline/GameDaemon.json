@@ -1291,6 +1291,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"CreateDataReader": {
+"calls": 40,
+"consts": 67,
+"refs": 50,
+"score": 52.2,
+"status": "DIFF"
+},
 "Creature::AddChangedExtraPropertyId": {
 "calls": 100,
 "consts": 100,
@@ -1741,6 +1748,14 @@
 "score": 66.7,
 "status": "DIFF"
 },
+"DrAliasMapImpl::Clear": {
+"calls": 100,
+"consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "DrAliasMapImpl::Count": {
 "calls": 100,
 "consts": 100,
@@ -1751,9 +1766,24 @@
 },
 "DrAliasMapImpl::DrAliasMapImpl": {
 "calls": 0,
+"consts": 0,
+"refs": 50,
+"score": 16.7,
+"status": "DIFF"
+},
+"DrAliasMapImpl::InsertInto": {
+"calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
-"score": 66.7,
+"score": 100.0,
+"status": "MATCH"
+},
+"DrAliasMapImpl::IsSubsetOf": {
+"calls": 0,
+"consts": 0,
+"refs": 100,
+"score": 33.3,
 "status": "DIFF"
 },
 "DrAliasMapImpl::WriteToBuffer": {
@@ -1763,6 +1793,55 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"DrAliasMapImpl::allocElArray": {
+"calls": 50,
+"consts": 83,
+"refs": 57,
+"score": 63.5,
+"status": "DIFF"
+},
+"DrAliasMapImpl::clearElArray": {
+"calls": 50,
+"consts": 100,
+"refs": 67,
+"score": 72.2,
+"status": "DIFF"
+},
+"DrAliasMapImpl::~DrAliasMapImpl": {
+"calls": 80,
+"consts": 100,
+"refs": 80,
+"score": 86.7,
+"status": "DIFF"
+},
+"DrAliasStringTable::Build": {
+"calls": 86,
+"consts": 100,
+"refs": 67,
+"score": 84.1,
+"status": "DIFF"
+},
+"DrAliasStringTable::Clear": {
+"calls": 50,
+"consts": 100,
+"refs": 67,
+"score": 72.2,
+"status": "DIFF"
+},
+"DrAliasStringTable::ReadFromBuffer": {
+"calls": 83,
+"consts": 86,
+"refs": 67,
+"score": 78.6,
+"status": "DIFF"
+},
+"DrAliasStringTable::construct": {
+"calls": 67,
+"consts": 100,
+"refs": 67,
+"score": 77.8,
+"status": "DIFF"
 },
 "DrAutoKeyElMap::destroy": {
 "calls": 100,
@@ -1985,6 +2064,27 @@
 "consts": 100,
 "refs": 0,
 "score": 66.7,
+"status": "DIFF"
+},
+"DrStlAllocator<DrEl * __ptr64,0>::deallocate": {
+"calls": 0,
+"consts": 100,
+"refs": 67,
+"score": 55.6,
+"status": "DIFF"
+},
+"DrStlAllocator<std::basic_string<wchar_t,std::char_traits<wchar_t>,DrStlAllocator<wchar_t,1> >,1>::deallocate": {
+"calls": 0,
+"consts": 100,
+"refs": 67,
+"score": 55.6,
+"status": "DIFF"
+},
+"DrStlAllocator<wchar_t,1>::allocate": {
+"calls": 0,
+"consts": 100,
+"refs": 67,
+"score": 55.6,
 "status": "DIFF"
 },
 "DuelAttractionState::CanResurrect": {
@@ -6478,6 +6578,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"ReleaseDataReader": {
+"calls": 40,
+"consts": 100,
+"refs": 50,
+"score": 63.3,
+"status": "DIFF"
+},
 "RenameCharacterTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
@@ -8160,6 +8267,14 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"ci_wchar_traits::compare": {
+"calls": 100,
+"consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "destroy": {
 "calls": 100,
 "consts": 100,
@@ -8191,6 +8306,13 @@
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"operator delete [??3@YAXPEAX0@Z]": {
+"calls": 100,
+"consts": 100,
+"refs": 33,
+"score": 77.8,
+"status": "DIFF"
 },
 "pre_c_init": {
 "calls": 100,
