@@ -1,5 +1,16 @@
 # lift-gamedaemon-gap-028-e28 handoff
 
+## Round 4 repair (log path still live)
+
+The proof found the log functions live through the `Pc::Send` bodies. These bodies call `Session::send` or `Session::SendV`, which reach `PacketBuffer` and the log path. Round 4 put the 4 `Pc::Send` bodies back to their skeleton `LIFT_STUB` bodies and removed their 4 `/INCLUDE` keep pragmas:
+
+- `Pc::Send(char const *, char *)` (0x5eb2e0): log path (E16) through `Session`.
+- `Pc::Send(char const *, ...)` (0x5eb350): log path (E16) through `Session`.
+- `Pc::Send(Packet const *)` (0x5eb3c0): log path (E16) through `Session`.
+- `Pc::Send(PacketList const *)` (0x5eb420): log path (E16) through `Session`.
+
+Round 4 also removed the `PacketListView` view, the `Channel.h` path literal, the `Log.h` and `Network.h` includes of `pc_cpp_2.cpp`, and the `friend class Pc;` line in `Session.h`. No other lifted body of this card calls `Session`, `PacketBuffer`, `Pc::Send` or a send helper. The card does not change `README.md`.
+
 ## Round 3 repair (review rejects and log path E16)
 
 Round 3 put these bodies back to the skeleton `LIFT_STUB` body and removed their `/INCLUDE` keep pragmas:
@@ -59,10 +70,6 @@ Lifted:
 
 - `Pc::IsSharableCombatModeZone` (0x5e6a90)
 - `Pc::GetActiveSummoned` (0x5ea0d0)
-- `Pc::Send(char const *, char *)` (0x5eb2e0)
-- `Pc::Send(char const *, ...)` (0x5eb350)
-- `Pc::Send(Packet const *)` (0x5eb3c0)
-- `Pc::Send(PacketList const *)` (0x5eb420)
 - `Pc::ReturningToArenaLobby` (0x5ed820)
 - `Pc::RollbackReturnToArenaLobby` (0x5ed880)
 - `Pc::SetGameGameMode` (0x5edae0)
@@ -72,12 +79,15 @@ Lifted:
 **Not done:**
 
 - `Pc::SetIpAddress` (0x5f0f00): review reject (the build loads `Id` after the `Network::GetAddressStringW` calls), and it calls `Log::Write` (E16 is open).
+- `Pc::Send(char const *, char *)` (0x5eb2e0): log path (E16). It reaches the log functions through `Session`.
+- `Pc::Send(char const *, ...)` (0x5eb350): log path (E16). It reaches the log functions through `Session`.
+- `Pc::Send(Packet const *)` (0x5eb3c0): log path (E16). It reaches the log functions through `Session`.
+- `Pc::Send(PacketList const *)` (0x5eb420): log path (E16). It reaches the log functions through `Session`.
 
-The bodies read `Pc` through a local view with PDB offsets. `Pc::_user` is read as `Channel const *` (the PDB base of `User` at +0), and `Channel::GetSession` is the virtual call. `Pc::Send(PacketList const *)` calls the private `Session::send`, so `Session.h` (BloodLib) has a new `friend class Pc;` line. Each lifted body has a dead-strip keep pragma.
+The bodies read `Pc` through a local view with PDB offsets. Each lifted body has a dead-strip keep pragma.
 
 Open items for the reviewer:
 
-- The `PacketList::Buffers` element type is not checked in the PDB. The view uses `PacketBuffer const **`, as in the call of the original.
 - `Pc::_arenaLock` is a `CriticalSection`. The view uses `CRITICAL_SECTION` at the same offset (the PDB member `CS` is at +0).
 
 ## effectcontent_cpp_1
@@ -120,5 +130,4 @@ The driver runs the gate, the builds and the MATCH comparison after the session.
 - `src/Server/GameDaemon/zonetimer_cpp.cpp`
 - `src/Server/GameDaemon/npcspawn_cpp.cpp`
 - `src/Server/GameDaemon/pc_cpp_2.cpp`
-- `src/Server/BloodLib/include/Session.h`
 - `Docs/Plan/handoffs/lift-gamedaemon-gap-028-e28.md`

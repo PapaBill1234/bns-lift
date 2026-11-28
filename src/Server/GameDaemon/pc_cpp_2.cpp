@@ -11,16 +11,10 @@
 #include "team.h"
 #include "user.h"
 #include "zone.h"
-#include "Log.h"
-#include "../BloodLib/include/Network.h"
 #include "LiftStub.h"
 
 #pragma comment(linker, "/INCLUDE:?IsSharableCombatModeZone@Pc@@QEBA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?GetActiveSummoned@Pc@@QEAAPEAVSummoned@@XZ")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?Send@Pc@@QEAAXPEBDPEAD@Z")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?Send@Pc@@UEAAXPEBDZZ")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?Send@Pc@@UEAAXPEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?Send@Pc@@UEAAXPEBVPacketList@@@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?ReturningToArenaLobby@Pc@@QEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?RollbackReturnToArenaLobby@Pc@@QEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?SetGameGameMode@Pc@@QEAAXD@Z")  // LIFT: dead-strip keep (no live caller yet)
@@ -29,14 +23,6 @@
 
 namespace
 {
-// LIFT: view of PacketList. The skeleton class is empty. Offsets are from the PDB.
-struct PacketListView
-{
-    char lift_pad_0[0x4];
-    int Count;                       // +4 (0x4)
-    PacketBuffer const **Buffers;    // +8 (0x8). ❓ PDB element type not checked; the original passes it as PacketBuffer const **
-};
-
 // LIFT: views of PDB classes that have no layout in the skeleton yet. Offsets are from the PDB.
 
 // LIFT: view of Data::ZoneRecord (sharable_combatmode at +0xB9).
@@ -92,9 +78,6 @@ struct PcView
     bool _isReturningToArenaLobby;       // +36948 (0x9054)
     char _arenaGameGameMode;             // +36949 (0x9055)
 };
-
-wchar_t const *const PC_CHANNEL_HEADER_FILE =
-    L"E:\\DailyBuild02\\GameDaemon-Common-0.0.348\\depot\\Branch\\348NC\\Program\\Server\\BloodLib\\include\\Channel.h";
 }  // namespace
 
 // 0x5e5ad0
@@ -315,70 +298,27 @@ void __cdecl Pc::SendGameBuilderAuth(void)
 }
 
 // 0x5eb2e0
-void __cdecl Pc::Send(char const *format, char *args)
+void __cdecl Pc::Send(char const *, char *)
 {
-    ::Channel const *user = reinterpret_cast<PcView *>(this)->_user;
-    if (user != nullptr)
-    {
-        Session *session = const_cast<Session *>(user->GetSession());
-        if (session != nullptr)
-        {
-            session->SendV(format, args);
-            session->removeReferenceCount(PC_CHANNEL_HEADER_FILE, 52);
-        }
-    }
+    LIFT_STUB(0x5eb2e0);
 }
 
 // 0x5eb350
-void __cdecl Pc::Send(char const *format, ...)
+void __cdecl Pc::Send(char const *, ...)
 {
-    va_list args;
-    va_start(args, format);
-    ::Channel const *user = reinterpret_cast<PcView *>(this)->_user;
-    if (user != nullptr)
-    {
-        Session *session = const_cast<Session *>(user->GetSession());
-        if (session != nullptr)
-        {
-            session->SendV(format, args);
-            session->removeReferenceCount(PC_CHANNEL_HEADER_FILE, 52);
-        }
-    }
-    va_end(args);
+    LIFT_STUB(0x5eb350);
 }
 
 // 0x5eb3c0
-void __cdecl Pc::Send(::Packet const *packet)
+void __cdecl Pc::Send(::Packet const *)
 {
-    ::Channel const *user = reinterpret_cast<PcView *>(this)->_user;
-    if (user != nullptr)
-    {
-        Session *session = const_cast<Session *>(user->GetSession());
-        if (session != nullptr)
-        {
-            session->Send(packet);
-            session->removeReferenceCount(PC_CHANNEL_HEADER_FILE, 52);
-        }
-    }
+    LIFT_STUB(0x5eb3c0);
 }
 
 // 0x5eb420
-void __cdecl Pc::Send(::PacketList const *packetList)
+void __cdecl Pc::Send(::PacketList const *)
 {
-    ::Channel const *user = reinterpret_cast<PcView *>(this)->_user;
-    if (user != nullptr)
-    {
-        Session *session = const_cast<Session *>(user->GetSession());
-        if (session != nullptr)
-        {
-            // LIFT: inline Session::Send(PacketList const *)
-            session->_lock.Enter();
-            PacketListView const *list = reinterpret_cast<PacketListView const *>(packetList);
-            session->send(list->Buffers, list->Count);
-            session->_lock.Leave();
-            session->removeReferenceCount(PC_CHANNEL_HEADER_FILE, 52);
-        }
-    }
+    LIFT_STUB(0x5eb420);
 }
 
 // 0x5eb4a0
