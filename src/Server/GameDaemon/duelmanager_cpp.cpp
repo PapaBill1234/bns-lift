@@ -38,7 +38,7 @@ struct DuelMemberView
 struct DuelTeamView
 {
     // LIFT: view of the node of std::list<DuelMember *, StlAllocator<DuelMember *, 2> > (VS2010 _List_nod::_Node).
-    // The lift toolchain has no <list> header.
+    // This view is older than include/vs2010/list. A later card can use std::list.
     struct MemberNode
     {
         MemberNode *_Next;        // +0

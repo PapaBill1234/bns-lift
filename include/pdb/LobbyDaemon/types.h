@@ -7,6 +7,7 @@
 #include <map>
 #include <set>
 #include <deque>
+#include <list>
 #include <queue>
 #include <utility>
 

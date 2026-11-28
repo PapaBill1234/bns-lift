@@ -1,5 +1,6 @@
 // Selftest for include/vs2010/ (VS2010 STL subset).
 // 1. static_assert: container sizes and member offsets. The values come from the CacheGate PDB
+//    (std::list: GameDaemon PDB)
 //    (x64, VS2010 SP1 release). The test allocator is 1 byte, as StlAllocator<T, 2> in the PDB.
 // 2. Explicit instantiation: all members of each container must compile.
 // 3. lift_stl_selftest(): a quiet runtime test. main() calls it. It returns 0 when all checks pass.
@@ -9,6 +10,7 @@
 #include <map>
 #include <set>
 #include <deque>
+#include <list>
 #include <queue>
 #include <algorithm>
 
@@ -60,6 +62,7 @@ typedef std::vector<int, TestAlloc<int> > TVector;
 typedef std::map<unsigned short, void*, std::less<unsigned short>, TestAlloc<std::pair<const unsigned short, void*> > > TMap;
 typedef std::set<int, std::less<int>, TestAlloc<int> > TSet;
 typedef std::deque<void*, TestAlloc<void*> > TDeque;
+typedef std::list<int, TestAlloc<int> > TList;
 typedef std::priority_queue<Timer*, std::vector<Timer*, TestAlloc<Timer*> >, GreaterBySlotIndex> TPrioQueue;
 
 struct PrioQueueProbe : TPrioQueue
@@ -124,6 +127,19 @@ static_assert(sizeof(TDeque::iterator) == 0x18, "deque iterator size");
 static_assert(offsetof(TDeque::iterator, _Myoff) == 0x10, "deque iterator _Myoff");
 static_assert(sizeof(std::_Container_proxy) == 0x10, "_Container_proxy size");
 
+// list<int, StlAllocator<int,2>> (GameDaemon PDB): 0x18, node 0x18, iterator 0x8.
+static_assert(sizeof(TList) == 0x18, "list size");
+static_assert(offsetof(TList, _Myhead) == 0x00, "list _Myhead");
+static_assert(offsetof(TList, _Mysize) == 0x08, "list _Mysize");
+static_assert(offsetof(TList, _Alnod) == 0x10, "list _Alnod");
+static_assert(offsetof(TList, _Alval) == 0x11, "list _Alval");
+static_assert(sizeof(TList::_Node) == 0x18, "list node size");
+static_assert(offsetof(TList::_Node, _Next) == 0x00, "list node _Next");
+static_assert(offsetof(TList::_Node, _Prev) == 0x08, "list node _Prev");
+static_assert(offsetof(TList::_Node, _Myval) == 0x10, "list node _Myval");
+static_assert(sizeof(TList::iterator) == 0x08, "list iterator size");
+static_assert(sizeof(TList::const_iterator) == 0x08, "list const_iterator size");
+
 // priority_queue<Timer*, vector, GreaterBySlotIndex>: 0x28.
 static_assert(sizeof(TPrioQueue) == 0x28, "priority_queue size");
 static_assert(PrioQueueProbe::OffC() == 0x00, "priority_queue c");
@@ -143,6 +159,7 @@ template class std::set<int, std::less<int>, TestAlloc<int> >;
 template class std::deque<void*, TestAlloc<void*> >;
 template class std::priority_queue<Timer*, std::vector<Timer*, TestAlloc<Timer*> >, GreaterBySlotIndex>;
 template class std::queue<void*, TDeque>;
+template class std::list<int, TestAlloc<int> >;
 
 namespace {
 unsigned int g_seed = 12345;
@@ -278,6 +295,65 @@ int TestDeque()
     return 0;
 }
 
+// The ring must be closed in both directions and the node count must agree with _Mysize.
+int CheckList(const TList& l)
+{
+    size_t n = 0;
+    TList::_Nodeptr h = l._Myhead;
+    for (TList::_Nodeptr p = h->_Next; p != h; p = p->_Next, ++n)
+        if (p->_Next->_Prev != p || n > l.size())
+            return 1;
+    return n == l.size() && h->_Prev->_Next == h ? 0 : 1;
+}
+
+int TestList()
+{
+    TList l;
+    if (!l.empty() || l._Myhead->_Next != l._Myhead || l._Myhead->_Prev != l._Myhead)
+        return 51;
+    for (int i = 0; i < 100; ++i) {
+        l.push_back(i + 100);
+        l.push_front(99 - i);
+    }
+    if (l.size() != 200 || CheckList(l))
+        return 52;
+    int want = 0;
+    for (TList::const_iterator it = l.begin(); it != l.end(); ++it, ++want)
+        if (*it != want)
+            return 53;
+    l.pop_front();
+    l.pop_back();
+    if (l.front() != 1 || l.back() != 198 || l.size() != 198)
+        return 54;
+    l.remove_if([](int v) { return v % 2 != 0; });
+    l.remove(100);
+    if (l.size() != 98 || l.front() != 2 || CheckList(l))
+        return 55;
+    TList m(l);
+    TList::iterator mid = l.begin();
+    for (int i = 0; i < 10; ++i)
+        ++mid;
+    l.splice(mid, m);   // m moves into l before the 11th node.
+    if (!m.empty() || l.size() != 196 || CheckList(l) || CheckList(m))
+        return 56;
+    TList::iterator it = l.insert(l.begin(), -1);
+    if (*it != -1 || l.front() != -1)
+        return 57;
+    l.erase(l.begin(), mid);
+    if (l.front() != 22 || l.size() != 88 || CheckList(l))
+        return 58;
+    l.reverse();
+    if (l.front() != 198 || l.back() != 22 || CheckList(l))
+        return 59;
+    m = l;
+    if (!(m == l) || CheckList(m))
+        return 60;
+    l.clear();
+    if (!l.empty() || CheckList(l))
+        return 61;
+    return 0;
+}
+
 int TestPrioQueue()
 {
     TPrioQueue q;
@@ -305,6 +381,8 @@ int lift_stl_selftest()
     if ((rc = TestMap()) != 0)
         return rc;
     if ((rc = TestDeque()) != 0)
+        return rc;
+    if ((rc = TestList()) != 0)
         return rc;
     return TestPrioQueue();
 }

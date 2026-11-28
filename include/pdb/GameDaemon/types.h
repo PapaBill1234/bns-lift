@@ -7,6 +7,7 @@
 #include <map>
 #include <set>
 #include <deque>
+#include <list>
 #include <queue>
 #include <utility>
 
@@ -57529,8 +57530,8 @@ public:
     std::map<unsigned short, Data::AcquireSkillByQuestMission *> _skillByQuestMissionList;
     std::map<unsigned long long, char *> _weeklyTimeTableList;
     std::map<unsigned long long, std::pair<int, int>> _weeklyTimeMinuteTableList;
-    alignas(8) unsigned char _battleRoyalFieldJobStyleRestrictionList[0x18];  // ❓ PDB type 0xB58A: std::list<int,StlAllocator<int,2> >
-    alignas(8) unsigned char _arenaDaemonPersistentZoneList[0x18];  // ❓ PDB type 0xB58A: std::list<int,StlAllocator<int,2> >
+    std::list<int> _battleRoyalFieldJobStyleRestrictionList;
+    std::list<int> _arenaDaemonPersistentZoneList;
     std::multimap<int, int> _skillChildrenMap;
     std::multimap<int, unsigned long long> _skillVariationMap;
     std::map<int, Data::GradeBenefit *> _gradeBenefitListMap;
@@ -86752,7 +86753,7 @@ public:
     long long _roundStartTime;
     long long _gameStartTime;
     wchar_t _gameStartTimeStr[128];
-    alignas(8) unsigned char _spectatorList[0x18];  // ❓ PDB type 0x9B86: std::list<__int64,StlAllocator<__int64,2> >
+    std::list<long long> _spectatorList;
 };
 static_assert(sizeof(DuelManager) == 0xD4B0, "sizeof DuelManager");
 static_assert(offsetof(DuelManager, _data) == 0x8, "DuelManager::_data");
@@ -90722,7 +90723,7 @@ public:
     virtual DuelMember * const instantiateDuelMember(int const, int const, Pc * const);  // slot 2
     virtual void onLeave(DuelMember * const);  // slot 3
     int const _teamIndex;
-    alignas(8) unsigned char _members[0x18];  // ❓ PDB type 0xAD57: std::list<DuelMember *,StlAllocator<DuelMember *,2> >
+    std::list<DuelMember *> _members;
     long long _reserveKey;
     int _maxMemberCount;
     int _ratingScore;
@@ -102908,7 +102909,7 @@ public:
     unsigned long long npcDataKey;
     int npcRepeatIndexInNpcRandomSpawnRecord;
     Data::ZoneNpcRandomSpawnRecordPtr npcRandomSpawnRecord;
-    void * areaList;
+    std::list<unsigned long long> * areaList;
     std::vector<unsigned long long> * reserveAreaList;
 };
 static_assert(sizeof(NpcRandomSpawnInfo) == 0x28, "sizeof NpcRandomSpawnInfo");
@@ -102969,7 +102970,7 @@ public:
     Npc * * _npcRandomSpawnNpc;
     NpcSpawnTask * * _npcRandomSpawnTask;
     int _maxNpcRandomSpawn;
-    void * _npcRandomSpawnAreaGroupList;
+    std::list<unsigned long long> * _npcRandomSpawnAreaGroupList;
     std::vector<unsigned long long> * _npcRandomSpawnReserveAreaGroupList;
     Npc * * _debugNpc;
     NpcSpawnTask * * _debugSpawnTask;
@@ -126152,7 +126153,7 @@ public:
     virtual XmlReaderIO::ErrCode Next();
     virtual void Close();
     void * _zfile;
-    alignas(8) unsigned char _fileList[0x18];  // ❓ PDB type 0x154C3: std::list<ZipPackedReaderIO::FileName,StlAllocator<ZipPackedReaderIO::FileName,2> >
+    std::list<ZipPackedReaderIO::FileName> _fileList;
     alignas(8) unsigned char _openFileArray[0x20];  // ❓ PDB type 0x1544A: std::vector<std::_List_iterator<std::_List_val<ZipPackedReaderIO::FileName,StlAllocator<ZipPackedReaderIO::FileName,2> > >,StlAllocator<std::_List_iterator<std::_List_val<ZipPackedReaderIO::FileName,StlAllocator<ZipPackedReaderIO::FileName,2> > >,2> >
     int _openFileIdx;
 };

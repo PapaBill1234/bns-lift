@@ -19,7 +19,7 @@ with its PDB name (_GUID, _RTL_CRITICAL_SECTION). The header includes no SDK hea
 Skipped: CRT and STL internals, templates that are not mapped.
 A member that has a type which the script cannot write becomes a
 byte array with the same offset and size (comment: original type name).
-std:: types map to include/vs2010/ (string, vector, map, set, deque, queue, pair).
+std:: types map to include/vs2010/ (string, vector, list, map, set, deque, queue, pair).
 """
 import argparse
 import os
@@ -344,7 +344,7 @@ _GUID PROCESS_INFORMATION STARTUPINFOA STARTUPINFOW
 """.split())
 STL_MAP = {"std::basic_string": None, "std::vector": None, "std::map": None,
            "std::multimap": None, "std::set": None, "std::multiset": None,
-           "std::deque": None, "std::queue": None, "std::priority_queue": None,
+           "std::deque": None, "std::list": None, "std::queue": None, "std::priority_queue": None,
            "std::pair": None}
 VTBL_SKIP = ("__vecDelDtor", "__delDtor", "__local_vftable_ctor_closure")
 
@@ -594,7 +594,7 @@ class Gen:
         if base == "std::pair" and len(a) == 2:
             x, y = self.sname(a[0], hard, soft), self.sname(a[1], hard, soft)
             return None if None in (x, y) else "std::pair<%s, %s>" % (x, y)
-        if base in ("std::vector", "std::deque") and len(a) == 2:
+        if base in ("std::vector", "std::deque", "std::list") and len(a) == 2:
             x = self.sname(a[0], hard, soft)
             return None if x is None else "%s<%s>" % (base, x)
         if base in ("std::set", "std::multiset") and len(a) == 3:
@@ -1171,6 +1171,7 @@ class Gen:
              "#include <map>",
              "#include <set>",
              "#include <deque>",
+             "#include <list>",
              "#include <queue>",
              "#include <utility>",
              "",

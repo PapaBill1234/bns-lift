@@ -35,7 +35,7 @@ public:
         unsigned int _crc;                         // +0x60
     };
     // LIFT: the PDB type of _fileList is std::list<FileName, StlAllocator<FileName, 2> > (size 0x18).
-    // The VS2010 header set of this repo has no <list>. FileList keeps the size only. FileNode is the
+    // FileList is older than include/vs2010/list and keeps the size only. A later card can use std::list. FileNode is the
     // VS2010 list node (_Next, _Prev, _Myval). A release list iterator holds only the node pointer.
     struct FileNode
     {
