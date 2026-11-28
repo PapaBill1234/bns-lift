@@ -1,6 +1,9 @@
 // datamanager_cpp_2.cpp: datamanager.cpp part 2 (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
 #include "datamanager.h"
 #include "geoworld.h"
+#include "gamedaemon.h"
+#include "AlertSender.h"
+#include "Log.h"
 #include "LiftStub.h"
 
 // 0x630ee0
@@ -46,6 +49,8 @@ int __cdecl Data::DataManager::GetCombatSeasonContentsTypeCount(void)
     int count = 0;
     for (char i = 1; i < 16; ++i)
     {
+        if (i == 2)
+            continue;
         switch (i)
         {
         case 1:
@@ -77,9 +82,56 @@ int __cdecl Data::DataManager::GetBattleRoyalFieldScoreConversion(char, char, in
 }
 
 // 0x632990
-char __cdecl Data::DataManager::GetGameModeFromArenaMatchingRuleDetailType(char, char)
+#pragma comment(linker, "/INCLUDE:?GetGameModeFromArenaMatchingRuleDetailType@DataManager@Data@@SADDD@Z")  // LIFT: dead-strip keep (no live caller yet)
+char __cdecl Data::DataManager::GetGameModeFromArenaMatchingRuleDetailType(char gameMode, char detailType)
 {
-    LIFT_STUB(0x632990);
+    if (gameMode == 9)
+    {
+        int v2 = detailType;
+        switch (v2)
+        {
+        case 1:
+            return 2;
+        default:
+        {
+            ++GameDaemon::DEBUG_CHECKER_MODE_DATAVALIDATION_CRASH_COUNT;
+            if (GameDaemon::DEBUG_CHECKER_MODE == true)
+            {
+                Instance->WriteDataValidationFailureLog(
+                    L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\..\\Data\\DataManager.cpp",
+                    12308,
+                    L"[data], == CRASH ==, [battle-royal-field], %s; invalid detailType:%d",
+                    L"Data::DataManager::GetGameModeFromArenaMatchingRuleDetailType",
+                    detailType);
+            }
+            else
+            {
+                Log::Write(
+                    Log::LT_ERROR,
+                    L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\..\\Data\\DataManager.cpp",
+                    12308,
+                    L"== CRASH == [battle-royal-field], %s; invalid detailType:%d",
+                    L"Data::DataManager::GetGameModeFromArenaMatchingRuleDetailType",
+                    detailType);
+                AlertSender::Write(
+                    L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\..\\Data\\DataManager.cpp",
+                    12308,
+                    L"== CRASH == [battle-royal-field], %s; invalid detailType:%d",
+                    L"Data::DataManager::GetGameModeFromArenaMatchingRuleDetailType",
+                    static_cast<int>(detailType));
+            }
+            return 2;
+        }
+        }
+    }
+    else if (detailType == 8 || detailType == 10)
+    {
+        return 2;
+    }
+    else
+    {
+        return 1;
+    }
 }
 
 // 0x632a70

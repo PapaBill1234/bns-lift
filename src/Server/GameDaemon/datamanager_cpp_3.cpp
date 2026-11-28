@@ -1,5 +1,6 @@
 // datamanager_cpp_3.cpp: datamanager.cpp part 3 (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
 #include "datamanager.h"
+#include <stdarg.h>
 #include "LiftStub.h"
 
 // 0x64a210
@@ -621,27 +622,60 @@ char __cdecl Data::DataManager::GetChallengeTypeWeek(void)
 }
 
 // 0x662a10
-void __cdecl Data::DataManager::WriteDataReaderErrorLog(wchar_t const *, int, wchar_t const *, ...)
+#pragma comment(linker, "/INCLUDE:?WriteDataReaderErrorLog@DataManager@Data@@QEAAXPEB_WH0ZZ")  // LIFT: dead-strip keep (no live caller yet)
+void __cdecl Data::DataManager::WriteDataReaderErrorLog(wchar_t const * file, int line, wchar_t const * format, ...)
 {
-    LIFT_STUB(0x662a10);
+    if (_parallelLoad)
+        EnterCriticalSection(&_dataReaderErrorLogFileLock.CS);
+    ::LogFile * logFile = _dataReaderErrorLogFile;
+    if (logFile != nullptr)
+    {
+        va_list va;
+        va_start(va, format);
+        logFile->Write(file, line, format, va);
+        // BUG: the original leaves the lock held when the log file is null (parallel load). Kept for the match. ❓
+        if (_parallelLoad)
+            LeaveCriticalSection(&_dataReaderErrorLogFileLock.CS);
+    }
 }
 
 // 0x662a80
-void __cdecl Data::DataManager::WriteScriptLoaderErrorLog(wchar_t const *, int, wchar_t const *, ...)
+#pragma comment(linker, "/INCLUDE:?WriteScriptLoaderErrorLog@DataManager@Data@@QEAAXPEB_WH0ZZ")  // LIFT: dead-strip keep (no live caller yet)
+void __cdecl Data::DataManager::WriteScriptLoaderErrorLog(wchar_t const * file, int line, wchar_t const * format, ...)
 {
-    LIFT_STUB(0x662a80);
+    ::LogFile * logFile = _scriptLoaderErrorLogFile;
+    if (logFile != nullptr)
+    {
+        va_list va;
+        va_start(va, format);
+        logFile->Write(file, line, format, va);
+    }
 }
 
 // 0x662ab0
-void __cdecl Data::DataManager::WriteDataLoadErrorLog(wchar_t const *, int, wchar_t const *, ...)
+#pragma comment(linker, "/INCLUDE:?WriteDataLoadErrorLog@DataManager@Data@@QEAAXPEB_WH0ZZ")  // LIFT: dead-strip keep (no live caller yet)
+void __cdecl Data::DataManager::WriteDataLoadErrorLog(wchar_t const * file, int line, wchar_t const * format, ...)
 {
-    LIFT_STUB(0x662ab0);
+    ::LogFile * logFile = _dataLoadErrorLogFile;
+    if (logFile != nullptr)
+    {
+        va_list va;
+        va_start(va, format);
+        logFile->Write(file, line, format, va);
+    }
 }
 
 // 0x662ae0
-void __cdecl Data::DataManager::WriteDataValidationFailureLog(wchar_t const *, int, wchar_t const *, ...)
+#pragma comment(linker, "/INCLUDE:?WriteDataValidationFailureLog@DataManager@Data@@QEAAXPEB_WH0ZZ")  // LIFT: dead-strip keep (no live caller yet)
+void __cdecl Data::DataManager::WriteDataValidationFailureLog(wchar_t const * file, int line, wchar_t const * format, ...)
 {
-    LIFT_STUB(0x662ae0);
+    ::LogFile * logFile = _dataValidationFailureLogFile;
+    if (logFile != nullptr)
+    {
+        va_list va;
+        va_start(va, format);
+        logFile->Write(file, line, format, va);
+    }
 }
 
 // 0x662b10
