@@ -1,7 +1,8 @@
 // instantpaymenttran.h: instantpaymenttran.cpp, instantpaymenttran.h (GameDaemon PDB, 2019 + PDB). Wave 0: declarations of the stubbed functions only.
-// LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
+// LIFT: some classes have no members and no bases yet. Later waves add the PDB layouts.
 #pragma once
 #include "GameDaemonFwd.h"
+#include "gametran.h"
 
 // PDB: InstantPaymentJob, size 0x158. The vtable order is the PDB slot order.
 class InstantPaymentJob
@@ -34,7 +35,7 @@ private:
     short __cdecl getGameFailReason(void);  // 0x1343b0
 protected:
     ::InstantPaymentTran *_tran;  // +0x8
-    unsigned __int64 _goodsInfo[33];  // +0x10  LIFT: PDB type InstantPaymentGoodsInfoParam (0x108 bytes); its layout is not lifted yet
+    ::InstantPaymentGoodsInfoParam _goodsInfo;  // +0x10
     __int64 _resultServiceId;  // +0x118
     __int64 _resultPurchaseId;  // +0x120
     unsigned int _resultServiceTypes[10];  // +0x128
@@ -101,7 +102,8 @@ protected:
     virtual bool __cdecl tryInstantPaymentOkImpl(void *);  // 0x134ca0
 };
 
-class InstantPaymentTran
+// PDB: InstantPaymentTran, size 0x60.
+class InstantPaymentTran : public UserTran
 {
 public:
     virtual ::GameTranDef const * __cdecl GetDefinition(void) const;  // 0x1107c0
@@ -109,9 +111,11 @@ public:
     virtual __cdecl ~InstantPaymentTran(void);  // 0x132640
 private:
     virtual bool __cdecl work(int, void *);  // 0x1326b0
+    ::InstantPaymentJob *_job;  // +0x58
 };
 
-class InstantPaymentTransformItemSubJob
+// PDB: InstantPaymentTransformItemSubJob, size 0x258.
+class InstantPaymentTransformItemSubJob : public InstantPaymentJob
 {
 protected:
     virtual void __cdecl setExtraParam(void *);  // 0x1351e0
@@ -120,5 +124,9 @@ protected:
     virtual bool __cdecl tryInstantPaymentFailImpl(void);  // 0x135970
 public:
     virtual int __cdecl DataId(short);  // 0x6eb460
+private:
+    __int64 _recipeId;  // +0x158
+    int _goodsItemDataId;  // +0x160
+    ::InstantPaymentTransformInfoParam _transformParam;  // +0x168
 };
 

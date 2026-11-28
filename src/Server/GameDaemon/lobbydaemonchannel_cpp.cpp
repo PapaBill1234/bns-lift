@@ -2,13 +2,23 @@
 #include "lobbydaemonchannel.h"
 #include "user.h"
 #include "LiftStub.h"
+#include "AlertSender.h"
+#include "Log.h"
+
+// LIFT: per-exe path literal (lessons A6).
+#define LOBBYDAEMONCHANNEL_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\LobbyDaemonChannel.cpp"
 
 #pragma comment(linker, "/INCLUDE:?HandleLobbyGame_UpdateAccountContentQuotaOk@@YA_NPEBVSession@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
 
 // 0x13e280
+#pragma comment(linker, "/INCLUDE:?OnAccept@LobbyDaemonSessionHandler@@UEBA_NPEBVSession@@@Z")  // LIFT: dead-strip keep (no live caller yet)
 bool __cdecl LobbyDaemonSessionHandler::OnAccept(::Session const *) const
 {
-    LIFT_STUB(0x13e280);
+    Log::Write(Log::LT_ERROR, LOBBYDAEMONCHANNEL_FILE, 58,
+               L"== CRASH == [game-lobbyd], cannot accept from lobbyd (game connect to lobbyd)");
+    AlertSender::Write(LOBBYDAEMONCHANNEL_FILE, 58,
+                       L"== CRASH == [game-lobbyd], cannot accept from lobbyd (game connect to lobbyd)");
+    return false;
 }
 
 // 0x13e2c0
@@ -90,9 +100,14 @@ bool __cdecl HandleLobbyGame_LeaveWorldFail(::Session const *, ::Packet const *)
 }
 
 // 0x140250
-bool __cdecl HandleLobbyGame_CloseSessionNotify(::Session const *, ::Packet const *)
+#pragma comment(linker, "/INCLUDE:?HandleLobbyGame_CloseSessionNotify@@YA_NPEBVSession@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+bool __cdecl HandleLobbyGame_CloseSessionNotify(::Session const *, ::Packet const *packet)
 {
-    LIFT_STUB(0x140250);
+    short c;
+    __int64 cliKey;
+    packet->Decompose("hq", &c, &cliKey);
+    Log::Write(Log::LT_DEBUG, LOBBYDAEMONCHANNEL_FILE, 551, L"[lobbydchannel] CloseSessionNotify, cliKey:%I64x", cliKey);
+    return true;
 }
 
 // 0x1402a0
@@ -384,9 +399,18 @@ bool __cdecl HandleLobbyGame_ChangedGradeLevelNotify(::Session const *, ::Packet
 }
 
 // 0x14b060
-bool __cdecl HandleLobbyGame_UpdateAccountExpFail(::Session const *, ::Packet const *)
+#pragma comment(linker, "/INCLUDE:?HandleLobbyGame_UpdateAccountExpFail@@YA_NPEBVSession@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+bool __cdecl HandleLobbyGame_UpdateAccountExpFail(::Session const *, ::Packet const *packet)
 {
-    LIFT_STUB(0x14b060);
+    short c;
+    __int64 gameTid;
+    unsigned __int64 pcdbid;
+    short reason;
+    packet->Decompose("hqqE", &c, &gameTid, &pcdbid, &reason);
+    Log::Write(Log::LT_ERROR, LOBBYDAEMONCHANNEL_FILE, 3065,
+               L"[lobbyd channel], HandleLobbyGame_UpdateAccountExpFail, tid:%#I64x, pcDbId:%#I64x, reason:%d",
+               gameTid, pcdbid, static_cast<int>(reason));
+    return true;
 }
 
 // 0x14b0e0
@@ -400,15 +424,33 @@ bool __cdecl HandleLobbyGame_UpdateAccountContentQuotaOk(::Session const *, ::Pa
 }
 
 // 0x14b120
-bool __cdecl HandleLobbyGame_UpdateAccountContentQuotaFail(::Session const *, ::Packet const *)
+#pragma comment(linker, "/INCLUDE:?HandleLobbyGame_UpdateAccountContentQuotaFail@@YA_NPEBVSession@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+bool __cdecl HandleLobbyGame_UpdateAccountContentQuotaFail(::Session const *, ::Packet const *packet)
 {
-    LIFT_STUB(0x14b120);
+    short c;
+    __int64 gameTid;
+    unsigned __int64 pcdbid;
+    short reason;
+    packet->Decompose("hqqE", &c, &gameTid, &pcdbid, &reason);
+    Log::Write(Log::LT_ERROR, LOBBYDAEMONCHANNEL_FILE, 3090,
+               L"[lobbyd channel], HandleLobbyGame_UpdateAccountContentQuotaFail, tid:%#I64x, pcDbId:%#I64x, reason:%d",
+               gameTid, pcdbid, static_cast<int>(reason));
+    return true;
 }
 
 // 0x14b1a0
-bool __cdecl HandleLobbyGame_UpdateAccountRecycleTimeFail(::Session const *, ::Packet const *)
+#pragma comment(linker, "/INCLUDE:?HandleLobbyGame_UpdateAccountRecycleTimeFail@@YA_NPEBVSession@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+bool __cdecl HandleLobbyGame_UpdateAccountRecycleTimeFail(::Session const *, ::Packet const *packet)
 {
-    LIFT_STUB(0x14b1a0);
+    short c;
+    __int64 gameTid;
+    unsigned __int64 pcdbid;
+    short reason;
+    packet->Decompose("hqqE", &c, &gameTid, &pcdbid, &reason);
+    Log::Write(Log::LT_ERROR, LOBBYDAEMONCHANNEL_FILE, 3115,
+               L"[lobbyd channel], HandleLobbyGame_UpdateAccountRecycleTimeFail, tid:%#I64x, pcDbId:%#I64x, reason:%d",
+               gameTid, pcdbid, static_cast<int>(reason));
+    return true;
 }
 
 // 0x14b220

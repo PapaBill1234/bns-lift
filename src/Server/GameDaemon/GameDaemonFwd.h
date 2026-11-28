@@ -2113,12 +2113,52 @@ class GuildPriorityQueueJob {};
 struct GuildUniformInfo {};
 struct InitCombatResultList {};
 struct InitTimeAttackResultList {};
+// PDB: InstantPaymentGoodsInfoParam, size 0x108.
 struct InstantPaymentGoodsInfoParam
 {
 public:
-    struct GoodsInfo {};
+    // PDB: InstantPaymentGoodsInfoParam::GoodsInfo, size 0x18.
+    struct GoodsInfo
+    {
+        unsigned int serviceType;  // +0x0
+        int goodsNumber;  // +0x4
+        char priceStr[8];  // +0x8
+        double price;  // +0x10
+    };
+    char totalPriceStr[8];  // +0x0
+    double totalPrice;  // +0x8
+    short goodsCount;  // +0x10
+    GoodsInfo goods[10];  // +0x18
+    // LIFT: the PDB default constructor is not declared yet.
 };
-struct InstantPaymentTransformInfoParam {};
+// PDB: InstantPaymentTransformResult, size 0x6.
+struct InstantPaymentTransformResult
+{
+    char group;  // +0x0
+    char randomResult;  // +0x1
+    bool succByFailureExp;  // +0x2
+    short mainIngredientFailureExp;  // +0x4
+};
+// PDB: InstantPaymentTransformInfoParam, size 0xf0.
+struct InstantPaymentTransformInfoParam
+{
+    int mainIngredientRetryCostItemId;  // +0x0
+    int disposeOrderCount;  // +0x4
+    short disposeItemPos[10];  // +0x8
+    short disposeItemAmount[10];  // +0x1c
+    char disposeHiddenIndex[5];  // +0x30
+    int acquireOrderCount;  // +0x38
+    unsigned __int64 acquireItemDataKey[10];  // +0x40
+    short acquireItemAmount[10];  // +0x90
+    unsigned short acquireReservedPos[10];  // +0xa4
+    unsigned int acquireKeepWeaponGemSlot[8];  // +0xb8
+    int acquireKeepWeaponAppearanceItemDataId;  // +0xd8
+    char acquireKeepWeaponAppearanceItemLevel;  // +0xdc
+    int acquireKeepSpiritDataId;  // +0xe0
+    char acquireKeepSpiritAbility[2];  // +0xe4
+    char acquireKeepSpiritAbilityValue[2];  // +0xe6
+    ::InstantPaymentTransformResult transformResult;  // +0xe8
+};
 struct InviteChallengePartyTaskParam {};
 struct InviteTeamGameLogInfo {};
 struct JoinPartyLogInfo {};

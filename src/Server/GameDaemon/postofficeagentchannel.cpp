@@ -3,11 +3,21 @@
 #include "cachedaemonchannel.h"
 #include "pc.h"
 #include "LiftStub.h"
+#include "AlertSender.h"
+#include "Log.h"
+
+// LIFT: per-exe path literal (lessons A6).
+#define POSTOFFICEAGENTCHANNEL_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\PostOfficeAgentChannel.cpp"
 
 // 0x1961b0
+#pragma comment(linker, "/INCLUDE:?OnAccept@PostOfficeAgentSessionHandler@@UEBA_NPEBVSession@@@Z")  // LIFT: dead-strip keep (no live caller yet)
 bool __cdecl PostOfficeAgentSessionHandler::OnAccept(::Session const *) const
 {
-    LIFT_STUB(0x1961b0);
+    Log::Write(Log::LT_ERROR, POSTOFFICEAGENTCHANNEL_FILE, 24,
+               L"== CRASH == [game-post], cannot accept from posta (game connect to posta)");
+    AlertSender::Write(POSTOFFICEAGENTCHANNEL_FILE, 24,
+                       L"== CRASH == [game-post], cannot accept from posta (game connect to posta)");
+    return false;
 }
 
 // 0x1961f0

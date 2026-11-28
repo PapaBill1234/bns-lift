@@ -1,9 +1,14 @@
 // instantpaymenttran_cpp.cpp: instantpaymenttran.cpp (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
 #include "instantpaymenttran.h"
 #include "LiftStub.h"
+#include <string.h>
 
 #pragma comment(linker, "/INCLUDE:?tryAbortImpl@InstantPaymentJob@@MEAA_NF@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?DataId@InstantPaymentBuyCollectionItemsSubJob@@UEAAHF@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?setExtraParam@InstantPaymentTransformItemSubJob@@MEAAXPEAX@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?setExtraParam@InstantPaymentBuyCollectionItemsSubJob@@MEAAXPEAX@Z")  // LIFT: dead-strip keep (no live caller yet)
+
+#define INSTANTPAYMENTTRAN_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\InstantPaymentTran.cpp"
 
 // 0x132640
 __cdecl InstantPaymentTran::~InstantPaymentTran(void)
@@ -127,9 +132,17 @@ bool __cdecl InstantPaymentRandomStoreExpandSubJob::tryInstantPaymentOkImpl(void
 }
 
 // 0x1351e0
-void __cdecl InstantPaymentTransformItemSubJob::setExtraParam(void *)
+void __cdecl InstantPaymentTransformItemSubJob::setExtraParam(void *param)
 {
-    LIFT_STUB(0x1351e0);
+    if (param == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, INSTANTPAYMENTTRAN_FILE, 736,
+                   L"[instant-payment-tran], InstantPaymentTransformItemSubJob, setExtraParam, null param, tran:%#I64x",
+                   _tran != nullptr ? _tran->GetId() : 0);
+        return;
+    }
+    memcpy(&_transformParam, param, sizeof(_transformParam));
+    _goodsInfo.goods[0].serviceType = *static_cast<unsigned int *>(param);  // ❓ the original stores the first dword of the param
 }
 
 // 0x135260
@@ -151,9 +164,16 @@ bool __cdecl InstantPaymentTransformItemSubJob::tryInstantPaymentFailImpl(void)
 }
 
 // 0x135e20
-void __cdecl InstantPaymentBuyCollectionItemsSubJob::setExtraParam(void *)
+void __cdecl InstantPaymentBuyCollectionItemsSubJob::setExtraParam(void *param)
 {
-    LIFT_STUB(0x135e20);
+    if (param == nullptr)
+    {
+        Log::Write(Log::LT_ERROR, INSTANTPAYMENTTRAN_FILE, 840,
+                   L"[instant-payment-tran], InstantPaymentBuyCollectionItemsSubJob, setExtraParam, null param, tran:%#I64x",
+                   _tran != nullptr ? _tran->GetId() : 0);
+        return;
+    }
+    memcpy(&_buyParam, param, sizeof(_buyParam));
 }
 
 // 0x135e80

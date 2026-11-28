@@ -2,11 +2,21 @@
 #include "marketdealeragentchannel.h"
 #include "pc.h"
 #include "LiftStub.h"
+#include "AlertSender.h"
+#include "Log.h"
+
+// LIFT: per-exe path literal (lessons A6).
+#define MARKETDEALERAGENTCHANNEL_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\MarketDealerAgentChannel.cpp"
 
 // 0x15af30
+#pragma comment(linker, "/INCLUDE:?OnAccept@MarketDealerAgentSessionHandler@@UEBA_NPEBVSession@@@Z")  // LIFT: dead-strip keep (no live caller yet)
 bool __cdecl MarketDealerAgentSessionHandler::OnAccept(::Session const *) const
 {
-    LIFT_STUB(0x15af30);
+    Log::Write(Log::LT_ERROR, MARKETDEALERAGENTCHANNEL_FILE, 29,
+               L"== CRASH == [game-marketD], cannot accept from marketD (game connect to marketD)");
+    AlertSender::Write(MARKETDEALERAGENTCHANNEL_FILE, 29,
+                       L"== CRASH == [game-marketD], cannot accept from marketD (game connect to marketD)");
+    return false;
 }
 
 // 0x15af70
@@ -52,15 +62,28 @@ bool __cdecl HandleMarketServiceRegisterPurchaseOk(::Session const *, ::Packet c
 }
 
 // 0x15b8f0
-bool __cdecl HandleMarketServiceCancelPurchaseReservationFail(::Session const *, ::Packet const *)
+#pragma comment(linker, "/INCLUDE:?HandleMarketServiceCancelPurchaseReservationFail@@YA_NPEBVSession@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+bool __cdecl HandleMarketServiceCancelPurchaseReservationFail(::Session const *, ::Packet const *packet)
 {
-    LIFT_STUB(0x15b8f0);
+    short c;
+    unsigned __int64 tid = 0;
+    short reason = 0;
+    packet->Decompose("hqE", &c, &tid, &reason);
+    Log::Write(Log::LT_ERROR, MARKETDEALERAGENTCHANNEL_FILE, 228,
+               L"[game-marketD], MarketService_CancelPurchaseReservationFail; tid:0x%I64x, reason:%d", tid, static_cast<int>(reason));
+    return true;
 }
 
 // 0x15b960
-bool __cdecl HandleMarketServiceCancelPurchaseReservationOk(::Session const *, ::Packet const *)
+#pragma comment(linker, "/INCLUDE:?HandleMarketServiceCancelPurchaseReservationOk@@YA_NPEBVSession@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+bool __cdecl HandleMarketServiceCancelPurchaseReservationOk(::Session const *, ::Packet const *packet)
 {
-    LIFT_STUB(0x15b960);
+    short c;
+    unsigned __int64 tid = 0;
+    packet->Decompose("hq", &c, &tid);
+    Log::Write(Log::LT_DEBUG, MARKETDEALERAGENTCHANNEL_FILE, 239,
+               L"[game-marketD], MarketService_CancelPurchaseReservationOk; tid:0x%I64x", tid);
+    return true;
 }
 
 // 0x15b9c0
@@ -112,15 +135,28 @@ bool __cdecl HandleMarketServiceRegisterBidOk(::Session const *, ::Packet const 
 }
 
 // 0x15c3d0
-bool __cdecl HandleMarketServiceCancelBidReservationFail(::Session const *, ::Packet const *)
+#pragma comment(linker, "/INCLUDE:?HandleMarketServiceCancelBidReservationFail@@YA_NPEBVSession@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+bool __cdecl HandleMarketServiceCancelBidReservationFail(::Session const *, ::Packet const *packet)
 {
-    LIFT_STUB(0x15c3d0);
+    short c;
+    unsigned __int64 tid = 0;
+    short reason = 0;
+    packet->Decompose("hqE", &c, &tid, &reason);
+    Log::Write(Log::LT_ERROR, MARKETDEALERAGENTCHANNEL_FILE, 400,
+               L"[game-marketD], HandleMarketServiceCancelBidReservationFail; tid:0x%I64x, reason:%d", tid, static_cast<int>(reason));
+    return true;
 }
 
 // 0x15c440
-bool __cdecl HandleMarketServiceCancelBidReservationOk(::Session const *, ::Packet const *)
+#pragma comment(linker, "/INCLUDE:?HandleMarketServiceCancelBidReservationOk@@YA_NPEBVSession@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+bool __cdecl HandleMarketServiceCancelBidReservationOk(::Session const *, ::Packet const *packet)
 {
-    LIFT_STUB(0x15c440);
+    short c;
+    unsigned __int64 tid = 0;
+    packet->Decompose("hq", &c, &tid);
+    Log::Write(Log::LT_DEBUG, MARKETDEALERAGENTCHANNEL_FILE, 411,
+               L"[game-marketD], HandleMarketServiceCancelBidReservationOk; tid:0x%I64x", tid);
+    return true;
 }
 
 // 0x15c4a0
@@ -172,15 +208,32 @@ bool __cdecl HandleMarketServiceRegisterSaleOk(::Session const *, ::Packet const
 }
 
 // 0x15d010
-bool __cdecl HandleMarketServiceCancelSaleReservationFail(::Session const *, ::Packet const *)
+#pragma comment(linker, "/INCLUDE:?HandleMarketServiceCancelSaleReservationFail@@YA_NPEBVSession@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+bool __cdecl HandleMarketServiceCancelSaleReservationFail(::Session const *, ::Packet const *packet)
 {
-    LIFT_STUB(0x15d010);
+    short c;
+    unsigned __int64 tid = 0;
+    short reason = 0;
+    packet->Decompose("hqE", &c, &tid, &reason);
+    // LIFT: inlined pc id form (low 32 bits of the db id + 0x1000000000000); no PDB name for the helper.
+    Log::Write(Log::LT_DEBUG, MARKETDEALERAGENTCHANNEL_FILE, 654,
+               L"[game-marketD], HandleMarketServiceCancelSaleReservationFail; pc:0x%I64x, reason:%d",
+               static_cast<unsigned int>(tid) + 0x1000000000000ULL, static_cast<int>(reason));
+    return true;
 }
 
 // 0x15d090
-bool __cdecl HandleMarketServiceCancelSaleReservationOk(::Session const *, ::Packet const *)
+#pragma comment(linker, "/INCLUDE:?HandleMarketServiceCancelSaleReservationOk@@YA_NPEBVSession@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
+bool __cdecl HandleMarketServiceCancelSaleReservationOk(::Session const *, ::Packet const *packet)
 {
-    LIFT_STUB(0x15d090);
+    short c;
+    unsigned __int64 tid = 0;
+    packet->Decompose("hq", &c, &tid);
+    // LIFT: inlined pc id form (low 32 bits of the db id + 0x1000000000000); no PDB name for the helper.
+    Log::Write(Log::LT_DEBUG, MARKETDEALERAGENTCHANNEL_FILE, 668,
+               L"[game-marketD], HandleMarketServiceCancelSaleReservationOk; pc:0x%I64x",
+               static_cast<unsigned int>(tid) + 0x1000000000000ULL);
+    return true;
 }
 
 // 0x15d100
@@ -232,15 +285,19 @@ bool __cdecl HandleMarketServiceRetrieveSaleListOk(::Session const *, ::Packet c
 }
 
 // 0x15eb10
+#pragma comment(linker, "/INCLUDE:?HandleMarketServiceHelloFail@@YA_NPEBVSession@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
 bool __cdecl HandleMarketServiceHelloFail(::Session const *, ::Packet const *)
 {
-    LIFT_STUB(0x15eb10);
+    Log::Write(Log::LT_DEBUG, MARKETDEALERAGENTCHANNEL_FILE, 1194, L"[game-marketD], HandleMarketServiceHelloFail");
+    return true;
 }
 
 // 0x15eb40
+#pragma comment(linker, "/INCLUDE:?HandleMarketServiceHelloOk@@YA_NPEBVSession@@PEBVPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
 bool __cdecl HandleMarketServiceHelloOk(::Session const *, ::Packet const *)
 {
-    LIFT_STUB(0x15eb40);
+    Log::Write(Log::LT_DEBUG, MARKETDEALERAGENTCHANNEL_FILE, 1200, L"[game-marketD], HandleMarketServiceHelloOk");
+    return true;
 }
 
 // 0x15eb70
