@@ -9,7 +9,6 @@
 #include "LiftStub.h"
 
 #pragma comment(linker, "/INCLUDE:?Initialize@LogServer@@QEAA_N_N_K@Z")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?Connect@LogServer@@UEAA_NKG@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?ClearLogData@LogServer@@QEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?AsyncSend@LogServer@@QEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?SendComplete@LogServer@@QEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
@@ -82,8 +81,7 @@ bool __cdecl LogServer::Initialize(bool seqIdLogEnable, unsigned __int64 seqIdLo
 // 0x6ba780
 bool __cdecl LogServer::Connect(unsigned long ip, unsigned short port)
 {
-    // LIFT: LogServer has no base member in the header yet; call the base body through a cast.
-    return reinterpret_cast<LogArchiveSession *>(this)->LogArchiveSession::Connect(ip, port);
+    LIFT_STUB(0x6ba780);
 }
 
 // 0x6ba7a0

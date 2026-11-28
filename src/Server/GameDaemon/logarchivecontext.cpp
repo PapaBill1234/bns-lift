@@ -13,7 +13,6 @@
 #pragma comment(linker, "/INCLUDE:?PushNetworkData@LogArchiveWriteBuffer@@QEAA_NQEBDI@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?PushFileData@LogArchiveWriteBuffer@@QEAA_NQEBDI@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?ClearFileBuffer@LogArchiveWriteBuffer@@QEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:??0LogArchiveWriteContext@@QEAA@H@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?SwitchStatus@LogArchiveWriteContext@@QEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?GetWritingBuffer@LogArchiveWriteContext@@QEBAQEAVLogArchiveWriteBuffer@@XZ")  // LIFT: dead-strip keep (no live caller yet)
 
@@ -307,20 +306,7 @@ bool __cdecl LogArchiveWriteBuffer::growBufferCount(unsigned int newBufferCount)
 // 0x6d8de0
 __cdecl LogArchiveWriteContext::LogArchiveWriteContext(int mode)
 {
-    _status = 2;
-    _mode = mode;
-    Internal = 0;
-    InternalHigh = 0;
-    Pointer = nullptr;
-    hEvent = nullptr;
-    for (int i = 0; i < 2; ++i)
-    {
-        LogArchiveWriteBuffer *buffer =
-            static_cast<LogArchiveWriteBuffer *>(Memory::_Manager[2]->Alloc(48, LOG_ARCHIVE_CONTEXT_FILE, 247));
-        if (buffer != nullptr)
-            buffer = new (buffer) LogArchiveWriteBuffer(_mode);
-        _pWriteBuffers[i] = buffer;
-    }
+    LIFT_STUB(0x6d8de0);
 }
 
 // 0x6d8e80
