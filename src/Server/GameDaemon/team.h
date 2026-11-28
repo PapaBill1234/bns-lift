@@ -16,6 +16,41 @@ public:
     __cdecl LeavePartyMemberResult(void);  // 0x1edaa0
 };
 
+// LIFT: byte views of the PDB layouts. Team, TeamParty and TeamManager have no members here yet.
+// The views give the PDB members at their PDB offsets (pattern: GameObjectIdView in gameobject.h).
+struct TeamPartyView
+{
+    char lift_pad_0[0x24];  // ❓ no PDB name: TeamParty +0 to +0x23 (vfptr, _members, _memberCounts)
+    int _memberCount;  // +36 (0x24)
+    char lift_pad_28[0x10];  // ❓ no PDB name: _memberCapacity, _id
+    char _type;  // +56 (0x38)
+    char lift_pad_39[0x67];  // ❓ no PDB name: TeamParty +0x39 to +0x9F
+    short _dungeonId;  // +160 (0xA0)
+    char lift_pad_a2[0x6];  // ❓ no PDB name: _dungeonMaxMemberCount
+    char _dungeonStep;  // +168 (0xA8)
+    char lift_pad_a9[0x7];  // ❓ no PDB name: _dungeonMemberCount
+    unsigned __int64 _challengePartyAttractionKey;  // +176 (0xB0)
+    char lift_pad_b8[0x670];  // ❓ no PDB name: TeamParty +0xB8 to +0x727
+    bool _isPublishedRecruitArenaDungeonMember;  // +1832 (0x728)
+};
+
+struct TeamView
+{
+    char lift_pad_0[0x28];  // ❓ no PDB name: GameObject +0 to +0x27
+    unsigned __int64 Id;  // +40 (0x28) (PDB: GameObject::Id)
+    int _partyCapacity;  // +48 (0x30)
+    int _partyCount;  // +52 (0x34)
+    ::TeamPartyView **_parties;  // +56 (0x38) (PDB: TeamParty **)
+    char lift_pad_40[0x4C];  // ❓ no PDB name: Team +0x40 to +0x8B
+    bool _visible;  // +140 (0x8C)
+};
+
+struct TeamManagerView
+{
+    char lift_pad_0[0xB0];  // ❓ no PDB name: TeamManager +0 to +0xAF
+    CRITICAL_SECTION _lock;  // +176 (0xB0) (PDB: CriticalSection _lock; member CS)
+};
+
 class Team
 {
 public:
@@ -113,6 +148,9 @@ public:
 
 class TeamManager
 {
+private:
+    // LIFT: PDB static member. The code reads it through the TLS slot, so it is thread-local.
+    static __declspec(thread) int TeamMgrLockCount;
 public:
     __cdecl TeamManager(unsigned int);  // 0x1f0350
     virtual __cdecl ~TeamManager(void);  // 0x1f04b0
