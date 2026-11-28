@@ -4,7 +4,7 @@
 
 - Stem `defmemory_cpp`: `DrMemoryManager::Memory` (0x6ed6a0). Formtest: SAME.
 - Stem `aliasimpl_h`: `ci_wchar_traits::compare` (0x6f3310). Formtest: SAME.
-- Stem `defmemory_h`: `DrBaseStaticMemory::Instance` (0x6ecf90, FORM), `DrBaseDynamicMemory::Instance` (0x6ecff0, SAME). This session added the keep pragma for `DrBaseDynamicMemory::Instance` (no lifted caller).
+- Stem `defmemory_h`: no lifted body. Round 5 put both `Instance` bodies back to `LIFT_STUB` (see "Not done").
 - Stem `src_stlmemory`: the 3 `DrStlAllocator` members (0x6ee800, 0x6f35d0, 0x6fd420). The template is in `drstlmemory.h`. The `.cpp` file instantiates the members. Formtest for 0x6ee800: SAME.
 - Stem `datareader`: `SetupDataReader` (0x6eb2b0), `CloseDataReader` (0x6eb2c0), `CreateDataReader` (0x6eb2d0), `ReleaseDataReader` (0x6eb330). Formtest: SAME for all 4.
 - Stem `aliasimpl_cpp`:
@@ -21,6 +21,8 @@
 
 ## Not done
 
+- `DrBaseStaticMemory::Instance` (0x6ecf90): LTCG + ICF folds the `DrHeapMemory` vftable with the derived vftables (the original keeps a separate derived deleting dtor at 0x6eb430 that calls `~DrHeapMemory` out of line). Needs a later card.
+- `DrBaseDynamicMemory::Instance` (0x6ecff0): LTCG + ICF folds the `DrHeapMemory` vftable with the derived vftables (the original keeps a separate derived deleting dtor at 0x6eb430 that calls `~DrHeapMemory` out of line). Needs a later card.
 - `DrAliasMapImpl::ReplaceIfChanged` (0x6f3630): it passes `*this` as `DrAliasMap const &`. That needs the `DrAliasMap` base class. The base needs bodies for `WriteSize` and `Print`. They are not in the index (folded), so their bodies are not known.
 - `DrAliasMapImpl::Find` (0x6f4860): not done in this session (context limit).
 - `DrAliasMapImpl::rebuildElArray` (0x6f4a90): not done in this session (context limit).
@@ -50,6 +52,13 @@
 - Formtest (no LTCG): the ctor 0x6ed620 is SAME. `Instance` 0x6ecf90 is FORM, 0x6ecff0 is SAME.
 - Known residue: the derived deleting dtor 0x6eb430 shows DIFF 2. The explicit dtor writes the derived vftable before the call; the original does not. 0x6eb430 was not MATCH in the baseline. This residue also stops the fold of the 2 derived vftables with each other.
 - If the driver proof still fails on 0x6ed620: put `DrBaseStaticMemory::Instance` (0x6ecf90) and `DrBaseDynamicMemory::Instance` (0x6ecff0) back to `LIFT_STUB` and remove the 2 derived dtors.
+
+## Round 5 fix
+
+- Cause: the round 4 driver build (LTCG) still loads `??_7DrBaseDynamicMemory@@6B@` in the ctor 0x6ed620. LTCG inlines the empty derived dtors and removes the derived vftable store. Then ICF folds the 3 vftables and the 6 deleting dtors. The round 4 formtest ran without LTCG, so it did not show this.
+- Fix: `defmemory_h.cpp` has the 2 `Instance` bodies as `LIFT_STUB` again (base form, includes `LiftStub.h`). The keep pragma of `DrBaseDynamicMemory::Instance` is removed.
+- Fix: `defmemory.h` no longer declares the 2 derived dtors, and `defmemory_h.cpp` no longer defines them. The 2 classes keep the PDB base `DrHeapMemory`. No code constructs them, so the build emits no derived vftable.
+- All other lifted bodies have no change. This session could not run formtest (shell access was denied). The driver build is the proof.
 
 ## Open items
 

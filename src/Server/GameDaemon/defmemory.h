@@ -20,8 +20,6 @@ protected:
 class DrBaseDynamicMemory : public DrHeapMemory
 {
 public:
-    // LIFT: PDB virtual dtor. Its deleting dtor (0x6eb430, folded with DrBaseStaticMemory) calls ~DrHeapMemory out of line.
-    virtual __cdecl ~DrBaseDynamicMemory(void);
     static ::DrBaseDynamicMemory * __cdecl Instance(void);  // 0x6ecff0
 };
 
@@ -29,8 +27,6 @@ public:
 class DrBaseStaticMemory : public DrHeapMemory
 {
 public:
-    // LIFT: PDB virtual dtor. Its deleting dtor (0x6eb430, folded with DrBaseDynamicMemory) calls ~DrHeapMemory out of line.
-    virtual __cdecl ~DrBaseStaticMemory(void);
     static ::DrBaseStaticMemory * __cdecl Instance(void);  // 0x6ecf90
 };
 
