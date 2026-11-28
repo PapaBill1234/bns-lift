@@ -608,6 +608,20 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"BuilderSessionHandler::OnAccept": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BuilderSessionHandler::OnConnect": {
+"calls": 100,
+"consts": 100,
+"refs": 67,
+"score": 88.9,
+"status": "DIFF"
+},
 "CaptureTheFlag::Context1": {
 "calls": 100,
 "consts": 100,
@@ -2099,6 +2113,48 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"GameArenaSessionHandler::OnAccept": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GameArenaSessionHandler::OnConnect": {
+"calls": 100,
+"consts": 100,
+"refs": 67,
+"score": 88.9,
+"status": "DIFF"
+},
+"GameDaemon::GetAddressStringWForLogs": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GameDaemon::GetRandomStoreServiceState": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GameDaemon::GetServerIdForDaemon": {
+"calls": 100,
+"consts": 0,
+"refs": 100,
+"score": 66.7,
+"status": "DIFF"
+},
+"GameDaemon::GetServerIdForNPChat": {
+"calls": 100,
+"consts": 0,
+"refs": 100,
+"score": 66.7,
+"status": "DIFF"
+},
 "GameDaemon::GetTimerInterval": {
 "calls": 100,
 "consts": 100,
@@ -2134,6 +2190,20 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"GameDaemon::NotCheckToPlayInWeek": {
+"calls": 100,
+"consts": 50,
+"refs": 100,
+"score": 83.3,
+"status": "DIFF"
+},
+"GameDaemon::ServiceName": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "GameDaemon::SetEventReplyCacheHello": {
 "calls": 100,
 "consts": 100,
@@ -2162,7 +2232,35 @@
 "score": 88.9,
 "status": "DIFF"
 },
+"GameTran::run": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GameTran::~GameTran": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "GameTranExpireToken::GetTid": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedCooldownTimer::EventId": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GamedReloadInvalidRestoreTimer::EventId": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -2212,6 +2310,13 @@
 "status": "MATCH"
 },
 "GemProperty::SyncMax": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GenerateTid": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -2387,6 +2492,97 @@
 "status": "MATCH"
 },
 "HandleArenaLobbyArenaHelloFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleCacheGame_BindRaidDungeonFail": {
+"calls": 67,
+"consts": 0,
+"refs": 0,
+"score": 22.2,
+"status": "DIFF"
+},
+"HandleCacheGame_DeliverSystemPostFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleCacheGame_DeliverSystemPostOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleCacheGame_HelloFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleCacheGame_InitializeMentoringFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleCacheGame_InitializeSeasonContentsChallengePartyScheduleFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleCacheGame_InitializeSeasonContentsScheduleFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleCacheGame_LoadGuildCombatRecordFail": {
+"calls": 100,
+"consts": 100,
+"refs": 75,
+"score": 91.7,
+"status": "DIFF"
+},
+"HandleCacheGame_LoadMileageDepositRetryListFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleCacheGame_LoadRaidDungeonListFail": {
+"calls": 100,
+"consts": 100,
+"refs": 67,
+"score": 88.9,
+"status": "DIFF"
+},
+"HandleCacheGame_PurePropertyTransactionOk": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleCacheGame_RetrieveFactionStatisticsFail": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"HandleChattingGame_A2G_PROTOCOL_VERSIONNotify": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -3078,6 +3274,27 @@
 "refs": 0,
 "score": 66.7,
 "status": "DIFF"
+},
+"ManageSessionHandler::OnAccept": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ManageSessionHandler::OnConnect": {
+"calls": 100,
+"consts": 100,
+"refs": 67,
+"score": 88.9,
+"status": "DIFF"
+},
+"ManagementdChannel::onCloseAll": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
 },
 "MarkExpressPostTran::GetDefinition": {
 "calls": 100,
@@ -3996,6 +4213,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"PetitionSessionHandler::OnAccept": {
+"calls": 100,
+"consts": 100,
+"refs": 67,
+"score": 88.9,
+"status": "DIFF"
+},
 "PickupAction::availableCancel": {
 "calls": 100,
 "consts": 0,
@@ -4578,6 +4802,13 @@
 "status": "DIFF"
 },
 "SessionSendBuffer::increaseBuffer": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"SessionTran::~SessionTran": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -5186,6 +5417,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"UnsentMileageDepositManager::~UnsentMileageDepositManager": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "UpdateBidTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
@@ -5201,6 +5439,13 @@
 "status": "DIFF"
 },
 "User::GetId": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"UserTran::~UserTran": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
