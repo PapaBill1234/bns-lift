@@ -223,6 +223,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Action::availableCancel": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Action::cancelAction": {
 "calls": 100,
 "consts": 100,
@@ -1567,6 +1574,20 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"DuelBotActionQueue::IntervalAction": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DuelBotActionQueue::RequestActionCancel": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "DuelBotChallengeAttractionState::GetTypeName": {
 "calls": 100,
 "consts": 100,
@@ -2568,6 +2589,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"NpcPredefinedMoveAction::NpcMoveTypeName": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "OceanicEffect::GetDataSubType": {
 "calls": 100,
 "consts": 100,
@@ -3269,6 +3297,13 @@
 "status": "DIFF"
 },
 "RepairWithCampfireAction::availableCancel": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RestorationAction::availableCancel": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
