@@ -90,6 +90,13 @@
 "score": 66.7,
 "status": "DIFF"
 },
+"AccountInventoryChannelManager::~AccountInventoryChannelManager": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "AccountInventoryGetGoodsCountTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
@@ -1987,12 +1994,40 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"GeoCube::GeoCube": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GeoCube::~GeoCube": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "GeoRegion::GetEnv": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"GeoZone::GetRespawn": {
+"calls": 100,
+"consts": 80,
+"refs": 100,
+"score": 93.3,
+"status": "DIFF"
+},
+"GeoZone::IsTeamPartyZone": {
+"calls": 100,
+"consts": 33,
+"refs": 100,
+"score": 77.8,
+"status": "DIFF"
 },
 "GetDataReaderInterfaceVersion": {
 "calls": 100,
@@ -2072,6 +2107,34 @@
 "status": "MATCH"
 },
 "HeapMemoryManager::ReallocZero": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"IdManager<__int64>::Initialize": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"IdManager<__int64>::PopId": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"IdManager<__int64>::PushId": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"IdManager<__int64>::~IdManager<__int64>": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -4381,6 +4444,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Zone::GetBattleRoyalFieldAttractionState": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Zone::GetCampfire": {
 "calls": 100,
 "consts": 100,
@@ -4388,7 +4458,42 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Zone::GetDuelAttractionState": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Zone::GetEnterPublicRaidAttractionState": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Zone::GetFieldItem": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Zone::GetPartyBattleFieldAttractionState": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Zone::GetPublicRaid": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Zone::HandleNpcSpawnEvent": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -4416,7 +4521,35 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"ZonePerfMonitor::EndZsoTest": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "ZoneSerializedObject::TimerExpired": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZoneWaitingPcList::Find": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZoneWaitingPcList::GetCount": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ZoneWaitingPcList::Initialize": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
