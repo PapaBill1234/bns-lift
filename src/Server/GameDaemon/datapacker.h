@@ -24,8 +24,11 @@ public:
         __cdecl FileName(char const *, unsigned __int64, unsigned __int64, unsigned __int64, unsigned int);  // 0x153d0
         __cdecl ~FileName(void);  // 0x157c0
 
-        std::wstring _pathW;                       // +0x0
-        std::vector<std::wstring> _pathTokenW;     // +0x28
+        // PDB types: the strings use StlAllocator<wchar_t, 2> (the destructor frees through Memory::_Manager[2]).
+        std::basic_string<wchar_t, std::char_traits<wchar_t>, StlAllocator<wchar_t, 2> > _pathW;  // +0x0
+        std::vector<std::basic_string<wchar_t, std::char_traits<wchar_t>, StlAllocator<wchar_t, 2> >,
+                    StlAllocator<std::basic_string<wchar_t, std::char_traits<wchar_t>, StlAllocator<wchar_t, 2> >, 2> >
+            _pathTokenW;                           // +0x28
         unsigned __int64 _uncompressedSize;        // +0x48
         unsigned __int64 _posInZipDir;             // +0x50
         unsigned __int64 _numOfFile;               // +0x58

@@ -21,9 +21,10 @@ __cdecl Data::SlateScrollCache::~SlateScrollCache(void)
 }
 
 // 0x157c0
+// PDB: compiler-generated. The body is the inlined destructor of _pathTokenW and _pathW (StlAllocator<..., 2>).
+#pragma comment(linker, "/INCLUDE:??1FileName@ZipPackedReaderIO@@QEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
 __cdecl ZipPackedReaderIO::FileName::~FileName(void)
 {
-    LIFT_STUB(0x157c0);
 }
 
 // 0x191c0 EventObject::~EventObject: LIFT: no body in wave 0 (shared class DynamicEventObject has another form or the change needs codegen (W1, pattern 35)).

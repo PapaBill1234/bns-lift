@@ -25,7 +25,13 @@
         CrashHandler::MakeCrash(LOCK_H_NARROW, line, L"");                          \
     } while (0)
 
-// 0x1cbc0 AutoCS::~AutoCS: LIFT: no body in wave 0 (shared class AutoCS has another form or the change needs codegen (W1, pattern 35)).
+// 0x1cbc0
+// LIFT: GameDaemon body (thunk to Leave). This file links only into GameDaemon, so the other exe bodies of ~AutoCS do not clash.
+#pragma comment(linker, "/INCLUDE:??1AutoCS@@QEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
+AutoCS::~AutoCS()
+{
+    Leave();
+}
 
 // 0x1cbd0
 void AutoCS::Enter()
