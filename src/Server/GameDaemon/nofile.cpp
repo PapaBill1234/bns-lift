@@ -29,8 +29,8 @@ __cdecl ZipPackedReaderIO::FileName::~FileName(void)
 
 // 0x191c0 EventObject::~EventObject: LIFT: no body in wave 0 (shared class DynamicEventObject has another form or the change needs codegen (W1, pattern 35)).
 
-// PDB: AccountContentQuota, size 0x18. AccountRecycleTime, size 0x10. Only this file needs the complete types.
-struct AccountContentQuota
+// PDB: AccountContentQuota, size 0x18. AccountRecycleTime, size 0x10. GameDaemonFwd.h holds the empty types, so this file uses View copies.
+struct AccountContentQuotaView
 {
     int _data_id;                  // +0x0
     short _version;                // +0x4
@@ -38,14 +38,14 @@ struct AccountContentQuota
     long long _last_update_time;   // +0x10
 };
 
-struct AccountRecycleTime
+struct AccountRecycleTimeView
 {
     short _groupId;                // +0x0
     long long _actualTime;         // +0x8
 };
 
-typedef std::vector<AccountContentQuota, StlAllocator<AccountContentQuota, 2> > AccountContentQuotaList;
-typedef std::vector<AccountRecycleTime, StlAllocator<AccountRecycleTime, 2> > AccountRecycleTimeList;
+typedef std::vector<AccountContentQuotaView, StlAllocator<AccountContentQuotaView, 2> > AccountContentQuotaList;
+typedef std::vector<AccountRecycleTimeView, StlAllocator<AccountRecycleTimeView, 2> > AccountRecycleTimeList;
 
 // LIFT: partial layout of LogoutOkParam (PDB size 0x68). The class has no members in the header yet.
 struct LogoutOkParamView
