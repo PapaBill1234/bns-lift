@@ -4,12 +4,10 @@ Exe: GameDaemon (2019 + PDB). Round 1. Two sessions did the work (planned contex
 
 ## Lifted
 
-- `source_logfile`: `LogFile::Write` (0x6a0250).
-- `logarchivesession`: `LogArchiveSession::~LogArchiveSession` (0x6b9d00), `LogArchiveSession::Close` (0x6ba510).
 - `daemon`: `Daemon::AddDelayedRelease` (0x68cf50), `Daemon::SetPublicAddressWithSetting` (0x68d9e0), `parseCIDRAddress` (0x68dba0).
-- `lock`: `AutoCS::Enter` (0x1cbd0), `AutoCS::Leave` (0x1cc50), `AccountInventoryChannelManager::~AccountInventoryChannelManager` (0x18d060), `AutoSRW::~AutoSRW` (0x1dc200).
+- `lock`: `AccountInventoryChannelManager::~AccountInventoryChannelManager` (0x18d060), `AutoSRW::~AutoSRW` (0x1dc200).
 - `source_delayedrelease`: `DelayedRelease::DelayedRelease` (0x6a11d0), `DelayedDelete::Cleanup` (0x6a1960), `DelayedDelete::deleteNode` (0x6a19d0), `DeleteEvent::HandleEvent` (0x6a1a50).
-- `channel`: `DaemonChannel::Send` x3 (0x69a3e0, 0x69a440, 0x69a4c0), `ClientSideDaemonChannel::initialize` (0x69a740), `ClientSideHashedDaemonChannel::Send` x2 (0x69abf0, 0x69ac40), `ClientSideHashedDaemonChannel::initialize` (0x69acc0), `ClientSideHashedDaemonChannel::releaseSession` (0x69afb0), `ServerSideDaemonChannel::Initialize` (0x69b0a0).
+- `channel`: `DaemonChannel::Send` x3 (0x69a3e0, 0x69a440, 0x69a4c0), `ClientSideHashedDaemonChannel::Send` x2 (0x69abf0, 0x69ac40), `ClientSideHashedDaemonChannel::releaseSession` (0x69afb0).
 - `source_jsoncpp`: `Json::Reader::Reader` (0x6a4eb0), `Json::Value::CommentInfo::~CommentInfo` (0x6a8600), `Json::Value::CZString::~CZString` (0x6a87a0), `Json::Value::CZString::operator<` (0x6a87d0), `Json::Value::isInt` (0x6aa080), `Json::Value::isUInt64` (0x6aa1b0), `Json::valueToString(unsigned __int64)` (0x6aa430), `Json::valueToString(double)` (0x6aa650), `Json::valueToString(bool)` (0x6aa680), `GameObjectIdManager::~GameObjectIdManager` (0x6aad60).
 
 ## Decisions
@@ -22,6 +20,14 @@ Exe: GameDaemon (2019 + PDB). Round 1. Two sessions did the work (planned contex
 
 ## Not done
 
+- 0x6a0250 `LogFile::Write`: log path (E16). Round 4 put back the `LIFT_STUB` and removed the `/INCLUDE` line.
+- 0x6b9d00 `LogArchiveSession::~LogArchiveSession`: log path (E16). The inlined `Close` calls `Log::Write`.
+- 0x6ba510 `LogArchiveSession::Close`: log path (E16). The body calls `Log::Write`.
+- 0x1cbd0 `AutoCS::Enter`: log path (E16). The inlined assert calls `Log::Write` and `AlertSender::Write`.
+- 0x1cc50 `AutoCS::Leave`: log path (E16). Same cause.
+- 0x69a740 `ClientSideDaemonChannel::initialize`: log path (E16). Same cause.
+- 0x69acc0 `ClientSideHashedDaemonChannel::initialize`: log path (E16). Same cause.
+- 0x69b0a0 `ServerSideDaemonChannel::Initialize`: log path (E16). Same cause.
 - 0x6a83c0 `Json::Exception::~Exception`: `Json::Exception` has no `std::exception` base and no `msg_` member yet (earlier decision, see the comment in `jsoncpp.h` and 0x6a84d0). The body needs that layout.
 - 0x6a8420 `Json::Exception::what`: same cause (needs `msg_`).
 - 0x6a8440 `Json::throwRuntimeError`: same cause. `Json::RuntimeError` also has no layout.
@@ -34,6 +40,8 @@ The driver builds and runs the gate and funcdiff after this session. This sessio
 Round 2: the round 1 gate build failed. The build log showed only a wine `XDG_RUNTIME_DIR` line. The missing object was `include_jsoncpp.cpp.obj`. Its cause: `jsoncpp.h` includes `<stack>` for `Json::Reader::nodes_`, and the VS2010 STL subset in `include/vs2010` had no `stack` header (the build uses `/X`). Round 2 adds `include/vs2010/stack` (`std::stack` over `deque`, size 0x30, the same form as `include/vs2010/queue`). This round did not change other code.
 
 Round 3: the round 2 gate build failed again. The build log showed only the wine `XDG_RUNTIME_DIR` line. The ninja log shows that `source_delayedrelease.cpp.obj` did not build. Its cause: only `tools/vs2010/build.sh` defines `LIFT_EXE_GD`. The clang-cl (ninja) build does not define it. Thus `DelayedRelease.h` keeps the inline constructor there, and `source_delayedrelease.cpp` defined `DelayedRelease::DelayedRelease` a second time. Round 3 puts the out-of-line constructor (0x6a11d0) and its `/INCLUDE` keep line under `#if defined(LIFT_EXE_GD)`. The VS2010 GameDaemon build keeps the lift. This round did not change other code.
+
+Round 4: the round 3 deferred link failed. The link log showed an unresolved external `LogFile::Write` from `source_logfile.cpp.obj` (the `/INCLUDE` line). This is the log path (E16). Round 4 put back the `LIFT_STUB` bodies of all 8 log-path functions of this card (see "Not done"). It removed their `/INCLUDE` lines and the two inlined assert macros in `lock.cpp` and `channel.cpp`. This round did not change other bodies.
 
 ## Files changed
 

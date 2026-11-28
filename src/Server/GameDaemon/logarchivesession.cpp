@@ -4,16 +4,11 @@
 #include "../BloodLib/include/Log.h"
 #include "LiftStub.h"
 
-#pragma comment(linker, "/INCLUDE:??1LogArchiveSession@@UEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?Close@LogArchiveSession@@UEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
-
-static wchar_t const LOG_ARCHIVE_SESSION_FILE[] = L"source\\LogArchiveSession.cpp";
-
 // 0x6b9d00
-// LIFT: the destructor calls Close. The compiler inlines it (same line 249 in HR).
+// LIFT: log path (E16): the inlined Close calls Log::Write.
 __cdecl LogArchiveSession::~LogArchiveSession(void)
 {
-    Close();
+    LIFT_STUB(0x6b9d00);
 }
 
 // 0x6b9d60
@@ -41,15 +36,8 @@ int __cdecl LogArchiveSession::recv(char *, int, int)
 }
 
 // 0x6ba510
+// LIFT: log path (E16): the body calls Log::Write.
 void __cdecl LogArchiveSession::Close(void)
 {
-    if (_sock != INVALID_SOCKET)
-    {
-        if (closesocket(_sock) == SOCKET_ERROR)
-        {
-            // ❓ The text of the format string is not in the HR cache (0x6ba510). The text below is a guess.
-            Log::Write(LOG_ARCHIVE_SESSION_FILE, 249, WSAGetLastError(), L"closesocket failed");
-        }
-        _sock = INVALID_SOCKET;
-    }
+    LIFT_STUB(0x6ba510);
 }
