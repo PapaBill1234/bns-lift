@@ -9,7 +9,6 @@
 #pragma comment(linker, "/INCLUDE:??0LogArchiveReadBuffer@@QEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:??1LogArchiveReadBuffer@@QEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?ClearBuffer@LogArchiveReadBuffer@@QEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:??1LogArchiveWriteContext@@QEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
 
 static wchar_t const LOG_ARCHIVE_CONTEXT_FILE[] = L"source\\LogArchiveContext.cpp";
 
@@ -114,15 +113,7 @@ __cdecl LogArchiveWriteContext::LogArchiveWriteContext(int)
 // 0x6d8e80
 __cdecl LogArchiveWriteContext::~LogArchiveWriteContext(void)
 {
-    for (int i = 0; i < 2; ++i)
-    {
-        LogArchiveWriteBuffer *buffer = _pWriteBuffers[i];
-        if (buffer != nullptr)
-        {
-            buffer->~LogArchiveWriteBuffer();
-            Memory::_Manager[2]->Free(buffer, LOG_ARCHIVE_CONTEXT_FILE, 255);
-        }
-    }
+    LIFT_STUB(0x6d8e80);
 }
 
 // 0x6d8f20

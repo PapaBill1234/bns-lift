@@ -1,8 +1,8 @@
 # Handoff: lift-gamedaemon-gap-045-e45
 
-Round 1. Exe: GameDaemon (2019 + PDB). The driver does the build, the gate and the MATCH count. No build or gate was run in this session.
+Round 3 (repair of round 2). Exe: GameDaemon (2019 + PDB). The driver does the build, the gate and the MATCH count. No build or gate was run in this session.
 
-## Lifted (17 bodies)
+## Lifted (14 bodies)
 
 | RVA | PDB name | Note |
 | --- | --- | --- |
@@ -15,16 +15,13 @@ Round 1. Exe: GameDaemon (2019 + PDB). The driver does the build, the gate and t
 | `0x6d8430` | `LogArchiveReadBuffer::LogArchiveReadBuffer` | Keep pragma. |
 | `0x6d84c0` | `LogArchiveReadBuffer::~LogArchiveReadBuffer` | Keep pragma. |
 | `0x6d84f0` | `LogArchiveReadBuffer::ClearBuffer` | Keep pragma. |
-| `0x6d8e80` | `LogArchiveWriteContext::~LogArchiveWriteContext` | Keep pragma. |
-| `0xac70` | `Packet::IncRepeatCount` | Folded under the Packet name. |
 | `0x6bb020` | `LogServer::AsyncRecv` | `LogServerView` (raw offsets `_sock` +0x8, `_readBuffer` +0x30). The log message text is not in HR. `L"WSARecv()"` is assumed (marked with a question mark in the source). |
-| `0x693240` | `PacketConcatenateBuffer::DecomposeV` | Same logic as `Decompose(int, ...)` in BloodLib. The crash check is kept. |
 | `0x10d40` | `FragmentPacket::FreeBody` | Uses `Packet::GetFreeBody`. |
 | `0x693a60` | `RelationalRefCntObject::remove_child` | Views of `ParentRole`, `ChildRole` and the object in the .cpp. The class has no members in the header yet. |
 | `0x688990` | `SyncBuffer::realign` | `SyncBufferView`. The overlapping copy uses `memmove`. |
 | `0x68ba10` | `Property::findMaxId` (SyncDef) | The id check (crash when id >= 4) is kept. |
 
-## Not done (6)
+## Not done (9)
 
 | RVA | PDB name | Reason |
 | --- | --- | --- |
@@ -34,6 +31,9 @@ Round 1. Exe: GameDaemon (2019 + PDB). The driver does the build, the gate and t
 | `0x18eb0` | `StlAllocator<ZipPackedReaderIO::FileName,2>::construct` | `ZipPackedReaderIO::FileName` has no layout in GameDaemon yet. The function is a class template member with `basic_string` and `vector` copies. |
 | `0x68a700` | `Property::Get(unsigned short, bool *) const` | HR has an extra hidden table argument (FieldDef array, stride 184). The FieldDef layout and the table source are not known. |
 | `0x69ed10` | `LogMedia::LogMedia` | EXCLUDED in LobbyDaemon (`Docs/Parity/excluded.tsv`, line 28, precheck P3_imm on the constant `0xffffffff`). The GameDaemon body stores the same `-1`. The constructor is also inline in the shared `LogMedia.h`. |
+| `0x6d8e80` | `LogArchiveWriteContext::~LogArchiveWriteContext` | Review reject: the original reloads the buffer pointer from `[rdi+0x0]` after the indirect call `[rax+0x38]` and passes it to Free. The build passed a value read before the call. Back to `LIFT_STUB`. A later card. |
+| `0xac70` | `Packet::IncRepeatCount` | P2_cc reject (build `jns`, original `js`). Back to `LIFT_STUB`. A later card. |
+| `0x693240` | `PacketConcatenateBuffer::DecomposeV` | P2_cc reject (build `jae`, original `jbe`) and P3_imm reject (original has 4 times `0x8`). Back to `LIFT_STUB`. A later card. |
 
 ## Shared functions of the card
 
