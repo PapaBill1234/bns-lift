@@ -29,16 +29,101 @@ __cdecl ZipPackedReaderIO::FileName::~FileName(void)
 
 // 0x191c0 EventObject::~EventObject: LIFT: no body in wave 0 (shared class DynamicEventObject has another form or the change needs codegen (W1, pattern 35)).
 
+// PDB: AccountContentQuota, size 0x18. AccountRecycleTime, size 0x10. Only this file needs the complete types.
+struct AccountContentQuota
+{
+    int _data_id;                  // +0x0
+    short _version;                // +0x4
+    long long _quantity;           // +0x8
+    long long _last_update_time;   // +0x10
+};
+
+struct AccountRecycleTime
+{
+    short _groupId;                // +0x0
+    long long _actualTime;         // +0x8
+};
+
+typedef std::vector<AccountContentQuota, StlAllocator<AccountContentQuota, 2> > AccountContentQuotaList;
+typedef std::vector<AccountRecycleTime, StlAllocator<AccountRecycleTime, 2> > AccountRecycleTimeList;
+
+// LIFT: partial layout of LogoutOkParam (PDB size 0x68). The class has no members in the header yet.
+struct LogoutOkParamView
+{
+    char _head[0x28];
+    AccountContentQuotaList accountContentQuotaList;  // +0x28
+    AccountRecycleTimeList accountRecycleTimeList;    // +0x48
+};
+
+// LIFT: partial layout of TimeBasedPlayInfoList (PDB size 0x80). Only the fields that clear() writes.
+struct TimeBasedPlayInfoView
+{
+    int scheduleNumber;                   // +0x0
+    int duration;                         // +0x4
+    long long startTimeUTC;               // +0x8
+    long long expireTimeUTC;              // +0x10
+    unsigned long long ackAndRewards;     // +0x18 acknowledgedPlayTime, rewardList, activated (one qword store)
+};
+
+struct TimeBasedPlayInfoListView
+{
+    bool _isPcCafe;                       // +0x0
+    bool _useLock;                        // +0x1
+    char _pad0[6];
+    void* _timeLock;                      // +0x8
+    long long _lastCheckTimeUTC;          // +0x10
+    long long _lastResetTimeUTC[2];       // +0x18
+    long long _nextResetTimeUTC[2];       // +0x28
+    void* _infoLock;                      // +0x38
+    TimeBasedPlayInfoView info[2];        // +0x40
+};
+
+// LIFT: partial layout of EnterWorldOkParam (PDB size 0xC58).
+struct EnterWorldOkParamView
+{
+    char _head[0xB70];
+    TimeBasedPlayInfoListView timeBasedRewardInfoList;  // +0xB70
+    char _mid[0xC18 - 0xBF0];
+    AccountContentQuotaList accountContentQuotaList;    // +0xC18
+    AccountRecycleTimeList accountRecycleTimeList;      // +0xC38
+};
+
 // 0xc0000
+// PDB: compiler-generated. The body is the inlined destructor of the 2 vectors (last member first).
+#pragma comment(linker, "/INCLUDE:??1LogoutOkParam@@QEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
 __cdecl LogoutOkParam::~LogoutOkParam(void)
 {
-    LIFT_STUB(0xc0000);
+    LogoutOkParamView* self = reinterpret_cast<LogoutOkParamView*>(this);
+    self->accountRecycleTimeList.~AccountRecycleTimeList();
+    self->accountContentQuotaList.~AccountContentQuotaList();
 }
 
 // 0x13fd20
+// PDB: compiler-generated. The 2 vectors, then the inlined TimeBasedPlayInfoList::clear (members in reverse order).
+#pragma comment(linker, "/INCLUDE:??1EnterWorldOkParam@@QEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
 __cdecl EnterWorldOkParam::~EnterWorldOkParam(void)
 {
-    LIFT_STUB(0x13fd20);
+    EnterWorldOkParamView* self = reinterpret_cast<EnterWorldOkParamView*>(this);
+    self->accountRecycleTimeList.~AccountRecycleTimeList();
+    self->accountContentQuotaList.~AccountContentQuotaList();
+    TimeBasedPlayInfoListView& list = self->timeBasedRewardInfoList;
+    list._isPcCafe = false;
+    list._useLock = false;
+    list._lastCheckTimeUTC = 0;
+    list._lastResetTimeUTC[0] = 0;
+    list._lastResetTimeUTC[1] = 0;
+    list._nextResetTimeUTC[0] = 0;
+    list._nextResetTimeUTC[1] = 0;
+    list.info[0].scheduleNumber = 0;
+    list.info[0].duration = 0;
+    list.info[0].startTimeUTC = 0;
+    list.info[0].expireTimeUTC = 0;
+    list.info[0].ackAndRewards = 0;
+    list.info[1].scheduleNumber = 0;
+    list.info[1].duration = 0;
+    list.info[1].startTimeUTC = 0;
+    list.info[1].expireTimeUTC = 0;
+    list.info[1].ackAndRewards = 0;
 }
 
 // 0x14a320

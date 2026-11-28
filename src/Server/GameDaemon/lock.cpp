@@ -44,7 +44,8 @@ void AutoCS::Enter()
 }
 
 // 0x1cc50
-void AutoCS::Leave()
+// LIFT: noinline (A4). The original ~AutoCS (0x1cbc0) is a tail jump to this function.
+__declspec(noinline) void AutoCS::Leave()
 {
     if (CS == nullptr)
         LOCK_ASSERT_CRASH(122);
