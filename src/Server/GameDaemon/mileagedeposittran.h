@@ -18,10 +18,17 @@ private:
 
 class UnsentMileageDepositManager
 {
+public:
+    enum State {};  // LIFT: PDB nested enum UnsentMileageDepositManager::State (values not needed yet)
 private:
     __cdecl ~UnsentMileageDepositManager(void);  // 0x16cf30
 public:
     bool __cdecl Initialize(::FragmentPacketConcatenater *);  // 0x16cf70
     void __cdecl SendMileageDeposit(void);  // 0x16d290
+private:
+    State _state;                          // +0 (0x0)
+    int _currentIndex;                     // +4 (0x4)
+    int _mileageCount;                     // +8 (0x8)
+    ::MileageDepositContext * _mileageList;  // +16 (0x10)
 };
 

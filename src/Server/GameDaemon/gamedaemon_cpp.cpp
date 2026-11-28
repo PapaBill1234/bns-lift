@@ -1,7 +1,55 @@
 // gamedaemon_cpp.cpp: gamedaemon.cpp (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
 #include "gamedaemon.h"
+#include "gamedconfig.h"
 #include "pc.h"
+#include "Network.h"
+#include "StlMemory.h"
+#include <vector>
+#include <algorithm>
 #include "LiftStub.h"
+
+#pragma comment(linker, "/INCLUDE:?EventId@GamedReloadInvalidRestoreTimer@@UEBAIXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetRandomStoreServiceState@GameDaemon@@SAHD@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetServerIdForDaemon@GameDaemon@@SAFXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetServerIdForNPChat@GameDaemon@@SAFD@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?EventId@GamedCooldownTimer@@UEBAIXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?ServiceName@GameDaemon@@UEAAPEB_WXZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?NotCheckToPlayInWeek@GameDaemon@@QEAA_ND@Z")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?GetAddressStringWForLogs@GameDaemon@@SAPEB_WK@Z")  // LIFT: dead-strip keep (no live caller yet)
+
+namespace
+{
+// LIFT: view of the GameDaemon members after the declared part of the layout (PDB offsets).
+struct GameDaemonView
+{
+    char lift_pad_0[0x1628];
+    ::SeasonContentsTypes * seasonContentsTypes;  // +5672 (0x1628)
+    char lift_pad_1[0x152D2 - 0x1630];
+    short _worldClusterId;                        // +86738 (0x152D2)
+    char lift_pad_2[0x1533C - 0x152D4];
+    unsigned int _worldId;                        // +86844 (0x1533C)
+    char lift_pad_3[0x15350 - 0x15340];
+    int * _randomStoreServiceStates;              // +86864 (0x15350)
+};
+
+// LIFT: view of GamedConfig after the declared part of the layout (PDB offset).
+struct GamedConfigView
+{
+    char lift_pad_0[0x65C];
+    bool _allowClientIPAddressInLogs;  // +1628 (0x65C)
+};
+
+// LIFT: view of SeasonContentsTypes (PDB: _typeList at +0, size 0x20). The skeleton class has no members yet.
+struct SeasonContentsTypesView
+{
+    std::vector<char, StlAllocator<char, 2> > _typeList;  // +0
+};
+
+inline GameDaemonView * AsView(::GameDaemon * daemon)
+{
+    return reinterpret_cast<GameDaemonView *>(daemon);
+}
+}
 
 // 0x339ee0
 unsigned __int64 __cdecl GenerateTid(void)
@@ -96,7 +144,7 @@ bool __cdecl NPMessageHandleEvent::HandleEvent(::EventContext *, unsigned long)
 // 0x33afc0
 unsigned int __cdecl GamedReloadInvalidRestoreTimer::EventId(void) const
 {
-    LIFT_STUB(0x33afc0);
+    return 130;
 }
 
 // 0x33afd0
@@ -196,21 +244,29 @@ bool __cdecl GameDaemon::SetTimeZoneBias(void)
 }
 
 // 0x340e70
-int __cdecl GameDaemon::GetRandomStoreServiceState(char)
+int __cdecl GameDaemon::GetRandomStoreServiceState(char randomStoreNumber)
 {
-    LIFT_STUB(0x340e70);
+    int * randomStoreServiceStates = AsView(GamedInstance)->_randomStoreServiceStates;
+    if (randomStoreServiceStates == nullptr || randomStoreNumber < 1 || randomStoreNumber > 2)
+        return 0;
+    return randomStoreServiceStates[randomStoreNumber - 1];
 }
 
 // 0x340ea0
 short __cdecl GameDaemon::GetServerIdForDaemon(void)
 {
-    LIFT_STUB(0x340ea0);
+    if (GamedInstance->config->_arenaEnabled && GamedInstance->config->_arenaId != 0)
+        return static_cast<short>(GamedInstance->config->_arenaId + 10000);
+    return AsView(GamedInstance)->_worldClusterId;
 }
 
 // 0x340ee0
-short __cdecl GameDaemon::GetServerIdForNPChat(char)
+short __cdecl GameDaemon::GetServerIdForNPChat(char gameServerType)
 {
-    LIFT_STUB(0x340ee0);
+    (void)gameServerType;
+    if (GamedInstance->config->_arenaEnabled && GamedInstance->config->_arenaId != 0)
+        return static_cast<short>(GamedInstance->config->_arenaId + 10000);
+    return static_cast<short>(AsView(GamedInstance)->_worldId);
 }
 
 // 0x340f20
@@ -258,7 +314,7 @@ bool __cdecl GameDaemon::reload(wchar_t **, int)
 // 0x342ae0
 unsigned int __cdecl GamedCooldownTimer::EventId(void) const
 {
-    LIFT_STUB(0x342ae0);
+    return 129;
 }
 
 // 0x342af0
@@ -288,7 +344,7 @@ void __cdecl GameDaemon::FailedEventObjectHandler(::EventObject *)
 // 0x343030
 wchar_t const * __cdecl GameDaemon::ServiceName(void)
 {
-    LIFT_STUB(0x343030);
+    return L"BnS gamed";
 }
 
 // 0x343040
@@ -304,9 +360,33 @@ void __cdecl GameDaemon::PrintDependency(void)
 }
 
 // 0x343650
-bool __cdecl GameDaemon::NotCheckToPlayInWeek(char)
+bool __cdecl GameDaemon::NotCheckToPlayInWeek(char seasonContentsType)
 {
-    LIFT_STUB(0x343650);
+    SeasonContentsTypesView * seasonContentsTypes =
+        reinterpret_cast<SeasonContentsTypesView *>(AsView(this)->seasonContentsTypes);
+    if (seasonContentsTypes == nullptr || seasonContentsType <= 0 || seasonContentsType >= 16)
+        return false;
+    // LIFT: SeasonContentsTypes::IsExist (inlined, PDB name) is a binary search of the sorted type list.
+    // include/vs2010/algorithm has no binary_search, so the VS2010 _Lower_bound loop is written here.
+    typedef std::vector<char, StlAllocator<char, 2> > TypeList;
+    TypeList const& typeList = seasonContentsTypes->_typeList;
+    TypeList::const_iterator first = typeList.begin();
+    TypeList::const_iterator const last = typeList.end();
+    long long count = last - first;
+    while (count > 0)
+    {
+        long long const half = count / 2;
+        if (first[half] < seasonContentsType)
+        {
+            first += half + 1;
+            count -= half + 1;
+        }
+        else
+        {
+            count = half;
+        }
+    }
+    return first != last && !(seasonContentsType < *first);
 }
 
 // 0x3436c0
@@ -322,7 +402,10 @@ void __cdecl GameDaemon::WriteDump(bool)
 }
 
 // 0x343910
-wchar_t const * __cdecl GameDaemon::GetAddressStringWForLogs(unsigned long)
+wchar_t const * __cdecl GameDaemon::GetAddressStringWForLogs(unsigned long addr)
 {
-    LIFT_STUB(0x343910);
+    if (GamedInstance != nullptr && GamedInstance->config != nullptr &&
+        !reinterpret_cast<GamedConfigView *>(GamedInstance->config)->_allowClientIPAddressInLogs)
+        addr = 0;
+    return Network::GetAddressStringW(addr);
 }
