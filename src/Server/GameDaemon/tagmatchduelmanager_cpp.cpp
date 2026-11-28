@@ -38,7 +38,9 @@ void __cdecl TagMatchDuelMember::ResetRound(void)
     self[40] = 0;
     *reinterpret_cast<int *>(self + 44) = -1;
     *reinterpret_cast<__int64 *>(self + 48) = 0;
-    const char *rule = reinterpret_cast<const char *>(gamed->ruleConfig);
+    // LIFT: GameDaemon::ruleConfig is private; read it at PDB offset +0xAB0.
+    const char *rule = reinterpret_cast<const char *>(
+        *reinterpret_cast< ::RuleConfig * const *>(reinterpret_cast<const char *>(gamed) + 0xAB0));
     *reinterpret_cast<int *>(self + 56) = *reinterpret_cast<const int *>(rule + 0x3B4);
     *reinterpret_cast<int *>(self + 60) = *reinterpret_cast<const int *>(rule + 0x3B8);
 }
