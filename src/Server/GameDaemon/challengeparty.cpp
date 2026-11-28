@@ -2,7 +2,13 @@
 #include "challengeparty.h"
 #include "pc.h"
 #include "zone.h"
+#include "Log.h"
 #include "LiftStub.h"
+
+#define CHALLENGEPARTY_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\ChallengeParty.cpp"
+
+#pragma comment(linker, "/INCLUDE:??1ChallengeParty@@UEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
+#pragma comment(linker, "/INCLUDE:?Initialize@ChallengePartyManager@@QEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
 
 // 0x65dd0
 __cdecl ChallengeParty::ChallengeParty(::LoadChallengePartyInfo const &, unsigned __int64)
@@ -13,7 +19,9 @@ __cdecl ChallengeParty::ChallengeParty(::LoadChallengePartyInfo const &, unsigne
 // 0x65f80
 __cdecl ChallengeParty::~ChallengeParty(void)
 {
-    LIFT_STUB(0x65f80);
+    // The _lock member destructor and the DynamicRefCntObj base destructor run after this body.
+    Log::Write(Log::LT_DEBUG, CHALLENGEPARTY_FILE, 34, L"[%s], %s; challengePartyId:%#I64x, refCount:%d", L"challenge-party",
+               L"ChallengeParty::~ChallengeParty", _info._challengePartyId, _ref);
 }
 
 // 0x66010
@@ -199,7 +207,10 @@ void __cdecl ChallengeParty::UpdateRetrieveRankingInfo(char, ::LatestRankingInfo
 // 0x6aed0
 bool __cdecl ChallengePartyManager::Initialize(void)
 {
-    LIFT_STUB(0x6aed0);
+    _challengePartyList.clear();
+    InitializeSRWLock(&_challengePartyMgrCS);
+    Log::Write(Log::LT_DEBUG, CHALLENGEPARTY_FILE, 1046, L"[%s], %s", L"challenge-party", L"ChallengePartyManager::Initialize");
+    return true;
 }
 
 // 0x6af60

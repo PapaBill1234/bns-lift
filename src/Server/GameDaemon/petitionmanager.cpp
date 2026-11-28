@@ -50,6 +50,7 @@ bool __cdecl Petition::CheckOut(__int64, wchar_t const *)
 // 0x18fb30
 __cdecl PetitionManager::PetitionManager(void)
 {
+    // ❓ Not done: needs three std::map members (StlAllocator<..., 2>) and a CriticalSection member in the class view.
     LIFT_STUB(0x18fb30);
 }
 

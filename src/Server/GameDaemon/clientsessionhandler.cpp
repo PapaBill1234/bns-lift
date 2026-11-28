@@ -17,12 +17,14 @@
 // 0x7d6b0
 void __cdecl ClientSessionHandler::OnCreated(::Session const *) const
 {
+    // ❓ Not done: needs GameDaemon::GamedInstance->_tlsInterface, TencentLibsInterface and TpDPSecurity (vtable, size 80).
     LIFT_STUB(0x7d6b0);
 }
 
 // 0x7d730
 void __cdecl ClientSessionHandler::OnDestroyed(::Session const *) const
 {
+    // ❓ Not done: same reason as OnCreated.
     LIFT_STUB(0x7d730);
 }
 

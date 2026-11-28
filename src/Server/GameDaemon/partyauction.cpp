@@ -82,6 +82,7 @@ void __cdecl PartyAuction::Clear(void)
 // 0x173640
 void __cdecl PartyAuction::sendSelectPacket(void)
 {
+    // ❓ Not done: needs the zone packet global and the Pc virtual Send slot.
     LIFT_STUB(0x173640);
 }
 

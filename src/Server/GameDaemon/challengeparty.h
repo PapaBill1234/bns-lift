@@ -1,9 +1,13 @@
 // challengeparty.h: challengeparty.cpp (GameDaemon PDB, 2019 + PDB). Wave 0: declarations of the stubbed functions only.
-// LIFT: the classes have no members and no bases yet. Later waves add the PDB layouts.
+// LIFT: ChallengeParty and ChallengePartyManager have their PDB layouts. Padding stands in for members with no declared type yet.
 #pragma once
 #include "GameDaemonFwd.h"
+#include <windows.h>
+#include <map>
+#include "../BloodLib/include/Lock.h"
+#include "../BloodLib/include/StlMemory.h"
 
-class ChallengeParty
+class ChallengeParty : public ::DynamicRefCntObj  // PDB size 0xF10
 {
 public:
     enum ADD_MEMBER_REASON {};
@@ -48,9 +52,24 @@ public:
     void __cdecl InitializeBestRecord(::SeasonContentsChallengePartyBestRecord const &);  // 0x6aa10
     bool __cdecl EnableRetrieveRankingInfo(char, ::LatestRankingInfo &);  // 0x6ab60
     void __cdecl UpdateRetrieveRankingInfo(char, ::LatestRankingInfo const &);  // 0x6ad50
+private:
+    ::CriticalSection _lock;  // +0x18
+    long volatile _isModifiable;  // +0x40
+    // LIFT: padding for _bestRecords[2] (+0x48), _bestRecordContext[2] (+0x68), _latestRankingInfo[2] (+0x868) and _rankingDesc[401] (+0x948).
+    char _pad44[0xC70 - 0x44];
+    // LIFT: view of LoadChallengePartyInfo (PDB size 0x58). GameDaemonFwd.h has only an empty LoadChallengePartyInfo.
+    struct
+    {
+        long long _challengePartyId;  // +0
+        wchar_t _name[33];  // +8
+        unsigned long long _leaderPcDbId;  // +0x50
+    } _info;  // +0xC70
+    char _members[0xF08 - 0xCC8];  // LIFT: padding for ChallengeParty::Member _members[6] (+0xCC8)
+    int _memberCount;  // +0xF08
 };
+static_assert(sizeof(ChallengeParty) == 0xF10, "sizeof ChallengeParty");
 
-class ChallengePartyManager
+class ChallengePartyManager  // PDB size 0x30
 {
 public:
     bool __cdecl Initialize(void);  // 0x6aed0
@@ -63,6 +82,10 @@ public:
     ::Pointer2< ::ChallengeParty> __cdecl GetChallengePartyPtr(__int64);  // 0x6b230
     bool __cdecl CreateChallengeParty(::CreateChallengePartyOkFromCacheParam *, wchar_t const *, ::ChallengeParty::CREATE_PARTY_REASON);  // 0x6b300
     bool __cdecl RemoveMember(__int64, unsigned __int64, ::LeaveChallengePartyReason);  // 0x6b640
+private:
+    _RTL_SRWLOCK _challengePartyMgrCS;  // +0x0
+    long long _lastRankingLogId;  // +0x8
+    ::std::map<__int64, ::ChallengeParty *, ::std::less<__int64>, ::StlAllocator< ::std::pair<__int64, ::ChallengeParty *>, 2> > _challengePartyList;  // +0x10
 };
 
 struct ChallengeParty::Member
@@ -70,4 +93,3 @@ struct ChallengeParty::Member
 public:
     bool __cdecl Compose(char, char, ::FragmentPacket *) const;  // 0x66010
 };
-

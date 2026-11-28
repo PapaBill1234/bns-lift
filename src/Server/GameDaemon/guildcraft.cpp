@@ -95,6 +95,7 @@ void __cdecl GuildCraft::AddAssentient(unsigned __int64, char, wchar_t const *)
 // 0x114ad0
 bool __cdecl GuildCraft::EnableMakeGuildCraft(char, ::GuildCraft::Product &)
 {
+    // ❓ Not done: needs the GuildCraftRecipeRecord table lookup (loader index 102). The pseudocode releases _srwLock with no acquire.
     LIFT_STUB(0x114ad0);
 }
 
