@@ -17,7 +17,9 @@ Card: `lift-gamedaemon-e35` (easy leaves, GameDaemon).
 
 Each body has an `/INCLUDE` keep pragma (no live caller yet).
 `skillaction.h` now gives `TargetSkillAction`, `ChainSkillAction` and `NoneTargetSkillAction` a partial PDB layout:
-a `LiftBytes` base for base `SkillAction` (+8 to +0xB7), `_targetId` (+0xB8), a ❓ gap to +0x2050, and the PDB members that the bodies use.
+a private helper base `LiftSkillActionBase` (no PDB name) for base `SkillAction` (+8 to +0x204F), and the PDB members that the bodies use.
+The helper base holds `_targetId` (+0xB8, PDB member of `SkillAction`) between two ❓ byte gaps.
+Round 2: `_targetId` moved from the derived classes into the helper base. The `pdb_layout` check failed because the derived classes have no PDB member `_targetId`.
 
 ## Not done
 
