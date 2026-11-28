@@ -12,9 +12,7 @@
 #define GUILD_CPP_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\Guild.cpp"
 
 #pragma comment(linker, "/INCLUDE:?findByPcDbId@Guild@@AEAAH_K@Z")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?findByPcName@Guild@@AEAAHPEB_W@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?findByPcDbIdInWaiting@Guild@@AEAAH_K@Z")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?checkPermissionGuild20@Guild@@AEAA_NHD@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?Initialize@GuildIdManager@@QEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?PushGuildId@GuildIdManager@@QEAA_NAEA_K@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?PopGuildId@GuildIdManager@@QEAA_KXZ")  // LIFT: dead-strip keep (no live caller yet)
@@ -221,14 +219,8 @@ int __cdecl Guild::findByPcDbId(unsigned __int64 pcDbId)
 // 0xfa770
 int __cdecl Guild::findByPcName(wchar_t const *pcName)
 {
-    if (_guildMemberCount <= 0)
-        return -1;
-    for (int i = 0; i < 100; ++i)
-    {
-        if (_wcsicmp(_guildMember[i].name, pcName) == 0)
-            return i;
-    }
-    return -1;
+    // ❓ Not done: review reject P2_cc (build jg, original jle), P3_imm. A later card.
+    LIFT_STUB(0xfa770);
 }
 
 // 0xfa7f0
@@ -247,12 +239,8 @@ int __cdecl Guild::findByPcDbIdInWaiting(unsigned __int64 pcDbId)
 // 0xfa830
 bool __cdecl Guild::checkPermissionGuild20(int grade, char permission)
 {
-    // ❓ PDB enumerator names of the grade (1 to 5) and the permission (1 to 17) are not looked up.
-    if (grade < 1 || grade > 5)
-        return false;
-    if (permission < 1 || permission > 17)
-        return false;
-    return (reinterpret_cast< ::GuildView *>(this)->_permission[grade - 1] & (1 << (permission - 1))) != 0;
+    // ❓ Not done: review reject P2_cc (build setb, original setne), P3_imm. A later card.
+    LIFT_STUB(0xfa830);
 }
 
 // 0xfa870

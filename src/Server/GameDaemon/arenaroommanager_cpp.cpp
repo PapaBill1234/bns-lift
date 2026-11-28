@@ -8,12 +8,10 @@
 
 #define ARENAROOMMANAGER_FILE L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\ArenaRoomManager.cpp"
 
-#pragma comment(linker, "/INCLUDE:?build@ArenaDuelRoom@@MEAA_ND@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?GetPcContentsType@ArenaPublicRaidRoom@@MEAA?AW4PcContentsTypeType@Data@@XZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?IssueOtp@ArenaRoomManager@@QEAA_KXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:??0ArenaSessionTimer@@QEAA@_J0PEB_W@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?Init@DisconnectedArenaSessionInfo@@QEAAXPEBV1@@Z")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?Decompose@DisconnectedArenaSessionInfo@@QEAA_NPEBVPacket@@AEAVPacketDecomposer@@@Z")  // LIFT: dead-strip keep (no live caller yet)
 
 // 0x49a20
 bool __cdecl ArenaRoom::Build(short, unsigned __int64, unsigned __int64, bool, ::FragmentPacketConcatenater *)
@@ -36,20 +34,8 @@ int __cdecl ArenaRoom::GetMemberCount(void)
 // 0x49c50
 bool __cdecl ArenaDuelRoom::build(char arenaLobbyGameMode)
 {
-    ::ArenaDuelRoomView *view = reinterpret_cast< ::ArenaDuelRoomView *>(this);
-    // ❓ PDB enumerator names of the arena lobby and arena duel game modes are not looked up. The values are those of the original.
-    if (arenaLobbyGameMode == 1)
-    {
-        view->_roomInfo._gameGameMode = 1;
-        return true;
-    }
-    if (arenaLobbyGameMode == 2)
-    {
-        view->_roomInfo._gameGameMode = 2;
-        return true;
-    }
-    view->_roomInfo._gameGameMode = 0;
-    return false;
+    // ❓ Not done: review reject P2_cc (build jne, original je), P3_imm, P9_ret_width. A later card.
+    LIFT_STUB(0x49c50);
 }
 
 // 0x49c80
@@ -208,10 +194,8 @@ bool __cdecl DisconnectedArenaSessionInfo::BuildPacket(::Packet &, ::PacketCompo
 // 0x4ae50
 bool __cdecl DisconnectedArenaSessionInfo::Decompose(::Packet const *packet, ::PacketDecomposer &pdr)
 {
-    // ❓ The 13th field (arena attraction) goes to a local. The class has no member for it.
-    char attraction = 0;
-    return packet->Decompose(&pdr, 13, &_disconnectedTime, &_pcDbId, _name, 33, &_teamId, &_partyId, &_reserveKey,
-                             &_worldId, &_arenaId, &_zoneId, &_geoZoneId, &_moveType, &_gameMode, &attraction) != 0;
+    // ❓ Not done: review reject P2_cc (build setne, original setb). A later card.
+    LIFT_STUB(0x4ae50);
 }
 
 // 0x4af50

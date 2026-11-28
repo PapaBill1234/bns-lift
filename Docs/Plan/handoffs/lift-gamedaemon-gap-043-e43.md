@@ -4,21 +4,17 @@
 
 ### arenaroommanager_cpp
 
-- `ArenaDuelRoom::build` (0x49c50)
 - `ArenaPublicRaidRoom::GetPcContentsType` (0x4a500)
 - `ArenaRoomManager::IssueOtp` (0x4a900)
 - `ArenaSessionTimer::ArenaSessionTimer` (0x4ac20)
 - `DisconnectedArenaSessionInfo::Init` (0x4acd0)
-- `DisconnectedArenaSessionInfo::Decompose` (0x4ae50)
 
 The header `arenaroommanager.h` now has the PDB layouts of `ArenaSessionTimer`, `DisconnectedArenaSessionInfo` (base `DynamicRefCntObj`) and `ArenaRoomManager::_otpSeed`. `ArenaDuelRoom` has a view of `_roomInfo`.
 
 ### guild_cpp_2
 
 - `Guild::findByPcDbId` (0xfa740)
-- `Guild::findByPcName` (0xfa770)
 - `Guild::findByPcDbIdInWaiting` (0xfa7f0)
-- `Guild::checkPermissionGuild20` (0xfa830)
 - `GuildIdManager::Initialize` (0x104f10)
 - `GuildIdManager::PushGuildId` (0x104f90)
 - `GuildIdManager::PopGuildId` (0x105030)
@@ -34,7 +30,6 @@ The header `guildcraft.h` now has the PDB layout of `GuildCraft` (base `DynamicR
 
 ### partyauction
 
-- `PartyAuction::nextStep` (0x173570)
 - `PartyAuction::checkAuth` (0x1736c0)
 
 The header `partyauction.h` now has the PDB layout of `PartyAuction` (base `RefCntObject`, size 0x1D8), `AuctionItem` and `AuctionMember`. The destructor and `deallocate_me` are declared only. Their bodies are in a later card.
@@ -140,3 +135,16 @@ The `pdb_layout` gate found 10 pad or invented members. The bodies did not chang
 - `GuildCraft::NormalMaterial`, `BrandMaterial` and `PCInfo`: the pads are replaced by the PDB members with PDB names and offsets.
 
 No function went back to `LIFT_STUB` in this round.
+
+## Repair round 4 (review rejects)
+
+Five functions went back to `LIFT_STUB`. Their `/INCLUDE` pragmas are removed. Each is **Not done**, with "a later card":
+
+- `ArenaDuelRoom::build` (0x49c50): P2_cc (build `jne`, original `je`); P3_imm; P9_ret_width.
+- `DisconnectedArenaSessionInfo::Decompose` (0x4ae50): P2_cc (build `setne`, original `setb`).
+- `Guild::checkPermissionGuild20` (0xfa830): P2_cc (build `setb`, original `setne`); P3_imm.
+- `Guild::findByPcName` (0xfa770): P2_cc (build `jg`, original `jle`); P3_imm.
+- `PartyAuction::nextStep` (0x173570): P2_cc (build `jne`, original `je`); P3_imm.
+- `PacketBuffer::Decompose` (0x69bf00): P2_cc (build `jae`, original `jbe`); P3_imm. `packetbuffer.cpp` already holds the `LIFT_STUB` form. No change.
+
+The 17 accepted bodies and the MATCH bodies did not change.

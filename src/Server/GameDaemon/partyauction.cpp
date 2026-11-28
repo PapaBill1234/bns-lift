@@ -5,7 +5,6 @@
 
 static_assert(sizeof(PartyAuction) == 0x1D8, "sizeof PartyAuction");
 
-#pragma comment(linker, "/INCLUDE:?nextStep@PartyAuction@@AEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?checkAuth@PartyAuction@@AEAA_NH@Z")  // LIFT: dead-strip keep (no live caller yet)
 
 // 0x171a20
@@ -53,24 +52,8 @@ bool __cdecl PartyAuction::startAuction(::TeamPartyProxy *)
 // 0x173570
 bool __cdecl PartyAuction::nextStep(void)
 {
-    // LIFT: the loop below is PartyAuction::isFinish, inlined in the original.
-    bool finish = true;
-    for (int i = 0; i < _auctionitemCount; ++i)
-    {
-        if (!_auctionItems[i].finish)
-        {
-            finish = false;
-            break;
-        }
-    }
-    if (finish)
-        return false;
-
-    do
-    {
-        _currentAuctionIndex = static_cast<char>((_currentAuctionIndex + 1) % _auctionitemCount);
-    } while (_auctionItems[_currentAuctionIndex].finish);
-    return true;
+    // ❓ Not done: review reject P2_cc (build jne, original je), P3_imm. A later card.
+    LIFT_STUB(0x173570);
 }
 
 // 0x1735e0
