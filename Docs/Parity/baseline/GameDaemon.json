@@ -1910,6 +1910,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"GameArenaLobbyManager::GameArenaLobbyManager": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "GameDaemon::GetTimerInterval": {
 "calls": 100,
 "consts": 100,
@@ -2044,6 +2051,13 @@
 "status": "DIFF"
 },
 "GetDataReaderInterfaceVersion": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GetNPCustomProtocolStr": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
