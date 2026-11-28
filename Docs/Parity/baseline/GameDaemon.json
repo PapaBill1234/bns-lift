@@ -300,6 +300,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"AirDashEffect::GetDataSubType": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "AlertSender::AlertSender": {
 "calls": 100,
 "consts": 100,
@@ -811,6 +818,20 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"Creature::AddChangedExtraPropertyId": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Creature::AddChangedPropertyId": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "Creature::GetActivatedBadgeEquipSlot": {
 "calls": 100,
 "consts": 100,
@@ -854,6 +875,13 @@
 "status": "MATCH"
 },
 "CreatureProperty::Version": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"DashEffect::GetDataSubType": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -1623,6 +1651,20 @@
 "score": 66.7,
 "status": "DIFF"
 },
+"EffectList::Clear": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"EffectList::EffectList": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "EffectProperty::FieldDefine": {
 "calls": 100,
 "consts": 100,
@@ -1757,6 +1799,20 @@
 "status": "MATCH"
 },
 "FSE_readNCount": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"FallDamageEffect::GetDataSubType": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"FallDeathEffect::GetDataSubType": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -2072,6 +2128,13 @@
 "status": "MATCH"
 },
 "ItemBase<WeaponTrait>::GetFieldCount": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"ItemPouch::ItemPouch": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -2499,6 +2562,13 @@
 "status": "MATCH"
 },
 "NpcPartyTimer::TimerExpired": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"OceanicEffect::GetDataSubType": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
@@ -3310,6 +3380,34 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"SkillContainer::FindInPassiveSkills": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"SkillContainer::GetCurrentSkillPageJobStyle": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"SkillContainer::GetSkillPageEnable": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"SkillContainer::isCandidateSkill": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "SkillPage::FieldDefine": {
 "calls": 100,
 "consts": 100,
@@ -3849,6 +3947,13 @@
 "score": 100.0,
 "status": "MATCH"
 },
+"TransitEffect::GetDataSubType": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "TryRegisterGuildTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
@@ -4235,6 +4340,20 @@
 "status": "DIFF"
 },
 "ZipPackedReaderIO::Next": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Zone::GetCampfire": {
+"calls": 100,
+"consts": 100,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Zone::GetFieldItem": {
 "calls": 100,
 "consts": 100,
 "refs": 100,
