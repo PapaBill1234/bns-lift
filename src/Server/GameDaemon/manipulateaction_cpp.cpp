@@ -201,28 +201,9 @@ int __cdecl FishManipulateAction::decideFishRandomSize(int, int, unsigned __int6
 }
 
 // 0x4791d0
-// ❓ the skeleton has no names for the fail reason values; the values are from the binary. `this` is not used.
-#pragma comment(linker, "/INCLUDE:?convertFailReason@FishManipulateAction@@AEAAFF@Z")  // LIFT: dead-strip keep (no live caller yet)
-short __cdecl FishManipulateAction::convertFailReason(short failReason)
+short __cdecl FishManipulateAction::convertFailReason(short)
 {
-    switch (failReason)
-    {
-    case 219:
-        return 664;
-    case 220:
-        return 665;
-    case 223:
-        return 666;
-    case 226:
-        return 667;
-    case 639:
-        return 656;
-    case 640:
-        return 657;
-    case 650:
-        return 659;
-    }
-    return failReason;
+    LIFT_STUB(0x4791d0);
 }
 
 // 0x479230

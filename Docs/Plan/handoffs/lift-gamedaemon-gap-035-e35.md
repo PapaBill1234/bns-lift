@@ -6,14 +6,11 @@ Card: `lift-gamedaemon-e35` (easy leaves, GameDaemon).
 
 ### skillaction_cpp_2
 
-- 0x4a6550 `SkillAction::getConsumePoint`. The enumerator names of `Data::SkillPointTypeType` are not in the skeleton, so the cases use the values 0 to 5 (marked ❓).
 - 0x4acc40 `TargetSkillAction::SucceedTargetInfo`.
 - 0x4af2f0 `ChainSkillAction::SucceedTargetInfo`.
 - 0x4b09e0 `NoneTargetSkillAction::SucceedTargetInfo`.
 
-### manipulateaction_cpp
-
-- 0x4791d0 `FishManipulateAction::convertFailReason`. The fail reason values have no names in the skeleton (marked ❓).
+Round 3 (repair): review rejected `SkillAction::getConsumePoint` and `FishManipulateAction::convertFailReason`. The PDB gives both a `this` parameter, so they are not static. Both bodies are `LIFT_STUB` again. Their keep pragmas are removed.
 
 Each body has an `/INCLUDE` keep pragma (no live caller yet).
 `skillaction.h` now gives `TargetSkillAction`, `ChainSkillAction` and `NoneTargetSkillAction` a partial PDB layout:
@@ -49,6 +46,7 @@ Round 2: `_targetId` moved from the derived classes into the helper base. The `p
 | 0x4ac080 | `SkillAction::getSkillInstanceIdForGameLog` | The body reads `_zoneInstance` and `Zone::_skillInstanceIdForGameLog`. The skeleton classes have no members. |
 | 0x4ac100 | `CasterSkillAction::SucceedTargetInfo` | The body inlines `Action::GetCaster`, which is a stub (`_childRole` has no name yet). |
 | 0x4adc20 | `GroundRadiusSkillAction::SucceedTargetInfo` | The body copies `_targetPosition` (`vector16`). The skeleton `vector16` is an empty struct, so the copy cannot match. |
+| 0x4a6550 | `SkillAction::getConsumePoint` | Review reject: each parameter sits one register later than in the original. The PDB gives a `this` parameter (not static), so the body is a stub again. |
 | 0x4b09d0 | `NoneTargetSkillAction::isExecutable` | The body is a virtual call to `isFlyable(0)`. The skeleton vtable order is not the PDB order, so the slot does not match. |
 
 ### manipulateaction_cpp
@@ -58,6 +56,7 @@ Round 2: `_targetId` moved from the derived classes into the helper base. The `p
 | 0x475440 | `ManipulateAction::failAction` | Same cause as 0x47cc20: caster access (`_childRole`) and the variadic `Send` on a skeleton class. |
 | 0x476800 | `NpcManipulateAction::failAction` | Same cause as 0x475440. |
 | 0x476d60 | `GiveFactionScoreToRefinerAction::failAction` | Same cause as 0x475440. |
+| 0x4791d0 | `FishManipulateAction::convertFailReason` | Review reject: the parameter sits one register later than in the original. The PDB gives a `this` parameter (not static), so the body is a stub again. |
 | 0x479230 | `ManipulateActionGameLog::GetFishingFieldId` | The body reads `Env::_env2` record fields and calls a `DataManager` loader table virtual (loader 90). The skeleton has no `Env` record layout and no `DataManager` table accessor. |
 | 0x479280 | `ManipulateActionGameLog::GetFishingPasteId` | The body calls the `Item::GetData` virtual and a `DataManager` loader table virtual (loader 91). The skeleton has no layout for these. |
 

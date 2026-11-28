@@ -5,7 +5,6 @@
 #include "LiftStub.h"
 #include <string.h>
 
-#pragma comment(linker, "/INCLUDE:?getConsumePoint@SkillAction@@IEAA_JW4SkillPointTypeType@Data@@_J111@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?SucceedTargetInfo@TargetSkillAction@@UEAA_N_JHAEA_KAEAUvector16@@QEA_KAEAD@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?SucceedTargetInfo@ChainSkillAction@@UEAA_N_JHAEA_KAEAUvector16@@QEA_KAEAD@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?SucceedTargetInfo@NoneTargetSkillAction@@UEAA_N_JHAEA_KAEAUvector16@@QEA_KAEAD@Z")  // LIFT: dead-strip keep (no live caller yet)
@@ -29,24 +28,9 @@ bool __cdecl SkillAction::checkDuelBotRecycleTime(::Creature *)
 }
 
 // 0x4a6550
-// LIFT: the PDB names the five params type, value, baseMax, totalMax, currentPoint. `this` is not used.
-// ❓ the enumerator names of Data::SkillPointTypeType are not in the skeleton; the values 0 to 5 are from the binary.
-__int64 __cdecl SkillAction::getConsumePoint(::Data::SkillPointTypeType type, __int64 value, __int64 baseMax, __int64 totalMax, __int64 currentPoint)
+__int64 __cdecl SkillAction::getConsumePoint(::Data::SkillPointTypeType, __int64, __int64, __int64, __int64)
 {
-    switch ((int)type)
-    {
-    case 0:
-    case 1:
-    case 2:
-        return value;
-    case 3:
-        return baseMax * value / 100;
-    case 4:
-        return totalMax * value / 100;
-    case 5:
-        return currentPoint * value / 100;
-    }
-    return 0;
+    LIFT_STUB(0x4a6550);
 }
 
 // 0x4a65f0
