@@ -27,6 +27,10 @@ Each `BoardGacha*::SendFail` body sends `Send("hE", opcode, 2)`. The `failReason
 - `OccupationWarManager::getRatingRevise` (0x1719a0): needs the `Data::DataManager::Instance->_loaderDefs[6]` table layout and a virtual call on `DrTable`. No lifted code shows this form yet.
 - `Task::getParentZone` (0x291b50), `RequestActionCancel::start` (0x293fd0), `RequestSkillTrigger::start` (0x294000): the pseudocode reads `RelationalRefCntObject` parent fields at unknown offsets (`MEMORY[0x8B8]`, `parent[56]` vtable call). Needs more than 5 look-ups.
 
+## Repair (round 3)
+
+`useRandomValue2()` in `gamemath_cpp.cpp` read the private `GameDaemon::config` member. It now reads the member at its PDB offset (+0xAA8), then `_userandomValue2` at +0x30C. No other body changed.
+
 ## Not checked
 
 The author session ran no build and no formtest. The driver build must confirm each lifted body.

@@ -8,10 +8,13 @@
 #pragma comment(linker, "/INCLUDE:?tryProbability@@YA_NH@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?tryProbability10000@@YA_NH@Z")  // LIFT: dead-strip keep (no live caller yet)
 
-// Partial PDB offset: GamedConfig::_userandomValue2 is at +0x30C.
+// LIFT: GameDaemon::config is a private PDB member at +0xAA8. Read it by offset.
+// LIFT: GamedConfig::_userandomValue2 is at +0x30C.
 static bool useRandomValue2()
 {
-    return *(reinterpret_cast<const bool *>(GameDaemon::GamedInstance->config) + 0x30C);
+    const char *daemon = reinterpret_cast<const char *>(GameDaemon::GamedInstance);
+    const char *config = *reinterpret_cast<const char * const *>(daemon + 0xAA8);
+    return *reinterpret_cast<const bool *>(config + 0x30C);
 }
 
 // 0xd5760
