@@ -445,6 +445,42 @@ decompose_overflow:
 // 0x23D90 (SmartCouponDaemon)
 bool PacketBuffer::encrypt(PacketCrypt* crypt, Security3rdParty* crypt3rd)
 {
+#if defined(LIFT_EXE_GD)
+    // LIFT: GameDaemon form (lessons A22). GD 0x69cc40 has one `mov al,1` exit, computes &Buffer[6] before the
+    // 3rd-party branch and reads encBufSize before the sendBuffer store.
+    if (crypt != nullptr)
+    {
+        int encBufSize = 0;
+        bool with3rdParty = false;
+        for (PacketBuffer* pktbuf = this; pktbuf != nullptr; pktbuf = pktbuf->Next)
+        {
+            if (pktbuf->sendBuffer != nullptr)
+                continue;
+            encBufSize = 4002;
+            int size = *reinterpret_cast<short*>(&pktbuf->Buffer[8]);
+            char* encBuf = &pktbuf->Buffer[6];
+            if (crypt3rd != nullptr)
+            {
+                int size3rd = size - 2;
+                if (crypt3rd->Encrypt(reinterpret_cast<unsigned char*>(&pktbuf->Buffer[10]), &size3rd,
+                                      &with3rdParty) == Security3rdParty::S3ERR_SUCCESS)
+                    size = size3rd + 2;
+            }
+            PacketCrypt::ErrCode error =
+                crypt->Encrypt(reinterpret_cast<unsigned char*>(encBuf), &encBufSize, size, with3rdParty);
+            if (error != PacketCrypt::SPCE_NO_ERROR)
+            {
+                Log::Write(Log::LT_ERROR, PACKETBUFFER_FILE, 1221, L"PacketBuffer, cannot ecrypt packet, error-code:%d",
+                           error);
+                return false;
+            }
+            int sendSize = encBufSize;
+            pktbuf->sendBuffer = encBuf;
+            pktbuf->sendSize = sendSize;
+        }
+    }
+    return true;
+#else
     if (crypt == nullptr)
         return true;
     int encBufSize = 0;
@@ -473,6 +509,7 @@ bool PacketBuffer::encrypt(PacketCrypt* crypt, Security3rdParty* crypt3rd)
         pktbuf->sendSize = encBufSize;
     }
     return true;
+#endif
 }
 
 // 0x23EA0 (SmartCouponDaemon)

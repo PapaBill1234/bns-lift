@@ -958,11 +958,24 @@ __declspec(noinline) bool Session::send(PacketBuffer const** const pbufferList, 
     {
         if (!_connection->AsyncSend(context))
         {
+#if defined(LIFT_EXE_GD)
+            // LIFT: GameDaemon form (lessons A22). GD 0x699940 reads _connection->_socket and _id before
+            // WSAGetLastError.
+            SOCKET socket = _connection->_socket;
+            auto id = _id;
+            int error = WSAGetLastError();
+            Log::Write(Log::LT_ERROR, SESSION_FILE, 1300,
+                       L"[session], cannot send packet; async send failed, id:%I64x, this:%p, state:%d, socket:%I32x, "
+                       L"error:%d",
+                       id, this, _state, static_cast<unsigned int>(socket), error);
+            return false;
+#else
             Log::Write(Log::LT_ERROR, SESSION_FILE, 1300,
                        L"[session], cannot send packet; async send failed, id:%I64x, this:%p, state:%d, socket:%I32x, "
                        L"error:%d",
                        _id, this, _state, static_cast<unsigned int>(_connection->_socket), WSAGetLastError());
             return false;
+#endif
         }
         self->_sendPending = true;
     }
