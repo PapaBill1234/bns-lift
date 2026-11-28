@@ -9,6 +9,7 @@
 
 - `MarketReaderAgentSessionHandler::OnAccept` (0x1618f0): log path (E16). The body calls `Log::Write` and `AlertSender::Write`.
 - `MarketReaderAgentSessionHandler::PacketHandler` (0x161d40): log path (E16). The body calls `Log::Write`.
+- Round 2: fix the build error in `npservicetran_cpp.cpp`. The case labels of `GetNPCustomProtocolStr` now use constant enumerators. The switch uses the int value of the type.
 - `GameSideArenaLobbySessionHandler::OnAccept` (0xd26d0): log path (E16). The body calls `Log::Write` and `AlertSender::Write`.
 - `GameArenaLobbyManager::ResetIsInitializeGuildInfo` (0xd3720): log path (E16). The inlined lock check calls `Log::Write` and `AlertSender::Write`.
 - `NPRegisterServiceTran::NPRegisterServiceTran` (0x16f530): the constructor sets the `GameTran` and the class vtables. The skeleton `GameTran` has no virtual layout and no lifted constructor. A view cannot give the vtable stores.

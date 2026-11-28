@@ -5,18 +5,21 @@
 namespace
 {
 // LIFT: PDB enumerators of NPCustomProtocolType. The skeleton enum in GameDaemonFwd.h has no enumerators yet.
-const ::NPCustomProtocolType NP_CUSTOM_PROTOCOL_TYPE_GAME = static_cast< ::NPCustomProtocolType>(1);
-const ::NPCustomProtocolType NP_CUSTOM_PROTOCOL_TYPE_WORLD = static_cast< ::NPCustomProtocolType>(2);
-const ::NPCustomProtocolType NP_CUSTOM_PROTOCOL_TYPE_GAMEWAREHOUSE = static_cast< ::NPCustomProtocolType>(3);
-const ::NPCustomProtocolType NP_CUSTOM_PROTOCOL_TYPE_AUCTION = static_cast< ::NPCustomProtocolType>(4);
-const ::NPCustomProtocolType NP_CUSTOM_PROTOCOL_TYPE_GAMEGROUP = static_cast< ::NPCustomProtocolType>(5);
+enum
+{
+    NP_CUSTOM_PROTOCOL_TYPE_GAME = 1,
+    NP_CUSTOM_PROTOCOL_TYPE_WORLD = 2,
+    NP_CUSTOM_PROTOCOL_TYPE_GAMEWAREHOUSE = 3,
+    NP_CUSTOM_PROTOCOL_TYPE_AUCTION = 4,
+    NP_CUSTOM_PROTOCOL_TYPE_GAMEGROUP = 5
+};
 }  // namespace
 
 // 0x16f4e0
 #pragma comment(linker, "/INCLUDE:?GetNPCustomProtocolStr@@YAPEADW4NPCustomProtocolType@@@Z")  // LIFT: dead-strip keep (no live caller yet)
 char * __cdecl GetNPCustomProtocolStr(::NPCustomProtocolType type)
 {
-    switch (type)
+    switch (static_cast<int>(type))
     {
     case NP_CUSTOM_PROTOCOL_TYPE_GAME:
         return "Srv2Game";
