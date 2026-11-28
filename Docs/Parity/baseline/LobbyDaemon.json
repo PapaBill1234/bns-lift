@@ -2,6 +2,7 @@
 "AbandonChargeJob::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9,6 +10,7 @@
 "AbandonChargeJob::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -16,6 +18,7 @@
 "AbandonChargeJob::_vtbl": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -52,6 +55,7 @@
 "AccountInventoryChannel::SendConsumeWarehouseItemReq": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -67,6 +71,7 @@
 "AccountInventoryChannel::SendGetGoodsCountReq": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -74,6 +79,7 @@
 "AccountInventoryChannel::SendHelloReq": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -88,6 +94,7 @@
 "AccountInventoryChannel::SendLoginNotify": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -95,6 +102,7 @@
 "AccountInventoryChannel::SendLogoutNotify": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -102,6 +110,7 @@
 "AccountInventoryChannel::SendRetrieveCharacterGoodsCountReq": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -109,6 +118,7 @@
 "AccountInventoryChannel::SendRetrieveLobbyServiceItemListReq": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -116,6 +126,7 @@
 "AccountInventoryChannel::SendRetrieveSingleWarehouseItemReq": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -123,6 +134,7 @@
 "AccountInventoryChannel::SendTakeGoodsReq": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -130,6 +142,7 @@
 "AccountInventoryChannel::SendTryWarehouseItemConsumptionReq": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -137,6 +150,7 @@
 "AccountInventorySessionHandler::OnAccept": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -158,6 +172,7 @@
 "AddSlotService::Setup": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -165,6 +180,7 @@
 "Aes128::BlockSize": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -172,6 +188,7 @@
 "Aes128::Cleanup": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -179,6 +196,7 @@
 "Aes128::Decrypt": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -186,6 +204,7 @@
 "Aes128::EncSize": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -193,6 +212,7 @@
 "Aes128::Encrypt": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -200,6 +220,7 @@
 "Aes128::GetType": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -207,6 +228,7 @@
 "Aes128::Setup": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -238,6 +260,7 @@
 "Aes128Table_Decrypt": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -253,6 +276,7 @@
 "Aes128Table_Setup": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -260,6 +284,7 @@
 "AlertSender::AlertSender": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -267,6 +292,7 @@
 "AlertSender::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -274,6 +300,7 @@
 "AlertSender::Write": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -281,6 +308,7 @@
 "AlertSender::createSocket": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -295,6 +323,7 @@
 "AlertSender::run": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -302,6 +331,7 @@
 "AlertSender::sendRemain": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -309,6 +339,7 @@
 "AlertSender::writev2": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -316,6 +347,7 @@
 "AnonymousLobbyGatePresence::Close": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -323,6 +355,7 @@
 "AnonymousLobbyGatePresence::GetKind": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -330,6 +363,7 @@
 "AnonymousLobbyGatePresence::IsEqual": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -337,6 +371,7 @@
 "AnonymousLobbyGatePresence::Kick": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -374,6 +409,7 @@
 "AutoDbTran::~AutoDbTran": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -381,6 +417,7 @@
 "BLDaemonInfoTable::BLDaemonInfoTable": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -396,6 +433,7 @@
 "BLDaemonInfoTable::Find": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -403,6 +441,7 @@
 "BLDaemonInfoTable::Load": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -410,6 +449,7 @@
 "BLDaemonInfoTable::Update": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -417,6 +457,7 @@
 "BLDaemonInfoTable::add": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -431,6 +472,7 @@
 "BLDaemonInfoTable::~BLDaemonInfoTable": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -438,6 +480,7 @@
 "BannedWordFilterLib::FilterName": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -445,6 +488,7 @@
 "BannedWordFilterLoader::CreateFileBuffer": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -452,6 +496,7 @@
 "BannedWordFilterLoader::InitBannedWordFilterLoader": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -467,6 +512,7 @@
 "BannedWordFilterMemoryAllocator::Alloc": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -474,6 +520,7 @@
 "BannedWordFilterMemoryAllocator::Free": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -481,6 +528,7 @@
 "BannedWordFilterMemoryAllocator::Realloc": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -488,6 +536,7 @@
 "BaseRefCntObj::deallocate_me": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -495,6 +544,7 @@
 "BaseRefCntObj::~BaseRefCntObj": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -502,6 +552,7 @@
 "BloodDaemonMain": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -509,6 +560,7 @@
 "Blowfish::BlockSize": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -516,6 +568,7 @@
 "Blowfish::Cleanup": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -523,6 +576,7 @@
 "Blowfish::Decrypt": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -530,6 +584,7 @@
 "Blowfish::EncSize": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -545,6 +600,7 @@
 "Blowfish::GetType": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -552,6 +608,7 @@
 "Blowfish::Setup": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -580,6 +637,7 @@
 "BnsCommonConfig::UpdateAllVariable": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -602,6 +660,7 @@
 "BoundedList::Remove": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -609,6 +668,7 @@
 "CancelWaitCharacterDeletionJob::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -616,6 +676,7 @@
 "CancelWaitCharacterDeletionJob::_vtbl": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -665,6 +726,7 @@
 "CancelWaitCharacterDeletionJob::work": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -672,6 +734,7 @@
 "CancelWaitCharacterDeletionJob::~CancelWaitCharacterDeletionJob": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -693,6 +756,7 @@
 "ChangeCharacterRaceService::Fetch": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -707,6 +771,7 @@
 "ChangeCharacterRaceService::Setup": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -742,6 +807,7 @@
 "ChangeCharacterSexService::Fetch": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -756,6 +822,7 @@
 "ChangeCharacterSexService::Setup": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -777,6 +844,7 @@
 "Channel::GetSession": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -791,6 +859,7 @@
 "Channel::RemoveSession": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -798,6 +867,7 @@
 "Channel::SetSession": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -805,6 +875,7 @@
 "Channel::removeSession": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -812,6 +883,7 @@
 "Channel::~Channel": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -883,6 +955,7 @@
 "Character::IsPlayable": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -890,6 +963,7 @@
 "Character::SetLevel": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -897,6 +971,7 @@
 "Character::SetShowcase": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -904,6 +979,7 @@
 "Character::SetSlotId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -932,6 +1008,7 @@
 "CharacterCosmesisService::Setup": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -954,6 +1031,7 @@
 "CliSession::CliSession [??0CliSession@@AEAA@XZ]": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -990,6 +1068,7 @@
 "CliSession::NotifyChangedGradeLevel": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1005,6 +1084,7 @@
 "CliSession::OnChargeStopRequested": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1019,6 +1099,7 @@
 "CliSession::TimeoutStopPlay": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1026,6 +1107,7 @@
 "CliSession::UpdateBotScore": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1048,6 +1130,7 @@
 "CliSession::addLobbyService": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1055,6 +1138,7 @@
 "CliSession::addRenameUserService": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1062,6 +1146,7 @@
 "CliSession::cleanupCharge": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1069,6 +1154,7 @@
 "CliSession::closePresence": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1083,6 +1169,7 @@
 "CliSession::fetchContentBans": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1090,6 +1177,7 @@
 "CliSession::finalize": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1097,6 +1185,7 @@
 "CliSession::getCharacter": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1104,6 +1193,7 @@
 "CliSession::getLobbyServiceByType": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1111,6 +1201,7 @@
 "CliSession::getPlayingCharacter": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1118,6 +1209,7 @@
 "CliSession::kickPresence": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1125,6 +1217,7 @@
 "CliSession::leave": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1132,6 +1225,7 @@
 "CliSession::logout": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1139,6 +1233,7 @@
 "CliSession::onPcCafeChargeStart": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1146,6 +1241,7 @@
 "CliSession::onPcCafeChargeStop": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1153,6 +1249,7 @@
 "CliSession::queryLobbyService": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1160,6 +1257,7 @@
 "CliSession::removeCharacter": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1167,6 +1265,7 @@
 "CliSession::removeLobbyService": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1174,6 +1273,7 @@
 "CliSession::setChargeKey": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1188,6 +1288,7 @@
 "CliSession::setPcCafe": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1195,6 +1296,7 @@
 "CliSession::setPcCafeCode": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1202,6 +1304,7 @@
 "CliSession::setPresence": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1209,6 +1312,7 @@
 "CliSession::setRMSInquiryResult": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1216,6 +1320,7 @@
 "CliSession::setRole": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1223,6 +1328,7 @@
 "CliSessionEnterWorldMessage::Dispatch": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1230,6 +1336,7 @@
 "CliSessionEnterWorldMessage::~CliSessionEnterWorldMessage": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1244,6 +1351,7 @@
 "CliSessionJob::CliSessionJob": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1251,6 +1359,7 @@
 "CliSessionJob::dispatch_work": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1258,6 +1367,7 @@
 "CliSessionJob::~CliSessionJob": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1265,6 +1375,7 @@
 "CliSessionLeaveWorldMessage::Dispatch": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1272,6 +1383,7 @@
 "CliSessionTable::Delete": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1287,6 +1399,7 @@
 "CliSessionTable::Delete_index_gate": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1302,6 +1415,7 @@
 "CliSessionTable::Delete_index_pcid": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1309,6 +1423,7 @@
 "CliSessionTable::Insert_index_gate": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1324,6 +1439,7 @@
 "CliSessionTable::Insert_index_pcid": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1331,6 +1447,7 @@
 "CliSessionTable::Select": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1338,6 +1455,7 @@
 "CliSessionTable::SelectAll": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1353,6 +1471,7 @@
 "CliSessionTable::Select_index_gate": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1360,6 +1479,7 @@
 "CliSessionTable::Select_index_pcid": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1367,6 +1487,7 @@
 "ConcatenatePacket": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1382,6 +1503,7 @@
 "Connection::AsyncConnect": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1389,6 +1511,7 @@
 "Connection::AsyncRecv": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1396,6 +1519,7 @@
 "Connection::AsyncSend": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1403,6 +1527,7 @@
 "Connection::CompleteAsyncConnect": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1410,6 +1535,7 @@
 "Connection::makeConnectSocket": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1417,6 +1543,7 @@
 "Console::SetTitle": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1424,6 +1551,7 @@
 "Console::~Console": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1475,6 +1603,7 @@
 "CoolDown::HandleEvent": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1482,6 +1611,7 @@
 "CoolDown::Start": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1489,6 +1619,7 @@
 "CoolDown::TimerClass": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1496,6 +1627,7 @@
 "CrashHandler::CrashHandler": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1503,6 +1635,7 @@
 "CrashHandler::Handle": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1517,6 +1650,7 @@
 "CrashHandler::MakeCrash": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1531,6 +1665,7 @@
 "CrashHandler::SetMailInfo": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1538,6 +1673,7 @@
 "CrashHandler::handleCrash": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1545,6 +1681,7 @@
 "CreateCharacterJob::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1573,6 +1710,7 @@
 "CreateCharacterJob::expireGetSlot": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1608,6 +1746,7 @@
 "CreateCharacterJob::work": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1615,6 +1754,7 @@
 "CreateCharacterJob::~CreateCharacterJob": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1622,6 +1762,7 @@
 "CriticalSection::~CriticalSection": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1629,6 +1770,7 @@
 "Crypto::Destroy": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1644,6 +1786,7 @@
 "Ctr::Decrypt": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1667,6 +1810,7 @@
 "Daemon::Cooldown": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1674,6 +1818,7 @@
 "Daemon::Daemon": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1681,6 +1826,7 @@
 "Daemon::LoadVersion": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1688,6 +1834,7 @@
 "Daemon::Reload": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1695,6 +1842,7 @@
 "Daemon::Start": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1702,6 +1850,7 @@
 "Daemon::cooldown": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1709,6 +1858,7 @@
 "Daemon::noTimerMain": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1716,6 +1866,7 @@
 "Daemon::setAddress": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1723,6 +1874,7 @@
 "Daemon::setCurrentDirectory": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1730,6 +1882,7 @@
 "Daemon::start": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1737,6 +1890,7 @@
 "Daemon::startDaemon": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1744,6 +1898,7 @@
 "Daemon::timerMain": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1751,6 +1906,7 @@
 "Daemon::~Daemon": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1758,6 +1914,7 @@
 "DaemonConfig::AllocConfig": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1780,6 +1937,7 @@
 "Db::AllocTransaction": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1787,6 +1945,7 @@
 "Db::ConvertTime": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1802,6 +1961,7 @@
 "Db::Log": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1809,6 +1969,7 @@
 "Db::ReleaseTransaction": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1816,6 +1977,7 @@
 "Db::errorLog": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1823,6 +1985,7 @@
 "Db::initEnv": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1837,6 +2000,7 @@
 "DbTransaction::BindParam": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1844,6 +2008,7 @@
 "DbTransaction::Execute": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1851,6 +2016,7 @@
 "DbTransaction::Fetch": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1858,6 +2024,7 @@
 "DbTransaction::Prepare": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1865,6 +2032,7 @@
 "DbTransaction::close": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1872,6 +2040,7 @@
 "DbTransaction::connect": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1879,6 +2048,7 @@
 "DbTransaction::connectionErrorLog": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1886,6 +2056,7 @@
 "DbTransaction::initStatement": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1893,6 +2064,7 @@
 "DbTransaction::initialize": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1900,6 +2072,7 @@
 "DbTransaction::statmentErrorLog": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1914,6 +2087,7 @@
 "DelayedRelease::Add": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1921,6 +2095,7 @@
 "DelayedRelease::Cleanup": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1928,6 +2103,7 @@
 "DelayedRelease::Release": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1935,6 +2111,7 @@
 "DelayedRelease::releaseNode": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1942,6 +2119,7 @@
 "DeleteCharacterJob::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1949,6 +2127,7 @@
 "DeleteCharacterJob::_vtbl": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2050,6 +2229,7 @@
 "DeleteCharacterJob::getCharacterGoodsCountOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2086,6 +2266,7 @@
 "DeleteCharacterJob::~DeleteCharacterJob": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2100,6 +2281,7 @@
 "DumpRegister": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2107,6 +2289,7 @@
 "DumpStack": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2114,6 +2297,7 @@
 "DynamicEventObject::deallocate_me": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2121,6 +2305,7 @@
 "DynamicEventObject::~DynamicEventObject": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2128,6 +2313,7 @@
 "DynamicRefCntObj::~DynamicRefCntObj": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2135,6 +2321,7 @@
 "EndWaitGameWorldJob::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2142,6 +2329,7 @@
 "EndWaitGameWorldJob::_vtbl": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2164,6 +2352,7 @@
 "EndWaitGameWorldJob::work": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2171,6 +2360,7 @@
 "EnterGameWorldJob::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2178,6 +2368,7 @@
 "EnterGameWorldJob::_vtbl": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2200,6 +2391,7 @@
 "ExceptionCodeString": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2207,6 +2399,7 @@
 "ExtendJumpingCharacterCreationQuotaJob::ExtendJumpingCharacterCreationQuotaJob": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2214,6 +2407,7 @@
 "ExtendJumpingCharacterCreationQuotaJob::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2221,6 +2415,7 @@
 "ExtendJumpingCharacterCreationQuotaJob::checkAccountInventoryItem": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2243,6 +2438,7 @@
 "ExtendJumpingCharacterCreationQuotaJob::checkAccountInventoryItemTimeout": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2279,6 +2475,7 @@
 "ExtendJumpingCharacterCreationQuotaJob::finConsumeAccountInventoryItemTimeout": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2337,6 +2534,7 @@
 "ExtendJumpingCharacterCreationQuotaJob::tryConsumeAccountInventoryItemTimeout": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2344,6 +2542,7 @@
 "ExtendJumpingCharacterCreationQuotaJob::work": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2351,6 +2550,7 @@
 "ExtendJumpingCharacterCreationQuotaJob::~ExtendJumpingCharacterCreationQuotaJob": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2387,6 +2587,7 @@
 "ExtendJumpingCharacterCreationQuotaService::Setup": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2408,6 +2609,7 @@
 "FSE_count_simple": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2415,6 +2617,7 @@
 "FragmentPacket::Compose": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2422,6 +2625,7 @@
 "FragmentPacket::FragmentPacket": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2429,6 +2633,7 @@
 "FragmentPacket::FreeSize": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2436,6 +2641,7 @@
 "FragmentPacket::IncRepeatCount": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2443,6 +2649,7 @@
 "FragmentPacket::~FragmentPacket": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2457,6 +2664,7 @@
 "FragmentPacketConcatenater::AllocSize": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2464,6 +2672,7 @@
 "FragmentPacketConcatenater::Clear": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2485,6 +2694,7 @@
 "FragmentPacketConcatenater::Destroy": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2492,6 +2702,7 @@
 "FragmentPacketConcatenater::check": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2499,6 +2710,7 @@
 "FragmentPacketConcatenater::~FragmentPacketConcatenater": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2513,6 +2725,7 @@
 "FragmentPacketSplitter::Clear": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2527,6 +2740,7 @@
 "FsdDecomposer::Decompose": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2534,6 +2748,7 @@
 "FsdDecomposer::GetByte": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2541,6 +2756,7 @@
 "FsdDecomposer::GetDword": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2548,6 +2764,7 @@
 "FsdDecomposer::GetQword": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2562,6 +2779,7 @@
 "FsdDecomposer::GetWord": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2576,6 +2794,7 @@
 "GameAccount::~GameAccount": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2583,6 +2802,7 @@
 "GameServiceLocation::ReserveStopPlay": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2590,6 +2810,7 @@
 "GameServiceLocation::TimeoutStopPlay": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2604,6 +2825,7 @@
 "GameTimeQueue::GameTimeQueue": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2611,6 +2833,7 @@
 "GameTimeQueue::Release": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2618,6 +2841,7 @@
 "GameTimeQueue::~GameTimeQueue": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2625,6 +2849,7 @@
 "GameTimeScheduler::GameTimeScheduler": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2632,6 +2857,7 @@
 "GameTimeScheduler::HandleEvent": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2655,6 +2881,7 @@
 "GameTimeScheduler::~GameTimeScheduler": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2683,6 +2910,7 @@
 "GameWorld::GameWorld": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2690,6 +2918,7 @@
 "GameWorld::GetWid": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2697,6 +2926,7 @@
 "GameWorld::PermitCharacterManagement": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2718,6 +2948,7 @@
 "GameWorldCluster::GameWorldCluster": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2732,6 +2963,7 @@
 "GameWorldCluster::UpdateCounters": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2739,6 +2971,7 @@
 "GameWorldCluster::addGameWorld": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2753,6 +2986,7 @@
 "GameWorldCluster::~GameWorldCluster": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2760,6 +2994,7 @@
 "GameWorldPresence::IsEqual": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2767,6 +3002,7 @@
 "GameWorldPresence::Kick": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2774,6 +3010,7 @@
 "GameWorldPresence::OnSet": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2781,6 +3018,7 @@
 "GameWorldPresence::OnUnset": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2788,6 +3026,7 @@
 "GameWorldRegistry::EnumerateCluster": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2795,6 +3034,7 @@
 "GameWorldRegistry::FetchWorldInfoList": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2802,6 +3042,7 @@
 "GameWorldRegistry::FetchWorldInfoListForInfoGate": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2809,6 +3050,7 @@
 "GameWorldRegistry::GameWorldRegistry": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2816,6 +3058,7 @@
 "GameWorldRegistry::Get": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2823,6 +3066,7 @@
 "GameWorldRegistry::Setup": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2830,6 +3074,7 @@
 "GameWorldRegistry::addGameWorldCluster": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2837,6 +3082,7 @@
 "GameWorldRegistry::getGameWorldCluster": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2844,6 +3090,7 @@
 "GameWorldRegistry::~GameWorldRegistry": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2851,6 +3098,7 @@
 "GameWorldReport::GetPacket": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2865,6 +3113,7 @@
 "GameWorldReport::~GameWorldReport": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2872,6 +3121,7 @@
 "GameWorldReporter::HandleEvent": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2886,6 +3136,7 @@
 "GameWorldReporter::WriteReport": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2893,6 +3144,7 @@
 "GameWorldReporter::~GameWorldReporter": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2900,6 +3152,7 @@
 "GameWorldReporterListener": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2914,6 +3167,7 @@
 "GamedChannel::SendActivateGradeFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2921,6 +3175,7 @@
 "GamedChannel::SendActivateGradeOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2928,6 +3183,7 @@
 "GamedChannel::SendApplyNewChargeItemNotify": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2935,6 +3191,7 @@
 "GamedChannel::SendAuctionBidFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2942,6 +3199,7 @@
 "GamedChannel::SendAuctionBidOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2949,6 +3207,7 @@
 "GamedChannel::SendAuctionEscrowReq": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2956,6 +3215,7 @@
 "GamedChannel::SendChangeCharacterAppearanceReq": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2963,6 +3223,7 @@
 "GamedChannel::SendChangeCharacterRaceReq": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2970,6 +3231,7 @@
 "GamedChannel::SendChangeCharacterSexReq": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2977,6 +3239,7 @@
 "GamedChannel::SendChangedGradeLevelNotify": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2984,6 +3247,7 @@
 "GamedChannel::SendChangedGradeNotify": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2991,6 +3255,7 @@
 "GamedChannel::SendCloseSessionNotify": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2998,6 +3263,7 @@
 "GamedChannel::SendCreateCharacterReq": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3005,6 +3271,7 @@
 "GamedChannel::SendDeleteCharacterCompleteNotify": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3012,6 +3279,7 @@
 "GamedChannel::SendDeleteCharacterReq": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3019,6 +3287,7 @@
 "GamedChannel::SendDepositGameMileageFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3026,6 +3295,7 @@
 "GamedChannel::SendDepositGameMileageOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3033,6 +3303,7 @@
 "GamedChannel::SendEnterWorldFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3040,6 +3311,7 @@
 "GamedChannel::SendExtendJumpingCharacterCreationQuotaWithAccountInventoryItemFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3047,6 +3319,7 @@
 "GamedChannel::SendExtendJumpingCharacterCreationQuotaWithAccountInventoryItemOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3054,6 +3327,7 @@
 "GamedChannel::SendGetGradeListFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3061,6 +3335,7 @@
 "GamedChannel::SendKickReq": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3068,6 +3343,7 @@
 "GamedChannel::SendLeaveWorldFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3075,6 +3351,7 @@
 "GamedChannel::SendLeaveWorldOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3082,6 +3359,7 @@
 "GamedChannel::SendRenameCharacterReq": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3089,6 +3367,7 @@
 "GamedChannel::SendRestoreCharacterReq": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3096,6 +3375,7 @@
 "GamedChannel::SendSecondPasswordGetStatusFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3103,6 +3383,7 @@
 "GamedChannel::SendSecondPasswordGetStatusOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3110,6 +3391,7 @@
 "GamedChannel::SendSecondPasswordIsVerifiedFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3117,6 +3399,7 @@
 "GamedChannel::SendSecondPasswordIsVerifiedOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3124,6 +3407,7 @@
 "GamedChannel::SendStartChargeFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3131,6 +3415,7 @@
 "GamedChannel::SendStartChargeOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3138,6 +3423,7 @@
 "GamedChannel::SendStopChargeFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3145,6 +3431,7 @@
 "GamedChannel::SendStopChargeOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3152,6 +3439,7 @@
 "GamedChannel::SendStopPlayNotify": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3159,6 +3447,7 @@
 "GamedChannel::SendTakeAccountTimeBasedPlayRewardFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3166,6 +3455,7 @@
 "GamedChannel::SendTryRegisterGuildFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3173,6 +3463,7 @@
 "GamedChannel::SendTryRegisterGuildOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3180,6 +3471,7 @@
 "GamedChannel::SendTryRenameGuildFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3187,6 +3479,7 @@
 "GamedChannel::SendTryRenameGuildOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3194,6 +3487,7 @@
 "GamedChannel::SendUpdateAccountContentQuotaFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3201,6 +3495,7 @@
 "GamedChannel::SendUpdateAccountContentQuotaOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3208,6 +3503,7 @@
 "GamedChannel::SendUpdateAccountDataFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3215,6 +3511,7 @@
 "GamedChannel::SendUpdateAccountDataOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3222,6 +3519,7 @@
 "GamedChannel::SendUpdateAccountExpFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3229,6 +3527,7 @@
 "GamedChannel::SendUpdateAccountExpOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3236,6 +3535,7 @@
 "GamedChannel::SendUpdateAccountRecycleTimeFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3243,6 +3543,7 @@
 "GamedChannel::SendUpdateAccountRecycleTimeOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3250,6 +3551,7 @@
 "GamedChannel::SendUpdateCharacterDataFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3257,6 +3559,7 @@
 "GamedChannel::SendUpdateCharacterDataOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3264,6 +3567,7 @@
 "GamedChannel::SendUpdateChargeRemainTimeNotify": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3271,6 +3575,7 @@
 "GamedChannel::SendUpdateJumpingCharacterStateFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3278,6 +3583,7 @@
 "GamedChannel::SendUpdateJumpingCharacterStateOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3285,6 +3591,7 @@
 "GamedChannel::SendUpgradeJumpingCharacterStateWithCreationQuotaFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3292,6 +3599,7 @@
 "GamedChannel::SendUpgradeJumpingCharacterStateWithCreationQuotaOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3299,6 +3607,7 @@
 "GamedChannelManager::Acquire": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3306,6 +3615,7 @@
 "GamedChannelManager::Add": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3313,6 +3623,7 @@
 "GamedChannelManager::OnAccept": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3327,6 +3638,7 @@
 "GamedChannelManager::OnConnect": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3341,6 +3653,7 @@
 "GamedChannelManager::Remove": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3348,6 +3661,7 @@
 "GamedChannelManager::~GamedChannelManager": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3355,6 +3669,7 @@
 "GenerateClikey": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3362,6 +3677,7 @@
 "GenerateJobid": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3369,6 +3685,7 @@
 "GenerateLobbyTokenkey": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3376,6 +3693,7 @@
 "GetChargeInfoJob::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3383,6 +3701,7 @@
 "GetChargeInfoJob::_vtbl": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3390,6 +3709,7 @@
 "GetChargeInfoJob::expireChargeGetInfo": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3426,6 +3746,7 @@
 "GetGoodsCountJob::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3433,6 +3754,7 @@
 "GetGoodsCountJob::_vtbl": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3447,6 +3769,7 @@
 "GetGoodsCountJob::getGoodsCountOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3454,6 +3777,7 @@
 "GetGoodsCountJob::getGoodsCountReq": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3461,6 +3785,7 @@
 "GetGoodsCountJob::getGoodsCountTimeout": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3475,6 +3800,7 @@
 "GetGoodsCountJob::work": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3482,6 +3808,7 @@
 "GetGoodsCountJob::~GetGoodsCountJob": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3504,6 +3831,7 @@
 "GetLobbyServiceItemJob::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3511,6 +3839,7 @@
 "GetLobbyServiceItemJob::_vtbl": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3532,6 +3861,7 @@
 "GetLobbyServiceItemJob::getLobbyServiceItemReq": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3539,6 +3869,7 @@
 "GetLobbyServiceItemJob::getLobbyServiceItemTimeout": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3553,6 +3884,7 @@
 "GetLobbyServiceItemJob::work": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3560,6 +3892,7 @@
 "GetLobbyServiceItemJob::~GetLobbyServiceItemJob": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3567,6 +3900,7 @@
 "GiveupWaitGameWorldJob::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3574,6 +3908,7 @@
 "GiveupWaitGameWorldJob::_vtbl": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3581,6 +3916,7 @@
 "GiveupWaitGameWorldJob::giveupWait": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3596,6 +3932,7 @@
 "GiveupWaitGameWorldJob::work": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3610,6 +3947,7 @@
 "GradeService::ApplyChangedGradeLevel": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3638,6 +3976,7 @@
 "GradeService::SetGradeLevel": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3659,6 +3998,7 @@
 "GrowingBuffer::grow": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3666,6 +4006,7 @@
 "HandleAccountInventoryLobby_CancelWarehouseItemConsumptionFail": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3673,6 +4014,7 @@
 "HandleAccountInventoryLobby_CancelWarehouseItemConsumptionOk": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3680,6 +4022,7 @@
 "HandleAccountInventoryLobby_ConsumeWarehouseItemFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3695,6 +4038,7 @@
 "HandleAccountInventoryLobby_FinishWarehouseItemConsumptionFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3738,6 +4082,7 @@
 "HandleAccountInventoryLobby_HelloOk": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3800,6 +4145,7 @@
 "HandleAccountInventoryLobby_RetrieveSingleWarehouseItemOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3823,6 +4169,7 @@
 "HandleAccountInventoryLobby_TryWarehouseItemConsumptionFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3845,6 +4192,7 @@
 "HandleLobbyGame_CancelRegisterGuildNotify": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3852,6 +4200,7 @@
 "HandleLobbyGame_CancelRenameGuildNotify": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3859,6 +4208,7 @@
 "HandleLobbyGame_ChangeCharacterAppearanceFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3866,6 +4216,7 @@
 "HandleLobbyGame_ChangeCharacterAppearanceOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3873,6 +4224,7 @@
 "HandleLobbyGame_ChangeCharacterRaceFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3880,6 +4232,7 @@
 "HandleLobbyGame_ChangeCharacterRaceOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3887,6 +4240,7 @@
 "HandleLobbyGame_ChangeCharacterSexFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3894,6 +4248,7 @@
 "HandleLobbyGame_ChangeCharacterSexOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3901,6 +4256,7 @@
 "HandleLobbyGame_CreateCharacterFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3908,6 +4264,7 @@
 "HandleLobbyGame_CreateCharacterOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3915,6 +4272,7 @@
 "HandleLobbyGame_DeleteCharacterFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3922,6 +4280,7 @@
 "HandleLobbyGame_DeleteCharacterOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3929,6 +4288,7 @@
 "HandleLobbyGame_DeleteGuildNotify": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3951,6 +4311,7 @@
 "HandleLobbyGame_FinishRegisterGuildNotify": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3958,6 +4319,7 @@
 "HandleLobbyGame_FinishRenameGuildNotify": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3979,6 +4341,7 @@
 "HandleLobbyGame_KickFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3986,6 +4349,7 @@
 "HandleLobbyGame_KickOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4014,6 +4378,7 @@
 "HandleLobbyGame_RenameCharacterFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4021,6 +4386,7 @@
 "HandleLobbyGame_RenameCharacterOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4028,6 +4394,7 @@
 "HandleLobbyGame_RestoreCharacterFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4035,6 +4402,7 @@
 "HandleLobbyGame_RestoreCharacterOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4058,6 +4426,7 @@
 "HandleLobbyGame_ServiceOpenNotify": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4065,6 +4434,7 @@
 "HandleLobbyGame_SetAppDataNotify": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4107,6 +4477,7 @@
 "HandleLobbyGame_UpdateBotScoreNotify": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4114,6 +4485,7 @@
 "HandleLobbyGame_UpdateCharacterDataReq": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4156,6 +4528,7 @@
 "HandleLobbyLobbyGate_CheckCharacterNameReq": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4184,6 +4557,7 @@
 "HandleLobbyLobbyGate_GetEnterWorldTokenReq": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4212,6 +4586,7 @@
 "HandleLobbyManage_HelloReq": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4219,6 +4594,7 @@
 "HandlePostOfficeHelloFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4226,6 +4602,7 @@
 "HandlePostOfficeHelloOk": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4233,6 +4610,7 @@
 "HandlePostOfficeRegisterPostFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4240,6 +4618,7 @@
 "HandlePostOfficeRegisterPostOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4247,6 +4626,7 @@
 "Handle_CommonGrade_GetLevel": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4254,6 +4634,7 @@
 "Handle_CommonGrade_ListAllGrades": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4261,6 +4642,7 @@
 "Handle_CommonGrade_ListGrades": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4268,6 +4650,7 @@
 "Handle_CommonPres_UserInfo": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4275,6 +4658,7 @@
 "Handle_CommonSecondPassword_GetStatus": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4282,6 +4666,7 @@
 "Handle_CommonSlot_GetSlot": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4289,6 +4674,7 @@
 "Handle_CommonSlot_ListSlots": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4296,6 +4682,7 @@
 "Handle_SrvAuction_Bid": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4303,6 +4690,7 @@
 "Handle_SrvAuth_ChangeMyUserNameIncomplete": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4310,6 +4698,7 @@
 "Handle_SrvAuth_ConsumeGameToken": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4317,6 +4706,7 @@
 "Handle_SrvAuth_GetUserNameChangeableIncomplete": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4324,6 +4714,7 @@
 "Handle_SrvAuth_IsUserNameChangeableIncomplete": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4331,6 +4722,7 @@
 "Handle_SrvCharge_Abandon": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4338,6 +4730,7 @@
 "Handle_SrvCharge_GetInfo": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4368,6 +4761,7 @@
 "Handle_SrvCharge_Start": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4375,6 +4769,7 @@
 "Handle_SrvCharge_Stop": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4382,6 +4777,7 @@
 "Handle_SrvContentBan_ListUserBans": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4389,6 +4785,7 @@
 "Handle_SrvFriend_SendMessage": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4396,6 +4793,7 @@
 "Handle_SrvGameAccount_ListUserLastPresences": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4403,6 +4801,7 @@
 "Handle_SrvGameTime_GetGameTime": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4410,6 +4809,7 @@
 "Handle_SrvGate_RegisterService": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4417,6 +4817,7 @@
 "Handle_SrvGrade_ActivateGrade": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4438,6 +4839,7 @@
 "Handle_SrvPres_GetUserInfo": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4445,6 +4847,7 @@
 "Handle_SrvPres_Kick": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4452,6 +4855,7 @@
 "Handle_SrvPres_Login": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4459,6 +4863,7 @@
 "Handle_SrvPres_Logout": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4466,6 +4871,7 @@
 "Handle_SrvPres_Message": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4473,6 +4879,7 @@
 "Handle_SrvPres_SetAppData": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4480,6 +4887,7 @@
 "Handle_SrvProfile_GetUserProfile": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4487,6 +4895,7 @@
 "Handle_SrvPromotionStamp_AttendPromotionSecured": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4494,6 +4903,7 @@
 "Handle_SrvPromotionStamp_GetPromotionPolicy": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4501,6 +4911,7 @@
 "Handle_SrvPromotionStamp_GetUserPromotionStatus": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4508,6 +4919,7 @@
 "Handle_SrvPromotionStamp_ListCurrentPromotions": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4515,6 +4927,7 @@
 "Handle_SrvRMS_Inquiry": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4522,6 +4935,7 @@
 "Handle_SrvSecondPassword_IsVerified": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4529,6 +4943,7 @@
 "Handle_SrvSlot_CreateSlots": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4536,6 +4951,7 @@
 "Handle_SrvSlot_SetData": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4543,6 +4959,7 @@
 "Handle_SrvVirtualCurrency_Deposit": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4550,6 +4967,7 @@
 "HeapMemoryManager::Alloc": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4557,6 +4975,7 @@
 "HeapMemoryManager::AllocZero": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4564,6 +4983,7 @@
 "HeapMemoryManager::Free": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4571,6 +4991,7 @@
 "HeapMemoryManager::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4578,6 +4999,7 @@
 "HeapMemoryManager::Realloc": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4585,6 +5007,7 @@
 "HeapMemoryManager::ReallocZero": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4592,6 +5015,7 @@
 "InfoGateChannel::SendAuthTokenFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4599,6 +5023,7 @@
 "InfoGateChannel::SendAuthTokenOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4606,6 +5031,7 @@
 "InfoGateChannel::SendGetWorldInfoListFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4613,6 +5039,7 @@
 "InfoGateChannelManager::Acquire": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4620,6 +5047,7 @@
 "InfoGateChannelManager::Add": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4627,6 +5055,7 @@
 "InfoGateChannelManager::Broadcast": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4634,6 +5063,7 @@
 "InfoGateChannelManager::BroadcastBoastEventInWorldNotify": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4641,6 +5071,7 @@
 "InfoGateChannelManager::OnAccept": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4648,6 +5079,7 @@
 "InfoGateChannelManager::OnClose": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4655,6 +5087,7 @@
 "InfoGateChannelManager::OnConnect": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4669,6 +5102,7 @@
 "InfoGateChannelManager::Remove": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4676,6 +5110,7 @@
 "InfoGateChannelManager::~InfoGateChannelManager": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4683,6 +5118,7 @@
 "InitCliSessionWlobbyTokenJob::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4690,6 +5126,7 @@
 "InitCliSessionWlobbyTokenJob::_vtbl": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4705,6 +5142,7 @@
 "InitCliSessionWlobbyTokenJob::initOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4712,6 +5150,7 @@
 "InitCliSessionWlobbyTokenJob::work": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4719,6 +5158,7 @@
 "InitCliSessionWnpTokenJob::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4733,6 +5173,7 @@
 "InitSymbol": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4740,6 +5181,7 @@
 "IoWorker::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4747,6 +5189,7 @@
 "IoWorker::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4761,6 +5204,7 @@
 "IoWorker::stop": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4768,6 +5212,7 @@
 "IoWorker::yield": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4775,6 +5220,7 @@
 "IsVietnamese": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4782,6 +5228,7 @@
 "KickJob::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4789,6 +5236,7 @@
 "KickJob::_vtbl": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4818,6 +5266,7 @@
 "KickJob::worldKickExpire": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4825,6 +5274,7 @@
 "KickJob::worldKickFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4832,6 +5282,7 @@
 "KickJob::worldKickOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4846,6 +5297,7 @@
 "KickJob::~KickJob": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4853,6 +5305,7 @@
 "LeaveGameWorldJob::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4868,6 +5321,7 @@
 "LeaveGameWorldJob::_vtbl": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4890,6 +5344,7 @@
 "LeaveGameWorldJob::work": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4897,6 +5352,7 @@
 "LeaveGameWorldToken::GetKind": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4904,6 +5360,7 @@
 "ListGoodsJob::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4911,6 +5368,7 @@
 "ListGoodsJob::_vtbl": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4940,6 +5398,7 @@
 "ListGoodsJob::listGoodsReq": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4947,6 +5406,7 @@
 "ListGoodsJob::listGoodsTimeout": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4954,6 +5414,7 @@
 "ListGoodsJob::work": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4961,6 +5422,7 @@
 "ListGoodsJob::~ListGoodsJob": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4968,6 +5430,7 @@
 "ListLobbyServiceItemJob::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4975,6 +5438,7 @@
 "ListLobbyServiceItemJob::_vtbl": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5005,6 +5469,7 @@
 "ListLobbyServiceItemJob::listLobbyServiceItemReq": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5012,6 +5477,7 @@
 "ListLobbyServiceItemJob::listLobbyServiceItemTimeout": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5019,6 +5485,7 @@
 "ListLobbyServiceItemJob::work": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5026,6 +5493,7 @@
 "ListLobbyServiceItemJob::~ListLobbyServiceItemJob": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5041,6 +5509,7 @@
 "LobbyDB::BindCharacterSlot": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5048,6 +5517,7 @@
 "LobbyDB::CancelCharacterCreation": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5055,6 +5525,7 @@
 "LobbyDB::CancelCharacterDeletion": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5062,6 +5533,7 @@
 "LobbyDB::CancelGuildRegistration": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5069,6 +5541,7 @@
 "LobbyDB::CancelRenameGuild": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5076,6 +5549,7 @@
 "LobbyDB::CheckValidityOfCharacterName": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5083,6 +5557,7 @@
 "LobbyDB::DeleteGuild": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5090,6 +5565,7 @@
 "LobbyDB::ExpireCharacterDeletionWaiting": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5097,6 +5573,7 @@
 "LobbyDB::FinishCharacterCreation": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5104,6 +5581,7 @@
 "LobbyDB::FinishCharacterDeletion": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5111,6 +5589,7 @@
 "LobbyDB::FinishCharacterRestoration": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5118,6 +5597,7 @@
 "LobbyDB::FinishGuildRegistration": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5125,6 +5605,7 @@
 "LobbyDB::FinishRenameGuild": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5139,6 +5620,7 @@
 "LobbyDB::LoadGameAccounExpInfo": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5174,6 +5656,7 @@
 "LobbyDB::LoadJumpingCharacterCreationQuota": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5181,6 +5664,7 @@
 "LobbyDB::RegisterGameAccountExpInfo": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5195,6 +5679,7 @@
 "LobbyDB::TryCharacterCreation": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5202,6 +5687,7 @@
 "LobbyDB::TryCharacterDeletion": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5209,6 +5695,7 @@
 "LobbyDB::TryCharacterRestoration": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5216,6 +5703,7 @@
 "LobbyDB::TryGuildRegistration": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5223,6 +5711,7 @@
 "LobbyDB::TryRenameGuild": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5230,6 +5719,7 @@
 "LobbyDB::UpdateCharacterData": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5237,6 +5727,7 @@
 "LobbyDB::UpdateCharacterLevel": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5244,6 +5735,7 @@
 "LobbyDB::UpdateGameAccountContentQuota": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5251,6 +5743,7 @@
 "LobbyDB::UpdateGameAccountExpInfo": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5258,6 +5751,7 @@
 "LobbyDB::UpdateGameAccountTimeBasedPlayInfo": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5265,6 +5759,7 @@
 "LobbyDB::UpdateJumpingCharacterStateComplete": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5272,6 +5767,7 @@
 "LobbyDB::UpdateLastLogout": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5279,6 +5775,7 @@
 "LobbyDB::UpdateLastPlayEnd": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5286,6 +5783,7 @@
 "LobbyDB::UpdateLastPlayStart": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5293,6 +5791,7 @@
 "LobbyDaemon::CheckServiceItemDataId": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5300,6 +5799,7 @@
 "LobbyDaemon::Descriptions": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5307,6 +5807,7 @@
 "LobbyDaemon::FailedEventObjectHandler": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5314,6 +5815,7 @@
 "LobbyDaemon::FilterBannedWord": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5321,6 +5823,7 @@
 "LobbyDaemon::GetAddressStringWForLogs": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5328,6 +5831,7 @@
 "LobbyDaemon::GetTimerInterval": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5335,6 +5839,7 @@
 "LobbyDaemon::GetTimerMaxTime": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5342,6 +5847,7 @@
 "LobbyDaemon::LobbyDaemon": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5349,6 +5855,7 @@
 "LobbyDaemon::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5356,6 +5863,7 @@
 "LobbyDaemon::PrintDependency": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5363,6 +5871,7 @@
 "LobbyDaemon::ServiceName": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5370,6 +5879,7 @@
 "LobbyDaemon::SetTimeZoneBias": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5377,6 +5887,7 @@
 "LobbyDaemon::ShortName": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5384,6 +5895,7 @@
 "LobbyDaemon::cooldown": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5413,6 +5925,7 @@
 "LobbyDaemon::setArgument": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5420,6 +5933,7 @@
 "LobbyDaemon::startNPChannel": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5427,6 +5941,7 @@
 "LobbyGateChannel::SendAccountInventoryNotify": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5434,6 +5949,7 @@
 "LobbyGateChannel::SendBindCharacterSlotFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5441,6 +5957,7 @@
 "LobbyGateChannel::SendCancelWaitCharacterDeletionFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5448,6 +5965,7 @@
 "LobbyGateChannel::SendCancelWaitCharacterDeletionOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5471,6 +5989,7 @@
 "LobbyGateChannel::SendCloseAnonymousSessionNotify": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5478,6 +5997,7 @@
 "LobbyGateChannel::SendCloseSessionNotify": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5485,6 +6005,7 @@
 "LobbyGateChannel::SendCreateCharacterFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5492,6 +6013,7 @@
 "LobbyGateChannel::SendCreateCharacterOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5499,6 +6021,7 @@
 "LobbyGateChannel::SendDeleteCharacterFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5506,6 +6029,7 @@
 "LobbyGateChannel::SendDeleteCharacterOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5513,6 +6037,7 @@
 "LobbyGateChannel::SendEndWaitCharacterDeletionNotify": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5520,6 +6045,7 @@
 "LobbyGateChannel::SendEndWaitNotify": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5543,6 +6069,7 @@
 "LobbyGateChannel::SendGetCharacterInfoFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5550,6 +6077,7 @@
 "LobbyGateChannel::SendGetCharacterInfoListFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5557,6 +6085,7 @@
 "LobbyGateChannel::SendGetChargeInfoFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5564,6 +6093,7 @@
 "LobbyGateChannel::SendGetChargeInfoOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5571,6 +6101,7 @@
 "LobbyGateChannel::SendGetEnterWorldTokenFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5578,6 +6109,7 @@
 "LobbyGateChannel::SendGetEnterWorldTokenOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5585,6 +6117,7 @@
 "LobbyGateChannel::SendGetGoodsCountFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5592,6 +6125,7 @@
 "LobbyGateChannel::SendGetGoodsCountOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5614,6 +6148,7 @@
 "LobbyGateChannel::SendGetWaitInfoFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5628,6 +6163,7 @@
 "LobbyGateChannel::SendGiveupWaitFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5635,6 +6171,7 @@
 "LobbyGateChannel::SendGiveupWaitOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5642,6 +6179,7 @@
 "LobbyGateChannel::SendInitSessionWithLobbyTokenFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5649,6 +6187,7 @@
 "LobbyGateChannel::SendInitSessionWithLobbyTokenOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5656,6 +6195,7 @@
 "LobbyGateChannel::SendInitSessionWithNPTokenFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5663,6 +6203,7 @@
 "LobbyGateChannel::SendInitSessionWithNPTokenOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5670,6 +6211,7 @@
 "LobbyGateChannel::SendKickNotify": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5677,6 +6219,7 @@
 "LobbyGateChannel::SendListGoodsFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5706,6 +6249,7 @@
 "LobbyGateChannel::SendRecoverCharacterFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5713,6 +6257,7 @@
 "LobbyGateChannel::SendRecoverCharacterOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5720,6 +6265,7 @@
 "LobbyGateChannel::SendStartSessionWithLobbyTokenFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5734,6 +6280,7 @@
 "LobbyGateChannel::SendStartSessionWithNPTokenFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5755,6 +6302,7 @@
 "LobbyGateChannel::SendTakeGoodsFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5769,6 +6317,7 @@
 "LobbyGateChannelManager::Acquire": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5776,6 +6325,7 @@
 "LobbyGateChannelManager::OnAccept": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5805,6 +6355,7 @@
 "LobbyGateChannelManager::Remove": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5812,6 +6363,7 @@
 "LobbyGateChannelManager::~LobbyGateChannelManager": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5819,6 +6371,7 @@
 "LobbyGatePresence::Close": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5826,6 +6379,7 @@
 "LobbyGatePresence::IsEqual": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5833,6 +6387,7 @@
 "LobbyGatePresence::Kick": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5840,6 +6395,7 @@
 "LobbyGatePresence::NotifyChangedGrade": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5847,6 +6403,7 @@
 "LobbyGatePresence::NotifyChangedGradeLevel": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5854,6 +6411,7 @@
 "LobbyGatePresence::OnSet": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5861,6 +6419,7 @@
 "LobbyGatePresence::OnUnset": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5868,6 +6427,7 @@
 "LobbyJob::dispatch_work": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5875,6 +6435,7 @@
 "LobbyJob::execute": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5882,6 +6443,7 @@
 "LobbyJob::resume": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5889,6 +6451,7 @@
 "LobbyJob::transit": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5896,6 +6459,7 @@
 "LobbyJob::~LobbyJob": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5903,6 +6467,7 @@
 "LobbyJobManager::Execute": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5910,6 +6475,7 @@
 "LobbyJobManager::ExecuteW": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5917,6 +6483,7 @@
 "LobbyJobManager::Register": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5924,6 +6491,7 @@
 "LobbyJobManager::ResumeW": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5947,6 +6515,7 @@
 "LobbyJobManager::find": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5954,6 +6523,7 @@
 "LobbyJobManager::remove": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5961,6 +6531,7 @@
 "LobbyJobTransaction::Expire": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5968,6 +6539,7 @@
 "LobbyJobTransaction::GetTid": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5975,6 +6547,7 @@
 "LobbyJobTransaction::Set": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5989,6 +6562,7 @@
 "LobbyLocale::GetNextThaiCell": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6003,6 +6577,7 @@
 "LobbyLocale::GetVietToneMarkType": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6010,6 +6585,7 @@
 "LobbyLocale::GetVietVowelType": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6038,6 +6614,7 @@
 "LobbyLocale::IsWupperNotApplied": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6045,6 +6622,7 @@
 "LobbyMessage::Dispatch": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6052,6 +6630,7 @@
 "LobbyMessage::~LobbyMessage": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6059,6 +6638,7 @@
 "LobbyObjPoolMemAllocator::Alloc": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6087,6 +6667,7 @@
 "LobbyTick::Add": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6094,6 +6675,7 @@
 "LobbyTick::HandleEvent": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6101,6 +6683,7 @@
 "LobbyTick::Remove": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6108,6 +6691,7 @@
 "LobbyTick::process": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6115,6 +6699,7 @@
 "LobbyTick::~LobbyTick": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6122,6 +6707,7 @@
 "LobbyTickEvent::HandleEvent": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6129,6 +6715,7 @@
 "LobbyTickEvent::LobbyTickEvent": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6136,6 +6723,7 @@
 "LobbyTickEvent::~LobbyTickEvent": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6143,6 +6731,7 @@
 "LobbyToken::LobbyToken": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6150,6 +6739,7 @@
 "LobbyTokenDesk::Issue": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6157,6 +6747,7 @@
 "LobbydReloadInvalidRestoreTimer::EventId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6164,6 +6755,7 @@
 "LobbydReloadInvalidRestoreTimer::HandleEvent": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6178,6 +6770,7 @@
 "Log::Add": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6185,6 +6778,7 @@
 "Log::Close": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6192,6 +6786,7 @@
 "Log::Flush": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6199,6 +6794,7 @@
 "Log::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6206,6 +6802,7 @@
 "Log::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6213,6 +6810,7 @@
 "Log::Write [?Write@Log@@SAXPEB_WHJ0ZZ]": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6220,6 +6818,7 @@
 "Log::Write [?Write@Log@@SAXW4Type@1@PEB_WH1ZZ]": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6227,6 +6826,7 @@
 "Log::WriteV": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6234,6 +6834,7 @@
 "Log::run": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6241,6 +6842,7 @@
 "LogBuffer::Acquire": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6248,6 +6850,7 @@
 "LogBuffer::GetLog": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6255,6 +6858,7 @@
 "LogBuffer::GetType": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6262,6 +6866,7 @@
 "LogBuffer::Prepare": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6269,6 +6874,7 @@
 "LogBuffer::Release": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6276,6 +6882,7 @@
 "LogBuffer::deallocate_me": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6283,6 +6890,7 @@
 "LogBufferAllocator::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6290,6 +6898,7 @@
 "LogBufferAllocator::allocate": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6297,6 +6906,7 @@
 "LogBufferAllocator::initAllocator": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6304,6 +6914,7 @@
 "LogBufferPool::allocate": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6311,6 +6922,7 @@
 "LogBufferPool::deallocate": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6318,6 +6930,7 @@
 "LogMedia::Add": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6333,6 +6946,7 @@
 "LogMedia::Write": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6340,6 +6954,7 @@
 "LogoutInGameWorldJob::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6355,6 +6970,7 @@
 "LogoutInGameWorldJob::_vtbl": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6370,6 +6986,7 @@
 "LogoutInGameWorldJob::logout": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6385,6 +7002,7 @@
 "LogoutJob::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6407,6 +7025,7 @@
 "LogoutJob::work": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6414,6 +7033,7 @@
 "ManageChannel::GetId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6421,6 +7041,7 @@
 "ManageChannel::SendCleanupGameAccountIdIndexFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6428,6 +7049,7 @@
 "ManageChannel::SendCleanupGameAccountIdIndexOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6435,6 +7057,7 @@
 "ManageChannel::SendCleanupPcidIndexFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6442,6 +7065,7 @@
 "ManageChannel::SendCleanupPcidIndexOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6449,6 +7073,7 @@
 "ManageSessionHandler::OnAccept": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6456,6 +7081,7 @@
 "ManageSessionHandler::OnClose": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6463,6 +7089,7 @@
 "ManageSessionHandler::OnConnect": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6477,6 +7104,7 @@
 "MembershipMileage::Accept": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6484,6 +7112,7 @@
 "MembershipMileageSession::start": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6491,6 +7120,7 @@
 "MembershipMileageSession::stop": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6498,6 +7128,7 @@
 "MembershipMileageSession::update": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6505,6 +7136,7 @@
 "Memory::CreateManager": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6512,6 +7144,7 @@
 "MileageInterimDepositTimer::MileageInterimDepositTimer": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6526,6 +7159,7 @@
 "MileageInterimDepositTimer::~MileageInterimDepositTimer": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6533,6 +7167,7 @@
 "MileageManager::Accept": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6547,6 +7182,7 @@
 "MileageSlot::MileageSlot": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6554,6 +7190,7 @@
 "MileageSlot::~MileageSlot": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6561,6 +7198,7 @@
 "NPChannel::Connect": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6568,6 +7206,7 @@
 "NPChannel::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6582,6 +7221,7 @@
 "NPChannel::checkLibError": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6642,6 +7282,7 @@
 "NPGameServiceChannel::SendRequestGradeListAllGrades": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6649,6 +7290,7 @@
 "NPGameServiceChannel::SendRequestListUserLastPresences": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6656,6 +7298,7 @@
 "NPGameServiceChannel::SendRequestPresenceKick": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6671,6 +7314,7 @@
 "NPGameServiceChannel::SendRequestPresenceLogout": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6678,6 +7322,7 @@
 "NPGameServiceChannel::SendRequestProfileGetUserProfile": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6685,6 +7330,7 @@
 "NPGameServiceChannel::SendRequestSlotCreateActivitySlots": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6692,6 +7338,7 @@
 "NPGameServiceChannel::SendRequestSlotGetSlot": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6699,6 +7346,7 @@
 "NPGameServiceChannel::SendRequestSlotSetActivitySlotData": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6713,6 +7361,7 @@
 "NPGameServiceChannelCmdDispatcher": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6720,6 +7369,7 @@
 "NPLobbyJobTransaction::Expire": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6727,6 +7377,7 @@
 "NPLobbyMessageHandleEvent::HandleEvent": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6742,6 +7393,7 @@
 "NPMsgHelper::LocaleHourToUTCTime": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6749,6 +7401,7 @@
 "NPPing::HandleEvent": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6756,6 +7409,7 @@
 "NPPing::TimerClass": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6763,6 +7417,7 @@
 "NPPing::TimerId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6770,6 +7425,7 @@
 "NPServiceChannelManager::HandleMessage": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6799,6 +7455,7 @@
 "NPTransactionRegistry::Find": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6813,6 +7470,7 @@
 "NPTransactionRegistry::Register": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6820,6 +7478,7 @@
 "NPTransactionRegistry::ReleaseAll": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6827,6 +7486,7 @@
 "Network::GetAddressStringW": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6841,6 +7501,7 @@
 "Network::Network": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6848,6 +7509,7 @@
 "Network::OpenPort [?OpenPort@Network@@SA_NI@Z]": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6862,6 +7524,7 @@
 "Network::ReconnectSession": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6869,6 +7532,7 @@
 "Network::initInstance": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6884,6 +7548,7 @@
 "Network::initializeSocketInterface": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6891,6 +7556,7 @@
 "Network::iocpHandle": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6913,6 +7579,7 @@
 "ObjPool::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6920,6 +7587,7 @@
 "ObjPoolTimer::Add": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6927,6 +7595,7 @@
 "ObjPoolTimer::HandleEvent": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6934,6 +7603,7 @@
 "ObjPoolTimer::Start": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6949,6 +7619,7 @@
 "ObjPoolTimer::~ObjPoolTimer": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6956,6 +7627,7 @@
 "Packet::Add": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6963,6 +7635,7 @@
 "Packet::AddSize": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6970,6 +7643,7 @@
 "Packet::Allocate [?Allocate@Packet@@QEAAPEBDPEAVPacketComposer@@@Z]": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6977,6 +7651,7 @@
 "Packet::Allocate [?Allocate@Packet@@QEAAPEBDXZ]": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6984,6 +7659,7 @@
 "Packet::Clear": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6991,6 +7667,7 @@
 "Packet::Compose [?Compose@Packet@@QEAAGPEAVPacketComposer@@HZZ]": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6998,6 +7675,7 @@
 "Packet::Compose [?Compose@Packet@@QEAAGPEBDZZ]": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7005,6 +7683,7 @@
 "Packet::ComposeV": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7012,6 +7691,7 @@
 "Packet::Decompose [?Decompose@Packet@@QEBAGPEAVPacketDecomposer@@HZZ]": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7019,6 +7699,7 @@
 "Packet::Decompose [?Decompose@Packet@@QEBAGPEAVPacketDecomposer@@PEAUVarData@1@@Z]": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7026,6 +7707,7 @@
 "Packet::Decompose [?Decompose@Packet@@QEBAGPEAVPacketDecomposer@@PEAUVarStr@1@@Z]": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7033,6 +7715,7 @@
 "Packet::Decompose [?Decompose@Packet@@QEBAGPEBDZZ]": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7040,6 +7723,7 @@
 "Packet::FreeSize": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7047,6 +7731,7 @@
 "Packet::GetFreeBody": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7054,6 +7739,7 @@
 "Packet::~Packet": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7061,6 +7747,7 @@
 "PacketBuffer::CheckCompose": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7068,6 +7755,7 @@
 "PacketBuffer::Compose": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7075,6 +7763,7 @@
 "PacketBuffer::Decompose": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7082,6 +7771,7 @@
 "PacketBuffer::deallocate_me": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7089,6 +7779,7 @@
 "PacketBuffer::encrypt": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7096,6 +7787,7 @@
 "PacketBufferAllocator::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7103,6 +7795,7 @@
 "PacketBufferAllocator::allocate": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7110,6 +7803,7 @@
 "PacketBufferAllocator::initAllocator": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7117,6 +7811,7 @@
 "PacketBufferPool::allocate": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7124,6 +7819,7 @@
 "PacketBufferPool::deallocate": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7131,6 +7827,7 @@
 "PacketConcatenateBuffer::Add": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7138,6 +7835,7 @@
 "PacketConcatenateBuffer::Clear": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7152,6 +7850,7 @@
 "PacketConcatenateBuffer::Decompose [?Decompose@PacketConcatenateBuffer@@QEAA_NHZZ]": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7159,6 +7858,7 @@
 "PacketConcatenateBuffer::copy": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7166,6 +7866,7 @@
 "PacketConcatenateBuffer::~PacketConcatenateBuffer": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7173,6 +7874,7 @@
 "PacketDecomposer::Reset": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7180,6 +7882,7 @@
 "PacketFormatIterator::CurrentFormat": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7187,6 +7890,7 @@
 "PacketFormatIterator::Forward": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7194,6 +7898,7 @@
 "PacketFormatIterator::GetIndex": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7201,6 +7906,7 @@
 "PacketFormatIterator::Reset": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7208,6 +7914,7 @@
 "PacketFormatIterator::Rewind": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7215,6 +7922,7 @@
 "PacketFormatIterator::SetFormat": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7222,6 +7930,7 @@
 "PacketFormatIterator::skipRepeatFormat": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7229,6 +7938,7 @@
 "PacketHandleEvent::HandleEvent": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7236,6 +7946,7 @@
 "PacketHandleEvent::~PacketHandleEvent": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7243,6 +7954,7 @@
 "PagePoolMemoryManager::Alloc": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7250,6 +7962,7 @@
 "PagePoolMemoryManager::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7257,6 +7970,7 @@
 "PagePoolMemoryManager::~PagePoolMemoryManager": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7264,6 +7978,7 @@
 "PerfCounterProvider::loadLibrary": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7278,6 +7993,7 @@
 "PipeCommandProcess::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7285,6 +8001,7 @@
 "PipeCommandProcess::PipeCommandProcess": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7292,6 +8009,7 @@
 "PipeCommandProcess::addCommand": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7299,6 +8017,7 @@
 "PipeCommandProcess::clear": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7313,6 +8032,7 @@
 "PipeCommandProcess::run": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7320,6 +8040,7 @@
 "PipeCommandProcess::~PipeCommandProcess": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7327,6 +8048,7 @@
 "PipeConsole::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7334,6 +8056,7 @@
 "PipeConsole::PipeConsole": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7369,6 +8092,7 @@
 "PipeConsole::clear": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7376,6 +8100,7 @@
 "PipeConsole::connectPipe": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7383,6 +8108,7 @@
 "PipeConsole::disconnectAndReconnect": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7390,6 +8116,7 @@
 "PipeConsole::init": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7397,6 +8124,7 @@
 "PipeConsole::initPipe": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7418,6 +8146,7 @@
 "PipeConsole::writeReply": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7425,6 +8154,7 @@
 "PipeConsole::writeStateInfo": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7432,6 +8162,7 @@
 "PipeConsole::writeStateReply": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7439,6 +8170,7 @@
 "PipeConsole::writeStateReply2": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7446,6 +8178,7 @@
 "Port::Clear": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7461,6 +8194,7 @@
 "Port::MakeNewSession [?MakeNewSession@Port@@IEAAPEAVSession@@PEA_KKGH@Z]": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7468,6 +8202,7 @@
 "Port::MakeNewSession [?MakeNewSession@Port@@IEAA_NKGPEAVChannel@@J_N1PEAPEAVSession@@@Z]": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7475,6 +8210,7 @@
 "Port::ReconnectSession": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7482,6 +8218,7 @@
 "Port::RemoveSession": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7489,6 +8226,7 @@
 "Port::clearPool": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7496,6 +8234,7 @@
 "Port::makeSession": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7503,6 +8242,7 @@
 "PortListener::Clear": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7510,6 +8250,7 @@
 "PortListener::HandleEvent": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7555,6 +8296,7 @@
 "PostOfficeChannel::SendHelloReq": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7569,6 +8311,7 @@
 "PostOfficeSessionHandler::OnAccept": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7583,6 +8326,7 @@
 "PostOfficeSessionHandler::OnConnect": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7590,6 +8334,7 @@
 "PostOfficeSessionHandler::PacketHandler": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7597,6 +8342,7 @@
 "Presence::~Presence": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7612,6 +8358,7 @@
 "Prng::addEntropy": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7619,6 +8366,7 @@
 "Prng::setSeed": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7626,6 +8374,7 @@
 "RawPacketBufferHandler::AllocSize": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7641,6 +8390,7 @@
 "RawPacketBufferHandler::Destroy": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7648,6 +8398,7 @@
 "RawPacketBufferHandler::ToBuffer": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7655,6 +8406,7 @@
 "RawPacketBufferHandler::ToPacket": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7662,6 +8414,7 @@
 "RawPacketBufferHandler::~RawPacketBufferHandler": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7669,6 +8422,7 @@
 "ReconnectTimer::HandleEvent": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7676,6 +8430,7 @@
 "RecoverPcJob::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7690,6 +8445,7 @@
 "RecoverPcJob::_vtbl": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7733,6 +8489,7 @@
 "RecoverPcJob::work": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7740,6 +8497,7 @@
 "RecoverPcJob::~RecoverPcJob": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7747,6 +8505,7 @@
 "RefCntHistory::add": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7754,6 +8513,7 @@
 "RefCntHistory::dump": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7761,6 +8521,7 @@
 "RefCntList::Pushback": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7768,6 +8529,7 @@
 "RefCntList::Remove": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7782,6 +8544,7 @@
 "RefCntObject::DumpRefCntHistory": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7796,6 +8559,7 @@
 "RefCntObject::deallocate_object": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7803,6 +8567,7 @@
 "RefCntObject::operator delete": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7810,6 +8575,7 @@
 "RefCntObject::removeReferenceCount": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7817,6 +8583,7 @@
 "RefCntObject::~RefCntObject": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7824,6 +8591,7 @@
 "RefCntPoolObj::operator delete": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7831,6 +8599,7 @@
 "RefCntPoolObj::~RefCntPoolObj": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7838,6 +8607,7 @@
 "ReleaseEvent::EventId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7845,6 +8615,7 @@
 "ReleaseEvent::HandleEvent": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7852,6 +8623,7 @@
 "RenameCharacterService::Setup": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7873,6 +8645,7 @@
 "RepeatPacketComposer::Allocated": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7880,6 +8653,7 @@
 "RepeatPacketComposer::CurrentFormat": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7887,6 +8661,7 @@
 "RepeatPacketComposer::Forward": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7894,6 +8669,7 @@
 "RepeatPacketComposer::PopRepeatCount": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7901,6 +8677,7 @@
 "RepeatPacketComposer::PushRepeatCount": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7908,6 +8685,7 @@
 "RepeatPacketComposer::Reset": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7915,6 +8693,7 @@
 "RepeatPacketComposer::Rewind": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7922,6 +8701,7 @@
 "RepeatPacketComposer::skipRepeatFormat": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7929,6 +8709,7 @@
 "RepeatPacketDecomposer::PopRepeatCount": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7936,6 +8717,7 @@
 "RepeatPacketDecomposer::Reset": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7958,6 +8740,7 @@
 "SecondPasswordGetStatusJob::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7965,6 +8748,7 @@
 "SecondPasswordGetStatusJob::expireGetStatus": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7987,6 +8771,7 @@
 "SecondPasswordGetStatusJob::responseGetStatus": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -7994,6 +8779,7 @@
 "SecondPasswordGetStatusJob::work": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8001,6 +8787,7 @@
 "SecondPasswordIsVerifiedJob::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8008,6 +8795,7 @@
 "SecondPasswordIsVerifiedJob::expireIsVerified": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8030,6 +8818,7 @@
 "SecondPasswordIsVerifiedJob::responseIsVerified": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8037,6 +8826,7 @@
 "SecondPasswordIsVerifiedJob::work": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8044,6 +8834,7 @@
 "Section<__int64>::Intersect<__int64,std::vector,StlAllocator<Section<__int64>,2> >": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8051,6 +8842,7 @@
 "ServiceItems::Add": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8073,6 +8865,7 @@
 "Session::GetChannel": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8087,6 +8880,7 @@
 "Session::HandleFailedEvent": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8094,6 +8888,7 @@
 "Session::Recv": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8101,6 +8896,7 @@
 "Session::Send [?Send@Session@@QEBAXPEBDZZ]": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8108,6 +8904,7 @@
 "Session::Send [?Send@Session@@QEBAXPEBVPacket@@@Z]": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8115,6 +8912,7 @@
 "Session::SendV": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8122,6 +8920,7 @@
 "Session::Session [??0Session@@IEAA@IPEBVPacketBufferHandler@@@Z]": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8129,6 +8928,7 @@
 "Session::Session [??0Session@@IEAA@XZ]": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8136,6 +8936,7 @@
 "Session::SetChannel": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8143,6 +8944,7 @@
 "Session::SetPacketConcatenater": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8150,6 +8952,7 @@
 "Session::clear": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8157,6 +8960,7 @@
 "Session::close": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8172,6 +8976,7 @@
 "Session::deallocate_me": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8179,6 +8984,7 @@
 "Session::handlePacket": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8186,6 +8992,7 @@
 "Session::initialize": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8193,6 +9000,7 @@
 "Session::reconnect": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8200,6 +9008,7 @@
 "Session::recv": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8207,6 +9016,7 @@
 "Session::send": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8214,6 +9024,7 @@
 "Session::sendNext": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8221,6 +9032,7 @@
 "Session::tryReconnect": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8236,6 +9048,7 @@
 "SessionHandler::~SessionHandler": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8243,6 +9056,7 @@
 "SessionPool::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8250,6 +9064,7 @@
 "SessionPool::MakeSession": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8257,6 +9072,7 @@
 "SessionPool::RemoveSession": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8271,6 +9087,7 @@
 "SessionPool::addToPool": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8285,6 +9102,7 @@
 "SessionSendBuffer::Add": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8292,6 +9110,7 @@
 "SessionSendBuffer::Clear": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8299,6 +9118,7 @@
 "SessionSendBuffer::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8306,6 +9126,7 @@
 "SessionSendBuffer::RemoveSentBuffer": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8313,6 +9134,7 @@
 "SessionSendBuffer::clearPacketBufferList": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8320,6 +9142,7 @@
 "SessionSendBuffer::increaseBuffer": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8327,6 +9150,7 @@
 "SharedChannel::Accept": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8334,6 +9158,7 @@
 "SharedChannel::Close": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8341,6 +9166,7 @@
 "SharedChannel::Connect": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8348,6 +9174,7 @@
 "SharedChannel::IsConnected": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8355,6 +9182,7 @@
 "SharedChannel::RawChannel::GetId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8362,6 +9190,7 @@
 "SharedChannel::Send [?Send@SharedChannel@@QEAA_NPEBVPacket@@@Z]": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8369,6 +9198,7 @@
 "SharedChannel::StopReconnect": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8376,6 +9206,7 @@
 "SharedChannel::~SharedChannel": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8383,6 +9214,7 @@
 "SharedChannelFragmentPacketHandleEvent::HandleEvent": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8390,6 +9222,7 @@
 "SharedChannelFragmentPacketHandleEvent::SharedChannelFragmentPacketHandleEvent": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8397,6 +9230,7 @@
 "SharedChannelFragmentPacketHandleEvent::~SharedChannelFragmentPacketHandleEvent": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8404,6 +9238,7 @@
 "SharedChannelList::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8411,6 +9246,7 @@
 "SharedChannelList::Set": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8418,6 +9254,7 @@
 "SharedChannelList::~SharedChannelList": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8425,6 +9262,7 @@
 "SharedChannelPacketHandleEvent::HandleEvent": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8432,6 +9270,7 @@
 "SharedChannelPacketHandleEvent::SharedChannelPacketHandleEvent": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8439,6 +9278,7 @@
 "SharedChannelPacketHandleEvent::~SharedChannelPacketHandleEvent": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8446,6 +9286,7 @@
 "StartChargeJob::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8453,6 +9294,7 @@
 "StartChargeJob::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8460,6 +9302,7 @@
 "StartChargeJob::_vtbl": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8467,6 +9310,7 @@
 "StartChargeJob::expireStartCharge": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8504,6 +9348,7 @@
 "StartCliSessionWlobbyTokenJob::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8511,6 +9356,7 @@
 "StartCliSessionWlobbyTokenJob::_vtbl": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8518,6 +9364,7 @@
 "StartCliSessionWlobbyTokenJob::getGradeLevelExpire": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8547,6 +9394,7 @@
 "StartCliSessionWlobbyTokenJob::listAllGradesExpire": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8582,6 +9430,7 @@
 "StartCliSessionWnpTokenJob::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8603,6 +9452,7 @@
 "StartCliSessionWnpTokenJob::consumeTokenExpire": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8610,6 +9460,7 @@
 "StartCliSessionWnpTokenJob::createSlotsExpire": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8617,6 +9468,7 @@
 "StartCliSessionWnpTokenJob::createSlotsReq": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8624,6 +9476,7 @@
 "StartCliSessionWnpTokenJob::getUserProfileReq": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8631,6 +9484,7 @@
 "StartCliSessionWnpTokenJob::listSlotsExpire": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8645,6 +9499,7 @@
 "StartCliSessionWnpTokenJob::listUserLastPresencesExpire": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8652,6 +9507,7 @@
 "StartCliSessionWnpTokenJob::listUserLastPresencesReq": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8659,6 +9515,7 @@
 "StartCliSessionWnpTokenJob::presenceLoginExpire": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8673,6 +9530,7 @@
 "StartCliSessionWnpTokenJob::setSlotDataExpire": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8680,6 +9538,7 @@
 "StartCliSessionWnpTokenJob::setSlotDataReq": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8702,6 +9561,7 @@
 "StartCliSessionWnpTokenJob::~StartCliSessionWnpTokenJob": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8709,6 +9569,7 @@
 "StaticPageMemoryManager::Alloc": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8730,6 +9591,7 @@
 "StaticPageMemoryManager::Free": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8737,6 +9599,7 @@
 "StaticPageMemoryManager::Initialize [?Initialize@StaticPageMemoryManager@@QEAA_NPEAX_K1PEBVMemoryManager@@@Z]": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8765,6 +9628,7 @@
 "StaticPageMemoryManager::allocate": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8772,6 +9636,7 @@
 "StaticPageMemoryManager::~StaticPageMemoryManager": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8779,6 +9644,7 @@
 "StopChargeJob::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8786,6 +9652,7 @@
 "StopChargeJob::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8793,6 +9660,7 @@
 "StopChargeJob::_vtbl": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8800,6 +9668,7 @@
 "StopChargeJob::expireChargeStop": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8837,6 +9706,7 @@
 "StrNormalize": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8852,6 +9722,7 @@
 "String::UnicodeToMultibyte": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8859,6 +9730,7 @@
 "StsMsgLib::_StsMsgRequest::GetCommand": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8866,6 +9738,7 @@
 "StsMsgLib::_StsMsgRequest::GetMessageType": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8873,6 +9746,7 @@
 "StsMsgLib::_StsMsgRequest::GetTransactionId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8880,6 +9754,7 @@
 "SysInfo::Hostname": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8887,6 +9762,7 @@
 "SysInfo::IpAddress": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8894,6 +9770,7 @@
 "SystemEvent::Make": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8901,6 +9778,7 @@
 "SystemEvent::~SystemEvent": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8908,6 +9786,7 @@
 "SystemPerfMonitor::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8915,6 +9794,7 @@
 "SystemPerfMonitor::~SystemPerfMonitor": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8922,6 +9802,7 @@
 "TakeGoodsJob::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8929,6 +9810,7 @@
 "TakeGoodsJob::_vtbl": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8958,6 +9840,7 @@
 "TakeGoodsJob::takeGoodsReq": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8965,6 +9848,7 @@
 "TakeGoodsJob::takeGoodsTimeout": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8972,6 +9856,7 @@
 "TakeGoodsJob::work": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8979,6 +9864,7 @@
 "TakeGoodsJob::~TakeGoodsJob": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8986,6 +9872,7 @@
 "TencentUIC::CheckNameFilter": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -8993,6 +9880,7 @@
 "TencentUIC::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9000,6 +9888,7 @@
 "TextConsole::Close": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9007,6 +9896,7 @@
 "TextConsole::Open": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9014,6 +9904,7 @@
 "TextConsole::TextConsole": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9021,6 +9912,7 @@
 "TextConsole::Write": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9028,6 +9920,7 @@
 "TextConsole::WriteStartLog": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9035,6 +9928,7 @@
 "TextConsole::WriteStatusLog": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9042,6 +9936,7 @@
 "TextConsole::controlHandler": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9049,6 +9944,7 @@
 "TextConsole::setTitle": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9056,6 +9952,7 @@
 "TextConsole::write": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9063,6 +9960,7 @@
 "TextConsoleControlHandler": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9070,6 +9968,7 @@
 "Thread::stop": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9077,6 +9976,7 @@
 "Thread::yield": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9084,6 +9984,7 @@
 "Thread::~Thread": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9091,6 +9992,7 @@
 "ThreadManager::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9098,6 +10000,7 @@
 "ThreadManager::StartThread": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9105,6 +10008,7 @@
 "ThreadManager::StopAll": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9119,6 +10023,7 @@
 "ThreadManager::entry": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9126,6 +10031,7 @@
 "ThreadManager::~ThreadManager": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9133,6 +10039,7 @@
 "TimeBasedPlayInfoList::~TimeBasedPlayInfoList": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9154,6 +10061,7 @@
 "TimeBasedPlaySeasonSchedule::Rule::Rule": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9161,6 +10069,7 @@
 "TimeBasedPlaySeasonSchedule::TimeBasedPlaySeasonSchedule": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9168,6 +10077,7 @@
 "Timer::EventId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9175,6 +10085,7 @@
 "Timer::~Timer": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9182,6 +10093,7 @@
 "TimerQueue::Add": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9189,6 +10101,7 @@
 "TimerQueue::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9196,6 +10109,7 @@
 "TimerQueue::Remove": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9203,6 +10117,7 @@
 "TimerQueue::TimeExpired": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9210,6 +10125,7 @@
 "TimerQueue::addLongTermQueue": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9217,6 +10133,7 @@
 "TimerQueue::clearLongTermQueueSlot": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9224,6 +10141,7 @@
 "TimerQueue::clearShortTermQueueSlot": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9231,6 +10149,7 @@
 "TimerQueue::removeShortTermQueue": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9238,6 +10157,7 @@
 "TimerQueue::~TimerQueue": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9245,6 +10165,7 @@
 "TransactionChannel::InitializeTransactionChannel": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9259,6 +10180,7 @@
 "TransactionChannel::Manager::remove": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9273,6 +10195,7 @@
 "TransactionChannel::~TransactionChannel": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9288,6 +10211,7 @@
 "TrustedPacketBufferHandler::Destroy": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9295,6 +10219,7 @@
 "TrustedPacketBufferHandler::ToBuffer": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9310,6 +10235,7 @@
 "TryEnterGameWorldJob::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9317,6 +10243,7 @@
 "TryEnterGameWorldJob::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9324,6 +10251,7 @@
 "TryEnterGameWorldJob::TryEnterGameWorldJob": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9331,6 +10259,7 @@
 "TryEnterGameWorldJob::_vtbl": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9426,6 +10355,7 @@
 "TryEnterGameWorldJob::restorePcExpired": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9449,6 +10379,7 @@
 "TryEnterGameWorldJob::restorePcReq": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9463,6 +10394,7 @@
 "TryEnterGameWorldJob::~TryEnterGameWorldJob": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9477,6 +10409,7 @@
 "WaitQueue::WaitQueue": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9484,6 +10417,7 @@
 "WaitQueue::~WaitQueue": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9491,6 +10425,7 @@
 "WaitQueueList::Init": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9498,6 +10433,7 @@
 "WaitQueueList::~WaitQueueList": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9505,6 +10441,7 @@
 "WinMsgHandler::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9512,6 +10449,7 @@
 "WinMsgHandler::WaitInit": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9519,6 +10457,7 @@
 "WinMsgHandler::run": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9526,6 +10465,7 @@
 "WinMsgHandler::~WinMsgHandler": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9533,6 +10473,7 @@
 "WinServiceConsole::Close": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9540,6 +10481,7 @@
 "WinServiceConsole::InstallService": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9547,6 +10489,7 @@
 "WinServiceConsole::Open": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9554,6 +10497,7 @@
 "WinServiceConsole::ServiceMain": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9561,6 +10505,7 @@
 "WinServiceConsole::SetState": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9568,6 +10513,7 @@
 "WinServiceConsole::UninstallService": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9575,6 +10521,7 @@
 "WinServiceConsole::WriteStartLog": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9582,6 +10529,7 @@
 "WinServiceConsole::addLog": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9589,6 +10537,7 @@
 "WinServiceConsole::controlHandler": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9596,6 +10545,7 @@
 "WinServiceConsole::getLastErrorText": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9603,6 +10553,7 @@
 "WinServiceConsole::reportStatusToSCManager": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9610,6 +10561,7 @@
 "WinServiceControlHandler": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9631,6 +10583,7 @@
 "WindowConsole::SetState": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9646,6 +10599,7 @@
 "WindowConsole::Write": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9653,6 +10607,7 @@
 "WindowConsole::WriteStartLog": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9660,6 +10615,7 @@
 "WindowConsole::setTitle": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9667,6 +10623,7 @@
 "WindowConsole::write": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9674,6 +10631,7 @@
 "WindowConsole::~WindowConsole": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9681,6 +10639,7 @@
 "WindowConsoleOnClose": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9688,6 +10647,7 @@
 "WindowConsoleOnReload": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9695,6 +10655,7 @@
 "WindowConsoleOnSafeShutdown": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9702,6 +10663,7 @@
 "ZSTD_BtFindBestMatch": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9709,6 +10671,7 @@
 "ZSTD_BtFindBestMatch_extDict": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9716,6 +10679,7 @@
 "ZSTD_BtFindBestMatch_selectMLS": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9723,6 +10687,7 @@
 "ZSTD_BtFindBestMatch_selectMLS_extDict": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9730,6 +10695,7 @@
 "ZSTD_CCtx_resetParameters": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9737,6 +10703,7 @@
 "ZSTD_DUBT_findBestMatch": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9744,6 +10711,7 @@
 "ZSTD_HcFindBestMatch_extDict_selectMLS": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9751,6 +10719,7 @@
 "ZSTD_HcFindBestMatch_selectMLS": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9758,6 +10727,7 @@
 "ZSTD_compressBlock_btlazy2": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9765,6 +10735,7 @@
 "ZSTD_compressBlock_btlazy2_extDict": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9804,6 +10775,7 @@
 "ZSTD_compressBlock_doubleFast": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9811,6 +10783,7 @@
 "ZSTD_compressBlock_doubleFast_extDict": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9818,6 +10791,7 @@
 "ZSTD_compressBlock_doubleFast_extDict_generic": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9825,6 +10799,7 @@
 "ZSTD_compressBlock_fast": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9832,6 +10807,7 @@
 "ZSTD_compressBlock_fast_dictMatchState": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9839,6 +10815,7 @@
 "ZSTD_compressBlock_fast_extDict": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9846,6 +10823,7 @@
 "ZSTD_compressBlock_fast_extDict_generic": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9853,6 +10831,7 @@
 "ZSTD_compressBlock_greedy": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9860,6 +10839,7 @@
 "ZSTD_compressBlock_greedy_extDict": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9867,6 +10847,7 @@
 "ZSTD_compressBlock_lazy": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9874,6 +10855,7 @@
 "ZSTD_compressBlock_lazy2": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9881,6 +10863,7 @@
 "ZSTD_compressBlock_lazy2_extDict": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9888,6 +10871,7 @@
 "ZSTD_compressBlock_lazy_extDict": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9895,6 +10879,7 @@
 "ZSTD_count": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9902,6 +10887,7 @@
 "ZSTD_count_2segments": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9909,6 +10895,7 @@
 "ZSTD_cpuid": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9916,6 +10903,7 @@
 "ZSTD_createCCtx_advanced": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9923,6 +10911,7 @@
 "ZSTD_downscaleStat": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9930,6 +10919,7 @@
 "ZSTD_freeCDict": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9937,6 +10927,7 @@
 "ZSTD_fullLiteralsCost_cached": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9944,6 +10935,7 @@
 "ZSTD_hashPtr": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9951,6 +10943,7 @@
 "ZSTD_insertAndFindFirstIndexHash3": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9958,6 +10951,7 @@
 "ZSTD_insertAndFindFirstIndex_internal": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9965,6 +10959,7 @@
 "ZSTD_insertBt1": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9972,6 +10967,7 @@
 "ZSTD_insertDUBT1": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9979,6 +10975,7 @@
 "ZSTD_litLengthContribution": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9986,6 +10983,7 @@
 "ZSTD_litLengthPrice": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9993,6 +10991,7 @@
 "ZSTD_rawLiteralsCost": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -10000,6 +10999,7 @@
 "ZSTD_readMINMATCH": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -10007,6 +11007,7 @@
 "ZSTD_rescaleFreqs": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -10014,6 +11015,7 @@
 "ZSTD_setBasePrices": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -10021,6 +11023,7 @@
 "ZSTD_storeSeq": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -10028,6 +11031,7 @@
 "ZSTD_updateDUBT": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -10035,6 +11039,7 @@
 "ZSTD_updateRep": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -10042,6 +11047,7 @@
 "ZSTD_updateStats": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -10049,6 +11055,7 @@
 "_FindPESection": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -10056,6 +11063,7 @@
 "_IsNonwritableInCurrentImage": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -10063,6 +11071,7 @@
 "_IsNonwritableInCurrentImage$filt$0": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -10070,6 +11079,7 @@
 "_ValidateImageBase": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -10077,6 +11087,7 @@
 "_matherr": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -10084,6 +11095,7 @@
 "_onexit": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -10091,6 +11103,7 @@
 "_onexit$fin$0": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -10098,6 +11111,7 @@
 "_snprintf_s<1024>": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -10105,6 +11119,7 @@
 "aes128TableDecrypt": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -10112,6 +11127,7 @@
 "aes128TableEncrypt": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -10119,6 +11135,7 @@
 "aes128TableSetupDecKey": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -10133,6 +11150,7 @@
 "atexit": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -10140,6 +11158,7 @@
 "decrypt": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -10147,6 +11166,7 @@
 "encrypt": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -10154,6 +11174,7 @@
 "hash": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -10161,6 +11182,7 @@
 "makeConsole": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -10168,6 +11190,7 @@
 "makeDirectory": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -10182,6 +11205,7 @@
 "pre_c_init": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -10189,6 +11213,7 @@
 "pre_cpp_init": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -10196,6 +11221,7 @@
 "printUsage": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -10203,6 +11229,7 @@
 "swprintf": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -10210,6 +11237,7 @@
 "swprintf_s<128>": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -10217,6 +11245,7 @@
 "swprintf_s<129>": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -10224,6 +11253,7 @@
 "swprintf_s<256>": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -10231,6 +11261,7 @@
 "swprintf_s<260>": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -10238,6 +11269,7 @@
 "swprintf_s<33>": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -10245,6 +11277,7 @@
 "swprintf_s<513>": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -10252,6 +11285,7 @@
 "swprintf_s<520>": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -10259,6 +11293,7 @@
 "swprintf_s<64>": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -10266,6 +11301,7 @@
 "swprintf_s<780>": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -10273,6 +11309,7 @@
 "tss_load_sdk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -10287,6 +11324,7 @@
 "wmainCRTStartup": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"

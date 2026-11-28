@@ -2,6 +2,7 @@
 "Aes128::BlockSize": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9,6 +10,7 @@
 "Aes128::Cleanup": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -16,6 +18,7 @@
 "Aes128::Decrypt": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -23,6 +26,7 @@
 "Aes128::EncSize": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -30,6 +34,7 @@
 "Aes128::Encrypt": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -37,6 +42,7 @@
 "Aes128::GetType": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -44,6 +50,7 @@
 "Aes128::Setup": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -51,6 +58,7 @@
 "Aes128::~Aes128": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -58,6 +66,7 @@
 "Aes128NI_Decrypt": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -65,6 +74,7 @@
 "Aes128NI_Encrypt": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -72,6 +82,7 @@
 "Aes128NI_Setup": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -79,6 +90,7 @@
 "Aes128Table_Decrypt": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -86,6 +98,7 @@
 "Aes128Table_Encrypt": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -93,6 +106,7 @@
 "Aes128Table_Setup": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -100,6 +114,7 @@
 "AlertSender::AlertSender": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -107,6 +122,7 @@
 "AlertSender::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -114,6 +130,7 @@
 "AlertSender::Write": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -121,6 +138,7 @@
 "AlertSender::createSocket": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -128,6 +146,7 @@
 "AlertSender::fini": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -135,6 +154,7 @@
 "AlertSender::run": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -142,6 +162,7 @@
 "AlertSender::sendRemain": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -149,6 +170,7 @@
 "AlertSender::writev2": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -156,6 +178,7 @@
 "AutoDbTran::~AutoDbTran": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -163,6 +186,7 @@
 "BaseRefCntObj::deallocate_me": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -170,6 +194,7 @@
 "BaseRefCntObj::~BaseRefCntObj": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -177,6 +202,7 @@
 "BigInteger::Add": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -184,6 +210,7 @@
 "BigInteger::BigInteger": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -205,6 +232,7 @@
 "BigInteger::LeftShift": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -212,6 +240,7 @@
 "BigInteger::Mul": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -219,6 +248,7 @@
 "BigInteger::Pow2": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -226,6 +256,7 @@
 "BigInteger::RightShift": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -233,6 +264,7 @@
 "BigInteger::Set [?Set@BigInteger@@QEAAXPEBV1@H@Z]": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -240,6 +272,7 @@
 "BigInteger::Set [?Set@BigInteger@@QEAAX_J@Z]": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -247,6 +280,7 @@
 "BigInteger::Set [?Set@BigInteger@@QEAA_NHPEBEH@Z]": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -254,6 +288,7 @@
 "BigInteger::Sqr": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -261,6 +296,7 @@
 "BigInteger::Sub": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -268,6 +304,7 @@
 "BigInteger::absCompare": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -275,6 +312,7 @@
 "BigInteger::add": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -282,6 +320,7 @@
 "BigInteger::expMod": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -296,6 +335,7 @@
 "BigInteger::leftShiftDigit": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -303,6 +343,7 @@
 "BigInteger::montgomeryNormalize": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -310,6 +351,7 @@
 "BigInteger::montgomeryReduce": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -317,6 +359,7 @@
 "BigInteger::mul [?mul@BigInteger@@AEAAXI@Z]": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -324,6 +367,7 @@
 "BigInteger::mul [?mul@BigInteger@@CAXPEBV1@0PEAV1@@Z]": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -331,6 +375,7 @@
 "BigInteger::setBit": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -338,6 +383,7 @@
 "BigInteger::sqr": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -345,6 +391,7 @@
 "BigInteger::sub": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -352,6 +399,7 @@
 "BigInteger::~BigInteger": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -359,6 +407,7 @@
 "BloodDaemonMain": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -366,6 +415,7 @@
 "Blowfish::BlockSize": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -373,6 +423,7 @@
 "Blowfish::Cleanup": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -380,6 +431,7 @@
 "Blowfish::Decrypt": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -387,6 +439,7 @@
 "Blowfish::EncSize": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -394,6 +447,7 @@
 "Blowfish::Encrypt": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -401,6 +455,7 @@
 "Blowfish::GetType": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -408,6 +463,7 @@
 "Blowfish::Setup": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -415,6 +471,7 @@
 "BnsCommonConfig::CheckMinMaxBoundary": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -422,6 +479,7 @@
 "BnsCommonConfig::CompareMatch": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -429,6 +487,7 @@
 "BnsCommonConfig::Copy": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -436,6 +495,7 @@
 "BnsCommonConfig::Dump": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -443,6 +503,7 @@
 "BnsCommonConfig::LoadBnsCommonConfig": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -450,6 +511,7 @@
 "BnsCommonConfig::ReloadBnsCommonConfig": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -457,6 +519,7 @@
 "BnsCommonConfig::UpdateAllVariable": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -464,6 +527,7 @@
 "BnsCommonConfig::UpdateReloadedVariable": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -471,6 +535,7 @@
 "BnsCommonConfigLoad::Load": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -478,6 +543,7 @@
 "BnsCommonConfigReload::Load": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -485,6 +551,7 @@
 "Channel::Close": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -492,6 +559,7 @@
 "Channel::GetSession": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -499,6 +567,7 @@
 "Channel::MakeSession": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -506,6 +575,7 @@
 "Channel::RemoveSession": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -513,6 +583,7 @@
 "Channel::SetSession": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -520,6 +591,7 @@
 "Channel::removeSession": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -527,6 +599,7 @@
 "Channel::~Channel": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -534,6 +607,7 @@
 "Connection::Accept": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -541,6 +615,7 @@
 "Connection::AsyncConnect": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -548,6 +623,7 @@
 "Connection::AsyncRecv": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -555,6 +631,7 @@
 "Connection::AsyncSend": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -562,6 +639,7 @@
 "Connection::CompleteAsyncConnect": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -569,6 +647,7 @@
 "Connection::GetLocalAddress": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -576,6 +655,7 @@
 "Connection::makeConnectSocket": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -583,6 +663,7 @@
 "Console::Console": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -590,6 +671,7 @@
 "Console::Flush": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -597,6 +679,7 @@
 "Console::GetType": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -604,6 +687,7 @@
 "Console::SetTitle": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -611,6 +695,7 @@
 "Console::~Console": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -618,6 +703,7 @@
 "CouponJob::dispatch_work": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -625,6 +711,7 @@
 "CouponJob::execute": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -632,6 +719,7 @@
 "CouponJob::resume": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -639,6 +727,7 @@
 "CouponJob::transit": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -646,6 +735,7 @@
 "CouponJob::~CouponJob": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -653,6 +743,7 @@
 "CrashHandler::CrashHandler": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -660,6 +751,7 @@
 "CrashHandler::Handle": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -667,6 +759,7 @@
 "CrashHandler::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -674,6 +767,7 @@
 "CrashHandler::MakeCrash": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -681,6 +775,7 @@
 "CrashHandler::SetLogPath": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -688,6 +783,7 @@
 "CrashHandler::SetMailInfo": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -695,6 +791,7 @@
 "CrashHandler::handleCrash": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -702,6 +799,7 @@
 "CriticalSection::CriticalSection": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -709,6 +807,7 @@
 "CriticalSection::~CriticalSection": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -716,6 +815,7 @@
 "Crypto::Destroy": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -723,6 +823,7 @@
 "Crypto::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -730,6 +831,7 @@
 "CryptoKey::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -737,6 +839,7 @@
 "Ctr::Decrypt": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -744,6 +847,7 @@
 "Ctr::Encrypt": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -751,6 +855,7 @@
 "Ctr::Setup": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -758,6 +863,7 @@
 "DChannel::GetId": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -765,6 +871,7 @@
 "DChannelMgr::AddDaemon": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -772,6 +879,7 @@
 "DChannelMgr::CreateDaemonListXml": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -779,6 +887,7 @@
 "DChannelMgr::DChannelMgr": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -786,6 +895,7 @@
 "DChannelMgr::Finalize": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -793,6 +903,7 @@
 "DChannelMgr::FindDaemon": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -800,6 +911,7 @@
 "DChannelMgr::OnAccept": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -807,6 +919,7 @@
 "DChannelMgr::OnClose": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -814,6 +927,7 @@
 "DChannelMgr::OnConnect": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -821,6 +935,7 @@
 "DChannelMgr::PacketHandler": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -828,6 +943,7 @@
 "DChannelMgr::ReplaceDaemon": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -835,6 +951,7 @@
 "DChannelMgr::SetupDaemonList": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -842,6 +959,7 @@
 "DChannelMgr::SetupDaemonListFromXml": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -849,6 +967,7 @@
 "DChannelMgr::writeFileUtf8": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -856,6 +975,7 @@
 "DChannelMgr::~DChannelMgr": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -863,6 +983,7 @@
 "Daemon::Cooldown": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -870,6 +991,7 @@
 "Daemon::Daemon": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -877,6 +999,7 @@
 "Daemon::LoadVersion": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -884,6 +1007,7 @@
 "Daemon::Reload": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -891,6 +1015,7 @@
 "Daemon::Start": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -898,6 +1023,7 @@
 "Daemon::cooldown": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -905,6 +1031,7 @@
 "Daemon::noTimerMain": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -912,6 +1039,7 @@
 "Daemon::setAddress": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -919,6 +1047,7 @@
 "Daemon::setCurrentDirectory": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -926,6 +1055,7 @@
 "Daemon::start": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -933,6 +1063,7 @@
 "Daemon::startDaemon": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -940,6 +1071,7 @@
 "Daemon::timerMain": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -947,6 +1079,7 @@
 "Daemon::~Daemon": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -954,6 +1087,7 @@
 "DaemonConfig::AllocConfig": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -968,6 +1102,7 @@
 "DaemonConfig::Load": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -975,6 +1110,7 @@
 "Db::AllocTransaction": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -982,6 +1118,7 @@
 "Db::Clear": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -989,6 +1126,7 @@
 "Db::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -996,6 +1134,7 @@
 "Db::Log": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1003,6 +1142,7 @@
 "Db::ReleaseTransaction": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1010,6 +1150,7 @@
 "Db::clearList": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1017,6 +1158,7 @@
 "Db::errorLog": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1024,6 +1166,7 @@
 "Db::initEnv": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1031,6 +1174,7 @@
 "DbTransaction::BindCol": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1038,6 +1182,7 @@
 "DbTransaction::BindParam": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1045,6 +1190,7 @@
 "DbTransaction::Execute": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1052,6 +1198,7 @@
 "DbTransaction::Fetch": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1059,6 +1206,7 @@
 "DbTransaction::Prepare": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1066,6 +1214,7 @@
 "DbTransaction::close": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1073,6 +1222,7 @@
 "DbTransaction::connect": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1080,6 +1230,7 @@
 "DbTransaction::connectionErrorLog": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1087,6 +1238,7 @@
 "DbTransaction::initStatement": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1094,6 +1246,7 @@
 "DbTransaction::initialize": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1101,6 +1254,7 @@
 "DbTransaction::statmentErrorLog": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1108,6 +1262,7 @@
 "DelayedRelease::Add": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1115,6 +1270,7 @@
 "DelayedRelease::Cleanup": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1122,6 +1278,7 @@
 "DelayedRelease::Release": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1129,6 +1286,7 @@
 "DelayedRelease::releaseNode": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1136,6 +1294,7 @@
 "DumpRegister": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1143,6 +1302,7 @@
 "DumpStack": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1150,6 +1310,7 @@
 "DynamicEventObject::deallocate_me": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1157,6 +1318,7 @@
 "DynamicEventObject::~DynamicEventObject": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1164,6 +1326,7 @@
 "DynamicRefCntObj::~DynamicRefCntObj": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1171,6 +1334,7 @@
 "EventNotiJob::EventNotiJob": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1178,6 +1342,7 @@
 "EventNotiJob::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1185,6 +1350,7 @@
 "EventNotiJob::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1192,6 +1358,7 @@
 "EventNotiJob::deallocate_me": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1199,6 +1366,7 @@
 "EventNotiJob::eventNotiExpire": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1206,6 +1374,7 @@
 "EventNotiJob::eventNotiReq": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1213,6 +1382,7 @@
 "EventNotiJob::eventNotiRes": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1227,6 +1397,7 @@
 "EventNotiJob::init": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1234,6 +1405,7 @@
 "EventNotiJob::work": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1241,6 +1413,7 @@
 "ExceptionCodeString": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1248,6 +1421,7 @@
 "FSE_count_simple": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1255,6 +1429,7 @@
 "GameEventConfig::Dump": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1262,6 +1437,7 @@
 "GameEventConfig::FindGameEventInfo": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1269,6 +1445,7 @@
 "GameEventConfig::GameEventConfig": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1276,6 +1453,7 @@
 "GameEventConfig::Load": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1290,6 +1468,7 @@
 "GameEventConfig::addGameEventInfo": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1297,6 +1476,7 @@
 "GameEventConfig::~GameEventConfig": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1304,6 +1484,7 @@
 "GameEventLogEvent::EventId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1311,6 +1492,7 @@
 "GameEventLogEvent::HandleEvent": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1318,6 +1500,7 @@
 "GameEventManager::Clear": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1325,6 +1508,7 @@
 "GameEventManager::GameEventManager": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1332,6 +1516,7 @@
 "GameEventManager::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1339,6 +1524,7 @@
 "GameEventManager::PostGameEventLogList": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1346,6 +1532,7 @@
 "GameEventManager::initWorkerThread": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1353,6 +1540,7 @@
 "GameEventManager::~GameEventManager": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1360,6 +1548,7 @@
 "GameEventWorker::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1367,6 +1556,7 @@
 "GameEventWorker::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1374,6 +1564,7 @@
 "GameEventWorker::handleFailedEvent": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1381,6 +1572,7 @@
 "GameEventWorker::run": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1388,6 +1580,7 @@
 "GameEventWorker::stop": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1395,6 +1588,7 @@
 "GenerateJobid": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1402,6 +1596,7 @@
 "GrowingBuffer::grow": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1409,6 +1604,7 @@
 "HandleSmartCouponManager_HelloReq": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1416,6 +1612,7 @@
 "HandleSmartCouponManager_LoadRetryReadyGameEventLogListReq": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1423,6 +1620,7 @@
 "HandleSmartCouponManager_RetryCouponPublicationReq": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1452,6 +1650,7 @@
 "HeapMemoryManager::Alloc": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1459,6 +1658,7 @@
 "HeapMemoryManager::AllocZero": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1466,6 +1666,7 @@
 "HeapMemoryManager::Free": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1473,6 +1674,7 @@
 "HeapMemoryManager::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1480,6 +1682,7 @@
 "HeapMemoryManager::Realloc": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1487,6 +1690,7 @@
 "HeapMemoryManager::ReallocZero": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1494,6 +1698,7 @@
 "InitSymbol": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1501,6 +1706,7 @@
 "IoWorker::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1508,6 +1714,7 @@
 "IoWorker::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1522,6 +1729,7 @@
 "IoWorker::stop": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1529,6 +1737,7 @@
 "IoWorker::yield": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1536,6 +1745,7 @@
 "JobManager::Clear": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1543,6 +1753,7 @@
 "JobManager::Execute": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1550,6 +1761,7 @@
 "JobManager::ExecuteW": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1557,6 +1769,7 @@
 "JobManager::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1564,6 +1777,7 @@
 "JobManager::Register": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1571,6 +1785,7 @@
 "JobManager::ResumeW": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1578,6 +1793,7 @@
 "JobManager::add": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1585,6 +1801,7 @@
 "JobManager::find": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1592,6 +1809,7 @@
 "JobManager::remove": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1599,6 +1817,7 @@
 "JobManager::~JobManager": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1606,6 +1825,7 @@
 "Log::Add": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1613,6 +1833,7 @@
 "Log::Close": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1620,6 +1841,7 @@
 "Log::Flush": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1627,6 +1849,7 @@
 "Log::InitMedia": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1634,6 +1857,7 @@
 "Log::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1641,6 +1865,7 @@
 "Log::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1648,6 +1873,7 @@
 "Log::Write [?Write@Log@@SAXPEB_WHJ0ZZ]": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1655,6 +1881,7 @@
 "Log::Write [?Write@Log@@SAXW4Type@1@PEB_WH1ZZ]": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1662,6 +1889,7 @@
 "Log::WriteV": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1669,6 +1897,7 @@
 "Log::run": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1676,6 +1905,7 @@
 "LogBuffer::Acquire": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1683,6 +1913,7 @@
 "LogBuffer::GetLog": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1690,6 +1921,7 @@
 "LogBuffer::GetType": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1697,6 +1929,7 @@
 "LogBuffer::Prepare": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1704,6 +1937,7 @@
 "LogBuffer::Release": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1711,6 +1945,7 @@
 "LogBuffer::deallocate_me": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1718,6 +1953,7 @@
 "LogBufferAllocator::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1725,6 +1961,7 @@
 "LogBufferAllocator::allocate": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1732,6 +1969,7 @@
 "LogBufferAllocator::initAllocator": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1739,6 +1977,7 @@
 "LogBufferPool::allocate": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1746,6 +1985,7 @@
 "LogBufferPool::deallocate": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1753,6 +1993,7 @@
 "LogFile::Flush": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1760,6 +2001,7 @@
 "LogFile::GetLastFileName": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1767,6 +2009,7 @@
 "LogFile::GetType": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1774,6 +2017,7 @@
 "LogFile::LogFile": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1781,6 +2025,7 @@
 "LogFile::MakeFilename": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1788,6 +2033,7 @@
 "LogFile::initialize": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1795,6 +2041,7 @@
 "LogFile::makeDirectory": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1802,6 +2049,7 @@
 "LogFile::write": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1809,6 +2057,7 @@
 "LogFile::writeFile": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1816,6 +2065,7 @@
 "LogFile::writeToBuffer [?writeToBuffer@LogFile@@AEAAXPEB_WH0H0H0H0H@Z]": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1823,6 +2073,7 @@
 "LogFile::writeToBuffer [?writeToBuffer@LogFile@@AEAAXW4Type@Log@@U_SYSTEMTIME@@PEB_WH2@Z]": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1830,6 +2081,7 @@
 "LogFile::~LogFile": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1837,6 +2089,7 @@
 "LogMedia::Add": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1844,6 +2097,7 @@
 "LogMedia::GetLastFileName": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1851,6 +2105,7 @@
 "LogMedia::Write": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1858,6 +2113,7 @@
 "ManagerChannel::GetId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1865,6 +2121,7 @@
 "ManagerChannel::SendRetryCouponPublicationFail": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1872,6 +2129,7 @@
 "ManagerChannel::SendRetryCouponPublicationOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1879,6 +2137,7 @@
 "ManagerSessionHandler::OnAccept": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1886,6 +2145,7 @@
 "ManagerSessionHandler::OnClose": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1893,6 +2153,7 @@
 "ManagerSessionHandler::OnConnect": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1900,6 +2161,7 @@
 "ManagerSessionHandler::PacketHandler": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1907,6 +2169,7 @@
 "MaskGenerator::generate": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1914,6 +2177,7 @@
 "Memory::CreateManager": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1921,6 +2185,7 @@
 "NPChannel::Cleanup": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1928,6 +2193,7 @@
 "NPChannel::Connect": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1935,6 +2201,7 @@
 "NPChannel::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1949,6 +2216,7 @@
 "NPChannel::Setup": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1956,6 +2224,7 @@
 "NPChannel::checkLibError": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1963,6 +2232,7 @@
 "NPChannel::handlePacket": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1970,6 +2240,7 @@
 "NPChannel::onConnect": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1977,6 +2248,7 @@
 "NPChannel::sendInitialConnectMessage": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1984,6 +2256,7 @@
 "NPChannel::~NPChannel": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1991,6 +2264,7 @@
 "NPHandlerEventNoti": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1998,6 +2272,7 @@
 "NPJobTransaction::Expire": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2005,6 +2280,7 @@
 "NPMsgHandleEvent::HandleEvent": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2012,6 +2288,7 @@
 "NPMsgHandleEvent::~NPMsgHandleEvent": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2019,6 +2296,7 @@
 "NPPing::HandleEvent": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2026,6 +2304,7 @@
 "NPPing::TimerClass": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2033,6 +2312,7 @@
 "NPPing::TimerId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2040,6 +2320,7 @@
 "NPServiceChannel::SendRequestEventNoti": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2047,6 +2328,7 @@
 "NPServiceChannelCmdDispatcher": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2054,6 +2336,7 @@
 "NPServiceChannelManager::HandleMessage": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2061,6 +2344,7 @@
 "NPServiceChannelManager::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2068,6 +2352,7 @@
 "NPServiceChannelManager::OnClose": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2075,6 +2360,7 @@
 "NPServiceChannelManager::OnConnect": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2082,6 +2368,7 @@
 "NPSessionHandler::OnAccept": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2089,6 +2376,7 @@
 "NPSessionHandler::OnClose": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2096,6 +2384,7 @@
 "NPSessionHandler::OnConnect": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2103,6 +2392,7 @@
 "NPSessionHandler::PacketHandler": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2110,6 +2400,7 @@
 "NPTransactionRegistry::Find": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2117,6 +2408,7 @@
 "NPTransactionRegistry::NPTransactionRegistry": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2124,6 +2416,7 @@
 "NPTransactionRegistry::Register": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2131,6 +2424,7 @@
 "NPTransactionRegistry::Release": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2138,6 +2432,7 @@
 "NPTransactionRegistry::ReleaseAll": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2145,6 +2440,7 @@
 "Network::Clear": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2152,6 +2448,7 @@
 "Network::ClosePort": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2159,6 +2456,7 @@
 "Network::GetAddressStringW": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2166,6 +2464,7 @@
 "Network::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2173,6 +2472,7 @@
 "Network::Network": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2180,6 +2480,7 @@
 "Network::OpenPort [?OpenPort@Network@@SA_NI@Z]": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2187,6 +2488,7 @@
 "Network::OpenPort [?OpenPort@Network@@SA_NIGHPEBVSessionHandler@@PEBVPacketBufferHandler@@I_N22@Z]": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2194,6 +2496,7 @@
 "Network::ReconnectSession": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2201,6 +2504,7 @@
 "Network::initInstance": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2208,6 +2512,7 @@
 "Network::initWorkerThread": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2215,6 +2520,7 @@
 "Network::initializeSocketInterface": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2222,6 +2528,7 @@
 "Network::iocpHandle": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2229,6 +2536,7 @@
 "OaepEncoder::Decode": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2236,6 +2544,7 @@
 "OaepEncoder::Encode": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2243,6 +2552,7 @@
 "OaepEncoder::Setup": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2250,6 +2560,7 @@
 "OaepEncoder::decode": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2257,6 +2568,7 @@
 "OaepEncoder::encode": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2264,6 +2576,7 @@
 "ObjPool::Checkin": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2271,6 +2584,7 @@
 "ObjPool::Checkout": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2278,6 +2592,7 @@
 "ObjPool::Finalize": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2285,6 +2600,7 @@
 "ObjPool::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2292,6 +2608,7 @@
 "ObjPool::ObjPool": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2299,6 +2616,7 @@
 "ObjPoolTimer::Add": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2306,6 +2624,7 @@
 "ObjPoolTimer::HandleEvent": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2313,6 +2632,7 @@
 "ObjPoolTimer::Start": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2320,6 +2640,7 @@
 "ObjPoolTimer::process": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2327,6 +2648,7 @@
 "ObjPoolTimer::~ObjPoolTimer": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2334,6 +2656,7 @@
 "Packet::AddSize": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2341,6 +2664,7 @@
 "Packet::Allocate": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2348,6 +2672,7 @@
 "Packet::Clear": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2355,6 +2680,7 @@
 "Packet::Compose": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2362,6 +2688,7 @@
 "Packet::Decompose": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2369,6 +2696,7 @@
 "Packet::~Packet": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2376,6 +2704,7 @@
 "PacketBuffer::Compose": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2383,6 +2712,7 @@
 "PacketBuffer::Decompose": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2390,6 +2720,7 @@
 "PacketBuffer::deallocate_me": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2397,6 +2728,7 @@
 "PacketBuffer::encrypt": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2404,6 +2736,7 @@
 "PacketBufferAllocator::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2411,6 +2744,7 @@
 "PacketBufferAllocator::allocate": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2418,6 +2752,7 @@
 "PacketBufferAllocator::initAllocator": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2425,6 +2760,7 @@
 "PacketBufferPool::allocate": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2432,6 +2768,7 @@
 "PacketBufferPool::deallocate": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2439,6 +2776,7 @@
 "PagePoolMemoryManager::Alloc": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2446,6 +2784,7 @@
 "PagePoolMemoryManager::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2453,6 +2792,7 @@
 "PagePoolMemoryManager::~PagePoolMemoryManager": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2460,6 +2800,7 @@
 "PipeCommandProcess::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2467,6 +2808,7 @@
 "PipeCommandProcess::PipeCommandProcess": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2474,6 +2816,7 @@
 "PipeCommandProcess::addCommand": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2481,6 +2824,7 @@
 "PipeCommandProcess::clear": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2495,6 +2839,7 @@
 "PipeCommandProcess::run": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2502,6 +2847,7 @@
 "PipeCommandProcess::~PipeCommandProcess": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2509,6 +2855,7 @@
 "PipeConsole::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2516,6 +2863,7 @@
 "PipeConsole::PipeConsole": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2523,6 +2871,7 @@
 "PipeConsole::SetDetectFrozenThread": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2530,6 +2879,7 @@
 "PipeConsole::SetInvalidInfo": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2537,6 +2887,7 @@
 "PipeConsole::addNode": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2544,6 +2895,7 @@
 "PipeConsole::checkFrozenThread": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2551,6 +2903,7 @@
 "PipeConsole::cleanup": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2558,6 +2911,7 @@
 "PipeConsole::clear": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2565,6 +2919,7 @@
 "PipeConsole::connectPipe": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2572,6 +2927,7 @@
 "PipeConsole::disconnectAndReconnect": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2579,6 +2935,7 @@
 "PipeConsole::init": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2586,6 +2943,7 @@
 "PipeConsole::initPipe": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2607,6 +2965,7 @@
 "PipeConsole::writeReply": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2614,6 +2973,7 @@
 "PipeConsole::writeStateInfo": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2621,6 +2981,7 @@
 "PipeConsole::writeStateReply": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2628,6 +2989,7 @@
 "PipeConsole::writeStateReply2": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2635,6 +2997,7 @@
 "PipeConsole::~PipeConsole": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2642,6 +3005,7 @@
 "Port::Clear": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2649,6 +3013,7 @@
 "Port::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2656,6 +3021,7 @@
 "Port::MakeNewSession [?MakeNewSession@Port@@IEAAPEAVSession@@PEA_KKGH@Z]": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2663,6 +3029,7 @@
 "Port::MakeNewSession [?MakeNewSession@Port@@IEAA_NKGPEAVChannel@@J_N1PEAPEAVSession@@@Z]": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2670,6 +3037,7 @@
 "Port::ReconnectSession": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2677,6 +3045,7 @@
 "Port::RemoveSession": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2684,6 +3053,7 @@
 "Port::clearPool": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2691,6 +3061,7 @@
 "Port::makeSession": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2698,6 +3069,7 @@
 "PortListener::Clear": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2705,6 +3077,7 @@
 "PortListener::HandleEvent": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2712,6 +3085,7 @@
 "PortListener::HandleFailedEvent": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2719,6 +3093,7 @@
 "PortListener::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2726,6 +3101,7 @@
 "PortListener::accept": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2733,6 +3109,7 @@
 "PortListener::asyncAccept": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2740,6 +3117,7 @@
 "Prng::Generate": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2747,6 +3125,7 @@
 "Prng::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2754,6 +3133,7 @@
 "Prng::addEntropy": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2761,6 +3141,7 @@
 "Prng::setSeed": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2768,6 +3149,7 @@
 "RawPacketBufferHandler::AllocSize": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2775,6 +3157,7 @@
 "RawPacketBufferHandler::Clone": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2782,6 +3165,7 @@
 "RawPacketBufferHandler::Destroy": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2789,6 +3173,7 @@
 "RawPacketBufferHandler::ToBuffer": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2796,6 +3181,7 @@
 "RawPacketBufferHandler::ToPacket": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2803,6 +3189,7 @@
 "RawPacketBufferHandler::~RawPacketBufferHandler": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2810,6 +3197,7 @@
 "ReconnectTimer::HandleEvent": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2817,6 +3205,7 @@
 "RefCntHistory::add": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2824,6 +3213,7 @@
 "RefCntHistory::dump": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2831,6 +3221,7 @@
 "RefCntObject::DumpRefCntHistory": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2838,6 +3229,7 @@
 "RefCntObject::addReferenceCount": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2845,6 +3237,7 @@
 "RefCntObject::deallocate_object": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2852,6 +3245,7 @@
 "RefCntObject::operator delete": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2859,6 +3253,7 @@
 "RefCntObject::removeReferenceCount": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2866,6 +3261,7 @@
 "RefCntObject::~RefCntObject": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2873,6 +3269,7 @@
 "ReleaseEvent::EventId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2880,6 +3277,7 @@
 "ReleaseEvent::HandleEvent": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2887,6 +3285,7 @@
 "RetrieveEventLogContext::AddEventLogInfo": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2894,6 +3293,7 @@
 "RetrieveEventLogContext::~RetrieveEventLogContext": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2901,6 +3301,7 @@
 "RetrievePublicationContext::AddPublicationInfo": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2908,6 +3309,7 @@
 "RetrievePublicationContext::~RetrievePublicationContext": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2915,6 +3317,7 @@
 "RetryCouponPublicationEvent::EventId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2929,6 +3332,7 @@
 "Ripemd128::Digest": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2936,6 +3340,7 @@
 "Ripemd160::Digest": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2943,6 +3348,7 @@
 "Ripemd160::~Ripemd160": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2950,6 +3356,7 @@
 "Rsa::Rsa": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2964,6 +3371,7 @@
 "Rsa::encrypt": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2971,6 +3379,7 @@
 "RsaPublic::Decrypt": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2978,6 +3387,7 @@
 "RsaPublic::Encrypt": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2985,6 +3395,7 @@
 "RsaPublic::GetType": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2992,6 +3403,7 @@
 "RsaPublic::Setup": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2999,6 +3411,7 @@
 "RsaPublic::~RsaPublic": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3006,6 +3419,7 @@
 "STSMSGLIB_CHECK_DLL_VERSION": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3013,6 +3427,7 @@
 "SendPublicationEvent::EventId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3020,6 +3435,7 @@
 "SendPublicationEvent::HandleEvent": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3027,6 +3443,7 @@
 "SendRetryCouponPublicationFailEvent::EventId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3034,6 +3451,7 @@
 "SendRetryCouponPublicationFailEvent::HandleEvent": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3041,6 +3459,7 @@
 "SendRetryCouponPublicationOkEvent::EventId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3048,6 +3467,7 @@
 "SendRetryCouponPublicationOkEvent::HandleEvent": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3055,6 +3475,7 @@
 "Session::Accept": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3069,6 +3490,7 @@
 "Session::GetChannel": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3083,6 +3505,7 @@
 "Session::HandleFailedEvent": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3090,6 +3513,7 @@
 "Session::Recv": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3097,6 +3521,7 @@
 "Session::Send": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3104,6 +3529,7 @@
 "Session::SendV": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3111,6 +3537,7 @@
 "Session::Session [??0Session@@IEAA@IPEBVPacketBufferHandler@@@Z]": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3118,6 +3545,7 @@
 "Session::Session [??0Session@@IEAA@XZ]": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3125,6 +3553,7 @@
 "Session::SetChannel": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3132,6 +3561,7 @@
 "Session::clear": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3139,6 +3569,7 @@
 "Session::close": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3146,6 +3577,7 @@
 "Session::deallocate_me": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3153,6 +3585,7 @@
 "Session::handlePacket": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3160,6 +3593,7 @@
 "Session::initialize": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3167,6 +3601,7 @@
 "Session::reconnect": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3174,6 +3609,7 @@
 "Session::recv": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3181,6 +3617,7 @@
 "Session::send": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3188,6 +3625,7 @@
 "Session::sendNext": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3195,6 +3633,7 @@
 "Session::tryReconnect": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3202,6 +3641,7 @@
 "Session::~Session": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3209,6 +3649,7 @@
 "SessionHandler::~SessionHandler": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3216,6 +3657,7 @@
 "SessionPool::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3223,6 +3665,7 @@
 "SessionPool::MakeSession": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3230,6 +3673,7 @@
 "SessionPool::RemoveSession": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3237,6 +3681,7 @@
 "SessionPool::SessionPool": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3244,6 +3689,7 @@
 "SessionPool::addToPool": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3251,6 +3697,7 @@
 "SessionPool::~SessionPool": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3258,6 +3705,7 @@
 "SessionSendBuffer::Add": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3265,6 +3713,7 @@
 "SessionSendBuffer::Clear": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3272,6 +3721,7 @@
 "SessionSendBuffer::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3279,6 +3729,7 @@
 "SessionSendBuffer::RemoveSentBuffer": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3286,6 +3737,7 @@
 "SessionSendBuffer::clearPacketBufferList": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3293,6 +3745,7 @@
 "SessionSendBuffer::increaseBuffer": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3300,6 +3753,7 @@
 "SharedChannel::Accept": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3307,6 +3761,7 @@
 "SharedChannel::Close": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3314,6 +3769,7 @@
 "SharedChannel::Connect": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3321,6 +3777,7 @@
 "SharedChannel::IsConnected": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3328,6 +3785,7 @@
 "SharedChannel::RawChannel::GetId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3335,6 +3793,7 @@
 "SharedChannel::StopReconnect": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3342,6 +3801,7 @@
 "SharedChannel::~SharedChannel": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3349,6 +3809,7 @@
 "SmartCouponDB::LoadCouponPublicationList": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3356,6 +3817,7 @@
 "SmartCouponDB::LoadGameEventLogList": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3363,6 +3825,7 @@
 "SmartCouponDB::LoadRetryReadyGameEventLogList": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3370,6 +3833,7 @@
 "SmartCouponDB::LoadSingleCouponPublication": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3377,6 +3841,7 @@
 "SmartCouponDB::ProcessAccountGameEventLog": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3384,6 +3849,7 @@
 "SmartCouponDB::ProcessCharacterGameEventLog": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3391,6 +3857,7 @@
 "SmartCouponDB::RegisterGameEventLog": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3398,6 +3865,7 @@
 "SmartCouponDB::UpdateStatusToProcessFailure": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3405,6 +3873,7 @@
 "SmartCouponDB::UpdateStatusToPublicationFailure": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3412,6 +3881,7 @@
 "SmartCouponDB::UpdateStatusToPublicationSuccess": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3419,6 +3889,7 @@
 "SmartCouponDaemon::Descriptions": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3426,6 +3897,7 @@
 "SmartCouponDaemon::FailedEventObjectHandler": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3433,6 +3905,7 @@
 "SmartCouponDaemon::GetTimerInterval": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3440,6 +3913,7 @@
 "SmartCouponDaemon::GetTimerMaxTime": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3447,6 +3921,7 @@
 "SmartCouponDaemon::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3454,6 +3929,7 @@
 "SmartCouponDaemon::PrintDependency": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3461,6 +3937,7 @@
 "SmartCouponDaemon::ServiceName": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3468,6 +3945,7 @@
 "SmartCouponDaemon::SetManagerChannel": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3475,6 +3953,7 @@
 "SmartCouponDaemon::ShortName": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3482,6 +3961,7 @@
 "SmartCouponDaemon::cooldown": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3489,6 +3969,7 @@
 "SmartCouponDaemon::initLog": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3496,6 +3977,7 @@
 "SmartCouponDaemon::initNetwork": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3510,6 +3992,7 @@
 "SmartCouponDaemon::loadUnhandledCouponPublication": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3517,6 +4000,7 @@
 "SmartCouponDaemon::loadUnhandledGameEventLog": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3524,6 +4008,7 @@
 "SmartCouponDaemon::onStart": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3531,6 +4016,7 @@
 "SmartCouponDaemon::reload": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3538,6 +4024,7 @@
 "SmartCouponDaemon::setArgument": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3545,6 +4032,7 @@
 "SmartCouponDaemon::shutdown": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3552,6 +4040,7 @@
 "SmartCouponDaemon::startNPChannel": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3559,6 +4048,7 @@
 "SmartCouponDaemon::~SmartCouponDaemon": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3566,6 +4056,7 @@
 "SmartCouponObjPoolMemoryAllocator::Alloc": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3573,6 +4064,7 @@
 "StaticPageMemoryManager::Alloc": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3580,6 +4072,7 @@
 "StaticPageMemoryManager::AllocZero": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3587,6 +4080,7 @@
 "StaticPageMemoryManager::Clear": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3594,6 +4088,7 @@
 "StaticPageMemoryManager::Free": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3601,6 +4096,7 @@
 "StaticPageMemoryManager::Initialize [?Initialize@StaticPageMemoryManager@@QEAA_NPEAX_K1PEBVMemoryManager@@@Z]": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3608,6 +4104,7 @@
 "StaticPageMemoryManager::Initialize [?Initialize@StaticPageMemoryManager@@UEAA_NPEBX_K@Z]": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3615,6 +4112,7 @@
 "StaticPageMemoryManager::Realloc": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3622,6 +4120,7 @@
 "StaticPageMemoryManager::ReallocZero": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3629,6 +4128,7 @@
 "StaticPageMemoryManager::allocate": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3636,6 +4136,7 @@
 "StaticPageMemoryManager::~StaticPageMemoryManager": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3643,6 +4144,7 @@
 "String::GetId128FromGuidString": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3650,6 +4152,7 @@
 "StsMsgLib::_StsMsgRequest::GetCommand": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3657,6 +4160,7 @@
 "StsMsgLib::_StsMsgRequest::GetMessageType": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3664,6 +4168,7 @@
 "StsMsgLib::_StsMsgRequest::GetTransactionId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3671,6 +4176,7 @@
 "SysInfo::Hostname": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3678,6 +4184,7 @@
 "SysInfo::IpAddress": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3685,6 +4192,7 @@
 "SystemEvent::~SystemEvent": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3692,6 +4200,7 @@
 "TextConsole::Close": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3699,6 +4208,7 @@
 "TextConsole::Open": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3706,6 +4216,7 @@
 "TextConsole::TextConsole": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3713,6 +4224,7 @@
 "TextConsole::Write": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3720,6 +4232,7 @@
 "TextConsole::WriteStartLog": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3727,6 +4240,7 @@
 "TextConsole::WriteStatusLog": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3734,6 +4248,7 @@
 "TextConsole::controlHandler": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3741,6 +4256,7 @@
 "TextConsole::setTitle": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3748,6 +4264,7 @@
 "TextConsole::write": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3755,6 +4272,7 @@
 "TextConsoleControlHandler": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3762,6 +4280,7 @@
 "Thread::stop": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3769,6 +4288,7 @@
 "Thread::yield": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3776,6 +4296,7 @@
 "Thread::~Thread": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3783,6 +4304,7 @@
 "ThreadManager::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3790,6 +4312,7 @@
 "ThreadManager::StartThread": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3797,6 +4320,7 @@
 "ThreadManager::StopAll": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3804,6 +4328,7 @@
 "ThreadManager::StopThread": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3811,6 +4336,7 @@
 "ThreadManager::entry": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3818,6 +4344,7 @@
 "ThreadManager::stopThread": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3825,6 +4352,7 @@
 "ThreadManager::~ThreadManager": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3832,6 +4360,7 @@
 "Timer::EventId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3839,6 +4368,7 @@
 "Timer::~Timer": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3846,6 +4376,7 @@
 "TimerQueue::Add": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3853,6 +4384,7 @@
 "TimerQueue::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3860,6 +4392,7 @@
 "TimerQueue::Remove": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3867,6 +4400,7 @@
 "TimerQueue::TimeExpired": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3874,6 +4408,7 @@
 "TimerQueue::addLongTermQueue": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3881,6 +4416,7 @@
 "TimerQueue::clearLongTermQueueSlot": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3888,6 +4424,7 @@
 "TimerQueue::clearShortTermQueueSlot": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3895,6 +4432,7 @@
 "TimerQueue::removeShortTermQueue": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3902,6 +4440,7 @@
 "TimerQueue::~TimerQueue": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3909,6 +4448,7 @@
 "TrustedPacketBufferHandler::Clone": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3916,6 +4456,7 @@
 "TrustedPacketBufferHandler::Destroy": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3923,6 +4464,7 @@
 "TrustedPacketBufferHandler::ToBuffer": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3930,6 +4472,7 @@
 "TrustedPacketBufferHandler::ToPacket": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3937,6 +4480,7 @@
 "WinMsgHandler::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3944,6 +4488,7 @@
 "WinMsgHandler::WaitInit": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3951,6 +4496,7 @@
 "WinMsgHandler::run": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3958,6 +4504,7 @@
 "WinMsgHandler::~WinMsgHandler": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3965,6 +4512,7 @@
 "WinServiceConsole::Close": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3972,6 +4520,7 @@
 "WinServiceConsole::InstallService": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3979,6 +4528,7 @@
 "WinServiceConsole::Open": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3986,6 +4536,7 @@
 "WinServiceConsole::ServiceMain": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3993,6 +4544,7 @@
 "WinServiceConsole::SetState": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4000,6 +4552,7 @@
 "WinServiceConsole::UninstallService": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4007,6 +4560,7 @@
 "WinServiceConsole::WriteStartLog": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4014,6 +4568,7 @@
 "WinServiceConsole::addLog": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4021,6 +4576,7 @@
 "WinServiceConsole::controlHandler": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4028,6 +4584,7 @@
 "WinServiceConsole::getLastErrorText": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4035,6 +4592,7 @@
 "WinServiceConsole::reportStatusToSCManager": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4042,6 +4600,7 @@
 "WinServiceControlHandler": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4049,6 +4608,7 @@
 "WindowConsole::Close": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4056,6 +4616,7 @@
 "WindowConsole::Open": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4063,6 +4624,7 @@
 "WindowConsole::SetState": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4070,6 +4632,7 @@
 "WindowConsole::WindowConsole": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4077,6 +4640,7 @@
 "WindowConsole::Write": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4084,6 +4648,7 @@
 "WindowConsole::WriteStartLog": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4091,6 +4656,7 @@
 "WindowConsole::setTitle": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4098,6 +4664,7 @@
 "WindowConsole::write": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4105,6 +4672,7 @@
 "WindowConsole::~WindowConsole": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4112,6 +4680,7 @@
 "WindowConsoleOnClose": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4119,6 +4688,7 @@
 "WindowConsoleOnReload": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4126,6 +4696,7 @@
 "WindowConsoleOnSafeShutdown": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4133,6 +4704,7 @@
 "ZSTD_BtFindBestMatch": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4140,6 +4712,7 @@
 "ZSTD_BtFindBestMatch_extDict": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4147,6 +4720,7 @@
 "ZSTD_BtFindBestMatch_selectMLS": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4154,6 +4728,7 @@
 "ZSTD_BtFindBestMatch_selectMLS_extDict": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4161,6 +4736,7 @@
 "ZSTD_CCtx_resetParameters": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4168,6 +4744,7 @@
 "ZSTD_DUBT_findBestMatch": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4175,6 +4752,7 @@
 "ZSTD_HcFindBestMatch_extDict_selectMLS": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4182,6 +4760,7 @@
 "ZSTD_HcFindBestMatch_selectMLS": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4189,6 +4768,7 @@
 "ZSTD_compressBlock_btlazy2": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4196,6 +4776,7 @@
 "ZSTD_compressBlock_btlazy2_extDict": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4203,6 +4784,7 @@
 "ZSTD_compressBlock_btopt": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4210,6 +4792,7 @@
 "ZSTD_compressBlock_btopt_extDict": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4217,6 +4800,7 @@
 "ZSTD_compressBlock_btultra": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4224,6 +4808,7 @@
 "ZSTD_compressBlock_btultra_extDict": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4231,6 +4816,7 @@
 "ZSTD_compressBlock_doubleFast": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4238,6 +4824,7 @@
 "ZSTD_compressBlock_doubleFast_extDict": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4245,6 +4832,7 @@
 "ZSTD_compressBlock_doubleFast_extDict_generic": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4252,6 +4840,7 @@
 "ZSTD_compressBlock_fast": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4259,6 +4848,7 @@
 "ZSTD_compressBlock_fast_dictMatchState": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4266,6 +4856,7 @@
 "ZSTD_compressBlock_fast_extDict": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4273,6 +4864,7 @@
 "ZSTD_compressBlock_fast_extDict_generic": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4280,6 +4872,7 @@
 "ZSTD_compressBlock_greedy": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4287,6 +4880,7 @@
 "ZSTD_compressBlock_greedy_extDict": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4294,6 +4888,7 @@
 "ZSTD_compressBlock_lazy": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4301,6 +4896,7 @@
 "ZSTD_compressBlock_lazy2": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4308,6 +4904,7 @@
 "ZSTD_compressBlock_lazy2_extDict": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4315,6 +4912,7 @@
 "ZSTD_compressBlock_lazy_extDict": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4322,6 +4920,7 @@
 "ZSTD_count": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4329,6 +4928,7 @@
 "ZSTD_count_2segments": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4336,6 +4936,7 @@
 "ZSTD_cpuid": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4343,6 +4944,7 @@
 "ZSTD_createCCtx_advanced": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4350,6 +4952,7 @@
 "ZSTD_downscaleStat": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4357,6 +4960,7 @@
 "ZSTD_freeCDict": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4364,6 +4968,7 @@
 "ZSTD_hashPtr": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4371,6 +4976,7 @@
 "ZSTD_insertAndFindFirstIndexHash3": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4378,6 +4984,7 @@
 "ZSTD_insertAndFindFirstIndex_internal": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4385,6 +4992,7 @@
 "ZSTD_insertBt1": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4392,6 +5000,7 @@
 "ZSTD_insertDUBT1": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4399,6 +5008,7 @@
 "ZSTD_litLengthContribution": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4406,6 +5016,7 @@
 "ZSTD_readMINMATCH": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4413,6 +5024,7 @@
 "ZSTD_rescaleFreqs": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4420,6 +5032,7 @@
 "ZSTD_storeSeq": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4427,6 +5040,7 @@
 "ZSTD_updateDUBT": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4434,6 +5048,7 @@
 "ZSTD_updateRep": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4441,6 +5056,7 @@
 "ZSTD_updateStats": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4448,6 +5064,7 @@
 "_FindPESection": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4455,6 +5072,7 @@
 "_IsNonwritableInCurrentImage": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4462,6 +5080,7 @@
 "_IsNonwritableInCurrentImage$filt$0": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4469,6 +5088,7 @@
 "_ValidateImageBase": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4476,6 +5096,7 @@
 "_matherr": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4483,6 +5104,7 @@
 "_onexit": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4490,6 +5112,7 @@
 "_onexit$fin$0": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4497,6 +5120,7 @@
 "aes128TableDecrypt": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4504,6 +5128,7 @@
 "aes128TableEncrypt": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4511,6 +5136,7 @@
 "aes128TableSetupDecKey": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4525,6 +5151,7 @@
 "atexit": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4532,6 +5159,7 @@
 "decrypt": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4539,6 +5167,7 @@
 "encrypt": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4546,6 +5175,7 @@
 "hash": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4553,6 +5183,7 @@
 "i2os": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4560,6 +5191,7 @@
 "makeConsole": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4567,6 +5199,7 @@
 "makeDirectory": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4574,6 +5207,7 @@
 "operator delete": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4581,6 +5215,7 @@
 "operator delete[]": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4588,6 +5223,7 @@
 "os2i": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4595,6 +5231,7 @@
 "pre_c_init": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4602,6 +5239,7 @@
 "pre_cpp_init": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4609,6 +5247,7 @@
 "printUsage": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4616,6 +5255,7 @@
 "swprintf": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4623,6 +5263,7 @@
 "swprintf_s<128>": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4630,6 +5271,7 @@
 "swprintf_s<256>": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4637,6 +5279,7 @@
 "swprintf_s<260>": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4644,6 +5287,7 @@
 "swprintf_s<520>": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4651,6 +5295,7 @@
 "swprintf_s<64>": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4658,6 +5303,7 @@
 "swprintf_s<780>": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4665,6 +5311,7 @@
 "wmain": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4672,6 +5319,7 @@
 "wmain$dtor$0": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4679,6 +5327,7 @@
 "wmainCRTStartup": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"

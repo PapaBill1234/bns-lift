@@ -2,6 +2,7 @@
 "AccessoryItem::R_GetRandomEffectGroupId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -9,6 +10,7 @@
 "AccessoryItem::R_GetRandomEffectId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -16,6 +18,7 @@
 "AccessoryProperty::FieldDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -23,6 +26,7 @@
 "AccessoryProperty::FieldMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -30,6 +34,7 @@
 "AccessoryProperty::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -37,6 +42,7 @@
 "AccessoryProperty::SyncDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -44,6 +50,7 @@
 "AccessoryProperty::SyncMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -51,6 +58,7 @@
 "AccessoryProperty::TypeId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -58,6 +66,7 @@
 "AccessoryProperty::Version": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -107,6 +116,7 @@
 "AccountInventoryChannelManager::~AccountInventoryChannelManager": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -114,6 +124,7 @@
 "AccountInventoryGetGoodsCountTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -121,6 +132,7 @@
 "AccountInventoryJumpingCharacter2TicketTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -128,6 +140,7 @@
 "AccountInventoryListGoodsTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -135,6 +148,7 @@
 "AccountInventoryRetrieveWarehouseItemListTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -142,6 +156,7 @@
 "AccountInventoryRetrieveWarehouseLobbyServiceItemListTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -156,6 +171,7 @@
 "AccountInventoryTakeGoodsTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -163,6 +179,7 @@
 "AccountInventoryTakeWarehouseItemTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -170,6 +187,7 @@
 "AchievementDaemonChannel::onConnect": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -177,6 +195,7 @@
 "AcquiredSkill1::FieldDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -184,6 +203,7 @@
 "AcquiredSkill1::FieldMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -191,6 +211,7 @@
 "AcquiredSkill1::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -198,6 +219,7 @@
 "AcquiredSkill1::SyncDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -205,6 +227,7 @@
 "AcquiredSkill1::SyncMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -212,6 +235,7 @@
 "AcquiredSkill1::TypeId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -219,6 +243,7 @@
 "AcquiredSkill1::Version": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -233,6 +258,7 @@
 "ActSequenceLoader::GetTableType": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -240,6 +266,7 @@
 "ActSequenceLoader::ReadFromBuffer": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -247,6 +274,7 @@
 "Action::GetSlotId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -254,6 +282,7 @@
 "Action::SetSlotId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -261,6 +290,7 @@
 "Action::availableCancel": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -268,6 +298,7 @@
 "Action::cancelAction": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -275,6 +306,7 @@
 "ActionQueue::generateInstanceId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -282,6 +314,7 @@
 "ActionQueue::~ActionQueue": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -289,6 +322,7 @@
 "ActivatedTeleport::FieldDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -296,6 +330,7 @@
 "ActivatedTeleport::FieldMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -303,6 +338,7 @@
 "ActivatedTeleport::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -310,6 +346,7 @@
 "ActivatedTeleport::SyncDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -317,6 +354,7 @@
 "ActivatedTeleport::SyncMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -324,6 +362,7 @@
 "ActivatedTeleport::TypeId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -331,6 +370,7 @@
 "AdditionalHpEffect::checkApply": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -338,6 +378,7 @@
 "AirDash::CheckToManipulate": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -345,6 +386,7 @@
 "AirDashAction::getPriority": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -352,6 +394,7 @@
 "AirDashEffect::GetDataSubType": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -359,6 +402,7 @@
 "AlertSender::AlertSender": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -366,6 +410,7 @@
 "AlertSender::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -380,6 +425,7 @@
 "AlertSender::createSocket": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -394,6 +440,7 @@
 "AlertSender::run": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -401,6 +448,7 @@
 "AlertSender::sendRemain": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -408,6 +456,7 @@
 "ArenaDungeonRoom::GetArenaAttraction": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -436,6 +485,7 @@
 "ArenaLobbyRoomUtil::IsPublicRaidGameMode": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -443,6 +493,7 @@
 "ArenaPublicRaidRoom::GetArenaPortalPublicRaidModeType": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -457,6 +508,7 @@
 "ArenaPublicRaidRoom::GetPublicRaidKey": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -464,6 +516,7 @@
 "ArenaPublicRaidRoom::IsSetPublicRaidReservePcCount": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -471,6 +524,7 @@
 "ArenaPublicRaidRoom::SetPublicRaidReservePcCount": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -478,6 +532,7 @@
 "ArenaRoom::GetArenaPortalPublicRaidModeType": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -485,6 +540,7 @@
 "ArenaRoomManager::IssueOtp": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -492,6 +548,7 @@
 "ArenaSessionTimer::ArenaSessionTimer": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -506,6 +563,7 @@
 "AttractionState::CanChangeChannel": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -513,6 +571,7 @@
 "AttractionState::~AttractionState": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -534,6 +593,7 @@
 "AutoCS::~AutoCS": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -541,6 +601,7 @@
 "AutoSRW::~AutoSRW": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -548,6 +609,7 @@
 "BIT_initDStream": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -555,6 +617,7 @@
 "BIT_reloadDStream": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -562,6 +625,7 @@
 "BannedWordFilterDynamicMemoryManager::Alloc": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -569,6 +633,7 @@
 "BannedWordFilterDynamicMemoryManager::Free": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -576,6 +641,7 @@
 "BannedWordFilterDynamicMemoryManager::Realloc": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -583,6 +649,7 @@
 "BattleRoyalField::GetTypeName": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -625,6 +692,7 @@
 "BossChallengeAttractionState::EnableInfiniteHyperEnergy": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -632,6 +700,7 @@
 "BossChallengeAttractionState::GetTypeName": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -639,6 +708,7 @@
 "BossCombatSequence::ReserveTransitBerserk": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -646,6 +716,7 @@
 "BrainBase::popState": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -653,6 +724,7 @@
 "BrainBase::pushState": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -660,6 +732,7 @@
 "BrainBase::~BrainBase": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -667,6 +740,7 @@
 "BrainBoss::GetLastTargetId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -674,6 +748,7 @@
 "BrainBoss::GetState": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -681,6 +756,7 @@
 "BrainBoss::InitSpecialState": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -695,6 +771,7 @@
 "BrainCitizen::GetState": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -702,6 +779,7 @@
 "BrainFollower::GetLastTargetId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -709,6 +787,7 @@
 "BrainFollower::GetState": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -716,6 +795,7 @@
 "BrainMonster::GetLastTargetId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -723,6 +803,15 @@
 "BrainMonster::GetState": {
 "calls": 100,
 "consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"BrainMonsterTalkable::GetState": {
+"calls": 100,
+"consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -730,6 +819,7 @@
 "BrainRaidBoss::GetLastTargetId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -737,6 +827,7 @@
 "BrainRaidBoss::GetState": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -744,6 +835,7 @@
 "BrainRaidBoss::InitSpecialState": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -751,6 +843,7 @@
 "BuilderSessionHandler::OnAccept": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -765,6 +858,7 @@
 "Campfire::GetRemainDuration": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -772,6 +866,7 @@
 "CampfireIdManager::IsExist": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -779,6 +874,7 @@
 "CaptureTheFlag::Context1": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -786,6 +882,7 @@
 "CaptureTheFlag::Context2": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -793,6 +890,7 @@
 "ChainSkillAction::SucceedTargetInfo": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -800,6 +898,7 @@
 "ChallengeListProperty::FieldDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -807,6 +906,7 @@
 "ChallengeListProperty::FieldMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -814,6 +914,7 @@
 "ChallengeListProperty::SyncDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -821,6 +922,7 @@
 "ChallengeListProperty::SyncMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -828,6 +930,7 @@
 "ChallengeListProperty::TypeId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -835,6 +938,7 @@
 "ChallengeParty::~ChallengeParty": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -842,6 +946,7 @@
 "ChallengePartyAttractionState::GetTypeName": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -849,6 +954,7 @@
 "ChallengePartyAttractionState::SetAttractionOption": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -863,6 +969,7 @@
 "ChangeCharacterAppearanceTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -870,6 +977,7 @@
 "ChangeCharacterRaceTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -877,6 +985,7 @@
 "ChangeCharacterSexTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -891,6 +1000,7 @@
 "ClientOption::FieldDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -898,6 +1008,7 @@
 "ClientOption::FieldMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -905,6 +1016,7 @@
 "ClientOption::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -912,6 +1024,7 @@
 "ClientOption::SyncDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -919,6 +1032,7 @@
 "ClientOption::SyncMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -926,6 +1040,7 @@
 "ClientOption::TypeId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -954,6 +1069,7 @@
 "ClientSideHashedDaemonChannel::Send [?Send@ClientSideHashedDaemonChannel@@QEAA_N_KPEBDZZ]": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -975,6 +1091,7 @@
 "ClientSideHashedDaemonChannel::releaseSession": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -982,6 +1099,7 @@
 "CollectingProperty::FieldDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -989,6 +1107,7 @@
 "CollectingProperty::FieldMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -996,6 +1115,7 @@
 "CollectingProperty::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1003,6 +1123,7 @@
 "CollectingProperty::SyncDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1010,6 +1131,7 @@
 "CollectingProperty::SyncMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1017,6 +1139,7 @@
 "CollectingProperty::TypeId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1024,6 +1147,7 @@
 "CombatSequence::registerLastAction": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1045,6 +1169,7 @@
 "Connection::AsyncSend": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1052,6 +1177,7 @@
 "ContentQuotaProperty::FieldDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1059,6 +1185,7 @@
 "ContentQuotaProperty::FieldMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1066,6 +1193,7 @@
 "ContentQuotaProperty::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1073,6 +1201,7 @@
 "ContentQuotaProperty::SyncDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1080,6 +1209,7 @@
 "ContentQuotaProperty::SyncMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1101,6 +1231,7 @@
 "CostumeProperty::FieldDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1108,6 +1239,7 @@
 "CostumeProperty::FieldMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1115,6 +1247,7 @@
 "CostumeProperty::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1122,6 +1255,7 @@
 "CostumeProperty::SyncDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1129,6 +1263,7 @@
 "CostumeProperty::SyncMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1136,6 +1271,7 @@
 "CostumeProperty::Version": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1150,6 +1286,7 @@
 "CreateCharacterTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1157,6 +1294,7 @@
 "Creature::AddChangedExtraPropertyId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1164,6 +1302,7 @@
 "Creature::AddChangedPropertyId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1171,6 +1310,7 @@
 "Creature::CanJoinFaction": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1178,6 +1318,7 @@
 "Creature::CheckCombatSideEnabled": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1192,6 +1333,7 @@
 "Creature::GetActivatedBadgeEquipSlot": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1206,6 +1348,7 @@
 "CreatureProperty::FieldDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1213,6 +1356,7 @@
 "CreatureProperty::FieldMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1220,6 +1364,7 @@
 "CreatureProperty::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1227,6 +1372,7 @@
 "CreatureProperty::SyncDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1234,6 +1380,7 @@
 "CreatureProperty::SyncMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1241,6 +1388,7 @@
 "CreatureProperty::Version": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1248,6 +1396,7 @@
 "Daemon::SetPublicAddressWithSetting": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1255,6 +1404,7 @@
 "DaemonChannel::Send [?Send@DaemonChannel@@QEAA_NPEBDZZ]": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1262,6 +1412,7 @@
 "DaemonChannel::Send [?Send@DaemonChannel@@QEAA_NPEBVPacketList@@@Z]": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1269,6 +1420,47 @@
 "DashEffect::GetDataSubType": {
 "calls": 100,
 "consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Data::FilterSet::FilterSet": {
+"calls": 100,
+"consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Data::FilterSet::~FilterSet": {
+"calls": 100,
+"consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Data::ObjectScript::GetDecisionSequence": {
+"calls": 100,
+"consts": 100,
+"exact": false,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Data::ReactionSet::ReactionSet": {
+"calls": 100,
+"consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Data::ReactionSet::~ReactionSet": {
+"calls": 100,
+"consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1283,6 +1475,7 @@
 "DeathMatchDuelManager::verifyDuelType": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1290,6 +1483,7 @@
 "DebuffGuildBattleFieldEffect::checkApply": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1297,6 +1491,7 @@
 "DelayedDelete::Cleanup": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1304,6 +1499,7 @@
 "DelayedRelease::DelayedRelease": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1311,6 +1507,7 @@
 "DeleteCharacterTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1318,6 +1515,7 @@
 "DeleteEvent::EventId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1325,6 +1523,7 @@
 "DeleteEvent::HandleEvent": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1332,6 +1531,7 @@
 "DeleteGuildTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1360,6 +1560,7 @@
 "DesireIncreaseEffect::checkApply": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1367,6 +1568,7 @@
 "DetachPostAttachmentTran_IndetachFixed::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1374,6 +1576,7 @@
 "DisconnectedArenaSessionInfo::Init": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1381,6 +1584,7 @@
 "DisconnectedArenaSessionInfo::~DisconnectedArenaSessionInfo": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1388,6 +1592,7 @@
 "DiscoveryArea::FieldDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1395,6 +1600,7 @@
 "DiscoveryArea::FieldMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1402,6 +1608,7 @@
 "DiscoveryArea::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1409,6 +1616,7 @@
 "DiscoveryArea::SyncDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1416,6 +1624,7 @@
 "DiscoveryArea::SyncMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1423,6 +1632,7 @@
 "DiscoveryArea::TypeId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1451,6 +1661,7 @@
 "DrAliasMapImpl::Count": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1465,6 +1676,7 @@
 "DrAliasMapImpl::WriteToBuffer": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1472,6 +1684,7 @@
 "DrAutoKeyElMap::destroy": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1479,6 +1692,7 @@
 "DrAutoKeyInnerIter::IsValid": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1486,6 +1700,7 @@
 "DrAutoKeyInnerIter::Next": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1493,6 +1708,7 @@
 "DrAutoKeyInnerIter::Ptr": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1500,6 +1716,7 @@
 "DrAutoKeyTable::Find": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1507,6 +1724,7 @@
 "DrAutoKeyTable::FinishLoadAlias": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1514,6 +1732,7 @@
 "DrDataReaderImpl::DrDataReaderImpl": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1521,6 +1740,7 @@
 "DrDataReaderImpl::~DrDataReaderImpl": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1528,6 +1748,7 @@
 "DrDataTableImpl::DrDataTableImpl": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1535,6 +1756,7 @@
 "DrDataTableImpl::ReferenceCopiedEl": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1542,6 +1764,7 @@
 "DrDataTableImpl::Setup": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1549,6 +1772,7 @@
 "DrDataTableImpl::UseLegacyElHeader": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1556,6 +1780,7 @@
 "DrDefLog::Write": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1563,6 +1788,7 @@
 "DrHeapMemory::Alloc": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1570,6 +1796,7 @@
 "DrHeapMemory::DrHeapMemory": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1577,6 +1804,7 @@
 "DrHeapMemory::Free": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1584,6 +1812,7 @@
 "DrHeapMemory::Realloc": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1591,6 +1820,7 @@
 "DrMemoryManager::SetupMemory": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1598,6 +1828,7 @@
 "DrMultiKeyElMap::count": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1605,6 +1836,7 @@
 "DrMultiKeyInnerIter::IsValid": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1612,6 +1844,7 @@
 "DrMultiKeyInnerIter::Next": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1619,6 +1852,7 @@
 "DrMultiKeyInnerIter::Ptr": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1626,6 +1860,7 @@
 "DrMultiKeyTable::Find": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1633,6 +1868,7 @@
 "DrParallelWorkerManager::Execute": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1640,6 +1876,7 @@
 "DrParallelWorkerManager::Init": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1647,6 +1884,7 @@
 "DrParallelWorkerManager::SetWorkerFunc": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1654,6 +1892,7 @@
 "DrParallelWorkerManager::SetWorkerInitFunc": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1675,6 +1914,7 @@
 "DuelAttractionState::CanTakeAchievementReward": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1682,6 +1922,7 @@
 "DuelAttractionState::GetGameType": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1689,6 +1930,7 @@
 "DuelAttractionState::GetTypeName": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1696,6 +1938,7 @@
 "DuelAttractionState::OnZoneAttractionEventTimer": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1703,6 +1946,7 @@
 "DuelBot::GetAOEDefendPowerModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1710,6 +1954,7 @@
 "DuelBot::GetAbnormalAttackPowerModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1717,6 +1962,7 @@
 "DuelBot::GetAbnormalDefendPowerModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1724,6 +1970,7 @@
 "DuelBot::GetAttackCounterDamageModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1731,6 +1978,7 @@
 "DuelBot::GetAttackCriticalDamageModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1738,6 +1986,7 @@
 "DuelBot::GetAttackCriticalValueModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1745,6 +1994,7 @@
 "DuelBot::GetAttackHitValueModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1752,6 +2002,7 @@
 "DuelBot::GetAttackParryPierceModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1759,6 +2010,7 @@
 "DuelBot::GetAttackPerfectParryDamageModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1766,6 +2018,7 @@
 "DuelBot::GetAttackPierceModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1773,6 +2026,7 @@
 "DuelBot::GetAttackStiffDurationValueModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1780,6 +2034,7 @@
 "DuelBot::GetCastDurationValueModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1787,6 +2042,7 @@
 "DuelBot::GetDefendCounterReduceModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1794,6 +2050,7 @@
 "DuelBot::GetDefendCriticalDamageModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1801,6 +2058,7 @@
 "DuelBot::GetDefendCriticalValueModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1808,6 +2066,7 @@
 "DuelBot::GetDefendDodgeValueModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1815,6 +2074,7 @@
 "DuelBot::GetDefendForceValueModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1822,6 +2082,7 @@
 "DuelBot::GetDefendParryReduceModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1829,6 +2090,7 @@
 "DuelBot::GetDefendParryValueModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1836,6 +2098,7 @@
 "DuelBot::GetDefendPerfectParryReduceModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1843,6 +2106,7 @@
 "DuelBot::GetDefendPhysicalValueModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1850,6 +2114,7 @@
 "DuelBot::GetDefendStiffDurationValueModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1857,6 +2122,7 @@
 "DuelBot::GetHatePowerModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1864,6 +2130,7 @@
 "DuelBot::GetHealPowerModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1871,6 +2138,7 @@
 "DuelBot::GetLastAttackLimitTime": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1878,6 +2146,7 @@
 "DuelBot::GetLastAttackedLimitTime": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1885,6 +2154,7 @@
 "DuelBot::GetLastComboExecFirstLimitTime": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1892,6 +2162,7 @@
 "DuelBot::GetLastComboExecFirstResult": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1899,6 +2170,7 @@
 "DuelBot::GetLastComboExecLastLimitTime": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1906,6 +2178,7 @@
 "DuelBot::GetLastComboExecLastResult": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1913,6 +2186,7 @@
 "DuelBot::GetLastComboFireLimitTime": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1920,6 +2194,7 @@
 "DuelBot::GetLastComboSkill": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1927,6 +2202,7 @@
 "DuelBot::SetLastAttackLimitTime": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1934,6 +2210,7 @@
 "DuelBot::SetLastAttackedLimitTime": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1941,6 +2218,7 @@
 "DuelBot::SetLastComboExecFirstLimitTime": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1948,6 +2226,7 @@
 "DuelBot::SetLastComboExecFirstResult": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1955,6 +2234,7 @@
 "DuelBot::SetLastComboExecLastLimitTime": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1962,6 +2242,7 @@
 "DuelBot::SetLastComboExecLastResult": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1969,6 +2250,7 @@
 "DuelBot::SetLastComboFireLimitTime": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1976,6 +2258,7 @@
 "DuelBot::SetLastComboSkill": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1983,6 +2266,7 @@
 "DuelBotActionQueue::GetMovement": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1990,6 +2274,7 @@
 "DuelBotActionQueue::GetOperation": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -1997,6 +2282,7 @@
 "DuelBotActionQueue::IntervalAction": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2004,6 +2290,7 @@
 "DuelBotActionQueue::RequestActionCancel": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2011,6 +2298,7 @@
 "DuelBotChallengeAttractionState::GetTypeName": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2018,6 +2306,7 @@
 "DuelBotSpawn::Init": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2025,6 +2314,7 @@
 "DuelBotTrainingRoom::GetTypeName": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2046,6 +2336,7 @@
 "DuelBotTrainingRoomScore::FieldDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2053,6 +2344,7 @@
 "DuelBotTrainingRoomScore::FieldMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2060,6 +2352,7 @@
 "DuelBotTrainingRoomScore::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2067,6 +2360,7 @@
 "DuelBotTrainingRoomScore::SyncDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2074,6 +2368,7 @@
 "DuelBotTrainingRoomScore::SyncMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2081,6 +2376,7 @@
 "DuelBotTrainingRoomScore::TypeId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2092,9 +2388,18 @@
 "score": 41.7,
 "status": "DIFF"
 },
+"DuelManager::isSaveGameResult": {
+"calls": 100,
+"consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
 "DuelManager::resetRound": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2102,6 +2407,7 @@
 "DuelMember::ReadyRound": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2109,6 +2415,7 @@
 "DuelMember::ResetRound": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2123,6 +2430,7 @@
 "DuelTeam::ResetRound": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2130,6 +2438,7 @@
 "DynamicEventObject::deallocate_me": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2137,6 +2446,7 @@
 "EffectList::Clear": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2144,6 +2454,7 @@
 "EffectList::EffectList": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2151,6 +2462,7 @@
 "EffectProperty::FieldDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2158,6 +2470,7 @@
 "EffectProperty::FieldMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2165,6 +2478,7 @@
 "EffectProperty::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2172,6 +2486,7 @@
 "EffectProperty::SyncDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2179,6 +2494,7 @@
 "EffectProperty::SyncMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2186,6 +2502,7 @@
 "EmbersExplosionTimerEffect::checkApply": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2200,6 +2517,7 @@
 "Env::GetActionRadius": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2207,6 +2525,7 @@
 "Env::GetManipulateDuration": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2214,6 +2533,7 @@
 "Env::GetOwnerId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2221,6 +2541,7 @@
 "ExtraCreatureProperty::FieldDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2228,6 +2549,7 @@
 "ExtraCreatureProperty::FieldMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2235,6 +2557,7 @@
 "ExtraCreatureProperty::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2242,6 +2565,7 @@
 "ExtraCreatureProperty::SyncDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2249,6 +2573,7 @@
 "ExtraCreatureProperty::SyncMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2256,6 +2581,7 @@
 "ExtraCreatureProperty::TypeId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2263,6 +2589,7 @@
 "FSE_buildDTable": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2270,6 +2597,7 @@
 "FSE_count_simple": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2277,6 +2605,7 @@
 "FSE_decompress_usingDTable": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2284,6 +2613,7 @@
 "FSE_decompress_wksp": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2291,6 +2621,7 @@
 "FSE_readNCount": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2298,6 +2629,7 @@
 "FactionContribution::TopContributionGroupId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2305,6 +2637,7 @@
 "FallDamageEffect::GetDataSubType": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2312,6 +2645,7 @@
 "FallDeathEffect::GetDataSubType": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2319,6 +2653,7 @@
 "FallDeathEffect::checkApply": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2326,6 +2661,7 @@
 "FieldItem::GetRemainedDecomposition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2333,6 +2669,7 @@
 "FieldItem::GetRemainedExplosion": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2340,6 +2677,7 @@
 "FieldItemIdManager::IsExist": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2347,6 +2685,7 @@
 "FishingProperty::FieldDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2354,6 +2693,7 @@
 "FishingProperty::FieldMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2361,6 +2701,7 @@
 "FishingProperty::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2368,6 +2709,7 @@
 "FishingProperty::SyncDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2375,6 +2717,7 @@
 "FishingProperty::SyncMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2382,6 +2725,7 @@
 "FishingProperty::TypeId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2389,6 +2733,7 @@
 "FragmentPacket::FreeBody": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2396,6 +2741,7 @@
 "GameArenaLobbyManager::GameArenaLobbyManager": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2403,6 +2749,7 @@
 "GameArenaSessionHandler::OnAccept": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2417,6 +2764,7 @@
 "GameDaemon::GetAddressStringWForLogs": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2424,6 +2772,7 @@
 "GameDaemon::GetRandomStoreServiceState": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2445,6 +2794,7 @@
 "GameDaemon::GetTimerInterval": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2452,6 +2802,7 @@
 "GameDaemon::IsArenaDaemon": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2459,6 +2810,7 @@
 "GameDaemon::IsArenaDungeonDaemon": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2466,6 +2818,7 @@
 "GameDaemon::IsArenaEnabledGameDaemon": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2473,6 +2826,7 @@
 "GameDaemon::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2487,6 +2841,7 @@
 "GameDaemon::ServiceName": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2494,6 +2849,7 @@
 "GameDaemon::SetEventReplyCacheHello": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2501,6 +2857,7 @@
 "GameDaemon::ShortName": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2508,6 +2865,7 @@
 "GameLocale::GetVietToneMarkType": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2515,13 +2873,29 @@
 "GameLocale::IsWupperNotApplied": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
 },
+"GameObject::OnTimer": {
+"calls": 100,
+"consts": 100,
+"refs": 67,
+"score": 88.9,
+"status": "DIFF"
+},
+"GameObject::Think": {
+"calls": 100,
+"consts": 100,
+"refs": 67,
+"score": 88.9,
+"status": "DIFF"
+},
 "GameObjectIdManager::Make": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2529,6 +2903,7 @@
 "GameObjectIdManager::~GameObjectIdManager": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2543,6 +2918,7 @@
 "GameTran::run": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2550,6 +2926,7 @@
 "GameTran::~GameTran": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2557,6 +2934,7 @@
 "GameTranExpireToken::GetTid": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2564,6 +2942,7 @@
 "GamedCooldownTimer::EventId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2571,6 +2950,7 @@
 "GamedReloadInvalidRestoreTimer::EventId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2578,6 +2958,7 @@
 "GemItem::R_GetRandomEffectGroupId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2585,6 +2966,7 @@
 "GemItem::R_GetRandomEffectId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2592,6 +2974,7 @@
 "GemProperty::FieldDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2599,6 +2982,7 @@
 "GemProperty::FieldMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2606,6 +2990,7 @@
 "GemProperty::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2613,6 +2998,7 @@
 "GemProperty::SyncDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2620,6 +3006,7 @@
 "GemProperty::SyncMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2627,6 +3014,7 @@
 "GenerateGameEventTid": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2634,6 +3022,7 @@
 "GenerateTid": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2641,6 +3030,7 @@
 "GeoCube::GeoCube": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2648,6 +3038,7 @@
 "GeoCube::~GeoCube": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2655,6 +3046,7 @@
 "GeoRegion::GetEnv": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2676,6 +3068,7 @@
 "GetDataReaderInterfaceVersion": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2683,6 +3076,7 @@
 "GetNPCustomProtocolStr": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2690,6 +3084,7 @@
 "GroceryProperty::FieldDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2697,6 +3092,7 @@
 "GroceryProperty::FieldMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2704,6 +3100,7 @@
 "GroceryProperty::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2711,6 +3108,7 @@
 "GroceryProperty::SyncDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2718,6 +3116,7 @@
 "GroceryProperty::SyncMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2725,6 +3124,7 @@
 "GroceryProperty::Version": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2732,6 +3132,7 @@
 "Guild::GetBanishOpenGuildMemberCountResetTime": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2739,6 +3140,7 @@
 "Guild::findByPcDbId": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2746,6 +3148,7 @@
 "Guild::findByPcDbIdInWaiting": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2753,6 +3156,7 @@
 "GuildContribution::Reset": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2767,6 +3171,7 @@
 "GuildCraft::GetAsseintGuildCraftQuota": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2774,6 +3179,7 @@
 "GuildCraft::IsCompletedGuildCraftDonation": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2781,6 +3187,7 @@
 "GuildCraft::MakeGuildCraft": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2788,6 +3195,7 @@
 "GuildIdManager::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2795,6 +3203,7 @@
 "GuildIdManager::PopGuildId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2802,6 +3211,7 @@
 "GuildIdManager::PushGuildId": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2809,6 +3219,7 @@
 "GuildJoinTicket::GuildJoinTicket": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2816,6 +3227,22 @@
 "GuildJoinTicketListPerGuild::GuildJoinTicketListPerGuild": {
 "calls": 100,
 "consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"GuildUniform::EnableRegisterGuildUniform": {
+"calls": 100,
+"consts": 67,
+"refs": 100,
+"score": 88.9,
+"status": "DIFF"
+},
+"GuildUniformManager::GetRegisteredUniformCount": {
+"calls": 100,
+"consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2823,6 +3250,7 @@
 "HUF_readStats": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2830,6 +3258,7 @@
 "HandleAccountInventoryGame_BoardGachaCancelDrawByItemFail": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2837,6 +3266,7 @@
 "HandleAccountInventoryGame_BoardGachaCancelDrawByItemOk": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2844,6 +3274,7 @@
 "HandleAccountInventoryGame_BoardGachaFinishDrawByItemRecoveryFail": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2851,6 +3282,7 @@
 "HandleAccountInventoryGame_BoardGachaRetrieveSeasonScheduleFail": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2858,6 +3290,7 @@
 "HandleAccountInventoryGame_RefundInstantPaymentFail": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2865,6 +3298,7 @@
 "HandleAccountInventoryGame_RefundInstantPaymentOk": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2872,6 +3306,7 @@
 "HandleAchievementGameGameHelloFail": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2879,6 +3314,7 @@
 "HandleArenaGameArenaHelloFail": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2886,6 +3322,7 @@
 "HandleArenaLobbyArenaHelloFail": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2900,6 +3337,7 @@
 "HandleCacheGame_DeliverSystemPostFail": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2907,6 +3345,7 @@
 "HandleCacheGame_DeliverSystemPostOk": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2914,6 +3353,7 @@
 "HandleCacheGame_HelloFail": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2921,6 +3361,7 @@
 "HandleCacheGame_InitializeMentoringFail": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2928,6 +3369,7 @@
 "HandleCacheGame_InitializeSeasonContentsChallengePartyScheduleFail": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2935,6 +3377,7 @@
 "HandleCacheGame_InitializeSeasonContentsScheduleFail": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2949,6 +3392,7 @@
 "HandleCacheGame_LoadMileageDepositRetryListFail": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2963,6 +3407,7 @@
 "HandleCacheGame_PurePropertyTransactionOk": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2970,6 +3415,7 @@
 "HandleCacheGame_RetrieveFactionStatisticsFail": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2977,6 +3423,7 @@
 "HandleChattingGame_A2G_PROTOCOL_VERSIONNotify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2984,6 +3431,7 @@
 "HandleDuelBotGameGameHelloFail": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -2998,6 +3446,7 @@
 "HandleGame_CheckRoundTripTimeReq": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3005,6 +3454,7 @@
 "HandleGame_CreatePartyReq": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3012,6 +3462,7 @@
 "HandleGame_ExtendJumpingCharacterCreationQuotaWithWarehouseItemReq": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3019,6 +3470,7 @@
 "HandleGame_GodSay": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3026,6 +3478,7 @@
 "HandleGame_PickGemCardReq": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3033,6 +3486,7 @@
 "HandleGame_PingReq": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3040,6 +3494,7 @@
 "HandleGame_RestoreVitalityReq": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3047,6 +3502,7 @@
 "HandleGame_SaveVitalityReq": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3054,6 +3510,7 @@
 "HandleGame_SendPetitionChatNotifyReq": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3061,6 +3518,7 @@
 "HandleGame_UpgradeJumpingCharacterStateWithCreationQuotaReq": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3068,6 +3526,7 @@
 "HandleLobbyGame_CloseSessionNotify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3075,6 +3534,7 @@
 "HandleLobbyGame_UpdateAccountContentQuotaFail": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3082,6 +3542,7 @@
 "HandleLobbyGame_UpdateAccountContentQuotaOk": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3089,6 +3550,7 @@
 "HandleLobbyGame_UpdateAccountExpFail": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3096,6 +3558,7 @@
 "HandleLobbyGame_UpdateAccountRecycleTimeFail": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3103,6 +3566,7 @@
 "HandleMarketServiceCancelBidReservationFail": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3110,6 +3574,7 @@
 "HandleMarketServiceCancelBidReservationOk": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3117,6 +3582,7 @@
 "HandleMarketServiceCancelPurchaseReservationFail": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3124,6 +3590,7 @@
 "HandleMarketServiceCancelPurchaseReservationOk": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3131,6 +3598,7 @@
 "HandleMarketServiceCancelSaleReservationFail": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3138,6 +3606,7 @@
 "HandleMarketServiceCancelSaleReservationOk": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3145,6 +3614,7 @@
 "HandleMarketServiceHelloFail": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3152,6 +3622,7 @@
 "HandleMarketServiceHelloOk": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3159,6 +3630,7 @@
 "HandleRankingGame_HelloFail": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3166,6 +3638,7 @@
 "HandleSmartCoupon_GameEventByAccountFail": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3173,6 +3646,7 @@
 "HandleSmartCoupon_GameEventByAccountOk": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3180,6 +3654,7 @@
 "HandleSmartCoupon_GameEventByCharacterFail": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3187,6 +3662,7 @@
 "HandleSmartCoupon_GameEventByCharacterOk": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3194,6 +3670,7 @@
 "HeapMemoryManager::Alloc": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3201,6 +3678,7 @@
 "HeapMemoryManager::AllocZero": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3208,6 +3686,7 @@
 "HeapMemoryManager::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3215,6 +3694,7 @@
 "HeapMemoryManager::ReallocZero": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3222,6 +3702,7 @@
 "HpDamageEffect::checkApply": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3229,6 +3710,7 @@
 "IdManager<__int64>::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3236,6 +3718,7 @@
 "IdManager<__int64>::PopId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3243,6 +3726,7 @@
 "IdManager<__int64>::PushId": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3250,6 +3734,7 @@
 "IdManager<__int64>::~IdManager<__int64>": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3264,6 +3749,7 @@
 "InitializeRecycleGroupEffect::checkApply": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3271,6 +3757,7 @@
 "InstantPaymentBuyCollectionItemsSubJob::DataId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3278,6 +3765,7 @@
 "InstantPaymentBuyCollectionItemsSubJob::setExtraParam": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3285,6 +3773,7 @@
 "InstantPaymentJob::tryAbortImpl": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3299,6 +3788,7 @@
 "InstantPaymentTransformItemSubJob::setExtraParam": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3313,6 +3803,7 @@
 "Inventory::IsActivatedGemSlot": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3327,6 +3818,7 @@
 "ItemBase<AccessoryTrait>::GetClass": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3334,6 +3826,7 @@
 "ItemBase<AccessoryTrait>::GetDataId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3341,6 +3834,7 @@
 "ItemBase<AccessoryTrait>::GetDepot": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3348,6 +3842,7 @@
 "ItemBase<AccessoryTrait>::GetPos": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3355,6 +3850,7 @@
 "ItemBase<AccessoryTrait>::GetSequestration": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3362,6 +3858,7 @@
 "ItemBase<GemTrait>::GetClass": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3369,6 +3866,7 @@
 "ItemBase<GroceryTrait>::GetClass": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3376,6 +3874,7 @@
 "ItemBase<WeaponTrait>::GetFieldCount": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3383,6 +3882,7 @@
 "ItemPouch::ItemPouch": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3404,6 +3904,7 @@
 "Json::Value::CZString::operator<": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3411,6 +3912,7 @@
 "Json::Value::CZString::~CZString": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3418,6 +3920,7 @@
 "Json::Value::CommentInfo::~CommentInfo": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3425,6 +3928,7 @@
 "Json::Value::isInt": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3432,6 +3936,7 @@
 "Json::Value::isUInt64": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3439,6 +3944,7 @@
 "LeadTheBallManager::Context1": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3467,6 +3973,7 @@
 "LeaveWorldTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3474,6 +3981,7 @@
 "LoadTableBinder::Execute": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3481,6 +3989,7 @@
 "LoadTableMT_PostProcBinder::Execute": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3488,6 +3997,7 @@
 "LoadTableMT_PreProcBinder::Execute": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3502,6 +4012,7 @@
 "LobbyTokenAuthTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3509,6 +4020,7 @@
 "Log::Add": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3516,6 +4028,7 @@
 "Log::Write [?Write@Log@@SAXPEB_WHJ0ZZ]": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3523,6 +4036,7 @@
 "Log::Write [?Write@Log@@SAXW4Type@1@PEB_WH1ZZ]": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3551,6 +4065,7 @@
 "LogArchive::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3579,6 +4094,7 @@
 "LogArchiveReadBuffer::~LogArchiveReadBuffer": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3691,6 +4207,7 @@
 "LogBuffer::GetLog": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3698,6 +4215,7 @@
 "LogBuffer::GetType": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3705,6 +4223,7 @@
 "LogBuffer::Prepare": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3712,6 +4231,7 @@
 "LogBuffer::Release": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3719,6 +4239,7 @@
 "LogBuffer::deallocate_me": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3726,6 +4247,7 @@
 "LogBufferAllocator::allocate": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3740,6 +4262,7 @@
 "LogBufferPool::deallocate": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3782,6 +4305,7 @@
 "LogServer::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3810,6 +4334,7 @@
 "LogServerSessionHandler::~LogServerSessionHandler": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3817,6 +4342,7 @@
 "Logger": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3824,6 +4350,7 @@
 "LogoutArenaTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3838,6 +4365,7 @@
 "LtExpireSO::TimerExpired": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3859,6 +4387,7 @@
 "ManageSessionHandler::OnAccept": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3873,6 +4402,7 @@
 "ManagementdChannel::onCloseAll": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3880,6 +4410,7 @@
 "MarkExpressPostTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3901,6 +4432,7 @@
 "MentoringProperty::FieldDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3908,6 +4440,7 @@
 "MentoringProperty::FieldMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3915,6 +4448,7 @@
 "MentoringProperty::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3922,6 +4456,7 @@
 "MentoringProperty::SyncDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3929,6 +4464,7 @@
 "MentoringProperty::SyncMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3943,6 +4479,7 @@
 "MysteriousStore::IsAuthorizedMember": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3985,6 +4522,7 @@
 "NoneTargetSkillAction::SucceedTargetInfo": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3992,6 +4530,7 @@
 "Npc::GetAOEDefendPowerModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -3999,6 +4538,7 @@
 "Npc::GetAbnormalAttackPowerModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4006,6 +4546,7 @@
 "Npc::GetAbnormalDefendPowerModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4013,6 +4554,7 @@
 "Npc::GetAttackAttributeModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4020,6 +4562,7 @@
 "Npc::GetAttackCounterDamageModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4027,6 +4570,7 @@
 "Npc::GetAttackCriticalDamageModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4034,6 +4578,7 @@
 "Npc::GetAttackCriticalValueModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4041,6 +4586,7 @@
 "Npc::GetAttackHitValueModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4048,6 +4594,7 @@
 "Npc::GetAttackParryPierceModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4055,6 +4602,7 @@
 "Npc::GetAttackPerfectParryDamageModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4062,6 +4610,7 @@
 "Npc::GetAttackPierceModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4069,6 +4618,7 @@
 "Npc::GetAttackStiffDurationValueModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4076,6 +4626,7 @@
 "Npc::GetCastDurationValueModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4083,6 +4634,7 @@
 "Npc::GetDefendCounterReduceModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4090,6 +4642,7 @@
 "Npc::GetDefendCriticalDamageModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4097,6 +4650,7 @@
 "Npc::GetDefendCriticalValueModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4104,6 +4658,7 @@
 "Npc::GetDefendDodgeValueModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4111,6 +4666,7 @@
 "Npc::GetDefendForceValueModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4118,6 +4674,7 @@
 "Npc::GetDefendParryReduceModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4125,6 +4682,7 @@
 "Npc::GetDefendParryValueModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4132,6 +4690,7 @@
 "Npc::GetDefendPerfectParryReduceModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4139,6 +4698,7 @@
 "Npc::GetDefendPhysicalValueModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4146,6 +4706,7 @@
 "Npc::GetDefendStiffDurationValueModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4153,6 +4714,7 @@
 "Npc::GetHatePowerModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4160,6 +4722,7 @@
 "Npc::GetHealPowerModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4167,6 +4730,7 @@
 "Npc::GetRAttackAbnormalHitModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4174,6 +4738,7 @@
 "Npc::GetRAttackAoePierceModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4181,6 +4746,7 @@
 "Npc::GetRDefendAbnormalDodgeModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4188,6 +4754,7 @@
 "Npc::GetRHypermovePowerModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4195,6 +4762,7 @@
 "Npc::GetRSupportPowerModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4202,6 +4770,7 @@
 "NpcContribution::Reset": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4209,6 +4778,7 @@
 "NpcContribution::TotalDamage": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4223,6 +4793,7 @@
 "NpcParty::Remove": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4230,6 +4801,7 @@
 "NpcParty::~NpcParty": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4237,6 +4809,7 @@
 "NpcPartyTimer::TimerExpired": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4244,6 +4817,7 @@
 "NpcPredefinedMoveAction::NpcMoveTypeName": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4265,6 +4839,7 @@
 "OceanicEffect::GetDataSubType": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4272,6 +4847,7 @@
 "OceanicEffect::checkApply": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4279,6 +4855,7 @@
 "OpenQuest::getDaemonUpTimeSec": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4293,6 +4870,7 @@
 "Packet::Allocate [?Allocate@Packet@@QEAAPEBDXZ]": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4335,6 +4913,7 @@
 "Packet::~Packet": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4356,6 +4935,7 @@
 "PacketBuffer::deallocate_me": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4363,6 +4943,7 @@
 "PacketBuffer::encrypt": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4370,6 +4951,7 @@
 "PacketBufferAllocator::allocate": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4384,6 +4966,7 @@
 "PacketBufferPool::deallocate": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4391,6 +4974,7 @@
 "PartyAuction::checkAuth": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4412,6 +4996,7 @@
 "PartyBattleFieldAttractionState::CanTakeAchievementReward": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4419,6 +5004,7 @@
 "PartyBattleFieldAttractionState::CheckToManipulateEnv": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4426,6 +5012,7 @@
 "PartyBattleFieldAttractionState::DisposeFieldItem": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4433,6 +5020,7 @@
 "PartyBattleFieldAttractionState::EnableInfiniteHyperEnergy": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4440,6 +5028,7 @@
 "PartyBattleFieldAttractionState::GetTypeName": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4447,6 +5036,7 @@
 "PartyBattleFieldAttractionState::Leave": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4454,6 +5044,7 @@
 "PartyBattleFieldAttractionState::OnCanceledEnvManipulation": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4461,6 +5052,7 @@
 "PartyBattleFieldAttractionState::OnDamagedEvent": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4468,6 +5060,7 @@
 "PartyBattleFieldAttractionState::OnDead": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4475,6 +5068,7 @@
 "PartyBattleFieldAttractionState::OnEnterFootSwitch": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4482,6 +5076,7 @@
 "PartyBattleFieldAttractionState::OnEnvManipulated": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4489,6 +5084,7 @@
 "PartyBattleFieldAttractionState::TryToManipulateEnv": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4496,6 +5092,7 @@
 "PartyBattleManager::CanTakeAchievementReward": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4517,6 +5114,7 @@
 "PartyBattleSide::GetFirstMemberId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4524,6 +5122,7 @@
 "PartyBattleSide::IncreaseDeathCount": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4531,6 +5130,7 @@
 "PartyBattleSide::IncreaseManipulationCount": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4538,6 +5138,7 @@
 "PartyBattleSide::IncreaseOccupationCount": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4545,6 +5146,7 @@
 "PartyBattleSide::PartyBattleSide": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4552,6 +5154,7 @@
 "PartyBattleSide::~PartyBattleSide": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4559,6 +5162,7 @@
 "PartyMatchMaker::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4566,6 +5170,7 @@
 "PassiveEffect::GetRemainDuration": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4573,6 +5178,7 @@
 "Pc::CalculateStyleScoreBonus": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4580,6 +5186,7 @@
 "Pc::ClearLastComboSkillValue": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4587,6 +5194,7 @@
 "Pc::DeactivateSkillScore": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4594,6 +5202,7 @@
 "Pc::GetActiveSummoned": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4601,6 +5210,7 @@
 "Pc::GetArenaAttraction": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4608,6 +5218,7 @@
 "Pc::GetGameGameMode": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4615,6 +5226,7 @@
 "Pc::GetLastAttackLimitTime": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4622,6 +5234,7 @@
 "Pc::GetLastAttackedLimitTime": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4629,6 +5242,7 @@
 "Pc::GetLastComboExecFirstLimitTime": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4636,6 +5250,7 @@
 "Pc::GetLastComboExecFirstResult": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4643,6 +5258,7 @@
 "Pc::GetLastComboExecLastLimitTime": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4650,6 +5266,7 @@
 "Pc::GetLastComboExecLastResult": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4657,6 +5274,7 @@
 "Pc::GetLastComboFireLimitTime": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4664,6 +5282,7 @@
 "Pc::GetLastComboSkill": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4671,6 +5290,7 @@
 "Pc::GetSkillResultContext": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4678,6 +5298,7 @@
 "Pc::IsExceptHate": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4685,6 +5306,7 @@
 "Pc::IsSharableCombatModeZone": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4692,6 +5314,7 @@
 "Pc::IsTryingInstantPayment": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4699,6 +5322,7 @@
 "Pc::ReturningToArenaLobby": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4706,6 +5330,7 @@
 "Pc::RollbackReturnToArenaLobby": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4713,6 +5338,7 @@
 "Pc::SendAbortCraftFail": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4720,6 +5346,7 @@
 "Pc::SendJoinCraftUnionFail": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4727,6 +5354,7 @@
 "Pc::SendLeaveCraftUnionFail": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4734,6 +5362,7 @@
 "Pc::SendRegisterCraftFail": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4762,6 +5391,7 @@
 "Pc::SendTakeCraftFail": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4776,6 +5406,7 @@
 "Pc::SetCombatModeByTargeted": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4783,6 +5414,7 @@
 "Pc::SetExceptHate": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4790,6 +5422,7 @@
 "Pc::SetGameGameMode": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4797,6 +5430,7 @@
 "Pc::SetLastAttackLimitTime": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4804,6 +5438,7 @@
 "Pc::SetLastAttackedLimitTime": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4811,6 +5446,7 @@
 "Pc::SetLastComboExecFirstLimitTime": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4818,6 +5454,7 @@
 "Pc::SetLastComboExecFirstResult": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4825,6 +5462,7 @@
 "Pc::SetLastComboExecLastLimitTime": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4832,6 +5470,7 @@
 "Pc::SetLastComboExecLastResult": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4839,6 +5478,7 @@
 "Pc::SetLastComboFireLimitTime": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4846,6 +5486,7 @@
 "Pc::SetLastComboSkill": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4853,6 +5494,7 @@
 "PcActionQueue::GetOperation": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4860,6 +5502,7 @@
 "PcContribution::PcContribution": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4867,6 +5510,7 @@
 "PcPublicRaidState::CheckAddScoreCoolTime": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4874,6 +5518,7 @@
 "PcPublicRaidState::GetAddScoreCount": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4881,6 +5526,7 @@
 "PcPublicRaidState::IncrementAddScoreCount": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4888,6 +5534,7 @@
 "PcPublicRaidState::IsEventAttendee": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4895,6 +5542,7 @@
 "PcPublicRaidState::ResetEventAttendee": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4902,6 +5550,7 @@
 "PcPublicRaidState::SetAddScoreCoolTime": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4909,6 +5558,7 @@
 "PcPublicRaidState::SetEventAttendee": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4916,6 +5566,7 @@
 "Petition::Accept": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4923,9 +5574,32 @@
 "Petition::Petition": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
+},
+"PetitionPacketBufferHandler::Decompose [?Decompose@PetitionPacketBufferHandler@@SAGPEBVPacket@@PEBDZZ]": {
+"calls": 40,
+"consts": 0,
+"refs": 0,
+"score": 13.3,
+"status": "DIFF"
+},
+"PetitionPacketBufferHandler::Destroy": {
+"calls": 100,
+"consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"PetitionPacketBufferHandler::ToBuffer": {
+"calls": 100,
+"consts": 0,
+"refs": 100,
+"score": 66.7,
+"status": "DIFF"
 },
 "PetitionSessionHandler::OnAccept": {
 "calls": 100,
@@ -4944,6 +5618,7 @@
 "PickupDeadBodyAction::availableCancel": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4965,6 +5640,7 @@
 "PublicRaid::GetMaxPcCount": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4972,6 +5648,7 @@
 "PublicRaid::GetTypeName": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -4993,6 +5670,7 @@
 "PutdownFieldItemAction::availableCancel": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5000,6 +5678,7 @@
 "QuestJournal::RemoveLeaveZoneRollbackQuestIndex": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5007,6 +5686,7 @@
 "QuestJournal::isScriptableCase": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5014,6 +5694,7 @@
 "QuestJournal::removeAttrationQuest": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5021,6 +5702,7 @@
 "QuestList::FieldDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5028,6 +5710,7 @@
 "QuestList::FieldMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5035,6 +5718,7 @@
 "QuestList::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5042,6 +5726,7 @@
 "QuestList::SyncDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5049,6 +5734,7 @@
 "QuestList::SyncMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5056,6 +5742,7 @@
 "QuestProperty::FieldDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5063,6 +5750,7 @@
 "QuestProperty::FieldMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5070,6 +5758,7 @@
 "QuestProperty::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5077,6 +5766,7 @@
 "QuestProperty::SyncDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5084,6 +5774,7 @@
 "QuestProperty::SyncMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5091,6 +5782,7 @@
 "QuestTableImpl::GetMaxQuestId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5098,6 +5790,7 @@
 "QuestTableImpl::GetMaxQuestNum": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5105,6 +5798,7 @@
 "QuestTableImpl::GetQuest": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5112,6 +5806,7 @@
 "QuestTableImpl::GetQuestByIndex": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5119,6 +5814,15 @@
 "QuestTableImpl::QuestTableImpl": {
 "calls": 100,
 "consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RaidDungeon::GetOccupyingObjectId": {
+"calls": 100,
+"consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5126,6 +5830,7 @@
 "RaidDungeonBindProperty::FieldDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5133,6 +5838,7 @@
 "RaidDungeonBindProperty::FieldMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5140,6 +5846,7 @@
 "RaidDungeonBindProperty::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5147,6 +5854,7 @@
 "RaidDungeonBindProperty::SyncDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5154,6 +5862,31 @@
 "RaidDungeonBindProperty::SyncMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RaidDungeonManager::RaidDungeonManager": {
+"calls": 100,
+"consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RaidDungeonManager::~RaidDungeonManager": {
+"calls": 100,
+"consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"RaidDungeonPropertyContainer::RaidDungeonPropertyContainer": {
+"calls": 100,
+"consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5161,6 +5894,7 @@
 "RaidDungeonUnbindProperty::FieldDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5168,6 +5902,7 @@
 "RaidDungeonUnbindProperty::FieldMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5175,6 +5910,7 @@
 "RaidDungeonUnbindProperty::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5182,6 +5918,7 @@
 "RaidDungeonUnbindProperty::SyncDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5189,6 +5926,7 @@
 "RaidDungeonUnbindProperty::SyncMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5196,6 +5934,7 @@
 "RaidDungeonUnbindProperty::TypeId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5203,6 +5942,7 @@
 "RandomStore::FieldDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5210,6 +5950,7 @@
 "RandomStore::FieldMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5217,6 +5958,7 @@
 "RandomStore::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5224,6 +5966,7 @@
 "RandomStore::SyncDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5231,6 +5974,7 @@
 "RandomStore::SyncMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5238,6 +5982,7 @@
 "RandomStore::TypeId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5245,6 +5990,7 @@
 "RankingChannel::onConnect": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5259,6 +6005,7 @@
 "RankingSeasonInfo::CopySeasonInfo": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5266,6 +6013,7 @@
 "RankingSeasonInfo::~RankingSeasonInfo": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5273,6 +6021,7 @@
 "RankingSeasonManager::GetSeasonContentsSchedule": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5280,6 +6029,7 @@
 "RankingSeasonManager::isClosedSeason": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5287,6 +6037,7 @@
 "RecycleTimeManager::SetGlobalRecycleTime2": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5301,6 +6052,7 @@
 "RecycleTimeProperty::FieldDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5308,6 +6060,7 @@
 "RecycleTimeProperty::FieldMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5315,6 +6068,7 @@
 "RecycleTimeProperty::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5322,6 +6076,7 @@
 "RecycleTimeProperty::SyncDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5329,6 +6084,7 @@
 "RecycleTimeProperty::SyncMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5336,6 +6092,7 @@
 "RefCntHistory::add": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5343,6 +6100,7 @@
 "RefCntHistory::dump": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5350,6 +6108,7 @@
 "RefCntObject::DumpRefCntHistory": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5364,6 +6123,7 @@
 "RefCntObject::deallocate_object": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5385,6 +6145,7 @@
 "RegisterBidTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5406,6 +6167,7 @@
 "RegisterPurchaseTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5413,6 +6175,7 @@
 "RelationalRefCntObject::remove_child": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5420,6 +6183,7 @@
 "RenameCharacterTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5434,6 +6198,7 @@
 "RepairWithCampfireAction::availableCancel": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5441,6 +6206,7 @@
 "RestorationAction::availableCancel": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5448,6 +6214,7 @@
 "RestoreCharacterTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5455,6 +6222,7 @@
 "ReturnSimSkillEffect::checkApply": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5462,6 +6230,7 @@
 "ReturnToArenaLobbyTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5469,6 +6238,7 @@
 "SeasonContentsCombatRecord::FieldDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5476,6 +6246,7 @@
 "SeasonContentsCombatRecord::FieldMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5483,6 +6254,7 @@
 "SeasonContentsCombatRecord::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5490,6 +6262,7 @@
 "SeasonContentsCombatRecord::SyncDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5497,6 +6270,7 @@
 "SeasonContentsCombatRecord::SyncMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5504,6 +6278,7 @@
 "SeasonContentsCombatRecord::TypeId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5511,6 +6286,7 @@
 "SeasonContentsTimeAttackRecord::FieldDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5518,6 +6294,7 @@
 "SeasonContentsTimeAttackRecord::FieldMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5525,6 +6302,7 @@
 "SeasonContentsTimeAttackRecord::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5532,6 +6310,7 @@
 "SeasonContentsTimeAttackRecord::SyncDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5539,6 +6318,7 @@
 "SeasonContentsTimeAttackRecord::SyncMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5546,6 +6326,7 @@
 "SerializerTimer::TimerId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5560,6 +6341,7 @@
 "Session::Send [?Send@Session@@QEBAXPEBDZZ]": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5574,6 +6356,7 @@
 "Session::send": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5588,6 +6371,7 @@
 "SessionSendBuffer::increaseBuffer": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5595,6 +6379,7 @@
 "SessionTran::~SessionTran": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5602,6 +6387,7 @@
 "SetImmuneBreakerEffect::checkApply": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5609,6 +6395,7 @@
 "SkillAction::getDashAngle": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5616,6 +6403,7 @@
 "SkillContainer::FindInPassiveSkills": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5623,6 +6411,7 @@
 "SkillContainer::GetCurrentSkillPageJobStyle": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5630,6 +6419,7 @@
 "SkillContainer::GetSkillPageEnable": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5637,6 +6427,7 @@
 "SkillContainer::isCandidateSkill": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5644,6 +6435,7 @@
 "SkillPage::FieldDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5651,6 +6443,7 @@
 "SkillPage::FieldMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5658,6 +6451,7 @@
 "SkillPage::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5665,6 +6459,7 @@
 "SkillPage::SyncDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5672,6 +6467,7 @@
 "SkillPage::SyncMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5679,6 +6475,7 @@
 "SkillPage::TypeId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5686,6 +6483,7 @@
 "SkillSkinProperty::FieldDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5693,6 +6491,7 @@
 "SkillSkinProperty::FieldMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5700,6 +6499,7 @@
 "SkillSkinProperty::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5707,6 +6507,7 @@
 "SkillSkinProperty::SyncDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5714,6 +6515,7 @@
 "SkillSkinProperty::SyncMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5721,6 +6523,7 @@
 "SkillSkinProperty::TypeId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5728,6 +6531,7 @@
 "SkillTrainingRoom::GetTypeName": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5735,6 +6539,7 @@
 "SlateProperty::FieldDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5742,6 +6547,7 @@
 "SlateProperty::FieldMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5749,6 +6555,7 @@
 "SlateProperty::SyncDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5756,6 +6563,7 @@
 "SlateProperty::SyncMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5763,6 +6571,7 @@
 "SlateProperty::TypeId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5777,6 +6586,7 @@
 "StringBuilderW::AppendFormat": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5784,6 +6594,7 @@
 "StringBuilderW::~StringBuilderW": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5791,6 +6602,7 @@
 "Summoned::FinishCombat": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5798,6 +6610,7 @@
 "Summoned::GetAOEDefendPowerModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5805,6 +6618,7 @@
 "Summoned::GetAbnormalAttackPowerModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5812,6 +6626,7 @@
 "Summoned::GetAbnormalDefendPowerModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5819,6 +6634,7 @@
 "Summoned::GetAttackAttributeModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5826,6 +6642,7 @@
 "Summoned::GetAttackCounterDamageModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5833,6 +6650,7 @@
 "Summoned::GetAttackCriticalDamageModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5840,6 +6658,7 @@
 "Summoned::GetAttackCriticalValueModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5847,6 +6666,7 @@
 "Summoned::GetAttackHitValueModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5854,6 +6674,7 @@
 "Summoned::GetAttackParryPierceModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5861,6 +6682,7 @@
 "Summoned::GetAttackPerfectParryDamageModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5868,6 +6690,7 @@
 "Summoned::GetAttackPierceModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5875,6 +6698,7 @@
 "Summoned::GetAttackStiffDurationValueModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5882,6 +6706,7 @@
 "Summoned::GetCastDurationValueModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5889,6 +6714,7 @@
 "Summoned::GetDefendCounterReduceModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5896,6 +6722,7 @@
 "Summoned::GetDefendCriticalDamageModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5903,6 +6730,7 @@
 "Summoned::GetDefendCriticalValueModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5910,6 +6738,7 @@
 "Summoned::GetDefendDodgeValueModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5917,6 +6746,7 @@
 "Summoned::GetDefendForceValueModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5924,6 +6754,7 @@
 "Summoned::GetDefendParryReduceModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5931,6 +6762,7 @@
 "Summoned::GetDefendParryValueModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5938,6 +6770,7 @@
 "Summoned::GetDefendPerfectParryReduceModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5945,6 +6778,7 @@
 "Summoned::GetDefendPhysicalValueModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5952,6 +6786,7 @@
 "Summoned::GetDefendStiffDurationValueModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5959,6 +6794,7 @@
 "Summoned::GetHatePowerModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5966,6 +6802,7 @@
 "Summoned::GetHealPowerModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5973,6 +6810,7 @@
 "Summoned::GetRAttackAbnormalHitModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5980,6 +6818,7 @@
 "Summoned::GetRAttackAoePierceModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5987,6 +6826,7 @@
 "Summoned::GetRDefendAbnormalDodgeModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -5994,6 +6834,7 @@
 "Summoned::GetRHypermovePowerModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6001,6 +6842,7 @@
 "Summoned::GetRSupportPowerModify": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6008,6 +6850,7 @@
 "Summoned::StartCombat": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6015,6 +6858,7 @@
 "SummonedProperty::FieldDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6022,6 +6866,7 @@
 "SummonedProperty::FieldMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6029,6 +6874,7 @@
 "SummonedProperty::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6036,6 +6882,7 @@
 "SummonedProperty::SyncDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6043,6 +6890,7 @@
 "SummonedProperty::SyncMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6050,6 +6898,7 @@
 "SystemMultiEvent::~SystemMultiEvent": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6064,6 +6913,7 @@
 "TagMatchDuelManager::resetRound": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6071,6 +6921,7 @@
 "TagMatchDuelManager::verifyDuelType": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6078,6 +6929,7 @@
 "TagMatchDuelTeam::ResetRound": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6113,6 +6965,55 @@
 "TargetSkillAction::SucceedTargetInfo": {
 "calls": 100,
 "consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Team::GetPartyChallengePartyAttractionId": {
+"calls": 100,
+"consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Team::GetPartyDifficultyType": {
+"calls": 100,
+"consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Team::GetPartyMemberCount": {
+"calls": 100,
+"consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Team::IsPublishedRecruitArenaDungeonPartyMember": {
+"calls": 100,
+"consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"Team::findEmptyPartyIndex": {
+"calls": 100,
+"consts": 100,
+"exact": true,
+"refs": 100,
+"score": 100.0,
+"status": "MATCH"
+},
+"TeamManager::unlock": {
+"calls": 100,
+"consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6120,6 +7021,7 @@
 "TendencyFieldAttractionState::DisableMoveToArena": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6127,6 +7029,7 @@
 "TendencyFieldAttractionState::DisableMoveToSkillTrainingRoom": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6134,6 +7037,7 @@
 "TendencyFieldAttractionState::DrainTendencyScores": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6141,6 +7045,7 @@
 "TendencyFieldAttractionState::EnableChangeFactionCostume": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6148,6 +7053,7 @@
 "TendencyFieldAttractionState::EnableInfiniteHyperEnergy": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6155,6 +7061,7 @@
 "TendencyFieldAttractionState::EnableSetGuildMeetingPlace": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6162,6 +7069,7 @@
 "TendencyFieldAttractionState::EnableWarpToGuildMember": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6169,6 +7077,7 @@
 "TendencyFieldAttractionState::GetGameType": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6176,6 +7085,7 @@
 "TendencyFieldAttractionState::GetTypeName": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6183,6 +7093,7 @@
 "Thread::stop": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6190,6 +7101,7 @@
 "Thread::yield": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6197,6 +7109,7 @@
 "Thread::~Thread": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6218,6 +7131,7 @@
 "TimeBasedPlaySeasonSchedule::Rule::Rule": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6225,6 +7139,7 @@
 "TransitEffect::GetDataSubType": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6232,6 +7147,7 @@
 "TryRegisterGuildTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6239,6 +7155,7 @@
 "UnsentMileageDepositManager::~UnsentMileageDepositManager": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6246,6 +7163,7 @@
 "UpdateBidTran::GetDefinition": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6260,6 +7178,7 @@
 "User::GetId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6267,6 +7186,7 @@
 "UserTran::~UserTran": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6274,13 +7194,22 @@
 "WarFieldAttractionState::GetTypeName": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
 },
+"WarFieldGroup::getDataKey": {
+"calls": 100,
+"consts": 100,
+"refs": 75,
+"score": 91.7,
+"status": "DIFF"
+},
 "WeaponItem::R_GetRandomEffectGroupId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6288,6 +7217,7 @@
 "WeaponItem::R_GetRandomEffectId": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6295,6 +7225,7 @@
 "WeaponProperty::FieldDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6302,6 +7233,7 @@
 "WeaponProperty::FieldMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6309,6 +7241,7 @@
 "WeaponProperty::Name": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6316,6 +7249,7 @@
 "WeaponProperty::SyncDefine": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6323,6 +7257,7 @@
 "WeaponProperty::SyncMax": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6337,6 +7272,7 @@
 "ZSTD_BtFindBestMatch": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6344,6 +7280,7 @@
 "ZSTD_BtFindBestMatch_extDict": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6351,6 +7288,7 @@
 "ZSTD_BtFindBestMatch_selectMLS": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6358,6 +7296,7 @@
 "ZSTD_BtFindBestMatch_selectMLS_extDict": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6365,6 +7304,7 @@
 "ZSTD_DUBT_findBestMatch": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6379,6 +7319,7 @@
 "ZSTD_HcFindBestMatch_selectMLS": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6435,6 +7376,7 @@
 "ZSTD_compressBlock_doubleFast_extDict": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6463,6 +7405,7 @@
 "ZSTD_compressBlock_fast_extDict": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6519,6 +7462,7 @@
 "ZSTD_count": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6526,6 +7470,7 @@
 "ZSTD_count_2segments": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6533,6 +7478,7 @@
 "ZSTD_downscaleStat": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6540,6 +7486,7 @@
 "ZSTD_hashPtr": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6547,6 +7494,7 @@
 "ZSTD_insertAndFindFirstIndexHash3": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6554,6 +7502,7 @@
 "ZSTD_insertAndFindFirstIndex_internal": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6561,6 +7510,7 @@
 "ZSTD_insertBt1": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6568,6 +7518,7 @@
 "ZSTD_insertDUBT1": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6575,6 +7526,7 @@
 "ZSTD_litLengthContribution": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6582,6 +7534,7 @@
 "ZSTD_readMINMATCH": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6596,6 +7549,7 @@
 "ZSTD_storeSeq": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6603,6 +7557,7 @@
 "ZSTD_updateDUBT": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6610,6 +7565,7 @@
 "ZSTD_updateRep": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6617,6 +7573,7 @@
 "ZSTD_updateStats": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6638,6 +7595,7 @@
 "ZipPackedReaderIO::Next": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6645,6 +7603,7 @@
 "Zone::GetBattleRoyalFieldAttractionState": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6652,6 +7611,7 @@
 "Zone::GetCampfire": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6659,6 +7619,7 @@
 "Zone::GetDuelAttractionState": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6666,6 +7627,7 @@
 "Zone::GetEnterPublicRaidAttractionState": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6673,6 +7635,7 @@
 "Zone::GetFieldItem": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6680,6 +7643,7 @@
 "Zone::GetPartyBattleFieldAttractionState": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6687,6 +7651,7 @@
 "Zone::GetPublicRaid": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6694,6 +7659,7 @@
 "Zone::HandleNpcSpawnEvent": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6701,6 +7667,7 @@
 "ZoneCampfireNode::AddToCube": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6708,6 +7675,7 @@
 "ZoneFieldItemNode::AddToCube": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6715,6 +7683,7 @@
 "ZoneObjectIdList::Clear": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6722,6 +7691,7 @@
 "ZonePerfMonitor::EndZsoTest": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6729,6 +7699,7 @@
 "ZoneSerializedObject::TimerExpired": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6736,6 +7707,7 @@
 "ZoneSerializer::preExecute": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6743,6 +7715,7 @@
 "ZoneWaitingPcList::Find": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6750,6 +7723,7 @@
 "ZoneWaitingPcList::GetCount": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6757,6 +7731,7 @@
 "ZoneWaitingPcList::Initialize": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6764,6 +7739,7 @@
 "_FindPESection": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6771,6 +7747,7 @@
 "_IsNonwritableInCurrentImage": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6778,6 +7755,7 @@
 "_IsNonwritableInCurrentImage$filt$0": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6785,6 +7763,7 @@
 "_ValidateImageBase": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6792,6 +7771,7 @@
 "_matherr": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6799,6 +7779,7 @@
 "_onexit": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6806,6 +7787,7 @@
 "_onexit$fin$0": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6813,6 +7795,7 @@
 "atexit": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6820,6 +7803,7 @@
 "destroy": {
 "calls": 100,
 "consts": 100,
+"exact": false,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6827,6 +7811,7 @@
 "getAngle": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6834,6 +7819,7 @@
 "loadTableWorker": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6841,6 +7827,7 @@
 "md5_init": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6848,6 +7835,7 @@
 "pre_c_init": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6855,6 +7843,7 @@
 "pre_cpp_init": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6862,6 +7851,7 @@
 "randomValue2Amount100": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6869,6 +7859,7 @@
 "swprintf": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
@@ -6876,6 +7867,7 @@
 "wmainCRTStartup": {
 "calls": 100,
 "consts": 100,
+"exact": true,
 "refs": 100,
 "score": 100.0,
 "status": "MATCH"
