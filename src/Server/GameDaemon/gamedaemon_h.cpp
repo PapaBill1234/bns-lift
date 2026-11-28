@@ -16,6 +16,11 @@
 
 // LIFT: the PDB puts GamedInstance in the globals (rva 0xF9DDC0). gamedaemon.cpp defines it in the original. This file holds it until that file is lifted.
 ::GameDaemon * GameDaemon::GamedInstance = nullptr;
+// LIFT: the PDB global that follows GamedInstance (rva 0xF9DDC8). The data-validation log paths count failures here.
+int GameDaemon::DEBUG_CHECKER_MODE_DATAVALIDATION_FAILURE_COUNT = 0;
+// LIFT: PDB globals (rva 0xF9DCEC and 0xF9B1AB). The original file that defines them is not lifted yet.
+int GameDaemon::DEBUG_CHECKER_MODE_DATAVALIDATION_CRASH_COUNT = 0;
+bool GameDaemon::DEBUG_CHECKER_MODE = false;
 
 // 0x27f80
 bool __cdecl GameDaemon::IsArenaDaemon(void)

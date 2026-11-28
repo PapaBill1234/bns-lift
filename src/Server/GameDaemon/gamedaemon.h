@@ -73,6 +73,9 @@ public:
     static wchar_t const * __cdecl GetAddressStringWForLogs(unsigned long);  // 0x343910
 
     static ::GameDaemon * GamedInstance;
+    static int DEBUG_CHECKER_MODE_DATAVALIDATION_FAILURE_COUNT;  // PDB global (rva 0xF9DDC8)
+    static int DEBUG_CHECKER_MODE_DATAVALIDATION_CRASH_COUNT;  // PDB global (rva 0xF9DCEC)
+    static bool DEBUG_CHECKER_MODE;  // PDB global (rva 0xF9B1AB)
     ::RuleConfig * GetRuleConfig(void) { return ruleConfig; }  // PDB inline
 
     // PDB data members (PDB size 0x15378). LIFT: the members after arenaGameChannelEnable (+0x1038 to +0x15378) follow in later waves.

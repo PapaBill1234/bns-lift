@@ -40,9 +40,28 @@ bool __cdecl Data::DataManager::IsValidCombatSeasonContentsType(char)
 }
 
 // 0x6327a0
+#pragma comment(linker, "/INCLUDE:?GetCombatSeasonContentsTypeCount@DataManager@Data@@SAHXZ")  // LIFT: dead-strip keep (no live caller yet)
 int __cdecl Data::DataManager::GetCombatSeasonContentsTypeCount(void)
 {
-    LIFT_STUB(0x6327a0);
+    int count = 0;
+    for (char i = 1; i < 16; ++i)
+    {
+        switch (i)
+        {
+        case 1:
+        case 3:
+        case 4:
+        case 7:
+        case 10:
+        case 11:
+        case 12:
+        case 14:
+        case 15:
+            ++count;
+            break;
+        }
+    }
+    return count;
 }
 
 // 0x632820

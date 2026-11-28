@@ -1,6 +1,7 @@
 // datamanager_cpp_1.cpp: datamanager.cpp part 1 (GameDaemon PDB, 2019 + PDB). Wave 0: stubs only. A stub is not a lift.
 #include "datamanager.h"
 #include "scripttable.h"
+#include "gamedaemon.h"
 #include "LiftStub.h"
 
 // 0x616f60
@@ -167,6 +168,7 @@ void __cdecl Data::SlateRelationCache::addStoneCache(__int64, short, char)
 
 // 0x618710
 __cdecl Data::DataManager::DataManager(::DrDataReader *, ::DrAliasMap *, ::DrElReader *, wchar_t const *)
+    : _badgeSynthesisResultDataPacket(0, "")  // LIFT: stub only. FragmentPacket has no default constructor. The real command and format come with the lift of this constructor.
 {
     LIFT_STUB(0x618710);
 }
@@ -424,15 +426,63 @@ unsigned __int64 __cdecl Data::DataManager::loadZoneNpcSpawn(void)
 }
 
 // 0x62aed0
-bool __cdecl Data::DataManager::addToArenaDungeonZoneIdList(unsigned __int64)
+#pragma comment(linker, "/INCLUDE:?addToArenaDungeonZoneIdList@DataManager@Data@@AEAA_N_K@Z")  // LIFT: dead-strip keep (no live caller yet)
+bool __cdecl Data::DataManager::addToArenaDungeonZoneIdList(unsigned __int64 geoZoneId)
 {
-    LIFT_STUB(0x62aed0);
+    if (_arenaDungeonZoneIdCapacity <= _arenaDungeonZoneIdCount)
+    {
+        _arenaDungeonZoneIds = static_cast<unsigned __int64 *>(Memory::_Manager[1]->ReallocZero(
+            _arenaDungeonZoneIds,
+            8LL * (_arenaDungeonZoneIdCapacity + 128),
+            8LL * _arenaDungeonZoneIdCapacity,
+            L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\..\\Data\\DataManager.cpp",
+            9141));
+        if (_arenaDungeonZoneIds == nullptr)
+        {
+            int capacity = _arenaDungeonZoneIdCapacity;
+            ++GameDaemon::DEBUG_CHECKER_MODE_DATAVALIDATION_FAILURE_COUNT;
+            Instance->WriteDataValidationFailureLog(
+                L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\..\\Data\\DataManager.cpp",
+                9144,
+                L"[data], == DATA VALIDATION FAILURE ==, [datamanager], addToArenaDungeonZoneIdList; allocation failed, geoZoneId:%I64d capacity:%d",
+                geoZoneId,
+                capacity);
+            return false;
+        }
+        _arenaDungeonZoneIdCapacity += 128;
+    }
+    _arenaDungeonZoneIds[_arenaDungeonZoneIdCount++] = geoZoneId;
+    return true;
 }
 
 // 0x62afc0
-bool __cdecl Data::DataManager::addToArenaDuelZoneIdList(unsigned __int64)
+#pragma comment(linker, "/INCLUDE:?addToArenaDuelZoneIdList@DataManager@Data@@AEAA_N_K@Z")  // LIFT: dead-strip keep (no live caller yet)
+bool __cdecl Data::DataManager::addToArenaDuelZoneIdList(unsigned __int64 geoZoneId)
 {
-    LIFT_STUB(0x62afc0);
+    if (_arenaDuelZoneIdCapacity <= _arenaDuelZoneIdCount)
+    {
+        _arenaDuelZoneIds = static_cast<unsigned __int64 *>(Memory::_Manager[1]->ReallocZero(
+            _arenaDuelZoneIds,
+            8LL * (_arenaDuelZoneIdCapacity + 128),
+            8LL * _arenaDuelZoneIdCapacity,
+            L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\..\\Data\\DataManager.cpp",
+            9160));
+        if (_arenaDuelZoneIds == nullptr)
+        {
+            int capacity = _arenaDuelZoneIdCapacity;
+            ++GameDaemon::DEBUG_CHECKER_MODE_DATAVALIDATION_FAILURE_COUNT;
+            Instance->WriteDataValidationFailureLog(
+                L"e:\\dailybuild02\\gamedaemon-common-0.0.348\\depot\\branch\\348nc\\program\\server\\gamedaemon\\..\\Data\\DataManager.cpp",
+                9163,
+                L"[data], == DATA VALIDATION FAILURE ==, [datamanager], addToArenaDuelZoneIdList; allocation failed, geoZoneId:%I64d capacity:%d",
+                geoZoneId,
+                capacity);
+            return false;
+        }
+        _arenaDuelZoneIdCapacity += 128;
+    }
+    _arenaDuelZoneIds[_arenaDuelZoneIdCount++] = geoZoneId;
+    return true;
 }
 
 // 0x62b0b0
@@ -478,15 +528,23 @@ __int64 __cdecl Data::DataManager::GetMasteryExp(char)
 }
 
 // 0x62c300
-::Data::GradeBenefit * __cdecl Data::DataManager::GetGradeBenefitList(int)
+#pragma comment(linker, "/INCLUDE:?GetGradeBenefitList@DataManager@Data@@SAPEAUGradeBenefit@2@H@Z")  // LIFT: dead-strip keep (no live caller yet)
+::Data::GradeBenefit * __cdecl Data::DataManager::GetGradeBenefitList(int gradeKey)
 {
-    LIFT_STUB(0x62c300);
+    ::std::map<int, ::Data::GradeBenefit *, ::std::less<int>, ::StlAllocator< ::std::pair<int, ::Data::GradeBenefit *>, 2> >::iterator it = Instance->_gradeBenefitListMap.find(gradeKey);
+    if (it == Instance->_gradeBenefitListMap.end())
+        return nullptr;
+    return it->second;
 }
 
 // 0x62c370
-char __cdecl Data::DataManager::GetWeaponBrandMaxGemSlotCount(unsigned __int64)
+#pragma comment(linker, "/INCLUDE:?GetWeaponBrandMaxGemSlotCount@DataManager@Data@@SAD_K@Z")  // LIFT: dead-strip keep (no live caller yet)
+char __cdecl Data::DataManager::GetWeaponBrandMaxGemSlotCount(unsigned __int64 brandKey)
 {
-    LIFT_STUB(0x62c370);
+    ::std::map<unsigned __int64, char, ::std::less<unsigned __int64>, ::StlAllocator< ::std::pair<unsigned __int64, char>, 2> >::iterator it = Instance->_weaponBrandMaxGemSlotCountMap.find(brandKey);
+    if (it == Instance->_weaponBrandMaxGemSlotCountMap.end())
+        return -1;
+    return it->second;
 }
 
 // 0x62c3e0
