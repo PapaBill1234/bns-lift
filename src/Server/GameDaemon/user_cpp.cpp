@@ -7,7 +7,6 @@
 #include <time.h>
 #include <wchar.h>
 #include "Channel.h"
-#include "RefCntObject.h"
 #include "Log.h"
 #include "LiftStub.h"
 
@@ -375,19 +374,7 @@ void __cdecl User::resetPc(::RefCntObject *ref1, ::RefCntObject *, ::RefCntObjec
 // 0x3e5700
 void __cdecl User::resetPc(void)
 {
-    Pc *pc = *UserAt<Pc *>(this, USER_pc);
-    if (pc != nullptr)
-    {
-        *UserAt<unsigned __int64>(this, USER_PcId) = 0;
-        *UserAt<Pc *>(this, USER_pc) = nullptr;
-        // LIFT: Pc::_user is at +0x4DE0 and Pc::_pcDbId is at +0x4E10 (PDB). Pc is a RefCntObject.
-        RefCntObject *user = *UserAt<RefCntObject *>(pc, 0x4DE0);
-        *UserAt<void *>(pc, 0x4DE0) = nullptr;
-        *UserAt<unsigned __int64>(pc, 0x4E10) = 0;
-        if (user != nullptr)
-            user->removeReferenceCount(USER_CPP_FILE, 1763);
-        reinterpret_cast<RefCntObject *>(pc)->removeReferenceCount(USER_CPP_FILE, 1765);
-    }
+    LIFT_STUB(0x3e5700);
 }
 
 // 0x3e5770

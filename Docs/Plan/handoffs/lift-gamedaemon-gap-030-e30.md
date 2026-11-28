@@ -1,25 +1,28 @@
-# Handoff: lift-gamedaemon-gap-030-e30 (round 3)
+# Handoff: lift-gamedaemon-gap-030-e30 (round 4)
 
 ## Lifted
 
-32 functions keep a lifted body. The review accepted them in the last run.
+30 functions keep a lifted body. The review accepted them in the last run.
 
 - `pc_cpp_3`: `Pc::isActivatedGrade`, `GetRewardContribution`, `AvailableTurnBack`, `BeginArenaLobbyReservation`, `RollbackArenaLobbyReservation`, `LeaveArenaLobbyOk`, `ReturnToGameByEnterFail`, `GetArenaSessionState`, `checkTeamGuildBattleFieldWithTarget`.
-- `pc_cpp_4`: `Pc::SetTakingAchievementReward`, `IsTakingAchievementReward`, `GetPowerInfoForGameLog`, `HasCraft`, `FetchCraftUnionList`, `clearCraftList`, `IsUsingJumpingCharacter2Ticket`, `ClearTransformItemRetry`, `ClearAttractionReward`, `SendInitializeSeasonContentsRecordFail`, `isAccountExpCharged`.
-- `user_cpp`: `TimeBasedPlayInfoList::~TimeBasedPlayInfoList`, `SetLastCheckTimeUTC`, `GetValidCheckTimeUTC`, `SetData`, `SetDurationForDebug`; `User::SetSession`, `SetPcCafeDebugCode`, `resetPc` (0x3e56f0 and 0x3e5700).
+- `pc_cpp_4`: `Pc::SetTakingAchievementReward`, `IsTakingAchievementReward`, `GetPowerInfoForGameLog`, `HasCraft`, `FetchCraftUnionList`, `IsUsingJumpingCharacter2Ticket`, `ClearTransformItemRetry`, `ClearAttractionReward`, `SendInitializeSeasonContentsRecordFail`, `isAccountExpCharged`.
+- `user_cpp`: `TimeBasedPlayInfoList::~TimeBasedPlayInfoList`, `SetLastCheckTimeUTC`, `GetValidCheckTimeUTC`, `SetData`, `SetDurationForDebug`; `User::SetSession`, `SetPcCafeDebugCode`, `resetPc` thunk (0x3e56f0).
 - `npcspawn_h`: `NpcSpawnInfo::GetAlias`, `GetActDetect`, `GetActSocial`.
 
 ## Notes
 
 - Each lifted leaf with no live caller has a `/INCLUDE` keep pragma with a `// LIFT:` note.
-- The 8 rejected bodies are back to `LIFT_STUB`. Their `/INCLUDE` pragmas are removed.
+- Round 4 repair: the proof failed with R4 `strict_regress` on `RefCntHistory::add`. Two new callers of `RefCntObject::removeReferenceCount` caused it. Those callers are back to `LIFT_STUB`. The `/INCLUDE` pragma of `clearCraftList` is removed. The `#include "RefCntObject.h"` lines are removed from `pc_cpp_4.cpp` and `user_cpp.cpp`.
+- The `User::resetPc` thunk (0x3e56f0) stays lifted. It only jumps to `resetPc(void)` and calls no `removeReferenceCount`. Its `/INCLUDE` pragma stays, because it is the only keep line of that thunk. It now jumps to a `LIFT_STUB` body.
 
 ## Not done
 
-Each function below is a `LIFT_STUB` again. Each goes to a later card.
+Each function below is a `LIFT_STUB`. Each goes to a later card.
 
 | Function | RVA | Reason |
 | --- | --- | --- |
+| `Pc::clearCraftList` | 0x608950 | New caller of RefCntObject::removeReferenceCount; the LTCG code of RefCntHistory::add regresses (R4); a later card. |
+| `User::resetPc` (void) | 0x3e5700 | New caller of RefCntObject::removeReferenceCount; the LTCG code of RefCntHistory::add regresses (R4); a later card. |
 | `Pc::IsInArenaOrArenaLobby` | 0x601020 | Review reject P2_cc (build `jb`, original `jl`). A later card. |
 | `Pc::EnableToRetrieveMyRanking` | 0x607550 | Review reject P2_cc (build `jbe`, original `ja`) and P3_imm. A later card. |
 | `Pc::IsJoinedCraftUnion` | 0x6083a0 | Review reject P2_cc (build `jge`, original `jl`) and P9_ret_width. A later card. |
@@ -35,7 +38,6 @@ The driver builds and runs the gate and funcdiff. The author did not run them.
 
 ## Files changed
 
-- `src/Server/GameDaemon/pc_cpp_3.cpp`
 - `src/Server/GameDaemon/pc_cpp_4.cpp`
 - `src/Server/GameDaemon/user_cpp.cpp`
 - `Docs/Plan/handoffs/lift-gamedaemon-gap-030-e30.md`

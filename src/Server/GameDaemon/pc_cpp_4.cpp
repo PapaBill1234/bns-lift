@@ -9,7 +9,6 @@
 #include "Log.h"
 #include "Memory.h"
 #include "MemoryManager.h"
-#include "RefCntObject.h"
 #include <time.h>
 #include <stdio.h>
 #include <wchar.h>
@@ -19,7 +18,6 @@
 #pragma comment(linker, "/INCLUDE:?IsTakingAchievementReward@Pc@@QEAA_NXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?HasCraft@Pc@@QEAA_ND@Z")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?FetchCraftUnionList@Pc@@QEAAXPEAVFragmentPacket@@@Z")  // LIFT: dead-strip keep (no live caller yet)
-#pragma comment(linker, "/INCLUDE:?clearCraftList@Pc@@AEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?IsUsingJumpingCharacter2Ticket@Pc@@QEAA?B_NXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?ClearTransformItemRetry@Pc@@QEAAXXZ")  // LIFT: dead-strip keep (no live caller yet)
 #pragma comment(linker, "/INCLUDE:?isAccountExpCharged@Pc@@AEAA_N_J_N@Z")  // LIFT: dead-strip keep (no live caller yet)
@@ -481,23 +479,7 @@ bool __cdecl Pc::IsRegisteredCraftRecipe(int recipeId, unsigned __int64 groupAli
 // 0x608950
 void __cdecl Pc::clearCraftList(void)
 {
-    CraftListView *list = PcAt<CraftListView>(this, PC_craftList);
-    AcquireSRWLockExclusive(PcAt<::_RTL_SRWLOCK>(this, PC_craftListLock));
-    char **first = list->_Myfirst;
-    for (char **last = list->_Mylast; first != last; ++first)
-    {
-        if (*first != nullptr)
-            reinterpret_cast<::RefCntObject *>(*first)->removeReferenceCount(PC_CPP_FILE, 19749);
-    }
-    // vector::clear: erase(begin, end).
-    char **mylast = list->_Mylast;
-    char **myfirst = list->_Myfirst;
-    if (myfirst != mylast)
-    {
-        memmove(myfirst, mylast, 0);
-        list->_Mylast = myfirst;
-    }
-    ReleaseSRWLockExclusive(PcAt<::_RTL_SRWLOCK>(this, PC_craftListLock));
+    LIFT_STUB(0x608950);
 }
 
 // 0x608a10
