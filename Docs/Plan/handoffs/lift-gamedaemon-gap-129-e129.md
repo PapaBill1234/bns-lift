@@ -1,4 +1,8 @@
-# Handoff: lift-gamedaemon-gap-129-e129 (round 3)
+# Handoff: lift-gamedaemon-gap-129-e129 (round 4)
+
+Round 4 keeps the 14 accepted bodies as they are. It changes only `AlertSender::Write` (GD stub).
+The scratch directory `.formtest/` is empty. Git does not track an empty directory, so the commit does
+not include it. This session could not delete it (no shell access).
 
 Card: `lift-gamedaemon-e129`. GameDaemon forms of the 4 shared log functions.
 All GameDaemon changes are inside `#if defined(LIFT_EXE_GD)` (or `LIFT_LOG_ADD_MEMBER`, which only
@@ -17,6 +21,7 @@ All GameDaemon changes are inside `#if defined(LIFT_EXE_GD)` (or `LIFT_LOG_ADD_M
 
 | Function | RVA (GD) | Reason |
 | --- | --- | --- |
+| `AlertSender::Write` | 0x686d80 | Review reject (round 2): the arity of the GD `writev2` call is wrong. The original passes 4 arguments and puts the `va_list` in `r9`. The build put it at `[rsp+0x20]` as a 5th argument. Round 4: the GD form is now `LIFT_STUB(0x686d80);` with `__declspec(noinline)`. The source had no GD keep line for it. The other exes keep their form. |
 | `AlertSender::writev2` | 0x686da0 | P3_imm frame size. The original keeps the constant 2 in r15 (one more save slot, `__chkstk` 0x16e0). Formtest of 3 source forms (plain stores, `int` stores, `size_t` helper functions) gives 0x16d0 each time. The GD form is now `LIFT_STUB(0x686da0);` with `__declspec(noinline)` (so LTCG does not put the stub into `AlertSender::Write`). The keep line is removed. The lifted GD form is in the git history of this card (round 2). |
 
 ## Notes for review

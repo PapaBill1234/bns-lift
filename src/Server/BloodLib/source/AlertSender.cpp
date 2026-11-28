@@ -175,6 +175,17 @@ __declspec(noinline) bool AlertSender::createSocket()
 }
 
 // 0x18CD0 (SmartCouponDaemon)
+#if defined(LIFT_EXE_GD)
+// LIFT: GameDaemon 0x686d80 is a stub (card lift-gamedaemon-e129, Not done). The original passes the
+// va_list in r9 as the 4th argument of writev2; the build stored it at [rsp+0x20] as a 5th argument.
+__declspec(noinline) void AlertSender::Write(wchar_t const* file, int line, wchar_t const* format, ...)
+{
+    (void)file;
+    (void)line;
+    (void)format;
+    LIFT_STUB(0x686d80);
+}
+#else
 void AlertSender::Write(wchar_t const* file, int line, wchar_t const* format, ...)
 {
     va_list args;
@@ -182,6 +193,7 @@ void AlertSender::Write(wchar_t const* file, int line, wchar_t const* format, ..
     _alertSender.writev2(file, line, format, args);
     va_end(args);
 }
+#endif
 
 // 0x18CF0 (SmartCouponDaemon)
 // LTCG removed `this`. The code uses _alertSender, that is the same object.
