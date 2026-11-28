@@ -45,6 +45,10 @@ void RefCntObject::operator delete(void* ptr, wchar_t const* file, int line)
 // LIFT: GameDaemon form (0xa870 GD, RefCntObject.h:77). The GD body reads ignoreHistory, and the callers
 // LogBuffer::Acquire (0x69d2e0 GD) and LogMedia::Add (0x69ed80 GD) pass it in edx (lessons A22).
 #if defined(LIFT_EXE_GD)
+// LIFT: card lift-gamedaemon-e129. Each lifted GD caller passes false, so LTCG drops the bool (no edx set at
+// the call). The GD original keeps it (xor edx, edx in LogBuffer::Acquire and LogMedia::Add). The keep line
+// makes the symbol external, so the call keeps the PDB signature with 4 arguments.
+#pragma comment(linker, "/INCLUDE:?addReferenceCount@RefCntObject@@QEAAJ_NPEB_WH@Z")  // LIFT: dead-strip keep (no live caller yet)
 long RefCntObject::addReferenceCount(bool ignoreHistory, wchar_t const* file, int line)
 {
     long ref = _ref;
@@ -198,8 +202,15 @@ void RefCntHistory::dump(RefCntObject* ptr)
         wchar_t timeStr[128];
         swprintf(timeStr, 128, L"%04d/%02d/%02d-%02d:%02d:%02d%s%s", localTm.tm_year + 1900, localTm.tm_mon + 1,
                  localTm.tm_mday, localTm.tm_hour, localTm.tm_min, localTm.tm_sec, L"", L"");
+#if defined(LIFT_EXE_GD)
+        // LIFT: GameDaemon form (0x693db0 GD, lessons A22). The GD body reads _history again after swprintf
+        // and keeps the constant 1 in r15 for LT_DEBUG (formtest: no `mov ecx, 1` in the last Log::Write).
+        RefCntHistoryItem& cur = _history[i];
+#else
+        RefCntHistoryItem& cur = item;
+#endif
         wchar_t const* opName = L"none";
-        switch (item._op)
+        switch (cur._op)
         {
         case RefCntHistory::OP_ADDREF:
             opName = L"addref";
@@ -213,8 +224,8 @@ void RefCntHistory::dump(RefCntObject* ptr)
         Log::Write(Log::LT_DEBUG, L"source\\RefCntObject.cpp", 350,
                    L"[refcnt-history], seq:%d, ptr:0x%p, tag:0x%08x, time:%s, thread-id:%d, idx:%d, op:%s, ref:%d, "
                    L"calc-ref:%d, file:%s, line:%d",
-                   item._seq, ptr, tag, timeStr, item._threadId, i + 1, opName, item._ref, calcRef, fileName,
-                   item._line);
+                   cur._seq, ptr, tag, timeStr, cur._threadId, i + 1, opName, cur._ref, calcRef, fileName,
+                   cur._line);
     }
 }
 

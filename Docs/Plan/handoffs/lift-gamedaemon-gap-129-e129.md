@@ -1,26 +1,28 @@
-# Handoff: lift-gamedaemon-gap-129-e129 (round 1)
+# Handoff: lift-gamedaemon-gap-129-e129 (round 3)
 
 Card: `lift-gamedaemon-e129`. GameDaemon forms of the 4 shared log functions.
 All GameDaemon changes are inside `#if defined(LIFT_EXE_GD)` (or `LIFT_LOG_ADD_MEMBER`, which only
-`Log.cpp` sets for GameDaemon). The other 5 exes keep their source form.
+`Log.cpp` sets for GameDaemon). The other 5 exes keep their source form and object code.
 
 ## Lifted
 
 | Function | RVA (GD) | Change |
 | --- | --- | --- |
-| `Log::Write` (`?Write@Log@@SAXW4Type@1@PEB_WH1ZZ`) | 0x687a10 | GD `Log::Add` (0x687b70) is a private member, not static. `Log.h` declares the member form under `LIFT_LOG_ADD_MEMBER`. `Log::Write` and `Log::WriteV` call `instance->Add(logbuf)` for GD. Keep pragma added. |
-| `LogBuffer::Acquire` | 0x69d2e0 | The body stays the same. The GD `RefCntObject::addReferenceCount` form (already in `RefCntObject.cpp`) gives the 4-argument call. Keep pragma added. |
-| `LogMedia::Add` | 0x69ed80 | The body stays the same, as for `LogBuffer::Acquire`. Keep pragma added. The pragma uses the build name `?Add@LogMedia@@QEAAHPEAVLogBuffer@@@Z` (the shared header declares `Add` public). Round 1 used the PDB name (protected, `IEAA`). That name did not resolve and the GameDaemon link failed. |
-| `AlertSender::writev2` | 0x686da0 | The GD form reads all members through `_alertSender` (LTCG removed `this`). The list test puts the "full" branch first. The tail test puts the empty-list branch first. The log copy size is the int product `2 * logCount`. Keep pragma added. |
-
-## Notes for review
-
-- `AlertSender::writev2`: formtest (VS2010, no /GL) gives the same `jg` branch order and the same block order as the original. The remaining difference is register allocation. The original keeps the constant 2 in r15. That adds one save slot, so the original frame is 0x16e0 and the formtest frame is 0x16d0. The real build uses LTCG and drops `this`, so its register pressure can differ. If review still rejects on P3 (frame size), put the GD form back to `LIFT_STUB(0x686da0);`.
-- The formtest snippet does not stay in the repo.
+| `Log::Write` (`?Write@Log@@SAXW4Type@1@PEB_WH1ZZ`) | 0x687a10 | Accepted in round 2. No change. GD `Log::Add` (0x687b70) is a private member. `Log::Write` and `Log::WriteV` call `instance->Add(logbuf)` for GD. |
+| `LogBuffer::Acquire` | 0x69d2e0 | The body stays the same. Round 3: the GD `RefCntObject::addReferenceCount` (0xa870) gets a GD-only keep line. Each lifted GD caller passes `false`, so LTCG dropped the bool and the call had no `edx`. The keep line makes the symbol external, so LTCG keeps the 4-argument PDB signature (`xor edx, edx`). |
+| `LogMedia::Add` | 0x69ed80 | Same fix as `LogBuffer::Acquire`. |
+| `RefCntHistory::dump` | 0x693db0 | This body is live in GD only since this card (Log::Write keeps the LogBuffer vtable). Round 3: GD form reads `_history[i]` again after `swprintf` (as the GD original). Formtest: the constant 1 stays in r15 and the last `Log::Write` uses `mov ecx, r15d`. The extra `mov ecx, 0x1` is gone. The other exes alias the same item (no code change). |
 
 ## Not done
 
-None.
+| Function | RVA (GD) | Reason |
+| --- | --- | --- |
+| `AlertSender::writev2` | 0x686da0 | P3_imm frame size. The original keeps the constant 2 in r15 (one more save slot, `__chkstk` 0x16e0). Formtest of 3 source forms (plain stores, `int` stores, `size_t` helper functions) gives 0x16d0 each time. The GD form is now `LIFT_STUB(0x686da0);` with `__declspec(noinline)` (so LTCG does not put the stub into `AlertSender::Write`). The keep line is removed. The lifted GD form is in the git history of this card (round 2). |
+
+## Notes for review
+
+- The `addReferenceCount` keep line can change other GD callers of `addReferenceCount`. The GD original passes `edx` at its call sites, so the change moves them toward the original.
+- `RefCntHistory::dump`: formtest has only register name differences left (no `/GL` in formtest).
 
 ## Changed files
 
@@ -29,4 +31,5 @@ None.
 - `src/Server/BloodLib/source/LogBuffer.cpp`
 - `src/Server/BloodLib/source/LogMedia.cpp`
 - `src/Server/BloodLib/source/AlertSender.cpp`
+- `src/Server/BloodLib/source/RefCntObject.cpp`
 - `Docs/Plan/handoffs/lift-gamedaemon-gap-129-e129.md`

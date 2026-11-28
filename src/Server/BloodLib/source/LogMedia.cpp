@@ -16,7 +16,8 @@ wchar_t* LogMedia::GetLastFileName()
 
 // 0x285B0 (SmartCouponDaemon)
 // LIFT: noinline. The original calls it from its only caller Log::Add (CacheGate 0xa2c0) in all 4 exes.
-// GameDaemon 0x69ed80: the same body. The GD addReferenceCount form (RefCntObject.cpp) keeps the bool in edx.
+// GameDaemon 0x69ed80: the same body. The GD addReferenceCount (RefCntObject.cpp) has a keep line, so LTCG
+// keeps its 4-argument signature and this call sets edx = 0 (false).
 #if defined(LIFT_EXE_GD)
 // LIFT: the shared header declares Add public (QEAA). The GameDaemon PDB has it protected (IEAA).
 #pragma comment(linker, "/INCLUDE:?Add@LogMedia@@QEAAHPEAVLogBuffer@@@Z")  // LIFT: dead-strip keep (no live caller yet)
