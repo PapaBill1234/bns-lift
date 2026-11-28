@@ -2,10 +2,12 @@
 #include "logagent.h"
 #include "LiftStub.h"
 
+#pragma comment(linker, "/INCLUDE:??1LogAgent@@UEAA@XZ")  // LIFT: dead-strip keep (no live caller yet)
+
 // 0x6bb190
+// LIFT: the body closes the socket. That is the inlined base destructor ~LogArchiveSession (Close, line 249).
 __cdecl LogAgent::~LogAgent(void)
 {
-    LIFT_STUB(0x6bb190);
 }
 
 // 0x6bb200

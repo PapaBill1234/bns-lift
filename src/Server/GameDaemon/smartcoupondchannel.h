@@ -3,7 +3,8 @@
 #pragma once
 #include "GameDaemonFwd.h"
 
-class SmartCouponSessionHandler
+// PDB: SmartCouponSessionHandler (GameDaemon), size 0x8, base SessionHandler +0.
+class SmartCouponSessionHandler : public SessionHandler
 {
 public:
     virtual bool __cdecl OnAccept(::Session const *) const;  // 0x28030
